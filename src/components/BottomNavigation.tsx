@@ -1,17 +1,32 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Home, Users, MapPin, ShoppingBag, Newspaper } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const BottomNavigation = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState('trending');
 
   const tabs = [
-    { id: 'trending', label: 'Trending', icon: Home },
-    { id: 'players', label: 'Players', icon: Users },
-    { id: 'courses', label: 'Courses', icon: MapPin },
-    { id: 'marketplace', label: 'Buy/Sell', icon: ShoppingBag },
-    { id: 'news', label: 'News', icon: Newspaper },
+    { id: 'trending', label: 'Trending', icon: Home, path: '/' },
+    { id: 'players', label: 'Players', icon: Users, path: '/players' },
+    { id: 'courses', label: 'Courses', icon: MapPin, path: '/courses' },
+    { id: 'marketplace', label: 'Buy/Sell', icon: ShoppingBag, path: '/marketplace' },
+    { id: 'news', label: 'News', icon: Newspaper, path: '/news' },
   ];
+
+  useEffect(() => {
+    const currentTab = tabs.find(tab => tab.path === location.pathname);
+    if (currentTab) {
+      setActiveTab(currentTab.id);
+    }
+  }, [location.pathname]);
+
+  const handleTabClick = (tab: typeof tabs[0]) => {
+    setActiveTab(tab.id);
+    navigate(tab.path);
+  };
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-background border-t border-border z-40">
@@ -24,7 +39,7 @@ const BottomNavigation = () => {
             return (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => handleTabClick(tab)}
                 className={`flex flex-col items-center justify-center space-y-1 transition-colors ${
                   isActive 
                     ? 'text-green-600' 
