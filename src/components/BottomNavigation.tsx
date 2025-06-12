@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import { Home, Users, MapPin, ShoppingBag, Newspaper } from 'lucide-react';
+import { Home, Users, MapPin, Newspaper } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const BottomNavigation = () => {
@@ -12,7 +11,6 @@ const BottomNavigation = () => {
     { id: 'trending', label: 'Trending', icon: Home, path: '/' },
     { id: 'players', label: 'Players', icon: Users, path: '/players' },
     { id: 'courses', label: 'Courses', icon: MapPin, path: '/courses' },
-    { id: 'marketplace', label: 'Buy/Sell', icon: ShoppingBag, path: '/marketplace' },
     { id: 'news', label: 'News', icon: Newspaper, path: '/news' },
   ];
 
