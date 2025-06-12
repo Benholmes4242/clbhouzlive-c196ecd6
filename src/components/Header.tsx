@@ -11,7 +11,7 @@ const Header = () => {
           {/* Logo */}
           <div className="flex items-center space-x-4">
             <div className="text-2xl font-bold text-primary">
-              Golf<span className="text-green-600">Hub</span>
+              Club<span className="text-green-600">house</span>
             </div>
           </div>
 
