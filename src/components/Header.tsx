@@ -11,7 +11,7 @@ const Header = () => {
           {/* Logo */}
           <div className="flex items-center space-x-4">
             <div className="text-2xl font-bold text-primary">
-              Mem<span className="text-amber-600">bers</span>
+              Mem<span className="text-amber-700">bers</span>
             </div>
           </div>
 
@@ -31,7 +31,7 @@ const Header = () => {
           <div className="flex items-center space-x-4">
             <Button variant="ghost" size="icon" className="relative">
               <Bell className="h-5 w-5" />
-              <span className="absolute -top-1 -right-1 bg-amber-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+              <span className="absolute -top-1 -right-1 bg-amber-700 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
             </Button>
             <Button variant="ghost" size="icon">
               <MessageCircle className="h-5 w-5" />
