@@ -1,13 +1,45 @@
 
-import React from 'react';
-import { Play, Heart, MessageCircle, Share, MoreHorizontal } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Play, Heart, MessageCircle, Share, MoreHorizontal, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { supabase } from '@/integrations/supabase/client';
+
+interface VideoPost {
+  id: string;
+  type: 'youtube' | 'friend' | 'post';
+  user: {
+    name: string;
+    username: string;
+    avatar: string;
+    verified: boolean;
+  };
+  content: {
+    type: 'video' | 'image';
+    description: string;
+    thumbnail?: string;
+    image?: string;
+    duration?: string;
+    videoUrl?: string;
+    youtubeId?: string;
+  };
+  stats: {
+    likes: number;
+    comments: number;
+    shares: number;
+  };
+  timeAgo: string;
+}
 
 const TrendingFeed = () => {
-  const posts = [
+  const [posts, setPosts] = useState<VideoPost[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Static posts for now (original content)
+  const staticPosts: VideoPost[] = [
     {
-      id: 1,
+      id: '1',
+      type: 'post',
       user: {
         name: 'Tiger Woods',
         username: '@tigerwoods',
@@ -28,7 +60,8 @@ const TrendingFeed = () => {
       timeAgo: '2h',
     },
     {
-      id: 2,
+      id: '2',
+      type: 'post',
       user: {
         name: 'Golf Digest',
         username: '@golfdigest',
@@ -47,28 +80,88 @@ const TrendingFeed = () => {
       },
       timeAgo: '4h',
     },
-    {
-      id: 3,
-      user: {
-        name: 'Amateur Golfer UK',
-        username: '@amateurgolferuk',
-        avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
-        verified: false,
-      },
-      content: {
-        type: 'video',
-        description: 'Finally broke 80! Here\'s the shot that sealed it 🎯',
-        thumbnail: 'https://images.unsplash.com/photo-1587174486073-ae5e5cec4674?w=600&h=400&fit=crop',
-        duration: '1:20',
-      },
-      stats: {
-        likes: 2400,
-        comments: 89,
-        shares: 45,
-      },
-      timeAgo: '6h',
-    },
   ];
+
+  const fetchYouTubeVideos = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('fetch-youtube-videos');
+      
+      if (error) {
+        console.error('Error fetching YouTube videos:', error);
+        return [];
+      }
+      
+      return data?.videos || [];
+    } catch (error) {
+      console.error('Error calling YouTube function:', error);
+      return [];
+    }
+  };
+
+  const fetchFriendVideos = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('fetch-friend-videos');
+      
+      if (error) {
+        console.error('Error fetching friend videos:', error);
+        return [];
+      }
+      
+      return data?.videos || [];
+    } catch (error) {
+      console.error('Error calling friend videos function:', error);
+      return [];
+    }
+  };
+
+  useEffect(() => {
+    const loadContent = async () => {
+      setLoading(true);
+      
+      // Fetch YouTube and friend videos in parallel
+      const [youtubeVideos, friendVideos] = await Promise.all([
+        fetchYouTubeVideos(),
+        fetchFriendVideos()
+      ]);
+      
+      // Combine all posts and sort by recency
+      const allPosts = [...staticPosts, ...youtubeVideos, ...friendVideos];
+      setPosts(allPosts);
+      setLoading(false);
+    };
+
+    loadContent();
+  }, []);
+
+  const handleVideoClick = (post: VideoPost) => {
+    if (post.content.youtubeId) {
+      window.open(`https://www.youtube.com/watch?v=${post.content.youtubeId}`, '_blank');
+    } else if (post.content.videoUrl) {
+      window.open(post.content.videoUrl, '_blank');
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="space-y-6 pb-20">
+        {[1, 2, 3].map((i) => (
+          <Card key={i} className="border-0 shadow-sm animate-pulse">
+            <div className="p-4">
+              <div className="flex items-center space-x-3 mb-3">
+                <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
+                <div className="space-y-1">
+                  <div className="h-4 bg-gray-200 rounded w-24"></div>
+                  <div className="h-3 bg-gray-200 rounded w-32"></div>
+                </div>
+              </div>
+              <div className="h-4 bg-gray-200 rounded mb-3"></div>
+              <div className="h-80 bg-gray-200 rounded"></div>
+            </div>
+          </Card>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 pb-20">
@@ -91,6 +184,12 @@ const TrendingFeed = () => {
                         <div className="w-2 h-2 bg-white rounded-full" />
                       </div>
                     )}
+                    {post.type === 'youtube' && (
+                      <span className="text-xs bg-red-500 text-white px-2 py-0.5 rounded">YouTube</span>
+                    )}
+                    {post.type === 'friend' && (
+                      <span className="text-xs bg-blue-500 text-white px-2 py-0.5 rounded">Friend</span>
+                    )}
                   </div>
                   <span className="text-xs text-muted-foreground">{post.user.username} • {post.timeAgo}</span>
                 </div>
@@ -105,20 +204,30 @@ const TrendingFeed = () => {
             
             <div className="relative rounded-lg overflow-hidden mb-3">
               {post.content.type === 'video' ? (
-                <div className="relative">
+                <div 
+                  className="relative cursor-pointer group"
+                  onClick={() => handleVideoClick(post)}
+                >
                   <img
                     src={post.content.thumbnail}
                     alt="Video thumbnail"
                     className="w-full h-80 object-cover"
                   />
-                  <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                    <div className="bg-white/90 rounded-full p-3">
+                  <div className="absolute inset-0 bg-black/20 flex items-center justify-center group-hover:bg-black/30 transition-all">
+                    <div className="bg-white/90 rounded-full p-3 group-hover:scale-110 transition-transform">
                       <Play className="h-6 w-6 text-green-600 fill-current" />
                     </div>
                   </div>
-                  <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
-                    {post.content.duration}
-                  </div>
+                  {post.content.duration && (
+                    <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
+                      {post.content.duration}
+                    </div>
+                  )}
+                  {(post.type === 'youtube' || post.content.videoUrl) && (
+                    <div className="absolute top-2 right-2 bg-black/70 text-white p-1 rounded">
+                      <ExternalLink className="h-4 w-4" />
+                    </div>
+                  )}
                 </div>
               ) : (
                 <img
