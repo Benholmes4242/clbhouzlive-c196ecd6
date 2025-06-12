@@ -1,5 +1,6 @@
 import React from 'react';
 import { Plus } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const StoryBar = () => {
   const stories = [
@@ -43,9 +44,11 @@ const StoryBar = () => {
             <div key={story.id} className="flex flex-col items-center space-y-1 min-w-0">
               <div className="relative">
                 {story.type === 'add' ? (
-                  <div className="w-16 h-16 bg-muted border-2 border-dashed border-green-600 rounded-full flex items-center justify-center">
-                    <Plus className="h-6 w-6 text-green-600" />
-                  </div>
+                  <Link to="/create-profile">
+                    <div className="w-16 h-16 bg-muted border-2 border-dashed border-amber-700 rounded-full flex items-center justify-center hover:bg-muted/80 transition-colors">
+                      <Plus className="h-6 w-6 text-amber-700" />
+                    </div>
+                  </Link>
                 ) : (
                   <div className={`w-16 h-16 rounded-full p-0.5 ${story.hasStory ? 'bg-gradient-to-tr from-green-500 to-green-700' : ''}`}>
                     <img
