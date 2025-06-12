@@ -31,10 +31,70 @@ async function parseRSSFeed(url: string, source: string): Promise<NewsArticle[]>
         const link = item.match(/<link[^>]*>([\s\S]*?)<\/link>/i)?.[1]?.trim()
         const pubDate = item.match(/<pubDate[^>]*>([\s\S]*?)<\/pubDate>/i)?.[1]?.trim()
         
-        // Try to extract image from media:content or enclosure
-        let imageUrl = item.match(/<media:content[^>]*url="([^"]*)"[^>]*>/i)?.[1]
+        // Enhanced image extraction with multiple fallback methods
+        let imageUrl = null
+        
+        // Method 1: Try media:content (most common)
+        imageUrl = item.match(/<media:content[^>]*url="([^"]*)"[^>]*>/i)?.[1]
+        
+        // Method 2: Try media:thumbnail
         if (!imageUrl) {
-          imageUrl = item.match(/<enclosure[^>]*url="([^"]*)"[^>]*type="image/i)?.[1]
+          imageUrl = item.match(/<media:thumbnail[^>]*url="([^"]*)"[^>]*>/i)?.[1]
+        }
+        
+        // Method 3: Try enclosure with image type
+        if (!imageUrl) {
+          imageUrl = item.match(/<enclosure[^>]*url="([^"]*)"[^>]*type="image[^"]*"[^>]*>/i)?.[1]
+        }
+        
+        // Method 4: Try content:encoded and look for img tags
+        if (!imageUrl) {
+          const contentEncoded = item.match(/<content:encoded[^>]*>([\s\S]*?)<\/content:encoded>/i)?.[1]
+          if (contentEncoded) {
+            const imgMatch = contentEncoded.match(/<img[^>]*src="([^"]*)"[^>]*>/i)
+            if (imgMatch) {
+              imageUrl = imgMatch[1].replace(/&amp;/g, '&')
+            }
+          }
+        }
+        
+        // Method 5: Look for img tags in description
+        if (!imageUrl) {
+          const imgInDesc = description?.match(/<img[^>]*src="([^"]*)"[^>]*>/i)
+          if (imgInDesc) {
+            imageUrl = imgInDesc[1].replace(/&amp;/g, '&')
+          }
+        }
+        
+        // Method 6: Try to find image URLs in CDATA sections
+        if (!imageUrl) {
+          const cdataMatches = item.match(/<!\[CDATA\[([\s\S]*?)\]\]>/gi)
+          if (cdataMatches) {
+            for (const cdata of cdataMatches) {
+              const imgMatch = cdata.match(/<img[^>]*src="([^"]*)"[^>]*>/i)
+              if (imgMatch) {
+                imageUrl = imgMatch[1].replace(/&amp;/g, '&')
+                break
+              }
+            }
+          }
+        }
+        
+        // Method 7: Try itunes:image for some feeds
+        if (!imageUrl) {
+          imageUrl = item.match(/<itunes:image[^>]*href="([^"]*)"[^>]*>/i)?.[1]
+        }
+        
+        // Clean up the image URL if found
+        if (imageUrl) {
+          // Remove any HTML entities
+          imageUrl = imageUrl.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+          
+          // Ensure it's a valid image URL (basic validation)
+          if (!imageUrl.match(/\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i) && !imageUrl.includes('unsplash') && !imageUrl.includes('imgur')) {
+            // If it doesn't look like an image, skip it
+            imageUrl = null
+          }
         }
         
         if (title && link) {
@@ -85,6 +145,10 @@ Deno.serve(async (req) => {
       const articles = await parseRSSFeed(feed.url, feed.source)
       allArticles.push(...articles)
       console.log(`Found ${articles.length} articles from ${feed.source}`)
+      
+      // Log image extraction results for debugging
+      const articlesWithImages = articles.filter(a => a.image_url)
+      console.log(`${articlesWithImages.length} articles have images from ${feed.source}`)
     }
 
     if (allArticles.length > 0) {
@@ -101,12 +165,17 @@ Deno.serve(async (req) => {
       }
 
       console.log(`Successfully inserted ${allArticles.length} articles`)
+      
+      // Log how many articles have images
+      const withImages = allArticles.filter(a => a.image_url).length
+      console.log(`${withImages} articles have images out of ${allArticles.length} total`)
     }
 
     return new Response(
       JSON.stringify({ 
         success: true, 
         articlesCount: allArticles.length,
+        articlesWithImages: allArticles.filter(a => a.image_url).length,
         message: `Fetched ${allArticles.length} articles from golf news sources`
       }),
       { 
