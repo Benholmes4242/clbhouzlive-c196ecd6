@@ -36,14 +36,14 @@ const CourseExplorer = () => {
       let query = supabase
         .from('golf_courses')
         .select('*')
-        .order('global_rank', { ascending: true, nullsLast: true });
+        .order('global_rank', { ascending: true, nullsFirst: false });
 
       if (searchTerm) {
         query = query.or(`name.ilike.%${searchTerm}%,country.ilike.%${searchTerm}%,region.ilike.%${searchTerm}%`);
       }
 
       if (selectedContinent) {
-        query = query.eq('continent', selectedContinent);
+        query = query.eq('continent', selectedContinent as any);
       }
 
       if (selectedCountry) {
@@ -69,7 +69,7 @@ const CourseExplorer = () => {
         .order('country');
 
       if (selectedContinent) {
-        query = query.eq('continent', selectedContinent);
+        query = query.eq('continent', selectedContinent as any);
       }
 
       const { data, error } = await query;

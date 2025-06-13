@@ -50,7 +50,7 @@ const Top100Courses = () => {
       const { data, error } = await supabase
         .from('golf_courses')
         .select('*')
-        .eq('continent', selectedRegion)
+        .eq('continent', selectedRegion as any)
         .not('regional_rank', 'is', null)
         .lte('regional_rank', 100)
         .order('regional_rank', { ascending: true });

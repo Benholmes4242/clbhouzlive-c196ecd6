@@ -21,7 +21,7 @@ const CourseMapView = () => {
         .select('*')
         .not('latitude', 'is', null)
         .not('longitude', 'is', null)
-        .order('global_rank', { ascending: true, nullsLast: true });
+        .order('global_rank', { ascending: true, nullsFirst: false });
 
       if (searchTerm) {
         query = query.or(`name.ilike.%${searchTerm}%,country.ilike.%${searchTerm}%`);

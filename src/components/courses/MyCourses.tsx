@@ -33,17 +33,19 @@ interface UserCourse {
 }
 
 const MyCourses = () => {
-  const { data: { user } } = useQuery({
+  const { data: userResponse } = useQuery({
     queryKey: ['current-user'],
     queryFn: async () => {
       return await supabase.auth.getUser();
     },
   });
 
+  const user = userResponse?.data?.user;
+
   const { data: userCourses, isLoading } = useQuery({
     queryKey: ['my-courses'],
     queryFn: async () => {
-      if (!user?.user) return [];
+      if (!user) return [];
 
       const { data, error } = await supabase
         .from('user_courses')
@@ -51,19 +53,19 @@ const MyCourses = () => {
           *,
           golf_courses (*)
         `)
-        .eq('user_id', user.user.id)
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
       return data as UserCourse[];
     },
-    enabled: !!user?.user,
+    enabled: !!user,
   });
 
   const { data: top100Stats } = useQuery({
     queryKey: ['top100-stats'],
     queryFn: async () => {
-      if (!user?.user) return { total: 0, played: 0 };
+      if (!user) return { total: 0, played: 0 };
 
       // Get total Top 100 courses
       const { count: totalTop100 } = await supabase
@@ -78,7 +80,7 @@ const MyCourses = () => {
         .select(`
           golf_courses!inner(global_rank)
         `, { count: 'exact', head: true })
-        .eq('user_id', user.user.id)
+        .eq('user_id', user.id)
         .eq('played', true)
         .not('golf_courses.global_rank', 'is', null)
         .lte('golf_courses.global_rank', 100);
@@ -88,10 +90,10 @@ const MyCourses = () => {
         played: playedTop100 || 0,
       };
     },
-    enabled: !!user?.user,
+    enabled: !!user,
   });
 
-  if (!user?.user) {
+  if (!user) {
     return (
       <Card>
         <CardContent className="p-8 text-center">
