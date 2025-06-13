@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -86,8 +85,8 @@ const News = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Golf News</h1>
+      <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-between gap-4">
+        <h1 className="text-3xl font-bold text-center sm:text-left">Golf News</h1>
         <Button onClick={fetchLatestNews} variant="outline" size="sm">
           <RefreshCw className="h-4 w-4 mr-2" />
           Refresh News
@@ -97,14 +96,14 @@ const News = () => {
       {isLoading ? (
         <div className="space-y-4">
           {[1, 2, 3, 4, 5].map((i) => (
-            <Card key={i}>
+            <Card key={i} className="max-w-4xl mx-auto">
               <CardHeader>
-                <Skeleton className="h-6 w-3/4" />
-                <Skeleton className="h-4 w-1/2" />
+                <Skeleton className="h-6 w-3/4 mx-auto" />
+                <Skeleton className="h-4 w-1/2 mx-auto" />
               </CardHeader>
               <CardContent>
-                <div className="flex space-x-4">
-                  <Skeleton className="h-24 w-32 rounded-lg flex-shrink-0" />
+                <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                  <Skeleton className="h-24 w-full sm:w-32 rounded-lg flex-shrink-0 mx-auto sm:mx-0" />
                   <Skeleton className="h-20 w-full" />
                 </div>
               </CardContent>
@@ -114,11 +113,11 @@ const News = () => {
       ) : articles && articles.length > 0 ? (
         <div className="space-y-4">
           {articles.map((article) => (
-            <Card key={article.id} className="hover:shadow-lg transition-shadow">
+            <Card key={article.id} className="hover:shadow-lg transition-shadow max-w-4xl mx-auto">
               <CardContent className="p-6">
-                <div className="flex space-x-4">
-                  <div className="flex-shrink-0">
-                    <div className="w-32 h-24 bg-muted rounded-lg overflow-hidden">
+                <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                  <div className="flex-shrink-0 mx-auto sm:mx-0">
+                    <div className="w-full sm:w-32 h-24 bg-muted rounded-lg overflow-hidden">
                       {article.image_url ? (
                         <img
                           src={article.image_url}
@@ -139,14 +138,14 @@ const News = () => {
                     </div>
                   </div>
                   
-                  <div className="flex-1 min-w-0">
+                  <div className="flex-1 min-w-0 text-center sm:text-left">
                     <div className="mb-2">
                       <CardTitle className="text-lg mb-2 line-clamp-2 leading-tight">
                         {article.title}
                       </CardTitle>
-                      <div className="flex items-center text-sm text-muted-foreground space-x-2">
+                      <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-start text-sm text-muted-foreground space-y-1 sm:space-y-0 sm:space-x-2">
                         <span className="font-medium text-green-600">{article.source}</span>
-                        <span>•</span>
+                        <span className="hidden sm:inline">•</span>
                         <span>{formatDate(article.pub_date)}</span>
                       </div>
                     </div>
@@ -155,17 +154,19 @@ const News = () => {
                       {article.description}
                     </p>
                     
-                    <Button asChild variant="outline" size="sm">
-                      <a
-                        href={article.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center"
-                      >
-                        Read More
-                        <ExternalLink className="h-3 w-3 ml-2" />
-                      </a>
-                    </Button>
+                    <div className="flex justify-center sm:justify-start">
+                      <Button asChild variant="outline" size="sm">
+                        <a
+                          href={article.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center"
+                        >
+                          Read More
+                          <ExternalLink className="h-3 w-3 ml-2" />
+                        </a>
+                      </Button>
+                    </div>
                   </div>
                 </div>
               </CardContent>
