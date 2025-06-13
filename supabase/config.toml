@@ -3,3 +3,6 @@ project_id = "ybxkehyomcakqjvuhnna"
 
 [functions.fetch-news]
 verify_jwt = false
+
+[functions.scrape-golf-courses]
+verify_jwt = false
