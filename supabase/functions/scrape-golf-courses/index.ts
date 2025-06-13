@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -41,6 +40,7 @@ serve(async (req) => {
 
     const firecrawlApiKey = Deno.env.get('FIRECRAWL_API_KEY');
     if (!firecrawlApiKey) {
+      console.error('Firecrawl API key not found in environment variables');
       return new Response(
         JSON.stringify({ error: 'Firecrawl API key not configured' }),
         { 
@@ -51,6 +51,7 @@ serve(async (req) => {
     }
 
     console.log('Starting to scrape URL:', url);
+    console.log('Using Firecrawl API key:', firecrawlApiKey.substring(0, 10) + '...');
 
     // Use Firecrawl to scrape the website
     const firecrawlResponse = await fetch('https://api.firecrawl.dev/v0/scrape', {
@@ -66,19 +67,47 @@ serve(async (req) => {
       }),
     });
 
+    console.log('Firecrawl response status:', firecrawlResponse.status);
+    console.log('Firecrawl response headers:', Object.fromEntries(firecrawlResponse.headers.entries()));
+
     if (!firecrawlResponse.ok) {
       const errorText = await firecrawlResponse.text();
-      console.error('Firecrawl API error:', errorText);
-      return new Response(
-        JSON.stringify({ error: 'Failed to scrape website' }),
-        { 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 500
-        }
-      );
+      console.error('Firecrawl API error response:', errorText);
+      console.error('Firecrawl API status:', firecrawlResponse.status);
+      console.error('Firecrawl API status text:', firecrawlResponse.statusText);
+      
+      // Try to parse error as JSON for more details
+      try {
+        const errorJson = JSON.parse(errorText);
+        console.error('Firecrawl API error details:', errorJson);
+        return new Response(
+          JSON.stringify({ 
+            error: errorJson.error || errorJson.message || 'Failed to scrape website',
+            details: errorJson,
+            status: firecrawlResponse.status 
+          }),
+          { 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 500
+          }
+        );
+      } catch (parseError) {
+        return new Response(
+          JSON.stringify({ 
+            error: 'Failed to scrape website', 
+            details: errorText,
+            status: firecrawlResponse.status 
+          }),
+          { 
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            status: 500
+          }
+        );
+      }
     }
 
     const scrapedData: FirecrawlResponse = await firecrawlResponse.json();
+    console.log('Firecrawl response data:', JSON.stringify(scrapedData, null, 2));
     
     if (!scrapedData.success) {
       console.error('Firecrawl scraping failed:', scrapedData.error);
@@ -93,8 +122,11 @@ serve(async (req) => {
 
     // Parse golf course data from the scraped content
     const courses = parseGolfCourseData(scrapedData.data?.[0]?.markdown || '');
+    console.log('Parsed courses:', courses.length);
     
     if (courses.length === 0) {
+      console.log('No golf courses found in scraped content');
+      console.log('Scraped markdown preview:', scrapedData.data?.[0]?.markdown?.substring(0, 500));
       return new Response(
         JSON.stringify({ error: 'No golf courses found in the scraped data' }),
         { 
@@ -157,7 +189,10 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in scrape-golf-courses function:', error);
     return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
+      JSON.stringify({ 
+        error: 'Internal server error',
+        details: error.message 
+      }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500
