@@ -9,6 +9,60 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      golf_courses: {
+        Row: {
+          continent: Database["public"]["Enums"]["continent"]
+          country: string
+          created_at: string
+          description: string | null
+          global_rank: number | null
+          id: string
+          latitude: number | null
+          longitude: number | null
+          name: string
+          region: string | null
+          regional_rank: number | null
+          thumbnail_image: string | null
+          top100_url: string | null
+          updated_at: string
+          website_url: string | null
+        }
+        Insert: {
+          continent: Database["public"]["Enums"]["continent"]
+          country: string
+          created_at?: string
+          description?: string | null
+          global_rank?: number | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name: string
+          region?: string | null
+          regional_rank?: number | null
+          thumbnail_image?: string | null
+          top100_url?: string | null
+          updated_at?: string
+          website_url?: string | null
+        }
+        Update: {
+          continent?: Database["public"]["Enums"]["continent"]
+          country?: string
+          created_at?: string
+          description?: string | null
+          global_rank?: number | null
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          name?: string
+          region?: string | null
+          regional_rank?: number | null
+          thumbnail_image?: string | null
+          top100_url?: string | null
+          updated_at?: string
+          website_url?: string | null
+        }
+        Relationships: []
+      }
       news_articles: {
         Row: {
           created_at: string
@@ -45,6 +99,53 @@ export type Database = {
         }
         Relationships: []
       }
+      user_courses: {
+        Row: {
+          course_id: string
+          created_at: string
+          id: string
+          notes: string | null
+          photo_url: string | null
+          played: boolean | null
+          played_date: string | null
+          rating: number | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          photo_url?: string | null
+          played?: boolean | null
+          played_date?: string | null
+          rating?: number | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          photo_url?: string | null
+          played?: boolean | null
+          played_date?: string | null
+          rating?: number | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_courses_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -53,7 +154,13 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      continent:
+        | "North America"
+        | "South America"
+        | "Europe"
+        | "Asia"
+        | "Africa"
+        | "Oceania"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -168,6 +275,15 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      continent: [
+        "North America",
+        "South America",
+        "Europe",
+        "Asia",
+        "Africa",
+        "Oceania",
+      ],
+    },
   },
 } as const
