@@ -25,11 +25,10 @@ const Header = () => {
             <img
               src="/lovable-uploads/51e72efc-b6f0-4596-a139-348c49c1168e.png"
               alt="Members Logo"
-              // maximize logo height, leaving a slightly larger gap (8px instead of 4px)
               className="w-auto"
               style={{
                 display: "block",
-                maxHeight: "calc(100% - 8px)", // 4px gap on top and bottom
+                maxHeight: "36px", // reduced from previous size (was likely larger)
                 maxWidth: 240,
                 objectFit: "contain"
               }}
