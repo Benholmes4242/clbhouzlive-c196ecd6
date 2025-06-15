@@ -120,14 +120,17 @@ const ProfilePage = () => {
     );
   }
 
-  // Render with mock/placeholder data if not logged in
+  // Always allow editing on your own profile (there's no other profile viewer state for now)
+  const canEditAvatar = !!user; // Adjust: true if this is your profile
+
   return (
     <div className="min-h-screen bg-background pb-28 max-w-2xl mx-auto px-4">
       <ProfileHeader
         photoPreview={photoPreview}
-        profilePhotoUrl={profile?.profile_photo_url ?? ''}
+        profilePhotoUrl={profile?.profile_photo_url ?? ""}
         uploading={uploading}
         handlePhotoUpload={handlePhotoUpload}
+        canEdit={canEditAvatar}
       />
       <HomeClubSection
         editingClub={editingClub}

@@ -1,14 +1,12 @@
 
-import React from "react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
+import React, { useRef } from "react";
 
 interface ProfileHeaderProps {
   photoPreview: string | null;
   profilePhotoUrl: string | null;
   uploading: boolean;
   handlePhotoUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  canEdit?: boolean;
 }
 
 const UserPlaceholderIcon = () => (
@@ -29,15 +27,49 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   photoPreview,
   profilePhotoUrl,
   uploading,
-  handlePhotoUpload
+  handlePhotoUpload,
+  canEdit = false,
 }) => {
   const hasPhoto = !!photoPreview || !!profilePhotoUrl;
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Trick: allow selecting the same file again by resetting file input after use
+  const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    handlePhotoUpload(event);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ""; // reset file input so re-uploading same file triggers change
+    }
+  };
+
+  // When editable, clicking the avatar triggers the file picker
+  const handleAvatarClick = () => {
+    if (canEdit && !uploading) {
+      fileInputRef.current?.click();
+    }
+  };
 
   return (
     <div className="flex flex-col items-center gap-3 pt-8">
-      <div className="relative shadow-xl">
-        {/* Always provide a soft gray background and border behind the avatar */}
-        <div className="w-40 h-40 md:w-52 md:h-52 rounded-full border-4 border-green-700 overflow-hidden bg-[#ececec] flex items-center justify-center object-cover transition-all relative">
+      <div
+        className={`
+          relative shadow-xl
+          ${canEdit ? "cursor-pointer group focus-within:ring-2 focus-within:ring-green-600" : ""}
+        `}
+        tabIndex={canEdit ? 0 : -1}
+        onClick={handleAvatarClick}
+        onKeyDown={e => {
+          if (canEdit && (e.key === "Enter" || e.key === " ")) handleAvatarClick();
+        }}
+        aria-label={canEdit ? "Change profile photo" : "Profile photo"}
+        role={canEdit ? "button" : undefined}
+      >
+        {/* Avatar circle with consistent gray background */}
+        <div
+          className={
+            `w-40 h-40 md:w-52 md:h-52 rounded-full border-4 border-green-700 overflow-hidden bg-[#ececec] flex items-center justify-center object-cover transition-all relative duration-200` +
+            (canEdit ? " group-hover:ring-4 group-hover:ring-green-500 group-hover:ring-offset-2" : "")
+          }
+        >
           {hasPhoto ? (
             // Avatar image, always fills the circle with object-cover
             <img
@@ -50,20 +82,28 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           ) : (
             <UserPlaceholderIcon />
           )}
+          {/* When editable: show a dim overlay + "Change" label on hover */}
+          {canEdit && (
+            <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+              <span className="bg-white/80 text-green-900 text-xs px-3 py-1 rounded-full font-medium shadow">
+                Change photo
+              </span>
+            </div>
+          )}
         </div>
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handlePhotoUpload}
-          className="absolute bottom-2 right-2 w-10 h-10 opacity-0 cursor-pointer"
-          disabled={uploading}
-        />
-        <div className="absolute bottom-2 right-2 bg-green-700 text-white p-2 rounded-full shadow hover:bg-green-800 transition-colors pointer-events-none">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <path d="M13.7 9.35A3.35 3.35 0 1 1 7 9.35a3.35 3.35 0 0 1 6.7 0Z" stroke="white" strokeWidth="1.7"/>
-            <rect x="2.25" y="4.25" width="15.5" height="13.5" rx="2.5" stroke="white" strokeWidth="1.7"/>
-          </svg>
-        </div>
+        {/* Hidden input covers avatar when editing */}
+        {canEdit && (
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            onChange={onFileChange}
+            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+            disabled={uploading}
+            tabIndex={-1}
+            aria-label="Upload profile photo"
+          />
+        )}
       </div>
     </div>
   );
