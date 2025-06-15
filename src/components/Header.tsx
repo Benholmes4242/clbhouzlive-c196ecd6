@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Search, Bell, MessageCircle, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -22,22 +21,16 @@ const Header = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div
-            className="flex items-center h-full"
-            // set equal vertical padding so the logo fills between the red lines in the reference image
-            style={{
-              paddingTop: 6,   // adjust as needed for fine-tuned alignment
-              paddingBottom: 6 // matching padding for equal gap
-            }}
-          >
+          <div className="flex items-center">
             <img
               src="/lovable-uploads/51e72efc-b6f0-4596-a139-348c49c1168e.png"
               alt="Members Logo"
+              // maximize logo height, leaving a slightly larger gap (8px instead of 4px)
               className="w-auto"
               style={{
                 display: "block",
-                maxHeight: "calc(100% - 0px - 12px)", // subtract the top/bottom padding for logo to fill space
-                maxWidth: 200,                        // keep width in balance with new height
+                maxHeight: "calc(100% - 8px)", // 4px gap on top and bottom
+                maxWidth: 240,
                 objectFit: "contain"
               }}
             />
@@ -54,6 +47,8 @@ const Header = () => {
               />
             </div>
           </div>
+
+          {/* Navigation Icons */}
           <div className="flex items-center space-x-4">
             <Button variant="ghost" size="icon" className="relative">
               <Bell className="h-5 w-5" />
@@ -77,4 +72,3 @@ const Header = () => {
 };
 
 export default Header;
-
