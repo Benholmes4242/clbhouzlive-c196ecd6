@@ -10,9 +10,12 @@ const Header = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <div className="flex items-center space-x-4">
-            <div className="text-2xl font-bold text-primary">
-              Mem<span className="text-amber-700">bers</span>
-            </div>
+            <img
+              src="/lovable-uploads/51e72efc-b6f0-4596-a139-348c49c1168e.png"
+              alt="Members Logo"
+              className="h-10 w-auto"
+              style={{ maxWidth: 160, objectFit: "contain" }}
+            />
           </div>
 
           {/* Search Bar */}
@@ -47,3 +50,4 @@ const Header = () => {
 };
 
 export default Header;
+
