@@ -19,14 +19,14 @@ const Auth: React.FC = () => {
       if (data?.user) navigate("/");
     });
     // Listen for auth state changes
-    const { data: subscription } = supabase.auth.onAuthStateChange(
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         if (session?.user) navigate("/");
       }
     );
     // Clean up
     return () => {
-      subscription?.unsubscribe();
+      subscription.unsubscribe();
     };
   }, [navigate]);
 
