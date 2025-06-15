@@ -1,13 +1,13 @@
-import React, { useRef, useState } from 'react';
-import { ArrowLeft, Camera, Upload } from 'lucide-react';
-import { Link } from 'react-router-dom';
+
+import React, { useState } from 'react';
+import { ArrowLeft } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
-import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import ProfilePhotoUploader from "@/components/profile/ProfilePhotoUploader";
+import BasicInfoForm from "@/components/profile/BasicInfoForm";
+import GolfInfoForm from "@/components/profile/GolfInfoForm";
 
 const CreateProfile = () => {
   const [formData, setFormData] = useState({
@@ -22,30 +22,22 @@ const CreateProfile = () => {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
-  
-  // New: Profile photo state and ref
+
+  // Profile photo state
   const [profilePhotoFile, setProfilePhotoFile] = useState<File | null>(null);
   const [profilePhotoPreview, setProfilePhotoPreview] = useState<string | null>(null);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handlePhotoClick = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    }
-  };
-
-  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] ?? null;
-    if (file) {
-      setProfilePhotoFile(file);
-      setProfilePhotoPreview(URL.createObjectURL(file));
-    }
+  const handlePhotoChange = (file: File | null) => {
+    setProfilePhotoFile(file);
+    setProfilePhotoPreview(file ? URL.createObjectURL(file) : null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -59,8 +51,6 @@ const CreateProfile = () => {
     }
 
     let uploadedPhotoUrl: string | null = null;
-
-    // Upload the profile photo if one was selected
     if (profilePhotoFile) {
       setUploadingPhoto(true);
       const ext = profilePhotoFile.name.split('.').pop();
@@ -79,7 +69,6 @@ const CreateProfile = () => {
       setUploadingPhoto(false);
     }
 
-    // Insert or update the user_profiles row (save photo url if exists)
     const { error } = await supabase.from("user_profiles").upsert({
       id: user.id,
       home_club: formData.favoriteClub,
@@ -118,7 +107,7 @@ const CreateProfile = () => {
                 objectFit: "contain"
               }}
             />
-            <div className="w-16" /> {/* Spacer for centering */}
+            <div className="w-16" /> {/* Spacer */}
           </div>
         </div>
       </header>
@@ -126,140 +115,23 @@ const CreateProfile = () => {
       <main className="container mx-auto px-4 py-6 max-w-2xl">
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Profile Photo */}
-          <div className="flex flex-col items-center space-y-4">
-            <div
-              className="relative cursor-pointer group"
-              onClick={handlePhotoClick}
-              aria-label="Add profile photo"
-              tabIndex={0}
-              onKeyDown={e => {
-                if (e.key === "Enter" || e.key === " ") handlePhotoClick();
-              }}
-            >
-              <div className="w-24 h-24 bg-muted border-2 border-dashed border-amber-700 rounded-full flex items-center justify-center overflow-hidden">
-                {profilePhotoPreview ? (
-                  <img
-                    src={profilePhotoPreview}
-                    alt="Profile preview"
-                    className="object-cover w-full h-full"
-                  />
-                ) : (
-                  <Camera className="h-8 w-8 text-amber-700" />
-                )}
-              </div>
-              <Button
-                type="button"
-                size="sm"
-                className="absolute -bottom-2 -right-2 rounded-full w-8 h-8 p-0 flex items-center justify-center"
-                tabIndex={-1}
-                onClick={e => {
-                  e.stopPropagation();
-                  handlePhotoClick();
-                }}
-                variant="secondary"
-              >
-                <Upload className="h-4 w-4" />
-              </Button>
-              {/* Hidden file input */}
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                style={{ display: "none" }}
-                onChange={handlePhotoChange}
-                disabled={submitting || uploadingPhoto}
-                tabIndex={-1}
-              />
-            </div>
-            <p className="text-sm text-muted-foreground">
-              {profilePhotoPreview ? "Change photo" : "Add profile photo"}
-            </p>
-          </div>
-
+          <ProfilePhotoUploader
+            profilePhotoPreview={profilePhotoPreview}
+            uploadingPhoto={uploadingPhoto}
+            submitting={submitting}
+            onPhotoChange={handlePhotoChange}
+          />
           {/* Basic Information */}
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold">Basic Information</h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="name">Full Name</Label>
-                <Input
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  placeholder="Enter your full name"
-                  required
-                />
-              </div>
-              
-              <div>
-                <Label htmlFor="username">Username</Label>
-                <Input
-                  id="username"
-                  name="username"
-                  value={formData.username}
-                  onChange={handleInputChange}
-                  placeholder="Choose a username"
-                  required
-                />
-              </div>
-            </div>
-
-            <div>
-              <Label htmlFor="bio">Bio</Label>
-              <Textarea
-                id="bio"
-                name="bio"
-                value={formData.bio}
-                onChange={handleInputChange}
-                placeholder="Tell us about yourself and your golf journey..."
-                rows={3}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="location">City or Country</Label>
-              <Input
-                id="location"
-                name="location"
-                value={formData.location}
-                onChange={handleInputChange}
-                placeholder="City or Country"
-              />
-            </div>
-          </div>
-
+          <BasicInfoForm formData={formData} onChange={handleInputChange} />
           {/* Golf Information */}
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold">Golf Information</h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="handicap">Handicap</Label>
-                <Input
-                  id="handicap"
-                  name="handicap"
-                  value={formData.handicap}
-                  onChange={handleInputChange}
-                  placeholder="e.g., 15"
-                  type="number"
-                />
-              </div>
-            </div>
-
-            <div>
-              <Label htmlFor="favoriteClub">Home Club/Course</Label>
-              <Input
-                id="favoriteClub"
-                name="favoriteClub"
-                value={formData.favoriteClub}
-                onChange={handleInputChange}
-                placeholder="Your home club or course"
-              />
-            </div>
-          </div>
-
+          <GolfInfoForm
+            formData={{
+              handicap: formData.handicap,
+              favoriteClub: formData.favoriteClub,
+              yearsPlaying: formData.yearsPlaying
+            }}
+            onChange={handleInputChange}
+          />
           {/* Submit Button */}
           <div className="pt-6">
             <Button type="submit" className="w-full">
