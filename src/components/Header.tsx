@@ -21,16 +21,15 @@ const Header = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex items-center">
+          <div className="flex items-center h-full" style={{ paddingTop: 10, paddingBottom: 10 }}>
             <img
               src="/lovable-uploads/51e72efc-b6f0-4596-a139-348c49c1168e.png"
               alt="Members Logo"
-              // maximize logo height, leaving a slightly larger gap (8px instead of 4px)
               className="w-auto"
               style={{
                 display: "block",
-                maxHeight: "calc(100% - 8px)", // 4px gap on top and bottom
-                maxWidth: 240,
+                maxHeight: "36px", // actual logo height, smaller than before
+                maxWidth: 220,
                 objectFit: "contain"
               }}
             />
@@ -47,8 +46,6 @@ const Header = () => {
               />
             </div>
           </div>
-
-          {/* Navigation Icons */}
           <div className="flex items-center space-x-4">
             <Button variant="ghost" size="icon" className="relative">
               <Bell className="h-5 w-5" />
