@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Search, Bell, MessageCircle, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -26,11 +25,11 @@ const Header = () => {
             <img
               src="/lovable-uploads/51e72efc-b6f0-4596-a139-348c49c1168e.png"
               alt="Members Logo"
-              // maximize logo height, leaving smallest visual gap
+              // maximize logo height, leaving a slightly larger gap (8px instead of 4px)
               className="w-auto"
               style={{
                 display: "block",
-                maxHeight: "calc(100% - 4px)", // 2px gap top/bottom
+                maxHeight: "calc(100% - 8px)", // 4px gap on top and bottom
                 maxWidth: 240,
                 objectFit: "contain"
               }}
@@ -73,4 +72,3 @@ const Header = () => {
 };
 
 export default Header;
-
