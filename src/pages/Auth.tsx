@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
@@ -8,6 +7,7 @@ import AuthForm from "./auth/AuthForm";
 import ConfirmNotice from "./auth/ConfirmNotice";
 import AuthLayout from "./auth/AuthLayout";
 import BottomNavigation from "@/components/BottomNavigation";
+import { useSupabaseSession } from "@/hooks/useSupabaseSession";
 
 const Auth: React.FC = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -18,22 +18,38 @@ const Auth: React.FC = () => {
   const [showConfirmNotice, setShowConfirmNotice] = useState(false);
   const [resending, setResending] = useState(false);
   const [resendMsg, setResendMsg] = useState<string | null>(null);
-
+  const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const lastResendEmail = useRef(""); // to avoid spamming resend if email field is empty
 
+  // Helper to check if a profile exists for a user
+  async function checkProfileExists(userId: string): Promise<boolean> {
+    const { data } = await supabase.from('user_profiles').select('id').eq('id', userId).maybeSingle();
+    return !!data;
+  }
+
   useEffect(() => {
     // Redirect authenticated users away from Auth page
-    supabase.auth.getUser().then(({ data }) => {
-      if (data?.user && data.user.confirmed_at) navigate("/");
+    supabase.auth.getUser().then(async ({ data }) => {
+      if (data?.user && data.user.confirmed_at) {
+        // Will handle redirect after login/signup just below
+        // No navigation here
+      }
     });
     // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        if (session?.user && session.user.confirmed_at) navigate("/");
+      async (_event, session) => {
+        if (session?.user && session.user.confirmed_at) {
+          // After login/signup, check if profile exists
+          const hasProfile = await checkProfileExists(session.user.id);
+          if (hasProfile) {
+            navigate("/profile", { replace: true });
+          } else {
+            navigate("/create-profile", { replace: true });
+          }
+        }
       }
     );
-    // Clean up
     return () => {
       subscription.unsubscribe();
     };
@@ -92,6 +108,4 @@ const Auth: React.FC = () => {
     </>
   );
 };
-
 export default Auth;
-

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ArrowLeft, Camera, Upload } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -6,6 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
+import { useSupabaseSession } from "@/hooks/useSupabaseSession";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client"; // Needed for saving to DB
 
 const CreateProfile = () => {
   const [formData, setFormData] = useState({
@@ -17,16 +19,40 @@ const CreateProfile = () => {
     favoriteClub: '',
     yearsPlaying: ''
   });
+  const { user } = useSupabaseSession();
+  const navigate = useNavigate();
+  const [submitting, setSubmitting] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Profile data:', formData);
-    // Handle profile creation logic here
+    setSubmitting(true);
+
+    if (!user) {
+      alert("You must be logged in to create a profile.");
+      setSubmitting(false);
+      return;
+    }
+    // Minimal: insert profile into user_profiles table
+    const { error } = await supabase.from("user_profiles").upsert({
+      id: user.id,
+      home_club: formData.favoriteClub,
+      // add other profile fields as needed
+      // e.g.: bio: formData.bio, username: formData.username, etc.
+    });
+
+    setSubmitting(false);
+
+    if (error) {
+      alert("Error saving profile.");
+      return;
+    }
+
+    navigate("/profile"); // Redirect to main profile page after creation
   };
 
   return (
@@ -171,5 +197,4 @@ const CreateProfile = () => {
     </div>
   );
 };
-
 export default CreateProfile;

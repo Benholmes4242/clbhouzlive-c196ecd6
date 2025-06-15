@@ -1,9 +1,21 @@
-
 import React from 'react';
 import { Search, Bell, MessageCircle, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useNavigate } from "react-router-dom";
+import { useSupabaseSession } from "@/hooks/useSupabaseSession";
 
 const Header = () => {
+  const navigate = useNavigate();
+  const { user } = useSupabaseSession();
+
+  const handleProfileClick = () => {
+    if (!user) {
+      navigate('/auth');
+    } else {
+      navigate('/profile');
+    }
+  };
+
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
       <div className="container mx-auto px-4">
@@ -39,7 +51,11 @@ const Header = () => {
             <Button variant="ghost" size="icon">
               <MessageCircle className="h-5 w-5" />
             </Button>
-            <Button variant="ghost" size="icon">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleProfileClick}
+            >
               <User className="h-5 w-5" />
             </Button>
           </div>
@@ -50,4 +66,3 @@ const Header = () => {
 };
 
 export default Header;
-
