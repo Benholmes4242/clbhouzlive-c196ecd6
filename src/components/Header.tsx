@@ -28,7 +28,7 @@ const Header = () => {
               className="w-auto"
               style={{
                 display: "block",
-                maxHeight: "44px", // increased from 36px to make the logo a little bigger
+                maxHeight: "56px", // increased from 44px to make the logo a bit bigger
                 maxWidth: 240,
                 objectFit: "contain"
               }}
