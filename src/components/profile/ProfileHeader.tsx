@@ -83,6 +83,8 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               alt="Profile"
               className="w-full h-full object-cover select-none"
               draggable={false}
+              crossOrigin="anonymous"
+              loading="lazy"
               style={{ background: "transparent" }}
             />
           ) : (
