@@ -209,13 +209,13 @@ const CreateProfile = () => {
             </div>
 
             <div>
-              <Label htmlFor="location">Location</Label>
+              <Label htmlFor="location">City or Country</Label>
               <Input
                 id="location"
                 name="location"
                 value={formData.location}
                 onChange={handleInputChange}
-                placeholder="City, State"
+                placeholder="City or Country"
               />
             </div>
           </div>
@@ -236,28 +236,16 @@ const CreateProfile = () => {
                   type="number"
                 />
               </div>
-              
-              <div>
-                <Label htmlFor="yearsPlaying">Years Playing</Label>
-                <Input
-                  id="yearsPlaying"
-                  name="yearsPlaying"
-                  value={formData.yearsPlaying}
-                  onChange={handleInputChange}
-                  placeholder="e.g., 5"
-                  type="number"
-                />
-              </div>
             </div>
 
             <div>
-              <Label htmlFor="favoriteClub">Favorite Golf Club/Course</Label>
+              <Label htmlFor="favoriteClub">Home Club/Course</Label>
               <Input
                 id="favoriteClub"
                 name="favoriteClub"
                 value={formData.favoriteClub}
                 onChange={handleInputChange}
-                placeholder="Where do you love to play?"
+                placeholder="Your home club or course"
               />
             </div>
           </div>
