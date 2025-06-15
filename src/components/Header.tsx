@@ -20,20 +20,21 @@ const Header = () => {
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
       <div className="container mx-auto px-4">
-        {/* Increase header height to accommodate larger logo */}
-        <div className="flex items-center justify-between" style={{ height: '5.5rem' }}>
+        {/* Restore original header height, e.g., h-16 (4rem) */}
+        <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex items-center" style={{ height: '100%' }}>
+          <div className="flex items-center h-full">
             <img
               src="/lovable-uploads/51e72efc-b6f0-4596-a139-348c49c1168e.png"
               alt="Members Logo"
-              className="h-[4.5rem] w-auto"
+              // fill as much of the header as possible, with a tiny gap (4px)
+              className="h-[calc(100%-8px)] w-auto"
               style={{
-                maxHeight: "calc(100% - 0.5rem)",
-                maxWidth: 280,
+                maxHeight: "calc(100% - 8px)",
+                maxWidth: 240,
                 objectFit: "contain",
-                marginTop: "0.25rem", // small gap top
-                marginBottom: "0.25rem" // small gap bottom
+                marginTop: "4px",
+                marginBottom: "4px"
               }}
             />
           </div>
@@ -74,4 +75,3 @@ const Header = () => {
 };
 
 export default Header;
-
