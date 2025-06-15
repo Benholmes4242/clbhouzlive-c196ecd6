@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { ArrowLeft, Camera, Upload } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -7,7 +7,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
 import { useNavigate } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client"; // Needed for saving to DB
+import { supabase } from "@/integrations/supabase/client";
 
 const CreateProfile = () => {
   const [formData, setFormData] = useState({
@@ -22,10 +22,30 @@ const CreateProfile = () => {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
+  
+  // New: Profile photo state and ref
+  const [profilePhotoFile, setProfilePhotoFile] = useState<File | null>(null);
+  const [profilePhotoPreview, setProfilePhotoPreview] = useState<string | null>(null);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handlePhotoClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] ?? null;
+    if (file) {
+      setProfilePhotoFile(file);
+      setProfilePhotoPreview(URL.createObjectURL(file));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -37,12 +57,34 @@ const CreateProfile = () => {
       setSubmitting(false);
       return;
     }
-    // Minimal: insert profile into user_profiles table
+
+    let uploadedPhotoUrl: string | null = null;
+
+    // Upload the profile photo if one was selected
+    if (profilePhotoFile) {
+      setUploadingPhoto(true);
+      const ext = profilePhotoFile.name.split('.').pop();
+      const filePath = `${user.id}/avatar.${ext}`;
+      const { error: uploadError } = await supabase.storage
+        .from("avatars")
+        .upload(filePath, profilePhotoFile, { upsert: true });
+      if (uploadError) {
+        alert("Failed to upload profile photo.");
+        setUploadingPhoto(false);
+        setSubmitting(false);
+        return;
+      }
+      const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
+      uploadedPhotoUrl = urlData?.publicUrl ?? null;
+      setUploadingPhoto(false);
+    }
+
+    // Insert or update the user_profiles row (save photo url if exists)
     const { error } = await supabase.from("user_profiles").upsert({
       id: user.id,
       home_club: formData.favoriteClub,
-      // add other profile fields as needed
-      // e.g.: bio: formData.bio, username: formData.username, etc.
+      profile_photo_url: uploadedPhotoUrl,
+      // optionally add other profile fields
     });
 
     setSubmitting(false);
@@ -52,7 +94,7 @@ const CreateProfile = () => {
       return;
     }
 
-    navigate("/profile"); // Redirect to main profile page after creation
+    navigate("/profile");
   };
 
   return (
@@ -75,19 +117,53 @@ const CreateProfile = () => {
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Profile Photo */}
           <div className="flex flex-col items-center space-y-4">
-            <div className="relative">
-              <div className="w-24 h-24 bg-muted border-2 border-dashed border-amber-700 rounded-full flex items-center justify-center">
-                <Camera className="h-8 w-8 text-amber-700" />
+            <div
+              className="relative cursor-pointer group"
+              onClick={handlePhotoClick}
+              aria-label="Add profile photo"
+              tabIndex={0}
+              onKeyDown={e => {
+                if (e.key === "Enter" || e.key === " ") handlePhotoClick();
+              }}
+            >
+              <div className="w-24 h-24 bg-muted border-2 border-dashed border-amber-700 rounded-full flex items-center justify-center overflow-hidden">
+                {profilePhotoPreview ? (
+                  <img
+                    src={profilePhotoPreview}
+                    alt="Profile preview"
+                    className="object-cover w-full h-full"
+                  />
+                ) : (
+                  <Camera className="h-8 w-8 text-amber-700" />
+                )}
               </div>
               <Button
                 type="button"
                 size="sm"
-                className="absolute -bottom-2 -right-2 rounded-full w-8 h-8 p-0"
+                className="absolute -bottom-2 -right-2 rounded-full w-8 h-8 p-0 flex items-center justify-center"
+                tabIndex={-1}
+                onClick={e => {
+                  e.stopPropagation();
+                  handlePhotoClick();
+                }}
+                variant="secondary"
               >
                 <Upload className="h-4 w-4" />
               </Button>
+              {/* Hidden file input */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                style={{ display: "none" }}
+                onChange={handlePhotoChange}
+                disabled={submitting || uploadingPhoto}
+                tabIndex={-1}
+              />
             </div>
-            <p className="text-sm text-muted-foreground">Add profile photo</p>
+            <p className="text-sm text-muted-foreground">
+              {profilePhotoPreview ? "Change photo" : "Add profile photo"}
+            </p>
           </div>
 
           {/* Basic Information */}
@@ -197,4 +273,5 @@ const CreateProfile = () => {
     </div>
   );
 };
+
 export default CreateProfile;
