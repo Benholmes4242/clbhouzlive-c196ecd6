@@ -107,7 +107,17 @@ const CreateProfile = () => {
               <ArrowLeft className="h-5 w-5" />
               <span>Back</span>
             </Link>
-            <h1 className="text-lg font-semibold">Create Profile</h1>
+            <img
+              src="/lovable-uploads/51e72efc-b6f0-4596-a139-348c49c1168e.png"
+              alt="Members Logo"
+              className="w-auto"
+              style={{
+                display: "block",
+                maxHeight: "56px",
+                maxWidth: 160,
+                objectFit: "contain"
+              }}
+            />
             <div className="w-16" /> {/* Spacer for centering */}
           </div>
         </div>
