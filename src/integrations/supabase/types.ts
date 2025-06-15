@@ -99,6 +99,51 @@ export type Database = {
         }
         Relationships: []
       }
+      user_course_tracker: {
+        Row: {
+          checked: boolean | null
+          course_id: string | null
+          created_at: string | null
+          id: string
+          played_date: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          checked?: boolean | null
+          course_id?: string | null
+          created_at?: string | null
+          id?: string
+          played_date?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          checked?: boolean | null
+          course_id?: string | null
+          created_at?: string | null
+          id?: string
+          played_date?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_course_tracker_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_course_tracker_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_courses: {
         Row: {
           course_id: string
@@ -145,6 +190,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_profiles: {
+        Row: {
+          created_at: string | null
+          eg_app_connected: boolean | null
+          eg_handicap_index: number | null
+          eg_recent_rounds: Json | null
+          home_club: string | null
+          id: string
+          profile_photo_url: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          eg_app_connected?: boolean | null
+          eg_handicap_index?: number | null
+          eg_recent_rounds?: Json | null
+          home_club?: string | null
+          id: string
+          profile_photo_url?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          eg_app_connected?: boolean | null
+          eg_handicap_index?: number | null
+          eg_recent_rounds?: Json | null
+          home_club?: string | null
+          id?: string
+          profile_photo_url?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
       }
     }
     Views: {

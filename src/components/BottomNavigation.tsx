@@ -12,6 +12,7 @@ const BottomNavigation = () => {
     { id: 'players', label: 'Players', icon: Users, path: '/players' },
     { id: 'courses', label: 'Courses', icon: MapPin, path: '/courses' },
     { id: 'news', label: 'News', icon: Newspaper, path: '/news' },
+    { id: 'profile', label: 'Profile', icon: Users, path: '/profile' }, // Profile tab (using Users icon for now)
   ];
 
   useEffect(() => {
