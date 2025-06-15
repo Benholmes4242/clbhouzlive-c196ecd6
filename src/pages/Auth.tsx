@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
@@ -65,7 +66,7 @@ const Auth: React.FC = () => {
       {/* Confirmation notice */}
       {showConfirmNotice && (
         <div className="mb-3 text-center text-sm text-primary-foreground bg-primary p-3 rounded">
-          Please check your email to confirm your account before logging in.
+          Please check your email to confirm your account and become a member.
         </div>
       )}
       {errorMsg && (
@@ -89,3 +90,4 @@ const Auth: React.FC = () => {
 };
 
 export default Auth;
+
