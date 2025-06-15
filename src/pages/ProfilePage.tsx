@@ -88,30 +88,28 @@ const ProfilePage = () => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Show instant preview from selected file
+    // Show instant preview from selected file (displayed during upload)
     const tempPreviewUrl = URL.createObjectURL(file);
     setPhotoPreview(tempPreviewUrl);
 
     setUploading(true);
     const fileExt = file.name.split('.').pop();
-    const filePath = `${user.id}/avatar.${fileExt}`;
+    const timestamp = Date.now();
+    // Use a unique filename for each upload
+    const filePath = `${user.id}/avatar-${timestamp}.${fileExt}`;
 
-    // Upload to Supabase Storage (upsert means override, but URL stays same)
-    let { error } = await supabase.storage.from('avatars').upload(filePath, file, { upsert: true });
+    // Upload to Supabase Storage (unique path—no overwrite)
+    let { error } = await supabase.storage.from('avatars').upload(filePath, file, { upsert: false });
     if (error) {
       alert('Upload failed!');
       setUploading(false);
       return;
     }
 
-    // Get fresh public URL and append a cache-busting query param
+    // Get fresh public URL (unique so will never be cached)
     const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
     let avatarUrl = urlData?.publicUrl ?? '';
-    if (avatarUrl) {
-      // Bust cache by appending timestamp
-      avatarUrl = `${avatarUrl}?t=${Date.now()}`;
-    }
-    setPhotoPreview(avatarUrl);
+    setPhotoPreview(avatarUrl); // update preview immediately for the latest well-uploaded image
     await supabase.from('user_profiles').update({ profile_photo_url: avatarUrl, updated_at: new Date().toISOString() }).eq('id', user.id);
     setProfile((p) => p ? { ...p, profile_photo_url: avatarUrl } : p);
     setUploading(false);
