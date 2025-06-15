@@ -1,10 +1,10 @@
-
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { X, Golf } from "lucide-react";
+// import { X, Golf } from "lucide-react";
+import { X } from "lucide-react"; // Removed Golf icon as it's not available
 
 type BagItemData = {
   type: string;
@@ -145,7 +145,7 @@ const BagManager = ({ userId }: { userId: string }) => {
   return (
     <section className="mt-10 px-2">
       <div className="flex items-center gap-2 mb-3">
-        <Golf className="h-6 w-6 text-green-700" />
+        {/* Removed <Golf /> icon (not available in lucide-react) */}
         <h2 className="text-xl font-bold">What's in the Bag?</h2>
       </div>
       <p className="text-muted-foreground text-base mb-3">

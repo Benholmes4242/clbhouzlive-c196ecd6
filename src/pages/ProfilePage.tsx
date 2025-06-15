@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Input } from '@/components/ui/input';
@@ -30,7 +29,6 @@ import HomeClubSection from "@/components/profile/HomeClubSection";
 import EGAppIntegration from "@/components/profile/EGAppIntegration";
 import CourseTracker from "@/components/profile/CourseTracker";
 import BottomNavigation from '@/components/BottomNavigation';
-import BagManager from '@/components/BagManager'; // Ensure latest BagManager is used
 
 const ProfilePage = () => {
   const [user, setUser] = useState<any>(null);
