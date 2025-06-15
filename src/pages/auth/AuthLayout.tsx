@@ -30,7 +30,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
       >
         {isSignUp
           ? "Already have an account? Sign in"
-          : "Don't have an account? Sign up"}
+          : "Become a member Sign up"}
       </button>
     </div>
   </div>
