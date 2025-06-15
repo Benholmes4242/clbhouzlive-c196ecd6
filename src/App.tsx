@@ -9,6 +9,7 @@ import News from "./pages/News";
 import Courses from "./pages/Courses";
 import NotFound from "./pages/NotFound";
 import ProfilePage from "./pages/ProfilePage";
+import Auth from "./pages/Auth";
 
 const queryClient = new QueryClient();
 
@@ -20,6 +21,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/auth" element={<Auth />} />
           <Route path="/create-profile" element={<CreateProfile />} />
           <Route path="/news" element={<News />} />
           <Route path="/courses" element={<Courses />} />
