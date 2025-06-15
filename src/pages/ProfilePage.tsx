@@ -8,8 +8,7 @@ import { Progress } from '@/components/ui/progress';
 import { User } from '@supabase/supabase-js';
 import { useNavigate } from 'react-router-dom';
 import BagManager from '@/components/BagManager';
-
-import Header from "@/components/Header"; // <-- Add this import
+import Header from "@/components/Header"; // use shared site header
 
 type Profile = {
   id: string;
@@ -45,8 +44,6 @@ const ProfilePage = () => {
   const [totalStats, setTotalStats] = useState<{ [cat: string]: number }>({});
 
   useEffect(() => {
-    // TEMPORARY: Allow opening profile page even without login
-    // Optionally: Load default/static data for testing if not logged in
     supabase.auth.getUser().then(({ data }) => {
       setUser(data?.user ?? null);
       if (data?.user) {
@@ -123,39 +120,40 @@ const ProfilePage = () => {
     );
   }
 
-  // Always allow editing on your own profile (there's no other profile viewer state for now)
-  const canEditAvatar = !!user; // Adjust: true if this is your profile
+  const canEditAvatar = !!user;
 
   return (
-    <div className="min-h-screen bg-background pb-28 max-w-2xl mx-auto px-4">
-      {/* Use the shared site header */}
+    <div className="min-h-screen bg-background pb-28">
+      {/* Header always full-width */}
       <Header />
-      {/* Content below header */}
-      <ProfileHeader
-        photoPreview={photoPreview}
-        profilePhotoUrl={profile?.profile_photo_url ?? ""}
-        uploading={uploading}
-        handlePhotoUpload={handlePhotoUpload}
-        canEdit={canEditAvatar}
-      />
-      <HomeClubSection
-        editingClub={editingClub}
-        clubInput={clubInput}
-        homeClub={profile?.home_club ?? 'Not set'}
-        onEditClick={() => setEditingClub(true)}
-        onCancel={() => setEditingClub(false)}
-        onInput={e => setClubInput(e.target.value)}
-        onSave={saveHomeClub}
-        setClubInput={setClubInput}
-      />
-      <EGAppIntegration
-        egAppConnected={profile?.eg_app_connected ?? false}
-        handicapIndex={profile?.eg_handicap_index ?? null}
-        recentRounds={profile?.eg_recent_rounds ?? null}
-      />
-      {/* What's in the Bag section */}
-      {user && <BagManager userId={user.id} />}
-      <CourseTracker trackerStats={trackerStats} totalStats={totalStats} />
+      {/* Main content centered */}
+      <div className="max-w-2xl mx-auto px-4">
+        <ProfileHeader
+          photoPreview={photoPreview}
+          profilePhotoUrl={profile?.profile_photo_url ?? ""}
+          uploading={uploading}
+          handlePhotoUpload={handlePhotoUpload}
+          canEdit={canEditAvatar}
+        />
+        <HomeClubSection
+          editingClub={editingClub}
+          clubInput={clubInput}
+          homeClub={profile?.home_club ?? 'Not set'}
+          onEditClick={() => setEditingClub(true)}
+          onCancel={() => setEditingClub(false)}
+          onInput={e => setClubInput(e.target.value)}
+          onSave={saveHomeClub}
+          setClubInput={setClubInput}
+        />
+        <EGAppIntegration
+          egAppConnected={profile?.eg_app_connected ?? false}
+          handicapIndex={profile?.eg_handicap_index ?? null}
+          recentRounds={profile?.eg_recent_rounds ?? null}
+        />
+        {/* What's in the Bag section */}
+        {user && <BagManager userId={user.id} />}
+        <CourseTracker trackerStats={trackerStats} totalStats={totalStats} />
+      </div>
       <BottomNavigation />
     </div>
   );
