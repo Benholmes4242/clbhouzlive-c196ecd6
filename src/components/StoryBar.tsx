@@ -1,6 +1,9 @@
+
 import React from 'react';
 import { Plus } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useSupabaseSession } from "@/hooks/useSupabaseSession";
+import { supabase } from "@/integrations/supabase/client";
 
 const StoryBar = () => {
   const stories = [
@@ -36,6 +39,24 @@ const StoryBar = () => {
     },
   ];
 
+  const navigate = useNavigate();
+  const { user } = useSupabaseSession();
+
+  // Function to handle "Your Profile" navigation
+  const handleYourProfile = async () => {
+    if (!user) {
+      navigate('/auth');
+    } else {
+      // Check if profile exists
+      const { data } = await supabase.from('user_profiles').select('id').eq('id', user.id).maybeSingle();
+      if (data) {
+        navigate('/profile');
+      } else {
+        navigate('/create-profile');
+      }
+    }
+  };
+
   return (
     <div className="bg-background border-b border-border">
       <div className="container mx-auto px-4 py-4">
@@ -44,11 +65,15 @@ const StoryBar = () => {
             <div key={story.id} className="flex flex-col items-center space-y-1 min-w-0">
               <div className="relative">
                 {story.type === 'add' ? (
-                  <Link to="/create-profile">
+                  <button
+                    type="button"
+                    onClick={handleYourProfile}
+                    aria-label="Create or view your profile"
+                  >
                     <div className="w-16 h-16 bg-muted border-2 border-dashed border-amber-700 rounded-full flex items-center justify-center hover:bg-muted/80 transition-colors">
                       <Plus className="h-6 w-6 text-amber-700" />
                     </div>
-                  </Link>
+                  </button>
                 ) : (
                   <div className={`w-16 h-16 rounded-full p-0.5 ${story.hasStory ? 'bg-gradient-to-tr from-green-500 to-green-700' : ''}`}>
                     <img
@@ -71,3 +96,4 @@ const StoryBar = () => {
 };
 
 export default StoryBar;
+
