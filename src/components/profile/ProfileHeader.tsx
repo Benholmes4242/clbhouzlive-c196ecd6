@@ -63,21 +63,25 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         aria-label={canEdit ? "Change profile photo" : "Profile photo"}
         role={canEdit ? "button" : undefined}
       >
-        {/* Avatar circle with only green border, NO inner gray/white bg (remove bg-[#ececec]) */}
+        {/* Avatar circle with only green border, no background */}
         <div
           className={
-            `w-40 h-40 md:w-52 md:h-52 rounded-full border-4 border-green-700 overflow-hidden flex items-center justify-center object-cover transition-all relative duration-200` +
+            "w-40 h-40 md:w-52 md:h-52 rounded-full border-4 border-green-700 overflow-hidden flex items-center justify-center object-cover transition-all relative duration-200" +
             (canEdit ? " group-hover:ring-4 group-hover:ring-green-500 group-hover:ring-offset-2" : "")
           }
+          style={{
+            background: "transparent", // explicitly transparent background
+            boxShadow: "none" // no shadow inside the avatar circle
+          }}
         >
           {hasPhoto ? (
-            // Avatar image, fills the circle, NO background color set
+            // Avatar image, fills the circle, no background
             <img
               src={photoPreview || profilePhotoUrl!}
               alt="Profile"
               className="w-full h-full object-cover select-none"
               draggable={false}
-              style={{ backgroundColor: "transparent" }}
+              style={{ background: "transparent" }}
             />
           ) : (
             <UserPlaceholderIcon />
