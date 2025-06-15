@@ -30,7 +30,7 @@ import EGAppIntegration from "@/components/profile/EGAppIntegration";
 import CourseTracker from "@/components/profile/CourseTracker";
 
 const ProfilePage = () => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [editingClub, setEditingClub] = useState(false);
@@ -39,37 +39,40 @@ const ProfilePage = () => {
   const [uploading, setUploading] = useState(false);
   const [trackerStats, setTrackerStats] = useState<{ [cat: string]: number }>({});
   const [totalStats, setTotalStats] = useState<{ [cat: string]: number }>({});
-  const navigate = useNavigate();
 
-  // Init: fetch user session+profile
   useEffect(() => {
-    supabase.auth.getUser().then(({ data, error }) => {
-      if (error || !data.user) {
-        navigate('/auth');
-        return;
+    // TEMPORARY: Allow opening profile page even without login
+    // Optionally: Load default/static data for testing if not logged in
+    supabase.auth.getUser().then(({ data }) => {
+      setUser(data?.user ?? null);
+      if (data?.user) {
+        fetchProfile(data.user.id);
+        fetchTrackerStats(data.user.id);
+      } else {
+        setProfile(null);
+        setTrackerStats({});
+        setTotalStats({});
+        setLoading(false);
       }
-      setUser(data.user);
-      fetchProfile(data.user.id);
-      fetchTrackerStats(data.user.id);
     });
   }, []);
 
-  // Fetch profile info
   const fetchProfile = async (id: string) => {
     setLoading(true);
     const { data, error } = await supabase.from('user_profiles').select('*').eq('id', id).maybeSingle();
     if (!error && data) {
       setProfile(data);
       setClubInput(data.home_club ?? '');
+    } else {
+      setProfile(null);
     }
     setLoading(false);
   };
 
-  // Fetch tracker stats
   const fetchTrackerStats = async (userId: string) => {
     let stats: { [cat: string]: number } = {};
     let totals: { [cat: string]: number } = {};
-    const { data, error } = await supabase.from('user_course_tracker').select('course_id, checked');
+    const { data } = await supabase.from('user_course_tracker').select('course_id, checked');
     if (data) {
       ['GB&I', 'Europe', 'USA', 'Global'].forEach((cat) => {
         stats[cat] = data.filter(row => !!row.checked).length;
@@ -80,15 +83,15 @@ const ProfilePage = () => {
     setTotalStats(totals);
   };
 
-  // Upload photo
   const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (!user) return;
     const file = event.target.files?.[0];
-    if (!file || !user) return;
+    if (!file) return;
     setUploading(true);
     const fileExt = file.name.split('.').pop();
     const filePath = `${user.id}/avatar.${fileExt}`;
-    let { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file, { upsert: true });
-    if (uploadError) {
+    let { error } = await supabase.storage.from('avatars').upload(filePath, file, { upsert: true });
+    if (error) {
       alert('Upload failed!');
       setUploading(false);
       return;
@@ -101,7 +104,6 @@ const ProfilePage = () => {
     setUploading(false);
   };
 
-  // Home club editing logic
   const saveHomeClub = async () => {
     if (!user) return;
     await supabase.from('user_profiles').update({ home_club: clubInput, updated_at: new Date().toISOString() }).eq('id', user.id);
@@ -109,7 +111,7 @@ const ProfilePage = () => {
     setEditingClub(false);
   };
 
-  if (loading || !profile) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <span className="text-muted-foreground text-base">Loading profile...</span>
@@ -117,39 +119,32 @@ const ProfilePage = () => {
     );
   }
 
+  // Render with mock/placeholder data if not logged in
   return (
     <div className="min-h-screen bg-background pb-28 max-w-2xl mx-auto px-4">
-      {/* Profile Header */}
       <ProfileHeader
         photoPreview={photoPreview}
-        profilePhotoUrl={profile.profile_photo_url}
+        profilePhotoUrl={profile?.profile_photo_url ?? ''}
         uploading={uploading}
         handlePhotoUpload={handlePhotoUpload}
       />
-
-      {/* Home Golf Club */}
       <HomeClubSection
         editingClub={editingClub}
         clubInput={clubInput}
-        homeClub={profile.home_club}
+        homeClub={profile?.home_club ?? 'Not set'}
         onEditClick={() => setEditingClub(true)}
         onCancel={() => setEditingClub(false)}
         onInput={e => setClubInput(e.target.value)}
         onSave={saveHomeClub}
         setClubInput={setClubInput}
       />
-
-      {/* EG App Integration */}
       <EGAppIntegration
-        egAppConnected={profile.eg_app_connected}
-        handicapIndex={profile.eg_handicap_index}
-        recentRounds={profile.eg_recent_rounds}
+        egAppConnected={profile?.eg_app_connected ?? false}
+        handicapIndex={profile?.eg_handicap_index ?? null}
+        recentRounds={profile?.eg_recent_rounds ?? null}
       />
-
-      {/* What's in the Bag */}
+      {/* Hide BagManager if no user */}
       {user && <BagManager userId={user.id} />}
-
-      {/* Top 100 Courses Tracker */}
       <CourseTracker trackerStats={trackerStats} totalStats={totalStats} />
     </div>
   );

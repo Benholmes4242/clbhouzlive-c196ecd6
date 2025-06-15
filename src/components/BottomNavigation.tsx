@@ -1,18 +1,17 @@
+
 import React, { useState, useEffect } from 'react';
-import { Home, Users, MapPin, Newspaper } from 'lucide-react';
+import { User, LogIn } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const BottomNavigation = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [activeTab, setActiveTab] = useState('trending');
+  const [activeTab, setActiveTab] = useState('profile');
 
+  // Only two tabs (Profile and Login) as requested
   const tabs = [
-    { id: 'trending', label: 'Trending', icon: Home, path: '/' },
-    { id: 'players', label: 'Players', icon: Users, path: '/players' },
-    { id: 'courses', label: 'Courses', icon: MapPin, path: '/courses' },
-    { id: 'news', label: 'News', icon: Newspaper, path: '/news' },
-    { id: 'profile', label: 'Profile', icon: Users, path: '/profile' }, // Profile tab (using Users icon for now)
+    { id: 'profile', label: 'Profile', icon: User, path: '/profile' },
+    { id: 'login', label: 'Login', icon: LogIn, path: '/auth' },
   ];
 
   useEffect(() => {
@@ -22,7 +21,7 @@ const BottomNavigation = () => {
     }
   }, [location.pathname]);
 
-  const handleTabClick = (tab: typeof tabs[0]) => {
+  const handleTabClick = (tab) => {
     setActiveTab(tab.id);
     navigate(tab.path);
   };
@@ -34,14 +33,13 @@ const BottomNavigation = () => {
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
-            
             return (
               <button
                 key={tab.id}
                 onClick={() => handleTabClick(tab)}
                 className={`flex flex-col items-center justify-center space-y-1 transition-colors ${
-                  isActive 
-                    ? 'text-green-600' 
+                  isActive
+                    ? 'text-green-600'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
