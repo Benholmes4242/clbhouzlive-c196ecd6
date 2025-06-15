@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import AuthForm from "./auth/AuthForm";
 import ConfirmNotice from "./auth/ConfirmNotice";
 import AuthLayout from "./auth/AuthLayout";
+import BottomNavigation from "@/components/BottomNavigation";
 
 const Auth: React.FC = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -39,53 +40,56 @@ const Auth: React.FC = () => {
   }, [navigate]);
 
   return (
-    <AuthLayout
-      isSignUp={isSignUp}
-      toggleAuthMode={() => {
-        setIsSignUp((s) => !s);
-        setShowConfirmNotice(false);
-        setErrorMsg(null);
-        setResendMsg(null);
-      }}
-      submitting={submitting}
-    >
-      <AuthForm
+    <>
+      <AuthLayout
         isSignUp={isSignUp}
-        setShowConfirmNotice={setShowConfirmNotice}
-        setErrorMsg={setErrorMsg}
-        setSubmitting={setSubmitting}
-        setResendMsg={setResendMsg}
-        lastResendEmail={lastResendEmail}
-        setEmail={setEmail}
-        setPassword={setPassword}
-        email={email}
-        password={password}
+        toggleAuthMode={() => {
+          setIsSignUp((s) => !s);
+          setShowConfirmNotice(false);
+          setErrorMsg(null);
+          setResendMsg(null);
+        }}
         submitting={submitting}
-        showConfirmNotice={showConfirmNotice}
-      />
-      {/* Confirmation notice */}
-      {showConfirmNotice && (
-        <div className="mb-3 text-center text-sm text-primary-foreground bg-primary p-3 rounded">
-          Please check your email to confirm your account to become a member.
-        </div>
-      )}
-      {errorMsg && (
-        <div className="mb-3 text-destructive text-center text-sm">{errorMsg}</div>
-      )}
-      {resendMsg && (
-        <div className="mb-3 text-green-700 text-center text-sm">{resendMsg}</div>
-      )}
-      {showConfirmNotice && (
-        <ConfirmNotice
-          lastResendEmail={lastResendEmail}
-          password={password}
-          setResending={setResending}
-          resending={resending}
-          setResendMsg={setResendMsg}
+      >
+        <AuthForm
+          isSignUp={isSignUp}
+          setShowConfirmNotice={setShowConfirmNotice}
           setErrorMsg={setErrorMsg}
+          setSubmitting={setSubmitting}
+          setResendMsg={setResendMsg}
+          lastResendEmail={lastResendEmail}
+          setEmail={setEmail}
+          setPassword={setPassword}
+          email={email}
+          password={password}
+          submitting={submitting}
+          showConfirmNotice={showConfirmNotice}
         />
-      )}
-    </AuthLayout>
+        {/* Confirmation notice */}
+        {showConfirmNotice && (
+          <div className="mb-3 text-center text-sm text-primary-foreground bg-primary p-3 rounded">
+            Please check your email to confirm your account to become a member.
+          </div>
+        )}
+        {errorMsg && (
+          <div className="mb-3 text-destructive text-center text-sm">{errorMsg}</div>
+        )}
+        {resendMsg && (
+          <div className="mb-3 text-green-700 text-center text-sm">{resendMsg}</div>
+        )}
+        {showConfirmNotice && (
+          <ConfirmNotice
+            lastResendEmail={lastResendEmail}
+            password={password}
+            setResending={setResending}
+            resending={resending}
+            setResendMsg={setResendMsg}
+            setErrorMsg={setErrorMsg}
+          />
+        )}
+      </AuthLayout>
+      <BottomNavigation />
+    </>
   );
 };
 
