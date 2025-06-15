@@ -24,7 +24,7 @@ const Auth: React.FC = () => {
       if (data?.user && data.user.confirmed_at) navigate("/");
     });
     // Listen for auth state changes
-    const { subscription } = supabase.auth.onAuthStateChange(
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         if (session?.user && session.user.confirmed_at) navigate("/");
       }
