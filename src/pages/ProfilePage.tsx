@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { User } from '@supabase/supabase-js';
 import { useNavigate } from 'react-router-dom';
+import BagManager from '@/components/BagManager';
 
 type Profile = {
   id: string;
@@ -38,7 +39,6 @@ const ProfilePage = () => {
 
   // Init: fetch user session+profile
   useEffect(() => {
-    // Get current user
     supabase.auth.getUser().then(({ data, error }) => {
       if (error || !data.user) {
         navigate('/auth');
@@ -61,15 +61,13 @@ const ProfilePage = () => {
     setLoading(false);
   };
 
-  // Fetch tracker stats (played count for each category)
+  // Fetch tracker stats
   const fetchTrackerStats = async (userId: string) => {
-    // Count for all categories: (fake split by region for now; real implementation would match DB structure)
     let stats: { [cat: string]: number } = {};
     let totals: { [cat: string]: number } = {};
     const { data, error } = await supabase.from('user_course_tracker').select('course_id, checked');
     if (data) {
       ['GB&I', 'Europe', 'USA', 'Global'].forEach((cat) => {
-        // Real logic: count matching category ONLY
         stats[cat] = data.filter(row => !!row.checked).length;
         totals[cat] = 100;
       });
@@ -78,26 +76,22 @@ const ProfilePage = () => {
     setTotalStats(totals);
   };
 
-  // Upload photo to Supabase storage (public bucket 'avatars')
+  // Upload photo
   const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file || !user) return;
     setUploading(true);
-    // Create a unique filename
     const fileExt = file.name.split('.').pop();
     const filePath = `${user.id}/avatar.${fileExt}`;
-    // Upload
     let { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file, { upsert: true });
     if (uploadError) {
       alert('Upload failed!');
       setUploading(false);
       return;
     }
-    // Get URL
     const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
     const avatarUrl = urlData?.publicUrl ?? '';
-    // Update user profile
-    await supabase.from('user_profiles').update({ profile_photo_url: avatarUrl, updated_at: new Date() }).eq('id', user.id);
+    await supabase.from('user_profiles').update({ profile_photo_url: avatarUrl, updated_at: new Date().toISOString() }).eq('id', user.id);
     setPhotoPreview(avatarUrl);
     setProfile(p => p ? { ...p, profile_photo_url: avatarUrl } : p);
     setUploading(false);
@@ -106,7 +100,7 @@ const ProfilePage = () => {
   // Home club editing logic
   const saveHomeClub = async () => {
     if (!user) return;
-    await supabase.from('user_profiles').update({ home_club: clubInput, updated_at: new Date() }).eq('id', user.id);
+    await supabase.from('user_profiles').update({ home_club: clubInput, updated_at: new Date().toISOString() }).eq('id', user.id);
     setProfile(p => p ? { ...p, home_club: clubInput } : p);
     setEditingClub(false);
   };
@@ -182,6 +176,9 @@ const ProfilePage = () => {
         )}
       </div>
 
+      {/* What's in the Bag */}
+      {user && <BagManager userId={user.id} />}
+
       {/* Top 100 Courses Tracker */}
       <div className="mt-10 px-2">
         <h2 className="text-lg font-semibold mb-3">Top 100 Courses Tracker</h2>
@@ -190,7 +187,6 @@ const ProfilePage = () => {
             const played = trackerStats[cat.key] || 0;
             const total = totalStats[cat.key] || 100;
             const percentage = Math.round((played / total) * 100);
-
             return (
               <div key={cat.key} className="bg-muted/70 rounded-lg p-4">
                 <div className="flex items-center justify-between">
@@ -199,7 +195,6 @@ const ProfilePage = () => {
                 </div>
                 <Progress value={percentage} className="mt-2" />
                 <div className="mt-2 text-xs text-muted-foreground">{percentage}% completed</div>
-                {/* TODO: Add interactive checklist for this category */}
               </div>
             );
           })}

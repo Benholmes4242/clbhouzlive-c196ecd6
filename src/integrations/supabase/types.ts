@@ -99,6 +99,50 @@ export type Database = {
         }
         Relationships: []
       }
+      user_bag: {
+        Row: {
+          brand: string
+          created_at: string | null
+          id: string
+          image_url: string | null
+          model: string | null
+          notes: string | null
+          type: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          brand: string
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          model?: string | null
+          notes?: string | null
+          type: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          brand?: string
+          created_at?: string | null
+          id?: string
+          image_url?: string | null
+          model?: string | null
+          notes?: string | null
+          type?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_bag_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "user_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_course_tracker: {
         Row: {
           checked: boolean | null
