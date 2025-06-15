@@ -49,10 +49,10 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   };
 
   return (
-    <div className="flex flex-col items-center gap-3 pt-8">
+    <div className="flex flex-col items-center gap-3 pt-8" style={{ background: "transparent", boxShadow: "none" }}>
       <div
         className={`
-          relative shadow-xl
+          relative
           ${canEdit ? "cursor-pointer group focus-within:ring-2 focus-within:ring-green-600" : ""}
         `}
         tabIndex={canEdit ? 0 : -1}
@@ -62,20 +62,22 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         }}
         aria-label={canEdit ? "Change profile photo" : "Profile photo"}
         role={canEdit ? "button" : undefined}
+        style={{ background: "transparent", boxShadow: "none" }}
       >
-        {/* Avatar circle with only green border, no background */}
+        {/* Avatar circle with green border, absolutely NO background, shadow, or padding */}
         <div
           className={
             "w-40 h-40 md:w-52 md:h-52 rounded-full border-4 border-green-700 overflow-hidden flex items-center justify-center object-cover transition-all relative duration-200" +
             (canEdit ? " group-hover:ring-4 group-hover:ring-green-500 group-hover:ring-offset-2" : "")
           }
           style={{
-            background: "transparent", // explicitly transparent background
-            boxShadow: "none" // no shadow inside the avatar circle
+            background: "transparent",
+            boxShadow: "none",
+            padding: 0,
+            margin: 0,
           }}
         >
           {hasPhoto ? (
-            // Avatar image, fills the circle, no background
             <img
               src={photoPreview || profilePhotoUrl!}
               alt="Profile"
