@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Input } from '@/components/ui/input';
@@ -7,6 +8,8 @@ import { Progress } from '@/components/ui/progress';
 import { User } from '@supabase/supabase-js';
 import { useNavigate } from 'react-router-dom';
 import BagManager from '@/components/BagManager';
+
+import Header from "@/components/Header"; // <-- Add this import
 
 type Profile = {
   id: string;
@@ -125,20 +128,9 @@ const ProfilePage = () => {
 
   return (
     <div className="min-h-screen bg-background pb-28 max-w-2xl mx-auto px-4">
-      {/* Members logo — matches Header.tsx left-side */}
-      <div className="flex items-center h-16 mb-2">
-        <img
-          src="/lovable-uploads/51e72efc-b6f0-4596-a139-348c49c1168e.png"
-          alt="Members Logo"
-          className="w-auto"
-          style={{
-            display: "block",
-            maxHeight: "56px", // matches Header.tsx size
-            maxWidth: 240,
-            objectFit: "contain"
-          }}
-        />
-      </div>
+      {/* Use the shared site header */}
+      <Header />
+      {/* Content below header */}
       <ProfileHeader
         photoPreview={photoPreview}
         profilePhotoUrl={profile?.profile_photo_url ?? ""}
