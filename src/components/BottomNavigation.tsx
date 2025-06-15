@@ -1,15 +1,18 @@
 
 import React, { useState, useEffect } from 'react';
-import { User, LogIn } from 'lucide-react';
+import { User, LogIn, Home, Newspaper, GolfIcon } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const BottomNavigation = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [activeTab, setActiveTab] = useState('profile');
+  const [activeTab, setActiveTab] = useState('home');
 
-  // Only two tabs (Profile and Login) as requested
+  // All main tabs
   const tabs = [
+    { id: 'home', label: 'Home', icon: Home, path: '/' },
+    { id: 'news', label: 'News', icon: Newspaper, path: '/news' },
+    { id: 'courses', label: 'Courses', icon: GolfIcon, path: '/courses' },
     { id: 'profile', label: 'Profile', icon: User, path: '/profile' },
     { id: 'login', label: 'Login', icon: LogIn, path: '/auth' },
   ];
@@ -21,7 +24,7 @@ const BottomNavigation = () => {
     }
   }, [location.pathname]);
 
-  const handleTabClick = (tab) => {
+  const handleTabClick = (tab: { id: string; path: string }) => {
     setActiveTab(tab.id);
     navigate(tab.path);
   };
@@ -29,7 +32,7 @@ const BottomNavigation = () => {
   return (
     <nav className="fixed bottom-0 left-0 right-0 bg-background border-t border-border z-40">
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-around h-16">
+        <div className="flex items-center justify-around h-16 relative">
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -37,7 +40,7 @@ const BottomNavigation = () => {
               <button
                 key={tab.id}
                 onClick={() => handleTabClick(tab)}
-                className={`flex flex-col items-center justify-center space-y-1 transition-colors ${
+                className={`flex flex-col items-center justify-center space-y-1 transition-colors relative ${
                   isActive
                     ? 'text-green-600'
                     : 'text-muted-foreground hover:text-foreground'
@@ -46,7 +49,7 @@ const BottomNavigation = () => {
                 <Icon className={`h-5 w-5 ${isActive ? 'fill-current' : ''}`} />
                 <span className="text-xs font-medium">{tab.label}</span>
                 {isActive && (
-                  <div className="absolute bottom-0 w-12 h-0.5 bg-green-600 rounded-full" />
+                  <div className="absolute bottom-0 w-12 h-0.5 bg-green-600 rounded-full left-1/2 -translate-x-1/2" />
                 )}
               </button>
             );
@@ -58,3 +61,4 @@ const BottomNavigation = () => {
 };
 
 export default BottomNavigation;
+
