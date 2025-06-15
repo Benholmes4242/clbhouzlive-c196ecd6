@@ -35,13 +35,17 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 
   return (
     <div className="flex flex-col items-center gap-3 pt-8">
-      <div className="relative shadow-lg">
-        <div className="w-40 h-40 md:w-52 md:h-52 rounded-full border-4 border-green-600 overflow-hidden bg-[#f3f3f3] flex items-center justify-center object-cover transition-all">
+      <div className="relative shadow-xl">
+        {/* Always provide a soft gray background and border behind the avatar */}
+        <div className="w-40 h-40 md:w-52 md:h-52 rounded-full border-4 border-green-700 overflow-hidden bg-[#ececec] flex items-center justify-center object-cover transition-all relative">
           {hasPhoto ? (
+            // Avatar image, always fills the circle with object-cover
             <img
               src={photoPreview || profilePhotoUrl!}
               alt="Profile"
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover bg-[#ececec] select-none"
+              style={{ backgroundColor: "#ececec" }}
+              draggable={false}
             />
           ) : (
             <UserPlaceholderIcon />
