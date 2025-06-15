@@ -30,6 +30,7 @@ import HomeClubSection from "@/components/profile/HomeClubSection";
 import EGAppIntegration from "@/components/profile/EGAppIntegration";
 import CourseTracker from "@/components/profile/CourseTracker";
 import BottomNavigation from '@/components/BottomNavigation';
+import BagManager from '@/components/BagManager'; // Ensure latest BagManager is used
 
 const ProfilePage = () => {
   const [user, setUser] = useState<any>(null);
@@ -145,7 +146,7 @@ const ProfilePage = () => {
         handicapIndex={profile?.eg_handicap_index ?? null}
         recentRounds={profile?.eg_recent_rounds ?? null}
       />
-      {/* Hide BagManager if no user */}
+      {/* What's in the Bag section */}
       {user && <BagManager userId={user.id} />}
       <CourseTracker trackerStats={trackerStats} totalStats={totalStats} />
       <BottomNavigation />
@@ -154,4 +155,3 @@ const ProfilePage = () => {
 };
 
 export default ProfilePage;
-
