@@ -20,21 +20,19 @@ const Header = () => {
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
       <div className="container mx-auto px-4">
-        {/* Restore original header height, e.g., h-16 (4rem) */}
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <div className="flex items-center h-full">
+          <div className="flex items-center">
             <img
               src="/lovable-uploads/51e72efc-b6f0-4596-a139-348c49c1168e.png"
               alt="Members Logo"
-              // fill as much of the header as possible, with a tiny gap (4px)
-              className="h-[calc(100%-8px)] w-auto"
+              // maximize logo height, leaving smallest visual gap
+              className="w-auto"
               style={{
-                maxHeight: "calc(100% - 8px)",
+                display: "block",
+                maxHeight: "calc(100% - 4px)", // 2px gap top/bottom
                 maxWidth: 240,
-                objectFit: "contain",
-                marginTop: "4px",
-                marginBottom: "4px"
+                objectFit: "contain"
               }}
             />
           </div>
@@ -75,3 +73,4 @@ const Header = () => {
 };
 
 export default Header;
+
