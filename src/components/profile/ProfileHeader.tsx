@@ -39,9 +39,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         </svg>
       </div>
     </div>
-    <div className="text-base mt-2 text-muted-foreground text-center">
-      Add a golf selfie or round photo
-    </div>
   </div>
 );
 
