@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { User, LogIn, Home, Newspaper, GolfIcon } from 'lucide-react';
+import { User, LogIn, Home, Newspaper, Flag } from 'lucide-react'; // Replaced GolfIcon with Flag
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const BottomNavigation = () => {
@@ -12,7 +12,7 @@ const BottomNavigation = () => {
   const tabs = [
     { id: 'home', label: 'Home', icon: Home, path: '/' },
     { id: 'news', label: 'News', icon: Newspaper, path: '/news' },
-    { id: 'courses', label: 'Courses', icon: GolfIcon, path: '/courses' },
+    { id: 'courses', label: 'Courses', icon: Flag, path: '/courses' }, // Changed to Flag icon
     { id: 'profile', label: 'Profile', icon: User, path: '/profile' },
     { id: 'login', label: 'Login', icon: LogIn, path: '/auth' },
   ];
@@ -61,4 +61,3 @@ const BottomNavigation = () => {
 };
 
 export default BottomNavigation;
-
