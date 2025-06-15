@@ -1,27 +1,25 @@
+
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-// import { X, Golf } from "lucide-react";
-import { X } from "lucide-react"; // Removed Golf icon as it's not available
+import { X } from "lucide-react";
 
+// Removed Cloth (Optional) and photo-related fields
 type BagItemData = {
   type: string;
   label: string;
-  photoLabel: string;
-  showPhoto: boolean;
   field: string;
 };
 
 const BAG_FIELDS: BagItemData[] = [
-  { type: "Driver", label: "Driver", field: "driver", photoLabel: "Upload Driver Photo", showPhoto: true },
-  { type: "Wood", label: "Woods", field: "woods", photoLabel: "Upload Woods Photo", showPhoto: true },
-  { type: "Iron", label: "Irons", field: "irons", photoLabel: "Upload Irons Photo", showPhoto: true },
-  { type: "Wedge", label: "Wedges", field: "wedges", photoLabel: "Upload Wedges Photo", showPhoto: true },
-  { type: "Putter", label: "Putter", field: "putter", photoLabel: "Upload Putter Photo", showPhoto: true },
-  { type: "Ball", label: "Ball", field: "ball", photoLabel: "Upload Ball Photo", showPhoto: true },
-  { type: "Cloth", label: "Cloth (Optional)", field: "cloth", photoLabel: "Upload Cloth Photo", showPhoto: true },
+  { type: "Driver", label: "Driver", field: "driver" },
+  { type: "Wood", label: "Woods", field: "woods" },
+  { type: "Iron", label: "Irons", field: "irons" },
+  { type: "Wedge", label: "Wedges", field: "wedges" },
+  { type: "Putter", label: "Putter", field: "putter" },
+  { type: "Ball", label: "Ball", field: "ball" }
 ];
 
 type BagItem = {
@@ -38,7 +36,7 @@ const BagManager = ({ userId }: { userId: string }) => {
   const [bag, setBag] = useState<BagItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState<{
-    [key: string]: { brand: string; model: string; notes: string; image: File | null; imageUrl: string | null }
+    [key: string]: { brand: string; model: string; notes: string }
   }>({});
   const [uploading, setUploading] = useState(false);
 
@@ -62,9 +60,7 @@ const BagManager = ({ userId }: { userId: string }) => {
         newForm[item.type] = {
           brand: item.brand || "",
           model: item.model || "",
-          notes: item.notes || "",
-          image: null,
-          imageUrl: item.image_url ?? null
+          notes: item.notes || ""
         };
       }
       setForm(newForm);
@@ -72,40 +68,19 @@ const BagManager = ({ userId }: { userId: string }) => {
     setLoading(false);
   }
 
-  async function handleInputChange(type: string, key: string, value: string | File | null) {
+  async function handleInputChange(type: string, key: string, value: string) {
     setForm(f => ({
       ...f,
       [type]: {
-        ...(f[type] || { brand: "", model: "", notes: "", image: null, imageUrl: null }),
+        ...(f[type] || { brand: "", model: "", notes: "" }),
         [key]: value
       }
     }));
   }
 
-  async function handlePhotoUpload(type: string, file: File) {
-    setUploading(true);
-    const ext = file.name.split('.').pop();
-    const path = `${userId}/bag/${type.toLowerCase()}-${Date.now()}.${ext}`;
-    // Small file, so upsert is fine
-    let { error } = await supabase.storage.from('avatars').upload(path, file, { upsert: true });
-    if (error) {
-      setUploading(false);
-      alert("Photo upload failed.");
-      return null;
-    }
-    const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(path);
-    setUploading(false);
-    return urlData?.publicUrl ?? null;
-  }
-
   async function handleSave(type: string) {
     const itemForm = form[type];
     if (!itemForm || !itemForm.brand) return;
-    let imageUrl = itemForm.imageUrl || null;
-    // Upload photo if selected
-    if (itemForm.image) {
-      imageUrl = await handlePhotoUpload(type, itemForm.image);
-    }
     // Find if already exists in bag
     const existing = bag.find(i => i.type === type);
     if (existing) {
@@ -114,7 +89,7 @@ const BagManager = ({ userId }: { userId: string }) => {
         brand: itemForm.brand,
         model: itemForm.model || null,
         notes: itemForm.notes || null,
-        image_url: imageUrl
+        image_url: null
       }).eq("id", existing.id);
     } else {
       // Insert
@@ -124,11 +99,9 @@ const BagManager = ({ userId }: { userId: string }) => {
         brand: itemForm.brand,
         model: itemForm.model || null,
         notes: itemForm.notes || null,
-        image_url: imageUrl
+        image_url: null
       }]);
     }
-    // Remove temp file from form
-    setForm(f => ({ ...f, [type]: { ...f[type], image: null, imageUrl } }));
     fetchBag();
   }
 
@@ -136,7 +109,7 @@ const BagManager = ({ userId }: { userId: string }) => {
     const existing = bag.find(i => i.type === type);
     if (existing) {
       await supabase.from("user_bag").delete().eq("id", existing.id);
-      setForm(f => ({ ...f, [type]: { brand: "", model: "", notes: "", image: null, imageUrl: null } }));
+      setForm(f => ({ ...f, [type]: { brand: "", model: "", notes: "" } }));
       fetchBag();
     }
   }
@@ -145,17 +118,16 @@ const BagManager = ({ userId }: { userId: string }) => {
   return (
     <section className="mt-10 px-2">
       <div className="flex items-center gap-2 mb-3">
-        {/* Removed <Golf /> icon (not available in lucide-react) */}
         <h2 className="text-xl font-bold">What's in the Bag?</h2>
       </div>
       <p className="text-muted-foreground text-base mb-3">
-        Show off your clubs, golf ball, or favorite towel 🎒
+        Show off your clubs or golf ball 🎒
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         {BAG_FIELDS.map(field => {
           const existing = bag.find(i => i.type === field.type);
-          const val = form[field.type] || { brand: "", model: "", notes: "", image: null, imageUrl: null };
+          const val = form[field.type] || { brand: "", model: "", notes: "" };
           return (
             <div
               key={field.field}
@@ -189,37 +161,6 @@ const BagManager = ({ userId }: { userId: string }) => {
                 onChange={e => handleInputChange(field.type, "model", e.target.value)}
                 className="mb-1"
               />
-              {field.type === "Cloth" && (
-                <>
-                  <Label className="text-xs text-muted-foreground">Description (optional / fun!)</Label>
-                  <Input
-                    value={val.notes || ""}
-                    placeholder={`Your towel, lucky rag, etc`}
-                    onChange={e => handleInputChange(field.type, "notes", e.target.value)}
-                    className="mb-1"
-                  />
-                </>
-              )}
-              {field.showPhoto && (
-                <div>
-                  <Label className="text-xs text-muted-foreground">{field.photoLabel}</Label>
-                  <div className="flex items-center gap-2">
-                    <Input
-                      type="file"
-                      accept="image/*"
-                      disabled={uploading}
-                      className="w-auto"
-                      onChange={e => {
-                        const file = e.target.files?.[0] ?? null;
-                        handleInputChange(field.type, "image", file);
-                      }}
-                    />
-                    {val.imageUrl && (
-                      <img src={val.imageUrl} alt={`${field.label} photo`} className="h-10 w-10 rounded object-cover border" />
-                    )}
-                  </div>
-                </div>
-              )}
               <Button
                 className="mt-2"
                 variant="default"
@@ -238,3 +179,4 @@ const BagManager = ({ userId }: { userId: string }) => {
 };
 
 export default BagManager;
+
