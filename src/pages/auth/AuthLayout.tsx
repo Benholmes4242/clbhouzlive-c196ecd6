@@ -29,7 +29,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
         disabled={submitting}
       >
         {isSignUp
-          ? "Already have an account? Sign in"
+          ? "Already a member? Sign in"
           : "Become a member. Sign up"}
       </button>
     </div>
