@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Input } from '@/components/ui/input';
@@ -88,20 +87,33 @@ const ProfilePage = () => {
     if (!user) return;
     const file = event.target.files?.[0];
     if (!file) return;
+
+    // Show instant preview from selected file
+    const tempPreviewUrl = URL.createObjectURL(file);
+    setPhotoPreview(tempPreviewUrl);
+
     setUploading(true);
     const fileExt = file.name.split('.').pop();
     const filePath = `${user.id}/avatar.${fileExt}`;
+
+    // Upload to Supabase Storage (upsert means override, but URL stays same)
     let { error } = await supabase.storage.from('avatars').upload(filePath, file, { upsert: true });
     if (error) {
       alert('Upload failed!');
       setUploading(false);
       return;
     }
+
+    // Get fresh public URL and append a cache-busting query param
     const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
-    const avatarUrl = urlData?.publicUrl ?? '';
-    await supabase.from('user_profiles').update({ profile_photo_url: avatarUrl, updated_at: new Date().toISOString() }).eq('id', user.id);
+    let avatarUrl = urlData?.publicUrl ?? '';
+    if (avatarUrl) {
+      // Bust cache by appending timestamp
+      avatarUrl = `${avatarUrl}?t=${Date.now()}`;
+    }
     setPhotoPreview(avatarUrl);
-    setProfile(p => p ? { ...p, profile_photo_url: avatarUrl } : p);
+    await supabase.from('user_profiles').update({ profile_photo_url: avatarUrl, updated_at: new Date().toISOString() }).eq('id', user.id);
+    setProfile((p) => p ? { ...p, profile_photo_url: avatarUrl } : p);
     setUploading(false);
   };
 
