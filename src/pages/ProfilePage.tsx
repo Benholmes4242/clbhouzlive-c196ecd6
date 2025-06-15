@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Input } from '@/components/ui/input';
@@ -28,6 +29,7 @@ import ProfileHeader from "@/components/profile/ProfileHeader";
 import HomeClubSection from "@/components/profile/HomeClubSection";
 import EGAppIntegration from "@/components/profile/EGAppIntegration";
 import CourseTracker from "@/components/profile/CourseTracker";
+import BottomNavigation from '@/components/BottomNavigation';
 
 const ProfilePage = () => {
   const [user, setUser] = useState<any>(null);
@@ -146,8 +148,10 @@ const ProfilePage = () => {
       {/* Hide BagManager if no user */}
       {user && <BagManager userId={user.id} />}
       <CourseTracker trackerStats={trackerStats} totalStats={totalStats} />
+      <BottomNavigation />
     </div>
   );
 };
 
 export default ProfilePage;
+
