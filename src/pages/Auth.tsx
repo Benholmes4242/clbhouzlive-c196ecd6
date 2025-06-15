@@ -61,7 +61,14 @@ const Auth: React.FC = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="bg-muted rounded-lg shadow-md p-6 w-full max-w-md mx-auto flex flex-col items-center">
-        <h1 className="text-2xl font-semibold mb-5">{isSignUp ? "Sign Up" : "Sign In"}</h1>
+        {/* Members logo at the top */}
+        <img
+          src="/lovable-uploads/1f870366-4fd9-4e56-a9a0-31c86f07d340.png"
+          alt="Members Logo"
+          className="mb-6"
+          style={{ width: 200, maxWidth: "80%" }}
+        />
+        {/* No H1/H2 header here */}
         <form className="w-full" onSubmit={handleAuth}>
           <div className="mb-4">
             <Input
@@ -114,3 +121,4 @@ const Auth: React.FC = () => {
 };
 
 export default Auth;
+
