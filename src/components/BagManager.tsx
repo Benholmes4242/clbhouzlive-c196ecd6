@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { X } from "lucide-react";
 
 // Removed Cloth (Optional) and photo-related fields
@@ -32,18 +33,34 @@ type BagItem = {
   image_url: string | null;
 };
 
-const BagManager = ({ userId }: { userId: string }) => {
+interface BagManagerProps {
+  userId: string;
+  isOwnProfile?: boolean;
+  bagVisible?: boolean;
+}
+
+const BagManager = ({ userId, isOwnProfile = false, bagVisible = true }: BagManagerProps) => {
   const [bag, setBag] = useState<BagItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [form, setForm] = useState<{
     [key: string]: { brand: string; model: string; notes: string }
   }>({});
   const [uploading, setUploading] = useState(false);
+  const [isBagVisible, setIsBagVisible] = useState(bagVisible);
 
   useEffect(() => {
     if (userId) fetchBag();
     // eslint-disable-next-line
   }, [userId]);
+
+  useEffect(() => {
+    setIsBagVisible(bagVisible);
+  }, [bagVisible]);
+
+  // If this is not the user's own profile and bag is not visible, don't render anything
+  if (!isOwnProfile && !isBagVisible) {
+    return null;
+  }
 
   async function fetchBag() {
     setLoading(true);
@@ -114,11 +131,34 @@ const BagManager = ({ userId }: { userId: string }) => {
     }
   }
 
+  async function handleVisibilityToggle(checked: boolean) {
+    setIsBagVisible(checked);
+    await supabase
+      .from("user_profiles")
+      .update({ bag_visible: checked })
+      .eq("id", userId);
+  }
+
   // Render
   return (
     <section className="mt-10 px-2">
       <div className="flex items-center gap-2 mb-3">
         <h2 className="text-xl font-bold">What's in the Bag?</h2>
+        {isOwnProfile && (
+          <div className="flex items-center space-x-2 ml-auto">
+            <Checkbox
+              id="bag-visibility"
+              checked={isBagVisible}
+              onCheckedChange={handleVisibilityToggle}
+            />
+            <Label
+              htmlFor="bag-visibility"
+              className="text-sm text-muted-foreground cursor-pointer"
+            >
+              Show this section on my public profile
+            </Label>
+          </div>
+        )}
       </div>
       <p className="text-muted-foreground text-base mb-3">
         Show off your clubs or golf ball 🎒
@@ -135,7 +175,7 @@ const BagManager = ({ userId }: { userId: string }) => {
             >
               <div className="flex items-center gap-2">
                 <span className="font-semibold text-lg tracking-wide">{field.label}:</span>
-                {existing && (
+                {existing && isOwnProfile && (
                   <Button
                     variant="ghost"
                     size="icon"
@@ -147,29 +187,45 @@ const BagManager = ({ userId }: { userId: string }) => {
                   </Button>
                 )}
               </div>
-              <Label className="text-xs text-muted-foreground">Make / Brand</Label>
-              <Input
-                value={val.brand || ""}
-                placeholder={`e.g. Titleist, TaylorMade`}
-                onChange={e => handleInputChange(field.type, "brand", e.target.value)}
-                className="mb-1"
-              />
-              <Label className="text-xs text-muted-foreground">Model</Label>
-              <Input
-                value={val.model || ""}
-                placeholder={`e.g. Pro V1x, i230`}
-                onChange={e => handleInputChange(field.type, "model", e.target.value)}
-                className="mb-1"
-              />
-              <Button
-                className="mt-2"
-                variant="default"
-                size="sm"
-                onClick={() => handleSave(field.type)}
-                disabled={uploading || !val.brand}
-              >
-                {existing ? "Update" : "Save"}
-              </Button>
+              {isOwnProfile ? (
+                <>
+                  <Label className="text-xs text-muted-foreground">Make / Brand</Label>
+                  <Input
+                    value={val.brand || ""}
+                    placeholder={`e.g. Titleist, TaylorMade`}
+                    onChange={e => handleInputChange(field.type, "brand", e.target.value)}
+                    className="mb-1"
+                  />
+                  <Label className="text-xs text-muted-foreground">Model</Label>
+                  <Input
+                    value={val.model || ""}
+                    placeholder={`e.g. Pro V1x, i230`}
+                    onChange={e => handleInputChange(field.type, "model", e.target.value)}
+                    className="mb-1"
+                  />
+                  <Button
+                    className="mt-2"
+                    variant="default"
+                    size="sm"
+                    onClick={() => handleSave(field.type)}
+                    disabled={uploading || !val.brand}
+                  >
+                    {existing ? "Update" : "Save"}
+                  </Button>
+                </>
+              ) : (
+                existing && (
+                  <div className="space-y-1">
+                    <div className="text-sm">
+                      <span className="font-medium">{existing.brand}</span>
+                      {existing.model && <span className="text-muted-foreground"> {existing.model}</span>}
+                    </div>
+                    {existing.notes && (
+                      <div className="text-xs text-muted-foreground">{existing.notes}</div>
+                    )}
+                  </div>
+                )
+              )}
             </div>
           );
         })}
@@ -179,4 +235,3 @@ const BagManager = ({ userId }: { userId: string }) => {
 };
 
 export default BagManager;
-

@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Input } from '@/components/ui/input';
@@ -16,6 +17,7 @@ type Profile = {
   eg_app_connected: boolean | null;
   eg_handicap_index: number | null;
   eg_recent_rounds: any | null;
+  bag_visible: boolean | null;
 };
 
 const courseCategories = [
@@ -161,7 +163,13 @@ const ProfilePage = () => {
           recentRounds={profile?.eg_recent_rounds ?? null}
         />
         {/* What's in the Bag section */}
-        {user && <BagManager userId={user.id} />}
+        {user && (
+          <BagManager 
+            userId={user.id} 
+            isOwnProfile={true}
+            bagVisible={profile?.bag_visible ?? true}
+          />
+        )}
         <CourseTracker trackerStats={trackerStats} totalStats={totalStats} />
       </div>
       <BottomNavigation />

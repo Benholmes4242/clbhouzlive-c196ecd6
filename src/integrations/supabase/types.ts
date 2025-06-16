@@ -237,6 +237,7 @@ export type Database = {
       }
       user_profiles: {
         Row: {
+          bag_visible: boolean | null
           created_at: string | null
           eg_app_connected: boolean | null
           eg_handicap_index: number | null
@@ -247,6 +248,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          bag_visible?: boolean | null
           created_at?: string | null
           eg_app_connected?: boolean | null
           eg_handicap_index?: number | null
@@ -257,6 +259,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          bag_visible?: boolean | null
           created_at?: string | null
           eg_app_connected?: boolean | null
           eg_handicap_index?: number | null
