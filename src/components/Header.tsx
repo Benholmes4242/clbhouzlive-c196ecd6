@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Search, Bell, MessageCircle, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -16,6 +17,10 @@ const Header = () => {
     }
   };
 
+  const handleLogoClick = () => {
+    navigate('/');
+  };
+
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
       <div className="container mx-auto px-4">
@@ -25,13 +30,14 @@ const Header = () => {
             <img
               src="/lovable-uploads/51e72efc-b6f0-4596-a139-348c49c1168e.png"
               alt="Members Logo"
-              className="w-auto"
+              className="w-auto cursor-pointer"
               style={{
                 display: "block",
                 maxHeight: "56px", // increased from 44px to make the logo a bit bigger
                 maxWidth: 240,
                 objectFit: "contain"
               }}
+              onClick={handleLogoClick}
             />
           </div>
 
