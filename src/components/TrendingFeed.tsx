@@ -1,9 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
-import { Play, Heart, MessageCircle, Share, MoreHorizontal, ExternalLink } from 'lucide-react';
+import { Play, Heart, MessageCircle, Share, MoreHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { supabase } from '@/integrations/supabase/client';
+import VideoPlayer from './VideoPlayer';
 
 interface VideoPost {
   id: string;
@@ -34,6 +34,13 @@ interface VideoPost {
 const TrendingFeed = () => {
   const [posts, setPosts] = useState<VideoPost[]>([]);
   const [loading, setLoading] = useState(true);
+  const [videoPlayer, setVideoPlayer] = useState<{
+    isOpen: boolean;
+    youtubeId?: string;
+    videoUrl?: string;
+  }>({
+    isOpen: false,
+  });
 
   // Static posts for now (original content)
   const staticPosts: VideoPost[] = [
@@ -134,11 +141,15 @@ const TrendingFeed = () => {
   }, []);
 
   const handleVideoClick = (post: VideoPost) => {
-    if (post.content.youtubeId) {
-      window.open(`https://www.youtube.com/watch?v=${post.content.youtubeId}`, '_blank');
-    } else if (post.content.videoUrl) {
-      window.open(post.content.videoUrl, '_blank');
-    }
+    setVideoPlayer({
+      isOpen: true,
+      youtubeId: post.content.youtubeId,
+      videoUrl: post.content.videoUrl,
+    });
+  };
+
+  const closeVideoPlayer = () => {
+    setVideoPlayer({ isOpen: false });
   };
 
   if (loading) {
@@ -164,101 +175,105 @@ const TrendingFeed = () => {
   }
 
   return (
-    <div className="space-y-6 pb-20">
-      {posts.map((post) => (
-        <Card key={post.id} className="border-0 shadow-sm">
-          <div className="p-4">
-            {/* Post Header */}
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center space-x-3">
-                <img
-                  src={post.user.avatar}
-                  alt={post.user.name}
-                  className="w-10 h-10 rounded-full object-cover"
-                />
-                <div>
-                  <div className="flex items-center space-x-1">
-                    <span className="font-semibold text-sm">{post.user.name}</span>
-                    {post.user.verified && (
-                      <div className="w-4 h-4 bg-green-600 rounded-full flex items-center justify-center">
-                        <div className="w-2 h-2 bg-white rounded-full" />
+    <>
+      <div className="space-y-6 pb-20">
+        {posts.map((post) => (
+          <Card key={post.id} className="border-0 shadow-sm">
+            <div className="p-4">
+              {/* Post Header */}
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center space-x-3">
+                  <img
+                    src={post.user.avatar}
+                    alt={post.user.name}
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                  <div>
+                    <div className="flex items-center space-x-1">
+                      <span className="font-semibold text-sm">{post.user.name}</span>
+                      {post.user.verified && (
+                        <div className="w-4 h-4 bg-green-600 rounded-full flex items-center justify-center">
+                          <div className="w-2 h-2 bg-white rounded-full" />
+                        </div>
+                      )}
+                      {post.type === 'youtube' && (
+                        <span className="text-xs bg-red-500 text-white px-2 py-0.5 rounded">YouTube</span>
+                      )}
+                      {post.type === 'friend' && (
+                        <span className="text-xs bg-blue-500 text-white px-2 py-0.5 rounded">Friend</span>
+                      )}
+                    </div>
+                    <span className="text-xs text-muted-foreground">{post.user.username} • {post.timeAgo}</span>
+                  </div>
+                </div>
+                <Button variant="ghost" size="icon">
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </div>
+
+              {/* Post Content */}
+              <p className="text-sm mb-3">{post.content.description}</p>
+              
+              <div className="relative rounded-lg overflow-hidden mb-3">
+                {post.content.type === 'video' ? (
+                  <div 
+                    className="relative cursor-pointer group"
+                    onClick={() => handleVideoClick(post)}
+                  >
+                    <img
+                      src={post.content.thumbnail}
+                      alt="Video thumbnail"
+                      className="w-full h-80 object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/20 flex items-center justify-center group-hover:bg-black/30 transition-all">
+                      <div className="bg-white/90 rounded-full p-3 group-hover:scale-110 transition-transform">
+                        <Play className="h-6 w-6 text-green-600 fill-current" />
+                      </div>
+                    </div>
+                    {post.content.duration && (
+                      <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
+                        {post.content.duration}
                       </div>
                     )}
-                    {post.type === 'youtube' && (
-                      <span className="text-xs bg-red-500 text-white px-2 py-0.5 rounded">YouTube</span>
-                    )}
-                    {post.type === 'friend' && (
-                      <span className="text-xs bg-blue-500 text-white px-2 py-0.5 rounded">Friend</span>
-                    )}
                   </div>
-                  <span className="text-xs text-muted-foreground">{post.user.username} • {post.timeAgo}</span>
-                </div>
-              </div>
-              <Button variant="ghost" size="icon">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </div>
-
-            {/* Post Content */}
-            <p className="text-sm mb-3">{post.content.description}</p>
-            
-            <div className="relative rounded-lg overflow-hidden mb-3">
-              {post.content.type === 'video' ? (
-                <div 
-                  className="relative cursor-pointer group"
-                  onClick={() => handleVideoClick(post)}
-                >
+                ) : (
                   <img
-                    src={post.content.thumbnail}
-                    alt="Video thumbnail"
+                    src={post.content.image}
+                    alt="Post content"
                     className="w-full h-80 object-cover"
                   />
-                  <div className="absolute inset-0 bg-black/20 flex items-center justify-center group-hover:bg-black/30 transition-all">
-                    <div className="bg-white/90 rounded-full p-3 group-hover:scale-110 transition-transform">
-                      <Play className="h-6 w-6 text-green-600 fill-current" />
-                    </div>
-                  </div>
-                  {post.content.duration && (
-                    <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
-                      {post.content.duration}
-                    </div>
-                  )}
-                  {(post.type === 'youtube' || post.content.videoUrl) && (
-                    <div className="absolute top-2 right-2 bg-black/70 text-white p-1 rounded">
-                      <ExternalLink className="h-4 w-4" />
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <img
-                  src={post.content.image}
-                  alt="Post content"
-                  className="w-full h-80 object-cover"
-                />
-              )}
-            </div>
+                )}
+              </div>
 
-            {/* Post Actions */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-red-500">
-                  <Heart className="h-4 w-4 mr-1" />
-                  {post.stats.likes.toLocaleString()}
-                </Button>
-                <Button variant="ghost" size="sm" className="text-muted-foreground">
-                  <MessageCircle className="h-4 w-4 mr-1" />
-                  {post.stats.comments}
-                </Button>
-                <Button variant="ghost" size="sm" className="text-muted-foreground">
-                  <Share className="h-4 w-4 mr-1" />
-                  {post.stats.shares}
-                </Button>
+              {/* Post Actions */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-red-500">
+                    <Heart className="h-4 w-4 mr-1" />
+                    {post.stats.likes.toLocaleString()}
+                  </Button>
+                  <Button variant="ghost" size="sm" className="text-muted-foreground">
+                    <MessageCircle className="h-4 w-4 mr-1" />
+                    {post.stats.comments}
+                  </Button>
+                  <Button variant="ghost" size="sm" className="text-muted-foreground">
+                    <Share className="h-4 w-4 mr-1" />
+                    {post.stats.shares}
+                  </Button>
+                </div>
               </div>
             </div>
-          </div>
-        </Card>
-      ))}
-    </div>
+          </Card>
+        ))}
+      </div>
+      
+      <VideoPlayer
+        isOpen={videoPlayer.isOpen}
+        onClose={closeVideoPlayer}
+        youtubeId={videoPlayer.youtubeId}
+        videoUrl={videoPlayer.videoUrl}
+      />
+    </>
   );
 };
 
