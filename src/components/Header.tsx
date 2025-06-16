@@ -21,6 +21,11 @@ const Header = () => {
     navigate('/');
   };
 
+  // Mock data for notifications and messages - in a real app, this would come from your backend
+  const hasNotifications = user && true; // Replace with actual notification check
+  const notificationCount = user ? 3 : 0; // Replace with actual count
+  const hasMessages = user && false; // Replace with actual message check
+
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
       <div className="container mx-auto px-4">
@@ -57,10 +62,17 @@ const Header = () => {
           <div className="flex items-center space-x-4">
             <Button variant="ghost" size="icon" className="relative">
               <Bell className="h-5 w-5" />
-              <span className="absolute -top-1 -right-1 bg-amber-700 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">3</span>
+              {hasNotifications && (
+                <span className="absolute -top-1 -right-1 bg-amber-700 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {notificationCount}
+                </span>
+              )}
             </Button>
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" className="relative">
               <MessageCircle className="h-5 w-5" />
+              {hasMessages && (
+                <span className="absolute -top-1 -right-1 bg-amber-700 text-white text-xs rounded-full h-2 w-2"></span>
+              )}
             </Button>
             <Button
               variant="ghost"
