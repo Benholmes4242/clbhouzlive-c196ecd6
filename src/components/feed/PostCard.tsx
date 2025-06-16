@@ -33,14 +33,9 @@ interface VideoPost {
 
 interface PostCardProps {
   post: VideoPost;
-  onVideoClick: (post: VideoPost) => void;
 }
 
-const PostCard = ({ post, onVideoClick }: PostCardProps) => {
-  const handleVideoClick = () => {
-    onVideoClick(post);
-  };
-
+const PostCard = ({ post }: PostCardProps) => {
   return (
     <Card className="border-0 shadow-sm">
       <div className="p-4">
@@ -51,8 +46,7 @@ const PostCard = ({ post, onVideoClick }: PostCardProps) => {
         />
         
         <PostContent 
-          content={post.content} 
-          onVideoClick={post.content.type === 'video' ? handleVideoClick : undefined}
+          content={post.content}
         />
 
         <div className="flex items-center justify-between">

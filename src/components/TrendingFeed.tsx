@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import VideoPlayer from './VideoPlayer';
 import PostCard from './feed/PostCard';
 import LoadingSkeleton from './feed/LoadingSkeleton';
 
@@ -34,13 +33,6 @@ interface VideoPost {
 const TrendingFeed = () => {
   const [posts, setPosts] = useState<VideoPost[]>([]);
   const [loading, setLoading] = useState(true);
-  const [videoPlayer, setVideoPlayer] = useState<{
-    isOpen: boolean;
-    youtubeId?: string;
-    videoUrl?: string;
-  }>({
-    isOpen: false,
-  });
 
   // Static posts for now (original content)
   const staticPosts: VideoPost[] = [
@@ -140,41 +132,19 @@ const TrendingFeed = () => {
     loadContent();
   }, []);
 
-  const handleVideoClick = (post: VideoPost) => {
-    setVideoPlayer({
-      isOpen: true,
-      youtubeId: post.content.youtubeId,
-      videoUrl: post.content.videoUrl,
-    });
-  };
-
-  const closeVideoPlayer = () => {
-    setVideoPlayer({ isOpen: false });
-  };
-
   if (loading) {
     return <LoadingSkeleton />;
   }
 
   return (
-    <>
-      <div className="space-y-6 pb-20">
-        {posts.map((post) => (
-          <PostCard 
-            key={post.id} 
-            post={post} 
-            onVideoClick={handleVideoClick}
-          />
-        ))}
-      </div>
-      
-      <VideoPlayer
-        isOpen={videoPlayer.isOpen}
-        onClose={closeVideoPlayer}
-        youtubeId={videoPlayer.youtubeId}
-        videoUrl={videoPlayer.videoUrl}
-      />
-    </>
+    <div className="space-y-6 pb-20">
+      {posts.map((post) => (
+        <PostCard 
+          key={post.id} 
+          post={post}
+        />
+      ))}
+    </div>
   );
 };
 
