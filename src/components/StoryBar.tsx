@@ -11,29 +11,34 @@ const StoryBar = () => {
       id: 'add',
       type: 'add',
       user: 'Your Profile',
+      username: 'your-profile',
       avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
     },
     {
       id: 1,
       user: 'Rory McIlroy',
+      username: 'rory-mcilroy',
       avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
       hasStory: true,
     },
     {
       id: 2,
       user: 'Golf Weekly',
+      username: 'golf-weekly',
       avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
       hasStory: true,
     },
     {
       id: 3,
       user: 'PGA Tour',
+      username: 'pga-tour',
       avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150&h=150&fit=crop&crop=face',
       hasStory: true,
     },
     {
       id: 4,
       user: 'Local Pro',
+      username: 'local-pro',
       avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=150&h=150&fit=crop&crop=face',
       hasStory: true,
     },
@@ -57,6 +62,11 @@ const StoryBar = () => {
     }
   };
 
+  // Function to handle other users' profile navigation
+  const handleOtherProfile = (username: string) => {
+    navigate(`/profile/${username}`);
+  };
+
   return (
     <div className="bg-background border-b border-border">
       <div className="container mx-auto px-4 py-4">
@@ -75,13 +85,20 @@ const StoryBar = () => {
                     </div>
                   </button>
                 ) : (
-                  <div className={`w-16 h-16 rounded-full p-0.5 ${story.hasStory ? 'bg-gradient-to-tr from-green-500 to-green-700' : ''}`}>
-                    <img
-                      src={story.avatar}
-                      alt={story.user}
-                      className="w-full h-full rounded-full object-cover border-2 border-background"
-                    />
-                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleOtherProfile(story.username)}
+                    aria-label={`View ${story.user}'s profile`}
+                    className="focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 rounded-full"
+                  >
+                    <div className={`w-16 h-16 rounded-full p-0.5 ${story.hasStory ? 'bg-gradient-to-tr from-green-500 to-green-700' : ''} hover:scale-105 transition-transform`}>
+                      <img
+                        src={story.avatar}
+                        alt={story.user}
+                        className="w-full h-full rounded-full object-cover border-2 border-background"
+                      />
+                    </div>
+                  </button>
                 )}
               </div>
               <span className="text-xs text-center text-muted-foreground max-w-16 truncate">
@@ -96,4 +113,3 @@ const StoryBar = () => {
 };
 
 export default StoryBar;
-
