@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Search, Bell, MessageCircle, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -22,9 +21,9 @@ const Header = () => {
   };
 
   // Mock data for notifications and messages - in a real app, this would come from your backend
-  const hasNotifications = user && true; // Replace with actual notification check
-  const notificationCount = user ? 3 : 0; // Replace with actual count
-  const hasMessages = user && false; // Replace with actual message check
+  const hasNotifications = user && false; // Set to false to show no notifications
+  const notificationCount = user ? 0 : 0; // Set to 0 to show no count
+  const hasMessages = user && false; // Set to false to show no messages
 
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
