@@ -109,12 +109,25 @@ export function useNotifications() {
     }
   };
 
+  const removeNotification = (notificationId: string) => {
+    setNotifications(prev => prev.filter(n => n.id !== notificationId));
+    // Also update unread count if the removed notification was unread
+    setNotifications(prev => {
+      const removedNotification = notifications.find(n => n.id === notificationId);
+      if (removedNotification && !removedNotification.read) {
+        setUnreadCount(current => Math.max(0, current - 1));
+      }
+      return prev.filter(n => n.id !== notificationId);
+    });
+  };
+
   return {
     notifications,
     unreadCount,
     loading,
     markAsRead,
     markAllAsRead,
+    removeNotification,
     refetch: fetchNotifications
   };
 }

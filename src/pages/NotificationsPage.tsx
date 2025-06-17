@@ -16,7 +16,7 @@ import { formatDistanceToNow } from 'date-fns';
 const NotificationsPage = () => {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
-  const { notifications, unreadCount, loading, markAsRead, markAllAsRead } = useNotifications();
+  const { notifications, unreadCount, loading, markAsRead, markAllAsRead, removeNotification } = useNotifications();
   const { toast } = useToast();
 
   const handleFriendRequestAction = async (notificationId: string, friendRequestId: string, action: 'accept' | 'decline') => {
@@ -49,8 +49,8 @@ const NotificationsPage = () => {
         });
       }
 
-      // Mark notification as read
-      await markAsRead(notificationId);
+      // Remove the notification from the local state immediately
+      removeNotification(notificationId);
     } catch (error) {
       console.error('Error handling friend request:', error);
       toast({
