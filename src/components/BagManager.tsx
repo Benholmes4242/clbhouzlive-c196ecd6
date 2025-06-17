@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -63,7 +64,14 @@ const BagManager = ({ userId, isOwnProfile = false, bagVisible = true }: BagMana
       .eq("id", userId);
   }
 
-  const bagTypes = ["Driver", "Woods", "Irons", "Wedges", "Putter", "Ball"];
+  const bagTypes = [
+    { type: "Driver", dbType: "Driver", allowMultiple: false },
+    { type: "Woods", dbType: "Wood", allowMultiple: true },
+    { type: "Irons", dbType: "Iron", allowMultiple: false },
+    { type: "Wedges", dbType: "Wedge", allowMultiple: true },
+    { type: "Putter", dbType: "Putter", allowMultiple: false },
+    { type: "Ball", dbType: "Ball", allowMultiple: false }
+  ];
 
   if (loading) {
     return (
@@ -101,26 +109,26 @@ const BagManager = ({ userId, isOwnProfile = false, bagVisible = true }: BagMana
       </div>
 
       <div className="space-y-2">
-        {bagTypes.map(type => {
-          // Map display labels to database types
-          const dbType = type === "Woods" ? "Wood" : 
-                        type === "Irons" ? "Iron" : 
-                        type === "Wedges" ? "Wedge" : type;
+        {bagTypes.map(bagType => {
+          const items = bag.filter(i => i.type === bagType.dbType);
           
-          const item = bag.find(i => i.type === dbType);
-          
-          // If not own profile and item is not set, don't show this row
-          if (!isOwnProfile && !item) {
+          // If not own profile and no items, don't show this row
+          if (!isOwnProfile && items.length === 0) {
             return null;
           }
           
           return (
-            <div key={type} className="flex items-start gap-2">
-              <span className="font-bold text-sm min-w-16">{type}:</span>
-              {item ? (
-                <div className="text-sm">
-                  <span className="font-bold">{item.brand}</span>
-                  {item.model && <span className="font-bold"> {item.model}</span>}
+            <div key={bagType.type} className="flex items-start gap-2">
+              <span className="font-bold text-sm min-w-16">{bagType.type}:</span>
+              {items.length > 0 ? (
+                <div className="text-sm space-y-1">
+                  {items.map((item, index) => (
+                    <div key={item.id}>
+                      <span className="font-bold">{item.brand}</span>
+                      {item.model && <span className="font-bold"> {item.model}</span>}
+                      {index < items.length - 1 && bagType.allowMultiple && <span className="text-muted-foreground">, </span>}
+                    </div>
+                  ))}
                 </div>
               ) : (
                 <span className="text-muted-foreground text-sm">Not set</span>
