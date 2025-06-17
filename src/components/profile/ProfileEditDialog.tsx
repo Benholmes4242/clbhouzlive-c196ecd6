@@ -17,6 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Edit } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -26,6 +27,7 @@ interface ProfileEditDialogProps {
     username?: string | null;
     home_club?: string | null;
     eg_handicap_index?: number | null;
+    is_public?: boolean | null;
   } | null;
   userId: string;
   onProfileUpdate: () => void;
@@ -42,6 +44,7 @@ const ProfileEditDialog: React.FC<ProfileEditDialogProps> = ({
     username: profile?.username || "",
     homeClub: profile?.home_club || "",
     handicap: profile?.eg_handicap_index?.toString() || "",
+    isPublic: profile?.is_public ?? true,
   });
   const [saving, setSaving] = useState(false);
 
@@ -96,6 +99,13 @@ const ProfileEditDialog: React.FC<ProfileEditDialogProps> = ({
     }));
   };
 
+  const handlePublicToggle = (checked: boolean) => {
+    setFormData(prev => ({
+      ...prev,
+      isPublic: checked
+    }));
+  };
+
   const handleSave = async () => {
     setSaving(true);
     try {
@@ -103,6 +113,7 @@ const ProfileEditDialog: React.FC<ProfileEditDialogProps> = ({
         display_name: formData.displayName,
         home_club: formData.homeClub || null,
         eg_handicap_index: formData.handicap ? parseFloat(formData.handicap) : null,
+        is_public: formData.isPublic,
         updated_at: new Date().toISOString(),
       };
 
@@ -187,6 +198,19 @@ const ProfileEditDialog: React.FC<ProfileEditDialogProps> = ({
                 ))}
               </SelectContent>
             </Select>
+          </div>
+          <div className="flex items-center justify-between space-x-2">
+            <div className="space-y-1">
+              <Label htmlFor="public-profile">Public Profile</Label>
+              <p className="text-sm text-muted-foreground">
+                Allow others to discover and view your profile
+              </p>
+            </div>
+            <Switch
+              id="public-profile"
+              checked={formData.isPublic}
+              onCheckedChange={handlePublicToggle}
+            />
           </div>
         </div>
         <div className="flex justify-end gap-2">
