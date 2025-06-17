@@ -1,5 +1,6 @@
 
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 interface ProfileHeaderProps {
   photoPreview: string | null;
@@ -32,6 +33,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 }) => {
   const hasPhoto = !!photoPreview || !!profilePhotoUrl;
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [showEnlargedPhoto, setShowEnlargedPhoto] = useState(false);
 
   // Trick: allow selecting the same file again by resetting file input after use
   const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -41,79 +43,107 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     }
   };
 
-  // When editable, clicking the avatar triggers the file picker
+  // Handle avatar click - either upload (if can edit) or enlarge (if has photo)
   const handleAvatarClick = () => {
     if (canEdit && !uploading) {
       fileInputRef.current?.click();
+    } else if (hasPhoto) {
+      setShowEnlargedPhoto(true);
     }
   };
 
+  const currentPhotoUrl = photoPreview || profilePhotoUrl;
+
   return (
-    <div className="flex flex-col items-center gap-3 pt-8" style={{ background: "transparent", boxShadow: "none" }}>
-      <div
-        className={`
-          relative
-          ${canEdit ? "cursor-pointer group focus-within:ring-2 focus-within:ring-green-600" : ""}
-        `}
-        tabIndex={canEdit ? 0 : -1}
-        onClick={handleAvatarClick}
-        onKeyDown={e => {
-          if (canEdit && (e.key === "Enter" || e.key === " ")) handleAvatarClick();
-        }}
-        aria-label={canEdit ? "Change profile photo" : "Profile photo"}
-        role={canEdit ? "button" : undefined}
-        style={{ background: "transparent", boxShadow: "none" }}
-      >
-        {/* Avatar circle with green border, absolutely NO background, shadow, or padding */}
+    <>
+      <div className="flex flex-col items-center gap-3 pt-8" style={{ background: "transparent", boxShadow: "none" }}>
         <div
-          className={
-            "w-40 h-40 md:w-52 md:h-52 rounded-full border-4 border-green-700 overflow-hidden flex items-center justify-center object-cover transition-all relative duration-200" +
-            (canEdit ? " group-hover:ring-4 group-hover:ring-green-500 group-hover:ring-offset-2" : "")
-          }
-          style={{
-            background: "transparent",
-            boxShadow: "none",
-            padding: 0,
-            margin: 0,
+          className={`
+            relative
+            ${canEdit ? "cursor-pointer group focus-within:ring-2 focus-within:ring-green-600" : hasPhoto ? "cursor-pointer" : ""}
+          `}
+          tabIndex={canEdit || hasPhoto ? 0 : -1}
+          onClick={handleAvatarClick}
+          onKeyDown={e => {
+            if ((canEdit || hasPhoto) && (e.key === "Enter" || e.key === " ")) handleAvatarClick();
           }}
+          aria-label={canEdit ? "Change profile photo" : hasPhoto ? "View profile photo" : "Profile photo"}
+          role={canEdit || hasPhoto ? "button" : undefined}
+          style={{ background: "transparent", boxShadow: "none" }}
         >
-          {hasPhoto ? (
-            <img
-              src={photoPreview || profilePhotoUrl!}
-              alt="Profile"
-              className="w-full h-full object-cover select-none"
-              draggable={false}
-              crossOrigin="anonymous"
-              loading="lazy"
-              style={{ background: "transparent" }}
-            />
-          ) : (
-            <UserPlaceholderIcon />
-          )}
-          {/* When editable: show a dim overlay + "Change" label on hover */}
+          {/* Avatar circle with green border, absolutely NO background, shadow, or padding */}
+          <div
+            className={
+              "w-40 h-40 md:w-52 md:h-52 rounded-full border-4 border-green-700 overflow-hidden flex items-center justify-center object-cover transition-all relative duration-200" +
+              (canEdit ? " group-hover:ring-4 group-hover:ring-green-500 group-hover:ring-offset-2" : hasPhoto ? " hover:ring-4 hover:ring-green-500 hover:ring-offset-2" : "")
+            }
+            style={{
+              background: "transparent",
+              boxShadow: "none",
+              padding: 0,
+              margin: 0,
+            }}
+          >
+            {hasPhoto ? (
+              <img
+                src={currentPhotoUrl!}
+                alt="Profile"
+                className="w-full h-full object-cover select-none"
+                draggable={false}
+                crossOrigin="anonymous"
+                loading="lazy"
+                style={{ background: "transparent" }}
+              />
+            ) : (
+              <UserPlaceholderIcon />
+            )}
+            {/* When editable: show a dim overlay + "Change" label on hover */}
+            {canEdit && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+                <span className="bg-white/80 text-green-900 text-xs px-3 py-1 rounded-full font-medium shadow">
+                  Change photo
+                </span>
+              </div>
+            )}
+            {/* When not editable but has photo: show enlarge hint on hover */}
+            {!canEdit && hasPhoto && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 hover:opacity-100 transition-opacity pointer-events-none">
+                <span className="bg-white/80 text-green-900 text-xs px-3 py-1 rounded-full font-medium shadow">
+                  Click to enlarge
+                </span>
+              </div>
+            )}
+          </div>
+          {/* Hidden input covers avatar when editing */}
           {canEdit && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
-              <span className="bg-white/80 text-green-900 text-xs px-3 py-1 rounded-full font-medium shadow">
-                Change photo
-              </span>
-            </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={onFileChange}
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+              disabled={uploading}
+              tabIndex={-1}
+              aria-label="Upload profile photo"
+            />
           )}
         </div>
-        {/* Hidden input covers avatar when editing */}
-        {canEdit && (
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            onChange={onFileChange}
-            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-            disabled={uploading}
-            tabIndex={-1}
-            aria-label="Upload profile photo"
-          />
-        )}
       </div>
-    </div>
+
+      {/* Enlarged photo dialog */}
+      <Dialog open={showEnlargedPhoto} onOpenChange={setShowEnlargedPhoto}>
+        <DialogContent className="max-w-4xl w-full max-h-[90vh] p-0">
+          <div className="relative w-full h-full flex items-center justify-center bg-black">
+            <img
+              src={currentPhotoUrl!}
+              alt="Profile photo enlarged"
+              className="max-w-full max-h-[90vh] object-contain"
+              crossOrigin="anonymous"
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
