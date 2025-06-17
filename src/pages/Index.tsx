@@ -4,6 +4,7 @@ import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
 import StoryBar from '@/components/StoryBar';
 import TrendingFeed from '@/components/TrendingFeed';
+import SuggestedUsers from '@/components/SuggestedUsers';
 
 const Index = () => {
   return (
@@ -12,8 +13,16 @@ const Index = () => {
       <StoryBar />
       
       <main className="container mx-auto px-4 py-6">
-        <div className="max-w-2xl mx-auto">
-          <TrendingFeed />
+        <div className="flex gap-8 max-w-6xl mx-auto">
+          {/* Main feed */}
+          <div className="flex-1 max-w-2xl">
+            <TrendingFeed />
+          </div>
+          
+          {/* Suggested users sidebar */}
+          <div className="hidden lg:block w-80 flex-shrink-0">
+            <SuggestedUsers />
+          </div>
         </div>
       </main>
       
