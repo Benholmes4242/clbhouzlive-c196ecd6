@@ -1,14 +1,14 @@
 
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { User } from '@supabase/supabase-js';
-import { useNavigate } from 'react-router-dom';
 import BagManager from '@/components/BagManager';
-import Header from "@/components/Header"; // use shared site header
+import Header from "@/components/Header";
+import ProfileHeader from "@/components/profile/ProfileHeader";
+import EGAppIntegration from "@/components/profile/EGAppIntegration";
+import CourseTracker from "@/components/profile/CourseTracker";
+import BottomNavigation from '@/components/BottomNavigation';
+import ProfileEditDialog from '@/components/profile/ProfileEditDialog';
 
 type Profile = {
   id: string;
@@ -18,27 +18,14 @@ type Profile = {
   eg_handicap_index: number | null;
   eg_recent_rounds: any | null;
   bag_visible: boolean | null;
+  display_name: string | null;
+  username: string | null;
 };
-
-const courseCategories = [
-  { key: 'GB&I', label: 'Top 100 GB & Ireland' },
-  { key: 'Europe', label: 'Top 100 Europe' },
-  { key: 'USA', label: 'Top 100 USA' },
-  { key: 'Global', label: 'Top 100 Global' },
-];
-
-import ProfileHeader from "@/components/profile/ProfileHeader";
-import HomeClubSection from "@/components/profile/HomeClubSection";
-import EGAppIntegration from "@/components/profile/EGAppIntegration";
-import CourseTracker from "@/components/profile/CourseTracker";
-import BottomNavigation from '@/components/BottomNavigation';
 
 const ProfilePage = () => {
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [editingClub, setEditingClub] = useState(false);
-  const [clubInput, setClubInput] = useState('');
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [trackerStats, setTrackerStats] = useState<{ [cat: string]: number }>({});
@@ -64,7 +51,6 @@ const ProfilePage = () => {
     const { data, error } = await supabase.from('user_profiles').select('*').eq('id', id).maybeSingle();
     if (!error && data) {
       setProfile(data);
-      setClubInput(data.home_club ?? '');
     } else {
       setProfile(null);
     }
@@ -90,17 +76,14 @@ const ProfilePage = () => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Show instant preview from selected file (displayed during upload)
     const tempPreviewUrl = URL.createObjectURL(file);
     setPhotoPreview(tempPreviewUrl);
 
     setUploading(true);
     const fileExt = file.name.split('.').pop();
     const timestamp = Date.now();
-    // Use a unique filename for each upload
     const filePath = `${user.id}/avatar-${timestamp}.${fileExt}`;
 
-    // Upload to Supabase Storage (unique path—no overwrite)
     let { error } = await supabase.storage.from('avatars').upload(filePath, file, { upsert: false });
     if (error) {
       alert('Upload failed!');
@@ -108,20 +91,12 @@ const ProfilePage = () => {
       return;
     }
 
-    // Get fresh public URL (unique so will never be cached)
     const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
     let avatarUrl = urlData?.publicUrl ?? '';
-    setPhotoPreview(avatarUrl); // update preview immediately for the latest well-uploaded image
+    setPhotoPreview(avatarUrl);
     await supabase.from('user_profiles').update({ profile_photo_url: avatarUrl, updated_at: new Date().toISOString() }).eq('id', user.id);
     setProfile((p) => p ? { ...p, profile_photo_url: avatarUrl } : p);
     setUploading(false);
-  };
-
-  const saveHomeClub = async () => {
-    if (!user) return;
-    await supabase.from('user_profiles').update({ home_club: clubInput, updated_at: new Date().toISOString() }).eq('id', user.id);
-    setProfile(p => p ? { ...p, home_club: clubInput } : p);
-    setEditingClub(false);
   };
 
   if (loading) {
@@ -136,9 +111,7 @@ const ProfilePage = () => {
 
   return (
     <div className="min-h-screen bg-background pb-28">
-      {/* Header always full-width */}
       <Header />
-      {/* Main content centered */}
       <div className="max-w-2xl mx-auto px-4">
         <ProfileHeader
           photoPreview={photoPreview}
@@ -147,22 +120,37 @@ const ProfilePage = () => {
           handlePhotoUpload={handlePhotoUpload}
           canEdit={canEditAvatar}
         />
-        <HomeClubSection
-          editingClub={editingClub}
-          clubInput={clubInput}
-          homeClub={profile?.home_club ?? 'Not set'}
-          onEditClick={() => setEditingClub(true)}
-          onCancel={() => setEditingClub(false)}
-          onInput={e => setClubInput(e.target.value)}
-          onSave={saveHomeClub}
-          setClubInput={setClubInput}
-        />
+        
+        {/* Profile Info Section */}
+        <div className="flex flex-col items-center mt-6 space-y-3">
+          <div className="text-center space-y-2">
+            <h1 className="text-2xl font-semibold">
+              {profile?.display_name || profile?.username || user?.email || "Anonymous User"}
+            </h1>
+            <p className="text-muted-foreground">London, England, United Kingdom</p>
+            <p className="text-sm">
+              <span className="font-medium">Home Club:</span> {profile?.home_club || "Not set"}
+            </p>
+            <p className="text-sm">
+              <span className="font-medium">Handicap:</span> {profile?.eg_handicap_index || "Not set"}
+            </p>
+          </div>
+          
+          {user && (
+            <ProfileEditDialog
+              profile={profile}
+              userId={user.id}
+              onProfileUpdate={() => fetchProfile(user.id)}
+            />
+          )}
+        </div>
+
         <EGAppIntegration
           egAppConnected={profile?.eg_app_connected ?? false}
           handicapIndex={profile?.eg_handicap_index ?? null}
           recentRounds={profile?.eg_recent_rounds ?? null}
         />
-        {/* What's in the Bag section */}
+        
         {user && (
           <BagManager 
             userId={user.id} 
@@ -170,6 +158,7 @@ const ProfilePage = () => {
             bagVisible={profile?.bag_visible ?? true}
           />
         )}
+        
         <CourseTracker trackerStats={trackerStats} totalStats={totalStats} />
       </div>
       <BottomNavigation />
