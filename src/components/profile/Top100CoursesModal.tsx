@@ -112,7 +112,7 @@ const Top100CoursesModal: React.FC<Top100CoursesModalProps> = ({
                       <div className="flex items-center gap-2">
                         {displayRank && (
                           <span className="text-sm font-medium text-muted-foreground">
-                            {region === 'global' ? `#${displayRank}` : displayRank}
+                            {displayRank}
                           </span>
                         )}
                         <h3 className="font-semibold truncate">{course.name}</h3>
