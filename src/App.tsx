@@ -14,6 +14,7 @@ import UserProfilePage from "./pages/UserProfilePage";
 import Auth from "./pages/Auth";
 import AdminPage from "./pages/AdminPage";
 import NotificationsPage from "./pages/NotificationsPage";
+import MessagesPage from "./pages/MessagesPage";
 
 const queryClient = new QueryClient();
 

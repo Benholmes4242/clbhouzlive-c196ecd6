@@ -65,14 +65,58 @@ export function useMessages() {
     
     setLoading(true);
     
-    // Get all conversations with last message and unread count
-    const { data: conversationsData, error } = await supabase.rpc('get_conversations', {
-      user_id: user.id
-    });
+    try {
+      // Get all messages for the current user
+      const { data: messages, error: messagesError } = await supabase
+        .from('messages')
+        .select('*')
+        .or(`sender_id.eq.${user.id},recipient_id.eq.${user.id}`)
+        .order('created_at', { ascending: false });
 
-    if (!error && conversationsData) {
-      setConversations(conversationsData);
+      if (messagesError) {
+        console.error('Error fetching messages:', messagesError);
+        setLoading(false);
+        return;
+      }
+
+      // Group messages by conversation (friend)
+      const conversationMap = new Map<string, Conversation>();
+
+      for (const message of messages || []) {
+        const friendId = message.sender_id === user.id ? message.recipient_id : message.sender_id;
+        
+        if (!conversationMap.has(friendId)) {
+          // Get friend's profile
+          const { data: friendProfile } = await supabase
+            .from('user_profiles')
+            .select('display_name, username, profile_photo_url')
+            .eq('id', friendId)
+            .single();
+
+          conversationMap.set(friendId, {
+            friend_id: friendId,
+            friend_name: friendProfile?.display_name || '',
+            friend_username: friendProfile?.username || '',
+            friend_photo_url: friendProfile?.profile_photo_url || null,
+            last_message: message.content,
+            last_message_time: message.created_at,
+            unread_count: 0,
+            is_last_message_from_me: message.sender_id === user.id
+          });
+        }
+
+        // Count unread messages from this friend
+        if (message.recipient_id === user.id && !message.read) {
+          const conv = conversationMap.get(friendId)!;
+          conv.unread_count++;
+        }
+      }
+
+      setConversations(Array.from(conversationMap.values()));
+    } catch (error) {
+      console.error('Error in fetchConversations:', error);
     }
+    
     setLoading(false);
   };
 
