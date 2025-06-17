@@ -11,6 +11,8 @@ export const useStoryData = () => {
 
   useEffect(() => {
     const fetchStoriesData = async () => {
+      console.log('Fetching stories data, user:', user);
+      
       if (!user) {
         // Show static data for non-authenticated users
         setStories([
@@ -39,7 +41,7 @@ export const useStoryData = () => {
         ];
 
         // Fetch friends (accepted friend relationships)
-        const { data: friendsData } = await supabase
+        const { data: friendsData, error: friendsError } = await supabase
           .from('user_friends')
           .select(`
             friend_id,
@@ -53,6 +55,8 @@ export const useStoryData = () => {
           .eq('user_id', user.id)
           .eq('status', 'accepted')
           .limit(10);
+
+        console.log('Friends data:', friendsData, 'Friends error:', friendsError);
 
         if (friendsData && friendsData.length > 0) {
           // User has friends, show them
@@ -70,16 +74,25 @@ export const useStoryData = () => {
             }
           });
         } else {
-          // No friends, fetch random users to toggle through
+          // No friends, fetch random users to show as suggestions
           const friendIds = friendsData?.map((f: any) => f.friend_id) || [];
           const excludeIds = [user.id, ...friendIds];
 
-          const { data: randomUsers } = await supabase
+          console.log('Exclude IDs:', excludeIds);
+
+          let query = supabase
             .from('user_profiles')
             .select('id, username, display_name, profile_photo_url, home_club')
-            .eq('is_public', true)
-            .not('id', 'in', `(${excludeIds.join(',')})`)
-            .limit(20); // Fetch more users to toggle through
+            .eq('is_public', true);
+
+          // Only add the not filter if we have IDs to exclude
+          if (excludeIds.length > 0) {
+            query = query.not('id', 'in', `(${excludeIds.join(',')})`);
+          }
+
+          const { data: randomUsers, error: randomError } = await query.limit(20);
+
+          console.log('Random users data:', randomUsers, 'Random error:', randomError);
 
           if (randomUsers && randomUsers.length > 0) {
             randomUsers.forEach((profile: any) => {
@@ -92,9 +105,40 @@ export const useStoryData = () => {
                 hasStory: false,
               });
             });
+          } else {
+            // Fallback to mock data if no users found
+            console.log('No random users found, using mock data');
+            const mockUsers = [
+              {
+                id: 'mock-1',
+                type: 'suggested' as const,
+                user: 'Mike Johnson',
+                username: 'mike_golf_pro',
+                avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+                hasStory: false,
+              },
+              {
+                id: 'mock-2',
+                type: 'suggested' as const,
+                user: 'Sarah Chen',
+                username: 'sarah_golf',
+                avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b302?w=150&h=150&fit=crop&crop=face',
+                hasStory: false,
+              },
+              {
+                id: 'mock-3',
+                type: 'suggested' as const,
+                user: 'Alex Rodriguez',
+                username: 'alex_links',
+                avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
+                hasStory: false,
+              }
+            ];
+            newStories.push(...mockUsers);
           }
         }
 
+        console.log('Final stories:', newStories);
         setStories(newStories);
       } catch (error) {
         console.error('Error fetching stories data:', error);
