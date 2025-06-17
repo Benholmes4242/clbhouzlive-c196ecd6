@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -64,7 +63,7 @@ const BagManager = ({ userId, isOwnProfile = false, bagVisible = true }: BagMana
       .eq("id", userId);
   }
 
-  const bagTypes = ["Driver", "Wood", "Iron", "Wedge", "Putter", "Ball"];
+  const bagTypes = ["Driver", "Woods", "Irons", "Wedges", "Putter", "Ball"];
 
   if (loading) {
     return (
@@ -103,7 +102,12 @@ const BagManager = ({ userId, isOwnProfile = false, bagVisible = true }: BagMana
 
       <div className="space-y-2">
         {bagTypes.map(type => {
-          const item = bag.find(i => i.type === type);
+          // Map display labels to database types
+          const dbType = type === "Woods" ? "Wood" : 
+                        type === "Irons" ? "Iron" : 
+                        type === "Wedges" ? "Wedge" : type;
+          
+          const item = bag.find(i => i.type === dbType);
           
           // If not own profile and item is not set, don't show this row
           if (!isOwnProfile && !item) {
