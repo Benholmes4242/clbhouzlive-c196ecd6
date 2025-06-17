@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, Bell, MessageCircle, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -15,6 +16,7 @@ import { useSearch } from "@/hooks/useSearch";
 import SearchResults from "@/components/search/SearchResults";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useMessages } from "@/hooks/useMessages";
+import { useQuery } from "@tanstack/react-query";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -24,6 +26,21 @@ const Header = () => {
   const { query, setQuery, results, loading, clearResults } = useSearch();
   const [showResults, setShowResults] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+
+  // Fetch user profile for username/display name
+  const { data: userProfile } = useQuery({
+    queryKey: ['currentUserProfile', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const { data } = await supabase
+        .from('user_profiles')
+        .select('username, display_name')
+        .eq('id', user.id)
+        .maybeSingle();
+      return data;
+    },
+    enabled: !!user?.id,
+  });
 
   // Calculate total unread messages
   const unreadMessagesCount = conversations.reduce((total, conv) => total + conv.unread_count, 0);
@@ -74,6 +91,8 @@ const Header = () => {
   const handleMessagesClick = () => {
     navigate('/messages');
   };
+
+  const currentUsername = userProfile?.username || userProfile?.display_name || 'User';
 
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
@@ -148,6 +167,10 @@ const Header = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem disabled className="text-muted-foreground cursor-default">
+                    {currentUsername}
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={() => navigate('/profile')}>
                     My Profile
                   </DropdownMenuItem>
