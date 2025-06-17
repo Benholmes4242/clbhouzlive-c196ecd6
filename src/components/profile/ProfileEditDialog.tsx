@@ -7,6 +7,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -38,11 +45,51 @@ const ProfileEditDialog: React.FC<ProfileEditDialogProps> = ({
   });
   const [saving, setSaving] = useState(false);
 
+  // Generate handicap options from +10.0 to 50.0 in 0.1 increments
+  const generateHandicapOptions = () => {
+    const options = [];
+    
+    // Add positive handicaps from +10.0 down to +0.1
+    for (let i = 100; i >= 1; i--) {
+      const value = i / 10;
+      options.push({
+        value: (-value).toString(),
+        label: `+${value.toFixed(1)}`
+      });
+    }
+    
+    // Add 0.0
+    options.push({
+      value: "0",
+      label: "0.0"
+    });
+    
+    // Add regular handicaps from 0.1 to 50.0
+    for (let i = 1; i <= 500; i++) {
+      const value = i / 10;
+      options.push({
+        value: value.toString(),
+        label: value.toFixed(1)
+      });
+    }
+    
+    return options;
+  };
+
+  const handicapOptions = generateHandicapOptions();
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
+    }));
+  };
+
+  const handleHandicapChange = (value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      handicap: value
     }));
   };
 
@@ -116,15 +163,18 @@ const ProfileEditDialog: React.FC<ProfileEditDialogProps> = ({
           </div>
           <div className="space-y-2">
             <Label htmlFor="handicap">Handicap</Label>
-            <Input
-              id="handicap"
-              name="handicap"
-              type="number"
-              step="0.1"
-              value={formData.handicap}
-              onChange={handleInputChange}
-              placeholder="Your handicap index"
-            />
+            <Select value={formData.handicap} onValueChange={handleHandicapChange}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select your handicap" />
+              </SelectTrigger>
+              <SelectContent className="max-h-60">
+                {handicapOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
         <div className="flex justify-end gap-2">
