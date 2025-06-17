@@ -47,118 +47,45 @@ export const useStoryData = () => {
           }
         ];
 
-        // 1. Fetch direct friends (bidirectional - where current user is either user_id or friend_id)
+        // 1. First, fetch friends (accepted friend relationships)
         const { data: friendsData, error: friendsError } = await supabase
           .from('user_friends')
           .select(`
-            user_id,
             friend_id,
-            user_profiles!user_friends_user_id_fkey (
-              id,
-              username,
-              display_name,
-              profile_photo_url
-            ),
-            friend_profiles:user_profiles!user_friends_friend_id_fkey (
+            user_profiles!user_friends_friend_id_fkey (
               id,
               username,
               display_name,
               profile_photo_url
             )
           `)
-          .or(`user_id.eq.${user.id},friend_id.eq.${user.id}`)
+          .eq('user_id', user.id)
           .eq('status', 'accepted');
 
         console.log('Friends data:', friendsData, 'Friends error:', friendsError);
 
         const friendIds: string[] = [];
-        const directFriends: StoryUser[] = [];
         
         if (friendsData && friendsData.length > 0) {
-          // Process bidirectional friend relationships
+          // Add friends first (highest priority)
           friendsData.forEach((friendship: any) => {
-            let friendProfile = null;
-            
-            // Determine which profile is the friend (not the current user)
-            if (friendship.user_id === user.id && friendship.friend_profiles) {
-              friendProfile = friendship.friend_profiles;
-            } else if (friendship.friend_id === user.id && friendship.user_profiles) {
-              friendProfile = friendship.user_profiles;
-            }
-            
-            if (friendProfile && !friendIds.includes(friendProfile.id)) {
-              friendIds.push(friendProfile.id);
-              directFriends.push({
-                id: friendProfile.id,
+            const profile = friendship.user_profiles;
+            if (profile) {
+              friendIds.push(profile.id);
+              newStories.push({
+                id: profile.id,
                 type: 'friend',
-                user: friendProfile.display_name || friendProfile.username || 'Friend',
-                username: friendProfile.username || friendProfile.id,
-                avatar: friendProfile.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+                user: profile.display_name || profile.username || 'Friend',
+                username: profile.username || profile.id,
+                avatar: profile.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
                 hasStory: true,
               });
             }
           });
         }
 
-        console.log('Direct friends found:', directFriends.length);
-
-        // 2. Fetch friend-of-friends (suggested based on mutual connections)
-        const friendOfFriends: StoryUser[] = [];
-        
-        if (friendIds.length > 0) {
-          // Get friends of our friends (excluding ourselves and our direct friends)
-          const { data: friendOfFriendsData } = await supabase
-            .from('user_friends')
-            .select(`
-              user_id,
-              friend_id,
-              user_profiles!user_friends_user_id_fkey (
-                id,
-                username,
-                display_name,
-                profile_photo_url,
-                is_public
-              ),
-              friend_profiles:user_profiles!user_friends_friend_id_fkey (
-                id,
-                username,
-                display_name,
-                profile_photo_url,
-                is_public
-              )
-            `)
-            .in('user_id', friendIds)
-            .eq('status', 'accepted')
-            .limit(5);
-
-          if (friendOfFriendsData) {
-            const processedIds = new Set([user.id, ...friendIds]);
-            
-            friendOfFriendsData.forEach((friendship: any) => {
-              const potentialFriend = friendship.friend_profiles;
-              
-              if (potentialFriend && 
-                  potentialFriend.is_public && 
-                  !processedIds.has(potentialFriend.id)) {
-                processedIds.add(potentialFriend.id);
-                friendOfFriends.push({
-                  id: potentialFriend.id,
-                  type: 'suggested',
-                  user: potentialFriend.display_name || potentialFriend.username || 'Player',
-                  username: potentialFriend.username || potentialFriend.id,
-                  avatar: potentialFriend.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
-                  hasStory: false,
-                });
-              }
-            });
-          }
-        }
-
-        console.log('Friend-of-friends found:', friendOfFriends.length);
-
-        // 3. Fetch trending/random players (excluding current user, friends, and friend-of-friends)
-        const excludeIds = [user.id, ...friendIds, ...friendOfFriends.map(f => f.id)];
-        const trendingPlayers: StoryUser[] = [];
+        // 2. Then, fetch suggested users (excluding current user and friends)
+        const excludeIds = [user.id, ...friendIds];
         
         let query = supabase
           .from('user_profiles')
@@ -170,11 +97,14 @@ export const useStoryData = () => {
           query = query.not('id', 'in', `(${excludeIds.join(',')})`);
         }
 
-        const { data: trendingUsers } = await query.limit(8);
+        const { data: suggestedUsers, error: suggestedError } = await query.limit(15);
 
-        if (trendingUsers && trendingUsers.length > 0) {
-          trendingUsers.forEach((profile: any) => {
-            trendingPlayers.push({
+        console.log('Suggested users data:', suggestedUsers, 'Suggested error:', suggestedError);
+
+        if (suggestedUsers && suggestedUsers.length > 0) {
+          // Add suggested users (lower priority than friends)
+          suggestedUsers.forEach((profile: any) => {
+            newStories.push({
               id: profile.id,
               type: 'suggested',
               user: profile.display_name || profile.username || 'Player',
@@ -185,17 +115,9 @@ export const useStoryData = () => {
           });
         }
 
-        console.log('Trending players found:', trendingPlayers.length);
-
-        // 4. Assemble stories in the correct order
-        // Your Profile → Direct Friends → Friend-of-Friends → Trending Players
-        newStories.push(...directFriends);
-        newStories.push(...friendOfFriends);
-        newStories.push(...trendingPlayers);
-
-        // 5. Only add minimal mock data if we have very few users total
-        if (newStories.length < 4) {
-          console.log('Adding minimal mock data as fallback');
+        // 3. Finally, if we still don't have enough users, add mock data as fallback
+        if (newStories.length < 5) {
+          console.log('Adding mock data as fallback');
           const mockUsers = [
             {
               id: 'mock-1',
@@ -212,13 +134,21 @@ export const useStoryData = () => {
               username: 'sarah_golf',
               avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b302?w=150&h=150&fit=crop&crop=face',
               hasStory: false,
+            },
+            {
+              id: 'mock-3',
+              type: 'suggested' as const,
+              user: 'Alex Rodriguez',
+              username: 'alex_links',
+              avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
+              hasStory: false,
             }
           ].filter(mockUser => !newStories.find(story => story.username === mockUser.username));
           
-          newStories.push(...mockUsers.slice(0, 2)); // Only add 2 mock users max
+          newStories.push(...mockUsers);
         }
 
-        console.log('Final stories order:', newStories.map(s => ({ type: s.type, user: s.user, id: s.id })));
+        console.log('Final stories order:', newStories.map(s => ({ type: s.type, user: s.user })));
         setStories(newStories);
       } catch (error) {
         console.error('Error fetching stories data:', error);
