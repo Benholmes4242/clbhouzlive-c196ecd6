@@ -1,19 +1,44 @@
 
+
 import React from "react";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 interface EGAppIntegrationProps {
   egAppConnected: boolean | null;
   handicapIndex: number | null;
   recentRounds: any;
+  userId?: string;
+  isOwnProfile?: boolean;
+  egVisible?: boolean;
+  onVisibilityToggle?: (checked: boolean) => void;
 }
 
 const EGAppIntegration: React.FC<EGAppIntegrationProps> = ({
   egAppConnected,
   handicapIndex,
-  recentRounds
+  recentRounds,
+  userId,
+  isOwnProfile,
+  egVisible = true,
+  onVisibilityToggle
 }) => (
   <div className="mt-8 px-2">
-    <h2 className="text-lg font-semibold mb-2">EG (England Golf) App</h2>
+    <div className="flex items-center justify-between mb-2">
+      <h2 className="text-lg font-semibold">EG (England Golf) App</h2>
+      {isOwnProfile && onVisibilityToggle && (
+        <div className="flex items-center space-x-2">
+          <Label htmlFor="eg-visibility" className="text-sm">
+            Show on public profile
+          </Label>
+          <Switch
+            id="eg-visibility"
+            checked={egVisible}
+            onCheckedChange={onVisibilityToggle}
+          />
+        </div>
+      )}
+    </div>
     <div className="bg-muted rounded-lg px-4 py-3 text-sm text-muted-foreground">
       <span>Connect your England Golf app to display your Handicap Index and recent rounds here.</span>
     </div>
@@ -32,3 +57,4 @@ const EGAppIntegration: React.FC<EGAppIntegrationProps> = ({
 );
 
 export default EGAppIntegration;
+

@@ -18,6 +18,7 @@ type Profile = {
   eg_recent_rounds: any | null;
   bag_visible: boolean | null;
   tracker_visible: boolean | null;
+  eg_visible: boolean | null;
   display_name: string | null;
   username: string | null;
   bio: string | null;
@@ -90,6 +91,15 @@ const ProfilePage = () => {
       .update({ tracker_visible: checked })
       .eq("id", user.id);
     setProfile(prev => prev ? { ...prev, tracker_visible: checked } : prev);
+  };
+
+  const handleEGVisibilityToggle = async (checked: boolean) => {
+    if (!user) return;
+    await supabase
+      .from("user_profiles")
+      .update({ eg_visible: checked })
+      .eq("id", user.id);
+    setProfile(prev => prev ? { ...prev, eg_visible: checked } : prev);
   };
 
   const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -170,6 +180,10 @@ const ProfilePage = () => {
           egAppConnected={profile?.eg_app_connected ?? false}
           handicapIndex={profile?.eg_handicap_index ?? null}
           recentRounds={profile?.eg_recent_rounds ?? null}
+          userId={user?.id}
+          isOwnProfile={!!user}
+          egVisible={profile?.eg_visible ?? true}
+          onVisibilityToggle={handleEGVisibilityToggle}
         />
         
         {user && (
