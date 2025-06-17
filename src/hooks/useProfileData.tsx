@@ -39,21 +39,72 @@ export const useProfileData = () => {
   };
 
   const fetchTrackerStats = async (userId: string) => {
-    let stats: { [cat: string]: number } = {};
-    let totals: { [cat: string]: number } = {};
-    
-    const { data } = await supabase
+    // Fetch played courses with their golf course details
+    const { data: userCourses } = await supabase
       .from('user_courses')
-      .select('course_id, played')
+      .select(`
+        course_id,
+        played,
+        golf_courses (
+          id,
+          name,
+          country,
+          region,
+          continent,
+          global_rank,
+          regional_rank
+        )
+      `)
       .eq('user_id', userId)
       .eq('played', true);
+
+    let stats: { [cat: string]: number } = {
+      'GB&I': 0,
+      'Europe': 0,
+      'USA': 0,
+      'Global': 0
+    };
     
-    if (data) {
-      ['GB&I', 'Europe', 'USA', 'Global'].forEach((cat) => {
-        stats[cat] = data.length;
-        totals[cat] = 100;
+    let totals: { [cat: string]: number } = {
+      'GB&I': 100,
+      'Europe': 100,
+      'USA': 100,
+      'Global': 100
+    };
+
+    if (userCourses) {
+      userCourses.forEach(userCourse => {
+        const course = userCourse.golf_courses;
+        if (!course) return;
+
+        // Global - courses with global rank <= 100
+        if (course.global_rank && course.global_rank <= 100) {
+          stats['Global']++;
+        }
+
+        // GB&I - courses with regional rank <= 100 in GB&I countries
+        if (course.regional_rank && course.regional_rank <= 100) {
+          const gbiCountries = ['Scotland', 'England', 'Wales', 'Northern Ireland', 'Ireland'];
+          if (gbiCountries.includes(course.country)) {
+            stats['GB&I']++;
+          }
+        }
+
+        // Europe - courses with regional rank <= 100 in Europe (excluding GB&I)
+        if (course.regional_rank && course.regional_rank <= 100 && course.continent === 'Europe') {
+          const gbiCountries = ['Scotland', 'England', 'Wales', 'Northern Ireland', 'Ireland'];
+          if (!gbiCountries.includes(course.country)) {
+            stats['Europe']++;
+          }
+        }
+
+        // USA - courses with regional rank <= 100 in USA
+        if (course.regional_rank && course.regional_rank <= 100 && course.country === 'United States') {
+          stats['USA']++;
+        }
       });
     }
+
     setTrackerStats(stats);
     setTotalStats(totals);
   };
