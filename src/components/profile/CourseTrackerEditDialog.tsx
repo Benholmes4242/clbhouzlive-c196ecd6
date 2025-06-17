@@ -181,7 +181,7 @@ const CourseTrackerEditDialog: React.FC<CourseTrackerEditDialogProps> = ({
       </DialogTrigger>
       <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Edit Top 100 Courses Played</DialogTitle>
+          <DialogTitle>Top 100 Courses Played</DialogTitle>
         </DialogHeader>
         
         {loading ? (
