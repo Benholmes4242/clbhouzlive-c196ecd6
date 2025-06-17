@@ -15,17 +15,32 @@ const UserProfilePage = () => {
   const { username } = useParams<{ username: string }>();
   const { user: currentUser } = useSupabaseSession();
 
-  // Fetch the user profile by username
+  // Fetch the user profile by username or ID
   const { data: profile, isLoading } = useQuery({
     queryKey: ['userProfile', username],
     queryFn: async () => {
       if (!username) return null;
-      const { data, error } = await supabase
+      
+      // First try to find by username
+      let { data, error } = await supabase
         .from('user_profiles')
         .select('*')
         .eq('username', username)
         .eq('is_public', true)
         .maybeSingle();
+      
+      // If not found by username, try to find by ID (fallback for users without usernames)
+      if (!data && !error) {
+        const { data: idData, error: idError } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('id', username)
+          .eq('is_public', true)
+          .maybeSingle();
+        
+        data = idData;
+        error = idError;
+      }
       
       if (error) throw error;
       return data;
