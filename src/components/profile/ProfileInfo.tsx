@@ -46,8 +46,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
         )}
       </div>
       
-      {/* Only show edit button if it's the user's own profile */}
-      {userId && isOwnProfile && (
+      {userId && (
         <ProfileEditDialog
           profile={profile}
           userId={userId}

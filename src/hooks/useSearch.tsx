@@ -9,7 +9,7 @@ interface SearchResult {
   title: string;
   subtitle: string;
   image?: string;
-  username?: string;
+  username?: string; // Add username to the interface
 }
 
 export const useSearch = () => {
@@ -24,7 +24,7 @@ export const useSearch = () => {
     
     const { data, error } = await supabase
       .from('user_profiles')
-      .select('id, display_name, username, home_club, profile_photo_url')
+      .select('id, display_name, username, home_club')
       .or(`display_name.ilike.%${searchTerm}%,username.ilike.%${searchTerm}%,home_club.ilike.%${searchTerm}%`)
       .eq('is_public', true)
       .limit(10);
@@ -41,8 +41,7 @@ export const useSearch = () => {
       type: 'user' as const,
       title: user.display_name || user.username || 'Anonymous User',
       subtitle: user.home_club ? `Home Club: ${user.home_club}` : 'No home club set',
-      username: user.username || user.id,
-      image: user.profile_photo_url || undefined
+      username: user.username || user.id // Fallback to ID if no username
     }));
 
     console.log('Processed user results:', userResults);
@@ -54,7 +53,7 @@ export const useSearch = () => {
     
     const { data, error } = await supabase
       .from('golf_courses')
-      .select('id, name, country, region, thumbnail_image')
+      .select('id, name, country, region')
       .ilike('name', `%${searchTerm}%`)
       .limit(10);
 
@@ -69,8 +68,7 @@ export const useSearch = () => {
       id: course.id,
       type: 'course' as const,
       title: course.name,
-      subtitle: `${course.region || course.country}`,
-      image: course.thumbnail_image || undefined
+      subtitle: `${course.region || course.country}`
     }));
 
     console.log('Processed course results:', courseResults);
