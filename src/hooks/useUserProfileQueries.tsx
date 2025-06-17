@@ -49,12 +49,12 @@ export const useUserProfileQueries = () => {
       
       console.log('Fetching tracker stats for user:', profile.id);
       
-      // Fetch played courses with their golf course details
+      // Fetch played courses with their golf course details from the correct table
       const { data: userCourses, error } = await supabase
-        .from('user_courses')
+        .from('user_course_tracker')
         .select(`
           course_id,
-          played,
+          checked,
           golf_courses (
             id,
             name,
@@ -66,7 +66,7 @@ export const useUserProfileQueries = () => {
           )
         `)
         .eq('user_id', profile.id)
-        .eq('played', true);
+        .eq('checked', true);
 
       if (error) {
         console.error('Error fetching user courses:', error);

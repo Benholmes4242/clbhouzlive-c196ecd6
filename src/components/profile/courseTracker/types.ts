@@ -12,7 +12,7 @@ export interface CourseTrackerProps {
 export interface PlayedCourse {
   id: string;
   course_id: string;
-  played: boolean;
+  checked: boolean;
   played_date?: string;
   golf_courses?: {
     id: string;

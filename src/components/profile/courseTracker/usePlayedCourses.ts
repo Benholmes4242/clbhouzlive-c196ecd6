@@ -12,7 +12,7 @@ export const usePlayedCourses = (userId?: string, selectedCategory?: string | nu
       console.log('Fetching played courses for user:', userId, 'category:', selectedCategory);
       
       const { data, error } = await supabase
-        .from('user_courses')
+        .from('user_course_tracker')
         .select(`
           *,
           golf_courses (
@@ -26,7 +26,7 @@ export const usePlayedCourses = (userId?: string, selectedCategory?: string | nu
           )
         `)
         .eq('user_id', userId)
-        .eq('played', true);
+        .eq('checked', true);
 
       if (error) {
         console.error('Error fetching played courses:', error);
