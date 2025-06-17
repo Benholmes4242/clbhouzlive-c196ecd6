@@ -112,6 +112,7 @@ const BagEditDialog: React.FC<BagEditDialogProps> = ({ userId, onBagUpdate }) =>
     }
     fetchBag();
     onBagUpdate();
+    // Don't close the dialog, just refresh the data
   }
 
   async function handleDelete(type: string) {
@@ -134,7 +135,7 @@ const BagEditDialog: React.FC<BagEditDialogProps> = ({ userId, onBagUpdate }) =>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Edit What's in the Bag</DialogTitle>
+          <DialogTitle>What's in the Bag</DialogTitle>
         </DialogHeader>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 py-4">
           {BAG_FIELDS.map(field => {
