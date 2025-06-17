@@ -1,18 +1,87 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
 import { supabase } from "@/integrations/supabase/client";
-import { useStoryData } from './StoryBar/useStoryData';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+} from "@/components/ui/carousel";
 import StoryItem from './StoryBar/StoryItem';
-import StoryNavigation from './StoryBar/StoryNavigation';
 import StoryBarSkeleton from './StoryBar/StoryBarSkeleton';
+import { StoryUser } from './StoryBar/types';
 
 const StoryBar = () => {
-  const [currentIndex, setCurrentIndex] = useState(0);
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
-  const { stories, loading } = useStoryData();
+
+  // Mock data for demonstration
+  const stories: StoryUser[] = [
+    {
+      id: 'add',
+      type: 'add',
+      user: 'Your Story',
+      username: 'your-profile',
+      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+    },
+    {
+      id: '1',
+      type: 'friend',
+      user: 'Charlotte Barrett',
+      username: 'charlottebarrett',
+      avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b302?w=150&h=150&fit=crop&crop=face',
+      hasStory: true,
+    },
+    {
+      id: '2',
+      type: 'friend',
+      user: 'Nicola Anne',
+      username: 'nicola_anne31',
+      avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
+      hasStory: true,
+    },
+    {
+      id: '3',
+      type: 'friend',
+      user: 'Leah Player',
+      username: 'leahplayer',
+      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face',
+      hasStory: true,
+    },
+    {
+      id: '4',
+      type: 'suggested',
+      user: 'Mike Johnson',
+      username: 'mike_golf_pro',
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+      hasStory: false,
+    },
+    {
+      id: '5',
+      type: 'suggested',
+      user: 'Sarah Chen',
+      username: 'sarah_golf',
+      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
+      hasStory: false,
+    },
+    {
+      id: '6',
+      type: 'suggested',
+      user: 'Alex Rodriguez',
+      username: 'alex_links',
+      avatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&h=150&fit=crop&crop=face',
+      hasStory: false,
+    },
+    {
+      id: '7',
+      type: 'suggested',
+      user: 'Emma Thompson',
+      username: 'emma_fairway',
+      avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face',
+      hasStory: false,
+    },
+  ];
 
   // Function to handle "Your Profile" navigation
   const handleYourProfile = async () => {
@@ -34,51 +103,28 @@ const StoryBar = () => {
     navigate(`/profile/${username}`);
   };
 
-  // Navigation functions for carousel
-  const goToPrevious = () => {
-    setCurrentIndex((prevIndex) => 
-      prevIndex === 0 ? Math.max(0, stories.length - 7) : Math.max(0, prevIndex - 1)
-    );
-  };
-
-  const goToNext = () => {
-    setCurrentIndex((prevIndex) => 
-      Math.min(stories.length - 7, prevIndex + 1)
-    );
-  };
-
-  // Get visible stories (7 at a time)
-  const visibleStories = stories.slice(currentIndex, currentIndex + 7);
-  const canGoPrevious = currentIndex > 0;
-  const canGoNext = currentIndex + 7 < stories.length;
-
-  if (loading) {
-    return <StoryBarSkeleton />;
-  }
-
   return (
     <div className="bg-background border-b border-border">
       <div className="container mx-auto px-4 py-4">
-        <div className="relative flex items-center">
-          <StoryNavigation
-            canGoPrevious={canGoPrevious}
-            canGoNext={canGoNext}
-            onPrevious={goToPrevious}
-            onNext={goToNext}
-          />
-
-          {/* Stories container */}
-          <div className="flex space-x-4 overflow-hidden mx-8">
-            {visibleStories.map((story) => (
-              <StoryItem
-                key={story.id}
-                story={story}
-                onYourProfileClick={handleYourProfile}
-                onOtherProfileClick={handleOtherProfile}
-              />
+        <Carousel
+          opts={{
+            align: "start",
+            dragFree: true,
+          }}
+          className="w-full"
+        >
+          <CarouselContent className="-ml-2 md:-ml-4">
+            {stories.map((story) => (
+              <CarouselItem key={story.id} className="pl-2 md:pl-4 basis-auto">
+                <StoryItem
+                  story={story}
+                  onYourProfileClick={handleYourProfile}
+                  onOtherProfileClick={handleOtherProfile}
+                />
+              </CarouselItem>
             ))}
-          </div>
-        </div>
+          </CarouselContent>
+        </Carousel>
       </div>
     </div>
   );
