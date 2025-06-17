@@ -28,24 +28,24 @@ const Top100Courses: React.FC<Top100CoursesProps> = ({
 
   const regions = [
     { 
+      key: 'global', 
+      name: 'World Top 100',
+      description: 'Top 100 courses worldwide'
+    },
+    { 
       key: 'great-britain-ireland', 
-      name: 'Great Britain & Ireland',
+      name: 'Britain & Ireland',
       description: 'Top courses across the British Isles'
     },
     { 
       key: 'north-america', 
-      name: 'North America',
-      description: 'Premier courses across USA, Canada & Mexico'
+      name: 'USA',
+      description: 'Premier courses across the United States'
     },
     { 
       key: 'europe', 
       name: 'Europe',
       description: 'Continental European golf courses'
-    },
-    { 
-      key: 'global', 
-      name: 'Global',
-      description: 'Top 100 courses worldwide'
     }
   ];
 
