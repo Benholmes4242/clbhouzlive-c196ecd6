@@ -104,14 +104,21 @@ export const useProfileActions = ({ targetUserId, currentUserId }: UseProfileAct
   const handleRemoveFriend = async () => {
     setLoading(true);
     try {
+      // Remove friend relationship (both directions)
       await supabase
         .from('user_friends')
         .delete()
         .or(`and(user_id.eq.${currentUserId},friend_id.eq.${targetUserId}),and(user_id.eq.${targetUserId},friend_id.eq.${currentUserId})`);
       
+      // Also remove follow relationships (both directions)
+      await supabase
+        .from('user_follows')
+        .delete()
+        .or(`and(follower_id.eq.${currentUserId},following_id.eq.${targetUserId}),and(follower_id.eq.${targetUserId},following_id.eq.${currentUserId})`);
+      
       toast({
         title: "Friend removed",
-        description: "You are no longer friends with this user.",
+        description: "You are no longer friends with this user and have unfollowed each other.",
       });
       
       queryClient.invalidateQueries({
