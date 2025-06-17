@@ -2,6 +2,7 @@
 import React from 'react';
 import { User, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 
 interface SearchResult {
   id: string;
@@ -69,11 +70,26 @@ const SearchResults: React.FC<SearchResultsProps> = ({
           className="flex items-center p-3 hover:bg-muted cursor-pointer border-b border-border last:border-b-0"
           onClick={() => handleResultClick(result)}
         >
-          <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center mr-3">
+          <div className="mr-3">
             {result.type === 'user' ? (
-              <User className="w-5 h-5 text-muted-foreground" />
+              <Avatar className="w-10 h-10">
+                <AvatarImage src={result.image} alt={result.title} />
+                <AvatarFallback>
+                  <User className="w-5 h-5 text-muted-foreground" />
+                </AvatarFallback>
+              </Avatar>
             ) : (
-              <MapPin className="w-5 h-5 text-muted-foreground" />
+              <div className="w-10 h-10 rounded bg-muted flex items-center justify-center overflow-hidden">
+                {result.image ? (
+                  <img
+                    src={result.image}
+                    alt={result.title}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <MapPin className="w-5 h-5 text-muted-foreground" />
+                )}
+              </div>
             )}
           </div>
           <div className="flex-1">
