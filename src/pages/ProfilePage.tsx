@@ -23,7 +23,7 @@ const ProfilePage = () => {
   // Redirect to auth page if user is not logged in
   useEffect(() => {
     if (!loading && !user) {
-      navigate('/auth');
+      navigate('/auth', { replace: true });
     }
   }, [user, loading, navigate]);
 
@@ -50,8 +50,12 @@ const ProfilePage = () => {
   // Show loading while checking authentication
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <span className="text-muted-foreground text-base">Loading...</span>
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <span className="text-muted-foreground text-base">Loading...</span>
+        </div>
+        <BottomNavigation />
       </div>
     );
   }

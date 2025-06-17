@@ -42,8 +42,15 @@ const HeaderUserMenu = () => {
   };
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate('/');
+    try {
+      await supabase.auth.signOut();
+      // Force navigation to auth page after logout
+      navigate('/auth', { replace: true });
+    } catch (error) {
+      console.error('Error logging out:', error);
+      // Still navigate to auth page even if logout fails
+      navigate('/auth', { replace: true });
+    }
   };
 
   const currentUsername = userProfile?.username || userProfile?.display_name || 'User';

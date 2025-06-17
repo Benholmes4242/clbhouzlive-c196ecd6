@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from './useSupabaseSession';
 
 export const useProfileData = () => {
-  const { user } = useSupabaseSession();
+  const { user, loading: sessionLoading } = useSupabaseSession();
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -33,6 +33,11 @@ export const useProfileData = () => {
   useEffect(() => {
     let isMounted = true;
     
+    // Wait for session loading to complete
+    if (sessionLoading) {
+      return;
+    }
+    
     if (user) {
       setLoading(true);
       fetchProfile(user.id).finally(() => {
@@ -42,20 +47,22 @@ export const useProfileData = () => {
       });
     } else {
       // Important: Set loading to false when there's no user
-      setLoading(false);
-      setProfile(null);
-      setError(null);
+      if (isMounted) {
+        setLoading(false);
+        setProfile(null);
+        setError(null);
+      }
     }
 
     return () => {
       isMounted = false;
     };
-  }, [user?.id]); // Only re-run when user ID changes
+  }, [user?.id, sessionLoading]); // Include sessionLoading in dependencies
 
   return {
     user,
     profile,
-    loading,
+    loading: sessionLoading || loading, // Combined loading state
     error,
     setProfile,
     fetchProfile
