@@ -18,12 +18,12 @@ const CourseRankBadges = ({ globalRank, regionalRank, country }: CourseRankBadge
       {globalRank && (
         <Badge className="bg-yellow-500 text-yellow-900 hover:bg-yellow-500">
           <Globe className="h-3 w-3 mr-1" />
-          #{globalRank}
+          {globalRank}
         </Badge>
       )}
       {regionalRank && (
         <Badge variant="secondary">
-          {regionalLabel} #{regionalRank}
+          {regionalLabel} {regionalRank}
         </Badge>
       )}
     </div>
