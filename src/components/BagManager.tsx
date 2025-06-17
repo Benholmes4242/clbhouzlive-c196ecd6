@@ -106,7 +106,7 @@ const BagManager = ({ userId, isOwnProfile = false, bagVisible = true }: BagMana
               {item ? (
                 <div className="text-sm">
                   <span className="font-bold">{item.brand}</span>
-                  {item.model && <span className="text-muted-foreground"> {item.model}</span>}
+                  {item.model && <span className="font-bold text-muted-foreground"> {item.model}</span>}
                 </div>
               ) : (
                 <span className="font-bold text-muted-foreground text-sm">Not set</span>
