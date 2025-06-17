@@ -59,13 +59,6 @@ const Top100CoursesModal: React.FC<Top100CoursesModalProps> = ({
     return course.regional_rank || course.global_rank;
   };
 
-  const getRankPrefix = () => {
-    if (region === 'britain-ireland') return 'GB&I';
-    if (region === 'usa') return 'USA';
-    if (region === 'europe') return 'EUR';
-    return '#'; // For global
-  };
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[80vh]">
@@ -94,7 +87,6 @@ const Top100CoursesModal: React.FC<Top100CoursesModalProps> = ({
               {filteredCourses.map((course) => {
                 const isPlayed = playedCourses.has(course.id);
                 const displayRank = getRankToDisplay(course);
-                const rankPrefix = getRankPrefix();
                 
                 return (
                   <div
@@ -120,7 +112,7 @@ const Top100CoursesModal: React.FC<Top100CoursesModalProps> = ({
                       <div className="flex items-center gap-2">
                         {displayRank && (
                           <span className="text-sm font-medium text-muted-foreground">
-                            {region === 'global' ? `#${displayRank}` : `${rankPrefix} ${displayRank}`}
+                            {region === 'global' ? `#${displayRank}` : displayRank}
                           </span>
                         )}
                         <h3 className="font-semibold truncate">{course.name}</h3>
