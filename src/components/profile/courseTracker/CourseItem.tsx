@@ -14,7 +14,7 @@ type Course = {
 interface CourseItemProps {
   course: Course;
   isPlayed: boolean;
-  onToggle: (courseId: string, played: boolean) => void;
+  onToggle: (courseId: string, checked: boolean) => void;
 }
 
 const CourseItem: React.FC<CourseItemProps> = ({

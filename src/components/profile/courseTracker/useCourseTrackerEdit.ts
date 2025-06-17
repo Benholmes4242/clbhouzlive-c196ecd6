@@ -14,7 +14,7 @@ type Course = {
 type UserCourse = {
   id: string;
   course_id: string;
-  played: boolean;
+  checked: boolean;
 };
 
 interface UseCourseTrackerEditProps {
@@ -53,8 +53,8 @@ export const useCourseTrackerEdit = ({ userId, open, onTrackerUpdate }: UseCours
 
   async function fetchUserCourses() {
     const { data, error } = await supabase
-      .from("user_courses")
-      .select("id, course_id, played")
+      .from("user_course_tracker")
+      .select("id, course_id, checked")
       .eq("user_id", userId);
     
     if (!error && data) {
@@ -62,16 +62,16 @@ export const useCourseTrackerEdit = ({ userId, open, onTrackerUpdate }: UseCours
     }
   }
 
-  async function handleCourseToggle(courseId: string, played: boolean) {
-    console.log('Toggling course:', courseId, 'played:', played);
+  async function handleCourseToggle(courseId: string, checked: boolean) {
+    console.log('Toggling course:', courseId, 'checked:', checked);
     
     const existingUserCourse = userCourses.find(uc => uc.course_id === courseId);
     
     if (existingUserCourse) {
       // Update existing record
       const { error } = await supabase
-        .from("user_courses")
-        .update({ played, updated_at: new Date().toISOString() })
+        .from("user_course_tracker")
+        .update({ checked, updated_at: new Date().toISOString() })
         .eq("id", existingUserCourse.id);
       
       if (error) {
@@ -82,18 +82,18 @@ export const useCourseTrackerEdit = ({ userId, open, onTrackerUpdate }: UseCours
       setUserCourses(prev => 
         prev.map(uc => 
           uc.id === existingUserCourse.id 
-            ? { ...uc, played } 
+            ? { ...uc, checked } 
             : uc
         )
       );
     } else {
       // Create new record
       const { data, error } = await supabase
-        .from("user_courses")
+        .from("user_course_tracker")
         .insert([{
           user_id: userId,
           course_id: courseId,
-          played
+          checked
         }])
         .select()
         .single();
@@ -120,7 +120,7 @@ export const useCourseTrackerEdit = ({ userId, open, onTrackerUpdate }: UseCours
   }
 
   const isCoursePlayed = (courseId: string) => {
-    return userCourses.find(uc => uc.course_id === courseId)?.played || false;
+    return userCourses.find(uc => uc.course_id === courseId)?.checked || false;
   };
 
   return {

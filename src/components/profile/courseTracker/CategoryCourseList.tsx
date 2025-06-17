@@ -16,7 +16,7 @@ interface CategoryCourseListProps {
   courses: Course[];
   searchQuery: string;
   isCoursePlayed: (courseId: string) => boolean;
-  onCourseToggle: (courseId: string, played: boolean) => void;
+  onCourseToggle: (courseId: string, checked: boolean) => void;
 }
 
 const CategoryCourseList: React.FC<CategoryCourseListProps> = ({
