@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Edit } from "lucide-react";
 
 type Course = {
@@ -40,6 +41,13 @@ const CourseTrackerEditDialog: React.FC<CourseTrackerEditDialogProps> = ({
   const [courses, setCourses] = useState<Course[]>([]);
   const [userCourses, setUserCourses] = useState<UserCourse[]>([]);
   const [loading, setLoading] = useState(false);
+
+  const courseCategories = [
+    { key: 'gbi', label: 'GB & Ireland', regions: ['England', 'Scotland', 'Wales', 'Northern Ireland', 'Ireland'] },
+    { key: 'europe', label: 'Europe', regions: ['Europe'] },
+    { key: 'usa', label: 'USA', regions: ['USA'] },
+    { key: 'global', label: 'Global', regions: [] } // Global includes all
+  ];
 
   useEffect(() => {
     if (open && userId) {
@@ -115,6 +123,41 @@ const CourseTrackerEditDialog: React.FC<CourseTrackerEditDialogProps> = ({
     return userCourses.find(uc => uc.course_id === courseId)?.played || false;
   };
 
+  const getCoursesForCategory = (categoryKey: string) => {
+    if (categoryKey === 'global') {
+      return courses; // Global shows all courses
+    }
+    
+    const category = courseCategories.find(cat => cat.key === categoryKey);
+    if (!category) return [];
+    
+    return courses.filter(course => {
+      if (categoryKey === 'gbi') {
+        return category.regions.some(region => 
+          course.country.toLowerCase().includes(region.toLowerCase()) ||
+          course.region?.toLowerCase().includes(region.toLowerCase())
+        );
+      }
+      if (categoryKey === 'europe') {
+        // Exclude GB&I countries from Europe
+        const gbiRegions = ['England', 'Scotland', 'Wales', 'Northern Ireland', 'Ireland'];
+        const isGBI = gbiRegions.some(region => 
+          course.country.toLowerCase().includes(region.toLowerCase()) ||
+          course.region?.toLowerCase().includes(region.toLowerCase())
+        );
+        return !isGBI && (
+          course.region?.toLowerCase().includes('europe') ||
+          course.country.toLowerCase().includes('europe')
+        );
+      }
+      if (categoryKey === 'usa') {
+        return course.country.toLowerCase().includes('usa') ||
+               course.country.toLowerCase().includes('united states');
+      }
+      return false;
+    });
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -123,7 +166,7 @@ const CourseTrackerEditDialog: React.FC<CourseTrackerEditDialogProps> = ({
           Edit Courses
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Edit Top 100 Courses Played</DialogTitle>
         </DialogHeader>
@@ -131,30 +174,49 @@ const CourseTrackerEditDialog: React.FC<CourseTrackerEditDialogProps> = ({
         {loading ? (
           <div className="py-8 text-center">Loading courses...</div>
         ) : (
-          <div className="space-y-3 py-4">
-            {courses.map(course => (
-              <div key={course.id} className="flex items-center space-x-3 p-3 border rounded-lg">
-                <Checkbox
-                  id={`course-${course.id}`}
-                  checked={isCoursePlayed(course.id)}
-                  onCheckedChange={(checked) => 
-                    handleCourseToggle(course.id, checked as boolean)
-                  }
-                />
-                <div className="flex-1">
-                  <Label 
-                    htmlFor={`course-${course.id}`}
-                    className="text-sm font-medium cursor-pointer"
-                  >
-                    #{course.global_rank} {course.name}
-                  </Label>
-                  <p className="text-xs text-muted-foreground">
-                    {course.region}, {course.country}
-                  </p>
+          <Tabs defaultValue="gbi" className="w-full">
+            <TabsList className="grid w-full grid-cols-4">
+              {courseCategories.map(category => (
+                <TabsTrigger key={category.key} value={category.key} className="text-xs">
+                  {category.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+            
+            {courseCategories.map(category => (
+              <TabsContent key={category.key} value={category.key} className="mt-4">
+                <div className="space-y-3 max-h-96 overflow-y-auto">
+                  {getCoursesForCategory(category.key).map(course => (
+                    <div key={course.id} className="flex items-center space-x-3 p-3 border rounded-lg">
+                      <Checkbox
+                        id={`course-${course.id}`}
+                        checked={isCoursePlayed(course.id)}
+                        onCheckedChange={(checked) => 
+                          handleCourseToggle(course.id, checked as boolean)
+                        }
+                      />
+                      <div className="flex-1">
+                        <Label 
+                          htmlFor={`course-${course.id}`}
+                          className="text-sm font-medium cursor-pointer"
+                        >
+                          #{course.global_rank} {course.name}
+                        </Label>
+                        <p className="text-xs text-muted-foreground">
+                          {course.region}, {course.country}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                  {getCoursesForCategory(category.key).length === 0 && (
+                    <div className="text-center py-8 text-muted-foreground">
+                      No courses found for {category.label}
+                    </div>
+                  )}
                 </div>
-              </div>
+              </TabsContent>
             ))}
-          </div>
+          </Tabs>
         )}
       </DialogContent>
     </Dialog>
