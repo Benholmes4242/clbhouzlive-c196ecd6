@@ -20,6 +20,8 @@ export const useSearch = () => {
   const debouncedQuery = useDebounce(query, 300);
 
   const searchUsers = async (searchTerm: string): Promise<SearchResult[]> => {
+    console.log('Searching users for term:', searchTerm);
+    
     const { data, error } = await supabase
       .from('user_profiles')
       .select('id, display_name, username, home_club')
@@ -27,38 +29,50 @@ export const useSearch = () => {
       .eq('is_public', true)
       .limit(10);
 
+    console.log('User search query result:', { data, error });
+
     if (error) {
       console.error('Error searching users:', error);
       return [];
     }
 
-    return (data || []).map(user => ({
+    const userResults = (data || []).map(user => ({
       id: user.id,
       type: 'user' as const,
       title: user.display_name || user.username || 'Anonymous User',
       subtitle: user.home_club ? `Home Club: ${user.home_club}` : 'No home club set',
       username: user.username || user.id // Fallback to ID if no username
     }));
+
+    console.log('Processed user results:', userResults);
+    return userResults;
   };
 
   const searchCourses = async (searchTerm: string): Promise<SearchResult[]> => {
+    console.log('Searching courses for term:', searchTerm);
+    
     const { data, error } = await supabase
       .from('golf_courses')
       .select('id, name, country, region')
       .ilike('name', `%${searchTerm}%`)
       .limit(10);
 
+    console.log('Course search query result:', { data, error });
+
     if (error) {
       console.error('Error searching courses:', error);
       return [];
     }
 
-    return (data || []).map(course => ({
+    const courseResults = (data || []).map(course => ({
       id: course.id,
       type: 'course' as const,
       title: course.name,
       subtitle: `${course.region || course.country}`
     }));
+
+    console.log('Processed course results:', courseResults);
+    return courseResults;
   };
 
   const performSearch = useCallback(async (searchTerm: string) => {
@@ -68,6 +82,7 @@ export const useSearch = () => {
       return;
     }
 
+    console.log('Performing search for:', searchTerm);
     setLoading(true);
     
     try {
@@ -76,8 +91,11 @@ export const useSearch = () => {
         searchCourses(searchTerm)
       ]);
 
+      console.log('All search results:', { userResults, courseResults });
+
       // Combine and limit total results
       const allResults = [...userResults, ...courseResults].slice(0, 20);
+      console.log('Final combined results:', allResults);
       setResults(allResults);
     } catch (error) {
       console.error('Search error:', error);
