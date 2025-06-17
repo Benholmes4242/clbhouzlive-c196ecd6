@@ -132,7 +132,7 @@ const UserProfilePage = () => {
         .eq('following_id', profile.id)
         .maybeSingle();
 
-      // Check friend status
+      // Check friend status - look for bidirectional relationships
       const { data: friendData } = await supabase
         .from('user_friends')
         .select('status')

@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Progress } from "@/components/ui/progress";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -72,13 +73,14 @@ const CourseTracker: React.FC<CourseTrackerProps> = ({
           case 'Global':
             return golfCourse.global_rank && golfCourse.global_rank <= 100;
           case 'GB&I':
+            const gbiCountries = ['Scotland', 'England', 'Wales', 'Northern Ireland', 'Ireland'];
             return golfCourse.regional_rank && golfCourse.regional_rank <= 100 && 
-                   (golfCourse.country === 'Scotland' || golfCourse.country === 'England' || 
-                    golfCourse.country === 'Wales' || golfCourse.country === 'Northern Ireland' ||
-                    golfCourse.country === 'Ireland');
+                   gbiCountries.includes(golfCourse.country);
           case 'Europe':
+            const gbiCountriesForEurope = ['Scotland', 'England', 'Wales', 'Northern Ireland', 'Ireland'];
             return golfCourse.regional_rank && golfCourse.regional_rank <= 100 && 
-                   golfCourse.continent === 'Europe';
+                   golfCourse.continent === 'Europe' && 
+                   !gbiCountriesForEurope.includes(golfCourse.country);
           case 'USA':
             return golfCourse.regional_rank && golfCourse.regional_rank <= 100 && 
                    golfCourse.country === 'United States';
@@ -87,6 +89,7 @@ const CourseTracker: React.FC<CourseTrackerProps> = ({
         }
       }) || [];
       
+      console.log('Filtered courses for category', selectedCategory, ':', filtered);
       return filtered;
     },
     enabled: !!userId && !!selectedCategory,
