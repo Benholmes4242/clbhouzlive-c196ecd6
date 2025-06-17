@@ -235,39 +235,78 @@ export type Database = {
           },
         ]
       }
+      user_friends: {
+        Row: {
+          created_at: string
+          friend_id: string
+          id: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          friend_id: string
+          id?: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          friend_id?: string
+          id?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_profiles: {
         Row: {
           bag_visible: boolean | null
+          bio: string | null
           created_at: string | null
+          display_name: string | null
           eg_app_connected: boolean | null
           eg_handicap_index: number | null
           eg_recent_rounds: Json | null
           home_club: string | null
           id: string
+          is_public: boolean | null
           profile_photo_url: string | null
           updated_at: string | null
+          username: string | null
         }
         Insert: {
           bag_visible?: boolean | null
+          bio?: string | null
           created_at?: string | null
+          display_name?: string | null
           eg_app_connected?: boolean | null
           eg_handicap_index?: number | null
           eg_recent_rounds?: Json | null
           home_club?: string | null
           id: string
+          is_public?: boolean | null
           profile_photo_url?: string | null
           updated_at?: string | null
+          username?: string | null
         }
         Update: {
           bag_visible?: boolean | null
+          bio?: string | null
           created_at?: string | null
+          display_name?: string | null
           eg_app_connected?: boolean | null
           eg_handicap_index?: number | null
           eg_recent_rounds?: Json | null
           home_club?: string | null
           id?: string
+          is_public?: boolean | null
           profile_photo_url?: string | null
           updated_at?: string | null
+          username?: string | null
         }
         Relationships: []
       }
