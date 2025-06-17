@@ -47,7 +47,7 @@ export const useStoryData = () => {
           }
         ];
 
-        // 1. Fetch friends (bidirectional - where current user is either user_id or friend_id)
+        // 1. Fetch direct friends (bidirectional - where current user is either user_id or friend_id)
         const { data: friendsData, error: friendsError } = await supabase
           .from('user_friends')
           .select(`
@@ -72,6 +72,7 @@ export const useStoryData = () => {
         console.log('Friends data:', friendsData, 'Friends error:', friendsError);
 
         const friendIds: string[] = [];
+        const directFriends: StoryUser[] = [];
         
         if (friendsData && friendsData.length > 0) {
           // Process bidirectional friend relationships
@@ -87,7 +88,7 @@ export const useStoryData = () => {
             
             if (friendProfile && !friendIds.includes(friendProfile.id)) {
               friendIds.push(friendProfile.id);
-              newStories.push({
+              directFriends.push({
                 id: friendProfile.id,
                 type: 'friend',
                 user: friendProfile.display_name || friendProfile.username || 'Friend',
@@ -99,10 +100,65 @@ export const useStoryData = () => {
           });
         }
 
-        console.log('Friend IDs found:', friendIds);
+        console.log('Direct friends found:', directFriends.length);
 
-        // 2. Fetch suggested users (excluding current user and friends)
-        const excludeIds = [user.id, ...friendIds];
+        // 2. Fetch friend-of-friends (suggested based on mutual connections)
+        const friendOfFriends: StoryUser[] = [];
+        
+        if (friendIds.length > 0) {
+          // Get friends of our friends (excluding ourselves and our direct friends)
+          const { data: friendOfFriendsData } = await supabase
+            .from('user_friends')
+            .select(`
+              user_id,
+              friend_id,
+              user_profiles!user_friends_user_id_fkey (
+                id,
+                username,
+                display_name,
+                profile_photo_url,
+                is_public
+              ),
+              friend_profiles:user_profiles!user_friends_friend_id_fkey (
+                id,
+                username,
+                display_name,
+                profile_photo_url,
+                is_public
+              )
+            `)
+            .in('user_id', friendIds)
+            .eq('status', 'accepted')
+            .limit(5);
+
+          if (friendOfFriendsData) {
+            const processedIds = new Set([user.id, ...friendIds]);
+            
+            friendOfFriendsData.forEach((friendship: any) => {
+              const potentialFriend = friendship.friend_profiles;
+              
+              if (potentialFriend && 
+                  potentialFriend.is_public && 
+                  !processedIds.has(potentialFriend.id)) {
+                processedIds.add(potentialFriend.id);
+                friendOfFriends.push({
+                  id: potentialFriend.id,
+                  type: 'suggested',
+                  user: potentialFriend.display_name || potentialFriend.username || 'Player',
+                  username: potentialFriend.username || potentialFriend.id,
+                  avatar: potentialFriend.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+                  hasStory: false,
+                });
+              }
+            });
+          }
+        }
+
+        console.log('Friend-of-friends found:', friendOfFriends.length);
+
+        // 3. Fetch trending/random players (excluding current user, friends, and friend-of-friends)
+        const excludeIds = [user.id, ...friendIds, ...friendOfFriends.map(f => f.id)];
+        const trendingPlayers: StoryUser[] = [];
         
         let query = supabase
           .from('user_profiles')
@@ -114,14 +170,11 @@ export const useStoryData = () => {
           query = query.not('id', 'in', `(${excludeIds.join(',')})`);
         }
 
-        const { data: suggestedUsers, error: suggestedError } = await query.limit(10);
+        const { data: trendingUsers } = await query.limit(8);
 
-        console.log('Suggested users data:', suggestedUsers, 'Suggested error:', suggestedError);
-
-        if (suggestedUsers && suggestedUsers.length > 0) {
-          // Add suggested users (lower priority than friends)
-          suggestedUsers.forEach((profile: any) => {
-            newStories.push({
+        if (trendingUsers && trendingUsers.length > 0) {
+          trendingUsers.forEach((profile: any) => {
+            trendingPlayers.push({
               id: profile.id,
               type: 'suggested',
               user: profile.display_name || profile.username || 'Player',
@@ -132,7 +185,15 @@ export const useStoryData = () => {
           });
         }
 
-        // 3. Only add mock data if we have very few users total
+        console.log('Trending players found:', trendingPlayers.length);
+
+        // 4. Assemble stories in the correct order
+        // Your Profile → Direct Friends → Friend-of-Friends → Trending Players
+        newStories.push(...directFriends);
+        newStories.push(...friendOfFriends);
+        newStories.push(...trendingPlayers);
+
+        // 5. Only add minimal mock data if we have very few users total
         if (newStories.length < 4) {
           console.log('Adding minimal mock data as fallback');
           const mockUsers = [
