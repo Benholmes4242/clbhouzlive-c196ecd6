@@ -1,6 +1,5 @@
-
 import React, { useState, useRef, useEffect } from 'react';
-import { Search, Bell, MessageCircle, User } from 'lucide-react';
+import { Search, Bell, MessageCircle, User, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from "react-router-dom";
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
@@ -25,6 +24,7 @@ const Header = () => {
   const { conversations } = useMessages();
   const { query, setQuery, results, loading, clearResults } = useSearch();
   const [showResults, setShowResults] = useState(false);
+  const [showMobileSearch, setShowMobileSearch] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
   // Fetch user profile for username/display name
@@ -85,6 +85,20 @@ const Header = () => {
     };
   }, []);
 
+  const handleMobileSearchToggle = () => {
+    setShowMobileSearch(!showMobileSearch);
+    if (showMobileSearch) {
+      setQuery('');
+      setShowResults(false);
+    }
+  };
+
+  const handleMobileResultClick = () => {
+    setQuery('');
+    setShowResults(false);
+    setShowMobileSearch(false);
+  };
+
   // Mock data for messages - in a real app, this would come from your backend
   const hasMessages = user && false; // Set to false to show no messages
 
@@ -114,7 +128,7 @@ const Header = () => {
             />
           </div>
 
-          {/* Search Bar */}
+          {/* Desktop Search Bar */}
           <div className="hidden md:flex items-center max-w-md w-full mx-8" ref={searchRef}>
             <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
@@ -142,6 +156,16 @@ const Header = () => {
 
           {/* Navigation Icons */}
           <div className="flex items-center space-x-4">
+            {/* Mobile Search Icon */}
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="md:hidden" 
+              onClick={handleMobileSearchToggle}
+            >
+              {showMobileSearch ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
+            </Button>
+
             <Button variant="ghost" size="icon" className="relative" onClick={handleNotificationsClick}>
               <Bell className="h-5 w-5" />
               {user && unreadCount > 0 && (
@@ -194,6 +218,35 @@ const Header = () => {
             )}
           </div>
         </div>
+
+        {/* Mobile Search Bar */}
+        {showMobileSearch && (
+          <div className="md:hidden pb-4" ref={searchRef}>
+            <div className="relative w-full">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <input
+                type="text"
+                placeholder="Search players, courses, or content..."
+                className="w-full pl-10 pr-4 py-2 bg-muted rounded-full border border-border focus:outline-none focus:ring-2 focus:ring-amber-500"
+                value={query}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  setShowResults(true);
+                }}
+                onFocus={() => setShowResults(true)}
+                autoFocus
+              />
+              {showResults && (
+                <SearchResults
+                  results={results}
+                  onResultClick={handleMobileResultClick}
+                  loading={loading}
+                  query={query}
+                />
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </header>
   );
