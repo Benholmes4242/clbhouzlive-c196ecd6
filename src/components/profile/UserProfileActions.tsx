@@ -121,6 +121,35 @@ const UserProfileActions: React.FC<UserProfileActionsProps> = ({
     }
   };
 
+  const handleRemoveFriend = async () => {
+    setLoading(true);
+    try {
+      // Remove the friendship (works for both directions)
+      await supabase
+        .from('user_friends')
+        .delete()
+        .or(`and(user_id.eq.${currentUserId},friend_id.eq.${targetUserId}),and(user_id.eq.${targetUserId},friend_id.eq.${currentUserId})`);
+      
+      toast({
+        title: "Friend removed",
+        description: "You are no longer friends with this user.",
+      });
+      
+      queryClient.invalidateQueries({
+        queryKey: ['relationshipStatus', currentUserId, targetUserId]
+      });
+    } catch (error) {
+      console.error('Error removing friend:', error);
+      toast({
+        title: "Error",
+        description: "Failed to remove friend. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleMessage = () => {
     if (friendStatus !== 'accepted') {
       toast({
@@ -198,6 +227,11 @@ const UserProfileActions: React.FC<UserProfileActionsProps> = ({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
+          {friendStatus === 'accepted' && (
+            <DropdownMenuItem onClick={handleRemoveFriend} disabled={loading}>
+              Remove Friend
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem onClick={() => {
             toast({
               title: "Coming soon",
