@@ -31,17 +31,28 @@ type UserCourse = {
 interface CourseTrackerEditDialogProps {
   userId: string;
   onTrackerUpdate: () => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  defaultCategory?: string;
 }
 
 const CourseTrackerEditDialog: React.FC<CourseTrackerEditDialogProps> = ({ 
   userId, 
-  onTrackerUpdate 
+  onTrackerUpdate,
+  open: controlledOpen,
+  onOpenChange: controlledOnOpenChange,
+  defaultCategory = 'gbi'
 }) => {
-  const [open, setOpen] = useState(false);
+  const [internalOpen, setInternalOpen] = useState(false);
   const [courses, setCourses] = useState<Course[]>([]);
   const [userCourses, setUserCourses] = useState<UserCourse[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [activeTab, setActiveTab] = useState(defaultCategory);
+
+  // Use controlled state if provided, otherwise use internal state
+  const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
+  const setOpen = controlledOnOpenChange || setInternalOpen;
 
   const courseCategories = [
     { key: 'gbi', label: 'GB & Ireland', regions: ['England', 'Scotland', 'Wales', 'Northern Ireland', 'Ireland'] },
@@ -54,8 +65,9 @@ const CourseTrackerEditDialog: React.FC<CourseTrackerEditDialogProps> = ({
     if (open && userId) {
       fetchCourses();
       fetchUserCourses();
+      setActiveTab(defaultCategory);
     }
-  }, [open, userId]);
+  }, [open, userId, defaultCategory]);
 
   async function fetchCourses() {
     setLoading(true);
@@ -198,7 +210,7 @@ const CourseTrackerEditDialog: React.FC<CourseTrackerEditDialogProps> = ({
               />
             </div>
             
-            <Tabs defaultValue="gbi" className="w-full">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-4">
                 {courseCategories.map(category => (
                   <TabsTrigger key={category.key} value={category.key} className="text-xs">

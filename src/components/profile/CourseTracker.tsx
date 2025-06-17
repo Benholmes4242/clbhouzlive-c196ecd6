@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Progress } from "@/components/ui/progress";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -37,6 +36,7 @@ const CourseTracker: React.FC<CourseTrackerProps> = ({
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editDialogCategory, setEditDialogCategory] = useState<string>('gbi');
 
   // Fetch played courses for the selected category
   const { data: playedCourses } = useQuery({
@@ -99,7 +99,14 @@ const CourseTracker: React.FC<CourseTrackerProps> = ({
 
   const handleCategoryClick = (categoryKey: string) => {
     if (isOwnProfile) {
-      // For own profile, open edit dialog
+      // For own profile, open edit dialog with selected category
+      const dialogCategoryMap: { [key: string]: string } = {
+        'GB&I': 'gbi',
+        'Europe': 'europe', 
+        'USA': 'usa',
+        'Global': 'global'
+      };
+      setEditDialogCategory(dialogCategoryMap[categoryKey] || 'gbi');
       setEditDialogOpen(true);
     } else {
       // For other profiles, show played courses
@@ -119,7 +126,10 @@ const CourseTracker: React.FC<CourseTrackerProps> = ({
           <>
             <CourseTrackerEditDialog 
               userId={userId} 
-              onTrackerUpdate={onTrackerUpdate || (() => {})} 
+              onTrackerUpdate={onTrackerUpdate || (() => {})}
+              open={editDialogOpen}
+              onOpenChange={setEditDialogOpen}
+              defaultCategory={editDialogCategory}
             />
             <div className="flex items-center space-x-2 ml-auto">
               <Checkbox
