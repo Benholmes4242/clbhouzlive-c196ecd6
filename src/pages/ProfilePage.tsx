@@ -6,7 +6,6 @@ import BottomNavigation from '@/components/BottomNavigation';
 import ProfileInfo from '@/components/profile/ProfileInfo';
 import ProfilePhotoManager from '@/components/profile/ProfilePhotoManager';
 import ProfileSections from '@/components/profile/ProfileSections';
-import FriendRequestDebug from '@/components/debug/FriendRequestDebug';
 import { useProfileData } from '@/hooks/useProfileData';
 
 const ProfilePage = () => {
@@ -87,8 +86,6 @@ const ProfilePage = () => {
           onTrackerUpdate={handleTrackerUpdate}
           isOwnProfile={true}
         />
-
-        <FriendRequestDebug />
       </div>
       <BottomNavigation />
     </div>
