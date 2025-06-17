@@ -60,7 +60,7 @@ const Explore = () => {
             <input
               type="text"
               placeholder="Search members, clubs, courses, posts..."
-              className="w-full pl-10 pr-4 py-3 bg-muted rounded-full border border-border focus:outline-none focus:ring-2 focus:ring-green-600 text-base"
+              className="w-full pl-10 pr-4 py-3 bg-muted rounded-full border border-border focus:outline-none focus:ring-2 focus:ring-amber-700 focus:border-amber-700 text-base"
               value={query}
               onChange={(e) => {
                 setQuery(e.target.value);
