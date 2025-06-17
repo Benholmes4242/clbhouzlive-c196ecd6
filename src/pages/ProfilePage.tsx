@@ -15,6 +15,7 @@ const ProfilePage = () => {
     user,
     profile,
     loading,
+    error,
     setProfile,
     fetchProfile
   } = useProfileData();
@@ -28,12 +29,16 @@ const ProfilePage = () => {
 
   const handleEGVisibilityToggle = async (checked: boolean) => {
     if (!user) return;
-    const updateData: any = { eg_visible: checked };
-    await supabase
-      .from("user_profiles")
-      .update(updateData)
-      .eq("id", user.id);
-    setProfile(prev => prev ? { ...prev, eg_visible: checked } : prev);
+    try {
+      const updateData: any = { eg_visible: checked };
+      await supabase
+        .from("user_profiles")
+        .update(updateData)
+        .eq("id", user.id);
+      setProfile(prev => prev ? { ...prev, eg_visible: checked } : prev);
+    } catch (error) {
+      console.error('Error updating EG visibility:', error);
+    }
   };
 
   const handleProfileUpdate = () => {
@@ -47,6 +52,27 @@ const ProfilePage = () => {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <span className="text-muted-foreground text-base">Loading...</span>
+      </div>
+    );
+  }
+
+  // Show error if there's an issue
+  if (error) {
+    return (
+      <div className="min-h-screen bg-background pb-28">
+        <Header />
+        <div className="flex items-center justify-center min-h-[60vh]">
+          <div className="text-center space-y-4">
+            <span className="text-destructive text-base">Error loading profile</span>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="block mx-auto text-sm text-muted-foreground hover:text-foreground"
+            >
+              Try refreshing the page
+            </button>
+          </div>
+        </div>
+        <BottomNavigation />
       </div>
     );
   }
