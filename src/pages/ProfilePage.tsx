@@ -129,10 +129,10 @@ const ProfilePage = () => {
             </h1>
             <p className="text-muted-foreground">London, England, United Kingdom</p>
             <p className="text-sm">
-              <span className="font-medium">Home Club:</span> {profile?.home_club || "Not set"}
+              <span>Home Club:</span> {profile?.home_club || "Not set"}
             </p>
             <p className="text-sm">
-              <span className="font-medium">Handicap:</span> {profile?.eg_handicap_index || "Not set"}
+              <span>Handicap:</span> {profile?.eg_handicap_index || "Not set"}
             </p>
           </div>
           
