@@ -96,9 +96,6 @@ const BagManager = ({ userId, isOwnProfile = false, bagVisible = true }: BagMana
           </>
         )}
       </div>
-      <p className="text-muted-foreground text-base mb-3">
-        Show off your clubs or golf ball 🎒
-      </p>
 
       <div className="space-y-2">
         {bagTypes.map(type => {
