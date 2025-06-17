@@ -10,6 +10,7 @@ import News from "./pages/News";
 import Courses from "./pages/Courses";
 import NotFound from "./pages/NotFound";
 import ProfilePage from "./pages/ProfilePage";
+import UserProfilePage from "./pages/UserProfilePage";
 import Auth from "./pages/Auth";
 import AdminPage from "./pages/AdminPage";
 
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/news" element={<News />} />
           <Route path="/courses" element={<Courses />} />
           <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/profile/:username" element={<UserProfilePage />} />
           <Route path="/admin" element={<AdminPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

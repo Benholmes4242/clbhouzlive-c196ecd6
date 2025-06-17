@@ -1,7 +1,6 @@
 
 import React from 'react';
-import { User, MapPin, Users } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { User, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface SearchResult {
@@ -26,10 +25,18 @@ const SearchResults: React.FC<SearchResultsProps> = ({
   loading,
   query
 }) => {
-  // Debug logging
-  console.log('Search results:', results);
-  console.log('Search query:', query);
-  
+  const navigate = useNavigate();
+
+  const handleResultClick = (result: SearchResult) => {
+    if (result.type === 'user' && result.username) {
+      // Navigate to user profile using their username
+      navigate(`/profile/${result.username}`);
+    } else if (result.type === 'course') {
+      navigate(`/courses?course=${result.id}`);
+    }
+    onResultClick(result);
+  };
+
   if (loading) {
     return (
       <div className="absolute top-full left-0 right-0 bg-background border border-border rounded-md mt-1 shadow-lg z-50">
@@ -60,7 +67,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
         <div
           key={`${result.type}-${result.id}`}
           className="flex items-center p-3 hover:bg-muted cursor-pointer border-b border-border last:border-b-0"
-          onClick={() => onResultClick(result)}
+          onClick={() => handleResultClick(result)}
         >
           <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center mr-3">
             {result.type === 'user' ? (
