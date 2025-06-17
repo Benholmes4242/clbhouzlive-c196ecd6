@@ -45,6 +45,9 @@ const ProfileEditDialog: React.FC<ProfileEditDialogProps> = ({
   });
   const [saving, setSaving] = useState(false);
 
+  // Check if username is already set (not null/empty) to determine if it should be read-only
+  const isUsernameSet = profile?.username && profile.username.trim() !== "";
+
   // Generate handicap options from +10.0 to 50.0 in 0.1 increments
   const generateHandicapOptions = () => {
     const options = [];
@@ -96,13 +99,17 @@ const ProfileEditDialog: React.FC<ProfileEditDialogProps> = ({
   const handleSave = async () => {
     setSaving(true);
     try {
-      const updateData = {
+      const updateData: any = {
         display_name: formData.displayName,
-        username: formData.username || null,
         home_club: formData.homeClub || null,
         eg_handicap_index: formData.handicap ? parseFloat(formData.handicap) : null,
         updated_at: new Date().toISOString(),
       };
+
+      // Only update username if it's not already set
+      if (!isUsernameSet) {
+        updateData.username = formData.username || null;
+      }
 
       await supabase
         .from('user_profiles')
@@ -149,7 +156,12 @@ const ProfileEditDialog: React.FC<ProfileEditDialogProps> = ({
               value={formData.username}
               onChange={handleInputChange}
               placeholder="Your username"
+              disabled={isUsernameSet}
+              className={isUsernameSet ? "bg-gray-100 text-gray-500 cursor-not-allowed" : ""}
             />
+            {isUsernameSet && (
+              <p className="text-xs text-gray-500">Username cannot be changed once set</p>
+            )}
           </div>
           <div className="space-y-2">
             <Label htmlFor="homeClub">Home Club</Label>
