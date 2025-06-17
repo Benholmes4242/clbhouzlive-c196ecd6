@@ -17,33 +17,18 @@ const FollowButton: React.FC<FollowButtonProps> = ({
 }) => {
   const getButtonText = () => {
     if (loading) return "Loading...";
-    
-    // If users are friends, they should automatically be following each other
-    if (friendStatus === 'accepted') {
-      return "Following";
-    }
-    
     return isFollowing ? "Following" : "Follow";
   };
 
   const getButtonVariant = () => {
-    // If users are friends or following, show secondary variant
-    if (friendStatus === 'accepted' || isFollowing) {
-      return "secondary";
-    }
-    return "default";
-  };
-
-  const shouldDisableButton = () => {
-    // Disable if loading or if users are friends (they auto-follow)
-    return loading || friendStatus === 'accepted';
+    return isFollowing ? "secondary" : "default";
   };
 
   return (
     <Button
       variant={getButtonVariant()}
       onClick={onFollow}
-      disabled={shouldDisableButton()}
+      disabled={loading}
       className="flex-1 max-w-32"
     >
       {getButtonText()}

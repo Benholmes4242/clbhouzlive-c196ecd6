@@ -110,7 +110,7 @@ export const useProfileActions = ({ targetUserId, currentUserId }: UseProfileAct
         .delete()
         .or(`and(user_id.eq.${currentUserId},friend_id.eq.${targetUserId}),and(user_id.eq.${targetUserId},friend_id.eq.${currentUserId})`);
       
-      // Also remove follow relationships (both directions)
+      // Also remove follow relationships (both directions) when removing friend
       await supabase
         .from('user_follows')
         .delete()
