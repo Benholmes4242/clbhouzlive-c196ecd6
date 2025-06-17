@@ -1,6 +1,6 @@
 
 import React from "react";
-import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 
 interface EGAppIntegrationProps {
@@ -27,14 +27,17 @@ const EGAppIntegration: React.FC<EGAppIntegrationProps> = ({
       <h2 className="text-lg font-semibold">EG (England Golf) App</h2>
       {isOwnProfile && onVisibilityToggle && (
         <div className="flex items-center space-x-2">
-          <Label htmlFor="eg-visibility" className="text-sm">
-            Show on public profile
-          </Label>
-          <Switch
+          <Checkbox
             id="eg-visibility"
             checked={egVisible}
             onCheckedChange={onVisibilityToggle}
           />
+          <Label
+            htmlFor="eg-visibility"
+            className="text-sm text-muted-foreground cursor-pointer"
+          >
+            Show this section on my public profile
+          </Label>
         </div>
       )}
     </div>
