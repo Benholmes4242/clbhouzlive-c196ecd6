@@ -1,5 +1,4 @@
 
-
 import React from "react";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -57,4 +56,3 @@ const EGAppIntegration: React.FC<EGAppIntegrationProps> = ({
 );
 
 export default EGAppIntegration;
-
