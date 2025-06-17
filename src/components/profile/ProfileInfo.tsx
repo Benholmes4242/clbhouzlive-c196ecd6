@@ -30,9 +30,11 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
         <p className="text-sm">
           <span>Home Club:</span> {profile?.home_club || "Not set"}
         </p>
-        <p className="text-sm">
-          <span>Handicap:</span> {profile?.eg_handicap_index || "Not set"}
-        </p>
+        {profile?.eg_handicap_index !== null && profile?.eg_handicap_index !== undefined && (
+          <p className="text-sm">
+            <span>Handicap:</span> {profile.eg_handicap_index}
+          </p>
+        )}
       </div>
       
       {userId && (
