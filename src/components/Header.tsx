@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { useNavigate } from "react-router-dom";
-import HeaderSearch from './header/HeaderSearch';
 import HeaderNavigation from './header/HeaderNavigation';
 import HeaderUserMenu from './header/HeaderUserMenu';
 
@@ -31,8 +30,6 @@ const Header = () => {
               onClick={handleLogoClick}
             />
           </div>
-
-          <HeaderSearch />
 
           {/* Navigation Icons */}
           <div className="flex items-center space-x-4">

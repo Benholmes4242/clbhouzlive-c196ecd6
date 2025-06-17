@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import CreateProfile from "./pages/CreateProfile";
 import News from "./pages/News";
 import Courses from "./pages/Courses";
+import Explore from "./pages/Explore";
 import NotFound from "./pages/NotFound";
 import ProfilePage from "./pages/ProfilePage";
 import UserProfilePage from "./pages/UserProfilePage";
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/create-profile" element={<CreateProfile />} />
+          <Route path="/explore" element={<Explore />} />
           <Route path="/news" element={<News />} />
           <Route path="/courses" element={<Courses />} />
           <Route path="/profile" element={<ProfilePage />} />
