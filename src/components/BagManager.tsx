@@ -122,11 +122,10 @@ const BagManager = ({ userId, isOwnProfile = false, bagVisible = true }: BagMana
               <span className="font-bold text-sm min-w-16">{bagType.type}:</span>
               {items.length > 0 ? (
                 <div className="text-sm space-y-1">
-                  {items.map((item, index) => (
+                  {items.map((item) => (
                     <div key={item.id}>
                       <span className="font-bold">{item.brand}</span>
                       {item.model && <span className="font-bold"> {item.model}</span>}
-                      {index < items.length - 1 && bagType.allowMultiple && <span className="text-muted-foreground">, </span>}
                     </div>
                   ))}
                 </div>
