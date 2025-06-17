@@ -29,6 +29,10 @@ export const useProfileData = () => {
       fetchProfile(user.id).finally(() => {
         setLoading(false);
       });
+    } else {
+      // Important: Set loading to false when there's no user
+      setLoading(false);
+      setProfile(null);
     }
   }, [user]);
 
