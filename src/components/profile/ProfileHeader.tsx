@@ -134,13 +134,15 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       {/* Enlarged photo dialog */}
       {hasPhoto && (
         <Dialog open={showEnlargedPhoto} onOpenChange={setShowEnlargedPhoto}>
-          <DialogContent className="max-w-4xl w-auto p-2">
-            <img
-              src={photoPreview || profilePhotoUrl!}
-              alt="Profile photo"
-              className="w-full h-auto max-h-[80vh] object-contain rounded-lg"
-              crossOrigin="anonymous"
-            />
+          <DialogContent className="max-w-md w-auto p-2">
+            <div className="w-80 h-80 mx-auto">
+              <img
+                src={photoPreview || profilePhotoUrl!}
+                alt="Profile photo"
+                className="w-full h-full object-cover rounded-full"
+                crossOrigin="anonymous"
+              />
+            </div>
           </DialogContent>
         </Dialog>
       )}
