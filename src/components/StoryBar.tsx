@@ -1,6 +1,6 @@
 
 import React, { useEffect, useState } from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,6 +17,7 @@ type StoryUser = {
 
 const StoryBar = () => {
   const [stories, setStories] = useState<StoryUser[]>([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
@@ -66,7 +67,8 @@ const StoryBar = () => {
           .eq('status', 'accepted')
           .limit(10);
 
-        if (friendsData) {
+        if (friendsData && friendsData.length > 0) {
+          // User has friends, show them
           friendsData.forEach((friendship: any) => {
             const profile = friendship.user_profiles;
             if (profile) {
@@ -80,30 +82,30 @@ const StoryBar = () => {
               });
             }
           });
-        }
+        } else {
+          // No friends, fetch random users to toggle through
+          const friendIds = friendsData?.map((f: any) => f.friend_id) || [];
+          const excludeIds = [user.id, ...friendIds];
 
-        // Fetch suggested players (public profiles that aren't friends)
-        const friendIds = friendsData?.map((f: any) => f.friend_id) || [];
-        const excludeIds = [user.id, ...friendIds];
+          const { data: randomUsers } = await supabase
+            .from('user_profiles')
+            .select('id, username, display_name, profile_photo_url, home_club')
+            .eq('is_public', true)
+            .not('id', 'in', `(${excludeIds.join(',')})`)
+            .limit(20); // Fetch more users to toggle through
 
-        const { data: suggestedData } = await supabase
-          .from('user_profiles')
-          .select('id, username, display_name, profile_photo_url')
-          .eq('is_public', true)
-          .not('id', 'in', `(${excludeIds.join(',')})`)
-          .limit(5);
-
-        if (suggestedData) {
-          suggestedData.forEach((profile: any) => {
-            newStories.push({
-              id: profile.id,
-              type: 'suggested',
-              user: profile.display_name || profile.username || 'Player',
-              username: profile.username || profile.id,
-              avatar: profile.profile_photo_url || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
-              hasStory: false, // Suggested players don't have stories yet
+          if (randomUsers && randomUsers.length > 0) {
+            randomUsers.forEach((profile: any) => {
+              newStories.push({
+                id: profile.id,
+                type: 'suggested',
+                user: profile.display_name || profile.username || 'Player',
+                username: profile.username || profile.id,
+                avatar: profile.profile_photo_url || `https://images.unsplash.com/photo-${Math.random() > 0.5 ? '1507003211169-0a1dd7228f2d' : '1500648767791-00dcc994a43e'}?w=150&h=150&fit=crop&crop=face`,
+                hasStory: false,
+              });
             });
-          });
+          }
         }
 
         setStories(newStories);
@@ -147,6 +149,24 @@ const StoryBar = () => {
     navigate(`/profile/${username}`);
   };
 
+  // Navigation functions for carousel
+  const goToPrevious = () => {
+    setCurrentIndex((prevIndex) => 
+      prevIndex === 0 ? Math.max(0, stories.length - 7) : Math.max(0, prevIndex - 1)
+    );
+  };
+
+  const goToNext = () => {
+    setCurrentIndex((prevIndex) => 
+      Math.min(stories.length - 7, prevIndex + 1)
+    );
+  };
+
+  // Get visible stories (7 at a time)
+  const visibleStories = stories.slice(currentIndex, currentIndex + 7);
+  const canGoPrevious = currentIndex > 0;
+  const canGoNext = currentIndex + 7 < stories.length;
+
   if (loading) {
     return (
       <div className="bg-background border-b border-border">
@@ -168,48 +188,73 @@ const StoryBar = () => {
   return (
     <div className="bg-background border-b border-border">
       <div className="container mx-auto px-4 py-4">
-        <div className="flex space-x-4 overflow-x-auto scrollbar-hide">
-          {stories.map((story) => (
-            <div key={story.id} className="flex flex-col items-center space-y-1 min-w-0">
-              <div className="relative">
-                {story.type === 'add' ? (
-                  <button
-                    type="button"
-                    onClick={handleYourProfile}
-                    aria-label="Create or view your profile"
-                  >
-                    <div className="w-16 h-16 bg-muted border-2 border-dashed border-amber-700 rounded-full flex items-center justify-center hover:bg-muted/80 transition-colors">
-                      <Plus className="h-6 w-6 text-amber-700" />
-                    </div>
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => handleOtherProfile(story.username)}
-                    aria-label={`View ${story.user}'s profile`}
-                    className="focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 rounded-full"
-                  >
-                    <div className={`w-16 h-16 rounded-full p-0.5 ${
-                      story.hasStory 
-                        ? 'bg-gradient-to-tr from-green-500 to-green-700' 
-                        : story.type === 'suggested' 
-                        ? 'bg-gradient-to-tr from-blue-500 to-blue-700' 
-                        : ''
-                    } hover:scale-105 transition-transform`}>
-                      <img
-                        src={story.avatar}
-                        alt={story.user}
-                        className="w-full h-full rounded-full object-cover border-2 border-background"
-                      />
-                    </div>
-                  </button>
-                )}
+        <div className="relative flex items-center">
+          {/* Previous button */}
+          {canGoPrevious && (
+            <button
+              onClick={goToPrevious}
+              className="absolute left-0 z-10 w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-gray-50 transition-colors"
+              aria-label="Previous stories"
+            >
+              <ChevronLeft className="h-4 w-4 text-gray-600" />
+            </button>
+          )}
+
+          {/* Stories container */}
+          <div className="flex space-x-4 overflow-hidden mx-8">
+            {visibleStories.map((story) => (
+              <div key={story.id} className="flex flex-col items-center space-y-1 min-w-0">
+                <div className="relative">
+                  {story.type === 'add' ? (
+                    <button
+                      type="button"
+                      onClick={handleYourProfile}
+                      aria-label="Create or view your profile"
+                    >
+                      <div className="w-16 h-16 bg-muted border-2 border-dashed border-amber-700 rounded-full flex items-center justify-center hover:bg-muted/80 transition-colors">
+                        <Plus className="h-6 w-6 text-amber-700" />
+                      </div>
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => handleOtherProfile(story.username)}
+                      aria-label={`View ${story.user}'s profile`}
+                      className="focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 rounded-full"
+                    >
+                      <div className={`w-16 h-16 rounded-full p-0.5 ${
+                        story.hasStory 
+                          ? 'bg-gradient-to-tr from-green-500 to-green-700' 
+                          : story.type === 'suggested' 
+                          ? 'bg-gradient-to-tr from-blue-500 to-blue-700' 
+                          : ''
+                      } hover:scale-105 transition-transform`}>
+                        <img
+                          src={story.avatar}
+                          alt={story.user}
+                          className="w-full h-full rounded-full object-cover border-2 border-background"
+                        />
+                      </div>
+                    </button>
+                  )}
+                </div>
+                <span className="text-xs text-center text-muted-foreground max-w-16 truncate">
+                  {story.user}
+                </span>
               </div>
-              <span className="text-xs text-center text-muted-foreground max-w-16 truncate">
-                {story.user}
-              </span>
-            </div>
-          ))}
+            ))}
+          </div>
+
+          {/* Next button */}
+          {canGoNext && (
+            <button
+              onClick={goToNext}
+              className="absolute right-0 z-10 w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-gray-50 transition-colors"
+              aria-label="Next stories"
+            >
+              <ChevronRight className="h-4 w-4 text-gray-600" />
+            </button>
+          )}
         </div>
       </div>
     </div>
