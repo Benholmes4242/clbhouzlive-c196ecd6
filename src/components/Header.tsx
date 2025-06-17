@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Search, Bell, MessageCircle, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -15,14 +14,19 @@ import { supabase } from "@/integrations/supabase/client";
 import { useSearch } from "@/hooks/useSearch";
 import SearchResults from "@/components/search/SearchResults";
 import { useNotifications } from "@/hooks/useNotifications";
+import { useMessages } from "@/hooks/useMessages";
 
 const Header = () => {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const { unreadCount } = useNotifications();
+  const { conversations } = useMessages();
   const { query, setQuery, results, loading, clearResults } = useSearch();
   const [showResults, setShowResults] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+
+  // Calculate total unread messages
+  const unreadMessagesCount = conversations.reduce((total, conv) => total + conv.unread_count, 0);
 
   const handleProfileClick = () => {
     if (!user) {
@@ -66,6 +70,10 @@ const Header = () => {
 
   // Mock data for messages - in a real app, this would come from your backend
   const hasMessages = user && false; // Set to false to show no messages
+
+  const handleMessagesClick = () => {
+    navigate('/messages');
+  };
 
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
@@ -123,10 +131,12 @@ const Header = () => {
                 </span>
               )}
             </Button>
-            <Button variant="ghost" size="icon" className="relative">
+            <Button variant="ghost" size="icon" className="relative" onClick={handleMessagesClick}>
               <MessageCircle className="h-5 w-5" />
-              {hasMessages && (
-                <span className="absolute -top-1 -right-1 bg-amber-700 text-white text-xs rounded-full h-2 w-2"></span>
+              {user && unreadMessagesCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-amber-700 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {unreadMessagesCount > 9 ? '9+' : unreadMessagesCount}
+                </span>
               )}
             </Button>
             

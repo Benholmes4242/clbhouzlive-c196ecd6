@@ -32,6 +32,7 @@ const App = () => (
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/profile/:username" element={<UserProfilePage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
+          <Route path="/messages" element={<MessagesPage />} />
           <Route path="/admin" element={<AdminPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
