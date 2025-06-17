@@ -108,15 +108,19 @@ export const useCourseTrackerEdit = ({ userId, open, onTrackerUpdate }: UseCours
       }
     }
     
-    // Invalidate all relevant queries to ensure the tracker updates
+    // Invalidate ALL relevant queries to ensure data is fresh across different user sessions
     queryClient.invalidateQueries({ queryKey: ['trackerStats'] });
     queryClient.invalidateQueries({ queryKey: ['playedCourses'] });
     queryClient.invalidateQueries({ queryKey: ['userProfile'] });
     
+    // Also specifically invalidate queries for this user's profile
+    queryClient.invalidateQueries({ queryKey: ['trackerStats', userId] });
+    queryClient.invalidateQueries({ queryKey: ['userProfile', userId] });
+    
     // Call the update callback
     onTrackerUpdate();
     
-    console.log('Course toggle completed, queries invalidated');
+    console.log('Course toggle completed, all queries invalidated');
   }
 
   const isCoursePlayed = (courseId: string) => {

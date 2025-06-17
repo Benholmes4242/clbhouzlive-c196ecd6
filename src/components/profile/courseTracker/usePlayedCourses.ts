@@ -83,5 +83,7 @@ export const usePlayedCourses = (userId?: string, selectedCategory?: string | nu
       return filtered;
     },
     enabled: !!userId && !!selectedCategory,
+    // Add a shorter stale time to ensure fresh data
+    staleTime: 30000, // 30 seconds
   });
 };
