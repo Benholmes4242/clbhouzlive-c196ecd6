@@ -7,6 +7,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
 import { CheckCircle, Upload, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { Database } from '@/integrations/supabase/types';
+
+type Continent = Database['public']['Enums']['continent'];
 
 const BulkCourseImporter = () => {
   const { toast } = useToast();
@@ -46,7 +49,7 @@ const BulkCourseImporter = () => {
     { name: "Prestwick Golf Club", world_rank: 93, gbi_rank: 30, county: "Ayrshire & Arran", country: "United Kingdom", region: "Scotland", description: "Prestwick's rugged fairways and dunes deliver a deeply traditional golf experience." }
   ];
 
-  const getContinent = (country: string) => {
+  const getContinent = (country: string): Continent => {
     if (country === 'Ireland') return 'Europe';
     if (country === 'United Kingdom') return 'Europe';
     return 'Europe';
@@ -82,7 +85,7 @@ const BulkCourseImporter = () => {
           if (!existingCourse) {
             const { data, error } = await supabase
               .from('golf_courses')
-              .insert(course)
+              .insert([course])
               .select()
               .single();
 
