@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { User } from '@supabase/supabase-js';
@@ -18,6 +17,7 @@ type Profile = {
   eg_handicap_index: number | null;
   eg_recent_rounds: any | null;
   bag_visible: boolean | null;
+  tracker_visible: boolean | null;
   display_name: string | null;
   username: string | null;
 };
@@ -60,15 +60,32 @@ const ProfilePage = () => {
   const fetchTrackerStats = async (userId: string) => {
     let stats: { [cat: string]: number } = {};
     let totals: { [cat: string]: number } = {};
-    const { data } = await supabase.from('user_course_tracker').select('course_id, checked');
+    
+    const { data } = await supabase
+      .from('user_courses')
+      .select('course_id, played')
+      .eq('user_id', userId)
+      .eq('played', true);
+    
     if (data) {
+      // For now, we'll count all played courses for each category
+      // In the future, you might want to categorize courses by region
       ['GB&I', 'Europe', 'USA', 'Global'].forEach((cat) => {
-        stats[cat] = data.filter(row => !!row.checked).length;
+        stats[cat] = data.length; // This is simplified - you'd want to filter by region
         totals[cat] = 100;
       });
     }
     setTrackerStats(stats);
     setTotalStats(totals);
+  };
+
+  const handleTrackerVisibilityToggle = async (checked: boolean) => {
+    if (!user) return;
+    await supabase
+      .from("user_profiles")
+      .update({ tracker_visible: checked })
+      .eq("id", user.id);
+    setProfile(prev => prev ? { ...prev, tracker_visible: checked } : prev);
   };
 
   const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -159,7 +176,15 @@ const ProfilePage = () => {
           />
         )}
         
-        <CourseTracker trackerStats={trackerStats} totalStats={totalStats} />
+        <CourseTracker 
+          trackerStats={trackerStats} 
+          totalStats={totalStats}
+          userId={user?.id}
+          isOwnProfile={!!user}
+          trackerVisible={profile?.tracker_visible ?? true}
+          onVisibilityToggle={handleTrackerVisibilityToggle}
+          onTrackerUpdate={() => fetchTrackerStats(user?.id || "")}
+        />
       </div>
       <BottomNavigation />
     </div>
