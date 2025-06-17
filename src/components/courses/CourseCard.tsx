@@ -24,36 +24,51 @@ interface Course {
 
 interface CourseCardProps {
   course: Course;
+  viewingUserId?: string; // The user whose profile/courses we're viewing
 }
 
-const CourseCard = ({ course }: CourseCardProps) => {
+const CourseCard = ({ course, viewingUserId }: CourseCardProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isHovered, setIsHovered] = useState(false);
 
+  // Get current authenticated user
+  const { data: currentUserResponse } = useQuery({
+    queryKey: ['current-user'],
+    queryFn: async () => {
+      return await supabase.auth.getUser();
+    },
+  });
+
+  const currentUser = currentUserResponse?.data?.user;
+
   // Check if user has played this course
   const { data: userCourse } = useQuery({
-    queryKey: ['user-course', course.id],
+    queryKey: ['user-course', course.id, viewingUserId || currentUser?.id],
     queryFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return null;
+      const targetUserId = viewingUserId || currentUser?.id;
+      if (!targetUserId) return null;
 
       const { data, error } = await supabase
         .from('user_courses')
         .select('*')
         .eq('course_id', course.id)
-        .eq('user_id', user.id)
+        .eq('user_id', targetUserId)
         .maybeSingle();
 
       if (error && error.code !== 'PGRST116') throw error;
       return data;
     },
+    enabled: !!(viewingUserId || currentUser?.id),
   });
+
+  // Only allow course status changes if viewing own profile/courses
+  const canModifyCourseStatus = currentUser?.id && (!viewingUserId || viewingUserId === currentUser.id);
 
   const togglePlayedMutation = useMutation({
     mutationFn: async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Not authenticated');
+      if (!currentUser) throw new Error('Not authenticated');
+      if (!canModifyCourseStatus) throw new Error('Cannot modify other users courses');
 
       if (userCourse) {
         // Update existing record
@@ -68,7 +83,7 @@ const CourseCard = ({ course }: CourseCardProps) => {
           .from('user_courses')
           .insert({
             course_id: course.id,
-            user_id: user.id,
+            user_id: currentUser.id,
             played: true,
           });
         if (error) throw error;
@@ -77,6 +92,7 @@ const CourseCard = ({ course }: CourseCardProps) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['user-course', course.id] });
       queryClient.invalidateQueries({ queryKey: ['my-courses'] });
+      queryClient.invalidateQueries({ queryKey: ['trackerStats'] });
       toast({
         title: userCourse?.played ? "Removed from played courses" : "Added to played courses",
         description: userCourse?.played 
@@ -96,6 +112,7 @@ const CourseCard = ({ course }: CourseCardProps) => {
 
   const handleTogglePlayed = (e: React.MouseEvent) => {
     e.stopPropagation();
+    if (!canModifyCourseStatus) return;
     togglePlayedMutation.mutate();
   };
 
@@ -131,28 +148,37 @@ const CourseCard = ({ course }: CourseCardProps) => {
           )}
         </div>
 
-        {/* Played status button */}
-        <div className="absolute top-3 right-3">
-          <Button
-            size="sm"
-            variant={userCourse?.played ? "default" : "secondary"}
-            onClick={handleTogglePlayed}
-            disabled={togglePlayedMutation.isPending}
-            className="shadow-lg"
-          >
-            {userCourse?.played ? (
-              <>
-                <Check className="h-4 w-4 mr-1" />
+        {/* Played status button - only show if can modify or if course is played */}
+        {(canModifyCourseStatus || userCourse?.played) && (
+          <div className="absolute top-3 right-3">
+            {canModifyCourseStatus ? (
+              <Button
+                size="sm"
+                variant={userCourse?.played ? "default" : "secondary"}
+                onClick={handleTogglePlayed}
+                disabled={togglePlayedMutation.isPending}
+                className="shadow-lg"
+              >
+                {userCourse?.played ? (
+                  <>
+                    <Check className="h-4 w-4 mr-1" />
+                    Played
+                  </>
+                ) : (
+                  <>
+                    <Plus className="h-4 w-4 mr-1" />
+                    Add
+                  </>
+                )}
+              </Button>
+            ) : userCourse?.played ? (
+              <Badge variant="default" className="shadow-lg">
+                <Check className="h-3 w-3 mr-1" />
                 Played
-              </>
-            ) : (
-              <>
-                <Plus className="h-4 w-4 mr-1" />
-                Add
-              </>
-            )}
-          </Button>
-        </div>
+              </Badge>
+            ) : null}
+          </div>
+        )}
       </div>
 
       <CardContent className="p-4">
