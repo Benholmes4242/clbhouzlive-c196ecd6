@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
+
+import React, { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -8,26 +8,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Edit, Search } from "lucide-react";
-import { useQueryClient } from "@tanstack/react-query";
-
-type Course = {
-  id: string;
-  name: string;
-  country: string;
-  region: string;
-  global_rank: number;
-};
-
-type UserCourse = {
-  id: string;
-  course_id: string;
-  played: boolean;
-};
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Edit } from "lucide-react";
+import { useCourseTrackerEdit } from "./courseTracker/useCourseTrackerEdit";
+import CourseSearch from "./courseTracker/CourseSearch";
+import CategoryCourseList from "./courseTracker/CategoryCourseList";
 
 interface CourseTrackerEditDialogProps {
   userId: string;
@@ -45,165 +30,36 @@ const CourseTrackerEditDialog: React.FC<CourseTrackerEditDialogProps> = ({
   defaultCategory = 'gbi'
 }) => {
   const [internalOpen, setInternalOpen] = useState(false);
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [userCourses, setUserCourses] = useState<UserCourse[]>([]);
-  const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState(defaultCategory);
-  const queryClient = useQueryClient();
 
   // Use controlled state if provided, otherwise use internal state
   const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
   const setOpen = controlledOnOpenChange || setInternalOpen;
 
+  const {
+    courses,
+    loading,
+    handleCourseToggle,
+    isCoursePlayed
+  } = useCourseTrackerEdit({
+    userId,
+    open,
+    onTrackerUpdate
+  });
+
   const courseCategories = [
-    { key: 'gbi', label: 'GB & Ireland', regions: ['England', 'Scotland', 'Wales', 'Northern Ireland', 'Ireland'] },
-    { key: 'europe', label: 'Europe', regions: ['Europe'] },
-    { key: 'usa', label: 'USA', regions: ['USA'] },
-    { key: 'global', label: 'Global', regions: [] } // Global includes all
+    { key: 'gbi', label: 'GB & Ireland' },
+    { key: 'europe', label: 'Europe' },
+    { key: 'usa', label: 'USA' },
+    { key: 'global', label: 'Global' }
   ];
 
-  useEffect(() => {
-    if (open && userId) {
-      fetchCourses();
-      fetchUserCourses();
+  React.useEffect(() => {
+    if (open) {
       setActiveTab(defaultCategory);
     }
-  }, [open, userId, defaultCategory]);
-
-  async function fetchCourses() {
-    setLoading(true);
-    const { data, error } = await supabase
-      .from("golf_courses")
-      .select("id, name, country, region, global_rank")
-      .not("global_rank", "is", null)
-      .order("global_rank", { ascending: true })
-      .limit(100);
-    
-    if (!error && data) {
-      setCourses(data);
-    }
-    setLoading(false);
-  }
-
-  async function fetchUserCourses() {
-    const { data, error } = await supabase
-      .from("user_courses")
-      .select("id, course_id, played")
-      .eq("user_id", userId);
-    
-    if (!error && data) {
-      setUserCourses(data);
-    }
-  }
-
-  async function handleCourseToggle(courseId: string, played: boolean) {
-    console.log('Toggling course:', courseId, 'played:', played);
-    
-    const existingUserCourse = userCourses.find(uc => uc.course_id === courseId);
-    
-    if (existingUserCourse) {
-      // Update existing record
-      const { error } = await supabase
-        .from("user_courses")
-        .update({ played, updated_at: new Date().toISOString() })
-        .eq("id", existingUserCourse.id);
-      
-      if (error) {
-        console.error('Error updating course:', error);
-        return;
-      }
-      
-      setUserCourses(prev => 
-        prev.map(uc => 
-          uc.id === existingUserCourse.id 
-            ? { ...uc, played } 
-            : uc
-        )
-      );
-    } else {
-      // Create new record
-      const { data, error } = await supabase
-        .from("user_courses")
-        .insert([{
-          user_id: userId,
-          course_id: courseId,
-          played
-        }])
-        .select()
-        .single();
-      
-      if (error) {
-        console.error('Error creating course record:', error);
-        return;
-      }
-      
-      if (data) {
-        setUserCourses(prev => [...prev, data]);
-      }
-    }
-    
-    // Invalidate all relevant queries to ensure the tracker updates
-    queryClient.invalidateQueries({ queryKey: ['trackerStats'] });
-    queryClient.invalidateQueries({ queryKey: ['playedCourses'] });
-    queryClient.invalidateQueries({ queryKey: ['userProfile'] });
-    
-    // Call the update callback
-    onTrackerUpdate();
-    
-    console.log('Course toggle completed, queries invalidated');
-  }
-
-  const isCoursePlayed = (courseId: string) => {
-    return userCourses.find(uc => uc.course_id === courseId)?.played || false;
-  };
-
-  const getCoursesForCategory = (categoryKey: string) => {
-    if (categoryKey === 'global') {
-      return courses; // Global shows all courses
-    }
-    
-    const category = courseCategories.find(cat => cat.key === categoryKey);
-    if (!category) return [];
-    
-    return courses.filter(course => {
-      if (categoryKey === 'gbi') {
-        return category.regions.some(region => 
-          course.country.toLowerCase().includes(region.toLowerCase()) ||
-          course.region?.toLowerCase().includes(region.toLowerCase())
-        );
-      }
-      if (categoryKey === 'europe') {
-        // Exclude GB&I countries from Europe
-        const gbiRegions = ['England', 'Scotland', 'Wales', 'Northern Ireland', 'Ireland'];
-        const isGBI = gbiRegions.some(region => 
-          course.country.toLowerCase().includes(region.toLowerCase()) ||
-          course.region?.toLowerCase().includes(region.toLowerCase())
-        );
-        return !isGBI && (
-          course.region?.toLowerCase().includes('europe') ||
-          course.country.toLowerCase().includes('europe')
-        );
-      }
-      if (categoryKey === 'usa') {
-        return course.country.toLowerCase().includes('usa') ||
-               course.country.toLowerCase().includes('united states');
-      }
-      return false;
-    });
-  };
-
-  const getFilteredCourses = (categoryKey: string) => {
-    const categoryCourses = getCoursesForCategory(categoryKey);
-    
-    if (!searchQuery.trim()) {
-      return categoryCourses;
-    }
-    
-    return categoryCourses.filter(course =>
-      course.name.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  };
+  }, [open, defaultCategory]);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -222,15 +78,10 @@ const CourseTrackerEditDialog: React.FC<CourseTrackerEditDialogProps> = ({
           <div className="py-8 text-center">Loading courses...</div>
         ) : (
           <div className="space-y-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <Input
-                placeholder="Search courses..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
-            </div>
+            <CourseSearch
+              searchQuery={searchQuery}
+              onSearchChange={setSearchQuery}
+            />
             
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="grid w-full grid-cols-4">
@@ -242,42 +93,14 @@ const CourseTrackerEditDialog: React.FC<CourseTrackerEditDialogProps> = ({
               </TabsList>
               
               {courseCategories.map(category => (
-                <TabsContent key={category.key} value={category.key} className="mt-4">
-                  <div className="space-y-3 max-h-96 overflow-y-auto">
-                    {getFilteredCourses(category.key).map(course => (
-                      <div 
-                        key={course.id} 
-                        className="flex items-center space-x-3 p-3 border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
-                        onClick={() => handleCourseToggle(course.id, !isCoursePlayed(course.id))}
-                      >
-                        <Checkbox
-                          id={`course-${course.id}`}
-                          checked={isCoursePlayed(course.id)}
-                          onCheckedChange={(checked) => 
-                            handleCourseToggle(course.id, checked as boolean)
-                          }
-                          onClick={(e) => e.stopPropagation()}
-                        />
-                        <div className="flex-1">
-                          <Label 
-                            htmlFor={`course-${course.id}`}
-                            className="text-sm font-medium cursor-pointer"
-                          >
-                            #{course.global_rank} {course.name}
-                          </Label>
-                          <p className="text-xs text-muted-foreground">
-                            {course.region}, {course.country}
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                    {getFilteredCourses(category.key).length === 0 && (
-                      <div className="text-center py-8 text-muted-foreground">
-                        {searchQuery.trim() ? `No courses found matching "${searchQuery}"` : `No courses found for ${category.label}`}
-                      </div>
-                    )}
-                  </div>
-                </TabsContent>
+                <CategoryCourseList
+                  key={category.key}
+                  categoryKey={category.key}
+                  courses={courses}
+                  searchQuery={searchQuery}
+                  isCoursePlayed={isCoursePlayed}
+                  onCourseToggle={handleCourseToggle}
+                />
               ))}
             </Tabs>
           </div>
