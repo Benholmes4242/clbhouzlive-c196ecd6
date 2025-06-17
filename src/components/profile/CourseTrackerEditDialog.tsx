@@ -11,8 +11,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Edit } from "lucide-react";
+import { Edit, Search } from "lucide-react";
 
 type Course = {
   id: string;
@@ -41,6 +42,7 @@ const CourseTrackerEditDialog: React.FC<CourseTrackerEditDialogProps> = ({
   const [courses, setCourses] = useState<Course[]>([]);
   const [userCourses, setUserCourses] = useState<UserCourse[]>([]);
   const [loading, setLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const courseCategories = [
     { key: 'gbi', label: 'GB & Ireland', regions: ['England', 'Scotland', 'Wales', 'Northern Ireland', 'Ireland'] },
@@ -158,6 +160,18 @@ const CourseTrackerEditDialog: React.FC<CourseTrackerEditDialogProps> = ({
     });
   };
 
+  const getFilteredCourses = (categoryKey: string) => {
+    const categoryCourses = getCoursesForCategory(categoryKey);
+    
+    if (!searchQuery.trim()) {
+      return categoryCourses;
+    }
+    
+    return categoryCourses.filter(course =>
+      course.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -174,49 +188,61 @@ const CourseTrackerEditDialog: React.FC<CourseTrackerEditDialogProps> = ({
         {loading ? (
           <div className="py-8 text-center">Loading courses...</div>
         ) : (
-          <Tabs defaultValue="gbi" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
-              {courseCategories.map(category => (
-                <TabsTrigger key={category.key} value={category.key} className="text-xs">
-                  {category.label}
-                </TabsTrigger>
-              ))}
-            </TabsList>
+          <div className="space-y-4">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+              <Input
+                placeholder="Search courses..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
             
-            {courseCategories.map(category => (
-              <TabsContent key={category.key} value={category.key} className="mt-4">
-                <div className="space-y-3 max-h-96 overflow-y-auto">
-                  {getCoursesForCategory(category.key).map(course => (
-                    <div key={course.id} className="flex items-center space-x-3 p-3 border rounded-lg">
-                      <Checkbox
-                        id={`course-${course.id}`}
-                        checked={isCoursePlayed(course.id)}
-                        onCheckedChange={(checked) => 
-                          handleCourseToggle(course.id, checked as boolean)
-                        }
-                      />
-                      <div className="flex-1">
-                        <Label 
-                          htmlFor={`course-${course.id}`}
-                          className="text-sm font-medium cursor-pointer"
-                        >
-                          #{course.global_rank} {course.name}
-                        </Label>
-                        <p className="text-xs text-muted-foreground">
-                          {course.region}, {course.country}
-                        </p>
+            <Tabs defaultValue="gbi" className="w-full">
+              <TabsList className="grid w-full grid-cols-4">
+                {courseCategories.map(category => (
+                  <TabsTrigger key={category.key} value={category.key} className="text-xs">
+                    {category.label}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+              
+              {courseCategories.map(category => (
+                <TabsContent key={category.key} value={category.key} className="mt-4">
+                  <div className="space-y-3 max-h-96 overflow-y-auto">
+                    {getFilteredCourses(category.key).map(course => (
+                      <div key={course.id} className="flex items-center space-x-3 p-3 border rounded-lg">
+                        <Checkbox
+                          id={`course-${course.id}`}
+                          checked={isCoursePlayed(course.id)}
+                          onCheckedChange={(checked) => 
+                            handleCourseToggle(course.id, checked as boolean)
+                          }
+                        />
+                        <div className="flex-1">
+                          <Label 
+                            htmlFor={`course-${course.id}`}
+                            className="text-sm font-medium cursor-pointer"
+                          >
+                            #{course.global_rank} {course.name}
+                          </Label>
+                          <p className="text-xs text-muted-foreground">
+                            {course.region}, {course.country}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                  {getCoursesForCategory(category.key).length === 0 && (
-                    <div className="text-center py-8 text-muted-foreground">
-                      No courses found for {category.label}
-                    </div>
-                  )}
-                </div>
-              </TabsContent>
-            ))}
-          </Tabs>
+                    ))}
+                    {getFilteredCourses(category.key).length === 0 && (
+                      <div className="text-center py-8 text-muted-foreground">
+                        {searchQuery.trim() ? `No courses found matching "${searchQuery}"` : `No courses found for ${category.label}`}
+                      </div>
+                    )}
+                  </div>
+                </TabsContent>
+              ))}
+            </Tabs>
+          </div>
         )}
       </DialogContent>
     </Dialog>
