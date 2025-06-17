@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Trophy, Star, Check, Plus } from 'lucide-react';
+import { MapPin, Globe, Star, Check, Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface Course {
@@ -116,6 +116,10 @@ const CourseCard = ({ course, viewingUserId }: CourseCardProps) => {
     togglePlayedMutation.mutate();
   };
 
+  // Determine if course is in GB&I region
+  const isGBIRegion = course.country === 'United Kingdom' || course.country === 'Ireland';
+  const regionalLabel = isGBIRegion ? 'GB&I' : 'Regional';
+
   return (
     <Card 
       className="overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer"
@@ -137,13 +141,13 @@ const CourseCard = ({ course, viewingUserId }: CourseCardProps) => {
         <div className="absolute top-3 left-3 flex gap-2">
           {course.global_rank && (
             <Badge className="bg-yellow-500 text-yellow-900 hover:bg-yellow-500">
-              <Trophy className="h-3 w-3 mr-1" />
+              <Globe className="h-3 w-3 mr-1" />
               #{course.global_rank}
             </Badge>
           )}
           {course.regional_rank && (
             <Badge variant="secondary">
-              Regional #{course.regional_rank}
+              {regionalLabel} #{course.regional_rank}
             </Badge>
           )}
         </div>
