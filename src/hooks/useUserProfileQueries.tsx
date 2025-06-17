@@ -47,8 +47,10 @@ export const useUserProfileQueries = () => {
     queryFn: async () => {
       if (!profile?.id) return {};
       
+      console.log('Fetching tracker stats for user:', profile.id);
+      
       // Fetch played courses with their golf course details
-      const { data: userCourses } = await supabase
+      const { data: userCourses, error } = await supabase
         .from('user_courses')
         .select(`
           course_id,
@@ -66,6 +68,13 @@ export const useUserProfileQueries = () => {
         .eq('user_id', profile.id)
         .eq('played', true);
 
+      if (error) {
+        console.error('Error fetching user courses:', error);
+        throw error;
+      }
+
+      console.log('User courses data:', userCourses);
+
       let stats: { [cat: string]: number } = {
         'GB&I': 0,
         'Europe': 0,
@@ -73,14 +82,25 @@ export const useUserProfileQueries = () => {
         'Global': 0
       };
 
-      if (userCourses) {
+      if (userCourses && userCourses.length > 0) {
         userCourses.forEach(userCourse => {
           const course = userCourse.golf_courses;
-          if (!course) return;
+          if (!course) {
+            console.log('No golf course data for course ID:', userCourse.course_id);
+            return;
+          }
+
+          console.log('Processing course:', course.name, {
+            global_rank: course.global_rank,
+            regional_rank: course.regional_rank,
+            country: course.country,
+            continent: course.continent
+          });
 
           // Global - courses with global rank <= 100
           if (course.global_rank && course.global_rank <= 100) {
             stats['Global']++;
+            console.log('Added to Global:', course.name);
           }
 
           // GB&I - courses with regional rank <= 100 in GB&I countries
@@ -88,6 +108,7 @@ export const useUserProfileQueries = () => {
             const gbiCountries = ['Scotland', 'England', 'Wales', 'Northern Ireland', 'Ireland'];
             if (gbiCountries.includes(course.country)) {
               stats['GB&I']++;
+              console.log('Added to GB&I:', course.name);
             }
           }
 
@@ -96,16 +117,19 @@ export const useUserProfileQueries = () => {
             const gbiCountries = ['Scotland', 'England', 'Wales', 'Northern Ireland', 'Ireland'];
             if (!gbiCountries.includes(course.country)) {
               stats['Europe']++;
+              console.log('Added to Europe:', course.name);
             }
           }
 
           // USA - courses with regional rank <= 100 in USA
           if (course.regional_rank && course.regional_rank <= 100 && course.country === 'United States') {
             stats['USA']++;
+            console.log('Added to USA:', course.name);
           }
         });
       }
 
+      console.log('Final tracker stats:', stats);
       return stats;
     },
     enabled: !!profile?.id,
