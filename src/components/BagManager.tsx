@@ -26,23 +26,9 @@ const BagManager = ({ userId, isOwnProfile = false, bagVisible = true }: BagMana
   const [loading, setLoading] = useState(true);
   const [isBagVisible, setIsBagVisible] = useState(bagVisible);
 
-  useEffect(() => {
-    if (userId) fetchBag();
-  }, [userId]);
-
-  useEffect(() => {
-    setIsBagVisible(bagVisible);
-  }, [bagVisible]);
-
-  // For public profiles, show bag if it's visible OR if there are items in the bag
-  // For own profile, always show the section
-  const shouldShowBagSection = isOwnProfile || isBagVisible;
-
-  if (!shouldShowBagSection) {
-    return null;
-  }
-
   async function fetchBag() {
+    if (!userId) return;
+    
     setLoading(true);
     const { data, error } = await supabase
       .from("user_bag")
@@ -56,12 +42,28 @@ const BagManager = ({ userId, isOwnProfile = false, bagVisible = true }: BagMana
     setLoading(false);
   }
 
+  useEffect(() => {
+    if (userId) fetchBag();
+  }, [userId]);
+
+  useEffect(() => {
+    setIsBagVisible(bagVisible);
+  }, [bagVisible]);
+
   async function handleVisibilityToggle(checked: boolean) {
     setIsBagVisible(checked);
     await supabase
       .from("user_profiles")
       .update({ bag_visible: checked })
       .eq("id", userId);
+  }
+
+  // For public profiles, show bag if it's visible OR if there are items in the bag
+  // For own profile, always show the section
+  const shouldShowBagSection = isOwnProfile || isBagVisible;
+
+  if (!shouldShowBagSection) {
+    return null;
   }
 
   const bagTypes = [
