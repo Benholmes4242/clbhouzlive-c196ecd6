@@ -36,6 +36,7 @@ const CourseTracker: React.FC<CourseTrackerProps> = ({
   onTrackerUpdate
 }) => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   // Fetch played courses for the selected category
   const { data: playedCourses } = useQuery({
@@ -97,7 +98,13 @@ const CourseTracker: React.FC<CourseTrackerProps> = ({
   }
 
   const handleCategoryClick = (categoryKey: string) => {
-    setSelectedCategory(categoryKey);
+    if (isOwnProfile) {
+      // For own profile, open edit dialog
+      setEditDialogOpen(true);
+    } else {
+      // For other profiles, show played courses
+      setSelectedCategory(categoryKey);
+    }
   };
 
   const closeDialog = () => {
@@ -140,23 +147,20 @@ const CourseTracker: React.FC<CourseTrackerProps> = ({
           return (
             <div 
               key={cat.key} 
-              className={`bg-muted/70 rounded-lg p-4 ${!isOwnProfile ? 'cursor-pointer hover:bg-muted/90 transition-colors' : ''}`}
-              onClick={!isOwnProfile ? () => handleCategoryClick(cat.key) : undefined}
+              className="bg-muted/70 rounded-lg p-4 cursor-pointer hover:bg-muted/90 transition-colors"
+              onClick={() => handleCategoryClick(cat.key)}
             >
               <div className="flex items-center justify-between">
                 <span className="font-medium">{cat.label}</span>
                 <span className="text-xs font-semibold">{played} / {total}</span>
               </div>
               <Progress value={percentage} className="mt-2" />
-              {isOwnProfile && (
-                <div className="mt-2 text-xs text-muted-foreground">{percentage}% completed</div>
-              )}
             </div>
           );
         })}
       </div>
 
-      {/* Dialog for showing played courses */}
+      {/* Dialog for showing played courses (only for non-own profiles) */}
       <Dialog open={!!selectedCategory} onOpenChange={closeDialog}>
         <DialogContent className="max-w-md">
           <DialogHeader>
