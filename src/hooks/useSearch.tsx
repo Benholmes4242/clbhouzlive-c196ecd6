@@ -9,6 +9,7 @@ interface SearchResult {
   title: string;
   subtitle: string;
   image?: string;
+  username?: string; // Add username to the interface
 }
 
 export const useSearch = () => {
@@ -35,7 +36,8 @@ export const useSearch = () => {
       id: user.id,
       type: 'user' as const,
       title: user.display_name || user.username || 'Anonymous User',
-      subtitle: user.home_club ? `Home Club: ${user.home_club}` : 'No home club set'
+      subtitle: user.home_club ? `Home Club: ${user.home_club}` : 'No home club set',
+      username: user.username || user.id // Fallback to ID if no username
     }));
   };
 

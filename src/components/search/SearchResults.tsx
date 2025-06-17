@@ -10,6 +10,7 @@ interface SearchResult {
   title: string;
   subtitle: string;
   image?: string;
+  username?: string;
 }
 
 interface SearchResultsProps {
@@ -25,6 +26,10 @@ const SearchResults: React.FC<SearchResultsProps> = ({
   loading,
   query
 }) => {
+  // Debug logging
+  console.log('Search results:', results);
+  console.log('Search query:', query);
+  
   if (loading) {
     return (
       <div className="absolute top-full left-0 right-0 bg-background border border-border rounded-md mt-1 shadow-lg z-50">

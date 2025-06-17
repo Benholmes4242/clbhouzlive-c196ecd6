@@ -41,7 +41,13 @@ const Header = () => {
 
   const handleResultClick = (result: any) => {
     if (result.type === 'user') {
-      navigate(`/profile/${result.id}`);
+      // Navigate to user profile using their username or ID
+      if (result.username && result.username !== result.id) {
+        navigate(`/profile/${result.username}`);
+      } else {
+        // For now, navigate to their own profile page - we'll need to create user profile pages later
+        navigate(`/profile`); // Temporary - should be `/user/${result.id}` when that route exists
+      }
     } else if (result.type === 'course') {
       navigate(`/courses?course=${result.id}`);
     }
