@@ -47,21 +47,29 @@ const Top100Courses = () => {
     queryFn: async () => {
       if (!selectedRegion) return [];
 
-      const { data, error } = await supabase
+      let query = supabase
         .from('golf_courses')
         .select('*')
-        .eq('continent', selectedRegion as any)
-        .not('regional_rank', 'is', null)
-        .lte('regional_rank', 100)
-        .order('regional_rank', { ascending: true });
+        .not('global_rank', 'is', null)
+        .order('global_rank', { ascending: true });
 
+      if (selectedRegion === 'Britain & Ireland') {
+        query = query.in('country', ['United Kingdom', 'Ireland']);
+      } else if (selectedRegion === 'Europe') {
+        query = query.eq('continent', 'Europe').not('country', 'in', '("United Kingdom","Ireland")');
+      } else if (selectedRegion === 'USA') {
+        query = query.eq('country', 'United States');
+      }
+      // For 'Worldwide', no additional filter is applied
+
+      const { data, error } = await query.limit(100);
       if (error) throw error;
       return data as Course[];
     },
     enabled: !!selectedRegion,
   });
 
-  const continents = ['North America', 'South America', 'Europe', 'Asia', 'Africa', 'Oceania'];
+  const regions = ['Britain & Ireland', 'Europe', 'USA', 'Worldwide'];
 
   const LoadingSkeleton = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -132,9 +140,9 @@ const Top100Courses = () => {
                     <SelectValue placeholder="Select a region" />
                   </SelectTrigger>
                   <SelectContent>
-                    {continents.map((continent) => (
-                      <SelectItem key={continent} value={continent}>
-                        {continent}
+                    {regions.map((region) => (
+                      <SelectItem key={region} value={region}>
+                        {region}
                       </SelectItem>
                     ))}
                   </SelectContent>
