@@ -34,15 +34,9 @@ const BagManager = ({ userId, isOwnProfile = false, bagVisible = true }: BagMana
     setIsBagVisible(bagVisible);
   }, [bagVisible]);
 
-  // For public profiles, show bag if it's visible OR if there are items in the bag
-  // For own profile, always show the section
-  const shouldShowBagSection = isOwnProfile || isBagVisible;
-
-  if (!shouldShowBagSection) {
-    return null;
-  }
-
   async function fetchBag() {
+    if (!userId) return;
+    
     setLoading(true);
     const { data, error } = await supabase
       .from("user_bag")
@@ -72,6 +66,14 @@ const BagManager = ({ userId, isOwnProfile = false, bagVisible = true }: BagMana
     { type: "Putter", dbType: "Putter", allowMultiple: false },
     { type: "Ball", dbType: "Ball", allowMultiple: false }
   ];
+
+  // For public profiles, show bag if it's visible OR if there are items in the bag
+  // For own profile, always show the section
+  const shouldShowBagSection = isOwnProfile || isBagVisible;
+
+  if (!shouldShowBagSection) {
+    return null;
+  }
 
   if (loading) {
     return (
@@ -122,11 +124,10 @@ const BagManager = ({ userId, isOwnProfile = false, bagVisible = true }: BagMana
               <span className="font-bold text-sm min-w-16">{bagType.type}:</span>
               {items.length > 0 ? (
                 <div className="text-sm space-y-1">
-                  {items.map((item, index) => (
+                  {items.map((item) => (
                     <div key={item.id}>
                       <span className="font-bold">{item.brand}</span>
                       {item.model && <span className="font-bold"> {item.model}</span>}
-                      {index < items.length - 1 && bagType.allowMultiple && <span className="text-muted-foreground">, </span>}
                     </div>
                   ))}
                 </div>
