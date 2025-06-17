@@ -424,6 +424,44 @@ export type Database = {
         }
         Relationships: []
       }
+      user_top100_courses: {
+        Row: {
+          course_id: string
+          created_at: string
+          id: string
+          played: boolean | null
+          played_date: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          id?: string
+          played?: boolean | null
+          played_date?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          id?: string
+          played?: boolean | null
+          played_date?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_top100_courses_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

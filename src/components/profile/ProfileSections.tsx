@@ -3,6 +3,7 @@ import React from 'react';
 import BagManager from '@/components/BagManager';
 import EGAppIntegration from './EGAppIntegration';
 import SocialActivity from './SocialActivity';
+import Top100Courses from './Top100Courses';
 
 interface ProfileSectionsProps {
   profile: {
@@ -11,6 +12,7 @@ interface ProfileSectionsProps {
     eg_recent_rounds?: any | null;
     bag_visible?: boolean | null;
     eg_visible?: boolean | null;
+    top100_visible?: boolean | null;
   } | null;
   user: any;
   onEGVisibilityToggle: (checked: boolean) => void;
@@ -40,6 +42,14 @@ const ProfileSections: React.FC<ProfileSectionsProps> = ({
           userId={user.id} 
           isOwnProfile={isOwnProfile}
           bagVisible={profile?.bag_visible ?? true}
+        />
+      )}
+
+      {user && (
+        <Top100Courses
+          userId={user.id}
+          isOwnProfile={isOwnProfile}
+          top100Visible={profile?.top100_visible ?? true}
         />
       )}
 
