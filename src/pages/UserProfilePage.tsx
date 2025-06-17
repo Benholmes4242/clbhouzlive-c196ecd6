@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -144,6 +143,7 @@ const UserProfilePage = () => {
             currentUserId={currentUser.id}
             isFollowing={relationshipStatus?.isFollowing || false}
             friendStatus={relationshipStatus?.friendStatus || null}
+            username={profile.username || profile.display_name || 'User'}
           />
         )}
 

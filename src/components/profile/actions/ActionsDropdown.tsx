@@ -5,7 +5,8 @@ import {
   DropdownMenu, 
   DropdownMenuContent, 
   DropdownMenuItem, 
-  DropdownMenuTrigger 
+  DropdownMenuTrigger,
+  DropdownMenuSeparator
 } from '@/components/ui/dropdown-menu';
 import { MoreHorizontal } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -14,12 +15,14 @@ interface ActionsDropdownProps {
   friendStatus: 'pending' | 'accepted' | null;
   loading: boolean;
   onRemoveFriend: () => void;
+  username: string;
 }
 
 const ActionsDropdown: React.FC<ActionsDropdownProps> = ({
   friendStatus,
   loading,
-  onRemoveFriend
+  onRemoveFriend,
+  username
 }) => {
   const { toast } = useToast();
 
@@ -31,6 +34,10 @@ const ActionsDropdown: React.FC<ActionsDropdownProps> = ({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
+        <DropdownMenuItem disabled className="text-muted-foreground cursor-default">
+          {username}
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
         {friendStatus === 'accepted' && (
           <DropdownMenuItem onClick={onRemoveFriend} disabled={loading}>
             Remove Friend

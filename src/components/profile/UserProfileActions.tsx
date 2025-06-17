@@ -11,13 +11,15 @@ interface UserProfileActionsProps {
   currentUserId: string;
   isFollowing: boolean;
   friendStatus: 'pending' | 'accepted' | null;
+  username: string;
 }
 
 const UserProfileActions: React.FC<UserProfileActionsProps> = ({
   targetUserId,
   currentUserId,
   isFollowing,
-  friendStatus
+  friendStatus,
+  username
 }) => {
   const { loading, handleFollow, handleFriendRequest, handleRemoveFriend } = useProfileActions({
     targetUserId,
@@ -45,6 +47,7 @@ const UserProfileActions: React.FC<UserProfileActionsProps> = ({
         friendStatus={friendStatus}
         loading={loading}
         onRemoveFriend={handleRemoveFriend}
+        username={username}
       />
     </div>
   );
