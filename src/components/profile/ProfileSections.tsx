@@ -3,6 +3,7 @@ import React from 'react';
 import BagManager from '@/components/BagManager';
 import EGAppIntegration from './EGAppIntegration';
 import CourseTracker from './CourseTracker';
+import SocialActivity from './SocialActivity';
 
 interface ProfileSectionsProps {
   profile: {
@@ -58,6 +59,12 @@ const ProfileSections: React.FC<ProfileSectionsProps> = ({
         trackerVisible={profile?.tracker_visible ?? true}
         onVisibilityToggle={onTrackerVisibilityToggle}
         onTrackerUpdate={onTrackerUpdate}
+      />
+
+      <SocialActivity
+        userId={user?.id}
+        isOwnProfile={!!user}
+        activityVisible={true}
       />
     </>
   );
