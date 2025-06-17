@@ -52,6 +52,7 @@ const CourseTracker: React.FC<CourseTrackerProps> = ({
             name,
             country,
             region,
+            continent,
             global_rank,
             regional_rank
           )
