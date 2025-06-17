@@ -41,102 +41,6 @@ export const useUserProfileQueries = () => {
     enabled: !!username,
   });
 
-  // Fetch tracker stats for this user with a consistent cache key that matches other components
-  const { data: trackerStats } = useQuery({
-    queryKey: ['trackerStats', profile?.id],
-    queryFn: async () => {
-      if (!profile?.id) return {};
-      
-      console.log('Fetching tracker stats for public profile user:', profile.id);
-      
-      // Fetch played courses with their golf course details from the correct table
-      const { data: userCourses, error } = await supabase
-        .from('user_course_tracker')
-        .select(`
-          course_id,
-          checked,
-          golf_courses (
-            id,
-            name,
-            country,
-            region,
-            continent,
-            global_rank,
-            regional_rank
-          )
-        `)
-        .eq('user_id', profile.id)
-        .eq('checked', true);
-
-      if (error) {
-        console.error('Error fetching user courses for public profile:', error);
-        throw error;
-      }
-
-      console.log('User courses data for public profile:', userCourses);
-
-      let stats: { [cat: string]: number } = {
-        'GB&I': 0,
-        'Europe': 0,
-        'USA': 0,
-        'Global': 0
-      };
-
-      if (userCourses && userCourses.length > 0) {
-        userCourses.forEach(userCourse => {
-          const course = userCourse.golf_courses;
-          if (!course) {
-            console.log('No golf course data for course ID:', userCourse.course_id);
-            return;
-          }
-
-          console.log('Processing course for public profile:', course.name, {
-            global_rank: course.global_rank,
-            regional_rank: course.regional_rank,
-            country: course.country,
-            continent: course.continent
-          });
-
-          // Global - courses with global rank <= 100
-          if (course.global_rank && course.global_rank <= 100) {
-            stats['Global']++;
-            console.log('Added to Global for public profile:', course.name);
-          }
-
-          // GB&I - courses with regional rank <= 100 in GB&I countries
-          if (course.regional_rank && course.regional_rank <= 100) {
-            const gbiCountries = ['Scotland', 'England', 'Wales', 'Northern Ireland', 'Ireland'];
-            if (gbiCountries.includes(course.country)) {
-              stats['GB&I']++;
-              console.log('Added to GB&I for public profile:', course.name);
-            }
-          }
-
-          // Europe - courses with regional rank <= 100 in Europe (excluding GB&I)
-          if (course.regional_rank && course.regional_rank <= 100 && course.continent === 'Europe') {
-            const gbiCountries = ['Scotland', 'England', 'Wales', 'Northern Ireland', 'Ireland'];
-            if (!gbiCountries.includes(course.country)) {
-              stats['Europe']++;
-              console.log('Added to Europe for public profile:', course.name);
-            }
-          }
-
-          // USA - courses with regional rank <= 100 in USA
-          if (course.regional_rank && course.regional_rank <= 100 && course.country === 'United States') {
-            stats['USA']++;
-            console.log('Added to USA for public profile:', course.name);
-          }
-        });
-      }
-
-      console.log('Final tracker stats for public profile:', stats);
-      return stats;
-    },
-    enabled: !!profile?.id,
-    // Add a shorter stale time to ensure fresh data
-    staleTime: 30000, // 30 seconds
-  });
-
   // Check relationship status with current user
   const { data: relationshipStatus } = useQuery({
     queryKey: ['relationshipStatus', currentUser?.id, profile?.id],
@@ -174,7 +78,6 @@ export const useUserProfileQueries = () => {
   return {
     profile,
     isLoading,
-    trackerStats,
     relationshipStatus,
     currentUser
   };

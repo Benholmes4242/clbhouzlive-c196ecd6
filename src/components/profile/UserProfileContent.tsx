@@ -8,7 +8,6 @@ import UserProfileActions from '@/components/profile/UserProfileActions';
 interface UserProfileContentProps {
   profile: any;
   currentUser: any;
-  trackerStats: { [cat: string]: number };
   relationshipStatus: {
     isFollowing: boolean;
     friendStatus: 'pending' | 'accepted' | null;
@@ -18,11 +17,9 @@ interface UserProfileContentProps {
 const UserProfileContent: React.FC<UserProfileContentProps> = ({
   profile,
   currentUser,
-  trackerStats,
   relationshipStatus
 }) => {
   const isOwnProfile = currentUser?.id === profile.id;
-  const totalStats = { 'GB&I': 100, 'Europe': 100, 'USA': 100, 'Global': 100 };
 
   return (
     <div className="max-w-2xl mx-auto px-4">
@@ -52,11 +49,7 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({
       <ProfileSections
         profile={profile}
         user={profile}
-        trackerStats={trackerStats || {}}
-        totalStats={totalStats}
         onEGVisibilityToggle={() => {}}
-        onTrackerVisibilityToggle={() => {}}
-        onTrackerUpdate={() => {}}
         isOwnProfile={isOwnProfile}
       />
     </div>

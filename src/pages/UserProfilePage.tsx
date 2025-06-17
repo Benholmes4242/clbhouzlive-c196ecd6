@@ -10,7 +10,6 @@ const UserProfilePage = () => {
   const {
     profile,
     isLoading,
-    trackerStats,
     relationshipStatus,
     currentUser
   } = useUserProfileQueries();
@@ -25,7 +24,6 @@ const UserProfilePage = () => {
         <UserProfileContent
           profile={profile}
           currentUser={currentUser}
-          trackerStats={trackerStats || {}}
           relationshipStatus={relationshipStatus}
         />
       )}

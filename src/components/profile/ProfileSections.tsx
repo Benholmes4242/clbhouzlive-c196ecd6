@@ -2,7 +2,6 @@
 import React from 'react';
 import BagManager from '@/components/BagManager';
 import EGAppIntegration from './EGAppIntegration';
-import CourseTracker from './CourseTracker';
 import SocialActivity from './SocialActivity';
 
 interface ProfileSectionsProps {
@@ -11,26 +10,17 @@ interface ProfileSectionsProps {
     eg_handicap_index?: number | null;
     eg_recent_rounds?: any | null;
     bag_visible?: boolean | null;
-    tracker_visible?: boolean | null;
     eg_visible?: boolean | null;
   } | null;
   user: any;
-  trackerStats: { [cat: string]: number };
-  totalStats: { [cat: string]: number };
   onEGVisibilityToggle: (checked: boolean) => void;
-  onTrackerVisibilityToggle: (checked: boolean) => void;
-  onTrackerUpdate: () => void;
   isOwnProfile?: boolean;
 }
 
 const ProfileSections: React.FC<ProfileSectionsProps> = ({
   profile,
   user,
-  trackerStats,
-  totalStats,
   onEGVisibilityToggle,
-  onTrackerVisibilityToggle,
-  onTrackerUpdate,
   isOwnProfile = false
 }) => {
   return (
@@ -52,16 +42,6 @@ const ProfileSections: React.FC<ProfileSectionsProps> = ({
           bagVisible={profile?.bag_visible ?? true}
         />
       )}
-      
-      <CourseTracker 
-        trackerStats={trackerStats} 
-        totalStats={totalStats}
-        userId={user?.id}
-        isOwnProfile={isOwnProfile}
-        trackerVisible={profile?.tracker_visible ?? true}
-        onVisibilityToggle={isOwnProfile ? onTrackerVisibilityToggle : undefined}
-        onTrackerUpdate={onTrackerUpdate}
-      />
 
       <SocialActivity
         userId={user?.id}

@@ -13,21 +13,9 @@ const ProfilePage = () => {
     user,
     profile,
     loading,
-    trackerStats,
-    totalStats,
     setProfile,
-    fetchProfile,
-    fetchTrackerStats
+    fetchProfile
   } = useProfileData();
-
-  const handleTrackerVisibilityToggle = async (checked: boolean) => {
-    if (!user) return;
-    await supabase
-      .from("user_profiles")
-      .update({ tracker_visible: checked })
-      .eq("id", user.id);
-    setProfile(prev => prev ? { ...prev, tracker_visible: checked } : prev);
-  };
 
   const handleEGVisibilityToggle = async (checked: boolean) => {
     if (!user) return;
@@ -42,12 +30,6 @@ const ProfilePage = () => {
   const handleProfileUpdate = () => {
     if (user) {
       fetchProfile(user.id);
-    }
-  };
-
-  const handleTrackerUpdate = () => {
-    if (user) {
-      fetchTrackerStats(user.id);
     }
   };
 
@@ -79,11 +61,7 @@ const ProfilePage = () => {
         <ProfileSections
           profile={profile}
           user={user}
-          trackerStats={trackerStats}
-          totalStats={totalStats}
           onEGVisibilityToggle={handleEGVisibilityToggle}
-          onTrackerVisibilityToggle={handleTrackerVisibilityToggle}
-          onTrackerUpdate={handleTrackerUpdate}
           isOwnProfile={true}
         />
       </div>
