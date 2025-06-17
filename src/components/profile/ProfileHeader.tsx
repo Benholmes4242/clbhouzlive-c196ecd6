@@ -134,14 +134,25 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       {/* Enlarged photo dialog */}
       {hasPhoto && (
         <Dialog open={showEnlargedPhoto} onOpenChange={setShowEnlargedPhoto}>
-          <DialogContent className="max-w-md w-auto p-2">
-            <div className="w-80 h-80 mx-auto">
+          <DialogContent className="max-w-fit w-auto p-0 bg-transparent border-none shadow-none">
+            <div className="w-80 h-80 mx-auto relative">
               <img
                 src={photoPreview || profilePhotoUrl!}
                 alt="Profile photo"
-                className="w-full h-full object-cover rounded-full"
+                className="w-full h-full object-cover rounded-full shadow-2xl"
                 crossOrigin="anonymous"
               />
+              {/* Custom close button positioned outside the circle */}
+              <button
+                onClick={() => setShowEnlargedPhoto(false)}
+                className="absolute -top-2 -right-2 w-8 h-8 bg-black/60 hover:bg-black/80 text-white rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110"
+                aria-label="Close"
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="m18 6-12 12" />
+                  <path d="m6 6 12 12" />
+                </svg>
+              </button>
             </div>
           </DialogContent>
         </Dialog>
