@@ -74,9 +74,13 @@ const UserProfilePage = () => {
         .or(`and(user_id.eq.${currentUser.id},friend_id.eq.${profile.id}),and(user_id.eq.${profile.id},friend_id.eq.${currentUser.id})`)
         .maybeSingle();
 
+      // Ensure friend status is properly typed
+      const friendStatus = friendData?.status;
+      const validFriendStatus = friendStatus === 'pending' || friendStatus === 'accepted' ? friendStatus : null;
+
       return {
         isFollowing: !!followData,
-        friendStatus: friendData?.status || null
+        friendStatus: validFriendStatus
       };
     },
     enabled: !!currentUser?.id && !!profile?.id && currentUser.id !== profile.id,
