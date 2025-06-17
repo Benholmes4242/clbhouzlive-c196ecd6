@@ -1,5 +1,6 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import Header from "@/components/Header";
 import BottomNavigation from '@/components/BottomNavigation';
@@ -9,6 +10,7 @@ import ProfileSections from '@/components/profile/ProfileSections';
 import { useProfileData } from '@/hooks/useProfileData';
 
 const ProfilePage = () => {
+  const navigate = useNavigate();
   const {
     user,
     profile,
@@ -16,6 +18,13 @@ const ProfilePage = () => {
     setProfile,
     fetchProfile
   } = useProfileData();
+
+  // Redirect to auth page if user is not logged in
+  useEffect(() => {
+    if (!loading && !user) {
+      navigate('/auth');
+    }
+  }, [user, loading, navigate]);
 
   const handleEGVisibilityToggle = async (checked: boolean) => {
     if (!user) return;
@@ -33,12 +42,18 @@ const ProfilePage = () => {
     }
   };
 
+  // Show loading while checking authentication
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <span className="text-muted-foreground text-base">Loading profile...</span>
+        <span className="text-muted-foreground text-base">Loading...</span>
       </div>
     );
+  }
+
+  // Don't render anything if user is not authenticated (will redirect)
+  if (!user) {
+    return null;
   }
 
   return (
