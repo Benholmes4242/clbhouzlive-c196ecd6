@@ -42,7 +42,8 @@ export function useNotifications() {
           table: 'notifications',
           filter: `user_id=eq.${user.id}`
         },
-        () => {
+        (payload) => {
+          console.log('Notification change detected:', payload);
           fetchNotifications();
         }
       )
@@ -56,6 +57,7 @@ export function useNotifications() {
   const fetchNotifications = async () => {
     if (!user) return;
     
+    console.log('Fetching notifications for user:', user.id);
     setLoading(true);
     const { data, error } = await supabase
       .from('notifications')
@@ -63,7 +65,10 @@ export function useNotifications() {
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
 
-    if (!error && data) {
+    if (error) {
+      console.error('Error fetching notifications:', error);
+    } else {
+      console.log('Fetched notifications:', data);
       // Cast the data to match our Notification interface
       const typedNotifications = data as Notification[];
       setNotifications(typedNotifications);
