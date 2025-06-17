@@ -26,12 +26,12 @@ interface Course {
 
 const CourseExplorer = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedContinent, setSelectedContinent] = useState<string>('');
+  const [selectedRegion, setSelectedRegion] = useState<string>('');
   const [selectedCountry, setSelectedCountry] = useState<string>('');
   const [top100Only, setTop100Only] = useState(false);
 
   const { data: courses, isLoading } = useQuery({
-    queryKey: ['courses', searchTerm, selectedContinent, selectedCountry, top100Only],
+    queryKey: ['courses', searchTerm, selectedRegion, selectedCountry, top100Only],
     queryFn: async () => {
       let query = supabase
         .from('golf_courses')
@@ -42,8 +42,15 @@ const CourseExplorer = () => {
         query = query.or(`name.ilike.%${searchTerm}%,country.ilike.%${searchTerm}%,region.ilike.%${searchTerm}%`);
       }
 
-      if (selectedContinent) {
-        query = query.eq('continent', selectedContinent as any);
+      if (selectedRegion) {
+        if (selectedRegion === 'Britain & Ireland') {
+          query = query.in('country', ['United Kingdom', 'Ireland']);
+        } else if (selectedRegion === 'Europe') {
+          query = query.eq('continent', 'Europe').not('country', 'in', '("United Kingdom","Ireland")');
+        } else if (selectedRegion === 'USA') {
+          query = query.eq('country', 'United States');
+        }
+        // For 'Worldwide', no filter is applied
       }
 
       if (selectedCountry) {
@@ -61,15 +68,21 @@ const CourseExplorer = () => {
   });
 
   const { data: countries } = useQuery({
-    queryKey: ['countries', selectedContinent],
+    queryKey: ['countries', selectedRegion],
     queryFn: async () => {
       let query = supabase
         .from('golf_courses')
         .select('country')
         .order('country');
 
-      if (selectedContinent) {
-        query = query.eq('continent', selectedContinent as any);
+      if (selectedRegion) {
+        if (selectedRegion === 'Britain & Ireland') {
+          query = query.in('country', ['United Kingdom', 'Ireland']);
+        } else if (selectedRegion === 'Europe') {
+          query = query.eq('continent', 'Europe').not('country', 'in', '("United Kingdom","Ireland")');
+        } else if (selectedRegion === 'USA') {
+          query = query.eq('country', 'United States');
+        }
       }
 
       const { data, error } = await query;
@@ -79,16 +92,16 @@ const CourseExplorer = () => {
     },
   });
 
-  const continents = ['North America', 'South America', 'Europe', 'Asia', 'Africa', 'Oceania'];
+  const regions = ['Britain & Ireland', 'Europe', 'USA', 'Worldwide'];
 
   const clearFilters = () => {
     setSearchTerm('');
-    setSelectedContinent('');
+    setSelectedRegion('');
     setSelectedCountry('');
     setTop100Only(false);
   };
 
-  const hasActiveFilters = searchTerm || selectedContinent || selectedCountry || top100Only;
+  const hasActiveFilters = searchTerm || selectedRegion || selectedCountry || top100Only;
 
   return (
     <div className="space-y-6">
@@ -105,20 +118,20 @@ const CourseExplorer = () => {
         </div>
 
         <div className="flex flex-wrap gap-3">
-          <Select value={selectedContinent} onValueChange={setSelectedContinent}>
+          <Select value={selectedRegion} onValueChange={setSelectedRegion}>
             <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Continent" />
+              <SelectValue placeholder="Region" />
             </SelectTrigger>
             <SelectContent>
-              {continents.map((continent) => (
-                <SelectItem key={continent} value={continent}>
-                  {continent}
+              {regions.map((region) => (
+                <SelectItem key={region} value={region}>
+                  {region}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
 
-          {selectedContinent && (
+          {selectedRegion && (
             <Select value={selectedCountry} onValueChange={setSelectedCountry}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Country" />
@@ -155,8 +168,8 @@ const CourseExplorer = () => {
             {searchTerm && (
               <Badge variant="secondary">Search: {searchTerm}</Badge>
             )}
-            {selectedContinent && (
-              <Badge variant="secondary">{selectedContinent}</Badge>
+            {selectedRegion && (
+              <Badge variant="secondary">{selectedRegion}</Badge>
             )}
             {selectedCountry && (
               <Badge variant="secondary">{selectedCountry}</Badge>
