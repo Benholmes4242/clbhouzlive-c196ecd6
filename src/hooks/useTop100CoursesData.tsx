@@ -96,10 +96,14 @@ export const useTop100CoursesData = (userId: string, isOwnProfile: boolean) => {
   const handleVisibilityToggle = async (checked: boolean) => {
     if (!isOwnProfile) return;
     
-    await supabase
+    const { error } = await supabase
       .from("user_profiles")
       .update({ top100_visible: checked })
       .eq("id", userId);
+
+    if (error) {
+      console.error('Error updating top100 visibility:', error);
+    }
   };
 
   return {

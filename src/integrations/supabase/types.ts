@@ -358,10 +358,12 @@ export type Database = {
           eg_app_connected: boolean | null
           eg_handicap_index: number | null
           eg_recent_rounds: Json | null
+          eg_visible: boolean | null
           home_club: string | null
           id: string
           is_public: boolean | null
           profile_photo_url: string | null
+          top100_visible: boolean | null
           tracker_visible: boolean | null
           updated_at: string | null
           username: string | null
@@ -374,10 +376,12 @@ export type Database = {
           eg_app_connected?: boolean | null
           eg_handicap_index?: number | null
           eg_recent_rounds?: Json | null
+          eg_visible?: boolean | null
           home_club?: string | null
           id: string
           is_public?: boolean | null
           profile_photo_url?: string | null
+          top100_visible?: boolean | null
           tracker_visible?: boolean | null
           updated_at?: string | null
           username?: string | null
@@ -390,10 +394,12 @@ export type Database = {
           eg_app_connected?: boolean | null
           eg_handicap_index?: number | null
           eg_recent_rounds?: Json | null
+          eg_visible?: boolean | null
           home_club?: string | null
           id?: string
           is_public?: boolean | null
           profile_photo_url?: string | null
+          top100_visible?: boolean | null
           tracker_visible?: boolean | null
           updated_at?: string | null
           username?: string | null
