@@ -13,6 +13,7 @@ import ProfilePage from "./pages/ProfilePage";
 import UserProfilePage from "./pages/UserProfilePage";
 import Auth from "./pages/Auth";
 import AdminPage from "./pages/AdminPage";
+import NotificationsPage from "./pages/NotificationsPage";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ const App = () => (
           <Route path="/courses" element={<Courses />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/profile/:username" element={<UserProfilePage />} />
+          <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/admin" element={<AdminPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

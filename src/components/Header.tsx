@@ -14,10 +14,12 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useSearch } from "@/hooks/useSearch";
 import SearchResults from "@/components/search/SearchResults";
+import { useNotifications } from "@/hooks/useNotifications";
 
 const Header = () => {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
+  const { unreadCount } = useNotifications();
   const { query, setQuery, results, loading, clearResults } = useSearch();
   const [showResults, setShowResults] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
@@ -39,6 +41,10 @@ const Header = () => {
     navigate('/');
   };
 
+  const handleNotificationsClick = () => {
+    navigate('/notifications');
+  };
+
   const handleResultClick = () => {
     setQuery('');
     setShowResults(false);
@@ -58,9 +64,7 @@ const Header = () => {
     };
   }, []);
 
-  // Mock data for notifications and messages - in a real app, this would come from your backend
-  const hasNotifications = user && false; // Set to false to show no notifications
-  const notificationCount = user ? 0 : 0; // Set to 0 to show no count
+  // Mock data for messages - in a real app, this would come from your backend
   const hasMessages = user && false; // Set to false to show no messages
 
   return (
@@ -111,11 +115,11 @@ const Header = () => {
 
           {/* Navigation Icons */}
           <div className="flex items-center space-x-4">
-            <Button variant="ghost" size="icon" className="relative">
+            <Button variant="ghost" size="icon" className="relative" onClick={handleNotificationsClick}>
               <Bell className="h-5 w-5" />
-              {hasNotifications && (
-                <span className="absolute -top-1 -right-1 bg-amber-700 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {notificationCount}
+              {user && unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {unreadCount > 9 ? '9+' : unreadCount}
                 </span>
               )}
             </Button>
