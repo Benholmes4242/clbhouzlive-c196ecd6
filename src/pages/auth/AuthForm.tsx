@@ -40,34 +40,23 @@ const AuthForm: React.FC<AuthFormProps> = ({
     setShowConfirmNotice(false);
 
     if (isSignUp) {
-      // EMAIL SIGNUP
-      const redirectUrl = `${window.location.origin}/`;
-      const { error } = await supabase.auth.signUp({
+      // EMAIL SIGNUP - No email confirmation required
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
-        options: { emailRedirectTo: redirectUrl },
       });
+      
       if (error) {
         setErrorMsg(error.message);
-      } else {
-        setShowConfirmNotice(true);
-        lastResendEmail.current = email || "";
+      } else if (data?.user) {
+        // User is automatically signed in after signup
+        console.log("User signed up successfully:", data.user);
       }
     } else {
       // EMAIL LOGIN
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
-        if (error.message.includes("Email not confirmed")) {
-          setShowConfirmNotice(true);
-          setErrorMsg("Please confirm your email before logging in.");
-          lastResendEmail.current = email || "";
-        } else {
-          setErrorMsg(error.message);
-        }
-      } else if (data?.user && !data.user.confirmed_at) {
-        setShowConfirmNotice(true);
-        setErrorMsg("Please confirm your email before logging in.");
-        lastResendEmail.current = email || "";
+        setErrorMsg(error.message);
       }
       // On success, user is redirected by onAuthStateChange in main Auth file
     }

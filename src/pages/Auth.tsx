@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
@@ -29,17 +30,10 @@ const Auth: React.FC = () => {
   }
 
   useEffect(() => {
-    // Redirect authenticated users away from Auth page
-    supabase.auth.getUser().then(async ({ data }) => {
-      if (data?.user && data.user.confirmed_at) {
-        // Will handle redirect after login/signup just below
-        // No navigation here
-      }
-    });
     // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
-        if (session?.user && session.user.confirmed_at) {
+        if (session?.user) {
           // After login/signup, check if profile exists
           const hasProfile = await checkProfileExists(session.user.id);
           if (hasProfile) {
@@ -50,6 +44,7 @@ const Auth: React.FC = () => {
         }
       }
     );
+    
     return () => {
       subscription.unsubscribe();
     };
@@ -81,7 +76,7 @@ const Auth: React.FC = () => {
           submitting={submitting}
           showConfirmNotice={showConfirmNotice}
         />
-        {/* Confirmation notice */}
+        {/* Only show confirmation notice if explicitly needed (shouldn't happen with disabled email confirmation) */}
         {showConfirmNotice && (
           <div className="mb-3 text-center text-sm text-primary-foreground bg-primary p-3 rounded">
             Please check your email to confirm your account to become a member.
