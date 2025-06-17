@@ -33,6 +33,10 @@ const AuthForm: React.FC<AuthFormProps> = ({
   submitting,
   showConfirmNotice,
 }) => {
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetSubmitting, setResetSubmitting] = useState(false);
+
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
@@ -64,6 +68,54 @@ const AuthForm: React.FC<AuthFormProps> = ({
     setSubmitting(false);
   };
 
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setResetSubmitting(true);
+    setErrorMsg(null);
+
+    const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+      redirectTo: `${window.location.origin}/auth`,
+    });
+
+    if (error) {
+      setErrorMsg(error.message);
+    } else {
+      setResendMsg("Password reset email sent! Check your inbox.");
+      setShowForgotPassword(false);
+      setResetEmail("");
+    }
+
+    setResetSubmitting(false);
+  };
+
+  if (showForgotPassword) {
+    return (
+      <form className="w-full" onSubmit={handleForgotPassword}>
+        <div className="mb-4">
+          <Input
+            type="email"
+            value={resetEmail}
+            onChange={(e) => setResetEmail(e.target.value)}
+            placeholder="Enter your email address"
+            disabled={resetSubmitting}
+            required
+          />
+        </div>
+        <Button type="submit" disabled={resetSubmitting} className="w-full mb-3">
+          {resetSubmitting ? "Sending..." : "Send Reset Email"}
+        </Button>
+        <button
+          type="button"
+          className="w-full text-xs text-muted-foreground underline-offset-4 hover:underline"
+          onClick={() => setShowForgotPassword(false)}
+          disabled={resetSubmitting}
+        >
+          Back to sign in
+        </button>
+      </form>
+    );
+  }
+
   return (
     <form className="w-full" onSubmit={handleAuth}>
       <div className="mb-4">
@@ -89,9 +141,21 @@ const AuthForm: React.FC<AuthFormProps> = ({
         />
       </div>
       {!showConfirmNotice && (
-        <Button type="submit" disabled={submitting} className="w-full">
-          {isSignUp ? (submitting ? "Signing up..." : "Sign Up") : (submitting ? "Signing in..." : "Sign In")}
-        </Button>
+        <>
+          <Button type="submit" disabled={submitting} className="w-full mb-3">
+            {isSignUp ? (submitting ? "Signing up..." : "Sign Up") : (submitting ? "Signing in..." : "Sign In")}
+          </Button>
+          {!isSignUp && (
+            <button
+              type="button"
+              className="w-full text-xs text-muted-foreground underline-offset-4 hover:underline"
+              onClick={() => setShowForgotPassword(true)}
+              disabled={submitting}
+            >
+              Forgot your password?
+            </button>
+          )}
+        </>
       )}
     </form>
   );
