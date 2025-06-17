@@ -100,13 +100,19 @@ const BagManager = ({ userId, isOwnProfile = false, bagVisible = true }: BagMana
       <div className="space-y-2">
         {bagTypes.map(type => {
           const item = bag.find(i => i.type === type);
+          
+          // If not own profile and item is not set, don't show this row
+          if (!isOwnProfile && !item) {
+            return null;
+          }
+          
           return (
             <div key={type} className="flex items-start gap-2">
-              <span className="font-medium text-sm min-w-16">{type}:</span>
+              <span className="font-bold text-sm min-w-16">{type}:</span>
               {item ? (
                 <div className="text-sm">
-                  <span className="font-medium">{item.brand}</span>
-                  {item.model && <span className="text-muted-foreground"> {item.model}</span>}
+                  <span className="font-bold">{item.brand}</span>
+                  {item.model && <span className="font-bold"> {item.model}</span>}
                 </div>
               ) : (
                 <span className="text-muted-foreground text-sm">Not set</span>
