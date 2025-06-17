@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -212,13 +211,18 @@ const CourseTrackerEditDialog: React.FC<CourseTrackerEditDialogProps> = ({
                 <TabsContent key={category.key} value={category.key} className="mt-4">
                   <div className="space-y-3 max-h-96 overflow-y-auto">
                     {getFilteredCourses(category.key).map(course => (
-                      <div key={course.id} className="flex items-center space-x-3 p-3 border rounded-lg">
+                      <div 
+                        key={course.id} 
+                        className="flex items-center space-x-3 p-3 border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
+                        onClick={() => handleCourseToggle(course.id, !isCoursePlayed(course.id))}
+                      >
                         <Checkbox
                           id={`course-${course.id}`}
                           checked={isCoursePlayed(course.id)}
                           onCheckedChange={(checked) => 
                             handleCourseToggle(course.id, checked as boolean)
                           }
+                          onClick={(e) => e.stopPropagation()}
                         />
                         <div className="flex-1">
                           <Label 
