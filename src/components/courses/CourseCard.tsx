@@ -1,12 +1,12 @@
 
 import React, { useState } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { MapPin, Globe, Star, Check, Plus } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import CourseImage from './CourseImage';
+import CourseRankBadges from './CourseRankBadges';
+import CoursePlayedButton from './CoursePlayedButton';
+import CourseInfo from './CourseInfo';
 
 interface Course {
   id: string;
@@ -24,15 +24,12 @@ interface Course {
 
 interface CourseCardProps {
   course: Course;
-  viewingUserId?: string; // The user whose profile/courses we're viewing
+  viewingUserId?: string;
 }
 
 const CourseCard = ({ course, viewingUserId }: CourseCardProps) => {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
   const [isHovered, setIsHovered] = useState(false);
 
-  // Get current authenticated user
   const { data: currentUserResponse } = useQuery({
     queryKey: ['current-user'],
     queryFn: async () => {
@@ -42,7 +39,6 @@ const CourseCard = ({ course, viewingUserId }: CourseCardProps) => {
 
   const currentUser = currentUserResponse?.data?.user;
 
-  // Check if user has played this course
   const { data: userCourse } = useQuery({
     queryKey: ['user-course', course.id, viewingUserId || currentUser?.id],
     queryFn: async () => {
@@ -62,63 +58,7 @@ const CourseCard = ({ course, viewingUserId }: CourseCardProps) => {
     enabled: !!(viewingUserId || currentUser?.id),
   });
 
-  // Only allow course status changes if viewing own profile/courses
   const canModifyCourseStatus = currentUser?.id && (!viewingUserId || viewingUserId === currentUser.id);
-
-  const togglePlayedMutation = useMutation({
-    mutationFn: async () => {
-      if (!currentUser) throw new Error('Not authenticated');
-      if (!canModifyCourseStatus) throw new Error('Cannot modify other users courses');
-
-      if (userCourse) {
-        // Update existing record
-        const { error } = await supabase
-          .from('user_courses')
-          .update({ played: !userCourse.played })
-          .eq('id', userCourse.id);
-        if (error) throw error;
-      } else {
-        // Create new record
-        const { error } = await supabase
-          .from('user_courses')
-          .insert({
-            course_id: course.id,
-            user_id: currentUser.id,
-            played: true,
-          });
-        if (error) throw error;
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user-course', course.id] });
-      queryClient.invalidateQueries({ queryKey: ['my-courses'] });
-      queryClient.invalidateQueries({ queryKey: ['trackerStats'] });
-      toast({
-        title: userCourse?.played ? "Removed from played courses" : "Added to played courses",
-        description: userCourse?.played 
-          ? `${course.name} removed from your played courses`
-          : `${course.name} marked as played`,
-      });
-    },
-    onError: (error) => {
-      console.error('Error updating course status:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update course status. Please try again.",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const handleTogglePlayed = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!canModifyCourseStatus) return;
-    togglePlayedMutation.mutate();
-  };
-
-  // Determine if course is in GB&I region
-  const isGBIRegion = course.country === 'United Kingdom' || course.country === 'Ireland';
-  const regionalLabel = isGBIRegion ? 'GB&I' : 'Regional';
 
   return (
     <Card 
@@ -127,89 +67,36 @@ const CourseCard = ({ course, viewingUserId }: CourseCardProps) => {
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="relative">
-        <div className="h-48 overflow-hidden">
-          <img
-            src={course.thumbnail_image || 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=400&h=300&fit=crop'}
-            alt={course.name}
-            className={`w-full h-full object-cover transition-transform duration-300 ${
-              isHovered ? 'scale-105' : 'scale-100'
-            }`}
-          />
-        </div>
+        <CourseImage 
+          thumbnailImage={course.thumbnail_image}
+          name={course.name}
+          isHovered={isHovered}
+        />
         
-        {/* Rank badges */}
-        <div className="absolute top-3 left-3 flex gap-2">
-          {course.global_rank && (
-            <Badge className="bg-yellow-500 text-yellow-900 hover:bg-yellow-500">
-              <Globe className="h-3 w-3 mr-1" />
-              #{course.global_rank}
-            </Badge>
-          )}
-          {course.regional_rank && (
-            <Badge variant="secondary">
-              {regionalLabel} #{course.regional_rank}
-            </Badge>
-          )}
-        </div>
+        <CourseRankBadges 
+          globalRank={course.global_rank}
+          regionalRank={course.regional_rank}
+          country={course.country}
+        />
 
-        {/* Played status button - only show if can modify or if course is played */}
-        {(canModifyCourseStatus || userCourse?.played) && (
-          <div className="absolute top-3 right-3">
-            {canModifyCourseStatus ? (
-              <Button
-                size="sm"
-                variant={userCourse?.played ? "default" : "secondary"}
-                onClick={handleTogglePlayed}
-                disabled={togglePlayedMutation.isPending}
-                className="shadow-lg"
-              >
-                {userCourse?.played ? (
-                  <>
-                    <Check className="h-4 w-4 mr-1" />
-                    Played
-                  </>
-                ) : (
-                  <>
-                    <Plus className="h-4 w-4 mr-1" />
-                    Add
-                  </>
-                )}
-              </Button>
-            ) : userCourse?.played ? (
-              <Badge variant="default" className="shadow-lg">
-                <Check className="h-3 w-3 mr-1" />
-                Played
-              </Badge>
-            ) : null}
-          </div>
-        )}
+        <CoursePlayedButton
+          courseId={course.id}
+          courseName={course.name}
+          userCourse={userCourse}
+          canModifyCourseStatus={canModifyCourseStatus}
+          currentUserId={currentUser?.id}
+          viewingUserId={viewingUserId}
+        />
       </div>
 
       <CardContent className="p-4">
-        <div className="space-y-3">
-          <div>
-            <h3 className="font-semibold text-lg line-clamp-2 leading-tight">
-              {course.name}
-            </h3>
-            <div className="flex items-center text-sm text-muted-foreground mt-1">
-              <MapPin className="h-3 w-3 mr-1" />
-              <span>{course.region ? `${course.region}, ` : ''}{course.country}</span>
-            </div>
-          </div>
-
-          {course.description && (
-            <p className="text-sm text-muted-foreground line-clamp-2">
-              {course.description}
-            </p>
-          )}
-
-          {userCourse?.rating && (
-            <div className="flex items-center gap-1">
-              <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-              <span className="text-sm font-medium">{userCourse.rating}/5</span>
-            </div>
-          )}
-        </div>
+        <CourseInfo
+          name={course.name}
+          region={course.region}
+          country={course.country}
+          description={course.description}
+          userCourse={userCourse}
+        />
       </CardContent>
     </Card>
   );
