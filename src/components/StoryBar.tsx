@@ -3,28 +3,36 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
 import { supabase } from "@/integrations/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
 import StoryItem from './StoryBar/StoryItem';
-import StoryBarSkeleton from './StoryBar/StoryBarSkeleton';
 import { StoryUser } from './StoryBar/types';
 
 const StoryBar = () => {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
 
-  // Mock data for demonstration
-  const stories: StoryUser[] = [
-    {
-      id: 'add',
-      type: 'add',
-      user: 'Your Story',
-      username: 'your-profile',
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+  // Fetch user profile data
+  const { data: userProfile } = useQuery({
+    queryKey: ['userProfile', user?.id],
+    queryFn: async () => {
+      if (!user) return null;
+      const { data } = await supabase
+        .from('user_profiles')
+        .select('profile_photo_url, display_name, username')
+        .eq('id', user.id)
+        .maybeSingle();
+      return data;
     },
+    enabled: !!user,
+  });
+
+  // Mock data for other users
+  const mockUsers: StoryUser[] = [
     {
       id: '1',
       type: 'friend',
@@ -83,6 +91,17 @@ const StoryBar = () => {
     },
   ];
 
+  // Create the complete stories array
+  const yourStory: StoryUser = {
+    id: 'your-profile',
+    type: 'add',
+    user: userProfile?.display_name || 'Your Profile',
+    username: 'your-profile',
+    avatar: userProfile?.profile_photo_url || '',
+  };
+
+  const stories = [yourStory, ...mockUsers];
+
   // Function to handle "Your Profile" navigation
   const handleYourProfile = async () => {
     if (!user) {
@@ -105,7 +124,7 @@ const StoryBar = () => {
 
   return (
     <div className="bg-background border-b border-border">
-      <div className="container mx-auto px-4 py-4">
+      <div className="px-4 py-4">
         <Carousel
           opts={{
             align: "start",
@@ -113,13 +132,14 @@ const StoryBar = () => {
           }}
           className="w-full"
         >
-          <CarouselContent className="-ml-2 md:-ml-4">
+          <CarouselContent className="gap-4">
             {stories.map((story) => (
-              <CarouselItem key={story.id} className="pl-2 md:pl-4 basis-auto">
+              <CarouselItem key={story.id} className="basis-auto">
                 <StoryItem
                   story={story}
                   onYourProfileClick={handleYourProfile}
                   onOtherProfileClick={handleOtherProfile}
+                  hasProfile={!!userProfile}
                 />
               </CarouselItem>
             ))}

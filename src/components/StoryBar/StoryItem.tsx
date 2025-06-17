@@ -7,33 +7,42 @@ interface StoryItemProps {
   story: StoryUser;
   onYourProfileClick: () => void;
   onOtherProfileClick: (username: string) => void;
+  hasProfile?: boolean;
 }
 
 const StoryItem: React.FC<StoryItemProps> = ({ 
   story, 
   onYourProfileClick, 
-  onOtherProfileClick 
+  onOtherProfileClick,
+  hasProfile = false
 }) => {
+  const isYourProfile = story.type === 'add';
+
   return (
     <div className="flex flex-col items-center space-y-2 min-w-0">
       <div className="relative">
-        {story.type === 'add' ? (
+        {isYourProfile ? (
           <button
             type="button"
             onClick={onYourProfileClick}
-            aria-label="Create or view your profile"
+            aria-label="View your profile"
             className="focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 rounded-full"
           >
-            <div className="w-16 h-16 bg-muted border-2 border-dashed border-amber-700 rounded-full flex items-center justify-center hover:bg-muted/80 transition-colors relative">
-              <img
-                src={story.avatar}
-                alt={story.user}
-                className="w-full h-full rounded-full object-cover opacity-70"
-              />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Plus className="h-6 w-6 text-white drop-shadow-lg" />
+            {hasProfile && story.avatar ? (
+              // User has a profile photo
+              <div className="w-16 h-16 rounded-full p-0.5 bg-gradient-to-tr from-green-500 to-green-700 hover:scale-105 transition-transform">
+                <img
+                  src={story.avatar}
+                  alt={story.user}
+                  className="w-full h-full rounded-full object-cover border-2 border-background"
+                />
               </div>
-            </div>
+            ) : (
+              // User doesn't have a profile photo - show plus icon
+              <div className="w-16 h-16 bg-muted border-2 border-dashed border-gray-400 rounded-full flex items-center justify-center hover:bg-muted/80 transition-colors">
+                <Plus className="h-6 w-6 text-muted-foreground" />
+              </div>
+            )}
           </button>
         ) : (
           <button
