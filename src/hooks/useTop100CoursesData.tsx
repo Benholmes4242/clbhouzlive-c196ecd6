@@ -56,8 +56,8 @@ export const useTop100CoursesData = (userId: string, isOwnProfile: boolean) => {
     );
 
     const progress: Record<string, { played: number; total: number }> = {
-      'great-britain-ireland': { played: 0, total: 0 },
-      'north-america': { played: 0, total: 0 },
+      'britain-ireland': { played: 0, total: 0 },
+      'usa': { played: 0, total: 0 },
       'europe': { played: 0, total: 0 },
       'global': { played: 0, total: 0 }
     };
@@ -71,22 +71,15 @@ export const useTop100CoursesData = (userId: string, isOwnProfile: boolean) => {
       if (isPlayed) progress.global.played++;
 
       // Regional categorization
-      if (course.continent === 'North America') {
-        progress['north-america'].total++;
-        if (isPlayed) progress['north-america'].played++;
-      } else if (course.continent === 'Europe') {
-        // Separate GB&I from continental Europe
-        if (course.country === 'Scotland' || 
-            course.country === 'England' || 
-            course.country === 'Wales' || 
-            course.country === 'Northern Ireland' ||
-            course.country === 'Ireland') {
-          progress['great-britain-ireland'].total++;
-          if (isPlayed) progress['great-britain-ireland'].played++;
-        } else {
-          progress['europe'].total++;
-          if (isPlayed) progress['europe'].played++;
-        }
+      if (course.country === 'United States') {
+        progress['usa'].total++;
+        if (isPlayed) progress['usa'].played++;
+      } else if (course.country === 'United Kingdom' || course.country === 'Ireland') {
+        progress['britain-ireland'].total++;
+        if (isPlayed) progress['britain-ireland'].played++;
+      } else if (course.continent === 'Europe' && course.country !== 'United Kingdom' && course.country !== 'Ireland') {
+        progress['europe'].total++;
+        if (isPlayed) progress['europe'].played++;
       }
     });
 

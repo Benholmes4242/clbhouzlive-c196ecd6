@@ -33,12 +33,12 @@ const Top100Courses: React.FC<Top100CoursesProps> = ({
       description: 'Top 100 courses worldwide'
     },
     { 
-      key: 'great-britain-ireland', 
+      key: 'britain-ireland', 
       name: 'Britain & Ireland',
       description: 'Top courses across the British Isles'
     },
     { 
-      key: 'north-america', 
+      key: 'usa', 
       name: 'USA',
       description: 'Premier courses across the United States'
     },

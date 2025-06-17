@@ -18,14 +18,14 @@ export const useTop100CoursesList = (region: string, userId: string, isOwnProfil
         .order('global_rank');
 
       // Filter by region
-      if (region === 'great-britain-ireland') {
-        query = query.in('country', ['Scotland', 'England', 'Wales', 'Northern Ireland', 'Ireland']);
-      } else if (region === 'north-america') {
-        query = query.eq('continent', 'North America');
+      if (region === 'britain-ireland') {
+        query = query.in('country', ['United Kingdom', 'Ireland']);
+      } else if (region === 'usa') {
+        query = query.eq('country', 'United States');
       } else if (region === 'europe') {
         query = query
           .eq('continent', 'Europe')
-          .not('country', 'in', '("Scotland","England","Wales","Northern Ireland","Ireland")');
+          .not('country', 'in', '("United Kingdom","Ireland")');
       }
       // For 'global', no additional filter needed
 
