@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Edit, Search } from "lucide-react";
+import { useQueryClient } from "@tanstack/react-query";
 
 type Course = {
   id: string;
@@ -49,6 +50,7 @@ const CourseTrackerEditDialog: React.FC<CourseTrackerEditDialogProps> = ({
   const [loading, setLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [activeTab, setActiveTab] = useState(defaultCategory);
+  const queryClient = useQueryClient();
 
   // Use controlled state if provided, otherwise use internal state
   const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
@@ -96,14 +98,21 @@ const CourseTrackerEditDialog: React.FC<CourseTrackerEditDialogProps> = ({
   }
 
   async function handleCourseToggle(courseId: string, played: boolean) {
+    console.log('Toggling course:', courseId, 'played:', played);
+    
     const existingUserCourse = userCourses.find(uc => uc.course_id === courseId);
     
     if (existingUserCourse) {
       // Update existing record
-      await supabase
+      const { error } = await supabase
         .from("user_courses")
         .update({ played, updated_at: new Date().toISOString() })
         .eq("id", existingUserCourse.id);
+      
+      if (error) {
+        console.error('Error updating course:', error);
+        return;
+      }
       
       setUserCourses(prev => 
         prev.map(uc => 
@@ -114,7 +123,7 @@ const CourseTrackerEditDialog: React.FC<CourseTrackerEditDialogProps> = ({
       );
     } else {
       // Create new record
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("user_courses")
         .insert([{
           user_id: userId,
@@ -124,12 +133,25 @@ const CourseTrackerEditDialog: React.FC<CourseTrackerEditDialogProps> = ({
         .select()
         .single();
       
+      if (error) {
+        console.error('Error creating course record:', error);
+        return;
+      }
+      
       if (data) {
         setUserCourses(prev => [...prev, data]);
       }
     }
     
+    // Invalidate all relevant queries to ensure the tracker updates
+    queryClient.invalidateQueries({ queryKey: ['trackerStats'] });
+    queryClient.invalidateQueries({ queryKey: ['playedCourses'] });
+    queryClient.invalidateQueries({ queryKey: ['userProfile'] });
+    
+    // Call the update callback
     onTrackerUpdate();
+    
+    console.log('Course toggle completed, queries invalidated');
   }
 
   const isCoursePlayed = (courseId: string) => {
