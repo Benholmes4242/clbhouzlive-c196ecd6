@@ -54,7 +54,7 @@ const StoryBar = () => {
 
   if (loading) {
     return (
-      <div className="bg-background border-b border-border">
+      <div className="sticky top-16 z-40 bg-background border-b border-border">
         <div className="px-4 py-4">
           <div className="flex space-x-4">
             {[1, 2, 3, 4, 5].map((i) => (
@@ -70,7 +70,7 @@ const StoryBar = () => {
   }
 
   return (
-    <div className="bg-background border-b border-border">
+    <div className="sticky top-16 z-40 bg-background border-b border-border">
       <div className="px-4 py-4">
         <Carousel
           opts={{
