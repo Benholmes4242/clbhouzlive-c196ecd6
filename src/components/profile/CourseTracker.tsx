@@ -39,7 +39,7 @@ const CourseTracker: React.FC<CourseTrackerProps> = ({
       setEditDialogCategory(dialogCategoryMap[categoryKey] || 'gbi');
       setEditDialogOpen(true);
     } else {
-      // For other profiles, show played courses
+      // For other profiles, show played courses - use the category key directly
       setSelectedCategory(categoryKey);
     }
   };
