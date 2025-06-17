@@ -95,9 +95,11 @@ const ProfilePage = () => {
 
   const handleEGVisibilityToggle = async (checked: boolean) => {
     if (!user) return;
+    // Use a more flexible approach for the update to avoid TypeScript issues
+    const updateData: any = { eg_visible: checked };
     await supabase
       .from("user_profiles")
-      .update({ eg_visible: checked })
+      .update(updateData)
       .eq("id", user.id);
     setProfile(prev => prev ? { ...prev, eg_visible: checked } : prev);
   };
