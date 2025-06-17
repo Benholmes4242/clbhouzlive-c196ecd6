@@ -29,18 +29,25 @@ export const useStoryData = () => {
       }
 
       try {
+        // Get current user's profile
+        const { data: currentUserProfile } = await supabase
+          .from('user_profiles')
+          .select('profile_photo_url, display_name, username')
+          .eq('id', user.id)
+          .maybeSingle();
+
         // Start with "Your Profile" story
         const newStories: StoryUser[] = [
           {
             id: 'add',
             type: 'add',
-            user: 'Your Profile',
+            user: currentUserProfile?.display_name || 'Your Profile',
             username: 'your-profile',
-            avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+            avatar: currentUserProfile?.profile_photo_url || '',
           }
         ];
 
-        // Fetch friends (accepted friend relationships)
+        // 1. First, fetch friends (accepted friend relationships)
         const { data: friendsData, error: friendsError } = await supabase
           .from('user_friends')
           .select(`
@@ -53,16 +60,18 @@ export const useStoryData = () => {
             )
           `)
           .eq('user_id', user.id)
-          .eq('status', 'accepted')
-          .limit(10);
+          .eq('status', 'accepted');
 
         console.log('Friends data:', friendsData, 'Friends error:', friendsError);
 
+        const friendIds: string[] = [];
+        
         if (friendsData && friendsData.length > 0) {
-          // User has friends, show them
+          // Add friends first (highest priority)
           friendsData.forEach((friendship: any) => {
             const profile = friendship.user_profiles;
             if (profile) {
+              friendIds.push(profile.id);
               newStories.push({
                 id: profile.id,
                 type: 'friend',
@@ -73,72 +82,73 @@ export const useStoryData = () => {
               });
             }
           });
-        } else {
-          // No friends, fetch random users to show as suggestions
-          const friendIds = friendsData?.map((f: any) => f.friend_id) || [];
-          const excludeIds = [user.id, ...friendIds];
-
-          console.log('Exclude IDs:', excludeIds);
-
-          let query = supabase
-            .from('user_profiles')
-            .select('id, username, display_name, profile_photo_url, home_club')
-            .eq('is_public', true);
-
-          // Only add the not filter if we have IDs to exclude
-          if (excludeIds.length > 0) {
-            query = query.not('id', 'in', `(${excludeIds.join(',')})`);
-          }
-
-          const { data: randomUsers, error: randomError } = await query.limit(20);
-
-          console.log('Random users data:', randomUsers, 'Random error:', randomError);
-
-          if (randomUsers && randomUsers.length > 0) {
-            randomUsers.forEach((profile: any) => {
-              newStories.push({
-                id: profile.id,
-                type: 'suggested',
-                user: profile.display_name || profile.username || 'Player',
-                username: profile.username || profile.id,
-                avatar: profile.profile_photo_url || `https://images.unsplash.com/photo-${Math.random() > 0.5 ? '1507003211169-0a1dd7228f2d' : '1500648767791-00dcc994a43e'}?w=150&h=150&fit=crop&crop=face`,
-                hasStory: false,
-              });
-            });
-          } else {
-            // Fallback to mock data if no users found
-            console.log('No random users found, using mock data');
-            const mockUsers = [
-              {
-                id: 'mock-1',
-                type: 'suggested' as const,
-                user: 'Mike Johnson',
-                username: 'mike_golf_pro',
-                avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
-                hasStory: false,
-              },
-              {
-                id: 'mock-2',
-                type: 'suggested' as const,
-                user: 'Sarah Chen',
-                username: 'sarah_golf',
-                avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b302?w=150&h=150&fit=crop&crop=face',
-                hasStory: false,
-              },
-              {
-                id: 'mock-3',
-                type: 'suggested' as const,
-                user: 'Alex Rodriguez',
-                username: 'alex_links',
-                avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
-                hasStory: false,
-              }
-            ];
-            newStories.push(...mockUsers);
-          }
         }
 
-        console.log('Final stories:', newStories);
+        // 2. Then, fetch suggested users (excluding current user and friends)
+        const excludeIds = [user.id, ...friendIds];
+        
+        let query = supabase
+          .from('user_profiles')
+          .select('id, username, display_name, profile_photo_url, home_club')
+          .eq('is_public', true);
+
+        // Only add the not filter if we have IDs to exclude
+        if (excludeIds.length > 0) {
+          query = query.not('id', 'in', `(${excludeIds.join(',')})`);
+        }
+
+        const { data: suggestedUsers, error: suggestedError } = await query.limit(15);
+
+        console.log('Suggested users data:', suggestedUsers, 'Suggested error:', suggestedError);
+
+        if (suggestedUsers && suggestedUsers.length > 0) {
+          // Add suggested users (lower priority than friends)
+          suggestedUsers.forEach((profile: any) => {
+            newStories.push({
+              id: profile.id,
+              type: 'suggested',
+              user: profile.display_name || profile.username || 'Player',
+              username: profile.username || profile.id,
+              avatar: profile.profile_photo_url || `https://images.unsplash.com/photo-${Math.random() > 0.5 ? '1507003211169-0a1dd7228f2d' : '1500648767791-00dcc994a43e'}?w=150&h=150&fit=crop&crop=face`,
+              hasStory: false,
+            });
+          });
+        }
+
+        // 3. Finally, if we still don't have enough users, add mock data as fallback
+        if (newStories.length < 5) {
+          console.log('Adding mock data as fallback');
+          const mockUsers = [
+            {
+              id: 'mock-1',
+              type: 'suggested' as const,
+              user: 'Mike Johnson',
+              username: 'mike_golf_pro',
+              avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+              hasStory: false,
+            },
+            {
+              id: 'mock-2',
+              type: 'suggested' as const,
+              user: 'Sarah Chen',
+              username: 'sarah_golf',
+              avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b302?w=150&h=150&fit=crop&crop=face',
+              hasStory: false,
+            },
+            {
+              id: 'mock-3',
+              type: 'suggested' as const,
+              user: 'Alex Rodriguez',
+              username: 'alex_links',
+              avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
+              hasStory: false,
+            }
+          ].filter(mockUser => !newStories.find(story => story.username === mockUser.username));
+          
+          newStories.push(...mockUsers);
+        }
+
+        console.log('Final stories order:', newStories.map(s => ({ type: s.type, user: s.user })));
         setStories(newStories);
       } catch (error) {
         console.error('Error fetching stories data:', error);
