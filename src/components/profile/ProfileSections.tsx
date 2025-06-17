@@ -13,6 +13,8 @@ interface ProfileSectionsProps {
     bag_visible?: boolean | null;
     eg_visible?: boolean | null;
     top100_visible?: boolean | null;
+    display_name?: string | null;
+    username?: string | null;
   } | null;
   user: any;
   onEGVisibilityToggle: (checked: boolean) => void;
@@ -25,6 +27,8 @@ const ProfileSections: React.FC<ProfileSectionsProps> = ({
   onEGVisibilityToggle,
   isOwnProfile = false
 }) => {
+  const profileDisplayName = profile?.display_name || profile?.username || 'User';
+
   return (
     <>
       <EGAppIntegration
@@ -57,6 +61,7 @@ const ProfileSections: React.FC<ProfileSectionsProps> = ({
         userId={user?.id}
         isOwnProfile={isOwnProfile}
         activityVisible={true}
+        profileDisplayName={profileDisplayName}
       />
     </>
   );

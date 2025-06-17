@@ -20,13 +20,15 @@ interface SocialActivityProps {
   isOwnProfile?: boolean;
   activityVisible?: boolean;
   onVisibilityToggle?: (checked: boolean) => void;
+  profileDisplayName?: string;
 }
 
 const SocialActivity: React.FC<SocialActivityProps> = ({
   userId,
   isOwnProfile = false,
   activityVisible = true,
-  onVisibilityToggle
+  onVisibilityToggle,
+  profileDisplayName
 }) => {
   // Mock data for now - in a real app this would come from the backend
   const mockPosts: ActivityPost[] = [
@@ -56,6 +58,16 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
     return null;
   }
 
+  // Get the correct attribution text
+  const getPostAttribution = () => {
+    if (isOwnProfile) {
+      return "You posted this";
+    } else {
+      const firstName = profileDisplayName?.split(' ')[0] || 'User';
+      return `${firstName} posted this`;
+    }
+  };
+
   return (
     <div className="mt-10 px-2">
       <div className="flex items-center justify-between mb-4">
@@ -78,7 +90,7 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
           <Card key={post.id} className="p-4">
             <div className="flex justify-between items-start mb-3">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium">You posted this</span>
+                <span className="text-sm font-medium">{getPostAttribution()}</span>
                 <span className="text-xs text-muted-foreground">• {post.timeAgo}</span>
               </div>
               <Button variant="ghost" size="icon" className="h-6 w-6">

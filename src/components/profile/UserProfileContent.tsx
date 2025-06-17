@@ -4,6 +4,7 @@ import ProfileInfo from '@/components/profile/ProfileInfo';
 import ProfilePhotoManager from '@/components/profile/ProfilePhotoManager';
 import ProfileSections from '@/components/profile/ProfileSections';
 import UserProfileActions from '@/components/profile/UserProfileActions';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 interface UserProfileContentProps {
   profile: any;
@@ -19,12 +20,13 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({
   currentUser,
   relationshipStatus
 }) => {
-  const isOwnProfile = currentUser?.id === profile.id;
+  const { user } = useSupabaseSession();
+  const isOwnProfile = user?.id === profile.id;
 
   return (
     <div className="max-w-2xl mx-auto px-4">
       <ProfilePhotoManager
-        user={profile}
+        user={isOwnProfile ? profile : null}
         profile={profile}
         onProfileUpdate={() => {}}
       />
