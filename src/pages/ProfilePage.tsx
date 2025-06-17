@@ -84,6 +84,7 @@ const ProfilePage = () => {
           onEGVisibilityToggle={handleEGVisibilityToggle}
           onTrackerVisibilityToggle={handleTrackerVisibilityToggle}
           onTrackerUpdate={handleTrackerUpdate}
+          isOwnProfile={true}
         />
       </div>
       <BottomNavigation />

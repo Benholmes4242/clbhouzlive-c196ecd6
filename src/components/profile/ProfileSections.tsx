@@ -20,6 +20,7 @@ interface ProfileSectionsProps {
   onEGVisibilityToggle: (checked: boolean) => void;
   onTrackerVisibilityToggle: (checked: boolean) => void;
   onTrackerUpdate: () => void;
+  isOwnProfile?: boolean;
 }
 
 const ProfileSections: React.FC<ProfileSectionsProps> = ({
@@ -29,7 +30,8 @@ const ProfileSections: React.FC<ProfileSectionsProps> = ({
   totalStats,
   onEGVisibilityToggle,
   onTrackerVisibilityToggle,
-  onTrackerUpdate
+  onTrackerUpdate,
+  isOwnProfile = false
 }) => {
   return (
     <>
@@ -38,15 +40,15 @@ const ProfileSections: React.FC<ProfileSectionsProps> = ({
         handicapIndex={profile?.eg_handicap_index ?? null}
         recentRounds={profile?.eg_recent_rounds ?? null}
         userId={user?.id}
-        isOwnProfile={!!user}
+        isOwnProfile={isOwnProfile}
         egVisible={profile?.eg_visible ?? true}
-        onVisibilityToggle={onEGVisibilityToggle}
+        onVisibilityToggle={isOwnProfile ? onEGVisibilityToggle : undefined}
       />
       
       {user && (
         <BagManager 
           userId={user.id} 
-          isOwnProfile={true}
+          isOwnProfile={isOwnProfile}
           bagVisible={profile?.bag_visible ?? true}
         />
       )}
@@ -55,15 +57,15 @@ const ProfileSections: React.FC<ProfileSectionsProps> = ({
         trackerStats={trackerStats} 
         totalStats={totalStats}
         userId={user?.id}
-        isOwnProfile={!!user}
+        isOwnProfile={isOwnProfile}
         trackerVisible={profile?.tracker_visible ?? true}
-        onVisibilityToggle={onTrackerVisibilityToggle}
+        onVisibilityToggle={isOwnProfile ? onTrackerVisibilityToggle : undefined}
         onTrackerUpdate={onTrackerUpdate}
       />
 
       <SocialActivity
         userId={user?.id}
-        isOwnProfile={!!user}
+        isOwnProfile={isOwnProfile}
         activityVisible={true}
       />
     </>

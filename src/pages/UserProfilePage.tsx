@@ -155,6 +155,7 @@ const UserProfilePage = () => {
           onEGVisibilityToggle={() => {}}
           onTrackerVisibilityToggle={() => {}}
           onTrackerUpdate={() => {}}
+          isOwnProfile={isOwnProfile}
         />
       </div>
       <BottomNavigation />
