@@ -1,6 +1,7 @@
 
 import React from 'react';
 import ProfileEditDialog from './ProfileEditDialog';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 interface ProfileInfoProps {
   profile: {
@@ -20,6 +21,14 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
   userId,
   onProfileUpdate
 }) => {
+  const { user } = useSupabaseSession();
+  const isOwnProfile = user?.id === userId;
+
+  // Show handicap if:
+  // 1. It's the user's own profile (even if not set, so they know to fill it in)
+  // 2. It's another user's profile AND the handicap is set
+  const shouldShowHandicap = isOwnProfile || (profile?.eg_handicap_index !== null && profile?.eg_handicap_index !== undefined);
+
   return (
     <div className="flex flex-col items-center mt-6 space-y-3">
       <div className="text-center space-y-2">
@@ -30,9 +39,9 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
         <p className="text-sm">
           <span>Home Club:</span> {profile?.home_club || "Not set"}
         </p>
-        {profile?.eg_handicap_index !== null && profile?.eg_handicap_index !== undefined && (
+        {shouldShowHandicap && (
           <p className="text-sm">
-            <span>Handicap:</span> {profile.eg_handicap_index}
+            <span>Handicap:</span> {profile?.eg_handicap_index !== null && profile?.eg_handicap_index !== undefined ? profile.eg_handicap_index : "Not set"}
           </p>
         )}
       </div>
