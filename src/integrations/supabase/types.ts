@@ -275,6 +275,7 @@ export type Database = {
           id: string
           is_public: boolean | null
           profile_photo_url: string | null
+          tracker_visible: boolean | null
           updated_at: string | null
           username: string | null
         }
@@ -290,6 +291,7 @@ export type Database = {
           id: string
           is_public?: boolean | null
           profile_photo_url?: string | null
+          tracker_visible?: boolean | null
           updated_at?: string | null
           username?: string | null
         }
@@ -305,6 +307,7 @@ export type Database = {
           id?: string
           is_public?: boolean | null
           profile_photo_url?: string | null
+          tracker_visible?: boolean | null
           updated_at?: string | null
           username?: string | null
         }

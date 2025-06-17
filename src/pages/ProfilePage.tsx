@@ -20,6 +20,10 @@ type Profile = {
   tracker_visible: boolean | null;
   display_name: string | null;
   username: string | null;
+  bio: string | null;
+  is_public: boolean | null;
+  created_at: string | null;
+  updated_at: string | null;
 };
 
 const ProfilePage = () => {
@@ -50,7 +54,7 @@ const ProfilePage = () => {
     setLoading(true);
     const { data, error } = await supabase.from('user_profiles').select('*').eq('id', id).maybeSingle();
     if (!error && data) {
-      setProfile(data);
+      setProfile(data as Profile);
     } else {
       setProfile(null);
     }
