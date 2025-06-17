@@ -64,8 +64,10 @@ export function useNotifications() {
       .order('created_at', { ascending: false });
 
     if (!error && data) {
-      setNotifications(data);
-      setUnreadCount(data.filter(n => !n.read).length);
+      // Cast the data to match our Notification interface
+      const typedNotifications = data as Notification[];
+      setNotifications(typedNotifications);
+      setUnreadCount(typedNotifications.filter(n => !n.read).length);
     }
     setLoading(false);
   };
