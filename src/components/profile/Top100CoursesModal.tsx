@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -8,7 +8,8 @@ import {
 } from '@/components/ui/dialog';
 import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Check } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Check, Search } from 'lucide-react';
 import { useTop100CoursesList } from '@/hooks/useTop100CoursesList';
 
 interface Top100CoursesModalProps {
@@ -28,12 +29,26 @@ const Top100CoursesModal: React.FC<Top100CoursesModalProps> = ({
   isOpen,
   onClose
 }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  
   const {
     courses,
     playedCourses,
     isLoading,
     toggleCourse
   } = useTop100CoursesList(region, userId, isOwnProfile);
+
+  // Filter courses based on search term
+  const filteredCourses = useMemo(() => {
+    if (!searchTerm.trim()) return courses;
+    
+    const term = searchTerm.toLowerCase();
+    return courses.filter(course => 
+      course.name.toLowerCase().includes(term) ||
+      course.country.toLowerCase().includes(term) ||
+      course.region?.toLowerCase().includes(term)
+    );
+  }, [courses, searchTerm]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -42,6 +57,17 @@ const Top100CoursesModal: React.FC<Top100CoursesModalProps> = ({
           <DialogTitle>{regionName} - Top 100 Courses</DialogTitle>
         </DialogHeader>
         
+        {/* Search Bar */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+          <Input
+            placeholder="Search courses by name, country, or region..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+        
         <ScrollArea className="h-[60vh] pr-4">
           {isLoading ? (
             <div className="flex items-center justify-center py-8">
@@ -49,7 +75,7 @@ const Top100CoursesModal: React.FC<Top100CoursesModalProps> = ({
             </div>
           ) : (
             <div className="space-y-3">
-              {courses.map((course) => {
+              {filteredCourses.map((course) => {
                 const isPlayed = playedCourses.has(course.id);
                 
                 return (
@@ -93,6 +119,12 @@ const Top100CoursesModal: React.FC<Top100CoursesModalProps> = ({
                   </div>
                 );
               })}
+              
+              {filteredCourses.length === 0 && courses.length > 0 && (
+                <div className="text-center py-8 text-muted-foreground">
+                  No courses found matching "{searchTerm}".
+                </div>
+              )}
               
               {courses.length === 0 && (
                 <div className="text-center py-8 text-muted-foreground">
