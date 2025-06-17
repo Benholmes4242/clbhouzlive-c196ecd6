@@ -111,8 +111,9 @@ const BagEditDialog: React.FC<BagEditDialogProps> = ({ userId, onBagUpdate }) =>
       }]);
     }
     fetchBag();
+    // Call onBagUpdate to refresh the main profile page data in the background
+    // but don't close the dialog
     onBagUpdate();
-    // Don't close the dialog, just refresh the data
   }
 
   async function handleDelete(type: string) {
