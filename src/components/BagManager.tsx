@@ -102,14 +102,14 @@ const BagManager = ({ userId, isOwnProfile = false, bagVisible = true }: BagMana
           const item = bag.find(i => i.type === type);
           return (
             <div key={type} className="flex items-start gap-2">
-              <span className="font-bold text-sm min-w-16">{type}:</span>
+              <span className="font-medium text-sm min-w-16">{type}:</span>
               {item ? (
                 <div className="text-sm">
-                  <span className="font-bold">{item.brand}</span>
-                  {item.model && <span className="font-bold text-muted-foreground"> {item.model}</span>}
+                  <span className="font-medium">{item.brand}</span>
+                  {item.model && <span className="text-muted-foreground"> {item.model}</span>}
                 </div>
               ) : (
-                <span className="font-bold text-muted-foreground text-sm">Not set</span>
+                <span className="text-muted-foreground text-sm">Not set</span>
               )}
             </div>
           );
