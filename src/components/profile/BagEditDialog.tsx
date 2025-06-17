@@ -56,6 +56,13 @@ const BagEditDialog: React.FC<BagEditDialogProps> = ({ userId, onBagUpdate }) =>
     if (open && userId) fetchBag();
   }, [open, userId]);
 
+  // Call onBagUpdate when dialog closes
+  useEffect(() => {
+    if (!open) {
+      onBagUpdate();
+    }
+  }, [open, onBagUpdate]);
+
   async function fetchBag() {
     const { data, error } = await supabase
       .from("user_bag")
@@ -136,8 +143,8 @@ const BagEditDialog: React.FC<BagEditDialogProps> = ({ userId, onBagUpdate }) =>
       }]);
     }
 
+    // Only refresh the bag data, don't call onBagUpdate
     fetchBag();
-    onBagUpdate();
   }
 
   async function handleDelete(type: string) {
@@ -152,7 +159,6 @@ const BagEditDialog: React.FC<BagEditDialogProps> = ({ userId, onBagUpdate }) =>
       [type]: field?.allowMultiple ? [{ brand: "", model: "", notes: "" }] : [{ brand: "", model: "", notes: "" }]
     }));
     fetchBag();
-    onBagUpdate();
   }
 
   return (
