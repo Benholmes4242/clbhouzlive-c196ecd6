@@ -30,6 +30,7 @@ const UserProfileActions: React.FC<UserProfileActionsProps> = ({
         isFollowing={isFollowing}
         loading={loading}
         onFollow={() => handleFollow(isFollowing)}
+        friendStatus={friendStatus}
       />
 
       <MessageButton friendStatus={friendStatus} />
