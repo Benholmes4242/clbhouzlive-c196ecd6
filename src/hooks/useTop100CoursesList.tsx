@@ -14,23 +14,38 @@ export const useTop100CoursesList = (region: string, userId: string, isOwnProfil
       let query = supabase
         .from('golf_courses')
         .select('*')
-        .not('global_rank', 'is', null)
-        .order('global_rank');
+        .not('global_rank', 'is', null);
 
-      // Filter by region
+      // Filter by region and order accordingly
       if (region === 'britain-ireland') {
-        query = query.in('country', ['United Kingdom', 'Ireland']);
+        query = query
+          .in('country', ['United Kingdom', 'Ireland'])
+          .order('global_rank'); // Order by global rank for regional display
       } else if (region === 'usa') {
-        query = query.eq('country', 'United States');
+        query = query
+          .eq('country', 'United States')
+          .order('global_rank');
       } else if (region === 'europe') {
         query = query
           .eq('continent', 'Europe')
-          .not('country', 'in', '("United Kingdom","Ireland")');
+          .not('country', 'in', '("United Kingdom","Ireland")')
+          .order('global_rank');
+      } else {
+        // For 'global', order by global rank
+        query = query.order('global_rank');
       }
-      // For 'global', no additional filter needed
 
       const { data, error } = await query;
       if (error) throw error;
+
+      // For regional views, assign regional ranks based on position in filtered list
+      if (region === 'britain-ireland' || region === 'usa' || region === 'europe') {
+        return (data || []).map((course, index) => ({
+          ...course,
+          regional_rank: index + 1
+        }));
+      }
+
       return data || [];
     },
     enabled: !!region,

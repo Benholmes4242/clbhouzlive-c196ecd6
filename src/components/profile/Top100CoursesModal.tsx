@@ -50,6 +50,22 @@ const Top100CoursesModal: React.FC<Top100CoursesModalProps> = ({
     );
   }, [courses, searchTerm]);
 
+  // Determine which rank to display based on region
+  const getRankToDisplay = (course: any) => {
+    if (region === 'global') {
+      return course.global_rank;
+    }
+    // For regional views, use the regional_rank assigned in the hook
+    return course.regional_rank || course.global_rank;
+  };
+
+  const getRankPrefix = () => {
+    if (region === 'britain-ireland') return 'GB&I';
+    if (region === 'usa') return 'USA';
+    if (region === 'europe') return 'EUR';
+    return '#'; // For global
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-2xl max-h-[80vh]">
@@ -77,6 +93,8 @@ const Top100CoursesModal: React.FC<Top100CoursesModalProps> = ({
             <div className="space-y-3">
               {filteredCourses.map((course) => {
                 const isPlayed = playedCourses.has(course.id);
+                const displayRank = getRankToDisplay(course);
+                const rankPrefix = getRankPrefix();
                 
                 return (
                   <div
@@ -100,9 +118,9 @@ const Top100CoursesModal: React.FC<Top100CoursesModalProps> = ({
                     
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        {course.global_rank && (
+                        {displayRank && (
                           <span className="text-sm font-medium text-muted-foreground">
-                            #{course.global_rank}
+                            {region === 'global' ? `#${displayRank}` : `${rankPrefix} ${displayRank}`}
                           </span>
                         )}
                         <h3 className="font-semibold truncate">{course.name}</h3>
