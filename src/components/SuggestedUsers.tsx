@@ -189,12 +189,6 @@ const SuggestedUsers = () => {
             </div>
           ))}
         </div>
-        
-        <div className="mt-4 pt-4 border-t text-xs text-muted-foreground">
-          <p>About • Help • Press • API • Jobs • Privacy • Terms</p>
-          <p>Locations • Language • Meta Verified</p>
-          <p className="mt-2">© 2025 GOLF SOCIAL</p>
-        </div>
       </Card>
     </div>
   );
