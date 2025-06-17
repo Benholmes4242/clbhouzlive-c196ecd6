@@ -5,8 +5,7 @@ import CourseExplorer from './CourseExplorer';
 import Top100Courses from './Top100Courses';
 import CourseMapView from './CourseMapView';
 import MyCourses from './MyCourses';
-import CourseScraper from './CourseScraper';
-import { Search, Trophy, Map, User, Download } from 'lucide-react';
+import { Search, Trophy, Map, User } from 'lucide-react';
 
 const CoursesContent = () => {
   return (
@@ -17,7 +16,7 @@ const CoursesContent = () => {
       </div>
 
       <Tabs defaultValue="explore" className="w-full">
-        <TabsList className="grid w-full grid-cols-5 max-w-2xl mx-auto">
+        <TabsList className="grid w-full grid-cols-4 max-w-2xl mx-auto">
           <TabsTrigger value="explore" className="flex items-center gap-2">
             <Search className="h-4 w-4" />
             <span className="hidden sm:inline">Explore</span>
@@ -33,10 +32,6 @@ const CoursesContent = () => {
           <TabsTrigger value="my-courses" className="flex items-center gap-2">
             <User className="h-4 w-4" />
             <span className="hidden sm:inline">My Courses</span>
-          </TabsTrigger>
-          <TabsTrigger value="import" className="flex items-center gap-2">
-            <Download className="h-4 w-4" />
-            <span className="hidden sm:inline">Import</span>
           </TabsTrigger>
         </TabsList>
 
@@ -54,10 +49,6 @@ const CoursesContent = () => {
         
         <TabsContent value="my-courses" className="mt-6">
           <MyCourses />
-        </TabsContent>
-        
-        <TabsContent value="import" className="mt-6">
-          <CourseScraper />
         </TabsContent>
       </Tabs>
     </div>
