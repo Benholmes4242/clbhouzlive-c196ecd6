@@ -4,6 +4,14 @@ import { Search, Bell, MessageCircle, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from "react-router-dom";
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { supabase } from "@/integrations/supabase/client";
 
 const Header = () => {
   const navigate = useNavigate();
@@ -18,6 +26,11 @@ const Header = () => {
   };
 
   const handleLogoClick = () => {
+    navigate('/');
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
     navigate('/');
   };
 
@@ -74,13 +87,36 @@ const Header = () => {
                 <span className="absolute -top-1 -right-1 bg-amber-700 text-white text-xs rounded-full h-2 w-2"></span>
               )}
             </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleProfileClick}
-            >
-              <User className="h-5 w-5" />
-            </Button>
+            
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <User className="h-5 w-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem onClick={() => navigate('/profile')}>
+                    My Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate('/settings')}>
+                    Settings
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={handleLogout}>
+                    Log Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleProfileClick}
+              >
+                <User className="h-5 w-5" />
+              </Button>
+            )}
           </div>
         </div>
       </div>
