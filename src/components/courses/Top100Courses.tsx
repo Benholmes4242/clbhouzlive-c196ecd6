@@ -49,18 +49,27 @@ const Top100Courses = () => {
 
       let query = supabase
         .from('golf_courses')
-        .select('*')
-        .not('global_rank', 'is', null)
-        .order('global_rank', { ascending: true });
+        .select('*');
 
       if (selectedRegion === 'Britain & Ireland') {
-        query = query.in('country', ['United Kingdom', 'Ireland']);
+        // Show all GB&I courses ranked 1-100 by regional rank
+        query = query
+          .in('country', ['United Kingdom', 'Ireland'])
+          .not('regional_rank', 'is', null)
+          .lte('regional_rank', 100)
+          .order('regional_rank', { ascending: true });
       } else if (selectedRegion === 'Europe') {
-        query = query.eq('continent', 'Europe').not('country', 'in', '("United Kingdom","Ireland")');
+        query = query
+          .eq('continent', 'Europe')
+          .not('country', 'in', '("United Kingdom","Ireland")')
+          .not('global_rank', 'is', null)
+          .order('global_rank', { ascending: true });
       } else if (selectedRegion === 'USA') {
-        query = query.eq('country', 'United States');
+        query = query
+          .eq('country', 'United States')
+          .not('global_rank', 'is', null)
+          .order('global_rank', { ascending: true });
       }
-      // For 'Worldwide', no additional filter is applied
 
       const { data, error } = await query.limit(100);
       if (error) throw error;
@@ -119,7 +128,7 @@ const Top100Courses = () => {
             ) : globalTop100 && globalTop100.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {globalTop100.map((course) => (
-                  <CourseCard key={course.id} course={course} />
+                  <CourseCard key={course.id} course={course} viewContext="global" />
                 ))}
               </div>
             ) : (
@@ -157,10 +166,20 @@ const Top100Courses = () => {
             ) : loadingRegional ? (
               <LoadingSkeleton />
             ) : regionalTop100 && regionalTop100.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {regionalTop100.map((course) => (
-                  <CourseCard key={course.id} course={course} />
-                ))}
+              <div className="space-y-4">
+                {selectedRegion === 'Britain & Ireland' && (
+                  <div className="text-center mb-6">
+                    <h4 className="text-lg font-semibold text-green-700">GB&I Top 100</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Complete ranking of Great Britain & Ireland's finest courses
+                    </p>
+                  </div>
+                )}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {regionalTop100.map((course) => (
+                    <CourseCard key={course.id} course={course} viewContext="regional" />
+                  ))}
+                </div>
               </div>
             ) : (
               <div className="text-center py-12">

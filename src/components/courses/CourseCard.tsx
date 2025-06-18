@@ -25,9 +25,10 @@ interface Course {
 interface CourseCardProps {
   course: Course;
   viewingUserId?: string;
+  viewContext?: 'global' | 'regional';
 }
 
-const CourseCard = ({ course, viewingUserId }: CourseCardProps) => {
+const CourseCard = ({ course, viewingUserId, viewContext = 'global' }: CourseCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
 
   const { data: currentUserResponse } = useQuery({
@@ -77,6 +78,7 @@ const CourseCard = ({ course, viewingUserId }: CourseCardProps) => {
           globalRank={course.global_rank}
           regionalRank={course.regional_rank}
           country={course.country}
+          viewContext={viewContext}
         />
 
         <CoursePlayedButton
