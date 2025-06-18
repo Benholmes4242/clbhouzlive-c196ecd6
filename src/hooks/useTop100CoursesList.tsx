@@ -13,33 +13,46 @@ export const useTop100CoursesList = (region: string, userId: string, isOwnProfil
     queryFn: async () => {
       let query = supabase
         .from('golf_courses')
-        .select('*')
-        .not('global_rank', 'is', null);
+        .select('*');
 
       // Filter by region and order accordingly
       if (region === 'britain-ireland') {
         query = query
           .in('country', ['United Kingdom', 'Ireland'])
-          .order('global_rank'); // Order by global rank for regional display
+          .or('global_rank.not.is.null,regional_rank.not.is.null') // Include courses with either global or regional rank
+          .order('regional_rank', { nullsLast: true })
+          .order('global_rank', { nullsLast: true });
       } else if (region === 'usa') {
         query = query
           .eq('country', 'United States')
+          .not('global_rank', 'is', null)
           .order('global_rank');
       } else if (region === 'europe') {
         query = query
           .eq('continent', 'Europe')
           .not('country', 'in', '("United Kingdom","Ireland")')
+          .not('global_rank', 'is', null)
           .order('global_rank');
       } else {
         // For 'global', order by global rank
-        query = query.order('global_rank');
+        query = query
+          .not('global_rank', 'is', null)
+          .order('global_rank');
       }
 
       const { data, error } = await query;
       if (error) throw error;
 
-      // For regional views, assign regional ranks based on position in filtered list
-      if (region === 'britain-ireland' || region === 'usa' || region === 'europe') {
+      // For Britain & Ireland, assign sequential regional ranks if not already set
+      if (region === 'britain-ireland') {
+        return (data || []).map((course, index) => ({
+          ...course,
+          regional_rank: course.regional_rank || (index + 1)
+        }));
+      }
+
+      // For other regional views, assign regional ranks based on position in filtered list
+      if (region === 'usa' || region === 'europe') {
         return (data || []).map((course, index) => ({
           ...course,
           regional_rank: index + 1
