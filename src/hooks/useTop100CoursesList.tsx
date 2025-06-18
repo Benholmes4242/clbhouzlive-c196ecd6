@@ -20,8 +20,8 @@ export const useTop100CoursesList = (region: string, userId: string, isOwnProfil
         query = query
           .in('country', ['United Kingdom', 'Ireland'])
           .or('global_rank.not.is.null,regional_rank.not.is.null') // Include courses with either global or regional rank
-          .order('regional_rank', { nullsLast: true })
-          .order('global_rank', { nullsLast: true });
+          .order('regional_rank', { nullsFirst: false })
+          .order('global_rank', { nullsFirst: false });
       } else if (region === 'usa') {
         query = query
           .eq('country', 'United States')

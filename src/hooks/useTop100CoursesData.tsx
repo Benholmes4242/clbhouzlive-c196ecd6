@@ -41,7 +41,7 @@ export const useTop100CoursesData = (userId: string, isOwnProfile: boolean) => {
         .from('golf_courses')
         .select('id, continent, country, region, global_rank, regional_rank')
         .or('global_rank.not.is.null,regional_rank.not.is.null') // Include courses with either ranking
-        .order('global_rank', { nullsLast: true });
+        .order('global_rank', { nullsFirst: false });
 
       if (error) throw error;
       return data || [];
