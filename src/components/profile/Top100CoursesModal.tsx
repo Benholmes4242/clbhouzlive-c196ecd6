@@ -9,7 +9,7 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
-import { Check, Search } from 'lucide-react';
+import { Check, Search, Circle } from 'lucide-react';
 import { useTop100CoursesList } from '@/hooks/useTop100CoursesList';
 
 interface Top100CoursesModalProps {
@@ -104,7 +104,9 @@ const Top100CoursesModal: React.FC<Top100CoursesModalProps> = ({
                       />
                     ) : (
                       <div className="flex-shrink-0 w-4 h-4 flex items-center justify-center">
-                        {isPlayed && <Check className="h-4 w-4 text-green-600" />}
+                        {isPlayed && (
+                          <Circle className="h-3 w-3 text-green-600 fill-current" />
+                        )}
                       </div>
                     )}
                     
