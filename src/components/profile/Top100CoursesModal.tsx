@@ -51,15 +51,6 @@ const Top100CoursesModal: React.FC<Top100CoursesModalProps> = ({
     );
   }, [courses, searchTerm]);
 
-  // Determine which rank to display based on region
-  const getRankToDisplay = (course: any) => {
-    if (region === 'global') {
-      return course.global_rank;
-    }
-    // For regional views, use the regional_rank assigned in the hook
-    return course.regional_rank || course.global_rank;
-  };
-
   // Get regional label for badges
   const getRegionalLabel = (course: any) => {
     if (course.country === 'United Kingdom' || course.country === 'Ireland') {
@@ -72,7 +63,6 @@ const Top100CoursesModal: React.FC<Top100CoursesModalProps> = ({
     <div className="space-y-3">
       {filteredCourses.map((course) => {
         const isPlayed = playedCourses.has(course.id);
-        const displayRank = getRankToDisplay(course);
         
         return (
           <div
@@ -90,9 +80,9 @@ const Top100CoursesModal: React.FC<Top100CoursesModalProps> = ({
             
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
-                {displayRank && (
+                {course.regional_rank && (
                   <span className="text-sm font-medium text-muted-foreground">
-                    {displayRank}
+                    {course.regional_rank}
                   </span>
                 )}
                 <h3 className="font-semibold truncate">{course.name}</h3>
@@ -116,7 +106,6 @@ const Top100CoursesModal: React.FC<Top100CoursesModalProps> = ({
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {filteredCourses.map((course) => {
         const isPlayed = playedCourses.has(course.id);
-        const displayRank = getRankToDisplay(course);
         const regionalLabel = getRegionalLabel(course);
         
         return (
@@ -138,12 +127,14 @@ const Top100CoursesModal: React.FC<Top100CoursesModalProps> = ({
               
               {/* Rank Badges */}
               <div className="absolute top-2 left-2 flex gap-1">
-                {displayRank && course.global_rank && (
+                {/* Gold badge - always shows global rank */}
+                {course.global_rank && (
                   <Badge className="bg-yellow-500 text-yellow-900 hover:bg-yellow-500 text-xs">
                     <Globe className="h-2 w-2 mr-1" />
-                    {displayRank}
+                    {course.global_rank}
                   </Badge>
                 )}
+                {/* Grey badge - shows regional rank when viewing regional lists */}
                 {course.regional_rank && region !== 'global' && (
                   <Badge variant="secondary" className="text-xs">
                     {regionalLabel} {course.regional_rank}
