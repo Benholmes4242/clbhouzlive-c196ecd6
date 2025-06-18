@@ -9,7 +9,7 @@ import {
 import { Checkbox } from '@/components/ui/checkbox';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
-import { Check, Search, Circle } from 'lucide-react';
+import { Check, Search, Dot } from 'lucide-react';
 import { useTop100CoursesList } from '@/hooks/useTop100CoursesList';
 
 interface Top100CoursesModalProps {
@@ -105,7 +105,15 @@ const Top100CoursesModal: React.FC<Top100CoursesModalProps> = ({
                     ) : (
                       <div className="flex-shrink-0 w-4 h-4 flex items-center justify-center">
                         {isPlayed && (
-                          <Circle className="h-3 w-3 text-green-600 fill-current" />
+                          <div className="w-3 h-3 bg-white rounded-full border-2 border-gray-300 relative">
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
+                            </div>
+                            {/* Dimple pattern */}
+                            <div className="absolute top-0.5 left-0.5 w-0.5 h-0.5 bg-gray-200 rounded-full opacity-60"></div>
+                            <div className="absolute top-0.5 right-0.5 w-0.5 h-0.5 bg-gray-200 rounded-full opacity-60"></div>
+                            <div className="absolute bottom-0.5 left-1 w-0.5 h-0.5 bg-gray-200 rounded-full opacity-60"></div>
+                          </div>
                         )}
                       </div>
                     )}
