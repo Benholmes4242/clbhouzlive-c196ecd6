@@ -18,10 +18,26 @@ const HeaderNavigation = () => {
 
   const handleNotificationsClick = () => {
     navigate('/notifications');
+    // Scroll to top after navigation
+    setTimeout(() => {
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: 'smooth'
+      });
+    }, 50);
   };
 
   const handleMessagesClick = () => {
     navigate('/messages');
+    // Scroll to top after navigation
+    setTimeout(() => {
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: 'smooth'
+      });
+    }, 50);
   };
 
   return (
