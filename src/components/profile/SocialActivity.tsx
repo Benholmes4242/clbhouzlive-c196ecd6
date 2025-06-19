@@ -58,7 +58,7 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
           )
         `)
         .eq('user_id', userId)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false }); // Ensure newest first
 
       if (error) {
         console.error('Error fetching user posts:', error);
@@ -152,8 +152,12 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
                       <video
                         src={media.media_url}
                         controls
+                        preload="metadata"
                         className="w-full h-48 object-cover rounded-lg"
-                      />
+                        poster={`${media.media_url}#t=0.1`}
+                      >
+                        Your browser does not support the video tag.
+                      </video>
                     )}
                   </div>
                 ))}

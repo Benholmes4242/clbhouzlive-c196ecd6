@@ -47,7 +47,7 @@ export const useUserPosts = () => {
             media_url
           )
         `)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false }); // Ensure newest first
 
       if (error) {
         console.error('Error fetching posts:', error);

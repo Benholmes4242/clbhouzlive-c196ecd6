@@ -186,14 +186,19 @@ const TrendingFeed = () => {
       dateB = new Date(); // Fallback for video posts without proper timestamps
     }
     
-    return dateB.getTime() - dateA.getTime();
+    return dateB.getTime() - dateA.getTime(); // Newest first
   });
 
   return (
     <div className="space-y-6 pb-20">
       {sortedContent.map((item) => (
         item.type === 'user_post' ? (
-          <UserPost key={item.id} post={item} />
+          <UserPost 
+            key={item.id} 
+            post={item} 
+            onPostUpdated={refetchUserPosts}
+            onPostDeleted={refetchUserPosts}
+          />
         ) : (
           <PostCard key={item.id} post={item} />
         )
