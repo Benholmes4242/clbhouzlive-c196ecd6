@@ -74,8 +74,12 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
         shares: 0, // Would need a shares table to track this
         timeAgo: new Date(post.created_at).toLocaleDateString(),
         created_at: post.created_at,
-        post_media: post.post_media,
-        image: post.post_media?.[0]?.media_type === 'image' ? post.post_media[0].media_url : undefined
+        post_media: (post.post_media || []).map(media => ({
+          id: media.id,
+          media_type: media.media_type as 'image' | 'video',
+          media_url: media.media_url
+        })),
+        image: post.post_media?.find(media => media.media_type === 'image')?.media_url
       }));
 
       setPosts(formattedPosts);

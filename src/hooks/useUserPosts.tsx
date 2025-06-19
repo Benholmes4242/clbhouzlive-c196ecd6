@@ -41,12 +41,6 @@ export const useUserPosts = () => {
           content,
           created_at,
           user_id,
-          user_profiles!posts_user_id_fkey (
-            id,
-            display_name,
-            username,
-            profile_photo_url
-          ),
           post_media (
             id,
             media_type,
@@ -60,18 +54,38 @@ export const useUserPosts = () => {
         return;
       }
 
-      const formattedPosts = postsData.map(post => ({
-        id: post.id,
-        content: post.content,
-        created_at: post.created_at,
-        user: {
-          id: post.user_profiles?.id || post.user_id,
-          display_name: post.user_profiles?.display_name,
-          username: post.user_profiles?.username,
-          profile_photo_url: post.user_profiles?.profile_photo_url
-        },
-        post_media: post.post_media || []
-      }));
+      // Get user profiles for all post authors
+      const userIds = [...new Set(postsData.map(post => post.user_id))];
+      const { data: profiles, error: profilesError } = await supabase
+        .from('user_profiles')
+        .select('id, display_name, username, profile_photo_url')
+        .in('id', userIds);
+
+      if (profilesError) {
+        console.error('Error fetching profiles:', profilesError);
+        return;
+      }
+
+      const formattedPosts = postsData.map(post => {
+        const userProfile = profiles?.find(profile => profile.id === post.user_id);
+        
+        return {
+          id: post.id,
+          content: post.content,
+          created_at: post.created_at,
+          user: {
+            id: post.user_id,
+            display_name: userProfile?.display_name || null,
+            username: userProfile?.username || null,
+            profile_photo_url: userProfile?.profile_photo_url || null
+          },
+          post_media: (post.post_media || []).map(media => ({
+            id: media.id,
+            media_type: media.media_type as 'image' | 'video',
+            media_url: media.media_url
+          }))
+        };
+      });
 
       setPosts(formattedPosts);
     } catch (error) {
