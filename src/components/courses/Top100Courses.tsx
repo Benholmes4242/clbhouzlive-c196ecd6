@@ -16,6 +16,7 @@ interface Course {
   continent: string;
   global_rank: number | null;
   regional_rank: number | null;
+  usa_rank: number | null;
   description: string;
   thumbnail_image: string;
   latitude: number | null;
@@ -65,10 +66,12 @@ const Top100Courses = () => {
           .not('global_rank', 'is', null)
           .order('global_rank', { ascending: true });
       } else if (selectedRegion === 'USA') {
+        // Show USA Top 100 courses ranked by usa_rank
         query = query
           .eq('country', 'United States')
-          .not('global_rank', 'is', null)
-          .order('global_rank', { ascending: true });
+          .not('usa_rank', 'is', null)
+          .lte('usa_rank', 100)
+          .order('usa_rank', { ascending: true });
       }
 
       const { data, error } = await query.limit(100);
@@ -172,6 +175,14 @@ const Top100Courses = () => {
                     <h4 className="text-lg font-semibold text-green-700">GB&I Top 100</h4>
                     <p className="text-sm text-muted-foreground">
                       Complete ranking of Great Britain & Ireland's finest courses
+                    </p>
+                  </div>
+                )}
+                {selectedRegion === 'USA' && (
+                  <div className="text-center mb-6">
+                    <h4 className="text-lg font-semibold text-blue-700">USA Top 100</h4>
+                    <p className="text-sm text-muted-foreground">
+                      The finest golf courses across the United States
                     </p>
                   </div>
                 )}

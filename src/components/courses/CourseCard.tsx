@@ -16,6 +16,7 @@ interface Course {
   continent: string;
   global_rank: number | null;
   regional_rank: number | null;
+  usa_rank: number | null;
   description: string;
   thumbnail_image: string;
   latitude: number | null;
@@ -77,6 +78,7 @@ const CourseCard = ({ course, viewingUserId, viewContext = 'global' }: CourseCar
         <CourseRankBadges 
           globalRank={course.global_rank}
           regionalRank={course.regional_rank}
+          usaRank={course.usa_rank}
           country={course.country}
           viewContext={viewContext}
         />

@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -18,6 +17,7 @@ interface Course {
   continent: string;
   global_rank: number | null;
   regional_rank: number | null;
+  usa_rank: number | null;
   description: string;
   thumbnail_image: string;
   latitude: number | null;
@@ -58,7 +58,13 @@ const CourseExplorer = () => {
       }
 
       if (top100Only) {
-        query = query.not('global_rank', 'is', null).lte('global_rank', 100);
+        if (selectedRegion === 'USA') {
+          query = query.not('usa_rank', 'is', null).lte('usa_rank', 100);
+        } else if (selectedRegion === 'Britain & Ireland') {
+          query = query.not('regional_rank', 'is', null).lte('regional_rank', 100);
+        } else {
+          query = query.not('global_rank', 'is', null).lte('global_rank', 100);
+        }
       }
 
       const { data, error } = await query;
