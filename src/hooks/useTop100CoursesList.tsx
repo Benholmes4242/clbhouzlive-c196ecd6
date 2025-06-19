@@ -24,10 +24,12 @@ export const useTop100CoursesList = (region: string, userId: string, isOwnProfil
           .lte('regional_rank', 100)
           .order('regional_rank', { ascending: true });
       } else if (region === 'usa') {
+        // Get all USA courses with USA rankings (1-100)
         query = query
           .eq('country', 'United States')
           .not('usa_rank', 'is', null)
-          .order('usa_rank');
+          .lte('usa_rank', 100)
+          .order('usa_rank', { ascending: true });
       } else if (region === 'europe') {
         query = query
           .eq('continent', 'Europe')
@@ -43,24 +45,6 @@ export const useTop100CoursesList = (region: string, userId: string, isOwnProfil
 
       const { data, error } = await query;
       if (error) throw error;
-
-      console.log(`Found ${data?.length || 0} courses for region: ${region}`);
-      
-      // Debug logging for USA region
-      if (region === 'usa') {
-        console.log('USA courses with rankings:');
-        data?.forEach(course => {
-          console.log(`${course.usa_rank}: ${course.name}`);
-        });
-        
-        // Check for missing ranks
-        const ranks = data?.map(c => c.usa_rank).sort((a, b) => a - b) || [];
-        for (let i = 1; i <= 100; i++) {
-          if (!ranks.includes(i)) {
-            console.log(`Missing USA rank: ${i}`);
-          }
-        }
-      }
 
       return data || [];
     },
