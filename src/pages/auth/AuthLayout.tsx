@@ -17,8 +17,8 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
   <div className="min-h-screen flex items-center justify-center bg-background px-4">
     <div className="bg-muted rounded-lg shadow-md p-6 w-full max-w-md mx-auto flex flex-col items-center">
       <img
-        src="/lovable-uploads/1f870366-4fd9-4e56-a9a0-31c86f07d340.png"
-        alt="Members Logo"
+        src="/lovable-uploads/43a9bf96-e341-493d-8d66-06e6c095abba.png"
+        alt="clbhouz Logo"
         className="mb-6"
         style={{ width: 200, maxWidth: "80%" }}
       />
@@ -29,8 +29,8 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
         disabled={submitting}
       >
         {isSignUp
-          ? "Already a member? Sign in"
-          : "Become a member. Sign up"}
+          ? "Already have an account? Sign in"
+          : "New to clbhouz? Sign up"}
       </button>
     </div>
   </div>
