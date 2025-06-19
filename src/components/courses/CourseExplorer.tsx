@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -71,6 +72,9 @@ const CourseExplorer = () => {
           query = query.not('usa_rank', 'is', null).lte('usa_rank', 100);
         } else if (selectedRegion === 'Britain & Ireland') {
           query = query.not('regional_rank', 'is', null).lte('regional_rank', 100);
+        } else if (selectedRegion === 'Worldwide') {
+          // For worldwide, only show courses with global ranks 1-100
+          query = query.not('global_rank', 'is', null).gte('global_rank', 1).lte('global_rank', 100);
         } else {
           query = query.not('global_rank', 'is', null).lte('global_rank', 100);
         }
@@ -146,7 +150,7 @@ const CourseExplorer = () => {
             </SelectContent>
           </Select>
 
-          {selectedRegion && countries && countries.length > 0 && (
+          {selectedRegion && selectedRegion !== 'Worldwide' && countries && countries.length > 0 && (
             <Select value={selectedCountry} onValueChange={setSelectedCountry}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Country" />
