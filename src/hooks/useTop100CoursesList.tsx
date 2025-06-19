@@ -26,8 +26,8 @@ export const useTop100CoursesList = (region: string, userId: string, isOwnProfil
       } else if (region === 'usa') {
         query = query
           .eq('country', 'United States')
-          .not('global_rank', 'is', null)
-          .order('global_rank');
+          .not('usa_rank', 'is', null)
+          .order('usa_rank');
       } else if (region === 'europe') {
         query = query
           .eq('continent', 'Europe')
