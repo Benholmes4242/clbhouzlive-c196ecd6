@@ -2,13 +2,11 @@
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Plus, Image, Video, X } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useToast } from '@/hooks/use-toast';
+import PostContentForm from './PostContentForm';
 
 interface CreatePostDialogProps {
   onPostCreated?: () => void;
@@ -22,41 +20,8 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
   const [mediaFiles, setMediaFiles] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const files = Array.from(e.target.files);
-      setMediaFiles(prev => [...prev, ...files]);
-    }
-  };
-
-  const handlePhotoClick = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.multiple = true;
-    input.onchange = (e) => {
-      const target = e.target as HTMLInputElement;
-      if (target.files) {
-        const files = Array.from(target.files);
-        setMediaFiles(prev => [...prev, ...files]);
-      }
-    };
-    input.click();
-  };
-
-  const handleVideoClick = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'video/*';
-    input.multiple = true;
-    input.onchange = (e) => {
-      const target = e.target as HTMLInputElement;
-      if (target.files) {
-        const files = Array.from(target.files);
-        setMediaFiles(prev => [...prev, ...files]);
-      }
-    };
-    input.click();
+  const handleFilesSelected = (newFiles: File[]) => {
+    setMediaFiles(prev => [...prev, ...newFiles]);
   };
 
   const removeFile = (index: number) => {
@@ -149,76 +114,25 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
         <DialogHeader>
           <DialogTitle>Create a Post</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
-          <div>
-            <Label htmlFor="content">What's on your mind?</Label>
-            <Textarea
-              id="content"
-              placeholder="Share your thoughts..."
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              className="min-h-[100px]"
-            />
-          </div>
+        
+        <PostContentForm
+          content={content}
+          onContentChange={setContent}
+          mediaFiles={mediaFiles}
+          onFilesSelected={handleFilesSelected}
+          onRemoveFile={removeFile}
+        />
 
-          <div>
-            <Label>Add Photos or Videos</Label>
-            <div className="flex gap-2 mt-2">
-              <Button 
-                type="button" 
-                variant="outline" 
-                size="sm" 
-                className="gap-2"
-                onClick={handlePhotoClick}
-              >
-                <Image className="h-4 w-4" />
-                Photo
-              </Button>
-              <Button 
-                type="button" 
-                variant="outline" 
-                size="sm" 
-                className="gap-2"
-                onClick={handleVideoClick}
-              >
-                <Video className="h-4 w-4" />
-                Video
-              </Button>
-            </div>
-          </div>
-
-          {mediaFiles.length > 0 && (
-            <div className="space-y-2">
-              <Label>Selected Files:</Label>
-              <div className="space-y-2">
-                {mediaFiles.map((file, index) => (
-                  <div key={index} className="flex items-center justify-between p-2 bg-muted rounded">
-                    <span className="text-sm truncate">{file.name}</span>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => removeFile(index)}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setOpen(false)}>
-              Cancel
-            </Button>
-            <Button 
-              onClick={handleSubmit} 
-              disabled={isSubmitting || (!content.trim() && mediaFiles.length === 0)}
-            >
-              {isSubmitting ? 'Posting...' : 'Post'}
-            </Button>
-          </div>
+        <div className="flex justify-end gap-2">
+          <Button variant="outline" onClick={() => setOpen(false)}>
+            Cancel
+          </Button>
+          <Button 
+            onClick={handleSubmit} 
+            disabled={isSubmitting || (!content.trim() && mediaFiles.length === 0)}
+          >
+            {isSubmitting ? 'Posting...' : 'Post'}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>
