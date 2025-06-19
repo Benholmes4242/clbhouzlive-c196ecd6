@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -109,7 +110,7 @@ const MyCourses = () => {
 
   const playedCourses = userCourses?.filter(uc => uc.played) || [];
   const wishlistCourses = userCourses?.filter(uc => !uc.played) || [];
-  const top100Progress = top100Stats ? (top100Stats.played / top100Stats.total) * 100 : 0;
+  const top100Progress = top100Stats && top100Stats.total > 0 ? (top100Stats.played / top100Stats.total) * 100 : 0;
 
   return (
     <div className="space-y-6">
@@ -146,7 +147,7 @@ const MyCourses = () => {
       </div>
 
       {/* Top 100 Progress */}
-      {top100Stats && (
+      {top100Stats && top100Stats.total > 0 && (
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center justify-between mb-3">

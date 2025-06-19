@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -5,7 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Search, Filter, X } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Search, Filter, X, Upload } from 'lucide-react';
 import CourseCard from './CourseCard';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -137,13 +139,13 @@ const CourseExplorer = () => {
             </SelectContent>
           </Select>
 
-          {selectedRegion && (
+          {selectedRegion && countries && countries.length > 0 && (
             <Select value={selectedCountry} onValueChange={setSelectedCountry}>
               <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Country" />
               </SelectTrigger>
               <SelectContent>
-                {countries?.map((country) => (
+                {countries.map((country) => (
                   <SelectItem key={country} value={country}>
                     {country}
                   </SelectItem>
@@ -205,14 +207,23 @@ const CourseExplorer = () => {
           ))}
         </div>
       ) : (
-        <div className="text-center py-12">
-          <p className="text-muted-foreground text-lg">No courses found matching your criteria</p>
-          {hasActiveFilters && (
-            <Button variant="outline" onClick={clearFilters} className="mt-4">
-              Clear filters to see all courses
-            </Button>
-          )}
-        </div>
+        <Card>
+          <CardContent className="p-8 text-center">
+            <Upload className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+            <h3 className="text-lg font-semibold mb-2">No courses found</h3>
+            <p className="text-muted-foreground mb-4">
+              {hasActiveFilters 
+                ? "No courses match your current filters. Try adjusting your search criteria."
+                : "No golf courses have been added yet. Import courses to get started."
+              }
+            </p>
+            {hasActiveFilters && (
+              <Button variant="outline" onClick={clearFilters}>
+                Clear filters
+              </Button>
+            )}
+          </CardContent>
+        </Card>
       )}
     </div>
   );

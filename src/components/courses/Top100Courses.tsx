@@ -4,9 +4,10 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardContent } from '@/components/ui/card';
 import CourseCard from './CourseCard';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Trophy, Globe, Map as MapIcon } from 'lucide-react';
+import { Trophy, Globe, Map as MapIcon, Upload } from 'lucide-react';
 
 interface Course {
   id: string;
@@ -95,6 +96,16 @@ const Top100Courses = () => {
     </div>
   );
 
+  const EmptyState = ({ title, description }: { title: string; description: string }) => (
+    <Card>
+      <CardContent className="p-8 text-center">
+        <Upload className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+        <h3 className="text-lg font-semibold mb-2">{title}</h3>
+        <p className="text-muted-foreground">{description}</p>
+      </CardContent>
+    </Card>
+  );
+
   return (
     <div className="space-y-6">
       <div className="text-center">
@@ -135,9 +146,10 @@ const Top100Courses = () => {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-12">
-                <p className="text-muted-foreground">No Top 100 courses found</p>
-              </div>
+              <EmptyState 
+                title="No Top 100 courses found"
+                description="Import golf course data to see the world's top 100 courses"
+              />
             )}
           </div>
         </TabsContent>
@@ -193,9 +205,10 @@ const Top100Courses = () => {
                 </div>
               </div>
             ) : (
-              <div className="text-center py-12">
-                <p className="text-muted-foreground">No courses found for {selectedRegion}</p>
-              </div>
+              <EmptyState 
+                title={`No courses found for ${selectedRegion}`}
+                description="Import golf course data to see regional rankings"
+              />
             )}
           </div>
         </TabsContent>
