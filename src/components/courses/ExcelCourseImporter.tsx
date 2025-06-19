@@ -31,6 +31,29 @@ const ExcelCourseImporter = () => {
   const [file, setFile] = useState<File | null>(null);
   const [importResult, setImportResult] = useState<any>(null);
   const [progress, setProgress] = useState(0);
+  const [parseError, setParseError] = useState<string | null>(null);
+
+  const parseCSVLine = (line: string): string[] => {
+    const result = [];
+    let current = '';
+    let inQuotes = false;
+    
+    for (let i = 0; i < line.length; i++) {
+      const char = line[i];
+      
+      if (char === '"') {
+        inQuotes = !inQuotes;
+      } else if (char === ',' && !inQuotes) {
+        result.push(current.trim());
+        current = '';
+      } else {
+        current += char;
+      }
+    }
+    
+    result.push(current.trim());
+    return result;
+  };
 
   const parseExcelFile = async (file: File): Promise<ExcelCourseData[]> => {
     return new Promise((resolve, reject) => {
@@ -38,52 +61,82 @@ const ExcelCourseImporter = () => {
       
       reader.onload = async (e) => {
         try {
-          const data = new Uint8Array(e.target?.result as ArrayBuffer);
+          console.log('Starting to parse file:', file.name);
+          const text = e.target?.result as string;
           
-          // Simple CSV-like parsing - expecting the file to be saved as CSV
-          const text = new TextDecoder().decode(data);
-          const lines = text.split('\n').filter(line => line.trim());
+          if (!text || text.trim().length === 0) {
+            throw new Error('File is empty or could not be read');
+          }
+          
+          const lines = text.split(/\r?\n/).filter(line => line.trim());
+          console.log('Total lines found:', lines.length);
           
           if (lines.length < 2) {
             throw new Error('File must contain at least a header row and one data row');
           }
           
-          const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+          const headers = parseCSVLine(lines[0]).map(h => h.toLowerCase().replace(/[^a-z0-9]/g, '_'));
+          console.log('Headers found:', headers);
+          
           const courses: ExcelCourseData[] = [];
           
-          // Expected columns: name, country, region, continent, global_rank, regional_rank, usa_rank, description, latitude, longitude, thumbnail_image
           for (let i = 1; i < lines.length; i++) {
-            const values = lines[i].split(',').map(v => v.trim());
+            const values = parseCSVLine(lines[i]);
+            console.log(`Processing row ${i}:`, values);
             
-            if (values.length < 3) continue; // Skip invalid rows
+            if (values.length < 2) {
+              console.log(`Skipping row ${i}: insufficient columns`);
+              continue;
+            }
+            
+            const nameIndex = headers.findIndex(h => h.includes('name'));
+            const countryIndex = headers.findIndex(h => h.includes('country'));
+            const regionIndex = headers.findIndex(h => h.includes('region'));
+            const continentIndex = headers.findIndex(h => h.includes('continent'));
+            const globalRankIndex = headers.findIndex(h => h.includes('global') && h.includes('rank'));
+            const regionalRankIndex = headers.findIndex(h => h.includes('regional') && h.includes('rank'));
+            const usaRankIndex = headers.findIndex(h => h.includes('usa') && h.includes('rank'));
+            const descriptionIndex = headers.findIndex(h => h.includes('description'));
+            const latitudeIndex = headers.findIndex(h => h.includes('latitude') || h.includes('lat'));
+            const longitudeIndex = headers.findIndex(h => h.includes('longitude') || h.includes('lng') || h.includes('lon'));
+            const thumbnailIndex = headers.findIndex(h => h.includes('thumbnail') || h.includes('image'));
+            
+            const name = nameIndex >= 0 ? values[nameIndex]?.replace(/"/g, '') : '';
+            const country = countryIndex >= 0 ? values[countryIndex]?.replace(/"/g, '') : '';
+            
+            if (!name || !country) {
+              console.log(`Skipping row ${i}: missing name or country`);
+              continue;
+            }
             
             const course: ExcelCourseData = {
-              name: values[headers.indexOf('name')] || '',
-              country: values[headers.indexOf('country')] || '',
-              region: values[headers.indexOf('region')] || '',
-              continent: (values[headers.indexOf('continent')] || 'Europe') as Continent,
-              global_rank: values[headers.indexOf('global_rank')] ? parseInt(values[headers.indexOf('global_rank')]) : undefined,
-              regional_rank: values[headers.indexOf('regional_rank')] ? parseInt(values[headers.indexOf('regional_rank')]) : undefined,
-              usa_rank: values[headers.indexOf('usa_rank')] ? parseInt(values[headers.indexOf('usa_rank')]) : undefined,
-              description: values[headers.indexOf('description')] || '',
-              latitude: values[headers.indexOf('latitude')] ? parseFloat(values[headers.indexOf('latitude')]) : undefined,
-              longitude: values[headers.indexOf('longitude')] ? parseFloat(values[headers.indexOf('longitude')]) : undefined,
-              thumbnail_image: values[headers.indexOf('thumbnail_image')] || 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=400&h=300&fit=crop'
+              name,
+              country,
+              region: regionIndex >= 0 ? values[regionIndex]?.replace(/"/g, '') || '' : '',
+              continent: (continentIndex >= 0 ? values[continentIndex]?.replace(/"/g, '') || 'Europe' : 'Europe') as Continent,
+              global_rank: globalRankIndex >= 0 && values[globalRankIndex] ? parseInt(values[globalRankIndex]) : undefined,
+              regional_rank: regionalRankIndex >= 0 && values[regionalRankIndex] ? parseInt(values[regionalRankIndex]) : undefined,
+              usa_rank: usaRankIndex >= 0 && values[usaRankIndex] ? parseInt(values[usaRankIndex]) : undefined,
+              description: descriptionIndex >= 0 ? values[descriptionIndex]?.replace(/"/g, '') || '' : '',
+              latitude: latitudeIndex >= 0 && values[latitudeIndex] ? parseFloat(values[latitudeIndex]) : undefined,
+              longitude: longitudeIndex >= 0 && values[longitudeIndex] ? parseFloat(values[longitudeIndex]) : undefined,
+              thumbnail_image: thumbnailIndex >= 0 ? values[thumbnailIndex]?.replace(/"/g, '') || 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=400&h=300&fit=crop' : 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=400&h=300&fit=crop'
             };
             
-            if (course.name && course.country) {
-              courses.push(course);
-            }
+            courses.push(course);
+            console.log('Added course:', course.name);
           }
           
+          console.log('Parsed courses:', courses.length);
           resolve(courses);
         } catch (error) {
+          console.error('Parse error:', error);
           reject(error);
         }
       };
       
       reader.onerror = () => reject(new Error('Failed to read file'));
-      reader.readAsArrayBuffer(file);
+      reader.readAsText(file);
     });
   };
 
@@ -165,19 +218,41 @@ const ExcelCourseImporter = () => {
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = event.target.files?.[0];
+    console.log('File selected:', selectedFile);
+    
     if (selectedFile) {
       setFile(selectedFile);
       setImportResult(null);
       setProgress(0);
+      setParseError(null);
+      
+      // Show file info
+      toast({
+        title: "File Selected",
+        description: `Selected: ${selectedFile.name} (${(selectedFile.size / 1024).toFixed(1)} KB)`,
+      });
     }
   };
 
   const handleImport = async () => {
-    if (!file) return;
+    if (!file) {
+      toast({
+        title: "No File Selected",
+        description: "Please select a CSV file first.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    console.log('Starting import process with file:', file.name);
+    setParseError(null);
 
     try {
       const coursesData = await parseExcelFile(file);
+      console.log('Parsed data:', coursesData);
+      
       if (coursesData.length === 0) {
+        setParseError("No valid course data found in the file. Please check the format.");
         toast({
           title: "No Data Found",
           description: "No valid course data found in the file.",
@@ -189,9 +264,11 @@ const ExcelCourseImporter = () => {
       importMutation.mutate(coursesData);
     } catch (error) {
       console.error('Error parsing file:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      setParseError(errorMessage);
       toast({
         title: "File Parse Error",
-        description: "Could not parse the Excel file. Please ensure it's in the correct format.",
+        description: errorMessage,
         variant: "destructive",
       });
     }
@@ -202,10 +279,10 @@ const ExcelCourseImporter = () => {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <FileSpreadsheet className="h-5 w-5" />
-          Import Courses from Excel
+          Import Courses from CSV
         </CardTitle>
         <p className="text-sm text-muted-foreground">
-          Upload an Excel file (saved as CSV) with golf course data
+          Upload a CSV file with golf course data
         </p>
       </CardHeader>
       
@@ -214,24 +291,30 @@ const ExcelCourseImporter = () => {
           <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
             <input
               type="file"
-              accept=".csv,.xlsx,.xls"
+              accept=".csv,.txt"
               onChange={handleFileSelect}
               className="hidden"
-              id="excel-upload"
+              id="csv-upload"
             />
             <label
-              htmlFor="excel-upload"
+              htmlFor="csv-upload"
               className="cursor-pointer flex flex-col items-center gap-2"
             >
               <Upload className="h-8 w-8 text-muted-foreground" />
               <span className="text-sm font-medium">
-                {file ? file.name : 'Click to select Excel file'}
+                {file ? `Selected: ${file.name}` : 'Click to select CSV file'}
               </span>
               <span className="text-xs text-muted-foreground">
-                Accepts .csv, .xlsx, .xls files
+                Accepts .csv, .txt files
               </span>
             </label>
           </div>
+          
+          {file && (
+            <div className="text-sm text-muted-foreground text-center">
+              File size: {(file.size / 1024).toFixed(1)} KB
+            </div>
+          )}
           
           {file && (
             <Button
@@ -244,6 +327,21 @@ const ExcelCourseImporter = () => {
             </Button>
           )}
         </div>
+
+        {/* Parse Error */}
+        {parseError && (
+          <Card className="bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800">
+            <CardContent className="pt-4">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="h-5 w-5 text-red-600 mt-0.5" />
+                <div className="space-y-1">
+                  <h4 className="font-semibold text-red-900 dark:text-red-100">Parse Error</h4>
+                  <p className="text-sm text-red-800 dark:text-red-200">{parseError}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Progress */}
         {importMutation.isPending && (
@@ -283,13 +381,13 @@ const ExcelCourseImporter = () => {
             <div className="flex items-start gap-3">
               <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5" />
               <div className="space-y-1">
-                <h4 className="font-semibold text-blue-900 dark:text-blue-100">Expected Format</h4>
+                <h4 className="font-semibold text-blue-900 dark:text-blue-100">Expected CSV Format</h4>
                 <p className="text-sm text-blue-800 dark:text-blue-200">
-                  Your Excel file should have these columns: name, country, region, continent, 
+                  Your CSV file should have these columns: name, country, region, continent, 
                   global_rank, regional_rank, usa_rank, description, latitude, longitude, thumbnail_image
                 </p>
                 <p className="text-xs text-blue-700 dark:text-blue-300 mt-2">
-                  Save your Excel file as CSV format for best compatibility.
+                  The first row should contain column headers. Values can be quoted with double quotes.
                 </p>
               </div>
             </div>
