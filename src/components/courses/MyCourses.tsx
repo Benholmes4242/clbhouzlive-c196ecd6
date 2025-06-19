@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -25,6 +24,7 @@ interface UserCourse {
     continent: string;
     global_rank: number | null;
     regional_rank: number | null;
+    usa_rank: number | null;
     description: string;
     thumbnail_image: string;
     latitude: number | null;
