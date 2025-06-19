@@ -29,6 +29,16 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
     }
   };
 
+  const handlePhotoClick = () => {
+    const input = document.getElementById('image-upload') as HTMLInputElement;
+    input?.click();
+  };
+
+  const handleVideoClick = () => {
+    const input = document.getElementById('video-upload') as HTMLInputElement;
+    input?.click();
+  };
+
   const removeFile = (index: number) => {
     setMediaFiles(prev => prev.filter((_, i) => i !== index));
   };
@@ -134,34 +144,44 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
           <div>
             <Label>Add Photos or Videos</Label>
             <div className="flex gap-2 mt-2">
-              <Label htmlFor="image-upload" className="cursor-pointer">
-                <Button type="button" variant="outline" size="sm" className="gap-2">
-                  <Image className="h-4 w-4" />
-                  Photo
-                </Button>
-                <Input
-                  id="image-upload"
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handleFileChange}
-                  className="hidden"
-                />
-              </Label>
-              <Label htmlFor="video-upload" className="cursor-pointer">
-                <Button type="button" variant="outline" size="sm" className="gap-2">
-                  <Video className="h-4 w-4" />
-                  Video
-                </Button>
-                <Input
-                  id="video-upload"
-                  type="file"
-                  accept="video/*"
-                  multiple
-                  onChange={handleFileChange}
-                  className="hidden"
-                />
-              </Label>
+              <Button 
+                type="button" 
+                variant="outline" 
+                size="sm" 
+                className="gap-2"
+                onClick={handlePhotoClick}
+              >
+                <Image className="h-4 w-4" />
+                Photo
+              </Button>
+              <Button 
+                type="button" 
+                variant="outline" 
+                size="sm" 
+                className="gap-2"
+                onClick={handleVideoClick}
+              >
+                <Video className="h-4 w-4" />
+                Video
+              </Button>
+              
+              {/* Hidden file inputs */}
+              <Input
+                id="image-upload"
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleFileChange}
+                className="hidden"
+              />
+              <Input
+                id="video-upload"
+                type="file"
+                accept="video/*"
+                multiple
+                onChange={handleFileChange}
+                className="hidden"
+              />
             </div>
           </div>
 
