@@ -23,8 +23,8 @@ const Header = () => {
               className="w-auto cursor-pointer"
               style={{
                 display: "block",
-                maxHeight: "56px",
-                maxWidth: 240,
+                maxHeight: "48px",
+                maxWidth: 280,
                 objectFit: "contain"
               }}
               onClick={handleLogoClick}
