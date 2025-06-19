@@ -210,11 +210,11 @@ const CourseExplorer = () => {
         <Card>
           <CardContent className="p-8 text-center">
             <Upload className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-            <h3 className="text-lg font-semibold mb-2">No courses found</h3>
+            <h3 className="text-lg font-semibold mb-2">No golf courses found</h3>
             <p className="text-muted-foreground mb-4">
               {hasActiveFilters 
                 ? "No courses match your current filters. Try adjusting your search criteria."
-                : "No golf courses have been added yet. Import courses to get started."
+                : "No golf courses have been added yet. Use the import tools to add course data."
               }
             </p>
             {hasActiveFilters && (

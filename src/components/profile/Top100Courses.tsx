@@ -1,7 +1,10 @@
+
 import React, { useState } from 'react';
 import { Progress } from '@/components/ui/progress';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { Card, CardContent } from '@/components/ui/card';
+import { Upload } from 'lucide-react';
 import Top100CoursesModal from './Top100CoursesModal';
 import { useTop100CoursesData } from '@/hooks/useTop100CoursesData';
 
@@ -72,6 +75,44 @@ const Top100Courses: React.FC<Top100CoursesProps> = ({
     );
   }
 
+  // Check if any regions have course data
+  const hasAnyData = Object.values(regionProgress).some(progress => progress.total > 0);
+
+  if (!hasAnyData) {
+    return (
+      <section className="mt-10 px-2">
+        <div className="flex items-center gap-2 mb-3">
+          <h2 className="text-xl font-bold">Top 100 Courses</h2>
+          {isOwnProfile && (
+            <div className="flex items-center space-x-2 ml-auto">
+              <Checkbox
+                id="top100-visibility"
+                checked={isTop100Visible}
+                onCheckedChange={onVisibilityToggle}
+              />
+              <Label
+                htmlFor="top100-visibility"
+                className="text-sm text-muted-foreground cursor-pointer"
+              >
+                Show this section on my public profile
+              </Label>
+            </div>
+          )}
+        </div>
+
+        <Card>
+          <CardContent className="p-8 text-center">
+            <Upload className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+            <h3 className="text-lg font-semibold mb-2">No Top 100 course data available</h3>
+            <p className="text-muted-foreground">
+              Import golf course data to start tracking your Top 100 progress
+            </p>
+          </CardContent>
+        </Card>
+      </section>
+    );
+  }
+
   return (
     <section className="mt-10 px-2">
       <div className="flex items-center gap-2 mb-3">
@@ -95,8 +136,12 @@ const Top100Courses: React.FC<Top100CoursesProps> = ({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {regions.map((region) => {
-          const progress = regionProgress[region.key] || { played: 0, total: 100 };
+          const progress = regionProgress[region.key] || { played: 0, total: 0 };
           const percentage = progress.total > 0 ? (progress.played / progress.total) * 100 : 0;
+          
+          if (progress.total === 0) {
+            return null; // Don't show regions with no data
+          }
           
           return (
             <div

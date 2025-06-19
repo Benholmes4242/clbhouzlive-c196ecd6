@@ -204,9 +204,8 @@ const MyCourses = () => {
                 <CheckCircle className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
                 <h3 className="text-lg font-semibold mb-2">No courses played yet</h3>
                 <p className="text-muted-foreground mb-4">
-                  Start exploring and mark courses you've played
+                  Start exploring and mark courses you've played once course data is added
                 </p>
-                <Button variant="outline">Explore Courses</Button>
               </CardContent>
             </Card>
           )}
@@ -231,9 +230,8 @@ const MyCourses = () => {
                 <Target className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
                 <h3 className="text-lg font-semibold mb-2">No courses in wishlist</h3>
                 <p className="text-muted-foreground mb-4">
-                  Add courses to your wishlist to track where you want to play
+                  Add courses to your wishlist once course data is available
                 </p>
-                <Button variant="outline">Browse Courses</Button>
               </CardContent>
             </Card>
           )}
