@@ -19,20 +19,19 @@ export const useTop100CoursesList = (region: string, userId: string, isOwnProfil
       if (region === 'britain-ireland') {
         // Get all GB&I courses with regional rankings (1-100)
         query = query
-          .in('country', ['United Kingdom', 'Ireland', 'Isle of Man'])
+          .in('country', ['United Kingdom', 'Ireland'])
           .not('regional_rank', 'is', null)
           .lte('regional_rank', 100)
           .order('regional_rank', { ascending: true });
       } else if (region === 'usa') {
-        // Get all USA courses with USA rankings (1-100)
         query = query
           .eq('country', 'United States')
-          .not('usa_rank', 'is', null)
-          .order('usa_rank');
+          .not('global_rank', 'is', null)
+          .order('global_rank');
       } else if (region === 'europe') {
         query = query
           .eq('continent', 'Europe')
-          .not('country', 'in', '("United Kingdom","Ireland","Isle of Man")')
+          .not('country', 'in', '("United Kingdom","Ireland")')
           .not('global_rank', 'is', null)
           .order('global_rank');
       } else {

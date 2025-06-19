@@ -1,169 +1,114 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useQuery } from '@tanstack/react-query';
 
-interface RegionProgress {
-  [key: string]: {
-    played: number;
-    total: number;
-  };
-}
+export const useTop100CoursesData = (userId: string, isOwnProfile: boolean) => {
+  const [regionProgress, setRegionProgress] = useState<Record<string, { played: number; total: number }>>({});
 
-export const useTop100CoursesData = (userId: string, isOwnProfile: boolean = false) => {
-  const [regionProgress, setRegionProgress] = useState<RegionProgress>({});
-  const [isLoading, setIsLoading] = useState(true);
-
-  const fetchRegionProgress = async () => {
-    try {
-      // Fetch global/worldwide progress
-      const { data: globalData, error: globalError } = await supabase
-        .from('golf_courses')
+  // Query to get the user's played courses
+  const { data: playedCoursesData, isLoading } = useQuery({
+    queryKey: ['userTop100Courses', userId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('user_top100_courses')
         .select(`
-          id,
-          name,
-          user_top100_courses!left (
-            played,
-            user_id
+          course_id,
+          golf_courses (
+            id,
+            name,
+            country,
+            region,
+            continent,
+            global_rank,
+            regional_rank
           )
         `)
-        .not('global_rank', 'is', null)
-        .order('global_rank');
+        .eq('user_id', userId)
+        .eq('played', true);
 
-      if (globalError) {
-        console.error('Error fetching global courses:', globalError);
-        return;
-      }
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!userId,
+  });
 
-      // Calculate global progress
-      const globalPlayed = globalData?.filter(course => 
-        course.user_top100_courses?.some(utc => utc.user_id === userId && utc.played)
-      ).length || 0;
-
-      // Fetch Britain & Ireland progress (courses with regional_rank)
-      const { data: britainIrelandData, error: biError } = await supabase
+  // Query to get all Top 100 courses for calculating progress
+  const { data: allCoursesData } = useQuery({
+    queryKey: ['allTop100Courses'],
+    queryFn: async () => {
+      const { data, error } = await supabase
         .from('golf_courses')
-        .select(`
-          id,
-          name,
-          user_top100_courses!left (
-            played,
-            user_id
-          )
-        `)
-        .in('country', ['United Kingdom', 'Ireland', 'Isle of Man'])
-        .not('regional_rank', 'is', null)
-        .order('regional_rank');
+        .select('id, continent, country, region, global_rank, regional_rank')
+        .or('global_rank.not.is.null,regional_rank.not.is.null') // Include courses with either ranking
+        .order('global_rank', { nullsFirst: false });
 
-      if (biError) {
-        console.error('Error fetching Britain & Ireland courses:', biError);
-        return;
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  // Calculate progress for each region
+  useEffect(() => {
+    if (!allCoursesData || !playedCoursesData) return;
+
+    const playedCourseIds = new Set(
+      playedCoursesData.map(pc => pc.course_id)
+    );
+
+    const progress: Record<string, { played: number; total: number }> = {
+      'britain-ireland': { played: 0, total: 0 },
+      'usa': { played: 0, total: 0 },
+      'europe': { played: 0, total: 0 },
+      'global': { played: 0, total: 0 }
+    };
+
+    // Count total courses and played courses by region
+    allCoursesData.forEach(course => {
+      const isPlayed = playedCourseIds.has(course.id);
+      
+      // Global category includes all courses with global ranks
+      if (course.global_rank) {
+        progress.global.total++;
+        if (isPlayed) progress.global.played++;
       }
 
-      const biPlayed = britainIrelandData?.filter(course => 
-        course.user_top100_courses?.some(utc => utc.user_id === userId && utc.played)
-      ).length || 0;
-
-      // Fetch USA courses (from usa_rank)
-      const { data: usaData, error: usaError } = await supabase
-        .from('golf_courses')
-        .select(`
-          id,
-          name,
-          user_top100_courses!left (
-            played,
-            user_id
-          )
-        `)
-        .eq('country', 'United States')
-        .not('usa_rank', 'is', null)
-        .order('usa_rank');
-
-      if (usaError) {
-        console.error('Error fetching USA courses:', usaError);
-        return;
+      // Regional categorization
+      if (course.country === 'United States' && course.global_rank) {
+        progress['usa'].total++;
+        if (isPlayed) progress['usa'].played++;
+      } else if ((course.country === 'United Kingdom' || course.country === 'Ireland') && 
+                 (course.global_rank || course.regional_rank)) {
+        progress['britain-ireland'].total++;
+        if (isPlayed) progress['britain-ireland'].played++;
+      } else if (course.continent === 'Europe' && 
+                 course.country !== 'United Kingdom' && 
+                 course.country !== 'Ireland' && 
+                 course.global_rank) {
+        progress['europe'].total++;
+        if (isPlayed) progress['europe'].played++;
       }
+    });
 
-      const usaPlayed = usaData?.filter(course => 
-        course.user_top100_courses?.some(utc => utc.user_id === userId && utc.played)
-      ).length || 0;
+    setRegionProgress(progress);
+  }, [allCoursesData, playedCoursesData]);
 
-      // Fetch Europe courses (excluding UK/Ireland, from global rankings)
-      const { data: europeData, error: europeError } = await supabase
-        .from('golf_courses')
-        .select(`
-          id,
-          name,
-          user_top100_courses!left (
-            played,
-            user_id
-          )
-        `)
-        .eq('continent', 'Europe')
-        .not('country', 'in', '("United Kingdom","Ireland","Isle of Man")')
-        .not('global_rank', 'is', null)
-        .order('global_rank');
-
-      if (europeError) {
-        console.error('Error fetching Europe courses:', europeError);
-        return;
-      }
-
-      const europePlayed = europeData?.filter(course => 
-        course.user_top100_courses?.some(utc => utc.user_id === userId && utc.played)
-      ).length || 0;
-
-      setRegionProgress({
-        global: {
-          played: globalPlayed,
-          total: globalData?.length || 100
-        },
-        'britain-ireland': {
-          played: biPlayed,
-          total: britainIrelandData?.length || 100
-        },
-        usa: {
-          played: usaPlayed,
-          total: usaData?.length || 0
-        },
-        europe: {
-          played: europePlayed,
-          total: europeData?.length || 0
-        }
-      });
-
-    } catch (error) {
-      console.error('Error fetching region progress:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleVisibilityToggle = async (visible: boolean) => {
+  const handleVisibilityToggle = async (checked: boolean) => {
     if (!isOwnProfile) return;
     
-    try {
-      const { error } = await supabase
-        .from('user_profiles')
-        .update({ top100_visible: visible })
-        .eq('id', userId);
-      
-      if (error) {
-        console.error('Error updating visibility:', error);
-      }
-    } catch (error) {
-      console.error('Error updating visibility:', error);
+    const { error } = await supabase
+      .from("user_profiles")
+      .update({ top100_visible: checked })
+      .eq("id", userId);
+
+    if (error) {
+      console.error('Error updating top100 visibility:', error);
     }
   };
-
-  useEffect(() => {
-    if (userId) {
-      fetchRegionProgress();
-    }
-  }, [userId]);
 
   return {
     regionProgress,
     isLoading,
-    handleVisibilityToggle: isOwnProfile ? handleVisibilityToggle : undefined
+    handleVisibilityToggle
   };
 };
