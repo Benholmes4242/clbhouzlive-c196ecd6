@@ -98,6 +98,25 @@ const Top100CoursesModal: React.FC<Top100CoursesModalProps> = ({
         return;
       }
 
+      console.log(`Fetched ${data?.length || 0} courses for region: ${region}`);
+      
+      // Debug logging for USA region
+      if (region === 'usa') {
+        console.log('USA modal courses:');
+        data?.forEach(course => {
+          console.log(`Rank ${course.usa_rank}: ${course.name} (ID: ${course.id})`);
+        });
+        
+        // Check for missing ranks
+        const ranks = data?.map(c => c.usa_rank).sort((a, b) => a - b) || [];
+        console.log('All USA ranks found:', ranks);
+        for (let i = 1; i <= 100; i++) {
+          if (!ranks.includes(i)) {
+            console.log(`Missing USA rank in modal: ${i}`);
+          }
+        }
+      }
+
       const coursesWithPlayedStatus = data?.map(course => ({
         id: course.id,
         name: course.name,
@@ -192,41 +211,47 @@ const Top100CoursesModal: React.FC<Top100CoursesModalProps> = ({
           </div>
         ) : (
           <div className="space-y-4">
-            {courses.map((course) => (
-              <div key={course.id} className="border rounded-lg p-4 space-y-3">
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="font-bold text-lg">{getRankDisplay(course)}</span>
-                      <h3 className="font-semibold text-lg">{course.name}</h3>
+            {courses.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                No courses found for this region.
+              </div>
+            ) : (
+              courses.map((course) => (
+                <div key={course.id} className="border rounded-lg p-4 space-y-3">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="font-bold text-lg">{getRankDisplay(course)}</span>
+                        <h3 className="font-semibold text-lg">{course.name}</h3>
+                      </div>
+                      <div className="flex items-center gap-1 text-sm text-muted-foreground mb-2">
+                        <MapPin className="h-4 w-4" />
+                        <span>{course.region}, {course.country}</span>
+                      </div>
+                      <p className="text-sm text-muted-foreground">{course.description}</p>
                     </div>
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground mb-2">
-                      <MapPin className="h-4 w-4" />
-                      <span>{course.region}, {course.country}</span>
-                    </div>
-                    <p className="text-sm text-muted-foreground">{course.description}</p>
+                    
+                    {isOwnProfile && (
+                      <div className="flex items-center space-x-2 ml-4">
+                        <Checkbox
+                          checked={course.played}
+                          onCheckedChange={(checked) => 
+                            handleTogglePlayed(course.id, !!checked)
+                          }
+                        />
+                        <span className="text-sm">Played</span>
+                      </div>
+                    )}
                   </div>
                   
-                  {isOwnProfile && (
-                    <div className="flex items-center space-x-2 ml-4">
-                      <Checkbox
-                        checked={course.played}
-                        onCheckedChange={(checked) => 
-                          handleTogglePlayed(course.id, !!checked)
-                        }
-                      />
-                      <span className="text-sm">Played</span>
+                  {course.played && course.played_date && (
+                    <div className="text-sm text-muted-foreground">
+                      Played on: {format(new Date(course.played_date), 'PPP')}
                     </div>
                   )}
                 </div>
-                
-                {course.played && course.played_date && (
-                  <div className="text-sm text-muted-foreground">
-                    Played on: {format(new Date(course.played_date), 'PPP')}
-                  </div>
-                )}
-              </div>
-            ))}
+              ))
+            )}
           </div>
         )}
       </DialogContent>
