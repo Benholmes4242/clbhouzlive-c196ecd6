@@ -30,13 +30,33 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
   };
 
   const handlePhotoClick = () => {
-    const input = document.getElementById('image-upload') as HTMLInputElement;
-    input?.click();
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.multiple = true;
+    input.onchange = (e) => {
+      const target = e.target as HTMLInputElement;
+      if (target.files) {
+        const files = Array.from(target.files);
+        setMediaFiles(prev => [...prev, ...files]);
+      }
+    };
+    input.click();
   };
 
   const handleVideoClick = () => {
-    const input = document.getElementById('video-upload') as HTMLInputElement;
-    input?.click();
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'video/*';
+    input.multiple = true;
+    input.onchange = (e) => {
+      const target = e.target as HTMLInputElement;
+      if (target.files) {
+        const files = Array.from(target.files);
+        setMediaFiles(prev => [...prev, ...files]);
+      }
+    };
+    input.click();
   };
 
   const removeFile = (index: number) => {
@@ -164,24 +184,6 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
                 <Video className="h-4 w-4" />
                 Video
               </Button>
-              
-              {/* Hidden file inputs */}
-              <Input
-                id="image-upload"
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handleFileChange}
-                className="hidden"
-              />
-              <Input
-                id="video-upload"
-                type="file"
-                accept="video/*"
-                multiple
-                onChange={handleFileChange}
-                className="hidden"
-              />
             </div>
           </div>
 
