@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -59,6 +60,9 @@ const CourseExplorer = () => {
           query = query.eq('continent', 'Europe').not('country', 'in', '("United Kingdom","Ireland")');
         } else if (selectedRegion === 'USA') {
           query = query.eq('country', 'United States');
+        } else if (selectedRegion === 'Worldwide') {
+          // For worldwide, exclude USA courses ranked 44 and above
+          query = query.or('country.neq.United States,usa_rank.lte.43');
         }
         // For 'Worldwide', no filter is applied
       }
@@ -241,3 +245,4 @@ const CourseExplorer = () => {
 };
 
 export default CourseExplorer;
+
