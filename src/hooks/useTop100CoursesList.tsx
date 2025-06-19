@@ -24,12 +24,10 @@ export const useTop100CoursesList = (region: string, userId: string, isOwnProfil
           .lte('regional_rank', 100)
           .order('regional_rank', { ascending: true });
       } else if (region === 'usa') {
-        // Get all USA courses with USA rankings (1-100)
         query = query
           .eq('country', 'United States')
-          .not('usa_rank', 'is', null)
-          .lte('usa_rank', 100)
-          .order('usa_rank', { ascending: true });
+          .not('global_rank', 'is', null)
+          .order('global_rank');
       } else if (region === 'europe') {
         query = query
           .eq('continent', 'Europe')
