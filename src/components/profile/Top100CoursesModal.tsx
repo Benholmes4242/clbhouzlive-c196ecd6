@@ -68,7 +68,7 @@ const Top100CoursesModal: React.FC<Top100CoursesModalProps> = ({
           break;
         case 'britain-ireland':
           query = query
-            .in('country', ['United Kingdom', 'Ireland'])
+            .in('country', ['United Kingdom', 'Ireland', 'Isle of Man'])
             .not('regional_rank', 'is', null)
             .order('regional_rank');
           break;
@@ -81,7 +81,7 @@ const Top100CoursesModal: React.FC<Top100CoursesModalProps> = ({
         case 'europe':
           query = query
             .eq('continent', 'Europe')
-            .not('country', 'in', '("United Kingdom","Ireland")')
+            .not('country', 'in', '("United Kingdom","Ireland","Isle of Man")')
             .not('global_rank', 'is', null)
             .order('global_rank');
           break;
@@ -159,10 +159,13 @@ const Top100CoursesModal: React.FC<Top100CoursesModalProps> = ({
   }, [isOpen, region, userId]);
 
   const getRankDisplay = (course: Course) => {
-    if (region === 'global') {
+    if (region === 'britain-ireland') {
+      // For GB&I, show regional rank first, then global rank if available
+      const regionalRank = course.regional_rank ? `#${course.regional_rank}` : '';
+      const globalRank = course.global_rank ? ` (#${course.global_rank} World)` : '';
+      return regionalRank + globalRank;
+    } else if (region === 'global') {
       return course.global_rank ? `#${course.global_rank}` : '';
-    } else if (region === 'britain-ireland') {
-      return course.regional_rank ? `#${course.regional_rank}` : '';
     } else {
       return course.global_rank ? `#${course.global_rank}` : '';
     }

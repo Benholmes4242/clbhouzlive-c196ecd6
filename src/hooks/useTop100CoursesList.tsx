@@ -19,7 +19,7 @@ export const useTop100CoursesList = (region: string, userId: string, isOwnProfil
       if (region === 'britain-ireland') {
         // Get all GB&I courses with regional rankings (1-100)
         query = query
-          .in('country', ['United Kingdom', 'Ireland'])
+          .in('country', ['United Kingdom', 'Ireland', 'Isle of Man'])
           .not('regional_rank', 'is', null)
           .lte('regional_rank', 100)
           .order('regional_rank', { ascending: true });
@@ -31,7 +31,7 @@ export const useTop100CoursesList = (region: string, userId: string, isOwnProfil
       } else if (region === 'europe') {
         query = query
           .eq('continent', 'Europe')
-          .not('country', 'in', '("United Kingdom","Ireland")')
+          .not('country', 'in', '("United Kingdom","Ireland","Isle of Man")')
           .not('global_rank', 'is', null)
           .order('global_rank');
       } else {

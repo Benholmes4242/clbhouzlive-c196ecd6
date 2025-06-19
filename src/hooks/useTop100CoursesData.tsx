@@ -50,7 +50,7 @@ export const useTop100CoursesData = (userId: string, isOwnProfile: boolean = fal
             user_id
           )
         `)
-        .in('country', ['United Kingdom', 'Ireland'])
+        .in('country', ['United Kingdom', 'Ireland', 'Isle of Man'])
         .not('regional_rank', 'is', null)
         .order('regional_rank');
 
@@ -63,7 +63,7 @@ export const useTop100CoursesData = (userId: string, isOwnProfile: boolean = fal
         course.user_top100_courses?.some(utc => utc.user_id === userId && utc.played)
       ).length || 0;
 
-      // Fetch USA courses
+      // Fetch USA courses (from global rankings)
       const { data: usaData, error: usaError } = await supabase
         .from('golf_courses')
         .select(`
@@ -87,7 +87,7 @@ export const useTop100CoursesData = (userId: string, isOwnProfile: boolean = fal
         course.user_top100_courses?.some(utc => utc.user_id === userId && utc.played)
       ).length || 0;
 
-      // Fetch Europe courses (excluding UK/Ireland)
+      // Fetch Europe courses (excluding UK/Ireland, from global rankings)
       const { data: europeData, error: europeError } = await supabase
         .from('golf_courses')
         .select(`
@@ -99,7 +99,7 @@ export const useTop100CoursesData = (userId: string, isOwnProfile: boolean = fal
           )
         `)
         .eq('continent', 'Europe')
-        .not('country', 'in', '("United Kingdom","Ireland")')
+        .not('country', 'in', '("United Kingdom","Ireland","Isle of Man")')
         .not('global_rank', 'is', null)
         .order('global_rank');
 
@@ -119,7 +119,7 @@ export const useTop100CoursesData = (userId: string, isOwnProfile: boolean = fal
         },
         'britain-ireland': {
           played: biPlayed,
-          total: britainIrelandData?.length || 0
+          total: britainIrelandData?.length || 100
         },
         usa: {
           played: usaPlayed,
