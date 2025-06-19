@@ -63,7 +63,7 @@ export const useTop100CoursesData = (userId: string, isOwnProfile: boolean = fal
         course.user_top100_courses?.some(utc => utc.user_id === userId && utc.played)
       ).length || 0;
 
-      // Fetch USA courses (from global rankings)
+      // Fetch USA courses (from usa_rank)
       const { data: usaData, error: usaError } = await supabase
         .from('golf_courses')
         .select(`
@@ -75,8 +75,8 @@ export const useTop100CoursesData = (userId: string, isOwnProfile: boolean = fal
           )
         `)
         .eq('country', 'United States')
-        .not('global_rank', 'is', null)
-        .order('global_rank');
+        .not('usa_rank', 'is', null)
+        .order('usa_rank');
 
       if (usaError) {
         console.error('Error fetching USA courses:', usaError);

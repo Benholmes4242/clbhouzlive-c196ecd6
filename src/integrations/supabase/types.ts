@@ -25,6 +25,7 @@ export type Database = {
           thumbnail_image: string | null
           top100_url: string | null
           updated_at: string
+          usa_rank: number | null
           website_url: string | null
         }
         Insert: {
@@ -42,6 +43,7 @@ export type Database = {
           thumbnail_image?: string | null
           top100_url?: string | null
           updated_at?: string
+          usa_rank?: number | null
           website_url?: string | null
         }
         Update: {
@@ -59,6 +61,7 @@ export type Database = {
           thumbnail_image?: string | null
           top100_url?: string | null
           updated_at?: string
+          usa_rank?: number | null
           website_url?: string | null
         }
         Relationships: []
