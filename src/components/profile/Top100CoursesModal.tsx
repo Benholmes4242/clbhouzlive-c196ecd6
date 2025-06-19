@@ -17,7 +17,6 @@ interface Course {
   description: string;
   global_rank?: number;
   regional_rank?: number;
-  usa_rank?: number;
   played?: boolean;
   played_date?: string;
 }
@@ -55,7 +54,6 @@ const Top100CoursesModal: React.FC<Top100CoursesModalProps> = ({
           description,
           global_rank,
           regional_rank,
-          usa_rank,
           user_top100_courses!left (
             played,
             played_date,
@@ -77,8 +75,8 @@ const Top100CoursesModal: React.FC<Top100CoursesModalProps> = ({
         case 'usa':
           query = query
             .eq('country', 'United States')
-            .not('usa_rank', 'is', null)
-            .order('usa_rank');
+            .not('global_rank', 'is', null)
+            .order('global_rank');
           break;
         case 'europe':
           query = query
@@ -106,7 +104,6 @@ const Top100CoursesModal: React.FC<Top100CoursesModalProps> = ({
         description: course.description,
         global_rank: course.global_rank,
         regional_rank: course.regional_rank,
-        usa_rank: course.usa_rank,
         played: course.user_top100_courses?.some(utc => utc.user_id === userId && utc.played) || false,
         played_date: course.user_top100_courses?.find(utc => utc.user_id === userId)?.played_date
       })) || [];
@@ -167,11 +164,6 @@ const Top100CoursesModal: React.FC<Top100CoursesModalProps> = ({
       const regionalRank = course.regional_rank ? `#${course.regional_rank}` : '';
       const globalRank = course.global_rank ? ` (#${course.global_rank} World)` : '';
       return regionalRank + globalRank;
-    } else if (region === 'usa') {
-      // For USA, show USA rank first, then global rank if available
-      const usaRank = course.usa_rank ? `#${course.usa_rank}` : '';
-      const globalRank = course.global_rank ? ` (#${course.global_rank} World)` : '';
-      return usaRank + globalRank;
     } else if (region === 'global') {
       return course.global_rank ? `#${course.global_rank}` : '';
     } else {
