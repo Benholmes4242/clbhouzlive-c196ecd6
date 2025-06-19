@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -26,7 +27,7 @@ interface Course {
 const Top100Courses = () => {
   const [selectedRegion, setSelectedRegion] = useState<string>('');
 
-  // Global Top 100
+  // Global Top 100 - only courses with actual global rankings 1-100
   const { data: globalTop100, isLoading: loadingGlobal } = useQuery({
     queryKey: ['global-top-100'],
     queryFn: async () => {
@@ -34,6 +35,7 @@ const Top100Courses = () => {
         .from('golf_courses')
         .select('*')
         .not('global_rank', 'is', null)
+        .gte('global_rank', 1)
         .lte('global_rank', 100)
         .order('global_rank', { ascending: true });
 
