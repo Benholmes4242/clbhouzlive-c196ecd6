@@ -57,14 +57,14 @@ const Top100Courses = () => {
       if (selectedRegion === 'Britain & Ireland') {
         // Show all GB&I courses ranked 1-100 by regional rank
         query = query
-          .in('country', ['United Kingdom', 'Ireland'])
+          .in('country', ['England', 'Scotland', 'Wales', 'Northern Ireland', 'Ireland', 'Isle of Man'])
           .not('regional_rank', 'is', null)
           .lte('regional_rank', 100)
           .order('regional_rank', { ascending: true });
       } else if (selectedRegion === 'Europe') {
         query = query
           .eq('continent', 'Europe')
-          .not('country', 'in', '("United Kingdom","Ireland")')
+          .not('country', 'in', '("England","Scotland","Wales","Northern Ireland","Ireland","Isle of Man")')
           .not('global_rank', 'is', null)
           .order('global_rank', { ascending: true });
       } else if (selectedRegion === 'USA') {
@@ -73,7 +73,7 @@ const Top100Courses = () => {
           .eq('country', 'United States')
           .not('usa_rank', 'is', null)
           .lte('usa_rank', 100)
-          .order('usa_rank', { ascending: true }); // Changed from global_rank to usa_rank
+          .order('usa_rank', { ascending: true });
       }
 
       const { data, error } = await query.limit(100);

@@ -1,5 +1,4 @@
 
-
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -55,16 +54,15 @@ const CourseExplorer = () => {
 
       if (selectedRegion) {
         if (selectedRegion === 'Britain & Ireland') {
-          query = query.in('country', ['United Kingdom', 'Ireland']);
+          query = query.in('country', ['England', 'Scotland', 'Wales', 'Northern Ireland', 'Ireland', 'Isle of Man']);
         } else if (selectedRegion === 'Europe') {
-          query = query.eq('continent', 'Europe').not('country', 'in', '("United Kingdom","Ireland")');
+          query = query.eq('continent', 'Europe').not('country', 'in', '("England","Scotland","Wales","Northern Ireland","Ireland","Isle of Man")');
         } else if (selectedRegion === 'USA') {
           query = query.eq('country', 'United States');
         } else if (selectedRegion === 'Worldwide') {
           // For worldwide, exclude USA courses ranked 44 and above
           query = query.or('country.neq.United States,usa_rank.lte.43');
         }
-        // For 'Worldwide', no filter is applied
       }
 
       if (selectedCountry) {
@@ -100,9 +98,9 @@ const CourseExplorer = () => {
 
       if (selectedRegion) {
         if (selectedRegion === 'Britain & Ireland') {
-          query = query.in('country', ['United Kingdom', 'Ireland']);
+          query = query.in('country', ['England', 'Scotland', 'Wales', 'Northern Ireland', 'Ireland', 'Isle of Man']);
         } else if (selectedRegion === 'Europe') {
-          query = query.eq('continent', 'Europe').not('country', 'in', '("United Kingdom","Ireland")');
+          query = query.eq('continent', 'Europe').not('country', 'in', '("England","Scotland","Wales","Northern Ireland","Ireland","Isle of Man")');
         } else if (selectedRegion === 'USA') {
           query = query.eq('country', 'United States');
         }
@@ -245,4 +243,3 @@ const CourseExplorer = () => {
 };
 
 export default CourseExplorer;
-
