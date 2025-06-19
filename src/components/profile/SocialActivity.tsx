@@ -1,8 +1,10 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MoreHorizontal, Heart, MessageCircle, Share, Plus } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import CreatePostDialog from '@/components/posts/CreatePostDialog';
 
 interface ActivityPost {
   id: string;
@@ -13,6 +15,12 @@ interface ActivityPost {
   comments: number;
   shares: number;
   timeAgo: string;
+  created_at?: string;
+  post_media?: Array<{
+    id: string;
+    media_type: 'image' | 'video';
+    media_url: string;
+  }>;
 }
 
 interface SocialActivityProps {
@@ -30,28 +38,57 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
   onVisibilityToggle,
   profileDisplayName
 }) => {
-  // Mock data for now - in a real app this would come from the backend
-  const mockPosts: ActivityPost[] = [
-    {
-      id: '1',
-      type: 'post',
-      content: 'Just had an amazing round at Augusta National! The greens were in perfect condition. What a privilege to play such an iconic course.',
-      image: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=200&fit=crop',
-      likes: 24,
-      comments: 8,
-      shares: 3,
-      timeAgo: '2d'
-    },
-    {
-      id: '2',
-      type: 'post', 
-      content: 'Working on my short game this week. Here are 3 tips that have really helped improve my chipping around the greens...',
-      likes: 15,
-      comments: 12,
-      shares: 7,
-      timeAgo: '1w'
+  const [posts, setPosts] = useState<ActivityPost[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchUserPosts = async () => {
+    if (!userId) return;
+
+    try {
+      const { data: postsData, error } = await supabase
+        .from('posts')
+        .select(`
+          id,
+          content,
+          created_at,
+          post_media (
+            id,
+            media_type,
+            media_url
+          )
+        `)
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching user posts:', error);
+        return;
+      }
+
+      const formattedPosts = postsData.map(post => ({
+        id: post.id,
+        type: 'post' as const,
+        content: post.content || '',
+        likes: 0, // Would need a likes table to track this
+        comments: 0, // Would need a comments table to track this
+        shares: 0, // Would need a shares table to track this
+        timeAgo: new Date(post.created_at).toLocaleDateString(),
+        created_at: post.created_at,
+        post_media: post.post_media,
+        image: post.post_media?.[0]?.media_type === 'image' ? post.post_media[0].media_url : undefined
+      }));
+
+      setPosts(formattedPosts);
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  useEffect(() => {
+    fetchUserPosts();
+  }, [userId]);
 
   // If this is not the user's own profile and activity is not visible, don't render anything
   if (!isOwnProfile && !activityVisible) {
@@ -74,19 +111,16 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
         <div className="flex items-center gap-2">
           <h2 className="text-lg font-semibold">Activity</h2>
           <span className="text-sm text-muted-foreground">
-            {mockPosts.length} posts
+            {posts.length} posts
           </span>
         </div>
         {isOwnProfile && (
-          <Button variant="outline" size="sm" className="gap-2">
-            <Plus className="h-4 w-4" />
-            Create a post
-          </Button>
+          <CreatePostDialog onPostCreated={fetchUserPosts} />
         )}
       </div>
 
       <div className="space-y-4">
-        {mockPosts.map((post) => (
+        {posts.map((post) => (
           <Card key={post.id} className="p-4">
             <div className="flex justify-between items-start mb-3">
               <div className="flex items-center gap-2">
@@ -100,13 +134,25 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
 
             <p className="text-sm mb-3">{post.content}</p>
 
-            {post.image && (
-              <div className="mb-3">
-                <img
-                  src={post.image}
-                  alt="Post content"
-                  className="w-full h-48 object-cover rounded-lg"
-                />
+            {post.post_media && post.post_media.length > 0 && (
+              <div className="mb-3 space-y-2">
+                {post.post_media.map((media) => (
+                  <div key={media.id}>
+                    {media.media_type === 'image' ? (
+                      <img
+                        src={media.media_url}
+                        alt="Post content"
+                        className="w-full h-48 object-cover rounded-lg"
+                      />
+                    ) : (
+                      <video
+                        src={media.media_url}
+                        controls
+                        className="w-full h-48 object-cover rounded-lg"
+                      />
+                    )}
+                  </div>
+                ))}
               </div>
             )}
 
@@ -129,11 +175,11 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
           </Card>
         ))}
 
-        <div className="text-center">
-          <Button variant="ghost" className="text-sm text-muted-foreground">
-            Show all posts →
-          </Button>
-        </div>
+        {posts.length === 0 && !loading && (
+          <div className="text-center py-8">
+            <p className="text-muted-foreground">No posts yet.</p>
+          </div>
+        )}
       </div>
     </div>
   );

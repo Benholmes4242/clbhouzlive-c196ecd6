@@ -1,8 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import PostCard from './feed/PostCard';
+import UserPost from './posts/UserPost';
 import LoadingSkeleton from './feed/LoadingSkeleton';
+import { useUserPosts } from '@/hooks/useUserPosts';
 
 interface VideoPost {
   id: string;
@@ -31,10 +32,10 @@ interface VideoPost {
 }
 
 const TrendingFeed = () => {
-  const [posts, setPosts] = useState<VideoPost[]>([]);
+  const [videoPosts, setVideoPosts] = useState<VideoPost[]>([]);
   const [loading, setLoading] = useState(true);
+  const { posts: userPosts, loading: userPostsLoading, refetch: refetchUserPosts } = useUserPosts();
 
-  // Static posts for now (original content)
   const staticPosts: VideoPost[] = [
     {
       id: '1',
@@ -125,24 +126,35 @@ const TrendingFeed = () => {
       
       // Combine all posts and sort by recency
       const allPosts = [...staticPosts, ...youtubeVideos, ...friendVideos];
-      setPosts(allPosts);
+      setVideoPosts(allPosts);
       setLoading(false);
     };
 
     loadContent();
   }, []);
 
-  if (loading) {
+  if (loading || userPostsLoading) {
     return <LoadingSkeleton />;
   }
 
+  // Combine user posts and video posts, sort by creation time
+  const allContent = [
+    ...userPosts.map(post => ({ ...post, type: 'user_post' })),
+    ...videoPosts
+  ].sort((a, b) => {
+    const dateA = new Date(a.created_at || a.timeAgo || '0').getTime();
+    const dateB = new Date(b.created_at || b.timeAgo || '0').getTime();
+    return dateB - dateA;
+  });
+
   return (
     <div className="space-y-6 pb-20">
-      {posts.map((post) => (
-        <PostCard 
-          key={post.id} 
-          post={post}
-        />
+      {allContent.map((item) => (
+        item.type === 'user_post' ? (
+          <UserPost key={item.id} post={item} />
+        ) : (
+          <PostCard key={item.id} post={item} />
+        )
       ))}
     </div>
   );
