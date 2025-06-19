@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -37,8 +36,16 @@ const CourseExplorer = () => {
     queryFn: async () => {
       let query = supabase
         .from('golf_courses')
-        .select('*')
-        .order('global_rank', { ascending: true, nullsFirst: false });
+        .select('*');
+
+      // Set initial ordering based on region
+      if (selectedRegion === 'USA') {
+        query = query.order('usa_rank', { ascending: true, nullsFirst: false });
+      } else if (selectedRegion === 'Britain & Ireland') {
+        query = query.order('regional_rank', { ascending: true, nullsFirst: false });
+      } else {
+        query = query.order('global_rank', { ascending: true, nullsFirst: false });
+      }
 
       if (searchTerm) {
         query = query.or(`name.ilike.%${searchTerm}%,country.ilike.%${searchTerm}%,region.ilike.%${searchTerm}%`);

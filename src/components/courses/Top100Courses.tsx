@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -67,12 +66,12 @@ const Top100Courses = () => {
           .not('global_rank', 'is', null)
           .order('global_rank', { ascending: true });
       } else if (selectedRegion === 'USA') {
-        // Show USA Top 100 courses ranked by usa_rank
+        // Show USA Top 100 courses ranked by usa_rank (not global_rank)
         query = query
           .eq('country', 'United States')
           .not('usa_rank', 'is', null)
           .lte('usa_rank', 100)
-          .order('usa_rank', { ascending: true });
+          .order('usa_rank', { ascending: true }); // Changed from global_rank to usa_rank
       }
 
       const { data, error } = await query.limit(100);
