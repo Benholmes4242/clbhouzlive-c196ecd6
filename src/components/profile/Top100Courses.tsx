@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Progress } from '@/components/ui/progress';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -29,7 +28,7 @@ const Top100Courses: React.FC<Top100CoursesProps> = ({
   const regions = [
     { 
       key: 'global', 
-      name: 'World Top 100',
+      name: 'Worldwide Top 100',
       description: 'Top 100 courses worldwide'
     },
     { 
