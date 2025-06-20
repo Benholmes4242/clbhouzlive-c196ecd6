@@ -3,11 +3,25 @@ import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import CourseExplorer from './CourseExplorer';
 import MyCourses from './MyCourses';
-import CourseScraper from './CourseScraper';
-import BulkCourseImporter from './BulkCourseImporter';
-import ExcelCourseImporter from './ExcelCourseImporter';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
+import { Card, CardContent } from '@/components/ui/card';
+import { User } from 'lucide-react';
 
 const CoursesContent = () => {
+  const { user } = useSupabaseSession();
+  const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('explore');
+
+  const handleMyCoursesClick = () => {
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
+    setActiveTab('my-courses');
+  };
+
   return (
     <div className="space-y-6">
       <div className="text-center">
@@ -17,13 +31,10 @@ const CoursesContent = () => {
         </p>
       </div>
 
-      <Tabs defaultValue="explore" className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="explore">Explore</TabsTrigger>
-          <TabsTrigger value="my-courses">My Courses</TabsTrigger>
-          <TabsTrigger value="scraper">Web Scraper</TabsTrigger>
-          <TabsTrigger value="bulk-import">Bulk Import</TabsTrigger>
-          <TabsTrigger value="excel-import">Excel Import</TabsTrigger>
+          <TabsTrigger value="my-courses" onClick={handleMyCoursesClick}>My Courses</TabsTrigger>
         </TabsList>
 
         <TabsContent value="explore" className="mt-6">
@@ -31,19 +42,26 @@ const CoursesContent = () => {
         </TabsContent>
 
         <TabsContent value="my-courses" className="mt-6">
-          <MyCourses />
-        </TabsContent>
-
-        <TabsContent value="scraper" className="mt-6">
-          <CourseScraper />
-        </TabsContent>
-
-        <TabsContent value="bulk-import" className="mt-6">
-          <BulkCourseImporter />
-        </TabsContent>
-
-        <TabsContent value="excel-import" className="mt-6">
-          <ExcelCourseImporter />
+          {user ? (
+            <MyCourses />
+          ) : (
+            <Card>
+              <CardContent className="p-8 text-center">
+                <User className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                <h3 className="text-lg font-semibold mb-2">Sign in to track your courses</h3>
+                <p className="text-muted-foreground mb-4">
+                  Create an account to track which courses you've played and manage your golf journey
+                </p>
+                <Button 
+                  onClick={() => navigate('/auth')}
+                  className="text-white hover:opacity-90"
+                  style={{ backgroundColor: '#322F30' }}
+                >
+                  Sign In
+                </Button>
+              </CardContent>
+            </Card>
+          )}
         </TabsContent>
       </Tabs>
     </div>
