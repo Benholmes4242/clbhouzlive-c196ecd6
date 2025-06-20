@@ -1,6 +1,7 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import { Play, Pause, Maximize2 } from 'lucide-react';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 
 interface PostContentProps {
   content: {
@@ -8,6 +9,7 @@ interface PostContentProps {
     description: string;
     thumbnail?: string;
     image?: string;
+    images?: string[]; // Add support for multiple images
     duration?: string;
     videoUrl?: string;
     youtubeId?: string;
@@ -51,6 +53,16 @@ const PostContent = ({ content, onVideoClick }: PostContentProps) => {
     // Try different quality options in order of preference
     return `https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg`;
   };
+
+  // Get all images for carousel
+  const getAllImages = () => {
+    const images = [];
+    if (content.image) images.push(content.image);
+    if (content.images) images.push(...content.images);
+    return images;
+  };
+
+  const allImages = getAllImages();
 
   return (
     <>
@@ -152,13 +164,35 @@ const PostContent = ({ content, onVideoClick }: PostContentProps) => {
               </div>
             ) : null}
           </div>
-        ) : (
+        ) : allImages.length > 1 ? (
+          // Multiple images - use carousel
+          <Carousel className="w-full">
+            <CarouselContent>
+              {allImages.map((imageUrl, index) => (
+                <CarouselItem key={index}>
+                  <img
+                    src={imageUrl}
+                    alt={`Post content ${index + 1}`}
+                    className="w-full h-80 object-cover"
+                  />
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            {allImages.length > 1 && (
+              <>
+                <CarouselPrevious className="left-2" />
+                <CarouselNext className="right-2" />
+              </>
+            )}
+          </Carousel>
+        ) : allImages.length === 1 ? (
+          // Single image
           <img
-            src={content.image}
+            src={allImages[0]}
             alt="Post content"
             className="w-full h-80 object-cover"
           />
-        )}
+        ) : null}
       </div>
     </>
   );

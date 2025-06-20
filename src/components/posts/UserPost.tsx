@@ -13,6 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import EditPostDialog from './EditPostDialog';
 
 interface PostMedia {
@@ -150,28 +151,60 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
 
           {/* Post Media */}
           {post.post_media && post.post_media.length > 0 && (
-            <div className="space-y-2 mb-3">
-              {post.post_media.map((media) => (
-                <div key={media.id} className="rounded-lg overflow-hidden">
-                  {media.media_type === 'image' ? (
+            <div className="mb-3">
+              {post.post_media.length > 1 ? (
+                // Multiple media items - use carousel
+                <Carousel className="w-full">
+                  <CarouselContent>
+                    {post.post_media.map((media) => (
+                      <CarouselItem key={media.id}>
+                        <div className="rounded-lg overflow-hidden">
+                          {media.media_type === 'image' ? (
+                            <img
+                              src={media.media_url}
+                              alt="Post content"
+                              className="w-full h-80 object-cover"
+                            />
+                          ) : (
+                            <video
+                              src={media.media_url}
+                              controls
+                              preload="metadata"
+                              className="w-full h-80 object-cover"
+                              poster={`${media.media_url}#t=0.1`}
+                            >
+                              Your browser does not support the video tag.
+                            </video>
+                          )}
+                        </div>
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  <CarouselPrevious className="left-2" />
+                  <CarouselNext className="right-2" />
+                </Carousel>
+              ) : (
+                // Single media item
+                <div className="rounded-lg overflow-hidden">
+                  {post.post_media[0].media_type === 'image' ? (
                     <img
-                      src={media.media_url}
+                      src={post.post_media[0].media_url}
                       alt="Post content"
                       className="w-full h-80 object-cover"
                     />
                   ) : (
                     <video
-                      src={media.media_url}
+                      src={post.post_media[0].media_url}
                       controls
                       preload="metadata"
                       className="w-full h-80 object-cover"
-                      poster={`${media.media_url}#t=0.1`}
+                      poster={`${post.post_media[0].media_url}#t=0.1`}
                     >
                       Your browser does not support the video tag.
                     </video>
                   )}
                 </div>
-              ))}
+              )}
             </div>
           )}
 
