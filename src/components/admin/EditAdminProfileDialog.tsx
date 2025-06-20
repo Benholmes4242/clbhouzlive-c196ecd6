@@ -8,13 +8,20 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Loader2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Loader2, Clock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import AdminRoleDropdown from './AdminRoleDropdown';
 
 interface AdminProfile {
   id: string;
@@ -44,6 +51,12 @@ const EditAdminProfileDialog = ({
   const [firstName, setFirstName] = useState(profile.first_name);
   const [lastName, setLastName] = useState(profile.last_name);
   const [email, setEmail] = useState(profile.email);
+  const [selectedRole, setSelectedRole] = useState(() => {
+    if (profile.temp_admin_expires && new Date(profile.temp_admin_expires) > new Date()) {
+      return 'temp_admin';
+    }
+    return profile.role || 'admin';
+  });
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
@@ -59,7 +72,8 @@ const EditAdminProfileDialog = ({
 
     setLoading(true);
     try {
-      const { error } = await supabase
+      // Update basic profile info
+      const { error: profileError } = await supabase
         .from('admin_profiles')
         .update({
           first_name: firstName.trim(),
@@ -69,7 +83,41 @@ const EditAdminProfileDialog = ({
         })
         .eq('id', profile.id);
 
-      if (error) throw error;
+      if (profileError) throw profileError;
+
+      // Update role if changed
+      const currentRole = profile.temp_admin_expires && new Date(profile.temp_admin_expires) > new Date() 
+        ? 'temp_admin' 
+        : profile.role || 'admin';
+
+      if (selectedRole !== currentRole) {
+        let updateData: any = {};
+
+        if (selectedRole === 'temp_admin') {
+          // Set temporary admin for 24 hours
+          const expiresAt = new Date();
+          expiresAt.setHours(expiresAt.getHours() + 24);
+          
+          updateData = {
+            role: 'admin',
+            temp_admin_expires: expiresAt.toISOString(),
+            updated_at: new Date().toISOString()
+          };
+        } else {
+          updateData = {
+            role: selectedRole,
+            temp_admin_expires: null,
+            updated_at: new Date().toISOString()
+          };
+        }
+
+        const { error: roleError } = await supabase
+          .from('admin_profiles')
+          .update(updateData)
+          .eq('id', profile.id);
+
+        if (roleError) throw roleError;
+      }
 
       toast({
         title: "Success",
@@ -87,6 +135,19 @@ const EditAdminProfileDialog = ({
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const getRoleDisplay = (role: string) => {
+    switch (role) {
+      case 'admin':
+        return 'Full Admin';
+      case 'review_only':
+        return 'Read Only Admin';
+      case 'temp_admin':
+        return 'Temporary Admin';
+      default:
+        return 'Full Admin';
     }
   };
 
@@ -139,11 +200,41 @@ const EditAdminProfileDialog = ({
               Role
             </Label>
             <div className="col-span-3">
-              <AdminRoleDropdown 
-                profile={profile}
-                currentUserId={currentUserId}
-                onRoleChanged={onProfileUpdated}
-              />
+              {profile.user_id === currentUserId ? (
+                <Badge variant="default">
+                  {getRoleDisplay(selectedRole)}
+                  {selectedRole === 'temp_admin' && profile.temp_admin_expires && (
+                    <span className="ml-2 flex items-center">
+                      <Clock className="h-3 w-3 mr-1" />
+                      {Math.ceil((new Date(profile.temp_admin_expires).getTime() - new Date().getTime()) / (1000 * 60 * 60))}h left
+                    </span>
+                  )}
+                </Badge>
+              ) : (
+                <div className="flex items-center space-x-2">
+                  <Select
+                    value={selectedRole}
+                    onValueChange={setSelectedRole}
+                    disabled={loading}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="admin">Full Admin</SelectItem>
+                      <SelectItem value="review_only">Read Only Admin</SelectItem>
+                      <SelectItem value="temp_admin">Temporary Admin</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  
+                  {selectedRole === 'temp_admin' && profile.temp_admin_expires && (
+                    <Badge variant="outline" className="bg-yellow-50 text-xs">
+                      <Clock className="h-3 w-3 mr-1" />
+                      {Math.ceil((new Date(profile.temp_admin_expires).getTime() - new Date().getTime()) / (1000 * 60 * 60))}h left
+                    </Badge>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
