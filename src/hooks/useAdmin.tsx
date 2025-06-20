@@ -18,34 +18,54 @@ interface AdminUser {
 }
 
 export const useAdmin = () => {
-  const { user } = useSupabaseSession();
+  const { user, loading: sessionLoading } = useSupabaseSession();
   const [users, setUsers] = useState<AdminUser[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+
+  console.log('useAdmin hook - user:', !!user, 'sessionLoading:', sessionLoading);
 
   // Check if current user is admin
   const checkAdminStatus = async () => {
     if (!user) {
+      console.log('No user, setting isAdmin to false');
       setIsAdmin(false);
+      setLoading(false);
       return;
     }
 
-    const { data, error } = await supabase.rpc('is_admin');
-    if (!error) {
-      setIsAdmin(data || false);
+    console.log('Checking admin status for user:', user.id);
+    try {
+      const { data, error } = await supabase.rpc('is_admin');
+      if (error) {
+        console.error('Error checking admin status:', error);
+        setIsAdmin(false);
+      } else {
+        console.log('Admin status result:', data);
+        setIsAdmin(data || false);
+      }
+    } catch (error) {
+      console.error('Exception checking admin status:', error);
+      setIsAdmin(false);
     }
+    setLoading(false);
   };
 
   // Fetch all users (admin only)
   const fetchUsers = async () => {
-    if (!isAdmin) return;
+    if (!isAdmin) {
+      console.log('User is not admin, skipping user fetch');
+      return;
+    }
     
+    console.log('Fetching users for admin dashboard');
     setLoading(true);
     try {
       const { data, error } = await supabase.rpc('get_all_users_admin');
       if (error) {
         console.error('Error fetching users:', error);
       } else {
+        console.log('Fetched users:', data?.length || 0);
         setUsers(data || []);
       }
     } catch (error) {
@@ -97,19 +117,23 @@ export const useAdmin = () => {
     }
   };
 
+  // Check admin status when user changes or session loading completes
   useEffect(() => {
-    checkAdminStatus();
-  }, [user]);
+    if (!sessionLoading) {
+      checkAdminStatus();
+    }
+  }, [user, sessionLoading]);
 
+  // Fetch users when admin status is confirmed
   useEffect(() => {
-    if (isAdmin) {
+    if (isAdmin && !loading) {
       fetchUsers();
     }
   }, [isAdmin]);
 
   return {
     users,
-    loading,
+    loading: loading || sessionLoading,
     isAdmin,
     fetchUsers,
     assignRole,

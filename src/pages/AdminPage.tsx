@@ -10,15 +10,18 @@ import AdminLoading from '@/components/admin/AdminLoading';
 
 const AdminPage = () => {
   const navigate = useNavigate();
-  const { user } = useSupabaseSession();
-  const { users, loading, isAdmin, assignRole, removeRole } = useAdmin();
+  const { user, loading: sessionLoading } = useSupabaseSession();
+  const { users, loading: adminLoading, isAdmin, assignRole, removeRole } = useAdmin();
 
-  // Redirect if not logged in
+  console.log('AdminPage render - user:', !!user, 'sessionLoading:', sessionLoading, 'isAdmin:', isAdmin, 'adminLoading:', adminLoading);
+
+  // Don't redirect immediately, wait for session to load
   React.useEffect(() => {
-    if (!user) {
+    if (!sessionLoading && !user) {
+      console.log('No user found after session loaded, redirecting to auth');
       navigate('/auth');
     }
-  }, [user, navigate]);
+  }, [user, sessionLoading, navigate]);
 
   const handleRoleChange = async (userId: string, newRole: string) => {
     if (newRole === 'none') {
@@ -31,8 +34,8 @@ const AdminPage = () => {
     }
   };
 
-  // Show loading state
-  if (loading) {
+  // Show loading state while session or admin status is loading
+  if (sessionLoading || adminLoading) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
@@ -43,7 +46,7 @@ const AdminPage = () => {
     );
   }
 
-  // Show access denied if not admin
+  // Show access denied if not admin (but only after loading is complete)
   if (!isAdmin) {
     return (
       <div className="min-h-screen bg-background">
