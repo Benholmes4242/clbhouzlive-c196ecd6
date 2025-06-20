@@ -18,6 +18,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface AdminUser {
   id: string;
@@ -40,11 +41,46 @@ interface UserManagementProps {
 
 const UserManagement: React.FC<UserManagementProps> = ({ users, onRoleChange }) => {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [localUsers, setLocalUsers] = useState<AdminUser[]>(users);
+
+  // Update local users when props change
+  React.useEffect(() => {
+    setLocalUsers(users);
+  }, [users]);
 
   const handleRoleChange = async (userId: string, newRole: string) => {
     setActionLoading(userId);
-    await onRoleChange(userId, newRole);
-    setActionLoading(null);
+    
+    try {
+      // Optimistically update the local state
+      setLocalUsers(prevUsers => 
+        prevUsers.map(user => 
+          user.id === userId 
+            ? { ...user, role: newRole === 'none' ? null : newRole as 'admin' | 'moderator' | 'user' } 
+            : user
+        )
+      );
+
+      // Handle role changes directly here instead of using the hook
+      if (newRole === 'none') {
+        // Remove all roles
+        await supabase
+          .from('user_roles')
+          .delete()
+          .eq('user_id', userId);
+      } else {
+        // Upsert the new role
+        await supabase
+          .from('user_roles')
+          .upsert({ user_id: userId, role: newRole }, { onConflict: 'user_id,role' });
+      }
+    } catch (error) {
+      console.error('Error updating role:', error);
+      // Revert the optimistic update on error
+      setLocalUsers(users);
+    } finally {
+      setActionLoading(null);
+    }
   };
 
   const getRoleBadgeVariant = (role: string | null) => {
@@ -75,7 +111,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ users, onRoleChange }) 
             </TableRow>
           </TableHeader>
           <TableBody>
-            {users.map((user) => (
+            {localUsers.map((user) => (
               <TableRow key={user.id}>
                 <TableCell className="font-medium">{user.email}</TableCell>
                 <TableCell>{user.display_name || '-'}</TableCell>
@@ -93,24 +129,26 @@ const UserManagement: React.FC<UserManagementProps> = ({ users, onRoleChange }) 
                   }
                 </TableCell>
                 <TableCell>
-                  <Select
-                    value={user.role || 'none'}
-                    onValueChange={(value) => handleRoleChange(user.id, value)}
-                    disabled={actionLoading === user.id}
-                  >
-                    <SelectTrigger className="w-32">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="none">No role</SelectItem>
-                      <SelectItem value="user">User</SelectItem>
-                      <SelectItem value="moderator">Moderator</SelectItem>
-                      <SelectItem value="admin">Admin</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  {actionLoading === user.id && (
-                    <Loader2 className="w-4 h-4 animate-spin ml-2" />
-                  )}
+                  <div className="flex items-center gap-2">
+                    <Select
+                      value={user.role || 'none'}
+                      onValueChange={(value) => handleRoleChange(user.id, value)}
+                      disabled={actionLoading === user.id}
+                    >
+                      <SelectTrigger className="w-32">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">No role</SelectItem>
+                        <SelectItem value="user">User</SelectItem>
+                        <SelectItem value="moderator">Moderator</SelectItem>
+                        <SelectItem value="admin">Admin</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {actionLoading === user.id && (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    )}
+                  </div>
                 </TableCell>
               </TableRow>
             ))}

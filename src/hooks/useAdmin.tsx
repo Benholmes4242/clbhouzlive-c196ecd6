@@ -75,7 +75,7 @@ export const useAdmin = () => {
     }
   };
 
-  // Assign role to user
+  // Assign role to user - simplified version that doesn't auto-refresh
   const assignRole = async (userId: string, role: 'admin' | 'moderator' | 'user') => {
     try {
       const { error } = await supabase
@@ -87,7 +87,6 @@ export const useAdmin = () => {
         return false;
       }
       
-      await fetchUsers(); // Refresh users list
       return true;
     } catch (error) {
       console.error('Error assigning role:', error);
@@ -95,7 +94,7 @@ export const useAdmin = () => {
     }
   };
 
-  // Remove role from user
+  // Remove role from user - simplified version that doesn't auto-refresh
   const removeRole = async (userId: string, role: 'admin' | 'moderator' | 'user') => {
     try {
       const { error } = await supabase
@@ -109,7 +108,6 @@ export const useAdmin = () => {
         return false;
       }
       
-      await fetchUsers(); // Refresh users list
       return true;
     } catch (error) {
       console.error('Error removing role:', error);
