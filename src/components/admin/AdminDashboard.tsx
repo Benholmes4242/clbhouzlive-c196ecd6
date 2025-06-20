@@ -1,11 +1,15 @@
 
-import React from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Upload } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useState } from 'react';
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import AdminSidebar from './AdminSidebar';
 import AdminOverview from './AdminOverview';
 import UserManagement from './UserManagement';
 import ExcelCourseImporter from '@/components/courses/ExcelCourseImporter';
+import Analytics from './Analytics';
+import TeamManagement from './TeamManagement';
+import AdminSettings from './AdminSettings';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Upload } from 'lucide-react';
 
 interface AdminUser {
   id: string;
@@ -27,46 +31,56 @@ interface AdminDashboardProps {
 }
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ users, onRoleChange }) => {
+  const [activeTab, setActiveTab] = useState('overview');
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'overview':
+        return <AdminOverview users={users} />;
+      case 'users':
+        return <UserManagement users={users} onRoleChange={onRoleChange} />;
+      case 'courses':
+        return (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-2xl font-bold mb-2">Course Import</h2>
+              <p className="text-muted-foreground">Upload and import golf course data from Excel/CSV files</p>
+            </div>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Upload className="h-5 w-5" />
+                  Golf Course Data Import
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ExcelCourseImporter />
+              </CardContent>
+            </Card>
+          </div>
+        );
+      case 'analytics':
+        return <Analytics />;
+      case 'team':
+        return <TeamManagement />;
+      case 'settings':
+        return <AdminSettings />;
+      default:
+        return <AdminOverview users={users} />;
+    }
+  };
+
   return (
-    <div className="space-y-6">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
-        <p className="text-muted-foreground">Manage users, roles, and course data</p>
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full">
+        <AdminSidebar activeTab={activeTab} onTabChange={setActiveTab} />
+        <SidebarInset className="flex-1">
+          <div className="p-6">
+            {renderContent()}
+          </div>
+        </SidebarInset>
       </div>
-
-      <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="users">User Management</TabsTrigger>
-          <TabsTrigger value="courses">Course Import</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview" className="space-y-6">
-          <AdminOverview users={users} />
-        </TabsContent>
-
-        <TabsContent value="users" className="space-y-6">
-          <UserManagement users={users} onRoleChange={onRoleChange} />
-        </TabsContent>
-
-        <TabsContent value="courses" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Upload className="h-5 w-5" />
-                Golf Course Data Import
-              </CardTitle>
-              <p className="text-sm text-muted-foreground">
-                Upload and import golf course data from Excel/CSV files
-              </p>
-            </CardHeader>
-            <CardContent>
-              <ExcelCourseImporter />
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-    </div>
+    </SidebarProvider>
   );
 };
 
