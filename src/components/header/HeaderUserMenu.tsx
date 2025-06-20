@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { User } from 'lucide-react';
+import { User, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from "react-router-dom";
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
@@ -29,6 +29,21 @@ const HeaderUserMenu = () => {
         .eq('id', user.id)
         .maybeSingle();
       return data;
+    },
+    enabled: !!user?.id,
+  });
+
+  // Check if user is admin
+  const { data: isAdmin } = useQuery({
+    queryKey: ['isAdmin', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return false;
+      const { data, error } = await supabase.rpc('is_admin');
+      if (error) {
+        console.error('Error checking admin status:', error);
+        return false;
+      }
+      return data || false;
     },
     enabled: !!user?.id,
   });
@@ -74,6 +89,15 @@ const HeaderUserMenu = () => {
           <DropdownMenuItem onClick={() => navigate('/settings')}>
             Settings
           </DropdownMenuItem>
+          {isAdmin && (
+            <>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => navigate('/admin')}>
+                <Shield className="h-4 w-4 mr-2" />
+                Admin Dashboard
+              </DropdownMenuItem>
+            </>
+          )}
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={handleLogout}>
             Log Out
