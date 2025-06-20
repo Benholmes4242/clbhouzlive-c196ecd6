@@ -57,12 +57,27 @@ const HeaderUserMenu = () => {
     }
   };
 
-  const handleAdminClick = (e: React.MouseEvent) => {
+  const handleAdminClick = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+    
     console.log('Admin dashboard clicked, isAdmin:', isAdmin);
-    console.log('Navigating to /admin');
-    navigate('/admin');
+    console.log('User ID:', user?.id);
+    console.log('Current URL:', window.location.href);
+    
+    if (!isAdmin) {
+      console.error('User is not admin, cannot access admin dashboard');
+      return;
+    }
+    
+    try {
+      console.log('Navigating to /admin...');
+      // Use replace to avoid back button issues
+      navigate('/admin', { replace: true });
+      console.log('Navigation command executed');
+    } catch (error) {
+      console.error('Error navigating to admin:', error);
+    }
   };
 
   const handleLogout = async () => {
@@ -100,7 +115,7 @@ const HeaderUserMenu = () => {
           <DropdownMenuItem onClick={() => navigate('/settings')}>
             Settings
           </DropdownMenuItem>
-          {isAdmin && (
+          {isAdmin && !isAdminLoading && (
             <>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleAdminClick}>
