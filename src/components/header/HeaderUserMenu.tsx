@@ -56,6 +56,10 @@ const HeaderUserMenu = () => {
     }
   };
 
+  const handleAdminClick = () => {
+    navigate('/admin');
+  };
+
   const handleLogout = async () => {
     try {
       await supabase.auth.signOut();
@@ -92,7 +96,7 @@ const HeaderUserMenu = () => {
           {isAdmin && (
             <>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => navigate('/admin')}>
+              <DropdownMenuItem onClick={handleAdminClick}>
                 <Shield className="h-4 w-4 mr-2" />
                 Admin Dashboard
               </DropdownMenuItem>
