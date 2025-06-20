@@ -39,9 +39,13 @@ const Index = () => {
             />
           </div>
           
-          {/* Tagline */}
+          {/* Tagline with matching colors */}
           <div className="space-y-2">
-            <h1 className="text-2xl font-bold text-foreground">swing. snap. share.</h1>
+            <h1 className="text-2xl font-bold text-foreground">
+              <span className="text-gray-800">swing.</span>{' '}
+              <span className="text-orange-600">snap.</span>{' '}
+              <span className="text-gray-800">share.</span>
+            </h1>
             <p className="text-muted-foreground text-lg">
               Connect with fellow golfers and share your best moments
             </p>
