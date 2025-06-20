@@ -11,7 +11,7 @@ import FileUpload from './excel-importer/FileUpload';
 import DataPreview from './excel-importer/DataPreview';
 import ImportProgress from './excel-importer/ImportProgress';
 import ImportResults from './excel-importer/ImportResults';
-import DebugInfo from './excel-importer/DebugInfo';
+import DebugInfoComponent from './excel-importer/DebugInfo';
 import ErrorDisplay from './excel-importer/ErrorDisplay';
 import FormatInfo from './excel-importer/FormatInfo';
 
@@ -203,7 +203,7 @@ const ExcelCourseImporter = () => {
         </Button>
       )}
 
-      <DebugInfo debugInfo={debugInfo} />
+      <DebugInfoComponent debugInfo={debugInfo} />
       <ErrorDisplay parseError={parseError} />
       <ImportProgress progress={progress} isImporting={importMutation.isPending} />
       <ImportResults importResult={importResult} />
