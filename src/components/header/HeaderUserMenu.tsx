@@ -43,6 +43,7 @@ const HeaderUserMenu = () => {
         console.error('Error checking admin status:', error);
         return false;
       }
+      console.log('Admin check result:', data);
       return data || false;
     },
     enabled: !!user?.id,
@@ -54,6 +55,14 @@ const HeaderUserMenu = () => {
     } else {
       navigate('/profile');
     }
+  };
+
+  const handleAdminClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log('Admin dashboard clicked, isAdmin:', isAdmin);
+    console.log('Navigating to /admin');
+    navigate('/admin');
   };
 
   const handleLogout = async () => {
@@ -69,6 +78,8 @@ const HeaderUserMenu = () => {
   };
 
   const currentUsername = userProfile?.username || userProfile?.display_name || 'User';
+
+  console.log('HeaderUserMenu render - user:', !!user, 'isAdmin:', isAdmin, 'isAdminLoading:', isAdminLoading);
 
   if (user) {
     return (
@@ -92,7 +103,7 @@ const HeaderUserMenu = () => {
           {isAdmin && (
             <>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={() => navigate('/admin')}>
+              <DropdownMenuItem onClick={handleAdminClick}>
                 <Shield className="h-4 w-4 mr-2" />
                 Admin Dashboard
               </DropdownMenuItem>
