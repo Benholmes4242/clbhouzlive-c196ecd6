@@ -1,10 +1,38 @@
 
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { UserPlus } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { UserPlus, Clock, CheckCircle } from 'lucide-react';
+import InviteTeamMemberDialog from './InviteTeamMemberDialog';
+import { useAdminTeam } from '@/hooks/useAdminTeam';
 
 const TeamManagement = () => {
+  const { adminProfiles, invitations, loading } = useAdminTeam();
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex justify-between items-center">
+          <div>
+            <h2 className="text-2xl font-bold mb-2">Team Management</h2>
+            <p className="text-muted-foreground">Manage your admin team members and their permissions</p>
+          </div>
+          <InviteTeamMemberDialog />
+        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle>Loading...</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-center py-8 text-muted-foreground">
+              <p>Loading team members...</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -12,23 +40,86 @@ const TeamManagement = () => {
           <h2 className="text-2xl font-bold mb-2">Team Management</h2>
           <p className="text-muted-foreground">Manage your admin team members and their permissions</p>
         </div>
-        <Button>
-          <UserPlus className="h-4 w-4 mr-2" />
-          Invite Team Member
-        </Button>
+        <InviteTeamMemberDialog />
       </div>
 
+      {/* Active Team Members */}
       <Card>
         <CardHeader>
-          <CardTitle>Team Members</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <CheckCircle className="h-5 w-5" />
+            Active Team Members ({adminProfiles.length})
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-8 text-muted-foreground">
-            <p>No team members configured yet.</p>
-            <p className="text-sm mt-2">Use the "Invite Team Member" button to add team members.</p>
-          </div>
+          {adminProfiles.length === 0 ? (
+            <div className="text-center py-8 text-muted-foreground">
+              <p>No active team members yet.</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {adminProfiles.map((profile) => (
+                <div key={profile.id} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                      <span className="text-sm font-medium text-primary">
+                        {profile.first_name.charAt(0)}{profile.last_name.charAt(0)}
+                      </span>
+                    </div>
+                    <div>
+                      <div className="font-medium">{profile.first_name} {profile.last_name}</div>
+                      <div className="text-sm text-muted-foreground">{profile.email}</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <Badge variant="default">Admin</Badge>
+                    <div className="text-sm text-muted-foreground">
+                      Joined {new Date(profile.created_at).toLocaleDateString()}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
+
+      {/* Pending Invitations */}
+      {invitations.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Clock className="h-5 w-5" />
+              Pending Invitations ({invitations.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {invitations.map((invitation) => (
+                <div key={invitation.id} className="flex items-center justify-between p-4 border rounded-lg">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-10 h-10 bg-muted rounded-full flex items-center justify-center">
+                      <UserPlus className="h-4 w-4 text-muted-foreground" />
+                    </div>
+                    <div>
+                      <div className="font-medium">{invitation.email}</div>
+                      <div className="text-sm text-muted-foreground">
+                        Invited {new Date(invitation.created_at).toLocaleDateString()}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <Badge variant="outline">Pending</Badge>
+                    <div className="text-sm text-muted-foreground">
+                      Expires {new Date(invitation.expires_at).toLocaleDateString()}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };
