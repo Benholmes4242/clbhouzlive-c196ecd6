@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -32,8 +31,7 @@ export const useTop100CoursesList = (region: string, userId: string, isOwnProfil
           .order('usa_rank', { ascending: true });
       } else if (region === 'europe') {
         query = query
-          .eq('continent', 'Europe')
-          .not('country', 'in', '("England","Scotland","Wales","Northern Ireland","Ireland","Isle of Man")')
+          .eq('continent', 'Continental Europe')
           .not('global_rank', 'is', null)
           .order('global_rank');
       } else {

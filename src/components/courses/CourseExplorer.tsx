@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -56,8 +55,8 @@ const CourseExplorer = () => {
       if (selectedRegion) {
         if (selectedRegion === 'Britain & Ireland') {
           query = query.in('country', ['England', 'Scotland', 'Wales', 'Northern Ireland', 'Ireland', 'Isle of Man']);
-        } else if (selectedRegion === 'Europe') {
-          query = query.eq('continent', 'Europe').not('country', 'in', '("England","Scotland","Wales","Northern Ireland","Ireland","Isle of Man")');
+        } else if (selectedRegion === 'Continental Europe') {
+          query = query.eq('continent', 'Continental Europe');
         } else if (selectedRegion === 'USA') {
           query = query.eq('country', 'United States');
         } else if (selectedRegion === 'Worldwide') {
@@ -100,8 +99,8 @@ const CourseExplorer = () => {
       if (selectedRegion) {
         if (selectedRegion === 'Britain & Ireland') {
           query = query.in('country', ['England', 'Scotland', 'Wales', 'Northern Ireland', 'Ireland', 'Isle of Man']);
-        } else if (selectedRegion === 'Europe') {
-          query = query.eq('continent', 'Europe').not('country', 'in', '("England","Scotland","Wales","Northern Ireland","Ireland","Isle of Man")');
+        } else if (selectedRegion === 'Continental Europe') {
+          query = query.eq('continent', 'Continental Europe');
         } else if (selectedRegion === 'USA') {
           query = query.eq('country', 'United States');
         }
@@ -114,7 +113,7 @@ const CourseExplorer = () => {
     },
   });
 
-  const regions = ['Britain & Ireland', 'Europe', 'USA', 'Worldwide'];
+  const regions = ['Britain & Ireland', 'Continental Europe', 'USA', 'Worldwide'];
 
   const clearFilters = () => {
     setSearchTerm('');

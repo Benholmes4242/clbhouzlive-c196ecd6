@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -62,10 +61,9 @@ const Top100Courses = () => {
           .not('regional_rank', 'is', null)
           .lte('regional_rank', 100)
           .order('regional_rank', { ascending: true });
-      } else if (selectedRegion === 'Europe') {
+      } else if (selectedRegion === 'Continental Europe') {
         query = query
-          .eq('continent', 'Europe')
-          .not('country', 'in', '("England","Scotland","Wales","Northern Ireland","Ireland","Isle of Man")')
+          .eq('continent', 'Continental Europe')
           .not('global_rank', 'is', null)
           .order('global_rank', { ascending: true });
       } else if (selectedRegion === 'USA') {
@@ -84,7 +82,7 @@ const Top100Courses = () => {
     enabled: !!selectedRegion,
   });
 
-  const regions = ['Britain & Ireland', 'Europe', 'USA', 'Worldwide'];
+  const regions = ['Britain & Ireland', 'Continental Europe', 'USA', 'Worldwide'];
 
   const LoadingSkeleton = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -197,6 +195,14 @@ const Top100Courses = () => {
                     <h4 className="text-lg font-semibold text-blue-700">USA Top 100</h4>
                     <p className="text-sm text-muted-foreground">
                       The finest golf courses across the United States
+                    </p>
+                  </div>
+                )}
+                {selectedRegion === 'Continental Europe' && (
+                  <div className="text-center mb-6">
+                    <h4 className="text-lg font-semibold text-purple-700">Continental Europe Top 100</h4>
+                    <p className="text-sm text-muted-foreground">
+                      Premier golf courses across Continental Europe
                     </p>
                   </div>
                 )}
