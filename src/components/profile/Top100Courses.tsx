@@ -31,7 +31,7 @@ const Top100Courses: React.FC<Top100CoursesProps> = ({
   const regions = [
     { 
       key: 'global', 
-      name: 'Worldwide Top 100',
+      name: 'Global Top 100',
       description: 'Top 100 courses worldwide'
     },
     { 
@@ -46,7 +46,7 @@ const Top100Courses: React.FC<Top100CoursesProps> = ({
     },
     { 
       key: 'europe', 
-      name: 'Europe',
+      name: 'Continental Europe',
       description: 'Continental European golf courses'
     }
   ];
