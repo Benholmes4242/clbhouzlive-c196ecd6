@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -35,6 +34,7 @@ const ExcelCourseImporter = () => {
   const [importResult, setImportResult] = useState<any>(null);
   const [progress, setProgress] = useState(0);
   const [parseError, setParseError] = useState<string | null>(null);
+  const [debugInfo, setDebugInfo] = useState<any>(null);
 
   const parseCSVLine = (line: string): string[] => {
     const result = [];
@@ -58,6 +58,19 @@ const ExcelCourseImporter = () => {
     return result;
   };
 
+  const normalizeHeader = (header: string): string => {
+    return header.toLowerCase()
+      .replace(/[^a-z0-9]/g, '_')
+      .replace(/_+/g, '_')
+      .replace(/^_|_$/g, '');
+  };
+
+  const findColumnIndex = (headers: string[], patterns: string[]): number => {
+    return headers.findIndex(header => 
+      patterns.some(pattern => header.includes(pattern))
+    );
+  };
+
   const parseExcelFile = async (file: File): Promise<ExcelCourseData[]> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -71,80 +84,107 @@ const ExcelCourseImporter = () => {
             throw new Error('File is empty or could not be read');
           }
           
-          const lines = text.split(/\r?\n/).filter(line => line.trim());
+          // Split by different line endings and filter empty lines
+          const lines = text.split(/\r?\n|\r/).filter(line => line.trim());
           console.log('Total lines found:', lines.length);
           
           if (lines.length < 2) {
             throw new Error('File must contain at least a header row and one data row');
           }
           
-          const headers = parseCSVLine(lines[0]).map(h => h.toLowerCase().replace(/[^a-z0-9]/g, '_'));
-          console.log('Headers found:', headers);
+          // Parse and normalize headers
+          const rawHeaders = parseCSVLine(lines[0]);
+          const headers = rawHeaders.map(normalizeHeader);
+          
+          console.log('Raw headers:', rawHeaders);
+          console.log('Normalized headers:', headers);
+          
+          // More flexible column mapping
+          const nameIndex = findColumnIndex(headers, ['name', 'course', 'golf_course', 'course_name']);
+          const countryIndex = findColumnIndex(headers, ['country', 'nation', 'location']);
+          const regionIndex = findColumnIndex(headers, ['region', 'state', 'province', 'area']);
+          const continentIndex = findColumnIndex(headers, ['continent']);
+          const globalRankIndex = findColumnIndex(headers, ['global_rank', 'world_rank', 'rank', 'global', 'world']);
+          const regionalRankIndex = findColumnIndex(headers, ['regional_rank', 'region_rank']);
+          const usaRankIndex = findColumnIndex(headers, ['usa_rank', 'us_rank', 'america_rank']);
+          const descriptionIndex = findColumnIndex(headers, ['description', 'notes', 'details']);
+          const latitudeIndex = findColumnIndex(headers, ['latitude', 'lat']);
+          const longitudeIndex = findColumnIndex(headers, ['longitude', 'lng', 'lon', 'long']);
+          const thumbnailIndex = findColumnIndex(headers, ['thumbnail', 'image', 'photo', 'picture']);
+          const websiteIndex = findColumnIndex(headers, ['website', 'url', 'link', 'web']);
+          
+          const debug = {
+            totalLines: lines.length,
+            headers: rawHeaders,
+            normalizedHeaders: headers,
+            columnMapping: {
+              name: nameIndex,
+              country: countryIndex,
+              region: regionIndex,
+              continent: continentIndex,
+              globalRank: globalRankIndex,
+              regionalRank: regionalRankIndex,
+              usaRank: usaRankIndex,
+              description: descriptionIndex,
+              latitude: latitudeIndex,
+              longitude: longitudeIndex,
+              thumbnail: thumbnailIndex,
+              website: websiteIndex
+            }
+          };
+          
+          setDebugInfo(debug);
+          console.log('Column mapping:', debug.columnMapping);
+          
+          if (nameIndex === -1) {
+            throw new Error(`Name column not found. Available columns: ${rawHeaders.join(', ')}. Expected columns with names like: name, course, golf_course, course_name`);
+          }
+          
+          if (countryIndex === -1) {
+            throw new Error(`Country column not found. Available columns: ${rawHeaders.join(', ')}. Expected columns with names like: country, nation, location`);
+          }
           
           const courses: ExcelCourseData[] = [];
           const validContinents: Continent[] = ['North America', 'South America', 'Europe', 'Asia', 'Africa', 'Oceania'];
+          const skippedRows = [];
           
           for (let i = 1; i < lines.length; i++) {
             const values = parseCSVLine(lines[i]);
             console.log(`Processing row ${i}:`, values);
             
-            if (values.length < 2) {
+            if (values.length < Math.max(nameIndex + 1, countryIndex + 1)) {
               console.log(`Skipping row ${i}: insufficient columns`);
+              skippedRows.push({ row: i, reason: 'insufficient columns', values });
               continue;
             }
             
-            // Map column indices
-            const nameIndex = headers.findIndex(h => 
-              h.includes('name') || h.includes('course')
-            );
-            const countryIndex = headers.findIndex(h => 
-              h.includes('country')
-            );
-            const regionIndex = headers.findIndex(h => 
-              h.includes('region') || h.includes('state')
-            );
-            const continentIndex = headers.findIndex(h => 
-              h.includes('continent')
-            );
-            const globalRankIndex = headers.findIndex(h => 
-              (h.includes('global') || h.includes('world')) && h.includes('rank')
-            );
-            const regionalRankIndex = headers.findIndex(h => 
-              h.includes('regional') && h.includes('rank')
-            );
-            const usaRankIndex = headers.findIndex(h => 
-              h.includes('usa') && h.includes('rank')
-            );
-            const descriptionIndex = headers.findIndex(h => 
-              h.includes('description') || h.includes('notes')
-            );
-            const latitudeIndex = headers.findIndex(h => 
-              h.includes('latitude') || h.includes('lat')
-            );
-            const longitudeIndex = headers.findIndex(h => 
-              h.includes('longitude') || h.includes('lng') || h.includes('lon')
-            );
-            const thumbnailIndex = headers.findIndex(h => 
-              h.includes('thumbnail') || h.includes('image') || h.includes('photo')
-            );
-            const websiteIndex = headers.findIndex(h => 
-              h.includes('website') || h.includes('url') || h.includes('link')
-            );
-            
-            const name = nameIndex >= 0 ? values[nameIndex]?.replace(/"/g, '').trim() : '';
-            const country = countryIndex >= 0 ? values[countryIndex]?.replace(/"/g, '').trim() : '';
+            const name = values[nameIndex]?.replace(/"/g, '').trim();
+            const country = values[countryIndex]?.replace(/"/g, '').trim();
             
             if (!name || !country) {
               console.log(`Skipping row ${i}: missing name or country`);
+              skippedRows.push({ row: i, reason: 'missing name or country', name, country });
               continue;
             }
             
-            // Handle continent with validation
+            // Handle continent with validation and smart defaults
             let continent: Continent = 'Europe'; // default
             if (continentIndex >= 0 && values[continentIndex]) {
               const continentValue = values[continentIndex]?.replace(/"/g, '').trim();
               if (validContinents.includes(continentValue as Continent)) {
                 continent = continentValue as Continent;
+              }
+            } else {
+              // Smart continent detection based on country
+              const countryLower = country.toLowerCase();
+              if (countryLower.includes('usa') || countryLower.includes('united states') || countryLower.includes('america') || countryLower.includes('canada')) {
+                continent = 'North America';
+              } else if (countryLower.includes('australia') || countryLower.includes('new zealand')) {
+                continent = 'Oceania';
+              } else if (countryLower.includes('japan') || countryLower.includes('china') || countryLower.includes('korea') || countryLower.includes('singapore')) {
+                continent = 'Asia';
+              } else if (countryLower.includes('south africa') || countryLower.includes('egypt') || countryLower.includes('morocco')) {
+                continent = 'Africa';
               }
             }
             
@@ -178,6 +218,12 @@ const ExcelCourseImporter = () => {
           }
           
           console.log('Parsed courses:', courses.length);
+          console.log('Skipped rows:', skippedRows.length);
+          
+          if (courses.length === 0) {
+            throw new Error(`No valid courses found. Debug info: ${JSON.stringify({ skippedRows, debug }, null, 2)}`);
+          }
+          
           resolve(courses);
         } catch (error) {
           console.error('Parse error:', error);
@@ -277,6 +323,7 @@ const ExcelCourseImporter = () => {
       setProgress(0);
       setParseError(null);
       setShowPreview(false);
+      setDebugInfo(null);
       
       // Show file info and parse for preview
       toast({
@@ -430,6 +477,25 @@ const ExcelCourseImporter = () => {
         )}
       </div>
 
+      {/* Debug Info */}
+      {debugInfo && (
+        <Card className="bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
+          <CardContent className="pt-4">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5" />
+              <div className="space-y-1">
+                <h4 className="font-semibold text-blue-900 dark:text-blue-100">Debug Information</h4>
+                <div className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
+                  <p>• Total lines: {debugInfo.totalLines}</p>
+                  <p>• Headers found: {debugInfo.headers.join(', ')}</p>
+                  <p>• Column mapping: {JSON.stringify(debugInfo.columnMapping, null, 2)}</p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Parse Error */}
       {parseError && (
         <Card className="bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800">
@@ -486,13 +552,14 @@ const ExcelCourseImporter = () => {
               <h4 className="font-semibold text-blue-900 dark:text-blue-100">Expected File Format</h4>
               <p className="text-sm text-blue-800 dark:text-blue-200">
                 Your file should have these columns (flexible naming): 
-                <strong> name/course, country, region/state, continent, global_rank/world_rank, 
-                regional_rank, usa_rank, description/notes, latitude/lat, longitude/lng, 
-                thumbnail/image, website/url</strong>
+                <strong> name/course/golf_course, country/nation/location, region/state, continent, 
+                global_rank/world_rank/rank, regional_rank, usa_rank, description/notes, 
+                latitude/lat, longitude/lng, thumbnail/image, website/url</strong>
               </p>
               <p className="text-xs text-blue-700 dark:text-blue-300 mt-2">
                 The first row should contain column headers. Only "name" and "country" are required. 
                 Continent values must be: North America, South America, Europe, Asia, Africa, or Oceania.
+                If continent is not provided, it will be auto-detected from the country name.
               </p>
             </div>
           </div>
