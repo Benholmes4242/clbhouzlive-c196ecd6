@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
@@ -43,15 +42,12 @@ const Index = () => {
           <div className="space-y-4">
             <Button 
               onClick={() => navigate('/auth')}
-              className="w-full py-3 text-lg"
+              className="w-full py-3 text-lg text-white hover:opacity-90"
+              style={{ backgroundColor: '#322F30' }}
               size="lg"
             >
               Get Started
             </Button>
-            
-            <p className="text-sm text-muted-foreground">
-              Join the community of golfers sharing their passion
-            </p>
           </div>
         </div>
       </div>
