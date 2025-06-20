@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -33,9 +32,6 @@ const News = () => {
       return data as NewsArticle[];
     },
   });
-
-  // Filter articles to only show those with images
-  const articlesWithImages = articles?.filter(article => article.image_url) || [];
 
   const fetchLatestNews = async () => {
     try {
@@ -114,23 +110,31 @@ const News = () => {
             </Card>
           ))}
         </div>
-      ) : articlesWithImages && articlesWithImages.length > 0 ? (
+      ) : articles && articles.length > 0 ? (
         <div className="space-y-4">
-          {articlesWithImages.map((article) => (
+          {articles.map((article) => (
             <Card key={article.id} className="hover:shadow-lg transition-shadow max-w-4xl mx-auto">
               <CardContent className="p-6">
                 <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
                   <div className="flex-shrink-0 mx-auto sm:mx-0">
                     <div className="w-full sm:w-32 h-24 bg-muted rounded-lg overflow-hidden">
-                      <img
-                        src={article.image_url}
-                        alt={article.title}
-                        className="w-full h-full object-cover"
-                        onError={(e) => {
-                          // Fallback to source-specific placeholder on error
-                          e.currentTarget.src = getImageForSource(article.source);
-                        }}
-                      />
+                      {article.image_url ? (
+                        <img
+                          src={article.image_url}
+                          alt={article.title}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            // Fallback to source-specific placeholder on error
+                            e.currentTarget.src = getImageForSource(article.source);
+                          }}
+                        />
+                      ) : (
+                        <img
+                          src={getImageForSource(article.source)}
+                          alt={`${article.source} placeholder`}
+                          className="w-full h-full object-cover"
+                        />
+                      )}
                     </div>
                   </div>
                   
@@ -172,7 +176,7 @@ const News = () => {
       ) : (
         <div className="text-center py-8">
           <Image className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-          <p className="text-muted-foreground mb-4">No news articles with images available</p>
+          <p className="text-muted-foreground mb-4">No news articles available</p>
           <Button onClick={fetchLatestNews}>
             Fetch Latest News
           </Button>
