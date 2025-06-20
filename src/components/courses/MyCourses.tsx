@@ -30,6 +30,7 @@ interface UserCourse {
     thumbnail_image: string;
     latitude: number | null;
     longitude: number | null;
+    website_url: string | null;
   };
 }
 
