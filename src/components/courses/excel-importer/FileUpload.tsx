@@ -13,7 +13,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ file, onFileSelect }) => {
       <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
         <input
           type="file"
-          accept=".csv,.xlsx,.xls,.txt"
+          accept=".csv,.txt"
           onChange={onFileSelect}
           className="hidden"
           id="excel-upload"
@@ -24,10 +24,10 @@ const FileUpload: React.FC<FileUploadProps> = ({ file, onFileSelect }) => {
         >
           <Upload className="h-8 w-8 text-muted-foreground" />
           <span className="text-sm font-medium">
-            {file ? `Selected: ${file.name}` : 'Click to select Excel/CSV file'}
+            {file ? `Selected: ${file.name}` : 'Click to select CSV file'}
           </span>
           <span className="text-xs text-muted-foreground">
-            Accepts .csv, .xlsx, .xls, .txt files
+            Accepts .csv and .txt files only
           </span>
         </label>
       </div>
