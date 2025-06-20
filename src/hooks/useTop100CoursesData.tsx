@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
@@ -80,7 +81,9 @@ export const useTop100CoursesData = (userId: string, isOwnProfile: boolean) => {
                  (course.global_rank || course.regional_rank)) {
         progress['britain-ireland'].total++;
         if (isPlayed) progress['britain-ireland'].played++;
-      } else if (course.continent === 'Continental Europe' && course.global_rank) {
+      } else if (course.continent === 'Europe' && 
+                 !['England', 'Scotland', 'Wales', 'Northern Ireland', 'Ireland', 'Isle of Man'].includes(course.country) &&
+                 course.global_rank) {
         progress['europe'].total++;
         if (isPlayed) progress['europe'].played++;
       }

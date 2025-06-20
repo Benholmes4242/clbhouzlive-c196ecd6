@@ -62,8 +62,10 @@ const Top100Courses = () => {
           .lte('regional_rank', 100)
           .order('regional_rank', { ascending: true });
       } else if (selectedRegion === 'Continental Europe') {
+        // Use 'Europe' continent but exclude GB&I countries
         query = query
-          .eq('continent', 'Continental Europe')
+          .eq('continent', 'Europe')
+          .not('country', 'in', '(England,Scotland,Wales,Northern Ireland,Ireland,Isle of Man)')
           .not('global_rank', 'is', null)
           .order('global_rank', { ascending: true });
       } else if (selectedRegion === 'USA') {

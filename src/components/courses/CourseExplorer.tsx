@@ -56,7 +56,8 @@ const CourseExplorer = () => {
         if (selectedRegion === 'Britain & Ireland') {
           query = query.in('country', ['England', 'Scotland', 'Wales', 'Northern Ireland', 'Ireland', 'Isle of Man']);
         } else if (selectedRegion === 'Continental Europe') {
-          query = query.eq('continent', 'Continental Europe');
+          // Use 'Europe' continent but exclude GB&I countries
+          query = query.eq('continent', 'Europe').not('country', 'in', '(England,Scotland,Wales,Northern Ireland,Ireland,Isle of Man)');
         } else if (selectedRegion === 'USA') {
           query = query.eq('country', 'United States');
         } else if (selectedRegion === 'Worldwide') {
@@ -100,7 +101,8 @@ const CourseExplorer = () => {
         if (selectedRegion === 'Britain & Ireland') {
           query = query.in('country', ['England', 'Scotland', 'Wales', 'Northern Ireland', 'Ireland', 'Isle of Man']);
         } else if (selectedRegion === 'Continental Europe') {
-          query = query.eq('continent', 'Continental Europe');
+          // Use 'Europe' continent but exclude GB&I countries
+          query = query.eq('continent', 'Europe').not('country', 'in', '(England,Scotland,Wales,Northern Ireland,Ireland,Isle of Man)');
         } else if (selectedRegion === 'USA') {
           query = query.eq('country', 'United States');
         }
