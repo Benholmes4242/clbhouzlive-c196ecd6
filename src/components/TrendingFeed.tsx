@@ -5,7 +5,6 @@ import UserPost from './posts/UserPost';
 import LoadingSkeleton from './feed/LoadingSkeleton';
 import { useUserPosts } from '@/hooks/useUserPosts';
 import { useExternalVideos } from '@/hooks/useExternalVideos';
-import { staticPosts } from './feed/staticPosts';
 import { sortContentByTime } from '@/utils/contentSorting';
 import { VideoPost, UserPostWithType } from './feed/types';
 
@@ -17,20 +16,35 @@ const TrendingFeed = () => {
     return <LoadingSkeleton />;
   }
 
-  // Convert user posts to the correct type and combine with video posts
+  // Convert user posts to the correct type
   const userPostsWithType: UserPostWithType[] = userPosts.map(post => ({
     ...post,
     type: 'user_post' as const
   }));
 
-  // Combine all posts and sort by recency
-  const allVideoPosts = [...staticPosts, ...externalVideos];
+  // Only include friend videos (external videos should only be from friends)
+  const friendVideos = externalVideos.filter(video => video.type === 'friend');
+
+  // Combine only real content: user posts and friend videos
   const allContent: (VideoPost | UserPostWithType)[] = [
     ...userPostsWithType,
-    ...allVideoPosts
+    ...friendVideos
   ];
 
   const sortedContent = sortContentByTime(allContent);
+
+  if (sortedContent.length === 0) {
+    return (
+      <div className="space-y-6 pb-20">
+        <div className="text-center py-12">
+          <p className="text-muted-foreground text-lg">No posts to show yet.</p>
+          <p className="text-muted-foreground text-sm mt-2">
+            Start following friends or create your first post!
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 pb-20">
