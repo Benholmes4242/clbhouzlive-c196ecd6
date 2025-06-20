@@ -69,10 +69,14 @@ const UserManagement: React.FC<UserManagementProps> = ({ users, onRoleChange }) 
           .delete()
           .eq('user_id', userId);
       } else {
-        // Upsert the new role
+        // Upsert the new role - fix the TypeScript error by ensuring proper typing
+        const roleData = { 
+          user_id: userId, 
+          role: newRole as 'admin' | 'moderator' | 'user'
+        };
         await supabase
           .from('user_roles')
-          .upsert({ user_id: userId, role: newRole }, { onConflict: 'user_id,role' });
+          .upsert(roleData, { onConflict: 'user_id,role' });
       }
     } catch (error) {
       console.error('Error updating role:', error);
