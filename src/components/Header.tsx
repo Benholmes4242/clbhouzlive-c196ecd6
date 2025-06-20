@@ -3,6 +3,7 @@ import React from 'react';
 import { useNavigate } from "react-router-dom";
 import HeaderNavigation from './header/HeaderNavigation';
 import HeaderUserMenu from './header/HeaderUserMenu';
+import HeaderSearch from './header/HeaderSearch';
 
 const Header = () => {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ const Header = () => {
           {/* Logo */}
           <div className="flex items-center">
             <img
-              src="/lovable-uploads/f08cf816-2bf3-41e0-b02e-078c45f51c9c.png"
+              src="/lovable-uploads/1e74af6c-d153-4197-a52b-5bf76a943867.png"
               alt="clbhouz Logo"
               className="w-auto cursor-pointer"
               style={{
@@ -30,6 +31,9 @@ const Header = () => {
               onClick={handleLogoClick}
             />
           </div>
+
+          {/* Search Bar */}
+          <HeaderSearch />
 
           {/* Navigation Icons */}
           <div className="flex items-center space-x-4">
