@@ -1,13 +1,18 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { UserPlus, Clock, CheckCircle } from 'lucide-react';
+import { UserPlus, Clock, CheckCircle, Edit } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import InviteTeamMemberDialog from './InviteTeamMemberDialog';
+import EditAdminProfileDialog from './EditAdminProfileDialog';
+import AdminRoleDropdown from './AdminRoleDropdown';
 import { useAdminTeam } from '@/hooks/useAdminTeam';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 const TeamManagement = () => {
-  const { adminProfiles, invitations, loading } = useAdminTeam();
+  const { adminProfiles, invitations, loading, refetch } = useAdminTeam();
+  const { user } = useSupabaseSession();
+  const [editingProfile, setEditingProfile] = useState<any>(null);
 
   if (loading) {
     return (
@@ -72,7 +77,20 @@ const TeamManagement = () => {
                     </div>
                   </div>
                   <div className="flex items-center space-x-4">
-                    <Badge variant="default">Admin</Badge>
+                    <AdminRoleDropdown 
+                      profile={profile}
+                      currentUserId={user?.id || ''}
+                      onRoleChanged={refetch}
+                    />
+                    {profile.user_id === user?.id && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setEditingProfile(profile)}
+                      >
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                    )}
                     <div className="text-sm text-muted-foreground">
                       Joined {new Date(profile.created_at).toLocaleDateString()}
                     </div>
@@ -109,7 +127,6 @@ const TeamManagement = () => {
                     </div>
                   </div>
                   <div className="flex items-center space-x-4">
-                    <Badge variant="outline">Pending</Badge>
                     <div className="text-sm text-muted-foreground">
                       Expires {new Date(invitation.expires_at).toLocaleDateString()}
                     </div>
@@ -119,6 +136,19 @@ const TeamManagement = () => {
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {/* Edit Profile Dialog */}
+      {editingProfile && (
+        <EditAdminProfileDialog
+          open={!!editingProfile}
+          onOpenChange={(open) => !open && setEditingProfile(null)}
+          profile={editingProfile}
+          onProfileUpdated={() => {
+            refetch();
+            setEditingProfile(null);
+          }}
+        />
       )}
     </div>
   );

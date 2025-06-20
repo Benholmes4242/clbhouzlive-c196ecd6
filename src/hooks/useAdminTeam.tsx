@@ -10,6 +10,8 @@ interface AdminProfile {
   email: string;
   created_at: string;
   updated_at: string;
+  role?: string;
+  temp_admin_expires?: string;
 }
 
 interface AdminInvitation {
