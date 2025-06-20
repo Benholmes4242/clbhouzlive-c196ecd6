@@ -1,4 +1,3 @@
-
 import React from 'react';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
@@ -33,7 +32,7 @@ const Index = () => {
           {/* Logo */}
           <div className="flex justify-center">
             <img
-              src="/lovable-uploads/6d5c5a4b-fd08-4304-ab88-2a9ba8485950.png"
+              src="/lovable-uploads/6c8a9d89-bafc-4d28-85b6-61bd3cb601df.png"
               alt="clbhouz"
               className="w-auto max-h-32 object-contain"
             />
@@ -43,7 +42,7 @@ const Index = () => {
           <div className="space-y-4">
             <Button 
               onClick={() => navigate('/auth')}
-              className="w-full py-3 text-lg bg-orange-600 hover:bg-orange-700 text-white"
+              className="w-full py-3 text-lg bg-gray-900 hover:bg-gray-800 text-white"
               size="lg"
             >
               Get Started
