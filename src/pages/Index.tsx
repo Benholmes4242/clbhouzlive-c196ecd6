@@ -33,22 +33,10 @@ const Index = () => {
           {/* Logo */}
           <div className="flex justify-center">
             <img
-              src="/lovable-uploads/1e74af6c-d153-4197-a52b-5bf76a943867.png"
-              alt="clbhouz Logo"
-              className="w-auto max-h-20 object-contain"
+              src="/lovable-uploads/6d5c5a4b-fd08-4304-ab88-2a9ba8485950.png"
+              alt="clbhouz"
+              className="w-auto max-h-32 object-contain"
             />
-          </div>
-          
-          {/* Tagline with matching colors */}
-          <div className="space-y-2">
-            <h1 className="text-2xl font-bold text-foreground">
-              <span className="text-gray-800">swing.</span>{' '}
-              <span className="text-orange-600">snap.</span>{' '}
-              <span className="text-gray-800">share.</span>
-            </h1>
-            <p className="text-muted-foreground text-lg">
-              Connect with fellow golfers and share your best moments
-            </p>
           </div>
           
           {/* Call to Action */}
