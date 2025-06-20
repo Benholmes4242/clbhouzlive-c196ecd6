@@ -82,15 +82,13 @@ const TeamManagement = () => {
                       currentUserId={user?.id || ''}
                       onRoleChanged={refetch}
                     />
-                    {profile.user_id === user?.id && (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setEditingProfile(profile)}
-                      >
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                    )}
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setEditingProfile(profile)}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
                     <div className="text-sm text-muted-foreground">
                       Joined {new Date(profile.created_at).toLocaleDateString()}
                     </div>
@@ -144,6 +142,7 @@ const TeamManagement = () => {
           open={!!editingProfile}
           onOpenChange={(open) => !open && setEditingProfile(null)}
           profile={editingProfile}
+          currentUserId={user?.id || ''}
           onProfileUpdated={() => {
             refetch();
             setEditingProfile(null);

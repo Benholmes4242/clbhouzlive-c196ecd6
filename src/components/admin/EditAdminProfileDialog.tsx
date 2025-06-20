@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import AdminRoleDropdown from './AdminRoleDropdown';
 
 interface AdminProfile {
   id: string;
@@ -21,6 +22,8 @@ interface AdminProfile {
   first_name: string;
   last_name: string;
   email: string;
+  role?: string;
+  temp_admin_expires?: string;
 }
 
 interface EditAdminProfileDialogProps {
@@ -28,13 +31,15 @@ interface EditAdminProfileDialogProps {
   onOpenChange: (open: boolean) => void;
   profile: AdminProfile;
   onProfileUpdated: () => void;
+  currentUserId: string;
 }
 
 const EditAdminProfileDialog = ({ 
   open, 
   onOpenChange, 
   profile, 
-  onProfileUpdated 
+  onProfileUpdated,
+  currentUserId
 }: EditAdminProfileDialogProps) => {
   const [firstName, setFirstName] = useState(profile.first_name);
   const [lastName, setLastName] = useState(profile.last_name);
@@ -91,7 +96,7 @@ const EditAdminProfileDialog = ({
         <DialogHeader>
           <DialogTitle>Edit Admin Profile</DialogTitle>
           <DialogDescription>
-            Update your admin profile information below.
+            Update admin profile information and privileges below.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
@@ -128,6 +133,18 @@ const EditAdminProfileDialog = ({
               onChange={(e) => setEmail(e.target.value)}
               className="col-span-3"
             />
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label className="text-right">
+              Role
+            </Label>
+            <div className="col-span-3">
+              <AdminRoleDropdown 
+                profile={profile}
+                currentUserId={currentUserId}
+                onRoleChanged={onProfileUpdated}
+              />
+            </div>
           </div>
         </div>
         <DialogFooter>
