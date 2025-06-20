@@ -38,9 +38,7 @@ const HeaderUserMenu = () => {
     queryKey: ['isAdmin', user?.id],
     queryFn: async () => {
       if (!user?.id) return false;
-      console.log('Checking admin status for user:', user.id);
       const { data, error } = await supabase.rpc('is_admin');
-      console.log('Admin check result:', { data, error });
       if (error) {
         console.error('Error checking admin status:', error);
         return false;
@@ -49,8 +47,6 @@ const HeaderUserMenu = () => {
     },
     enabled: !!user?.id,
   });
-
-  console.log('User admin status:', { isAdmin, isAdminLoading, userId: user?.id });
 
   const handleProfileClick = () => {
     if (!user) {
