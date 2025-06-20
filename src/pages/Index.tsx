@@ -43,7 +43,7 @@ const Index = () => {
           <div className="space-y-4">
             <Button 
               onClick={() => navigate('/auth')}
-              className="w-full py-3 text-lg"
+              className="w-full py-3 text-lg bg-orange-600 hover:bg-orange-700 text-white"
               size="lg"
             >
               Get Started
