@@ -7,6 +7,7 @@ import CourseImage from './CourseImage';
 import CourseRankBadges from './CourseRankBadges';
 import CoursePlayedButton from './CoursePlayedButton';
 import CourseInfo from './CourseInfo';
+import CourseDetailModal from './CourseDetailModal';
 
 interface Course {
   id: string;
@@ -21,6 +22,7 @@ interface Course {
   thumbnail_image: string;
   latitude: number | null;
   longitude: number | null;
+  website_url?: string | null;
 }
 
 interface CourseCardProps {
@@ -31,6 +33,7 @@ interface CourseCardProps {
 
 const CourseCard = ({ course, viewingUserId, viewContext = 'global' }: CourseCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { data: currentUserResponse } = useQuery({
     queryKey: ['current-user'],
@@ -62,47 +65,60 @@ const CourseCard = ({ course, viewingUserId, viewContext = 'global' }: CourseCar
 
   const canModifyCourseStatus = currentUser?.id && (!viewingUserId || viewingUserId === currentUser.id);
 
+  const handleCardClick = () => {
+    setIsModalOpen(true);
+  };
+
   return (
-    <Card 
-      className="overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <div className="relative">
-        <CourseImage 
-          thumbnailImage={course.thumbnail_image}
-          name={course.name}
-          isHovered={isHovered}
-        />
-        
-        <CourseRankBadges 
-          globalRank={course.global_rank}
-          regionalRank={course.regional_rank}
-          usaRank={course.usa_rank}
-          country={course.country}
-          viewContext={viewContext}
-        />
+    <>
+      <Card 
+        className="overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        onClick={handleCardClick}
+      >
+        <div className="relative">
+          <CourseImage 
+            thumbnailImage={course.thumbnail_image}
+            name={course.name}
+            isHovered={isHovered}
+          />
+          
+          <CourseRankBadges 
+            globalRank={course.global_rank}
+            regionalRank={course.regional_rank}
+            usaRank={course.usa_rank}
+            country={course.country}
+            viewContext={viewContext}
+          />
 
-        <CoursePlayedButton
-          courseId={course.id}
-          courseName={course.name}
-          userCourse={userCourse}
-          canModifyCourseStatus={canModifyCourseStatus}
-          currentUserId={currentUser?.id}
-          viewingUserId={viewingUserId}
-        />
-      </div>
+          <CoursePlayedButton
+            courseId={course.id}
+            courseName={course.name}
+            userCourse={userCourse}
+            canModifyCourseStatus={canModifyCourseStatus}
+            currentUserId={currentUser?.id}
+            viewingUserId={viewingUserId}
+          />
+        </div>
 
-      <CardContent className="p-4">
-        <CourseInfo
-          name={course.name}
-          region={course.region}
-          country={course.country}
-          description={course.description}
-          userCourse={userCourse}
-        />
-      </CardContent>
-    </Card>
+        <CardContent className="p-4">
+          <CourseInfo
+            name={course.name}
+            region={course.region}
+            country={course.country}
+            description={course.description}
+            userCourse={userCourse}
+          />
+        </CardContent>
+      </Card>
+
+      <CourseDetailModal
+        course={course}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
+    </>
   );
 };
 

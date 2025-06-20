@@ -77,7 +77,7 @@ const CoursePlayedButton = ({
   });
 
   const handleTogglePlayed = (e: React.MouseEvent) => {
-    e.stopPropagation();
+    e.stopPropagation(); // Prevent card click event
     if (!canModifyCourseStatus) return;
     togglePlayedMutation.mutate();
   };
