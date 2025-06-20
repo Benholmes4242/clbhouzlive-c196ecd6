@@ -75,44 +75,6 @@ const Top100Courses: React.FC<Top100CoursesProps> = ({
     );
   }
 
-  // Check if any regions have course data
-  const hasAnyData = Object.values(regionProgress).some(progress => progress.total > 0);
-
-  if (!hasAnyData) {
-    return (
-      <section className="mt-10 px-2">
-        <div className="flex items-center gap-2 mb-3">
-          <h2 className="text-xl font-bold">Top 100 Courses</h2>
-          {isOwnProfile && (
-            <div className="flex items-center space-x-2 ml-auto">
-              <Checkbox
-                id="top100-visibility"
-                checked={isTop100Visible}
-                onCheckedChange={onVisibilityToggle}
-              />
-              <Label
-                htmlFor="top100-visibility"
-                className="text-sm text-muted-foreground cursor-pointer"
-              >
-                Show this section on my public profile
-              </Label>
-            </div>
-          )}
-        </div>
-
-        <Card>
-          <CardContent className="p-8 text-center">
-            <Upload className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-            <h3 className="text-lg font-semibold mb-2">No Top 100 course data available</h3>
-            <p className="text-muted-foreground">
-              Import golf course data to start tracking your Top 100 progress
-            </p>
-          </CardContent>
-        </Card>
-      </section>
-    );
-  }
-
   return (
     <section className="mt-10 px-2">
       <div className="flex items-center gap-2 mb-3">
@@ -139,10 +101,6 @@ const Top100Courses: React.FC<Top100CoursesProps> = ({
           const progress = regionProgress[region.key] || { played: 0, total: 0 };
           const percentage = progress.total > 0 ? (progress.played / progress.total) * 100 : 0;
           
-          if (progress.total === 0) {
-            return null; // Don't show regions with no data
-          }
-          
           return (
             <div
               key={region.key}
@@ -159,6 +117,15 @@ const Top100Courses: React.FC<Top100CoursesProps> = ({
                 </div>
                 <Progress value={percentage} className="h-2" />
               </div>
+              
+              {progress.total === 0 && (
+                <div className="mt-3 text-center">
+                  <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                  <p className="text-xs text-muted-foreground">
+                    No course data available
+                  </p>
+                </div>
+              )}
             </div>
           );
         })}
