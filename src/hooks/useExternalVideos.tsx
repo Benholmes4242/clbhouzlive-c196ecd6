@@ -7,50 +7,35 @@ export const useExternalVideos = () => {
   const [videos, setVideos] = useState<VideoPost[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchYouTubeVideos = async () => {
-    try {
-      const { data, error } = await supabase.functions.invoke('fetch-youtube-videos');
-      
-      if (error) {
-        console.error('Error fetching YouTube videos:', error);
-        return [];
-      }
-      
-      return data?.videos || [];
-    } catch (error) {
-      console.error('Error calling YouTube function:', error);
-      return [];
-    }
-  };
-
-  const fetchFriendVideos = async () => {
-    try {
-      const { data, error } = await supabase.functions.invoke('fetch-friend-videos');
-      
-      if (error) {
-        console.error('Error fetching friend videos:', error);
-        return [];
-      }
-      
-      return data?.videos || [];
-    } catch (error) {
-      console.error('Error calling friend videos function:', error);
-      return [];
-    }
-  };
-
   useEffect(() => {
     const loadContent = async () => {
       setLoading(true);
       
-      // Fetch YouTube and friend videos in parallel
-      const [youtubeVideos, friendVideos] = await Promise.all([
-        fetchYouTubeVideos(),
-        fetchFriendVideos()
-      ]);
+      // Only fetch real friend videos from the edge function
+      // Remove any mock/example data completely
+      try {
+        const { data, error } = await supabase.functions.invoke('fetch-friend-videos');
+        
+        if (error) {
+          console.error('Error fetching friend videos:', error);
+          setVideos([]);
+        } else {
+          // Only use real friend videos, filter out any example/mock data
+          const realFriendVideos = data?.videos?.filter((video: VideoPost) => 
+            video.type === 'friend' && 
+            video.user.username !== '@mikej_golf' && 
+            video.user.username !== '@sarahgolf' &&
+            !video.user.name.includes('Mike Johnson') &&
+            !video.user.name.includes('Sarah Chen')
+          ) || [];
+          
+          setVideos(realFriendVideos);
+        }
+      } catch (error) {
+        console.error('Error calling friend videos function:', error);
+        setVideos([]);
+      }
       
-      const allVideos = [...youtubeVideos, ...friendVideos];
-      setVideos(allVideos);
       setLoading(false);
     };
 
