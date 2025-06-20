@@ -117,15 +117,6 @@ const Top100Courses: React.FC<Top100CoursesProps> = ({
                 </div>
                 <Progress value={percentage} className="h-2" />
               </div>
-              
-              {progress.total === 0 && (
-                <div className="mt-3 text-center">
-                  <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                  <p className="text-xs text-muted-foreground">
-                    No course data available
-                  </p>
-                </div>
-              )}
             </div>
           );
         })}
