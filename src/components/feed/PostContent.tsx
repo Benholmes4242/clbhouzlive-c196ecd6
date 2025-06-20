@@ -43,12 +43,14 @@ const PostContent = ({ content, onVideoClick }: PostContentProps) => {
   };
 
   const handleYouTubeClick = () => {
-    // For YouTube videos, we'll embed the iframe directly
     setIsPlaying(true);
   };
 
-  // Remove the intersection observer that auto-plays videos
-  // Videos should only play when clicked
+  // Get high quality YouTube thumbnail
+  const getYouTubeThumbnail = (youtubeId: string) => {
+    // Try different quality options in order of preference
+    return `https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg`;
+  };
 
   return (
     <>
@@ -65,17 +67,26 @@ const PostContent = ({ content, onVideoClick }: PostContentProps) => {
                     onClick={handleYouTubeClick}
                   >
                     <img
-                      src={content.thumbnail}
+                      src={content.thumbnail || getYouTubeThumbnail(content.youtubeId)}
                       alt="Video thumbnail"
                       className="w-full h-80 object-cover"
+                      onError={(e) => {
+                        // Fallback to lower quality if maxres fails
+                        const target = e.target as HTMLImageElement;
+                        if (target.src.includes('maxresdefault')) {
+                          target.src = `https://img.youtube.com/vi/${content.youtubeId}/hqdefault.jpg`;
+                        } else if (target.src.includes('hqdefault')) {
+                          target.src = `https://img.youtube.com/vi/${content.youtubeId}/mqdefault.jpg`;
+                        }
+                      }}
                     />
                     <div className="absolute inset-0 bg-black/20 flex items-center justify-center group-hover:bg-black/30 transition-all">
-                      <div className="bg-white/90 rounded-full p-3 group-hover:scale-110 transition-transform">
-                        <Play className="h-6 w-6 text-green-600 fill-current" />
+                      <div className="bg-white/90 rounded-full p-4 group-hover:scale-110 transition-transform shadow-lg">
+                        <Play className="h-8 w-8 text-red-600 fill-current ml-1" />
                       </div>
                     </div>
                     {content.duration && (
-                      <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
+                      <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-2 py-1 rounded font-medium">
                         {content.duration}
                       </div>
                     )}
@@ -83,7 +94,7 @@ const PostContent = ({ content, onVideoClick }: PostContentProps) => {
                 ) : (
                   <div className="relative">
                     <iframe
-                      src={`https://www.youtube.com/embed/${content.youtubeId}?autoplay=1&rel=0`}
+                      src={`https://www.youtube.com/embed/${content.youtubeId}?autoplay=1&rel=0&modestbranding=1`}
                       title="YouTube video player"
                       className="w-full h-80"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
