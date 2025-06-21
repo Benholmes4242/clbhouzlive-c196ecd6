@@ -1,14 +1,12 @@
 
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, Trophy, Star, Calendar } from 'lucide-react';
-import CourseCard from './CourseCard';
 import { useNavigate } from 'react-router-dom';
+import FriendSelector from './friends/FriendSelector';
+import FriendStatistics from './friends/FriendStatistics';
+import FriendCourseTabs from './friends/FriendCourseTabs';
+import EmptyFriendsState from './friends/EmptyFriendsState';
+import { useFriendData } from './friends/useFriendData';
 
 const FriendsCourses = () => {
   const { user } = useSupabaseSession();
@@ -16,102 +14,14 @@ const FriendsCourses = () => {
   const [selectedFriendId, setSelectedFriendId] = useState<string>('');
   const [activeTab, setActiveTab] = useState('top100');
 
-  // Fetch user's accepted friends with their profile data
-  const { data: friends = [], isLoading: isLoadingFriends } = useQuery({
-    queryKey: ['user-friends', user?.id],
-    queryFn: async () => {
-      if (!user?.id) return [];
-      
-      // First get friend IDs
-      const { data: friendships, error: friendshipsError } = await supabase
-        .from('user_friends')
-        .select('friend_id')
-        .eq('user_id', user.id)
-        .eq('status', 'accepted');
-
-      if (friendshipsError) throw friendshipsError;
-      if (!friendships || friendships.length === 0) return [];
-
-      // Then get profile data for those friends
-      const friendIds = friendships.map(f => f.friend_id);
-      const { data: profiles, error: profilesError } = await supabase
-        .from('user_profiles')
-        .select('id, display_name, username, profile_photo_url')
-        .in('id', friendIds);
-
-      if (profilesError) throw profilesError;
-      
-      return profiles?.map(profile => ({
-        friend_id: profile.id,
-        user_profiles: profile
-      })) || [];
-    },
-    enabled: !!user?.id,
-  });
-
-  // Fetch selected friend's played courses
-  const { data: friendPlayedCourses = [], isLoading: isLoadingPlayed } = useQuery({
-    queryKey: ['friend-played-courses', selectedFriendId],
-    queryFn: async () => {
-      if (!selectedFriendId) return [];
-      
-      const { data, error } = await supabase
-        .from('user_courses')
-        .select(`
-          *,
-          golf_courses (*)
-        `)
-        .eq('user_id', selectedFriendId)
-        .eq('played', true)
-        .order('played_date', { ascending: false });
-
-      if (error) throw error;
-      return data || [];
-    },
-    enabled: !!selectedFriendId,
-  });
-
-  // Fetch selected friend's Top 100 courses
-  const { data: friendTop100Courses = [], isLoading: isLoadingTop100 } = useQuery({
-    queryKey: ['friend-top100-courses', selectedFriendId],
-    queryFn: async () => {
-      if (!selectedFriendId) return [];
-      
-      const { data, error } = await supabase
-        .from('user_top100_courses')
-        .select(`
-          *,
-          golf_courses (*)
-        `)
-        .eq('user_id', selectedFriendId)
-        .eq('played', true)
-        .order('played_date', { ascending: false });
-
-      if (error) throw error;
-      return data || [];
-    },
-    enabled: !!selectedFriendId,
-  });
-
-  // Fetch selected friend's average rating
-  const { data: friendAverageRating } = useQuery({
-    queryKey: ['friend-average-rating', selectedFriendId],
-    queryFn: async () => {
-      if (!selectedFriendId) return null;
-      
-      const { data, error } = await supabase
-        .from('course_ratings')
-        .select('rating')
-        .eq('user_id', selectedFriendId);
-
-      if (error) throw error;
-      if (!data || data.length === 0) return null;
-      
-      const total = data.reduce((sum, rating) => sum + rating.rating, 0);
-      return (total / data.length).toFixed(1);
-    },
-    enabled: !!selectedFriendId,
-  });
+  const {
+    friends,
+    isLoadingFriends,
+    friendPlayedCourses,
+    friendTop100Courses,
+    isLoadingTop100,
+    friendAverageRating
+  } = useFriendData(user?.id, selectedFriendId);
 
   const selectedFriend = friends.find(f => f.friend_id === selectedFriendId);
   const friendName = selectedFriend?.user_profiles?.display_name || selectedFriend?.user_profiles?.username || 'Friend';
@@ -147,158 +57,35 @@ const FriendsCourses = () => {
   }
 
   if (friends.length === 0) {
-    return (
-      <Card>
-        <CardContent className="p-8 text-center">
-          <Users className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-          <h3 className="text-lg font-semibold mb-2">No friends yet</h3>
-          <p className="text-muted-foreground">
-            Add some friends to see their course progress and golfing journey
-          </p>
-        </CardContent>
-      </Card>
-    );
+    return <EmptyFriendsState />;
   }
 
   return (
     <div className="space-y-6">
-      {/* Friend Selection */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5" />
-            Select a Friend
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Select value={selectedFriendId} onValueChange={setSelectedFriendId}>
-            <SelectTrigger>
-              <SelectValue placeholder="Choose a friend to view their courses" />
-            </SelectTrigger>
-            <SelectContent>
-              {friends.map((friend) => (
-                <SelectItem key={friend.friend_id} value={friend.friend_id}>
-                  <div className="flex items-center gap-2">
-                    {friend.user_profiles?.profile_photo_url && (
-                      <img 
-                        src={friend.user_profiles.profile_photo_url} 
-                        alt={friend.user_profiles.display_name || friend.user_profiles.username || 'Friend'}
-                        className="w-6 h-6 rounded-full object-cover"
-                      />
-                    )}
-                    <span>
-                      {friend.user_profiles?.display_name || friend.user_profiles?.username || 'Friend'}
-                    </span>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </CardContent>
-      </Card>
+      <FriendSelector
+        friends={friends}
+        selectedFriendId={selectedFriendId}
+        onFriendSelect={setSelectedFriendId}
+      />
 
       {selectedFriendId && (
         <>
-          {/* Statistics Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Top 100 Played</CardTitle>
-                <Trophy className="h-4 w-4 text-yellow-600" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{totalTop100Played}</div>
-                <p className="text-xs text-muted-foreground">
-                  by {friendName}
-                </p>
-              </CardContent>
-            </Card>
+          <FriendStatistics
+            friendName={friendName}
+            totalTop100Played={totalTop100Played}
+            averageRating={friendAverageRating}
+            onAverageRatingClick={handleAverageRatingClick}
+          />
 
-            <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={handleAverageRatingClick}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Average Rating</CardTitle>
-                <Star className="h-4 w-4 text-yellow-500" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">
-                  {friendAverageRating ? `${friendAverageRating}/10` : 'N/A'}
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Click to view {friendName}'s profile
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Course Lists with Tabs */}
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="top100">Top 100</TabsTrigger>
-              <TabsTrigger value="recent">Recent</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="top100" className="mt-6">
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">
-                  {friendName}'s Top 100 Courses
-                </h3>
-                {isLoadingTop100 ? (
-                  <div className="text-center py-8">Loading Top 100 courses...</div>
-                ) : friendTop100Courses.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {friendTop100Courses.map((userCourse) => (
-                      <CourseCard 
-                        key={userCourse.id} 
-                        course={userCourse.golf_courses}
-                        viewingUserId={selectedFriendId}
-                        showPlayedButton={false}
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <Card>
-                    <CardContent className="p-8 text-center">
-                      <Trophy className="h-12 w-12 mx-auto mb-4 text-yellow-600" />
-                      <h3 className="text-lg font-semibold mb-2">No Top 100 courses played yet</h3>
-                      <p className="text-muted-foreground">
-                        {friendName} hasn't played any Top 100 courses yet
-                      </p>
-                    </CardContent>
-                  </Card>
-                )}
-              </div>
-            </TabsContent>
-
-            <TabsContent value="recent" className="mt-6">
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold">
-                  {friendName}'s Recent Activity (Last 30 Days)
-                </h3>
-                {recentCourses.length > 0 ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {recentCourses.map((userCourse) => (
-                      <CourseCard 
-                        key={`${userCourse.id}-recent`} 
-                        course={userCourse.golf_courses}
-                        viewingUserId={selectedFriendId}
-                        showPlayedButton={false}
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <Card>
-                    <CardContent className="p-8 text-center">
-                      <Calendar className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                      <h3 className="text-lg font-semibold mb-2">No recent activity</h3>
-                      <p className="text-muted-foreground">
-                        {friendName} hasn't played any courses in the last 30 days
-                      </p>
-                    </CardContent>
-                  </Card>
-                )}
-              </div>
-            </TabsContent>
-          </Tabs>
+          <FriendCourseTabs
+            friendName={friendName}
+            selectedFriendId={selectedFriendId}
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            friendTop100Courses={friendTop100Courses}
+            recentCourses={recentCourses}
+            isLoadingTop100={isLoadingTop100}
+          />
         </>
       )}
     </div>
