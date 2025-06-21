@@ -1,37 +1,50 @@
 
 import React from 'react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Check, Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
-interface UserCourse {
-  id: string;
-  played: boolean;
-  rating?: number;
-}
-
 interface CoursePlayedButtonProps {
   courseId: string;
-  courseName: string;
-  userCourse: UserCourse | null;
-  canModifyCourseStatus: boolean;
-  currentUserId?: string;
-  viewingUserId?: string;
+  userId: string;
 }
 
-const CoursePlayedButton = ({ 
-  courseId, 
-  courseName, 
-  userCourse, 
-  canModifyCourseStatus, 
-  currentUserId,
-  viewingUserId 
-}: CoursePlayedButtonProps) => {
+const CoursePlayedButton = ({ courseId, userId }: CoursePlayedButtonProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Get user's current session to check if they can modify this course
+  const { data: session } = useQuery({
+    queryKey: ['session'],
+    queryFn: async () => {
+      const { data } = await supabase.auth.getSession();
+      return data.session;
+    },
+  });
+
+  const currentUserId = session?.user?.id;
+  const canModifyCourseStatus = currentUserId === userId;
+
+  // Query to get user's course relationship
+  const { data: userCourse } = useQuery({
+    queryKey: ['user-course', courseId, userId],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('user_courses')
+        .select('*')
+        .eq('course_id', courseId)
+        .eq('user_id', userId)
+        .single();
+
+      if (error && error.code !== 'PGRST116') {
+        throw error;
+      }
+      return data;
+    },
+  });
 
   const togglePlayedMutation = useMutation({
     mutationFn: async () => {
@@ -56,14 +69,14 @@ const CoursePlayedButton = ({
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user-course', courseId] });
+      queryClient.invalidateQueries({ queryKey: ['user-course', courseId, userId] });
       queryClient.invalidateQueries({ queryKey: ['my-courses'] });
       queryClient.invalidateQueries({ queryKey: ['trackerStats'] });
       toast({
         title: userCourse?.played ? "Removed from played courses" : "Added to played courses",
         description: userCourse?.played 
-          ? `${courseName} removed from your played courses`
-          : `${courseName} marked as played`,
+          ? "Course removed from your played courses"
+          : "Course marked as played",
       });
     },
     onError: (error) => {
@@ -77,7 +90,7 @@ const CoursePlayedButton = ({
   });
 
   const handleTogglePlayed = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent card click event
+    e.stopPropagation();
     if (!canModifyCourseStatus) return;
     togglePlayedMutation.mutate();
   };
@@ -87,14 +100,13 @@ const CoursePlayedButton = ({
   }
 
   return (
-    <div className="absolute top-3 right-3">
+    <div>
       {canModifyCourseStatus ? (
         <Button
           size="sm"
           variant={userCourse?.played ? "default" : "secondary"}
           onClick={handleTogglePlayed}
           disabled={togglePlayedMutation.isPending}
-          className="shadow-lg"
         >
           {userCourse?.played ? (
             <>
@@ -109,7 +121,7 @@ const CoursePlayedButton = ({
           )}
         </Button>
       ) : userCourse?.played ? (
-        <Badge variant="default" className="shadow-lg">
+        <Badge variant="default">
           <Check className="h-3 w-3 mr-1" />
           Played
         </Badge>

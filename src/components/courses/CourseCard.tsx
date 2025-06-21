@@ -26,7 +26,7 @@ interface Course {
 
 interface CourseCardProps {
   course: Course;
-  viewContext?: 'global' | 'regional' | 'usa';
+  viewContext?: 'global' | 'regional';
   viewingUserId?: string;
 }
 
