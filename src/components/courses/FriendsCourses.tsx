@@ -33,6 +33,7 @@ const FriendsCourses = () => {
 
   const selectedFriend = friends.find(f => f.friend_id === selectedFriendId);
   const friendName = selectedFriend?.user_profiles?.display_name || selectedFriend?.user_profiles?.username || 'Friend';
+  const friendUsername = selectedFriend?.user_profiles?.username;
 
   // Calculate statistics
   const totalTop100Played = friendTop100Courses.length;
@@ -51,8 +52,9 @@ const FriendsCourses = () => {
     .slice(0, 6);
 
   const handleAverageRatingClick = () => {
-    if (selectedFriendId) {
-      navigate(`/my-ratings?user=${selectedFriend?.user_profiles?.username || selectedFriendId}`);
+    if (selectedFriendId && friendUsername) {
+      console.log('Navigating to friend ratings:', friendUsername);
+      navigate(`/my-ratings?user=${friendUsername}`);
     }
   };
 
@@ -84,6 +86,7 @@ const FriendsCourses = () => {
         <>
           <FriendStatistics
             friendName={friendName}
+            friendUsername={friendUsername}
             totalTop100Played={totalTop100Played}
             averageRating={friendAverageRating}
             onAverageRatingClick={handleAverageRatingClick}

@@ -42,7 +42,9 @@ const MyRatingsContent = () => {
 
   // Get the user parameter from URL to determine whose ratings to show
   const viewingUsername = searchParams.get('user');
-  const isViewingOwnRatings = !viewingUsername || viewingUsername === user?.id;
+  const isViewingOwnRatings = !viewingUsername;
+
+  console.log('MyRatingsContent: viewingUsername:', viewingUsername, 'isViewingOwnRatings:', isViewingOwnRatings);
 
   // Fetch the user profile if viewing someone else's ratings
   const { data: viewedUserProfile } = useQuery({
@@ -50,13 +52,18 @@ const MyRatingsContent = () => {
     queryFn: async () => {
       if (!viewingUsername || isViewingOwnRatings) return null;
       
+      console.log('Fetching profile for username:', viewingUsername);
       const { data, error } = await supabase
         .from('user_profiles')
         .select('id, display_name, username')
         .eq('username', viewingUsername)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching user profile:', error);
+        throw error;
+      }
+      console.log('Found user profile:', data);
       return data;
     },
     enabled: !!viewingUsername && !isViewingOwnRatings,
@@ -68,11 +75,17 @@ const MyRatingsContent = () => {
     ? 'My' 
     : (viewedUserProfile?.display_name || viewedUserProfile?.username || 'User');
 
+  console.log('MyRatingsContent: targetUserId:', targetUserId, 'displayName:', displayName);
+
   const { data: ratedCourses = [], isLoading } = useQuery({
     queryKey: ['user-rated-courses', targetUserId],
     queryFn: async () => {
-      if (!targetUserId) return [];
+      if (!targetUserId) {
+        console.log('No targetUserId, returning empty array');
+        return [];
+      }
       
+      console.log('Fetching ratings for user:', targetUserId);
       const { data, error } = await supabase
         .from('course_ratings')
         .select(`
@@ -100,7 +113,12 @@ const MyRatingsContent = () => {
         .eq('user_id', targetUserId)
         .order('rating', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching ratings:', error);
+        throw error;
+      }
+      
+      console.log('Found ratings:', data?.length || 0);
       return data as RatedCourse[];
     },
     enabled: !!targetUserId,

@@ -5,6 +5,7 @@ import { Trophy, Star } from 'lucide-react';
 
 interface FriendStatisticsProps {
   friendName: string;
+  friendUsername?: string;
   totalTop100Played: number;
   averageRating: string | null;
   onAverageRatingClick: () => void;
@@ -12,6 +13,7 @@ interface FriendStatisticsProps {
 
 const FriendStatistics: React.FC<FriendStatisticsProps> = ({
   friendName,
+  friendUsername,
   totalTop100Played,
   averageRating,
   onAverageRatingClick
