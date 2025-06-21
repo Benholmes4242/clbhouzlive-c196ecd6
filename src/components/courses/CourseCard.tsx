@@ -19,9 +19,10 @@ interface Course {
 interface CourseCardProps {
   course: Course;
   viewContext?: 'global' | 'regional' | 'usa';
+  viewingUserId?: string;
 }
 
-const CourseCard: React.FC<CourseCardProps> = ({ course, viewContext = 'global' }) => {
+const CourseCard: React.FC<CourseCardProps> = ({ course, viewContext = 'global', viewingUserId }) => {
   const getRankDisplay = () => {
     if (viewContext === 'regional' && course.regional_rank) {
       return `#${course.regional_rank}`;
