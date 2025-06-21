@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -10,9 +11,9 @@ interface Course {
   country: string;
   region?: string;
   continent?: string;
-  global_rank?: number;
-  regional_rank?: number;
-  usa_rank?: number;
+  global_rank?: number | null;
+  regional_rank?: number | null;
+  usa_rank?: number | null;
   description?: string;
   thumbnail_image?: string;
   latitude?: number | null;
