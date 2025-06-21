@@ -20,12 +20,14 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
   onToggle
 }) => {
   const [showRatingModal, setShowRatingModal] = useState(false);
+  const [wasAlreadyPlayed, setWasAlreadyPlayed] = useState(false);
 
   const handleCardClick = () => {
     if (!isOwnProfile || !onToggle) return;
     
     if (!isPlayed) {
-      // If course is not currently played, mark as played and show rating modal
+      // If course is not currently played, mark as played and show rating modal for first time
+      setWasAlreadyPlayed(false);
       onToggle();
       // Small delay to let the state update, then show rating modal
       setTimeout(() => {
@@ -33,6 +35,7 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
       }, 100);
     } else {
       // If already played, show the rating modal to edit existing rating
+      setWasAlreadyPlayed(true);
       setShowRatingModal(true);
     }
   };
@@ -129,7 +132,7 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
           }}
           isOpen={showRatingModal}
           onClose={() => setShowRatingModal(false)}
-          isEditMode={isPlayed}
+          isEditMode={wasAlreadyPlayed}
           onRemoveFromPlayed={onToggle}
         />
       )}
