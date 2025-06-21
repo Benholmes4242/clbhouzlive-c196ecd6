@@ -18,16 +18,16 @@ interface Course {
   id: string;
   name: string;
   country: string;
-  region: string;
-  continent: string;
-  global_rank: number | null;
-  regional_rank: number | null;
-  usa_rank: number | null;
-  description: string;
-  thumbnail_image: string;
-  latitude: number | null;
-  longitude: number | null;
-  website_url: string | null;
+  region?: string;
+  continent?: string;
+  global_rank?: number | null;
+  regional_rank?: number | null;
+  usa_rank?: number | null;
+  description?: string;
+  thumbnail_image?: string;
+  latitude?: number | null;
+  longitude?: number | null;
+  website_url?: string | null;
 }
 
 interface CourseDetailModalProps {
@@ -131,7 +131,7 @@ const CourseDetailModal = ({ course, isOpen, onClose }: CourseDetailModalProps) 
           {/* Location */}
           <div className="flex items-center gap-2 text-muted-foreground">
             <MapPin className="h-4 w-4" />
-            <span>{course.region}, {course.country}</span>
+            <span>{course.region ? `${course.region}, ${course.country}` : course.country}</span>
           </div>
 
           {/* Description */}
