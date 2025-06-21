@@ -49,8 +49,11 @@ export const useStoryData = () => {
           }
         ];
 
-        // Fetch accepted friends
-        const { data: friendsData, error: friendsError } = await supabase
+        // Try multiple approaches to fetch friends
+        console.log('Attempting to fetch friends with different queries...');
+
+        // First, try the original query
+        const { data: friendsData1, error: friendsError1 } = await supabase
           .from('user_friends')
           .select(`
             friend_id,
@@ -64,12 +67,69 @@ export const useStoryData = () => {
           .eq('user_id', user.id)
           .eq('status', 'accepted');
 
-        console.log('Friends query result:', { friendsData, friendsError });
-        console.log('Number of friends found:', friendsData?.length || 0);
+        console.log('Query 1 (original):', { friendsData1, friendsError1 });
 
-        if (friendsData && friendsData.length > 0) {
+        // Second, try querying both directions of friendship
+        const { data: friendsData2, error: friendsError2 } = await supabase
+          .from('user_friends')
+          .select(`
+            user_id,
+            friend_id,
+            status,
+            user_profiles!user_friends_friend_id_fkey (
+              id,
+              username,
+              display_name,
+              profile_photo_url
+            )
+          `)
+          .or(`user_id.eq.${user.id},friend_id.eq.${user.id}`)
+          .eq('status', 'accepted');
+
+        console.log('Query 2 (bidirectional):', { friendsData2, friendsError2 });
+
+        // Third, try a simple query without joins first
+        const { data: friendsData3, error: friendsError3 } = await supabase
+          .from('user_friends')
+          .select('*')
+          .eq('user_id', user.id)
+          .eq('status', 'accepted');
+
+        console.log('Query 3 (simple):', { friendsData3, friendsError3 });
+
+        // Use the first successful query that returns data
+        let friendsToProcess: any[] = [];
+        
+        if (friendsData1 && friendsData1.length > 0) {
+          friendsToProcess = friendsData1;
+          console.log('Using Query 1 results');
+        } else if (friendsData2 && friendsData2.length > 0) {
+          friendsToProcess = friendsData2;
+          console.log('Using Query 2 results');
+        } else if (friendsData3 && friendsData3.length > 0) {
+          console.log('Using Query 3 results, fetching profiles separately');
+          // Fetch profiles separately
+          const friendIds = friendsData3.map(f => f.friend_id);
+          const { data: profilesData } = await supabase
+            .from('user_profiles')
+            .select('id, username, display_name, profile_photo_url')
+            .in('id', friendIds);
+          
+          console.log('Fetched profiles separately:', profilesData);
+          
+          // Combine the data
+          friendsToProcess = friendsData3.map(friendship => ({
+            ...friendship,
+            user_profiles: profilesData?.find(p => p.id === friendship.friend_id)
+          }));
+        }
+
+        console.log('Final friends to process:', friendsToProcess);
+        console.log('Number of friends to process:', friendsToProcess.length);
+
+        if (friendsToProcess && friendsToProcess.length > 0) {
           // Add friends to the stories
-          friendsData.forEach((friendship: any) => {
+          friendsToProcess.forEach((friendship: any) => {
             const profile = friendship.user_profiles;
             console.log('Processing friend profile:', profile);
             
