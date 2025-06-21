@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Search, MapPin } from 'lucide-react';
@@ -23,7 +22,7 @@ const CourseExplorer = () => {
 
       if (selectedRegion === 'britain-ireland') {
         query = query
-          .in('country', ['England', 'Scotland', 'Wales', 'Northern Ireland', 'Ireland', 'Isle of Man'])
+          .in('country', ['England', 'Scotland', 'Wales', 'Northern Ireland', 'Ireland', 'Isle of Man', 'United Kingdom'])
           .not('regional_rank', 'is', null)
           .order('regional_rank', { ascending: true });
       } else if (selectedRegion === 'usa') {
@@ -34,7 +33,7 @@ const CourseExplorer = () => {
       } else if (selectedRegion === 'europe') {
         query = query
           .eq('continent', 'Europe')
-          .not('country', 'in', '(England,Scotland,Wales,Northern Ireland,Ireland,Isle of Man)')
+          .not('country', 'in', '(England,Scotland,Wales,Northern Ireland,Ireland,Isle of Man,United Kingdom)')
           .not('global_rank', 'is', null)
           .order('global_rank', { ascending: true });
       } else {
@@ -118,7 +117,7 @@ const CourseExplorer = () => {
             <CourseCard 
               key={course.id} 
               course={course} 
-              viewContext={selectedRegion === 'britain-ireland' ? 'regional' : 'global'}
+              viewContext={selectedRegion === 'britain-ireland' ? 'regional' : selectedRegion === 'usa' ? 'usa' : 'global'}
             />
           ))}
         </div>

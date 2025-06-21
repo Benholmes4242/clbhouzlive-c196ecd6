@@ -1,124 +1,110 @@
 
-import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { Card, CardContent } from '@/components/ui/card';
-import CourseImage from './CourseImage';
-import CourseRankBadges from './CourseRankBadges';
-import CoursePlayedButton from './CoursePlayedButton';
-import CourseInfo from './CourseInfo';
-import CourseDetailModal from './CourseDetailModal';
+import React from 'react';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { MapPin, Star } from 'lucide-react';
 
 interface Course {
   id: string;
   name: string;
   country: string;
-  region: string;
-  continent: string;
-  global_rank: number | null;
-  regional_rank: number | null;
-  usa_rank: number | null;
-  description: string;
-  thumbnail_image: string;
-  latitude: number | null;
-  longitude: number | null;
-  website_url: string | null;
+  region?: string;
+  global_rank?: number;
+  regional_rank?: number;
+  usa_rank?: number;
+  description?: string;
+  thumbnail_image?: string;
 }
 
 interface CourseCardProps {
   course: Course;
-  viewingUserId?: string;
-  viewContext?: 'global' | 'regional';
+  viewContext?: 'global' | 'regional' | 'usa';
 }
 
-const CourseCard = ({ course, viewingUserId, viewContext = 'global' }: CourseCardProps) => {
-  const [isHovered, setIsHovered] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const { data: currentUserResponse } = useQuery({
-    queryKey: ['current-user'],
-    queryFn: async () => {
-      return await supabase.auth.getUser();
-    },
-  });
-
-  const currentUser = currentUserResponse?.data?.user;
-
-  const { data: userCourse } = useQuery({
-    queryKey: ['user-course', course.id, viewingUserId || currentUser?.id],
-    queryFn: async () => {
-      const targetUserId = viewingUserId || currentUser?.id;
-      if (!targetUserId) return null;
-
-      const { data, error } = await supabase
-        .from('user_courses')
-        .select('*')
-        .eq('course_id', course.id)
-        .eq('user_id', targetUserId)
-        .maybeSingle();
-
-      if (error && error.code !== 'PGRST116') throw error;
-      return data;
-    },
-    enabled: !!(viewingUserId || currentUser?.id),
-  });
-
-  const canModifyCourseStatus = currentUser?.id && (!viewingUserId || viewingUserId === currentUser.id);
-
-  const handleCardClick = () => {
-    setIsModalOpen(true);
+const CourseCard: React.FC<CourseCardProps> = ({ course, viewContext = 'global' }) => {
+  const getRankDisplay = () => {
+    if (viewContext === 'regional' && course.regional_rank) {
+      return `#${course.regional_rank}`;
+    } else if (viewContext === 'usa' && course.usa_rank) {
+      return `#${course.usa_rank}`;
+    } else if (course.global_rank) {
+      return `#${course.global_rank}`;
+    }
+    return null;
   };
 
+  const getRankLabel = () => {
+    if (viewContext === 'regional') {
+      return 'GB&I';
+    } else if (viewContext === 'usa') {
+      return 'USA';
+    }
+    return 'Global';
+  };
+
+  const rank = getRankDisplay();
+
   return (
-    <>
-      <Card 
-        className="overflow-hidden hover:shadow-lg transition-all duration-300 cursor-pointer"
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-        onClick={handleCardClick}
-      >
-        <div className="relative">
-          <CourseImage 
-            thumbnailImage={course.thumbnail_image}
-            name={course.name}
-            isHovered={isHovered}
-          />
-          
-          <CourseRankBadges 
-            globalRank={course.global_rank}
-            regionalRank={course.regional_rank}
-            usaRank={course.usa_rank}
-            country={course.country}
-            viewContext={viewContext}
-          />
-
-          <CoursePlayedButton
-            courseId={course.id}
-            courseName={course.name}
-            userCourse={userCourse}
-            canModifyCourseStatus={canModifyCourseStatus}
-            currentUserId={currentUser?.id}
-            viewingUserId={viewingUserId}
-          />
+    <Card className="group hover:shadow-lg transition-all duration-200 cursor-pointer overflow-hidden">
+      <div className="relative">
+        <div className="aspect-video bg-muted overflow-hidden">
+          {course.thumbnail_image ? (
+            <img
+              src={course.thumbnail_image}
+              alt={course.name}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+              onError={(e) => {
+                e.currentTarget.src = 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=400&h=300&fit=crop';
+              }}
+            />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center">
+              <Star className="h-12 w-12 text-white opacity-50" />
+            </div>
+          )}
         </div>
-
-        <CardContent className="p-4">
-          <CourseInfo
-            name={course.name}
-            region={course.region}
-            country={course.country}
-            description={course.description}
-            userCourse={userCourse}
-          />
-        </CardContent>
-      </Card>
-
-      <CourseDetailModal
-        course={course}
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-      />
-    </>
+        {rank && (
+          <Badge 
+            variant="secondary" 
+            className="absolute top-2 left-2 bg-white/90 text-gray-900 font-semibold"
+          >
+            {rank} {getRankLabel()}
+          </Badge>
+        )}
+        {course.global_rank && course.global_rank <= 100 && (
+          <Badge 
+            variant="default" 
+            className="absolute top-2 right-2 bg-amber-500 hover:bg-amber-600 text-white"
+          >
+            Top 100
+          </Badge>
+        )}
+      </div>
+      
+      <CardHeader className="pb-2">
+        <h3 className="font-semibold text-lg leading-tight line-clamp-2 group-hover:text-primary transition-colors">
+          {course.name}
+        </h3>
+      </CardHeader>
+      
+      <CardContent className="pt-0">
+        <div className="flex items-center gap-1 text-muted-foreground text-sm mb-3">
+          <MapPin className="h-4 w-4 flex-shrink-0" />
+          <span className="line-clamp-1">
+            {course.region && course.region !== course.country 
+              ? `${course.region}, ${course.country}`
+              : course.country
+            }
+          </span>
+        </div>
+        
+        {course.description && (
+          <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
+            {course.description}
+          </p>
+        )}
+      </CardContent>
+    </Card>
   );
 };
 
