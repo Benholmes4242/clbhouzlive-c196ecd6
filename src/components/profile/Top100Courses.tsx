@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Trophy, MapPin } from 'lucide-react';
@@ -102,9 +101,6 @@ const Top100Courses: React.FC<Top100CoursesProps> = ({
                       <span className="text-lg">{region.emoji}</span>
                       <h3 className="font-semibold text-sm">{region.name}</h3>
                     </div>
-                    <Badge variant="secondary" className="text-xs">
-                      {progress?.played || 0}/{progress?.total || 0}
-                    </Badge>
                   </div>
                   
                   <div className="space-y-2">
