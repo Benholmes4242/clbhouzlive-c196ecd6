@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -81,7 +82,16 @@ const MyCourses = () => {
   // Calculate statistics
   const totalTop100Played = top100Courses.length;
 
+  // Filter recent courses to only include those played within the last 30 days
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
   const recentCourses = [...playedCourses, ...top100Courses]
+    .filter((userCourse) => {
+      if (!userCourse.played_date) return false;
+      const playedDate = new Date(userCourse.played_date);
+      return playedDate >= thirtyDaysAgo;
+    })
     .sort((a, b) => new Date(b.played_date || 0).getTime() - new Date(a.played_date || 0).getTime())
     .slice(0, 6);
 
@@ -157,7 +167,7 @@ const MyCourses = () => {
 
         <TabsContent value="recent" className="mt-6">
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Recently Played</h3>
+            <h3 className="text-lg font-semibold">Recently Played (Last 30 Days)</h3>
             {recentCourses.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {recentCourses.map((userCourse) => (
@@ -174,7 +184,7 @@ const MyCourses = () => {
                   <Calendar className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
                   <h3 className="text-lg font-semibold mb-2">No recent activity</h3>
                   <p className="text-muted-foreground">
-                    Play some courses and they'll appear here
+                    Play some courses in the last 30 days and they'll appear here
                   </p>
                 </CardContent>
               </Card>
