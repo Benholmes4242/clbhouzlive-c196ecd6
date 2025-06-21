@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { MapPin } from 'lucide-react';
 
 interface CourseMapProps {
   latitude: number;
@@ -9,16 +8,20 @@ interface CourseMapProps {
 }
 
 const CourseMap = ({ latitude, longitude, courseName }: CourseMapProps) => {
+  const mapUrl = `https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dOWTgHz4TJlE7o&q=${latitude},${longitude}&zoom=15&maptype=satellite`;
+
   return (
-    <div className="aspect-video w-full bg-muted rounded-lg flex items-center justify-center border">
-      <div className="text-center space-y-2">
-        <MapPin className="h-8 w-8 mx-auto text-muted-foreground" />
-        <div className="text-sm text-muted-foreground">
-          <p className="font-medium">{courseName}</p>
-          <p>Lat: {latitude.toFixed(4)}, Lng: {longitude.toFixed(4)}</p>
-          <p className="text-xs mt-1">Map integration coming soon</p>
-        </div>
-      </div>
+    <div className="w-full h-64 rounded-lg overflow-hidden border">
+      <iframe
+        src={mapUrl}
+        width="100%"
+        height="100%"
+        style={{ border: 0 }}
+        allowFullScreen
+        loading="lazy"
+        referrerPolicy="no-referrer-when-downgrade"
+        title={`Map of ${courseName}`}
+      />
     </div>
   );
 };
