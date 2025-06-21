@@ -22,16 +22,6 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [wasJustPlayed, setWasJustPlayed] = useState(false);
 
-  // Get regional label for badges
-  const getRegionalLabel = (course: any) => {
-    if (course.country === 'United Kingdom' || course.country === 'Ireland') {
-      return 'GB&I';
-    }
-    return 'Regional';
-  };
-
-  const regionalLabel = getRegionalLabel(course);
-
   const handleCardClick = () => {
     if (!isOwnProfile || !onToggle) return;
     
@@ -76,16 +66,16 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
                 {course.global_rank}
               </Badge>
             )}
-            {/* Grey badge - shows regional rank when viewing regional lists */}
-            {course.regional_rank && region !== 'global' && (
+            {/* GB&I badge - shows regional rank for GB&I courses */}
+            {course.regional_rank && region === 'britain-ireland' && (
               <Badge variant="secondary" className="text-xs">
-                {regionalLabel} {course.regional_rank}
+                #{course.regional_rank} GB&I
               </Badge>
             )}
             {/* USA rank badge */}
             {course.usa_rank && region === 'usa' && (
               <Badge variant="secondary" className="text-xs">
-                USA {course.usa_rank}
+                #{course.usa_rank} USA
               </Badge>
             )}
           </div>
