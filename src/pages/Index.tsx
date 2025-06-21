@@ -33,7 +33,7 @@ const Index = () => {
           {/* Logo */}
           <div className="flex justify-center">
             <img
-              src="/lovable-uploads/6d5c5a4b-fd08-4304-ab88-2a9ba8485950.png"
+              src="/lovable-uploads/071651d4-1096-4053-b720-6f758b637fb8.png"
               alt="clbhouz"
               className="w-auto max-h-32 object-contain"
             />

@@ -19,7 +19,7 @@ const Header = () => {
           {/* Logo */}
           <div className="flex items-center">
             <img
-              src="/lovable-uploads/1e74af6c-d153-4197-a52b-5bf76a943867.png"
+              src="/lovable-uploads/071651d4-1096-4053-b720-6f758b637fb8.png"
               alt="clbhouz Logo"
               className="w-auto cursor-pointer"
               style={{
