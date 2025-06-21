@@ -78,7 +78,7 @@ const CourseExplorer = () => {
   const currentRegion = regionOptions.find(r => r.value === selectedRegion);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-3">
       {/* Search */}
       <div className="relative max-w-md">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
