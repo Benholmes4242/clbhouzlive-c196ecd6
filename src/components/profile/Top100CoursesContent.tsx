@@ -47,6 +47,7 @@ const Top100CoursesContent: React.FC<Top100CoursesContentProps> = ({
             isPlayed={isPlayed}
             isOwnProfile={isOwnProfile}
             onToggle={toggleCourse}
+            region={region}
           />
         );
       })}
