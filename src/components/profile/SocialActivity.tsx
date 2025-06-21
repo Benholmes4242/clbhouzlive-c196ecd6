@@ -27,7 +27,7 @@ interface ActivityPost {
   comments: number;
   shares: number;
   timeAgo: string;
-  created_at?: string;
+  created_at: string; // Make this required to match PostModalData
   post_media?: Array<{
     id: string;
     media_type: 'image' | 'video';
@@ -112,7 +112,7 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
         comments: 0,
         shares: 0,
         timeAgo: new Date(post.created_at).toLocaleDateString(),
-        created_at: post.created_at,
+        created_at: post.created_at, // Ensure this is always present
         post_media: (post.post_media || []).map(media => ({
           id: media.id,
           media_type: media.media_type as 'image' | 'video',
