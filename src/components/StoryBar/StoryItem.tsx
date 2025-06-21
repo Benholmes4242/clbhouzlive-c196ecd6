@@ -29,7 +29,7 @@ const StoryItem: React.FC<StoryItemProps> = ({
             className="focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 rounded-full"
           >
             {hasProfile && story.avatar ? (
-              // User has a profile photo
+              // User has a profile photo - show with green ring
               <div className="w-16 h-16 rounded-full p-0.5 bg-gradient-to-tr from-green-500 to-green-700 hover:scale-105 transition-transform">
                 <img
                   src={story.avatar}
@@ -38,9 +38,11 @@ const StoryItem: React.FC<StoryItemProps> = ({
                 />
               </div>
             ) : (
-              // User doesn't have a profile photo - show plus icon
-              <div className="w-16 h-16 bg-muted border-2 border-dashed border-gray-400 rounded-full flex items-center justify-center hover:bg-muted/80 transition-colors">
-                <Plus className="h-6 w-6 text-muted-foreground" />
+              // User doesn't have a profile photo - show plus icon with green ring
+              <div className="w-16 h-16 rounded-full p-0.5 bg-gradient-to-tr from-green-500 to-green-700 hover:scale-105 transition-transform flex items-center justify-center">
+                <div className="w-full h-full bg-muted border-2 border-dashed border-gray-400 rounded-full flex items-center justify-center hover:bg-muted/80 transition-colors">
+                  <Plus className="h-6 w-6 text-muted-foreground" />
+                </div>
               </div>
             )}
           </button>
@@ -49,15 +51,9 @@ const StoryItem: React.FC<StoryItemProps> = ({
             type="button"
             onClick={() => onOtherProfileClick(story.username)}
             aria-label={`View ${story.user}'s profile`}
-            className="focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 rounded-full"
+            className="focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-full"
           >
-            <div className={`w-16 h-16 rounded-full p-0.5 ${
-              story.hasStory 
-                ? 'bg-gradient-to-tr from-pink-500 via-red-500 to-yellow-500' 
-                : story.type === 'suggested' 
-                ? 'bg-gray-300' 
-                : 'bg-gradient-to-tr from-green-500 to-green-700'
-            } hover:scale-105 transition-transform`}>
+            <div className="w-16 h-16 rounded-full p-0.5 bg-gradient-to-tr from-blue-500 to-blue-700 hover:scale-105 transition-transform">
               <img
                 src={story.avatar}
                 alt={story.user}

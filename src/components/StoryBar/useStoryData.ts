@@ -42,12 +42,12 @@ export const useStoryData = () => {
             id: 'add',
             type: 'add',
             user: currentUserProfile?.display_name || 'Your Profile',
-            username: 'your-profile',
+            username: currentUserProfile?.username || 'your-profile',
             avatar: currentUserProfile?.profile_photo_url || '',
           }
         ];
 
-        // Fetch only accepted friends (no mock data)
+        // Fetch accepted friends
         const { data: friendsData, error: friendsError } = await supabase
           .from('user_friends')
           .select(`
@@ -65,7 +65,7 @@ export const useStoryData = () => {
         console.log('Friends data:', friendsData, 'Friends error:', friendsError);
 
         if (friendsData && friendsData.length > 0) {
-          // Add only real friends
+          // Add friends to the stories
           friendsData.forEach((friendship: any) => {
             const profile = friendship.user_profiles;
             if (profile) {
@@ -75,13 +75,13 @@ export const useStoryData = () => {
                 user: profile.display_name || profile.username || 'Friend',
                 username: profile.username || profile.id,
                 avatar: profile.profile_photo_url || '',
-                hasStory: true,
+                hasStory: false, // Friends don't have stories, just profile access
               });
             }
           });
         }
 
-        console.log('Final stories (friends only):', newStories.map(s => ({ type: s.type, user: s.user })));
+        console.log('Final stories:', newStories.map(s => ({ type: s.type, user: s.user })));
         setStories(newStories);
       } catch (error) {
         console.error('Error fetching stories data:', error);

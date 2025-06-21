@@ -79,9 +79,9 @@ const StoryBar = () => {
           }}
           className="w-full"
         >
-          <CarouselContent className="gap-4">
+          <CarouselContent className="-ml-2">
             {stories.map((story) => (
-              <CarouselItem key={story.id} className="basis-auto">
+              <CarouselItem key={story.id} className="basis-auto pl-2">
                 <StoryItem
                   story={story}
                   onYourProfileClick={handleYourProfile}
