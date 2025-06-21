@@ -10,6 +10,7 @@ import CourseDetailHeader from './CourseDetailHeader';
 import CourseDetailImage from './CourseDetailImage';
 import CourseDetailInfo from './CourseDetailInfo';
 import CourseDetailRatingSection from './CourseDetailRatingSection';
+import CourseRatingStats from './CourseRatingStats';
 import CourseReviews from './CourseReviews';
 import CourseDetailMapSection from './CourseDetailMapSection';
 
@@ -100,6 +101,8 @@ const CourseDetailModal = ({ course, isOpen, onClose }: CourseDetailModalProps) 
 
   if (!course) return null;
 
+  const hasRated = !!userRating;
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -117,6 +120,10 @@ const CourseDetailModal = ({ course, isOpen, onClose }: CourseDetailModalProps) 
             description={course.description}
           />
 
+          {/* Show rating stats for everyone */}
+          <CourseRatingStats ratingStats={ratingStats} />
+
+          {/* Show rating form only if user hasn't rated yet */}
           <CourseDetailRatingSection
             courseId={course.id}
             courseName={course.name}
@@ -126,7 +133,11 @@ const CourseDetailModal = ({ course, isOpen, onClose }: CourseDetailModalProps) 
             userRating={userRating}
           />
 
-          <CourseReviews courseId={course.id} />
+          <CourseReviews 
+            courseId={course.id} 
+            courseName={course.name}
+            currentUser={currentUser}
+          />
 
           <CourseDetailMapSection
             latitude={course.latitude}

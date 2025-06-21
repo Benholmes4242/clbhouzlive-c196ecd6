@@ -37,6 +37,11 @@ const CourseDetailRatingSection = ({
   const canRate = currentUser && userCourse?.played;
   const hasRated = !!userRating;
 
+  // If user has already rated, don't show this section
+  if (hasRated) {
+    return null;
+  }
+
   return (
     <div className="border rounded-lg p-4">
       <h3 className="font-semibold mb-3">Community Rating</h3>
