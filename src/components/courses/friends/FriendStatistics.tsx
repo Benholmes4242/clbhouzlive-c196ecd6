@@ -41,7 +41,7 @@ const FriendStatistics: React.FC<FriendStatisticsProps> = ({
             {averageRating ? `${averageRating}/10` : 'N/A'}
           </div>
           <p className="text-xs text-muted-foreground">
-            Click to view {friendName}'s profile
+            Click to view {friendName}'s ratings
           </p>
         </CardContent>
       </Card>

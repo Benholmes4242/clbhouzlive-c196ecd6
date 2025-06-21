@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Star, ArrowLeft, Calendar, MessageSquare } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import CourseDetailModal from './CourseDetailModal';
 
 interface RatedCourse {
@@ -36,13 +36,42 @@ interface RatedCourse {
 const MyRatingsContent = () => {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [selectedCourse, setSelectedCourse] = useState<RatedCourse['golf_courses'] | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const { data: ratedCourses = [], isLoading } = useQuery({
-    queryKey: ['user-rated-courses', user?.id],
+  // Get the user parameter from URL to determine whose ratings to show
+  const viewingUsername = searchParams.get('user');
+  const isViewingOwnRatings = !viewingUsername || viewingUsername === user?.id;
+
+  // Fetch the user profile if viewing someone else's ratings
+  const { data: viewedUserProfile } = useQuery({
+    queryKey: ['user-profile', viewingUsername],
     queryFn: async () => {
-      if (!user?.id) return [];
+      if (!viewingUsername || isViewingOwnRatings) return null;
+      
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('id, display_name, username')
+        .eq('username', viewingUsername)
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!viewingUsername && !isViewingOwnRatings,
+  });
+
+  // Determine which user's ratings to fetch
+  const targetUserId = isViewingOwnRatings ? user?.id : viewedUserProfile?.id;
+  const displayName = isViewingOwnRatings 
+    ? 'My' 
+    : (viewedUserProfile?.display_name || viewedUserProfile?.username || 'User');
+
+  const { data: ratedCourses = [], isLoading } = useQuery({
+    queryKey: ['user-rated-courses', targetUserId],
+    queryFn: async () => {
+      if (!targetUserId) return [];
       
       const { data, error } = await supabase
         .from('course_ratings')
@@ -68,13 +97,13 @@ const MyRatingsContent = () => {
             website_url
           )
         `)
-        .eq('user_id', user.id)
+        .eq('user_id', targetUserId)
         .order('rating', { ascending: false });
 
       if (error) throw error;
       return data as RatedCourse[];
     },
-    enabled: !!user?.id,
+    enabled: !!targetUserId,
   });
 
   const formatDate = (dateString: string) => {
@@ -104,9 +133,11 @@ const MyRatingsContent = () => {
           <Button variant="ghost" size="icon" onClick={() => navigate('/courses')}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          <h1 className="text-2xl font-bold">My Ratings</h1>
+          <h1 className="text-2xl font-bold">
+            {isViewingOwnRatings ? 'My Ratings' : `${displayName} Ratings`}
+          </h1>
         </div>
-        <div className="text-center py-8">Loading your ratings...</div>
+        <div className="text-center py-8">Loading ratings...</div>
       </div>
     );
   }
@@ -118,7 +149,9 @@ const MyRatingsContent = () => {
           <Button variant="ghost" size="icon" onClick={() => navigate('/courses')}>
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          <h1 className="text-2xl font-bold">My Ratings</h1>
+          <h1 className="text-2xl font-bold">
+            {isViewingOwnRatings ? 'My Ratings' : `${displayName} Ratings`}
+          </h1>
           <Badge variant="secondary" className="ml-auto">
             {ratedCourses.length} courses rated
           </Badge>
@@ -130,7 +163,10 @@ const MyRatingsContent = () => {
               <Star className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
               <h3 className="text-lg font-semibold mb-2">No ratings yet</h3>
               <p className="text-muted-foreground">
-                Start rating courses you've played to see them here
+                {isViewingOwnRatings 
+                  ? 'Start rating courses you\'ve played to see them here' 
+                  : `${displayName} hasn't rated any courses yet`
+                }
               </p>
             </CardContent>
           </Card>

@@ -52,7 +52,7 @@ const FriendsCourses = () => {
 
   const handleAverageRatingClick = () => {
     if (selectedFriendId) {
-      navigate(`/profile/${selectedFriend?.user_profiles?.username || selectedFriendId}`);
+      navigate(`/my-ratings?user=${selectedFriend?.user_profiles?.username || selectedFriendId}`);
     }
   };
 
