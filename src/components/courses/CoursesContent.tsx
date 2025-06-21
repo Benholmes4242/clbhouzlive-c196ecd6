@@ -35,19 +35,25 @@ const CoursesContent = () => {
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className={`grid w-full ${user ? 'grid-cols-3' : 'grid-cols-2'}`}>
           <TabsTrigger value="explore">Explore</TabsTrigger>
+          {user && (
+            <TabsTrigger value="friends-courses" onClick={() => handleAuthRequiredTab('friends-courses')}>
+              Friend's Fairways
+            </TabsTrigger>
+          )}
           <TabsTrigger value="my-courses" onClick={() => handleAuthRequiredTab('my-courses')}>
             My Courses
           </TabsTrigger>
-          {user && (
-            <TabsTrigger value="friends-courses" onClick={() => handleAuthRequiredTab('friends-courses')}>
-              Friends' Courses
-            </TabsTrigger>
-          )}
         </TabsList>
 
         <TabsContent value="explore" className="mt-6">
           <CourseExplorer />
         </TabsContent>
+
+        {user && (
+          <TabsContent value="friends-courses" className="mt-6">
+            <FriendsCourses />
+          </TabsContent>
+        )}
 
         <TabsContent value="my-courses" className="mt-6">
           {user ? (
@@ -71,12 +77,6 @@ const CoursesContent = () => {
             </Card>
           )}
         </TabsContent>
-
-        {user && (
-          <TabsContent value="friends-courses" className="mt-6">
-            <FriendsCourses />
-          </TabsContent>
-        )}
       </Tabs>
     </div>
   );
