@@ -16,6 +16,8 @@ import {
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import EditPostDialog from './EditPostDialog';
 import TaggedText from './TaggedText';
+import PostModal from './PostModal';
+import VideoPreview from './VideoPreview';
 
 interface PostMedia {
   id: string;
@@ -56,10 +58,19 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
   const { toast } = useToast();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const displayName = post.user.display_name || post.user.username || 'User';
   const timeAgo = formatDistanceToNow(new Date(post.created_at), { addSuffix: true });
   const isOwnPost = user?.id === post.user.id;
+
+  const handlePostClick = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
 
   const handleDeletePost = async () => {
     if (!isOwnPost || isDeleting) return;
@@ -77,7 +88,6 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
 
       if (tagsError) throw tagsError;
 
-      // Delete post media
       const { error: mediaError } = await supabase
         .from('post_media')
         .delete()
@@ -85,7 +95,6 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
 
       if (mediaError) throw mediaError;
 
-      // Delete the post
       const { error: postError } = await supabase
         .from('posts')
         .delete()
@@ -171,40 +180,45 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
 
           {/* Post Media */}
           {post.post_media && post.post_media.length > 0 && (
-            <div className="mb-3">
+            <div className="mb-3 cursor-pointer" onClick={handlePostClick}>
               {post.post_media.length > 1 ? (
-                // Multiple media items - use carousel
-                <Carousel className="w-full">
-                  <CarouselContent>
-                    {post.post_media.map((media) => (
-                      <CarouselItem key={media.id}>
-                        <div className="rounded-lg overflow-hidden">
-                          {media.media_type === 'image' ? (
-                            <img
-                              src={media.media_url}
-                              alt="Post content"
-                              className="w-full h-80 object-cover"
-                            />
-                          ) : (
-                            <video
-                              src={media.media_url}
-                              controls
-                              preload="metadata"
-                              className="w-full h-80 object-cover"
-                              poster={`${media.media_url}#t=0.1`}
-                            >
-                              Your browser does not support the video tag.
-                            </video>
-                          )}
-                        </div>
-                      </CarouselItem>
+                <div className="relative">
+                  <Carousel className="w-full">
+                    <CarouselContent>
+                      {post.post_media.map((media) => (
+                        <CarouselItem key={media.id}>
+                          <div className="rounded-lg overflow-hidden">
+                            {media.media_type === 'image' ? (
+                              <img
+                                src={media.media_url}
+                                alt="Post content"
+                                className="w-full h-80 object-cover"
+                              />
+                            ) : (
+                              <VideoPreview
+                                src={media.media_url}
+                                className="w-full h-80"
+                                onFullscreen={handlePostClick}
+                              />
+                            )}
+                          </div>
+                        </CarouselItem>
+                      ))}
+                    </CarouselContent>
+                    <CarouselPrevious className="left-2" />
+                    <CarouselNext className="right-2" />
+                  </Carousel>
+                  {/* Indicator dots */}
+                  <div className="flex justify-center mt-2 space-x-1">
+                    {post.post_media.map((_, index) => (
+                      <div
+                        key={index}
+                        className="w-2 h-2 rounded-full bg-muted-foreground/30"
+                      />
                     ))}
-                  </CarouselContent>
-                  <CarouselPrevious className="left-2" />
-                  <CarouselNext className="right-2" />
-                </Carousel>
+                  </div>
+                </div>
               ) : (
-                // Single media item
                 <div className="rounded-lg overflow-hidden">
                   {post.post_media[0].media_type === 'image' ? (
                     <img
@@ -213,15 +227,11 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
                       className="w-full h-80 object-cover"
                     />
                   ) : (
-                    <video
+                    <VideoPreview
                       src={post.post_media[0].media_url}
-                      controls
-                      preload="metadata"
-                      className="w-full h-80 object-cover"
-                      poster={`${post.post_media[0].media_url}#t=0.1`}
-                    >
-                      Your browser does not support the video tag.
-                    </video>
+                      className="w-full h-80"
+                      onFullscreen={handlePostClick}
+                    />
                   )}
                 </div>
               )}
@@ -251,6 +261,13 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
         onOpenChange={setEditDialogOpen}
         post={post}
         onPostUpdated={onPostUpdated}
+      />
+
+      <PostModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        post={post}
+        isOwnPost={isOwnPost}
       />
     </>
   );

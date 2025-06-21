@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -5,6 +6,9 @@ import { MoreHorizontal, Heart, MessageCircle, Share } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import CreatePostDialog from '@/components/posts/CreatePostDialog';
 import TaggedText from '@/components/posts/TaggedText';
+import PostModal from '@/components/posts/PostModal';
+import VideoPreview from '@/components/posts/VideoPreview';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 
 interface PostTag {
   id: string;
@@ -30,6 +34,12 @@ interface ActivityPost {
     media_url: string;
   }>;
   post_tags: PostTag[];
+  user: {
+    id: string;
+    display_name: string | null;
+    username: string | null;
+    profile_photo_url: string | null;
+  };
 }
 
 interface SocialActivityProps {
@@ -49,6 +59,8 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
 }) => {
   const [posts, setPosts] = useState<ActivityPost[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedPost, setSelectedPost] = useState<ActivityPost | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const fetchUserPosts = async () => {
     if (!userId) return;
@@ -60,6 +72,7 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
           id,
           content,
           created_at,
+          user_id,
           post_media (
             id,
             media_type,
@@ -84,6 +97,13 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
         return;
       }
 
+      // Get user profile for the posts
+      const { data: userProfile } = await supabase
+        .from('user_profiles')
+        .select('id, display_name, username, profile_photo_url')
+        .eq('id', userId)
+        .single();
+
       const formattedPosts = postsData.map(post => ({
         id: post.id,
         type: 'post' as const,
@@ -105,6 +125,12 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
           name: tag.taggable_entities.name,
           username: tag.taggable_entities.username
         })),
+        user: {
+          id: userId,
+          display_name: userProfile?.display_name || null,
+          username: userProfile?.username || null,
+          profile_photo_url: userProfile?.profile_photo_url || null
+        },
         image: post.post_media?.find(media => media.media_type === 'image')?.media_url
       }));
 
@@ -119,6 +145,16 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
   useEffect(() => {
     fetchUserPosts();
   }, [userId]);
+
+  const handlePostClick = (post: ActivityPost) => {
+    setSelectedPost(post);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedPost(null);
+  };
 
   // If this is not the user's own profile and activity is not visible, don't render anything
   if (!isOwnProfile && !activityVisible) {
@@ -140,88 +176,134 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
   }
 
   return (
-    <div className="mt-10 px-2">
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <h2 className="text-lg font-semibold">Activity</h2>
-          <span className="text-sm text-muted-foreground">
-            {posts.length} posts
-          </span>
-        </div>
-        {isOwnProfile && (
-          <CreatePostDialog onPostCreated={fetchUserPosts} />
-        )}
-      </div>
-
-      <div className="space-y-4">
-        {posts.map((post) => (
-          <Card key={post.id} className="p-4">
-            <div className="flex justify-between items-start mb-3">
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium">{getPostAttribution()}</span>
-                <span className="text-xs text-muted-foreground">• {post.timeAgo}</span>
-              </div>
-              <Button variant="ghost" size="icon" className="h-6 w-6">
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-            </div>
-
-            <div className="text-sm mb-3">
-              <TaggedText text={post.content} tags={post.post_tags} />
-            </div>
-
-            {post.post_media && post.post_media.length > 0 && (
-              <div className="mb-3 space-y-2">
-                {post.post_media.map((media) => (
-                  <div key={media.id}>
-                    {media.media_type === 'image' ? (
-                      <img
-                        src={media.media_url}
-                        alt="Post content"
-                        className="w-full h-48 object-cover rounded-lg"
-                      />
-                    ) : (
-                      <video
-                        src={media.media_url}
-                        controls
-                        preload="metadata"
-                        className="w-full h-48 object-cover rounded-lg"
-                        poster={`${media.media_url}#t=0.1`}
-                      >
-                        Your browser does not support the video tag.
-                      </video>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <div className="flex items-center justify-between pt-2 border-t">
-              <div className="flex items-center gap-4">
-                <Button variant="ghost" size="sm" className="gap-1 text-muted-foreground hover:text-red-500">
-                  <Heart className="h-4 w-4" />
-                  {post.likes}
-                </Button>
-                <Button variant="ghost" size="sm" className="gap-1 text-muted-foreground">
-                  <MessageCircle className="h-4 w-4" />
-                  {post.comments}
-                </Button>
-                <Button variant="ghost" size="sm" className="gap-1 text-muted-foreground">
-                  <Share className="h-4 w-4" />
-                  {post.shares}
-                </Button>
-              </div>
-            </div>
-          </Card>
-        ))}
-
-        {posts.length === 0 && !loading && (
-          <div className="text-center py-8">
-            <p className="text-muted-foreground">No posts yet.</p>
+    <>
+      <div className="mt-10 px-2">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <h2 className="text-lg font-semibold">Activity</h2>
+            <span className="text-sm text-muted-foreground">
+              {posts.length} posts
+            </span>
           </div>
-        )}
+          {isOwnProfile && (
+            <CreatePostDialog onPostCreated={fetchUserPosts} />
+          )}
+        </div>
+
+        <div className="space-y-4">
+          {posts.map((post) => (
+            <Card key={post.id} className="p-4 cursor-pointer hover:shadow-md transition-shadow" onClick={() => handlePostClick(post)}>
+              <div className="flex justify-between items-start mb-3">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium">{getPostAttribution()}</span>
+                  <span className="text-xs text-muted-foreground">• {post.timeAgo}</span>
+                </div>
+                <Button variant="ghost" size="icon" className="h-6 w-6" onClick={(e) => e.stopPropagation()}>
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </div>
+
+              <div className="text-sm mb-3">
+                <TaggedText text={post.content} tags={post.post_tags} />
+              </div>
+
+              {post.post_media && post.post_media.length > 0 && (
+                <div className="mb-3">
+                  {post.post_media.length > 1 ? (
+                    <div className="relative">
+                      <Carousel className="w-full">
+                        <CarouselContent>
+                          {post.post_media.map((media, index) => (
+                            <CarouselItem key={media.id}>
+                              <div className="relative">
+                                {media.media_type === 'image' ? (
+                                  <img
+                                    src={media.media_url}
+                                    alt="Post content"
+                                    className="w-full h-48 object-cover rounded-lg"
+                                  />
+                                ) : (
+                                  <VideoPreview
+                                    src={media.media_url}
+                                    className="w-full h-48 rounded-lg overflow-hidden"
+                                    onFullscreen={() => handlePostClick(post)}
+                                  />
+                                )}
+                              </div>
+                            </CarouselItem>
+                          ))}
+                        </CarouselContent>
+                        {post.post_media.length > 1 && (
+                          <>
+                            <CarouselPrevious className="left-2" />
+                            <CarouselNext className="right-2" />
+                          </>
+                        )}
+                      </Carousel>
+                      {/* Indicator dots */}
+                      <div className="flex justify-center mt-2 space-x-1">
+                        {post.post_media.map((_, index) => (
+                          <div
+                            key={index}
+                            className="w-2 h-2 rounded-full bg-muted-foreground/30"
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div>
+                      {post.post_media[0].media_type === 'image' ? (
+                        <img
+                          src={post.post_media[0].media_url}
+                          alt="Post content"
+                          className="w-full h-48 object-cover rounded-lg"
+                        />
+                      ) : (
+                        <VideoPreview
+                          src={post.post_media[0].media_url}
+                          className="w-full h-48 rounded-lg overflow-hidden"
+                          onFullscreen={() => handlePostClick(post)}
+                        />
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="flex items-center justify-between pt-2 border-t" onClick={(e) => e.stopPropagation()}>
+                <div className="flex items-center gap-4">
+                  <Button variant="ghost" size="sm" className="gap-1 text-muted-foreground hover:text-red-500">
+                    <Heart className="h-4 w-4" />
+                    {post.likes}
+                  </Button>
+                  <Button variant="ghost" size="sm" className="gap-1 text-muted-foreground">
+                    <MessageCircle className="h-4 w-4" />
+                    {post.comments}
+                  </Button>
+                  <Button variant="ghost" size="sm" className="gap-1 text-muted-foreground">
+                    <Share className="h-4 w-4" />
+                    {post.shares}
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          ))}
+
+          {posts.length === 0 && !loading && (
+            <div className="text-center py-8">
+              <p className="text-muted-foreground">No posts yet.</p>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+
+      <PostModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        post={selectedPost}
+        isOwnPost={isOwnProfile}
+      />
+    </>
   );
 };
 
