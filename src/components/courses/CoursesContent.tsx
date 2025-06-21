@@ -25,7 +25,7 @@ const CoursesContent = () => {
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h1 className="text-3xl font-bold mb-2">Golf Courses</h1>
+        <h1 className="text-3xl font-bold mb-2">Top 100 Golf Courses in Britain & Ireland</h1>
         <p className="text-muted-foreground">
           Discover and track the world's greatest golf courses
         </p>
