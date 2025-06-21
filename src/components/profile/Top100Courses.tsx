@@ -3,7 +3,8 @@ import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Trophy, MapPin, Eye, EyeOff } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Trophy, MapPin } from 'lucide-react';
 import { useTop100CoursesData } from '@/hooks/useTop100CoursesData';
 import Top100CoursesModal from './Top100CoursesModal';
 
@@ -68,24 +69,19 @@ const Top100Courses: React.FC<Top100CoursesProps> = ({
           </div>
           
           {isOwnProfile && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleVisibilityToggle(!top100Visible)}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              {top100Visible ? (
-                <>
-                  <Eye className="h-4 w-4 mr-1" />
-                  Visible
-                </>
-              ) : (
-                <>
-                  <EyeOff className="h-4 w-4 mr-1" />
-                  Hidden
-                </>
-              )}
-            </Button>
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="show-top100"
+                checked={top100Visible}
+                onCheckedChange={handleVisibilityToggle}
+              />
+              <label 
+                htmlFor="show-top100" 
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+              >
+                Show this section
+              </label>
+            </div>
           )}
         </div>
 
