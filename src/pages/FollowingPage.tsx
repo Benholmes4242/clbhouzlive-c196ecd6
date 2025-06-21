@@ -21,7 +21,7 @@ const FollowingPage = () => {
         .from('user_follows')
         .select(`
           following_id,
-          user_profiles!user_follows_following_id_fkey (
+          user_profiles (
             id,
             display_name,
             username,

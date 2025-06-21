@@ -17,19 +17,12 @@ const FriendsPage = () => {
     queryFn: async () => {
       if (!userId) return [];
       
-      const { data, error } = await supabase
+      // Get friends where user is the requester
+      const { data: friendsAsUser, error: error1 } = await supabase
         .from('user_friends')
         .select(`
-          user_id,
           friend_id,
-          user_profiles!user_friends_user_id_fkey (
-            id,
-            display_name,
-            username,
-            profile_photo_url,
-            bio
-          ),
-          friend_profiles:user_profiles!user_friends_friend_id_fkey (
+          user_profiles!user_friends_friend_id_fkey (
             id,
             display_name,
             username,
@@ -37,19 +30,40 @@ const FriendsPage = () => {
             bio
           )
         `)
-        .or(`user_id.eq.${userId},friend_id.eq.${userId}`)
+        .eq('user_id', userId)
         .eq('status', 'accepted');
 
-      if (error) throw error;
+      // Get friends where user is the friend
+      const { data: friendsAsFriend, error: error2 } = await supabase
+        .from('user_friends')
+        .select(`
+          user_id,
+          user_profiles!user_friends_user_id_fkey (
+            id,
+            display_name,
+            username,
+            profile_photo_url,
+            bio
+          )
+        `)
+        .eq('friend_id', userId)
+        .eq('status', 'accepted');
+
+      if (error1 || error2) throw error1 || error2;
       
-      // Transform the data to get the friend profile (not the current user)
-      return (data || []).map(friend => {
-        const isCurrentUserTheUser = friend.user_id === userId;
-        return {
-          friendId: isCurrentUserTheUser ? friend.friend_id : friend.user_id,
-          profile: isCurrentUserTheUser ? friend.friend_profiles : friend.user_profiles
-        };
-      });
+      // Combine and transform the data
+      const allFriends = [
+        ...(friendsAsUser || []).map(friend => ({
+          friendId: friend.friend_id,
+          profile: friend.user_profiles
+        })),
+        ...(friendsAsFriend || []).map(friend => ({
+          friendId: friend.user_id,
+          profile: friend.user_profiles
+        }))
+      ];
+      
+      return allFriends;
     },
     enabled: !!userId,
   });
