@@ -1,50 +1,37 @@
 
 import React from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Check, Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
-interface CoursePlayedButtonProps {
-  courseId: string;
-  userId: string;
+interface UserCourse {
+  id: string;
+  played: boolean;
+  rating?: number;
 }
 
-const CoursePlayedButton = ({ courseId, userId }: CoursePlayedButtonProps) => {
+interface CoursePlayedButtonProps {
+  courseId: string;
+  courseName: string;
+  userCourse: UserCourse | null;
+  canModifyCourseStatus: boolean;
+  currentUserId?: string;
+  viewingUserId?: string;
+}
+
+const CoursePlayedButton = ({ 
+  courseId, 
+  courseName, 
+  userCourse, 
+  canModifyCourseStatus, 
+  currentUserId,
+  viewingUserId 
+}: CoursePlayedButtonProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-
-  // Get user's current session to check if they can modify this course
-  const { data: session } = useQuery({
-    queryKey: ['session'],
-    queryFn: async () => {
-      const { data } = await supabase.auth.getSession();
-      return data.session;
-    },
-  });
-
-  const currentUserId = session?.user?.id;
-  const canModifyCourseStatus = currentUserId === userId;
-
-  // Query to get user's course relationship
-  const { data: userCourse } = useQuery({
-    queryKey: ['user-course', courseId, userId],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from('user_courses')
-        .select('*')
-        .eq('course_id', courseId)
-        .eq('user_id', userId)
-        .single();
-
-      if (error && error.code !== 'PGRST116') {
-        throw error;
-      }
-      return data;
-    },
-  });
 
   const togglePlayedMutation = useMutation({
     mutationFn: async () => {
@@ -69,14 +56,14 @@ const CoursePlayedButton = ({ courseId, userId }: CoursePlayedButtonProps) => {
       }
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['user-course', courseId, userId] });
+      queryClient.invalidateQueries({ queryKey: ['user-course', courseId] });
       queryClient.invalidateQueries({ queryKey: ['my-courses'] });
       queryClient.invalidateQueries({ queryKey: ['trackerStats'] });
       toast({
         title: userCourse?.played ? "Removed from played courses" : "Added to played courses",
         description: userCourse?.played 
-          ? "Course removed from your played courses"
-          : "Course marked as played",
+          ? `${courseName} removed from your played courses`
+          : `${courseName} marked as played`,
       });
     },
     onError: (error) => {
@@ -90,7 +77,7 @@ const CoursePlayedButton = ({ courseId, userId }: CoursePlayedButtonProps) => {
   });
 
   const handleTogglePlayed = (e: React.MouseEvent) => {
-    e.stopPropagation();
+    e.stopPropagation(); // Prevent card click event
     if (!canModifyCourseStatus) return;
     togglePlayedMutation.mutate();
   };
@@ -100,13 +87,14 @@ const CoursePlayedButton = ({ courseId, userId }: CoursePlayedButtonProps) => {
   }
 
   return (
-    <div>
+    <div className="absolute top-3 right-3">
       {canModifyCourseStatus ? (
         <Button
           size="sm"
           variant={userCourse?.played ? "default" : "secondary"}
           onClick={handleTogglePlayed}
           disabled={togglePlayedMutation.isPending}
+          className="shadow-lg"
         >
           {userCourse?.played ? (
             <>
@@ -121,7 +109,7 @@ const CoursePlayedButton = ({ courseId, userId }: CoursePlayedButtonProps) => {
           )}
         </Button>
       ) : userCourse?.played ? (
-        <Badge variant="default">
+        <Badge variant="default" className="shadow-lg">
           <Check className="h-3 w-3 mr-1" />
           Played
         </Badge>
