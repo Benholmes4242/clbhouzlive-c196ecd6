@@ -1,16 +1,23 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Check, Plus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import PostPlayRatingModal from './PostPlayRatingModal';
 
 interface UserCourse {
   id: string;
   played: boolean;
   rating?: number;
+}
+
+interface Course {
+  id: string;
+  name: string;
+  thumbnail_image?: string;
 }
 
 interface CoursePlayedButtonProps {
@@ -20,6 +27,7 @@ interface CoursePlayedButtonProps {
   canModifyCourseStatus: boolean;
   currentUserId?: string;
   viewingUserId?: string;
+  course?: Course;
 }
 
 const CoursePlayedButton = ({ 
@@ -28,10 +36,12 @@ const CoursePlayedButton = ({
   userCourse, 
   canModifyCourseStatus, 
   currentUserId,
-  viewingUserId 
+  viewingUserId,
+  course
 }: CoursePlayedButtonProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [showRatingModal, setShowRatingModal] = useState(false);
 
   const togglePlayedMutation = useMutation({
     mutationFn: async () => {
@@ -59,12 +69,24 @@ const CoursePlayedButton = ({
       queryClient.invalidateQueries({ queryKey: ['user-course', courseId] });
       queryClient.invalidateQueries({ queryKey: ['my-courses'] });
       queryClient.invalidateQueries({ queryKey: ['trackerStats'] });
-      toast({
-        title: userCourse?.played ? "Removed from played courses" : "Added to played courses",
-        description: userCourse?.played 
-          ? `${courseName} removed from your played courses`
-          : `${courseName} marked as played`,
-      });
+      
+      // If marking as played (not unplaying), show rating modal
+      if (!userCourse?.played) {
+        toast({
+          title: "Added to played courses",
+          description: `${courseName} marked as played`,
+        });
+        
+        // Trigger rating modal for newly played courses
+        setTimeout(() => {
+          setShowRatingModal(true);
+        }, 500); // Small delay for smooth UX
+      } else {
+        toast({
+          title: "Removed from played courses",
+          description: `${courseName} removed from your played courses`,
+        });
+      }
     },
     onError: (error) => {
       console.error('Error updating course status:', error);
@@ -86,35 +108,50 @@ const CoursePlayedButton = ({
     return null;
   }
 
+  const courseForModal = course || {
+    id: courseId,
+    name: courseName,
+    thumbnail_image: undefined
+  };
+
   return (
-    <div className="absolute top-3 right-3">
-      {canModifyCourseStatus ? (
-        <Button
-          size="sm"
-          variant={userCourse?.played ? "default" : "secondary"}
-          onClick={handleTogglePlayed}
-          disabled={togglePlayedMutation.isPending}
-          className="shadow-lg"
-        >
-          {userCourse?.played ? (
-            <>
-              <Check className="h-4 w-4 mr-1" />
-              Played
-            </>
-          ) : (
-            <>
-              <Plus className="h-4 w-4 mr-1" />
-              Add
-            </>
-          )}
-        </Button>
-      ) : userCourse?.played ? (
-        <Badge variant="default" className="shadow-lg">
-          <Check className="h-3 w-3 mr-1" />
-          Played
-        </Badge>
-      ) : null}
-    </div>
+    <>
+      <div className="absolute top-3 right-3">
+        {canModifyCourseStatus ? (
+          <Button
+            size="sm"
+            variant={userCourse?.played ? "default" : "secondary"}
+            onClick={handleTogglePlayed}
+            disabled={togglePlayedMutation.isPending}
+            className="shadow-lg"
+          >
+            {userCourse?.played ? (
+              <>
+                <Check className="h-4 w-4 mr-1" />
+                Played
+              </>
+            ) : (
+              <>
+                <Plus className="h-4 w-4 mr-1" />
+                Add
+              </>
+            )}
+          </Button>
+        ) : userCourse?.played ? (
+          <Badge variant="default" className="shadow-lg">
+            <Check className="h-3 w-3 mr-1" />
+            Played
+          </Badge>
+        ) : null}
+      </div>
+
+      {/* Rating Modal */}
+      <PostPlayRatingModal
+        course={courseForModal}
+        isOpen={showRatingModal}
+        onClose={() => setShowRatingModal(false)}
+      />
+    </>
   );
 };
 

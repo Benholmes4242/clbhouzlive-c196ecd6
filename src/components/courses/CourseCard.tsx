@@ -4,6 +4,10 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Star } from 'lucide-react';
 import CourseDetailModal from './CourseDetailModal';
+import CoursePlayedButton from './CoursePlayedButton';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 interface Course {
   id: string;
@@ -28,7 +32,28 @@ interface CourseCardProps {
 }
 
 const CourseCard: React.FC<CourseCardProps> = ({ course, viewContext = 'global', viewingUserId }) => {
+  const { user } = useSupabaseSession();
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Fetch user's course status
+  const { data: userCourse } = useQuery({
+    queryKey: ['user-course', course.id, viewingUserId || user?.id],
+    queryFn: async () => {
+      const userId = viewingUserId || user?.id;
+      if (!userId) return null;
+
+      const { data, error } = await supabase
+        .from('user_courses')
+        .select('*')
+        .eq('course_id', course.id)
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (error && error.code !== 'PGRST116') throw error;
+      return data;
+    },
+    enabled: !!(viewingUserId || user?.id),
+  });
 
   const getRankDisplay = () => {
     if (viewContext === 'regional' && course.regional_rank) {
@@ -51,6 +76,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, viewContext = 'global',
   };
 
   const rank = getRankDisplay();
+  const canModifyCourseStatus = user && (!viewingUserId || viewingUserId === user.id);
 
   const handleCardClick = () => {
     setIsModalOpen(true);
@@ -59,7 +85,7 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, viewContext = 'global',
   return (
     <>
       <Card 
-        className="group hover:shadow-lg transition-all duration-200 cursor-pointer overflow-hidden"
+        className="group hover:shadow-lg transition-all duration-200 cursor-pointer overflow-hidden relative"
         onClick={handleCardClick}
       >
         <div className="relative">
@@ -95,6 +121,17 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, viewContext = 'global',
               Top 100
             </Badge>
           )}
+
+          {/* Course Played Button */}
+          <CoursePlayedButton
+            courseId={course.id}
+            courseName={course.name}
+            userCourse={userCourse}
+            canModifyCourseStatus={!!canModifyCourseStatus}
+            currentUserId={user?.id}
+            viewingUserId={viewingUserId}
+            course={course}
+          />
         </div>
         
         <CardHeader className="pb-2">
