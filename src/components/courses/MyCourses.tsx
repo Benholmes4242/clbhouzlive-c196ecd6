@@ -7,10 +7,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Calendar, Star, Trophy, Target } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import CourseCard from './CourseCard';
 
 const MyCourses = () => {
   const { user } = useSupabaseSession();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('top100');
 
   // Fetch user's played courses
@@ -57,15 +59,36 @@ const MyCourses = () => {
     enabled: !!user?.id,
   });
 
+  // Fetch user's average rating
+  const { data: averageRating } = useQuery({
+    queryKey: ['user-average-rating', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      
+      const { data, error } = await supabase
+        .from('course_ratings')
+        .select('rating')
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+      if (!data || data.length === 0) return null;
+      
+      const total = data.reduce((sum, rating) => sum + rating.rating, 0);
+      return (total / data.length).toFixed(1);
+    },
+    enabled: !!user?.id,
+  });
+
   // Calculate statistics
   const totalTop100Played = top100Courses.length;
-  const averageRating = playedCourses.length > 0 
-    ? playedCourses.reduce((sum, course) => sum + (course.rating || 0), 0) / playedCourses.filter(c => c.rating).length
-    : 0;
 
   const recentCourses = [...playedCourses, ...top100Courses]
     .sort((a, b) => new Date(b.played_date || 0).getTime() - new Date(a.played_date || 0).getTime())
     .slice(0, 6);
+
+  const handleAverageRatingClick = () => {
+    navigate('/my-ratings');
+  };
 
   return (
     <div className="space-y-6">
@@ -84,17 +107,17 @@ const MyCourses = () => {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={handleAverageRatingClick}>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Average Rating</CardTitle>
             <Star className="h-4 w-4 text-yellow-500" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {averageRating > 0 ? averageRating.toFixed(1) : 'N/A'}
+              {averageRating ? `${averageRating}/10` : 'N/A'}
             </div>
             <p className="text-xs text-muted-foreground">
-              Out of 5 stars
+              Click to view all ratings
             </p>
           </CardContent>
         </Card>

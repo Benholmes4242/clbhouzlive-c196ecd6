@@ -1,0 +1,222 @@
+
+import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Star, ArrowLeft, Calendar, MessageSquare } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import CourseDetailModal from './CourseDetailModal';
+
+interface RatedCourse {
+  id: string;
+  rating: number;
+  review: string | null;
+  review_date: string;
+  course_id: string;
+  golf_courses: {
+    id: string;
+    name: string;
+    country: string;
+    region: string;
+    continent: string;
+    global_rank: number | null;
+    regional_rank: number | null;
+    usa_rank: number | null;
+    description: string;
+    thumbnail_image: string;
+    latitude: number | null;
+    longitude: number | null;
+    website_url: string | null;
+  };
+}
+
+const MyRatingsContent = () => {
+  const { user } = useSupabaseSession();
+  const navigate = useNavigate();
+  const [selectedCourse, setSelectedCourse] = useState<RatedCourse['golf_courses'] | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const { data: ratedCourses = [], isLoading } = useQuery({
+    queryKey: ['user-rated-courses', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      
+      const { data, error } = await supabase
+        .from('course_ratings')
+        .select(`
+          id,
+          rating,
+          review,
+          review_date,
+          course_id,
+          golf_courses (
+            id,
+            name,
+            country,
+            region,
+            continent,
+            global_rank,
+            regional_rank,
+            usa_rank,
+            description,
+            thumbnail_image,
+            latitude,
+            longitude,
+            website_url
+          )
+        `)
+        .eq('user_id', user.id)
+        .order('rating', { ascending: false });
+
+      if (error) throw error;
+      return data as RatedCourse[];
+    },
+    enabled: !!user?.id,
+  });
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  const getReviewSummary = (review: string | null) => {
+    if (!review) return null;
+    const words = review.split(' ');
+    if (words.length <= 15) return review;
+    return words.slice(0, 15).join(' ') + '...';
+  };
+
+  const handleCourseClick = (course: RatedCourse['golf_courses']) => {
+    setSelectedCourse(course);
+    setIsModalOpen(true);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" onClick={() => navigate('/courses')}>
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <h1 className="text-2xl font-bold">My Ratings</h1>
+        </div>
+        <div className="text-center py-8">Loading your ratings...</div>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" onClick={() => navigate('/courses')}>
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+          <h1 className="text-2xl font-bold">My Ratings</h1>
+          <Badge variant="secondary" className="ml-auto">
+            {ratedCourses.length} courses rated
+          </Badge>
+        </div>
+
+        {ratedCourses.length === 0 ? (
+          <Card>
+            <CardContent className="p-8 text-center">
+              <Star className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+              <h3 className="text-lg font-semibold mb-2">No ratings yet</h3>
+              <p className="text-muted-foreground">
+                Start rating courses you've played to see them here
+              </p>
+            </CardContent>
+          </Card>
+        ) : (
+          <div className="space-y-4">
+            {ratedCourses.map((ratedCourse) => (
+              <Card key={ratedCourse.id} className="hover:shadow-lg transition-shadow cursor-pointer">
+                <CardContent className="p-6">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1 space-y-3">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <h3 
+                            className="font-semibold text-lg hover:text-primary transition-colors cursor-pointer"
+                            onClick={() => handleCourseClick(ratedCourse.golf_courses)}
+                          >
+                            {ratedCourse.golf_courses.name}
+                          </h3>
+                          <p className="text-muted-foreground text-sm">
+                            {ratedCourse.golf_courses.region}, {ratedCourse.golf_courses.country}
+                          </p>
+                        </div>
+                        <Badge variant="default" className="flex items-center gap-1">
+                          <Star className="h-3 w-3 fill-current" />
+                          {ratedCourse.rating}/10
+                        </Badge>
+                      </div>
+
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-1">
+                          <Calendar className="h-4 w-4" />
+                          <span>Rated {formatDate(ratedCourse.review_date)}</span>
+                        </div>
+                        {ratedCourse.review && (
+                          <div className="flex items-center gap-1">
+                            <MessageSquare className="h-4 w-4" />
+                            <span>Review included</span>
+                          </div>
+                        )}
+                      </div>
+
+                      {ratedCourse.review && (
+                        <div className="space-y-2">
+                          <p className="text-sm leading-relaxed">
+                            {getReviewSummary(ratedCourse.review)}
+                          </p>
+                          {ratedCourse.review.split(' ').length > 15 && (
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              onClick={() => handleCourseClick(ratedCourse.golf_courses)}
+                            >
+                              View Full Review
+                            </Button>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    {ratedCourse.golf_courses.thumbnail_image && (
+                      <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                        <img
+                          src={ratedCourse.golf_courses.thumbnail_image}
+                          alt={ratedCourse.golf_courses.name}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            e.currentTarget.src = 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=100&h=100&fit=crop';
+                          }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <CourseDetailModal
+        course={selectedCourse}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
+    </>
+  );
+};
+
+export default MyRatingsContent;

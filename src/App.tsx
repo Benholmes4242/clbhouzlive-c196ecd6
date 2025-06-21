@@ -19,6 +19,7 @@ import MessagesPage from "./pages/MessagesPage";
 import FollowersPage from "./pages/FollowersPage";
 import FollowingPage from "./pages/FollowingPage";
 import FriendsPage from "./pages/FriendsPage";
+import MyRatings from "./pages/MyRatings";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +36,7 @@ const App = () => (
           <Route path="/explore" element={<Explore />} />
           <Route path="/news" element={<News />} />
           <Route path="/courses" element={<Courses />} />
+          <Route path="/my-ratings" element={<MyRatings />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/profile/:username" element={<UserProfilePage />} />
           <Route path="/profile/:userId/followers" element={<FollowersPage />} />
