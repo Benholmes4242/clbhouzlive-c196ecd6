@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import CourseExplorer from './CourseExplorer';
 import MyCourses from './MyCourses';
+import FriendsCourses from './FriendsCourses';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
@@ -14,12 +15,12 @@ const CoursesContent = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('explore');
 
-  const handleMyCoursesClick = () => {
+  const handleAuthRequiredTab = (tabValue: string) => {
     if (!user) {
       navigate('/auth');
       return;
     }
-    setActiveTab('my-courses');
+    setActiveTab(tabValue);
   };
 
   return (
@@ -32,9 +33,16 @@ const CoursesContent = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className={`grid w-full ${user ? 'grid-cols-3' : 'grid-cols-2'}`}>
           <TabsTrigger value="explore">Explore</TabsTrigger>
-          <TabsTrigger value="my-courses" onClick={handleMyCoursesClick}>My Courses</TabsTrigger>
+          <TabsTrigger value="my-courses" onClick={() => handleAuthRequiredTab('my-courses')}>
+            My Courses
+          </TabsTrigger>
+          {user && (
+            <TabsTrigger value="friends-courses" onClick={() => handleAuthRequiredTab('friends-courses')}>
+              Friends' Courses
+            </TabsTrigger>
+          )}
         </TabsList>
 
         <TabsContent value="explore" className="mt-6">
@@ -63,6 +71,12 @@ const CoursesContent = () => {
             </Card>
           )}
         </TabsContent>
+
+        {user && (
+          <TabsContent value="friends-courses" className="mt-6">
+            <FriendsCourses />
+          </TabsContent>
+        )}
       </Tabs>
     </div>
   );
