@@ -9,6 +9,14 @@ interface PostMedia {
   media_url: string;
 }
 
+interface PostTag {
+  id: string;
+  entity_type: 'user' | 'golf_club' | 'business';
+  entity_id: string;
+  name: string;
+  username: string | null;
+}
+
 interface UserPostData {
   id: string;
   content: string | null;
@@ -20,6 +28,7 @@ interface UserPostData {
     profile_photo_url: string | null;
   };
   post_media: PostMedia[];
+  post_tags: PostTag[];
 }
 
 export const useUserPosts = () => {
@@ -45,9 +54,19 @@ export const useUserPosts = () => {
             id,
             media_type,
             media_url
+          ),
+          post_tags (
+            tagged_entity_id,
+            taggable_entities (
+              id,
+              entity_type,
+              entity_id,
+              name,
+              username
+            )
           )
         `)
-        .order('created_at', { ascending: false }); // Ensure newest first
+        .order('created_at', { ascending: false });
 
       if (error) {
         console.error('Error fetching posts:', error);
@@ -83,6 +102,13 @@ export const useUserPosts = () => {
             id: media.id,
             media_type: media.media_type as 'image' | 'video',
             media_url: media.media_url
+          })),
+          post_tags: (post.post_tags || []).map((tag: any) => ({
+            id: tag.taggable_entities.id,
+            entity_type: tag.taggable_entities.entity_type as 'user' | 'golf_club' | 'business',
+            entity_id: tag.taggable_entities.entity_id,
+            name: tag.taggable_entities.name,
+            username: tag.taggable_entities.username
           }))
         };
       });

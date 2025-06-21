@@ -9,6 +9,14 @@ import { useToast } from '@/hooks/use-toast';
 import PostContentForm from './PostContentForm';
 import PhotoGallery from './PhotoGallery';
 
+interface TaggableEntity {
+  id: string;
+  entity_type: 'user' | 'golf_club' | 'business';
+  entity_id: string;
+  name: string;
+  username: string | null;
+}
+
 interface CreatePostDialogProps {
   onPostCreated?: () => void;
 }
@@ -19,6 +27,7 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
   const [open, setOpen] = useState(false);
   const [content, setContent] = useState('');
   const [mediaFiles, setMediaFiles] = useState<File[]>([]);
+  const [selectedTags, setSelectedTags] = useState<TaggableEntity[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showGallery, setShowGallery] = useState(false);
 
@@ -58,6 +67,22 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
     if (mediaError) throw mediaError;
   };
 
+  const createPostTags = async (postId: string) => {
+    if (selectedTags.length === 0) return;
+
+    const tagInserts = selectedTags.map(tag => ({
+      post_id: postId,
+      tagged_entity_id: tag.id,
+      tagged_by_user_id: user!.id
+    }));
+
+    const { error } = await supabase
+      .from('post_tags')
+      .insert(tagInserts);
+
+    if (error) throw error;
+  };
+
   const handleSubmit = async () => {
     if (!user || (!content.trim() && mediaFiles.length === 0)) return;
 
@@ -80,14 +105,20 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
         await uploadMedia(file, postData.id);
       }
 
+      // Create post tags
+      await createPostTags(postData.id);
+
       toast({
         title: "Post created!",
-        description: "Your post has been shared successfully."
+        description: selectedTags.length > 0 
+          ? `Your post has been shared and ${selectedTags.length} ${selectedTags.length === 1 ? 'person has' : 'people have'} been tagged.`
+          : "Your post has been shared successfully."
       });
 
       // Reset form
       setContent('');
       setMediaFiles([]);
+      setSelectedTags([]);
       setOpen(false);
       setShowGallery(false);
       onPostCreated?.();
@@ -118,6 +149,7 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
         setShowGallery(false);
         setContent('');
         setMediaFiles([]);
+        setSelectedTags([]);
       }
     }}>
       <DialogTrigger asChild>
@@ -177,6 +209,7 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
                 mediaFiles={mediaFiles}
                 onFilesSelected={handleFilesSelected}
                 onRemoveFile={removeFile}
+                onTagsChange={setSelectedTags}
               />
             </div>
           </div>

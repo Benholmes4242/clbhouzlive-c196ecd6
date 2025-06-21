@@ -295,6 +295,45 @@ export type Database = {
           },
         ]
       }
+      post_tags: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string
+          tagged_by_user_id: string
+          tagged_entity_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id: string
+          tagged_by_user_id: string
+          tagged_entity_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string
+          tagged_by_user_id?: string
+          tagged_entity_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_tags_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_tags_tagged_entity_id_fkey"
+            columns: ["tagged_entity_id"]
+            isOneToOne: false
+            referencedRelation: "taggable_entities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       posts: {
         Row: {
           content: string | null
@@ -316,6 +355,36 @@ export type Database = {
           id?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      taggable_entities: {
+        Row: {
+          created_at: string
+          entity_id: string
+          entity_type: string
+          id: string
+          name: string
+          updated_at: string
+          username: string | null
+        }
+        Insert: {
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          id?: string
+          name: string
+          updated_at?: string
+          username?: string | null
+        }
+        Update: {
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          name?: string
+          updated_at?: string
+          username?: string | null
         }
         Relationships: []
       }

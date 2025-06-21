@@ -1,10 +1,18 @@
-
 import React, { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, Heart, MessageCircle, Share, Plus } from 'lucide-react';
+import { MoreHorizontal, Heart, MessageCircle, Share } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import CreatePostDialog from '@/components/posts/CreatePostDialog';
+import TaggedText from '@/components/posts/TaggedText';
+
+interface PostTag {
+  id: string;
+  entity_type: 'user' | 'golf_club' | 'business';
+  entity_id: string;
+  name: string;
+  username: string | null;
+}
 
 interface ActivityPost {
   id: string;
@@ -21,6 +29,7 @@ interface ActivityPost {
     media_type: 'image' | 'video';
     media_url: string;
   }>;
+  post_tags: PostTag[];
 }
 
 interface SocialActivityProps {
@@ -55,10 +64,20 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
             id,
             media_type,
             media_url
+          ),
+          post_tags (
+            tagged_entity_id,
+            taggable_entities (
+              id,
+              entity_type,
+              entity_id,
+              name,
+              username
+            )
           )
         `)
         .eq('user_id', userId)
-        .order('created_at', { ascending: false }); // Ensure newest first
+        .order('created_at', { ascending: false });
 
       if (error) {
         console.error('Error fetching user posts:', error);
@@ -69,15 +88,22 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
         id: post.id,
         type: 'post' as const,
         content: post.content || '',
-        likes: 0, // Would need a likes table to track this
-        comments: 0, // Would need a comments table to track this
-        shares: 0, // Would need a shares table to track this
+        likes: 0,
+        comments: 0,
+        shares: 0,
         timeAgo: new Date(post.created_at).toLocaleDateString(),
         created_at: post.created_at,
         post_media: (post.post_media || []).map(media => ({
           id: media.id,
           media_type: media.media_type as 'image' | 'video',
           media_url: media.media_url
+        })),
+        post_tags: (post.post_tags || []).map((tag: any) => ({
+          id: tag.taggable_entities.id,
+          entity_type: tag.taggable_entities.entity_type as 'user' | 'golf_club' | 'business',
+          entity_id: tag.taggable_entities.entity_id,
+          name: tag.taggable_entities.name,
+          username: tag.taggable_entities.username
         })),
         image: post.post_media?.find(media => media.media_type === 'image')?.media_url
       }));
@@ -109,6 +135,10 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
     }
   };
 
+  if (!isOwnProfile && !activityVisible) {
+    return null;
+  }
+
   return (
     <div className="mt-10 px-2">
       <div className="flex items-center justify-between mb-4">
@@ -136,7 +166,9 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
               </Button>
             </div>
 
-            <p className="text-sm mb-3">{post.content}</p>
+            <div className="text-sm mb-3">
+              <TaggedText text={post.content} tags={post.post_tags} />
+            </div>
 
             {post.post_media && post.post_media.length > 0 && (
               <div className="mb-3 space-y-2">

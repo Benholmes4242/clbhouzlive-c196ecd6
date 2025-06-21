@@ -15,11 +15,20 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import EditPostDialog from './EditPostDialog';
+import TaggedText from './TaggedText';
 
 interface PostMedia {
   id: string;
   media_type: 'image' | 'video';
   media_url: string;
+}
+
+interface PostTag {
+  id: string;
+  entity_type: 'user' | 'golf_club' | 'business';
+  entity_id: string;
+  name: string;
+  username: string | null;
 }
 
 interface UserPostData {
@@ -33,6 +42,7 @@ interface UserPostData {
     profile_photo_url: string | null;
   };
   post_media: PostMedia[];
+  post_tags: PostTag[];
 }
 
 interface UserPostProps {
@@ -59,7 +69,15 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
 
     setIsDeleting(true);
     try {
-      // Delete post media first
+      // Delete post tags first
+      const { error: tagsError } = await supabase
+        .from('post_tags')
+        .delete()
+        .eq('post_id', post.id);
+
+      if (tagsError) throw tagsError;
+
+      // Delete post media
       const { error: mediaError } = await supabase
         .from('post_media')
         .delete()
@@ -144,9 +162,11 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
             )}
           </div>
 
-          {/* Post Content */}
+          {/* Post Content with Tagged Text */}
           {post.content && (
-            <p className="text-sm mb-3">{post.content}</p>
+            <div className="text-sm mb-3">
+              <TaggedText text={post.content} tags={post.post_tags} />
+            </div>
           )}
 
           {/* Post Media */}
