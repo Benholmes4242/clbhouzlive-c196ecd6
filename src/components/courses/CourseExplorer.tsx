@@ -68,10 +68,10 @@ const CourseExplorer = () => {
   );
 
   const regionOptions = [
-    { value: 'britain-ireland', label: 'Britain & Ireland', icon: '🇬🇧🇮🇪' },
-    { value: 'usa', label: 'United States', icon: '🇺🇸' },
-    { value: 'europe', label: 'Continental Europe', icon: '🇪🇺' },
-    { value: 'global', label: 'Worldwide', icon: '🌍' }
+    { value: 'britain-ireland', label: 'Britain & Ireland' },
+    { value: 'usa', label: 'United States' },
+    { value: 'europe', label: 'Continental Europe' },
+    { value: 'global', label: 'Worldwide' }
   ];
 
   const currentRegion = regionOptions.find(r => r.value === selectedRegion);
@@ -98,10 +98,7 @@ const CourseExplorer = () => {
           <SelectContent>
             {regionOptions.map((region) => (
               <SelectItem key={region.value} value={region.value}>
-                <span className="flex items-center gap-2">
-                  <span>{region.icon}</span>
-                  {region.label}
-                </span>
+                {region.label}
               </SelectItem>
             ))}
           </SelectContent>
