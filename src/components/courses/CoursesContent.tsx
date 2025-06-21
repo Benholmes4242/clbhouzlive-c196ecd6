@@ -15,12 +15,12 @@ const CoursesContent = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('explore');
 
-  const handleAuthRequiredTab = (tabValue: string) => {
-    if (!user) {
+  const handleTabChange = (value: string) => {
+    if (!user && (value === 'my-courses' || value === 'friends-courses')) {
       navigate('/auth');
       return;
     }
-    setActiveTab(tabValue);
+    setActiveTab(value);
   };
 
   return (
@@ -32,15 +32,15 @@ const CoursesContent = () => {
         </p>
       </div>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+      <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
         <TabsList className={`grid w-full ${user ? 'grid-cols-3' : 'grid-cols-2'}`}>
           <TabsTrigger value="explore">Explore</TabsTrigger>
           {user && (
-            <TabsTrigger value="friends-courses" onClick={() => handleAuthRequiredTab('friends-courses')}>
+            <TabsTrigger value="friends-courses">
               Friend's Fairways
             </TabsTrigger>
           )}
-          <TabsTrigger value="my-courses" onClick={() => handleAuthRequiredTab('my-courses')}>
+          <TabsTrigger value="my-courses">
             My Courses
           </TabsTrigger>
         </TabsList>
