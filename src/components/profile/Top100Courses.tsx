@@ -79,7 +79,7 @@ const Top100Courses: React.FC<Top100CoursesProps> = ({
                 htmlFor="show-top100" 
                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
               >
-                Show this section
+                Show this section on my public profile
               </label>
             </div>
           )}
