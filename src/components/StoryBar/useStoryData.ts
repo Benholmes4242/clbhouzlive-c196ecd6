@@ -11,7 +11,7 @@ export const useStoryData = () => {
 
   useEffect(() => {
     const fetchStoriesData = async () => {
-      console.log('Fetching stories data, user:', user);
+      console.log('Fetching stories data, user:', user?.id);
       
       if (!user) {
         // Show only "Your Profile" for non-authenticated users
@@ -30,11 +30,13 @@ export const useStoryData = () => {
 
       try {
         // Get current user's profile
-        const { data: currentUserProfile } = await supabase
+        const { data: currentUserProfile, error: profileError } = await supabase
           .from('user_profiles')
           .select('profile_photo_url, display_name, username')
           .eq('id', user.id)
           .maybeSingle();
+
+        console.log('Current user profile:', currentUserProfile, 'Profile error:', profileError);
 
         // Start with "Your Profile" story
         const newStories: StoryUser[] = [
@@ -62,26 +64,33 @@ export const useStoryData = () => {
           .eq('user_id', user.id)
           .eq('status', 'accepted');
 
-        console.log('Friends data:', friendsData, 'Friends error:', friendsError);
+        console.log('Friends query result:', { friendsData, friendsError });
+        console.log('Number of friends found:', friendsData?.length || 0);
 
         if (friendsData && friendsData.length > 0) {
           // Add friends to the stories
           friendsData.forEach((friendship: any) => {
             const profile = friendship.user_profiles;
+            console.log('Processing friend profile:', profile);
+            
             if (profile) {
-              newStories.push({
+              const friendStory = {
                 id: profile.id,
-                type: 'friend',
+                type: 'friend' as const,
                 user: profile.display_name || profile.username || 'Friend',
                 username: profile.username || profile.id,
                 avatar: profile.profile_photo_url || '',
-                hasStory: false, // Friends don't have stories, just profile access
-              });
+                hasStory: false,
+              };
+              
+              console.log('Adding friend story:', friendStory);
+              newStories.push(friendStory);
             }
           });
         }
 
-        console.log('Final stories:', newStories.map(s => ({ type: s.type, user: s.user })));
+        console.log('Final stories array:', newStories);
+        console.log('Stories with avatars:', newStories.filter(s => s.avatar));
         setStories(newStories);
       } catch (error) {
         console.error('Error fetching stories data:', error);

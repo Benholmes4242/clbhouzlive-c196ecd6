@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, User } from 'lucide-react';
 import { StoryUser } from './types';
 
 interface StoryItemProps {
@@ -17,6 +17,13 @@ const StoryItem: React.FC<StoryItemProps> = ({
   hasProfile = false
 }) => {
   const isYourProfile = story.type === 'add';
+  
+  console.log('Rendering story item:', { 
+    user: story.user, 
+    type: story.type, 
+    hasAvatar: !!story.avatar,
+    avatar: story.avatar 
+  });
 
   return (
     <div className="flex flex-col items-center space-y-2 min-w-0">
@@ -54,11 +61,21 @@ const StoryItem: React.FC<StoryItemProps> = ({
             className="focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-full"
           >
             <div className="w-16 h-16 rounded-full p-0.5 bg-gradient-to-tr from-blue-500 to-blue-700 hover:scale-105 transition-transform">
-              <img
-                src={story.avatar}
-                alt={story.user}
-                className="w-full h-full rounded-full object-cover border-2 border-background"
-              />
+              {story.avatar ? (
+                <img
+                  src={story.avatar}
+                  alt={story.user}
+                  className="w-full h-full rounded-full object-cover border-2 border-background"
+                  onError={(e) => {
+                    console.log('Image failed to load:', story.avatar);
+                    e.currentTarget.style.display = 'none';
+                    e.currentTarget.nextElementSibling?.classList.remove('hidden');
+                  }}
+                />
+              ) : null}
+              <div className={`w-full h-full bg-muted rounded-full flex items-center justify-center border-2 border-background ${story.avatar ? 'hidden' : ''}`}>
+                <User className="h-8 w-8 text-muted-foreground" />
+              </div>
             </div>
           </button>
         )}
