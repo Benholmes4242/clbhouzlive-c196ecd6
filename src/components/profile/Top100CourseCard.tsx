@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
-import { Check, Globe, MapPin } from 'lucide-react';
+import { Check, Globe, MapPin, Edit } from 'lucide-react';
 import PostPlayRatingModal from '../courses/PostPlayRatingModal';
 
 interface Top100CourseCardProps {
@@ -20,22 +20,20 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
   onToggle
 }) => {
   const [showRatingModal, setShowRatingModal] = useState(false);
-  const [wasJustPlayed, setWasJustPlayed] = useState(false);
 
   const handleCardClick = () => {
     if (!isOwnProfile || !onToggle) return;
     
-    // If course is not currently played, show rating modal after marking as played
     if (!isPlayed) {
-      setWasJustPlayed(true);
+      // If course is not currently played, mark as played and show rating modal
       onToggle();
       // Small delay to let the state update, then show rating modal
       setTimeout(() => {
         setShowRatingModal(true);
       }, 100);
     } else {
-      // If already played, just toggle off
-      onToggle();
+      // If already played, show the rating modal to edit existing rating
+      setShowRatingModal(true);
     }
   };
 
@@ -82,10 +80,15 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
 
           {/* Played Indicator with enhanced visual feedback */}
           {isPlayed && (
-            <div className="absolute top-2 right-2">
+            <div className="absolute top-2 right-2 flex gap-1">
               <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
                 <Check className="h-4 w-4 text-white" />
               </div>
+              {isOwnProfile && (
+                <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
+                  <Edit className="h-3 w-3 text-white" />
+                </div>
+              )}
             </div>
           )}
 
@@ -121,7 +124,7 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
         )}
       </div>
 
-      {/* Rating Modal - only show for own profile when first marking as played */}
+      {/* Rating Modal - show for both new ratings and editing existing ones */}
       {showRatingModal && isOwnProfile && (
         <PostPlayRatingModal
           course={{
@@ -130,10 +133,9 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
             thumbnail_image: course.thumbnail_image
           }}
           isOpen={showRatingModal}
-          onClose={() => {
-            setShowRatingModal(false);
-            setWasJustPlayed(false);
-          }}
+          onClose={() => setShowRatingModal(false)}
+          isEditMode={isPlayed}
+          onRemoveFromPlayed={onToggle}
         />
       )}
     </>
