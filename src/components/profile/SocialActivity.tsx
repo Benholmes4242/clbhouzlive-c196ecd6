@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -28,11 +27,11 @@ interface ActivityPost {
   shares: number;
   timeAgo: string;
   created_at: string; // Make this required to match PostModalData
-  post_media?: Array<{
+  post_media: Array<{
     id: string;
     media_type: 'image' | 'video';
     media_url: string;
-  }>;
+  }>; // Make this required to match PostModalData
   post_tags: PostTag[];
   user: {
     id: string;
