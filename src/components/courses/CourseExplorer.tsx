@@ -115,6 +115,7 @@ const CourseExplorer = () => {
               key={course.id} 
               course={course} 
               viewContext={selectedRegion === 'britain-ireland' ? 'regional' : selectedRegion === 'usa' ? 'usa' : 'global'}
+              showPlayedButton={false} // Explicitly disable the played button in explore view
             />
           ))}
         </div>

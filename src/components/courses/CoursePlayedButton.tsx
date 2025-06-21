@@ -28,6 +28,7 @@ interface CoursePlayedButtonProps {
   currentUserId?: string;
   viewingUserId?: string;
   course?: Course;
+  showButton?: boolean; // New prop to control button visibility
 }
 
 const CoursePlayedButton = ({ 
@@ -37,11 +38,17 @@ const CoursePlayedButton = ({
   canModifyCourseStatus, 
   currentUserId,
   viewingUserId,
-  course
+  course,
+  showButton = true // Default to true for backward compatibility
 }: CoursePlayedButtonProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [showRatingModal, setShowRatingModal] = useState(false);
+
+  // Don't render anything if showButton is false
+  if (!showButton) {
+    return null;
+  }
 
   const togglePlayedMutation = useMutation({
     mutationFn: async () => {

@@ -148,6 +148,7 @@ const MyCourses = () => {
                     key={userCourse.id} 
                     course={userCourse.golf_courses}
                     viewingUserId={user?.id}
+                    showPlayedButton={false} // Disable played button since these are already played courses
                   />
                 ))}
               </div>
@@ -175,6 +176,7 @@ const MyCourses = () => {
                     key={`${userCourse.id}-recent`} 
                     course={userCourse.golf_courses}
                     viewingUserId={user?.id}
+                    showPlayedButton={false} // Disable played button since these are already played courses
                   />
                 ))}
               </div>

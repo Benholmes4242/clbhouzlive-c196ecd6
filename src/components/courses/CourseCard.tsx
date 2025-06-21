@@ -29,9 +29,15 @@ interface CourseCardProps {
   course: Course;
   viewContext?: 'global' | 'regional' | 'usa';
   viewingUserId?: string;
+  showPlayedButton?: boolean; // New prop to control button visibility
 }
 
-const CourseCard: React.FC<CourseCardProps> = ({ course, viewContext = 'global', viewingUserId }) => {
+const CourseCard: React.FC<CourseCardProps> = ({ 
+  course, 
+  viewContext = 'global', 
+  viewingUserId,
+  showPlayedButton = false // Default to false - only show when explicitly requested
+}) => {
   const { user } = useSupabaseSession();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -122,16 +128,19 @@ const CourseCard: React.FC<CourseCardProps> = ({ course, viewContext = 'global',
             </Badge>
           )}
 
-          {/* Course Played Button */}
-          <CoursePlayedButton
-            courseId={course.id}
-            courseName={course.name}
-            userCourse={userCourse}
-            canModifyCourseStatus={!!canModifyCourseStatus}
-            currentUserId={user?.id}
-            viewingUserId={viewingUserId}
-            course={course}
-          />
+          {/* Course Played Button - only show when explicitly requested */}
+          {showPlayedButton && (
+            <CoursePlayedButton
+              courseId={course.id}
+              courseName={course.name}
+              userCourse={userCourse}
+              canModifyCourseStatus={!!canModifyCourseStatus}
+              currentUserId={user?.id}
+              viewingUserId={viewingUserId}
+              course={course}
+              showButton={true}
+            />
+          )}
         </div>
         
         <CardHeader className="pb-2">

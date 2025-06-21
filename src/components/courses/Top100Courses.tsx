@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -145,7 +144,12 @@ const Top100Courses = () => {
             ) : globalTop100 && globalTop100.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {globalTop100.map((course) => (
-                  <CourseCard key={course.id} course={course} viewContext="global" />
+                  <CourseCard 
+                    key={course.id} 
+                    course={course} 
+                    viewContext="global" 
+                    showPlayedButton={false} // Disable played button in Top 100 view
+                  />
                 ))}
               </div>
             ) : (
@@ -211,7 +215,12 @@ const Top100Courses = () => {
                 )}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {regionalTop100.map((course) => (
-                    <CourseCard key={course.id} course={course} viewContext="regional" />
+                    <CourseCard 
+                      key={course.id} 
+                      course={course} 
+                      viewContext="regional" 
+                      showPlayedButton={false} // Disable played button in Top 100 view
+                    />
                   ))}
                 </div>
               </div>
