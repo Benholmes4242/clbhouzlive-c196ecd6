@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -390,7 +389,7 @@ const PostPlayRatingModal = ({
                         disabled={isSubmitting || !selectedRating}
                         className="flex-1"
                       >
-                        {isSubmitting ? "Submitting..." : "Submit Rating"}
+                        {isSubmitting ? "Submitting..." : "Rate this Course"}
                       </Button>
                     </>
                   )}
