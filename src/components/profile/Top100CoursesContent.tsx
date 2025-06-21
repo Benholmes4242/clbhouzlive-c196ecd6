@@ -2,7 +2,6 @@
 import React, { useMemo } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Top100CourseCard from './Top100CourseCard';
-import Top100CourseListItem from './Top100CourseListItem';
 
 interface Top100CoursesContentProps {
   courses: any[];
@@ -35,42 +34,6 @@ const Top100CoursesContent: React.FC<Top100CoursesContentProps> = ({
     );
   }, [courses, searchTerm]);
 
-  const renderListView = () => (
-    <div className="space-y-3">
-      {filteredCourses.map((course) => {
-        const isPlayed = playedCourses.has(course.id);
-        
-        return (
-          <Top100CourseListItem
-            key={course.id}
-            course={course}
-            isPlayed={isPlayed}
-            isOwnProfile={isOwnProfile}
-            onToggle={toggleCourse}
-            region={region}
-          />
-        );
-      })}
-    </div>
-  );
-
-  const renderGridView = () => (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      {filteredCourses.map((course) => {
-        const isPlayed = playedCourses.has(course.id);
-        
-        return (
-          <Top100CourseCard
-            key={course.id}
-            course={course}
-            isPlayed={isPlayed}
-            region={region}
-          />
-        );
-      })}
-    </div>
-  );
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8">
@@ -81,8 +44,23 @@ const Top100CoursesContent: React.FC<Top100CoursesContentProps> = ({
 
   return (
     <ScrollArea className="h-[60vh] pr-4">
-      {/* Render different views based on profile ownership */}
-      {isOwnProfile ? renderListView() : renderGridView()}
+      {/* Consistent card grid layout for both own profile and viewing others */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {filteredCourses.map((course) => {
+          const isPlayed = playedCourses.has(course.id);
+          
+          return (
+            <Top100CourseCard
+              key={course.id}
+              course={course}
+              isPlayed={isPlayed}
+              region={region}
+              isOwnProfile={isOwnProfile}
+              onToggle={isOwnProfile ? () => toggleCourse(course.id) : undefined}
+            />
+          );
+        })}
+      </div>
       
       {filteredCourses.length === 0 && courses.length > 0 && (
         <div className="text-center py-8 text-muted-foreground">

@@ -11,7 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
-import { Star, Check, X } from 'lucide-react';
+import { Star, Check, Trophy } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface Course {
@@ -122,29 +122,49 @@ const PostPlayRatingModal = ({ course, isOpen, onClose }: PostPlayRatingModalPro
           <>
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2 text-lg">
-                🟩 You've played {course.name}!
+                <Trophy className="h-5 w-5 text-yellow-600" />
+                Congratulations!
               </DialogTitle>
               <p className="text-sm text-muted-foreground">
-                Would you like to rate and review it now?
+                You've played {course.name}! How would you rate your experience?
               </p>
             </DialogHeader>
 
             <div className="space-y-6 mt-4">
-              {/* Course Image */}
-              {course.thumbnail_image && (
-                <div className="aspect-video w-full overflow-hidden rounded-lg">
-                  <img
-                    src={course.thumbnail_image}
-                    alt={course.name}
-                    className="w-full h-full object-cover"
-                  />
+              {/* Course Card Preview */}
+              <div className="relative rounded-lg border overflow-hidden bg-green-50 border-green-200">
+                <div className="relative h-24 overflow-hidden">
+                  {course.thumbnail_image ? (
+                    <img
+                      src={course.thumbnail_image}
+                      alt={course.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center">
+                      <Star className="h-8 w-8 text-white opacity-50" />
+                    </div>
+                  )}
+                  
+                  {/* Played indicator */}
+                  <div className="absolute top-2 right-2">
+                    <div className="w-6 h-6 bg-green-600 rounded-full flex items-center justify-center shadow-sm">
+                      <Check className="h-3 w-3 text-white" />
+                    </div>
+                  </div>
                 </div>
-              )}
+                
+                <div className="p-3">
+                  <h3 className="font-semibold text-sm line-clamp-1">
+                    {course.name}
+                  </h3>
+                </div>
+              </div>
 
               {/* Rating Section */}
               <div className="space-y-3">
                 <div className="text-center">
-                  <p className="text-sm font-medium mb-2">How would you rate your experience?</p>
+                  <p className="text-sm font-medium mb-2">Rate your experience</p>
                   <div className="flex items-center justify-center gap-1 mb-2">
                     <Star className="h-4 w-4 text-yellow-500" />
                     <span className="text-sm text-muted-foreground">Rate from 0.5 to 10</span>
@@ -191,7 +211,7 @@ const PostPlayRatingModal = ({ course, isOpen, onClose }: PostPlayRatingModalPro
                 <Textarea
                   value={review}
                   onChange={(e) => setReview(e.target.value)}
-                  placeholder="What made this course stand out (or not) for you?"
+                  placeholder="What made this course stand out for you?"
                   className="min-h-[80px] resize-none"
                   disabled={isSubmitting}
                   maxLength={500}
