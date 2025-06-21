@@ -136,7 +136,6 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
               <div>
                 <div className="flex items-center space-x-1">
                   <span className="font-semibold text-sm">{displayName}</span>
-                  <span className="text-xs bg-blue-500 text-white px-2 py-0.5 rounded">Friend</span>
                 </div>
                 <span className="text-xs text-muted-foreground">{timeAgo}</span>
               </div>

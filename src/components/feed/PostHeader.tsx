@@ -34,9 +34,6 @@ const PostHeader = ({ user, type, timeAgo }: PostHeaderProps) => {
             {type === 'youtube' && (
               <span className="text-xs bg-red-500 text-white px-2 py-0.5 rounded">YouTube</span>
             )}
-            {type === 'friend' && (
-              <span className="text-xs bg-blue-500 text-white px-2 py-0.5 rounded">Friend</span>
-            )}
           </div>
           <span className="text-xs text-muted-foreground">{user.username} • {timeAgo}</span>
         </div>
