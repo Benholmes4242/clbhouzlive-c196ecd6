@@ -20,50 +20,36 @@ const FriendsPage = () => {
       // Get friends where user is the requester
       const { data: friendsAsUser, error: error1 } = await supabase
         .from('user_friends')
-        .select(`
-          friend_id,
-          user_profiles!user_friends_friend_id_fkey (
-            id,
-            display_name,
-            username,
-            profile_photo_url,
-            bio
-          )
-        `)
+        .select('friend_id')
         .eq('user_id', userId)
         .eq('status', 'accepted');
 
       // Get friends where user is the friend
       const { data: friendsAsFriend, error: error2 } = await supabase
         .from('user_friends')
-        .select(`
-          user_id,
-          user_profiles!user_friends_user_id_fkey (
-            id,
-            display_name,
-            username,
-            profile_photo_url,
-            bio
-          )
-        `)
+        .select('user_id')
         .eq('friend_id', userId)
         .eq('status', 'accepted');
 
       if (error1 || error2) throw error1 || error2;
       
-      // Combine and transform the data
-      const allFriends = [
-        ...(friendsAsUser || []).map(friend => ({
-          friendId: friend.friend_id,
-          profile: friend.user_profiles
-        })),
-        ...(friendsAsFriend || []).map(friend => ({
-          friendId: friend.user_id,
-          profile: friend.user_profiles
-        }))
+      // Combine all friend IDs
+      const allFriendIds = [
+        ...(friendsAsUser || []).map(f => f.friend_id),
+        ...(friendsAsFriend || []).map(f => f.user_id)
       ];
-      
-      return allFriends;
+
+      if (allFriendIds.length === 0) return [];
+
+      // Get profile data for all friends
+      const { data: profiles, error: profileError } = await supabase
+        .from('user_profiles')
+        .select('id, display_name, username, profile_photo_url, bio')
+        .in('id', allFriendIds);
+
+      if (profileError) throw profileError;
+
+      return profiles || [];
     },
     enabled: !!userId,
   });
@@ -91,40 +77,35 @@ const FriendsPage = () => {
 
         {friends && friends.length > 0 ? (
           <div className="space-y-3">
-            {friends.map((friend) => {
-              const profile = friend.profile;
-              if (!profile) return null;
-
-              return (
-                <Card key={friend.friendId}>
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <img
-                          src={profile.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
-                          alt={profile.display_name || profile.username || 'User'}
-                          className="w-12 h-12 rounded-full object-cover"
-                        />
-                        <div>
-                          <h3 className="font-semibold">
-                            {profile.display_name || profile.username || 'User'}
-                          </h3>
-                          {profile.username && (
-                            <p className="text-sm text-muted-foreground">@{profile.username}</p>
-                          )}
-                          {profile.bio && (
-                            <p className="text-sm text-muted-foreground mt-1">{profile.bio}</p>
-                          )}
-                        </div>
+            {friends.map((profile) => (
+              <Card key={profile.id}>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={profile.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
+                        alt={profile.display_name || profile.username || 'User'}
+                        className="w-12 h-12 rounded-full object-cover"
+                      />
+                      <div>
+                        <h3 className="font-semibold">
+                          {profile.display_name || profile.username || 'User'}
+                        </h3>
+                        {profile.username && (
+                          <p className="text-sm text-muted-foreground">@{profile.username}</p>
+                        )}
+                        {profile.bio && (
+                          <p className="text-sm text-muted-foreground mt-1">{profile.bio}</p>
+                        )}
                       </div>
-                      <Button variant="outline" size="sm">
-                        Remove Friend
-                      </Button>
                     </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
+                    <Button variant="outline" size="sm">
+                      Remove Friend
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         ) : (
           <div className="text-center py-8 text-muted-foreground">

@@ -21,7 +21,8 @@ export const useTop100CoursesData = (userId: string, isOwnProfile: boolean) => {
             region,
             continent,
             global_rank,
-            regional_rank
+            regional_rank,
+            usa_rank
           )
         `)
         .eq('user_id', userId)
@@ -39,8 +40,8 @@ export const useTop100CoursesData = (userId: string, isOwnProfile: boolean) => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('golf_courses')
-        .select('id, continent, country, region, global_rank, regional_rank')
-        .or('global_rank.not.is.null,regional_rank.not.is.null') // Include courses with either ranking
+        .select('id, continent, country, region, global_rank, regional_rank, usa_rank')
+        .or('global_rank.not.is.null,regional_rank.not.is.null,usa_rank.not.is.null') // Include courses with any ranking
         .order('global_rank', { nullsFirst: false });
 
       if (error) throw error;
@@ -67,23 +68,29 @@ export const useTop100CoursesData = (userId: string, isOwnProfile: boolean) => {
     allCoursesData.forEach(course => {
       const isPlayed = playedCourseIds.has(course.id);
       
-      // Global category includes all courses with global ranks
-      if (course.global_rank) {
+      // Global category includes all courses with global ranks (1-100)
+      if (course.global_rank && course.global_rank <= 100) {
         progress.global.total++;
         if (isPlayed) progress.global.played++;
       }
 
-      // Regional categorization
-      if (course.country === 'United States' && course.global_rank) {
+      // USA category - courses with USA ranks (1-100)
+      if (course.country === 'United States' && course.usa_rank && course.usa_rank <= 100) {
         progress['usa'].total++;
         if (isPlayed) progress['usa'].played++;
-      } else if (['England', 'Scotland', 'Wales', 'Northern Ireland', 'Ireland', 'Isle of Man'].includes(course.country) && 
-                 (course.global_rank || course.regional_rank)) {
+      }
+      
+      // Britain & Ireland category - courses with regional ranks (1-100)
+      else if (['England', 'Scotland', 'Wales', 'Northern Ireland', 'Ireland', 'Isle of Man'].includes(course.country) && 
+               course.regional_rank && course.regional_rank <= 100) {
         progress['britain-ireland'].total++;
         if (isPlayed) progress['britain-ireland'].played++;
-      } else if (course.continent === 'Europe' && 
-                 !['England', 'Scotland', 'Wales', 'Northern Ireland', 'Ireland', 'Isle of Man'].includes(course.country) &&
-                 course.global_rank) {
+      }
+      
+      // Continental Europe category - European courses with global ranks
+      else if (course.continent === 'Europe' && 
+               !['England', 'Scotland', 'Wales', 'Northern Ireland', 'Ireland', 'Isle of Man'].includes(course.country) &&
+               course.global_rank) {
         progress['europe'].total++;
         if (isPlayed) progress['europe'].played++;
       }
