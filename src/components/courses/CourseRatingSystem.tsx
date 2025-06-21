@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -62,25 +61,12 @@ const CourseRatingSystem = ({
             .from('course-media')
             .upload(fileName, file);
 
-          if (uploadError) throw uploadError;
+          if (uploadError) {
+            console.error('Error uploading file:', uploadError);
+            throw new Error(`Failed to upload ${file.name}`);
+          }
 
-          const { data } = supabase.storage
-            .from('course-media')
-            .getPublicUrl(fileName);
-
-          // Store media reference in course_media table
-          const { error: mediaError } = await supabase
-            .from('course_media')
-            .insert({
-              course_id: courseId,
-              rating_id: ratingData.id,
-              user_id: userResponse.user.id,
-              media_type: file.type.startsWith('image/') ? 'image' : 'video',
-              media_url: data.publicUrl,
-              file_name: file.name
-            });
-
-          if (mediaError) throw mediaError;
+          console.log(`Successfully uploaded ${file.name}`);
         });
 
         await Promise.all(uploadPromises);

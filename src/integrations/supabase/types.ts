@@ -69,6 +69,54 @@ export type Database = {
         }
         Relationships: []
       }
+      course_media: {
+        Row: {
+          course_id: string
+          created_at: string
+          file_name: string
+          id: string
+          media_type: string
+          media_url: string
+          rating_id: string
+          user_id: string
+        }
+        Insert: {
+          course_id: string
+          created_at?: string
+          file_name: string
+          id?: string
+          media_type: string
+          media_url: string
+          rating_id: string
+          user_id: string
+        }
+        Update: {
+          course_id?: string
+          created_at?: string
+          file_name?: string
+          id?: string
+          media_type?: string
+          media_url?: string
+          rating_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "course_media_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "course_media_rating_id_fkey"
+            columns: ["rating_id"]
+            isOneToOne: false
+            referencedRelation: "course_ratings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       course_ratings: {
         Row: {
           course_id: string
