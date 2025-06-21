@@ -35,10 +35,10 @@ const Top100Courses: React.FC<Top100CoursesProps> = ({
   }
 
   const regions = [
-    { key: 'britain-ireland', name: 'Britain & Ireland', emoji: '🇬🇧🇮🇪' },
-    { key: 'usa', name: 'United States', emoji: '🇺🇸' },
-    { key: 'europe', name: 'Continental Europe', emoji: '🇪🇺' },
-    { key: 'global', name: 'Worldwide', emoji: '🌍' }
+    { key: 'britain-ireland', name: 'Britain & Ireland' },
+    { key: 'usa', name: 'United States' },
+    { key: 'europe', name: 'Continental Europe' },
+    { key: 'global', name: 'Worldwide' }
   ];
 
   const openModal = (regionKey: string) => {
@@ -99,12 +99,8 @@ const Top100Courses: React.FC<Top100CoursesProps> = ({
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
-                      <span className="text-lg">{region.emoji}</span>
                       <h3 className="font-semibold text-sm">{region.name}</h3>
                     </div>
-                    <Badge variant="secondary" className="text-xs">
-                      {progress?.played || 0}/{progress?.total || 0}
-                    </Badge>
                   </div>
                   
                   <div className="space-y-2">

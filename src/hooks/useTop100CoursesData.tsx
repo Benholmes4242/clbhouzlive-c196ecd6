@@ -1,10 +1,11 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 export const useTop100CoursesData = (userId: string, isOwnProfile: boolean) => {
   const [regionProgress, setRegionProgress] = useState<Record<string, { played: number; total: number }>>({});
+  const queryClient = useQueryClient();
 
   // Query to get the user's played courses
   const { data: playedCoursesData, isLoading } = useQuery({
@@ -102,12 +103,21 @@ export const useTop100CoursesData = (userId: string, isOwnProfile: boolean) => {
   const handleVisibilityToggle = async (checked: boolean) => {
     if (!isOwnProfile) return;
     
-    const { error } = await supabase
-      .from("user_profiles")
-      .update({ top100_visible: checked })
-      .eq("id", userId);
+    try {
+      const { error } = await supabase
+        .from("user_profiles")
+        .update({ top100_visible: checked })
+        .eq("id", userId);
 
-    if (error) {
+      if (error) {
+        console.error('Error updating top100 visibility:', error);
+        throw error;
+      }
+
+      // Invalidate the profile query to refresh the UI
+      queryClient.invalidateQueries({ queryKey: ['userProfile', userId] });
+      
+    } catch (error) {
       console.error('Error updating top100 visibility:', error);
     }
   };
