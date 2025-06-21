@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
-import { Check, Globe, MapPin, Edit } from 'lucide-react';
+import { Check, Globe, MapPin } from 'lucide-react';
 import PostPlayRatingModal from '../courses/PostPlayRatingModal';
 
 interface Top100CourseCardProps {
@@ -78,17 +78,12 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
             )}
           </div>
 
-          {/* Played Indicator with enhanced visual feedback */}
+          {/* Played Indicator */}
           {isPlayed && (
-            <div className="absolute top-2 right-2 flex gap-1">
+            <div className="absolute top-2 right-2">
               <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
                 <Check className="h-4 w-4 text-white" />
               </div>
-              {isOwnProfile && (
-                <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
-                  <Edit className="h-3 w-3 text-white" />
-                </div>
-              )}
             </div>
           )}
 
