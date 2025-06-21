@@ -83,9 +83,10 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
       )}
 
       <ProfileEditDialog
-        isOpen={isEditDialogOpen}
-        onClose={() => setIsEditDialogOpen(false)}
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
         profile={profile}
+        userId={profile?.id || userId || ''}
         onProfileUpdate={onProfileUpdate}
       />
     </div>

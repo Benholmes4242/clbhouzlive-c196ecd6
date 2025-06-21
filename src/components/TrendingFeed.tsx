@@ -17,7 +17,7 @@ const TrendingFeed = () => {
   const { videos: externalVideos, loading: externalVideosLoading } = useExternalVideos();
 
   // Get posts from followed users and friends
-  const { data: followedUsersPosts = [], loading: followedPostsLoading } = useQuery({
+  const { data: followedUsersPosts = [], isLoading: followedPostsLoading } = useQuery({
     queryKey: ['followedUsersPosts', user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
@@ -49,19 +49,67 @@ const TrendingFeed = () => {
       const { data: posts } = await supabase
         .from('posts')
         .select(`
-          *,
-          user:user_profiles(*),
-          post_media(*),
-          post_tags(
-            *,
-            entity:taggable_entities(*)
-          )
+          *
         `)
         .in('user_id', allConnectedUserIds)
         .order('created_at', { ascending: false })
         .limit(20);
 
-      return posts || [];
+      if (!posts) return [];
+
+      // Get user profiles for all post authors
+      const { data: profiles } = await supabase
+        .from('user_profiles')
+        .select('id, display_name, username, profile_photo_url')
+        .in('id', posts.map(p => p.user_id));
+
+      // Get post media for all posts
+      const { data: postMedia } = await supabase
+        .from('post_media')
+        .select('*')
+        .in('post_id', posts.map(p => p.id));
+
+      // Get post tags for all posts
+      const { data: postTags } = await supabase
+        .from('post_tags')
+        .select(`
+          *,
+          taggable_entities (*)
+        `)
+        .in('post_id', posts.map(p => p.id));
+
+      // Format posts with related data
+      const formattedPosts = posts.map(post => {
+        const userProfile = profiles?.find(profile => profile.id === post.user_id);
+        const media = postMedia?.filter(m => m.post_id === post.id) || [];
+        const tags = postTags?.filter(t => t.post_id === post.id).map((tag: any) => ({
+          id: tag.taggable_entities.id,
+          entity_type: tag.taggable_entities.entity_type,
+          entity_id: tag.taggable_entities.entity_id,
+          name: tag.taggable_entities.name,
+          username: tag.taggable_entities.username
+        })) || [];
+
+        return {
+          id: post.id,
+          content: post.content,
+          created_at: post.created_at,
+          user: {
+            id: post.user_id,
+            display_name: userProfile?.display_name || null,
+            username: userProfile?.username || null,
+            profile_photo_url: userProfile?.profile_photo_url || null
+          },
+          post_media: media.map(m => ({
+            id: m.id,
+            media_type: m.media_type as 'image' | 'video',
+            media_url: m.media_url
+          })),
+          post_tags: tags
+        };
+      });
+
+      return formattedPosts;
     },
     enabled: !!user?.id,
   });
