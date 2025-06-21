@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -101,9 +100,6 @@ const MyCourses = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{totalTop100Played}</div>
-            <p className="text-xs text-muted-foreground">
-              World-class courses
-            </p>
           </CardContent>
         </Card>
 
