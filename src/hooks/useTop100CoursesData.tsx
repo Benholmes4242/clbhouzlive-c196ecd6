@@ -103,6 +103,8 @@ export const useTop100CoursesData = (userId: string, isOwnProfile: boolean) => {
   const handleVisibilityToggle = async (checked: boolean) => {
     if (!isOwnProfile) return;
     
+    console.log('handleVisibilityToggle called with:', checked);
+    
     try {
       const { error } = await supabase
         .from("user_profiles")
@@ -113,6 +115,8 @@ export const useTop100CoursesData = (userId: string, isOwnProfile: boolean) => {
         console.error('Error updating top100 visibility:', error);
         throw error;
       }
+
+      console.log('Successfully updated top100_visible to:', checked);
 
       // Invalidate the profile query to refresh the UI
       queryClient.invalidateQueries({ queryKey: ['userProfile', userId] });

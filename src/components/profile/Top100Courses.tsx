@@ -73,11 +73,18 @@ const Top100Courses: React.FC<Top100CoursesProps> = ({
               <Checkbox
                 id="show-top100"
                 checked={top100Visible}
-                onCheckedChange={handleVisibilityToggle}
+                onCheckedChange={(checked) => {
+                  console.log('Checkbox clicked:', checked);
+                  handleVisibilityToggle(Boolean(checked));
+                }}
               />
               <label 
                 htmlFor="show-top100" 
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                onClick={() => {
+                  console.log('Label clicked, current state:', top100Visible);
+                  handleVisibilityToggle(!top100Visible);
+                }}
               >
                 Show this section on my public profile
               </label>
@@ -101,6 +108,9 @@ const Top100Courses: React.FC<Top100CoursesProps> = ({
                     <div className="flex items-center gap-2">
                       <h3 className="font-semibold text-sm">{region.name}</h3>
                     </div>
+                    <Badge variant="secondary" className="text-xs">
+                      {progress?.played || 0}/{progress?.total || 0}
+                    </Badge>
                   </div>
                   
                   <div className="space-y-2">
