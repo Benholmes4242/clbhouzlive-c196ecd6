@@ -14,6 +14,8 @@ const FriendsCourses = () => {
   const [selectedFriendId, setSelectedFriendId] = useState<string>('');
   const [activeTab, setActiveTab] = useState('top100');
 
+  console.log('FriendsCourses: Rendering with user:', user?.id);
+
   const {
     friends,
     isLoadingFriends,
@@ -22,6 +24,12 @@ const FriendsCourses = () => {
     isLoadingTop100,
     friendAverageRating
   } = useFriendData(user?.id, selectedFriendId);
+
+  console.log('FriendsCourses: Data from useFriendData:', {
+    friends: friends.length,
+    isLoadingFriends,
+    selectedFriendId
+  });
 
   const selectedFriend = friends.find(f => f.friend_id === selectedFriendId);
   const friendName = selectedFriend?.user_profiles?.display_name || selectedFriend?.user_profiles?.username || 'Friend';
@@ -49,6 +57,7 @@ const FriendsCourses = () => {
   };
 
   if (isLoadingFriends) {
+    console.log('FriendsCourses: Still loading friends...');
     return (
       <div className="text-center py-8">
         <div className="text-muted-foreground">Loading your friends...</div>
@@ -57,8 +66,11 @@ const FriendsCourses = () => {
   }
 
   if (friends.length === 0) {
+    console.log('FriendsCourses: No friends found, showing empty state');
     return <EmptyFriendsState />;
   }
+
+  console.log('FriendsCourses: Rendering with friends:', friends.length);
 
   return (
     <div className="space-y-6">
