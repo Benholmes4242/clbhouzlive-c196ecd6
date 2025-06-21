@@ -1,24 +1,153 @@
 
-import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { MapPin, Database } from 'lucide-react';
+import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Search, MapPin, Trophy } from 'lucide-react';
+import CourseCard from './CourseCard';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const CourseExplorer = () => {
+  const [selectedRegion, setSelectedRegion] = useState<string>('britain-ireland');
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // Fetch courses based on selected region
+  const { data: courses = [], isLoading } = useQuery({
+    queryKey: ['courses', selectedRegion],
+    queryFn: async () => {
+      let query = supabase
+        .from('golf_courses')
+        .select('*');
+
+      if (selectedRegion === 'britain-ireland') {
+        query = query
+          .in('country', ['England', 'Scotland', 'Wales', 'Northern Ireland', 'Ireland', 'Isle of Man'])
+          .not('regional_rank', 'is', null)
+          .order('regional_rank', { ascending: true });
+      } else if (selectedRegion === 'usa') {
+        query = query
+          .eq('country', 'United States')
+          .not('usa_rank', 'is', null)
+          .order('usa_rank', { ascending: true });
+      } else if (selectedRegion === 'europe') {
+        query = query
+          .eq('continent', 'Europe')
+          .not('country', 'in', '(England,Scotland,Wales,Northern Ireland,Ireland,Isle of Man)')
+          .not('global_rank', 'is', null)
+          .order('global_rank', { ascending: true });
+      } else {
+        query = query
+          .not('global_rank', 'is', null)
+          .order('global_rank', { ascending: true });
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+      return data || [];
+    },
+  });
+
+  // Filter courses based on search term
+  const filteredCourses = courses.filter(course => 
+    course.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    course.country.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    course.region?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const LoadingSkeleton = () => (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {[1, 2, 3, 4, 5, 6].map((i) => (
+        <div key={i} className="space-y-3">
+          <Skeleton className="h-48 w-full rounded-lg" />
+          <Skeleton className="h-6 w-3/4" />
+          <Skeleton className="h-4 w-1/2" />
+        </div>
+      ))}
+    </div>
+  );
+
+  const regionOptions = [
+    { value: 'britain-ireland', label: 'Britain & Ireland', icon: '🇬🇧🇮🇪' },
+    { value: 'usa', label: 'United States', icon: '🇺🇸' },
+    { value: 'europe', label: 'Continental Europe', icon: '🇪🇺' },
+    { value: 'global', label: 'Worldwide', icon: '🌍' }
+  ];
+
+  const currentRegion = regionOptions.find(r => r.value === selectedRegion);
+
   return (
     <div className="space-y-6">
-      <Card>
-        <CardContent className="p-8 text-center">
-          <Database className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-          <h3 className="text-xl font-semibold mb-2">No Course Data Available</h3>
-          <p className="text-muted-foreground mb-4">
-            All course data has been removed from the system. Course exploration is currently unavailable.
-          </p>
-          <div className="flex items-center justify-center text-sm text-muted-foreground">
-            <MapPin className="h-4 w-4 mr-1" />
-            <span>Ready for new course data</span>
+      {/* Region Selection */}
+      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Trophy className="h-5 w-5 text-yellow-600" />
+          <h3 className="text-lg font-semibold">Top Golf Courses</h3>
+        </div>
+        
+        <Select value={selectedRegion} onValueChange={setSelectedRegion}>
+          <SelectTrigger className="w-[200px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {regionOptions.map((region) => (
+              <SelectItem key={region.value} value={region.value}>
+                <span className="flex items-center gap-2">
+                  <span>{region.icon}</span>
+                  {region.label}
+                </span>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Search */}
+      <div className="relative max-w-md">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+        <Input
+          placeholder="Search courses, countries, or regions..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="pl-10"
+        />
+      </div>
+
+      {/* Course Grid */}
+      {isLoading ? (
+        <LoadingSkeleton />
+      ) : filteredCourses.length > 0 ? (
+        <div className="space-y-4">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <MapPin className="h-4 w-4" />
+            <span>
+              Showing {filteredCourses.length} courses in {currentRegion?.label}
+            </span>
           </div>
-        </CardContent>
-      </Card>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredCourses.map((course) => (
+              <CourseCard 
+                key={course.id} 
+                course={course} 
+                viewContext={selectedRegion === 'britain-ireland' ? 'regional' : 'global'}
+              />
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="text-center py-12">
+          <MapPin className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+          <h3 className="text-lg font-semibold mb-2">No courses found</h3>
+          <p className="text-muted-foreground">
+            {searchTerm 
+              ? `No courses match "${searchTerm}" in ${currentRegion?.label}`
+              : `No courses available for ${currentRegion?.label}`
+            }
+          </p>
+        </div>
+      )}
     </div>
   );
 };
