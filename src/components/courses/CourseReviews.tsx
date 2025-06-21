@@ -4,22 +4,21 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ChevronDown, ChevronUp, Star, User } from 'lucide-react';
+import { ChevronDown, ChevronUp, Star } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 interface CourseReviewsProps {
   courseId: string;
 }
 
-interface ReviewWithProfile {
+interface ReviewData {
   id: string;
   rating: number;
   review: string | null;
   review_date: string;
-  user_profiles: {
-    display_name: string | null;
-    username: string | null;
-  } | null;
+  user_id: string;
+  display_name?: string | null;
+  username?: string | null;
 }
 
 const CourseReviews = ({ courseId }: CourseReviewsProps) => {
@@ -28,38 +27,53 @@ const CourseReviews = ({ courseId }: CourseReviewsProps) => {
   const { data: reviews, isLoading } = useQuery({
     queryKey: ['course-reviews', courseId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // First get the ratings with reviews
+      const { data: ratingsData, error: ratingsError } = await supabase
         .from('course_ratings')
-        .select(`
-          id,
-          rating,
-          review,
-          review_date,
-          user_profiles!inner (
-            display_name,
-            username
-          )
-        `)
+        .select('id, rating, review, review_date, user_id')
         .eq('course_id', courseId)
         .not('review', 'is', null)
         .not('review', 'eq', '')
         .order('review_date', { ascending: false });
 
-      if (error) throw error;
-      return data as ReviewWithProfile[];
+      if (ratingsError) throw ratingsError;
+      if (!ratingsData) return [];
+
+      // Get user profiles for the ratings
+      const userIds = ratingsData.map(rating => rating.user_id);
+      
+      if (userIds.length === 0) return [];
+
+      const { data: profilesData, error: profilesError } = await supabase
+        .from('user_profiles')
+        .select('id, display_name, username')
+        .in('id', userIds);
+
+      if (profilesError) throw profilesError;
+
+      // Combine the data
+      const reviewsWithProfiles = ratingsData.map(rating => {
+        const profile = profilesData?.find(p => p.id === rating.user_id);
+        return {
+          ...rating,
+          display_name: profile?.display_name,
+          username: profile?.username
+        };
+      });
+
+      return reviewsWithProfiles as ReviewData[];
     },
     enabled: !!courseId,
   });
 
   const reviewCount = reviews?.length || 0;
 
-  const getUserDisplayName = (profile: ReviewWithProfile['user_profiles']) => {
-    if (!profile) return 'Anonymous';
-    return profile.display_name || profile.username || 'Anonymous';
+  const getUserDisplayName = (review: ReviewData) => {
+    return review.display_name || review.username || 'Anonymous';
   };
 
-  const getUserInitials = (profile: ReviewWithProfile['user_profiles']) => {
-    const name = getUserDisplayName(profile);
+  const getUserInitials = (review: ReviewData) => {
+    const name = getUserDisplayName(review);
     if (name === 'Anonymous') return 'A';
     
     const parts = name.split(' ');
@@ -106,7 +120,7 @@ const CourseReviews = ({ courseId }: CourseReviewsProps) => {
                     {/* User Avatar */}
                     <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                       <span className="text-sm font-medium text-primary">
-                        {getUserInitials(review.user_profiles)}
+                        {getUserInitials(review)}
                       </span>
                     </div>
                     
@@ -115,7 +129,7 @@ const CourseReviews = ({ courseId }: CourseReviewsProps) => {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <span className="font-medium">
-                            {getUserDisplayName(review.user_profiles)}
+                            {getUserDisplayName(review)}
                           </span>
                           <Badge variant="secondary" className="flex items-center gap-1">
                             <Star className="h-3 w-3 fill-current" />
