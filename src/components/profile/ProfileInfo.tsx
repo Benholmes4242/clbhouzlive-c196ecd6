@@ -20,7 +20,6 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
   userId,
   onProfileUpdate
 }) => {
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const { user } = useSupabaseSession();
   const isOwnProfile = user?.id === profile?.id;
 
@@ -36,7 +35,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
   const username = profile?.username ? `@${profile.username}` : '';
   const bio = profile?.bio || '';
   const homeClub = profile?.home_club || '';
-  const joinedDate = profile?.created_at ? new Date(profile.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long' }) : '';
+  the joinedDate = profile?.created_at ? new Date(profile.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long' }) : '';
 
   return (
     <div className="space-y-4">
@@ -65,15 +64,11 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
         </div>
 
         {isOwnProfile && (
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setIsEditDialogOpen(true)}
-            className="mt-2"
-          >
-            <Edit className="w-4 h-4 mr-2" />
-            Edit Profile
-          </Button>
+          <ProfileEditDialog
+            profile={profile}
+            userId={profile?.id || userId || ''}
+            onProfileUpdate={onProfileUpdate}
+          />
         )}
       </div>
 
@@ -81,14 +76,6 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
       {profile?.id && (
         <FollowerStats userId={profile.id} />
       )}
-
-      <ProfileEditDialog
-        open={isEditDialogOpen}
-        onOpenChange={setIsEditDialogOpen}
-        profile={profile}
-        userId={profile?.id || userId || ''}
-        onProfileUpdate={onProfileUpdate}
-      />
     </div>
   );
 };
