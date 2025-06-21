@@ -35,7 +35,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
   const username = profile?.username ? `@${profile.username}` : '';
   const bio = profile?.bio || '';
   const homeClub = profile?.home_club || '';
-  the joinedDate = profile?.created_at ? new Date(profile.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long' }) : '';
+  const joinedDate = profile?.created_at ? new Date(profile.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long' }) : '';
 
   return (
     <div className="space-y-4">
