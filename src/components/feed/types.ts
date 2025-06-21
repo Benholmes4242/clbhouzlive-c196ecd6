@@ -41,4 +41,11 @@ export interface UserPostWithType {
     media_type: 'image' | 'video';
     media_url: string;
   }>;
+  post_tags: Array<{
+    id: string;
+    entity_type: 'user' | 'golf_club' | 'business';
+    entity_id: string;
+    name: string;
+    username: string | null;
+  }>;
 }

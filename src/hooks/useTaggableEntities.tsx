@@ -29,7 +29,14 @@ export const useTaggableEntities = () => {
         .limit(10);
 
       if (error) throw error;
-      setEntities(data || []);
+      
+      // Type assertion to ensure entity_type is properly typed
+      const typedData = (data || []).map(item => ({
+        ...item,
+        entity_type: item.entity_type as 'user' | 'golf_club' | 'business'
+      }));
+      
+      setEntities(typedData);
     } catch (error) {
       console.error('Error searching entities:', error);
       setEntities([]);
@@ -52,7 +59,10 @@ export const useTaggableEntities = () => {
         .single();
 
       if (error) throw error;
-      return data;
+      return data ? {
+        ...data,
+        entity_type: data.entity_type as 'user' | 'golf_club' | 'business'
+      } : null;
     } catch (error) {
       console.error('Error creating golf club entity:', error);
       return null;
@@ -73,7 +83,10 @@ export const useTaggableEntities = () => {
         .single();
 
       if (error) throw error;
-      return data;
+      return data ? {
+        ...data,
+        entity_type: data.entity_type as 'user' | 'golf_club' | 'business'
+      } : null;
     } catch (error) {
       console.error('Error creating business entity:', error);
       return null;
