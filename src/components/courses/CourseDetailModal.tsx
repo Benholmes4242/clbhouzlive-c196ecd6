@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import React from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import {
   Dialog,
@@ -9,10 +9,9 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { MapPin, Star, Users } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
 import CourseRatingSystem from './CourseRatingSystem';
+import CourseReviews from './CourseReviews';
 import CourseMap from './CourseMap';
 
 interface Course {
@@ -38,9 +37,6 @@ interface CourseDetailModalProps {
 }
 
 const CourseDetailModal = ({ course, isOpen, onClose }: CourseDetailModalProps) => {
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-
   const { data: currentUserResponse } = useQuery({
     queryKey: ['current-user'],
     queryFn: async () => {
@@ -148,9 +144,9 @@ const CourseDetailModal = ({ course, isOpen, onClose }: CourseDetailModalProps) 
             </div>
           )}
 
-          {/* Clubhouse Rating */}
+          {/* Average Rating Display */}
           <div className="border rounded-lg p-4">
-            <h3 className="font-semibold mb-3">Clubhouse Rating</h3>
+            <h3 className="font-semibold mb-3">Community Rating</h3>
             
             {ratingStats ? (
               <div className="flex items-center gap-4 mb-4">
@@ -174,6 +170,7 @@ const CourseDetailModal = ({ course, isOpen, onClose }: CourseDetailModalProps) 
                 courseId={course.id}
                 courseName={course.name}
                 currentRating={userRating?.rating || null}
+                currentReview={userRating?.review || null}
                 hasRated={hasRated}
               />
             ) : !currentUser ? (
@@ -187,6 +184,9 @@ const CourseDetailModal = ({ course, isOpen, onClose }: CourseDetailModalProps) 
             ) : null}
           </div>
 
+          {/* Reviews Section */}
+          <CourseReviews courseId={course.id} />
+
           {/* Map */}
           {course.latitude && course.longitude && (
             <div>
@@ -196,17 +196,6 @@ const CourseDetailModal = ({ course, isOpen, onClose }: CourseDetailModalProps) 
                 longitude={course.longitude}
                 courseName={course.name}
               />
-            </div>
-          )}
-
-          {/* Website Link */}
-          {course.website_url && (
-            <div>
-              <Button asChild variant="outline" className="w-full">
-                <a href={course.website_url} target="_blank" rel="noopener noreferrer">
-                  Visit Course Website
-                </a>
-              </Button>
             </div>
           )}
         </div>

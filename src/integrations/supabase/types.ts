@@ -75,6 +75,8 @@ export type Database = {
           created_at: string
           id: string
           rating: number
+          review: string | null
+          review_date: string | null
           updated_at: string
           user_id: string
         }
@@ -83,6 +85,8 @@ export type Database = {
           created_at?: string
           id?: string
           rating: number
+          review?: string | null
+          review_date?: string | null
           updated_at?: string
           user_id: string
         }
@@ -91,6 +95,8 @@ export type Database = {
           created_at?: string
           id?: string
           rating?: number
+          review?: string | null
+          review_date?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -698,6 +704,7 @@ export type Database = {
           average_rating: number | null
           course_id: string | null
           total_ratings: number | null
+          total_reviews: number | null
         }
         Relationships: [
           {
