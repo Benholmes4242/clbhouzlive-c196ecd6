@@ -14,28 +14,35 @@ const FriendsCourses = () => {
   const navigate = useNavigate();
   const [selectedFriendId, setSelectedFriendId] = useState<string>('');
 
-  // Fetch user's accepted friends
+  // Fetch user's accepted friends with their profile data
   const { data: friends = [], isLoading: isLoadingFriends } = useQuery({
     queryKey: ['user-friends', user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
       
-      const { data, error } = await supabase
+      // First get friend IDs
+      const { data: friendships, error: friendshipsError } = await supabase
         .from('user_friends')
-        .select(`
-          friend_id,
-          user_profiles!user_friends_friend_id_fkey (
-            id,
-            display_name,
-            username,
-            profile_photo_url
-          )
-        `)
+        .select('friend_id')
         .eq('user_id', user.id)
         .eq('status', 'accepted');
 
-      if (error) throw error;
-      return data || [];
+      if (friendshipsError) throw friendshipsError;
+      if (!friendships || friendships.length === 0) return [];
+
+      // Then get profile data for those friends
+      const friendIds = friendships.map(f => f.friend_id);
+      const { data: profiles, error: profilesError } = await supabase
+        .from('user_profiles')
+        .select('id, display_name, username, profile_photo_url')
+        .in('id', friendIds);
+
+      if (profilesError) throw profilesError;
+      
+      return profiles?.map(profile => ({
+        friend_id: profile.id,
+        user_profiles: profile
+      })) || [];
     },
     enabled: !!user?.id,
   });
