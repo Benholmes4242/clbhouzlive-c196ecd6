@@ -128,7 +128,7 @@ const MyCourses = () => {
 
         <TabsContent value="top100" className="mt-6">
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Top 100 Courses Played ({totalTop100Played})</h3>
+            <h3 className="text-lg font-semibold">Top 100 Courses Played</h3>
             {isLoadingTop100 ? (
               <div className="text-center py-8">Loading your Top 100 courses...</div>
             ) : top100Courses.length > 0 ? (
