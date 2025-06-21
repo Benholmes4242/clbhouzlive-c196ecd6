@@ -16,6 +16,9 @@ import Auth from "./pages/Auth";
 import AdminPage from "./pages/AdminPage";
 import NotificationsPage from "./pages/NotificationsPage";
 import MessagesPage from "./pages/MessagesPage";
+import FollowersPage from "./pages/FollowersPage";
+import FollowingPage from "./pages/FollowingPage";
+import FriendsPage from "./pages/FriendsPage";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +37,9 @@ const App = () => (
           <Route path="/courses" element={<Courses />} />
           <Route path="/profile" element={<ProfilePage />} />
           <Route path="/profile/:username" element={<UserProfilePage />} />
+          <Route path="/profile/:userId/followers" element={<FollowersPage />} />
+          <Route path="/profile/:userId/following" element={<FollowingPage />} />
+          <Route path="/profile/:userId/friends" element={<FriendsPage />} />
           <Route path="/notifications" element={<NotificationsPage />} />
           <Route path="/messages" element={<MessagesPage />} />
           <Route path="/admin" element={<AdminPage />} />

@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Edit, MapPin, Calendar } from 'lucide-react';
+import { Edit, MapPin } from 'lucide-react';
 import ProfileEditDialog from './ProfileEditDialog';
 import FollowerStats from './FollowerStats';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -35,7 +35,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
   const username = profile?.username ? `@${profile.username}` : '';
   const bio = profile?.bio || '';
   const homeClub = profile?.home_club || '';
-  const joinedDate = profile?.created_at ? new Date(profile.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long' }) : '';
+  const handicapIndex = profile?.eg_handicap_index;
 
   return (
     <div className="space-y-4">
@@ -48,17 +48,16 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
           <p className="text-sm max-w-md mx-auto">{bio}</p>
         )}
         
-        <div className="flex flex-wrap justify-center gap-2 text-sm text-muted-foreground">
+        <div className="flex flex-col items-center gap-1 text-sm text-muted-foreground">
           {homeClub && (
             <div className="flex items-center gap-1">
               <MapPin className="w-4 h-4" />
               <span>{homeClub}</span>
             </div>
           )}
-          {joinedDate && (
-            <div className="flex items-center gap-1">
-              <Calendar className="w-4 h-4" />
-              <span>Joined {joinedDate}</span>
+          {handicapIndex !== null && handicapIndex !== undefined && (
+            <div className="text-sm text-foreground font-medium">
+              Handicap: {handicapIndex}
             </div>
           )}
         </div>

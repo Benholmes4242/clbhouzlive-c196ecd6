@@ -103,7 +103,7 @@ const Top100Courses: React.FC<Top100CoursesProps> = ({
                       <h3 className="font-semibold text-sm">{region.name}</h3>
                     </div>
                     <Badge variant="secondary" className="text-xs">
-                      {progress?.played || 0}/{progress?.total || 0}
+                      {progress?.played || 0} from {progress?.total || 0}
                     </Badge>
                   </div>
                   

@@ -1,6 +1,5 @@
 
 import React from 'react';
-import BagManager from '@/components/BagManager';
 import EGAppIntegration from './EGAppIntegration';
 import SocialActivity from './SocialActivity';
 import Top100Courses from './Top100Courses';
@@ -41,14 +40,6 @@ const ProfileSections: React.FC<ProfileSectionsProps> = ({
         onVisibilityToggle={isOwnProfile ? onEGVisibilityToggle : undefined}
       />
       
-      {user && (
-        <BagManager 
-          userId={user.id} 
-          isOwnProfile={isOwnProfile}
-          bagVisible={profile?.bag_visible ?? true}
-        />
-      )}
-
       {user && (
         <Top100Courses
           userId={user.id}
