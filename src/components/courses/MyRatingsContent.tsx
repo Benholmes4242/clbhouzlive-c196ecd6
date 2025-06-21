@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -42,22 +41,30 @@ const MyRatingsContent = () => {
 
   // Get the user parameter from URL to determine whose ratings to show
   const viewingUsername = searchParams.get('user');
-  const isViewingOwnRatings = !viewingUsername;
+  const viewingUserId = searchParams.get('userId');
+  const isViewingOwnRatings = !viewingUsername && !viewingUserId;
 
-  console.log('MyRatingsContent: viewingUsername:', viewingUsername, 'isViewingOwnRatings:', isViewingOwnRatings);
+  console.log('MyRatingsContent: viewingUsername:', viewingUsername, 'viewingUserId:', viewingUserId, 'isViewingOwnRatings:', isViewingOwnRatings);
 
   // Fetch the user profile if viewing someone else's ratings
   const { data: viewedUserProfile } = useQuery({
-    queryKey: ['user-profile', viewingUsername],
+    queryKey: ['user-profile', viewingUsername, viewingUserId],
     queryFn: async () => {
-      if (!viewingUsername || isViewingOwnRatings) return null;
+      if (isViewingOwnRatings) return null;
       
-      console.log('Fetching profile for username:', viewingUsername);
-      const { data, error } = await supabase
+      console.log('Fetching profile for username:', viewingUsername, 'or userId:', viewingUserId);
+      
+      let query = supabase
         .from('user_profiles')
-        .select('id, display_name, username')
-        .eq('username', viewingUsername)
-        .single();
+        .select('id, display_name, username');
+      
+      if (viewingUsername) {
+        query = query.eq('username', viewingUsername);
+      } else if (viewingUserId) {
+        query = query.eq('id', viewingUserId);
+      }
+      
+      const { data, error } = await query.single();
 
       if (error) {
         console.error('Error fetching user profile:', error);
@@ -66,7 +73,7 @@ const MyRatingsContent = () => {
       console.log('Found user profile:', data);
       return data;
     },
-    enabled: !!viewingUsername && !isViewingOwnRatings,
+    enabled: !isViewingOwnRatings,
   });
 
   // Determine which user's ratings to fetch

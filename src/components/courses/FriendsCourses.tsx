@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNavigate } from 'react-router-dom';
@@ -52,9 +51,12 @@ const FriendsCourses = () => {
     .slice(0, 6);
 
   const handleAverageRatingClick = () => {
-    if (selectedFriendId && friendUsername) {
-      console.log('Navigating to friend ratings:', friendUsername);
-      navigate(`/my-ratings?user=${friendUsername}`);
+    if (selectedFriendId) {
+      // Use username if available, otherwise use the friend's ID
+      const identifier = friendUsername || selectedFriendId;
+      const paramName = friendUsername ? 'user' : 'userId';
+      console.log('Navigating to friend ratings:', identifier, 'using param:', paramName);
+      navigate(`/my-ratings?${paramName}=${identifier}`);
     }
   };
 
