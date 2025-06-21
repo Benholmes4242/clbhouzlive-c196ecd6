@@ -1,15 +1,14 @@
 
-import React from 'react';
+import React, { useState } from 'react';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Edit, MapPin, Calendar } from 'lucide-react';
 import ProfileEditDialog from './ProfileEditDialog';
+import FollowerStats from './FollowerStats';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 interface ProfileInfoProps {
-  profile: {
-    display_name?: string | null;
-    username?: string | null;
-    home_club?: string | null;
-    eg_handicap_index?: number | null;
-  } | null;
+  profile: any;
   userEmail?: string;
   userId?: string;
   onProfileUpdate: () => void;
@@ -21,39 +20,74 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
   userId,
   onProfileUpdate
 }) => {
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const { user } = useSupabaseSession();
-  const isOwnProfile = user?.id === userId;
+  const isOwnProfile = user?.id === profile?.id;
 
-  // Show handicap if:
-  // 1. It's the user's own profile (even if not set, so they know to fill it in)
-  // 2. It's another user's profile AND the handicap is set
-  const shouldShowHandicap = isOwnProfile || (profile?.eg_handicap_index !== null && profile?.eg_handicap_index !== undefined);
+  if (!profile && !userEmail) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-muted-foreground">No profile information available</p>
+      </div>
+    );
+  }
+
+  const displayName = profile?.display_name || profile?.username || userEmail?.split('@')[0] || 'User';
+  const username = profile?.username ? `@${profile.username}` : '';
+  const bio = profile?.bio || '';
+  const homeClub = profile?.home_club || '';
+  const joinedDate = profile?.created_at ? new Date(profile.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long' }) : '';
 
   return (
-    <div className="flex flex-col items-center mt-6 space-y-3">
+    <div className="space-y-4">
       <div className="text-center space-y-2">
-        <h1 className="text-2xl font-semibold">
-          {profile?.display_name || profile?.username || userEmail || "Anonymous User"}
-        </h1>
-        <p className="text-muted-foreground">London, England, United Kingdom</p>
-        <p className="text-sm">
-          <span>Home Club:</span> {profile?.home_club || "Not set"}
-        </p>
-        {shouldShowHandicap && (
-          <p className="text-sm">
-            <span>Handicap:</span> {profile?.eg_handicap_index !== null && profile?.eg_handicap_index !== undefined ? profile.eg_handicap_index : "Not set"}
-          </p>
+        <h1 className="text-2xl font-bold">{displayName}</h1>
+        {username && (
+          <p className="text-muted-foreground text-lg">{username}</p>
+        )}
+        {bio && (
+          <p className="text-sm max-w-md mx-auto">{bio}</p>
+        )}
+        
+        <div className="flex flex-wrap justify-center gap-2 text-sm text-muted-foreground">
+          {homeClub && (
+            <div className="flex items-center gap-1">
+              <MapPin className="w-4 h-4" />
+              <span>{homeClub}</span>
+            </div>
+          )}
+          {joinedDate && (
+            <div className="flex items-center gap-1">
+              <Calendar className="w-4 h-4" />
+              <span>Joined {joinedDate}</span>
+            </div>
+          )}
+        </div>
+
+        {isOwnProfile && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setIsEditDialogOpen(true)}
+            className="mt-2"
+          >
+            <Edit className="w-4 h-4 mr-2" />
+            Edit Profile
+          </Button>
         )}
       </div>
-      
-      {/* Only show edit dialog if this is the user's own profile */}
-      {userId && isOwnProfile && (
-        <ProfileEditDialog
-          profile={profile}
-          userId={userId}
-          onProfileUpdate={onProfileUpdate}
-        />
+
+      {/* Show follower stats for all profiles */}
+      {profile?.id && (
+        <FollowerStats userId={profile.id} />
       )}
+
+      <ProfileEditDialog
+        isOpen={isEditDialogOpen}
+        onClose={() => setIsEditDialogOpen(false)}
+        profile={profile}
+        onProfileUpdate={onProfileUpdate}
+      />
     </div>
   );
 };

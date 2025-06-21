@@ -27,28 +27,34 @@ const UserProfileActions: React.FC<UserProfileActionsProps> = ({
   });
 
   return (
-    <div className="flex items-center justify-center gap-3 mt-6 mb-6">
-      <FollowButton
-        isFollowing={isFollowing}
-        loading={loading}
-        onFollow={() => handleFollow(isFollowing)}
-        friendStatus={friendStatus}
-      />
+    <div className="space-y-4">
+      {/* Primary action buttons */}
+      <div className="flex items-center justify-center gap-3">
+        <FollowButton
+          isFollowing={isFollowing}
+          loading={loading}
+          onFollow={() => handleFollow(isFollowing)}
+          friendStatus={friendStatus}
+        />
 
-      <MessageButton friendStatus={friendStatus} />
+        <FriendButton
+          friendStatus={friendStatus}
+          loading={loading}
+          onFriendRequest={() => handleFriendRequest(friendStatus)}
+        />
+      </div>
 
-      <FriendButton
-        friendStatus={friendStatus}
-        loading={loading}
-        onFriendRequest={() => handleFriendRequest(friendStatus)}
-      />
-
-      <ActionsDropdown
-        friendStatus={friendStatus}
-        loading={loading}
-        onRemoveFriend={handleRemoveFriend}
-        username={username}
-      />
+      {/* Secondary action buttons */}
+      <div className="flex items-center justify-center gap-3">
+        <MessageButton friendStatus={friendStatus} />
+        
+        <ActionsDropdown
+          friendStatus={friendStatus}
+          loading={loading}
+          onRemoveFriend={handleRemoveFriend}
+          username={username}
+        />
+      </div>
     </div>
   );
 };
