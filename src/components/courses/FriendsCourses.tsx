@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Users, Trophy, Star, Calendar } from 'lucide-react';
 import CourseCard from './CourseCard';
 import { useNavigate } from 'react-router-dom';
@@ -13,6 +14,7 @@ const FriendsCourses = () => {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const [selectedFriendId, setSelectedFriendId] = useState<string>('');
+  const [activeTab, setActiveTab] = useState('top100');
 
   // Fetch user's accepted friends with their profile data
   const { data: friends = [], isLoading: isLoadingFriends } = useQuery({
@@ -228,68 +230,75 @@ const FriendsCourses = () => {
             </Card>
           </div>
 
-          {/* Course Lists */}
-          <div className="space-y-8">
-            {/* Top 100 Courses */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">
-                {friendName}'s Top 100 Courses
-              </h3>
-              {isLoadingTop100 ? (
-                <div className="text-center py-8">Loading Top 100 courses...</div>
-              ) : friendTop100Courses.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {friendTop100Courses.map((userCourse) => (
-                    <CourseCard 
-                      key={userCourse.id} 
-                      course={userCourse.golf_courses}
-                      viewingUserId={selectedFriendId}
-                      showPlayedButton={false}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <Card>
-                  <CardContent className="p-8 text-center">
-                    <Trophy className="h-12 w-12 mx-auto mb-4 text-yellow-600" />
-                    <h3 className="text-lg font-semibold mb-2">No Top 100 courses played yet</h3>
-                    <p className="text-muted-foreground">
-                      {friendName} hasn't played any Top 100 courses yet
-                    </p>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
+          {/* Course Lists with Tabs */}
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="top100">Top 100</TabsTrigger>
+              <TabsTrigger value="recent">Recent</TabsTrigger>
+            </TabsList>
 
-            {/* Recent Courses */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold">
-                {friendName}'s Recent Activity (Last 30 Days)
-              </h3>
-              {recentCourses.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {recentCourses.map((userCourse) => (
-                    <CourseCard 
-                      key={`${userCourse.id}-recent`} 
-                      course={userCourse.golf_courses}
-                      viewingUserId={selectedFriendId}
-                      showPlayedButton={false}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <Card>
-                  <CardContent className="p-8 text-center">
-                    <Calendar className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                    <h3 className="text-lg font-semibold mb-2">No recent activity</h3>
-                    <p className="text-muted-foreground">
-                      {friendName} hasn't played any courses in the last 30 days
-                    </p>
-                  </CardContent>
-                </Card>
-              )}
-            </div>
-          </div>
+            <TabsContent value="top100" className="mt-6">
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">
+                  {friendName}'s Top 100 Courses
+                </h3>
+                {isLoadingTop100 ? (
+                  <div className="text-center py-8">Loading Top 100 courses...</div>
+                ) : friendTop100Courses.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {friendTop100Courses.map((userCourse) => (
+                      <CourseCard 
+                        key={userCourse.id} 
+                        course={userCourse.golf_courses}
+                        viewingUserId={selectedFriendId}
+                        showPlayedButton={false}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <Card>
+                    <CardContent className="p-8 text-center">
+                      <Trophy className="h-12 w-12 mx-auto mb-4 text-yellow-600" />
+                      <h3 className="text-lg font-semibold mb-2">No Top 100 courses played yet</h3>
+                      <p className="text-muted-foreground">
+                        {friendName} hasn't played any Top 100 courses yet
+                      </p>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="recent" className="mt-6">
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">
+                  {friendName}'s Recent Activity (Last 30 Days)
+                </h3>
+                {recentCourses.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {recentCourses.map((userCourse) => (
+                      <CourseCard 
+                        key={`${userCourse.id}-recent`} 
+                        course={userCourse.golf_courses}
+                        viewingUserId={selectedFriendId}
+                        showPlayedButton={false}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <Card>
+                    <CardContent className="p-8 text-center">
+                      <Calendar className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                      <h3 className="text-lg font-semibold mb-2">No recent activity</h3>
+                      <p className="text-muted-foreground">
+                        {friendName} hasn't played any courses in the last 30 days
+                      </p>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
+            </TabsContent>
+          </Tabs>
         </>
       )}
     </div>
