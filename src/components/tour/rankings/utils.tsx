@@ -23,8 +23,12 @@ export const getTourLogoSize = (tour: string) => {
       return 'h-16 w-auto'; // Consistent size for PGA
     case 'DP World':
       return 'h-16 w-auto'; // Updated to match PGA sizing
+    case 'LIV':
+      return 'h-16 w-auto'; // Increased to match PGA and DP World
+    case 'University':
+      return 'h-16 w-auto'; // Increased to match other major tours
     default:
-      return 'h-6 w-auto'; // Keep current size for LIV and University
+      return 'h-16 w-auto'; // Default to consistent sizing
   }
 };
 

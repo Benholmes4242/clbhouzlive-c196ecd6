@@ -97,19 +97,12 @@ const TeeTimesSection = () => {
   });
 
   const getTourLogoSize = (tour: string) => {
-    switch (tour) {
-      case 'PGA':
-        return 'h-16 w-auto'; // Updated to match consistent sizing
-      case 'DP World':
-        return 'h-16 w-auto'; // Updated to match PGA sizing
-      default:
-        return 'h-6 w-auto'; // Keep current size for LIV and University
-    }
+    return 'h-16 w-auto'; // Consistent sizing for all tours
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-4 min-h-[4rem]">
         <h2 className="text-xl font-semibold">Tee Times</h2>
         
         <div className="flex flex-col sm:flex-row gap-4">
@@ -143,7 +136,7 @@ const TeeTimesSection = () => {
             <CardContent className="p-4">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
+                  <div className="flex items-center gap-3 mb-2 min-h-[4rem]">
                     <Clock className="h-4 w-4 text-muted-foreground" />
                     <span className="font-medium text-lg">{teeTime.time}</span>
                     <div className={getTourLogoSize(teeTime.tour)}>

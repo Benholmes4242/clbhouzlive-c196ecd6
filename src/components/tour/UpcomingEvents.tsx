@@ -90,19 +90,12 @@ const UpcomingEvents = () => {
   };
 
   const getTourLogoSize = (tour: string) => {
-    switch (tour) {
-      case 'PGA':
-        return 'h-16 w-auto'; // Updated to match consistent sizing
-      case 'DP World':
-        return 'h-16 w-auto'; // Updated to match PGA sizing
-      default:
-        return 'h-6 w-auto'; // Keep current size for LIV and University
-    }
+    return 'h-16 w-auto'; // Consistent sizing for all tours
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between min-h-[4rem]">
         <h2 className="text-xl font-semibold">Upcoming Events</h2>
         <Select value={filterTour} onValueChange={setFilterTour}>
           <SelectTrigger className="w-[180px]">
@@ -122,7 +115,7 @@ const UpcomingEvents = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {filteredEvents.map((event) => (
           <Card key={event.id} className="hover:shadow-lg transition-shadow">
-            <CardHeader className="pb-3">
+            <CardHeader className="pb-3 min-h-[5rem]">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <CardTitle className="text-lg mb-2">{event.name}</CardTitle>

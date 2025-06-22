@@ -83,19 +83,12 @@ const LiveLeaderboards = () => {
   };
 
   const getTourLogoSize = (tour: string) => {
-    switch (tour) {
-      case 'PGA':
-        return 'h-16 w-auto'; // Consistent size for PGA
-      case 'DP World':
-        return 'h-16 w-auto'; // Updated to match PGA sizing
-      default:
-        return 'h-6 w-auto'; // Keep current size for LIV and University
-    }
+    return 'h-16 w-auto'; // Consistent sizing for all tours
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between min-h-[4rem]">
         <h2 className="text-xl font-semibold">Live Leaderboards</h2>
         <div className="flex gap-2">
           {mockTournaments.map((tournament) => (
@@ -112,7 +105,7 @@ const LiveLeaderboards = () => {
       </div>
 
       <Card>
-        <CardHeader>
+        <CardHeader className="min-h-[5rem]">
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <CardTitle className="flex items-center gap-4">
