@@ -28,8 +28,10 @@ const RankingsSection = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <span>{selectedRanking.name}</span>
+          <div className="flex items-center justify-between">
+            <CardTitle>
+              <span>{selectedRanking.name}</span>
+            </CardTitle>
             <div className={getTourLogoSize(selectedRanking.tour)}>
               <img
                 src={tourLogos[selectedRanking.tour]}
@@ -37,7 +39,7 @@ const RankingsSection = () => {
                 className="h-full w-auto object-contain"
               />
             </div>
-          </CardTitle>
+          </div>
         </CardHeader>
         <CardContent>
           <RankingsTable selectedRanking={selectedRanking} />
@@ -48,3 +50,4 @@ const RankingsSection = () => {
 };
 
 export default RankingsSection;
+

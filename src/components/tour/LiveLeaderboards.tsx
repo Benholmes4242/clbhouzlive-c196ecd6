@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -113,8 +114,8 @@ const LiveLeaderboards = () => {
 
       <Card>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
               <CardTitle className="flex items-center gap-4">
                 <span>{selectedTournament.name}</span>
                 {selectedTournament.status === 'live' && (
@@ -174,3 +175,4 @@ const LiveLeaderboards = () => {
 };
 
 export default LiveLeaderboards;
+
