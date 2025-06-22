@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -118,6 +119,16 @@ const RankingsSection = () => {
     }
   };
 
+  const getTourButtonText = (tour: string) => {
+    switch (tour) {
+      case 'PGA': return 'PGA';
+      case 'LIV': return 'LIV Golf';
+      case 'DP World': return 'DP Tour';
+      case 'University': return 'US University';
+      default: return tour;
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4">
@@ -141,10 +152,8 @@ const RankingsSection = () => {
                 variant={selectedRanking.id === ranking.id ? "default" : "outline"}
                 size="sm"
                 onClick={() => setSelectedRanking(ranking)}
-                className="flex items-center gap-3"
               >
-                {ranking.icon}
-                {ranking.tour}
+                {getTourButtonText(ranking.tour)}
               </Button>
             ))}
           </div>
