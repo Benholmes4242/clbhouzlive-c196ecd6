@@ -28,8 +28,8 @@ const RankingsSection = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-3">
-            {selectedRanking.name}
+          <CardTitle className="flex items-center justify-between">
+            <span>{selectedRanking.name}</span>
             <div className={getTourLogoSize(selectedRanking.tour)}>
               <img
                 src={tourLogos[selectedRanking.tour]}

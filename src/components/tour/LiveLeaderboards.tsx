@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -115,14 +116,7 @@ const LiveLeaderboards = () => {
           <div className="flex items-center justify-between">
             <div>
               <CardTitle className="flex items-center gap-4">
-                {selectedTournament.name}
-                <div className={getTourLogoSize(selectedTournament.tour)}>
-                  <img
-                    src={tourLogos[selectedTournament.tour]}
-                    alt={`${selectedTournament.tour} logo`}
-                    className="h-full w-auto object-contain"
-                  />
-                </div>
+                <span>{selectedTournament.name}</span>
                 {selectedTournament.status === 'live' && (
                   <Badge variant="destructive" className="animate-pulse">
                     LIVE
@@ -133,6 +127,13 @@ const LiveLeaderboards = () => {
                 {selectedTournament.round}
                 {selectedTournament.cutLine && ` • Cut Line: ${selectedTournament.cutLine}`}
               </p>
+            </div>
+            <div className={getTourLogoSize(selectedTournament.tour)}>
+              <img
+                src={tourLogos[selectedTournament.tour]}
+                alt={`${selectedTournament.tour} logo`}
+                className="h-full w-auto object-contain"
+              />
             </div>
           </div>
         </CardHeader>
