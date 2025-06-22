@@ -9,15 +9,35 @@ import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
 
 // Mock data for different content types
-const featuredMoment = {
-  id: '1',
-  title: 'Incredible hole-in-one at Pebble Beach',
-  user: 'ProGolfer_Mike',
-  timeAgo: '2 hours ago',
-  image: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=600&h=400&fit=crop',
-  type: 'video',
-  duration: '0:45'
-};
+const featuredMoments = [
+  {
+    id: '1',
+    title: 'Incredible hole-in-one at Pebble Beach',
+    user: 'ProGolfer_Mike',
+    timeAgo: '2 hours ago',
+    image: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=600&h=400&fit=crop',
+    type: 'video',
+    duration: '0:45'
+  },
+  {
+    id: '2',
+    title: 'Perfect approach shot at Augusta',
+    user: 'GolfPro_Sarah',
+    timeAgo: '4 hours ago',
+    image: 'https://images.unsplash.com/photo-1593111774240-d529f12cf4bb?w=600&h=400&fit=crop',
+    type: 'video',
+    duration: '1:20'
+  },
+  {
+    id: '3',
+    title: 'Amazing eagle putt at St Andrews',
+    user: 'LinksMaster',
+    timeAgo: '6 hours ago',
+    image: 'https://images.unsplash.com/photo-1587174486073-ae5e5ccd3ab6?w=600&h=400&fit=crop',
+    type: 'video',
+    duration: '0:32'
+  }
+];
 
 const courseHighlights = [
   { id: '1', name: 'Augusta National', location: 'Georgia, USA', posts: 247, image: 'https://images.unsplash.com/photo-1593111774240-d529f12cf4bb?w=300&h=200&fit=crop' },
@@ -30,7 +50,7 @@ const topPlayers = [
     id: '1', 
     name: 'Sarah Chen', 
     bio: '2 HCP • Teaching Pro', 
-    avatar: 'https://images.unsplash.com/photo-1494790108755-2616b2f6bb44?w=100&h=100&fit=crop',
+    avatar: 'https://images.unsplash.com/photo-1494790108755-2616b2f44?w=100&h=100&fit=crop',
     preview: 'https://images.unsplash.com/photo-1587174486073-ae5e5ccd3ab6?w=200&h=150&fit=crop'
   },
   { 
@@ -115,33 +135,48 @@ const ClubhouseFeed = () => {
           </div>
         </div>
 
-        {/* Featured Moment */}
+        {/* Featured Moments Carousel */}
         <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-4">Featured Moment</h2>
-          <div className="relative bg-card rounded-lg overflow-hidden shadow-sm border">
-            <img src={featuredMoment.image} alt={featuredMoment.title} className="w-full h-64 object-cover" />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-            {featuredMoment.type === 'video' && (
-              <>
-                <div className="absolute top-4 right-4 bg-black/60 text-white text-xs px-2 py-1 rounded">
-                  {featuredMoment.duration}
-                </div>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="bg-white/20 backdrop-blur-sm rounded-full p-4">
-                    <Play className="h-8 w-8 text-white fill-current" />
-                  </div>
-                </div>
-              </>
-            )}
-            <div className="absolute bottom-4 left-4 text-white">
-              <h3 className="text-lg font-semibold mb-1">{featuredMoment.title}</h3>
-              <div className="flex items-center gap-2 text-sm">
-                <span>@{featuredMoment.user}</span>
-                <Clock className="h-3 w-3" />
-                <span>{featuredMoment.timeAgo}</span>
-              </div>
-            </div>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold">Featured Moments</h2>
+            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+              View All <ChevronRight className="h-4 w-4 ml-1" />
+            </Button>
           </div>
+          <Carousel className="w-full">
+            <CarouselContent className="-ml-2 md:-ml-4">
+              {featuredMoments.map((moment) => (
+                <CarouselItem key={moment.id} className="pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3">
+                  <div className="relative bg-card rounded-lg overflow-hidden shadow-sm border hover:shadow-md transition-shadow cursor-pointer">
+                    <img src={moment.image} alt={moment.title} className="w-full h-48 object-cover" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    {moment.type === 'video' && (
+                      <>
+                        <div className="absolute top-4 right-4 bg-black/60 text-white text-xs px-2 py-1 rounded">
+                          {moment.duration}
+                        </div>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="bg-white/20 backdrop-blur-sm rounded-full p-3">
+                            <Play className="h-6 w-6 text-white fill-current" />
+                          </div>
+                        </div>
+                      </>
+                    )}
+                    <div className="absolute bottom-4 left-4 text-white">
+                      <h3 className="text-base font-semibold mb-1">{moment.title}</h3>
+                      <div className="flex items-center gap-2 text-sm">
+                        <span>@{moment.user}</span>
+                        <Clock className="h-3 w-3" />
+                        <span>{moment.timeAgo}</span>
+                      </div>
+                    </div>
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="hidden sm:flex" />
+            <CarouselNext className="hidden sm:flex" />
+          </Carousel>
         </div>
 
         {/* Course Highlights Carousel */}
