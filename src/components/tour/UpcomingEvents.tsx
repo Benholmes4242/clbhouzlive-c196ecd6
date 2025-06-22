@@ -1,10 +1,11 @@
 
 
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Bell, MapPin, Trophy } from 'lucide-react';
+import { Calendar, Bell, MapPin } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface Event {
@@ -128,13 +129,6 @@ const UpcomingEvents = () => {
                 <div className="flex-1">
                   <CardTitle className="text-lg mb-2">{event.name}</CardTitle>
                   <div className="flex items-center gap-3 mb-2">
-                    <div className={getTourLogoSize(event.tour)}>
-                      <img
-                        src={tourLogos[event.tour]}
-                        alt={`${event.tour} logo`}
-                        className="h-full w-auto object-contain"
-                      />
-                    </div>
                     {event.status === 'live' && (
                       <Badge variant="destructive" className="animate-pulse">
                         LIVE
@@ -142,7 +136,13 @@ const UpcomingEvents = () => {
                     )}
                   </div>
                 </div>
-                <Trophy className="h-6 w-6 text-yellow-600" />
+                <div className={getTourLogoSize(event.tour)}>
+                  <img
+                    src={tourLogos[event.tour]}
+                    alt={`${event.tour} logo`}
+                    className="h-full w-auto object-contain"
+                  />
+                </div>
               </div>
             </CardHeader>
             <CardContent>
@@ -180,4 +180,5 @@ const UpcomingEvents = () => {
 };
 
 export default UpcomingEvents;
+
 
