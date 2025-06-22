@@ -185,7 +185,7 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
                 <div className="relative">
                   <Carousel className="w-full">
                     <CarouselContent>
-                      {post.post_media.map((media) => (
+                      {post.post_media.map((media, index) => (
                         <CarouselItem key={media.id}>
                           <div className="rounded-lg overflow-hidden">
                             {media.media_type === 'image' ? (
@@ -199,6 +199,7 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
                                 src={media.media_url}
                                 className="w-full h-80"
                                 onFullscreen={handlePostClick}
+                                videoId={`user-post-${post.id}-${index}`}
                               />
                             )}
                           </div>
@@ -231,6 +232,7 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
                       src={post.post_media[0].media_url}
                       className="w-full h-80"
                       onFullscreen={handlePostClick}
+                      videoId={`user-post-${post.id}-0`}
                     />
                   )}
                 </div>

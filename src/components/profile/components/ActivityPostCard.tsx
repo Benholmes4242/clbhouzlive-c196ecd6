@@ -41,7 +41,7 @@ const ActivityPostCard: React.FC<ActivityPostCardProps> = ({ post, attributionTe
             <div className="relative">
               <Carousel className="w-full">
                 <CarouselContent>
-                  {post.post_media.map((media) => (
+                  {post.post_media.map((media, index) => (
                     <CarouselItem key={media.id}>
                       <div className="relative">
                         {media.media_type === 'image' ? (
@@ -55,6 +55,7 @@ const ActivityPostCard: React.FC<ActivityPostCardProps> = ({ post, attributionTe
                             src={media.media_url}
                             className="w-full h-48 rounded-lg overflow-hidden"
                             onFullscreen={() => onClick(post)}
+                            videoId={`activity-post-${post.id}-${index}`}
                           />
                         )}
                       </div>
@@ -91,6 +92,7 @@ const ActivityPostCard: React.FC<ActivityPostCardProps> = ({ post, attributionTe
                   src={post.post_media[0].media_url}
                   className="w-full h-48 rounded-lg overflow-hidden"
                   onFullscreen={() => onClick(post)}
+                  videoId={`activity-post-${post.id}-0`}
                 />
               )}
             </div>
