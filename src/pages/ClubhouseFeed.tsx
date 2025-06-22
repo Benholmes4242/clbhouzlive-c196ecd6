@@ -60,6 +60,13 @@ const topPlayers = [
     avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop',
     preview: 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=200&h=150&fit=crop'
   },
+  { 
+    id: '3', 
+    name: 'Emma Wilson', 
+    bio: '3 HCP • Golf Instructor', 
+    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop',
+    preview: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=200&h=150&fit=crop'
+  },
 ];
 
 const trendingTips = [
@@ -213,7 +220,7 @@ const ClubhouseFeed = () => {
           </Carousel>
         </div>
 
-        {/* Top Player Content Carousel */}
+        {/* Top Player Content Carousel - Three Grid Layout */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold">Top Player Content</h2>
@@ -224,7 +231,7 @@ const ClubhouseFeed = () => {
           <Carousel className="w-full">
             <CarouselContent className="-ml-2 md:-ml-4">
               {topPlayers.map((player) => (
-                <CarouselItem key={player.id} className="pl-2 md:pl-4 basis-full sm:basis-1/2">
+                <CarouselItem key={player.id} className="pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3">
                   <div className="bg-card rounded-lg p-4 shadow-sm border">
                     <div className="flex items-start gap-4">
                       <img src={player.avatar} alt={player.name} className="w-12 h-12 rounded-full object-cover flex-shrink-0" />
