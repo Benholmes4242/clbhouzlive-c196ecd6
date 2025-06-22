@@ -99,6 +99,16 @@ const News = () => {
           article.description.toLowerCase().includes('college') ||
           article.description.toLowerCase().includes('university')
         );
+      case 'amateur':
+        return articles.filter(article => 
+          article.title.toLowerCase().includes('amateur') ||
+          article.title.toLowerCase().includes('club') ||
+          article.title.toLowerCase().includes('handicap') ||
+          article.title.toLowerCase().includes('local') ||
+          article.description.toLowerCase().includes('amateur') ||
+          article.description.toLowerCase().includes('club golf') ||
+          article.description.toLowerCase().includes('recreational')
+        );
       default:
         return articles;
     }
@@ -225,11 +235,12 @@ const News = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="latest">Latest News</TabsTrigger>
           <TabsTrigger value="pga">PGA News</TabsTrigger>
           <TabsTrigger value="liv">LIV Golf</TabsTrigger>
           <TabsTrigger value="universities">USA Universities</TabsTrigger>
+          <TabsTrigger value="amateur">Amateur Golf</TabsTrigger>
         </TabsList>
 
         <TabsContent value="latest" className="mt-6">
@@ -246,6 +257,10 @@ const News = () => {
 
         <TabsContent value="universities" className="mt-6">
           {renderNewsContent(filterArticlesByCategory('universities'))}
+        </TabsContent>
+
+        <TabsContent value="amateur" className="mt-6">
+          {renderNewsContent(filterArticlesByCategory('amateur'))}
         </TabsContent>
       </Tabs>
     </div>
