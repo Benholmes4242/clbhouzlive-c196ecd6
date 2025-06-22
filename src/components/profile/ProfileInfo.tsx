@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Edit, MapPin } from 'lucide-react';
-import ProfileEditDialog from './ProfileEditDialog';
 import FollowerStats from './FollowerStats';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
@@ -61,14 +60,6 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
             </div>
           )}
         </div>
-
-        {isOwnProfile && (
-          <ProfileEditDialog
-            profile={profile}
-            userId={profile?.id || userId || ''}
-            onProfileUpdate={onProfileUpdate}
-          />
-        )}
       </div>
 
       {/* Show follower stats for all profiles */}

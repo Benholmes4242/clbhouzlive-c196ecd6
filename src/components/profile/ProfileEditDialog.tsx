@@ -10,7 +10,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Edit } from "lucide-react";
 import ProfileFormFields from "./ProfileFormFields";
-import UpdateUsernameDialog from "./UpdateUsernameDialog";
 import { useProfileForm } from "./hooks/useProfileForm";
 
 interface ProfileEditDialogProps {
@@ -43,42 +42,34 @@ const ProfileEditDialog: React.FC<ProfileEditDialogProps> = ({
   } = useProfileForm(profile, userId, onProfileUpdate, () => setOpen(false));
 
   return (
-    <div className="flex gap-2">
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-          <Button variant="outline" size="sm" className="gap-2">
-            <Edit className="w-4 h-4" />
-            Edit Profile
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" size="sm" className="gap-2">
+          <Edit className="w-4 h-4" />
+          Edit Profile
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-[425px]">
+        <DialogHeader>
+          <DialogTitle>Edit Profile</DialogTitle>
+        </DialogHeader>
+        <ProfileFormFields
+          formData={formData}
+          isUsernameSet={isUsernameSet}
+          onInputChange={handleInputChange}
+          onHandicapChange={handleHandicapChange}
+          onPublicToggle={handlePublicToggle}
+        />
+        <div className="flex justify-end gap-2">
+          <Button variant="outline" onClick={() => setOpen(false)}>
+            Cancel
           </Button>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Edit Profile</DialogTitle>
-          </DialogHeader>
-          <ProfileFormFields
-            formData={formData}
-            isUsernameSet={isUsernameSet}
-            onInputChange={handleInputChange}
-            onHandicapChange={handleHandicapChange}
-            onPublicToggle={handlePublicToggle}
-          />
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleSave} disabled={saving}>
-              {saving ? "Saving..." : "Save"}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-      
-      <UpdateUsernameDialog
-        userId={userId}
-        currentUsername={profile?.username}
-        onUpdate={onProfileUpdate}
-      />
-    </div>
+          <Button onClick={handleSave} disabled={saving}>
+            {saving ? "Saving..." : "Save"}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 };
 

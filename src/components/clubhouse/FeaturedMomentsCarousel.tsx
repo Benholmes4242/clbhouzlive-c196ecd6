@@ -43,7 +43,7 @@ const FeaturedMomentsCarousel = ({ userPosts = [], loading = false }: FeaturedMo
       
       return {
         id: `user-${post.id}`,
-        title: post.content || 'Golf Moment',
+        title: post.content || '',
         user: username,
         timeAgo: formatDistanceToNow(new Date(post.created_at), { addSuffix: true }),
         image: videoMedia!.media_url,
@@ -84,37 +84,34 @@ const FeaturedMomentsCarousel = ({ userPosts = [], loading = false }: FeaturedMo
         <CarouselContent className="-ml-2 md:-ml-4">
           {allMoments.map((moment) => (
             <CarouselItem key={moment.id} className="pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3">
-              <div className="relative bg-card rounded-lg overflow-hidden shadow-sm border hover:shadow-md transition-shadow cursor-pointer group">
-                {moment.type === 'video' ? (
-                  <VideoPreview
-                    src={moment.image}
-                    videoId={`featured-${moment.id}`}
-                    className="w-full h-48"
-                  />
-                ) : (
-                  <img src={moment.image} alt={moment.title} className="w-full h-48 object-cover" />
-                )}
+              <div className="bg-card rounded-lg overflow-hidden shadow-sm border hover:shadow-md transition-shadow cursor-pointer group">
+                <div className="relative">
+                  {moment.type === 'video' ? (
+                    <VideoPreview
+                      src={moment.image}
+                      videoId={`featured-${moment.id}`}
+                      className="w-full h-48"
+                    />
+                  ) : (
+                    <img src={moment.image} alt={moment.title} className="w-full h-48 object-cover" />
+                  )}
+                  
+                  {moment.type === 'video' && (
+                    <div className="absolute top-4 right-4 bg-black/60 text-white text-xs px-2 py-1 rounded">
+                      {moment.duration}
+                    </div>
+                  )}
+                </div>
                 
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                
-                {moment.type === 'video' && (
-                  <div className="absolute top-4 right-4 bg-black/60 text-white text-xs px-2 py-1 rounded">
-                    {moment.duration}
-                  </div>
-                )}
-                
-                <div className="absolute bottom-4 left-4 text-white">
-                  <h3 className="text-base font-semibold mb-1">{moment.title}</h3>
-                  <div className="flex items-center gap-2 text-sm">
+                <div className="p-4">
+                  {moment.title && (
+                    <p className="text-sm mb-2 line-clamp-2">{moment.title}</p>
+                  )}
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <span>@{moment.user}</span>
                     <Clock className="h-3 w-3" />
                     <span>{moment.timeAgo}</span>
                   </div>
-                  {(moment as any).userGenerated && (
-                    <div className="mt-1">
-                      <span className="text-xs bg-blue-500/80 px-2 py-1 rounded">Community</span>
-                    </div>
-                  )}
                 </div>
               </div>
             </CarouselItem>
