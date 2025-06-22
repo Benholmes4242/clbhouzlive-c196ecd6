@@ -98,38 +98,51 @@ const HeaderUserMenu = () => {
 
   if (user) {
     return (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon">
-            <User className="h-5 w-5" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-48">
-          <DropdownMenuItem disabled className="text-muted-foreground cursor-default">
-            {currentUsername}
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => navigate('/profile')}>
-            My Profile
-          </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => navigate('/settings')}>
-            Settings
-          </DropdownMenuItem>
-          {isAdmin && !isAdminLoading && (
-            <>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleAdminClick}>
-                <Shield className="h-4 w-4 mr-2" />
-                Admin Dashboard
-              </DropdownMenuItem>
-            </>
-          )}
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={handleLogout}>
-            Log Out
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <div className="group relative">
+        <Button variant="ghost" size="icon" className="cursor-pointer">
+          <User className="h-5 w-5" />
+        </Button>
+        
+        <div className="absolute right-0 top-full mt-2 w-48 bg-popover border border-border rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+          <div className="p-1">
+            <div className="px-2 py-1.5 text-sm text-muted-foreground cursor-default">
+              {currentUsername}
+            </div>
+            <div className="-mx-1 my-1 h-px bg-muted"></div>
+            <button 
+              onClick={() => navigate('/profile')}
+              className="relative flex w-full cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground"
+            >
+              My Profile
+            </button>
+            <button 
+              onClick={() => navigate('/settings')}
+              className="relative flex w-full cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground"
+            >
+              Settings
+            </button>
+            {isAdmin && !isAdminLoading && (
+              <>
+                <div className="-mx-1 my-1 h-px bg-muted"></div>
+                <button 
+                  onClick={handleAdminClick}
+                  className="relative flex w-full cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground"
+                >
+                  <Shield className="h-4 w-4 mr-2" />
+                  Admin Dashboard
+                </button>
+              </>
+            )}
+            <div className="-mx-1 my-1 h-px bg-muted"></div>
+            <button 
+              onClick={handleLogout}
+              className="relative flex w-full cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors hover:bg-accent hover:text-accent-foreground"
+            >
+              Log Out
+            </button>
+          </div>
+        </div>
+      </div>
     );
   }
 
@@ -138,6 +151,7 @@ const HeaderUserMenu = () => {
       variant="ghost"
       size="icon"
       onClick={handleProfileClick}
+      className="cursor-pointer"
     >
       <User className="h-5 w-5" />
     </Button>
