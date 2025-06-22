@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { User, Home, Newspaper, Flag, Search } from 'lucide-react';
+import { Home, Newspaper, Flag, Search } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const BottomNavigation = () => {
@@ -8,13 +8,12 @@ const BottomNavigation = () => {
   const location = useLocation();
   const [activeTab, setActiveTab] = useState('home');
 
-  // All main tabs
+  // All main tabs (removed profile tab)
   const tabs = [
     { id: 'home', label: 'Home', icon: Home, path: '/' },
     { id: 'explore', label: 'Explore', icon: Search, path: '/explore' },
     { id: 'news', label: 'News', icon: Newspaper, path: '/news' },
     { id: 'courses', label: 'Courses', icon: Flag, path: '/courses' },
-    { id: 'profile', label: 'Profile', icon: User, path: '/profile' },
   ];
 
   useEffect(() => {
