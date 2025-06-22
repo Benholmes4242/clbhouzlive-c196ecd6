@@ -84,7 +84,7 @@ const FeaturedMomentsCarousel = ({ userPosts = [], loading = false }: FeaturedMo
         <CarouselContent className="-ml-2 md:-ml-4">
           {allMoments.map((moment) => (
             <CarouselItem key={moment.id} className="pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3">
-              <div className="relative bg-card rounded-lg overflow-hidden shadow-sm border hover:shadow-md transition-shadow cursor-pointer">
+              <div className="relative bg-card rounded-lg overflow-hidden shadow-sm border hover:shadow-md transition-shadow cursor-pointer group">
                 {moment.type === 'video' ? (
                   <VideoPreview
                     src={moment.image}
