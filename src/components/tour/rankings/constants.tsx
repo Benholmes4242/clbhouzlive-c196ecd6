@@ -1,4 +1,5 @@
 
+import React from 'react';
 import { Trophy, Medal, GraduationCap } from 'lucide-react';
 import { RankingList } from './types';
 

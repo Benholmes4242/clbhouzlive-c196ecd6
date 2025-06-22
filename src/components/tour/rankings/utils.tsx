@@ -1,4 +1,6 @@
 
+import React from 'react';
+
 export const getTourColor = (tour: string) => {
   switch (tour) {
     case 'PGA': return 'bg-blue-500';
