@@ -1,3 +1,4 @@
+
 import React from 'react';
 import EGAppIntegration from '@/components/profile/EGAppIntegration';
 import Top100Courses from '@/components/profile/Top100Courses';
@@ -32,9 +33,13 @@ const ProfileSections: React.FC<ProfileSectionsProps> = ({
 
       {/* EG App Integration */}
       <EGAppIntegration
-        profile={profile}
+        egAppConnected={profile?.eg_app_connected}
+        handicapIndex={profile?.eg_handicap_index}
+        recentRounds={profile?.eg_recent_rounds}
+        userId={profile?.id || user?.id || ''}
         isOwnProfile={isOwnProfile}
-        onEGVisibilityToggle={onEGVisibilityToggle}
+        egVisible={profile?.eg_visible}
+        onVisibilityToggle={onEGVisibilityToggle}
       />
 
       {/* Top 100 Courses */}
