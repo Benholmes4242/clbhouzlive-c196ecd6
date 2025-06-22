@@ -237,7 +237,7 @@ const News = () => {
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         <TabsList className="grid w-full grid-cols-5">
           <TabsTrigger value="latest">Latest News</TabsTrigger>
-          <TabsTrigger value="pga">PGA News</TabsTrigger>
+          <TabsTrigger value="pga">PGA Tour</TabsTrigger>
           <TabsTrigger value="liv">LIV Golf</TabsTrigger>
           <TabsTrigger value="universities">USA Universities</TabsTrigger>
           <TabsTrigger value="amateur">Amateur Golf</TabsTrigger>
