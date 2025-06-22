@@ -20,15 +20,15 @@ export const getChangeIndicator = (change: number) => {
 export const getTourLogoSize = (tour: string) => {
   switch (tour) {
     case 'PGA':
-      return 'h-16 w-auto'; // Consistent size for PGA
+      return 'h-16 w-auto'; // Keep current size for PGA
     case 'DP World':
-      return 'h-16 w-auto'; // Updated to match PGA sizing
+      return 'h-16 w-auto'; // Keep current size for DP World
     case 'LIV':
-      return 'h-16 w-auto'; // Increased to match PGA and DP World
+      return 'h-12 w-auto'; // Make LIV logo smaller
     case 'University':
-      return 'h-16 w-auto'; // Increased to match other major tours
+      return 'h-12 w-auto'; // Make University/NCAA logo smaller
     default:
-      return 'h-16 w-auto'; // Default to consistent sizing
+      return 'h-16 w-auto'; // Default to standard sizing
   }
 };
 
