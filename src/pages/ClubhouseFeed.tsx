@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Play, UserPlus, Shuffle, Filter, MapPin, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -56,8 +55,6 @@ const clubSpotlight = [
     image: 'https://images.unsplash.com/photo-1556909114-f6e34c7aec6b?w=300&h=200&fit=crop'
   },
 ];
-
-const skillCategories = ['Putting', 'Iron Play', 'Driving', 'Bunker', 'Short Game', 'Swing Drills'];
 
 const ClubhouseFeed = () => {
   const [feedType, setFeedType] = useState('all');
@@ -142,24 +139,6 @@ const ClubhouseFeed = () => {
                 <span>{featuredMoment.timeAgo}</span>
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* Skill Categories */}
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-4">Explore by Skill</h2>
-          <div className="flex gap-2 overflow-x-auto pb-2">
-            {skillCategories.map((skill) => (
-              <Button
-                key={skill}
-                variant={skillFilter === skill ? 'default' : 'outline'}
-                onClick={() => setSkillFilter(skillFilter === skill ? '' : skill)}
-                size="sm"
-                className="whitespace-nowrap"
-              >
-                {skill}
-              </Button>
-            ))}
           </div>
         </div>
 
