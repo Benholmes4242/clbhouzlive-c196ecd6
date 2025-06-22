@@ -8,7 +8,7 @@ import Index from "./pages/Index";
 import CreateProfile from "./pages/CreateProfile";
 import News from "./pages/News";
 import Courses from "./pages/Courses";
-import Explore from "./pages/Explore";
+import ClubhouseFeed from "./pages/ClubhouseFeed";
 import TourCentral from "./pages/TourCentral";
 import NotFound from "./pages/NotFound";
 import ProfilePage from "./pages/ProfilePage";
@@ -34,7 +34,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/create-profile" element={<CreateProfile />} />
-          <Route path="/explore" element={<Explore />} />
+          <Route path="/clubhouse" element={<ClubhouseFeed />} />
           <Route path="/tour-central" element={<TourCentral />} />
           <Route path="/news" element={<News />} />
           <Route path="/courses" element={<Courses />} />
