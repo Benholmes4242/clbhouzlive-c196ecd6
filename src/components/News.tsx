@@ -1,9 +1,11 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ExternalLink, RefreshCw, Image } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -19,6 +21,7 @@ interface NewsArticle {
 
 const News = () => {
   const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState('latest');
 
   const { data: articles, isLoading, error, refetch } = useQuery({
     queryKey: ['news-articles'],
@@ -65,11 +68,139 @@ const News = () => {
   };
 
   const getImageForSource = (source: string) => {
-    // Return a golf-themed placeholder image based on source
     if (source === 'PGA Tour') {
       return 'https://images.unsplash.com/photo-1593111774240-d529f12cf4bb?w=400&h=300&fit=crop&auto=format';
     }
     return 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=400&h=300&fit=crop&auto=format';
+  };
+
+  const filterArticlesByCategory = (category: string) => {
+    if (!articles) return [];
+    
+    switch (category) {
+      case 'pga':
+        return articles.filter(article => 
+          article.source.toLowerCase().includes('pga') ||
+          article.title.toLowerCase().includes('pga') ||
+          article.description.toLowerCase().includes('pga tour')
+        );
+      case 'live':
+        return articles.filter(article => 
+          article.title.toLowerCase().includes('live') ||
+          article.title.toLowerCase().includes('leaderboard') ||
+          article.title.toLowerCase().includes('tournament') ||
+          article.description.toLowerCase().includes('live')
+        );
+      case 'universities':
+        return articles.filter(article => 
+          article.title.toLowerCase().includes('college') ||
+          article.title.toLowerCase().includes('university') ||
+          article.title.toLowerCase().includes('ncaa') ||
+          article.description.toLowerCase().includes('college') ||
+          article.description.toLowerCase().includes('university')
+        );
+      default:
+        return articles;
+    }
+  };
+
+  const renderNewsContent = (filteredArticles: NewsArticle[]) => {
+    if (isLoading) {
+      return (
+        <div className="space-y-4">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <Card key={i} className="max-w-4xl mx-auto">
+              <CardHeader>
+                <Skeleton className="h-6 w-3/4 mx-auto" />
+                <Skeleton className="h-4 w-1/2 mx-auto" />
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                  <Skeleton className="h-24 w-full sm:w-32 rounded-lg flex-shrink-0 mx-auto sm:mx-0" />
+                  <Skeleton className="h-20 w-full" />
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      );
+    }
+
+    if (filteredArticles.length === 0) {
+      return (
+        <div className="text-center py-8">
+          <Image className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+          <p className="text-muted-foreground mb-4">No articles found for this category</p>
+          <Button onClick={fetchLatestNews}>
+            Fetch Latest News
+          </Button>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-4">
+        {filteredArticles.map((article) => (
+          <Card key={article.id} className="hover:shadow-lg transition-shadow max-w-4xl mx-auto">
+            <CardContent className="p-6">
+              <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
+                <div className="flex-shrink-0 mx-auto sm:mx-0">
+                  <div className="w-full sm:w-32 h-24 bg-muted rounded-lg overflow-hidden">
+                    {article.image_url ? (
+                      <img
+                        src={article.image_url}
+                        alt={article.title}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src = getImageForSource(article.source);
+                        }}
+                      />
+                    ) : (
+                      <img
+                        src={getImageForSource(article.source)}
+                        alt={`${article.source} placeholder`}
+                        className="w-full h-full object-cover"
+                      />
+                    )}
+                  </div>
+                </div>
+                
+                <div className="flex-1 min-w-0 text-center sm:text-left">
+                  <div className="mb-2">
+                    <CardTitle className="text-lg mb-2 line-clamp-2 leading-tight">
+                      {article.title}
+                    </CardTitle>
+                    <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-start text-sm text-muted-foreground space-y-1 sm:space-y-0 sm:space-x-2">
+                      <span className="font-medium text-green-600">{article.source}</span>
+                      <span className="hidden sm:inline">•</span>
+                      <span>{formatDate(article.pub_date)}</span>
+                    </div>
+                  </div>
+                  
+                  <p className="text-muted-foreground mb-4 line-clamp-2 text-sm">
+                    {article.description}
+                  </p>
+                  
+                  <div className="flex justify-center sm:justify-start">
+                    <Button asChild variant="outline" size="sm">
+                      <a
+                        href={article.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center"
+                      >
+                        Read More
+                        <ExternalLink className="h-3 w-3 ml-2" />
+                      </a>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
   };
 
   if (error) {
@@ -93,95 +224,30 @@ const News = () => {
         </Button>
       </div>
 
-      {isLoading ? (
-        <div className="space-y-4">
-          {[1, 2, 3, 4, 5].map((i) => (
-            <Card key={i} className="max-w-4xl mx-auto">
-              <CardHeader>
-                <Skeleton className="h-6 w-3/4 mx-auto" />
-                <Skeleton className="h-4 w-1/2 mx-auto" />
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                  <Skeleton className="h-24 w-full sm:w-32 rounded-lg flex-shrink-0 mx-auto sm:mx-0" />
-                  <Skeleton className="h-20 w-full" />
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      ) : articles && articles.length > 0 ? (
-        <div className="space-y-4">
-          {articles.map((article) => (
-            <Card key={article.id} className="hover:shadow-lg transition-shadow max-w-4xl mx-auto">
-              <CardContent className="p-6">
-                <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                  <div className="flex-shrink-0 mx-auto sm:mx-0">
-                    <div className="w-full sm:w-32 h-24 bg-muted rounded-lg overflow-hidden">
-                      {article.image_url ? (
-                        <img
-                          src={article.image_url}
-                          alt={article.title}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            // Fallback to source-specific placeholder on error
-                            e.currentTarget.src = getImageForSource(article.source);
-                          }}
-                        />
-                      ) : (
-                        <img
-                          src={getImageForSource(article.source)}
-                          alt={`${article.source} placeholder`}
-                          className="w-full h-full object-cover"
-                        />
-                      )}
-                    </div>
-                  </div>
-                  
-                  <div className="flex-1 min-w-0 text-center sm:text-left">
-                    <div className="mb-2">
-                      <CardTitle className="text-lg mb-2 line-clamp-2 leading-tight">
-                        {article.title}
-                      </CardTitle>
-                      <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-start text-sm text-muted-foreground space-y-1 sm:space-y-0 sm:space-x-2">
-                        <span className="font-medium text-green-600">{article.source}</span>
-                        <span className="hidden sm:inline">•</span>
-                        <span>{formatDate(article.pub_date)}</span>
-                      </div>
-                    </div>
-                    
-                    <p className="text-muted-foreground mb-4 line-clamp-2 text-sm">
-                      {article.description}
-                    </p>
-                    
-                    <div className="flex justify-center sm:justify-start">
-                      <Button asChild variant="outline" size="sm">
-                        <a
-                          href={article.link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center"
-                        >
-                          Read More
-                          <ExternalLink className="h-3 w-3 ml-2" />
-                        </a>
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      ) : (
-        <div className="text-center py-8">
-          <Image className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-          <p className="text-muted-foreground mb-4">No news articles available</p>
-          <Button onClick={fetchLatestNews}>
-            Fetch Latest News
-          </Button>
-        </div>
-      )}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="latest">Latest News</TabsTrigger>
+          <TabsTrigger value="pga">PGA News</TabsTrigger>
+          <TabsTrigger value="live">Live Golf</TabsTrigger>
+          <TabsTrigger value="universities">USA Universities</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="latest" className="mt-6">
+          {renderNewsContent(filterArticlesByCategory('latest'))}
+        </TabsContent>
+
+        <TabsContent value="pga" className="mt-6">
+          {renderNewsContent(filterArticlesByCategory('pga'))}
+        </TabsContent>
+
+        <TabsContent value="live" className="mt-6">
+          {renderNewsContent(filterArticlesByCategory('live'))}
+        </TabsContent>
+
+        <TabsContent value="universities" className="mt-6">
+          {renderNewsContent(filterArticlesByCategory('universities'))}
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
