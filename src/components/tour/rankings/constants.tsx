@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Trophy, Medal, GraduationCap } from 'lucide-react';
+import { Trophy, Medal, GraduationCap, Globe } from 'lucide-react';
 import { RankingList } from './types';
 
 // University logo mapping
@@ -47,6 +47,20 @@ export const mockRankings: RankingList[] = [
       { position: 3, name: 'Brooks Koepka', points: 276, country: 'USA', change: 0 },
       { position: 4, name: 'Dustin Johnson', points: 254, country: 'USA', change: 1 },
       { position: 5, name: 'Phil Mickelson', points: 231, country: 'USA', change: -1 },
+    ],
+  },
+  {
+    id: 'dp-world-men',
+    name: 'DP World Tour Rankings',
+    tour: 'DP World',
+    category: 'men',
+    icon: <Globe className="h-5 w-5" />,
+    rankings: [
+      { position: 1, name: 'Rory McIlroy', points: 487, country: 'NIR', change: 0 },
+      { position: 2, name: 'Tommy Fleetwood', points: 423, country: 'ENG', change: 1 },
+      { position: 3, name: 'Tyrrell Hatton', points: 398, country: 'ENG', change: -1 },
+      { position: 4, name: 'Shane Lowry', points: 365, country: 'IRL', change: 2 },
+      { position: 5, name: 'Matt Fitzpatrick', points: 341, country: 'ENG', change: 0 },
     ],
   },
   {
