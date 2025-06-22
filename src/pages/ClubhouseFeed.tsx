@@ -29,14 +29,14 @@ const topPlayers = [
     name: 'Sarah Chen', 
     bio: '2 HCP • Teaching Pro', 
     avatar: 'https://images.unsplash.com/photo-1494790108755-2616b2f6bb44?w=100&h=100&fit=crop',
-    preview: 'https://images.unsplash.com/photo-1574767653875-3ed9ed8efe43?w=200&h=150&fit=crop'
+    preview: 'https://images.unsplash.com/photo-1593111774240-d529f12cf4bb?w=200&h=150&fit=crop'
   },
   { 
     id: '2', 
     name: 'Marcus Rodriguez', 
     bio: '5 HCP • Course Designer', 
     avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop',
-    preview: 'https://images.unsplash.com/photo-1566041510394-cf7c8fe21800?w=200&h=150&fit=crop'
+    preview: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=200&h=150&fit=crop'
   },
 ];
 
