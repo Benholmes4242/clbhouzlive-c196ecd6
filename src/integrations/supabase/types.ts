@@ -777,23 +777,7 @@ export type Database = {
       }
     }
     Views: {
-      course_rating_stats: {
-        Row: {
-          average_rating: number | null
-          course_id: string | null
-          total_ratings: number | null
-          total_reviews: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "course_ratings_course_id_fkey"
-            columns: ["course_id"]
-            isOneToOne: false
-            referencedRelation: "golf_courses"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
+      [_ in never]: never
     }
     Functions: {
       get_all_users_admin: {
