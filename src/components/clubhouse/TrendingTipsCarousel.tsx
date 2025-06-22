@@ -1,9 +1,10 @@
 
 import React from 'react';
-import { Play, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import VideoPreview from '@/components/posts/VideoPreview';
 import { trendingTips } from '@/data/clubhouseFeedData';
 
 const TrendingTipsCarousel = () => {
@@ -21,13 +22,14 @@ const TrendingTipsCarousel = () => {
             <CarouselItem key={tip.id} className="pl-2 md:pl-4 basis-full sm:basis-1/2">
               <div className="bg-card rounded-lg overflow-hidden shadow-sm border hover:shadow-md transition-shadow cursor-pointer">
                 <div className="relative">
-                  <img src={tip.image} alt={tip.title} className="w-full h-40 object-cover" />
-                  {tip.type === 'video' && (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="bg-black/50 rounded-full p-2">
-                        <Play className="h-4 w-4 text-white fill-current" />
-                      </div>
-                    </div>
+                  {tip.type === 'video' ? (
+                    <VideoPreview
+                      src={tip.image}
+                      videoId={`tip-${tip.id}`}
+                      className="w-full h-40"
+                    />
+                  ) : (
+                    <img src={tip.image} alt={tip.title} className="w-full h-40 object-cover" />
                   )}
                 </div>
                 <div className="p-4">
