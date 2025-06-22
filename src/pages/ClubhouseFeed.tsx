@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Play, UserPlus, Shuffle, Filter, MapPin, Clock, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -43,6 +42,7 @@ const courseHighlights = [
   { id: '1', name: 'Augusta National', location: 'Georgia, USA', posts: 247, image: 'https://images.unsplash.com/photo-1593111774240-d529f12cf4bb?w=300&h=200&fit=crop' },
   { id: '2', name: 'St. Andrews', location: 'Scotland', posts: 189, image: 'https://images.unsplash.com/photo-1587174486073-ae5e5ccd3ab6?w=300&h=200&fit=crop' },
   { id: '3', name: 'Pebble Beach', location: 'California, USA', posts: 156, image: 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=300&h=200&fit=crop' },
+  { id: '4', name: 'Royal County Down', location: 'Northern Ireland', posts: 134, image: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=300&h=200&fit=crop' },
 ];
 
 const topPlayers = [
@@ -179,7 +179,7 @@ const ClubhouseFeed = () => {
           </Carousel>
         </div>
 
-        {/* Course Highlights Carousel */}
+        {/* Course Highlights Carousel - Two Grid Layout */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold">Course Highlights</h2>
@@ -190,7 +190,7 @@ const ClubhouseFeed = () => {
           <Carousel className="w-full">
             <CarouselContent className="-ml-2 md:-ml-4">
               {courseHighlights.map((course) => (
-                <CarouselItem key={course.id} className="pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3">
+                <CarouselItem key={course.id} className="pl-2 md:pl-4 basis-full sm:basis-1/2">
                   <div className="bg-card rounded-lg overflow-hidden shadow-sm border hover:shadow-md transition-shadow cursor-pointer">
                     <img src={course.image} alt={course.name} className="w-full h-32 object-cover" />
                     <div className="p-4">
