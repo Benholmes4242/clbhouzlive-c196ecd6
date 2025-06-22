@@ -20,9 +20,9 @@ export const getChangeIndicator = (change: number) => {
 export const getTourLogoSize = (tour: string) => {
   switch (tour) {
     case 'PGA':
-      return 'h-16 w-auto'; // Increased size for PGA
+      return 'h-16 w-auto'; // Consistent size for PGA
     case 'DP World':
-      return 'h-12 w-auto'; // Keep current size for DP World
+      return 'h-16 w-auto'; // Updated to match PGA sizing
     default:
       return 'h-6 w-auto'; // Keep current size for LIV and University
   }

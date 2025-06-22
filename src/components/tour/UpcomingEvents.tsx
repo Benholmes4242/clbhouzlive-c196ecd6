@@ -1,6 +1,3 @@
-
-
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -95,8 +92,9 @@ const UpcomingEvents = () => {
   const getTourLogoSize = (tour: string) => {
     switch (tour) {
       case 'PGA':
+        return 'h-16 w-auto'; // Updated to match consistent sizing
       case 'DP World':
-        return 'h-12 w-auto'; // Double size for PGA and DP World
+        return 'h-16 w-auto'; // Updated to match PGA sizing
       default:
         return 'h-6 w-auto'; // Keep current size for LIV and University
     }
@@ -180,5 +178,3 @@ const UpcomingEvents = () => {
 };
 
 export default UpcomingEvents;
-
-
