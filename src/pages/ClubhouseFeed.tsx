@@ -8,6 +8,7 @@ import CourseHighlightsCarousel from '@/components/clubhouse/CourseHighlightsCar
 import TopPlayerContentCarousel from '@/components/clubhouse/TopPlayerContentCarousel';
 import TrendingTipsCarousel from '@/components/clubhouse/TrendingTipsCarousel';
 import ClubSpotlightCarousel from '@/components/clubhouse/ClubSpotlightCarousel';
+import ClubhouseContentFeed from '@/components/clubhouse/ClubhouseContentFeed';
 
 const ClubhouseFeed = () => {
   const [feedType, setFeedType] = useState('all');
@@ -38,6 +39,9 @@ const ClubhouseFeed = () => {
         <TopPlayerContentCarousel />
         <TrendingTipsCarousel />
         <ClubSpotlightCarousel />
+
+        {/* Main Content Feed */}
+        <ClubhouseContentFeed />
       </main>
       
       <BottomNavigation />
