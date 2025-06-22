@@ -37,7 +37,7 @@ const Auth: React.FC = () => {
       id: userId,
       username: username || null,
       display_name: null,
-      user_type: 'individual',
+      user_type: 'individual' as const,
       is_public: true,
     };
 
