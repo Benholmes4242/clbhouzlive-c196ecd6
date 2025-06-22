@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Clock, Search, Bell, Users } from 'lucide-react';
+import { getTourLogoSize } from './rankings/utils';
 
 interface TeeTime {
   id: string;
@@ -95,10 +96,6 @@ const TeeTimesSection = () => {
     
     return matchesSearch && matchesTour && matchesDate;
   });
-
-  const getTourLogoSize = (tour: string) => {
-    return 'h-16 w-auto'; // Consistent sizing for all tours
-  };
 
   return (
     <div className="space-y-6">

@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Calendar, Bell, MapPin } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { getTourLogoSize } from './rankings/utils';
 
 interface Event {
   id: string;
@@ -87,10 +88,6 @@ const UpcomingEvents = () => {
       day: 'numeric',
       year: 'numeric',
     });
-  };
-
-  const getTourLogoSize = (tour: string) => {
-    return 'h-16 w-auto'; // Consistent sizing for all tours
   };
 
   return (

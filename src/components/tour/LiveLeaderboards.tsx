@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { getTourLogoSize } from './rankings/utils';
 
 interface LeaderboardEntry {
   position: number;
@@ -80,10 +81,6 @@ const LiveLeaderboards = () => {
       case 'down': return <TrendingDown className="h-4 w-4 text-red-600" />;
       default: return <Minus className="h-4 w-4 text-gray-400" />;
     }
-  };
-
-  const getTourLogoSize = (tour: string) => {
-    return 'h-16 w-auto'; // Consistent sizing for all tours
   };
 
   return (
