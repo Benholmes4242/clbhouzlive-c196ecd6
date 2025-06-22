@@ -2,7 +2,7 @@
 import React from 'react';
 import EGAppIntegration from '@/components/profile/EGAppIntegration';
 import Top100Courses from '@/components/profile/Top100Courses';
-import UserAccountInfo from './UserAccountInfo';
+import SocialActivity from '@/components/profile/SocialActivity';
 
 interface ProfileSectionsProps {
   profile: any;
@@ -19,18 +19,6 @@ const ProfileSections: React.FC<ProfileSectionsProps> = ({
 }) => {
   return (
     <div className="space-y-8">
-      {/* User Account Information - Only show on own profile */}
-      {isOwnProfile && (
-        <UserAccountInfo
-          profile={profile}
-          userEmail={user?.email}
-          onProfileUpdate={() => {
-            // Trigger a refresh of profile data
-            window.location.reload();
-          }}
-        />
-      )}
-
       {/* EG App Integration */}
       <EGAppIntegration
         egAppConnected={profile?.eg_app_connected}
@@ -47,6 +35,14 @@ const ProfileSections: React.FC<ProfileSectionsProps> = ({
         userId={profile?.id || user?.id || ''}
         isOwnProfile={isOwnProfile}
         top100Visible={profile?.top100_visible}
+      />
+
+      {/* Social Activity - User's Posts */}
+      <SocialActivity
+        userId={profile?.id || user?.id || ''}
+        isOwnProfile={isOwnProfile}
+        activityVisible={profile?.activity_visible !== false}
+        profileDisplayName={profile?.display_name}
       />
     </div>
   );
