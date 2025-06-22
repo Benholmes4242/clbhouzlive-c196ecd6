@@ -24,9 +24,9 @@ export const getTourLogoSize = (tour: string) => {
     case 'DP World':
       return 'h-16 w-auto'; // Keep current size for DP World
     case 'LIV':
-      return 'h-12 w-auto'; // Make LIV logo smaller
+      return 'h-14 w-auto'; // Make LIV logo h-14
     case 'University':
-      return 'h-12 w-auto'; // Make University/NCAA logo smaller
+      return 'h-14 w-auto'; // Make University/NCAA logo h-14
     default:
       return 'h-16 w-auto'; // Default to standard sizing
   }
