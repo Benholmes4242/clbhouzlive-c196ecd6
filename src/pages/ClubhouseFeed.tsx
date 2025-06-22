@@ -8,10 +8,21 @@ import CourseHighlightsCarousel from '@/components/clubhouse/CourseHighlightsCar
 import TopPlayerContentCarousel from '@/components/clubhouse/TopPlayerContentCarousel';
 import TrendingTipsCarousel from '@/components/clubhouse/TrendingTipsCarousel';
 import ClubSpotlightCarousel from '@/components/clubhouse/ClubSpotlightCarousel';
-import ClubhouseContentFeed from '@/components/clubhouse/ClubhouseContentFeed';
+import { useClubhouseContent } from '@/hooks/useClubhouseContent';
 
 const ClubhouseFeed = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const { posts, loading } = useClubhouseContent();
+
+  // Filter posts based on search query
+  const filteredPosts = posts.filter(post => {
+    if (!searchQuery.trim()) return true;
+    
+    const searchLower = searchQuery.toLowerCase();
+    const content = post.content?.toLowerCase() || '';
+    
+    return content.includes(searchLower);
+  });
 
   return (
     <div className="min-h-screen bg-background">
@@ -30,15 +41,12 @@ const ClubhouseFeed = () => {
           setSearchQuery={setSearchQuery}
         />
 
-        {/* Carousel Sections */}
-        <FeaturedMomentsCarousel />
+        {/* Carousel Sections with User Content Integration */}
+        <FeaturedMomentsCarousel userPosts={filteredPosts} loading={loading} />
         <CourseHighlightsCarousel />
-        <TopPlayerContentCarousel />
+        <TopPlayerContentCarousel userPosts={filteredPosts} loading={loading} />
         <TrendingTipsCarousel />
         <ClubSpotlightCarousel />
-
-        {/* Main Content Feed */}
-        <ClubhouseContentFeed searchQuery={searchQuery} />
       </main>
       
       <BottomNavigation />
