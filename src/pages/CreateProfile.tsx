@@ -8,17 +8,37 @@ import { supabase } from "@/integrations/supabase/client";
 import ProfilePhotoUploader from "@/components/profile/ProfilePhotoUploader";
 import BasicInfoForm from "@/components/profile/BasicInfoForm";
 import GolfInfoForm from "@/components/profile/GolfInfoForm";
+import UserTypeSelector from "@/components/profile/UserTypeSelector";
+import BusinessInfoForm from "@/components/profile/BusinessInfoForm";
+import SocialLinksForm from "@/components/profile/SocialLinksForm";
 
 const CreateProfile = () => {
+  const [step, setStep] = useState(1);
+  const [userType, setUserType] = useState<'individual' | 'business'>('individual');
   const [formData, setFormData] = useState({
+    // Individual fields
     name: '',
     username: '',
     bio: '',
     location: '',
     handicap: '',
     favoriteClub: '',
-    yearsPlaying: ''
+    yearsPlaying: '',
+    // Business fields
+    businessName: '',
+    businessType: '',
+    contactPersonName: '',
+    phone: '',
+    websiteUrl: ''
   });
+  
+  const [socialLinks, setSocialLinks] = useState({
+    instagram: '',
+    twitter: '',
+    facebook: '',
+    website: ''
+  });
+
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
@@ -35,9 +55,25 @@ const CreateProfile = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleSelectChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSocialLinkChange = (platform: string, value: string) => {
+    setSocialLinks(prev => ({ ...prev, [platform]: value }));
+  };
+
   const handlePhotoChange = (file: File | null) => {
     setProfilePhotoFile(file);
     setProfilePhotoPreview(file ? URL.createObjectURL(file) : null);
+  };
+
+  const handleNext = () => {
+    setStep(step + 1);
+  };
+
+  const handleBack = () => {
+    setStep(step - 1);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -69,12 +105,29 @@ const CreateProfile = () => {
       setUploadingPhoto(false);
     }
 
-    const { error } = await supabase.from("user_profiles").upsert({
+    // Prepare profile data based on user type
+    const profileData: any = {
       id: user.id,
-      home_club: formData.favoriteClub,
+      user_type: userType === 'individual' ? 'individual' : 'club',
       profile_photo_url: uploadedPhotoUrl,
-      // optionally add other profile fields
-    });
+      bio: formData.bio,
+      location: formData.location,
+    };
+
+    if (userType === 'individual') {
+      profileData.display_name = formData.name;
+      profileData.username = formData.username;
+      profileData.home_club = formData.favoriteClub;
+    } else {
+      profileData.business_name = formData.businessName;
+      profileData.business_type = formData.businessType;
+      profileData.contact_person_name = formData.contactPersonName;
+      profileData.phone = formData.phone;
+      profileData.website_url = formData.websiteUrl;
+      profileData.social_links = socialLinks;
+    }
+
+    const { error } = await supabase.from("user_profiles").upsert(profileData);
 
     setSubmitting(false);
 
@@ -84,6 +137,83 @@ const CreateProfile = () => {
     }
 
     navigate("/profile");
+  };
+
+  const renderStep = () => {
+    switch (step) {
+      case 1:
+        return (
+          <UserTypeSelector
+            userType={userType}
+            onUserTypeChange={setUserType}
+          />
+        );
+      case 2:
+        return (
+          <ProfilePhotoUploader
+            profilePhotoPreview={profilePhotoPreview}
+            uploadingPhoto={uploadingPhoto}
+            submitting={submitting}
+            onPhotoChange={handlePhotoChange}
+          />
+        );
+      case 3:
+        return userType === 'individual' ? (
+          <BasicInfoForm formData={formData} onChange={handleInputChange} />
+        ) : (
+          <BusinessInfoForm
+            formData={formData}
+            onChange={handleInputChange}
+            onSelectChange={handleSelectChange}
+          />
+        );
+      case 4:
+        return userType === 'individual' ? (
+          <GolfInfoForm
+            formData={{
+              handicap: formData.handicap,
+              favoriteClub: formData.favoriteClub,
+              yearsPlaying: formData.yearsPlaying
+            }}
+            onChange={handleInputChange}
+          />
+        ) : (
+          <SocialLinksForm
+            socialLinks={socialLinks}
+            onChange={handleSocialLinkChange}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
+  const getStepTitle = () => {
+    switch (step) {
+      case 1: return 'Account Type';
+      case 2: return 'Profile Photo';
+      case 3: return userType === 'individual' ? 'Basic Information' : 'Business Information';
+      case 4: return userType === 'individual' ? 'Golf Information' : 'Social Links';
+      default: return 'Create Profile';
+    }
+  };
+
+  const isLastStep = step === 4;
+  const canProceed = () => {
+    switch (step) {
+      case 1: return true;
+      case 2: return true;
+      case 3:
+        if (userType === 'individual') {
+          return formData.name.trim() !== '';
+        } else {
+          return formData.businessName.trim() !== '' && 
+                 formData.businessType !== '' && 
+                 formData.contactPersonName.trim() !== '';
+        }
+      case 4: return true;
+      default: return false;
+    }
   };
 
   return (
@@ -113,30 +243,54 @@ const CreateProfile = () => {
       </header>
 
       <main className="container mx-auto px-4 py-6 max-w-2xl">
+        {/* Progress indicator */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm text-muted-foreground">Step {step} of 4</span>
+            <span className="text-sm font-medium">{getStepTitle()}</span>
+          </div>
+          <div className="w-full bg-secondary rounded-full h-2">
+            <div 
+              className="bg-primary h-2 rounded-full transition-all duration-300" 
+              style={{ width: `${(step / 4) * 100}%` }}
+            />
+          </div>
+        </div>
+
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Profile Photo */}
-          <ProfilePhotoUploader
-            profilePhotoPreview={profilePhotoPreview}
-            uploadingPhoto={uploadingPhoto}
-            submitting={submitting}
-            onPhotoChange={handlePhotoChange}
-          />
-          {/* Basic Information */}
-          <BasicInfoForm formData={formData} onChange={handleInputChange} />
-          {/* Golf Information */}
-          <GolfInfoForm
-            formData={{
-              handicap: formData.handicap,
-              favoriteClub: formData.favoriteClub,
-              yearsPlaying: formData.yearsPlaying
-            }}
-            onChange={handleInputChange}
-          />
-          {/* Submit Button */}
-          <div className="pt-6">
-            <Button type="submit" className="w-full">
-              Create Profile
-            </Button>
+          {renderStep()}
+          
+          {/* Navigation buttons */}
+          <div className="flex justify-between pt-6">
+            {step > 1 && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleBack}
+                disabled={submitting}
+              >
+                Back
+              </Button>
+            )}
+            
+            {isLastStep ? (
+              <Button 
+                type="submit" 
+                disabled={submitting || !canProceed()}
+                className="ml-auto"
+              >
+                {submitting ? 'Creating Profile...' : 'Create Profile'}
+              </Button>
+            ) : (
+              <Button
+                type="button"
+                onClick={handleNext}
+                disabled={!canProceed()}
+                className="ml-auto"
+              >
+                Next
+              </Button>
+            )}
           </div>
         </form>
       </main>

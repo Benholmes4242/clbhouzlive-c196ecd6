@@ -630,6 +630,10 @@ export type Database = {
         Row: {
           bag_visible: boolean | null
           bio: string | null
+          business_name: string | null
+          business_type: Database["public"]["Enums"]["business_type"] | null
+          contact_person_name: string | null
+          cover_photo_url: string | null
           created_at: string | null
           display_name: string | null
           eg_app_connected: boolean | null
@@ -639,15 +643,25 @@ export type Database = {
           home_club: string | null
           id: string
           is_public: boolean | null
+          location: string | null
+          logo_url: string | null
+          phone: string | null
           profile_photo_url: string | null
+          social_links: Json | null
           top100_visible: boolean | null
           tracker_visible: boolean | null
           updated_at: string | null
+          user_type: Database["public"]["Enums"]["user_type"] | null
           username: string | null
+          website_url: string | null
         }
         Insert: {
           bag_visible?: boolean | null
           bio?: string | null
+          business_name?: string | null
+          business_type?: Database["public"]["Enums"]["business_type"] | null
+          contact_person_name?: string | null
+          cover_photo_url?: string | null
           created_at?: string | null
           display_name?: string | null
           eg_app_connected?: boolean | null
@@ -657,15 +671,25 @@ export type Database = {
           home_club?: string | null
           id: string
           is_public?: boolean | null
+          location?: string | null
+          logo_url?: string | null
+          phone?: string | null
           profile_photo_url?: string | null
+          social_links?: Json | null
           top100_visible?: boolean | null
           tracker_visible?: boolean | null
           updated_at?: string | null
+          user_type?: Database["public"]["Enums"]["user_type"] | null
           username?: string | null
+          website_url?: string | null
         }
         Update: {
           bag_visible?: boolean | null
           bio?: string | null
+          business_name?: string | null
+          business_type?: Database["public"]["Enums"]["business_type"] | null
+          contact_person_name?: string | null
+          cover_photo_url?: string | null
           created_at?: string | null
           display_name?: string | null
           eg_app_connected?: boolean | null
@@ -675,11 +699,17 @@ export type Database = {
           home_club?: string | null
           id?: string
           is_public?: boolean | null
+          location?: string | null
+          logo_url?: string | null
+          phone?: string | null
           profile_photo_url?: string | null
+          social_links?: Json | null
           top100_visible?: boolean | null
           tracker_visible?: boolean | null
           updated_at?: string | null
+          user_type?: Database["public"]["Enums"]["user_type"] | null
           username?: string | null
+          website_url?: string | null
         }
         Relationships: []
       }
@@ -796,6 +826,12 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
+      business_type:
+        | "golf_club"
+        | "pro_shop"
+        | "teaching_academy"
+        | "tour_event"
+        | "other"
       continent:
         | "North America"
         | "South America"
@@ -803,6 +839,13 @@ export type Database = {
         | "Asia"
         | "Africa"
         | "Oceania"
+      user_type:
+        | "individual"
+        | "club"
+        | "pro_shop"
+        | "academy"
+        | "tour_event"
+        | "other"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -919,6 +962,13 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
+      business_type: [
+        "golf_club",
+        "pro_shop",
+        "teaching_academy",
+        "tour_event",
+        "other",
+      ],
       continent: [
         "North America",
         "South America",
@@ -926,6 +976,14 @@ export const Constants = {
         "Asia",
         "Africa",
         "Oceania",
+      ],
+      user_type: [
+        "individual",
+        "club",
+        "pro_shop",
+        "academy",
+        "tour_event",
+        "other",
       ],
     },
   },
