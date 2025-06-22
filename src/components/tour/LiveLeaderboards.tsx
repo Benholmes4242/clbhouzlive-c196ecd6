@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -83,6 +82,16 @@ const LiveLeaderboards = () => {
     }
   };
 
+  const getTourLogoSize = (tour: string) => {
+    switch (tour) {
+      case 'PGA':
+      case 'DP World':
+        return 'h-12 w-auto'; // Double size for PGA and DP World
+      default:
+        return 'h-6 w-auto'; // Keep current size for LIV and University
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
@@ -107,7 +116,7 @@ const LiveLeaderboards = () => {
             <div>
               <CardTitle className="flex items-center gap-3">
                 {selectedTournament.name}
-                <div className="h-6 w-auto">
+                <div className={getTourLogoSize(selectedTournament.tour)}>
                   <img
                     src={tourLogos[selectedTournament.tour]}
                     alt={`${selectedTournament.tour} logo`}

@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -97,6 +98,16 @@ const TeeTimesSection = () => {
     return matchesSearch && matchesTour && matchesDate;
   });
 
+  const getTourLogoSize = (tour: string) => {
+    switch (tour) {
+      case 'PGA':
+      case 'DP World':
+        return 'h-10 w-auto'; // Bigger size for PGA and DP World
+      default:
+        return 'h-5 w-auto'; // Keep current size for LIV and University
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4">
@@ -136,7 +147,7 @@ const TeeTimesSection = () => {
                   <div className="flex items-center gap-3 mb-2">
                     <Clock className="h-4 w-4 text-muted-foreground" />
                     <span className="font-medium text-lg">{teeTime.time}</span>
-                    <div className="h-5 w-auto">
+                    <div className={getTourLogoSize(teeTime.tour)}>
                       <img
                         src={tourLogos[teeTime.tour]}
                         alt={`${teeTime.tour} logo`}
@@ -190,3 +201,4 @@ const TeeTimesSection = () => {
 };
 
 export default TeeTimesSection;
+

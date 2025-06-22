@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -109,6 +110,16 @@ const RankingsSection = () => {
 
   const filteredRankings = mockRankings.filter(ranking => ranking.category === categoryFilter);
 
+  const getTourLogoSize = (tour: string) => {
+    switch (tour) {
+      case 'PGA':
+      case 'DP World':
+        return 'h-12 w-auto'; // Double size for PGA and DP World
+      default:
+        return 'h-6 w-auto'; // Keep current size for LIV and University
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4">
@@ -147,7 +158,7 @@ const RankingsSection = () => {
           <CardTitle className="flex items-center gap-3">
             {selectedRanking.icon}
             {selectedRanking.name}
-            <div className="h-6 w-auto">
+            <div className={getTourLogoSize(selectedRanking.tour)}>
               <img
                 src={tourLogos[selectedRanking.tour]}
                 alt={`${selectedRanking.tour} logo`}
@@ -215,3 +226,4 @@ const RankingsSection = () => {
 };
 
 export default RankingsSection;
+

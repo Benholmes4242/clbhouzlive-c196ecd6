@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -90,6 +91,16 @@ const UpcomingEvents = () => {
     });
   };
 
+  const getTourLogoSize = (tour: string) => {
+    switch (tour) {
+      case 'PGA':
+      case 'DP World':
+        return 'h-12 w-auto'; // Double size for PGA and DP World
+      default:
+        return 'h-6 w-auto'; // Keep current size for LIV and University
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
@@ -117,7 +128,7 @@ const UpcomingEvents = () => {
                 <div className="flex-1">
                   <CardTitle className="text-lg mb-2">{event.name}</CardTitle>
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="h-6 w-auto">
+                    <div className={getTourLogoSize(event.tour)}>
                       <img
                         src={tourLogos[event.tour]}
                         alt={`${event.tour} logo`}
@@ -169,3 +180,4 @@ const UpcomingEvents = () => {
 };
 
 export default UpcomingEvents;
+
