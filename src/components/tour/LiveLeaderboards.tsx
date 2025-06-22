@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Trophy, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
 interface LeaderboardEntry {
   position: number;
@@ -114,7 +114,7 @@ const LiveLeaderboards = () => {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
-              <CardTitle className="flex items-center gap-3">
+              <CardTitle className="flex items-center gap-4">
                 {selectedTournament.name}
                 <div className={getTourLogoSize(selectedTournament.tour)}>
                   <img
@@ -134,7 +134,6 @@ const LiveLeaderboards = () => {
                 {selectedTournament.cutLine && ` • Cut Line: ${selectedTournament.cutLine}`}
               </p>
             </div>
-            <Trophy className="h-6 w-6 text-yellow-600" />
           </div>
         </CardHeader>
         <CardContent>
@@ -152,7 +151,6 @@ const LiveLeaderboards = () => {
               {selectedTournament.leaderboard.map((entry) => (
                 <TableRow key={entry.position}>
                   <TableCell className="font-medium">
-                    {entry.position === 1 && <Trophy className="h-4 w-4 text-yellow-600 inline mr-1" />}
                     {entry.position}
                   </TableCell>
                   <TableCell>
