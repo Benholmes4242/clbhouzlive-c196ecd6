@@ -84,12 +84,12 @@ const News = () => {
           article.title.toLowerCase().includes('pga') ||
           article.description.toLowerCase().includes('pga tour')
         );
-      case 'live':
+      case 'liv':
         return articles.filter(article => 
-          article.title.toLowerCase().includes('live') ||
+          article.title.toLowerCase().includes('liv') ||
           article.title.toLowerCase().includes('leaderboard') ||
           article.title.toLowerCase().includes('tournament') ||
-          article.description.toLowerCase().includes('live')
+          article.description.toLowerCase().includes('liv')
         );
       case 'universities':
         return articles.filter(article => 
@@ -228,7 +228,7 @@ const News = () => {
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="latest">Latest News</TabsTrigger>
           <TabsTrigger value="pga">PGA News</TabsTrigger>
-          <TabsTrigger value="live">Live Golf</TabsTrigger>
+          <TabsTrigger value="liv">LIV Golf</TabsTrigger>
           <TabsTrigger value="universities">USA Universities</TabsTrigger>
         </TabsList>
 
@@ -240,8 +240,8 @@ const News = () => {
           {renderNewsContent(filterArticlesByCategory('pga'))}
         </TabsContent>
 
-        <TabsContent value="live" className="mt-6">
-          {renderNewsContent(filterArticlesByCategory('live'))}
+        <TabsContent value="liv" className="mt-6">
+          {renderNewsContent(filterArticlesByCategory('liv'))}
         </TabsContent>
 
         <TabsContent value="universities" className="mt-6">
