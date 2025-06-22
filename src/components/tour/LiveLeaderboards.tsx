@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -24,6 +23,14 @@ interface Tournament {
   leaderboard: LeaderboardEntry[];
   cutLine?: string;
 }
+
+// Tour logo mapping
+const tourLogos: Record<string, string> = {
+  'PGA': '/lovable-uploads/40d74a79-f402-4d98-af1d-242a35f993b4.png',
+  'LIV': '/lovable-uploads/09ec2e18-35f5-46cb-81a5-9862fe118274.png',
+  'DP World': '/lovable-uploads/62b4549e-fa2b-468b-9d6b-680542b8344d.png',
+  'University': '/lovable-uploads/6272d8e2-c43e-49e6-ae7b-667db411c2f8.png',
+};
 
 const mockTournaments: Tournament[] = [
   {
@@ -99,9 +106,13 @@ const LiveLeaderboards = () => {
             <div>
               <CardTitle className="flex items-center gap-2">
                 {selectedTournament.name}
-                <Badge className={`${getTourColor(selectedTournament.tour)} text-white`}>
-                  {selectedTournament.tour}
-                </Badge>
+                <div className="h-6 w-auto">
+                  <img
+                    src={tourLogos[selectedTournament.tour]}
+                    alt={`${selectedTournament.tour} logo`}
+                    className="h-full w-auto object-contain"
+                  />
+                </div>
                 {selectedTournament.status === 'live' && (
                   <Badge variant="destructive" className="animate-pulse">
                     LIVE
