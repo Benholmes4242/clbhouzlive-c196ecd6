@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
@@ -9,6 +8,7 @@ import ConfirmNotice from "./auth/ConfirmNotice";
 import AuthLayout from "./auth/AuthLayout";
 import BottomNavigation from "@/components/BottomNavigation";
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
+import type { AuthChangeEvent } from "@supabase/supabase-js";
 
 const Auth: React.FC = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -50,7 +50,7 @@ const Auth: React.FC = () => {
   useEffect(() => {
     // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      async (event: AuthChangeEvent, session) => {
         if (session?.user) {
           // Check if this is a new signup with username data
           if (event === 'SIGNED_UP' && session.user.user_metadata?.username) {
