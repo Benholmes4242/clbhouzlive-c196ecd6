@@ -70,13 +70,25 @@ const CourseDetailModal = ({ course, isOpen, onClose }: CourseDetailModalProps) 
       if (!course?.id) return null;
 
       const { data, error } = await supabase
-        .from('course_rating_stats')
-        .select('*')
-        .eq('course_id', course.id)
-        .maybeSingle();
+        .from('course_ratings')
+        .select('rating, review')
+        .eq('course_id', course.id);
 
-      if (error && error.code !== 'PGRST116') throw error;
-      return data;
+      if (error) throw error;
+
+      if (!data || data.length === 0) {
+        return null;
+      }
+
+      const totalRatings = data.length;
+      const averageRating = data.reduce((sum, rating) => sum + rating.rating, 0) / totalRatings;
+      const totalReviews = data.filter(r => r.review && r.review.trim() !== '').length;
+
+      return {
+        average_rating: Math.round(averageRating * 100) / 100,
+        total_ratings: totalRatings,
+        total_reviews: totalReviews
+      };
     },
     enabled: !!course?.id,
   });
