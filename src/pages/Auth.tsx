@@ -29,11 +29,34 @@ const Auth: React.FC = () => {
     return !!data;
   }
 
+  // Helper to create profile with username from signup
+  async function createUserProfile(userId: string, userData: any) {
+    const username = userData?.username;
+    
+    const profileData = {
+      id: userId,
+      username: username || null,
+      display_name: null,
+      user_type: 'individual',
+      is_public: true,
+    };
+
+    const { error } = await supabase.from('user_profiles').upsert(profileData);
+    if (error) {
+      console.error('Error creating user profile:', error);
+    }
+  }
+
   useEffect(() => {
     // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
+      async (event, session) => {
         if (session?.user) {
+          // Check if this is a new signup with username data
+          if (event === 'SIGNED_UP' && session.user.user_metadata?.username) {
+            await createUserProfile(session.user.id, session.user.user_metadata);
+          }
+          
           // After login/signup, check if profile exists
           const hasProfile = await checkProfileExists(session.user.id);
           if (hasProfile) {
