@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -131,7 +132,7 @@ const RankingsSection = () => {
                 variant={selectedRanking.id === ranking.id ? "default" : "outline"}
                 size="sm"
                 onClick={() => setSelectedRanking(ranking)}
-                className="flex items-center gap-2"
+                className="flex items-center gap-3"
               >
                 {ranking.icon}
                 {ranking.tour}
@@ -143,7 +144,7 @@ const RankingsSection = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-3">
             {selectedRanking.icon}
             {selectedRanking.name}
             <div className="h-6 w-auto">
@@ -190,7 +191,7 @@ const RankingsSection = () => {
                   )}
                   {selectedRanking.tour === 'University' && entry.school && (
                     <TableCell>
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-4">
                         <div className="w-8 h-8 rounded-full overflow-hidden bg-white border-2 border-gray-200 flex-shrink-0">
                           <img
                             src={universityLogos[entry.school]}
