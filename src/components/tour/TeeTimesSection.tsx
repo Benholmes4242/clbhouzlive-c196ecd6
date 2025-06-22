@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Clock, Search, Bell, Users } from 'lucide-react';
+import { Clock, Search, Users } from 'lucide-react';
 import { getTourLogoSize } from './rankings/utils';
 
 interface TeeTime {
@@ -136,13 +136,6 @@ const TeeTimesSection = () => {
                   <div className="flex items-center gap-3 mb-2 min-h-[4rem]">
                     <Clock className="h-4 w-4 text-muted-foreground" />
                     <span className="font-medium text-lg">{teeTime.time}</span>
-                    <div className={getTourLogoSize(teeTime.tour)}>
-                      <img
-                        src={tourLogos[teeTime.tour]}
-                        alt={`${teeTime.tour} logo`}
-                        className="h-full w-auto object-contain"
-                      />
-                    </div>
                   </div>
                   
                   <div className="mb-2">
@@ -164,10 +157,13 @@ const TeeTimesSection = () => {
                   </div>
                 </div>
                 
-                <Button variant="outline" size="sm" className="ml-4">
-                  <Bell className="h-4 w-4 mr-1" />
-                  Follow
-                </Button>
+                <div className={`flex items-center ${getTourLogoSize(teeTime.tour)}`}>
+                  <img
+                    src={tourLogos[teeTime.tour]}
+                    alt={`${teeTime.tour} logo`}
+                    className="h-full w-auto object-contain"
+                  />
+                </div>
               </div>
             </CardContent>
           </Card>
