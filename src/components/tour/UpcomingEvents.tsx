@@ -1,0 +1,158 @@
+
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Calendar, Bell, MapPin, Trophy } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+interface Event {
+  id: string;
+  name: string;
+  tour: 'PGA' | 'LIV' | 'DP World' | 'Amateur' | 'University';
+  date: string;
+  location: string;
+  status: 'upcoming' | 'live';
+  prize?: string;
+  image?: string;
+}
+
+const mockEvents: Event[] = [
+  {
+    id: '1',
+    name: 'The Masters Tournament',
+    tour: 'PGA',
+    date: '2024-04-11',
+    location: 'Augusta National Golf Club, GA',
+    status: 'upcoming',
+    prize: '$18M',
+  },
+  {
+    id: '2',
+    name: 'LIV Golf Miami',
+    tour: 'LIV',
+    date: '2024-04-05',
+    location: 'Trump National Doral, FL',
+    status: 'live',
+    prize: '$25M',
+  },
+  {
+    id: '3',
+    name: 'NCAA Division I Championship',
+    tour: 'University',
+    date: '2024-05-24',
+    location: 'Various Locations',
+    status: 'upcoming',
+  },
+  {
+    id: '4',
+    name: 'DP World Tour Championship',
+    tour: 'DP World',
+    date: '2024-11-14',
+    location: 'Dubai, UAE',
+    status: 'upcoming',
+    prize: '$10M',
+  },
+];
+
+const UpcomingEvents = () => {
+  const [filterTour, setFilterTour] = useState<string>('all');
+
+  const getTourColor = (tour: string) => {
+    switch (tour) {
+      case 'PGA': return 'bg-blue-500';
+      case 'LIV': return 'bg-green-500';
+      case 'DP World': return 'bg-gray-500';
+      case 'University': return 'bg-red-900';
+      case 'Amateur': return 'bg-orange-500';
+      default: return 'bg-gray-400';
+    }
+  };
+
+  const filteredEvents = filterTour === 'all' 
+    ? mockEvents 
+    : mockEvents.filter(event => event.tour === filterTour);
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
+        <h2 className="text-xl font-semibold">Upcoming Events</h2>
+        <Select value={filterTour} onValueChange={setFilterTour}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Filter by tour" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Tours</SelectItem>
+            <SelectItem value="PGA">PGA Tour</SelectItem>
+            <SelectItem value="LIV">LIV Golf</SelectItem>
+            <SelectItem value="DP World">DP World Tour</SelectItem>
+            <SelectItem value="University">University Golf</SelectItem>
+            <SelectItem value="Amateur">Amateur</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {filteredEvents.map((event) => (
+          <Card key={event.id} className="hover:shadow-lg transition-shadow">
+            <CardHeader className="pb-3">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <CardTitle className="text-lg mb-2">{event.name}</CardTitle>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Badge className={`${getTourColor(event.tour)} text-white`}>
+                      {event.tour}
+                    </Badge>
+                    {event.status === 'live' && (
+                      <Badge variant="destructive" className="animate-pulse">
+                        LIVE
+                      </Badge>
+                    )}
+                  </div>
+                </div>
+                <Trophy className="h-6 w-6 text-yellow-600" />
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                <div className="flex items-center text-sm text-muted-foreground">
+                  <Calendar className="h-4 w-4 mr-2" />
+                  {formatDate(event.date)}
+                </div>
+                <div className="flex items-center text-sm text-muted-foreground">
+                  <MapPin className="h-4 w-4 mr-2" />
+                  {event.location}
+                </div>
+                {event.prize && (
+                  <div className="text-sm font-medium text-green-600">
+                    Prize Pool: {event.prize}
+                  </div>
+                )}
+                <div className="flex gap-2 pt-2">
+                  <Button variant="outline" size="sm" className="flex-1">
+                    <Calendar className="h-4 w-4 mr-1" />
+                    Add to Calendar
+                  </Button>
+                  <Button variant="outline" size="sm" className="flex-1">
+                    <Bell className="h-4 w-4 mr-1" />
+                    Set Reminder
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default UpcomingEvents;
