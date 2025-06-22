@@ -25,6 +25,15 @@ interface RankingList {
   icon: React.ReactNode;
 }
 
+// University logo mapping
+const universityLogos: Record<string, string> = {
+  'Stanford University': '/lovable-uploads/508bb03c-7a9f-464d-9b09-48939c5e5c53.png',
+  'Duke University': '/lovable-uploads/df006b4c-e4aa-49b8-b83e-3d46eba27fdb.png',
+  'Oklahoma State': '/lovable-uploads/969e7650-5607-4c02-9a10-ac7a863764a7.png',
+  'University of Texas': '/lovable-uploads/6cd6b247-0cdf-4587-b46f-3ed85f18a9ce.png',
+  'Auburn University': '/lovable-uploads/7ea42fb3-2543-4f01-8a4e-cfdf2a5fac1a.png',
+};
+
 const mockRankings: RankingList[] = [
   {
     id: 'pga-men',
@@ -169,7 +178,18 @@ const RankingsSection = () => {
                     <TableCell className="text-center font-medium">{entry.points}</TableCell>
                   )}
                   {selectedRanking.tour === 'University' && entry.school && (
-                    <TableCell className="text-sm">{entry.school}</TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-full overflow-hidden bg-white border-2 border-gray-200 flex-shrink-0">
+                          <img
+                            src={universityLogos[entry.school]}
+                            alt={`${entry.school} logo`}
+                            className="w-full h-full object-contain"
+                          />
+                        </div>
+                        <span className="text-sm">{entry.school}</span>
+                      </div>
+                    </TableCell>
                   )}
                   <TableCell className="text-center">{getChangeIndicator(entry.change)}</TableCell>
                 </TableRow>
