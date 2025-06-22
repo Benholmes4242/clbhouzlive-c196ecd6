@@ -11,8 +11,7 @@ import ClubSpotlightCarousel from '@/components/clubhouse/ClubSpotlightCarousel'
 import ClubhouseContentFeed from '@/components/clubhouse/ClubhouseContentFeed';
 
 const ClubhouseFeed = () => {
-  const [feedType, setFeedType] = useState('all');
-  const [contentFilter, setContentFilter] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
 
   return (
     <div className="min-h-screen bg-background">
@@ -25,12 +24,10 @@ const ClubhouseFeed = () => {
           <p className="text-muted-foreground">Discover golf content from the community</p>
         </div>
 
-        {/* Controls */}
+        {/* Search Controls */}
         <ClubhouseFeedControls 
-          feedType={feedType}
-          setFeedType={setFeedType}
-          contentFilter={contentFilter}
-          setContentFilter={setContentFilter}
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
         />
 
         {/* Carousel Sections */}
@@ -41,7 +38,7 @@ const ClubhouseFeed = () => {
         <ClubSpotlightCarousel />
 
         {/* Main Content Feed */}
-        <ClubhouseContentFeed />
+        <ClubhouseContentFeed searchQuery={searchQuery} />
       </main>
       
       <BottomNavigation />
