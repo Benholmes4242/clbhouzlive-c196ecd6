@@ -71,7 +71,7 @@ const ClubhouseFeed = () => {
       <main className="container mx-auto px-4 py-6 pb-20">
         {/* Header */}
         <div className="mb-6">
-          <h1 className="text-3xl font-bold mb-2">The Clubhouse Feed</h1>
+          <h1 className="text-3xl font-bold mb-2">Clubhouse Feed</h1>
           <p className="text-muted-foreground">Discover golf content from the community</p>
         </div>
 
