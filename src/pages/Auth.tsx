@@ -53,7 +53,7 @@ const Auth: React.FC = () => {
       async (event: AuthChangeEvent, session) => {
         if (session?.user) {
           // Check if this is a new signup with username data
-          if (event === 'SIGNED_UP' && session.user.user_metadata?.username) {
+          if (event === 'SIGNED_IN' && session.user.user_metadata?.username) {
             await createUserProfile(session.user.id, session.user.user_metadata);
           }
           
