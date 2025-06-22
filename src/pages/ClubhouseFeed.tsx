@@ -51,21 +51,26 @@ const topPlayers = [
     name: 'Sarah Chen', 
     bio: '2 HCP • Teaching Pro', 
     avatar: 'https://images.unsplash.com/photo-1494790108755-2616b2f44?w=100&h=100&fit=crop',
-    preview: 'https://images.unsplash.com/photo-1587174486073-ae5e5ccd3ab6?w=200&h=150&fit=crop'
+    contentImage: 'https://images.unsplash.com/photo-1587174486073-ae5e5ccd3ab6?w=600&h=400&fit=crop',
+    type: 'image'
   },
   { 
     id: '2', 
     name: 'Marcus Rodriguez', 
     bio: '5 HCP • Course Designer', 
     avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop',
-    preview: 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=200&h=150&fit=crop'
+    contentImage: 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=600&h=400&fit=crop',
+    type: 'video',
+    duration: '2:15'
   },
   { 
     id: '3', 
     name: 'Emma Wilson', 
     bio: '3 HCP • Golf Instructor', 
     avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop',
-    preview: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=200&h=150&fit=crop'
+    contentImage: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=600&h=400&fit=crop',
+    type: 'video',
+    duration: '1:45'
   },
 ];
 
@@ -239,18 +244,33 @@ const ClubhouseFeed = () => {
             <CarouselContent className="-ml-2 md:-ml-4">
               {topPlayers.map((player) => (
                 <CarouselItem key={player.id} className="pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3">
-                  <div className="bg-card rounded-lg p-4 shadow-sm border">
-                    <div className="flex items-start gap-4">
-                      <img src={player.avatar} alt={player.name} className="w-12 h-12 rounded-full object-cover flex-shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold">{player.name}</h3>
-                        <p className="text-muted-foreground text-sm mb-3">{player.bio}</p>
-                        <img src={player.preview} alt="Preview" className="w-full h-24 object-cover rounded mb-3" />
-                        <Button size="sm" className="w-full">
-                          <UserPlus className="h-4 w-4 mr-2" />
-                          Follow
-                        </Button>
+                  <div className="relative bg-card rounded-lg overflow-hidden shadow-sm border hover:shadow-md transition-shadow cursor-pointer">
+                    <img src={player.contentImage} alt={player.name} className="w-full h-48 object-cover" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    {player.type === 'video' && (
+                      <>
+                        <div className="absolute top-4 right-4 bg-black/60 text-white text-xs px-2 py-1 rounded">
+                          {player.duration}
+                        </div>
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="bg-white/20 backdrop-blur-sm rounded-full p-3">
+                            <Play className="h-6 w-6 text-white fill-current" />
+                          </div>
+                        </div>
+                      </>
+                    )}
+                    <div className="absolute bottom-4 left-4 right-4">
+                      <div className="flex items-center gap-3 mb-3">
+                        <img src={player.avatar} alt={player.name} className="w-8 h-8 rounded-full object-cover border-2 border-white" />
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-white font-semibold text-sm">{player.name}</h3>
+                          <p className="text-white/80 text-xs">{player.bio}</p>
+                        </div>
                       </div>
+                      <Button size="sm" className="w-full bg-white/20 backdrop-blur-sm border border-white/30 text-white hover:bg-white/30">
+                        <UserPlus className="h-3 w-3 mr-2" />
+                        Follow
+                      </Button>
                     </div>
                   </div>
                 </CarouselItem>
