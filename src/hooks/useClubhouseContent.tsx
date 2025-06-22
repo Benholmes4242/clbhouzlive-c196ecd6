@@ -11,7 +11,7 @@ interface ClubhousePost {
     display_name: string | null;
     username: string | null;
     profile_photo_url: string | null;
-    user_type: 'individual' | 'business' | null;
+    user_type: 'individual' | 'club' | 'pro_shop' | 'academy' | 'tour_event' | 'other' | null;
     business_name: string | null;
   };
   post_media: {
