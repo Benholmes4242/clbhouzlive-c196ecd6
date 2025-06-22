@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -141,7 +140,6 @@ const RankingsSection = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="men">Men's Rankings</SelectItem>
-              <SelectItem value="women">Women's Rankings</SelectItem>
             </SelectContent>
           </Select>
           
@@ -163,7 +161,6 @@ const RankingsSection = () => {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-3">
-            {selectedRanking.icon}
             {selectedRanking.name}
             <div className={getTourLogoSize(selectedRanking.tour)}>
               <img
