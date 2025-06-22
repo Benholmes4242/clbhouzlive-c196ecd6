@@ -1,8 +1,10 @@
+
 import React, { useState } from 'react';
-import { Play, UserPlus, Shuffle, Filter, MapPin, Clock } from 'lucide-react';
+import { Play, UserPlus, Shuffle, Filter, MapPin, Clock, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
 
@@ -142,73 +144,112 @@ const ClubhouseFeed = () => {
           </div>
         </div>
 
-        {/* Course Highlights */}
+        {/* Course Highlights Carousel */}
         <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-4">Course Highlights</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {courseHighlights.map((course) => (
-              <div key={course.id} className="bg-card rounded-lg overflow-hidden shadow-sm border hover:shadow-md transition-shadow cursor-pointer">
-                <img src={course.image} alt={course.name} className="w-full h-32 object-cover" />
-                <div className="p-4">
-                  <h3 className="font-semibold mb-1">{course.name}</h3>
-                  <div className="flex items-center text-muted-foreground text-sm mb-2">
-                    <MapPin className="h-3 w-3 mr-1" />
-                    {course.location}
-                  </div>
-                  <Badge variant="secondary">{course.posts} posts</Badge>
-                </div>
-              </div>
-            ))}
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold">Course Highlights</h2>
+            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+              View All <ChevronRight className="h-4 w-4 ml-1" />
+            </Button>
           </div>
-        </div>
-
-        {/* Top Player Content */}
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-4">Top Player Content</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {topPlayers.map((player) => (
-              <div key={player.id} className="bg-card rounded-lg p-4 shadow-sm border">
-                <div className="flex items-start gap-4">
-                  <img src={player.avatar} alt={player.name} className="w-12 h-12 rounded-full object-cover" />
-                  <div className="flex-1">
-                    <h3 className="font-semibold">{player.name}</h3>
-                    <p className="text-muted-foreground text-sm mb-3">{player.bio}</p>
-                    <img src={player.preview} alt="Preview" className="w-full h-24 object-cover rounded mb-3" />
-                    <Button size="sm" className="w-full">
-                      <UserPlus className="h-4 w-4 mr-2" />
-                      Follow
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Trending Tips */}
-        <div className="mb-8">
-          <h2 className="text-xl font-semibold mb-4">Trending Tips</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {trendingTips.map((tip) => (
-              <div key={tip.id} className="bg-card rounded-lg overflow-hidden shadow-sm border hover:shadow-md transition-shadow cursor-pointer">
-                <div className="relative">
-                  <img src={tip.image} alt={tip.title} className="w-full h-40 object-cover" />
-                  {tip.type === 'video' && (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="bg-black/50 rounded-full p-2">
-                        <Play className="h-4 w-4 text-white fill-current" />
+          <Carousel className="w-full">
+            <CarouselContent className="-ml-2 md:-ml-4">
+              {courseHighlights.map((course) => (
+                <CarouselItem key={course.id} className="pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3">
+                  <div className="bg-card rounded-lg overflow-hidden shadow-sm border hover:shadow-md transition-shadow cursor-pointer">
+                    <img src={course.image} alt={course.name} className="w-full h-32 object-cover" />
+                    <div className="p-4">
+                      <h3 className="font-semibold mb-1">{course.name}</h3>
+                      <div className="flex items-center text-muted-foreground text-sm mb-2">
+                        <MapPin className="h-3 w-3 mr-1" />
+                        {course.location}
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <Badge variant="secondary">{course.posts} posts</Badge>
+                        <Button size="sm" variant="outline">View More</Button>
                       </div>
                     </div>
-                  )}
-                </div>
-                <div className="p-4">
-                  <Badge variant="secondary" className="mb-2">#{tip.tag}</Badge>
-                  <h3 className="font-semibold mb-1">{tip.title}</h3>
-                  <p className="text-muted-foreground text-sm">@{tip.user}</p>
-                </div>
-              </div>
-            ))}
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="hidden sm:flex" />
+            <CarouselNext className="hidden sm:flex" />
+          </Carousel>
+        </div>
+
+        {/* Top Player Content Carousel */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold">Top Player Content</h2>
+            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+              View All <ChevronRight className="h-4 w-4 ml-1" />
+            </Button>
           </div>
+          <Carousel className="w-full">
+            <CarouselContent className="-ml-2 md:-ml-4">
+              {topPlayers.map((player) => (
+                <CarouselItem key={player.id} className="pl-2 md:pl-4 basis-full sm:basis-1/2">
+                  <div className="bg-card rounded-lg p-4 shadow-sm border">
+                    <div className="flex items-start gap-4">
+                      <img src={player.avatar} alt={player.name} className="w-12 h-12 rounded-full object-cover flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold">{player.name}</h3>
+                        <p className="text-muted-foreground text-sm mb-3">{player.bio}</p>
+                        <img src={player.preview} alt="Preview" className="w-full h-24 object-cover rounded mb-3" />
+                        <Button size="sm" className="w-full">
+                          <UserPlus className="h-4 w-4 mr-2" />
+                          Follow
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="hidden sm:flex" />
+            <CarouselNext className="hidden sm:flex" />
+          </Carousel>
+        </div>
+
+        {/* Trending Tips Carousel */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold">Trending Tips</h2>
+            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+              View All <ChevronRight className="h-4 w-4 ml-1" />
+            </Button>
+          </div>
+          <Carousel className="w-full">
+            <CarouselContent className="-ml-2 md:-ml-4">
+              {trendingTips.map((tip) => (
+                <CarouselItem key={tip.id} className="pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3">
+                  <div className="bg-card rounded-lg overflow-hidden shadow-sm border hover:shadow-md transition-shadow cursor-pointer">
+                    <div className="relative">
+                      <img src={tip.image} alt={tip.title} className="w-full h-40 object-cover" />
+                      {tip.type === 'video' && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="bg-black/50 rounded-full p-2">
+                            <Play className="h-4 w-4 text-white fill-current" />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    <div className="p-4">
+                      <Badge variant="secondary" className="mb-2">#{tip.tag}</Badge>
+                      <h3 className="font-semibold mb-1">{tip.title}</h3>
+                      <div className="flex items-center justify-between">
+                        <p className="text-muted-foreground text-sm">@{tip.user}</p>
+                        <Button size="sm" variant="outline">View More</Button>
+                      </div>
+                    </div>
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="hidden sm:flex" />
+            <CarouselNext className="hidden sm:flex" />
+          </Carousel>
         </div>
 
         {/* Club & Business Spotlight */}
