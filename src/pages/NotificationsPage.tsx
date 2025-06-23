@@ -1,9 +1,10 @@
+
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { UserPlus, UserCheck, MessageCircle, Bell, ArrowLeft, Check, X } from 'lucide-react';
+import { UserPlus, UserCheck, MessageCircle, Bell, ArrowLeft, Check, X, Users } from 'lucide-react';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { supabase } from '@/integrations/supabase/client';
@@ -22,7 +23,8 @@ const NotificationsPage = () => {
     markAsRead, 
     markAllAsRead, 
     markNonPersistentAsRead,
-    removeNotification 
+    removeNotification,
+    removeFriendRequestNotifications
   } = useNotifications();
   const { toast } = useToast();
 
@@ -63,8 +65,8 @@ const NotificationsPage = () => {
         });
       }
 
-      // Remove the notification from the local state immediately
-      removeNotification(notificationId);
+      // Remove all notifications related to this friend request
+      await removeFriendRequestNotifications(friendRequestId);
     } catch (error) {
       console.error('Error handling friend request:', error);
       toast({
@@ -79,15 +81,7 @@ const NotificationsPage = () => {
     if (!user) return;
 
     try {
-      const { error } = await supabase
-        .from('notifications')
-        .delete()
-        .eq('id', notificationId)
-        .eq('user_id', user.id);
-
-      if (error) throw error;
-
-      removeNotification(notificationId);
+      await removeNotification(notificationId);
       
       toast({
         title: "Notification removed",
@@ -111,6 +105,8 @@ const NotificationsPage = () => {
         return <UserCheck className="w-5 h-5 text-green-600" />;
       case 'message':
         return <MessageCircle className="w-5 h-5 text-purple-600" />;
+      case 'follow':
+        return <Users className="w-5 h-5 text-orange-600" />;
       default:
         return <Bell className="w-5 h-5 text-gray-600" />;
     }

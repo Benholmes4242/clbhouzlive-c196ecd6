@@ -6,7 +6,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 export interface Notification {
   id: string;
   user_id: string;
-  type: 'friend_request' | 'friend_accepted' | 'message' | 'other';
+  type: 'friend_request' | 'friend_accepted' | 'message' | 'follow' | 'other';
   title: string;
   message: string | null;
   data: any;
@@ -147,13 +147,64 @@ export function useNotifications() {
     }
   };
 
-  const removeNotification = (notificationId: string) => {
-    setNotifications(prev => prev.filter(n => n.id !== notificationId));
-    // Also update unread count if the removed notification was unread and persistent
-    const removedNotification = notifications.find(n => n.id === notificationId);
-    if (removedNotification && !removedNotification.read && 
-        (removedNotification.type === 'friend_request' || removedNotification.type === 'message')) {
-      setUnreadCount(current => Math.max(0, current - 1));
+  const removeNotification = async (notificationId: string) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('notifications')
+        .delete()
+        .eq('id', notificationId)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      // Remove from local state
+      setNotifications(prev => prev.filter(n => n.id !== notificationId));
+      
+      // Also update unread count if the removed notification was unread and persistent
+      const removedNotification = notifications.find(n => n.id === notificationId);
+      if (removedNotification && !removedNotification.read && 
+          (removedNotification.type === 'friend_request' || removedNotification.type === 'message')) {
+        setUnreadCount(current => Math.max(0, current - 1));
+      }
+    } catch (error) {
+      console.error('Error removing notification:', error);
+      throw error;
+    }
+  };
+
+  // Remove friend request notifications when they are accepted/declined
+  const removeFriendRequestNotifications = async (friendRequestId: string) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('notifications')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('type', 'friend_request')
+        .eq('data->friend_request_id', friendRequestId);
+
+      if (!error) {
+        // Update local state
+        setNotifications(prev => 
+          prev.filter(n => 
+            !(n.type === 'friend_request' && n.data?.friend_request_id === friendRequestId)
+          )
+        );
+        
+        // Recalculate unread count
+        const updatedNotifications = notifications.filter(n => 
+          !(n.type === 'friend_request' && n.data?.friend_request_id === friendRequestId)
+        );
+        const persistentUnreadCount = updatedNotifications.filter(n => 
+          !n.read && (n.type === 'friend_request' || n.type === 'message')
+        ).length;
+        setUnreadCount(persistentUnreadCount);
+      }
+    } catch (error) {
+      console.error('Error removing friend request notifications:', error);
     }
   };
 
@@ -165,6 +216,7 @@ export function useNotifications() {
     markAllAsRead,
     markNonPersistentAsRead,
     removeNotification,
+    removeFriendRequestNotifications,
     refetch: fetchNotifications
   };
 }
