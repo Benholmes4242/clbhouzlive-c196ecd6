@@ -83,6 +83,34 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
     if (error) throw error;
   };
 
+  const rollbackPost = async (postId: string) => {
+    try {
+      console.log('Rolling back post creation for:', postId);
+      
+      // Delete post media
+      await supabase
+        .from('post_media')
+        .delete()
+        .eq('post_id', postId);
+
+      // Delete post tags
+      await supabase
+        .from('post_tags')
+        .delete()
+        .eq('post_id', postId);
+
+      // Delete the post
+      await supabase
+        .from('posts')
+        .delete()
+        .eq('id', postId);
+
+      console.log('Post rollback completed for:', postId);
+    } catch (rollbackError) {
+      console.error('Error during rollback:', rollbackError);
+    }
+  };
+
   const resetForm = () => {
     setContent('');
     setMediaFiles([]);
@@ -95,12 +123,12 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
     if (!user || (!content.trim() && mediaFiles.length === 0) || isSubmitting) return;
 
     setIsSubmitting(true);
-    let postCreated = false;
+    let createdPostId: string | null = null;
     
     try {
       console.log('Starting post creation...');
       
-      // Create the post
+      // Create the post first
       const { data: postData, error: postError } = await supabase
         .from('posts')
         .insert({
@@ -112,13 +140,13 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
 
       if (postError) {
         console.error('Post creation error:', postError);
-        throw postError;
+        throw new Error('Failed to create post');
       }
 
       console.log('Post created successfully:', postData.id);
-      postCreated = true;
+      createdPostId = postData.id;
 
-      // Upload media files
+      // Upload media files if any
       if (mediaFiles.length > 0) {
         console.log('Uploading media files...');
         for (const file of mediaFiles) {
@@ -127,7 +155,7 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
         console.log('Media upload completed');
       }
 
-      // Create post tags
+      // Create post tags if any
       if (selectedTags.length > 0) {
         console.log('Creating post tags...');
         await createPostTags(postData.id);
@@ -150,25 +178,17 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
     } catch (error) {
       console.error('Error creating post:', error);
       
-      // If the post was created but media/tags failed, still consider it a success
-      // since the main content is saved
-      if (postCreated) {
-        console.log('Post was created but additional content failed. Treating as partial success.');
-        toast({
-          title: "Post created with issues",
-          description: "Your post was created but some media or tags may not have been saved properly.",
-          variant: "destructive"
-        });
-        resetForm();
-        onPostCreated?.();
-      } else {
-        // Only show error if the actual post creation failed
-        toast({
-          title: "Failed to create post",
-          description: "Please try again. If the problem persists, check your internet connection.",
-          variant: "destructive"
-        });
+      // If we created a post but subsequent operations failed, roll it back
+      if (createdPostId) {
+        await rollbackPost(createdPostId);
       }
+      
+      // Show error to user
+      toast({
+        title: "Failed to create post",
+        description: "Please try again. If the problem persists, check your internet connection.",
+        variant: "destructive"
+      });
     } finally {
       setIsSubmitting(false);
     }
