@@ -51,7 +51,8 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
           onPostCreated={fetchUserPosts}
         />
 
-        <div className="space-y-4">
+        {/* Grid layout for square posts */}
+        <div className="grid grid-cols-3 gap-1 mt-4">
           {posts.map((post) => (
             <ActivityPostCard
               key={post.id}
@@ -60,13 +61,13 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
               onClick={handlePostClick}
             />
           ))}
-
-          {posts.length === 0 && !loading && (
-            <div className="text-center py-8">
-              <p className="text-muted-foreground">No posts yet.</p>
-            </div>
-          )}
         </div>
+
+        {posts.length === 0 && !loading && (
+          <div className="text-center py-8">
+            <p className="text-muted-foreground">No posts yet.</p>
+          </div>
+        )}
       </div>
 
       <PostModal
