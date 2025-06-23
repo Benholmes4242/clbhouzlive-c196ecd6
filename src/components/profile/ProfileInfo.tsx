@@ -34,7 +34,6 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
   const username = profile?.username ? `@${profile.username}` : '';
   const bio = profile?.bio || '';
   const homeClub = profile?.home_club || '';
-  const handicapIndex = profile?.eg_handicap_index;
 
   return (
     <div className="space-y-4">
@@ -52,11 +51,6 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
             <div className="flex items-center gap-1">
               <MapPin className="w-4 h-4" />
               <span>{homeClub}</span>
-            </div>
-          )}
-          {handicapIndex !== null && handicapIndex !== undefined && (
-            <div className="text-sm text-foreground font-medium">
-              Handicap: {handicapIndex}
             </div>
           )}
         </div>
