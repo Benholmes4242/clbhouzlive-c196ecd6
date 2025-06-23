@@ -63,7 +63,7 @@ const EGAppIntegration: React.FC<EGAppIntegrationProps> = ({
   return (
     <div className="mt-8 px-2">
       <div className="flex items-center justify-between mb-2">
-        <h2 className="text-lg font-semibold">EG (England Golf) App</h2>
+        <h2 className="text-lg font-semibold">Golf Handicap</h2>
         {isOwnProfile && onVisibilityToggle && (
           <div className="flex items-center space-x-2">
             <Checkbox
@@ -85,10 +85,6 @@ const EGAppIntegration: React.FC<EGAppIntegrationProps> = ({
         <div className="space-y-4">
           {!egAppConnected && !isEditing && (
             <div className="space-y-3">
-              <div className="bg-muted rounded-lg px-4 py-3 text-sm text-muted-foreground">
-                <span>Connect your England Golf app to display your Handicap Index and recent rounds, or manually enter your handicap.</span>
-              </div>
-              
               <div className="flex flex-col sm:flex-row gap-2">
                 <Button 
                   variant="outline" 
@@ -152,29 +148,13 @@ const EGAppIntegration: React.FC<EGAppIntegrationProps> = ({
                   <div>
                     <div className="text-sm font-medium">Handicap Index</div>
                     <div className="text-lg font-bold">{handicapIndex}</div>
-                    {egAppConnected ? (
+                    {egAppConnected && (
                       <div className="text-xs text-green-600 flex items-center gap-1 mt-1">
                         <Link2 className="w-3 h-3" />
                         Connected to EG App
                       </div>
-                    ) : (
-                      <div className="text-xs text-muted-foreground mt-1">
-                        Manually entered
-                      </div>
                     )}
                   </div>
-                  {!egAppConnected && (
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      onClick={() => {
-                        setManualHandicap(handicapIndex?.toString() || '');
-                        setIsEditing(true);
-                      }}
-                    >
-                      <Edit3 className="w-4 h-4" />
-                    </Button>
-                  )}
                 </div>
               </div>
               
