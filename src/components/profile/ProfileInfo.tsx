@@ -10,7 +10,7 @@ interface ProfileInfoProps {
   profile: any;
   userEmail?: string;
   userId?: string;
-  onProfileUpdate: () => void;
+  onProfileUpdate?: () => void;
 }
 
 const ProfileInfo: React.FC<ProfileInfoProps> = ({
@@ -37,6 +37,9 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
   const bio = profile?.bio || '';
   const homeClub = profile?.home_club || '';
 
+  // Create a no-op function if onProfileUpdate wasn't provided
+  const handleProfileUpdate = onProfileUpdate || (() => {});
+
   return (
     <div className="space-y-4">
       <ProfileHeader
@@ -54,7 +57,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
           homeClub={homeClub}
           isOwnProfile={isOwnProfile}
           userId={userId}
-          onProfileUpdate={onProfileUpdate}
+          onProfileUpdate={handleProfileUpdate}
         />
       )}
 

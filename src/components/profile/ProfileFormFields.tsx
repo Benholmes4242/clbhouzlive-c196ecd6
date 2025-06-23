@@ -40,10 +40,8 @@ const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
   onProfileUpdate,
 }) => {
   const handleHandicapUpdate = (newHandicap: number | null) => {
-    // Update the local form state
+    // Only update the local form state - no need to trigger full profile refetch
     onHandicapChange(newHandicap?.toString() || "");
-    // Trigger parent update without full page refresh
-    onProfileUpdate();
   };
 
   return (
