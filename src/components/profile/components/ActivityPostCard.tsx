@@ -1,8 +1,7 @@
 
 import React from 'react';
 import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { MoreHorizontal, Heart, MessageCircle, Share } from 'lucide-react';
+import { Maximize2 } from 'lucide-react';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import TaggedText from '@/components/posts/TaggedText';
 import VideoPreview from '@/components/posts/VideoPreview';
@@ -22,9 +21,9 @@ const ActivityPostCard: React.FC<ActivityPostCardProps> = ({ post, attributionTe
       onClick={() => onClick(post)}
     >
       <div className="h-full flex flex-col">
-        {/* Media Section - Takes up most of the space */}
+        {/* Media Section - Takes up full space */}
         {post.post_media && post.post_media.length > 0 ? (
-          <div className="flex-1 relative">
+          <div className="flex-1 relative group">
             {post.post_media.length > 1 ? (
               <div className="relative h-full">
                 <Carousel className="w-full h-full">
@@ -39,12 +38,20 @@ const ActivityPostCard: React.FC<ActivityPostCardProps> = ({ post, attributionTe
                               className="w-full h-full object-cover"
                             />
                           ) : (
-                            <VideoPreview
-                              src={media.media_url}
-                              className="w-full h-full"
-                              onFullscreen={() => onClick(post)}
-                              videoId={`activity-post-${post.id}-${index}`}
-                            />
+                            <div className="relative h-full">
+                              <VideoPreview
+                                src={media.media_url}
+                                className="w-full h-full"
+                                onFullscreen={() => onClick(post)}
+                                videoId={`activity-post-${post.id}-${index}`}
+                              />
+                              {/* Enlarge icon on hover for videos */}
+                              <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <div className="bg-black/70 text-white p-2 rounded-full hover:bg-black/80 transition-colors shadow-lg">
+                                  <Maximize2 className="h-4 w-4" />
+                                </div>
+                              </div>
+                            </div>
                           )}
                         </div>
                       </CarouselItem>
@@ -68,7 +75,7 @@ const ActivityPostCard: React.FC<ActivityPostCardProps> = ({ post, attributionTe
                 </div>
               </div>
             ) : (
-              <div className="h-full">
+              <div className="h-full relative">
                 {post.post_media[0].media_type === 'image' ? (
                   <img
                     src={post.post_media[0].media_url}
@@ -76,43 +83,32 @@ const ActivityPostCard: React.FC<ActivityPostCardProps> = ({ post, attributionTe
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <VideoPreview
-                    src={post.post_media[0].media_url}
-                    className="w-full h-full"
-                    onFullscreen={() => onClick(post)}
-                    videoId={`activity-post-${post.id}-0`}
-                  />
+                  <div className="relative h-full">
+                    <VideoPreview
+                      src={post.post_media[0].media_url}
+                      className="w-full h-full"
+                      onFullscreen={() => onClick(post)}
+                      videoId={`activity-post-${post.id}-0`}
+                    />
+                    {/* Enlarge icon on hover for videos */}
+                    <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <div className="bg-black/70 text-white p-2 rounded-full hover:bg-black/80 transition-colors shadow-lg">
+                        <Maximize2 className="h-4 w-4" />
+                      </div>
+                    </div>
+                  </div>
                 )}
               </div>
             )}
           </div>
         ) : (
-          // Text-only post
-          <div className="flex-1 p-4 flex flex-col justify-center">
+          // Text-only post - takes up full space
+          <div className="flex-1 p-4 flex flex-col justify-center bg-gradient-to-br from-gray-100 to-gray-200">
             <div className="text-sm text-center">
               <TaggedText text={post.content} tags={post.post_tags} />
             </div>
           </div>
         )}
-
-        {/* Bottom section with minimal info */}
-        <div className="p-2 bg-white/95 backdrop-blur-sm">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <Button variant="ghost" size="sm" className="gap-1 text-muted-foreground hover:text-red-500 p-1" onClick={(e) => e.stopPropagation()}>
-                <Heart className="h-3 w-3" />
-                <span className="text-xs">{post.likes}</span>
-              </Button>
-              <Button variant="ghost" size="sm" className="gap-1 text-muted-foreground p-1" onClick={(e) => e.stopPropagation()}>
-                <MessageCircle className="h-3 w-3" />
-                <span className="text-xs">{post.comments}</span>
-              </Button>
-            </div>
-            <Button variant="ghost" size="icon" className="h-6 w-6" onClick={(e) => e.stopPropagation()}>
-              <MoreHorizontal className="h-3 w-3" />
-            </Button>
-          </div>
-        </div>
       </div>
     </Card>
   );
