@@ -69,15 +69,14 @@ export function useNotifications() {
       console.error('Error fetching notifications:', error);
     } else {
       console.log('Fetched notifications:', data);
-      // Cast the data to match our Notification interface
       const typedNotifications = data as Notification[];
       setNotifications(typedNotifications);
       
-      // Calculate unread count - only count friend requests and messages as persistent notifications
-      const persistentUnreadCount = typedNotifications.filter(n => 
+      // Calculate unread count for persistent notifications only
+      const persistentUnread = typedNotifications.filter(n => 
         !n.read && (n.type === 'friend_request' || n.type === 'message')
       ).length;
-      setUnreadCount(persistentUnreadCount);
+      setUnreadCount(persistentUnread);
     }
     setLoading(false);
   };
@@ -92,21 +91,15 @@ export function useNotifications() {
       .eq('user_id', user.id);
 
     if (!error) {
-      // Update notifications state
-      setNotifications(prev => prev.map(n => 
-        n.id === notificationId ? { ...n, read: true } : n
-      ));
-      
-      // Update unread count - find the notification and check if it was persistent
-      setNotifications(prev => {
-        const notification = prev.find(n => n.id === notificationId);
-        if (notification && !notification.read && (notification.type === 'friend_request' || notification.type === 'message')) {
-          setUnreadCount(current => Math.max(0, current - 1));
-        }
-        return prev.map(n => 
+      // Update local state
+      setNotifications(currentNotifications => {
+        return currentNotifications.map(n => 
           n.id === notificationId ? { ...n, read: true } : n
         );
       });
+      
+      // Update unread count separately to avoid circular dependencies
+      setUnreadCount(currentCount => Math.max(0, currentCount - 1));
     }
   };
 
@@ -120,7 +113,9 @@ export function useNotifications() {
       .eq('read', false);
 
     if (!error) {
-      setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+      setNotifications(currentNotifications => 
+        currentNotifications.map(n => ({ ...n, read: true }))
+      );
       setUnreadCount(0);
     }
   };
@@ -128,7 +123,6 @@ export function useNotifications() {
   const markNonPersistentAsRead = async () => {
     if (!user) return;
 
-    // Mark all non-friend-request and non-message notifications as read
     const { error } = await supabase
       .from('notifications')
       .update({ read: true })
@@ -137,21 +131,20 @@ export function useNotifications() {
       .not('type', 'in', '("friend_request","message")');
 
     if (!error) {
-      // Update notifications state and recalculate unread count
-      setNotifications(prev => {
-        const updatedNotifications = prev.map(n => 
+      setNotifications(currentNotifications => {
+        const updated = currentNotifications.map(n => 
           n.type !== 'friend_request' && n.type !== 'message' 
             ? { ...n, read: true } 
             : n
         );
         
-        // Recalculate unread count for persistent notifications only
-        const persistentUnreadCount = updatedNotifications.filter(n => 
+        // Recalculate unread count based on updated notifications
+        const persistentUnread = updated.filter(n => 
           !n.read && (n.type === 'friend_request' || n.type === 'message')
         ).length;
-        setUnreadCount(persistentUnreadCount);
+        setUnreadCount(persistentUnread);
         
-        return updatedNotifications;
+        return updated;
       });
     }
   };
@@ -168,18 +161,17 @@ export function useNotifications() {
 
       if (error) throw error;
 
-      // Update state by removing the notification and updating unread count
-      setNotifications(prev => {
-        const removedNotification = prev.find(n => n.id === notificationId);
-        const updatedNotifications = prev.filter(n => n.id !== notificationId);
+      // Update state by removing the notification
+      setNotifications(currentNotifications => {
+        const filtered = currentNotifications.filter(n => n.id !== notificationId);
         
-        // Update unread count if the removed notification was unread and persistent
-        if (removedNotification && !removedNotification.read && 
-            (removedNotification.type === 'friend_request' || removedNotification.type === 'message')) {
-          setUnreadCount(current => Math.max(0, current - 1));
-        }
+        // Calculate new unread count from the filtered notifications
+        const persistentUnread = filtered.filter(n => 
+          !n.read && (n.type === 'friend_request' || n.type === 'message')
+        ).length;
+        setUnreadCount(persistentUnread);
         
-        return updatedNotifications;
+        return filtered;
       });
     } catch (error) {
       console.error('Error removing notification:', error);
@@ -187,7 +179,6 @@ export function useNotifications() {
     }
   };
 
-  // Remove friend request notifications when they are accepted/declined
   const removeFriendRequestNotifications = async (friendRequestId: string) => {
     if (!user) return;
 
@@ -200,19 +191,18 @@ export function useNotifications() {
         .eq('data->friend_request_id', friendRequestId);
 
       if (!error) {
-        // Update local state by filtering out friend request notifications and recalculating unread count
-        setNotifications(prev => {
-          const updatedNotifications = prev.filter(n => 
+        setNotifications(currentNotifications => {
+          const filtered = currentNotifications.filter(n => 
             !(n.type === 'friend_request' && n.data?.friend_request_id === friendRequestId)
           );
           
-          // Recalculate unread count for persistent notifications
-          const persistentUnreadCount = updatedNotifications.filter(n => 
+          // Recalculate unread count from filtered notifications
+          const persistentUnread = filtered.filter(n => 
             !n.read && (n.type === 'friend_request' || n.type === 'message')
           ).length;
-          setUnreadCount(persistentUnreadCount);
+          setUnreadCount(persistentUnread);
           
-          return updatedNotifications;
+          return filtered;
         });
       }
     } catch (error) {
