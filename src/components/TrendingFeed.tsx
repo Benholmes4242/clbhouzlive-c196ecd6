@@ -129,15 +129,26 @@ const TrendingFeed = () => {
     !video.content.description.includes('Working on my swing at the driving range')
   );
 
-  // Convert all posts to the correct type
+  // Filter out current user's posts from the followed users posts to avoid duplicates
+  const filteredFollowedPosts = followedUsersPosts.filter(post => post.user.id !== user?.id);
+
+  // Convert posts to the correct type and deduplicate by ID
   const allUserPosts: UserPostWithType[] = [
     ...userPosts.map(post => ({ ...post, type: 'user_post' as const })),
-    ...followedUsersPosts.map(post => ({ ...post, type: 'user_post' as const }))
+    ...filteredFollowedPosts.map(post => ({ ...post, type: 'user_post' as const }))
   ];
+
+  // Deduplicate posts by ID to prevent showing the same post twice
+  const uniqueUserPosts = allUserPosts.reduce((acc, post) => {
+    if (!acc.find(existingPost => existingPost.id === post.id)) {
+      acc.push(post);
+    }
+    return acc;
+  }, [] as UserPostWithType[]);
 
   // Combine all content
   const allContent: (VideoPost | UserPostWithType)[] = [
-    ...allUserPosts,
+    ...uniqueUserPosts,
     ...realFriendVideos
   ];
 
