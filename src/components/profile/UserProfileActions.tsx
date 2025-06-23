@@ -36,6 +36,9 @@ const UserProfileActions: React.FC<UserProfileActionsProps> = ({
   // Allow messaging between friends or if either is a business/club
   const canMessage = friendStatus === 'accepted' || targetUserType !== 'individual' || currentUserType !== 'individual';
 
+  console.log('UserProfileActions - targetUserType:', targetUserType, 'currentUserType:', currentUserType);
+  console.log('UserProfileActions - canSendFriendRequest:', canSendFriendRequest);
+
   return (
     <div className="space-y-4">
       {/* Primary action buttons */}

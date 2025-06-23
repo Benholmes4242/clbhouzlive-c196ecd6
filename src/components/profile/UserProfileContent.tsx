@@ -23,6 +23,9 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({
   const { user } = useSupabaseSession();
   const isOwnProfile = user?.id === profile.id;
 
+  console.log('UserProfileContent - profile user_type:', profile?.user_type);
+  console.log('UserProfileContent - current user type:', currentUser?.user_type);
+
   return (
     <div className="max-w-2xl mx-auto px-4">
       <ProfilePhotoManager
