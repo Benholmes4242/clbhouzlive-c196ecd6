@@ -27,6 +27,15 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
     setSelectedPost(null);
   };
 
+  const handlePostUpdated = () => {
+    fetchUserPosts();
+  };
+
+  const handlePostDeleted = () => {
+    fetchUserPosts();
+    handleCloseModal();
+  };
+
   // If this is not the user's own profile and activity is not visible, don't render anything
   if (!isOwnProfile && !activityVisible) {
     return null;
@@ -75,6 +84,8 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
         onClose={handleCloseModal}
         post={selectedPost}
         isOwnPost={isOwnProfile}
+        onPostUpdated={handlePostUpdated}
+        onPostDeleted={handlePostDeleted}
       />
     </>
   );
