@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Bell, MessageCircle } from 'lucide-react';
+import { MessageCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from "react-router-dom";
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
@@ -13,18 +13,6 @@ const HeaderNavigation = () => {
 
   // Calculate total unread messages
   const unreadMessagesCount = conversations.reduce((total, conv) => total + conv.unread_count, 0);
-
-  const handleNotificationsClick = () => {
-    navigate('/notifications');
-    // Scroll to top after navigation
-    setTimeout(() => {
-      window.scrollTo({
-        top: 0,
-        left: 0,
-        behavior: 'smooth'
-      });
-    }, 50);
-  };
 
   const handleMessagesClick = () => {
     navigate('/messages');
@@ -40,9 +28,6 @@ const HeaderNavigation = () => {
 
   return (
     <>
-      <Button variant="ghost" size="icon" className="relative" onClick={handleNotificationsClick}>
-        <Bell className="h-5 w-5" />
-      </Button>
       <Button variant="ghost" size="icon" className="relative" onClick={handleMessagesClick}>
         <MessageCircle className="h-5 w-5" />
         {user && unreadMessagesCount > 0 && (
