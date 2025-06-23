@@ -65,7 +65,11 @@ const FeaturedMomentsCarousel = ({ userPosts = [], loading = false }: FeaturedMo
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="bg-muted rounded-lg h-48 animate-pulse" />
+            <div key={i} className="space-y-2">
+              <div className="bg-muted rounded-lg h-40 animate-pulse" />
+              <div className="bg-muted rounded h-4 animate-pulse" />
+              <div className="bg-muted rounded h-3 w-3/4 animate-pulse" />
+            </div>
           ))}
         </div>
       </div>
@@ -84,33 +88,45 @@ const FeaturedMomentsCarousel = ({ userPosts = [], loading = false }: FeaturedMo
         <CarouselContent className="-ml-2 md:-ml-4">
           {allMoments.map((moment) => (
             <CarouselItem key={moment.id} className="pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3">
-              <div className="bg-card rounded-lg overflow-hidden shadow-sm border hover:shadow-md transition-shadow cursor-pointer group">
-                <div className="relative">
+              <div className="cursor-pointer group space-y-3">
+                {/* Thumbnail Container */}
+                <div className="relative rounded-lg overflow-hidden bg-black">
                   {moment.type === 'video' ? (
                     <VideoPreview
                       src={moment.image}
                       videoId={`featured-${moment.id}`}
-                      className="w-full h-48"
+                      className="w-full h-40"
                     />
                   ) : (
-                    <img src={moment.image} alt={moment.title} className="w-full h-48 object-cover" />
+                    <img 
+                      src={moment.image} 
+                      alt={moment.title} 
+                      className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-200" 
+                    />
                   )}
                   
+                  {/* Duration badge for videos */}
                   {moment.type === 'video' && (
-                    <div className="absolute top-4 right-4 bg-black/60 text-white text-xs px-2 py-1 rounded">
+                    <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-1.5 py-0.5 rounded text-center font-medium">
                       {moment.duration}
                     </div>
                   )}
                 </div>
                 
-                <div className="p-4">
+                {/* Content below thumbnail */}
+                <div className="space-y-1">
                   {moment.title && (
-                    <p className="text-sm mb-2 line-clamp-2">{moment.title}</p>
+                    <h3 className="text-sm font-medium line-clamp-2 leading-snug">
+                      {moment.title}
+                    </h3>
                   )}
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
                     <span>@{moment.user}</span>
-                    <Clock className="h-3 w-3" />
-                    <span>{moment.timeAgo}</span>
+                    <span>•</span>
+                    <div className="flex items-center gap-1">
+                      <Clock className="h-3 w-3" />
+                      <span>{moment.timeAgo}</span>
+                    </div>
                   </div>
                 </div>
               </div>
