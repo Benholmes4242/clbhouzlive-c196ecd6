@@ -3,21 +3,15 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Notification, NotificationHookReturn } from './types';
-import { getUnreadCount } from './utils';
-import { useNotificationActions } from './useNotificationActions';
 
 export function useNotifications(): NotificationHookReturn {
   const { user } = useSupabaseSession();
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
-
-  const actions = useNotificationActions(notifications, setNotifications, setUnreadCount);
 
   useEffect(() => {
     if (!user) {
       setNotifications([]);
-      setUnreadCount(0);
       setLoading(false);
       return;
     }
@@ -64,16 +58,112 @@ export function useNotifications(): NotificationHookReturn {
       console.log('Fetched notifications:', data);
       const typedNotifications = data as Notification[];
       setNotifications(typedNotifications);
-      setUnreadCount(getUnreadCount(typedNotifications));
     }
     setLoading(false);
   };
 
+  const markAsRead = async (notificationId: string) => {
+    if (!user) return;
+
+    const { error } = await supabase
+      .from('notifications')
+      .update({ read: true })
+      .eq('id', notificationId)
+      .eq('user_id', user.id);
+
+    if (!error) {
+      setNotifications(prev => 
+        prev.map(n => n.id === notificationId ? { ...n, read: true } : n)
+      );
+    }
+  };
+
+  const markAllAsRead = async () => {
+    if (!user) return;
+
+    const { error } = await supabase
+      .from('notifications')
+      .update({ read: true })
+      .eq('user_id', user.id)
+      .eq('read', false);
+
+    if (!error) {
+      setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    }
+  };
+
+  const markNonPersistentAsRead = async () => {
+    if (!user) return;
+
+    const { error } = await supabase
+      .from('notifications')
+      .update({ read: true })
+      .eq('user_id', user.id)
+      .eq('read', false)
+      .not('type', 'in', '("friend_request","message")');
+
+    if (!error) {
+      setNotifications(prev => 
+        prev.map(n => 
+          n.type !== 'friend_request' && n.type !== 'message' 
+            ? { ...n, read: true } 
+            : n
+        )
+      );
+    }
+  };
+
+  const removeNotification = async (notificationId: string) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('notifications')
+        .delete()
+        .eq('id', notificationId)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      setNotifications(prev => prev.filter(n => n.id !== notificationId));
+    } catch (error) {
+      console.error('Error removing notification:', error);
+      throw error;
+    }
+  };
+
+  const removeFriendRequestNotifications = async (friendRequestId: string) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('notifications')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('type', 'friend_request')
+        .eq('data->friend_request_id', friendRequestId);
+
+      if (!error) {
+        setNotifications(prev => 
+          prev.filter(n => 
+            !(n.type === 'friend_request' && n.data?.friend_request_id === friendRequestId)
+          )
+        );
+      }
+    } catch (error) {
+      console.error('Error removing friend request notifications:', error);
+    }
+  };
+
   return {
     notifications,
-    unreadCount,
+    unreadCount: 0, // Always return 0 to disable red badges
     loading,
-    ...actions,
+    markAsRead,
+    markAllAsRead,
+    markNonPersistentAsRead,
+    removeNotification,
+    removeFriendRequestNotifications,
     refetch: fetchNotifications
   };
 }
