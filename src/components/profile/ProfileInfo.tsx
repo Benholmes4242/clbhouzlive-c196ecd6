@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -78,7 +79,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
     <div className="space-y-4">
       <div className="text-center space-y-2">
         {/* Add more spacing for business profiles */}
-        <div className={isIndividual ? "mt-0" : "mt-6"}>
+        <div className={isIndividual ? "mt-0" : "mt-8"}>
           <h1 className="text-2xl font-bold">{displayName}</h1>
         </div>
         
@@ -188,9 +189,9 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
                 </div>
               )}
               
-              {/* About Us section for business profiles - with added spacing */}
+              {/* About Us section for business profiles - with increased spacing */}
               {bio && (
-                <div className="mt-6 text-center">
+                <div className="mt-8 text-center">
                   <h4 className="text-base font-semibold mb-2 text-foreground">About Us</h4>
                   <p className="text-sm max-w-md mx-auto">{bio}</p>
                 </div>
