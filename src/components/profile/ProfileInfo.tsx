@@ -79,8 +79,13 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
   return (
     <div className="space-y-4">
       <div className="text-center space-y-2">
-        <h1 className="text-2xl font-bold">{displayName}</h1>
-        {username && (
+        {/* Add more spacing for business profiles */}
+        <div className={isIndividual ? "mt-0" : "mt-6"}>
+          <h1 className="text-2xl font-bold">{displayName}</h1>
+        </div>
+        
+        {/* Only show username for individual users */}
+        {isIndividual && username && (
           <p className="text-muted-foreground text-lg">{username}</p>
         )}
         
@@ -150,7 +155,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
 
         {/* Business Information Section - Only show for non-individual users */}
         {!isIndividual && (
-          <div className="mt-4 border-t pt-4">
+          <div className="mt-4">
             <h3 className="text-lg font-semibold mb-3">Business Information</h3>
             <div className="space-y-2 text-sm text-muted-foreground">
               {profile?.business_name && (
