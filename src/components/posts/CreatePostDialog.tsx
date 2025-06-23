@@ -81,10 +81,10 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
   if (!user) return null;
 
   return (
-    <Dialog open={open} onOpenChange={(newOpen) => {
-      if (!newOpen && !isSubmitting) {
+    <Dialog open={open} onOpenChange={(isOpen) => {
+      if (!isOpen && !isSubmitting) {
         resetForm();
-      } else if (newOpen) {
+      } else if (isOpen) {
         setOpen(true);
       }
     }}>
