@@ -53,7 +53,8 @@ export function useNotifications(): NotificationHookReturn {
     if (error) {
       console.error('Error fetching notifications:', error);
     } else {
-      setNotifications(data || []);
+      // Type assertion to handle the Supabase data type
+      setNotifications((data || []) as Notification[]);
     }
     setLoading(false);
   }
