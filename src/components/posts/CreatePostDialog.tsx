@@ -101,7 +101,7 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
         {showGallery ? (
           <div className="h-full flex flex-col">
             <DialogNavigation
-              showGallery={Boolean(showGallery)}
+              showGallery={true}
               isSubmitting={isSubmitting}
               canProceedFromGallery={canProceedFromGallery}
               canSubmit={canSubmit}
@@ -120,7 +120,7 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
         ) : (
           <div className="h-full flex flex-col">
             <DialogNavigation
-              showGallery={Boolean(showGallery)}
+              showGallery={false}
               isSubmitting={isSubmitting}
               canProceedFromGallery={canProceedFromGallery}
               canSubmit={canSubmit}
