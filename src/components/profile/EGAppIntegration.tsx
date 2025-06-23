@@ -63,7 +63,7 @@ const EGAppIntegration: React.FC<EGAppIntegrationProps> = ({
   return (
     <div className="mt-8 px-2">
       <div className="flex items-center justify-between mb-2">
-        <h2 className="text-lg font-semibold">Golf Handicap</h2>
+        <h2 className="text-lg font-semibold">Handicap Index</h2>
         {isOwnProfile && onVisibilityToggle && (
           <div className="flex items-center space-x-2">
             <Checkbox
@@ -146,7 +146,6 @@ const EGAppIntegration: React.FC<EGAppIntegrationProps> = ({
               <div className="bg-muted rounded-lg px-4 py-3">
                 <div className="flex items-center justify-between">
                   <div>
-                    <div className="text-sm font-medium">Handicap Index</div>
                     <div className="text-lg font-bold">{handicapIndex}</div>
                     {egAppConnected && (
                       <div className="text-xs text-green-600 flex items-center gap-1 mt-1">
@@ -174,7 +173,6 @@ const EGAppIntegration: React.FC<EGAppIntegrationProps> = ({
         <div>
           {handicapIndex !== null ? (
             <div className="bg-muted rounded-lg px-4 py-3">
-              <div className="text-sm font-medium">Handicap Index</div>
               <div className="text-lg font-bold">{handicapIndex}</div>
               {egAppConnected && (
                 <div className="text-xs text-green-600 flex items-center gap-1 mt-1">
