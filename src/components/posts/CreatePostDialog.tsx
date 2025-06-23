@@ -75,8 +75,8 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
     setShowGallery(true);
   };
 
-  const canProceedFromGallery = mediaFiles.length > 0;
-  const canSubmit = !isSubmitting && (content.trim() || mediaFiles.length > 0);
+  const canProceedFromGallery = Boolean(mediaFiles.length > 0);
+  const canSubmit = Boolean(!isSubmitting && (content.trim() || mediaFiles.length > 0));
 
   if (!user) return null;
 
@@ -102,7 +102,7 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
           <div className="h-full flex flex-col">
             <DialogNavigation
               showGallery={true}
-              isSubmitting={isSubmitting}
+              isSubmitting={Boolean(isSubmitting)}
               canProceedFromGallery={canProceedFromGallery}
               canSubmit={canSubmit}
               onClose={() => !isSubmitting && setOpen(false)}
@@ -121,7 +121,7 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
           <div className="h-full flex flex-col">
             <DialogNavigation
               showGallery={false}
-              isSubmitting={isSubmitting}
+              isSubmitting={Boolean(isSubmitting)}
               canProceedFromGallery={canProceedFromGallery}
               canSubmit={canSubmit}
               onClose={() => !isSubmitting && setOpen(false)}
