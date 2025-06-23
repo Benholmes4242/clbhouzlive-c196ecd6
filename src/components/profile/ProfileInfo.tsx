@@ -1,4 +1,5 @@
 
+
 import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -81,6 +82,11 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
         <h1 className="text-2xl font-bold">{displayName}</h1>
         {username && (
           <p className="text-muted-foreground text-lg">{username}</p>
+        )}
+        
+        {/* Show follower stats under name for non-individual users */}
+        {!isIndividual && profile?.id && (
+          <FollowerStats userId={profile.id} userType={userType} />
         )}
         
         {/* Bio - Only show for individual users here */}
@@ -179,10 +185,11 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
                 </div>
               )}
               
-              {/* Bio/Description for business profiles - moved here */}
+              {/* About Us section for business profiles */}
               {bio && (
-                <div className="mt-3 pt-2 border-t border-muted">
-                  <p className="text-sm max-w-md mx-auto text-left">{bio}</p>
+                <div className="mt-4">
+                  <h4 className="text-base font-semibold mb-2 text-foreground">About Us</h4>
+                  <p className="text-sm max-w-md mx-auto text-center">{bio}</p>
                 </div>
               )}
             </div>
@@ -190,8 +197,8 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
         )}
       </div>
 
-      {/* Show follower stats for all profiles */}
-      {profile?.id && (
+      {/* Show follower stats for individual profiles only */}
+      {isIndividual && profile?.id && (
         <FollowerStats userId={profile.id} userType={userType} />
       )}
     </div>
@@ -199,3 +206,4 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
 };
 
 export default ProfileInfo;
+
