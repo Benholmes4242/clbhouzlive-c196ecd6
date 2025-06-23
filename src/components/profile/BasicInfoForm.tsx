@@ -10,6 +10,7 @@ interface BasicInfoFormProps {
     username: string;
     bio: string;
     location: string;
+    homeClub: string;
   };
   onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
 }
@@ -40,6 +41,19 @@ const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ formData, onChange }) => 
           required
         />
       </div>
+    </div>
+    <div>
+      <Label htmlFor="homeClub">Home Golf Club</Label>
+      <Input
+        id="homeClub"
+        name="homeClub"
+        value={formData.homeClub}
+        onChange={onChange}
+        placeholder="Enter your home golf club or 'Not applicable'"
+      />
+      <p className="text-sm text-muted-foreground mt-1">
+        Enter your home golf club name, or type "Not applicable" if you don't have one
+      </p>
     </div>
     <div>
       <Label htmlFor="bio">Bio</Label>

@@ -21,6 +21,7 @@ const CreateProfile = () => {
     username: '',
     bio: '',
     location: '',
+    homeClub: '',
     handicap: '',
     favoriteClub: '',
     yearsPlaying: '',
@@ -117,7 +118,10 @@ const CreateProfile = () => {
     if (userType === 'individual') {
       profileData.display_name = formData.name;
       profileData.username = formData.username;
-      profileData.home_club = formData.favoriteClub;
+      // Only set home_club if it's not "Not applicable" or empty
+      if (formData.homeClub && formData.homeClub.toLowerCase() !== 'not applicable') {
+        profileData.home_club = formData.homeClub;
+      }
     } else {
       profileData.business_name = formData.businessName;
       profileData.business_type = formData.businessType;
