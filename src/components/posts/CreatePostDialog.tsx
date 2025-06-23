@@ -85,7 +85,7 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
       if (!newOpen && !isSubmitting) {
         resetForm();
       } else if (newOpen) {
-        setOpen(newOpen);
+        setOpen(true);
       }
     }}>
       <DialogTrigger asChild>
