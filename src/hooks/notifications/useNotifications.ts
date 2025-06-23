@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { Notification, NotificationHookReturn } from './types';
+import type { Notification, NotificationHookReturn } from './types';
 
 export function useNotifications(): NotificationHookReturn {
   const { user } = useSupabaseSession();
@@ -29,8 +29,7 @@ export function useNotifications(): NotificationHookReturn {
           table: 'notifications',
           filter: `user_id=eq.${user.id}`
         },
-        (payload) => {
-          console.log('Notification change detected:', payload);
+        () => {
           fetchNotifications();
         }
       )
@@ -41,10 +40,9 @@ export function useNotifications(): NotificationHookReturn {
     };
   }, [user]);
 
-  const fetchNotifications = async () => {
+  async function fetchNotifications(): Promise<void> {
     if (!user) return;
     
-    console.log('Fetching notifications for user:', user.id);
     setLoading(true);
     const { data, error } = await supabase
       .from('notifications')
@@ -55,14 +53,12 @@ export function useNotifications(): NotificationHookReturn {
     if (error) {
       console.error('Error fetching notifications:', error);
     } else {
-      console.log('Fetched notifications:', data);
-      const typedNotifications = data as Notification[];
-      setNotifications(typedNotifications);
+      setNotifications(data || []);
     }
     setLoading(false);
-  };
+  }
 
-  const markAsRead = async (notificationId: string) => {
+  async function markAsRead(notificationId: string): Promise<void> {
     if (!user) return;
 
     const { error } = await supabase
@@ -76,9 +72,9 @@ export function useNotifications(): NotificationHookReturn {
         prev.map(n => n.id === notificationId ? { ...n, read: true } : n)
       );
     }
-  };
+  }
 
-  const markAllAsRead = async () => {
+  async function markAllAsRead(): Promise<void> {
     if (!user) return;
 
     const { error } = await supabase
@@ -90,9 +86,9 @@ export function useNotifications(): NotificationHookReturn {
     if (!error) {
       setNotifications(prev => prev.map(n => ({ ...n, read: true })));
     }
-  };
+  }
 
-  const markNonPersistentAsRead = async () => {
+  async function markNonPersistentAsRead(): Promise<void> {
     if (!user) return;
 
     const { error } = await supabase
@@ -111,9 +107,9 @@ export function useNotifications(): NotificationHookReturn {
         )
       );
     }
-  };
+  }
 
-  const removeNotification = async (notificationId: string) => {
+  async function removeNotification(notificationId: string): Promise<void> {
     if (!user) return;
 
     try {
@@ -130,9 +126,9 @@ export function useNotifications(): NotificationHookReturn {
       console.error('Error removing notification:', error);
       throw error;
     }
-  };
+  }
 
-  const removeFriendRequestNotifications = async (friendRequestId: string) => {
+  async function removeFriendRequestNotifications(friendRequestId: string): Promise<void> {
     if (!user) return;
 
     try {
@@ -153,7 +149,7 @@ export function useNotifications(): NotificationHookReturn {
     } catch (error) {
       console.error('Error removing friend request notifications:', error);
     }
-  };
+  }
 
   return {
     notifications,

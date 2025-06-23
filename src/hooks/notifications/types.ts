@@ -5,7 +5,7 @@ export interface Notification {
   type: 'friend_request' | 'friend_accepted' | 'message' | 'follow' | 'other';
   title: string;
   message: string | null;
-  data: any;
+  data: Record<string, any> | null;
   read: boolean;
   created_at: string;
   updated_at: string;
