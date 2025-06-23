@@ -52,32 +52,30 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
   };
 
   return (
-    <>
-      <div className="mt-10 px-2">
-        <ActivityHeader 
-          postsCount={posts.length}
-          isOwnProfile={isOwnProfile}
-          onPostCreated={fetchUserPosts}
-        />
+    <div className="mt-10 px-2">
+      <ActivityHeader 
+        postsCount={posts.length}
+        isOwnProfile={isOwnProfile}
+        onPostCreated={fetchUserPosts}
+      />
 
-        {/* Grid layout for square posts */}
-        <div className="grid grid-cols-3 gap-1 mt-4">
-          {posts.map((post) => (
-            <ActivityPostCard
-              key={post.id}
-              post={post}
-              attributionText={getPostAttribution()}
-              onClick={handlePostClick}
-            />
-          ))}
-        </div>
-
-        {posts.length === 0 && !loading && (
-          <div className="text-center py-8">
-            <p className="text-muted-foreground">No posts yet.</p>
-          </div>
-        )}
+      {/* Grid layout for square posts */}
+      <div className="grid grid-cols-3 gap-1 mt-4">
+        {posts.map((post) => (
+          <ActivityPostCard
+            key={post.id}
+            post={post}
+            attributionText={getPostAttribution()}
+            onClick={handlePostClick}
+          />
+        ))}
       </div>
+
+      {posts.length === 0 && !loading && (
+        <div className="text-center py-8">
+          <p className="text-muted-foreground">No posts yet.</p>
+        </div>
+      )}
 
       <PostModal
         isOpen={isModalOpen}
@@ -87,7 +85,7 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
         onPostUpdated={handlePostUpdated}
         onPostDeleted={handlePostDeleted}
       />
-    </>
+    </div>
   );
 };
 
