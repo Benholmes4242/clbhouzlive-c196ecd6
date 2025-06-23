@@ -1,9 +1,8 @@
-
 import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Edit, MapPin, Check, X } from 'lucide-react';
+import { Edit, MapPin, Check, X, Building, Phone, Globe } from 'lucide-react';
 import FollowerStats from './FollowerStats';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { supabase } from '@/integrations/supabase/client';
@@ -35,6 +34,8 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
     );
   }
 
+  const userType = profile?.user_type || 'individual';
+  const isIndividual = userType === 'individual';
   const displayName = profile?.display_name || profile?.username || userEmail?.split('@')[0] || 'User';
   const username = profile?.username ? `@${profile.username}` : '';
   const bio = profile?.bio || '';
@@ -84,8 +85,9 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
           <p className="text-sm max-w-md mx-auto">{bio}</p>
         )}
         
-        <div className="flex flex-col items-center gap-1 text-sm text-muted-foreground">
-          {(homeClub || isOwnProfile) && (
+        {/* Home Club - Only show for individual users */}
+        {isIndividual && (homeClub || isOwnProfile) && (
+          <div className="flex flex-col items-center gap-1 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-1">
                 <MapPin className="w-4 h-4" />
@@ -134,13 +136,53 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
                 )}
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
+
+        {/* Business Information Section - Only show for non-individual users */}
+        {!isIndividual && (
+          <div className="mt-4 border-t pt-4">
+            <h3 className="text-lg font-semibold mb-3">Business Information</h3>
+            <div className="space-y-2 text-sm text-muted-foreground">
+              {profile?.business_name && (
+                <div className="flex items-center justify-center gap-2">
+                  <Building className="w-4 h-4" />
+                  <span>{profile.business_name}</span>
+                </div>
+              )}
+              {profile?.phone && (
+                <div className="flex items-center justify-center gap-2">
+                  <Phone className="w-4 h-4" />
+                  <span>{profile.phone}</span>
+                </div>
+              )}
+              {profile?.website_url && (
+                <div className="flex items-center justify-center gap-2">
+                  <Globe className="w-4 h-4" />
+                  <a 
+                    href={profile.website_url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:underline"
+                  >
+                    Website
+                  </a>
+                </div>
+              )}
+              {profile?.location && (
+                <div className="flex items-center justify-center gap-2">
+                  <MapPin className="w-4 h-4" />
+                  <span>{profile.location}</span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Show follower stats for all profiles */}
       {profile?.id && (
-        <FollowerStats userId={profile.id} />
+        <FollowerStats userId={profile.id} userType={userType} />
       )}
     </div>
   );

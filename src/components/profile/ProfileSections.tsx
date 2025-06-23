@@ -17,27 +17,35 @@ const ProfileSections: React.FC<ProfileSectionsProps> = ({
   onEGVisibilityToggle,
   isOwnProfile
 }) => {
+  const userType = profile?.user_type || 'individual';
+  const showPersonalSections = userType === 'individual';
+
   return (
     <div className="space-y-8">
-      {/* EG App Integration */}
-      <EGAppIntegration
-        egAppConnected={profile?.eg_app_connected}
-        handicapIndex={profile?.eg_handicap_index}
-        recentRounds={profile?.eg_recent_rounds}
-        userId={profile?.id || user?.id || ''}
-        isOwnProfile={isOwnProfile}
-        egVisible={profile?.eg_visible}
-        onVisibilityToggle={onEGVisibilityToggle}
-      />
+      {/* Only show EG App Integration and Top 100 Courses for individual users */}
+      {showPersonalSections && (
+        <>
+          {/* EG App Integration */}
+          <EGAppIntegration
+            egAppConnected={profile?.eg_app_connected}
+            handicapIndex={profile?.eg_handicap_index}
+            recentRounds={profile?.eg_recent_rounds}
+            userId={profile?.id || user?.id || ''}
+            isOwnProfile={isOwnProfile}
+            egVisible={profile?.eg_visible}
+            onVisibilityToggle={onEGVisibilityToggle}
+          />
 
-      {/* Top 100 Courses */}
-      <Top100Courses
-        userId={profile?.id || user?.id || ''}
-        isOwnProfile={isOwnProfile}
-        top100Visible={profile?.top100_visible}
-      />
+          {/* Top 100 Courses */}
+          <Top100Courses
+            userId={profile?.id || user?.id || ''}
+            isOwnProfile={isOwnProfile}
+            top100Visible={profile?.top100_visible}
+          />
+        </>
+      )}
 
-      {/* Social Activity - User's Posts */}
+      {/* Social Activity - User's Posts - Show for all user types */}
       <SocialActivity
         userId={profile?.id || user?.id || ''}
         isOwnProfile={isOwnProfile}

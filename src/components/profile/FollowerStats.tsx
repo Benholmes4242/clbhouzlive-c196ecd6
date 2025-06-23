@@ -6,10 +6,12 @@ import { useNavigate } from 'react-router-dom';
 
 interface FollowerStatsProps {
   userId: string;
+  userType?: string;
 }
 
-const FollowerStats: React.FC<FollowerStatsProps> = ({ userId }) => {
+const FollowerStats: React.FC<FollowerStatsProps> = ({ userId, userType = 'individual' }) => {
   const navigate = useNavigate();
+  const isIndividual = userType === 'individual';
 
   // Get follower count
   const { data: followerCount = 0 } = useQuery({
@@ -35,10 +37,12 @@ const FollowerStats: React.FC<FollowerStatsProps> = ({ userId }) => {
     },
   });
 
-  // Get friends count
+  // Get friends count - only for individual users
   const { data: friendsCount = 0 } = useQuery({
     queryKey: ['friendsCount', userId],
     queryFn: async () => {
+      if (!isIndividual) return 0;
+      
       const { count } = await supabase
         .from('user_friends')
         .select('*', { count: 'exact', head: true })
@@ -46,6 +50,7 @@ const FollowerStats: React.FC<FollowerStatsProps> = ({ userId }) => {
         .eq('status', 'accepted');
       return count || 0;
     },
+    enabled: isIndividual,
   });
 
   const handleFollowingClick = () => {
@@ -70,10 +75,12 @@ const FollowerStats: React.FC<FollowerStatsProps> = ({ userId }) => {
         <div className="text-xl font-bold">{followerCount}</div>
         <div className="text-sm text-muted-foreground">Followers</div>
       </div>
-      <div className="text-center cursor-pointer hover:bg-muted/50 px-2 py-1 rounded" onClick={handleFriendsClick}>
-        <div className="text-xl font-bold">{friendsCount}</div>
-        <div className="text-sm text-muted-foreground">Friends</div>
-      </div>
+      {isIndividual && (
+        <div className="text-center cursor-pointer hover:bg-muted/50 px-2 py-1 rounded" onClick={handleFriendsClick}>
+          <div className="text-xl font-bold">{friendsCount}</div>
+          <div className="text-sm text-muted-foreground">Friends</div>
+        </div>
+      )}
     </div>
   );
 };
