@@ -66,7 +66,7 @@ const FeaturedMomentsCarousel = ({ userPosts = [], loading = false }: FeaturedMo
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3].map((i) => (
             <div key={i} className="space-y-2">
-              <div className="bg-muted rounded-lg h-40 animate-pulse" />
+              <div className="bg-muted rounded-lg h-56 animate-pulse" />
               <div className="bg-muted rounded h-4 animate-pulse" />
               <div className="bg-muted rounded h-3 w-3/4 animate-pulse" />
             </div>
@@ -89,19 +89,19 @@ const FeaturedMomentsCarousel = ({ userPosts = [], loading = false }: FeaturedMo
           {allMoments.map((moment) => (
             <CarouselItem key={moment.id} className="pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3">
               <div className="cursor-pointer group space-y-3">
-                {/* Thumbnail Container */}
-                <div className="relative rounded-lg overflow-hidden bg-black">
+                {/* Thumbnail Container - TV screen aspect ratio */}
+                <div className="relative rounded-lg overflow-hidden bg-black aspect-video">
                   {moment.type === 'video' ? (
                     <VideoPreview
                       src={moment.image}
                       videoId={`featured-${moment.id}`}
-                      className="w-full h-40"
+                      className="w-full h-full"
                     />
                   ) : (
                     <img 
                       src={moment.image} 
                       alt={moment.title} 
-                      className="w-full h-40 object-cover group-hover:scale-105 transition-transform duration-200" 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" 
                     />
                   )}
                   
