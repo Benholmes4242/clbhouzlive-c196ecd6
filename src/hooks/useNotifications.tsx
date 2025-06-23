@@ -21,8 +21,8 @@ export function useNotifications() {
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  // Helper function to calculate unread count
-  const calculateUnreadCount = (notificationList: Notification[]) => {
+  // Simple helper to calculate unread count
+  const getUnreadCount = (notificationList: Notification[]) => {
     return notificationList.filter(n => 
       !n.read && (n.type === 'friend_request' || n.type === 'message')
     ).length;
@@ -78,7 +78,7 @@ export function useNotifications() {
       console.log('Fetched notifications:', data);
       const typedNotifications = data as Notification[];
       setNotifications(typedNotifications);
-      setUnreadCount(calculateUnreadCount(typedNotifications));
+      setUnreadCount(getUnreadCount(typedNotifications));
     }
     setLoading(false);
   };
@@ -93,11 +93,13 @@ export function useNotifications() {
       .eq('user_id', user.id);
 
     if (!error) {
-      const updatedNotifications = notifications.map(n => 
-        n.id === notificationId ? { ...n, read: true } : n
-      );
-      setNotifications(updatedNotifications);
-      setUnreadCount(calculateUnreadCount(updatedNotifications));
+      setNotifications(prev => {
+        const updated = prev.map(n => 
+          n.id === notificationId ? { ...n, read: true } : n
+        );
+        setUnreadCount(getUnreadCount(updated));
+        return updated;
+      });
     }
   };
 
@@ -111,9 +113,11 @@ export function useNotifications() {
       .eq('read', false);
 
     if (!error) {
-      const updatedNotifications = notifications.map(n => ({ ...n, read: true }));
-      setNotifications(updatedNotifications);
-      setUnreadCount(0);
+      setNotifications(prev => {
+        const updated = prev.map(n => ({ ...n, read: true }));
+        setUnreadCount(0);
+        return updated;
+      });
     }
   };
 
@@ -128,13 +132,15 @@ export function useNotifications() {
       .not('type', 'in', '("friend_request","message")');
 
     if (!error) {
-      const updatedNotifications = notifications.map(n => 
-        n.type !== 'friend_request' && n.type !== 'message' 
-          ? { ...n, read: true } 
-          : n
-      );
-      setNotifications(updatedNotifications);
-      setUnreadCount(calculateUnreadCount(updatedNotifications));
+      setNotifications(prev => {
+        const updated = prev.map(n => 
+          n.type !== 'friend_request' && n.type !== 'message' 
+            ? { ...n, read: true } 
+            : n
+        );
+        setUnreadCount(getUnreadCount(updated));
+        return updated;
+      });
     }
   };
 
@@ -150,9 +156,11 @@ export function useNotifications() {
 
       if (error) throw error;
 
-      const filteredNotifications = notifications.filter(n => n.id !== notificationId);
-      setNotifications(filteredNotifications);
-      setUnreadCount(calculateUnreadCount(filteredNotifications));
+      setNotifications(prev => {
+        const filtered = prev.filter(n => n.id !== notificationId);
+        setUnreadCount(getUnreadCount(filtered));
+        return filtered;
+      });
     } catch (error) {
       console.error('Error removing notification:', error);
       throw error;
@@ -171,11 +179,13 @@ export function useNotifications() {
         .eq('data->friend_request_id', friendRequestId);
 
       if (!error) {
-        const filteredNotifications = notifications.filter(n => 
-          !(n.type === 'friend_request' && n.data?.friend_request_id === friendRequestId)
-        );
-        setNotifications(filteredNotifications);
-        setUnreadCount(calculateUnreadCount(filteredNotifications));
+        setNotifications(prev => {
+          const filtered = prev.filter(n => 
+            !(n.type === 'friend_request' && n.data?.friend_request_id === friendRequestId)
+          );
+          setUnreadCount(getUnreadCount(filtered));
+          return filtered;
+        });
       }
     } catch (error) {
       console.error('Error removing friend request notifications:', error);
