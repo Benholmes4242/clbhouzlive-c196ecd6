@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { UserPlus, UserCheck, MessageCircle, Bell, ArrowLeft, Check } from 'lucide-react';
+import { UserPlus, UserCheck, MessageCircle, Bell, ArrowLeft, Check, X } from 'lucide-react';
 import { useNotifications } from '@/hooks/useNotifications';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { supabase } from '@/integrations/supabase/client';
@@ -56,6 +56,34 @@ const NotificationsPage = () => {
       toast({
         title: "Error",
         description: "Failed to handle friend request. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleRemoveNotification = async (notificationId: string) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('notifications')
+        .delete()
+        .eq('id', notificationId)
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      removeNotification(notificationId);
+      
+      toast({
+        title: "Notification removed",
+        description: "The notification has been deleted.",
+      });
+    } catch (error) {
+      console.error('Error removing notification:', error);
+      toast({
+        title: "Error",
+        description: "Failed to remove notification. Please try again.",
         variant: "destructive",
       });
     }
@@ -193,6 +221,18 @@ const NotificationsPage = () => {
                               {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
                             </p>
                           </div>
+                          
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6 text-muted-foreground hover:text-destructive"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleRemoveNotification(notification.id);
+                            }}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
                         </div>
 
                         {/* Friend request actions */}
