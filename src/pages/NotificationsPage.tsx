@@ -1,5 +1,4 @@
-
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,8 +15,23 @@ import { formatDistanceToNow } from 'date-fns';
 const NotificationsPage = () => {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
-  const { notifications, unreadCount, loading, markAsRead, markAllAsRead, removeNotification } = useNotifications();
+  const { 
+    notifications, 
+    unreadCount, 
+    loading, 
+    markAsRead, 
+    markAllAsRead, 
+    markNonPersistentAsRead,
+    removeNotification 
+  } = useNotifications();
   const { toast } = useToast();
+
+  // Mark non-persistent notifications as read when the page is viewed
+  useEffect(() => {
+    if (user && !loading) {
+      markNonPersistentAsRead();
+    }
+  }, [user, loading]);
 
   const handleFriendRequestAction = async (notificationId: string, friendRequestId: string, action: 'accept' | 'decline') => {
     if (!user) return;
@@ -191,7 +205,9 @@ const NotificationsPage = () => {
                 <Card 
                   key={notification.id} 
                   className={`cursor-pointer transition-colors hover:bg-muted/30 ${
-                    !notification.read ? 'border-blue-200 bg-blue-50/30' : ''
+                    !notification.read && (notification.type === 'friend_request' || notification.type === 'message') 
+                      ? 'border-blue-200 bg-blue-50/30' 
+                      : ''
                   }`}
                   onClick={() => handleNotificationClick(notification)}
                 >
@@ -206,7 +222,7 @@ const NotificationsPage = () => {
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
                               <h3 className="font-semibold text-sm">{notification.title}</h3>
-                              {!notification.read && (
+                              {!notification.read && (notification.type === 'friend_request' || notification.type === 'message') && (
                                 <Badge variant="secondary" className="text-xs px-2 py-0">
                                   New
                                 </Badge>
