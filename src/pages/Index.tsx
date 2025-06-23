@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
 import StoryBar from '@/components/StoryBar';
@@ -8,10 +8,18 @@ import CreatePostDialog from '@/components/posts/CreatePostDialog';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { removeDuplicatePosts } from '@/utils/postCleanup';
 
 const Index = () => {
   const { user, loading } = useSupabaseSession();
   const navigate = useNavigate();
+
+  // Clean up duplicate posts when user is loaded
+  useEffect(() => {
+    if (user?.id) {
+      removeDuplicatePosts(user.id);
+    }
+  }, [user?.id]);
 
   // Show loading state while checking authentication
   if (loading) {

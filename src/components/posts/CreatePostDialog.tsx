@@ -83,11 +83,23 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
     if (error) throw error;
   };
 
+  const resetForm = () => {
+    setContent('');
+    setMediaFiles([]);
+    setSelectedTags([]);
+    setOpen(false);
+    setShowGallery(false);
+  };
+
   const handleSubmit = async () => {
-    if (!user || (!content.trim() && mediaFiles.length === 0)) return;
+    if (!user || (!content.trim() && mediaFiles.length === 0) || isSubmitting) return;
 
     setIsSubmitting(true);
+    let postCreated = false;
+    
     try {
+      console.log('Starting post creation...');
+      
       // Create the post
       const { data: postData, error: postError } = await supabase
         .from('posts')
@@ -98,15 +110,31 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
         .select()
         .single();
 
-      if (postError) throw postError;
+      if (postError) {
+        console.error('Post creation error:', postError);
+        throw postError;
+      }
+
+      console.log('Post created successfully:', postData.id);
+      postCreated = true;
 
       // Upload media files
-      for (const file of mediaFiles) {
-        await uploadMedia(file, postData.id);
+      if (mediaFiles.length > 0) {
+        console.log('Uploading media files...');
+        for (const file of mediaFiles) {
+          await uploadMedia(file, postData.id);
+        }
+        console.log('Media upload completed');
       }
 
       // Create post tags
-      await createPostTags(postData.id);
+      if (selectedTags.length > 0) {
+        console.log('Creating post tags...');
+        await createPostTags(postData.id);
+        console.log('Post tags created');
+      }
+
+      console.log('Post creation process completed successfully');
 
       toast({
         title: "Post created!",
@@ -115,21 +143,32 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
           : "Your post has been shared successfully."
       });
 
-      // Reset form
-      setContent('');
-      setMediaFiles([]);
-      setSelectedTags([]);
-      setOpen(false);
-      setShowGallery(false);
+      // Reset form and notify parent
+      resetForm();
       onPostCreated?.();
 
     } catch (error) {
       console.error('Error creating post:', error);
-      toast({
-        title: "Error",
-        description: "Failed to create post. Please try again.",
-        variant: "destructive"
-      });
+      
+      // If the post was created but media/tags failed, still consider it a success
+      // since the main content is saved
+      if (postCreated) {
+        console.log('Post was created but additional content failed. Treating as partial success.');
+        toast({
+          title: "Post created with issues",
+          description: "Your post was created but some media or tags may not have been saved properly.",
+          variant: "destructive"
+        });
+        resetForm();
+        onPostCreated?.();
+      } else {
+        // Only show error if the actual post creation failed
+        toast({
+          title: "Failed to create post",
+          description: "Please try again. If the problem persists, check your internet connection.",
+          variant: "destructive"
+        });
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -144,12 +183,10 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
 
   return (
     <Dialog open={open} onOpenChange={(newOpen) => {
-      setOpen(newOpen);
-      if (!newOpen) {
-        setShowGallery(false);
-        setContent('');
-        setMediaFiles([]);
-        setSelectedTags([]);
+      if (!newOpen && !isSubmitting) {
+        resetForm();
+      } else if (newOpen) {
+        setOpen(newOpen);
       }
     }}>
       <DialogTrigger asChild>
@@ -165,14 +202,19 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
         {showGallery ? (
           <div className="h-full flex flex-col">
             <div className="flex items-center justify-between p-4 border-b">
-              <Button variant="ghost" size="icon" onClick={() => setOpen(false)}>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => !isSubmitting && setOpen(false)}
+                disabled={isSubmitting}
+              >
                 <X className="h-5 w-5" />
               </Button>
               <DialogTitle className="text-lg font-semibold">New post</DialogTitle>
               <Button 
                 variant="ghost" 
                 onClick={() => setShowGallery(false)}
-                disabled={mediaFiles.length === 0}
+                disabled={mediaFiles.length === 0 || isSubmitting}
                 className="text-blue-500 font-semibold disabled:text-gray-400"
               >
                 Next
@@ -188,7 +230,12 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
         ) : (
           <div className="h-full flex flex-col">
             <div className="flex items-center justify-between p-4 border-b">
-              <Button variant="ghost" size="icon" onClick={() => setShowGallery(true)}>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={() => setShowGallery(true)}
+                disabled={isSubmitting}
+              >
                 <ArrowLeft className="h-5 w-5" />
               </Button>
               <DialogTitle className="text-lg font-semibold">New post</DialogTitle>
