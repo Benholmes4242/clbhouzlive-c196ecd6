@@ -96,11 +96,14 @@ export function useNotifications() {
         prev.map(n => n.id === notificationId ? { ...n, read: true } : n)
       );
       
-      // Update unread count only for persistent notification types
-      const notification = notifications.find(n => n.id === notificationId);
-      if (notification && (notification.type === 'friend_request' || notification.type === 'message')) {
-        setUnreadCount(prev => Math.max(0, prev - 1));
-      }
+      // Update unread count using current state
+      setNotifications(currentNotifications => {
+        const notification = currentNotifications.find(n => n.id === notificationId);
+        if (notification && (notification.type === 'friend_request' || notification.type === 'message')) {
+          setUnreadCount(prev => Math.max(0, prev - 1));
+        }
+        return currentNotifications.map(n => n.id === notificationId ? { ...n, read: true } : n);
+      });
     }
   };
 
@@ -139,11 +142,18 @@ export function useNotifications() {
         )
       );
       
-      // Recalculate unread count for persistent notifications only
-      const persistentUnreadCount = notifications.filter(n => 
-        !n.read && (n.type === 'friend_request' || n.type === 'message')
-      ).length;
-      setUnreadCount(persistentUnreadCount);
+      // Recalculate unread count using the updated notifications
+      setNotifications(currentNotifications => {
+        const persistentUnreadCount = currentNotifications.filter(n => 
+          !n.read && (n.type === 'friend_request' || n.type === 'message')
+        ).length;
+        setUnreadCount(persistentUnreadCount);
+        return currentNotifications.map(n => 
+          n.type !== 'friend_request' && n.type !== 'message' 
+            ? { ...n, read: true } 
+            : n
+        );
+      });
     }
   };
 
@@ -159,15 +169,18 @@ export function useNotifications() {
 
       if (error) throw error;
 
-      // Remove from local state
-      setNotifications(prev => prev.filter(n => n.id !== notificationId));
-      
-      // Also update unread count if the removed notification was unread and persistent
-      const removedNotification = notifications.find(n => n.id === notificationId);
-      if (removedNotification && !removedNotification.read && 
-          (removedNotification.type === 'friend_request' || removedNotification.type === 'message')) {
-        setUnreadCount(current => Math.max(0, current - 1));
-      }
+      // Remove from local state and update unread count
+      setNotifications(prev => {
+        const removedNotification = prev.find(n => n.id === notificationId);
+        const newNotifications = prev.filter(n => n.id !== notificationId);
+        
+        if (removedNotification && !removedNotification.read && 
+            (removedNotification.type === 'friend_request' || removedNotification.type === 'message')) {
+          setUnreadCount(current => Math.max(0, current - 1));
+        }
+        
+        return newNotifications;
+      });
     } catch (error) {
       console.error('Error removing notification:', error);
       throw error;
@@ -187,21 +200,19 @@ export function useNotifications() {
         .eq('data->friend_request_id', friendRequestId);
 
       if (!error) {
-        // Update local state
-        setNotifications(prev => 
-          prev.filter(n => 
+        // Update local state and recalculate unread count
+        setNotifications(prev => {
+          const updatedNotifications = prev.filter(n => 
             !(n.type === 'friend_request' && n.data?.friend_request_id === friendRequestId)
-          )
-        );
-        
-        // Recalculate unread count
-        const updatedNotifications = notifications.filter(n => 
-          !(n.type === 'friend_request' && n.data?.friend_request_id === friendRequestId)
-        );
-        const persistentUnreadCount = updatedNotifications.filter(n => 
-          !n.read && (n.type === 'friend_request' || n.type === 'message')
-        ).length;
-        setUnreadCount(persistentUnreadCount);
+          );
+          
+          const persistentUnreadCount = updatedNotifications.filter(n => 
+            !n.read && (n.type === 'friend_request' || n.type === 'message')
+          ).length;
+          setUnreadCount(persistentUnreadCount);
+          
+          return updatedNotifications;
+        });
       }
     } catch (error) {
       console.error('Error removing friend request notifications:', error);
