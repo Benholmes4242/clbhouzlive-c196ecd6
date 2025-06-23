@@ -1,13 +1,13 @@
 
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Plus, X, ArrowLeft } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { Plus } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useToast } from '@/hooks/use-toast';
+import { usePostSubmission } from './PostSubmissionHandler';
 import PostContentForm from './PostContentForm';
 import PhotoGallery from './PhotoGallery';
+import DialogNavigation from './DialogNavigation';
 
 interface TaggableEntity {
   id: string;
@@ -23,7 +23,7 @@ interface CreatePostDialogProps {
 
 const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
   const { user } = useSupabaseSession();
-  const { toast } = useToast();
+  const { submitPost } = usePostSubmission();
   const [open, setOpen] = useState(false);
   const [content, setContent] = useState('');
   const [mediaFiles, setMediaFiles] = useState<File[]>([]);
@@ -40,77 +40,6 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
     setMediaFiles(prev => prev.filter((_, i) => i !== index));
   };
 
-  const uploadMedia = async (file: File, postId: string) => {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${user?.id}/${Date.now()}.${fileExt}`;
-    
-    const { error: uploadError } = await supabase.storage
-      .from('post-media')
-      .upload(fileName, file);
-
-    if (uploadError) throw uploadError;
-
-    const { data: { publicUrl } } = supabase.storage
-      .from('post-media')
-      .getPublicUrl(fileName);
-
-    const mediaType = file.type.startsWith('image/') ? 'image' : 'video';
-    
-    const { error: mediaError } = await supabase
-      .from('post_media')
-      .insert({
-        post_id: postId,
-        media_type: mediaType,
-        media_url: publicUrl
-      });
-
-    if (mediaError) throw mediaError;
-  };
-
-  const createPostTags = async (postId: string) => {
-    if (selectedTags.length === 0) return;
-
-    const tagInserts = selectedTags.map(tag => ({
-      post_id: postId,
-      tagged_entity_id: tag.id,
-      tagged_by_user_id: user!.id
-    }));
-
-    const { error } = await supabase
-      .from('post_tags')
-      .insert(tagInserts);
-
-    if (error) throw error;
-  };
-
-  const rollbackPost = async (postId: string) => {
-    try {
-      console.log('Rolling back post creation for:', postId);
-      
-      // Delete post media
-      await supabase
-        .from('post_media')
-        .delete()
-        .eq('post_id', postId);
-
-      // Delete post tags
-      await supabase
-        .from('post_tags')
-        .delete()
-        .eq('post_id', postId);
-
-      // Delete the post
-      await supabase
-        .from('posts')
-        .delete()
-        .eq('id', postId);
-
-      console.log('Post rollback completed for:', postId);
-    } catch (rollbackError) {
-      console.error('Error during rollback:', rollbackError);
-    }
-  };
-
   const resetForm = () => {
     setContent('');
     setMediaFiles([]);
@@ -123,81 +52,31 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
     if (!user || (!content.trim() && mediaFiles.length === 0) || isSubmitting) return;
 
     setIsSubmitting(true);
-    let createdPostId: string | null = null;
     
-    try {
-      console.log('Starting post creation...');
-      
-      // Create the post first
-      const { data: postData, error: postError } = await supabase
-        .from('posts')
-        .insert({
-          user_id: user.id,
-          content: content.trim() || null
-        })
-        .select()
-        .single();
-
-      if (postError) {
-        console.error('Post creation error:', postError);
-        throw new Error('Failed to create post');
+    await submitPost({
+      user,
+      content,
+      mediaFiles,
+      selectedTags,
+      onSuccess: () => {
+        resetForm();
+        onPostCreated?.();
+      },
+      onError: () => {
+        // Error handling is done in the submission handler
       }
+    });
 
-      console.log('Post created successfully:', postData.id);
-      createdPostId = postData.id;
-
-      // Upload media files if any
-      if (mediaFiles.length > 0) {
-        console.log('Uploading media files...');
-        for (const file of mediaFiles) {
-          await uploadMedia(file, postData.id);
-        }
-        console.log('Media upload completed');
-      }
-
-      // Create post tags if any
-      if (selectedTags.length > 0) {
-        console.log('Creating post tags...');
-        await createPostTags(postData.id);
-        console.log('Post tags created');
-      }
-
-      console.log('Post creation process completed successfully');
-
-      toast({
-        title: "Post created!",
-        description: selectedTags.length > 0 
-          ? `Your post has been shared and ${selectedTags.length} ${selectedTags.length === 1 ? 'person has' : 'people have'} been tagged.`
-          : "Your post has been shared successfully."
-      });
-
-      // Reset form and notify parent
-      resetForm();
-      onPostCreated?.();
-
-    } catch (error) {
-      console.error('Error creating post:', error);
-      
-      // If we created a post but subsequent operations failed, roll it back
-      if (createdPostId) {
-        await rollbackPost(createdPostId);
-      }
-      
-      // Show error to user
-      toast({
-        title: "Failed to create post",
-        description: "Please try again. If the problem persists, check your internet connection.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+    setIsSubmitting(false);
   };
 
   const handleOpenDialog = () => {
     setOpen(true);
     setShowGallery(true);
   };
+
+  const canProceedFromGallery = mediaFiles.length > 0;
+  const canSubmit = !isSubmitting && (content.trim() || mediaFiles.length > 0);
 
   if (!user) return null;
 
@@ -221,25 +100,16 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
       <DialogContent className="sm:max-w-full sm:max-h-full sm:h-full sm:w-full p-0 gap-0">
         {showGallery ? (
           <div className="h-full flex flex-col">
-            <div className="flex items-center justify-between p-4 border-b">
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={() => !isSubmitting && setOpen(false)}
-                disabled={isSubmitting}
-              >
-                <X className="h-5 w-5" />
-              </Button>
-              <DialogTitle className="text-lg font-semibold">New post</DialogTitle>
-              <Button 
-                variant="ghost" 
-                onClick={() => setShowGallery(false)}
-                disabled={mediaFiles.length === 0 || isSubmitting}
-                className="text-blue-500 font-semibold disabled:text-gray-400"
-              >
-                Next
-              </Button>
-            </div>
+            <DialogNavigation
+              showGallery={true}
+              isSubmitting={isSubmitting}
+              canProceedFromGallery={canProceedFromGallery}
+              canSubmit={canSubmit}
+              onClose={() => !isSubmitting && setOpen(false)}
+              onBackToGallery={() => setShowGallery(true)}
+              onNext={() => setShowGallery(false)}
+              onSubmit={handleSubmit}
+            />
             <div className="flex-1 overflow-hidden">
               <PhotoGallery 
                 onFilesSelected={handleFilesSelected}
@@ -249,25 +119,16 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
           </div>
         ) : (
           <div className="h-full flex flex-col">
-            <div className="flex items-center justify-between p-4 border-b">
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={() => setShowGallery(true)}
-                disabled={isSubmitting}
-              >
-                <ArrowLeft className="h-5 w-5" />
-              </Button>
-              <DialogTitle className="text-lg font-semibold">New post</DialogTitle>
-              <Button 
-                onClick={handleSubmit} 
-                disabled={isSubmitting || (!content.trim() && mediaFiles.length === 0)}
-                className="text-blue-500 font-semibold disabled:text-gray-400"
-                variant="ghost"
-              >
-                {isSubmitting ? 'Sharing...' : 'Share'}
-              </Button>
-            </div>
+            <DialogNavigation
+              showGallery={false}
+              isSubmitting={isSubmitting}
+              canProceedFromGallery={canProceedFromGallery}
+              canSubmit={canSubmit}
+              onClose={() => !isSubmitting && setOpen(false)}
+              onBackToGallery={() => setShowGallery(true)}
+              onNext={() => setShowGallery(false)}
+              onSubmit={handleSubmit}
+            />
             
             <div className="flex-1 p-4">
               <PostContentForm
