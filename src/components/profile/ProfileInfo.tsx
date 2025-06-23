@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -81,7 +82,9 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
         {username && (
           <p className="text-muted-foreground text-lg">{username}</p>
         )}
-        {bio && (
+        
+        {/* Bio - Only show for individual users here */}
+        {isIndividual && bio && (
           <p className="text-sm max-w-md mx-auto">{bio}</p>
         )}
         
@@ -165,7 +168,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
                     rel="noopener noreferrer"
                     className="text-blue-600 hover:underline"
                   >
-                    Website
+                    {profile.website_url}
                   </a>
                 </div>
               )}
@@ -173,6 +176,13 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
                 <div className="flex items-center justify-center gap-2">
                   <MapPin className="w-4 h-4" />
                   <span>{profile.location}</span>
+                </div>
+              )}
+              
+              {/* Bio/Description for business profiles - moved here */}
+              {bio && (
+                <div className="mt-3 pt-2 border-t border-muted">
+                  <p className="text-sm max-w-md mx-auto text-left">{bio}</p>
                 </div>
               )}
             </div>
