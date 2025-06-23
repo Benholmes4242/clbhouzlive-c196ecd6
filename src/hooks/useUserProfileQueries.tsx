@@ -41,6 +41,24 @@ export const useUserProfileQueries = () => {
     enabled: !!username,
   });
 
+  // Fetch current user profile to get user_type
+  const { data: currentUserProfile } = useQuery({
+    queryKey: ['currentUserProfile', currentUser?.id],
+    queryFn: async () => {
+      if (!currentUser?.id) return null;
+      
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('user_type')
+        .eq('id', currentUser.id)
+        .maybeSingle();
+      
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!currentUser?.id,
+  });
+
   // Check relationship status with current user
   const { data: relationshipStatus } = useQuery({
     queryKey: ['relationshipStatus', currentUser?.id, profile?.id],
@@ -79,6 +97,6 @@ export const useUserProfileQueries = () => {
     profile,
     isLoading,
     relationshipStatus,
-    currentUser
+    currentUser: currentUserProfile ? { ...currentUser, ...currentUserProfile } : currentUser
   };
 };

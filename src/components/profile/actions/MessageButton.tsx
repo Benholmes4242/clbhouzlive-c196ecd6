@@ -4,15 +4,13 @@ import { Button } from '@/components/ui/button';
 import { MessageCircle } from 'lucide-react';
 
 interface MessageButtonProps {
-  friendStatus?: 'pending' | 'accepted' | null;
+  friendStatus: 'pending' | 'accepted' | null;
 }
 
-const MessageButton: React.FC<MessageButtonProps> = ({
-  friendStatus
-}) => {
+const MessageButton: React.FC<MessageButtonProps> = ({ friendStatus }) => {
   const handleMessageClick = () => {
-    // For now, just show a toast that messaging is coming soon
-    console.log('Messaging feature coming soon');
+    // Navigate to messages - this is a placeholder for now
+    console.log('Navigate to messages');
   };
 
   return (
@@ -20,10 +18,9 @@ const MessageButton: React.FC<MessageButtonProps> = ({
       variant="outline" 
       onClick={handleMessageClick}
       className="flex-1 max-w-32"
-      disabled={friendStatus !== 'accepted'}
     >
-      <MessageCircle className="w-4 h-4 mr-2" />
-      Message
+      <MessageCircle className="w-4 h-4" />
+      <span className="ml-2">Message</span>
     </Button>
   );
 };

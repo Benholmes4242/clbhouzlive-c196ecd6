@@ -12,6 +12,8 @@ interface UserProfileActionsProps {
   isFollowing: boolean;
   friendStatus: 'pending' | 'accepted' | null;
   username: string;
+  targetUserType?: string;
+  currentUserType?: string;
 }
 
 const UserProfileActions: React.FC<UserProfileActionsProps> = ({
@@ -19,12 +21,20 @@ const UserProfileActions: React.FC<UserProfileActionsProps> = ({
   currentUserId,
   isFollowing,
   friendStatus,
-  username
+  username,
+  targetUserType = 'individual',
+  currentUserType = 'individual'
 }) => {
   const { loading, handleFollow, handleFriendRequest, handleRemoveFriend } = useProfileActions({
     targetUserId,
     currentUserId
   });
+
+  // Only allow friend requests between individual users
+  const canSendFriendRequest = targetUserType === 'individual' && currentUserType === 'individual';
+  
+  // Only allow messaging between friends or if one is a business/club
+  const canMessage = friendStatus === 'accepted' || targetUserType !== 'individual' || currentUserType !== 'individual';
 
   return (
     <div className="space-y-4">
@@ -37,23 +47,29 @@ const UserProfileActions: React.FC<UserProfileActionsProps> = ({
           friendStatus={friendStatus}
         />
 
-        <FriendButton
-          friendStatus={friendStatus}
-          loading={loading}
-          onFriendRequest={() => handleFriendRequest(friendStatus)}
-        />
+        {canSendFriendRequest && (
+          <FriendButton
+            friendStatus={friendStatus}
+            loading={loading}
+            onFriendRequest={() => handleFriendRequest(friendStatus)}
+          />
+        )}
       </div>
 
       {/* Secondary action buttons */}
       <div className="flex items-center justify-center gap-3">
-        <MessageButton friendStatus={friendStatus} />
+        {canMessage && (
+          <MessageButton friendStatus={friendStatus} />
+        )}
         
-        <ActionsDropdown
-          friendStatus={friendStatus}
-          loading={loading}
-          onRemoveFriend={handleRemoveFriend}
-          username={username}
-        />
+        {canSendFriendRequest && (
+          <ActionsDropdown
+            friendStatus={friendStatus}
+            loading={loading}
+            onRemoveFriend={handleRemoveFriend}
+            username={username}
+          />
+        )}
       </div>
     </div>
   );
