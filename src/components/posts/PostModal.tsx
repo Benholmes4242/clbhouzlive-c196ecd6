@@ -114,6 +114,13 @@ const PostModal = ({ isOpen, onClose, post, isOwnPost = false, onPostUpdated, on
     }
   };
 
+  // Create a compatible post object for EditPostDialog
+  const editablePost = {
+    id: post.id,
+    content: post.content,
+    post_media: post.post_media || []
+  };
+
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
@@ -249,7 +256,7 @@ const PostModal = ({ isOpen, onClose, post, isOwnPost = false, onPostUpdated, on
       <EditPostDialog 
         open={editDialogOpen}
         onOpenChange={setEditDialogOpen}
-        post={post}
+        post={editablePost}
         onPostUpdated={onPostUpdated}
       />
     </>
