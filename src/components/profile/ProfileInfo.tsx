@@ -190,9 +190,9 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
                 </div>
               )}
               
-              {/* About Us section for business profiles - with much more spacing */}
+              {/* About Us section for business profiles - with significant spacing to match profile photo gap */}
               {bio && (
-                <div className="mt-12 text-center">
+                <div className="mt-20 text-center">
                   <h4 className="text-base font-semibold mb-2 text-foreground">About Us</h4>
                   <p className="text-sm max-w-md mx-auto">{bio}</p>
                 </div>
