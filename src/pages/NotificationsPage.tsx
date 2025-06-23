@@ -1,9 +1,8 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Bell, ArrowLeft } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useNotifications } from '@/hooks/useNotifications';
@@ -22,8 +21,6 @@ const NotificationsPage = () => {
     handleFriendRequest, 
     markAllNonFriendRequestsAsRead 
   } = useNotifications();
-  
-  const [filter, setFilter] = useState<'all' | 'friend_requests' | 'followers' | 'tags'>('all');
 
   // Mark non-friend-request notifications as read when visiting the page
   useEffect(() => {
@@ -43,18 +40,6 @@ const NotificationsPage = () => {
       </div>
     );
   }
-
-  const filteredNotifications = notifications.filter(notification => {
-    if (filter === 'all') return true;
-    if (filter === 'friend_requests') return notification.type === 'friend_request';
-    if (filter === 'followers') return notification.type === 'follow';
-    if (filter === 'tags') return notification.type === 'tag';
-    return true;
-  });
-
-  const friendRequestCount = notifications.filter(n => n.type === 'friend_request').length;
-  const followCount = notifications.filter(n => n.type === 'follow').length;
-  const tagCount = notifications.filter(n => n.type === 'tag').length;
 
   if (isLoading) {
     return (
@@ -82,87 +67,31 @@ const NotificationsPage = () => {
       
       <main className="container mx-auto px-4 py-6">
         <div className="max-w-2xl mx-auto">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => navigate(-1)}
-              >
-                <ArrowLeft className="w-4 h-4" />
-              </Button>
-              <div>
-                <h1 className="text-2xl font-bold">Notifications</h1>
-              </div>
+          <div className="flex items-center gap-4 mb-6">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate(-1)}
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </Button>
+            <div>
+              <h1 className="text-2xl font-bold">Notifications</h1>
             </div>
           </div>
 
-          {/* Filter Buttons */}
-          <div className="flex gap-2 mb-6 overflow-x-auto">
-            <Button
-              variant={filter === 'all' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setFilter('all')}
-            >
-              All
-            </Button>
-            <Button
-              variant={filter === 'friend_requests' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setFilter('friend_requests')}
-              className="flex items-center gap-1"
-            >
-              Friend Requests
-              {friendRequestCount > 0 && (
-                <Badge variant="secondary" className="ml-1">
-                  {friendRequestCount}
-                </Badge>
-              )}
-            </Button>
-            <Button
-              variant={filter === 'followers' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setFilter('followers')}
-              className="flex items-center gap-1"
-            >
-              Followers
-              {followCount > 0 && (
-                <Badge variant="secondary" className="ml-1">
-                  {followCount}
-                </Badge>
-              )}
-            </Button>
-            <Button
-              variant={filter === 'tags' ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setFilter('tags')}
-              className="flex items-center gap-1"
-            >
-              Tags
-              {tagCount > 0 && (
-                <Badge variant="secondary" className="ml-1">
-                  {tagCount}
-                </Badge>
-              )}
-            </Button>
-          </div>
-
-          {filteredNotifications.length === 0 ? (
+          {notifications.length === 0 ? (
             <Card>
               <CardContent className="p-8 text-center">
                 <Bell className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">
-                  {filter === 'all' ? 'No notifications' : `No ${filter.replace('_', ' ')}`}
-                </h3>
-                <p className="text-muted-foreground">
-                  {filter === 'all' ? "You're all caught up!" : `No ${filter.replace('_', ' ')} yet`}
-                </p>
+                <h3 className="text-lg font-semibold mb-2">No notifications</h3>
+                <p className="text-muted-foreground">You're all caught up!</p>
               </CardContent>
             </Card>
           ) : (
             <Card>
               <CardContent className="p-0">
-                {filteredNotifications.map((notification) => {
+                {notifications.map((notification) => {
                   if (notification.type === 'friend_request') {
                     return (
                       <FriendRequestNotification

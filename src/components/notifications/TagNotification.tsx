@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Tag, MessageSquare } from 'lucide-react';
 
 interface TagNotificationProps {
   notification: any;
@@ -23,29 +22,29 @@ const TagNotification: React.FC<TagNotificationProps> = ({ notification }) => {
   };
 
   return (
-    <div className="flex items-start gap-3 p-4 border-b border-border">
-      <Avatar className="h-10 w-10">
-        <AvatarImage src={tagger_photo} alt={tagger_name} />
-        <AvatarFallback>
-          {tagger_name?.charAt(0)?.toUpperCase() || '?'}
-        </AvatarFallback>
-      </Avatar>
-      <div className="flex-1">
-        <p className="font-medium">{tagger_name}</p>
-        <p className="text-sm text-muted-foreground mb-1">
-          {tagger_username ? `@${tagger_username}` : ''} • {formatTimeAgo(notification.created_at)}
-        </p>
-        {content_preview && (
-          <div className="bg-muted p-2 rounded-md text-sm">
-            <div className="flex items-center gap-1 mb-1">
-              <MessageSquare className="h-3 w-3" />
-              <span className="text-xs text-muted-foreground">Tagged you in:</span>
+    <div className="p-4 border-b border-border">
+      <div className="flex items-start gap-3">
+        <Avatar className="h-10 w-10">
+          <AvatarImage src={tagger_photo} alt={tagger_name} />
+          <AvatarFallback>
+            {tagger_name?.charAt(0)?.toUpperCase() || '?'}
+          </AvatarFallback>
+        </Avatar>
+        <div className="flex-1">
+          <h4 className="font-semibold text-sm text-muted-foreground mb-1">You were tagged</h4>
+          <p className="text-sm">
+            <span className="font-medium">@{tagger_username || tagger_name}</span> tagged you in a post.
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            {formatTimeAgo(notification.created_at)}
+          </p>
+          {content_preview && (
+            <div className="bg-muted p-2 rounded-md text-sm mt-2">
+              <p className="text-muted-foreground">"{content_preview}..."</p>
             </div>
-            <p>"{content_preview}..."</p>
-          </div>
-        )}
+          )}
+        </div>
       </div>
-      <Tag className="h-5 w-5 text-blue-600" />
     </div>
   );
 };

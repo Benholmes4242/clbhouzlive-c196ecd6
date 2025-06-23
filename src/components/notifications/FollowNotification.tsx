@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { UserPlus } from 'lucide-react';
 
 interface FollowNotificationProps {
   notification: any;
@@ -23,20 +22,24 @@ const FollowNotification: React.FC<FollowNotificationProps> = ({ notification })
   };
 
   return (
-    <div className="flex items-center gap-3 p-4 border-b border-border">
-      <Avatar className="h-10 w-10">
-        <AvatarImage src={follower_photo} alt={follower_name} />
-        <AvatarFallback>
-          {follower_name?.charAt(0)?.toUpperCase() || '?'}
-        </AvatarFallback>
-      </Avatar>
-      <div className="flex-1">
-        <p className="font-medium">{follower_name}</p>
-        <p className="text-sm text-muted-foreground">
-          {follower_username ? `@${follower_username}` : ''} • {formatTimeAgo(notification.created_at)}
-        </p>
+    <div className="p-4 border-b border-border">
+      <div className="flex items-start gap-3">
+        <Avatar className="h-10 w-10">
+          <AvatarImage src={follower_photo} alt={follower_name} />
+          <AvatarFallback>
+            {follower_name?.charAt(0)?.toUpperCase() || '?'}
+          </AvatarFallback>
+        </Avatar>
+        <div className="flex-1">
+          <h4 className="font-semibold text-sm text-muted-foreground mb-1">You have a new follower!</h4>
+          <p className="text-sm">
+            <span className="font-medium">@{follower_username || follower_name}</span> is now following you.
+          </p>
+          <p className="text-xs text-muted-foreground mt-1">
+            {formatTimeAgo(notification.created_at)}
+          </p>
+        </div>
       </div>
-      <UserPlus className="h-5 w-5 text-green-600" />
     </div>
   );
 };
