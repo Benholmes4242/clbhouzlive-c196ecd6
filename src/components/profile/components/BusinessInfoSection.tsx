@@ -13,7 +13,7 @@ const BusinessInfoSection: React.FC<BusinessInfoSectionProps> = ({
 }) => {
   return (
     <div className="mt-4">
-      <h3 className="text-lg font-semibold mb-3">Business Information</h3>
+      <h3 className="text-lg font-semibold mb-3 text-center">Business Information</h3>
       <div className="space-y-2 text-sm text-muted-foreground">
         {profile?.business_name && (
           <div className="flex items-center justify-center gap-2">
@@ -47,9 +47,9 @@ const BusinessInfoSection: React.FC<BusinessInfoSectionProps> = ({
           </div>
         )}
         
-        {/* About Us section for business profiles - with significant spacing to match profile photo gap */}
+        {/* About Us section for business profiles - with 3cm spacing from address */}
         {bio && (
-          <div className="mt-20 text-center">
+          <div className="mt-28 text-center">
             <h4 className="text-base font-semibold mb-2 text-foreground">About Us</h4>
             <p className="text-sm max-w-md mx-auto">{bio}</p>
           </div>
