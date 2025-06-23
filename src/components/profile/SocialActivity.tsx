@@ -51,6 +51,22 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
     }
   };
 
+  // Show loading state
+  if (loading) {
+    return (
+      <div className="mt-10 px-2">
+        <ActivityHeader 
+          postsCount={0}
+          isOwnProfile={isOwnProfile}
+          onPostCreated={fetchUserPosts}
+        />
+        <div className="text-center py-8">
+          <p className="text-muted-foreground">Loading posts...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="mt-10 px-2">
       <ActivityHeader 
@@ -71,7 +87,7 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
         ))}
       </div>
 
-      {posts.length === 0 && !loading && (
+      {posts.length === 0 && (
         <div className="text-center py-8">
           <p className="text-muted-foreground">No posts yet.</p>
         </div>

@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
 import { MoreHorizontal, Heart, MessageCircle, Share, X, Edit, Trash2 } from 'lucide-react';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { formatDistanceToNow } from 'date-fns';
@@ -124,130 +123,118 @@ const PostModal = ({ isOpen, onClose, post, isOwnPost = false, onPostUpdated, on
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-4xl max-h-[90vh] p-0 gap-0">
-          <div className="flex h-full">
-            {/* Media Section */}
-            {post.post_media && post.post_media.length > 0 && (
-              <div className="flex-1 bg-black flex items-center justify-center">
-                {post.post_media.length > 1 ? (
-                  <Carousel className="w-full h-full">
-                    <CarouselContent className="h-full">
-                      {post.post_media.map((media, index) => (
-                        <CarouselItem key={media.id} className="h-full flex items-center justify-center">
-                          {media.media_type === 'image' ? (
-                            <img
-                              src={media.media_url}
-                              alt="Post content"
-                              className="max-w-full max-h-full object-contain"
-                            />
-                          ) : (
-                            <VideoPreview
-                              src={media.media_url}
-                              className="max-w-full max-h-full"
-                              onFullscreen={() => {}}
-                              videoId={`modal-post-${post.id}-${index}`}
-                            />
-                          )}
-                        </CarouselItem>
-                      ))}
-                    </CarouselContent>
-                    <CarouselPrevious className="left-4" />
-                    <CarouselNext className="right-4" />
-                  </Carousel>
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    {post.post_media[0].media_type === 'image' ? (
-                      <img
-                        src={post.post_media[0].media_url}
-                        alt="Post content"
-                        className="max-w-full max-h-full object-contain"
-                      />
-                    ) : (
-                      <VideoPreview
-                        src={post.post_media[0].media_url}
-                        className="max-w-full max-h-full"
-                        onFullscreen={() => {}}
-                        videoId={`modal-post-${post.id}-0`}
-                      />
-                    )}
-                  </div>
-                )}
+        <DialogContent className="max-w-3xl max-h-[90vh] p-0 gap-0 aspect-square">
+          <div className="relative w-full h-full bg-black flex items-center justify-center">
+            {/* Close button */}
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={onClose}
+              className="absolute top-4 right-4 z-10 text-white hover:bg-white/20"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+
+            {/* Options menu for own posts */}
+            {isOwnPost && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button 
+                    variant="ghost" 
+                    size="icon"
+                    className="absolute top-4 left-4 z-10 text-white hover:bg-white/20"
+                  >
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start">
+                  <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
+                    <Edit className="h-4 w-4 mr-2" />
+                    Edit Post
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={handleDeletePost}
+                    disabled={isDeleting}
+                    className="text-red-600"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    {isDeleting ? 'Deleting...' : 'Delete Post'}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
+
+            {/* Media Content */}
+            {post.post_media && post.post_media.length > 0 ? (
+              post.post_media.length > 1 ? (
+                <Carousel className="w-full h-full">
+                  <CarouselContent className="h-full">
+                    {post.post_media.map((media, index) => (
+                      <CarouselItem key={media.id} className="h-full flex items-center justify-center">
+                        {media.media_type === 'image' ? (
+                          <img
+                            src={media.media_url}
+                            alt="Post content"
+                            className="max-w-full max-h-full object-contain"
+                          />
+                        ) : (
+                          <VideoPreview
+                            src={media.media_url}
+                            className="max-w-full max-h-full"
+                            onFullscreen={() => {}}
+                            videoId={`modal-post-${post.id}-${index}`}
+                          />
+                        )}
+                      </CarouselItem>
+                    ))}
+                  </CarouselContent>
+                  <CarouselPrevious className="left-4 text-white" />
+                  <CarouselNext className="right-4 text-white" />
+                </Carousel>
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  {post.post_media[0].media_type === 'image' ? (
+                    <img
+                      src={post.post_media[0].media_url}
+                      alt="Post content"
+                      className="max-w-full max-h-full object-contain"
+                    />
+                  ) : (
+                    <VideoPreview
+                      src={post.post_media[0].media_url}
+                      className="max-w-full max-h-full"
+                      onFullscreen={() => {}}
+                      videoId={`modal-post-${post.id}-0`}
+                    />
+                  )}
+                </div>
+              )
+            ) : (
+              // Text-only post
+              <div className="p-8 text-white text-center">
+                <div className="text-lg mb-4">
+                  <TaggedText text={post.content || ''} tags={post.post_tags || []} />
+                </div>
+                <div className="text-sm text-white/70">
+                  {displayName} • {timeAgo}
+                </div>
               </div>
             )}
 
-            {/* Content Section */}
-            <div className="w-96 border-l flex flex-col">
-              {/* Header */}
-              <div className="p-4 border-b flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <img
-                    src={post.user?.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
-                    alt={displayName}
-                    className="w-8 h-8 rounded-full object-cover"
-                  />
-                  <div>
-                    <span className="font-semibold text-sm">{displayName}</span>
-                    <p className="text-xs text-muted-foreground">{timeAgo}</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-center space-x-2">
-                  {isOwnPost && (
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
-                          <Edit className="h-4 w-4 mr-2" />
-                          Edit Post
-                        </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          onClick={handleDeletePost}
-                          disabled={isDeleting}
-                          className="text-red-600"
-                        >
-                          <Trash2 className="h-4 w-4 mr-2" />
-                          {isDeleting ? 'Deleting...' : 'Delete Post'}
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  )}
-                  
-                  <Button variant="ghost" size="icon" onClick={onClose}>
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-
-              {/* Content */}
-              <div className="flex-1 p-4">
-                {post.content && (
-                  <div className="text-sm mb-4">
-                    <TaggedText text={post.content} tags={post.post_tags || []} />
-                  </div>
-                )}
-              </div>
-
-              {/* Actions */}
-              <div className="p-4 border-t">
-                <div className="flex items-center space-x-4">
-                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-red-500">
-                    <Heart className="h-4 w-4 mr-1" />
-                    Like
-                  </Button>
-                  <Button variant="ghost" size="sm" className="text-muted-foreground">
-                    <MessageCircle className="h-4 w-4 mr-1" />
-                    Comment
-                  </Button>
-                  <Button variant="ghost" size="sm" className="text-muted-foreground">
-                    <Share className="h-4 w-4 mr-1" />
-                    Share
-                  </Button>
-                </div>
-              </div>
+            {/* Action buttons at bottom */}
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center space-x-4">
+              <Button variant="ghost" size="sm" className="text-white hover:bg-white/20 hover:text-red-500">
+                <Heart className="h-4 w-4 mr-1" />
+                Like
+              </Button>
+              <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
+                <MessageCircle className="h-4 w-4 mr-1" />
+                Comment
+              </Button>
+              <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
+                <Share className="h-4 w-4 mr-1" />
+                Share
+              </Button>
             </div>
           </div>
         </DialogContent>
