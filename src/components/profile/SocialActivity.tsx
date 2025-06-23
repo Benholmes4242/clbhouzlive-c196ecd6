@@ -36,11 +36,6 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
     handleCloseModal();
   };
 
-  // If this is not the user's own profile and activity is not visible, don't render anything
-  if (!isOwnProfile && !activityVisible) {
-    return null;
-  }
-
   // Get the correct attribution text
   const getPostAttribution = () => {
     if (isOwnProfile) {

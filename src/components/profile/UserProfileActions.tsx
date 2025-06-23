@@ -30,10 +30,10 @@ const UserProfileActions: React.FC<UserProfileActionsProps> = ({
     currentUserId
   });
 
-  // Only allow friend requests between individual users
+  // Only allow friend requests between individual users (both must be individual)
   const canSendFriendRequest = targetUserType === 'individual' && currentUserType === 'individual';
   
-  // Only allow messaging between friends or if one is a business/club
+  // Allow messaging between friends or if either is a business/club
   const canMessage = friendStatus === 'accepted' || targetUserType !== 'individual' || currentUserType !== 'individual';
 
   return (
@@ -47,6 +47,7 @@ const UserProfileActions: React.FC<UserProfileActionsProps> = ({
           friendStatus={friendStatus}
         />
 
+        {/* Only show friend button if both users are individuals */}
         {canSendFriendRequest && (
           <FriendButton
             friendStatus={friendStatus}
@@ -62,6 +63,7 @@ const UserProfileActions: React.FC<UserProfileActionsProps> = ({
           <MessageButton friendStatus={friendStatus} />
         )}
         
+        {/* Only show actions dropdown if both users are individuals */}
         {canSendFriendRequest && (
           <ActionsDropdown
             friendStatus={friendStatus}

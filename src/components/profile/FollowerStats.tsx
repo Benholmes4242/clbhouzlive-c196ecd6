@@ -13,7 +13,7 @@ const FollowerStats: React.FC<FollowerStatsProps> = ({ userId, userType = 'indiv
   const navigate = useNavigate();
   const isIndividual = userType === 'individual';
 
-  // Get follower count
+  // Get follower count - this should work for any viewer
   const { data: followerCount = 0 } = useQuery({
     queryKey: ['followerCount', userId],
     queryFn: async () => {
@@ -25,7 +25,7 @@ const FollowerStats: React.FC<FollowerStatsProps> = ({ userId, userType = 'indiv
     },
   });
 
-  // Get following count
+  // Get following count - this should work for any viewer
   const { data: followingCount = 0 } = useQuery({
     queryKey: ['followingCount', userId],
     queryFn: async () => {
@@ -37,7 +37,7 @@ const FollowerStats: React.FC<FollowerStatsProps> = ({ userId, userType = 'indiv
     },
   });
 
-  // Get friends count - only for individual users
+  // Get friends count - only for individual users, but should work for any viewer
   const { data: friendsCount = 0 } = useQuery({
     queryKey: ['friendsCount', userId],
     queryFn: async () => {

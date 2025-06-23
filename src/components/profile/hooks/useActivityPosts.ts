@@ -17,6 +17,7 @@ export const useActivityPosts = (userId?: string) => {
     setLoading(true);
 
     try {
+      // Fetch posts without RLS restrictions that might prevent business accounts from viewing
       const { data: postsData, error } = await supabase
         .from('posts')
         .select(`
