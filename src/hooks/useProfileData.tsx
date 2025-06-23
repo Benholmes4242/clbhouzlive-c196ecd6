@@ -30,6 +30,10 @@ export const useProfileData = () => {
     }
   };
 
+  const updateProfileField = (field: string, value: any) => {
+    setProfile((prev: any) => prev ? { ...prev, [field]: value } : prev);
+  };
+
   useEffect(() => {
     let isMounted = true;
     
@@ -65,6 +69,7 @@ export const useProfileData = () => {
     loading: sessionLoading || loading, // Combined loading state
     error,
     setProfile,
-    fetchProfile
+    fetchProfile,
+    updateProfileField
   };
 };

@@ -39,6 +39,13 @@ const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
   onPublicToggle,
   onProfileUpdate,
 }) => {
+  const handleHandicapUpdate = (newHandicap: number | null) => {
+    // Update the local form state
+    onHandicapChange(newHandicap?.toString() || "");
+    // Trigger parent update without full page refresh
+    onProfileUpdate();
+  };
+
   return (
     <div className="space-y-4 py-4">
       <div className="space-y-2">
@@ -82,7 +89,7 @@ const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
           <HandicapEditModal
             userId={userId}
             currentHandicap={formData.handicap ? parseFloat(formData.handicap) : null}
-            onHandicapUpdate={onProfileUpdate}
+            onHandicapUpdate={handleHandicapUpdate}
           />
         </div>
         <div className="text-sm text-muted-foreground">

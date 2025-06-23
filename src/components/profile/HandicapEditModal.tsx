@@ -24,7 +24,7 @@ import { generateHandicapOptions } from "./utils/handicapOptions";
 interface HandicapEditModalProps {
   userId: string;
   currentHandicap?: number | null;
-  onHandicapUpdate: () => void;
+  onHandicapUpdate: (newHandicap: number | null) => void;
 }
 
 const HandicapEditModal: React.FC<HandicapEditModalProps> = ({
@@ -41,8 +41,9 @@ const HandicapEditModal: React.FC<HandicapEditModalProps> = ({
   const handleSave = async () => {
     setSaving(true);
     try {
+      const newHandicapValue = handicap ? parseFloat(handicap) : null;
       const updateData = {
-        eg_handicap_index: handicap ? parseFloat(handicap) : null,
+        eg_handicap_index: newHandicapValue,
         updated_at: new Date().toISOString(),
       };
 
@@ -63,7 +64,8 @@ const HandicapEditModal: React.FC<HandicapEditModalProps> = ({
           title: "Success",
           description: "Handicap updated successfully",
         });
-        onHandicapUpdate();
+        // Update the parent state without causing a full page refresh
+        onHandicapUpdate(newHandicapValue);
         setOpen(false);
       }
     } catch (error) {

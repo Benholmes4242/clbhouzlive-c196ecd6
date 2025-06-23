@@ -17,7 +17,8 @@ const ProfilePage = () => {
     loading,
     error,
     setProfile,
-    fetchProfile
+    fetchProfile,
+    updateProfileField
   } = useProfileData();
 
   // Redirect to auth page if user is not logged in
@@ -35,7 +36,7 @@ const ProfilePage = () => {
         .from("user_profiles")
         .update(updateData)
         .eq("id", user.id);
-      setProfile(prev => prev ? { ...prev, eg_visible: checked } : prev);
+      updateProfileField('eg_visible', checked);
     } catch (error) {
       console.error('Error updating EG visibility:', error);
     }
