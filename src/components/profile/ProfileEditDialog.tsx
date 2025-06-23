@@ -56,9 +56,11 @@ const ProfileEditDialog: React.FC<ProfileEditDialogProps> = ({
         <ProfileFormFields
           formData={formData}
           isUsernameSet={isUsernameSet}
+          userId={userId}
           onInputChange={handleInputChange}
           onHandicapChange={handleHandicapChange}
           onPublicToggle={handlePublicToggle}
+          onProfileUpdate={onProfileUpdate}
         />
         <div className="flex justify-end gap-2">
           <Button variant="outline" onClick={() => setOpen(false)}>

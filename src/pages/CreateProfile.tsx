@@ -163,7 +163,22 @@ const CreateProfile = () => {
         );
       case 3:
         return userType === 'individual' ? (
-          <BasicInfoForm formData={formData} onChange={handleInputChange} />
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold">Basic Information</h2>
+            <BasicInfoForm formData={formData} onChange={handleInputChange} />
+            {/* Show selected username as read-only if it exists */}
+            {formData.username && (
+              <div className="mt-4 p-4 bg-gray-50 rounded-lg border">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-gray-700">Username (selected)</label>
+                  <div className="text-gray-600 font-medium">@{formData.username}</div>
+                  <p className="text-xs text-gray-500">
+                    Username selected — can't be changed without contacting Clbhouz Support.
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
         ) : (
           <BusinessInfoForm
             formData={formData}

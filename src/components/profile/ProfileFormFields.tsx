@@ -10,7 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import { generateHandicapOptions } from "./utils/handicapOptions";
+import HandicapEditModal from "./HandicapEditModal";
 
 interface ProfileFormData {
   displayName: string;
@@ -23,20 +23,22 @@ interface ProfileFormData {
 interface ProfileFormFieldsProps {
   formData: ProfileFormData;
   isUsernameSet: boolean;
+  userId: string;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onHandicapChange: (value: string) => void;
   onPublicToggle: (checked: boolean) => void;
+  onProfileUpdate: () => void;
 }
 
 const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
   formData,
   isUsernameSet,
+  userId,
   onInputChange,
   onHandicapChange,
   onPublicToggle,
+  onProfileUpdate,
 }) => {
-  const handicapOptions = generateHandicapOptions();
-
   return (
     <div className="space-y-4 py-4">
       <div className="space-y-2">
@@ -75,19 +77,17 @@ const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
         />
       </div>
       <div className="space-y-2">
-        <Label htmlFor="handicap">Handicap</Label>
-        <Select value={formData.handicap} onValueChange={onHandicapChange}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select your handicap" />
-          </SelectTrigger>
-          <SelectContent className="max-h-60">
-            {handicapOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="flex items-center justify-between">
+          <Label htmlFor="handicap">Handicap</Label>
+          <HandicapEditModal
+            userId={userId}
+            currentHandicap={formData.handicap ? parseFloat(formData.handicap) : null}
+            onHandicapUpdate={onProfileUpdate}
+          />
+        </div>
+        <div className="text-sm text-muted-foreground">
+          {formData.handicap ? `Current handicap: ${formData.handicap}` : 'No handicap set'}
+        </div>
       </div>
       <div className="flex items-center justify-between space-x-2">
         <div className="space-y-1">
