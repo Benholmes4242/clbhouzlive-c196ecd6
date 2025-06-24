@@ -21,7 +21,7 @@ interface NewsArticle {
 
 const News = () => {
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState('latest');
+  const [activeTab, setActiveTab] = useState('pga');
 
   const { data: articles, isLoading, error, refetch } = useQuery({
     queryKey: ['news-articles'],
@@ -91,23 +91,13 @@ const News = () => {
           article.title.toLowerCase().includes('tournament') ||
           article.description.toLowerCase().includes('liv')
         );
-      case 'universities':
+      case 'dpworld':
         return articles.filter(article => 
-          article.title.toLowerCase().includes('college') ||
-          article.title.toLowerCase().includes('university') ||
-          article.title.toLowerCase().includes('ncaa') ||
-          article.description.toLowerCase().includes('college') ||
-          article.description.toLowerCase().includes('university')
-        );
-      case 'amateur':
-        return articles.filter(article => 
-          article.title.toLowerCase().includes('amateur') ||
-          article.title.toLowerCase().includes('club') ||
-          article.title.toLowerCase().includes('handicap') ||
-          article.title.toLowerCase().includes('local') ||
-          article.description.toLowerCase().includes('amateur') ||
-          article.description.toLowerCase().includes('club golf') ||
-          article.description.toLowerCase().includes('recreational')
+          article.title.toLowerCase().includes('dp world') ||
+          article.title.toLowerCase().includes('european tour') ||
+          article.title.toLowerCase().includes('ryder cup') ||
+          article.description.toLowerCase().includes('dp world') ||
+          article.description.toLowerCase().includes('european tour')
         );
       default:
         return articles;
@@ -235,17 +225,11 @@ const News = () => {
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="latest">Latest News</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="pga">PGA Tour</TabsTrigger>
           <TabsTrigger value="liv">LIV Golf</TabsTrigger>
-          <TabsTrigger value="universities">USA Universities</TabsTrigger>
-          <TabsTrigger value="amateur">Amateur Golf</TabsTrigger>
+          <TabsTrigger value="dpworld">DP World Tour</TabsTrigger>
         </TabsList>
-
-        <TabsContent value="latest" className="mt-6">
-          {renderNewsContent(filterArticlesByCategory('latest'))}
-        </TabsContent>
 
         <TabsContent value="pga" className="mt-6">
           {renderNewsContent(filterArticlesByCategory('pga'))}
@@ -255,12 +239,8 @@ const News = () => {
           {renderNewsContent(filterArticlesByCategory('liv'))}
         </TabsContent>
 
-        <TabsContent value="universities" className="mt-6">
-          {renderNewsContent(filterArticlesByCategory('universities'))}
-        </TabsContent>
-
-        <TabsContent value="amateur" className="mt-6">
-          {renderNewsContent(filterArticlesByCategory('amateur'))}
+        <TabsContent value="dpworld" className="mt-6">
+          {renderNewsContent(filterArticlesByCategory('dpworld'))}
         </TabsContent>
       </Tabs>
     </div>
