@@ -17,30 +17,16 @@ interface BasicInfoFormProps {
 
 const BasicInfoForm: React.FC<BasicInfoFormProps> = ({ formData, onChange }) => (
   <div className="space-y-4">
-    <h2 className="text-xl font-semibold">Basic Information</h2>
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div>
-        <Label htmlFor="name">Full Name</Label>
-        <Input
-          id="name"
-          name="name"
-          value={formData.name}
-          onChange={onChange}
-          placeholder="Enter your full name"
-          required
-        />
-      </div>
-      <div>
-        <Label htmlFor="username">Username</Label>
-        <Input
-          id="username"
-          name="username"
-          value={formData.username}
-          onChange={onChange}
-          placeholder="Choose a username"
-          required
-        />
-      </div>
+    <div>
+      <Label htmlFor="name">Full Name</Label>
+      <Input
+        id="name"
+        name="name"
+        value={formData.name}
+        onChange={onChange}
+        placeholder="Enter your full name"
+        required
+      />
     </div>
     <div>
       <Label htmlFor="homeClub">Home Golf Club</Label>

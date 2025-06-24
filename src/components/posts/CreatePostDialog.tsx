@@ -1,7 +1,8 @@
+
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePostSubmission } from './PostSubmissionHandler';
 import PostContentForm from './PostContentForm';
@@ -46,6 +47,12 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
     });
   };
 
+  const handleClose = () => {
+    if (!isSubmitting) {
+      setIsOpen(false);
+    }
+  };
+
   if (!user) return null;
 
   return (
@@ -58,7 +65,18 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
       </DialogTrigger>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>Create Post</DialogTitle>
+          <div className="flex items-center justify-between">
+            <DialogTitle>Create Post</DialogTitle>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleClose}
+              disabled={isSubmitting}
+              className="h-6 w-6 p-0"
+            >
+              <X className="h-4 w-4" />
+            </Button>
+          </div>
         </DialogHeader>
         <PostContentForm 
           onSubmit={handleSubmit} 

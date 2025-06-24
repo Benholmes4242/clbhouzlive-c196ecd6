@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -48,6 +47,16 @@ const CreateProfile = () => {
   const [profilePhotoFile, setProfilePhotoFile] = useState<File | null>(null);
   const [profilePhotoPreview, setProfilePhotoPreview] = useState<string | null>(null);
   const [uploadingPhoto, setUploadingPhoto] = useState(false);
+
+  // Set username from auth metadata on component mount
+  useEffect(() => {
+    if (user?.user_metadata?.username) {
+      setFormData(prev => ({
+        ...prev,
+        username: user.user_metadata.username
+      }));
+    }
+  }, [user]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -166,14 +175,14 @@ const CreateProfile = () => {
           <div className="space-y-4">
             <h2 className="text-xl font-semibold">Basic Information</h2>
             <BasicInfoForm formData={formData} onChange={handleInputChange} />
-            {/* Show selected username as read-only if it exists */}
+            {/* Show selected username as read-only */}
             {formData.username && (
               <div className="mt-4 p-4 bg-gray-50 rounded-lg border">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">Username (selected)</label>
+                  <label className="text-sm font-medium text-gray-700">Username (selected during sign-up)</label>
                   <div className="text-gray-600 font-medium">@{formData.username}</div>
                   <p className="text-xs text-gray-500">
-                    Username selected — can't be changed without contacting Clbhouz Support.
+                    Username was selected during account creation and cannot be changed here.
                   </p>
                 </div>
               </div>
