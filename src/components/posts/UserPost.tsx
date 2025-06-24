@@ -19,7 +19,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 import EditPostDialog from './EditPostDialog';
 import TaggedText from './TaggedText';
 import PostModal from './PostModal';
@@ -65,6 +65,7 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   const displayName = post.user.display_name || post.user.username || 'User';
   const timeAgo = formatDistanceToNow(new Date(post.created_at), { addSuffix: true });
@@ -188,7 +189,16 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
           <div className="mb-3 cursor-pointer" onClick={handlePostClick}>
             {post.post_media.length > 1 ? (
               <div className="relative">
-                <Carousel className="w-full">
+                <Carousel 
+                  className="w-full"
+                  setApi={(api) => {
+                    if (api) {
+                      api.on('select', () => {
+                        setCurrentSlide(api.selectedScrollSnap());
+                      });
+                    }
+                  }}
+                >
                   <CarouselContent>
                     {post.post_media.map((media, index) => (
                       <CarouselItem key={media.id}>
@@ -214,15 +224,16 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
                       </CarouselItem>
                     ))}
                   </CarouselContent>
-                  <CarouselPrevious className="left-2" />
-                  <CarouselNext className="right-2" />
                 </Carousel>
-                {/* Indicator dots */}
-                <div className="flex justify-center mt-2 space-x-1">
+                
+                {/* Dot indicators */}
+                <div className="flex justify-center mt-3 space-x-2">
                   {post.post_media.map((_, index) => (
                     <div
                       key={index}
-                      className="w-2 h-2 rounded-full bg-muted-foreground/30"
+                      className={`w-2 h-2 rounded-full transition-colors ${
+                        index === currentSlide ? 'bg-foreground' : 'bg-muted-foreground/30'
+                      }`}
                     />
                   ))}
                 </div>

@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { MoreHorizontal, Heart, MessageCircle, Share, X, Edit, Trash2 } from 'lucide-react';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 import { formatDistanceToNow } from 'date-fns';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -58,6 +58,7 @@ const PostModal = ({ isOpen, onClose, post, isOwnPost = false, onPostUpdated, on
   const { toast } = useToast();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   if (!post) return null;
 
@@ -167,34 +168,55 @@ const PostModal = ({ isOpen, onClose, post, isOwnPost = false, onPostUpdated, on
             {/* Media Content */}
             {post.post_media && post.post_media.length > 0 ? (
               post.post_media.length > 1 ? (
-                <Carousel className="w-full h-full">
-                  <CarouselContent className="h-full">
-                    {post.post_media.map((media, index) => (
-                      <CarouselItem key={media.id} className="h-full flex items-center justify-center">
-                        <div className="w-full h-full flex items-center justify-center">
-                          {media.media_type === 'image' ? (
-                            <img
-                              src={media.media_url}
-                              alt="Post content"
-                              className="max-w-full max-h-full object-contain"
-                            />
-                          ) : (
-                            <div className="w-full h-full max-w-full max-h-full flex items-center justify-center">
-                              <VideoPreview
+                <div className="w-full h-full relative">
+                  <Carousel 
+                    className="w-full h-full"
+                    setApi={(api) => {
+                      if (api) {
+                        api.on('select', () => {
+                          setCurrentSlide(api.selectedScrollSnap());
+                        });
+                      }
+                    }}
+                  >
+                    <CarouselContent className="h-full">
+                      {post.post_media.map((media, index) => (
+                        <CarouselItem key={media.id} className="h-full flex items-center justify-center">
+                          <div className="w-full h-full flex items-center justify-center">
+                            {media.media_type === 'image' ? (
+                              <img
                                 src={media.media_url}
-                                className="w-full h-full max-w-full max-h-full"
-                                onFullscreen={() => {}}
-                                videoId={`modal-post-${post.id}-${index}`}
+                                alt="Post content"
+                                className="max-w-full max-h-full object-contain"
                               />
-                            </div>
-                          )}
-                        </div>
-                      </CarouselItem>
+                            ) : (
+                              <div className="w-full h-full max-w-full max-h-full flex items-center justify-center">
+                                <VideoPreview
+                                  src={media.media_url}
+                                  className="w-full h-full max-w-full max-h-full"
+                                  onFullscreen={() => {}}
+                                  videoId={`modal-post-${post.id}-${index}`}
+                                />
+                              </div>
+                            )}
+                          </div>
+                        </CarouselItem>
+                      ))}
+                    </CarouselContent>
+                  </Carousel>
+                  
+                  {/* Dot indicators */}
+                  <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                    {post.post_media.map((_, index) => (
+                      <div
+                        key={index}
+                        className={`w-2.5 h-2.5 rounded-full transition-colors ${
+                          index === currentSlide ? 'bg-white' : 'bg-white/50'
+                        }`}
+                      />
                     ))}
-                  </CarouselContent>
-                  <CarouselPrevious className="left-4 text-white" />
-                  <CarouselNext className="right-4 text-white" />
-                </Carousel>
+                  </div>
+                </div>
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
                   {post.post_media[0].media_type === 'image' ? (

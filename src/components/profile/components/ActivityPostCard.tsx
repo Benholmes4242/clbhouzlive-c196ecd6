@@ -1,8 +1,8 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Maximize2 } from 'lucide-react';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 import TaggedText from '@/components/posts/TaggedText';
 import VideoPreview from '@/components/posts/VideoPreview';
 import { ActivityPost } from '../types/ActivityTypes';
@@ -14,6 +14,8 @@ interface ActivityPostCardProps {
 }
 
 const ActivityPostCard: React.FC<ActivityPostCardProps> = ({ post, attributionText, onClick }) => {
+  const [currentSlide, setCurrentSlide] = useState(0);
+
   return (
     <Card 
       key={post.id} 
@@ -26,7 +28,16 @@ const ActivityPostCard: React.FC<ActivityPostCardProps> = ({ post, attributionTe
           <div className="flex-1 relative group">
             {post.post_media.length > 1 ? (
               <div className="relative h-full">
-                <Carousel className="w-full h-full">
+                <Carousel 
+                  className="w-full h-full"
+                  setApi={(api) => {
+                    if (api) {
+                      api.on('select', () => {
+                        setCurrentSlide(api.selectedScrollSnap());
+                      });
+                    }
+                  }}
+                >
                   <CarouselContent className="h-full">
                     {post.post_media.map((media, index) => (
                       <CarouselItem key={media.id} className="h-full">
@@ -57,19 +68,16 @@ const ActivityPostCard: React.FC<ActivityPostCardProps> = ({ post, attributionTe
                       </CarouselItem>
                     ))}
                   </CarouselContent>
-                  {post.post_media.length > 1 && (
-                    <>
-                      <CarouselPrevious className="left-2" />
-                      <CarouselNext className="right-2" />
-                    </>
-                  )}
                 </Carousel>
-                {/* Indicator dots */}
+                
+                {/* Dot indicators */}
                 <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-1">
                   {post.post_media.map((_, index) => (
                     <div
                       key={index}
-                      className="w-1.5 h-1.5 rounded-full bg-white/70"
+                      className={`w-1.5 h-1.5 rounded-full transition-colors ${
+                        index === currentSlide ? 'bg-white' : 'bg-white/50'
+                      }`}
                     />
                   ))}
                 </div>

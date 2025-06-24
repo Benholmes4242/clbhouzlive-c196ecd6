@@ -1,7 +1,6 @@
-
 import React, { useRef, useEffect, useState } from 'react';
 import { Play, Pause, Maximize2 } from 'lucide-react';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
 
 interface PostContentProps {
   content: {
@@ -21,6 +20,7 @@ const PostContent = ({ content, onVideoClick }: PostContentProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showControls, setShowControls] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   const handleVideoClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -166,25 +166,42 @@ const PostContent = ({ content, onVideoClick }: PostContentProps) => {
           </div>
         ) : allImages.length > 1 ? (
           // Multiple images - use carousel
-          <Carousel className="w-full">
-            <CarouselContent>
-              {allImages.map((imageUrl, index) => (
-                <CarouselItem key={index}>
-                  <img
-                    src={imageUrl}
-                    alt={`Post content ${index + 1}`}
-                    className="w-full h-80 object-cover"
-                  />
-                </CarouselItem>
+          <div className="relative">
+            <Carousel 
+              className="w-full"
+              setApi={(api) => {
+                if (api) {
+                  api.on('select', () => {
+                    setCurrentSlide(api.selectedScrollSnap());
+                  });
+                }
+              }}
+            >
+              <CarouselContent>
+                {allImages.map((imageUrl, index) => (
+                  <CarouselItem key={index}>
+                    <img
+                      src={imageUrl}
+                      alt={`Post content ${index + 1}`}
+                      className="w-full h-80 object-cover"
+                    />
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+            </Carousel>
+            
+            {/* Dot indicators */}
+            <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-2">
+              {allImages.map((_, index) => (
+                <div
+                  key={index}
+                  className={`w-2 h-2 rounded-full transition-colors ${
+                    index === currentSlide ? 'bg-white' : 'bg-white/50'
+                  }`}
+                />
               ))}
-            </CarouselContent>
-            {allImages.length > 1 && (
-              <>
-                <CarouselPrevious className="left-2" />
-                <CarouselNext className="right-2" />
-              </>
-            )}
-          </Carousel>
+            </div>
+          </div>
         ) : allImages.length === 1 ? (
           // Single image
           <img
