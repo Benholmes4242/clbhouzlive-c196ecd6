@@ -14,12 +14,20 @@ export interface GolfCourse {
   longitude: number | null;
 }
 
-export const regionMapping = {
-  'all': 'All Regions',
-  'britain-ireland': 'Britain & Ireland',
-  'europe': 'Europe',
-  'usa': 'USA',
-  'worldwide': 'Worldwide'
-} as const;
+export interface CourseRating {
+  id: string;
+  rating: number;
+  review: string | null;
+  review_date: string;
+  user_id: string;
+  user_profile?: {
+    username: string | null;
+    display_name: string | null;
+  } | null;
+}
 
-export type RegionKey = keyof typeof regionMapping;
+export interface GolfCourseEditorProps {
+  course: GolfCourse | null;
+  isCreating: boolean;
+  onClose: () => void;
+}
