@@ -93,6 +93,30 @@ export const usePostSubmission = () => {
     }
   };
 
+  const createOptimisticPost = (user: any, content: string, mediaFiles: File[], selectedTags: TaggableEntity[]) => {
+    const optimisticPost = {
+      id: `temp-${Date.now()}`,
+      content: content.trim() || null,
+      created_at: new Date().toISOString(),
+      user: {
+        id: user.id,
+        display_name: user.user_metadata?.display_name || user.email?.split('@')[0] || 'User',
+        username: user.user_metadata?.username || null,
+        profile_photo_url: user.user_metadata?.profile_photo_url || null
+      },
+      post_media: mediaFiles.map((file, index) => ({
+        id: `temp-media-${index}`,
+        media_type: file.type.startsWith('image/') ? 'image' as const : 'video' as const,
+        media_url: URL.createObjectURL(file),
+        uploading: true
+      })),
+      post_tags: selectedTags,
+      uploading: true
+    };
+
+    return optimisticPost;
+  };
+
   const submitPost = async ({
     user,
     content,
@@ -103,10 +127,24 @@ export const usePostSubmission = () => {
   }: PostSubmissionHandlerProps) => {
     if (!user || (!content.trim() && mediaFiles.length === 0)) return;
 
+    // Show instant feedback
+    toast({
+      title: "Post shared!",
+      description: mediaFiles.length > 0 ? "Uploading media in background..." : "Your post has been shared successfully.",
+      duration: 1000
+    });
+
+    // Create optimistic post for immediate UI update
+    const optimisticPost = createOptimisticPost(user, content, mediaFiles, selectedTags);
+    
+    // Immediately call onSuccess to update UI
+    onSuccess();
+
+    // Start background upload process
     let createdPostId: string | null = null;
     
     try {
-      console.log('Starting post creation...');
+      console.log('Starting background post creation...');
       
       // Create the post first
       const { data: postData, error: postError } = await supabase
@@ -128,11 +166,11 @@ export const usePostSubmission = () => {
 
       // Upload media files if any
       if (mediaFiles.length > 0) {
-        console.log('Uploading media files...');
+        console.log('Uploading media files in background...');
         for (const file of mediaFiles) {
           await uploadMedia(file, postData.id, user.id);
         }
-        console.log('Media upload completed');
+        console.log('Background media upload completed');
       }
 
       // Create post tags if any
@@ -142,33 +180,40 @@ export const usePostSubmission = () => {
         console.log('Post tags created');
       }
 
-      console.log('Post creation process completed successfully');
+      console.log('Background upload process completed successfully');
 
-      toast({
-        title: "Post created!",
-        description: selectedTags.length > 0 
-          ? `Your post has been shared and ${selectedTags.length} ${selectedTags.length === 1 ? 'person has' : 'people have'} been tagged.`
-          : "Your post has been shared successfully."
-      });
-
-      onSuccess();
+      // Broadcast success event for feed refresh
+      window.dispatchEvent(new CustomEvent('postUploadCompleted', { 
+        detail: { postId: postData.id, optimisticId: optimisticPost.id } 
+      }));
 
     } catch (error) {
-      console.error('Error creating post:', error);
+      console.error('Error in background upload:', error);
       
       // If we created a post but subsequent operations failed, roll it back
       if (createdPostId) {
         await rollbackPost(createdPostId);
       }
       
-      // Show error to user
+      // Show retry option
       toast({
-        title: "Failed to create post",
-        description: "Please try again. If the problem persists, check your internet connection.",
-        variant: "destructive"
+        title: "Upload failed",
+        description: "Tap to retry uploading your post.",
+        variant: "destructive",
+        duration: 5000,
+        action: {
+          altText: "Retry",
+          onClick: () => {
+            // Retry the upload
+            submitPost({ user, content, mediaFiles, selectedTags, onSuccess: () => {}, onError });
+          }
+        }
       });
 
-      onError();
+      // Broadcast error event for UI cleanup
+      window.dispatchEvent(new CustomEvent('postUploadFailed', { 
+        detail: { optimisticId: optimisticPost.id } 
+      }));
     }
   };
 

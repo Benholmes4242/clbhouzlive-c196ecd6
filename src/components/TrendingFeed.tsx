@@ -2,8 +2,10 @@
 import React from 'react';
 import PostCard from './feed/PostCard';
 import UserPost from './posts/UserPost';
+import OptimisticPostCard from './posts/OptimisticPostCard';
 import LoadingSkeleton from './feed/LoadingSkeleton';
 import { useUserPosts } from '@/hooks/useUserPosts';
+import { useOptimisticPosts } from '@/hooks/useOptimisticPosts';
 import { useExternalVideos } from '@/hooks/useExternalVideos';
 import { sortContentByTime } from '@/utils/contentSorting';
 import { VideoPost, UserPostWithType } from './feed/types';
@@ -14,6 +16,7 @@ import { supabase } from '@/integrations/supabase/client';
 const TrendingFeed = () => {
   const { user } = useSupabaseSession();
   const { posts: userPosts, loading: userPostsLoading, refetch: refetchUserPosts } = useUserPosts();
+  const { optimisticPosts } = useOptimisticPosts();
   const { videos: externalVideos, loading: externalVideosLoading } = useExternalVideos();
 
   // Get posts from followed users and friends
@@ -154,7 +157,7 @@ const TrendingFeed = () => {
 
   const sortedContent = sortContentByTime(allContent);
 
-  if (sortedContent.length === 0) {
+  if (sortedContent.length === 0 && optimisticPosts.length === 0) {
     return (
       <div className="space-y-6 pb-20">
         <div className="text-center py-12">
@@ -169,6 +172,19 @@ const TrendingFeed = () => {
 
   return (
     <div className="space-y-6 pb-20">
+      {/* Show optimistic posts first */}
+      {optimisticPosts.map((optimisticPost) => (
+        <OptimisticPostCard 
+          key={optimisticPost.id} 
+          post={optimisticPost}
+          onRetry={() => {
+            // Handle retry logic here if needed
+            console.log('Retry upload for:', optimisticPost.id);
+          }}
+        />
+      ))}
+      
+      {/* Show actual posts */}
       {sortedContent.map((item) => (
         item.type === 'user_post' ? (
           <UserPost 
