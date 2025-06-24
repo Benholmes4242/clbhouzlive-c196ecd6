@@ -22,6 +22,8 @@ interface GolfCourse {
   description: string | null;
   thumbnail_image: string | null;
   website_url: string | null;
+  latitude: number | null;
+  longitude: number | null;
 }
 
 const GolfCoursesManagement = () => {
@@ -38,7 +40,7 @@ const GolfCoursesManagement = () => {
       const { data, error } = await supabase
         .from('golf_courses')
         .select('*')
-        .order('global_rank', { ascending: true, nullsLast: true });
+        .order('global_rank', { ascending: true, nullsFirst: false });
 
       if (error) throw error;
       return data as GolfCourse[];
@@ -88,7 +90,13 @@ const GolfCoursesManagement = () => {
   };
 
   const handleEditCourse = (course: GolfCourse) => {
-    setSelectedCourse(course);
+    // Ensure the course has all required properties
+    const courseWithDefaults: GolfCourse = {
+      ...course,
+      latitude: course.latitude || null,
+      longitude: course.longitude || null,
+    };
+    setSelectedCourse(courseWithDefaults);
     setIsCreating(false);
     setIsEditorOpen(true);
   };

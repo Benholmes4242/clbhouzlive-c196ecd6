@@ -51,7 +51,7 @@ interface CourseRating {
   review: string | null;
   review_date: string;
   user_id: string;
-  user_profiles: {
+  user_profile?: {
     username: string | null;
     display_name: string | null;
   } | null;
@@ -79,7 +79,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
 
   const [deleteReviewId, setDeleteReviewId] = useState<string | null>(null);
 
-  // Fetch course ratings/reviews
+  // Fetch course ratings/reviews with a simpler query structure
   const { data: ratings, isLoading: ratingsLoading } = useQuery({
     queryKey: ['course-ratings', course?.id],
     queryFn: async () => {
@@ -87,18 +87,29 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
       
       const { data, error } = await supabase
         .from('course_ratings')
-        .select(`
-          *,
-          user_profiles:user_id (
-            username,
-            display_name
-          )
-        `)
+        .select('*')
         .eq('course_id', course.id)
         .order('review_date', { ascending: false });
 
       if (error) throw error;
-      return data as CourseRating[];
+      
+      // Fetch user profiles separately to avoid relation issues
+      const ratingsWithProfiles = await Promise.all(
+        (data || []).map(async (rating) => {
+          const { data: profile } = await supabase
+            .from('user_profiles')
+            .select('username, display_name')
+            .eq('id', rating.user_id)
+            .single();
+          
+          return {
+            ...rating,
+            user_profile: profile
+          };
+        })
+      );
+      
+      return ratingsWithProfiles as CourseRating[];
     },
     enabled: !isCreating && !!course?.id,
   });
@@ -398,8 +409,8 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
                           <div className="flex items-center gap-2 mb-2">
                             <User className="h-4 w-4 text-muted-foreground" />
                             <span className="font-medium">
-                              {rating.user_profiles?.display_name || 
-                               rating.user_profiles?.username || 
+                              {rating.user_profile?.display_name || 
+                               rating.user_profile?.username || 
                                'Anonymous User'}
                             </span>
                             <div className="flex items-center gap-1">
