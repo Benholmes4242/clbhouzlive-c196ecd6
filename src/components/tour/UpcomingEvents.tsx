@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -114,7 +115,7 @@ const UpcomingEvents = () => {
           <Card key={event.id} className="hover:shadow-lg transition-shadow">
             <CardHeader className="pb-3 min-h-[5rem]">
               <div className="flex items-start justify-between">
-                <div className="flex-1">
+                <div className="flex-1 pr-4">
                   <CardTitle className="text-lg mb-2">{event.name}</CardTitle>
                   <div className="flex items-center gap-3 mb-2">
                     {event.status === 'live' && (
@@ -124,7 +125,7 @@ const UpcomingEvents = () => {
                     )}
                   </div>
                 </div>
-                <div className={getTourLogoSize(event.tour)}>
+                <div className={`flex items-center justify-end ${getTourLogoSize(event.tour)}`}>
                   <img
                     src={tourLogos[event.tour]}
                     alt={`${event.tour} logo`}

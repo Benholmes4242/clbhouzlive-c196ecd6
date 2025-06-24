@@ -20,15 +20,15 @@ export const getChangeIndicator = (change: number) => {
 export const getTourLogoSize = (tour: string) => {
   switch (tour) {
     case 'PGA':
-      return 'h-16 w-auto'; // Keep current size for PGA
+      return 'h-12 w-auto sm:h-16 sm:w-auto'; // Responsive sizing for mobile
     case 'DP World':
-      return 'h-16 w-auto'; // Keep current size for DP World
+      return 'h-12 w-auto sm:h-16 sm:w-auto'; // Responsive sizing for mobile
     case 'LIV':
-      return 'h-10 w-auto'; // Make LIV logo h-10
+      return 'h-8 w-auto sm:h-12 sm:w-auto'; // Smaller on mobile, medium on desktop
     case 'University':
-      return 'h-10 w-auto'; // Make University/NCAA logo h-10
+      return 'h-8 w-auto sm:h-12 sm:w-auto'; // Smaller on mobile, medium on desktop
     default:
-      return 'h-16 w-auto'; // Default to standard sizing
+      return 'h-12 w-auto sm:h-16 sm:w-auto'; // Default responsive sizing
   }
 };
 

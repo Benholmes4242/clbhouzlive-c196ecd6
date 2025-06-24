@@ -105,7 +105,7 @@ const LiveLeaderboards = () => {
       <Card>
         <CardHeader className="h-24 flex flex-col justify-center py-4">
           <div className="flex items-center justify-between h-full">
-            <div className="flex-1 min-h-0">
+            <div className="flex-1 pr-4 min-h-0">
               <CardTitle className="flex items-center gap-4 mb-1">
                 <span>{selectedTournament.name}</span>
                 {selectedTournament.status === 'live' && (
@@ -119,7 +119,7 @@ const LiveLeaderboards = () => {
                 {selectedTournament.cutLine && ` • Cut Line: ${selectedTournament.cutLine}`}
               </p>
             </div>
-            <div className={`flex items-center ${getTourLogoSize(selectedTournament.tour)}`}>
+            <div className={`flex items-center justify-end ${getTourLogoSize(selectedTournament.tour)}`}>
               <img
                 src={tourLogos[selectedTournament.tour]}
                 alt={`${selectedTournament.tour} logo`}
