@@ -1,6 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useTaggableEntities } from '@/hooks/useTaggableEntities';
+import { useDebounce } from '@/hooks/useDebounce';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { User, Building, MapPin, Plus } from 'lucide-react';
@@ -26,6 +27,27 @@ const TagInput = ({ content, onContentChange, onTagsChange }: TagInputProps) => 
   const [selectedTags, setSelectedTags] = useState<TaggableEntity[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { entities, loading, searchEntities, createGolfClubEntity, createBusinessEntity } = useTaggableEntities();
+  
+  // Debounce the current query to reduce API calls
+  const debouncedQuery = useDebounce(currentQuery, 300);
+
+  // Search entities when debounced query changes
+  useEffect(() => {
+    if (debouncedQuery.length >= 2) {
+      searchEntities(debouncedQuery);
+    }
+  }, [debouncedQuery, searchEntities]);
+
+  // Deduplicate entities by entity_id and username/name combination
+  const uniqueEntities = entities.reduce((acc, entity) => {
+    const identifier = `${entity.entity_type}-${entity.entity_id}-${entity.username || entity.name}`;
+    if (!acc.find(item => 
+      `${item.entity_type}-${item.entity_id}-${item.username || item.name}` === identifier
+    )) {
+      acc.push(entity);
+    }
+    return acc;
+  }, [] as TaggableEntity[]);
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const newContent = e.target.value;
@@ -42,9 +64,6 @@ const TagInput = ({ content, onContentChange, onTagsChange }: TagInputProps) => 
       const query = tagMatch[1];
       setCurrentQuery(query);
       setShowSuggestions(true);
-      if (query.length >= 2) {
-        searchEntities(query);
-      }
     } else {
       setShowSuggestions(false);
       setCurrentQuery('');
@@ -123,7 +142,7 @@ const TagInput = ({ content, onContentChange, onTagsChange }: TagInputProps) => 
               <div className="p-2 text-sm text-muted-foreground">Searching...</div>
             ) : (
               <>
-                {entities.map((entity) => (
+                {uniqueEntities.map((entity) => (
                   <Button
                     key={entity.id}
                     variant="ghost"
@@ -145,7 +164,7 @@ const TagInput = ({ content, onContentChange, onTagsChange }: TagInputProps) => 
                   </Button>
                 ))}
                 
-                {currentQuery.length >= 2 && entities.length === 0 && !loading && (
+                {currentQuery.length >= 2 && uniqueEntities.length === 0 && !loading && (
                   <div className="space-y-1">
                     <Button
                       variant="ghost"
