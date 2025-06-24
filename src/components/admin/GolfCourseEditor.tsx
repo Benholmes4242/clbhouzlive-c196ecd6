@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -63,6 +62,19 @@ interface GolfCourseEditorProps {
   onClose: () => void;
 }
 
+const countryOptions = [
+  'USA',
+  'Britain and Ireland',
+  'Continental Europe',
+  'Worldwide'
+];
+
+const regionalRankOptions = [
+  'Britain and Ireland',
+  'USA',
+  'Continental Europe'
+];
+
 const continentOptions = [
   'North America',
   'South America',
@@ -76,8 +88,10 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const { register, handleSubmit, setValue, watch, reset } = useForm();
-
-  const [deleteReviewId, setDeleteReviewId] = useState<string | null>(null);
+  
+  const [selectedCountry, setSelectedCountry] = useState('');
+  const [selectedRegionalRank, setSelectedRegionalRank] = useState('');
+  const [selectedContinent, setSelectedContinent] = useState('');
 
   // Fetch course ratings/reviews with a simpler query structure
   const { data: ratings, isLoading: ratingsLoading } = useQuery({
@@ -130,6 +144,9 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
         latitude: course.latitude || '',
         longitude: course.longitude || '',
       });
+      setSelectedCountry(course.country);
+      setSelectedContinent(course.continent);
+      setSelectedRegionalRank(course.regional_rank?.toString() || '');
     } else {
       reset({
         name: '',
@@ -144,6 +161,9 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
         latitude: '',
         longitude: '',
       });
+      setSelectedCountry('');
+      setSelectedContinent('');
+      setSelectedRegionalRank('');
     }
   }, [course, isCreating, reset]);
 
@@ -228,7 +248,23 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
   });
 
   const onSubmit = (data: any) => {
-    saveMutation.mutate(data);
+    if (!selectedCountry) {
+      toast({
+        title: "Error",
+        description: "Please select a country",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const formData = {
+      ...data,
+      country: selectedCountry,
+      continent: selectedContinent || null,
+      regional_rank: selectedRegionalRank ? parseInt(selectedRegionalRank) : null,
+    };
+    
+    saveMutation.mutate(formData);
   };
 
   const handleDeleteReview = (reviewId: string) => {
@@ -276,11 +312,18 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
 
             <div className="space-y-2">
               <Label htmlFor="country">Country *</Label>
-              <Input
-                id="country"
-                {...register('country', { required: true })}
-                placeholder="Enter country"
-              />
+              <Select value={selectedCountry} onValueChange={setSelectedCountry}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select country" />
+                </SelectTrigger>
+                <SelectContent>
+                  {countryOptions.map((country) => (
+                    <SelectItem key={country} value={country}>
+                      {country}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">
@@ -293,8 +336,8 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="continent">Continent *</Label>
-              <Select onValueChange={(value) => setValue('continent', value)}>
+              <Label htmlFor="continent">Continent</Label>
+              <Select value={selectedContinent} onValueChange={setSelectedContinent}>
                 <SelectTrigger>
                   <SelectValue placeholder="Select continent" />
                 </SelectTrigger>
@@ -320,12 +363,18 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
 
             <div className="space-y-2">
               <Label htmlFor="regional_rank">Regional Rank</Label>
-              <Input
-                id="regional_rank"
-                type="number"
-                {...register('regional_rank')}
-                placeholder="Enter regional ranking"
-              />
+              <Select value={selectedRegionalRank} onValueChange={setSelectedRegionalRank}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select regional ranking category" />
+                </SelectTrigger>
+                <SelectContent>
+                  {regionalRankOptions.map((option) => (
+                    <SelectItem key={option} value={option}>
+                      {option}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">
