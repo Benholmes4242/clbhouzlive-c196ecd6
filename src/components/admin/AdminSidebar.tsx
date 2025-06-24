@@ -19,7 +19,8 @@ import {
   Upload, 
   TrendingUp, 
   UserCheck, 
-  Settings as SettingsIcon 
+  Settings as SettingsIcon,
+  MapPin
 } from "lucide-react";
 
 const menuItems = [
@@ -32,6 +33,11 @@ const menuItems = [
     title: "User Management",
     icon: Users,
     value: "users",
+  },
+  {
+    title: "Golf Courses",
+    icon: MapPin,
+    value: "golf-courses",
   },
   {
     title: "Course Import",
