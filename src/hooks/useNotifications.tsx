@@ -54,12 +54,61 @@ export const useNotifications = () => {
   const handleFriendRequestMutation = useMutation({
     mutationFn: async ({ friendRequestId, action }: { friendRequestId: string; action: 'accept' | 'decline' }) => {
       if (action === 'accept') {
-        const { error } = await supabase
+        // Update friend request status to accepted
+        const { error: friendError } = await supabase
           .from('user_friends')
           .update({ status: 'accepted' })
           .eq('id', friendRequestId);
 
-        if (error) throw error;
+        if (friendError) throw friendError;
+
+        // Get the friend request details to create mutual follows
+        const { data: friendRequest } = await supabase
+          .from('user_friends')
+          .select('user_id, friend_id')
+          .eq('id', friendRequestId)
+          .single();
+
+        if (friendRequest) {
+          // Create mutual follow relationships
+          const followPromises = [
+            // User follows friend
+            supabase
+              .from('user_follows')
+              .insert({
+                follower_id: friendRequest.user_id,
+                following_id: friendRequest.friend_id
+              })
+              .then(() => {}),
+            // Friend follows user  
+            supabase
+              .from('user_follows')
+              .insert({
+                follower_id: friendRequest.friend_id,
+                following_id: friendRequest.user_id
+              })
+              .then(() => {})
+          ];
+
+          await Promise.all(followPromises);
+
+          // Get the friend's username for the toast
+          const { data: friendProfile } = await supabase
+            .from('user_profiles')
+            .select('username, display_name')
+            .eq('id', friendRequest.user_id)
+            .single();
+
+          const friendName = friendProfile?.username ? `@${friendProfile.username}` : 
+                           friendProfile?.display_name || 'User';
+
+          // Show enhanced toast message
+          toast({
+            title: `🎉 You're now friends with ${friendName}`,
+            description: "You're automatically following each other!",
+            duration: 3000,
+          });
+        }
       } else {
         const { error } = await supabase
           .from('user_friends')
@@ -67,6 +116,11 @@ export const useNotifications = () => {
           .eq('id', friendRequestId);
 
         if (error) throw error;
+
+        toast({
+          title: "Friend request declined",
+          duration: 1500,
+        });
       }
 
       // Remove the notification
@@ -80,12 +134,13 @@ export const useNotifications = () => {
         if (error) throw error;
       }
     },
-    onSuccess: (_, { action }) => {
-      toast({
-        title: action === 'accept' ? 'Friend request accepted' : 'Friend request declined',
-        description: action === 'accept' ? 'You are now friends!' : 'Request removed',
-      });
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
+      // Also invalidate relationship status queries
+      queryClient.invalidateQueries({ queryKey: ['relationshipStatus'] });
+      queryClient.invalidateQueries({ queryKey: ['followerCount'] });
+      queryClient.invalidateQueries({ queryKey: ['followingCount'] });
+      queryClient.invalidateQueries({ queryKey: ['friendsCount'] });
     },
   });
 

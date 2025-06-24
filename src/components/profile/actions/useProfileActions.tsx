@@ -27,6 +27,7 @@ export const useProfileActions = ({ targetUserId, currentUserId }: UseProfileAct
         toast({
           title: "Unfollowed successfully",
           description: "You are no longer following this user.",
+          duration: 1500,
         });
       } else {
         await supabase
@@ -39,6 +40,7 @@ export const useProfileActions = ({ targetUserId, currentUserId }: UseProfileAct
         toast({
           title: "Following successfully",
           description: "You are now following this user.",
+          duration: 1500,
         });
       }
       
@@ -51,6 +53,7 @@ export const useProfileActions = ({ targetUserId, currentUserId }: UseProfileAct
         title: "Error",
         description: "Failed to update follow status. Please try again.",
         variant: "destructive",
+        duration: 3000,
       });
     } finally {
       setLoading(false);
@@ -69,7 +72,7 @@ export const useProfileActions = ({ targetUserId, currentUserId }: UseProfileAct
         
         toast({
           title: "Friend request cancelled",
-          description: "Your friend request has been cancelled.",
+          duration: 1500,
         });
       } else {
         await supabase
@@ -82,7 +85,7 @@ export const useProfileActions = ({ targetUserId, currentUserId }: UseProfileAct
         
         toast({
           title: "Friend request sent",
-          description: "Your friend request has been sent.",
+          duration: 1500,
         });
       }
       
@@ -95,6 +98,7 @@ export const useProfileActions = ({ targetUserId, currentUserId }: UseProfileAct
         title: "Error",
         description: "Failed to send friend request. Please try again.",
         variant: "destructive",
+        duration: 3000,
       });
     } finally {
       setLoading(false);
@@ -119,6 +123,7 @@ export const useProfileActions = ({ targetUserId, currentUserId }: UseProfileAct
       toast({
         title: "Friend removed",
         description: "You are no longer friends with this user and have unfollowed each other.",
+        duration: 2000,
       });
       
       queryClient.invalidateQueries({
@@ -130,6 +135,7 @@ export const useProfileActions = ({ targetUserId, currentUserId }: UseProfileAct
         title: "Error",
         description: "Failed to remove friend. Please try again.",
         variant: "destructive",
+        duration: 3000,
       });
     } finally {
       setLoading(false);
