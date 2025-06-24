@@ -25,17 +25,79 @@ export const useNotifications = () => {
     queryFn: async () => {
       if (!user) return [];
       
+      console.log('Fetching notifications for user:', user.id);
+      
       const { data, error } = await supabase
         .from('notifications')
         .select('*')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching notifications:', error);
+        throw error;
+      }
+      
+      console.log('Fetched notifications:', data);
       return data as Notification[];
     },
     enabled: !!user,
   });
+
+  // Set up real-time subscription for new notifications
+  useEffect(() => {
+    if (!user) return;
+
+    console.log('Setting up notifications subscription for user:', user.id);
+
+    const channel = supabase
+      .channel('notifications-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'notifications',
+          filter: `user_id=eq.${user.id}`
+        },
+        (payload) => {
+          console.log('New notification received:', payload);
+          queryClient.invalidateQueries({ queryKey: ['notifications'] });
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'notifications',
+          filter: `user_id=eq.${user.id}`
+        },
+        (payload) => {
+          console.log('Notification updated:', payload);
+          queryClient.invalidateQueries({ queryKey: ['notifications'] });
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'DELETE',
+          schema: 'public',
+          table: 'notifications',
+          filter: `user_id=eq.${user.id}`
+        },
+        (payload) => {
+          console.log('Notification deleted:', payload);
+          queryClient.invalidateQueries({ queryKey: ['notifications'] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      console.log('Cleaning up notifications subscription');
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id, queryClient]);
 
   const markAsReadMutation = useMutation({
     mutationFn: async (notificationIds: string[]) => {
@@ -53,6 +115,8 @@ export const useNotifications = () => {
 
   const handleFriendRequestMutation = useMutation({
     mutationFn: async ({ friendRequestId, action }: { friendRequestId: string; action: 'accept' | 'decline' }) => {
+      console.log('Processing friend request:', { friendRequestId, action });
+      
       if (action === 'accept') {
         // Update friend request status to accepted
         const { error: friendError } = await supabase
@@ -60,7 +124,10 @@ export const useNotifications = () => {
           .update({ status: 'accepted' })
           .eq('id', friendRequestId);
 
-        if (friendError) throw friendError;
+        if (friendError) {
+          console.error('Error accepting friend request:', friendError);
+          throw friendError;
+        }
 
         // Get the friend request details to create mutual follows
         const { data: friendRequest } = await supabase
@@ -78,8 +145,7 @@ export const useNotifications = () => {
               .insert({
                 follower_id: friendRequest.user_id,
                 following_id: friendRequest.friend_id
-              })
-              .then(() => {}),
+              }),
             // Friend follows user  
             supabase
               .from('user_follows')
@@ -87,10 +153,9 @@ export const useNotifications = () => {
                 follower_id: friendRequest.friend_id,
                 following_id: friendRequest.user_id
               })
-              .then(() => {})
           ];
 
-          await Promise.all(followPromises);
+          await Promise.allSettled(followPromises);
 
           // Get the friend's username for the toast
           const { data: friendProfile } = await supabase
@@ -110,12 +175,16 @@ export const useNotifications = () => {
           });
         }
       } else {
+        console.log('Declining friend request:', friendRequestId);
         const { error } = await supabase
           .from('user_friends')
           .delete()
           .eq('id', friendRequestId);
 
-        if (error) throw error;
+        if (error) {
+          console.error('Error declining friend request:', error);
+          throw error;
+        }
 
         toast({
           title: "Friend request declined",
@@ -126,12 +195,16 @@ export const useNotifications = () => {
       // Remove the notification
       const notification = notifications.find(n => n.data?.friend_request_id === friendRequestId);
       if (notification) {
+        console.log('Removing notification:', notification.id);
         const { error } = await supabase
           .from('notifications')
           .delete()
           .eq('id', notification.id);
 
-        if (error) throw error;
+        if (error) {
+          console.error('Error removing notification:', error);
+          throw error;
+        }
       }
     },
     onSuccess: () => {
@@ -142,6 +215,14 @@ export const useNotifications = () => {
       queryClient.invalidateQueries({ queryKey: ['followingCount'] });
       queryClient.invalidateQueries({ queryKey: ['friendsCount'] });
     },
+    onError: (error) => {
+      console.error('Friend request mutation error:', error);
+      toast({
+        title: "Error processing friend request",
+        description: "Please try again later.",
+        variant: "destructive",
+      });
+    }
   });
 
   const unreadCount = notifications.filter(n => !n.read).length;

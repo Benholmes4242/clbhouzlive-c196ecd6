@@ -15,7 +15,11 @@ const FriendRequestNotification: React.FC<FriendRequestNotificationProps> = ({
   onAccept,
   onDecline
 }) => {
-  const { requester_name, requester_photo, requester_username } = notification.data;
+  // Extract data from notification with fallbacks
+  const data = notification.data || {};
+  const requesterName = data.requester_name || 'Someone';
+  const requesterPhoto = data.requester_photo;
+  const requesterUsername = data.requester_username;
 
   const formatTimeAgo = (dateString: string) => {
     const now = new Date();
@@ -23,37 +27,51 @@ const FriendRequestNotification: React.FC<FriendRequestNotificationProps> = ({
     const diff = now.getTime() - date.getTime();
     const hours = Math.floor(diff / (1000 * 60 * 60));
     const days = Math.floor(hours / 24);
+    const minutes = Math.floor(diff / (1000 * 60));
 
     if (days > 0) return `${days}d ago`;
     if (hours > 0) return `${hours}h ago`;
+    if (minutes > 0) return `${minutes}m ago`;
     return 'Just now';
   };
 
   return (
-    <div className="p-4 border-b border-border">
+    <div className="p-4 border-b border-border bg-background">
       <div className="flex items-start gap-3">
-        <Avatar className="h-10 w-10">
-          <AvatarImage src={requester_photo} alt={requester_name} />
-          <AvatarFallback>
-            {requester_name?.charAt(0)?.toUpperCase() || '?'}
+        <Avatar className="h-10 w-10 flex-shrink-0">
+          <AvatarImage src={requesterPhoto} alt={requesterName} />
+          <AvatarFallback className="bg-blue-100 text-blue-700">
+            {requesterName?.charAt(0)?.toUpperCase() || '?'}
           </AvatarFallback>
         </Avatar>
-        <div className="flex-1">
-          <div className="mb-2">
-            <h4 className="font-semibold text-sm text-muted-foreground">Friend Request</h4>
-            <p className="text-sm">
-              <span className="font-medium">@{requester_username || requester_name}</span> has sent you a friend request.
+        <div className="flex-1 min-w-0">
+          <div className="mb-3">
+            <h4 className="font-semibold text-sm text-blue-600 mb-1">Friend Request</h4>
+            <p className="text-sm text-foreground">
+              <span className="font-medium">
+                {requesterUsername ? `@${requesterUsername}` : requesterName}
+              </span>{' '}
+              sent you a friend request
             </p>
             <p className="text-xs text-muted-foreground mt-1">
               {formatTimeAgo(notification.created_at)}
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <Button size="sm" onClick={onAccept} className="flex items-center gap-1">
+            <Button 
+              size="sm" 
+              onClick={onAccept} 
+              className="flex items-center gap-1 bg-green-600 hover:bg-green-700 text-white"
+            >
               <UserCheck className="h-4 w-4" />
               Accept
             </Button>
-            <Button variant="outline" size="sm" onClick={onDecline} className="flex items-center gap-1">
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={onDecline} 
+              className="flex items-center gap-1 border-red-200 text-red-600 hover:bg-red-50"
+            >
               <X className="h-4 w-4" />
               Decline
             </Button>

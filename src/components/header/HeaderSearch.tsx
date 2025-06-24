@@ -10,6 +10,7 @@ const HeaderSearch = () => {
   const [showResults, setShowResults] = useState(false);
   const [showMobileSearch, setShowMobileSearch] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+  const mobileSearchRef = useRef<HTMLDivElement>(null);
 
   const handleResultClick = () => {
     setQuery('');
@@ -30,19 +31,53 @@ const HeaderSearch = () => {
     }
   };
 
-  // Click outside to close search results
+  // Enhanced click outside handler for mobile and desktop
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+      // Handle desktop search
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
         setShowResults(false);
       }
+      
+      // Handle mobile search
+      if (mobileSearchRef.current && !mobileSearchRef.current.contains(event.target as Node)) {
+        if (showMobileSearch) {
+          setShowMobileSearch(false);
+          setQuery('');
+          setShowResults(false);
+        }
+      }
     };
 
+    // Add both mouse and touch event listeners for better mobile support
     document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
     };
-  }, []);
+  }, [showMobileSearch]);
+
+  // Close mobile search on escape key
+  useEffect(() => {
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        if (showMobileSearch) {
+          setShowMobileSearch(false);
+          setQuery('');
+          setShowResults(false);
+        } else if (showResults) {
+          setShowResults(false);
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleEscapeKey);
+    return () => {
+      document.removeEventListener('keydown', handleEscapeKey);
+    };
+  }, [showMobileSearch, showResults]);
 
   return (
     <>
@@ -84,7 +119,10 @@ const HeaderSearch = () => {
 
       {/* Mobile Search Bar */}
       {showMobileSearch && (
-        <div className="md:hidden pb-4 absolute top-full left-0 right-0 bg-background border-t border-border px-4 z-40" ref={searchRef}>
+        <div 
+          className="md:hidden pb-4 absolute top-full left-0 right-0 bg-background border-t border-border px-4 z-40" 
+          ref={mobileSearchRef}
+        >
           <div className="relative w-full">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <input
