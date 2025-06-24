@@ -31,3 +31,13 @@ export interface GolfCourseEditorProps {
   isCreating: boolean;
   onClose: () => void;
 }
+
+export type RegionKey = 'all' | 'usa' | 'britain-ireland' | 'europe' | 'worldwide';
+
+export const regionMapping: Record<RegionKey, string> = {
+  all: 'All Regions',
+  usa: 'USA',
+  'britain-ireland': 'Britain & Ireland',
+  europe: 'Continental Europe',
+  worldwide: 'Worldwide'
+};
