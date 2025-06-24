@@ -225,7 +225,11 @@ export const useNotifications = () => {
     }
   });
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  // Calculate unread count - only friend requests and new notifications
+  const unreadCount = notifications.filter(n => 
+    !n.read && (n.type === 'friend_request' || 
+                (n.type !== 'friend_request' && !n.read))
+  ).length;
 
   const markAsRead = (notificationIds: string[]) => {
     markAsReadMutation.mutate(notificationIds);

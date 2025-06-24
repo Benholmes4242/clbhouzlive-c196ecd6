@@ -2,6 +2,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Bell, CheckCircle, UserPlus, Tag, MessageSquare } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import FriendRequestNotification from './FriendRequestNotification';
 import FollowNotification from './FollowNotification';
 import TagNotification from './TagNotification';
@@ -17,6 +18,8 @@ const NotificationsList: React.FC<NotificationsListProps> = ({
   onAcceptFriendRequest, 
   onDeclineFriendRequest 
 }) => {
+  const navigate = useNavigate();
+
   const formatTimeAgo = (dateString: string) => {
     const now = new Date();
     const date = new Date(dateString);
@@ -29,6 +32,20 @@ const NotificationsList: React.FC<NotificationsListProps> = ({
     if (hours > 0) return `${hours}h ago`;
     if (minutes > 0) return `${minutes}m ago`;
     return 'Just now';
+  };
+
+  const handleMessageNotificationClick = (notification: any) => {
+    const senderId = notification.data?.sender_id;
+    if (senderId) {
+      navigate('/messages');
+    }
+  };
+
+  const handleFriendAcceptedClick = (notification: any) => {
+    const friendUsername = notification.data?.accepter_username;
+    if (friendUsername) {
+      navigate(`/profile/${friendUsername}`);
+    }
   };
 
   return (
@@ -74,7 +91,11 @@ const NotificationsList: React.FC<NotificationsListProps> = ({
 
           if (notification.type === 'friend_accepted') {
             return (
-              <div key={notification.id} className="flex items-center gap-3 p-4 border-b border-border">
+              <div 
+                key={notification.id} 
+                className="flex items-center gap-3 p-4 border-b border-border cursor-pointer hover:bg-muted/50"
+                onClick={() => handleFriendAcceptedClick(notification)}
+              >
                 <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
                   <CheckCircle className="h-5 w-5 text-green-600" />
                 </div>
@@ -84,6 +105,7 @@ const NotificationsList: React.FC<NotificationsListProps> = ({
                   <p className="text-xs text-muted-foreground mt-1">
                     {formatTimeAgo(notification.created_at)}
                   </p>
+                  <p className="text-xs text-blue-600 mt-1">Tap to view profile</p>
                 </div>
               </div>
             );
@@ -91,7 +113,11 @@ const NotificationsList: React.FC<NotificationsListProps> = ({
 
           if (notification.type === 'message') {
             return (
-              <div key={notification.id} className="flex items-center gap-3 p-4 border-b border-border">
+              <div 
+                key={notification.id} 
+                className="flex items-center gap-3 p-4 border-b border-border cursor-pointer hover:bg-muted/50"
+                onClick={() => handleMessageNotificationClick(notification)}
+              >
                 <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
                   <MessageSquare className="h-5 w-5 text-blue-600" />
                 </div>
@@ -101,6 +127,7 @@ const NotificationsList: React.FC<NotificationsListProps> = ({
                   <p className="text-xs text-muted-foreground mt-1">
                     {formatTimeAgo(notification.created_at)}
                   </p>
+                  <p className="text-xs text-blue-600 mt-1">Tap to open messages</p>
                 </div>
               </div>
             );
