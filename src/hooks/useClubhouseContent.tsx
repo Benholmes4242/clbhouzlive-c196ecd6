@@ -26,6 +26,11 @@ interface ClubhousePost {
     name: string;
     username: string | null;
   }[];
+  stats?: {
+    likes: number;
+    comments: number;
+    views: number;
+  };
 }
 
 export const useClubhouseContent = () => {
@@ -35,7 +40,7 @@ export const useClubhouseContent = () => {
   const fetchRandomContent = async () => {
     setLoading(true);
     try {
-      // Fetch random posts from all users (both individuals and businesses)
+      // Fetch posts with videos from all users across the platform
       const { data: postsData, error } = await supabase
         .from('posts')
         .select(`
@@ -43,7 +48,7 @@ export const useClubhouseContent = () => {
           content,
           created_at,
           user_id,
-          post_media (
+          post_media!inner (
             id,
             media_type,
             media_url
@@ -59,8 +64,9 @@ export const useClubhouseContent = () => {
             )
           )
         `)
+        .eq('post_media.media_type', 'video')
         .order('created_at', { ascending: false })
-        .limit(50); // Get more posts to shuffle from
+        .limit(100); // Get more posts to have variety
 
       if (error) {
         console.error('Error fetching posts:', error);
@@ -108,18 +114,28 @@ export const useClubhouseContent = () => {
             media_url: media.media_url
           })),
           post_tags: (post.post_tags || []).map((tag: any) => ({
-            id: tag.taggable_entities.id,
-            entity_type: tag.taggable_entities.entity_type as 'user' | 'golf_club' | 'business',
-            entity_id: tag.taggable_entities.entity_id,
-            name: tag.taggable_entities.name,
-            username: tag.taggable_entities.username
-          }))
+            id: tag.taggable_entities?.id || '',
+            entity_type: tag.taggable_entities?.entity_type as 'user' | 'golf_club' | 'business' || 'user',
+            entity_id: tag.taggable_entities?.entity_id || '',
+            name: tag.taggable_entities?.name || '',
+            username: tag.taggable_entities?.username || null
+          })),
+          stats: {
+            likes: Math.floor(Math.random() * 100), // Placeholder until we have actual engagement data
+            comments: Math.floor(Math.random() * 50),
+            views: Math.floor(Math.random() * 1000)
+          }
         };
       });
 
-      // Shuffle the posts for random display
-      const shuffledPosts = formattedPosts.sort(() => Math.random() - 0.5);
-      setPosts(shuffledPosts);
+      // Sort by a blend of recent and random content for discovery
+      const sortedPosts = formattedPosts.sort((a, b) => {
+        const aScore = new Date(a.created_at).getTime() + Math.random() * 86400000; // Add random factor
+        const bScore = new Date(b.created_at).getTime() + Math.random() * 86400000;
+        return bScore - aScore;
+      });
+
+      setPosts(sortedPosts);
 
     } catch (error) {
       console.error('Error fetching clubhouse content:', error);
