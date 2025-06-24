@@ -197,15 +197,18 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
                             <img
                               src={media.media_url}
                               alt="Post content"
-                              className="w-full h-80 object-cover"
+                              className="w-full aspect-square object-cover object-center"
+                              style={{ objectPosition: 'center top' }}
                             />
                           ) : (
-                            <VideoPreview
-                              src={media.media_url}
-                              className="w-full h-80"
-                              onFullscreen={handlePostClick}
-                              videoId={`user-post-${post.id}-${index}`}
-                            />
+                            <div className="aspect-square">
+                              <VideoPreview
+                                src={media.media_url}
+                                className="w-full h-full"
+                                onFullscreen={handlePostClick}
+                                videoId={`user-post-${post.id}-${index}`}
+                              />
+                            </div>
                           )}
                         </div>
                       </CarouselItem>
@@ -230,15 +233,18 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
                   <img
                     src={post.post_media[0].media_url}
                     alt="Post content"
-                    className="w-full h-80 object-cover"
+                    className="w-full aspect-square object-cover object-center"
+                    style={{ objectPosition: 'center top' }}
                   />
                 ) : (
-                  <VideoPreview
-                    src={post.post_media[0].media_url}
-                    className="w-full h-80"
-                    onFullscreen={handlePostClick}
-                    videoId={`user-post-${post.id}-0`}
-                  />
+                  <div className="aspect-square">
+                    <VideoPreview
+                      src={post.post_media[0].media_url}
+                      className="w-full h-full"
+                      onFullscreen={handlePostClick}
+                      videoId={`user-post-${post.id}-0`}
+                    />
+                  </div>
                 )}
               </div>
             )}

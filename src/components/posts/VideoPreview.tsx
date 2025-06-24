@@ -64,7 +64,8 @@ const VideoPreview = ({ src, poster, className = "", onFullscreen, videoId }: Vi
         ref={videoRef}
         src={src}
         poster={poster}
-        className="w-full h-full object-cover"
+        className="w-full h-full object-cover object-center"
+        style={{ objectPosition: 'center top' }}
         muted
         loop
         playsInline

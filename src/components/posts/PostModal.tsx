@@ -123,7 +123,7 @@ const PostModal = ({ isOpen, onClose, post, isOwnPost = false, onPostUpdated, on
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-3xl max-h-[90vh] p-0 gap-0 aspect-square">
+        <DialogContent className="max-w-[95vw] max-h-[95vh] w-full h-full p-0 gap-0 flex items-center justify-center">
           <div className="relative w-full h-full bg-black flex items-center justify-center">
             {/* Close button */}
             <Button 
@@ -171,20 +171,24 @@ const PostModal = ({ isOpen, onClose, post, isOwnPost = false, onPostUpdated, on
                   <CarouselContent className="h-full">
                     {post.post_media.map((media, index) => (
                       <CarouselItem key={media.id} className="h-full flex items-center justify-center">
-                        {media.media_type === 'image' ? (
-                          <img
-                            src={media.media_url}
-                            alt="Post content"
-                            className="max-w-full max-h-full object-contain"
-                          />
-                        ) : (
-                          <VideoPreview
-                            src={media.media_url}
-                            className="max-w-full max-h-full"
-                            onFullscreen={() => {}}
-                            videoId={`modal-post-${post.id}-${index}`}
-                          />
-                        )}
+                        <div className="w-full h-full flex items-center justify-center">
+                          {media.media_type === 'image' ? (
+                            <img
+                              src={media.media_url}
+                              alt="Post content"
+                              className="max-w-full max-h-full object-contain"
+                            />
+                          ) : (
+                            <div className="w-full h-full max-w-full max-h-full flex items-center justify-center">
+                              <VideoPreview
+                                src={media.media_url}
+                                className="w-full h-full max-w-full max-h-full"
+                                onFullscreen={() => {}}
+                                videoId={`modal-post-${post.id}-${index}`}
+                              />
+                            </div>
+                          )}
+                        </div>
                       </CarouselItem>
                     ))}
                   </CarouselContent>
@@ -200,12 +204,14 @@ const PostModal = ({ isOpen, onClose, post, isOwnPost = false, onPostUpdated, on
                       className="max-w-full max-h-full object-contain"
                     />
                   ) : (
-                    <VideoPreview
-                      src={post.post_media[0].media_url}
-                      className="max-w-full max-h-full"
-                      onFullscreen={() => {}}
-                      videoId={`modal-post-${post.id}-0`}
-                    />
+                    <div className="w-full h-full max-w-full max-h-full flex items-center justify-center">
+                      <VideoPreview
+                        src={post.post_media[0].media_url}
+                        className="w-full h-full max-w-full max-h-full"
+                        onFullscreen={() => {}}
+                        videoId={`modal-post-${post.id}-0`}
+                      />
+                    </div>
                   )}
                 </div>
               )
