@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, AlertCircle, RefreshCw } from 'lucide-react';
+import { Loader2, AlertCircle, RefreshCw, Video, Image } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
 interface OptimisticPostProps {
@@ -31,6 +31,17 @@ interface OptimisticPostProps {
 const OptimisticPostCard = ({ post, onRetry }: OptimisticPostProps) => {
   const displayName = post.user.display_name || post.user.username || 'User';
   const timeAgo = formatDistanceToNow(new Date(post.created_at), { addSuffix: true });
+  
+  const hasVideos = post.post_media.some(media => media.media_type === 'video');
+  const hasImages = post.post_media.some(media => media.media_type === 'image');
+
+  const getProcessingMessage = () => {
+    if (post.uploadFailed) return 'Upload failed';
+    if (hasVideos && hasImages) return 'Processing media...';
+    if (hasVideos) return 'Processing video...';
+    if (hasImages) return 'Uploading images...';
+    return 'Uploading...';
+  };
 
   return (
     <Card className="border-0 shadow-sm">
@@ -49,7 +60,7 @@ const OptimisticPostCard = ({ post, onRetry }: OptimisticPostProps) => {
                 {post.uploading && !post.uploadFailed && (
                   <div className="flex items-center space-x-1 text-xs text-blue-600">
                     <Loader2 className="h-3 w-3 animate-spin" />
-                    <span>Uploading...</span>
+                    <span>{getProcessingMessage()}</span>
                   </div>
                 )}
                 {post.uploadFailed && (
@@ -82,7 +93,7 @@ const OptimisticPostCard = ({ post, onRetry }: OptimisticPostProps) => {
         {post.post_media && post.post_media.length > 0 && (
           <div className="mb-3 relative">
             {post.post_media.map((media, index) => (
-              <div key={media.id} className="rounded-lg overflow-hidden relative">
+              <div key={media.id} className="rounded-lg overflow-hidden relative mb-2 last:mb-0">
                 {media.media_type === 'image' ? (
                   <div className="relative">
                     <img
@@ -93,18 +104,30 @@ const OptimisticPostCard = ({ post, onRetry }: OptimisticPostProps) => {
                     {post.uploading && (
                       <div className="absolute inset-0 flex items-center justify-center bg-black/20">
                         <div className="bg-white/90 rounded-lg px-3 py-2 flex items-center space-x-2">
-                          <Loader2 className="h-4 w-4 animate-spin" />
-                          <span className="text-sm">Uploading...</span>
+                          <Image className="h-4 w-4" />
+                          <span className="text-sm">Processing image...</span>
                         </div>
                       </div>
                     )}
                   </div>
                 ) : (
-                  <video
-                    src={media.media_url}
-                    className={`w-full h-80 object-cover ${post.uploading ? 'opacity-70' : ''}`}
-                    controls={!post.uploading}
-                  />
+                  <div className="relative">
+                    <video
+                      src={media.media_url}
+                      className={`w-full h-80 object-cover ${post.uploading ? 'opacity-70' : ''}`}
+                      controls={!post.uploading}
+                      muted
+                    />
+                    {post.uploading && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                        <div className="bg-white/90 rounded-lg px-3 py-2 flex items-center space-x-2">
+                          <Video className="h-4 w-4" />
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                          <span className="text-sm">Processing video...</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
             ))}
@@ -115,7 +138,16 @@ const OptimisticPostCard = ({ post, onRetry }: OptimisticPostProps) => {
         {post.uploadFailed && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-center">
             <p className="text-red-700 text-sm">
-              ⚠️ Upload failed. Check your connection and try again.
+              ⚠️ Upload failed. Check your connection and file size, then try again.
+            </p>
+          </div>
+        )}
+        
+        {/* Processing Status for Videos */}
+        {post.uploading && hasVideos && !post.uploadFailed && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
+            <p className="text-blue-700 text-sm">
+              🎬 Your video is being processed and will appear shortly.
             </p>
           </div>
         )}

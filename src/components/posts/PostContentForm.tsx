@@ -1,7 +1,12 @@
-
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { Camera, Video, X } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useToast } from '@/hooks/use-toast';
+import { X, ImagePlus, Loader2 } from 'lucide-react';
+import MediaFileHandler from './MediaFileHandler';
 import TagInput from './TagInput';
 
 interface TaggableEntity {
@@ -13,115 +18,140 @@ interface TaggableEntity {
 }
 
 interface PostContentFormProps {
-  content: string;
-  onContentChange: (content: string) => void;
-  mediaFiles: File[];
-  onFilesSelected: (files: File[]) => void;
-  onRemoveFile: (index: number) => void;
-  onTagsChange?: (tags: TaggableEntity[]) => void;
+  onSubmit: (content: string, mediaFiles: File[], selectedTags: TaggableEntity[]) => void;
+  isSubmitting?: boolean;
 }
 
-const PostContentForm = ({ 
-  content, 
-  onContentChange, 
-  mediaFiles, 
-  onFilesSelected, 
-  onRemoveFile,
-  onTagsChange = () => {}
-}: PostContentFormProps) => {
+const PostContentForm = ({ onSubmit, isSubmitting = false }: PostContentFormProps) => {
+  const { user } = useSupabaseSession();
+  const { toast } = useToast();
+  const [content, setContent] = useState('');
+  const [mediaFiles, setMediaFiles] = useState<File[]>([]);
   const [selectedTags, setSelectedTags] = useState<TaggableEntity[]>([]);
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    onFilesSelected(files);
-    e.target.value = '';
+  const handleContentChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setContent(e.target.value);
+  }, []);
+
+  const handleRemoveMedia = (indexToRemove: number) => {
+    setMediaFiles(prevFiles => prevFiles.filter((_, index) => index !== indexToRemove));
   };
 
-  const handleTagsChange = (tags: TaggableEntity[]) => {
-    setSelectedTags(tags);
-    onTagsChange(tags);
+  const handleSubmit = () => {
+    if (isSubmitting) return;
+    
+    // Validate before submitting
+    const maxSize = 150 * 1024 * 1024; // 150MB
+    const oversizedFiles = mediaFiles.filter(file => file.size > maxSize);
+    
+    if (oversizedFiles.length > 0) {
+      toast({
+        title: "File too large",
+        description: `${oversizedFiles[0].name} exceeds the 150MB limit. Please choose a smaller file.`,
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const hasVideos = mediaFiles.some(file => file.type.startsWith('video/'));
+    
+    if (hasVideos && mediaFiles.length > 1) {
+      toast({
+        title: "Multiple files with video",
+        description: "For best performance, please share videos one at a time.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    onSubmit(content, mediaFiles, selectedTags);
+    
+    // Clear form after submission
+    setContent('');
+    setMediaFiles([]);
+    setSelectedTags([]);
+  };
+
+  const getSubmitButtonText = () => {
+    if (isSubmitting) {
+      const hasVideos = mediaFiles.some(file => file.type.startsWith('video/'));
+      if (hasVideos) return 'Processing...';
+      if (mediaFiles.length > 0) return 'Uploading...';
+      return 'Sharing...';
+    }
+    return 'Share';
   };
 
   return (
     <div className="space-y-4">
-      <TagInput 
-        content={content}
-        onContentChange={onContentChange}
-        onTagsChange={handleTagsChange}
-      />
+      <div>
+        <Label htmlFor="postContent">Post Content</Label>
+        <Textarea
+          id="postContent"
+          placeholder="Write something..."
+          value={content}
+          onChange={handleContentChange}
+          rows={3}
+        />
+      </div>
 
-      {/* Media Preview */}
       {mediaFiles.length > 0 && (
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-3 gap-2">
           {mediaFiles.map((file, index) => (
-            <div key={index} className="relative rounded-lg overflow-hidden">
-              <button
-                className="absolute top-2 right-2 z-10 h-6 w-6 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-gray-700 hover:bg-white hover:text-gray-900 transition-all duration-200 shadow-md"
-                onClick={() => onRemoveFile(index)}
-              >
-                <X className="h-3 w-3" />
-              </button>
-              
+            <div key={index} className="relative">
               {file.type.startsWith('image/') ? (
                 <img
                   src={URL.createObjectURL(file)}
-                  alt="Preview"
-                  className="w-full h-32 object-cover"
+                  alt={file.name}
+                  className="w-full aspect-square object-cover rounded-md"
                 />
               ) : (
                 <video
                   src={URL.createObjectURL(file)}
-                  className="w-full h-32 object-cover"
-                  controls={false}
+                  className="w-full aspect-square object-cover rounded-md"
+                  controls
                 />
               )}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute top-1 right-1 text-white bg-black/50 hover:bg-black/80"
+                onClick={() => handleRemoveMedia(index)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
             </div>
           ))}
         </div>
       )}
 
-      {/* Media Upload Buttons */}
-      <div className="flex space-x-2">
-        <div className="relative">
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-            onChange={handleFileSelect}
-          />
-          <Button variant="outline" size="sm">
-            <Camera className="h-4 w-4 mr-2" />
-            Photo
-          </Button>
-        </div>
+      <div className="flex justify-between items-center">
+        <TagInput
+          onTagsChange={setSelectedTags}
+          selectedTags={selectedTags}
+        />
         
-        <div className="relative">
-          <input
-            type="file"
-            accept="video/*"
-            multiple
-            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-            onChange={handleFileSelect}
-          />
-          <Button variant="outline" size="sm">
-            <Video className="h-4 w-4 mr-2" />
-            Video
+        <div className="flex items-center space-x-2">
+          <MediaFileHandler onFilesSelected={setMediaFiles} />
+          <Button 
+            onClick={handleSubmit}
+            disabled={(!content.trim() && mediaFiles.length === 0) || isSubmitting}
+            className="min-w-[80px]"
+          >
+            {isSubmitting && (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            )}
+            {getSubmitButtonText()}
           </Button>
         </div>
       </div>
-
-      {/* Selected Tags Display */}
-      {selectedTags.length > 0 && (
-        <div className="space-y-2">
-          <p className="text-sm text-muted-foreground">Tagged:</p>
-          <div className="flex flex-wrap gap-2">
-            {selectedTags.map((tag) => (
-              <div key={tag.id} className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
-                @{tag.username || tag.name}
-              </div>
-            ))}
-          </div>
+      
+      {mediaFiles.length > 0 && (
+        <div className="text-xs text-muted-foreground">
+          <p>Maximum file size: 150MB per file</p>
+          {mediaFiles.some(file => file.type.startsWith('video/')) && (
+            <p>Large videos may take longer to process</p>
+          )}
         </div>
       )}
     </div>

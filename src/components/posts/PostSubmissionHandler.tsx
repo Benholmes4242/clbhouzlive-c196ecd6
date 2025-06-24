@@ -22,31 +22,82 @@ interface PostSubmissionHandlerProps {
 export const usePostSubmission = () => {
   const { toast } = useToast();
 
-  const uploadMedia = async (file: File, postId: string, userId: string) => {
-    const fileExt = file.name.split('.').pop();
-    const fileName = `${userId}/${Date.now()}.${fileExt}`;
+  const getFileErrorMessage = (file: File, error: any) => {
+    const maxSize = 150 * 1024 * 1024; // 150MB
     
-    const { error: uploadError } = await supabase.storage
-      .from('post-media')
-      .upload(fileName, file);
-
-    if (uploadError) throw uploadError;
-
-    const { data: { publicUrl } } = supabase.storage
-      .from('post-media')
-      .getPublicUrl(fileName);
-
-    const mediaType = file.type.startsWith('image/') ? 'image' : 'video';
+    if (file.size > maxSize) {
+      return `File too large: ${file.name} exceeds 150MB limit`;
+    }
     
-    const { error: mediaError } = await supabase
-      .from('post_media')
-      .insert({
-        post_id: postId,
-        media_type: mediaType,
-        media_url: publicUrl
-      });
+    if (error?.message?.includes('timeout')) {
+      return 'Upload timed out. Please check your connection and try again';
+    }
+    
+    if (error?.message?.includes('format') || error?.message?.includes('type')) {
+      return `Video format not supported: ${file.name}. Please use MP4, MOV, or AVI format`;
+    }
+    
+    return `Upload failed for ${file.name}. Please try again`;
+  };
 
-    if (mediaError) throw mediaError;
+  const uploadMediaWithRetry = async (file: File, postId: string, userId: string, maxRetries = 3) => {
+    let lastError;
+    
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${userId}/${Date.now()}-${attempt}.${fileExt}`;
+        
+        // Set longer timeout for larger files
+        const timeoutMs = Math.max(120000, file.size / 1024 / 1024 * 10000); // At least 2 minutes, plus 10s per MB
+        
+        const uploadPromise = supabase.storage
+          .from('post-media')
+          .upload(fileName, file, {
+            cacheControl: '3600',
+            upsert: false
+          });
+
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Upload timeout')), timeoutMs)
+        );
+
+        const { error: uploadError } = await Promise.race([uploadPromise, timeoutPromise]) as any;
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('post-media')
+          .getPublicUrl(fileName);
+
+        const mediaType = file.type.startsWith('image/') ? 'image' : 'video';
+        
+        const { error: mediaError } = await supabase
+          .from('post_media')
+          .insert({
+            post_id: postId,
+            media_type: mediaType,
+            media_url: publicUrl
+          });
+
+        if (mediaError) throw mediaError;
+        
+        console.log(`Successfully uploaded ${file.name} on attempt ${attempt}`);
+        return; // Success, exit retry loop
+        
+      } catch (error) {
+        console.error(`Upload attempt ${attempt} failed for ${file.name}:`, error);
+        lastError = error;
+        
+        if (attempt < maxRetries) {
+          // Wait before retrying (exponential backoff)
+          await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 1000));
+        }
+      }
+    }
+    
+    // All retries failed
+    throw lastError;
   };
 
   const createPostTags = async (postId: string, selectedTags: TaggableEntity[], userId: string) => {
@@ -117,6 +168,35 @@ export const usePostSubmission = () => {
     return optimisticPost;
   };
 
+  const validateFiles = (mediaFiles: File[]) => {
+    const maxSize = 150 * 1024 * 1024; // 150MB
+    const supportedVideoTypes = ['video/mp4', 'video/mov', 'video/quicktime', 'video/avi', 'video/x-msvideo'];
+    const supportedImageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    
+    for (const file of mediaFiles) {
+      if (file.size > maxSize) {
+        return `File "${file.name}" is too large. Maximum size is 150MB.`;
+      }
+      
+      const isVideo = file.type.startsWith('video/');
+      const isImage = file.type.startsWith('image/');
+      
+      if (isVideo && !supportedVideoTypes.includes(file.type)) {
+        return `Video format "${file.type}" is not supported. Please use MP4, MOV, or AVI format.`;
+      }
+      
+      if (isImage && !supportedImageTypes.includes(file.type)) {
+        return `Image format "${file.type}" is not supported. Please use JPEG, PNG, GIF, or WebP format.`;
+      }
+      
+      if (!isVideo && !isImage) {
+        return `File "${file.name}" is not a supported media type.`;
+      }
+    }
+    
+    return null; // No validation errors
+  };
+
   const submitPost = async ({
     user,
     content,
@@ -127,11 +207,29 @@ export const usePostSubmission = () => {
   }: PostSubmissionHandlerProps) => {
     if (!user || (!content.trim() && mediaFiles.length === 0)) return;
 
+    // Validate files before proceeding
+    const validationError = validateFiles(mediaFiles);
+    if (validationError) {
+      toast({
+        title: "Upload Error",
+        description: validationError,
+        variant: "destructive",
+        duration: 5000
+      });
+      onError();
+      return;
+    }
+
     // Show instant feedback
+    const hasVideos = mediaFiles.some(file => file.type.startsWith('video/'));
     toast({
       title: "Post shared!",
-      description: mediaFiles.length > 0 ? "Uploading media in background..." : "Your post has been shared successfully.",
-      duration: 1000
+      description: hasVideos 
+        ? "Processing video in background..." 
+        : mediaFiles.length > 0 
+          ? "Uploading media in background..." 
+          : "Your post has been shared successfully.",
+      duration: 2000
     });
 
     // Create optimistic post for immediate UI update
@@ -167,9 +265,38 @@ export const usePostSubmission = () => {
       // Upload media files if any
       if (mediaFiles.length > 0) {
         console.log('Uploading media files in background...');
+        
+        // Upload each file with retry logic
         for (const file of mediaFiles) {
-          await uploadMedia(file, postData.id, user.id);
+          try {
+            await uploadMediaWithRetry(file, postData.id, user.id);
+          } catch (error) {
+            console.error(`Failed to upload ${file.name} after retries:`, error);
+            
+            // Show specific error for this file
+            toast({
+              title: "Upload Error",
+              description: getFileErrorMessage(file, error),
+              variant: "destructive",
+              duration: 8000,
+              action: (
+                <button
+                  onClick={() => {
+                    // Retry just this file
+                    uploadMediaWithRetry(file, postData.id, user.id).catch(console.error);
+                  }}
+                  className="inline-flex h-8 shrink-0 items-center justify-center rounded-md border bg-transparent px-3 text-sm font-medium"
+                >
+                  Retry
+                </button>
+              )
+            });
+            
+            // Continue with other files instead of failing completely
+            continue;
+          }
         }
+        
         console.log('Background media upload completed');
       }
 
@@ -181,6 +308,15 @@ export const usePostSubmission = () => {
       }
 
       console.log('Background upload process completed successfully');
+
+      // Show success message for videos
+      if (hasVideos) {
+        toast({
+          title: "Video processed!",
+          description: "Your video post is now live.",
+          duration: 3000
+        });
+      }
 
       // Broadcast success event for feed refresh
       window.dispatchEvent(new CustomEvent('postUploadCompleted', { 
@@ -195,12 +331,14 @@ export const usePostSubmission = () => {
         await rollbackPost(createdPostId);
       }
       
-      // Show retry option with ToastAction component
+      // Show retry option with specific error message
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      
       toast({
         title: "Upload failed",
-        description: "Tap to retry uploading your post.",
+        description: `${errorMessage}. Tap to retry uploading your post.`,
         variant: "destructive",
-        duration: 5000,
+        duration: 8000,
         action: (
           <button
             onClick={() => {

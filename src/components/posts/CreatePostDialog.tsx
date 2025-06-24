@@ -1,13 +1,10 @@
-
 import React, { useState } from 'react';
-import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePostSubmission } from './PostSubmissionHandler';
 import PostContentForm from './PostContentForm';
-import PhotoGallery from './PhotoGallery';
-import DialogNavigation from './DialogNavigation';
 
 interface TaggableEntity {
   id: string;
@@ -24,32 +21,11 @@ interface CreatePostDialogProps {
 const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
   const { user } = useSupabaseSession();
   const { submitPost } = usePostSubmission();
-  const [open, setOpen] = useState(false);
-  const [content, setContent] = useState('');
-  const [mediaFiles, setMediaFiles] = useState<File[]>([]);
-  const [selectedTags, setSelectedTags] = useState<TaggableEntity[]>([]);
+  const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showGallery, setShowGallery] = useState(false);
 
-  const handleFilesSelected = (newFiles: File[]) => {
-    setMediaFiles(prev => [...prev, ...newFiles]);
-    setShowGallery(false);
-  };
-
-  const removeFile = (index: number) => {
-    setMediaFiles(prev => prev.filter((_, i) => i !== index));
-  };
-
-  const resetForm = () => {
-    setContent('');
-    setMediaFiles([]);
-    setSelectedTags([]);
-    setOpen(false);
-    setShowGallery(false);
-  };
-
-  const handleSubmit = async () => {
-    if (!user || (!content.trim() && mediaFiles.length === 0) || isSubmitting) return;
+  const handleSubmit = async (content: string, mediaFiles: File[], selectedTags: TaggableEntity[]) => {
+    if (!user) return;
 
     setIsSubmitting(true);
     
@@ -59,89 +35,35 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
       mediaFiles,
       selectedTags,
       onSuccess: () => {
-        resetForm();
+        setIsOpen(false);
+        setIsSubmitting(false);
         onPostCreated?.();
       },
       onError: () => {
-        // Error handling is done in the submission handler
+        setIsSubmitting(false);
+        // Keep dialog open on error so user can retry
       }
     });
-
-    setIsSubmitting(false);
   };
-
-  const handleOpenDialog = () => {
-    setOpen(true);
-    setShowGallery(true);
-  };
-
-  const canProceedFromGallery = Boolean(mediaFiles.length > 0);
-  const canSubmit = Boolean(!isSubmitting && (content.trim() || mediaFiles.length > 0));
 
   if (!user) return null;
 
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => {
-      if (!isOpen && !isSubmitting) {
-        resetForm();
-      } else if (isOpen) {
-        setOpen(true);
-      }
-    }}>
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button 
-          className="fixed bottom-20 right-4 z-30 h-14 w-14 rounded-full shadow-lg md:relative md:bottom-0 md:right-0 md:h-10 md:w-auto md:rounded-md md:px-4"
-          onClick={handleOpenDialog}
-        >
-          <Plus className="h-6 w-6 md:mr-2" />
-          <span className="hidden md:inline">Create Post</span>
+        <Button size="sm" className="flex items-center space-x-2">
+          <Plus className="h-4 w-4" />
+          <span>Share</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-full sm:max-h-full sm:h-full sm:w-full p-0 gap-0">
-        {showGallery ? (
-          <div className="h-full flex flex-col">
-            <DialogNavigation
-              showGallery={true}
-              isSubmitting={Boolean(isSubmitting)}
-              canProceedFromGallery={canProceedFromGallery}
-              canSubmit={canSubmit}
-              onClose={() => !isSubmitting && setOpen(false)}
-              onBackToGallery={() => setShowGallery(true)}
-              onNext={() => setShowGallery(false)}
-              onSubmit={handleSubmit}
-            />
-            <div className="flex-1 overflow-hidden">
-              <PhotoGallery 
-                onFilesSelected={handleFilesSelected}
-                selectedFiles={mediaFiles}
-              />
-            </div>
-          </div>
-        ) : (
-          <div className="h-full flex flex-col">
-            <DialogNavigation
-              showGallery={false}
-              isSubmitting={Boolean(isSubmitting)}
-              canProceedFromGallery={canProceedFromGallery}
-              canSubmit={canSubmit}
-              onClose={() => !isSubmitting && setOpen(false)}
-              onBackToGallery={() => setShowGallery(true)}
-              onNext={() => setShowGallery(false)}
-              onSubmit={handleSubmit}
-            />
-            
-            <div className="flex-1 p-4">
-              <PostContentForm
-                content={content}
-                onContentChange={setContent}
-                mediaFiles={mediaFiles}
-                onFilesSelected={handleFilesSelected}
-                onRemoveFile={removeFile}
-                onTagsChange={setSelectedTags}
-              />
-            </div>
-          </div>
-        )}
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle>Create Post</DialogTitle>
+        </DialogHeader>
+        <PostContentForm 
+          onSubmit={handleSubmit} 
+          isSubmitting={isSubmitting}
+        />
       </DialogContent>
     </Dialog>
   );
