@@ -195,19 +195,23 @@ export const usePostSubmission = () => {
         await rollbackPost(createdPostId);
       }
       
-      // Show retry option
+      // Show retry option with ToastAction component
       toast({
         title: "Upload failed",
         description: "Tap to retry uploading your post.",
         variant: "destructive",
         duration: 5000,
-        action: {
-          altText: "Retry",
-          onClick: () => {
-            // Retry the upload
-            submitPost({ user, content, mediaFiles, selectedTags, onSuccess: () => {}, onError });
-          }
-        }
+        action: (
+          <button
+            onClick={() => {
+              // Retry the upload
+              submitPost({ user, content, mediaFiles, selectedTags, onSuccess: () => {}, onError });
+            }}
+            className="inline-flex h-8 shrink-0 items-center justify-center rounded-md border bg-transparent px-3 text-sm font-medium"
+          >
+            Retry
+          </button>
+        )
       });
 
       // Broadcast error event for UI cleanup
