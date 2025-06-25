@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -212,7 +211,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
       return;
     }
 
-    if (!selectedCountry) {
+    if (!selectedCountry || selectedCountry.trim() === '') {
       toast({
         title: "Error",
         description: "Please select a country/region",
@@ -221,7 +220,6 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
       return;
     }
 
-    // Check the actual current state value, not the form data
     if (!selectedSubCountry || selectedSubCountry.trim() === '') {
       toast({
         title: "Error",
@@ -239,15 +237,12 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
     deleteReviewMutation.mutate(reviewId);
   };
 
-  // Custom handlers to prevent state reset during form operations
+  // Simplified handlers
   const handleCountryChange = (newCountry: string) => {
     console.log('Country changing to:', newCountry);
     setSelectedCountry(newCountry);
-    // Only reset sub-country if it's not compatible with new country
-    // This prevents accidental resets during form submission
-    if (newCountry !== selectedCountry) {
-      setSelectedSubCountry('');
-    }
+    // Reset sub-country when country changes
+    setSelectedSubCountry('');
   };
 
   const handleSubCountryChange = (newSubCountry: string) => {

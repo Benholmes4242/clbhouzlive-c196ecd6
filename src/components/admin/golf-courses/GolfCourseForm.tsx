@@ -36,12 +36,15 @@ const GolfCourseForm: React.FC<GolfCourseFormProps> = ({
 }) => {
   const availableSubCountries = selectedCountry ? subCountryOptions[selectedCountry] || [] : [];
 
-  // Reset sub-country when primary country changes
+  // Only reset sub-country when country changes AND the current sub-country is not valid for the new country
   React.useEffect(() => {
-    if (selectedCountry && !availableSubCountries.includes(selectedSubCountry)) {
-      setSelectedSubCountry('');
+    if (selectedCountry && selectedSubCountry && availableSubCountries.length > 0) {
+      if (!availableSubCountries.includes(selectedSubCountry)) {
+        console.log('Resetting sub-country because it is not valid for selected country');
+        setSelectedSubCountry('');
+      }
     }
-  }, [selectedCountry, selectedSubCountry, availableSubCountries, setSelectedSubCountry]);
+  }, [selectedCountry]); // Only depend on selectedCountry to avoid unnecessary resets
 
   return (
     <TooltipProvider>
