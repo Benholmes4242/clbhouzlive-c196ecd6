@@ -15,10 +15,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface AdminUser {
   id: string;
@@ -40,6 +53,7 @@ interface UserManagementProps {
 }
 
 const UserManagement: React.FC<UserManagementProps> = ({ users, onRoleChange }) => {
+  const { toast } = useToast();
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [localUsers, setLocalUsers] = useState<AdminUser[]>(users);
 
@@ -82,6 +96,36 @@ const UserManagement: React.FC<UserManagementProps> = ({ users, onRoleChange }) 
       console.error('Error updating role:', error);
       // Revert the optimistic update on error
       setLocalUsers(users);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleDeleteUser = async (userId: string, userEmail: string) => {
+    setActionLoading(userId);
+    
+    try {
+      // Call Supabase admin API to delete user
+      const { error } = await supabase.auth.admin.deleteUser(userId);
+      
+      if (error) {
+        throw error;
+      }
+      
+      // Remove user from local state
+      setLocalUsers(prevUsers => prevUsers.filter(user => user.id !== userId));
+      
+      toast({
+        title: "Success",
+        description: `User ${userEmail} has been deleted successfully`,
+      });
+    } catch (error: any) {
+      console.error('Error deleting user:', error);
+      toast({
+        title: "Error",
+        description: `Failed to delete user: ${error.message}`,
+        variant: "destructive",
+      });
     } finally {
       setActionLoading(null);
     }
@@ -149,6 +193,38 @@ const UserManagement: React.FC<UserManagementProps> = ({ users, onRoleChange }) 
                         <SelectItem value="admin">Admin</SelectItem>
                       </SelectContent>
                     </Select>
+                    
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={actionLoading === user.id}
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Delete User</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            Are you sure you want to delete the user <strong>{user.email}</strong>? 
+                            This action cannot be undone and will permanently remove the user and all their data.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => handleDeleteUser(user.id, user.email)}
+                            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                          >
+                            Delete User
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                    
                     {actionLoading === user.id && (
                       <Loader2 className="w-4 h-4 animate-spin" />
                     )}
