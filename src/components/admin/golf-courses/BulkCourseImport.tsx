@@ -9,7 +9,7 @@ interface CourseData {
   name: string;
   description: string;
   country: string;
-  continent: string;
+  continent: "Europe";
 }
 
 const courseData: CourseData[] = [
