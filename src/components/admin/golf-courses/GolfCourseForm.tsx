@@ -88,18 +88,25 @@ const GolfCourseForm: React.FC<GolfCourseFormProps> = ({
 }) => {
   const availableSubCountries = selectedCountry ? subCountryOptions[selectedCountry] || [] : [];
 
-  // Only reset sub-country when primary country changes AND there's no valid sub-country set
+  // Only reset sub-country when primary country changes AND the current sub-country is not valid
   // This prevents resetting when loading saved data
   React.useEffect(() => {
+    console.log('useEffect triggered - selectedCountry:', selectedCountry, 'selectedSubCountry:', selectedSubCountry);
+    console.log('Available sub-countries:', availableSubCountries);
+    
     if (selectedCountry && availableSubCountries.length > 0) {
       // Only reset if the current sub-country is not in the available options
-      // AND we're not loading saved data (selectedSubCountry is not empty)
+      // This ensures we don't reset when loading existing course data
       if (selectedSubCountry && !availableSubCountries.includes(selectedSubCountry)) {
         console.log('Resetting sub-country because it is not valid for selected primary country');
         setSelectedSubCountry('');
       }
+    } else if (!selectedCountry) {
+      // Clear sub-country if no primary country is selected
+      console.log('Clearing sub-country because no primary country is selected');
+      setSelectedSubCountry('');
     }
-  }, [selectedCountry, availableSubCountries]); // Removed selectedSubCountry from dependencies to prevent infinite loops
+  }, [selectedCountry, availableSubCountries.join(',')]); // Use join to create stable dependency
 
   // Reset regional rank when regional ranking region changes
   const handleRegionalRankingRegionChange = (value: string) => {
@@ -108,6 +115,8 @@ const GolfCourseForm: React.FC<GolfCourseFormProps> = ({
       setRegionalRank('');
     }
   };
+
+  console.log('GolfCourseForm render - selectedSubCountry:', selectedSubCountry);
 
   return (
     <TooltipProvider>
@@ -166,7 +175,10 @@ const GolfCourseForm: React.FC<GolfCourseFormProps> = ({
             </Label>
             <Select 
               value={selectedSubCountry} 
-              onValueChange={setSelectedSubCountry}
+              onValueChange={(value) => {
+                console.log('Sub-country changed to:', value);
+                setSelectedSubCountry(value);
+              }}
               disabled={!selectedCountry}
             >
               <SelectTrigger className={errors.sub_country ? 'border-red-500' : ''}>

@@ -67,6 +67,8 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
   useEffect(() => {
     if (course && !isCreating) {
       console.log('Initializing form with course data:', course);
+      console.log('Course sub_country value:', course.sub_country);
+      
       reset({
         name: course.name,
         region: course.region || '',
@@ -75,8 +77,13 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
         latitude: course.latitude || '',
         longitude: course.longitude || '',
       });
+      
+      // Set country and sub-country values with proper logging
       setSelectedCountry(course.country || '');
-      setSelectedSubCountry(course.sub_country || '');
+      const subCountryValue = course.sub_country || '';
+      console.log('Setting selectedSubCountry to:', subCountryValue);
+      setSelectedSubCountry(subCountryValue);
+      
       setCourseImageUrl(course.thumbnail_image || null);
       
       // Set Top 100s values
@@ -136,7 +143,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
       const courseData = {
         name: data.name,
         country: selectedCountry,
-        sub_country: selectedSubCountry || null,
+        sub_country: selectedSubCountry || null, // Make sure this is properly saved
         region: data.region || null,
         continent: continent,
         global_rank: globalRank ? parseInt(globalRank) : null,
@@ -149,7 +156,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
         longitude: data.longitude ? parseFloat(data.longitude) : null,
       };
 
-      console.log('Final course data to save:', courseData);
+      console.log('Final course data to save (including sub_country):', courseData);
 
       if (isCreating) {
         const { data: result, error } = await supabase
