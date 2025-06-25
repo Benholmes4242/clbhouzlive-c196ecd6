@@ -58,15 +58,6 @@ const subCountryOptions: Record<string, string[]> = {
   ]
 };
 
-const continentOptions = [
-  'North America',
-  'South America', 
-  'Europe',
-  'Asia',
-  'Africa',
-  'Oceania'
-];
-
 // Regional Top 100 options
 const regionalTop100Options = [
   'Great Britain and Ireland',
@@ -199,23 +190,6 @@ const GolfCourseForm: React.FC<GolfCourseFormProps> = ({
               {...register('region')}
               placeholder="e.g. Ayrshire, California, etc."
             />
-          </div>
-
-          {/* Continent - Optional */}
-          <div className="space-y-2">
-            <Label htmlFor="continent">Continent</Label>
-            <Select value={selectedContinent} onValueChange={setSelectedContinent}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select continent" />
-              </SelectTrigger>
-              <SelectContent>
-                {continentOptions.map((continent) => (
-                  <SelectItem key={continent} value={continent}>
-                    {continent}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
           </div>
         </div>
 

@@ -22,7 +22,6 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
   
   const [selectedCountry, setSelectedCountry] = useState('');
   const [selectedSubCountry, setSelectedSubCountry] = useState('');
-  const [selectedContinent, setSelectedContinent] = useState('');
   const [courseImageUrl, setCourseImageUrl] = useState<string | null>(null);
   
   // New state for Top 100s section
@@ -78,7 +77,6 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
       });
       setSelectedCountry(course.country || '');
       setSelectedSubCountry(course.sub_country || '');
-      setSelectedContinent(course.continent || '');
       setCourseImageUrl(course.thumbnail_image || null);
       
       // Set Top 100s values
@@ -109,7 +107,6 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
       });
       setSelectedCountry('');
       setSelectedSubCountry('');
-      setSelectedContinent('');
       setCourseImageUrl(null);
       setRegionalRankingRegion('');
       setRegionalRank('');
@@ -128,12 +125,20 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
       console.log('Regional rank:', regionalRank);
       console.log('Global rank:', globalRank);
       
+      // Auto-determine continent based on country
+      let continent: "North America" | "South America" | "Europe" | "Asia" | "Africa" | "Oceania" | null = null;
+      if (selectedCountry === 'USA') {
+        continent = 'North America';
+      } else if (selectedCountry === 'Britain & Ireland' || selectedCountry === 'Continental Europe') {
+        continent = 'Europe';
+      }
+      
       const courseData = {
         name: data.name,
         country: selectedCountry,
         sub_country: selectedSubCountry || null,
         region: data.region || null,
-        continent: selectedContinent as "North America" | "South America" | "Europe" | "Asia" | "Africa" | "Oceania" | null,
+        continent: continent,
         global_rank: globalRank ? parseInt(globalRank) : null,
         regional_rank: regionalRank ? parseInt(regionalRank) : null,
         country_rank: null, // Removed from UI
@@ -287,8 +292,8 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
             setSelectedCountry={setSelectedCountry}
             selectedSubCountry={selectedSubCountry}
             setSelectedSubCountry={setSelectedSubCountry}
-            selectedContinent={selectedContinent}
-            setSelectedContinent={setSelectedContinent}
+            selectedContinent=""
+            setSelectedContinent={() => {}}
             errors={errors}
             currentImageUrl={courseImageUrl}
             onImageChange={handleImageChange}
