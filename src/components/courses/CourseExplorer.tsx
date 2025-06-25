@@ -79,6 +79,22 @@ const CourseExplorer = () => {
 
   const currentRegion = regionOptions.find(r => r.value === selectedRegion);
 
+  // Map selectedRegion to viewContext
+  const getViewContext = () => {
+    switch (selectedRegion) {
+      case 'britain-ireland':
+        return 'regional';
+      case 'usa':
+        return 'usa';
+      case 'europe':
+        return 'europe';
+      case 'global':
+        return 'global';
+      default:
+        return 'global';
+    }
+  };
+
   return (
     <div className="space-y-3">
       {/* Search */}
@@ -117,8 +133,8 @@ const CourseExplorer = () => {
             <CourseCard 
               key={course.id} 
               course={course} 
-              viewContext={selectedRegion === 'britain-ireland' ? 'regional' : selectedRegion === 'usa' ? 'regional' : selectedRegion === 'europe' ? 'regional' : 'global'}
-              showPlayedButton={false} // Explicitly disable the played button in explore view
+              viewContext={getViewContext()}
+              showPlayedButton={false}
             />
           ))}
         </div>
