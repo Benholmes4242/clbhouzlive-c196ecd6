@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -49,8 +50,11 @@ export const useNotifications = () => {
 
     console.log('Setting up notifications subscription for user:', user.id);
 
+    // Create a unique channel name to avoid conflicts
+    const channelName = `notifications-${user.id}-${Date.now()}`;
+    
     const channel = supabase
-      .channel('notifications-changes')
+      .channel(channelName)
       .on(
         'postgres_changes',
         {
