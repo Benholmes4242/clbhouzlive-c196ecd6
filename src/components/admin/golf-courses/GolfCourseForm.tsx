@@ -88,15 +88,18 @@ const GolfCourseForm: React.FC<GolfCourseFormProps> = ({
 }) => {
   const availableSubCountries = selectedCountry ? subCountryOptions[selectedCountry] || [] : [];
 
-  // Reset sub-country when primary country changes and current sub-country is invalid
+  // Only reset sub-country when primary country changes AND there's no valid sub-country set
+  // This prevents resetting when loading saved data
   React.useEffect(() => {
-    if (selectedCountry && selectedSubCountry && availableSubCountries.length > 0) {
-      if (!availableSubCountries.includes(selectedSubCountry)) {
+    if (selectedCountry && availableSubCountries.length > 0) {
+      // Only reset if the current sub-country is not in the available options
+      // AND we're not loading saved data (selectedSubCountry is not empty)
+      if (selectedSubCountry && !availableSubCountries.includes(selectedSubCountry)) {
         console.log('Resetting sub-country because it is not valid for selected primary country');
         setSelectedSubCountry('');
       }
     }
-  }, [selectedCountry, selectedSubCountry, availableSubCountries, setSelectedSubCountry]);
+  }, [selectedCountry, availableSubCountries]); // Removed selectedSubCountry from dependencies to prevent infinite loops
 
   // Reset regional rank when regional ranking region changes
   const handleRegionalRankingRegionChange = (value: string) => {
