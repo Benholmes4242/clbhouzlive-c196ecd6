@@ -82,13 +82,18 @@ const HeaderUserMenu = () => {
 
   const handleLogout = async () => {
     try {
-      await supabase.auth.signOut();
-      // Force navigation to auth page after logout
-      navigate('/auth', { replace: true });
+      console.log('Logging out user...');
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        console.error('Error during logout:', error);
+      }
+      console.log('Logout successful, navigating to home...');
+      // Navigate to the home page (landing page) after logout
+      navigate('/', { replace: true });
     } catch (error) {
       console.error('Error logging out:', error);
-      // Still navigate to auth page even if logout fails
-      navigate('/auth', { replace: true });
+      // Still navigate to home page even if logout fails
+      navigate('/', { replace: true });
     }
   };
 
