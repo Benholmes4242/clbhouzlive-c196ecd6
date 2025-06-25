@@ -82,52 +82,18 @@ const HeaderUserMenu = () => {
 
   const handleLogout = async () => {
     try {
-      console.log('Starting logout process...');
-      
-      // Clear any localStorage items that might contain user data
-      const keysToRemove = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && (key.includes('supabase') || key.includes('user') || key.includes('auth'))) {
-          keysToRemove.push(key);
-        }
-      }
-      keysToRemove.forEach(key => localStorage.removeItem(key));
-      
-      // Clear sessionStorage as well
-      const sessionKeysToRemove = [];
-      for (let i = 0; i < sessionStorage.length; i++) {
-        const key = sessionStorage.key(i);
-        if (key && (key.includes('supabase') || key.includes('user') || key.includes('auth'))) {
-          sessionKeysToRemove.push(key);
-        }
-      }
-      sessionKeysToRemove.forEach(key => sessionStorage.removeItem(key));
-      
-      // Sign out from Supabase
+      console.log('Logging out user...');
       const { error } = await supabase.auth.signOut();
       if (error) {
-        console.error('Error during Supabase logout:', error);
-      } else {
-        console.log('Supabase logout successful');
+        console.error('Error during logout:', error);
       }
-      
-      // Force navigation to landing page
-      console.log('Redirecting to landing page...');
+      console.log('Logout successful, navigating to home...');
+      // Navigate to the home page (landing page) after logout
       navigate('/', { replace: true });
-      
-      // Force page reload to ensure complete state reset
-      setTimeout(() => {
-        window.location.href = '/';
-      }, 100);
-      
     } catch (error) {
-      console.error('Error during logout:', error);
+      console.error('Error logging out:', error);
       // Still navigate to home page even if logout fails
       navigate('/', { replace: true });
-      setTimeout(() => {
-        window.location.href = '/';
-      }, 100);
     }
   };
 

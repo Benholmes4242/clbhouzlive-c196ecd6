@@ -33,7 +33,7 @@ const Index = () => {
     );
   }
 
-  // Show login page for non-authenticated users - this is the landing page
+  // Show login page for non-authenticated users
   if (!user) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4">
@@ -41,7 +41,7 @@ const Index = () => {
           {/* Logo */}
           <div className="flex justify-center">
             <img
-              src="/lovable-uploads/7a748cde-b083-4542-9332-cfa1022d03af.png"
+              src="/lovable-uploads/071651d4-1096-4053-b720-6f758b637fb8.png"
               alt="clbhouz"
               className="w-auto max-h-32 object-contain"
             />
@@ -57,13 +57,16 @@ const Index = () => {
             >
               Get Started
             </Button>
+            <p className="text-muted-foreground text-sm">
+              Welcome to your digital clubhouse for all things golf
+            </p>
           </div>
         </div>
       </div>
     );
   }
 
-  // Show authenticated user content - this is the main feed
+  // Show authenticated user content
   return (
     <div className="min-h-screen bg-background">
       <Header />

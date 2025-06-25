@@ -1,4 +1,3 @@
-
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
@@ -20,8 +19,6 @@ import FollowingPage from "./pages/FollowingPage";
 import AdminSetupPage from "./pages/AdminSetupPage";
 import AdminPage from "./pages/AdminPage";
 import NotFound from "./pages/NotFound";
-import Settings from "./pages/Settings";
-import ProtectedRoute from "./components/auth/ProtectedRoute";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import {
@@ -31,6 +28,8 @@ import {
 
 const queryClient = new QueryClient();
 
+import Settings from "./pages/Settings";
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -38,97 +37,26 @@ function App() {
         <Toaster />
         <BrowserRouter>
           <Routes>
-            {/* Public Routes */}
             <Route path="/" element={<Index />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/create-profile" element={<CreateProfile />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/profile/:username" element={<UserProfilePage />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/courses" element={<Courses />} />
+            <Route path="/my-ratings" element={<MyRatings />} />
+            <Route path="/tour-central" element={<TourCentral />} />
+            <Route path="/news" element={<News />} />
+            <Route path="/clubhouse" element={<ClubhouseFeed />} />
+            <Route path="/explore" element={<Explore />} />
+            <Route path="/messages" element={<MessagesPage />} />
+            <Route path="/notifications" element={<NotificationsPage />} />
+            <Route path="/friends" element={<FriendsPage />} />
+            <Route path="/followers" element={<FollowersPage />} />
+            <Route path="/following" element={<FollowingPage />} />
+            <Route path="/admin-setup" element={<AdminSetupPage />} />
+            <Route path="/admin" element={<AdminPage />} />
             <Route path="*" element={<NotFound />} />
-            
-            {/* Protected Routes */}
-            <Route path="/create-profile" element={
-              <ProtectedRoute>
-                <CreateProfile />
-              </ProtectedRoute>
-            } />
-            <Route path="/profile" element={
-              <ProtectedRoute>
-                <ProfilePage />
-              </ProtectedRoute>
-            } />
-            <Route path="/profile/:username" element={
-              <ProtectedRoute>
-                <UserProfilePage />
-              </ProtectedRoute>
-            } />
-            <Route path="/settings" element={
-              <ProtectedRoute>
-                <Settings />
-              </ProtectedRoute>
-            } />
-            <Route path="/courses" element={
-              <ProtectedRoute>
-                <Courses />
-              </ProtectedRoute>
-            } />
-            <Route path="/my-ratings" element={
-              <ProtectedRoute>
-                <MyRatings />
-              </ProtectedRoute>
-            } />
-            <Route path="/tour-central" element={
-              <ProtectedRoute>
-                <TourCentral />
-              </ProtectedRoute>
-            } />
-            <Route path="/news" element={
-              <ProtectedRoute>
-                <News />
-              </ProtectedRoute>
-            } />
-            <Route path="/clubhouse" element={
-              <ProtectedRoute>
-                <ClubhouseFeed />
-              </ProtectedRoute>
-            } />
-            <Route path="/explore" element={
-              <ProtectedRoute>
-                <Explore />
-              </ProtectedRoute>
-            } />
-            <Route path="/messages" element={
-              <ProtectedRoute>
-                <MessagesPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/notifications" element={
-              <ProtectedRoute>
-                <NotificationsPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/friends" element={
-              <ProtectedRoute>
-                <FriendsPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/followers" element={
-              <ProtectedRoute>
-                <FollowersPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/following" element={
-              <ProtectedRoute>
-                <FollowingPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/admin-setup" element={
-              <ProtectedRoute>
-                <AdminSetupPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/admin" element={
-              <ProtectedRoute>
-                <AdminPage />
-              </ProtectedRoute>
-            } />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
