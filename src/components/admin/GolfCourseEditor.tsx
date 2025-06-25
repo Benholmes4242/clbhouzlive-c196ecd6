@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -23,6 +22,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
   const [selectedCountry, setSelectedCountry] = useState('');
   const [selectedSubCountry, setSelectedSubCountry] = useState('');
   const [selectedContinent, setSelectedContinent] = useState('');
+  const [courseImageUrl, setCourseImageUrl] = useState<string | null>(null);
 
   // Fetch course ratings/reviews with a simpler query structure
   const { data: ratings, isLoading: ratingsLoading } = useQuery({
@@ -72,7 +72,6 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
         country_rank: course.country_rank || '',
         regional_rank: course.regional_rank || '',
         description: course.description || '',
-        thumbnail_image: course.thumbnail_image || '',
         website_url: course.website_url || '',
         latitude: course.latitude || '',
         longitude: course.longitude || '',
@@ -80,6 +79,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
       setSelectedCountry(course.country);
       setSelectedSubCountry(course.sub_country || '');
       setSelectedContinent(course.continent || '');
+      setCourseImageUrl(course.thumbnail_image || null);
     } else {
       reset({
         name: '',
@@ -91,7 +91,6 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
         country_rank: '',
         regional_rank: '',
         description: '',
-        thumbnail_image: '',
         website_url: '',
         latitude: '',
         longitude: '',
@@ -99,6 +98,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
       setSelectedCountry('');
       setSelectedSubCountry('');
       setSelectedContinent('');
+      setCourseImageUrl(null);
     }
   }, [course, isCreating, reset]);
 
@@ -115,7 +115,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
         country_rank: data.country_rank ? parseInt(data.country_rank) : null,
         regional_rank: data.regional_rank ? parseInt(data.regional_rank) : null,
         description: data.description || null,
-        thumbnail_image: data.thumbnail_image || null,
+        thumbnail_image: courseImageUrl || null,
         website_url: data.website_url || null,
         latitude: data.latitude ? parseFloat(data.latitude) : null,
         longitude: data.longitude ? parseFloat(data.longitude) : null,
@@ -235,6 +235,8 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
             selectedContinent={selectedContinent}
             setSelectedContinent={setSelectedContinent}
             errors={errors}
+            currentImageUrl={courseImageUrl}
+            onImageChange={setCourseImageUrl}
           />
 
           <div className="flex gap-3 pt-4 border-t">

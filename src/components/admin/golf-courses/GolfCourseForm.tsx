@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Info } from 'lucide-react';
 import { countryOptions, subCountryOptions, continentOptions } from './types';
+import CourseImageUpload from './CourseImageUpload';
 
 interface GolfCourseFormProps {
   register: any;
@@ -17,6 +18,8 @@ interface GolfCourseFormProps {
   selectedContinent: string;
   setSelectedContinent: (value: string) => void;
   errors: any;
+  currentImageUrl?: string;
+  onImageChange: (imageUrl: string | null) => void;
 }
 
 const GolfCourseForm: React.FC<GolfCourseFormProps> = ({
@@ -28,6 +31,8 @@ const GolfCourseForm: React.FC<GolfCourseFormProps> = ({
   selectedContinent,
   setSelectedContinent,
   errors,
+  currentImageUrl,
+  onImageChange,
 }) => {
   const availableSubCountries = selectedCountry ? subCountryOptions[selectedCountry] || [] : [];
 
@@ -221,15 +226,11 @@ const GolfCourseForm: React.FC<GolfCourseFormProps> = ({
           </div>
         </div>
 
-        {/* Course Image URL - Optional */}
-        <div className="space-y-2">
-          <Label htmlFor="thumbnail_image">Course Image URL</Label>
-          <Input
-            id="thumbnail_image"
-            {...register('thumbnail_image')}
-            placeholder="Enter valid image link"
-          />
-        </div>
+        {/* Course Image Upload - Replaces URL input */}
+        <CourseImageUpload
+          currentImageUrl={currentImageUrl}
+          onImageChange={onImageChange}
+        />
 
         {/* Website URL - Optional */}
         <div className="space-y-2">
