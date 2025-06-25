@@ -162,6 +162,7 @@ export type Database = {
         Row: {
           continent: Database["public"]["Enums"]["continent"]
           country: string
+          country_rank: number | null
           created_at: string
           description: string | null
           global_rank: number | null
@@ -171,6 +172,7 @@ export type Database = {
           name: string
           region: string | null
           regional_rank: number | null
+          sub_country: string | null
           thumbnail_image: string | null
           top100_url: string | null
           updated_at: string
@@ -180,6 +182,7 @@ export type Database = {
         Insert: {
           continent: Database["public"]["Enums"]["continent"]
           country: string
+          country_rank?: number | null
           created_at?: string
           description?: string | null
           global_rank?: number | null
@@ -189,6 +192,7 @@ export type Database = {
           name: string
           region?: string | null
           regional_rank?: number | null
+          sub_country?: string | null
           thumbnail_image?: string | null
           top100_url?: string | null
           updated_at?: string
@@ -198,6 +202,7 @@ export type Database = {
         Update: {
           continent?: Database["public"]["Enums"]["continent"]
           country?: string
+          country_rank?: number | null
           created_at?: string
           description?: string | null
           global_rank?: number | null
@@ -207,6 +212,7 @@ export type Database = {
           name?: string
           region?: string | null
           regional_rank?: number | null
+          sub_country?: string | null
           thumbnail_image?: string | null
           top100_url?: string | null
           updated_at?: string
