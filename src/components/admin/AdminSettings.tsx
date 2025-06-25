@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -16,8 +17,12 @@ const AdminSettings = () => {
 
   // Load saved settings on component mount
   useEffect(() => {
+    console.log('Loading saved settings...');
     const savedTitle = localStorage.getItem('site_tab_title');
     const savedFaviconUrl = localStorage.getItem('site_favicon_url');
+    
+    console.log('Saved title:', savedTitle);
+    console.log('Saved favicon URL:', savedFaviconUrl);
     
     if (savedTitle) {
       setTabTitle(savedTitle);
@@ -49,6 +54,7 @@ const AdminSettings = () => {
   };
 
   const updateTitleMeta = (title: string) => {
+    console.log('Updating title meta to:', title);
     // Update the title meta tag in the head
     const titleElement = document.querySelector('title');
     if (titleElement) {
@@ -66,6 +72,7 @@ const AdminSettings = () => {
   };
 
   const updateFaviconInHead = (url: string) => {
+    console.log('Updating favicon to:', url);
     // Remove existing favicon links
     const existingFavicons = document.querySelectorAll('link[rel*="icon"]');
     existingFavicons.forEach(link => link.remove());
@@ -85,8 +92,11 @@ const AdminSettings = () => {
   };
 
   const handleUpdateBranding = () => {
+    console.log('Updating branding with:', { tabTitle, faviconUrl, faviconFile });
+    
     // Save tab title to localStorage and update document
     if (tabTitle.trim()) {
+      console.log('Saving tab title:', tabTitle);
       localStorage.setItem('site_tab_title', tabTitle);
       document.title = tabTitle;
       updateTitleMeta(tabTitle);
@@ -96,6 +106,7 @@ const AdminSettings = () => {
     if (faviconFile) {
       // Create a URL for the uploaded file
       const fileUrl = URL.createObjectURL(faviconFile);
+      console.log('Updating favicon with file URL:', fileUrl);
       updateFaviconInHead(fileUrl);
       
       // Save to localStorage for persistence
@@ -106,6 +117,7 @@ const AdminSettings = () => {
         description: "Favicon and tab title updated successfully! Note: File uploads require deployment to be permanent.",
       });
     } else if (faviconUrl.trim()) {
+      console.log('Updating favicon with URL:', faviconUrl);
       updateFaviconInHead(faviconUrl);
       
       // Save to localStorage for persistence
@@ -122,17 +134,15 @@ const AdminSettings = () => {
       });
     }
 
-    // Force a small delay to ensure changes are applied
-    setTimeout(() => {
-      // Trigger a page refresh indication
-      console.log('Branding settings saved:', {
-        title: tabTitle,
-        favicon: faviconUrl || 'file uploaded'
-      });
-    }, 100);
+    // Log current localStorage state
+    console.log('Current localStorage state:', {
+      title: localStorage.getItem('site_tab_title'),
+      favicon: localStorage.getItem('site_favicon_url')
+    });
   };
 
   const handleResetBranding = () => {
+    console.log('Resetting branding to defaults');
     // Reset to defaults
     const defaultTitle = 'clbhouz - The Golfer\'s Social Hub';
     setTabTitle(defaultTitle);
