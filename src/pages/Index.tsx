@@ -33,7 +33,7 @@ const Index = () => {
     );
   }
 
-  // Show login page for non-authenticated users
+  // Show login page for non-authenticated users - this is the landing page
   if (!user) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4">
@@ -45,6 +45,12 @@ const Index = () => {
               alt="clbhouz"
               className="w-auto max-h-32 object-contain"
             />
+          </div>
+          
+          {/* Tagline */}
+          <div className="space-y-2">
+            <h1 className="text-4xl font-bold text-foreground">clbhouz</h1>
+            <p className="text-xl text-muted-foreground font-medium">Swing. Snap. Share.</p>
           </div>
           
           {/* Call to Action */}
@@ -66,7 +72,7 @@ const Index = () => {
     );
   }
 
-  // Show authenticated user content
+  // Show authenticated user content - this is the main feed
   return (
     <div className="min-h-screen bg-background">
       <Header />
