@@ -6,7 +6,6 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Info } from 'lucide-react';
-import { countryOptions, subCountryOptions, continentOptions } from './types';
 import CourseImageUpload from './CourseImageUpload';
 
 interface GolfCourseFormProps {
@@ -22,6 +21,45 @@ interface GolfCourseFormProps {
   onImageChange: (imageUrl: string | null) => void;
 }
 
+// Define the primary countries that have regional Top 100 lists
+const primaryCountryOptions = [
+  'Britain & Ireland',
+  'USA', 
+  'Continental Europe'
+];
+
+// Map primary countries to their sub-countries
+const subCountryOptions: Record<string, string[]> = {
+  'Britain & Ireland': [
+    'England', 'Scotland', 'Wales', 'Northern Ireland', 'Ireland', 'Isle of Man'
+  ],
+  'USA': [
+    'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 
+    'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 
+    'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 
+    'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 
+    'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio', 
+    'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota', 
+    'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia', 
+    'Wisconsin', 'Wyoming', 'District of Columbia'
+  ],
+  'Continental Europe': [
+    'Austria', 'Belgium', 'Czech Republic', 'Denmark', 'Estonia', 'Finland', 'France', 
+    'Germany', 'Greece', 'Hungary', 'Iceland', 'Italy', 'Latvia', 'Lithuania', 'Luxembourg', 
+    'Netherlands', 'Norway', 'Poland', 'Portugal', 'Slovakia', 'Slovenia', 'Spain', 
+    'Sweden', 'Switzerland'
+  ]
+};
+
+const continentOptions = [
+  'North America',
+  'South America', 
+  'Europe',
+  'Asia',
+  'Africa',
+  'Oceania'
+];
+
 const GolfCourseForm: React.FC<GolfCourseFormProps> = ({
   register,
   selectedCountry,
@@ -36,15 +74,15 @@ const GolfCourseForm: React.FC<GolfCourseFormProps> = ({
 }) => {
   const availableSubCountries = selectedCountry ? subCountryOptions[selectedCountry] || [] : [];
 
-  // Only reset sub-country when country changes AND the current sub-country is not valid for the new country
+  // Reset sub-country when primary country changes and current sub-country is invalid
   React.useEffect(() => {
     if (selectedCountry && selectedSubCountry && availableSubCountries.length > 0) {
       if (!availableSubCountries.includes(selectedSubCountry)) {
-        console.log('Resetting sub-country because it is not valid for selected country');
+        console.log('Resetting sub-country because it is not valid for selected primary country');
         setSelectedSubCountry('');
       }
     }
-  }, [selectedCountry]); // Only depend on selectedCountry to avoid unnecessary resets
+  }, [selectedCountry, selectedSubCountry, availableSubCountries, setSelectedSubCountry]);
 
   return (
     <TooltipProvider>
@@ -70,13 +108,21 @@ const GolfCourseForm: React.FC<GolfCourseFormProps> = ({
           <div className="space-y-2">
             <Label htmlFor="country" className="flex items-center gap-1">
               Country / Region (Primary) <span className="text-red-500">*</span>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>This determines which Top 100 regional list the course belongs to</p>
+                </TooltipContent>
+              </Tooltip>
             </Label>
             <Select value={selectedCountry} onValueChange={setSelectedCountry}>
               <SelectTrigger className={errors.country ? 'border-red-500' : ''}>
-                <SelectValue placeholder="Select country/region" />
+                <SelectValue placeholder="Select primary region" />
               </SelectTrigger>
               <SelectContent>
-                {countryOptions.map((country) => (
+                {primaryCountryOptions.map((country) => (
                   <SelectItem key={country} value={country}>
                     {country}
                   </SelectItem>
@@ -99,7 +145,7 @@ const GolfCourseForm: React.FC<GolfCourseFormProps> = ({
               disabled={!selectedCountry}
             >
               <SelectTrigger className={errors.sub_country ? 'border-red-500' : ''}>
-                <SelectValue placeholder={selectedCountry ? "Select sub-country" : "Select country first"} />
+                <SelectValue placeholder={selectedCountry ? "Select sub-country" : "Select primary region first"} />
               </SelectTrigger>
               <SelectContent>
                 {availableSubCountries.map((subCountry) => (
@@ -150,7 +196,7 @@ const GolfCourseForm: React.FC<GolfCourseFormProps> = ({
                   <Info className="h-4 w-4 text-muted-foreground cursor-help" />
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>Overall world ranking (1-100)</p>
+                  <p>Overall world ranking (1-100). Displays on course cards in addition to regional rank.</p>
                 </TooltipContent>
               </Tooltip>
             </Label>
@@ -160,6 +206,29 @@ const GolfCourseForm: React.FC<GolfCourseFormProps> = ({
               min="1"
               max="100"
               {...register('global_rank')}
+              placeholder="e.g. 5"
+            />
+          </div>
+
+          {/* Regional Rank - Optional */}
+          <div className="space-y-2">
+            <Label htmlFor="regional_rank" className="flex items-center gap-1">
+              Regional Rank
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Rank within the selected primary region's Top 100 list (e.g. #5 in GB&I, #1 in USA, #7 in Continental Europe)</p>
+                </TooltipContent>
+              </Tooltip>
+            </Label>
+            <Input
+              id="regional_rank"
+              type="number"
+              min="1"
+              max="100"
+              {...register('regional_rank')}
               placeholder="e.g. 5"
             />
           </div>
@@ -186,28 +255,6 @@ const GolfCourseForm: React.FC<GolfCourseFormProps> = ({
             />
           </div>
 
-          {/* Regional Rank - Optional */}
-          <div className="space-y-2">
-            <Label htmlFor="regional_rank" className="flex items-center gap-1">
-              Regional Rank
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Info className="h-4 w-4 text-muted-foreground cursor-help" />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Rank within major regional top 100 lists (e.g. #8 in Continental Europe)</p>
-                </TooltipContent>
-              </Tooltip>
-            </Label>
-            <Input
-              id="regional_rank"
-              type="number"
-              min="1"
-              {...register('regional_rank')}
-              placeholder="e.g. 8"
-            />
-          </div>
-
           {/* Latitude - Optional */}
           <div className="space-y-2">
             <Label htmlFor="latitude">Latitude</Label>
@@ -229,7 +276,7 @@ const GolfCourseForm: React.FC<GolfCourseFormProps> = ({
           </div>
         </div>
 
-        {/* Course Image Upload - Replaces URL input */}
+        {/* Course Image Upload */}
         <CourseImageUpload
           currentImageUrl={currentImageUrl}
           onImageChange={onImageChange}

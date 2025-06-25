@@ -44,7 +44,7 @@ const Top100Courses = () => {
     },
   });
 
-  // Regional Top 100
+  // Regional Top 100 - updated logic based on primary country selection
   const { data: regionalTop100, isLoading: loadingRegional } = useQuery({
     queryKey: ['regional-top-100', selectedRegion],
     queryFn: async () => {
@@ -55,26 +55,26 @@ const Top100Courses = () => {
         .select('*');
 
       if (selectedRegion === 'Britain & Ireland') {
-        // Show all GB&I courses ranked 1-100 by regional rank
+        // Show courses where primary country is "Britain & Ireland" and have regional rank
         query = query
-          .in('country', ['England', 'Scotland', 'Wales', 'Northern Ireland', 'Ireland', 'Isle of Man'])
+          .eq('country', 'Britain & Ireland')
+          .not('regional_rank', 'is', null)
+          .lte('regional_rank', 100)
+          .order('regional_rank', { ascending: true });
+      } else if (selectedRegion === 'USA') {
+        // Show courses where primary country is "USA" and have regional rank
+        query = query
+          .eq('country', 'USA')
           .not('regional_rank', 'is', null)
           .lte('regional_rank', 100)
           .order('regional_rank', { ascending: true });
       } else if (selectedRegion === 'Continental Europe') {
-        // Use 'Europe' continent but exclude GB&I countries
+        // Show courses where primary country is "Continental Europe" and have regional rank
         query = query
-          .eq('continent', 'Europe')
-          .not('country', 'in', '(England,Scotland,Wales,Northern Ireland,Ireland,Isle of Man)')
-          .not('global_rank', 'is', null)
-          .order('global_rank', { ascending: true });
-      } else if (selectedRegion === 'USA') {
-        // Show USA Top 100 courses ranked by usa_rank (not global_rank)
-        query = query
-          .eq('country', 'United States')
-          .not('usa_rank', 'is', null)
-          .lte('usa_rank', 100)
-          .order('usa_rank', { ascending: true });
+          .eq('country', 'Continental Europe')
+          .not('regional_rank', 'is', null)
+          .lte('regional_rank', 100)
+          .order('regional_rank', { ascending: true });
       }
 
       const { data, error } = await query.limit(100);
@@ -84,7 +84,7 @@ const Top100Courses = () => {
     enabled: !!selectedRegion,
   });
 
-  const regions = ['Britain & Ireland', 'Continental Europe', 'USA', 'Worldwide'];
+  const regions = ['Britain & Ireland', 'USA', 'Continental Europe'];
 
   const LoadingSkeleton = () => (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -148,7 +148,7 @@ const Top100Courses = () => {
                     key={course.id} 
                     course={course} 
                     viewContext="global" 
-                    showPlayedButton={false} // Disable played button in Top 100 view
+                    showPlayedButton={false}
                   />
                 ))}
               </div>
@@ -219,7 +219,7 @@ const Top100Courses = () => {
                       key={course.id} 
                       course={course} 
                       viewContext="regional" 
-                      showPlayedButton={false} // Disable played button in Top 100 view
+                      showPlayedButton={false}
                     />
                   ))}
                 </div>
@@ -227,7 +227,7 @@ const Top100Courses = () => {
             ) : (
               <EmptyState 
                 title={`No courses found for ${selectedRegion}`}
-                description="Import golf course data to see regional rankings"
+                description="Add courses with regional rankings to see them in this list"
               />
             )}
           </div>

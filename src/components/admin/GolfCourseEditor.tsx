@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -25,7 +24,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
   const [selectedContinent, setSelectedContinent] = useState('');
   const [courseImageUrl, setCourseImageUrl] = useState<string | null>(null);
 
-  // Fetch course ratings/reviews with a simpler query structure
+  // Fetch course ratings/reviews
   const { data: ratings, isLoading: ratingsLoading } = useQuery({
     queryKey: ['course-ratings', course?.id],
     queryFn: async () => {
@@ -39,7 +38,6 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
 
       if (error) throw error;
       
-      // Fetch user profiles separately to avoid relation issues
       const ratingsWithProfiles = await Promise.all(
         (data || []).map(async (rating) => {
           const { data: profile } = await supabase
@@ -110,11 +108,6 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
       console.log('Selected country:', selectedCountry);
       console.log('Selected sub-country:', selectedSubCountry);
       console.log('Course image URL:', courseImageUrl);
-      
-      // Validate the image URL if it exists
-      if (courseImageUrl && !courseImageUrl.startsWith('http')) {
-        throw new Error('Invalid image URL format');
-      }
       
       const courseData = {
         name: data.name,
@@ -207,7 +200,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
     console.log('Current selectedCountry:', selectedCountry);
     console.log('Current selectedSubCountry:', selectedSubCountry);
     
-    // Validate required fields with current state values
+    // Validate required fields
     if (!data.name || data.name.trim() === '') {
       toast({
         title: "Error",
