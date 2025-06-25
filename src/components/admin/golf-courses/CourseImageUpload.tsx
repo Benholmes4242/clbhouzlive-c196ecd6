@@ -7,7 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 interface CourseImageUploadProps {
-  currentImageUrl?: string;
+  currentImageUrl?: string | null;
   onImageChange: (imageUrl: string | null) => void;
   disabled?: boolean;
 }
@@ -55,17 +55,31 @@ const CourseImageUpload: React.FC<CourseImageUploadProps> = ({
       const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
       const filePath = `courses/${fileName}`;
 
+      console.log('Uploading file to path:', filePath);
+
       // Upload file to Supabase storage
       const { data, error } = await supabase.storage
         .from('course-images')
         .upload(filePath, file);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Storage upload error:', error);
+        throw error;
+      }
+
+      console.log('File uploaded successfully:', data);
 
       // Get public URL
       const { data: { publicUrl } } = supabase.storage
         .from('course-images')
         .getPublicUrl(filePath);
+
+      console.log('Generated public URL:', publicUrl);
+
+      // Ensure the URL is valid
+      if (!publicUrl || !publicUrl.startsWith('http')) {
+        throw new Error('Invalid public URL generated');
+      }
 
       setPreviewUrl(publicUrl);
       onImageChange(publicUrl);
@@ -74,11 +88,11 @@ const CourseImageUpload: React.FC<CourseImageUploadProps> = ({
         title: "Success",
         description: "Course image uploaded successfully",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error uploading image:', error);
       toast({
         title: "Upload failed",
-        description: "Failed to upload image. Please try again.",
+        description: `Failed to upload image: ${error.message}`,
         variant: "destructive",
       });
     } finally {
@@ -91,6 +105,7 @@ const CourseImageUpload: React.FC<CourseImageUploadProps> = ({
   };
 
   const handleRemoveImage = () => {
+    console.log('Removing image');
     setPreviewUrl(null);
     onImageChange(null);
   };
@@ -98,6 +113,11 @@ const CourseImageUpload: React.FC<CourseImageUploadProps> = ({
   const handleUploadClick = () => {
     fileInputRef.current?.click();
   };
+
+  // Update preview URL when currentImageUrl changes
+  React.useEffect(() => {
+    setPreviewUrl(currentImageUrl || null);
+  }, [currentImageUrl]);
 
   return (
     <div className="space-y-3">
@@ -110,6 +130,11 @@ const CourseImageUpload: React.FC<CourseImageUploadProps> = ({
               src={previewUrl}
               alt="Course preview"
               className="w-full max-w-sm h-48 object-cover rounded-lg border"
+              onError={(e) => {
+                console.error('Image failed to load:', previewUrl);
+                // If image fails to load, show placeholder
+                e.currentTarget.style.display = 'none';
+              }}
             />
             <Button
               type="button"

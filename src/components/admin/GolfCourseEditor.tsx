@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -109,6 +110,11 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
       console.log('Selected country:', selectedCountry);
       console.log('Selected sub-country:', selectedSubCountry);
       console.log('Course image URL:', courseImageUrl);
+      
+      // Validate the image URL if it exists
+      if (courseImageUrl && !courseImageUrl.startsWith('http')) {
+        throw new Error('Invalid image URL format');
+      }
       
       const courseData = {
         name: data.name,
@@ -237,17 +243,20 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
     deleteReviewMutation.mutate(reviewId);
   };
 
-  // Simplified handlers
   const handleCountryChange = (newCountry: string) => {
     console.log('Country changing to:', newCountry);
     setSelectedCountry(newCountry);
-    // Reset sub-country when country changes
     setSelectedSubCountry('');
   };
 
   const handleSubCountryChange = (newSubCountry: string) => {
     console.log('Sub-country changing to:', newSubCountry);
     setSelectedSubCountry(newSubCountry);
+  };
+
+  const handleImageChange = (imageUrl: string | null) => {
+    console.log('Image URL changing to:', imageUrl);
+    setCourseImageUrl(imageUrl);
   };
 
   return (
@@ -270,7 +279,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
             setSelectedContinent={setSelectedContinent}
             errors={errors}
             currentImageUrl={courseImageUrl}
-            onImageChange={setCourseImageUrl}
+            onImageChange={handleImageChange}
           />
 
           <div className="flex gap-3 pt-4 border-t">
