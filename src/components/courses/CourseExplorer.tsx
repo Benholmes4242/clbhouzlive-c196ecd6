@@ -12,7 +12,7 @@ const CourseExplorer = () => {
   const [selectedRegion, setSelectedRegion] = useState<string>('britain-ireland');
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Fetch courses based on selected region
+  // Fetch courses based on selected region using correct filtering logic
   const { data: courses = [], isLoading } = useQuery({
     queryKey: ['courses', selectedRegion],
     queryFn: async () => {
@@ -21,22 +21,25 @@ const CourseExplorer = () => {
         .select('*');
 
       if (selectedRegion === 'britain-ireland') {
+        // Show courses where primary country is "Britain & Ireland" and have regional rank
         query = query
-          .in('country', ['England', 'Scotland', 'Wales', 'Northern Ireland', 'Ireland', 'Isle of Man', 'United Kingdom'])
+          .eq('country', 'Britain & Ireland')
           .not('regional_rank', 'is', null)
           .order('regional_rank', { ascending: true });
       } else if (selectedRegion === 'usa') {
+        // Show courses where primary country is "USA" and have regional rank
         query = query
-          .eq('country', 'United States')
-          .not('usa_rank', 'is', null)
-          .order('usa_rank', { ascending: true });
+          .eq('country', 'USA')
+          .not('regional_rank', 'is', null)
+          .order('regional_rank', { ascending: true });
       } else if (selectedRegion === 'europe') {
+        // Show courses where primary country is "Continental Europe" and have regional rank
         query = query
-          .eq('continent', 'Europe')
-          .not('country', 'in', '(England,Scotland,Wales,Northern Ireland,Ireland,Isle of Man,United Kingdom)')
-          .not('global_rank', 'is', null)
-          .order('global_rank', { ascending: true });
+          .eq('country', 'Continental Europe')
+          .not('regional_rank', 'is', null)
+          .order('regional_rank', { ascending: true });
       } else {
+        // Global - show all courses with global ranks
         query = query
           .not('global_rank', 'is', null)
           .order('global_rank', { ascending: true });
@@ -114,7 +117,7 @@ const CourseExplorer = () => {
             <CourseCard 
               key={course.id} 
               course={course} 
-              viewContext={selectedRegion === 'britain-ireland' ? 'regional' : selectedRegion === 'usa' ? 'usa' : 'global'}
+              viewContext={selectedRegion === 'britain-ireland' ? 'regional' : selectedRegion === 'usa' ? 'regional' : selectedRegion === 'europe' ? 'regional' : 'global'}
               showPlayedButton={false} // Explicitly disable the played button in explore view
             />
           ))}

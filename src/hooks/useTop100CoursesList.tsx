@@ -7,7 +7,7 @@ export const useTop100CoursesList = (region: string, userId: string, isOwnProfil
   const [playedCourses, setPlayedCourses] = useState<Set<string>>(new Set());
   const queryClient = useQueryClient();
 
-  // Query to get courses for the specific region
+  // Query to get courses for the specific region using correct filtering
   const { data: courses = [], isLoading: isLoadingCourses } = useQuery({
     queryKey: ['top100CoursesByRegion', region],
     queryFn: async () => {
@@ -15,28 +15,28 @@ export const useTop100CoursesList = (region: string, userId: string, isOwnProfil
         .from('golf_courses')
         .select('*');
 
-      // Filter by region and order accordingly
+      // Filter by region based on the primary country selection
       if (region === 'britain-ireland') {
-        // Get all GB&I courses with regional rankings (1-100)
+        // Get courses where primary country is "Britain & Ireland" and have regional rankings
         query = query
-          .in('country', ['England', 'Scotland', 'Wales', 'Northern Ireland', 'Ireland', 'Isle of Man'])
+          .eq('country', 'Britain & Ireland')
           .not('regional_rank', 'is', null)
           .lte('regional_rank', 100)
           .order('regional_rank', { ascending: true });
       } else if (region === 'usa') {
-        // Order USA courses by usa_rank, not global_rank
+        // Get courses where primary country is "USA" and have regional rankings
         query = query
-          .eq('country', 'United States')
-          .not('usa_rank', 'is', null)
-          .lte('usa_rank', 100)
-          .order('usa_rank', { ascending: true });
+          .eq('country', 'USA')
+          .not('regional_rank', 'is', null)
+          .lte('regional_rank', 100)
+          .order('regional_rank', { ascending: true });
       } else if (region === 'europe') {
-        // Use 'Europe' continent but exclude GB&I countries
+        // Get courses where primary country is "Continental Europe" and have regional rankings
         query = query
-          .eq('continent', 'Europe')
-          .not('country', 'in', '(England,Scotland,Wales,Northern Ireland,Ireland,Isle of Man)')
-          .not('global_rank', 'is', null)
-          .order('global_rank');
+          .eq('country', 'Continental Europe')
+          .not('regional_rank', 'is', null)
+          .lte('regional_rank', 100)
+          .order('regional_rank', { ascending: true });
       } else {
         // For 'global', order by global rank
         query = query
