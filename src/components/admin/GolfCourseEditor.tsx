@@ -69,10 +69,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
     if (course && !isCreating) {
       reset({
         name: course.name,
-        country: course.country,
-        sub_country: course.sub_country || '',
         region: course.region || '',
-        continent: course.continent || '',
         description: course.description || '',
         website_url: course.website_url || '',
         latitude: course.latitude || '',
@@ -102,10 +99,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
     } else {
       reset({
         name: '',
-        country: '',
-        sub_country: '',
         region: '',
-        continent: '',
         description: '',
         website_url: '',
         latitude: '',
@@ -251,7 +245,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
       return;
     }
 
-    // Validate Top 100s rankings
+    // Validate Top 100s rankings - only if regional ranking region is selected
     if (regionalRankingRegion && !regionalRank) {
       toast({
         title: "Error",
