@@ -81,7 +81,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
       // Set country and sub-country values with proper logging
       setSelectedCountry(course.country || '');
       
-      // The issue might be here - let's make sure we're using the right field
+      // Fix: Ensure we're properly setting the sub-country value
       const subCountryValue = course.sub_country || '';
       console.log('Setting selectedSubCountry to:', subCountryValue);
       setSelectedSubCountry(subCountryValue);
@@ -145,7 +145,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
       const courseData = {
         name: data.name,
         country: selectedCountry,
-        sub_country: selectedSubCountry, // Remove the || null to ensure empty string is saved as empty string
+        sub_country: selectedSubCountry, // Fix: Ensure this is properly included
         region: data.region || null,
         continent: continent,
         global_rank: globalRank ? parseInt(globalRank) : null,
@@ -318,7 +318,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
             <Button type="submit" disabled={saveMutation.isPending}>
               {saveMutation.isPending ? 'Saving...' : (isCreating ? 'Create Course' : 'Save Changes')}
             </Button>
-            <Button type="button" variant="outline" onClick={onClose}>
+            <Button type="button" variant="outline" onClick={onClose">
               Cancel
             </Button>
           </div>

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -54,7 +53,7 @@ const subCountryOptions: Record<string, string[]> = {
     'Austria', 'Belgium', 'Czech Republic', 'Denmark', 'Estonia', 'Finland', 'France', 
     'Germany', 'Greece', 'Hungary', 'Iceland', 'Italy', 'Latvia', 'Lithuania', 'Luxembourg', 
     'Netherlands', 'Norway', 'Poland', 'Portugal', 'Slovakia', 'Slovenia', 'Spain', 
-    'Sweden', 'Switzerland'
+    'Sweden', 'Switzerland', 'Ireland', 'Northern Ireland', 'Scotland', 'England', 'Wales'
   ]
 };
 
@@ -88,15 +87,13 @@ const GolfCourseForm: React.FC<GolfCourseFormProps> = ({
 }) => {
   const availableSubCountries = selectedCountry ? subCountryOptions[selectedCountry] || [] : [];
 
-  // Only reset sub-country when primary country changes AND the current sub-country is not valid
-  // This prevents resetting when loading saved data
+  // Fix: Only reset sub-country when country changes AND sub-country is not valid for the new country
   React.useEffect(() => {
     console.log('useEffect triggered - selectedCountry:', selectedCountry, 'selectedSubCountry:', selectedSubCountry);
     console.log('Available sub-countries:', availableSubCountries);
     
+    // Only reset if we have a country selected and the current sub-country is not valid for that country
     if (selectedCountry && availableSubCountries.length > 0) {
-      // Only reset if the current sub-country is not in the available options
-      // This ensures we don't reset when loading existing course data
       if (selectedSubCountry && !availableSubCountries.includes(selectedSubCountry)) {
         console.log('Resetting sub-country because it is not valid for selected primary country');
         setSelectedSubCountry('');
@@ -106,7 +103,7 @@ const GolfCourseForm: React.FC<GolfCourseFormProps> = ({
       console.log('Clearing sub-country because no primary country is selected');
       setSelectedSubCountry('');
     }
-  }, [selectedCountry, availableSubCountries.join(',')]); // Use join to create stable dependency
+  }, [selectedCountry]); // Remove the availableSubCountries dependency to prevent unnecessary resets
 
   // Reset regional rank when regional ranking region changes
   const handleRegionalRankingRegionChange = (value: string) => {
