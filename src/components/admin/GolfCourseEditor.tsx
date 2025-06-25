@@ -218,6 +218,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
     console.log('Form submitted with data:', data);
     console.log('Current selectedCountry:', selectedCountry);
     console.log('Current selectedSubCountry:', selectedSubCountry);
+    console.log('Current courseImageUrl:', courseImageUrl);
     
     // Validate required fields
     if (!data.name || data.name.trim() === '') {
@@ -265,6 +266,11 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
     deleteReviewMutation.mutate(reviewId);
   };
 
+  const handleImageChange = (imageUrl: string | null) => {
+    console.log('Image changed to:', imageUrl);
+    setCourseImageUrl(imageUrl);
+  };
+
   return (
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -285,7 +291,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
             setSelectedContinent={setSelectedContinent}
             errors={errors}
             currentImageUrl={courseImageUrl}
-            onImageChange={setCourseImageUrl}
+            onImageChange={handleImageChange}
             regionalRankingRegion={regionalRankingRegion}
             setRegionalRankingRegion={setRegionalRankingRegion}
             regionalRank={regionalRank}
