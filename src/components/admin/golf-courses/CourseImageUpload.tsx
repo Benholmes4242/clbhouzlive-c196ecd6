@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Upload, X, Image as ImageIcon } from 'lucide-react';
@@ -19,6 +19,7 @@ const CourseImageUpload: React.FC<CourseImageUploadProps> = ({
 }) => {
   const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(currentImageUrl || null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -82,12 +83,20 @@ const CourseImageUpload: React.FC<CourseImageUploadProps> = ({
       });
     } finally {
       setUploading(false);
+      // Clear the input so the same file can be selected again
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
   const handleRemoveImage = () => {
     setPreviewUrl(null);
     onImageChange(null);
+  };
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
   };
 
   return (
@@ -124,11 +133,19 @@ const CourseImageUpload: React.FC<CourseImageUploadProps> = ({
       )}
 
       <div className="flex gap-2">
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/jpeg,image/jpg,image/png,image/webp"
+          onChange={handleFileUpload}
+          className="hidden"
+          disabled={uploading || disabled}
+        />
         <Button
           type="button"
           variant="outline"
           disabled={uploading || disabled}
-          className="relative"
+          onClick={handleUploadClick}
         >
           {uploading ? (
             <>
@@ -141,13 +158,6 @@ const CourseImageUpload: React.FC<CourseImageUploadProps> = ({
               {previewUrl ? 'Change Image' : 'Upload Image'}
             </>
           )}
-          <input
-            type="file"
-            accept="image/jpeg,image/jpg,image/png,image/webp"
-            onChange={handleFileUpload}
-            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-            disabled={uploading || disabled}
-          />
         </Button>
       </div>
     </div>
