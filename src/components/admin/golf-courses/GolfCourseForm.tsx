@@ -19,6 +19,13 @@ interface GolfCourseFormProps {
   errors: any;
   currentImageUrl?: string;
   onImageChange: (imageUrl: string | null) => void;
+  // New props for Top 100s section
+  regionalRankingRegion: string;
+  setRegionalRankingRegion: (value: string) => void;
+  regionalRank: string;
+  setRegionalRank: (value: string) => void;
+  globalRank: string;
+  setGlobalRank: (value: string) => void;
 }
 
 // Define the primary countries that have regional Top 100 lists
@@ -60,6 +67,16 @@ const continentOptions = [
   'Oceania'
 ];
 
+// Regional Top 100 options
+const regionalTop100Options = [
+  'Great Britain and Ireland',
+  'USA',
+  'Continental Europe'
+];
+
+// Generate rank options 1-100
+const rankOptions = Array.from({ length: 100 }, (_, i) => (i + 1).toString());
+
 const GolfCourseForm: React.FC<GolfCourseFormProps> = ({
   register,
   selectedCountry,
@@ -71,6 +88,12 @@ const GolfCourseForm: React.FC<GolfCourseFormProps> = ({
   errors,
   currentImageUrl,
   onImageChange,
+  regionalRankingRegion,
+  setRegionalRankingRegion,
+  regionalRank,
+  setRegionalRank,
+  globalRank,
+  setGlobalRank,
 }) => {
   const availableSubCountries = selectedCountry ? subCountryOptions[selectedCountry] || [] : [];
 
@@ -83,6 +106,14 @@ const GolfCourseForm: React.FC<GolfCourseFormProps> = ({
       }
     }
   }, [selectedCountry, selectedSubCountry, availableSubCountries, setSelectedSubCountry]);
+
+  // Reset regional rank when regional ranking region changes
+  const handleRegionalRankingRegionChange = (value: string) => {
+    setRegionalRankingRegion(value);
+    if (!value) {
+      setRegionalRank('');
+    }
+  };
 
   return (
     <TooltipProvider>
@@ -186,76 +217,101 @@ const GolfCourseForm: React.FC<GolfCourseFormProps> = ({
               </SelectContent>
             </Select>
           </div>
+        </div>
 
-          {/* Global Rank - Optional */}
-          <div className="space-y-2">
-            <Label htmlFor="global_rank" className="flex items-center gap-1">
-              Global Rank
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Info className="h-4 w-4 text-muted-foreground cursor-help" />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Overall world ranking (1-100). Displays on course cards in addition to regional rank.</p>
-                </TooltipContent>
-              </Tooltip>
-            </Label>
-            <Input
-              id="global_rank"
-              type="number"
-              min="1"
-              max="100"
-              {...register('global_rank')}
-              placeholder="e.g. 5"
-            />
+        {/* New Top 100s Section */}
+        <div className="space-y-4">
+          <div className="border-t pt-4">
+            <h3 className="text-lg font-semibold mb-4">Top 100s</h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Regional Top 100 */}
+              <div className="space-y-2">
+                <Label className="flex items-center gap-1">
+                  Regional Top 100
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Select a regional Top 100 list and rank</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </Label>
+                <div className="flex gap-2">
+                  <Select value={regionalRankingRegion} onValueChange={handleRegionalRankingRegionChange}>
+                    <SelectTrigger className="flex-1">
+                      <SelectValue placeholder="Select region" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {regionalTop100Options.map((region) => (
+                        <SelectItem key={region} value={region}>
+                          {region}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <Select 
+                    value={regionalRank} 
+                    onValueChange={setRegionalRank}
+                    disabled={!regionalRankingRegion}
+                  >
+                    <SelectTrigger className="w-20">
+                      <SelectValue placeholder="Rank" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {rankOptions.map((rank) => (
+                        <SelectItem key={rank} value={rank}>
+                          {rank}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {/* Global Top 100 */}
+              <div className="space-y-2">
+                <Label className="flex items-center gap-1">
+                  Worldwide Top 100
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Select a rank in the global Top 100</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </Label>
+                <div className="flex gap-2">
+                  <Select value="Worldwide" disabled>
+                    <SelectTrigger className="flex-1">
+                      <SelectValue placeholder="Worldwide" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Worldwide">Worldwide</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select value={globalRank} onValueChange={setGlobalRank}>
+                    <SelectTrigger className="w-20">
+                      <SelectValue placeholder="Rank" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {rankOptions.map((rank) => (
+                        <SelectItem key={rank} value={rank}>
+                          {rank}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </div>
           </div>
+        </div>
 
-          {/* Regional Rank - Optional */}
-          <div className="space-y-2">
-            <Label htmlFor="regional_rank" className="flex items-center gap-1">
-              Regional Rank
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Info className="h-4 w-4 text-muted-foreground cursor-help" />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Rank within the selected primary region's Top 100 list (e.g. #5 in GB&I, #1 in USA, #7 in Continental Europe)</p>
-                </TooltipContent>
-              </Tooltip>
-            </Label>
-            <Input
-              id="regional_rank"
-              type="number"
-              min="1"
-              max="100"
-              {...register('regional_rank')}
-              placeholder="e.g. 5"
-            />
-          </div>
-
-          {/* Country Rank - Optional */}
-          <div className="space-y-2">
-            <Label htmlFor="country_rank" className="flex items-center gap-1">
-              Country Rank
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Info className="h-4 w-4 text-muted-foreground cursor-help" />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Ranking within selected sub-country (e.g. #2 in Scotland)</p>
-                </TooltipContent>
-              </Tooltip>
-            </Label>
-            <Input
-              id="country_rank"
-              type="number"
-              min="1"
-              {...register('country_rank')}
-              placeholder="e.g. 2"
-            />
-          </div>
-
-          {/* Latitude - Optional */}
+        {/* Latitude and Longitude */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label htmlFor="latitude">Latitude</Label>
             <Input
@@ -265,7 +321,6 @@ const GolfCourseForm: React.FC<GolfCourseFormProps> = ({
             />
           </div>
 
-          {/* Longitude - Optional */}
           <div className="space-y-2">
             <Label htmlFor="longitude">Longitude</Label>
             <Input

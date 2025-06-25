@@ -23,6 +23,11 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
   const [selectedSubCountry, setSelectedSubCountry] = useState('');
   const [selectedContinent, setSelectedContinent] = useState('');
   const [courseImageUrl, setCourseImageUrl] = useState<string | null>(null);
+  
+  // New state for Top 100s section
+  const [regionalRankingRegion, setRegionalRankingRegion] = useState('');
+  const [regionalRank, setRegionalRank] = useState('');
+  const [globalRank, setGlobalRank] = useState('');
 
   // Fetch course ratings/reviews
   const { data: ratings, isLoading: ratingsLoading } = useQuery({
@@ -67,9 +72,6 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
         sub_country: course.sub_country || '',
         region: course.region || '',
         continent: course.continent || '',
-        global_rank: course.global_rank || '',
-        country_rank: course.country_rank || '',
-        regional_rank: course.regional_rank || '',
         description: course.description || '',
         website_url: course.website_url || '',
         latitude: course.latitude || '',
@@ -79,6 +81,23 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
       setSelectedSubCountry(course.sub_country || '');
       setSelectedContinent(course.continent || '');
       setCourseImageUrl(course.thumbnail_image || null);
+      
+      // Set Top 100s values
+      if (course.regional_rank) {
+        setRegionalRank(course.regional_rank.toString());
+        // Map country to regional ranking region
+        if (course.country === 'Britain & Ireland') {
+          setRegionalRankingRegion('Great Britain and Ireland');
+        } else if (course.country === 'USA') {
+          setRegionalRankingRegion('USA');
+        } else if (course.country === 'Continental Europe') {
+          setRegionalRankingRegion('Continental Europe');
+        }
+      }
+      
+      if (course.global_rank) {
+        setGlobalRank(course.global_rank.toString());
+      }
     } else {
       reset({
         name: '',
@@ -86,9 +105,6 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
         sub_country: '',
         region: '',
         continent: '',
-        global_rank: '',
-        country_rank: '',
-        regional_rank: '',
         description: '',
         website_url: '',
         latitude: '',
@@ -98,6 +114,9 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
       setSelectedSubCountry('');
       setSelectedContinent('');
       setCourseImageUrl(null);
+      setRegionalRankingRegion('');
+      setRegionalRank('');
+      setGlobalRank('');
     }
   }, [course, isCreating, reset]);
 
@@ -108,6 +127,9 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
       console.log('Selected country:', selectedCountry);
       console.log('Selected sub-country:', selectedSubCountry);
       console.log('Course image URL:', courseImageUrl);
+      console.log('Regional ranking region:', regionalRankingRegion);
+      console.log('Regional rank:', regionalRank);
+      console.log('Global rank:', globalRank);
       
       const courseData = {
         name: data.name,
@@ -115,9 +137,9 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
         sub_country: selectedSubCountry || null,
         region: data.region || null,
         continent: selectedContinent as "North America" | "South America" | "Europe" | "Asia" | "Africa" | "Oceania" | null,
-        global_rank: data.global_rank ? parseInt(data.global_rank) : null,
-        country_rank: data.country_rank ? parseInt(data.country_rank) : null,
-        regional_rank: data.regional_rank ? parseInt(data.regional_rank) : null,
+        global_rank: globalRank ? parseInt(globalRank) : null,
+        regional_rank: regionalRank ? parseInt(regionalRank) : null,
+        country_rank: null, // Removed from UI
         description: data.description || null,
         thumbnail_image: courseImageUrl || null,
         website_url: data.website_url || null,
@@ -228,6 +250,16 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
       return;
     }
 
+    // Validate Top 100s rankings
+    if (regionalRankingRegion && !regionalRank) {
+      toast({
+        title: "Error",
+        description: "Please select a rank for the regional Top 100",
+        variant: "destructive",
+      });
+      return;
+    }
+
     // All validation passed, proceed with save
     saveMutation.mutate(data);
   };
@@ -265,14 +297,20 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
           <GolfCourseForm
             register={register}
             selectedCountry={selectedCountry}
-            setSelectedCountry={handleCountryChange}
+            setSelectedCountry={setSelectedCountry}
             selectedSubCountry={selectedSubCountry}
-            setSelectedSubCountry={handleSubCountryChange}
+            setSelectedSubCountry={setSelectedSubCountry}
             selectedContinent={selectedContinent}
             setSelectedContinent={setSelectedContinent}
             errors={errors}
             currentImageUrl={courseImageUrl}
-            onImageChange={handleImageChange}
+            onImageChange={setCourseImageUrl}
+            regionalRankingRegion={regionalRankingRegion}
+            setRegionalRankingRegion={setRegionalRankingRegion}
+            regionalRank={regionalRank}
+            setRegionalRank={setRegionalRank}
+            globalRank={globalRank}
+            setGlobalRank={setGlobalRank}
           />
 
           <div className="flex gap-3 pt-4 border-t">
