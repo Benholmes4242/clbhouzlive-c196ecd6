@@ -18,11 +18,21 @@ const CourseRankBadges = ({
   country, 
   viewContext = 'global' 
 }: CourseRankBadgesProps) => {
-  const isUK = country === 'United Kingdom';
-  const isIreland = country === 'Ireland';
-  const isUSA = country === 'United States';
-  const isGBI = isUK || isIreland;
+  // Check for GB&I countries - including all possible variations
+  const isGBI = ['United Kingdom', 'Ireland', 'England', 'Scotland', 'Wales', 'Northern Ireland', 'Isle of Man', 'Britain & Ireland'].includes(country);
+  const isUSA = ['United States', 'USA'].includes(country);
   const isEurope = country === 'Continental Europe';
+
+  console.log('CourseRankBadges Debug:', {
+    country,
+    viewContext,
+    regionalRank,
+    globalRank,
+    usaRank,
+    isGBI,
+    isUSA,
+    isEurope
+  });
 
   // Determine which rank to show based on context
   const getRankBadge = () => {
