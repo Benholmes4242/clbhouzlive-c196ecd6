@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
 import SiteBrandingCard from './settings/SiteBrandingCard';
 import GeneralSettingsCard from './settings/GeneralSettingsCard';
 import SecuritySettingsCard from './settings/SecuritySettingsCard';
@@ -21,11 +20,6 @@ const AdminSettings = () => {
         <SecuritySettingsCard />
         <FeatureFlagsCard />
         <MaintenanceModeCard />
-      </div>
-
-      <div className="flex justify-end space-x-4">
-        <Button variant="outline">Cancel</Button>
-        <Button>Save Changes</Button>
       </div>
     </div>
   );
