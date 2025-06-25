@@ -28,7 +28,8 @@ interface CoursePlayedButtonProps {
   currentUserId?: string;
   viewingUserId?: string;
   course?: Course;
-  showButton?: boolean; // New prop to control button visibility
+  showButton?: boolean;
+  variant?: 'overlay' | 'standalone'; // New prop to control display style
 }
 
 const CoursePlayedButton = ({ 
@@ -39,7 +40,8 @@ const CoursePlayedButton = ({
   currentUserId,
   viewingUserId,
   course,
-  showButton = true // Default to true for backward compatibility
+  showButton = true,
+  variant = 'overlay' // Default to overlay for backward compatibility
 }: CoursePlayedButtonProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -121,6 +123,52 @@ const CoursePlayedButton = ({
     thumbnail_image: undefined
   };
 
+  // Standalone variant for use in modals
+  if (variant === 'standalone') {
+    if (!canModifyCourseStatus && !userCourse?.played) {
+      return null;
+    }
+
+    return (
+      <>
+        {canModifyCourseStatus ? (
+          <Button
+            size="lg"
+            variant={userCourse?.played ? "outline" : "default"}
+            onClick={handleTogglePlayed}
+            disabled={togglePlayedMutation.isPending}
+            className="min-w-[200px]"
+          >
+            {userCourse?.played ? (
+              <>
+                <Check className="h-4 w-4 mr-2" />
+                Mark as Not Played
+              </>
+            ) : (
+              <>
+                <Plus className="h-4 w-4 mr-2" />
+                I've Played This Course
+              </>
+            )}
+          </Button>
+        ) : userCourse?.played ? (
+          <Badge variant="default" className="text-sm px-4 py-2">
+            <Check className="h-3 w-3 mr-1" />
+            You've Played This Course
+          </Badge>
+        ) : null}
+
+        {/* Rating Modal */}
+        <PostPlayRatingModal
+          course={courseForModal}
+          isOpen={showRatingModal}
+          onClose={() => setShowRatingModal(false)}
+        />
+      </>
+    );
+  }
+
+  // Original overlay variant for use in cards
   return (
     <>
       <div className="absolute top-3 right-3">

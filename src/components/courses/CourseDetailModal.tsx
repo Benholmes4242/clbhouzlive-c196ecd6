@@ -13,6 +13,7 @@ import CourseDetailRatingSection from './CourseDetailRatingSection';
 import CourseRatingStats from './CourseRatingStats';
 import CourseReviews from './CourseReviews';
 import CourseDetailMapSection from './CourseDetailMapSection';
+import CoursePlayedButton from './CoursePlayedButton';
 
 interface Course {
   id: string;
@@ -117,6 +118,8 @@ const CourseDetailModal = ({ course, isOpen, onClose, viewingUserId }: CourseDet
 
   if (!course) return null;
 
+  const canModifyCourseStatus = currentUser && !isViewingOtherUser;
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -134,11 +137,27 @@ const CourseDetailModal = ({ course, isOpen, onClose, viewingUserId }: CourseDet
             description={course.description}
           />
 
+          {/* Mark as Played Button - show only if user is logged in and viewing their own profile */}
+          {canModifyCourseStatus && (
+            <div className="flex justify-center">
+              <CoursePlayedButton
+                courseId={course.id}
+                courseName={course.name}
+                userCourse={userCourse}
+                canModifyCourseStatus={true}
+                currentUserId={currentUser?.id}
+                course={course}
+                showButton={true}
+                variant="standalone"
+              />
+            </div>
+          )}
+
           {/* Show rating stats for everyone */}
           <CourseRatingStats ratingStats={ratingStats} />
 
-          {/* Show rating form only if user is viewing their own profile and hasn't rated yet */}
-          {!isViewingOtherUser && (
+          {/* Show rating form only if user is viewing their own profile and has played the course */}
+          {!isViewingOtherUser && userCourse?.played && (
             <CourseDetailRatingSection
               courseId={course.id}
               courseName={course.name}
