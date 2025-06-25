@@ -63,6 +63,9 @@ const Index = () => {
             >
               Get Started
             </Button>
+            <p className="text-muted-foreground text-sm">
+              Welcome to your digital clubhouse for all things golf
+            </p>
           </div>
         </div>
       </div>
