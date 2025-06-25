@@ -41,16 +41,10 @@ const Index = () => {
           {/* Logo */}
           <div className="flex justify-center">
             <img
-              src="/lovable-uploads/071651d4-1096-4053-b720-6f758b637fb8.png"
+              src="/lovable-uploads/7a748cde-b083-4542-9332-cfa1022d03af.png"
               alt="clbhouz"
               className="w-auto max-h-32 object-contain"
             />
-          </div>
-          
-          {/* Tagline */}
-          <div className="space-y-2">
-            <h1 className="text-4xl font-bold text-foreground">clbhouz</h1>
-            <p className="text-xl text-muted-foreground font-medium">Swing. Snap. Share.</p>
           </div>
           
           {/* Call to Action */}
@@ -63,9 +57,6 @@ const Index = () => {
             >
               Get Started
             </Button>
-            <p className="text-muted-foreground text-sm">
-              Welcome to your digital clubhouse for all things golf
-            </p>
           </div>
         </div>
       </div>
