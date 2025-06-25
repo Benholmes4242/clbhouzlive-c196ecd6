@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -114,7 +113,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
         country: selectedCountry,
         sub_country: selectedSubCountry || null,
         region: data.region || null,
-        continent: selectedContinent || null,
+        continent: selectedContinent as "North America" | "South America" | "Europe" | "Asia" | "Africa" | "Oceania" | null,
         global_rank: data.global_rank ? parseInt(data.global_rank) : null,
         country_rank: data.country_rank ? parseInt(data.country_rank) : null,
         regional_rank: data.regional_rank ? parseInt(data.regional_rank) : null,
@@ -130,7 +129,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
       if (isCreating) {
         const { data: result, error } = await supabase
           .from('golf_courses')
-          .insert([courseData])
+          .insert(courseData)
           .select()
           .single();
         if (error) {
