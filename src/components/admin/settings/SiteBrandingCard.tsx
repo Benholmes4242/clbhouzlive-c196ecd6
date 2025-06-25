@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
-import { Upload, Globe } from 'lucide-react';
+import { Upload, Globe, AlertTriangle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const SiteBrandingCard = () => {
@@ -29,9 +29,14 @@ const SiteBrandingCard = () => {
       updateTitleMeta(savedTitle);
     }
     
-    if (savedFaviconUrl) {
+    // Only apply favicon if it's a valid URL (not a blob URL)
+    if (savedFaviconUrl && !savedFaviconUrl.startsWith('blob:')) {
       setFaviconUrl(savedFaviconUrl);
       updateFaviconInHead(savedFaviconUrl);
+    } else if (savedFaviconUrl && savedFaviconUrl.startsWith('blob:')) {
+      // Clear invalid blob URLs from localStorage
+      localStorage.removeItem('site_favicon_url');
+      console.log('Removed invalid blob URL from localStorage');
     }
   }, []);
 
@@ -103,17 +108,18 @@ const SiteBrandingCard = () => {
 
     // Handle favicon update
     if (faviconFile) {
-      // Create a URL for the uploaded file
+      // Create a URL for the uploaded file (temporary)
       const fileUrl = URL.createObjectURL(faviconFile);
       console.log('Updating favicon with file URL:', fileUrl);
       updateFaviconInHead(fileUrl);
       
-      // Save to localStorage for persistence
-      localStorage.setItem('site_favicon_url', fileUrl);
+      // Don't save blob URLs to localStorage as they're temporary
+      localStorage.removeItem('site_favicon_url');
       
       toast({
-        title: "Success",
-        description: "Favicon and tab title updated successfully! Note: File uploads require deployment to be permanent.",
+        title: "Warning",
+        description: "File uploads are temporary and will be lost when you refresh the page. Use a permanent URL for persistent favicons.",
+        variant: "destructive",
       });
     } else if (faviconUrl.trim()) {
       console.log('Updating favicon with URL:', faviconUrl);
@@ -160,6 +166,12 @@ const SiteBrandingCard = () => {
     const existingFavicons = document.querySelectorAll('link[rel*="icon"]');
     existingFavicons.forEach(link => link.remove());
     
+    // Clear file input
+    const fileInput = document.getElementById('favicon-file') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
+    
     toast({
       title: "Reset Complete",
       description: "Branding has been reset to default values.",
@@ -189,14 +201,21 @@ const SiteBrandingCard = () => {
         
         <div className="space-y-3">
           <Label>Favicon</Label>
-          <p className="text-sm text-muted-foreground">
-            Choose either a file upload or enter a URL (not both)
-          </p>
+          
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
+            <div className="flex items-start gap-2">
+              <AlertTriangle className="h-4 w-4 text-yellow-600 mt-0.5 flex-shrink-0" />
+              <div className="text-sm text-yellow-800">
+                <strong>Important:</strong> File uploads are temporary and will be lost when you refresh the page. 
+                For persistent favicons, use a permanent URL instead.
+              </div>
+            </div>
+          </div>
           
           <div className="space-y-3">
             <div>
               <Label htmlFor="favicon-file" className="text-sm font-medium">
-                Upload Favicon File
+                Upload Favicon File (Temporary)
               </Label>
               <div className="mt-1">
                 <Input
@@ -208,8 +227,8 @@ const SiteBrandingCard = () => {
                 />
               </div>
               {faviconFile && (
-                <p className="text-xs text-green-600 mt-1">
-                  Selected: {faviconFile.name}
+                <p className="text-xs text-orange-600 mt-1">
+                  Selected: {faviconFile.name} (will be lost on page refresh)
                 </p>
               )}
             </div>
@@ -220,7 +239,7 @@ const SiteBrandingCard = () => {
             
             <div>
               <Label htmlFor="favicon-url" className="text-sm font-medium">
-                Favicon URL
+                Favicon URL (Persistent)
               </Label>
               <Input
                 id="favicon-url"
@@ -229,6 +248,9 @@ const SiteBrandingCard = () => {
                 placeholder="https://example.com/favicon.png"
                 disabled={!!faviconFile}
               />
+              <p className="text-xs text-muted-foreground mt-1">
+                Use a permanent URL for persistent favicons
+              </p>
             </div>
           </div>
         </div>
