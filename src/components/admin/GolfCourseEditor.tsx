@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -266,22 +267,6 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
 
   const handleDeleteReview = (reviewId: string) => {
     deleteReviewMutation.mutate(reviewId);
-  };
-
-  const handleCountryChange = (newCountry: string) => {
-    console.log('Country changing to:', newCountry);
-    setSelectedCountry(newCountry);
-    setSelectedSubCountry('');
-  };
-
-  const handleSubCountryChange = (newSubCountry: string) => {
-    console.log('Sub-country changing to:', newSubCountry);
-    setSelectedSubCountry(newSubCountry);
-  };
-
-  const handleImageChange = (imageUrl: string | null) => {
-    console.log('Image URL changing to:', imageUrl);
-    setCourseImageUrl(imageUrl);
   };
 
   return (
