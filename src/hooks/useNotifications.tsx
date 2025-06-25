@@ -195,24 +195,23 @@ export const useNotifications = () => {
         });
       }
 
-      // Remove the notification
-      const notification = notifications.find(n => n.data?.friend_request_id === friendRequestId);
-      if (notification) {
-        console.log('Removing notification:', notification.id);
-        const { error } = await supabase
-          .from('notifications')
-          .delete()
-          .eq('id', notification.id);
+      // Remove the notification by friend_request_id
+      console.log('Removing notification for friend request:', friendRequestId);
+      const { error: deleteError } = await supabase
+        .from('notifications')
+        .delete()
+        .eq('data->>friend_request_id', friendRequestId);
 
-        if (error) {
-          console.error('Error removing notification:', error);
-          throw error;
-        }
+      if (deleteError) {
+        console.error('Error removing notification:', deleteError);
+        // Don't throw here as the main action succeeded
+      } else {
+        console.log('Successfully removed notification for friend request:', friendRequestId);
       }
     },
     onSuccess: () => {
+      // Invalidate all relevant queries to refresh the UI
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
-      // Also invalidate relationship status queries
       queryClient.invalidateQueries({ queryKey: ['relationshipStatus'] });
       queryClient.invalidateQueries({ queryKey: ['followerCount'] });
       queryClient.invalidateQueries({ queryKey: ['followingCount'] });
