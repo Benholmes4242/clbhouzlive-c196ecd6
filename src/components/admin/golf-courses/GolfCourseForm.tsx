@@ -106,6 +106,12 @@ const GolfCourseForm: React.FC<GolfCourseFormProps> = ({
     }
   };
 
+  // Handle sub-country change with better logging
+  const handleSubCountryChange = (value: string) => {
+    console.log('=== FORM: Sub-country manually changed to:', value);
+    setSelectedSubCountry(value);
+  };
+
   // Reset regional rank when regional ranking region changes
   const handleRegionalRankingRegionChange = (value: string) => {
     setRegionalRankingRegion(value);
@@ -171,10 +177,7 @@ const GolfCourseForm: React.FC<GolfCourseFormProps> = ({
             </Label>
             <Select 
               value={selectedSubCountry} 
-              onValueChange={(value) => {
-                console.log('=== FORM: Sub-country changed to:', value);
-                setSelectedSubCountry(value);
-              }}
+              onValueChange={handleSubCountryChange}
               disabled={!selectedCountry}
             >
               <SelectTrigger className={errors.sub_country ? 'border-red-500' : ''}>
