@@ -41,9 +41,9 @@ const Index = () => {
           {/* Logo */}
           <div className="flex justify-center">
             <img
-              src="/lovable-uploads/7a748cde-b083-4542-9332-cfa1022d03af.png"
+              src="/lovable-uploads/db232238-df12-4d85-a6d9-d97fbda7a9dc.png"
               alt="clbhouz"
-              className="w-auto max-h-32 object-contain"
+              className="w-auto max-h-48 object-contain"
             />
           </div>
           
@@ -57,6 +57,11 @@ const Index = () => {
             >
               Get Started
             </Button>
+            
+            {/* Tagline */}
+            <p className="text-muted-foreground text-sm">
+              Welcome to your digital clubhouse for all things golf
+            </p>
           </div>
         </div>
       </div>
