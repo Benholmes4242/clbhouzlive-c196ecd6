@@ -23,6 +23,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
   const [selectedCountry, setSelectedCountry] = useState('');
   const [selectedSubCountry, setSelectedSubCountry] = useState('');
   const [courseImageUrl, setCourseImageUrl] = useState<string | null>(null);
+  const [isFormInitialized, setIsFormInitialized] = useState(false);
   
   // New state for Top 100s section
   const [regionalRankingRegion, setRegionalRankingRegion] = useState('');
@@ -65,29 +66,24 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
 
   // Initialize form with course data
   useEffect(() => {
+    console.log('=== EDITOR: UseEffect triggered ===');
+    console.log('course:', course);
+    console.log('isCreating:', isCreating);
+    
     if (course && !isCreating) {
       console.log('=== EDITOR: Initializing form with course data ===');
       console.log('Course data:', course);
       console.log('Course sub_country value:', course.sub_country);
       
-      reset({
-        name: course.name,
-        region: course.region || '',
-        description: course.description || '',
-        website_url: course.website_url || '',
-        latitude: course.latitude || '',
-        longitude: course.longitude || '',
-      });
-      
-      // Set country and sub-country values with proper logging
-      console.log('Setting selectedCountry to:', course.country);
-      setSelectedCountry(course.country || '');
-      
-      // Fix: Ensure we're properly setting the sub-country value
+      // Set all state synchronously in the correct order
+      const countryValue = course.country || '';
       const subCountryValue = course.sub_country || '';
-      console.log('Setting selectedSubCountry to:', subCountryValue);
-      setSelectedSubCountry(subCountryValue);
       
+      console.log('About to set selectedCountry to:', countryValue);
+      console.log('About to set selectedSubCountry to:', subCountryValue);
+      
+      setSelectedCountry(countryValue);
+      setSelectedSubCountry(subCountryValue);
       setCourseImageUrl(course.thumbnail_image || null);
       
       // Set Top 100s values
@@ -101,11 +97,29 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
         } else if (course.country === 'Continental Europe') {
           setRegionalRankingRegion('Continental Europe');
         }
+      } else {
+        setRegionalRankingRegion('');
+        setRegionalRank('');
       }
       
       if (course.global_rank) {
         setGlobalRank(course.global_rank.toString());
+      } else {
+        setGlobalRank('');
       }
+      
+      // Reset form with course data
+      reset({
+        name: course.name,
+        region: course.region || '',
+        description: course.description || '',
+        website_url: course.website_url || '',
+        latitude: course.latitude || '',
+        longitude: course.longitude || '',
+      });
+      
+      setIsFormInitialized(true);
+      
     } else {
       console.log('=== EDITOR: Resetting form for new course ===');
       reset({
@@ -122,8 +136,9 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
       setRegionalRankingRegion('');
       setRegionalRank('');
       setGlobalRank('');
+      setIsFormInitialized(true);
     }
-  }, [course, isCreating, reset]);
+  }, [course?.id, isCreating, reset]);
 
   // Save course mutation
   const saveMutation = useMutation({
@@ -291,6 +306,11 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
     console.log('=== EDITOR: Image changed to:', imageUrl);
     setCourseImageUrl(imageUrl);
   };
+
+  // Don't render the form until it's fully initialized
+  if (!isFormInitialized) {
+    return null;
+  }
 
   return (
     <Dialog open={true} onOpenChange={onClose}>
