@@ -78,11 +78,29 @@ const CourseRankBadges = ({
   };
 
   const rankBadge = getRankBadge();
+  const showTop100Badge = globalRank && globalRank <= 100;
 
   return (
-    <div className="absolute top-2 left-2 flex flex-col gap-1">
-      {rankBadge}
-    </div>
+    <>
+      {/* Regional rank badge on the left */}
+      {rankBadge && (
+        <div className="absolute top-2 left-2">
+          {rankBadge}
+        </div>
+      )}
+      
+      {/* Top 100 badge on the right */}
+      {showTop100Badge && (
+        <div className="absolute top-2 right-2">
+          <Badge 
+            variant="default" 
+            className="bg-amber-500 hover:bg-amber-600 text-white"
+          >
+            Top 100
+          </Badge>
+        </div>
+      )}
+    </>
   );
 };
 
