@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -106,6 +107,8 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
   const saveMutation = useMutation({
     mutationFn: async (data: any) => {
       console.log('Saving course with data:', data);
+      console.log('Selected country:', selectedCountry);
+      console.log('Selected sub-country:', selectedSubCountry);
       console.log('Course image URL:', courseImageUrl);
       
       const courseData = {
@@ -196,10 +199,10 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
 
   const onSubmit = (data: any) => {
     console.log('Form submitted with data:', data);
-    console.log('Selected country:', selectedCountry);
-    console.log('Selected sub-country:', selectedSubCountry);
+    console.log('Current selectedCountry:', selectedCountry);
+    console.log('Current selectedSubCountry:', selectedSubCountry);
     
-    // Validate required fields
+    // Validate required fields with current state values
     if (!data.name || data.name.trim() === '') {
       toast({
         title: "Error",
@@ -218,7 +221,8 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
       return;
     }
 
-    if (!selectedSubCountry) {
+    // Check the actual current state value, not the form data
+    if (!selectedSubCountry || selectedSubCountry.trim() === '') {
       toast({
         title: "Error",
         description: "Please select a sub-country",
@@ -235,6 +239,22 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
     deleteReviewMutation.mutate(reviewId);
   };
 
+  // Custom handlers to prevent state reset during form operations
+  const handleCountryChange = (newCountry: string) => {
+    console.log('Country changing to:', newCountry);
+    setSelectedCountry(newCountry);
+    // Only reset sub-country if it's not compatible with new country
+    // This prevents accidental resets during form submission
+    if (newCountry !== selectedCountry) {
+      setSelectedSubCountry('');
+    }
+  };
+
+  const handleSubCountryChange = (newSubCountry: string) => {
+    console.log('Sub-country changing to:', newSubCountry);
+    setSelectedSubCountry(newSubCountry);
+  };
+
   return (
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -248,9 +268,9 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
           <GolfCourseForm
             register={register}
             selectedCountry={selectedCountry}
-            setSelectedCountry={setSelectedCountry}
+            setSelectedCountry={handleCountryChange}
             selectedSubCountry={selectedSubCountry}
-            setSelectedSubCountry={setSelectedSubCountry}
+            setSelectedSubCountry={handleSubCountryChange}
             selectedContinent={selectedContinent}
             setSelectedContinent={setSelectedContinent}
             errors={errors}
