@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { MapPin, Star } from 'lucide-react';
 import CourseDetailModal from './CourseDetailModal';
 import CoursePlayedButton from './CoursePlayedButton';
+import CourseRankBadges from './CourseRankBadges';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -27,16 +28,16 @@ interface Course {
 
 interface CourseCardProps {
   course: Course;
-  viewContext?: 'global' | 'regional' | 'usa';
+  viewContext?: 'global' | 'regional' | 'usa' | 'europe';
   viewingUserId?: string;
-  showPlayedButton?: boolean; // New prop to control button visibility
+  showPlayedButton?: boolean;
 }
 
 const CourseCard: React.FC<CourseCardProps> = ({ 
   course, 
   viewContext = 'global', 
   viewingUserId,
-  showPlayedButton = false // Default to false - only show when explicitly requested
+  showPlayedButton = true
 }) => {
   const { user } = useSupabaseSession();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -61,28 +62,8 @@ const CourseCard: React.FC<CourseCardProps> = ({
     enabled: !!(viewingUserId || user?.id),
   });
 
-  const getRankDisplay = () => {
-    if (viewContext === 'regional' && course.regional_rank) {
-      return `#${course.regional_rank}`;
-    } else if (viewContext === 'usa' && course.usa_rank) {
-      return `#${course.usa_rank}`;
-    } else if (course.global_rank) {
-      return `#${course.global_rank}`;
-    }
-    return null;
-  };
-
-  const getRankLabel = () => {
-    if (viewContext === 'regional') {
-      return 'GB&I';
-    } else if (viewContext === 'usa') {
-      return 'USA';
-    }
-    return 'Global';
-  };
-
-  const rank = getRankDisplay();
   const canModifyCourseStatus = user && (!viewingUserId || viewingUserId === user.id);
+  const isViewingOtherUser = viewingUserId && viewingUserId !== user?.id;
 
   const handleCardClick = () => {
     setIsModalOpen(true);
@@ -111,14 +92,17 @@ const CourseCard: React.FC<CourseCardProps> = ({
               </div>
             )}
           </div>
-          {rank && (
-            <Badge 
-              variant="secondary" 
-              className="absolute top-2 left-2 bg-white/90 text-gray-900 font-semibold"
-            >
-              {rank} {getRankLabel()}
-            </Badge>
-          )}
+
+          {/* Context-aware rank badges */}
+          <CourseRankBadges
+            globalRank={course.global_rank}
+            regionalRank={course.regional_rank}
+            usaRank={course.usa_rank}
+            country={course.country}
+            viewContext={viewContext}
+          />
+
+          {/* Top 100 badge */}
           {course.global_rank && course.global_rank <= 100 && (
             <Badge 
               variant="default" 
@@ -128,8 +112,8 @@ const CourseCard: React.FC<CourseCardProps> = ({
             </Badge>
           )}
 
-          {/* Course Played Button - only show when explicitly requested */}
-          {showPlayedButton && (
+          {/* Course Played Button - only show when explicitly requested and user can modify */}
+          {showPlayedButton && !isViewingOtherUser && (
             <CoursePlayedButton
               courseId={course.id}
               courseName={course.name}
@@ -140,6 +124,15 @@ const CourseCard: React.FC<CourseCardProps> = ({
               course={course}
               showButton={true}
             />
+          )}
+
+          {/* Show played status for other users (read-only) */}
+          {isViewingOtherUser && userCourse?.played && (
+            <div className="absolute top-3 right-3">
+              <Badge variant="default" className="shadow-lg">
+                Played
+              </Badge>
+            </div>
           )}
         </div>
         
@@ -172,6 +165,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
         course={course}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
+        viewingUserId={viewingUserId}
       />
     </>
   );

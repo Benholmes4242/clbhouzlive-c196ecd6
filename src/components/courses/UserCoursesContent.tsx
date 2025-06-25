@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -256,6 +255,7 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({ username }) => 
                     course={userCourse.golf_courses}
                     viewingUserId={targetUserId}
                     showPlayedButton={false}
+                    viewContext="global"
                   />
                 ))}
               </div>
@@ -289,6 +289,7 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({ username }) => 
                     course={userCourse.golf_courses}
                     viewingUserId={targetUserId}
                     showPlayedButton={false}
+                    viewContext="global"
                   />
                 ))}
               </div>

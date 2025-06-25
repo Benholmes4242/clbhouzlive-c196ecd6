@@ -34,9 +34,10 @@ interface CourseDetailModalProps {
   course: Course | null;
   isOpen: boolean;
   onClose: () => void;
+  viewingUserId?: string;
 }
 
-const CourseDetailModal = ({ course, isOpen, onClose }: CourseDetailModalProps) => {
+const CourseDetailModal = ({ course, isOpen, onClose, viewingUserId }: CourseDetailModalProps) => {
   const { data: currentUserResponse } = useQuery({
     queryKey: ['current-user'],
     queryFn: async () => {
@@ -45,23 +46,25 @@ const CourseDetailModal = ({ course, isOpen, onClose }: CourseDetailModalProps) 
   });
 
   const currentUser = currentUserResponse?.data?.user;
+  const isViewingOtherUser = viewingUserId && viewingUserId !== currentUser?.id;
 
   const { data: userCourse } = useQuery({
-    queryKey: ['user-course', course?.id, currentUser?.id],
+    queryKey: ['user-course', course?.id, viewingUserId || currentUser?.id],
     queryFn: async () => {
-      if (!currentUser?.id || !course?.id) return null;
+      const userId = viewingUserId || currentUser?.id;
+      if (!userId || !course?.id) return null;
 
       const { data, error } = await supabase
         .from('user_courses')
         .select('*')
         .eq('course_id', course.id)
-        .eq('user_id', currentUser.id)
+        .eq('user_id', userId)
         .maybeSingle();
 
       if (error && error.code !== 'PGRST116') throw error;
       return data;
     },
-    enabled: !!(currentUser?.id && course?.id),
+    enabled: !!(viewingUserId || currentUser?.id) && !!course?.id,
   });
 
   const { data: ratingStats } = useQuery({
@@ -94,26 +97,25 @@ const CourseDetailModal = ({ course, isOpen, onClose }: CourseDetailModalProps) 
   });
 
   const { data: userRating } = useQuery({
-    queryKey: ['user-course-rating', course?.id, currentUser?.id],
+    queryKey: ['user-course-rating', course?.id, viewingUserId || currentUser?.id],
     queryFn: async () => {
-      if (!currentUser?.id || !course?.id) return null;
+      const userId = viewingUserId || currentUser?.id;
+      if (!userId || !course?.id) return null;
 
       const { data, error } = await supabase
         .from('course_ratings')
         .select('*')
         .eq('course_id', course.id)
-        .eq('user_id', currentUser.id)
+        .eq('user_id', userId)
         .maybeSingle();
 
       if (error && error.code !== 'PGRST116') throw error;
       return data;
     },
-    enabled: !!(currentUser?.id && course?.id),
+    enabled: !!(viewingUserId || currentUser?.id) && !!course?.id,
   });
 
   if (!course) return null;
-
-  const hasRated = !!userRating;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -135,15 +137,17 @@ const CourseDetailModal = ({ course, isOpen, onClose }: CourseDetailModalProps) 
           {/* Show rating stats for everyone */}
           <CourseRatingStats ratingStats={ratingStats} />
 
-          {/* Show rating form only if user hasn't rated yet */}
-          <CourseDetailRatingSection
-            courseId={course.id}
-            courseName={course.name}
-            ratingStats={ratingStats}
-            currentUser={currentUser}
-            userCourse={userCourse}
-            userRating={userRating}
-          />
+          {/* Show rating form only if user is viewing their own profile and hasn't rated yet */}
+          {!isViewingOtherUser && (
+            <CourseDetailRatingSection
+              courseId={course.id}
+              courseName={course.name}
+              ratingStats={ratingStats}
+              currentUser={currentUser}
+              userCourse={userCourse}
+              userRating={userRating}
+            />
+          )}
 
           <CourseReviews 
             courseId={course.id} 

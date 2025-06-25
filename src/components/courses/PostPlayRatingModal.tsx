@@ -157,19 +157,29 @@ const PostPlayRatingModal = ({
         if (ratingError) throw ratingError;
       }
 
-      // Remove from played courses
-      const { error: playedError } = await supabase
-        .from('user_top100_courses')
+      // Remove from user_courses (regular courses)
+      const { error: courseError } = await supabase
+        .from('user_courses')
         .delete()
         .eq('user_id', userResponse.user.id)
         .eq('course_id', course.id);
       
-      if (playedError) throw playedError;
+      if (courseError && courseError.code !== 'PGRST116') {
+        // If not found in user_courses, try user_top100_courses
+        const { error: top100Error } = await supabase
+          .from('user_top100_courses')
+          .delete()
+          .eq('user_id', userResponse.user.id)
+          .eq('course_id', course.id);
+        
+        if (top100Error) throw top100Error;
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['course-rating-stats', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['user-course-rating', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['course-reviews', course?.id] });
+      queryClient.invalidateQueries({ queryKey: ['user-course', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['userTop100Courses'] });
       queryClient.invalidateQueries({ queryKey: ['userTop100CoursesInRegion'] });
       
