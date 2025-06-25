@@ -4,178 +4,255 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Info } from 'lucide-react';
+import { countryOptions, subCountryOptions, continentOptions } from './types';
 
 interface GolfCourseFormProps {
   register: any;
   selectedCountry: string;
   setSelectedCountry: (value: string) => void;
+  selectedSubCountry: string;
+  setSelectedSubCountry: (value: string) => void;
   selectedContinent: string;
   setSelectedContinent: (value: string) => void;
-  selectedRegionalRank: string;
-  setSelectedRegionalRank: (value: string) => void;
+  errors: any;
 }
-
-const countryOptions = [
-  'USA',
-  'Britain and Ireland',
-  'Continental Europe',
-  'Worldwide'
-];
-
-const regionalRankOptions = [
-  'Britain and Ireland',
-  'USA',
-  'Continental Europe'
-];
-
-const continentOptions = [
-  'North America',
-  'South America',
-  'Europe',
-  'Asia',
-  'Africa',
-  'Oceania'
-];
 
 const GolfCourseForm: React.FC<GolfCourseFormProps> = ({
   register,
   selectedCountry,
   setSelectedCountry,
+  selectedSubCountry,
+  setSelectedSubCountry,
   selectedContinent,
   setSelectedContinent,
-  selectedRegionalRank,
-  setSelectedRegionalRank,
+  errors,
 }) => {
+  const availableSubCountries = selectedCountry ? subCountryOptions[selectedCountry] || [] : [];
+
+  // Reset sub-country when primary country changes
+  React.useEffect(() => {
+    if (selectedCountry && !availableSubCountries.includes(selectedSubCountry)) {
+      setSelectedSubCountry('');
+    }
+  }, [selectedCountry, selectedSubCountry, availableSubCountries, setSelectedSubCountry]);
+
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <TooltipProvider>
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Golf Course Name - Required */}
+          <div className="space-y-2">
+            <Label htmlFor="name" className="flex items-center gap-1">
+              Golf Course Name <span className="text-red-500">*</span>
+            </Label>
+            <Input
+              id="name"
+              {...register('name', { required: 'Golf course name is required' })}
+              placeholder="Enter course name"
+              className={errors.name ? 'border-red-500' : ''}
+            />
+            {errors.name && (
+              <p className="text-sm text-red-500">{errors.name.message}</p>
+            )}
+          </div>
+
+          {/* Country/Region Primary - Required */}
+          <div className="space-y-2">
+            <Label htmlFor="country" className="flex items-center gap-1">
+              Country / Region (Primary) <span className="text-red-500">*</span>
+            </Label>
+            <Select value={selectedCountry} onValueChange={setSelectedCountry}>
+              <SelectTrigger className={errors.country ? 'border-red-500' : ''}>
+                <SelectValue placeholder="Select country/region" />
+              </SelectTrigger>
+              <SelectContent>
+                {countryOptions.map((country) => (
+                  <SelectItem key={country} value={country}>
+                    {country}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.country && (
+              <p className="text-sm text-red-500">{errors.country.message}</p>
+            )}
+          </div>
+
+          {/* Sub-Country - Required */}
+          <div className="space-y-2">
+            <Label htmlFor="sub_country" className="flex items-center gap-1">
+              Sub-Country <span className="text-red-500">*</span>
+            </Label>
+            <Select 
+              value={selectedSubCountry} 
+              onValueChange={setSelectedSubCountry}
+              disabled={!selectedCountry}
+            >
+              <SelectTrigger className={errors.sub_country ? 'border-red-500' : ''}>
+                <SelectValue placeholder={selectedCountry ? "Select sub-country" : "Select country first"} />
+              </SelectTrigger>
+              <SelectContent>
+                {availableSubCountries.map((subCountry) => (
+                  <SelectItem key={subCountry} value={subCountry}>
+                    {subCountry}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {errors.sub_country && (
+              <p className="text-sm text-red-500">{errors.sub_country.message}</p>
+            )}
+          </div>
+
+          {/* Local Area/County/State - Optional */}
+          <div className="space-y-2">
+            <Label htmlFor="region">Local Area / County / State</Label>
+            <Input
+              id="region"
+              {...register('region')}
+              placeholder="e.g. Ayrshire, California, etc."
+            />
+          </div>
+
+          {/* Continent - Optional */}
+          <div className="space-y-2">
+            <Label htmlFor="continent">Continent</Label>
+            <Select value={selectedContinent} onValueChange={setSelectedContinent}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select continent" />
+              </SelectTrigger>
+              <SelectContent>
+                {continentOptions.map((continent) => (
+                  <SelectItem key={continent} value={continent}>
+                    {continent}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Global Rank - Optional */}
+          <div className="space-y-2">
+            <Label htmlFor="global_rank" className="flex items-center gap-1">
+              Global Rank
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Overall world ranking (1-100)</p>
+                </TooltipContent>
+              </Tooltip>
+            </Label>
+            <Input
+              id="global_rank"
+              type="number"
+              min="1"
+              max="100"
+              {...register('global_rank')}
+              placeholder="e.g. 5"
+            />
+          </div>
+
+          {/* Country Rank - Optional */}
+          <div className="space-y-2">
+            <Label htmlFor="country_rank" className="flex items-center gap-1">
+              Country Rank
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Ranking within selected sub-country (e.g. #2 in Scotland)</p>
+                </TooltipContent>
+              </Tooltip>
+            </Label>
+            <Input
+              id="country_rank"
+              type="number"
+              min="1"
+              {...register('country_rank')}
+              placeholder="e.g. 2"
+            />
+          </div>
+
+          {/* Regional Rank - Optional */}
+          <div className="space-y-2">
+            <Label htmlFor="regional_rank" className="flex items-center gap-1">
+              Regional Rank
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Rank within major regional top 100 lists (e.g. #8 in Continental Europe)</p>
+                </TooltipContent>
+              </Tooltip>
+            </Label>
+            <Input
+              id="regional_rank"
+              type="number"
+              min="1"
+              {...register('regional_rank')}
+              placeholder="e.g. 8"
+            />
+          </div>
+
+          {/* Latitude - Optional */}
+          <div className="space-y-2">
+            <Label htmlFor="latitude">Latitude</Label>
+            <Input
+              id="latitude"
+              {...register('latitude')}
+              placeholder="Enter latitude (supports Google Maps)"
+            />
+          </div>
+
+          {/* Longitude - Optional */}
+          <div className="space-y-2">
+            <Label htmlFor="longitude">Longitude</Label>
+            <Input
+              id="longitude"
+              {...register('longitude')}
+              placeholder="Enter longitude (supports Google Maps)"
+            />
+          </div>
+        </div>
+
+        {/* Course Image URL - Optional */}
         <div className="space-y-2">
-          <Label htmlFor="name">Golf Course Name *</Label>
+          <Label htmlFor="thumbnail_image">Course Image URL</Label>
           <Input
-            id="name"
-            {...register('name', { required: true })}
-            placeholder="Enter course name"
+            id="thumbnail_image"
+            {...register('thumbnail_image')}
+            placeholder="Enter valid image link"
           />
         </div>
 
+        {/* Website URL - Optional */}
         <div className="space-y-2">
-          <Label htmlFor="country">Country *</Label>
-          <Select value={selectedCountry} onValueChange={setSelectedCountry}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select country" />
-            </SelectTrigger>
-            <SelectContent>
-              {countryOptions.map((country) => (
-                <SelectItem key={country} value={country}>
-                  {country}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="region">Region</Label>
+          <Label htmlFor="website_url">Website URL</Label>
           <Input
-            id="region"
-            {...register('region')}
-            placeholder="Enter region/state"
+            id="website_url"
+            {...register('website_url')}
+            placeholder="Enter club's official website"
           />
         </div>
 
+        {/* Description - Optional */}
         <div className="space-y-2">
-          <Label htmlFor="continent">Continent</Label>
-          <Select value={selectedContinent} onValueChange={setSelectedContinent}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select continent" />
-            </SelectTrigger>
-            <SelectContent>
-              {continentOptions.map((continent) => (
-                <SelectItem key={continent} value={continent}>
-                  {continent}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="global_rank">Global Rank</Label>
-          <Input
-            id="global_rank"
-            type="number"
-            {...register('global_rank')}
-            placeholder="Enter global ranking"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="regional_rank">Regional Rank</Label>
-          <Select value={selectedRegionalRank} onValueChange={setSelectedRegionalRank}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select regional ranking category" />
-            </SelectTrigger>
-            <SelectContent>
-              {regionalRankOptions.map((option) => (
-                <SelectItem key={option} value={option}>
-                  {option}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="latitude">Latitude</Label>
-          <Input
-            id="latitude"
-            type="number"
-            step="any"
-            {...register('latitude')}
-            placeholder="Enter latitude"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="longitude">Longitude</Label>
-          <Input
-            id="longitude"
-            type="number"
-            step="any"
-            {...register('longitude')}
-            placeholder="Enter longitude"
+          <Label htmlFor="description">Description</Label>
+          <Textarea
+            id="description"
+            {...register('description')}
+            placeholder="Short summary about the course..."
+            rows={4}
           />
         </div>
       </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="thumbnail_image">Course Image URL</Label>
-        <Input
-          id="thumbnail_image"
-          {...register('thumbnail_image')}
-          placeholder="Enter image URL"
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="website_url">Website URL</Label>
-        <Input
-          id="website_url"
-          {...register('website_url')}
-          placeholder="Enter website URL"
-        />
-      </div>
-
-      <div className="space-y-2">
-        <Label htmlFor="description">Description</Label>
-        <Textarea
-          id="description"
-          {...register('description')}
-          placeholder="Enter course description..."
-          rows={4}
-        />
-      </div>
-    </div>
+    </TooltipProvider>
   );
 };
 

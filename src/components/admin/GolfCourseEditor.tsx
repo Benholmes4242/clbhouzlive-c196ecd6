@@ -18,10 +18,10 @@ import { GolfCourse, CourseRating, GolfCourseEditorProps } from './golf-courses/
 const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating, onClose }) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { register, handleSubmit, reset } = useForm();
+  const { register, handleSubmit, reset, formState: { errors } } = useForm();
   
   const [selectedCountry, setSelectedCountry] = useState('');
-  const [selectedRegionalRank, setSelectedRegionalRank] = useState('');
+  const [selectedSubCountry, setSelectedSubCountry] = useState('');
   const [selectedContinent, setSelectedContinent] = useState('');
 
   // Fetch course ratings/reviews with a simpler query structure
@@ -65,9 +65,11 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
       reset({
         name: course.name,
         country: course.country,
+        sub_country: course.sub_country || '',
         region: course.region || '',
-        continent: course.continent,
+        continent: course.continent || '',
         global_rank: course.global_rank || '',
+        country_rank: course.country_rank || '',
         regional_rank: course.regional_rank || '',
         description: course.description || '',
         thumbnail_image: course.thumbnail_image || '',
@@ -76,15 +78,17 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
         longitude: course.longitude || '',
       });
       setSelectedCountry(course.country);
-      setSelectedContinent(course.continent);
-      setSelectedRegionalRank(course.regional_rank?.toString() || '');
+      setSelectedSubCountry(course.sub_country || '');
+      setSelectedContinent(course.continent || '');
     } else {
       reset({
         name: '',
         country: '',
+        sub_country: '',
         region: '',
         continent: '',
         global_rank: '',
+        country_rank: '',
         regional_rank: '',
         description: '',
         thumbnail_image: '',
@@ -93,8 +97,8 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
         longitude: '',
       });
       setSelectedCountry('');
+      setSelectedSubCountry('');
       setSelectedContinent('');
-      setSelectedRegionalRank('');
     }
   }, [course, isCreating, reset]);
 
@@ -104,9 +108,11 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
       const courseData = {
         name: data.name,
         country: data.country,
+        sub_country: data.sub_country || null,
         region: data.region || null,
-        continent: data.continent,
+        continent: data.continent || null,
         global_rank: data.global_rank ? parseInt(data.global_rank) : null,
+        country_rank: data.country_rank ? parseInt(data.country_rank) : null,
         regional_rank: data.regional_rank ? parseInt(data.regional_rank) : null,
         description: data.description || null,
         thumbnail_image: data.thumbnail_image || null,
@@ -177,10 +183,20 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
   });
 
   const onSubmit = (data: any) => {
+    // Validate required fields
     if (!selectedCountry) {
       toast({
         title: "Error",
-        description: "Please select a country",
+        description: "Please select a country/region",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!selectedSubCountry) {
+      toast({
+        title: "Error",
+        description: "Please select a sub-country",
         variant: "destructive",
       });
       return;
@@ -189,8 +205,8 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
     const formData = {
       ...data,
       country: selectedCountry,
+      sub_country: selectedSubCountry,
       continent: selectedContinent || null,
-      regional_rank: selectedRegionalRank ? parseInt(selectedRegionalRank) : null,
     };
     
     saveMutation.mutate(formData);
@@ -214,13 +230,14 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
             register={register}
             selectedCountry={selectedCountry}
             setSelectedCountry={setSelectedCountry}
+            selectedSubCountry={selectedSubCountry}
+            setSelectedSubCountry={setSelectedSubCountry}
             selectedContinent={selectedContinent}
             setSelectedContinent={setSelectedContinent}
-            selectedRegionalRank={selectedRegionalRank}
-            setSelectedRegionalRank={setSelectedRegionalRank}
+            errors={errors}
           />
 
-          <div className="flex gap-3 pt-4">
+          <div className="flex gap-3 pt-4 border-t">
             <Button type="submit" disabled={saveMutation.isPending}>
               {saveMutation.isPending ? 'Saving...' : (isCreating ? 'Create Course' : 'Save Changes')}
             </Button>
