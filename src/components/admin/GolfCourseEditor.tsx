@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -105,12 +106,15 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
   // Save course mutation
   const saveMutation = useMutation({
     mutationFn: async (data: any) => {
+      console.log('Saving course with data:', data);
+      console.log('Course image URL:', courseImageUrl);
+      
       const courseData = {
         name: data.name,
-        country: data.country,
-        sub_country: data.sub_country || null,
+        country: selectedCountry,
+        sub_country: selectedSubCountry || null,
         region: data.region || null,
-        continent: data.continent || null,
+        continent: selectedContinent || null,
         global_rank: data.global_rank ? parseInt(data.global_rank) : null,
         country_rank: data.country_rank ? parseInt(data.country_rank) : null,
         regional_rank: data.regional_rank ? parseInt(data.regional_rank) : null,
@@ -121,13 +125,18 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
         longitude: data.longitude ? parseFloat(data.longitude) : null,
       };
 
+      console.log('Final course data to save:', courseData);
+
       if (isCreating) {
         const { data: result, error } = await supabase
           .from('golf_courses')
           .insert([courseData])
           .select()
           .single();
-        if (error) throw error;
+        if (error) {
+          console.error('Insert error:', error);
+          throw error;
+        }
         return result;
       } else {
         const { data: result, error } = await supabase
@@ -136,7 +145,10 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
           .eq('id', course!.id)
           .select()
           .single();
-        if (error) throw error;
+        if (error) {
+          console.error('Update error:', error);
+          throw error;
+        }
         return result;
       }
     },
@@ -148,7 +160,8 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
       queryClient.invalidateQueries({ queryKey: ['admin-golf-courses'] });
       onClose();
     },
-    onError: (error) => {
+    onError: (error: any) => {
+      console.error('Save mutation error:', error);
       toast({
         title: "Error",
         description: `Failed to ${isCreating ? 'create' : 'update'} golf course: ${error.message}`,
@@ -183,7 +196,20 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
   });
 
   const onSubmit = (data: any) => {
+    console.log('Form submitted with data:', data);
+    console.log('Selected country:', selectedCountry);
+    console.log('Selected sub-country:', selectedSubCountry);
+    
     // Validate required fields
+    if (!data.name || data.name.trim() === '') {
+      toast({
+        title: "Error",
+        description: "Please enter a golf course name",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (!selectedCountry) {
       toast({
         title: "Error",
@@ -202,14 +228,8 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
       return;
     }
 
-    const formData = {
-      ...data,
-      country: selectedCountry,
-      sub_country: selectedSubCountry,
-      continent: selectedContinent || null,
-    };
-    
-    saveMutation.mutate(formData);
+    // All validation passed, proceed with save
+    saveMutation.mutate(data);
   };
 
   const handleDeleteReview = (reviewId: string) => {
