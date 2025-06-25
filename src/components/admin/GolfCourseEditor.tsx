@@ -67,6 +67,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
   // Initialize form with course data
   useEffect(() => {
     if (course && !isCreating) {
+      console.log('Initializing form with course data:', course);
       reset({
         name: course.name,
         region: course.region || '',
@@ -75,7 +76,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
         latitude: course.latitude || '',
         longitude: course.longitude || '',
       });
-      setSelectedCountry(course.country);
+      setSelectedCountry(course.country || '');
       setSelectedSubCountry(course.sub_country || '');
       setSelectedContinent(course.continent || '');
       setCourseImageUrl(course.thumbnail_image || null);
@@ -97,6 +98,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
         setGlobalRank(course.global_rank.toString());
       }
     } else {
+      console.log('Resetting form for new course');
       reset({
         name: '',
         region: '',
