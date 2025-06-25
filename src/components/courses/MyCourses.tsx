@@ -79,26 +79,56 @@ const MyCourses = () => {
     enabled: !!user?.id,
   });
 
+  // Combine all played courses from both tables, removing duplicates
+  const allPlayedCourses = React.useMemo(() => {
+    const courseMap = new Map();
+    
+    // Add courses from user_courses table
+    playedCourses.forEach(userCourse => {
+      if (userCourse.golf_courses) {
+        courseMap.set(userCourse.golf_courses.id, {
+          ...userCourse,
+          source: 'user_courses'
+        });
+      }
+    });
+    
+    // Add courses from user_top100_courses table (will overwrite if duplicate)
+    top100Courses.forEach(userCourse => {
+      if (userCourse.golf_courses) {
+        courseMap.set(userCourse.golf_courses.id, {
+          ...userCourse,
+          source: 'user_top100_courses'
+        });
+      }
+    });
+    
+    return Array.from(courseMap.values()).sort((a, b) => 
+      new Date(b.played_date || 0).getTime() - new Date(a.played_date || 0).getTime()
+    );
+  }, [playedCourses, top100Courses]);
+
   // Calculate statistics
-  const totalCoursesPlayed = playedCourses.length;
+  const totalCoursesPlayed = allPlayedCourses.length;
   const totalTop100Played = top100Courses.length;
 
   // Filter recent courses to only include those played within the last 30 days
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-  const recentCourses = [...playedCourses, ...top100Courses]
+  const recentCourses = allPlayedCourses
     .filter((userCourse) => {
       if (!userCourse.played_date) return false;
       const playedDate = new Date(userCourse.played_date);
       return playedDate >= thirtyDaysAgo;
     })
-    .sort((a, b) => new Date(b.played_date || 0).getTime() - new Date(a.played_date || 0).getTime())
     .slice(0, 12);
 
   const handleAverageRatingClick = () => {
     navigate('/my-ratings');
   };
+
+  const isLoading = isLoadingPlayed || isLoadingTop100;
 
   return (
     <div className="space-y-6">
@@ -151,13 +181,13 @@ const MyCourses = () => {
         <TabsContent value="all" className="mt-6">
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">All Courses Played</h3>
-            {isLoadingPlayed ? (
+            {isLoading ? (
               <div className="text-center py-8">Loading your courses...</div>
-            ) : playedCourses.length > 0 ? (
+            ) : allPlayedCourses.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {playedCourses.map((userCourse) => (
+                {allPlayedCourses.map((userCourse) => (
                   <CourseCard 
-                    key={userCourse.id} 
+                    key={`${userCourse.id}-${userCourse.source}`} 
                     course={userCourse.golf_courses}
                     viewingUserId={user?.id}
                     showPlayedButton={false}
@@ -215,7 +245,7 @@ const MyCourses = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {recentCourses.map((userCourse) => (
                   <CourseCard 
-                    key={`${userCourse.id}-recent`} 
+                    key={`${userCourse.id}-recent-${userCourse.source}`} 
                     course={userCourse.golf_courses}
                     viewingUserId={user?.id}
                     showPlayedButton={false}
