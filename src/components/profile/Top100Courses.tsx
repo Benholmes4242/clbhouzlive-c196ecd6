@@ -1,12 +1,12 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Trophy, MapPin } from 'lucide-react';
 import { useTop100CoursesData } from '@/hooks/useTop100CoursesData';
-import Top100CoursesModal from './Top100CoursesModal';
+import { useNavigate } from 'react-router-dom';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Top100CoursesProps {
   userId: string;
@@ -19,8 +19,8 @@ const Top100Courses: React.FC<Top100CoursesProps> = ({
   isOwnProfile = false,
   top100Visible = true
 }) => {
-  const [selectedRegion, setSelectedRegion] = useState<string>('');
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate();
+  const { user: currentUser } = useSupabaseSession();
   
   const {
     regionProgress,
@@ -41,9 +41,24 @@ const Top100Courses: React.FC<Top100CoursesProps> = ({
     { key: 'global', name: 'Worldwide' }
   ];
 
-  const openModal = (regionKey: string) => {
-    setSelectedRegion(regionKey);
-    setIsModalOpen(true);
+  const handleRegionClick = async (regionKey: string) => {
+    if (isOwnProfile) {
+      // For own profile, go to courses page
+      navigate('/courses?tab=my-courses');
+    } else {
+      // For other users, get their username and redirect to their courses page
+      const { data: userProfile } = await supabase
+        .from('user_profiles')
+        .select('username')
+        .eq('id', userId)
+        .maybeSingle();
+      
+      if (userProfile?.username) {
+        navigate(`/user/${userProfile.username}/courses`);
+      } else {
+        navigate(`/user/${userId}/courses`);
+      }
+    }
   };
 
   if (isLoading) {
@@ -60,93 +75,80 @@ const Top100Courses: React.FC<Top100CoursesProps> = ({
   }
 
   return (
-    <>
-      <section className="mt-10 px-2">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <Trophy className="h-5 w-5 text-yellow-600" />
-            <h2 className="text-xl font-bold">Top 100 Courses</h2>
-          </div>
-          
-          {isOwnProfile && (
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="show-top100"
-                checked={top100Visible}
-                onCheckedChange={(checked) => {
-                  console.log('Checkbox clicked:', checked);
-                  handleVisibilityToggle(Boolean(checked));
-                }}
-              />
-              <label 
-                htmlFor="show-top100" 
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
-                onClick={() => {
-                  console.log('Label clicked, current state:', top100Visible);
-                  handleVisibilityToggle(!top100Visible);
-                }}
-              >
-                Show this section on my public profile
-              </label>
-            </div>
-          )}
+    <section className="mt-10 px-2">
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          <Trophy className="h-5 w-5 text-yellow-600" />
+          <h2 className="text-xl font-bold">Top 100 Courses</h2>
         </div>
+        
+        {isOwnProfile && (
+          <div className="flex items-center space-x-2">
+            <Checkbox
+              id="show-top100"
+              checked={top100Visible}
+              onCheckedChange={(checked) => {
+                console.log('Checkbox clicked:', checked);
+                handleVisibilityToggle(Boolean(checked));
+              }}
+            />
+            <label 
+              htmlFor="show-top100" 
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+              onClick={() => {
+                console.log('Label clicked, current state:', top100Visible);
+                handleVisibilityToggle(!top100Visible);
+              }}
+            >
+              Show this section on my public profile
+            </label>
+          </div>
+        )}
+      </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {regions.map((region) => {
-            const progress = regionProgress[region.key];
-            const percentage = progress?.total > 0 ? Math.round((progress.played / progress.total) * 100) : 0;
-            
-            return (
-              <Card 
-                key={region.key}
-                className="cursor-pointer hover:shadow-md transition-shadow"
-                onClick={() => openModal(region.key)}
-              >
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <h3 className="font-semibold text-sm">{region.name}</h3>
-                    </div>
-                    <Badge variant="secondary" className="text-xs">
-                      {progress?.played || 0}/{progress?.total || 0}
-                    </Badge>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {regions.map((region) => {
+          const progress = regionProgress[region.key];
+          const percentage = progress?.total > 0 ? Math.round((progress.played / progress.total) * 100) : 0;
+          
+          return (
+            <Card 
+              key={region.key}
+              className="cursor-pointer hover:shadow-md transition-shadow"
+              onClick={() => handleRegionClick(region.key)}
+            >
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-semibold text-sm">{region.name}</h3>
+                  </div>
+                  <Badge variant="secondary" className="text-xs">
+                    {progress?.played || 0}/{progress?.total || 0}
+                  </Badge>
+                </div>
+                
+                <div className="space-y-2">
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div 
+                      className="bg-green-600 h-2 rounded-full transition-all duration-300"
+                      style={{ width: `${percentage}%` }}
+                    />
                   </div>
                   
-                  <div className="space-y-2">
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div 
-                        className="bg-green-600 h-2 rounded-full transition-all duration-300"
-                        style={{ width: `${percentage}%` }}
-                      />
-                    </div>
-                    
-                    <div className="flex items-center justify-between text-xs text-muted-foreground">
-                      <span>{percentage}% complete</span>
-                      <div className="flex items-center gap-1">
-                        <MapPin className="h-3 w-3" />
-                        <span>View courses</span>
-                      </div>
+                  <div className="flex items-center justify-between text-xs text-muted-foreground">
+                    <span>{percentage}% complete</span>
+                    <div className="flex items-center gap-1">
+                      <MapPin className="h-3 w-3" />
+                      <span>View courses</span>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-      </section>
-
-      {selectedRegion && (
-        <Top100CoursesModal
-          region={selectedRegion}
-          regionName={regions.find(r => r.key === selectedRegion)?.name || ''}
-          userId={userId}
-          isOwnProfile={isOwnProfile}
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-        />
-      )}
-    </>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+    </section>
   );
 };
 

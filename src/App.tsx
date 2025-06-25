@@ -1,4 +1,3 @@
-
 import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
@@ -6,6 +5,7 @@ import Auth from "./pages/Auth";
 import CreateProfile from "./pages/CreateProfile";
 import ProfilePage from "./pages/ProfilePage";
 import UserProfilePage from "./pages/UserProfilePage";
+import UserCoursesPage from "./pages/UserCoursesPage";
 import Courses from "./pages/Courses";
 import MyRatings from "./pages/MyRatings";
 import TourCentral from "./pages/TourCentral";
@@ -59,6 +59,11 @@ function App() {
               <Route path="/profile/:username" element={
                 <ProtectedRoute>
                   <UserProfilePage />
+                </ProtectedRoute>
+              } />
+              <Route path="/user/:username/courses" element={
+                <ProtectedRoute>
+                  <UserCoursesPage />
                 </ProtectedRoute>
               } />
               <Route path="/settings" element={
