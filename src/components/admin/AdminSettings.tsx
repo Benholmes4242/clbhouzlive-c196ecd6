@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,6 +13,23 @@ const AdminSettings = () => {
   const [faviconFile, setFaviconFile] = useState<File | null>(null);
   const [faviconUrl, setFaviconUrl] = useState('');
   const [tabTitle, setTabTitle] = useState('clbhouz - The Golfer\'s Social Hub');
+
+  // Load saved settings on component mount
+  useEffect(() => {
+    const savedTitle = localStorage.getItem('site_tab_title');
+    const savedFaviconUrl = localStorage.getItem('site_favicon_url');
+    
+    if (savedTitle) {
+      setTabTitle(savedTitle);
+      document.title = savedTitle;
+      updateTitleMeta(savedTitle);
+    }
+    
+    if (savedFaviconUrl) {
+      setFaviconUrl(savedFaviconUrl);
+      updateFaviconInHead(savedFaviconUrl);
+    }
+  }, []);
 
   const handleFaviconFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -32,41 +48,21 @@ const AdminSettings = () => {
     }
   };
 
-  const handleUpdateBranding = () => {
-    // Update the document title
-    if (tabTitle.trim()) {
-      document.title = tabTitle;
-      
-      // Update the title meta tag in the head
-      const titleElement = document.querySelector('title');
-      if (titleElement) {
-        titleElement.textContent = tabTitle;
-      }
+  const updateTitleMeta = (title: string) => {
+    // Update the title meta tag in the head
+    const titleElement = document.querySelector('title');
+    if (titleElement) {
+      titleElement.textContent = title;
     }
-
-    // Handle favicon update
-    if (faviconFile) {
-      // Create a URL for the uploaded file
-      const fileUrl = URL.createObjectURL(faviconFile);
-      updateFaviconInHead(fileUrl);
-      
-      toast({
-        title: "Success",
-        description: "Favicon and tab title updated successfully! Note: Favicon file uploads require deployment to be permanent.",
-      });
-    } else if (faviconUrl.trim()) {
-      updateFaviconInHead(faviconUrl);
-      
-      toast({
-        title: "Success",
-        description: "Favicon and tab title updated successfully!",
-      });
-    } else {
-      toast({
-        title: "Success", 
-        description: "Tab title updated successfully!",
-      });
+    
+    // Also update meta title for SEO
+    let metaTitleElement = document.querySelector('meta[property="og:title"]');
+    if (!metaTitleElement) {
+      metaTitleElement = document.createElement('meta');
+      metaTitleElement.setAttribute('property', 'og:title');
+      document.head.appendChild(metaTitleElement);
     }
+    metaTitleElement.setAttribute('content', title);
   };
 
   const updateFaviconInHead = (url: string) => {
@@ -80,6 +76,85 @@ const AdminSettings = () => {
     link.href = url;
     link.type = url.endsWith('.ico') ? 'image/x-icon' : 'image/png';
     document.head.appendChild(link);
+    
+    // Also add apple-touch-icon for mobile
+    const appleLink = document.createElement('link');
+    appleLink.rel = 'apple-touch-icon';
+    appleLink.href = url;
+    document.head.appendChild(appleLink);
+  };
+
+  const handleUpdateBranding = () => {
+    // Save tab title to localStorage and update document
+    if (tabTitle.trim()) {
+      localStorage.setItem('site_tab_title', tabTitle);
+      document.title = tabTitle;
+      updateTitleMeta(tabTitle);
+    }
+
+    // Handle favicon update
+    if (faviconFile) {
+      // Create a URL for the uploaded file
+      const fileUrl = URL.createObjectURL(faviconFile);
+      updateFaviconInHead(fileUrl);
+      
+      // Save to localStorage for persistence
+      localStorage.setItem('site_favicon_url', fileUrl);
+      
+      toast({
+        title: "Success",
+        description: "Favicon and tab title updated successfully! Note: File uploads require deployment to be permanent.",
+      });
+    } else if (faviconUrl.trim()) {
+      updateFaviconInHead(faviconUrl);
+      
+      // Save to localStorage for persistence
+      localStorage.setItem('site_favicon_url', faviconUrl);
+      
+      toast({
+        title: "Success",
+        description: "Favicon and tab title updated successfully!",
+      });
+    } else {
+      toast({
+        title: "Success", 
+        description: "Tab title updated successfully!",
+      });
+    }
+
+    // Force a small delay to ensure changes are applied
+    setTimeout(() => {
+      // Trigger a page refresh indication
+      console.log('Branding settings saved:', {
+        title: tabTitle,
+        favicon: faviconUrl || 'file uploaded'
+      });
+    }, 100);
+  };
+
+  const handleResetBranding = () => {
+    // Reset to defaults
+    const defaultTitle = 'clbhouz - The Golfer\'s Social Hub';
+    setTabTitle(defaultTitle);
+    setFaviconUrl('');
+    setFaviconFile(null);
+    
+    // Clear localStorage
+    localStorage.removeItem('site_tab_title');
+    localStorage.removeItem('site_favicon_url');
+    
+    // Reset document
+    document.title = defaultTitle;
+    updateTitleMeta(defaultTitle);
+    
+    // Reset favicon to default
+    const existingFavicons = document.querySelectorAll('link[rel*="icon"]');
+    existingFavicons.forEach(link => link.remove());
+    
+    toast({
+      title: "Reset Complete",
+      description: "Branding has been reset to default values.",
+    });
   };
 
   return (
@@ -156,10 +231,15 @@ const AdminSettings = () => {
               </div>
             </div>
             
-            <Button onClick={handleUpdateBranding} className="w-full">
-              <Upload className="h-4 w-4 mr-2" />
-              Update Branding
-            </Button>
+            <div className="flex gap-2">
+              <Button onClick={handleUpdateBranding} className="flex-1">
+                <Upload className="h-4 w-4 mr-2" />
+                Update Branding
+              </Button>
+              <Button variant="outline" onClick={handleResetBranding}>
+                Reset
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
