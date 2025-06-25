@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -87,23 +88,23 @@ const GolfCourseForm: React.FC<GolfCourseFormProps> = ({
 }) => {
   const availableSubCountries = selectedCountry ? subCountryOptions[selectedCountry] || [] : [];
 
-  // Fix: Only reset sub-country when country changes AND sub-country is not valid for the new country
-  React.useEffect(() => {
-    console.log('useEffect triggered - selectedCountry:', selectedCountry, 'selectedSubCountry:', selectedSubCountry);
-    console.log('Available sub-countries:', availableSubCountries);
+  console.log('=== FORM: GolfCourseForm render ===');
+  console.log('selectedCountry:', selectedCountry);
+  console.log('selectedSubCountry:', selectedSubCountry);
+  console.log('availableSubCountries:', availableSubCountries);
+
+  // Handle country change and validate sub-country
+  const handleCountryChange = (value: string) => {
+    console.log('=== FORM: Country changed to:', value);
+    setSelectedCountry(value);
     
-    // Only reset if we have a country selected and the current sub-country is not valid for that country
-    if (selectedCountry && availableSubCountries.length > 0) {
-      if (selectedSubCountry && !availableSubCountries.includes(selectedSubCountry)) {
-        console.log('Resetting sub-country because it is not valid for selected primary country');
-        setSelectedSubCountry('');
-      }
-    } else if (!selectedCountry) {
-      // Clear sub-country if no primary country is selected
-      console.log('Clearing sub-country because no primary country is selected');
+    // Only reset sub-country if the current selection is not valid for the new country
+    const newAvailableSubCountries = subCountryOptions[value] || [];
+    if (selectedSubCountry && !newAvailableSubCountries.includes(selectedSubCountry)) {
+      console.log('=== FORM: Resetting sub-country because it is not valid for new country');
       setSelectedSubCountry('');
     }
-  }, [selectedCountry]); // Remove the availableSubCountries dependency to prevent unnecessary resets
+  };
 
   // Reset regional rank when regional ranking region changes
   const handleRegionalRankingRegionChange = (value: string) => {
@@ -112,8 +113,6 @@ const GolfCourseForm: React.FC<GolfCourseFormProps> = ({
       setRegionalRank('');
     }
   };
-
-  console.log('GolfCourseForm render - selectedSubCountry:', selectedSubCountry);
 
   return (
     <TooltipProvider>
@@ -148,7 +147,7 @@ const GolfCourseForm: React.FC<GolfCourseFormProps> = ({
                 </TooltipContent>
               </Tooltip>
             </Label>
-            <Select value={selectedCountry} onValueChange={setSelectedCountry}>
+            <Select value={selectedCountry} onValueChange={handleCountryChange}>
               <SelectTrigger className={errors.country ? 'border-red-500' : ''}>
                 <SelectValue placeholder="Select primary region" />
               </SelectTrigger>
@@ -173,7 +172,7 @@ const GolfCourseForm: React.FC<GolfCourseFormProps> = ({
             <Select 
               value={selectedSubCountry} 
               onValueChange={(value) => {
-                console.log('Sub-country changed to:', value);
+                console.log('=== FORM: Sub-country changed to:', value);
                 setSelectedSubCountry(value);
               }}
               disabled={!selectedCountry}

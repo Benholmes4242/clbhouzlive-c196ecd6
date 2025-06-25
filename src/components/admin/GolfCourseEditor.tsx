@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -65,7 +66,8 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
   // Initialize form with course data
   useEffect(() => {
     if (course && !isCreating) {
-      console.log('Initializing form with course data:', course);
+      console.log('=== EDITOR: Initializing form with course data ===');
+      console.log('Course data:', course);
       console.log('Course sub_country value:', course.sub_country);
       
       reset({
@@ -78,6 +80,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
       });
       
       // Set country and sub-country values with proper logging
+      console.log('Setting selectedCountry to:', course.country);
       setSelectedCountry(course.country || '');
       
       // Fix: Ensure we're properly setting the sub-country value
@@ -104,7 +107,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
         setGlobalRank(course.global_rank.toString());
       }
     } else {
-      console.log('Resetting form for new course');
+      console.log('=== EDITOR: Resetting form for new course ===');
       reset({
         name: '',
         region: '',
@@ -125,7 +128,8 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
   // Save course mutation
   const saveMutation = useMutation({
     mutationFn: async (data: any) => {
-      console.log('Saving course with data:', data);
+      console.log('=== EDITOR: Saving course ===');
+      console.log('Form data:', data);
       console.log('Selected country:', selectedCountry);
       console.log('Selected sub-country:', selectedSubCountry);
       console.log('Course image URL:', courseImageUrl);
@@ -144,7 +148,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
       const courseData = {
         name: data.name,
         country: selectedCountry,
-        sub_country: selectedSubCountry, // Fix: Ensure this is properly included
+        sub_country: selectedSubCountry,
         region: data.region || null,
         continent: continent,
         global_rank: globalRank ? parseInt(globalRank) : null,
@@ -157,7 +161,8 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
         longitude: data.longitude ? parseFloat(data.longitude) : null,
       };
 
-      console.log('Final course data to save (including sub_country):', courseData);
+      console.log('=== EDITOR: Final course data to save ===');
+      console.log('courseData:', courseData);
 
       if (isCreating) {
         const { data: result, error } = await supabase
@@ -169,6 +174,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
           console.error('Insert error:', error);
           throw error;
         }
+        console.log('Course created successfully:', result);
         return result;
       } else {
         const { data: result, error } = await supabase
@@ -181,6 +187,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
           console.error('Update error:', error);
           throw error;
         }
+        console.log('Course updated successfully:', result);
         return result;
       }
     },
@@ -228,7 +235,8 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
   });
 
   const onSubmit = (data: any) => {
-    console.log('Form submitted with data:', data);
+    console.log('=== EDITOR: Form submitted ===');
+    console.log('Form data:', data);
     console.log('Current selectedCountry:', selectedCountry);
     console.log('Current selectedSubCountry:', selectedSubCountry);
     console.log('Current courseImageUrl:', courseImageUrl);
@@ -280,7 +288,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
   };
 
   const handleImageChange = (imageUrl: string | null) => {
-    console.log('Image changed to:', imageUrl);
+    console.log('=== EDITOR: Image changed to:', imageUrl);
     setCourseImageUrl(imageUrl);
   };
 
