@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 
@@ -11,9 +11,10 @@ interface FollowerStatsProps {
 
 const FollowerStats: React.FC<FollowerStatsProps> = ({ userId, userType = 'individual' }) => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const isIndividual = userType === 'individual';
 
-  // Get follower count with service role bypass for RLS
+  // Get follower count
   const { data: followerCount = 0 } = useQuery({
     queryKey: ['followerCount', userId],
     queryFn: async () => {
@@ -33,7 +34,7 @@ const FollowerStats: React.FC<FollowerStatsProps> = ({ userId, userType = 'indiv
     },
   });
 
-  // Get following count with service role bypass for RLS
+  // Get following count
   const { data: followingCount = 0 } = useQuery({
     queryKey: ['followingCount', userId],
     queryFn: async () => {
@@ -63,8 +64,7 @@ const FollowerStats: React.FC<FollowerStatsProps> = ({ userId, userType = 'indiv
       const { count, error } = await supabase
         .from('user_friends')
         .select('*', { count: 'exact', head: true })
-        .or(`user_id.eq.${userId},friend_id.eq.${userId}`)
-        .eq('status', 'accepted');
+        .or(`and(user_id.eq.${userId},status.eq.accepted),and(friend_id.eq.${userId},status.eq.accepted)`);
       
       if (error) {
         console.error('Error fetching friends count:', error);
@@ -78,14 +78,20 @@ const FollowerStats: React.FC<FollowerStatsProps> = ({ userId, userType = 'indiv
   });
 
   const handleFollowingClick = () => {
+    // Refresh data before navigating
+    queryClient.invalidateQueries({ queryKey: ['following'] });
     navigate('/following');
   };
 
   const handleFollowersClick = () => {
+    // Refresh data before navigating
+    queryClient.invalidateQueries({ queryKey: ['followers'] });
     navigate('/followers');
   };
 
   const handleFriendsClick = () => {
+    // Refresh data before navigating
+    queryClient.invalidateQueries({ queryKey: ['friends'] });
     navigate('/friends');
   };
 

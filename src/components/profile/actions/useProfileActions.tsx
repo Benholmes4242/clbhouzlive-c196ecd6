@@ -14,6 +14,18 @@ export const useProfileActions = ({ targetUserId, currentUserId }: UseProfileAct
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  const invalidateAllRelatedQueries = () => {
+    // Invalidate all relationship-related queries for both users
+    queryClient.invalidateQueries({ queryKey: ['relationshipStatus'] });
+    queryClient.invalidateQueries({ queryKey: ['followerCount'] });
+    queryClient.invalidateQueries({ queryKey: ['followingCount'] });
+    queryClient.invalidateQueries({ queryKey: ['friendsCount'] });
+    queryClient.invalidateQueries({ queryKey: ['friends'] });
+    queryClient.invalidateQueries({ queryKey: ['followers'] });
+    queryClient.invalidateQueries({ queryKey: ['following'] });
+    queryClient.invalidateQueries({ queryKey: ['notifications'] });
+  };
+
   const handleFollow = async (isFollowing: boolean) => {
     setLoading(true);
     try {
@@ -32,9 +44,12 @@ export const useProfileActions = ({ targetUserId, currentUserId }: UseProfileAct
       } else {
         await supabase
           .from('user_follows')
-          .insert({
+          .upsert({
             follower_id: currentUserId,
             following_id: targetUserId
+          }, { 
+            onConflict: 'follower_id,following_id',
+            ignoreDuplicates: true 
           });
         
         toast({
@@ -44,9 +59,7 @@ export const useProfileActions = ({ targetUserId, currentUserId }: UseProfileAct
         });
       }
       
-      queryClient.invalidateQueries({
-        queryKey: ['relationshipStatus', currentUserId, targetUserId]
-      });
+      invalidateAllRelatedQueries();
     } catch (error) {
       console.error('Error toggling follow:', error);
       toast({
@@ -64,24 +77,36 @@ export const useProfileActions = ({ targetUserId, currentUserId }: UseProfileAct
     setLoading(true);
     try {
       if (friendStatus === 'pending') {
+        // Cancel pending request
         await supabase
           .from('user_friends')
           .delete()
           .eq('user_id', currentUserId)
           .eq('friend_id', targetUserId);
         
+        // Also remove any related notifications
+        await supabase
+          .from('notifications')
+          .delete()
+          .eq('user_id', targetUserId)
+          .eq('type', 'friend_request')
+          .eq('data->>requester_id', currentUserId);
+        
         toast({
           title: "Friend request cancelled",
           duration: 1500,
         });
       } else {
-        await supabase
+        // Send new friend request
+        const { error } = await supabase
           .from('user_friends')
           .insert({
             user_id: currentUserId,
             friend_id: targetUserId,
             status: 'pending'
           });
+
+        if (error) throw error;
         
         toast({
           title: "Friend request sent",
@@ -89,9 +114,7 @@ export const useProfileActions = ({ targetUserId, currentUserId }: UseProfileAct
         });
       }
       
-      queryClient.invalidateQueries({
-        queryKey: ['relationshipStatus', currentUserId, targetUserId]
-      });
+      invalidateAllRelatedQueries();
     } catch (error) {
       console.error('Error sending friend request:', error);
       toast({
@@ -126,9 +149,7 @@ export const useProfileActions = ({ targetUserId, currentUserId }: UseProfileAct
         duration: 2000,
       });
       
-      queryClient.invalidateQueries({
-        queryKey: ['relationshipStatus', currentUserId, targetUserId]
-      });
+      invalidateAllRelatedQueries();
     } catch (error) {
       console.error('Error removing friend:', error);
       toast({

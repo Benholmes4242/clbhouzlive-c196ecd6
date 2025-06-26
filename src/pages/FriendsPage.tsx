@@ -19,40 +19,36 @@ const FriendsPage = () => {
       
       console.log('Fetching friends for user:', user.id);
       
-      // Get friends where current user is the requester
-      const { data: friendsAsUser, error: error1 } = await supabase
+      // Get all accepted friendships where current user is involved
+      const { data: friendships, error: friendshipError } = await supabase
         .from('user_friends')
-        .select('friend_id')
-        .eq('user_id', user.id)
-        .eq('status', 'accepted');
+        .select('user_id, friend_id')
+        .or(`and(user_id.eq.${user.id},status.eq.accepted),and(friend_id.eq.${user.id},status.eq.accepted)`);
 
-      // Get friends where current user is the friend
-      const { data: friendsAsFriend, error: error2 } = await supabase
-        .from('user_friends')
-        .select('user_id')
-        .eq('friend_id', user.id)
-        .eq('status', 'accepted');
-
-      if (error1 || error2) {
-        console.error('Error fetching friends:', error1 || error2);
-        throw error1 || error2;
+      if (friendshipError) {
+        console.error('Error fetching friendships:', friendshipError);
+        throw friendshipError;
       }
       
-      // Combine all friend IDs
-      const allFriendIds = [
-        ...(friendsAsUser || []).map(f => f.friend_id),
-        ...(friendsAsFriend || []).map(f => f.user_id)
-      ];
+      if (!friendships || friendships.length === 0) {
+        console.log('No friendships found');
+        return [];
+      }
 
-      console.log('Friend IDs found:', allFriendIds);
+      // Extract friend IDs (excluding current user)
+      const friendIds = friendships.map(friendship => 
+        friendship.user_id === user.id ? friendship.friend_id : friendship.user_id
+      );
 
-      if (allFriendIds.length === 0) return [];
+      console.log('Friend IDs found:', friendIds);
+
+      if (friendIds.length === 0) return [];
 
       // Get profile data for all friends
       const { data: profiles, error: profileError } = await supabase
         .from('user_profiles')
         .select('id, display_name, username, profile_photo_url, bio')
-        .in('id', allFriendIds);
+        .in('id', friendIds);
 
       if (profileError) {
         console.error('Error fetching friend profiles:', profileError);
@@ -111,7 +107,7 @@ const FriendsPage = () => {
                       </div>
                     </div>
                     <Button variant="outline" size="sm">
-                      Remove Friend
+                      View Profile
                     </Button>
                   </div>
                 </CardContent>

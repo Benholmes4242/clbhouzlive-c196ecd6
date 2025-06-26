@@ -145,16 +145,22 @@ export const useNotifications = () => {
             // User follows friend
             supabase
               .from('user_follows')
-              .insert({
+              .upsert({
                 follower_id: friendRequest.user_id,
                 following_id: friendRequest.friend_id
+              }, { 
+                onConflict: 'follower_id,following_id',
+                ignoreDuplicates: true 
               }),
             // Friend follows user  
             supabase
               .from('user_follows')
-              .insert({
+              .upsert({
                 follower_id: friendRequest.friend_id,
                 following_id: friendRequest.user_id
+              }, { 
+                onConflict: 'follower_id,following_id',
+                ignoreDuplicates: true 
               })
           ];
 
@@ -195,7 +201,7 @@ export const useNotifications = () => {
         });
       }
 
-      // Remove the notification by friend_request_id
+      // Remove the notification by friend_request_id immediately
       console.log('Removing notification for friend request:', friendRequestId);
       const { error: deleteError } = await supabase
         .from('notifications')
@@ -204,18 +210,20 @@ export const useNotifications = () => {
 
       if (deleteError) {
         console.error('Error removing notification:', deleteError);
-        // Don't throw here as the main action succeeded
       } else {
         console.log('Successfully removed notification for friend request:', friendRequestId);
       }
     },
     onSuccess: () => {
-      // Invalidate all relevant queries to refresh the UI
+      // Invalidate all relevant queries to refresh the UI immediately
       queryClient.invalidateQueries({ queryKey: ['notifications'] });
       queryClient.invalidateQueries({ queryKey: ['relationshipStatus'] });
       queryClient.invalidateQueries({ queryKey: ['followerCount'] });
       queryClient.invalidateQueries({ queryKey: ['followingCount'] });
       queryClient.invalidateQueries({ queryKey: ['friendsCount'] });
+      queryClient.invalidateQueries({ queryKey: ['friends'] });
+      queryClient.invalidateQueries({ queryKey: ['followers'] });
+      queryClient.invalidateQueries({ queryKey: ['following'] });
     },
     onError: (error) => {
       console.error('Friend request mutation error:', error);
