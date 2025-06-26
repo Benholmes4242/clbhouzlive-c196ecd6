@@ -9,6 +9,7 @@ interface ProfileHeaderProps {
   profileId?: string;
   isIndividual: boolean;
   bio: string;
+  profileUsername?: string; // Add profile username for navigation
 }
 
 const ProfileHeader: React.FC<ProfileHeaderProps> = ({
@@ -17,7 +18,8 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   userType,
   profileId,
   isIndividual,
-  bio
+  bio,
+  profileUsername
 }) => {
   return (
     <div className="text-center space-y-2">
@@ -33,7 +35,11 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
       
       {/* Show follower stats under name for non-individual users */}
       {!isIndividual && profileId && (
-        <FollowerStats userId={profileId} userType={userType} />
+        <FollowerStats 
+          userId={profileId} 
+          userType={userType} 
+          username={profileUsername}
+        />
       )}
       
       {/* Bio - Only show for individual users here */}

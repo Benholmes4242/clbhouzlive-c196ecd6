@@ -71,7 +71,11 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
 
       {/* Show follower stats for individual profiles only */}
       {isIndividual && profile?.id && (
-        <FollowerStats userId={profile.id} userType={userType} />
+        <FollowerStats 
+          userId={profile.id} 
+          userType={userType} 
+          username={profile.username}
+        />
       )}
     </div>
   );
