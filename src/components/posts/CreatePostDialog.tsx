@@ -17,9 +17,10 @@ interface TaggableEntity {
 
 interface CreatePostDialogProps {
   onPostCreated?: () => void;
+  variant?: 'header' | 'full';
 }
 
-const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
+const CreatePostDialog = ({ onPostCreated, variant = 'header' }: CreatePostDialogProps) => {
   const { user } = useSupabaseSession();
   const { submitPost } = usePostSubmission();
   const [isOpen, setIsOpen] = useState(false);
@@ -58,10 +59,20 @@ const CreatePostDialog = ({ onPostCreated }: CreatePostDialogProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" className="flex items-center space-x-2">
-          <Plus className="h-4 w-4" />
-          <span>Share</span>
-        </Button>
+        {variant === 'header' ? (
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="relative h-9 w-9 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground hover:text-primary-foreground"
+          >
+            <Plus className="h-5 w-5" />
+          </Button>
+        ) : (
+          <Button size="sm" className="flex items-center space-x-2">
+            <Plus className="h-4 w-4" />
+            <span>Share</span>
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent className="max-w-lg">
         <DialogHeader>

@@ -4,7 +4,6 @@ import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
 import StoryBar from '@/components/StoryBar';
 import TrendingFeed from '@/components/TrendingFeed';
-import CreatePostDialog from '@/components/posts/CreatePostDialog';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
@@ -76,9 +75,6 @@ const Index = () => {
       
       <main className="container mx-auto px-4 py-6">
         <div className="max-w-2xl mx-auto">
-          <div className="mb-6 flex justify-center md:justify-end">
-            <CreatePostDialog onPostCreated={() => window.location.reload()} />
-          </div>
           <TrendingFeed />
         </div>
       </main>
