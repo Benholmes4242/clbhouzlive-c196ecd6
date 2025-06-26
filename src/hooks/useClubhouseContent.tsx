@@ -13,6 +13,7 @@ interface ClubhousePost {
     profile_photo_url: string | null;
     user_type: 'individual' | 'club' | 'pro_shop' | 'academy' | 'tour_event' | 'other' | null;
     business_name: string | null;
+    eg_handicap_index?: number | null;
   };
   post_media: {
     id: string;
@@ -81,10 +82,10 @@ export const useClubhouseContent = () => {
       // Get unique user IDs
       const userIds = [...new Set(postsData.map(post => post.user_id))];
       
-      // Get user profiles for all post authors
+      // Get user profiles for all post authors with handicap data
       const { data: profiles, error: profilesError } = await supabase
         .from('user_profiles')
-        .select('id, display_name, username, profile_photo_url, user_type, business_name')
+        .select('id, display_name, username, profile_photo_url, user_type, business_name, eg_handicap_index')
         .in('id', userIds);
 
       if (profilesError) {
@@ -92,7 +93,7 @@ export const useClubhouseContent = () => {
         return;
       }
 
-      // Format posts with user data
+      // Format posts with user data including handicap
       const formattedPosts = postsData.map(post => {
         const userProfile = profiles?.find(profile => profile.id === post.user_id);
         
@@ -107,6 +108,7 @@ export const useClubhouseContent = () => {
             profile_photo_url: userProfile?.profile_photo_url || null,
             user_type: userProfile?.user_type || null,
             business_name: userProfile?.business_name || null,
+            eg_handicap_index: userProfile?.eg_handicap_index || null,
           },
           post_media: (post.post_media || []).map(media => ({
             id: media.id,
