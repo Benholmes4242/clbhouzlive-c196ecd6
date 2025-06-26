@@ -25,23 +25,23 @@ const GolfCourseCard: React.FC<GolfCourseCardProps> = ({ course, onEdit }) => {
     if (isGBI && course.regional_rank && course.regional_rank <= 100) {
       return (
         <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-300 text-xs">
-          #{course.regional_rank} GB&I
+          {course.regional_rank} GB&I
         </Badge>
       );
     }
     
     if (isUSA && course.usa_rank && course.usa_rank <= 100) {
       return (
-        <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-300 text-xs">
-          #{course.usa_rank} USA
+        <Badge variant="secondary" className="bg-red-100 text-red-800 border-red-300 text-xs">
+          {course.usa_rank} USA
         </Badge>
       );
     }
     
     if (isEurope && course.regional_rank && course.regional_rank <= 100) {
       return (
-        <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-300 text-xs">
-          #{course.regional_rank} Continental Europe
+        <Badge variant="secondary" className="bg-blue-100 text-blue-800 border-blue-300 text-xs">
+          {course.regional_rank} Europe
         </Badge>
       );
     }
@@ -54,7 +54,7 @@ const GolfCourseCard: React.FC<GolfCourseCardProps> = ({ course, onEdit }) => {
     if (course.global_rank && course.global_rank <= 100) {
       return (
         <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 border-yellow-300 text-xs">
-          #{course.global_rank} World
+          {course.global_rank} Worldwide
         </Badge>
       );
     }

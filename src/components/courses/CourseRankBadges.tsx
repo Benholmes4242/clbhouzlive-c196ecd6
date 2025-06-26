@@ -29,25 +29,25 @@ const CourseRankBadges = ({
       return (
         <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-300">
           <MapPin className="h-3 w-3 mr-1" />
-          #{regionalRank} GB&I
+          {regionalRank} GB&I
         </Badge>
       );
     }
     
     if (isUSA && usaRank && usaRank <= 100) {
       return (
-        <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-300">
+        <Badge variant="secondary" className="bg-red-100 text-red-800 border-red-300">
           <Flag className="h-3 w-3 mr-1" />
-          #{usaRank} USA
+          {usaRank} USA
         </Badge>
       );
     }
     
     if (isEurope && regionalRank && regionalRank <= 100) {
       return (
-        <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-300">
+        <Badge variant="secondary" className="bg-blue-100 text-blue-800 border-blue-300">
           <Globe className="h-3 w-3 mr-1" />
-          #{regionalRank} Continental Europe
+          {regionalRank} Europe
         </Badge>
       );
     }
@@ -61,7 +61,7 @@ const CourseRankBadges = ({
       return (
         <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 border-yellow-300">
           <Trophy className="h-3 w-3 mr-1" />
-          #{globalRank} World
+          {globalRank} Worldwide
         </Badge>
       );
     }
