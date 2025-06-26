@@ -78,15 +78,15 @@ const FollowerStats: React.FC<FollowerStatsProps> = ({ userId, userType = 'indiv
   });
 
   const handleFollowingClick = () => {
-    navigate(`/profile/${userId}/following`);
+    navigate('/following');
   };
 
   const handleFollowersClick = () => {
-    navigate(`/profile/${userId}/followers`);
+    navigate('/followers');
   };
 
   const handleFriendsClick = () => {
-    navigate(`/profile/${userId}/friends`);
+    navigate('/friends');
   };
 
   return (
