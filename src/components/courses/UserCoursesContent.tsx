@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -53,6 +54,15 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({ username }) => 
   });
 
   const targetUserId = isOwnProfile ? currentUser?.id : targetUserProfile?.id;
+  
+  // Get first name from display_name for tab label
+  const getFirstName = (profile: any) => {
+    if (!profile) return 'User';
+    const displayName = profile.display_name || profile.username || 'User';
+    return displayName.split(' ')[0]; // Get first word as first name
+  };
+
+  const tabLabel = isOwnProfile ? 'My Courses' : `${getFirstName(targetUserProfile)}'s Courses`;
   const displayName = isOwnProfile ? 'My' : (targetUserProfile?.display_name || targetUserProfile?.username || 'User\'s');
 
   // Fetch user's played courses
@@ -199,9 +209,9 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({ username }) => 
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h1 className="text-3xl font-bold mb-2">{displayName} Courses</h1>
+        <h1 className="text-3xl font-bold mb-2">{tabLabel}</h1>
         <p className="text-muted-foreground">
-          {isOwnProfile ? 'Track your golf course journey' : `View ${displayName.replace("'s", '')}'s golf course checklist`}
+          {isOwnProfile ? 'Track your golf course journey' : `View ${getFirstName(targetUserProfile)}'s golf course checklist`}
         </p>
       </div>
 
@@ -264,7 +274,7 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({ username }) => 
                 <CardContent className="p-8 text-center">
                   <Trophy className="h-12 w-12 mx-auto mb-4 text-yellow-600" />
                   <h3 className="text-lg font-semibold mb-2">
-                    {isOwnProfile ? 'No Top 100 courses played yet' : `${displayName.replace("'s", '')} hasn't played any Top 100 courses yet`}
+                    {isOwnProfile ? 'No Top 100 courses played yet' : `${getFirstName(targetUserProfile)} hasn't played any Top 100 courses yet`}
                   </h3>
                   <p className="text-muted-foreground">
                     {isOwnProfile 
@@ -298,7 +308,7 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({ username }) => 
                 <CardContent className="p-8 text-center">
                   <Calendar className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
                   <h3 className="text-lg font-semibold mb-2">
-                    {isOwnProfile ? 'No recent activity' : `${displayName.replace("'s", '')} has no recent activity`}
+                    {isOwnProfile ? 'No recent activity' : `${getFirstName(targetUserProfile)} has no recent activity`}
                   </h3>
                   <p className="text-muted-foreground">
                     {isOwnProfile 
