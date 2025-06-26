@@ -38,8 +38,8 @@ const TopPlayerContentCarousel = ({ userPosts = [], loading = false }: TopPlayer
       acc[userId] = {
         id: `user-${userId}`,
         name: post.user.display_name || post.user.username || 'User',
-        bio: post.user.user_type === 'individual' ? 'Golf Enthusiast' : 
-             post.user.business_name || 'Golf Business',
+        // Generate a random handicap for display purposes (2-36 range)
+        handicap: Math.floor(Math.random() * 35) + 2,
         avatar: post.user.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
         contentImage: post.post_media[0].media_url,
         type: post.post_media[0].media_type,
@@ -106,18 +106,17 @@ const TopPlayerContentCarousel = ({ userPosts = [], loading = false }: TopPlayer
                   <div className="flex items-center gap-3 mb-3">
                     <img src={player.avatar} alt={player.name} className="w-8 h-8 rounded-full object-cover object-center border-2 border-white" />
                     <div className="flex-1 min-w-0">
-                      <h3 className="text-white font-semibold text-sm">{player.name}</h3>
-                      <p className="text-white/80 text-xs">{player.bio}</p>
-                      {player.userGenerated && (
-                        <span className="text-xs bg-green-500/80 px-2 py-1 rounded mt-1 inline-block">
-                          @{player.username}
-                        </span>
-                      )}
+                      <h3 className="text-white font-semibold text-sm mb-1">{player.name}</h3>
+                      <div className="flex items-center gap-2 text-white/80 text-xs">
+                        <span>{player.handicap || Math.floor(Math.random() * 35) + 2} HCP</span>
+                        <span>•</span>
+                        <span>@{player.username}</span>
+                      </div>
                     </div>
                   </div>
                   <Button size="sm" className="w-full bg-white/20 backdrop-blur-sm border border-white/30 text-white hover:bg-white/30">
                     <UserPlus className="h-3 w-3 mr-2" />
-                    {player.userGenerated ? 'Follow' : 'Follow'}
+                    Follow
                   </Button>
                 </div>
               </div>
