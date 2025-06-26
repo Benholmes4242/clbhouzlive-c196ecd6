@@ -93,7 +93,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
             )}
           </div>
 
-          {/* Context-aware rank badges */}
+          {/* New rank badges system */}
           <CourseRankBadges
             globalRank={course.global_rank}
             regionalRank={course.regional_rank}
@@ -101,16 +101,6 @@ const CourseCard: React.FC<CourseCardProps> = ({
             country={course.country}
             viewContext={viewContext}
           />
-
-          {/* Top 100 badge */}
-          {course.global_rank && course.global_rank <= 100 && (
-            <Badge 
-              variant="default" 
-              className="absolute top-2 right-2 bg-amber-500 hover:bg-amber-600 text-white"
-            >
-              Top 100
-            </Badge>
-          )}
 
           {/* Course Played Button - only show when explicitly requested and user can modify */}
           {showPlayedButton && !isViewingOtherUser && (
@@ -128,7 +118,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
 
           {/* Show played status for other users (read-only) */}
           {isViewingOtherUser && userCourse?.played && (
-            <div className="absolute top-3 right-3">
+            <div className="absolute bottom-3 right-3">
               <Badge variant="default" className="shadow-lg">
                 Played
               </Badge>

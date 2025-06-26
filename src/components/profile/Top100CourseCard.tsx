@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
-import { Check, Globe, MapPin } from 'lucide-react';
+import { Check, Globe, MapPin, Trophy, Flag } from 'lucide-react';
 import PostPlayRatingModal from '../courses/PostPlayRatingModal';
 
 interface Top100CourseCardProps {
@@ -40,6 +40,59 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
     }
   };
 
+  // Check for GB&I countries - including all possible variations
+  const isGBI = ['United Kingdom', 'Ireland', 'England', 'Scotland', 'Wales', 'Northern Ireland', 'Isle of Man', 'Britain & Ireland'].includes(course.country);
+  const isUSA = ['United States', 'USA'].includes(course.country);
+  const isEurope = course.country === 'Continental Europe';
+
+  // Determine regional rank display
+  const getRegionalRankBadge = () => {
+    if (isGBI && course.regional_rank && course.regional_rank <= 100) {
+      return (
+        <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-300 text-xs">
+          <MapPin className="h-2 w-2 mr-1" />
+          #{course.regional_rank} GB&I
+        </Badge>
+      );
+    }
+    
+    if (isUSA && course.usa_rank && course.usa_rank <= 100) {
+      return (
+        <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-300 text-xs">
+          <Flag className="h-2 w-2 mr-1" />
+          #{course.usa_rank} USA
+        </Badge>
+      );
+    }
+    
+    if (isEurope && course.regional_rank && course.regional_rank <= 100) {
+      return (
+        <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-300 text-xs">
+          <Globe className="h-2 w-2 mr-1" />
+          #{course.regional_rank} Continental Europe
+        </Badge>
+      );
+    }
+    
+    return null;
+  };
+
+  // Determine worldwide rank display
+  const getWorldwideRankBadge = () => {
+    if (course.global_rank && course.global_rank <= 100) {
+      return (
+        <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 border-yellow-300 text-xs">
+          <Trophy className="h-2 w-2 mr-1" />
+          #{course.global_rank} World
+        </Badge>
+      );
+    }
+    return null;
+  };
+
+  const regionalBadge = getRegionalRankBadge();
+  const worldwideBadge = getWorldwideRankBadge();
+
   return (
     <>
       <div
@@ -58,32 +111,23 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
             className="w-full h-full object-cover"
           />
           
-          {/* Rank Badges */}
-          <div className="absolute top-2 left-2 flex gap-1">
-            {/* Gold badge - always shows global rank */}
-            {course.global_rank && (
-              <Badge className="bg-yellow-500 text-yellow-900 hover:bg-yellow-500 text-xs">
-                <Globe className="h-2 w-2 mr-1" />
-                {course.global_rank}
-              </Badge>
-            )}
-            {/* GB&I badge - shows regional rank for GB&I courses */}
-            {course.regional_rank && region === 'britain-ireland' && (
-              <Badge variant="secondary" className="text-xs">
-                #{course.regional_rank} GB&I
-              </Badge>
-            )}
-            {/* USA rank badge */}
-            {course.usa_rank && region === 'usa' && (
-              <Badge variant="secondary" className="text-xs">
-                #{course.usa_rank} USA
-              </Badge>
-            )}
-          </div>
+          {/* Regional rank badge on the left */}
+          {regionalBadge && (
+            <div className="absolute top-2 left-2">
+              {regionalBadge}
+            </div>
+          )}
+          
+          {/* Worldwide rank badge on the right */}
+          {worldwideBadge && (
+            <div className="absolute top-2 right-2">
+              {worldwideBadge}
+            </div>
+          )}
 
           {/* Played Indicator */}
           {isPlayed && (
-            <div className="absolute top-2 right-2">
+            <div className="absolute top-2 right-2 mt-8">
               <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
                 <Check className="h-4 w-4 text-white" />
               </div>
