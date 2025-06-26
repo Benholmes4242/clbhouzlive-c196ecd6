@@ -8,7 +8,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 interface FollowerStatsProps {
   userId: string;
   userType?: string;
-  username?: string; // Add username prop for navigation
+  username?: string;
 }
 
 const FollowerStats: React.FC<FollowerStatsProps> = ({ userId, userType = 'individual', username }) => {
@@ -18,10 +18,17 @@ const FollowerStats: React.FC<FollowerStatsProps> = ({ userId, userType = 'indiv
   const isIndividual = userType === 'individual';
   const isOwnProfile = currentUser?.id === userId;
 
-  // Get follower count for any user profile
-  const { data: followerCount = 0 } = useQuery({
+  console.log('FollowerStats - userId:', userId, 'userType:', userType, 'isOwnProfile:', isOwnProfile);
+
+  // Get follower count
+  const { data: followerCount = 0, isLoading: isLoadingFollowers } = useQuery({
     queryKey: ['followerCount', userId],
     queryFn: async () => {
+      if (!userId) {
+        console.log('FollowerStats: No userId provided for follower count');
+        return 0;
+      }
+      
       console.log('Fetching follower count for user:', userId);
       const { count, error } = await supabase
         .from('user_follows')
@@ -36,14 +43,19 @@ const FollowerStats: React.FC<FollowerStatsProps> = ({ userId, userType = 'indiv
       console.log('Follower count result:', count);
       return count || 0;
     },
-    refetchOnMount: true,
-    refetchOnWindowFocus: true,
+    enabled: !!userId,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
-  // Get following count for any user profile
-  const { data: followingCount = 0 } = useQuery({
+  // Get following count
+  const { data: followingCount = 0, isLoading: isLoadingFollowing } = useQuery({
     queryKey: ['followingCount', userId],
     queryFn: async () => {
+      if (!userId) {
+        console.log('FollowerStats: No userId provided for following count');
+        return 0;
+      }
+      
       console.log('Fetching following count for user:', userId);
       const { count, error } = await supabase
         .from('user_follows')
@@ -58,15 +70,18 @@ const FollowerStats: React.FC<FollowerStatsProps> = ({ userId, userType = 'indiv
       console.log('Following count result:', count);
       return count || 0;
     },
-    refetchOnMount: true,
-    refetchOnWindowFocus: true,
+    enabled: !!userId,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
-  // Get friends count for any user profile - only for individual users
-  const { data: friendsCount = 0 } = useQuery({
+  // Get friends count - only for individual users
+  const { data: friendsCount = 0, isLoading: isLoadingFriends } = useQuery({
     queryKey: ['friendsCount', userId],
     queryFn: async () => {
-      if (!isIndividual) return 0;
+      if (!isIndividual || !userId) {
+        console.log('FollowerStats: Not individual user or no userId for friends count');
+        return 0;
+      }
       
       console.log('Fetching friends count for user:', userId);
       const { count, error } = await supabase
@@ -82,20 +97,16 @@ const FollowerStats: React.FC<FollowerStatsProps> = ({ userId, userType = 'indiv
       console.log('Friends count result:', count);
       return count || 0;
     },
-    enabled: isIndividual,
-    refetchOnMount: true,
-    refetchOnWindowFocus: true,
+    enabled: isIndividual && !!userId,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
   const handleFollowingClick = () => {
     if (isOwnProfile) {
-      // For own profile, go to the standard following page
       queryClient.invalidateQueries({ queryKey: ['following'] });
       queryClient.invalidateQueries({ queryKey: ['followingCount'] });
       navigate('/following');
     } else if (username) {
-      // For other users, go to their following page (if we implement it)
-      // For now, show a message that this feature is coming soon
       console.log('Navigate to following for user:', username);
       // TODO: Implement /profile/:username/following route
     }
@@ -103,12 +114,10 @@ const FollowerStats: React.FC<FollowerStatsProps> = ({ userId, userType = 'indiv
 
   const handleFollowersClick = () => {
     if (isOwnProfile) {
-      // For own profile, go to the standard followers page
       queryClient.invalidateQueries({ queryKey: ['followers'] });
       queryClient.invalidateQueries({ queryKey: ['followerCount'] });
       navigate('/followers');
     } else if (username) {
-      // For other users, go to their followers page (if we implement it)
       console.log('Navigate to followers for user:', username);
       // TODO: Implement /profile/:username/followers route
     }
@@ -116,16 +125,23 @@ const FollowerStats: React.FC<FollowerStatsProps> = ({ userId, userType = 'indiv
 
   const handleFriendsClick = () => {
     if (isOwnProfile) {
-      // For own profile, go to the standard friends page
       queryClient.invalidateQueries({ queryKey: ['friends'] });
       queryClient.invalidateQueries({ queryKey: ['friendsCount'] });
       navigate('/friends');
     } else if (username) {
-      // For other users, go to their friends page (if we implement it)
       console.log('Navigate to friends for user:', username);
       // TODO: Implement /profile/:username/friends route
     }
   };
+
+  console.log('FollowerStats rendering - counts:', { 
+    followerCount, 
+    followingCount, 
+    friendsCount,
+    isLoadingFollowers,
+    isLoadingFollowing,
+    isLoadingFriends
+  });
 
   return (
     <div className="flex justify-center gap-8 py-4 border-y border-border">
@@ -133,14 +149,18 @@ const FollowerStats: React.FC<FollowerStatsProps> = ({ userId, userType = 'indiv
         className={`text-center ${isOwnProfile ? 'cursor-pointer hover:bg-muted/50 px-2 py-1 rounded' : 'px-2 py-1'}`} 
         onClick={isOwnProfile ? handleFollowingClick : undefined}
       >
-        <div className="text-xl font-bold">{followingCount}</div>
+        <div className="text-xl font-bold">
+          {isLoadingFollowing ? '...' : followingCount}
+        </div>
         <div className="text-sm text-muted-foreground">Following</div>
       </div>
       <div 
         className={`text-center ${isOwnProfile ? 'cursor-pointer hover:bg-muted/50 px-2 py-1 rounded' : 'px-2 py-1'}`} 
         onClick={isOwnProfile ? handleFollowersClick : undefined}
       >
-        <div className="text-xl font-bold">{followerCount}</div>
+        <div className="text-xl font-bold">
+          {isLoadingFollowers ? '...' : followerCount}
+        </div>
         <div className="text-sm text-muted-foreground">Followers</div>
       </div>
       {isIndividual && (
@@ -148,7 +168,9 @@ const FollowerStats: React.FC<FollowerStatsProps> = ({ userId, userType = 'indiv
           className={`text-center ${isOwnProfile ? 'cursor-pointer hover:bg-muted/50 px-2 py-1 rounded' : 'px-2 py-1'}`} 
           onClick={isOwnProfile ? handleFriendsClick : undefined}
         >
-          <div className="text-xl font-bold">{friendsCount}</div>
+          <div className="text-xl font-bold">
+            {isLoadingFriends ? '...' : friendsCount}
+          </div>
           <div className="text-sm text-muted-foreground">Friends</div>
         </div>
       )}

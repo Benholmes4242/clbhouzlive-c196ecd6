@@ -22,6 +22,8 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
   const { user } = useSupabaseSession();
   const isOwnProfile = user?.id === profile?.id;
 
+  console.log('ProfileInfo - profile:', profile, 'userId:', userId, 'profile.id:', profile?.id);
+
   if (!profile && !userEmail) {
     return (
       <div className="text-center py-8">
@@ -37,6 +39,11 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
   const bio = profile?.bio || '';
   const homeClub = profile?.home_club || '';
 
+  // Use profile.id as the primary userId for stats
+  const profileUserId = profile?.id || userId;
+
+  console.log('ProfileInfo - using profileUserId:', profileUserId, 'for stats');
+
   // Create a no-op function if onProfileUpdate wasn't provided
   const handleProfileUpdate = onProfileUpdate || (() => {});
 
@@ -49,6 +56,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
         profileId={profile?.id}
         isIndividual={isIndividual}
         bio={bio}
+        profileUsername={profile?.username}
       />
 
       {/* Home Club - Only show for individual users */}
@@ -70,11 +78,11 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
       )}
 
       {/* Show follower stats for individual profiles only */}
-      {isIndividual && profile?.id && (
+      {isIndividual && profileUserId && (
         <FollowerStats 
-          userId={profile.id} 
+          userId={profileUserId} 
           userType={userType} 
-          username={profile.username}
+          username={profile?.username}
         />
       )}
     </div>

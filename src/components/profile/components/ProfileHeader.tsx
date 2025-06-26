@@ -9,7 +9,7 @@ interface ProfileHeaderProps {
   profileId?: string;
   isIndividual: boolean;
   bio: string;
-  profileUsername?: string; // Add profile username for navigation
+  profileUsername?: string;
 }
 
 const ProfileHeader: React.FC<ProfileHeaderProps> = ({
@@ -21,6 +21,8 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   bio,
   profileUsername
 }) => {
+  console.log('ProfileHeader - profileId:', profileId, 'userType:', userType, 'profileUsername:', profileUsername);
+
   return (
     <div className="text-center space-y-2">
       {/* Add more spacing for business profiles */}
