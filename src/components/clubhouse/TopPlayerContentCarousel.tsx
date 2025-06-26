@@ -42,8 +42,10 @@ const TopPlayerContentCarousel = ({ userPosts = [], loading = false }: TopPlayer
       acc[userId] = {
         id: userId,
         name: post.user.display_name || post.user.username || 'User',
-        // Use actual handicap or fallback to random for display
-        handicap: post.user.eg_handicap_index ? Math.round(post.user.eg_handicap_index * 10) / 10 : Math.floor(Math.random() * 35) + 2,
+        // Use actual handicap from database
+        handicap: post.user.eg_handicap_index !== null && post.user.eg_handicap_index !== undefined 
+          ? Math.round(post.user.eg_handicap_index * 10) / 10 
+          : null,
         avatar: post.user.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
         contentImage: post.post_media[0].media_url,
         type: post.post_media[0].media_type,
@@ -56,7 +58,10 @@ const TopPlayerContentCarousel = ({ userPosts = [], loading = false }: TopPlayer
     return acc;
   }, {} as Record<string, any>);
 
-  const userPlayers = Object.values(uniqueUsers).slice(0, 6); // Show only real users, up to 6
+  const userPlayers = Object.values(uniqueUsers);
+
+  console.log('TopPlayerContentCarousel - userPlayers:', userPlayers);
+  console.log('TopPlayerContentCarousel - currentUser:', currentUser);
 
   if (loading) {
     return (
@@ -127,9 +132,12 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, currentUserId }) => {
   const handleFollowClick = async () => {
     if (!currentUserId || currentUserId === player.id) return;
     
+    console.log('Follow button clicked for user:', player.id);
     // Since we don't have follow status in this context, we'll assume not following and follow
     await handleFollow(false);
   };
+
+  const displayHandicap = player.handicap !== null ? `${player.handicap} HCP` : 'No HCP';
 
   return (
     <div className="relative bg-card rounded-lg overflow-hidden shadow-sm border hover:shadow-md transition-shadow cursor-pointer">
@@ -157,7 +165,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, currentUserId }) => {
           <div className="flex-1 min-w-0">
             <h3 className="text-white font-semibold text-sm mb-1">{player.name}</h3>
             <div className="flex items-center gap-2 text-white/80 text-xs">
-              <span>{player.handicap} HCP</span>
+              <span>{displayHandicap}</span>
               <span>•</span>
               <span>@{player.username}</span>
             </div>
