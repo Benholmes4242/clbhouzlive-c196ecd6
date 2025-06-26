@@ -9,6 +9,7 @@ export interface GolfCourse {
   global_rank: number | null;
   country_rank: number | null;
   regional_rank: number | null;
+  usa_rank: number | null;
   description: string | null;
   thumbnail_image: string | null;
   website_url: string | null;
