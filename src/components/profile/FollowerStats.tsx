@@ -32,6 +32,8 @@ const FollowerStats: React.FC<FollowerStatsProps> = ({ userId, userType = 'indiv
       console.log('Follower count result:', count);
       return count || 0;
     },
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 
   // Get following count
@@ -52,6 +54,8 @@ const FollowerStats: React.FC<FollowerStatsProps> = ({ userId, userType = 'indiv
       console.log('Following count result:', count);
       return count || 0;
     },
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 
   // Get friends count - only for individual users
@@ -75,23 +79,28 @@ const FollowerStats: React.FC<FollowerStatsProps> = ({ userId, userType = 'indiv
       return count || 0;
     },
     enabled: isIndividual,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 
   const handleFollowingClick = () => {
     // Refresh data before navigating
     queryClient.invalidateQueries({ queryKey: ['following'] });
+    queryClient.invalidateQueries({ queryKey: ['followingCount'] });
     navigate('/following');
   };
 
   const handleFollowersClick = () => {
     // Refresh data before navigating
     queryClient.invalidateQueries({ queryKey: ['followers'] });
+    queryClient.invalidateQueries({ queryKey: ['followerCount'] });
     navigate('/followers');
   };
 
   const handleFriendsClick = () => {
     // Refresh data before navigating
     queryClient.invalidateQueries({ queryKey: ['friends'] });
+    queryClient.invalidateQueries({ queryKey: ['friendsCount'] });
     navigate('/friends');
   };
 
