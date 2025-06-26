@@ -16,27 +16,23 @@ const Header = () => {
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <div className="flex items-center">
+          {/* Logo - Fixed positioning */}
+          <div className="flex items-center flex-shrink-0">
             <img
               src="/lovable-uploads/071651d4-1096-4053-b720-6f758b637fb8.png"
               alt="clbhouz Logo"
-              className="w-auto cursor-pointer"
-              style={{
-                display: "block",
-                maxHeight: "56px",
-                maxWidth: 240,
-                objectFit: "contain"
-              }}
+              className="h-10 w-auto cursor-pointer object-contain"
               onClick={handleLogoClick}
             />
           </div>
 
-          {/* Search Bar */}
-          <HeaderSearch />
+          {/* Search Bar - Centered with proper spacing */}
+          <div className="flex-1 max-w-md mx-4">
+            <HeaderSearch />
+          </div>
 
-          {/* Navigation Icons */}
-          <div className="flex items-center space-x-4">
+          {/* Navigation Icons - Fixed positioning */}
+          <div className="flex items-center space-x-4 flex-shrink-0">
             <HeaderNavigation />
             <HeaderUserMenu />
           </div>
