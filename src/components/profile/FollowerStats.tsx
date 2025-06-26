@@ -44,7 +44,7 @@ const FollowerStats: React.FC<FollowerStatsProps> = ({ userId, userType = 'indiv
       return count || 0;
     },
     enabled: !!userId,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 30, // 30 seconds instead of 5 minutes for faster updates
   });
 
   // Get following count
@@ -71,7 +71,7 @@ const FollowerStats: React.FC<FollowerStatsProps> = ({ userId, userType = 'indiv
       return count || 0;
     },
     enabled: !!userId,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 30, // 30 seconds instead of 5 minutes for faster updates
   });
 
   // Get friends count - only for individual users
@@ -98,7 +98,7 @@ const FollowerStats: React.FC<FollowerStatsProps> = ({ userId, userType = 'indiv
       return count || 0;
     },
     enabled: isIndividual && !!userId,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 30, // 30 seconds instead of 5 minutes for faster updates
   });
 
   const handleFollowingClick = () => {

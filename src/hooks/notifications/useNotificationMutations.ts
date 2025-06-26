@@ -87,6 +87,14 @@ export const useNotificationMutations = () => {
             description: "You're automatically following each other!",
             duration: 3000,
           });
+
+          // Invalidate specific count queries for both users
+          queryClient.invalidateQueries({ queryKey: ['followerCount', friendRequest.user_id] });
+          queryClient.invalidateQueries({ queryKey: ['followingCount', friendRequest.user_id] });
+          queryClient.invalidateQueries({ queryKey: ['friendsCount', friendRequest.user_id] });
+          queryClient.invalidateQueries({ queryKey: ['followerCount', friendRequest.friend_id] });
+          queryClient.invalidateQueries({ queryKey: ['followingCount', friendRequest.friend_id] });
+          queryClient.invalidateQueries({ queryKey: ['friendsCount', friendRequest.friend_id] });
         }
       } else {
         console.log('Declining friend request:', friendRequestId);
