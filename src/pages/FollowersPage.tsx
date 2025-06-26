@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { useParams } from 'react-router-dom';
 import Header from "@/components/Header";
 import BottomNavigation from '@/components/BottomNavigation';
 import { useQuery } from '@tanstack/react-query';
@@ -8,23 +7,35 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Users } from 'lucide-react';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 const FollowersPage = () => {
-  const { userId } = useParams<{ userId: string }>();
+  const { user } = useSupabaseSession();
 
   const { data: followers, isLoading } = useQuery({
-    queryKey: ['followers', userId],
+    queryKey: ['followers', user?.id],
     queryFn: async () => {
-      if (!userId) return [];
+      if (!user?.id) return [];
+      
+      console.log('Fetching followers for user:', user.id);
       
       // First get the follower relationships
       const { data: followData, error: followError } = await supabase
         .from('user_follows')
         .select('follower_id')
-        .eq('following_id', userId);
+        .eq('following_id', user.id);
 
-      if (followError) throw followError;
-      if (!followData || followData.length === 0) return [];
+      if (followError) {
+        console.error('Error fetching follow relationships:', followError);
+        throw followError;
+      }
+      
+      if (!followData || followData.length === 0) {
+        console.log('No followers found');
+        return [];
+      }
+
+      console.log('Follower IDs found:', followData.map(f => f.follower_id));
 
       // Then get the profile data for each follower
       const followerIds = followData.map(f => f.follower_id);
@@ -33,11 +44,15 @@ const FollowersPage = () => {
         .select('id, display_name, username, profile_photo_url, bio')
         .in('id', followerIds);
 
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error('Error fetching follower profiles:', profileError);
+        throw profileError;
+      }
 
+      console.log('Follower profiles:', profiles);
       return profiles || [];
     },
-    enabled: !!userId,
+    enabled: !!user?.id,
   });
 
   if (isLoading) {

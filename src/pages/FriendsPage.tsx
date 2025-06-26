@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { useParams } from 'react-router-dom';
 import Header from "@/components/Header";
 import BottomNavigation from '@/components/BottomNavigation';
 import { useQuery } from '@tanstack/react-query';
@@ -8,36 +7,44 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { UserCheck } from 'lucide-react';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 const FriendsPage = () => {
-  const { userId } = useParams<{ userId: string }>();
+  const { user } = useSupabaseSession();
 
   const { data: friends, isLoading } = useQuery({
-    queryKey: ['friends', userId],
+    queryKey: ['friends', user?.id],
     queryFn: async () => {
-      if (!userId) return [];
+      if (!user?.id) return [];
       
-      // Get friends where user is the requester
+      console.log('Fetching friends for user:', user.id);
+      
+      // Get friends where current user is the requester
       const { data: friendsAsUser, error: error1 } = await supabase
         .from('user_friends')
         .select('friend_id')
-        .eq('user_id', userId)
+        .eq('user_id', user.id)
         .eq('status', 'accepted');
 
-      // Get friends where user is the friend
+      // Get friends where current user is the friend
       const { data: friendsAsFriend, error: error2 } = await supabase
         .from('user_friends')
         .select('user_id')
-        .eq('friend_id', userId)
+        .eq('friend_id', user.id)
         .eq('status', 'accepted');
 
-      if (error1 || error2) throw error1 || error2;
+      if (error1 || error2) {
+        console.error('Error fetching friends:', error1 || error2);
+        throw error1 || error2;
+      }
       
       // Combine all friend IDs
       const allFriendIds = [
         ...(friendsAsUser || []).map(f => f.friend_id),
         ...(friendsAsFriend || []).map(f => f.user_id)
       ];
+
+      console.log('Friend IDs found:', allFriendIds);
 
       if (allFriendIds.length === 0) return [];
 
@@ -47,11 +54,15 @@ const FriendsPage = () => {
         .select('id, display_name, username, profile_photo_url, bio')
         .in('id', allFriendIds);
 
-      if (profileError) throw profileError;
+      if (profileError) {
+        console.error('Error fetching friend profiles:', profileError);
+        throw profileError;
+      }
 
+      console.log('Friend profiles:', profiles);
       return profiles || [];
     },
-    enabled: !!userId,
+    enabled: !!user?.id,
   });
 
   if (isLoading) {
