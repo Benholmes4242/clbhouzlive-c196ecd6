@@ -43,7 +43,7 @@ const CourseRankBadges = ({
     if (isEurope && regionalRank && regionalRank <= 100) {
       return (
         <Badge variant="secondary" className="bg-blue-100 text-blue-800 border-blue-300">
-          {regionalRank} Europe
+          {regionalRank} Continental Europe
         </Badge>
       );
     }

@@ -66,7 +66,7 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
     if (isEurope && course.regional_rank && course.regional_rank <= 100) {
       return (
         <Badge variant="secondary" className="bg-blue-100 text-blue-800 border-blue-300 text-xs">
-          {course.regional_rank} Europe
+          {course.regional_rank} Continental Europe
         </Badge>
       );
     }
