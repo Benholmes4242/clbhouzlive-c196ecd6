@@ -38,7 +38,8 @@ const Auth: React.FC = () => {
           // After login/signup, check if profile exists
           const hasProfile = await checkProfileExists(session.user.id);
           if (hasProfile) {
-            navigate("/profile", { replace: true });
+            // Redirect to homepage feed instead of profile
+            navigate("/", { replace: true });
           } else {
             // Always direct new users to profile creation flow
             navigate("/create-profile", { replace: true });
