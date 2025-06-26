@@ -27,13 +27,13 @@ const ActivityPostCard: React.FC<ActivityPostCardProps> = ({ post, attributionTe
               <img
                 src={post.post_media[0].media_url}
                 alt="Post content"
-                className="w-full h-full object-cover"
+                className="w-full h-full object-cover object-center"
               />
             ) : (
               <div className="relative h-full w-full">
                 <video
                   src={post.post_media[0].media_url}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover object-center"
                   muted
                   playsInline
                   preload="metadata"

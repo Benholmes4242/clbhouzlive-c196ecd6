@@ -20,7 +20,7 @@ const CourseHighlightsCarousel = () => {
           {courseHighlights.map((course) => (
             <CarouselItem key={course.id} className="pl-2 md:pl-4 basis-full sm:basis-1/2">
               <div className="bg-card rounded-lg overflow-hidden shadow-sm border hover:shadow-md transition-shadow cursor-pointer">
-                <img src={course.image} alt={course.name} className="w-full h-32 object-cover" />
+                <img src={course.image} alt={course.name} className="w-full h-32 object-cover object-center" />
                 <div className="p-4">
                   <h3 className="font-semibold mb-1">{course.name}</h3>
                   <div className="flex items-center text-muted-foreground text-sm mb-2">

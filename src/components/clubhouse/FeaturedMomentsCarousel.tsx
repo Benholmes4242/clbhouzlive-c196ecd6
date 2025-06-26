@@ -118,7 +118,7 @@ const FeaturedMomentsCarousel = ({ userPosts = [], loading = false }: FeaturedMo
                   <VideoPreview
                     src={moment.videoUrl}
                     videoId={`featured-${moment.id}`}
-                    className="w-full h-full"
+                    className="w-full h-full object-cover object-center"
                   />
                   
                   {/* Duration badge */}

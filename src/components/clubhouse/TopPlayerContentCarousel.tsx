@@ -88,10 +88,10 @@ const TopPlayerContentCarousel = ({ userPosts = [], loading = false }: TopPlayer
                   <VideoPreview
                     src={player.contentImage}
                     videoId={`player-${player.id}`}
-                    className="w-full h-48"
+                    className="w-full h-48 object-cover object-center"
                   />
                 ) : (
-                  <img src={player.contentImage} alt={player.name} className="w-full h-48 object-cover" />
+                  <img src={player.contentImage} alt={player.name} className="w-full h-48 object-cover object-center" />
                 )}
                 
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
@@ -104,7 +104,7 @@ const TopPlayerContentCarousel = ({ userPosts = [], loading = false }: TopPlayer
                 
                 <div className="absolute bottom-4 left-4 right-4">
                   <div className="flex items-center gap-3 mb-3">
-                    <img src={player.avatar} alt={player.name} className="w-8 h-8 rounded-full object-cover border-2 border-white" />
+                    <img src={player.avatar} alt={player.name} className="w-8 h-8 rounded-full object-cover object-center border-2 border-white" />
                     <div className="flex-1 min-w-0">
                       <h3 className="text-white font-semibold text-sm">{player.name}</h3>
                       <p className="text-white/80 text-xs">{player.bio}</p>

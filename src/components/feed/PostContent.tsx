@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect, useState } from 'react';
 import { Play, Pause, Maximize2 } from 'lucide-react';
 import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
@@ -81,7 +82,7 @@ const PostContent = ({ content, onVideoClick }: PostContentProps) => {
                     <img
                       src={content.thumbnail || getYouTubeThumbnail(content.youtubeId)}
                       alt="Video thumbnail"
-                      className="w-full h-80 object-cover"
+                      className="w-full h-80 object-cover object-center"
                       onError={(e) => {
                         // Fallback to lower quality if maxres fails
                         const target = e.target as HTMLImageElement;
@@ -124,7 +125,7 @@ const PostContent = ({ content, onVideoClick }: PostContentProps) => {
                 <video
                   ref={videoRef}
                   src={content.videoUrl}
-                  className="w-full h-80 object-cover cursor-pointer"
+                  className="w-full h-80 object-cover object-center cursor-pointer"
                   onClick={handleVideoClick}
                   muted
                   loop
@@ -183,7 +184,7 @@ const PostContent = ({ content, onVideoClick }: PostContentProps) => {
                     <img
                       src={imageUrl}
                       alt={`Post content ${index + 1}`}
-                      className="w-full h-80 object-cover"
+                      className="w-full h-80 object-cover object-center"
                     />
                   </CarouselItem>
                 ))}
@@ -207,7 +208,7 @@ const PostContent = ({ content, onVideoClick }: PostContentProps) => {
           <img
             src={allImages[0]}
             alt="Post content"
-            className="w-full h-80 object-cover"
+            className="w-full h-80 object-cover object-center"
           />
         ) : null}
       </div>
