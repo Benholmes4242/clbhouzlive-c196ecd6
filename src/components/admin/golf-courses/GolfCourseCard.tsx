@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Flag, Trophy, Globe } from 'lucide-react';
+import { MapPin, Flag } from 'lucide-react';
 import { GolfCourse } from './types';
 
 interface GolfCourseCardProps {
