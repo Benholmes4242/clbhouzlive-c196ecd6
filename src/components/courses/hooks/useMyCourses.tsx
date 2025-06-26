@@ -31,7 +31,7 @@ export const useMyCourses = () => {
   });
 
   // Fetch user's Top 100 courses
-  const { data: top100Courses = [], isLoading: isLoadingTop100 } = useQuery({
+  const { data: top100CoursesRaw = [], isLoading: isLoadingTop100 } = useQuery({
     queryKey: ['user-top100-courses', user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
@@ -72,6 +72,14 @@ export const useMyCourses = () => {
     enabled: !!user?.id,
   });
 
+  // Add source property to Top 100 courses
+  const top100Courses = React.useMemo(() => {
+    return top100CoursesRaw.map(course => ({
+      ...course,
+      source: 'user_top100_courses' as const
+    }));
+  }, [top100CoursesRaw]);
+
   // Combine all played courses from both tables, removing duplicates
   const allPlayedCourses = React.useMemo(() => {
     const courseMap = new Map();
@@ -87,7 +95,7 @@ export const useMyCourses = () => {
     });
     
     // Add courses from user_top100_courses table (will overwrite if duplicate)
-    top100Courses.forEach(userCourse => {
+    top100CoursesRaw.forEach(userCourse => {
       if (userCourse.golf_courses) {
         courseMap.set(userCourse.golf_courses.id, {
           ...userCourse,
@@ -99,7 +107,7 @@ export const useMyCourses = () => {
     return Array.from(courseMap.values()).sort((a, b) => 
       new Date(b.played_date || 0).getTime() - new Date(a.played_date || 0).getTime()
     );
-  }, [playedCourses, top100Courses]);
+  }, [playedCourses, top100CoursesRaw]);
 
   // Calculate statistics
   const totalCoursesPlayed = allPlayedCourses.length;
