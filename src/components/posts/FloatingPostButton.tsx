@@ -1,6 +1,6 @@
 
 import React, { useRef } from 'react';
-import { Aperture } from 'lucide-react';
+import { Camera } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePostSubmission } from './PostSubmissionHandler';
 
@@ -50,7 +50,7 @@ const FloatingPostButton = () => {
           aria-label="Create post"
         >
           <div className="plus-icon">
-            <Aperture className="h-5 w-5" />
+            <Camera className="h-5 w-5" />
           </div>
           <div className="post-label">Post</div>
         </button>
