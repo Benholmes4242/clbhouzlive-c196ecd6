@@ -5,7 +5,6 @@ import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
 import FloatingPostButton from '@/components/posts/FloatingPostButton';
 import ClubhouseFeedControls from '@/components/clubhouse/ClubhouseFeedControls';
-import TrendingTipsCarousel from '@/components/clubhouse/TrendingTipsCarousel';
 import CourseHighlightsCarousel from '@/components/clubhouse/CourseHighlightsCarousel';
 import ClubSpotlightCarousel from '@/components/clubhouse/ClubSpotlightCarousel';
 import FeaturedMomentsCarousel from '@/components/clubhouse/FeaturedMomentsCarousel';
@@ -43,10 +42,9 @@ const ClubhouseFeed = () => {
             />
             
             <FeaturedMomentsCarousel userPosts={posts} loading={loading} />
-            <TrendingTipsCarousel />
+            <TopPlayerContentCarousel userPosts={posts} loading={loading} />
             <CourseHighlightsCarousel />
             <ClubSpotlightCarousel />
-            <TopPlayerContentCarousel />
           </TabsContent>
 
           <TabsContent value="events" className="mt-6">
