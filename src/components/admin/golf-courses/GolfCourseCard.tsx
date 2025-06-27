@@ -21,6 +21,23 @@ const formatDescription = (description: string) => {
     ));
 };
 
+// Helper function to format location display
+const formatLocation = (course: GolfCourse) => {
+  const parts = [];
+  
+  if (course.sub_country) {
+    parts.push(course.sub_country);
+  }
+  
+  if (course.region && course.region !== course.country) {
+    parts.push(course.region);
+  }
+  
+  parts.push(course.country);
+  
+  return parts.join(', ');
+};
+
 const GolfCourseCard: React.FC<GolfCourseCardProps> = ({ course, onEdit }) => {
   const handleCardClick = () => {
     onEdit(course);
@@ -50,13 +67,7 @@ const GolfCourseCard: React.FC<GolfCourseCardProps> = ({ course, onEdit }) => {
             <h3 className="font-semibold text-lg mb-2">{course.name}</h3>
             <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
               <Flag className="h-4 w-4" />
-              <span>{course.country}</span>
-              {course.region && (
-                <>
-                  <span>•</span>
-                  <span>{course.region}</span>
-                </>
-              )}
+              <span>{formatLocation(course)}</span>
             </div>
             {course.description && (
               <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">

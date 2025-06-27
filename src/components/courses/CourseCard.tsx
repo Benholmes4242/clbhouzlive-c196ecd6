@@ -15,6 +15,7 @@ interface Course {
   name: string;
   country: string;
   region?: string;
+  sub_country?: string;
   continent?: string;
   global_rank?: number | null;
   regional_rank?: number | null;
@@ -43,6 +44,23 @@ const formatDescription = (description: string) => {
         {index < array.length - 1 && <br />}
       </React.Fragment>
     ));
+};
+
+// Helper function to format location display
+const formatLocation = (course: Course) => {
+  const parts = [];
+  
+  if (course.sub_country) {
+    parts.push(course.sub_country);
+  }
+  
+  if (course.region && course.region !== course.country) {
+    parts.push(course.region);
+  }
+  
+  parts.push(course.country);
+  
+  return parts.join(', ');
 };
 
 const CourseCard: React.FC<CourseCardProps> = ({ 
@@ -148,10 +166,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
           <div className="flex items-center gap-1 text-muted-foreground text-sm mb-3">
             <MapPin className="h-4 w-4 flex-shrink-0" />
             <span className="line-clamp-1">
-              {course.region && course.region !== course.country 
-                ? `${course.region}, ${course.country}`
-                : course.country
-              }
+              {formatLocation(course)}
             </span>
           </div>
           
