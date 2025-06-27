@@ -32,24 +32,24 @@ const GolfCourseCard: React.FC<GolfCourseCardProps> = ({ course, onEdit }) => {
       onClick={handleCardClick}
     >
       <CardContent className="p-6">
-        <div className="flex items-start gap-4">
+        <div className="flex items-start gap-6">
           <div className="flex-shrink-0">
             {course.thumbnail_image ? (
               <img
                 src={course.thumbnail_image}
                 alt={course.name}
-                className="w-16 h-16 rounded-lg object-cover"
+                className="w-32 h-24 rounded-lg object-cover border shadow-sm"
               />
             ) : (
-              <div className="w-16 h-16 rounded-lg bg-muted flex items-center justify-center">
-                <MapPin className="h-6 w-6 text-muted-foreground" />
+              <div className="w-32 h-24 rounded-lg bg-muted flex items-center justify-center border">
+                <MapPin className="h-8 w-8 text-muted-foreground" />
               </div>
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-lg mb-1">{course.name}</h3>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-              <Flag className="h-3 w-3" />
+            <h3 className="font-semibold text-lg mb-2">{course.name}</h3>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
+              <Flag className="h-4 w-4" />
               <span>{course.country}</span>
               {course.region && (
                 <>
