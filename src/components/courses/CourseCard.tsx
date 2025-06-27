@@ -1,175 +1,134 @@
 
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import React from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Star } from 'lucide-react';
-import CourseDetailModal from './CourseDetailModal';
-import CoursePlayedButton from './CoursePlayedButton';
+import { MapPin, Calendar, Star } from 'lucide-react';
+import CourseImage from './CourseImage';
 import CourseRankBadges from './CourseRankBadges';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import CoursePlayedButton from './CoursePlayedButton';
 
 interface Course {
   id: string;
   name: string;
   country: string;
+  sub_country?: string;
   region?: string;
-  continent?: string;
-  global_rank?: number | null;
-  regional_rank?: number | null;
-  usa_rank?: number | null;
+  global_rank?: number;
+  regional_rank?: number;
+  country_rank?: number;
+  usa_rank?: number;
   description?: string;
   thumbnail_image?: string;
-  latitude?: number | null;
-  longitude?: number | null;
-  website_url?: string | null;
+  website_url?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 interface CourseCardProps {
   course: Course;
-  viewContext?: 'global' | 'regional' | 'usa' | 'europe';
-  viewingUserId?: string;
+  viewContext: 'global' | 'regional' | 'usa' | 'europe';
   showPlayedButton?: boolean;
+  onCourseSelect?: (course: Course) => void;
 }
 
-// Helper function to format description text with line breaks
 const formatDescription = (description: string) => {
-  return description
-    .split('\n')
-    .map((line, index, array) => (
-      <React.Fragment key={index}>
-        {line}
-        {index < array.length - 1 && <br />}
-      </React.Fragment>
-    ));
+  if (!description) return null;
+  
+  return description.split('\n').map((paragraph, index) => {
+    if (paragraph.trim() === '') return null;
+    return (
+      <p key={index} className="mb-2 last:mb-0">
+        {paragraph.trim()}
+      </p>
+    );
+  }).filter(Boolean);
 };
 
-const CourseCard: React.FC<CourseCardProps> = ({ 
-  course, 
-  viewContext = 'global', 
-  viewingUserId,
-  showPlayedButton = true
-}) => {
-  const { user } = useSupabaseSession();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  // Fetch user's course status
-  const { data: userCourse } = useQuery({
-    queryKey: ['user-course', course.id, viewingUserId || user?.id],
-    queryFn: async () => {
-      const userId = viewingUserId || user?.id;
-      if (!userId) return null;
-
-      const { data, error } = await supabase
-        .from('user_courses')
-        .select('*')
-        .eq('course_id', course.id)
-        .eq('user_id', userId)
-        .maybeSingle();
-
-      if (error && error.code !== 'PGRST116') throw error;
-      return data;
-    },
-    enabled: !!(viewingUserId || user?.id),
-  });
-
-  const canModifyCourseStatus = user && (!viewingUserId || viewingUserId === user.id);
-  const isViewingOtherUser = viewingUserId && viewingUserId !== user?.id;
-
+const CourseCard = ({ course, viewContext, showPlayedButton = true, onCourseSelect }: CourseCardProps) => {
   const handleCardClick = () => {
-    setIsModalOpen(true);
+    if (onCourseSelect) {
+      onCourseSelect(course);
+    }
   };
 
   return (
-    <>
-      <Card 
-        className="group hover:shadow-lg transition-all duration-200 cursor-pointer overflow-hidden relative"
-        onClick={handleCardClick}
-      >
-        <div className="relative">
-          <div className="aspect-video bg-muted overflow-hidden">
-            {course.thumbnail_image ? (
-              <img
-                src={course.thumbnail_image}
-                alt={course.name}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                onError={(e) => {
-                  e.currentTarget.src = 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=400&h=300&fit=crop';
-                }}
-              />
-            ) : (
-              <div className="w-full h-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center">
-                <Star className="h-12 w-12 text-white opacity-50" />
-              </div>
+    <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" onClick={handleCardClick}>
+      <div className="aspect-video relative">
+        <CourseImage 
+          src={course.thumbnail_image} 
+          alt={course.name}
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute top-2 left-2">
+          <CourseRankBadges 
+            course={course} 
+            viewContext={viewContext}
+          />
+        </div>
+        {showPlayedButton && (
+          <div className="absolute top-2 right-2">
+            <CoursePlayedButton courseId={course.id} />
+          </div>
+        )}
+      </div>
+      
+      <CardContent className="p-4">
+        <div className="space-y-3">
+          <div>
+            <h3 className="font-semibold text-lg mb-1">{course.name}</h3>
+            <div className="flex items-center text-sm text-muted-foreground">
+              <MapPin className="h-4 w-4 mr-1" />
+              <span>{course.sub_country}, {course.country}</span>
+            </div>
+          </div>
+
+          {course.description && (
+            <div className="text-sm text-muted-foreground line-clamp-3">
+              {formatDescription(course.description)}
+            </div>
+          )}
+
+          <div className="flex flex-wrap gap-1">
+            {course.global_rank && (
+              <Badge variant="secondary" className="text-xs">
+                Global #{course.global_rank}
+              </Badge>
+            )}
+            {course.regional_rank && (
+              <Badge variant="outline" className="text-xs">
+                Regional #{course.regional_rank}
+              </Badge>
+            )}
+            {course.country_rank && (
+              <Badge variant="outline" className="text-xs">
+                Country #{course.country_rank}
+              </Badge>
+            )}
+            {course.usa_rank && (
+              <Badge variant="outline" className="text-xs">
+                USA #{course.usa_rank}
+              </Badge>
             )}
           </div>
 
-          {/* New rank badges system */}
-          <CourseRankBadges
-            globalRank={course.global_rank}
-            regionalRank={course.regional_rank}
-            usaRank={course.usa_rank}
-            country={course.country}
-            viewContext={viewContext}
-          />
-
-          {/* Course Played Button - only show when explicitly requested and user can modify */}
-          {showPlayedButton && !isViewingOtherUser && (
-            <CoursePlayedButton
-              courseId={course.id}
-              courseName={course.name}
-              userCourse={userCourse}
-              canModifyCourseStatus={!!canModifyCourseStatus}
-              currentUserId={user?.id}
-              viewingUserId={viewingUserId}
-              course={course}
-              showButton={true}
-            />
-          )}
-
-          {/* Show played status for other users (read-only) */}
-          {isViewingOtherUser && userCourse?.played && (
-            <div className="absolute bottom-3 right-3">
-              <Badge variant="default" className="shadow-lg">
-                Played
-              </Badge>
+          {course.website_url && (
+            <div className="text-xs text-muted-foreground">
+              <span className="font-medium">Website: </span>
+              <a 
+                href={course.website_url.startsWith('http') ? course.website_url : `https://${course.website_url}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:underline"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {course.website_url}
+              </a>
             </div>
           )}
         </div>
-        
-        <CardHeader className="pb-2">
-          <h3 className="font-semibold text-lg leading-tight line-clamp-2 group-hover:text-primary transition-colors">
-            {course.name}
-          </h3>
-        </CardHeader>
-        
-        <CardContent className="pt-0">
-          <div className="flex items-center gap-1 text-muted-foreground text-sm mb-3">
-            <MapPin className="h-4 w-4 flex-shrink-0" />
-            <span className="line-clamp-1">
-              {course.region && course.region !== course.country 
-                ? `${course.region}, ${course.country}`
-                : course.country
-              }
-            </span>
-          </div>
-          
-          {course.description && (
-            <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
-              {formatDescription(course.description)}
-            </p>
-          )}
-        </CardContent>
-      </Card>
-
-      <CourseDetailModal
-        course={course}
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        viewingUserId={viewingUserId}
-      />
-    </>
+      </CardContent>
+    </Card>
   );
 };
 
