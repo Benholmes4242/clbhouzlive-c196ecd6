@@ -141,10 +141,13 @@ export const usePostSubmission = () => {
         });
       }
 
-      // Broadcast success event for feed refresh
+      // Broadcast success event for feed refresh - this will trigger feed refresh
       window.dispatchEvent(new CustomEvent('postUploadCompleted', { 
         detail: { postId: postData.id, optimisticId: optimisticPost.id } 
       }));
+
+      // Also broadcast a general feed refresh event
+      window.dispatchEvent(new CustomEvent('refreshFeed'));
 
     } catch (error) {
       console.error('Error in background upload:', error);
@@ -192,10 +195,13 @@ export const usePostSubmission = () => {
 
       if (error) throw error;
 
-      // Broadcast delete event for UI cleanup
+      // Broadcast delete event for UI cleanup and feed refresh
       window.dispatchEvent(new CustomEvent('postDeleted', { 
         detail: { postId } 
       }));
+
+      // Also broadcast a general feed refresh event
+      window.dispatchEvent(new CustomEvent('refreshFeed'));
 
     } catch (error) {
       console.error('Error deleting post:', error);

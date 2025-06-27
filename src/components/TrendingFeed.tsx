@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import PostCard from './feed/PostCard';
 import UserPost from './posts/UserPost';
 import OptimisticPostCard from './posts/OptimisticPostCard';
@@ -20,7 +20,7 @@ const TrendingFeed = () => {
   const { videos: externalVideos, loading: externalVideosLoading } = useExternalVideos();
 
   // Get posts from followed users and friends
-  const { data: followedUsersPosts = [], isLoading: followedPostsLoading } = useQuery({
+  const { data: followedUsersPosts = [], isLoading: followedPostsLoading, refetch: refetchFollowedPosts } = useQuery({
     queryKey: ['followedUsersPosts', user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
@@ -117,6 +117,38 @@ const TrendingFeed = () => {
     enabled: !!user?.id,
   });
 
+  // Listen for feed refresh events
+  useEffect(() => {
+    const handleFeedRefresh = () => {
+      console.log('Feed refresh triggered');
+      refetchUserPosts();
+      refetchFollowedPosts();
+    };
+
+    const handlePostCompleted = () => {
+      console.log('Post upload completed, refreshing feed');
+      refetchUserPosts();
+      refetchFollowedPosts();
+    };
+
+    const handlePostDeleted = () => {
+      console.log('Post deleted, refreshing feed');
+      refetchUserPosts();
+      refetchFollowedPosts();
+    };
+
+    // Listen for various feed refresh events
+    window.addEventListener('refreshFeed', handleFeedRefresh);
+    window.addEventListener('postUploadCompleted', handlePostCompleted);
+    window.addEventListener('postDeleted', handlePostDeleted);
+
+    return () => {
+      window.removeEventListener('refreshFeed', handleFeedRefresh);
+      window.removeEventListener('postUploadCompleted', handlePostCompleted);
+      window.removeEventListener('postDeleted', handlePostDeleted);
+    };
+  }, [refetchUserPosts, refetchFollowedPosts]);
+
   if (userPostsLoading || externalVideosLoading || followedPostsLoading) {
     return <LoadingSkeleton />;
   }
@@ -190,8 +222,14 @@ const TrendingFeed = () => {
           <UserPost 
             key={item.id} 
             post={item} 
-            onPostUpdated={refetchUserPosts}
-            onPostDeleted={refetchUserPosts}
+            onPostUpdated={() => {
+              refetchUserPosts();
+              refetchFollowedPosts();
+            }}
+            onPostDeleted={() => {
+              refetchUserPosts();
+              refetchFollowedPosts();
+            }}
           />
         ) : (
           <PostCard key={item.id} post={item} />
