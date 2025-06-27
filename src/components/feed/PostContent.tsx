@@ -1,7 +1,7 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import { Play, Pause, Maximize2 } from 'lucide-react';
-import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
+import { SwipeCarousel } from '@/components/ui/swipe-carousel';
 
 interface PostContentProps {
   content: {
@@ -21,7 +21,6 @@ const PostContent = ({ content, onVideoClick }: PostContentProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showControls, setShowControls] = useState(false);
-  const [currentSlide, setCurrentSlide] = useState(0);
 
   const handleVideoClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -83,6 +82,7 @@ const PostContent = ({ content, onVideoClick }: PostContentProps) => {
                       src={content.thumbnail || getYouTubeThumbnail(content.youtubeId)}
                       alt="Video thumbnail"
                       className="w-full h-80 object-cover object-center"
+                      loading="lazy"
                       onError={(e) => {
                         // Fallback to lower quality if maxres fails
                         const target = e.target as HTMLImageElement;
@@ -130,6 +130,7 @@ const PostContent = ({ content, onVideoClick }: PostContentProps) => {
                   muted
                   loop
                   playsInline
+                  preload="metadata"
                 />
                 
                 {/* Video Controls Overlay */}
@@ -166,49 +167,27 @@ const PostContent = ({ content, onVideoClick }: PostContentProps) => {
             ) : null}
           </div>
         ) : allImages.length > 1 ? (
-          // Multiple images - use carousel
-          <div className="relative">
-            <Carousel 
-              className="w-full"
-              setApi={(api) => {
-                if (api) {
-                  api.on('select', () => {
-                    setCurrentSlide(api.selectedScrollSnap());
-                  });
-                }
-              }}
-            >
-              <CarouselContent>
-                {allImages.map((imageUrl, index) => (
-                  <CarouselItem key={index}>
-                    <img
-                      src={imageUrl}
-                      alt={`Post content ${index + 1}`}
-                      className="w-full h-80 object-cover object-center"
-                    />
-                  </CarouselItem>
-                ))}
-              </CarouselContent>
-            </Carousel>
-            
-            {/* Dot indicators */}
-            <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-2">
-              {allImages.map((_, index) => (
-                <div
-                  key={index}
-                  className={`w-2 h-2 rounded-full transition-colors ${
-                    index === currentSlide ? 'bg-white' : 'bg-white/50'
-                  }`}
-                />
-              ))}
-            </div>
-          </div>
+          // Multiple images - use new SwipeCarousel
+          <SwipeCarousel
+            items={allImages.map((imageUrl, index) => (
+              <img
+                key={index}
+                src={imageUrl}
+                alt={`Post content ${index + 1}`}
+                className="w-full h-80 object-cover object-center"
+                loading="lazy"
+              />
+            ))}
+            showDots={true}
+            showArrows={false}
+          />
         ) : allImages.length === 1 ? (
           // Single image
           <img
             src={allImages[0]}
             alt="Post content"
             className="w-full h-80 object-cover object-center"
+            loading="lazy"
           />
         ) : null}
       </div>

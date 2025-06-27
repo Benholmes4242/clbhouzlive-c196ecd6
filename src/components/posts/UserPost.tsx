@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MoreHorizontal, Heart, MessageCircle, Share, Edit, Trash2 } from 'lucide-react';
@@ -19,7 +18,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Carousel, CarouselContent, CarouselItem } from '@/components/ui/carousel';
+import { SwipeCarousel } from '@/components/ui/swipe-carousel';
 import EditPostDialog from './EditPostDialog';
 import TaggedText from './TaggedText';
 import PostModal from './PostModal';
@@ -65,19 +64,18 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentSlide, setCurrentSlide] = useState(0);
 
   const displayName = post.user.display_name || post.user.username || 'User';
   const timeAgo = formatDistanceToNow(new Date(post.created_at), { addSuffix: true });
   const isOwnPost = user?.id === post.user.id;
 
-  const handlePostClick = () => {
+  const handlePostClick = useCallback(() => {
     setIsModalOpen(true);
-  };
+  }, []);
 
-  const handleCloseModal = () => {
+  const handleCloseModal = useCallback(() => {
     setIsModalOpen(false);
-  };
+  }, []);
 
   const handleDeletePost = async () => {
     if (!isOwnPost || isDeleting) return;
@@ -87,7 +85,6 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
 
     setIsDeleting(true);
     try {
-      // Delete post tags first
       const { error: tagsError } = await supabase
         .from('post_tags')
         .delete()
@@ -127,6 +124,27 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
       setIsDeleting(false);
     }
   };
+
+  // Create carousel items from media
+  const carouselItems = post.post_media?.map((media, index) => (
+    <div key={media.id} className="w-full aspect-square">
+      {media.media_type === 'image' ? (
+        <img
+          src={media.media_url}
+          alt="Post content"
+          className="w-full h-full object-cover object-center"
+          loading="lazy"
+        />
+      ) : (
+        <VideoPreview
+          src={media.media_url}
+          className="w-full h-full"
+          onFullscreen={handlePostClick}
+          videoId={`user-post-${post.id}-${index}`}
+        />
+      )}
+    </div>
+  )) || [];
 
   const PostContent = () => (
     <Card className="border-0 shadow-sm">
@@ -184,81 +202,16 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
           </div>
         )}
 
-        {/* Post Media */}
-        {post.post_media && post.post_media.length > 0 && (
+        {/* Post Media using SwipeCarousel */}
+        {carouselItems.length > 0 && (
           <div className="mb-3 cursor-pointer" onClick={handlePostClick}>
-            {post.post_media.length > 1 ? (
-              <div className="relative">
-                <Carousel 
-                  className="w-full"
-                  setApi={(api) => {
-                    if (api) {
-                      api.on('select', () => {
-                        setCurrentSlide(api.selectedScrollSnap());
-                      });
-                    }
-                  }}
-                >
-                  <CarouselContent>
-                    {post.post_media.map((media, index) => (
-                      <CarouselItem key={media.id}>
-                        <div className="rounded-lg overflow-hidden">
-                          {media.media_type === 'image' ? (
-                            <img
-                              src={media.media_url}
-                              alt="Post content"
-                              className="w-full aspect-square object-cover object-center"
-                              style={{ objectPosition: 'center top' }}
-                            />
-                          ) : (
-                            <div className="aspect-square">
-                              <VideoPreview
-                                src={media.media_url}
-                                className="w-full h-full"
-                                onFullscreen={handlePostClick}
-                                videoId={`user-post-${post.id}-${index}`}
-                              />
-                            </div>
-                          )}
-                        </div>
-                      </CarouselItem>
-                    ))}
-                  </CarouselContent>
-                </Carousel>
-                
-                {/* Dot indicators */}
-                <div className="flex justify-center mt-3 space-x-2">
-                  {post.post_media.map((_, index) => (
-                    <div
-                      key={index}
-                      className={`w-2 h-2 rounded-full transition-colors ${
-                        index === currentSlide ? 'bg-foreground' : 'bg-muted-foreground/30'
-                      }`}
-                    />
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <div className="rounded-lg overflow-hidden">
-                {post.post_media[0].media_type === 'image' ? (
-                  <img
-                    src={post.post_media[0].media_url}
-                    alt="Post content"
-                    className="w-full aspect-square object-cover object-center"
-                    style={{ objectPosition: 'center top' }}
-                  />
-                ) : (
-                  <div className="aspect-square">
-                    <VideoPreview
-                      src={post.post_media[0].media_url}
-                      className="w-full h-full"
-                      onFullscreen={handlePostClick}
-                      videoId={`user-post-${post.id}-0`}
-                    />
-                  </div>
-                )}
-              </div>
-            )}
+            <div className="rounded-lg overflow-hidden">
+              <SwipeCarousel
+                items={carouselItems}
+                showDots={carouselItems.length > 1}
+                showArrows={false}
+              />
+            </div>
           </div>
         )}
 
