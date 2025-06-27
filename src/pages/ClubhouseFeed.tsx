@@ -1,13 +1,21 @@
 
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
 import FloatingPostButton from '@/components/posts/FloatingPostButton';
+import ClubhouseFeedControls from '@/components/clubhouse/ClubhouseFeedControls';
+import TrendingTipsCarousel from '@/components/clubhouse/TrendingTipsCarousel';
+import CourseHighlightsCarousel from '@/components/clubhouse/CourseHighlightsCarousel';
+import ClubSpotlightCarousel from '@/components/clubhouse/ClubSpotlightCarousel';
+import FeaturedMomentsCarousel from '@/components/clubhouse/FeaturedMomentsCarousel';
+import TopPlayerContentCarousel from '@/components/clubhouse/TopPlayerContentCarousel';
+import { useClubhouseContent } from '@/hooks/useClubhouseContent';
 
 const ClubhouseFeed = () => {
   const [activeTab, setActiveTab] = useState('feed');
+  const [searchQuery, setSearchQuery] = useState('');
+  const { posts, loading } = useClubhouseContent();
 
   return (
     <div className="min-h-screen bg-background">
@@ -29,42 +37,34 @@ const ClubhouseFeed = () => {
           </TabsList>
 
           <TabsContent value="feed" className="space-y-6 mt-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Premium Content</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Premium clubhouse content will be displayed here.
-                </p>
-              </CardContent>
-            </Card>
+            <ClubhouseFeedControls 
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+            />
+            
+            <TrendingTipsCarousel />
+            <CourseHighlightsCarousel />
+            <ClubSpotlightCarousel />
+            <FeaturedMomentsCarousel />
+            <TopPlayerContentCarousel />
           </TabsContent>
 
           <TabsContent value="events" className="mt-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Upcoming Events</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Premium events and tournaments will be displayed here.
-                </p>
-              </CardContent>
-            </Card>
+            <div className="bg-card rounded-lg p-6 shadow-sm border">
+              <h2 className="text-xl font-semibold mb-4">Upcoming Events</h2>
+              <p className="text-muted-foreground">
+                Premium events and tournaments will be displayed here.
+              </p>
+            </div>
           </TabsContent>
 
           <TabsContent value="community" className="mt-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Community Features</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground">
-                  Member discussions and exclusive content coming soon.
-                </p>
-              </CardContent>
-            </Card>
+            <div className="bg-card rounded-lg p-6 shadow-sm border">
+              <h2 className="text-xl font-semibold mb-4">Community Features</h2>
+              <p className="text-muted-foreground">
+                Member discussions and exclusive content coming soon.
+              </p>
+            </div>
           </TabsContent>
         </Tabs>
       </div>
