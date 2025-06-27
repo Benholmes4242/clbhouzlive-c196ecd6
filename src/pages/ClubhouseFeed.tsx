@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
-import FloatingPostButton from '@/components/posts/FloatingPostButton';
 import ClubhouseFeedControls from '@/components/clubhouse/ClubhouseFeedControls';
 import FeaturedMomentsCarousel from '@/components/clubhouse/FeaturedMomentsCarousel';
 import CourseHighlightsCarousel from '@/components/clubhouse/CourseHighlightsCarousel';
@@ -50,7 +49,6 @@ const ClubhouseFeed = () => {
         <ClubSpotlightCarousel />
       </main>
       
-      <FloatingPostButton />
       <BottomNavigation />
     </div>
   );

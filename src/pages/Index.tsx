@@ -4,7 +4,6 @@ import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
 import StoryBar from '@/components/StoryBar';
 import TrendingFeed from '@/components/TrendingFeed';
-import FloatingPostButton from '@/components/posts/FloatingPostButton';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
@@ -80,7 +79,6 @@ const Index = () => {
         </div>
       </main>
       
-      <FloatingPostButton />
       <BottomNavigation />
     </div>
   );

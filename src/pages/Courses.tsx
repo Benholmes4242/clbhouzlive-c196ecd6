@@ -2,7 +2,6 @@
 import React from 'react';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
-import FloatingPostButton from '@/components/posts/FloatingPostButton';
 import CoursesContent from '@/components/courses/CoursesContent';
 
 const Courses = () => {
@@ -16,7 +15,6 @@ const Courses = () => {
         </div>
       </main>
       
-      <FloatingPostButton />
       <BottomNavigation />
     </div>
   );
