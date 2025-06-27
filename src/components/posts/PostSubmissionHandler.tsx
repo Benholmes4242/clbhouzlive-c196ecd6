@@ -19,9 +19,5 @@ interface PostSubmissionHandlerProps {
   onError: () => void;
 }
 
-export const usePostSubmission = () => {
-  const { submitPost } = usePostSubmission();
-  const { deletePost } = usePostDeletion();
-
-  return { submitPost, deletePost };
-};
+// Export the hooks for use in components
+export { usePostSubmission, usePostDeletion };
