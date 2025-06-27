@@ -4,6 +4,33 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
+// Helper function to get the best ranking for sorting
+const getCourseRanking = (course: any) => {
+  // Prioritize rankings in this order: regional, global
+  if (course.regional_rank) return course.regional_rank;
+  if (course.global_rank) return course.global_rank;
+  return 9999; // Default for courses without rankings
+};
+
+// Custom sorting function for user courses
+const getSortedUserCourses = (userCourses: any[]) => {
+  // Get courses with ratings
+  const rated = userCourses
+    .filter(c => c.rating !== null && c.rating !== undefined)
+    .sort((a, b) => b.rating - a.rating); // Highest rating first
+  
+  // Get courses without ratings, sorted by Top 100 ranking
+  const unrated = userCourses
+    .filter(c => c.rating === null || c.rating === undefined)
+    .sort((a, b) => {
+      const aRank = getCourseRanking(a.golf_courses);
+      const bRank = getCourseRanking(b.golf_courses);
+      return aRank - bRank; // Lower rank number first
+    });
+
+  return [...rated, ...unrated];
+};
+
 export const useMyCourses = () => {
   const { user } = useSupabaseSession();
   const [activeTab, setActiveTab] = useState('all');
@@ -74,10 +101,13 @@ export const useMyCourses = () => {
 
   // Add source property to Top 100 courses
   const top100Courses = React.useMemo(() => {
-    return top100CoursesRaw.map(course => ({
+    const coursesWithSource = top100CoursesRaw.map(course => ({
       ...course,
       source: 'user_top100_courses' as const
     }));
+    
+    // Apply custom sorting to Top 100 courses
+    return getSortedUserCourses(coursesWithSource);
   }, [top100CoursesRaw]);
 
   // Combine all played courses from both tables, removing duplicates
@@ -104,9 +134,10 @@ export const useMyCourses = () => {
       }
     });
     
-    return Array.from(courseMap.values()).sort((a, b) => 
-      new Date(b.played_date || 0).getTime() - new Date(a.played_date || 0).getTime()
-    );
+    const combinedCourses = Array.from(courseMap.values());
+    
+    // Apply custom sorting to all courses
+    return getSortedUserCourses(combinedCourses);
   }, [playedCourses, top100CoursesRaw]);
 
   // Calculate statistics

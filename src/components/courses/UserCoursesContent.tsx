@@ -13,6 +13,33 @@ interface UserCoursesContentProps {
   username?: string;
 }
 
+// Helper function to get the best ranking for sorting
+const getCourseRanking = (course: any) => {
+  // Prioritize rankings in this order: regional, global
+  if (course.regional_rank) return course.regional_rank;
+  if (course.global_rank) return course.global_rank;
+  return 9999; // Default for courses without rankings
+};
+
+// Custom sorting function for user courses
+const getSortedUserCourses = (userCourses: any[]) => {
+  // Get courses with ratings
+  const rated = userCourses
+    .filter(c => c.rating !== null && c.rating !== undefined)
+    .sort((a, b) => b.rating - a.rating); // Highest rating first
+  
+  // Get courses without ratings, sorted by Top 100 ranking
+  const unrated = userCourses
+    .filter(c => c.rating === null || c.rating === undefined)
+    .sort((a, b) => {
+      const aRank = getCourseRanking(a.golf_courses);
+      const bRank = getCourseRanking(b.golf_courses);
+      return aRank - bRank; // Lower rank number first
+    });
+
+  return [...rated, ...unrated];
+};
+
 const UserCoursesContent: React.FC<UserCoursesContentProps> = ({ username }) => {
   const { user: currentUser } = useSupabaseSession();
   const navigate = useNavigate();
@@ -55,46 +82,88 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({ username }) => 
   const targetUserId = isOwnProfile ? currentUser?.id : targetUserProfile?.id;
   const displayName = isOwnProfile ? 'My' : (targetUserProfile?.display_name || targetUserProfile?.username || 'User\'s');
 
-  // Fetch user's played courses
-  const { data: playedCourses = [], isLoading: isLoadingPlayed } = useQuery({
+  // Fetch user's played courses with ratings
+  const { data: playedCoursesRaw = [], isLoading: isLoadingPlayed } = useQuery({
     queryKey: ['user-played-courses', targetUserId],
     queryFn: async () => {
       if (!targetUserId) return [];
       
-      const { data, error } = await supabase
+      // First get the courses
+      const { data: courses, error: coursesError } = await supabase
         .from('user_courses')
         .select(`
           *,
           golf_courses (*)
         `)
         .eq('user_id', targetUserId)
-        .eq('played', true)
-        .order('played_date', { ascending: false });
+        .eq('played', true);
 
-      if (error) throw error;
-      return data || [];
+      if (coursesError) throw coursesError;
+      
+      // Then get ratings for these courses
+      const { data: ratings, error: ratingsError } = await supabase
+        .from('course_ratings')
+        .select('course_id, rating')
+        .eq('user_id', targetUserId);
+
+      if (ratingsError) throw ratingsError;
+      
+      // Create a map of ratings by course_id
+      const ratingsMap = new Map();
+      ratings?.forEach(rating => {
+        ratingsMap.set(rating.course_id, rating.rating);
+      });
+      
+      // Add ratings to courses
+      const coursesWithRatings = courses?.map(course => ({
+        ...course,
+        rating: ratingsMap.get(course.course_id) || null
+      })) || [];
+      
+      return getSortedUserCourses(coursesWithRatings);
     },
     enabled: !!targetUserId,
   });
 
-  // Fetch user's Top 100 courses
-  const { data: top100Courses = [], isLoading: isLoadingTop100 } = useQuery({
+  // Fetch user's Top 100 courses with ratings
+  const { data: top100CoursesRaw = [], isLoading: isLoadingTop100 } = useQuery({
     queryKey: ['user-top100-courses', targetUserId],
     queryFn: async () => {
       if (!targetUserId) return [];
       
-      const { data, error } = await supabase
+      // First get the courses
+      const { data: courses, error: coursesError } = await supabase
         .from('user_top100_courses')
         .select(`
           *,
           golf_courses (*)
         `)
         .eq('user_id', targetUserId)
-        .eq('played', true)
-        .order('played_date', { ascending: false });
+        .eq('played', true);
 
-      if (error) throw error;
-      return data || [];
+      if (coursesError) throw coursesError;
+      
+      // Then get ratings for these courses
+      const { data: ratings, error: ratingsError } = await supabase
+        .from('course_ratings')
+        .select('course_id, rating')
+        .eq('user_id', targetUserId);
+
+      if (ratingsError) throw ratingsError;
+      
+      // Create a map of ratings by course_id
+      const ratingsMap = new Map();
+      ratings?.forEach(rating => {
+        ratingsMap.set(rating.course_id, rating.rating);
+      });
+      
+      // Add ratings to courses
+      const coursesWithRatings = courses?.map(course => ({
+        ...course,
+        rating: ratingsMap.get(course.course_id) || null
+      })) || [];
+      
+      return getSortedUserCourses(coursesWithRatings);
     },
     enabled: !!targetUserId,
   });
@@ -120,13 +189,13 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({ username }) => 
   });
 
   // Calculate statistics
-  const totalTop100Played = top100Courses.length;
+  const totalTop100Played = top100CoursesRaw.length;
 
   // Filter recent courses to only include those played within the last 30 days
   const thirtyDaysAgo = new Date();
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
-  const recentCourses = [...playedCourses, ...top100Courses]
+  const recentCourses = [...playedCoursesRaw, ...top100CoursesRaw]
     .filter((userCourse) => {
       if (!userCourse.played_date) return false;
       const playedDate = new Date(userCourse.played_date);
@@ -145,7 +214,6 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({ username }) => 
     }
   };
 
-  // Redirect to auth if not logged in and trying to view someone else's profile
   if (!currentUser && !isOwnProfile) {
     return (
       <div className="space-y-6">
@@ -168,7 +236,6 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({ username }) => 
     );
   }
 
-  // Show loading state
   if (!isOwnProfile && !targetUserProfile && username) {
     return (
       <div className="space-y-6">
@@ -182,7 +249,6 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({ username }) => 
     );
   }
 
-  // Show not found if user doesn't exist
   if (!isOwnProfile && !targetUserProfile && username) {
     return (
       <div className="space-y-6">
@@ -247,9 +313,9 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({ username }) => 
             <h3 className="text-lg font-semibold">Top 100 Courses Played</h3>
             {isLoadingTop100 ? (
               <div className="text-center py-8">Loading Top 100 courses...</div>
-            ) : top100Courses.length > 0 ? (
+            ) : top100CoursesRaw.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {top100Courses.map((userCourse) => (
+                {top100CoursesRaw.map((userCourse) => (
                   <CourseCard 
                     key={userCourse.id} 
                     course={userCourse.golf_courses}

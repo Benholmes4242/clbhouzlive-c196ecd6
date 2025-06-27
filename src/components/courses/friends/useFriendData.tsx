@@ -2,6 +2,33 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 
+// Helper function to get the best ranking for sorting
+const getCourseRanking = (course: any) => {
+  // Prioritize rankings in this order: regional, global
+  if (course.regional_rank) return course.regional_rank;
+  if (course.global_rank) return course.global_rank;
+  return 9999; // Default for courses without rankings
+};
+
+// Custom sorting function for user courses
+const getSortedUserCourses = (userCourses: any[]) => {
+  // Get courses with ratings (from course_ratings table)
+  const rated = userCourses
+    .filter(c => c.rating !== null && c.rating !== undefined)
+    .sort((a, b) => b.rating - a.rating); // Highest rating first
+  
+  // Get courses without ratings, sorted by Top 100 ranking
+  const unrated = userCourses
+    .filter(c => c.rating === null || c.rating === undefined)
+    .sort((a, b) => {
+      const aRank = getCourseRanking(a.golf_courses);
+      const bRank = getCourseRanking(b.golf_courses);
+      return aRank - bRank; // Lower rank number first
+    });
+
+  return [...rated, ...unrated];
+};
+
 export const useFriendData = (userId: string | undefined, selectedFriendId: string) => {
   // Fetch user's accepted friends with their profile data
   const { data: friends = [], isLoading: isLoadingFriends } = useQuery({
@@ -53,46 +80,88 @@ export const useFriendData = (userId: string | undefined, selectedFriendId: stri
     enabled: !!userId,
   });
 
-  // Fetch selected friend's played courses
-  const { data: friendPlayedCourses = [], isLoading: isLoadingPlayed } = useQuery({
+  // Fetch selected friend's played courses with their ratings
+  const { data: friendPlayedCoursesRaw = [], isLoading: isLoadingPlayed } = useQuery({
     queryKey: ['friend-played-courses', selectedFriendId],
     queryFn: async () => {
       if (!selectedFriendId) return [];
       
-      const { data, error } = await supabase
+      // First get the courses
+      const { data: courses, error: coursesError } = await supabase
         .from('user_courses')
         .select(`
           *,
           golf_courses (*)
         `)
         .eq('user_id', selectedFriendId)
-        .eq('played', true)
-        .order('played_date', { ascending: false });
+        .eq('played', true);
 
-      if (error) throw error;
-      return data || [];
+      if (coursesError) throw coursesError;
+      
+      // Then get ratings for these courses
+      const { data: ratings, error: ratingsError } = await supabase
+        .from('course_ratings')
+        .select('course_id, rating')
+        .eq('user_id', selectedFriendId);
+
+      if (ratingsError) throw ratingsError;
+      
+      // Create a map of ratings by course_id
+      const ratingsMap = new Map();
+      ratings?.forEach(rating => {
+        ratingsMap.set(rating.course_id, rating.rating);
+      });
+      
+      // Add ratings to courses
+      const coursesWithRatings = courses?.map(course => ({
+        ...course,
+        rating: ratingsMap.get(course.course_id) || null
+      })) || [];
+      
+      return getSortedUserCourses(coursesWithRatings);
     },
     enabled: !!selectedFriendId,
   });
 
-  // Fetch selected friend's Top 100 courses
-  const { data: friendTop100Courses = [], isLoading: isLoadingTop100 } = useQuery({
+  // Fetch selected friend's Top 100 courses with their ratings
+  const { data: friendTop100CoursesRaw = [], isLoading: isLoadingTop100 } = useQuery({
     queryKey: ['friend-top100-courses', selectedFriendId],
     queryFn: async () => {
       if (!selectedFriendId) return [];
       
-      const { data, error } = await supabase
+      // First get the courses
+      const { data: courses, error: coursesError } = await supabase
         .from('user_top100_courses')
         .select(`
           *,
           golf_courses (*)
         `)
         .eq('user_id', selectedFriendId)
-        .eq('played', true)
-        .order('played_date', { ascending: false });
+        .eq('played', true);
 
-      if (error) throw error;
-      return data || [];
+      if (coursesError) throw coursesError;
+      
+      // Then get ratings for these courses
+      const { data: ratings, error: ratingsError } = await supabase
+        .from('course_ratings')
+        .select('course_id, rating')
+        .eq('user_id', selectedFriendId);
+
+      if (ratingsError) throw ratingsError;
+      
+      // Create a map of ratings by course_id
+      const ratingsMap = new Map();
+      ratings?.forEach(rating => {
+        ratingsMap.set(rating.course_id, rating.rating);
+      });
+      
+      // Add ratings to courses
+      const coursesWithRatings = courses?.map(course => ({
+        ...course,
+        rating: ratingsMap.get(course.course_id) || null
+      })) || [];
+      
+      return getSortedUserCourses(coursesWithRatings);
     },
     enabled: !!selectedFriendId,
   });
@@ -121,16 +190,16 @@ export const useFriendData = (userId: string | undefined, selectedFriendId: stri
     friends: friends.length,
     isLoadingFriends,
     selectedFriendId,
-    friendTop100Courses: friendTop100Courses.length,
-    friendPlayedCourses: friendPlayedCourses.length
+    friendTop100Courses: friendTop100CoursesRaw.length,
+    friendPlayedCourses: friendPlayedCoursesRaw.length
   });
 
   return {
     friends,
     isLoadingFriends,
-    friendPlayedCourses,
+    friendPlayedCourses: friendPlayedCoursesRaw,
     isLoadingPlayed,
-    friendTop100Courses,
+    friendTop100Courses: friendTop100CoursesRaw,
     isLoadingTop100,
     friendAverageRating
   };
