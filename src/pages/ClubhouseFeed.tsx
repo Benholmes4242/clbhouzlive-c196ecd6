@@ -42,10 +42,10 @@ const ClubhouseFeed = () => {
               setSearchQuery={setSearchQuery}
             />
             
+            <FeaturedMomentsCarousel userPosts={posts} loading={loading} />
             <TrendingTipsCarousel />
             <CourseHighlightsCarousel />
             <ClubSpotlightCarousel />
-            <FeaturedMomentsCarousel />
             <TopPlayerContentCarousel />
           </TabsContent>
 
