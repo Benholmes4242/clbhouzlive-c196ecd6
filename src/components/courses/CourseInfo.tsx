@@ -16,6 +16,18 @@ interface CourseInfoProps {
   userCourse: UserCourse | null;
 }
 
+// Helper function to format description text with line breaks
+const formatDescription = (description: string) => {
+  return description
+    .split('\n')
+    .map((line, index, array) => (
+      <React.Fragment key={index}>
+        {line}
+        {index < array.length - 1 && <br />}
+      </React.Fragment>
+    ));
+};
+
 const CourseInfo = ({ name, region, country, description, userCourse }: CourseInfoProps) => {
   return (
     <div className="space-y-3">
@@ -31,7 +43,7 @@ const CourseInfo = ({ name, region, country, description, userCourse }: CourseIn
 
       {description && (
         <p className="text-sm text-muted-foreground line-clamp-2">
-          {description}
+          {formatDescription(description)}
         </p>
       )}
 

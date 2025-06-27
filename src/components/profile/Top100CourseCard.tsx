@@ -12,6 +12,18 @@ interface Top100CourseCardProps {
   onToggle?: () => void;
 }
 
+// Helper function to format description text with line breaks
+const formatDescription = (description: string) => {
+  return description
+    .split('\n')
+    .map((line, index, array) => (
+      <React.Fragment key={index}>
+        {line}
+        {index < array.length - 1 && <br />}
+      </React.Fragment>
+    ));
+};
+
 const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
   course,
   isPlayed,
@@ -151,7 +163,7 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
           </div>
           {course.description && (
             <p className="text-xs text-muted-foreground line-clamp-2">
-              {course.description}
+              {formatDescription(course.description)}
             </p>
           )}
         </div>

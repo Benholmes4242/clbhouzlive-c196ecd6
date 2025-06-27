@@ -33,6 +33,18 @@ interface CourseCardProps {
   showPlayedButton?: boolean;
 }
 
+// Helper function to format description text with line breaks
+const formatDescription = (description: string) => {
+  return description
+    .split('\n')
+    .map((line, index, array) => (
+      <React.Fragment key={index}>
+        {line}
+        {index < array.length - 1 && <br />}
+      </React.Fragment>
+    ));
+};
+
 const CourseCard: React.FC<CourseCardProps> = ({ 
   course, 
   viewContext = 'global', 
@@ -145,7 +157,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
           
           {course.description && (
             <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
-              {course.description}
+              {formatDescription(course.description)}
             </p>
           )}
         </CardContent>
