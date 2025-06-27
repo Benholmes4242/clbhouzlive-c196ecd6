@@ -37,15 +37,12 @@ const GolfCourseCard = ({ course, onEdit }: GolfCourseCardProps) => {
             <CardTitle className="text-lg font-semibold mb-2">{course.name}</CardTitle>
             <div className="flex items-center text-sm text-muted-foreground mb-2">
               <MapPin className="h-4 w-4 mr-1" />
-              <span>{course.city}, {course.state}</span>
-              {course.country && course.country !== 'United States' && (
-                <span>, {course.country}</span>
-              )}
+              <span>{course.sub_country}, {course.country}</span>
             </div>
-            {course.rating && (
+            {course.global_rank && (
               <div className="flex items-center mb-2">
                 <Star className="h-4 w-4 text-yellow-500 mr-1" />
-                <span className="text-sm font-medium">{course.rating}/5</span>
+                <span className="text-sm font-medium">Global Rank: #{course.global_rank}</span>
               </div>
             )}
           </div>
@@ -69,39 +66,27 @@ const GolfCourseCard = ({ course, onEdit }: GolfCourseCardProps) => {
           )}
           
           <div className="flex flex-wrap gap-2">
-            {course.course_type && (
-              <Badge variant="secondary">{course.course_type}</Badge>
+            {course.regional_rank && (
+              <Badge variant="secondary">Regional Rank: #{course.regional_rank}</Badge>
             )}
-            {course.holes && (
-              <Badge variant="outline">{course.holes} holes</Badge>
+            {course.country_rank && (
+              <Badge variant="outline">Country Rank: #{course.country_rank}</Badge>
             )}
-            {course.par && (
-              <Badge variant="outline">Par {course.par}</Badge>
-            )}
-            {course.yardage && (
-              <Badge variant="outline">{course.yardage} yards</Badge>
+            {course.usa_rank && (
+              <Badge variant="outline">USA Rank: #{course.usa_rank}</Badge>
             )}
           </div>
 
-          {course.website && (
+          {course.website_url && (
             <div className="text-sm">
               <span className="font-medium">Website: </span>
               <a 
-                href={course.website.startsWith('http') ? course.website : `https://${course.website}`}
+                href={course.website_url.startsWith('http') ? course.website_url : `https://${course.website_url}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-blue-600 hover:underline"
               >
-                {course.website}
-              </a>
-            </div>
-          )}
-
-          {course.phone && (
-            <div className="text-sm">
-              <span className="font-medium">Phone: </span>
-              <a href={`tel:${course.phone}`} className="text-blue-600 hover:underline">
-                {course.phone}
+                {course.website_url}
               </a>
             </div>
           )}
