@@ -9,7 +9,7 @@ interface CourseImageProps {
 
 const CourseImage = ({ thumbnailImage, name, isHovered }: CourseImageProps) => {
   return (
-    <div className="w-full h-full overflow-hidden">
+    <div className="h-48 overflow-hidden">
       <img
         src={thumbnailImage || 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=400&h=300&fit=crop'}
         alt={name}

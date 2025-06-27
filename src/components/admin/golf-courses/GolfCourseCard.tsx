@@ -1,9 +1,7 @@
 
 import React from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { MapPin, Edit, Star } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { MapPin, Flag } from 'lucide-react';
 import { GolfCourse } from './types';
 
 interface GolfCourseCardProps {
@@ -11,85 +9,61 @@ interface GolfCourseCardProps {
   onEdit: (course: GolfCourse) => void;
 }
 
+// Helper function to format description text with line breaks
 const formatDescription = (description: string) => {
-  if (!description) return null;
-  
-  return description.split('\n').map((paragraph, index) => {
-    if (paragraph.trim() === '') return null;
-    return (
-      <p key={index} className="mb-2 last:mb-0">
-        {paragraph.trim()}
-      </p>
-    );
-  }).filter(Boolean);
+  return description
+    .split('\n')
+    .map((line, index, array) => (
+      <React.Fragment key={index}>
+        {line}
+        {index < array.length - 1 && <br />}
+      </React.Fragment>
+    ));
 };
 
-const GolfCourseCard = ({ course, onEdit }: GolfCourseCardProps) => {
-  const handleEdit = () => {
+const GolfCourseCard: React.FC<GolfCourseCardProps> = ({ course, onEdit }) => {
+  const handleCardClick = () => {
     onEdit(course);
   };
 
   return (
-    <Card className="hover:shadow-md transition-shadow">
-      <CardHeader className="pb-3">
-        <div className="flex justify-between items-start">
-          <div className="flex-1">
-            <CardTitle className="text-lg font-semibold mb-2">{course.name}</CardTitle>
-            <div className="flex items-center text-sm text-muted-foreground mb-2">
-              <MapPin className="h-4 w-4 mr-1" />
-              <span>{course.sub_country}, {course.country}</span>
-            </div>
-            {course.global_rank && (
-              <div className="flex items-center mb-2">
-                <Star className="h-4 w-4 text-yellow-500 mr-1" />
-                <span className="text-sm font-medium">Global Rank: #{course.global_rank}</span>
+    <Card 
+      className="hover:shadow-lg transition-shadow cursor-pointer"
+      onClick={handleCardClick}
+    >
+      <CardContent className="p-6">
+        <div className="flex items-start gap-4">
+          <div className="flex-shrink-0">
+            {course.thumbnail_image ? (
+              <img
+                src={course.thumbnail_image}
+                alt={course.name}
+                className="w-16 h-16 rounded-lg object-cover"
+              />
+            ) : (
+              <div className="w-16 h-16 rounded-lg bg-muted flex items-center justify-center">
+                <MapPin className="h-6 w-6 text-muted-foreground" />
               </div>
             )}
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleEdit}
-            className="ml-4"
-          >
-            <Edit className="h-4 w-4 mr-1" />
-            Edit
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent className="pt-0">
-        <div className="space-y-4">
-          {course.description && (
-            <div className="text-sm text-muted-foreground">
-              {formatDescription(course.description)}
+          <div className="flex-1 min-w-0">
+            <h3 className="font-semibold text-lg mb-1">{course.name}</h3>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
+              <Flag className="h-3 w-3" />
+              <span>{course.country}</span>
+              {course.region && (
+                <>
+                  <span>•</span>
+                  <span>{course.region}</span>
+                </>
+              )}
             </div>
-          )}
-          
-          <div className="flex flex-wrap gap-2">
-            {course.regional_rank && (
-              <Badge variant="secondary">Regional Rank: #{course.regional_rank}</Badge>
-            )}
-            {course.country_rank && (
-              <Badge variant="outline">Country Rank: #{course.country_rank}</Badge>
-            )}
-            {course.usa_rank && (
-              <Badge variant="outline">USA Rank: #{course.usa_rank}</Badge>
+            {course.description && (
+              <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
+                {formatDescription(course.description)}
+              </p>
             )}
           </div>
-
-          {course.website_url && (
-            <div className="text-sm">
-              <span className="font-medium">Website: </span>
-              <a 
-                href={course.website_url.startsWith('http') ? course.website_url : `https://${course.website_url}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-blue-600 hover:underline"
-              >
-                {course.website_url}
-              </a>
-            </div>
-          )}
         </div>
       </CardContent>
     </Card>
