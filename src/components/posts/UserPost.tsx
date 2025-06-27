@@ -106,11 +106,6 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
 
       if (postError) throw postError;
 
-      toast({
-        title: "Post deleted",
-        description: "Your post has been deleted successfully."
-      });
-
       onPostDeleted?.();
 
     } catch (error) {
