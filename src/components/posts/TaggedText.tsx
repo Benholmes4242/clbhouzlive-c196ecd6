@@ -43,7 +43,7 @@ const TaggedText = ({ text, tags = [] }: TaggedTextProps) => {
     });
 
     // Find all @mentions in the text using a more comprehensive regex
-    const mentionRegex = /@[a-zA-Z0-9_]+/g;
+    const mentionRegex = /@[a-zA-Z0-9_\s]+/g;
     const parts = [];
     let lastIndex = 0;
     let match;
@@ -54,20 +54,22 @@ const TaggedText = ({ text, tags = [] }: TaggedTextProps) => {
         parts.push(text.substring(lastIndex, match.index));
       }
 
-      const mention = match[0];
+      const mention = match[0].trim();
       // Find matching tag by checking both username and name patterns
       const matchingTag = Array.from(tagMap.values()).find(tag => 
         mention === `@${tag.username}` || mention === `@${tag.name}`
       );
 
       if (matchingTag) {
+        // Display the full name/username with consistent blue styling
+        const displayName = matchingTag.username || matchingTag.name;
         parts.push(
           <button
             key={`tag-${match.index}-${matchingTag.id}`}
             onClick={() => handleTagClick(matchingTag)}
             className="text-blue-500 hover:text-blue-700 hover:underline font-medium cursor-pointer bg-transparent border-none p-0 inline"
           >
-            {mention}
+            @{displayName}
           </button>
         );
       } else {

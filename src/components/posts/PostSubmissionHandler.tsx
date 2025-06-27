@@ -3,7 +3,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { validateFiles, getFileErrorMessage } from './utils/fileValidation';
 import { uploadMediaWithRetry } from './utils/mediaUpload';
-import { createPostTags, rollbackPost } from './utils/postOperations';
+import { createPostTags, rollbackPost, createTagNotifications } from './utils/postOperations';
 import { createOptimisticPost } from './utils/optimisticPost';
 
 interface TaggableEntity {
@@ -49,12 +49,12 @@ export const usePostSubmission = () => {
       return;
     }
 
-    // Show centered "Post shared!" toast message
+    // Show centered "Post shared!" toast message with updated positioning
     toast({
       title: "Post shared! It's out there! 🎉",
       description: "",
       duration: 2000,
-      className: "fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black text-white border-none text-center font-semibold"
+      className: "fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black text-white border-none rounded-lg shadow-lg px-6 py-4 text-center font-semibold"
     });
 
     // Create optimistic post for immediate UI update
@@ -130,6 +130,11 @@ export const usePostSubmission = () => {
         console.log('Creating post tags...');
         await createPostTags(postData.id, selectedTags, user.id);
         console.log('Post tags created');
+
+        // Create notifications for tagged users
+        console.log('Creating tag notifications...');
+        await createTagNotifications(postData.id, selectedTags, user.id);
+        console.log('Tag notifications created');
       }
 
       console.log('Background upload process completed successfully');
@@ -187,12 +192,12 @@ export const usePostSubmission = () => {
 
   const deletePost = async (postId: string) => {
     try {
-      // Show centered "Post deleted" toast message
+      // Show centered "Post deleted" toast message with updated positioning and copy
       toast({
         title: "Post deleted",
         description: "Your post has been deleted successfully.",
         duration: 2000,
-        className: "fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black text-white border-none text-center font-semibold"
+        className: "fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black text-white border-none rounded-lg shadow-lg px-6 py-4 text-center font-semibold"
       });
 
       // Delete the post
