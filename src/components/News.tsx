@@ -35,6 +35,10 @@ const News = () => {
   };
 
   const allArticles = newsData || [];
+  
+  // Debug logging
+  console.log('All articles:', allArticles.length);
+  console.log('Active tab:', activeTab);
 
   return (
     <div className="space-y-6">
