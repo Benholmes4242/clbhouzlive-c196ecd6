@@ -29,12 +29,16 @@ const SwipeCarousel = memo(({
   }, [items.length, onSlideChange]);
 
   const goToPrevious = useCallback(() => {
-    goToSlide(currentIndex - 1);
-  }, [currentIndex, goToSlide]);
+    const newIndex = currentIndex > 0 ? currentIndex - 1 : 0;
+    setCurrentIndex(newIndex);
+    onSlideChange?.(newIndex);
+  }, [currentIndex, onSlideChange]);
 
   const goToNext = useCallback(() => {
-    goToSlide(currentIndex + 1);
-  }, [currentIndex, goToSlide]);
+    const newIndex = currentIndex < items.length - 1 ? currentIndex + 1 : items.length - 1;
+    setCurrentIndex(newIndex);
+    onSlideChange?.(newIndex);
+  }, [currentIndex, items.length, onSlideChange]);
 
   const handlers = useSwipeable({
     onSwipedLeft: () => {
@@ -50,7 +54,7 @@ const SwipeCarousel = memo(({
     trackMouse: true,
     trackTouch: true,
     preventScrollOnSwipe: true,
-    delta: 10
+    delta: 50
   });
 
   if (items.length === 0) return null;
@@ -60,21 +64,19 @@ const SwipeCarousel = memo(({
       {/* Carousel container */}
       <div 
         {...handlers} 
-        className="relative overflow-hidden w-full select-none"
+        className="relative overflow-hidden w-full select-none cursor-grab active:cursor-grabbing"
         style={{ touchAction: 'pan-y' }}
       >
         <div
-          className="flex transition-transform duration-300 ease-in-out"
+          className="flex transition-transform duration-300 ease-out"
           style={{
             transform: `translateX(-${currentIndex * 100}%)`,
-            width: `${items.length * 100}%`
           }}
         >
           {items.map((item, index) => (
             <div
               key={index}
               className="w-full flex-shrink-0"
-              style={{ width: `${100 / items.length}%` }}
             >
               {item}
             </div>
