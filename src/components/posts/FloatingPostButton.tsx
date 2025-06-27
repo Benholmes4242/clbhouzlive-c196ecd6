@@ -59,7 +59,7 @@ const FloatingPostButton = () => {
         selectedTags: [],
         onSuccess: () => {
           handleCloseModal();
-          window.location.reload();
+          // Don't reload the page, let the post submission handler handle UI updates
         },
         onError: () => {
           setIsSubmitting(false);
