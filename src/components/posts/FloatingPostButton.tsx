@@ -2,7 +2,7 @@
 import React, { useRef, useState } from 'react';
 import { Camera } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { usePostSubmission } from './PostSubmissionHandler';
+import { usePostSubmission } from '@/hooks/usePostSubmission';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useTaggableEntities } from '@/hooks/useTaggableEntities';
