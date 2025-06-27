@@ -1,54 +1,94 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
-import ClubhouseFeedControls from '@/components/clubhouse/ClubhouseFeedControls';
-import FeaturedMomentsCarousel from '@/components/clubhouse/FeaturedMomentsCarousel';
+import FloatingPostButton from '@/components/posts/FloatingPostButton';
+import ClubSpotlightCarousel from '@/components/clubhouse/ClubSpotlightCarousel';
 import CourseHighlightsCarousel from '@/components/clubhouse/CourseHighlightsCarousel';
+import FeaturedMomentsCarousel from '@/components/clubhouse/FeaturedMomentsCarousel';
 import TopPlayerContentCarousel from '@/components/clubhouse/TopPlayerContentCarousel';
 import TrendingTipsCarousel from '@/components/clubhouse/TrendingTipsCarousel';
-import ClubSpotlightCarousel from '@/components/clubhouse/ClubSpotlightCarousel';
+import ClubhouseFeedControls from '@/components/clubhouse/ClubhouseFeedControls';
 import { useClubhouseContent } from '@/hooks/useClubhouseContent';
 
 const ClubhouseFeed = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const { posts, loading } = useClubhouseContent();
-
-  // Filter posts based on search query
-  const filteredPosts = posts.filter(post => {
-    if (!searchQuery.trim()) return true;
-    
-    const searchLower = searchQuery.toLowerCase();
-    const content = post.content?.toLowerCase() || '';
-    
-    return content.includes(searchLower);
-  });
+  const [activeTab, setActiveTab] = useState('feed');
+  const [feedType, setFeedType] = useState('trending');
+  const [timeRange, setTimeRange] = useState('week');
+  
+  const { 
+    clubSpotlight, 
+    courseHighlights, 
+    featuredMoments, 
+    topPlayerContent, 
+    trendingTips 
+  } = useClubhouseContent(feedType, timeRange);
 
   return (
     <div className="min-h-screen bg-background">
       <Header />
       
-      <main className="container mx-auto px-4 py-6 pb-20">
-        {/* Header */}
+      <div className="container mx-auto px-4 py-6 pb-20">
         <div className="mb-6">
-          <h1 className="text-3xl font-bold mb-2">Clubhouse Feed</h1>
-          <p className="text-muted-foreground">Discover golf content from the community</p>
+          <h1 className="text-3xl font-bold text-center">Clubhouse</h1>
+          <p className="text-muted-foreground text-center mt-2">
+            Your premium golf community experience
+          </p>
         </div>
 
-        {/* Search Controls */}
-        <ClubhouseFeedControls 
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-        />
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="feed">Feed</TabsTrigger>
+            <TabsTrigger value="events">Events</TabsTrigger>
+            <TabsTrigger value="community">Community</TabsTrigger>
+          </TabsList>
 
-        {/* Carousel Sections with User Content Integration */}
-        <FeaturedMomentsCarousel userPosts={filteredPosts} loading={loading} />
-        <CourseHighlightsCarousel />
-        <TopPlayerContentCarousel userPosts={filteredPosts} loading={loading} />
-        <TrendingTipsCarousel />
-        <ClubSpotlightCarousel />
-      </main>
-      
+          <TabsContent value="feed" className="space-y-6 mt-6">
+            <ClubhouseFeedControls 
+              feedType={feedType}
+              setFeedType={setFeedType}
+              timeRange={timeRange}
+              setTimeRange={setTimeRange}
+            />
+            
+            <ClubSpotlightCarousel clubs={clubSpotlight} />
+            <CourseHighlightsCarousel courses={courseHighlights} />
+            <FeaturedMomentsCarousel moments={featuredMoments} />
+            <TopPlayerContentCarousel players={topPlayerContent} />
+            <TrendingTipsCarousel tips={trendingTips} />
+          </TabsContent>
+
+          <TabsContent value="events" className="mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Upcoming Events</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Premium events and tournaments will be displayed here.
+                </p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="community" className="mt-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Community Features</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Member discussions and exclusive content coming soon.
+                </p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
+
+      <FloatingPostButton />
       <BottomNavigation />
     </div>
   );

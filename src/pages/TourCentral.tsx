@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
+import FloatingPostButton from '@/components/posts/FloatingPostButton';
 import UpcomingEvents from '@/components/tour/UpcomingEvents';
 import LiveLeaderboards from '@/components/tour/LiveLeaderboards';
 import NewsComponent from '@/components/News';
@@ -47,6 +48,8 @@ const TourCentral = () => {
           </TabsContent>
         </Tabs>
       </div>
+      
+      <FloatingPostButton />
       <BottomNavigation />
     </div>
   );
