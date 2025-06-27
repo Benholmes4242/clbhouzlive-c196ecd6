@@ -64,8 +64,9 @@ const SwipeCarousel = memo(({
       {/* Carousel container */}
       <div 
         {...handlers} 
-        className="relative overflow-hidden w-full select-none cursor-grab active:cursor-grabbing"
+        className="relative overflow-hidden w-full select-none"
         style={{ touchAction: 'pan-y' }}
+        onDragStart={(e) => e.preventDefault()}
       >
         <div
           className="flex transition-transform duration-300 ease-out"
