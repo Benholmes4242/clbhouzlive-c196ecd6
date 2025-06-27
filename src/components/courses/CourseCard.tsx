@@ -30,6 +30,7 @@ interface CourseCardProps {
   viewContext: 'global' | 'regional' | 'usa' | 'europe';
   showPlayedButton?: boolean;
   onCourseSelect?: (course: Course) => void;
+  viewingUserId?: string;
 }
 
 const formatDescription = (description: string) => {
@@ -45,7 +46,7 @@ const formatDescription = (description: string) => {
   }).filter(Boolean);
 };
 
-const CourseCard = ({ course, viewContext, showPlayedButton = true, onCourseSelect }: CourseCardProps) => {
+const CourseCard = ({ course, viewContext, showPlayedButton = true, onCourseSelect, viewingUserId }: CourseCardProps) => {
   const handleCardClick = () => {
     if (onCourseSelect) {
       onCourseSelect(course);
@@ -56,20 +57,26 @@ const CourseCard = ({ course, viewContext, showPlayedButton = true, onCourseSele
     <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" onClick={handleCardClick}>
       <div className="aspect-video relative">
         <CourseImage 
-          src={course.thumbnail_image} 
-          alt={course.name}
-          className="w-full h-full object-cover"
+          thumbnailImage={course.thumbnail_image || 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=400&h=300&fit=crop'}
+          name={course.name}
+          isHovered={false}
         />
-        <div className="absolute top-2 left-2">
-          <CourseRankBadges 
-            course={course} 
-            viewContext={viewContext}
-          />
-        </div>
+        <CourseRankBadges 
+          globalRank={course.global_rank}
+          regionalRank={course.regional_rank}
+          usaRank={course.usa_rank}
+          country={course.country}
+          viewContext={viewContext}
+        />
         {showPlayedButton && (
-          <div className="absolute top-2 right-2">
-            <CoursePlayedButton courseId={course.id} />
-          </div>
+          <CoursePlayedButton 
+            courseId={course.id}
+            courseName={course.name}
+            userCourse={null}
+            canModifyCourseStatus={true}
+            viewingUserId={viewingUserId}
+            course={course}
+          />
         )}
       </div>
       

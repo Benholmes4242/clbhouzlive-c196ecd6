@@ -75,7 +75,7 @@ const CourseRankBadges = ({
         </div>
       )}
       
-      {/* Worldwide rank badge on the right */}
+      {/* Worldwide rank badge on the right, but only if there's no played button */}
       {worldwideBadge && (
         <div className="absolute top-2 right-2">
           {worldwideBadge}
