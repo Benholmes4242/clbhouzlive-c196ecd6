@@ -1,19 +1,17 @@
 
 import React, { useState, useEffect } from 'react';
-import { Home, Building2, Trophy, Flag, Plus } from 'lucide-react';
+import { Home, Building2, Trophy, Flag } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import CreatePostDialog from '@/components/posts/CreatePostDialog';
 
 const BottomNavigation = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [activeTab, setActiveTab] = useState('home');
 
-  // Updated tabs - removed news, added post button between clubhouse and tour-central
+  // Updated tabs - removed the post button
   const tabs = [
     { id: 'home', label: 'Home', icon: Home, path: '/' },
     { id: 'clubhouse', label: 'Clubhouse', icon: Building2, path: '/clubhouse' },
-    { id: 'post', label: 'Post', icon: Plus, path: null, isAction: true }, // Special post button
     { id: 'tour-central', label: 'Tour Central', icon: Trophy, path: '/tour-central' },
     { id: 'courses', label: 'Courses', icon: Flag, path: '/courses' },
   ];
@@ -26,11 +24,6 @@ const BottomNavigation = () => {
   }, [location.pathname]);
 
   const handleTabClick = (tab: { id: string; path: string | null; isAction?: boolean }) => {
-    if (tab.isAction) {
-      // Don't set active state for action buttons
-      return;
-    }
-    
     if (tab.path) {
       setActiveTab(tab.id);
       navigate(tab.path);
@@ -53,19 +46,6 @@ const BottomNavigation = () => {
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
-            
-            // Special handling for the Post button
-            if (tab.isAction) {
-              return (
-                <div key={tab.id} className="flex flex-col items-center justify-center space-y-1">
-                  <CreatePostDialog 
-                    variant="bottom-nav"
-                    onPostCreated={() => window.location.reload()}
-                  />
-                  <span className="text-xs font-medium text-muted-foreground">Post</span>
-                </div>
-              );
-            }
             
             return (
               <button
