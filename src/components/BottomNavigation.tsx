@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { House, Building2, Trophy, LandPlot } from 'lucide-react';
+import { Home, Building2, Trophy, Flag } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const BottomNavigation = () => {
@@ -8,12 +8,12 @@ const BottomNavigation = () => {
   const location = useLocation();
   const [activeTab, setActiveTab] = useState('home');
 
-  // Updated tabs - changed Home to Clubhouse with House icon, updated Courses icon to LandPlot
+  // Updated tabs - removed the post button
   const tabs = [
-    { id: 'home', label: 'Clubhouse', icon: House, path: '/' },
+    { id: 'home', label: 'Home', icon: Home, path: '/' },
     { id: 'clubhouse', label: 'Clubhouse', icon: Building2, path: '/clubhouse' },
     { id: 'tour-central', label: 'Tour Central', icon: Trophy, path: '/tour-central' },
-    { id: 'courses', label: 'Courses', icon: LandPlot, path: '/courses' },
+    { id: 'courses', label: 'Courses', icon: Flag, path: '/courses' },
   ];
 
   useEffect(() => {
