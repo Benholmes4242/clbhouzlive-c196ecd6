@@ -23,6 +23,7 @@ import EditPostDialog from './EditPostDialog';
 import TaggedText from './TaggedText';
 import PostModal from './PostModal';
 import VideoPreview from './VideoPreview';
+import { showToast } from '@/utils/toast';
 
 interface PostMedia {
   id: string;
@@ -105,6 +106,9 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
         .eq('id', post.id);
 
       if (postError) throw postError;
+
+      // Show delete toast
+      showToast("Post deleted");
 
       onPostDeleted?.();
 

@@ -1,10 +1,10 @@
-
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { validateFiles, getFileErrorMessage } from './utils/fileValidation';
 import { uploadMediaWithRetry } from './utils/mediaUpload';
 import { createPostTags, rollbackPost, createTagNotifications } from './utils/postOperations';
 import { createOptimisticPost } from './utils/optimisticPost';
+import { showToast } from '@/utils/toast';
 
 interface TaggableEntity {
   id: string;
@@ -141,6 +141,9 @@ export const usePostSubmission = () => {
         });
       }
 
+      // Show success toast
+      showToast("Post shared! It's out there!", '🎉');
+
       // Broadcast success event for feed refresh - this will trigger feed refresh
       window.dispatchEvent(new CustomEvent('postUploadCompleted', { 
         detail: { postId: postData.id, optimisticId: optimisticPost.id } 
@@ -194,6 +197,9 @@ export const usePostSubmission = () => {
         .eq('id', postId);
 
       if (error) throw error;
+
+      // Show delete toast
+      showToast("Post deleted");
 
       // Broadcast delete event for UI cleanup and feed refresh
       window.dispatchEvent(new CustomEvent('postDeleted', { 
