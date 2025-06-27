@@ -1,6 +1,6 @@
 
 import React, { useRef } from 'react';
-import { Plus } from 'lucide-react';
+import { Aperture } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePostSubmission } from './PostSubmissionHandler';
 
@@ -50,7 +50,7 @@ const FloatingPostButton = () => {
           aria-label="Create post"
         >
           <div className="plus-icon">
-            <Plus className="h-7 w-7" />
+            <Aperture className="h-5 w-5" />
           </div>
           <div className="post-label">Post</div>
         </button>
@@ -79,8 +79,8 @@ const FloatingPostButton = () => {
           color: #fff;
           border: none;
           border-radius: 50%;
-          width: 58px;
-          height: 58px;
+          width: 43.5px;
+          height: 43.5px;
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -103,11 +103,11 @@ const FloatingPostButton = () => {
         }
 
         .post-label {
-          font-size: 10px;
-          margin-top: 2px;
+          font-size: 8px;
+          margin-top: 1px;
           color: #fff;
           position: absolute;
-          bottom: -18px;
+          bottom: -15px;
           left: 50%;
           transform: translateX(-50%);
           font-weight: 500;
