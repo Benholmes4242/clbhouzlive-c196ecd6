@@ -65,7 +65,7 @@ const FloatingPostButton = () => {
         onChange={handleFileUpload}
       />
 
-      <style jsx>{`
+      <style>{`
         .floating-post-button {
           position: fixed;
           bottom: 32px;

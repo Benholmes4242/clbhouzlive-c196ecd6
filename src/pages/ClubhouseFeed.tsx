@@ -1,30 +1,13 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
 import FloatingPostButton from '@/components/posts/FloatingPostButton';
-import ClubSpotlightCarousel from '@/components/clubhouse/ClubSpotlightCarousel';
-import CourseHighlightsCarousel from '@/components/clubhouse/CourseHighlightsCarousel';
-import FeaturedMomentsCarousel from '@/components/clubhouse/FeaturedMomentsCarousel';
-import TopPlayerContentCarousel from '@/components/clubhouse/TopPlayerContentCarousel';
-import TrendingTipsCarousel from '@/components/clubhouse/TrendingTipsCarousel';
-import ClubhouseFeedControls from '@/components/clubhouse/ClubhouseFeedControls';
-import { useClubhouseContent } from '@/hooks/useClubhouseContent';
 
 const ClubhouseFeed = () => {
   const [activeTab, setActiveTab] = useState('feed');
-  const [feedType, setFeedType] = useState('trending');
-  const [timeRange, setTimeRange] = useState('week');
-  
-  const { 
-    clubSpotlight, 
-    courseHighlights, 
-    featuredMoments, 
-    topPlayerContent, 
-    trendingTips 
-  } = useClubhouseContent(feedType, timeRange);
 
   return (
     <div className="min-h-screen bg-background">
@@ -46,18 +29,16 @@ const ClubhouseFeed = () => {
           </TabsList>
 
           <TabsContent value="feed" className="space-y-6 mt-6">
-            <ClubhouseFeedControls 
-              feedType={feedType}
-              setFeedType={setFeedType}
-              timeRange={timeRange}
-              setTimeRange={setTimeRange}
-            />
-            
-            <ClubSpotlightCarousel clubs={clubSpotlight} />
-            <CourseHighlightsCarousel courses={courseHighlights} />
-            <FeaturedMomentsCarousel moments={featuredMoments} />
-            <TopPlayerContentCarousel players={topPlayerContent} />
-            <TrendingTipsCarousel tips={trendingTips} />
+            <Card>
+              <CardHeader>
+                <CardTitle>Premium Content</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Premium clubhouse content will be displayed here.
+                </p>
+              </CardContent>
+            </Card>
           </TabsContent>
 
           <TabsContent value="events" className="mt-6">
