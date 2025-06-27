@@ -70,7 +70,19 @@ const FloatingPostButton = () => {
     if (lastWord.startsWith('@') && lastWord.length > 1) {
       const query = lastWord.slice(1);
       await searchEntities(query);
-      setMentionSuggestions(entities);
+      
+      // Deduplicate entities by entity_id and username/name combination
+      const uniqueEntities = entities.reduce((acc, entity) => {
+        const identifier = `${entity.entity_type}-${entity.entity_id}-${entity.username || entity.name}`;
+        if (!acc.find(item => 
+          `${item.entity_type}-${item.entity_id}-${item.username || item.name}` === identifier
+        )) {
+          acc.push(entity);
+        }
+        return acc;
+      }, [] as TaggableEntity[]);
+      
+      setMentionSuggestions(uniqueEntities);
       setShowSuggestions(true);
     } else {
       setShowSuggestions(false);
