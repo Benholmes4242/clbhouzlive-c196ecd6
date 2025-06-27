@@ -49,14 +49,6 @@ export const usePostSubmission = () => {
       return;
     }
 
-    // Show centered "Post shared!" toast message
-    toast({
-      title: "Post shared! It's out there! 🎉",
-      description: "",
-      duration: 2000,
-      className: "fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black text-white border-none rounded-lg shadow-lg px-6 py-4 text-center font-semibold max-w-sm"
-    });
-
     // Create optimistic post for immediate UI update
     const optimisticPost = createOptimisticPost(user, content, mediaFiles, selectedTags);
     
@@ -192,14 +184,6 @@ export const usePostSubmission = () => {
 
   const deletePost = async (postId: string) => {
     try {
-      // Show centered "Post deleted" toast message
-      toast({
-        title: "Post deleted successfully.",
-        description: "",
-        duration: 2000,
-        className: "fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black text-white border-none rounded-lg shadow-lg px-6 py-4 text-center font-semibold max-w-sm"
-      });
-
       // Delete the post
       const { error } = await supabase
         .from('posts')
