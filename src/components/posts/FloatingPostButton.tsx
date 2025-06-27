@@ -1,6 +1,6 @@
 
-import React from 'react';
-import { Camera } from 'lucide-react';
+import React, { useState } from 'react';
+import { Camera, Image, Video, X } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePostSubmission } from '@/hooks/usePostSubmission';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -22,6 +22,7 @@ const FloatingPostButton = () => {
   const { user } = useSupabaseSession();
   const { submitPost } = usePostSubmission();
   const { entities, searchEntities } = useTaggableEntities();
+  const [showOptions, setShowOptions] = useState(false);
   
   const {
     fileInputRef,
@@ -47,8 +48,32 @@ const FloatingPostButton = () => {
 
   const handleButtonClick = () => {
     if (!user) return;
-    // Immediately open camera roll/file picker
+    setShowOptions(true);
+  };
+
+  const handleCameraClick = () => {
+    if (!user) return;
+    // Create a new file input for camera capture
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*,video/*';
+    input.capture = 'environment';
+    input.onchange = (e) => {
+      const target = e.target as HTMLInputElement;
+      const file = target.files?.[0];
+      if (file) {
+        openModal(file);
+      }
+    };
+    input.click();
+    setShowOptions(false);
+  };
+
+  const handleLibraryClick = () => {
+    if (!user) return;
+    // Use existing file input ref for library selection
     fileInputRef.current?.click();
+    setShowOptions(false);
   };
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -183,12 +208,48 @@ const FloatingPostButton = () => {
           <Camera className="h-5 w-5" />
         </button>
       </div>
+
+      {/* Options overlay */}
+      {showOptions && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end justify-center z-[1001]">
+          <div className="bg-white rounded-t-lg p-6 w-full max-w-sm mb-0 animate-slide-up">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">Create Post</h3>
+              <button
+                onClick={() => setShowOptions(false)}
+                className="p-2 hover:bg-gray-100 rounded-full"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            
+            <div className="space-y-3">
+              <Button
+                onClick={handleCameraClick}
+                className="w-full flex items-center gap-3 justify-start h-12"
+                variant="outline"
+              >
+                <Camera className="h-5 w-5" />
+                Take Photo/Video
+              </Button>
+              
+              <Button
+                onClick={handleLibraryClick}
+                className="w-full flex items-center gap-3 justify-start h-12"
+                variant="outline"
+              >
+                <Image className="h-5 w-5" />
+                Choose from Library
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
       
       <input
         ref={fileInputRef}
         type="file"
         accept="image/*,video/*"
-        capture="environment"
         style={{ display: 'none' }}
         onChange={handleFileSelect}
       />
@@ -262,6 +323,19 @@ const FloatingPostButton = () => {
           content: attr(data-placeholder);
           color: #9ca3af;
           pointer-events: none;
+        }
+
+        .animate-slide-up {
+          animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+          from {
+            transform: translateY(100%);
+          }
+          to {
+            transform: translateY(0);
+          }
         }
       `}</style>
     </>
