@@ -20,6 +20,7 @@ const FloatingPostButton = () => {
   const { submitPost } = usePostSubmission();
   const { entities, loading, searchEntities } = useTaggableEntities();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const captionInputRef = useRef<HTMLDivElement>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>('');
@@ -28,9 +29,11 @@ const FloatingPostButton = () => {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [mentionSuggestions, setMentionSuggestions] = useState<TaggableEntity[]>([]);
   const [selectedTags, setSelectedTags] = useState<TaggableEntity[]>([]);
+  const [cursorPosition, setCursorPosition] = useState(0);
 
   const handleButtonClick = () => {
     if (!user) return;
+    // Immediately open camera roll/file picker
     fileInputRef.current?.click();
   };
 
@@ -59,19 +62,37 @@ const FloatingPostButton = () => {
     }
   };
 
-  const handleCaptionChange = async (e: React.ChangeEvent<HTMLDivElement>) => {
-    const text = e.target.innerText;
+  const handleCaptionInput = async (e: React.FormEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLDivElement;
+    const text = target.innerText;
     setCaption(text);
 
-    // Check for @ mentions
-    const words = text.split(' ');
-    const lastWord = words[words.length - 1];
+    // Get cursor position
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0) {
+      setCursorPosition(selection.getRangeAt(0).startOffset);
+    }
 
-    if (lastWord.startsWith('@') && lastWord.length > 1) {
-      const query = lastWord.slice(1);
+    // Find the word at cursor position that starts with @
+    const words = text.split(/(\s+)/);
+    let currentPosition = 0;
+    let mentionWord = '';
+    
+    for (const word of words) {
+      if (currentPosition <= cursorPosition && cursorPosition <= currentPosition + word.length) {
+        if (word.startsWith('@') && word.length > 1) {
+          mentionWord = word;
+          break;
+        }
+      }
+      currentPosition += word.length;
+    }
+
+    if (mentionWord && mentionWord.length > 1) {
+      const query = mentionWord.slice(1);
       await searchEntities(query);
       
-      // Deduplicate entities by entity_id and username/name combination
+      // Deduplicate entities
       const uniqueEntities = entities.reduce((acc, entity) => {
         const identifier = `${entity.entity_type}-${entity.entity_id}-${entity.username || entity.name}`;
         if (!acc.find(item => 
@@ -98,12 +119,28 @@ const FloatingPostButton = () => {
       setSelectedTags(prev => [...prev, entity]);
     }
 
-    // Replace the @ mention in the caption
-    const words = caption.split(' ');
-    const lastWordIndex = words.length - 1;
-    if (words[lastWordIndex].startsWith('@')) {
-      words[lastWordIndex] = `@${displayName}`;
-      setCaption(words.join(' '));
+    // Replace the @ mention in the caption with styled version
+    const words = caption.split(/(\s+)/);
+    let currentPosition = 0;
+    let replacedText = '';
+    
+    for (let i = 0; i < words.length; i++) {
+      const word = words[i];
+      if (currentPosition <= cursorPosition && cursorPosition <= currentPosition + word.length) {
+        if (word.startsWith('@')) {
+          words[i] = `@${displayName}`;
+          break;
+        }
+      }
+      currentPosition += word.length;
+    }
+    
+    const newCaption = words.join('');
+    setCaption(newCaption);
+    
+    // Update the contentEditable div
+    if (captionInputRef.current) {
+      captionInputRef.current.innerText = newCaption;
     }
 
     setShowSuggestions(false);
@@ -144,9 +181,7 @@ const FloatingPostButton = () => {
           onClick={handleButtonClick}
           aria-label="Create post"
         >
-          <div className="plus-icon">
-            <Camera className="h-5 w-5" />
-          </div>
+          <Camera className="h-5 w-5" />
         </button>
       </div>
       
@@ -190,9 +225,10 @@ const FloatingPostButton = () => {
             {/* Caption Input with Mention Support */}
             <div className="relative">
               <div
+                ref={captionInputRef}
                 contentEditable
                 className="min-h-20 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                onInput={handleCaptionChange}
+                onInput={handleCaptionInput}
                 data-placeholder="Write your caption and tag friends with @..."
                 suppressContentEditableWarning={true}
                 style={{
@@ -202,11 +238,11 @@ const FloatingPostButton = () => {
 
               {/* Mention Suggestions Dropdown */}
               {showSuggestions && mentionSuggestions.length > 0 && (
-                <div className="suggestion-dropdown absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-md shadow-lg max-h-40 overflow-y-auto z-50 mt-1">
+                <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-md shadow-lg max-h-40 overflow-y-auto z-50 mt-1">
                   {mentionSuggestions.map((entity) => (
                     <div
                       key={entity.id}
-                      className="suggestion-item px-3 py-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2"
+                      className="px-3 py-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2"
                       onClick={() => selectMention(entity)}
                     >
                       <div className="flex flex-col">
@@ -218,26 +254,6 @@ const FloatingPostButton = () => {
                 </div>
               )}
             </div>
-
-            {/* Selected Tags Display */}
-            {selectedTags.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {selectedTags.map((tag) => (
-                  <span
-                    key={tag.id}
-                    className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800"
-                  >
-                    @{tag.username || tag.name}
-                    <button
-                      onClick={() => setSelectedTags(prev => prev.filter(t => t.id !== tag.id))}
-                      className="ml-1 text-blue-600 hover:text-blue-800"
-                    >
-                      ×
-                    </button>
-                  </span>
-                ))}
-              </div>
-            )}
 
             {/* Action Buttons */}
             <div className="flex gap-2 justify-end">
@@ -277,12 +293,10 @@ const FloatingPostButton = () => {
           width: 43.5px;
           height: 43.5px;
           display: flex;
-          flex-direction: column;
           align-items: center;
           justify-content: center;
           box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
           cursor: pointer;
-          position: relative;
           transition: transform 0.2s ease;
         }
 
@@ -290,41 +304,10 @@ const FloatingPostButton = () => {
           transform: scale(1.05);
         }
 
-        .plus-icon {
-          line-height: 1;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-
         [contenteditable]:empty:before {
           content: attr(data-placeholder);
           color: #9ca3af;
           pointer-events: none;
-        }
-
-        .mention-link {
-          color: #007aff;
-          font-weight: 500;
-          text-decoration: none;
-        }
-
-        .suggestion-dropdown {
-          background: white;
-          border: 1px solid #ddd;
-          max-height: 150px;
-          overflow-y: auto;
-          position: absolute;
-          z-index: 1000;
-        }
-
-        .suggestion-item {
-          padding: 8px;
-          cursor: pointer;
-        }
-
-        .suggestion-item:hover {
-          background: #f0f0f0;
         }
       `}</style>
     </>
