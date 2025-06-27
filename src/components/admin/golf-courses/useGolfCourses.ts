@@ -10,7 +10,7 @@ export const useGolfCourses = () => {
       const { data, error } = await supabase
         .from('golf_courses')
         .select('*')
-        .order('global_rank', { ascending: true, nullsFirst: false });
+        .order('name', { ascending: true });
 
       if (error) throw error;
       return data as GolfCourse[];
