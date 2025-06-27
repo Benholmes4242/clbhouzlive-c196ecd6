@@ -38,11 +38,11 @@ const GolfCourseCard: React.FC<GolfCourseCardProps> = ({ course, onEdit }) => {
               <img
                 src={course.thumbnail_image}
                 alt={course.name}
-                className="w-32 h-24 rounded-lg object-cover border shadow-sm"
+                className="w-48 h-36 rounded-lg object-cover border shadow-sm"
               />
             ) : (
-              <div className="w-32 h-24 rounded-lg bg-muted flex items-center justify-center border">
-                <MapPin className="h-8 w-8 text-muted-foreground" />
+              <div className="w-48 h-36 rounded-lg bg-muted flex items-center justify-center border">
+                <MapPin className="h-12 w-12 text-muted-foreground" />
               </div>
             )}
           </div>
