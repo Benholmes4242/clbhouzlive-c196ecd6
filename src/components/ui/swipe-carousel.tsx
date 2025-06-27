@@ -58,7 +58,7 @@ const SwipeCarousel = memo(({
         goToPrevious();
       }
     },
-    trackMouse: false, // Disable mouse tracking for better mobile performance
+    trackMouse: true, // Re-enable mouse tracking for desktop
     trackTouch: true,
     preventScrollOnSwipe: true,
     delta: 30, // Lower threshold for better mobile responsiveness
