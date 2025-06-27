@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import {
   Table,
@@ -32,20 +31,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
-
-interface AdminUser {
-  id: string;
-  email: string;
-  auth_created_at: string;
-  last_sign_in_at: string | null;
-  email_confirmed_at: string | null;
-  display_name: string | null;
-  username: string | null;
-  home_club: string | null;
-  is_public: boolean | null;
-  profile_created_at: string | null;
-  role: 'admin' | 'moderator' | 'user' | 'limited_admin' | null;
-}
+import type { AdminUser } from '@/hooks/useAdmin';
 
 interface UserManagementProps {
   users: AdminUser[];
