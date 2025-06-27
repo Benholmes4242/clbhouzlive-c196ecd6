@@ -185,5 +185,39 @@ export const usePostSubmission = () => {
     }
   };
 
-  return { submitPost };
+  const deletePost = async (postId: string) => {
+    try {
+      // Show centered "Post deleted" toast message
+      toast({
+        title: "Post deleted",
+        description: "Your post has been deleted successfully.",
+        duration: 2000,
+        className: "fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black text-white border-none text-center font-semibold"
+      });
+
+      // Delete the post
+      const { error } = await supabase
+        .from('posts')
+        .delete()
+        .eq('id', postId);
+
+      if (error) throw error;
+
+      // Broadcast delete event for UI cleanup
+      window.dispatchEvent(new CustomEvent('postDeleted', { 
+        detail: { postId } 
+      }));
+
+    } catch (error) {
+      console.error('Error deleting post:', error);
+      toast({
+        title: "Delete failed",
+        description: "Failed to delete post. Please try again.",
+        variant: "destructive",
+        duration: 5000
+      });
+    }
+  };
+
+  return { submitPost, deletePost };
 };
