@@ -2,6 +2,7 @@
 import React from 'react';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
+import FloatingPostButton from '@/components/posts/FloatingPostButton';
 import NewsComponent from '@/components/News';
 
 const News = () => {
@@ -15,6 +16,7 @@ const News = () => {
         </div>
       </main>
       
+      <FloatingPostButton />
       <BottomNavigation />
     </div>
   );

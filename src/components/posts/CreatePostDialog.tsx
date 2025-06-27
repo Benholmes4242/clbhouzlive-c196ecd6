@@ -17,7 +17,7 @@ interface TaggableEntity {
 
 interface CreatePostDialogProps {
   onPostCreated?: () => void;
-  variant?: 'header' | 'full';
+  variant?: 'header' | 'full' | 'floating';
 }
 
 const CreatePostDialog = ({ onPostCreated, variant = 'header' }: CreatePostDialogProps) => {
@@ -66,6 +66,13 @@ const CreatePostDialog = ({ onPostCreated, variant = 'header' }: CreatePostDialo
             className="relative h-9 w-9 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground hover:text-primary-foreground"
           >
             <Plus className="h-5 w-5" />
+          </Button>
+        ) : variant === 'floating' ? (
+          <Button 
+            size="icon" 
+            className="h-12 w-12 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200"
+          >
+            <Plus className="h-6 w-6" />
           </Button>
         ) : (
           <Button size="sm" className="flex items-center space-x-2">
