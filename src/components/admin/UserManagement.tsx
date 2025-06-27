@@ -44,7 +44,7 @@ interface AdminUser {
   home_club: string | null;
   is_public: boolean | null;
   profile_created_at: string | null;
-  role: 'admin' | 'moderator' | 'user' | null;
+  role: 'admin' | 'moderator' | 'user' | 'limited_admin' | null;
 }
 
 interface UserManagementProps {
@@ -70,7 +70,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ users, onRoleChange }) 
       setLocalUsers(prevUsers => 
         prevUsers.map(user => 
           user.id === userId 
-            ? { ...user, role: newRole === 'none' ? null : newRole as 'admin' | 'moderator' | 'user' } 
+            ? { ...user, role: newRole === 'none' ? null : newRole as 'admin' | 'moderator' | 'user' | 'limited_admin' } 
             : user
         )
       );
@@ -86,7 +86,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ users, onRoleChange }) 
         // Upsert the new role - fix the TypeScript error by ensuring proper typing
         const roleData = { 
           user_id: userId, 
-          role: newRole as 'admin' | 'moderator' | 'user'
+          role: newRole as 'admin' | 'moderator' | 'user' | 'limited_admin'
         };
         await supabase
           .from('user_roles')
@@ -134,9 +134,20 @@ const UserManagement: React.FC<UserManagementProps> = ({ users, onRoleChange }) 
   const getRoleBadgeVariant = (role: string | null) => {
     switch (role) {
       case 'admin': return 'destructive';
+      case 'limited_admin': return 'default';
       case 'moderator': return 'default';
       case 'user': return 'secondary';
       default: return 'outline';
+    }
+  };
+
+  const getRoleDisplayName = (role: string | null) => {
+    switch (role) {
+      case 'limited_admin': return 'Limited Admin';
+      case 'admin': return 'Admin';
+      case 'moderator': return 'Moderator';
+      case 'user': return 'User';
+      default: return 'No role';
     }
   };
 
@@ -167,7 +178,7 @@ const UserManagement: React.FC<UserManagementProps> = ({ users, onRoleChange }) 
                 <TableCell>{user.home_club || '-'}</TableCell>
                 <TableCell>
                   <Badge variant={getRoleBadgeVariant(user.role)}>
-                    {user.role || 'No role'}
+                    {getRoleDisplayName(user.role)}
                   </Badge>
                 </TableCell>
                 <TableCell>
@@ -183,13 +194,14 @@ const UserManagement: React.FC<UserManagementProps> = ({ users, onRoleChange }) 
                       onValueChange={(value) => handleRoleChange(user.id, value)}
                       disabled={actionLoading === user.id}
                     >
-                      <SelectTrigger className="w-32">
+                      <SelectTrigger className="w-36">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="none">No role</SelectItem>
                         <SelectItem value="user">User</SelectItem>
                         <SelectItem value="moderator">Moderator</SelectItem>
+                        <SelectItem value="limited_admin">Limited Admin</SelectItem>
                         <SelectItem value="admin">Admin</SelectItem>
                       </SelectContent>
                     </Select>

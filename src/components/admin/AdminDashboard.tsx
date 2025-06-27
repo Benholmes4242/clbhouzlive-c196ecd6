@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import AdminSidebar from './AdminSidebar';
 import AdminOverview from './AdminOverview';
@@ -23,18 +23,43 @@ interface AdminUser {
   home_club: string | null;
   is_public: boolean | null;
   profile_created_at: string | null;
-  role: 'admin' | 'moderator' | 'user' | null;
+  role: 'admin' | 'moderator' | 'user' | 'limited_admin' | null;
 }
 
 interface AdminDashboardProps {
   users: AdminUser[];
   onRoleChange: (userId: string, newRole: string) => Promise<void>;
+  userRole?: 'admin' | 'limited_admin';
 }
 
-const AdminDashboard: React.FC<AdminDashboardProps> = ({ users, onRoleChange }) => {
-  const [activeTab, setActiveTab] = useState('overview');
+const AdminDashboard: React.FC<AdminDashboardProps> = ({ users, onRoleChange, userRole = 'admin' }) => {
+  const [activeTab, setActiveTab] = useState(() => {
+    // Set default tab based on user role
+    return userRole === 'limited_admin' ? 'golf-courses' : 'overview';
+  });
+
+  // Ensure limited admin can only access golf-courses tab
+  const handleTabChange = (tab: string) => {
+    if (userRole === 'limited_admin' && tab !== 'golf-courses') {
+      return; // Prevent navigation to other tabs
+    }
+    setActiveTab(tab);
+  };
+
+  // Update active tab if userRole changes
+  useEffect(() => {
+    if (userRole === 'limited_admin' && activeTab !== 'golf-courses') {
+      setActiveTab('golf-courses');
+    }
+  }, [userRole, activeTab]);
 
   const renderContent = () => {
+    // Limited admin can only see golf courses
+    if (userRole === 'limited_admin') {
+      return <GolfCoursesManagement />;
+    }
+
+    // Full admin access
     switch (activeTab) {
       case 'overview':
         return <AdminOverview users={users} />;
@@ -76,7 +101,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ users, onRoleChange }) 
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
-        <AdminSidebar activeTab={activeTab} onTabChange={setActiveTab} />
+        <AdminSidebar 
+          activeTab={activeTab} 
+          onTabChange={handleTabChange}
+          userRole={userRole}
+        />
         <SidebarInset className="flex-1">
           <div className="p-6">
             {renderContent()}

@@ -33,18 +33,34 @@ const HeaderUserMenu = () => {
     enabled: !!user?.id,
   });
 
-  // Check if user is admin
-  const { data: isAdmin, isLoading: isAdminLoading } = useQuery({
-    queryKey: ['isAdmin', user?.id],
+  // Check if user is admin or limited admin
+  const { data: adminStatus, isLoading: isAdminLoading } = useQuery({
+    queryKey: ['adminStatus', user?.id],
     queryFn: async () => {
-      if (!user?.id) return false;
-      const { data, error } = await supabase.rpc('is_admin');
-      if (error) {
-        console.error('Error checking admin status:', error);
-        return false;
+      if (!user?.id) return { isAdmin: false, isLimitedAdmin: false };
+      
+      // Check for admin role
+      const { data: isAdmin, error: adminError } = await supabase.rpc('is_admin');
+      if (adminError) {
+        console.error('Error checking admin status:', adminError);
       }
-      console.log('Admin check result:', data);
-      return data || false;
+
+      // Check for limited admin role
+      const { data: isLimitedAdmin, error: limitedAdminError } = await supabase.rpc('has_role', {
+        _user_id: user.id,
+        _role: 'limited_admin'
+      });
+      
+      if (limitedAdminError) {
+        console.error('Error checking limited admin status:', limitedAdminError);
+      }
+
+      console.log('Admin status check result:', { isAdmin: isAdmin || false, isLimitedAdmin: isLimitedAdmin || false });
+      
+      return { 
+        isAdmin: isAdmin || false, 
+        isLimitedAdmin: isLimitedAdmin || false 
+      };
     },
     enabled: !!user?.id,
   });
@@ -61,12 +77,14 @@ const HeaderUserMenu = () => {
     e.preventDefault();
     e.stopPropagation();
     
-    console.log('Admin dashboard clicked, isAdmin:', isAdmin);
+    const hasAdminAccess = adminStatus?.isAdmin || adminStatus?.isLimitedAdmin;
+    
+    console.log('Admin dashboard clicked, hasAdminAccess:', hasAdminAccess);
     console.log('User ID:', user?.id);
     console.log('Current URL:', window.location.href);
     
-    if (!isAdmin) {
-      console.error('User is not admin, cannot access admin dashboard');
+    if (!hasAdminAccess) {
+      console.error('User does not have admin access, cannot access admin dashboard');
       return;
     }
     
@@ -132,8 +150,9 @@ const HeaderUserMenu = () => {
   };
 
   const currentUsername = userProfile?.username || userProfile?.display_name || 'User';
+  const hasAdminAccess = adminStatus?.isAdmin || adminStatus?.isLimitedAdmin;
 
-  console.log('HeaderUserMenu render - user:', !!user, 'isAdmin:', isAdmin, 'isAdminLoading:', isAdminLoading);
+  console.log('HeaderUserMenu render - user:', !!user, 'hasAdminAccess:', hasAdminAccess, 'isAdminLoading:', isAdminLoading);
 
   if (user) {
     return (
@@ -160,7 +179,7 @@ const HeaderUserMenu = () => {
             >
               Settings
             </button>
-            {isAdmin && !isAdminLoading && (
+            {hasAdminAccess && !isAdminLoading && (
               <>
                 <div className="-mx-1 my-1 h-px bg-muted"></div>
                 <button 

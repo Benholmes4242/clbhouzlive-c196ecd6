@@ -28,59 +28,76 @@ const menuItems = [
     title: "Overview",
     icon: BarChart3,
     value: "overview",
+    requiredRole: "admin",
   },
   {
     title: "User Management",
     icon: Users,
     value: "users",
+    requiredRole: "admin",
   },
   {
     title: "Golf Courses",
     icon: MapPin,
     value: "golf-courses",
+    requiredRole: "limited_admin", // Available to both admin and limited_admin
   },
   {
     title: "Course Import",
     icon: Upload,
     value: "courses",
+    requiredRole: "admin",
   },
   {
     title: "Analytics",
     icon: TrendingUp,
     value: "analytics",
+    requiredRole: "admin",
   },
   {
     title: "Team Management",
     icon: UserCheck,
     value: "team",
+    requiredRole: "admin",
   },
   {
     title: "Settings",
     icon: SettingsIcon,
     value: "settings",
+    requiredRole: "admin",
   },
 ];
 
 interface AdminSidebarProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
+  userRole?: 'admin' | 'limited_admin';
 }
 
-const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeTab, onTabChange }) => {
+const AdminSidebar: React.FC<AdminSidebarProps> = ({ activeTab, onTabChange, userRole = 'admin' }) => {
+  // Filter menu items based on user role
+  const filteredMenuItems = menuItems.filter(item => {
+    if (userRole === 'admin') return true; // Admin sees everything
+    if (userRole === 'limited_admin') return item.value === 'golf-courses'; // Limited admin only sees golf courses
+    return false;
+  });
+
   return (
     <Sidebar className="border-r border-border">
       <SidebarHeader className="p-6">
-        <h2 className="text-lg font-semibold text-foreground">Admin Panel</h2>
+        <h2 className="text-lg font-semibold text-foreground">
+          {userRole === 'limited_admin' ? 'Golf Courses Admin' : 'Admin Panel'}
+        </h2>
       </SidebarHeader>
       
       <SidebarContent>
         <SidebarGroup>
           <SidebarGroupLabel className="px-6 py-2 text-sm font-medium text-muted-foreground">
-            Management
+            {userRole === 'limited_admin' ? 'Golf Courses' : 'Management'}
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="px-4">
-              {menuItems.map((item) => (
+              {filteredMenuItems.map((item) => (
                 <SidebarMenuItem key={item.value}>
                   <SidebarMenuButton
                     onClick={() => onTabChange(item.value)}

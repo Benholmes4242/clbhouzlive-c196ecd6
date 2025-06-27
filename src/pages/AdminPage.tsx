@@ -11,9 +11,18 @@ import AdminLoading from '@/components/admin/AdminLoading';
 const AdminPage = () => {
   const navigate = useNavigate();
   const { user, loading: sessionLoading } = useSupabaseSession();
-  const { users, loading: adminLoading, isAdmin, assignRole, removeRole } = useAdmin();
+  const { 
+    users, 
+    loading: adminLoading, 
+    isAdmin, 
+    isLimitedAdmin, 
+    userRole,
+    hasAdminAccess,
+    assignRole, 
+    removeRole 
+  } = useAdmin();
 
-  console.log('AdminPage render - user:', !!user, 'sessionLoading:', sessionLoading, 'isAdmin:', isAdmin, 'adminLoading:', adminLoading);
+  console.log('AdminPage render - user:', !!user, 'sessionLoading:', sessionLoading, 'isAdmin:', isAdmin, 'isLimitedAdmin:', isLimitedAdmin, 'adminLoading:', adminLoading);
 
   // Don't redirect immediately, wait for session to load
   React.useEffect(() => {
@@ -29,8 +38,9 @@ const AdminPage = () => {
       await removeRole(userId, 'admin');
       await removeRole(userId, 'moderator');
       await removeRole(userId, 'user');
+      await removeRole(userId, 'limited_admin');
     } else {
-      await assignRole(userId, newRole as 'admin' | 'moderator' | 'user');
+      await assignRole(userId, newRole as 'admin' | 'moderator' | 'user' | 'limited_admin');
     }
   };
 
@@ -46,8 +56,8 @@ const AdminPage = () => {
     );
   }
 
-  // Show access denied if not admin (but only after loading is complete)
-  if (!isAdmin) {
+  // Show access denied if user has no admin access (neither admin nor limited_admin)
+  if (!hasAdminAccess) {
     return (
       <div className="min-h-screen bg-background">
         <Header />
@@ -61,7 +71,11 @@ const AdminPage = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <AdminDashboard users={users} onRoleChange={handleRoleChange} />
+      <AdminDashboard 
+        users={users} 
+        onRoleChange={handleRoleChange}
+        userRole={userRole || 'admin'}
+      />
     </div>
   );
 };

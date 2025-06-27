@@ -14,7 +14,7 @@ interface AdminUser {
   home_club: string | null;
   is_public: boolean | null;
   profile_created_at: string | null;
-  role: 'admin' | 'moderator' | 'user' | null;
+  role: 'admin' | 'moderator' | 'user' | 'limited_admin' | null;
 }
 
 export const useAdmin = () => {
@@ -22,31 +22,61 @@ export const useAdmin = () => {
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isLimitedAdmin, setIsLimitedAdmin] = useState(false);
+  const [userRole, setUserRole] = useState<'admin' | 'limited_admin' | null>(null);
 
   console.log('useAdmin hook - user:', !!user, 'sessionLoading:', sessionLoading);
 
-  // Check if current user is admin
+  // Check if current user is admin or limited admin
   const checkAdminStatus = async () => {
     if (!user) {
-      console.log('No user, setting isAdmin to false');
+      console.log('No user, setting admin status to false');
       setIsAdmin(false);
+      setIsLimitedAdmin(false);
+      setUserRole(null);
       setLoading(false);
       return;
     }
 
     console.log('Checking admin status for user:', user.id);
     try {
-      const { data, error } = await supabase.rpc('is_admin');
-      if (error) {
-        console.error('Error checking admin status:', error);
-        setIsAdmin(false);
+      // Check for admin role
+      const { data: isAdminData, error: adminError } = await supabase.rpc('is_admin');
+      if (adminError) {
+        console.error('Error checking admin status:', adminError);
+      }
+
+      // Check for limited admin role
+      const { data: hasLimitedAdminRole, error: limitedAdminError } = await supabase.rpc('has_role', {
+        _user_id: user.id,
+        _role: 'limited_admin'
+      });
+      
+      if (limitedAdminError) {
+        console.error('Error checking limited admin status:', limitedAdminError);
+      }
+
+      const isFullAdmin = isAdminData || false;
+      const isLimitedAdminUser = hasLimitedAdminRole || false;
+
+      console.log('Admin status result:', { isFullAdmin, isLimitedAdminUser });
+      
+      setIsAdmin(isFullAdmin);
+      setIsLimitedAdmin(isLimitedAdminUser);
+      
+      // Set user role for easier access
+      if (isFullAdmin) {
+        setUserRole('admin');
+      } else if (isLimitedAdminUser) {
+        setUserRole('limited_admin');
       } else {
-        console.log('Admin status result:', data);
-        setIsAdmin(data || false);
+        setUserRole(null);
       }
     } catch (error) {
       console.error('Exception checking admin status:', error);
       setIsAdmin(false);
+      setIsLimitedAdmin(false);
+      setUserRole(null);
     }
     setLoading(false);
   };
@@ -76,7 +106,7 @@ export const useAdmin = () => {
   };
 
   // Assign role to user - simplified version that doesn't auto-refresh
-  const assignRole = async (userId: string, role: 'admin' | 'moderator' | 'user') => {
+  const assignRole = async (userId: string, role: 'admin' | 'moderator' | 'user' | 'limited_admin') => {
     try {
       const { error } = await supabase
         .from('user_roles')
@@ -95,7 +125,7 @@ export const useAdmin = () => {
   };
 
   // Remove role from user - simplified version that doesn't auto-refresh
-  const removeRole = async (userId: string, role: 'admin' | 'moderator' | 'user') => {
+  const removeRole = async (userId: string, role: 'admin' | 'moderator' | 'user' | 'limited_admin') => {
     try {
       const { error } = await supabase
         .from('user_roles')
@@ -133,6 +163,9 @@ export const useAdmin = () => {
     users,
     loading: loading || sessionLoading,
     isAdmin,
+    isLimitedAdmin,
+    userRole,
+    hasAdminAccess: isAdmin || isLimitedAdmin, // Helper to check if user has any admin access
     fetchUsers,
     assignRole,
     removeRole
