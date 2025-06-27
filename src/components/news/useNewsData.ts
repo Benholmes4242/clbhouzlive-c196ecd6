@@ -9,6 +9,7 @@ interface NewsArticle {
   pub_date: string;
   source: string;
   image_url?: string;
+  content?: string;
 }
 
 export const useNewsData = () => {
@@ -20,13 +21,15 @@ export const useNewsData = () => {
         .from('news_articles')
         .select('*')
         .order('pub_date', { ascending: false })
-        .limit(20);
+        .limit(50);
 
       if (cachedArticles && cachedArticles.length > 0) {
+        console.log(`Loaded ${cachedArticles.length} cached articles from database`);
         return cachedArticles;
       }
 
       // If no cached articles, fetch fresh ones
+      console.log('No cached articles found, fetching fresh news...');
       const { data, error } = await supabase.functions.invoke('fetch-news');
       
       if (error) {
@@ -39,14 +42,19 @@ export const useNewsData = () => {
         .from('news_articles')
         .select('*')
         .order('pub_date', { ascending: false })
-        .limit(20);
+        .limit(50);
 
       if (freshError) {
         console.error('Error getting fresh articles:', freshError);
         throw new Error('Failed to get fresh articles');
       }
 
+      console.log(`Loaded ${freshArticles?.length || 0} fresh articles from database`);
       return freshArticles || [];
     },
+    staleTime: 5 * 60 * 1000, // Consider data fresh for 5 minutes
+    gcTime: 30 * 60 * 1000, // Keep in cache for 30 minutes
+    refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 };

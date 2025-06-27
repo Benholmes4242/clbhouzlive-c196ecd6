@@ -13,6 +13,67 @@ interface NewsArticle {
   pub_date: string
   source: string
   image_url?: string
+  content?: string
+}
+
+async function fetchFromNewsAPI(query: string, sources?: string): Promise<NewsArticle[]> {
+  const newsApiKey = Deno.env.get('NEWS_API_KEY')
+  if (!newsApiKey) {
+    console.error('NEWS_API_KEY not found')
+    return []
+  }
+
+  try {
+    const params = new URLSearchParams({
+      q: query,
+      sortBy: 'publishedAt',
+      pageSize: '20',
+      language: 'en',
+      apiKey: newsApiKey
+    })
+
+    if (sources) {
+      params.append('sources', sources)
+    }
+
+    const url = `https://newsapi.org/v2/everything?${params.toString()}`
+    
+    console.log(`Fetching from NewsAPI: ${query}`)
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Golf-News-App/1.0',
+        'Accept': 'application/json'
+      }
+    })
+
+    if (!response.ok) {
+      console.error(`NewsAPI error: ${response.status} ${response.statusText}`)
+      return []
+    }
+
+    const data = await response.json()
+    
+    if (data.status !== 'ok') {
+      console.error('NewsAPI returned error:', data.message)
+      return []
+    }
+
+    const articles: NewsArticle[] = data.articles.map((article: any) => ({
+      title: article.title || 'Untitled',
+      description: article.description || '',
+      link: article.url || '',
+      pub_date: new Date(article.publishedAt || new Date()).toISOString(),
+      source: article.source?.name || 'Unknown Source',
+      image_url: article.urlToImage || null,
+      content: article.content || article.description || ''
+    }))
+
+    console.log(`Successfully fetched ${articles.length} articles from NewsAPI for query: ${query}`)
+    return articles
+  } catch (error) {
+    console.error(`Error fetching from NewsAPI for query "${query}":`, error)
+    return []
+  }
 }
 
 async function parseRSSFeed(url: string, source: string): Promise<NewsArticle[]> {
@@ -40,7 +101,7 @@ async function parseRSSFeed(url: string, source: string): Promise<NewsArticle[]>
     console.log(`Found ${itemMatches?.length || 0} items for ${source}`)
     
     if (itemMatches) {
-      for (const item of itemMatches.slice(0, 15)) { // Increased to 15 articles per source
+      for (const item of itemMatches.slice(0, 10)) {
         const title = item.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1]?.replace(/<!\[CDATA\[(.*?)\]\]>/g, '$1').trim()
         const description = item.match(/<description[^>]*>([\s\S]*?)<\/description>/i)?.[1]?.replace(/<!\[CDATA\[(.*?)\]\]>/g, '$1').replace(/<[^>]*>/g, '').trim()
         const link = item.match(/<link[^>]*>([\s\S]*?)<\/link>/i)?.[1]?.trim()
@@ -51,59 +112,22 @@ async function parseRSSFeed(url: string, source: string): Promise<NewsArticle[]>
           pubDate = item.match(/<dc:date[^>]*>([\s\S]*?)<\/dc:date>/i)?.[1]?.trim()
         }
         
-        // Enhanced image extraction with multiple fallback methods
+        // Enhanced image extraction
         let imageUrl = null
-        
-        // Method 1: Try media:content (most common)
         imageUrl = item.match(/<media:content[^>]*url="([^"]*)"[^>]*>/i)?.[1]
-        
-        // Method 2: Try media:thumbnail
         if (!imageUrl) {
           imageUrl = item.match(/<media:thumbnail[^>]*url="([^"]*)"[^>]*>/i)?.[1]
         }
-        
-        // Method 3: Try enclosure with image type
         if (!imageUrl) {
           imageUrl = item.match(/<enclosure[^>]*url="([^"]*)"[^>]*type="image[^"]*"[^>]*>/i)?.[1]
         }
         
-        // Method 4: Try content:encoded and look for img tags
-        if (!imageUrl) {
-          const contentEncoded = item.match(/<content:encoded[^>]*>([\s\S]*?)<\/content:encoded>/i)?.[1]
-          if (contentEncoded) {
-            const imgMatch = contentEncoded.match(/<img[^>]*src="([^"]*)"[^>]*>/i)
-            if (imgMatch) {
-              imageUrl = imgMatch[1].replace(/&amp;/g, '&')
-            }
-          }
-        }
-        
-        // Method 5: Look for img tags in description
-        if (!imageUrl && description) {
-          const imgInDesc = description.match(/<img[^>]*src="([^"]*)"[^>]*>/i)
-          if (imgInDesc) {
-            imageUrl = imgInDesc[1].replace(/&amp;/g, '&')
-          }
-        }
-        
-        // Clean up the image URL if found
         if (imageUrl) {
           imageUrl = imageUrl.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
-          
-          // Basic validation for image URLs
-          if (!imageUrl.match(/\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i) && 
-              !imageUrl.includes('unsplash') && 
-              !imageUrl.includes('imgur') && 
-              !imageUrl.includes('pgatour') &&
-              !imageUrl.includes('golfnews')) {
-            imageUrl = null
-          }
         }
         
         if (title && link) {
           const parsedDate = pubDate ? new Date(pubDate) : new Date()
-          
-          // Validate the date
           const finalDate = isNaN(parsedDate.getTime()) ? new Date() : parsedDate
           
           articles.push({
@@ -112,7 +136,8 @@ async function parseRSSFeed(url: string, source: string): Promise<NewsArticle[]>
             link: link.replace(/&amp;/g, '&'),
             pub_date: finalDate.toISOString(),
             source,
-            image_url: imageUrl
+            image_url: imageUrl,
+            content: description || ''
           })
         }
       }
@@ -138,22 +163,36 @@ Deno.serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     )
 
-    console.log('Starting news fetch...')
-
-    // RSS feed URLs with improved configurations
-    const feeds = [
-      { url: 'https://golfnews.co.uk/feed/', source: 'Golf News UK' },
-      { url: 'https://www.pgatour.com/news.rss', source: 'PGA Tour' },
-      // Adding backup PGA Tour feeds
-      { url: 'https://feeds.pgatour.com/pgatour/news', source: 'PGA Tour' }
-    ]
+    console.log('Starting enhanced news fetch...')
 
     const allArticles: NewsArticle[] = []
 
-    // Fetch from each RSS feed with timeout
-    for (const feed of feeds) {
-      console.log(`Fetching from ${feed.source} at ${feed.url}...`)
-      
+    // Fetch PGA Tour news from NewsAPI with specific sources
+    console.log('Fetching PGA Tour news from NewsAPI...')
+    const pgaArticles = await fetchFromNewsAPI(
+      'PGA Tour OR "PGA Championship" OR "Masters Tournament" OR "golf tournament"',
+      'espn,bbc-sport,cnn,the-washington-post,reuters,associated-press,fox-sports'
+    )
+    allArticles.push(...pgaArticles)
+
+    // Fetch LIV Golf news
+    console.log('Fetching LIV Golf news from NewsAPI...')
+    const livArticles = await fetchFromNewsAPI('LIV Golf OR "LIV tournament"')
+    allArticles.push(...livArticles)
+
+    // Fetch DP World Tour news
+    console.log('Fetching DP World Tour news from NewsAPI...')
+    const dpArticles = await fetchFromNewsAPI('"DP World Tour" OR "European Tour"')
+    allArticles.push(...dpArticles)
+
+    // Supplement with RSS feeds for additional coverage
+    const rssFeeds = [
+      { url: 'https://golfnews.co.uk/feed/', source: 'Golf News UK' },
+      { url: 'https://www.pgatour.com/news.rss', source: 'PGA Tour' }
+    ]
+
+    for (const feed of rssFeeds) {
+      console.log(`Fetching from RSS: ${feed.source}...`)
       try {
         const articles = await Promise.race([
           parseRSSFeed(feed.url, feed.source),
@@ -165,12 +204,6 @@ Deno.serve(async (req) => {
         if (articles.length > 0) {
           allArticles.push(...articles)
           console.log(`Successfully fetched ${articles.length} articles from ${feed.source}`)
-          
-          // Log image extraction results for debugging
-          const articlesWithImages = articles.filter(a => a.image_url)
-          console.log(`${articlesWithImages.length} articles have images from ${feed.source}`)
-        } else {
-          console.log(`No articles found for ${feed.source}`)
         }
       } catch (error) {
         console.error(`Failed to fetch from ${feed.source}:`, error.message)
@@ -179,7 +212,10 @@ Deno.serve(async (req) => {
 
     // Remove duplicates based on title and link
     const uniqueArticles = allArticles.filter((article, index, self) => 
-      index === self.findIndex(a => a.title === article.title || a.link === article.link)
+      index === self.findIndex(a => 
+        (a.title === article.title && a.title.length > 10) || 
+        (a.link === article.link && a.link.length > 10)
+      )
     )
 
     console.log(`Total unique articles: ${uniqueArticles.length}`)
@@ -213,9 +249,6 @@ Deno.serve(async (req) => {
       }, {} as Record<string, number>)
       
       console.log('Articles by source:', sourceBreakdown)
-      
-      const withImages = uniqueArticles.filter(a => a.image_url).length
-      console.log(`${withImages} articles have images out of ${uniqueArticles.length} total`)
     }
 
     return new Response(
@@ -227,7 +260,7 @@ Deno.serve(async (req) => {
           acc[article.source] = (acc[article.source] || 0) + 1
           return acc
         }, {} as Record<string, number>),
-        message: `Fetched ${uniqueArticles.length} unique articles from golf news sources`
+        message: `Fetched ${uniqueArticles.length} unique articles from enhanced news sources`
       }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -236,7 +269,7 @@ Deno.serve(async (req) => {
     )
 
   } catch (error) {
-    console.error('Error in fetch-news function:', error)
+    console.error('Error in enhanced fetch-news function:', error)
     return new Response(
       JSON.stringify({ 
         success: false, 
