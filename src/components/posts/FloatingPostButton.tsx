@@ -1,11 +1,14 @@
 
-import React, { useRef, useState } from 'react';
+import React from 'react';
 import { Camera } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePostSubmission } from '@/hooks/usePostSubmission';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useTaggableEntities } from '@/hooks/useTaggableEntities';
+import { usePostCreationModal } from '@/hooks/usePostCreationModal';
+import PostMediaPreview from './PostMediaPreview';
+import CaptionInput from './CaptionInput';
 
 interface TaggableEntity {
   id: string;
@@ -18,18 +21,29 @@ interface TaggableEntity {
 const FloatingPostButton = () => {
   const { user } = useSupabaseSession();
   const { submitPost } = usePostSubmission();
-  const { entities, loading, searchEntities } = useTaggableEntities();
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const captionInputRef = useRef<HTMLDivElement>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string>('');
-  const [caption, setCaption] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [mentionSuggestions, setMentionSuggestions] = useState<TaggableEntity[]>([]);
-  const [selectedTags, setSelectedTags] = useState<TaggableEntity[]>([]);
-  const [cursorPosition, setCursorPosition] = useState(0);
+  const { entities, searchEntities } = useTaggableEntities();
+  
+  const {
+    fileInputRef,
+    captionInputRef,
+    isModalOpen,
+    selectedFile,
+    previewUrl,
+    caption,
+    setCaption,
+    isSubmitting,
+    setIsSubmitting,
+    showSuggestions,
+    setShowSuggestions,
+    mentionSuggestions,
+    setMentionSuggestions,
+    selectedTags,
+    setSelectedTags,
+    cursorPosition,
+    setCursorPosition,
+    openModal,
+    closeModal
+  } = usePostCreationModal();
 
   const handleButtonClick = () => {
     if (!user) return;
@@ -41,25 +55,10 @@ const FloatingPostButton = () => {
     const file = event.target.files?.[0];
     if (!file || !user) return;
 
-    setSelectedFile(file);
-    const url = URL.createObjectURL(file);
-    setPreviewUrl(url);
-    setIsModalOpen(true);
+    openModal(file);
 
     // Reset file input
     event.target.value = '';
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedFile(null);
-    setPreviewUrl('');
-    setCaption('');
-    setSelectedTags([]);
-    setShowSuggestions(false);
-    if (previewUrl) {
-      URL.revokeObjectURL(previewUrl);
-    }
   };
 
   const handleCaptionInput = async (e: React.FormEvent<HTMLDivElement>) => {
@@ -159,7 +158,7 @@ const FloatingPostButton = () => {
         mediaFiles: [selectedFile],
         selectedTags,
         onSuccess: () => {
-          handleCloseModal();
+          closeModal();
         },
         onError: () => {
           setIsSubmitting(false);
@@ -194,72 +193,27 @@ const FloatingPostButton = () => {
         onChange={handleFileSelect}
       />
 
-      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+      <Dialog open={isModalOpen} onOpenChange={closeModal}>
         <DialogContent className="max-w-md mx-auto">
           <DialogHeader>
             <DialogTitle>Create Post</DialogTitle>
           </DialogHeader>
           
           <div className="space-y-4">
-            {/* Media Preview */}
-            <div className="media-preview-container">
-              {selectedFile && (
-                <div className="w-full">
-                  {selectedFile.type.startsWith('image/') ? (
-                    <img
-                      src={previewUrl}
-                      alt="Preview"
-                      className="w-full max-h-64 object-cover rounded-lg"
-                    />
-                  ) : selectedFile.type.startsWith('video/') ? (
-                    <video
-                      src={previewUrl}
-                      controls
-                      className="w-full max-h-64 rounded-lg"
-                    />
-                  ) : null}
-                </div>
-              )}
-            </div>
+            <PostMediaPreview file={selectedFile} previewUrl={previewUrl} />
 
-            {/* Caption Input with Mention Support */}
-            <div className="relative">
-              <div
-                ref={captionInputRef}
-                contentEditable
-                className="min-h-20 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                onInput={handleCaptionInput}
-                data-placeholder="Write your caption and tag friends with @..."
-                suppressContentEditableWarning={true}
-                style={{
-                  minHeight: '80px',
-                }}
-              />
+            <CaptionInput
+              captionInputRef={captionInputRef}
+              onInput={handleCaptionInput}
+              showSuggestions={showSuggestions}
+              mentionSuggestions={mentionSuggestions}
+              onSelectMention={selectMention}
+            />
 
-              {/* Mention Suggestions Dropdown */}
-              {showSuggestions && mentionSuggestions.length > 0 && (
-                <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-md shadow-lg max-h-40 overflow-y-auto z-50 mt-1">
-                  {mentionSuggestions.map((entity) => (
-                    <div
-                      key={entity.id}
-                      className="px-3 py-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2"
-                      onClick={() => selectMention(entity)}
-                    >
-                      <div className="flex flex-col">
-                        <span className="font-medium">@{entity.username || entity.name}</span>
-                        <span className="text-xs text-gray-500 capitalize">{entity.entity_type}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Action Buttons */}
             <div className="flex gap-2 justify-end">
               <Button
                 variant="outline"
-                onClick={handleCloseModal}
+                onClick={closeModal}
                 disabled={isSubmitting}
               >
                 Cancel
