@@ -1,19 +1,20 @@
 
 import React, { useState, useEffect } from 'react';
-import { Home, Newspaper, Flag, Building2, Trophy } from 'lucide-react';
+import { Home, Building2, Trophy, Flag, Plus } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import CreatePostDialog from '@/components/posts/CreatePostDialog';
 
 const BottomNavigation = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [activeTab, setActiveTab] = useState('home');
 
-  // All main tabs (changed explore to clubhouse)
+  // Updated tabs - removed news, added post button between clubhouse and tour-central
   const tabs = [
     { id: 'home', label: 'Home', icon: Home, path: '/' },
     { id: 'clubhouse', label: 'Clubhouse', icon: Building2, path: '/clubhouse' },
+    { id: 'post', label: 'Post', icon: Plus, path: null, isAction: true }, // Special post button
     { id: 'tour-central', label: 'Tour Central', icon: Trophy, path: '/tour-central' },
-    { id: 'news', label: 'News', icon: Newspaper, path: '/news' },
     { id: 'courses', label: 'Courses', icon: Flag, path: '/courses' },
   ];
 
@@ -24,18 +25,25 @@ const BottomNavigation = () => {
     }
   }, [location.pathname]);
 
-  const handleTabClick = (tab: { id: string; path: string }) => {
-    setActiveTab(tab.id);
-    navigate(tab.path);
+  const handleTabClick = (tab: { id: string; path: string | null; isAction?: boolean }) => {
+    if (tab.isAction) {
+      // Don't set active state for action buttons
+      return;
+    }
     
-    // Scroll to top on tab navigation
-    setTimeout(() => {
-      window.scrollTo({
-        top: 0,
-        left: 0,
-        behavior: 'smooth'
-      });
-    }, 50);
+    if (tab.path) {
+      setActiveTab(tab.id);
+      navigate(tab.path);
+      
+      // Scroll to top on tab navigation
+      setTimeout(() => {
+        window.scrollTo({
+          top: 0,
+          left: 0,
+          behavior: 'smooth'
+        });
+      }, 50);
+    }
   };
 
   return (
@@ -45,6 +53,20 @@ const BottomNavigation = () => {
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
+            
+            // Special handling for the Post button
+            if (tab.isAction) {
+              return (
+                <div key={tab.id} className="flex flex-col items-center justify-center space-y-1">
+                  <CreatePostDialog 
+                    variant="bottom-nav"
+                    onPostCreated={() => window.location.reload()}
+                  />
+                  <span className="text-xs font-medium text-muted-foreground">Post</span>
+                </div>
+              );
+            }
+            
             return (
               <button
                 key={tab.id}

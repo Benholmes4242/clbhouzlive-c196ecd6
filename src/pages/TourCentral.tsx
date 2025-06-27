@@ -6,7 +6,7 @@ import BottomNavigation from '@/components/BottomNavigation';
 import FloatingPostButton from '@/components/posts/FloatingPostButton';
 import UpcomingEvents from '@/components/tour/UpcomingEvents';
 import LiveLeaderboards from '@/components/tour/LiveLeaderboards';
-import TeeTimesSection from '@/components/tour/TeeTimesSection';
+import NewsComponent from '@/components/News';
 import RankingsSection from '@/components/tour/RankingsSection';
 
 const TourCentral = () => {
@@ -27,7 +27,7 @@ const TourCentral = () => {
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="upcoming">Events</TabsTrigger>
             <TabsTrigger value="leaderboards">Live</TabsTrigger>
-            <TabsTrigger value="teetimes">Tee Times</TabsTrigger>
+            <TabsTrigger value="news">News</TabsTrigger>
             <TabsTrigger value="rankings">Rankings</TabsTrigger>
           </TabsList>
 
@@ -39,8 +39,8 @@ const TourCentral = () => {
             <LiveLeaderboards />
           </TabsContent>
 
-          <TabsContent value="teetimes" className="mt-6">
-            <TeeTimesSection />
+          <TabsContent value="news" className="mt-6">
+            <NewsComponent />
           </TabsContent>
 
           <TabsContent value="rankings" className="mt-6">

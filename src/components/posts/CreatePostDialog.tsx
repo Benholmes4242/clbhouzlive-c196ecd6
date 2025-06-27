@@ -17,7 +17,7 @@ interface TaggableEntity {
 
 interface CreatePostDialogProps {
   onPostCreated?: () => void;
-  variant?: 'header' | 'full' | 'floating';
+  variant?: 'header' | 'full' | 'floating' | 'bottom-nav';
 }
 
 const CreatePostDialog = ({ onPostCreated, variant = 'header' }: CreatePostDialogProps) => {
@@ -56,10 +56,10 @@ const CreatePostDialog = ({ onPostCreated, variant = 'header' }: CreatePostDialo
 
   if (!user) return null;
 
-  return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        {variant === 'header' ? (
+  const getButtonElement = () => {
+    switch (variant) {
+      case 'header':
+        return (
           <Button 
             variant="ghost" 
             size="icon" 
@@ -67,19 +67,39 @@ const CreatePostDialog = ({ onPostCreated, variant = 'header' }: CreatePostDialo
           >
             <Plus className="h-5 w-5" />
           </Button>
-        ) : variant === 'floating' ? (
+        );
+      case 'floating':
+        return (
           <Button 
             size="icon" 
             className="h-12 w-12 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200"
           >
             <Plus className="h-6 w-6" />
           </Button>
-        ) : (
+        );
+      case 'bottom-nav':
+        return (
+          <Button 
+            size="icon" 
+            className="h-8 w-8 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-200"
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
+        );
+      default:
+        return (
           <Button size="sm" className="flex items-center space-x-2">
             <Plus className="h-4 w-4" />
             <span>Share</span>
           </Button>
-        )}
+        );
+    }
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        {getButtonElement()}
       </DialogTrigger>
       <DialogContent className="max-w-lg">
         <DialogHeader>

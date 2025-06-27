@@ -1,5 +1,6 @@
+
 import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import CreateProfile from "./pages/CreateProfile";
@@ -9,7 +10,6 @@ import UserCoursesPage from "./pages/UserCoursesPage";
 import Courses from "./pages/Courses";
 import MyRatings from "./pages/MyRatings";
 import TourCentral from "./pages/TourCentral";
-import News from "./pages/News";
 import ClubhouseFeed from "./pages/ClubhouseFeed";
 import Explore from "./pages/Explore";
 import MessagesPage from "./pages/MessagesPage";
@@ -44,6 +44,9 @@ function App() {
               <Route path="/" element={<Index />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="*" element={<NotFound />} />
+              
+              {/* Redirect old news route to tour central */}
+              <Route path="/news" element={<Navigate to="/tour-central" replace />} />
               
               {/* Protected Routes */}
               <Route path="/create-profile" element={
@@ -84,11 +87,6 @@ function App() {
               <Route path="/tour-central" element={
                 <ProtectedRoute>
                   <TourCentral />
-                </ProtectedRoute>
-              } />
-              <Route path="/news" element={
-                <ProtectedRoute>
-                  <News />
                 </ProtectedRoute>
               } />
               <Route path="/clubhouse" element={
