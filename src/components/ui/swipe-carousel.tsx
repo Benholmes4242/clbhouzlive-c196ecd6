@@ -21,40 +21,49 @@ const SwipeCarousel = memo(({
   onSlideChange 
 }: SwipeCarouselProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   const goToSlide = useCallback((index: number) => {
+    if (isTransitioning) return;
+    
     const newIndex = Math.max(0, Math.min(index, items.length - 1));
+    if (newIndex === currentIndex) return;
+    
+    setIsTransitioning(true);
     setCurrentIndex(newIndex);
     onSlideChange?.(newIndex);
-  }, [items.length, onSlideChange]);
+    
+    // Reset transition lock after animation completes
+    setTimeout(() => setIsTransitioning(false), 350);
+  }, [items.length, onSlideChange, currentIndex, isTransitioning]);
 
   const goToPrevious = useCallback(() => {
-    const newIndex = currentIndex > 0 ? currentIndex - 1 : 0;
-    setCurrentIndex(newIndex);
-    onSlideChange?.(newIndex);
-  }, [currentIndex, onSlideChange]);
+    if (isTransitioning || currentIndex <= 0) return;
+    goToSlide(currentIndex - 1);
+  }, [currentIndex, goToSlide, isTransitioning]);
 
   const goToNext = useCallback(() => {
-    const newIndex = currentIndex < items.length - 1 ? currentIndex + 1 : items.length - 1;
-    setCurrentIndex(newIndex);
-    onSlideChange?.(newIndex);
-  }, [currentIndex, items.length, onSlideChange]);
+    if (isTransitioning || currentIndex >= items.length - 1) return;
+    goToSlide(currentIndex + 1);
+  }, [currentIndex, items.length, goToSlide, isTransitioning]);
 
   const handlers = useSwipeable({
     onSwipedLeft: () => {
-      if (currentIndex < items.length - 1) {
+      if (!isTransitioning && currentIndex < items.length - 1) {
         goToNext();
       }
     },
     onSwipedRight: () => {
-      if (currentIndex > 0) {
+      if (!isTransitioning && currentIndex > 0) {
         goToPrevious();
       }
     },
-    trackMouse: true,
+    trackMouse: false, // Disable mouse tracking for better mobile performance
     trackTouch: true,
     preventScrollOnSwipe: true,
-    delta: 50
+    delta: 30, // Lower threshold for better mobile responsiveness
+    swipeDuration: 500, // Shorter duration for quicker response
+    touchEventOptions: { passive: false } // Better touch event handling
   });
 
   if (items.length === 0) return null;
@@ -64,20 +73,25 @@ const SwipeCarousel = memo(({
       {/* Carousel container */}
       <div 
         {...handlers} 
-        className="relative overflow-hidden w-full select-none"
-        style={{ touchAction: 'pan-y' }}
+        className="relative overflow-hidden w-full select-none touch-pan-y"
         onDragStart={(e) => e.preventDefault()}
+        onContextMenu={(e) => e.preventDefault()}
       >
         <div
-          className="flex transition-transform duration-300 ease-out"
+          className={cn(
+            "flex ease-out",
+            isTransitioning ? "transition-transform duration-300" : ""
+          )}
           style={{
             transform: `translateX(-${currentIndex * 100}%)`,
+            willChange: 'transform'
           }}
         >
           {items.map((item, index) => (
             <div
               key={index}
               className="w-full flex-shrink-0"
+              style={{ touchAction: 'pan-y' }}
             >
               {item}
             </div>
@@ -93,16 +107,16 @@ const SwipeCarousel = memo(({
             size="icon"
             className="absolute left-2 top-1/2 -translate-y-1/2 z-10 h-8 w-8 rounded-full bg-white/80 hover:bg-white"
             onClick={goToPrevious}
-            disabled={currentIndex === 0}
+            disabled={currentIndex === 0 || isTransitioning}
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
           <Button
-            variant="outline"
+            variant="outline" 
             size="icon"
             className="absolute right-2 top-1/2 -translate-y-1/2 z-10 h-8 w-8 rounded-full bg-white/80 hover:bg-white"
             onClick={goToNext}
-            disabled={currentIndex === items.length - 1}
+            disabled={currentIndex === items.length - 1 || isTransitioning}
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
@@ -116,6 +130,7 @@ const SwipeCarousel = memo(({
             <button
               key={index}
               onClick={() => goToSlide(index)}
+              disabled={isTransitioning}
               className={cn(
                 "w-2 h-2 rounded-full transition-colors duration-200",
                 index === currentIndex 
