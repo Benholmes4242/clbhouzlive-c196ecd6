@@ -220,16 +220,12 @@ export const usePostSubmission = () => {
       return;
     }
 
-    // Show instant feedback
-    const hasVideos = mediaFiles.some(file => file.type.startsWith('video/'));
+    // Show centered "Post shared!" toast message
     toast({
-      title: "Post shared!",
-      description: hasVideos 
-        ? "Processing video in background..." 
-        : mediaFiles.length > 0 
-          ? "Uploading media in background..." 
-          : "Your post has been shared successfully.",
-      duration: 2000
+      title: "Post shared! It's out there! 🎉",
+      description: "",
+      duration: 2000,
+      className: "fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black text-white border-none text-center font-semibold"
     });
 
     // Create optimistic post for immediate UI update
@@ -309,7 +305,8 @@ export const usePostSubmission = () => {
 
       console.log('Background upload process completed successfully');
 
-      // Show success message for videos
+      // Show success message for videos (only if there were videos)
+      const hasVideos = mediaFiles.some(file => file.type.startsWith('video/'));
       if (hasVideos) {
         toast({
           title: "Video processed!",
