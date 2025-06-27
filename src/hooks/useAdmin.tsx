@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
-interface AdminUser {
+export interface AdminUser {
   id: string;
   email: string;
   auth_created_at: string;
