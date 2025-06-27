@@ -1,4 +1,3 @@
-
 import React, { useRef, useState } from 'react';
 import { Camera } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -84,7 +83,6 @@ const FloatingPostButton = () => {
           <div className="plus-icon">
             <Camera className="h-5 w-5" />
           </div>
-          <div className="post-label">Post</div>
         </button>
       </div>
       
@@ -191,17 +189,6 @@ const FloatingPostButton = () => {
           display: flex;
           align-items: center;
           justify-content: center;
-        }
-
-        .post-label {
-          font-size: 8px;
-          margin-top: 1px;
-          color: #fff;
-          position: absolute;
-          bottom: -15px;
-          left: 50%;
-          transform: translateX(-50%);
-          font-weight: 500;
         }
       `}</style>
     </>
