@@ -96,22 +96,22 @@ const CourseExplorer = () => {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row gap-4">
-        {/* Search */}
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-          <Input
-            placeholder="Search courses, countries, or regions..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
-          />
-        </div>
+    <div className="space-y-3">
+      {/* Search */}
+      <div className="relative max-w-md">
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+        <Input
+          placeholder="Search courses, countries, or regions..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="pl-10"
+        />
+      </div>
 
-        {/* Region Selection */}
+      {/* Region Selection */}
+      <div className="flex justify-start">
         <Select value={selectedRegion} onValueChange={setSelectedRegion}>
-          <SelectTrigger className="w-full sm:w-[200px]">
+          <SelectTrigger className="w-[200px]">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -134,7 +134,7 @@ const CourseExplorer = () => {
               key={course.id} 
               course={course} 
               viewContext={getViewContext()}
-              showPlayedButton={true}
+              showPlayedButton={false}
             />
           ))}
         </div>

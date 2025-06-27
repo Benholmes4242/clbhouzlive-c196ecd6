@@ -34,7 +34,7 @@ const CoursesContent = () => {
 
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
         <TabsList className={`grid w-full ${user ? 'grid-cols-3' : 'grid-cols-2'}`}>
-          <TabsTrigger value="explore">All Courses</TabsTrigger>
+          <TabsTrigger value="explore">Explore</TabsTrigger>
           {user && (
             <TabsTrigger value="friends-courses">
               Friend's Fairways
