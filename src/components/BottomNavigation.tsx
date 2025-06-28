@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Home, Building2, Trophy, Flag } from 'lucide-react';
+import { Home, Compass, Trophy, Flag } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const BottomNavigation = () => {
@@ -8,10 +8,10 @@ const BottomNavigation = () => {
   const location = useLocation();
   const [activeTab, setActiveTab] = useState('home');
 
-  // Updated tabs - changed Home to Clubhouse
+  // Updated tabs - changed second tab to Explore with compass icon
   const tabs = [
     { id: 'home', label: 'Clubhouse', icon: Home, path: '/' },
-    { id: 'clubhouse', label: 'Clubhouse', icon: Building2, path: '/clubhouse' },
+    { id: 'explore', label: 'Explore', icon: Compass, path: '/explore' },
     { id: 'tour-central', label: 'Tour Central', icon: Trophy, path: '/tour-central' },
     { id: 'courses', label: 'Courses', icon: Flag, path: '/courses' },
   ];
@@ -53,7 +53,7 @@ const BottomNavigation = () => {
               <button
                 key={tab.id}
                 onClick={() => handleTabClick(tab)}
-                className={`flex flex-col items-center justify-center space-y-1 transition-colors relative ${
+                className={`flex flex-col items-center justify-center space-y-1 transition-colors relative focus:outline-none ${
                   isActive
                     ? 'text-[#2a2626]'
                     : 'text-muted-foreground hover:text-foreground'
