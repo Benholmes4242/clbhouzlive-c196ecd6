@@ -14,19 +14,34 @@ export const useInfiniteExploreContent = () => {
   const [mockOffset, setMockOffset] = useState(0);
 
   const isValidImageUrl = (url: string): boolean => {
-    if (!url || typeof url !== 'string') return false;
+    if (!url || typeof url !== 'string' || url.trim() === '') {
+      console.log('Invalid URL - empty or not string:', url);
+      return false;
+    }
+    
+    // Check for common invalid patterns
+    if (url === 'null' || url === 'undefined' || url === '') {
+      console.log('Invalid URL - null/undefined string:', url);
+      return false;
+    }
+    
     // Check if it's a valid URL format
     try {
       new URL(url);
+      console.log('Valid URL:', url);
       return true;
     } catch {
       // If it's not a full URL, check if it's a relative path
-      return url.startsWith('/') || url.startsWith('http');
+      const isValid = url.startsWith('/') || url.startsWith('http');
+      console.log('URL validation result:', url, isValid);
+      return isValid;
     }
   };
 
   const fetchRealPosts = async (currentOffset: number) => {
     try {
+      console.log('Fetching real posts from offset:', currentOffset);
+      
       const { data: postsData, error } = await supabase
         .from('posts')
         .select(`
@@ -49,8 +64,11 @@ export const useInfiniteExploreContent = () => {
       }
 
       if (!postsData || postsData.length === 0) {
+        console.log('No posts data returned');
         return [];
       }
+
+      console.log('Raw posts data:', postsData);
 
       // Get unique user IDs
       const userIds = [...new Set(postsData.map(post => post.user_id))];
@@ -66,14 +84,26 @@ export const useInfiniteExploreContent = () => {
         return [];
       }
 
+      console.log('User profiles:', profiles);
+
       // Format posts for explore grid
       const formattedPosts = postsData.map(post => {
         const userProfile = profiles?.find(profile => profile.id === post.user_id);
         const media = (post.post_media || [])[0]; // Take first media item
         
-        if (!media || !isValidImageUrl(media.media_url)) return null;
+        console.log('Processing post:', {
+          postId: post.id,
+          mediaUrl: media?.media_url,
+          mediaType: media?.media_type,
+          hasValidUrl: media ? isValidImageUrl(media.media_url) : false
+        });
+        
+        if (!media || !isValidImageUrl(media.media_url)) {
+          console.log('Skipping post due to invalid media:', post.id);
+          return null;
+        }
 
-        return {
+        const formattedPost = {
           id: post.id,
           type: media.media_type as 'video' | 'image',
           src: media.media_url,
@@ -92,8 +122,12 @@ export const useInfiniteExploreContent = () => {
           label: Math.random() > 0.6 ? ['Pro Tip', 'Trending', 'From Clubhouse'][Math.floor(Math.random() * 3)] : undefined,
           isFollowing: Math.random() > 0.5
         };
+
+        console.log('Formatted post:', formattedPost);
+        return formattedPost;
       }).filter(Boolean) as ExploreContentItem[];
 
+      console.log('Final formatted posts:', formattedPosts);
       return formattedPosts;
     } catch (error) {
       console.error('Error fetching real posts:', error);
@@ -102,24 +136,44 @@ export const useInfiniteExploreContent = () => {
   };
 
   const getMockPosts = (currentMockOffset: number) => {
+    console.log('Getting mock posts from offset:', currentMockOffset);
+    
     const start = currentMockOffset % mockExploreContent.length;
     const end = Math.min(start + POSTS_PER_PAGE, mockExploreContent.length);
     
     let posts = mockExploreContent.slice(start, end);
+    console.log('Initial mock posts slice:', posts.length);
     
     // Filter out posts with invalid image URLs
-    posts = posts.filter(post => isValidImageUrl(post.src));
+    posts = posts.filter(post => {
+      const isValid = isValidImageUrl(post.src);
+      if (!isValid) {
+        console.log('Filtering out invalid mock post:', post.id, post.src);
+      }
+      return isValid;
+    });
+    
+    console.log('Mock posts after filtering:', posts.length);
     
     // If we need more posts and reached end, wrap around
     if (posts.length < POSTS_PER_PAGE && mockExploreContent.length > 0) {
       const remaining = POSTS_PER_PAGE - posts.length;
+      console.log('Need more posts, wrapping around for:', remaining);
+      
       const wrappedPosts = mockExploreContent.slice(0, remaining)
-        .filter(post => isValidImageUrl(post.src))
+        .filter(post => {
+          const isValid = isValidImageUrl(post.src);
+          if (!isValid) {
+            console.log('Filtering out invalid wrapped post:', post.id, post.src);
+          }
+          return isValid;
+        })
         .map(post => ({
           ...post,
           id: `${post.id}-${Math.random()}` // Ensure unique IDs
         }));
       posts = [...posts, ...wrappedPosts];
+      console.log('Final mock posts with wrapped:', posts.length);
     }
     
     return posts;
@@ -175,9 +229,11 @@ export const useInfiniteExploreContent = () => {
     
     // Load initial content
     const loadInitialContent = async () => {
+      console.log('Loading initial content');
       const realPosts = await fetchRealPosts(0);
       
       if (realPosts.length > 0) {
+        console.log('Setting initial real posts:', realPosts.length);
         setContent(realPosts);
         setOffset(POSTS_PER_PAGE);
         
@@ -185,11 +241,13 @@ export const useInfiniteExploreContent = () => {
           setRealPostsExhausted(true);
           // Also load some mock data to fill the page
           const mockPosts = getMockPosts(0);
+          console.log('Adding mock posts to fill page:', mockPosts.length);
           setContent(prev => [...prev, ...mockPosts]);
           setMockOffset(POSTS_PER_PAGE);
         }
       } else {
         // No real posts, start with mock data
+        console.log('No real posts, starting with mock data');
         setRealPostsExhausted(true);
         const mockPosts = getMockPosts(0);
         setContent(mockPosts);

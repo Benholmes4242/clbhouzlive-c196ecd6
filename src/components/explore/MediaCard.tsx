@@ -16,20 +16,47 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow }) => {
 
   if (item.type === 'cta') return null;
 
+  // Debug logging for blank thumbnails
+  console.log('MediaCard rendering:', {
+    id: item.id,
+    type: item.type,
+    src: item.src,
+    title: item.title,
+    hasValidSrc: !!item.src && item.src.length > 0
+  });
+
   const handleLike = () => {
     onLike(item.id);
   };
 
   const handleImageError = () => {
+    console.log('Image error for item:', item.id, item.src);
     setImageError(true);
   };
 
   const handleImageLoad = () => {
+    console.log('Image loaded successfully for item:', item.id);
     setImageLoaded(true);
   };
 
   // Fallback image for broken/missing images
   const fallbackImage = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
+
+  // If no valid src, show fallback immediately
+  if (!item.src || item.src.trim() === '') {
+    console.log('No valid src found for item:', item.id, 'using fallback');
+    return (
+      <div className="relative group cursor-pointer bg-white rounded-lg shadow-sm border overflow-hidden h-full">
+        <div className="relative w-full h-full overflow-hidden">
+          <img
+            src={fallbackImage}
+            alt={item.title || 'Content'}
+            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="relative group cursor-pointer bg-white rounded-lg shadow-sm border overflow-hidden h-full">
@@ -47,13 +74,13 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow }) => {
             {/* Loading placeholder */}
             {!imageLoaded && !imageError && (
               <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center">
-                <div className="w-8 h-8 bg-gray-300 rounded"></div>
+                <div className="w-8 h-8 bg-gray-300 rounded animate-spin"></div>
               </div>
             )}
             
             <img
               src={imageError ? fallbackImage : item.src}
-              alt={item.title}
+              alt={item.title || 'Content'}
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
               onError={handleImageError}
               onLoad={handleImageLoad}
