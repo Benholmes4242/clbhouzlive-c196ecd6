@@ -102,5 +102,18 @@ export const mockExploreContent: ExploreContentItem[] = [
     shares: 123,
     label: 'Trending',
     isFollowing: false
+  },
+  {
+    id: '9',
+    type: 'video',
+    src: 'https://images.unsplash.com/photo-1593111774240-d529f12cf4bb?w=400&h=550&fit=crop',
+    title: 'Epic Golf Course Flyover',
+    duration: '2:30',
+    user: { name: 'Drone Golf Pro', username: 'dronegolfpro', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face', verified: true },
+    likes: 1567,
+    comments: 89,
+    shares: 234,
+    label: 'Trending',
+    isFollowing: false
   }
 ];
