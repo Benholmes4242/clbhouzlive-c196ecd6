@@ -63,7 +63,8 @@ const CreatePostDialog = ({ onPostCreated, variant = 'header' }: CreatePostDialo
           <Button 
             variant="ghost" 
             size="icon" 
-            className="relative h-9 w-9 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground hover:text-primary-foreground"
+            className="relative h-9 w-9 rounded-full text-white hover:text-white"
+            style={{ backgroundColor: '#2a2626' }}
           >
             <Plus className="h-5 w-5" />
           </Button>
@@ -72,7 +73,8 @@ const CreatePostDialog = ({ onPostCreated, variant = 'header' }: CreatePostDialo
         return (
           <Button 
             size="icon" 
-            className="h-12 w-12 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg hover:shadow-xl transition-all duration-200"
+            className="h-12 w-12 rounded-full text-white shadow-lg hover:shadow-xl transition-all duration-200"
+            style={{ backgroundColor: '#2a2626' }}
           >
             <Plus className="h-6 w-6" />
           </Button>
@@ -81,14 +83,15 @@ const CreatePostDialog = ({ onPostCreated, variant = 'header' }: CreatePostDialo
         return (
           <Button 
             size="icon" 
-            className="h-8 w-8 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-200"
+            className="h-8 w-8 rounded-full text-white transition-all duration-200"
+            style={{ backgroundColor: '#2a2626' }}
           >
             <Plus className="h-4 w-4" />
           </Button>
         );
       default:
         return (
-          <Button size="sm" className="flex items-center space-x-2">
+          <Button size="sm" className="flex items-center space-x-2 text-white" style={{ backgroundColor: '#2a2626' }}>
             <Plus className="h-4 w-4" />
             <span>Share</span>
           </Button>

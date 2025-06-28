@@ -8,9 +8,9 @@ const BottomNavigation = () => {
   const location = useLocation();
   const [activeTab, setActiveTab] = useState('home');
 
-  // Updated tabs - removed the post button
+  // Updated tabs - changed Home to Clubhouse
   const tabs = [
-    { id: 'home', label: 'Home', icon: Home, path: '/' },
+    { id: 'home', label: 'Clubhouse', icon: Home, path: '/' },
     { id: 'clubhouse', label: 'Clubhouse', icon: Building2, path: '/clubhouse' },
     { id: 'tour-central', label: 'Tour Central', icon: Trophy, path: '/tour-central' },
     { id: 'courses', label: 'Courses', icon: Flag, path: '/courses' },
@@ -20,6 +20,8 @@ const BottomNavigation = () => {
     const currentTab = tabs.find(tab => tab.path === location.pathname);
     if (currentTab) {
       setActiveTab(currentTab.id);
+    } else if (location.pathname === '/') {
+      setActiveTab('home');
     }
   }, [location.pathname]);
 
@@ -46,6 +48,7 @@ const BottomNavigation = () => {
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
+            const isClubhouseTab = tab.id === 'home'; // First tab is the main clubhouse
             
             return (
               <button
@@ -53,14 +56,18 @@ const BottomNavigation = () => {
                 onClick={() => handleTabClick(tab)}
                 className={`flex flex-col items-center justify-center space-y-1 transition-colors relative ${
                   isActive
-                    ? 'text-green-600'
+                    ? isClubhouseTab 
+                      ? 'text-[#2a2626]'
+                      : 'text-green-600'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 <Icon className={`h-5 w-5 ${isActive ? 'fill-current' : ''}`} />
                 <span className="text-xs font-medium">{tab.label}</span>
                 {isActive && (
-                  <div className="absolute bottom-0 w-12 h-0.5 bg-green-600 rounded-full left-1/2 -translate-x-1/2" />
+                  <div className={`absolute bottom-0 w-12 h-0.5 rounded-full left-1/2 -translate-x-1/2 ${
+                    isClubhouseTab ? 'bg-[#2a2626]' : 'bg-green-600'
+                  }`} />
                 )}
               </button>
             );

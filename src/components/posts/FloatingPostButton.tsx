@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Camera } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -246,7 +245,7 @@ const FloatingPostButton = () => {
         }
 
         .post-btn {
-          background-color: #000;
+          background-color: #2a2626;
           color: #fff;
           border: none;
           border-radius: 50%;
