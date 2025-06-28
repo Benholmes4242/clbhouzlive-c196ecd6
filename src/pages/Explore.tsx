@@ -4,10 +4,12 @@ import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
 import ExploreFilters from '@/components/explore/ExploreFilters';
 import ExploreGrid from '@/components/explore/ExploreGrid';
+import MobileDebugConsole from '@/components/explore/MobileDebugConsole';
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 
 const Explore = () => {
   const [activeFilter, setActiveFilter] = useState('All');
+  const [debugVisible, setDebugVisible] = useState(false);
   const { 
     content, 
     loading, 
@@ -59,6 +61,12 @@ const Explore = () => {
       </main>
       
       <BottomNavigation />
+
+      {/* Mobile Debug Console */}
+      <MobileDebugConsole 
+        isVisible={debugVisible}
+        onToggle={() => setDebugVisible(!debugVisible)}
+      />
 
       <style>{`
         .scrollbar-hide {
