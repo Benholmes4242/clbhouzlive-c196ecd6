@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Heart, Play } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import { ExploreContentItem } from './types';
 import VideoPreview from '../posts/VideoPreview';
 
@@ -43,8 +43,8 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow }) => {
           </div>
         )}
 
-        {/* Engagement stats overlay */}
-        <div className="absolute bottom-2 left-2 right-2 flex justify-between items-center">
+        {/* Like button overlay */}
+        <div className="absolute bottom-2 left-2">
           <button
             onClick={handleLike}
             className="flex items-center space-x-1 bg-black bg-opacity-60 text-white px-2 py-1 rounded-full hover:bg-opacity-80 transition-all duration-200 text-sm"
@@ -52,21 +52,6 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow }) => {
             <Heart className="h-3 w-3" />
             <span className="font-medium">{item.likes}</span>
           </button>
-          
-          {item.comments && (
-            <div className="flex items-center space-x-3 text-white text-xs">
-              {item.comments > 0 && (
-                <span className="bg-black bg-opacity-60 px-2 py-1 rounded-full">
-                  💬 {item.comments}
-                </span>
-              )}
-              {item.shares && item.shares > 0 && (
-                <span className="bg-black bg-opacity-60 px-2 py-1 rounded-full">
-                  📤 {item.shares}
-                </span>
-              )}
-            </div>
-          )}
         </div>
 
         {/* User info overlay */}
@@ -83,15 +68,6 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow }) => {
             {item.user.verified && (
               <span className="text-blue-400 text-xs">✓</span>
             )}
-          </div>
-        )}
-
-        {/* Label overlay */}
-        {item.label && (
-          <div className="absolute bottom-12 left-2">
-            <span className="bg-amber-500 text-white text-xs px-2 py-1 rounded-full font-medium">
-              {item.label}
-            </span>
           </div>
         )}
       </div>
