@@ -24,6 +24,26 @@ const formatDescription = (description: string) => {
     ));
 };
 
+// Helper function to format location display
+const formatLocation = (course: any) => {
+  const parts = [];
+  
+  // Always start with country
+  parts.push(course.country);
+  
+  // Add sub_country if it exists
+  if (course.sub_country) {
+    parts.push(course.sub_country);
+  }
+  
+  // Add region if it exists and is different from country
+  if (course.region && course.region !== course.country) {
+    parts.push(course.region);
+  }
+  
+  return parts.join(', ');
+};
+
 const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
   course,
   isPlayed,
@@ -159,7 +179,7 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
           </h3>
           <div className="flex items-center text-xs text-muted-foreground mb-2">
             <MapPin className="h-3 w-3 mr-1" />
-            <span>{course.region ? `${course.region}, ` : ''}{course.country}</span>
+            <span>{formatLocation(course)}</span>
           </div>
           {course.description && (
             <p className="text-xs text-muted-foreground line-clamp-2">

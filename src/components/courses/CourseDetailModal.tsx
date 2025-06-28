@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -20,6 +19,7 @@ interface Course {
   name: string;
   country: string;
   region?: string;
+  sub_country?: string;
   continent?: string;
   global_rank?: number | null;
   regional_rank?: number | null;
@@ -134,6 +134,7 @@ const CourseDetailModal = ({ course, isOpen, onClose, viewingUserId }: CourseDet
           <CourseDetailInfo 
             region={course.region}
             country={course.country}
+            sub_country={course.sub_country}
             description={course.description}
           />
 

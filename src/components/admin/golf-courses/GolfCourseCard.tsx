@@ -25,15 +25,18 @@ const formatDescription = (description: string) => {
 const formatLocation = (course: GolfCourse) => {
   const parts = [];
   
+  // Always start with country
+  parts.push(course.country);
+  
+  // Add sub_country if it exists
   if (course.sub_country) {
     parts.push(course.sub_country);
   }
   
+  // Add region if it exists and is different from country
   if (course.region && course.region !== course.country) {
     parts.push(course.region);
   }
-  
-  parts.push(course.country);
   
   return parts.join(', ');
 };

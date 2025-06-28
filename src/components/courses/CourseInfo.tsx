@@ -40,15 +40,18 @@ const formatDescription = (description: string) => {
 const formatLocation = (props: { sub_country?: string; region?: string; country: string }) => {
   const parts = [];
   
+  // Always start with country
+  parts.push(props.country);
+  
+  // Add sub_country if it exists
   if (props.sub_country) {
     parts.push(props.sub_country);
   }
   
+  // Add region if it exists and is different from country
   if (props.region && props.region !== props.country) {
     parts.push(props.region);
   }
-  
-  parts.push(props.country);
   
   return parts.join(', ');
 };
