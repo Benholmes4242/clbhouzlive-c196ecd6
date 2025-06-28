@@ -16,17 +16,12 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow }) => {
 
   if (item.type === 'cta') return null;
 
-  // Enhanced debug logging for blank thumbnails
-  console.log('MediaCard rendering detailed:', {
+  console.log('MediaCard rendering:', {
     id: item.id,
     type: item.type,
     src: item.src,
     title: item.title,
-    hasValidSrc: !!item.src && item.src.length > 0,
-    srcLength: item.src?.length || 0,
-    srcType: typeof item.src,
-    isBlankOrWhitespace: !item.src || item.src.trim() === '',
-    actualSrcValue: JSON.stringify(item.src)
+    hasValidSrc: !!item.src && item.src.length > 0
   });
 
   const handleLike = () => {
@@ -80,10 +75,6 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow }) => {
             onLoad={() => console.log('Fallback image loaded for:', item.id)}
             onError={() => console.log('Even fallback image failed for:', item.id)}
           />
-          {/* Debug overlay for invalid src items */}
-          <div className="absolute top-1 left-1 bg-red-500 text-white text-xs px-1 py-0.5 rounded opacity-75">
-            Invalid Src
-          </div>
         </div>
       </div>
     );
@@ -94,18 +85,12 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow }) => {
       {/* Square Media Container */}
       <div className="relative w-full h-full overflow-hidden">
         {item.type === 'video' ? (
-          <>
-            <VideoPreview
-              src={item.src}
-              videoId={item.id}
-              className="w-full h-full"
-              isGridThumbnail={true}
-            />
-            {/* Debug overlay for videos */}
-            <div className="absolute top-1 right-1 bg-blue-500 text-white text-xs px-1 py-0.5 rounded opacity-75">
-              Video
-            </div>
-          </>
+          <VideoPreview
+            src={item.src}
+            videoId={item.id}
+            className="w-full h-full"
+            isGridThumbnail={true}
+          />
         ) : (
           <>
             {/* Loading placeholder */}
@@ -123,11 +108,6 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow }) => {
               onLoad={handleImageLoad}
               style={{ display: imageLoaded || imageError ? 'block' : 'none' }}
             />
-            
-            {/* Debug overlay for images */}
-            <div className="absolute top-1 right-1 bg-green-500 text-white text-xs px-1 py-0.5 rounded opacity-75">
-              {imageError ? 'Fallback' : 'Image'}
-            </div>
           </>
         )}
         

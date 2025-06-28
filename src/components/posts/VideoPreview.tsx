@@ -1,7 +1,6 @@
 
 import React, { useState } from 'react';
 import { Maximize2 } from 'lucide-react';
-import { useVideoAutoplay } from '@/hooks/useVideoAutoplay';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -25,12 +24,11 @@ const VideoPreview = ({
   const [isHovered, setIsHovered] = useState(false);
   const [hasError, setHasError] = useState(false);
   const isMobile = useIsMobile();
-  const { elementRef, isInView } = useIntersectionObserver({ threshold: 0.6 });
+  const { elementRef } = useIntersectionObserver({ threshold: 0.6 });
   
   // Detect iOS Safari
   const isIOSSafari = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
   
-  // Enhanced logging for video preview
   console.log('VideoPreview rendering:', {
     videoId,
     src,
@@ -40,16 +38,6 @@ const VideoPreview = ({
     isMobile,
     hasValidSrc: !!src && src.length > 0,
     srcType: typeof src
-  });
-  
-  // Disable autoplay completely on iOS Safari for grid thumbnails to prevent NotSupportedError
-  const shouldAutoplay = isGridThumbnail && !isIOSSafari;
-  
-  const { videoRef, isPlaying, isLoading } = useVideoAutoplay({
-    isInView: shouldAutoplay && isMobile ? isInView : false,
-    isHovered: shouldAutoplay && !isMobile ? isHovered : false,
-    videoId,
-    isGridContext: isGridThumbnail
   });
 
   const handleMouseEnter = () => {
@@ -68,26 +56,9 @@ const VideoPreview = ({
     e.stopPropagation();
     
     if (isGridThumbnail) {
-      // In grid view, clicking should open fullscreen or play/pause
+      // In grid view, clicking should open fullscreen
       onFullscreen?.();
       return;
-    }
-    
-    // Allow manual control on click in non-grid contexts
-    if (videoRef.current && !hasError) {
-      try {
-        if (videoRef.current.paused) {
-          videoRef.current.play().catch(error => {
-            console.log('Video play failed (expected on iOS):', error);
-            setHasError(true);
-          });
-        } else {
-          videoRef.current.pause();
-        }
-      } catch (error) {
-        console.log('Video control error (expected on iOS):', error);
-        setHasError(true);
-      }
     }
   };
 
@@ -122,7 +93,6 @@ const VideoPreview = ({
       onMouseLeave={handleMouseLeave}
     >
       <video
-        ref={videoRef}
         src={src}
         poster={poster}
         className="w-full h-full object-cover"
@@ -132,9 +102,8 @@ const VideoPreview = ({
         onClick={handleClick}
         onError={handleVideoError}
         preload="metadata"
-        // Add iOS-specific attributes
         webkit-playsinline="true"
-        controls={isIOSSafari && isGridThumbnail ? false : undefined}
+        controls={false}
       />
 
       {/* Show poster image overlay on iOS Safari for grid thumbnails */}
@@ -155,15 +124,8 @@ const VideoPreview = ({
         </div>
       )}
 
-      {/* Loading indicator - only show in non-grid contexts */}
-      {!isGridThumbnail && isLoading && !hasError && (
-        <div className="absolute inset-0 bg-black/10 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-2 border-white border-t-transparent"></div>
-        </div>
-      )}
-
       {/* Controls overlay - only show enlarge button on hover and not in grid thumbnails */}
-      {!isGridThumbnail && (isHovered || isPlaying) && !hasError && (
+      {!isGridThumbnail && isHovered && !hasError && (
         <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
           <button
             onClick={(e) => {
@@ -178,7 +140,7 @@ const VideoPreview = ({
       )}
 
       {/* Gradient overlay for better button visibility - only in non-grid contexts */}
-      {!isGridThumbnail && (isHovered || isPlaying) && !hasError && (
+      {!isGridThumbnail && isHovered && !hasError && (
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/30 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
       )}
     </div>
