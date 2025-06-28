@@ -261,9 +261,7 @@ const BottomNavigation = () => {
                   key={tab.id}
                   onClick={() => handleTabClick(tab)}
                   className={`flex flex-col items-center justify-center space-y-1 transition-colors relative focus:outline-none ${
-                    isActive && !isShareButton
-                      ? 'text-[#2a2626]'
-                      : isShareButton
+                    isActive
                       ? 'text-[#2a2626]'
                       : 'text-muted-foreground hover:text-foreground'
                   }`}
