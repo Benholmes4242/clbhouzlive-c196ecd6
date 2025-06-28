@@ -1,14 +1,12 @@
 
 import React, { useState } from 'react';
-import { Camera, Image, Video, X } from 'lucide-react';
+import { Camera } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePostSubmission } from '@/hooks/usePostSubmission';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 import { useTaggableEntities } from '@/hooks/useTaggableEntities';
 import { usePostCreationModal } from '@/hooks/usePostCreationModal';
-import PostMediaPreview from './PostMediaPreview';
-import CaptionInput from './CaptionInput';
+import PostOptionsModal from './PostOptionsModal';
+import PostCreationModal from './PostCreationModal';
 
 interface TaggableEntity {
   id: string;
@@ -209,42 +207,12 @@ const FloatingPostButton = () => {
         </button>
       </div>
 
-      {/* Options overlay */}
-      {showOptions && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-end justify-center z-[1001]">
-          <div className="bg-white rounded-t-lg p-6 w-full max-w-sm mb-0 animate-slide-up">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold">Create Post</h3>
-              <button
-                onClick={() => setShowOptions(false)}
-                className="p-2 hover:bg-gray-100 rounded-full"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            
-            <div className="space-y-3">
-              <Button
-                onClick={handleCameraClick}
-                className="w-full flex items-center gap-3 justify-start h-12"
-                variant="outline"
-              >
-                <Camera className="h-5 w-5" />
-                Take Photo/Video
-              </Button>
-              
-              <Button
-                onClick={handleLibraryClick}
-                className="w-full flex items-center gap-3 justify-start h-12"
-                variant="outline"
-              >
-                <Image className="h-5 w-5" />
-                Choose from Library
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+      <PostOptionsModal
+        isOpen={showOptions}
+        onClose={() => setShowOptions(false)}
+        onCameraClick={handleCameraClick}
+        onLibraryClick={handleLibraryClick}
+      />
       
       <input
         ref={fileInputRef}
@@ -254,42 +222,19 @@ const FloatingPostButton = () => {
         onChange={handleFileSelect}
       />
 
-      <Dialog open={isModalOpen} onOpenChange={closeModal}>
-        <DialogContent className="max-w-md mx-auto">
-          <DialogHeader>
-            <DialogTitle>Create Post</DialogTitle>
-          </DialogHeader>
-          
-          <div className="space-y-4">
-            <PostMediaPreview file={selectedFile} previewUrl={previewUrl} />
-
-            <CaptionInput
-              captionInputRef={captionInputRef}
-              onInput={handleCaptionInput}
-              showSuggestions={showSuggestions}
-              mentionSuggestions={mentionSuggestions}
-              onSelectMention={selectMention}
-            />
-
-            <div className="flex gap-2 justify-end">
-              <Button
-                variant="outline"
-                onClick={closeModal}
-                disabled={isSubmitting}
-              >
-                Cancel
-              </Button>
-              <Button
-                onClick={handleSubmitPost}
-                disabled={isSubmitting || !selectedFile}
-                className="bg-black text-white hover:bg-gray-800"
-              >
-                {isSubmitting ? 'Posting...' : 'Post'}
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <PostCreationModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        selectedFile={selectedFile}
+        previewUrl={previewUrl}
+        captionInputRef={captionInputRef}
+        onCaptionInput={handleCaptionInput}
+        showSuggestions={showSuggestions}
+        mentionSuggestions={mentionSuggestions}
+        onSelectMention={selectMention}
+        onSubmit={handleSubmitPost}
+        isSubmitting={isSubmitting}
+      />
 
       <style>{`
         .floating-post-button {
@@ -323,19 +268,6 @@ const FloatingPostButton = () => {
           content: attr(data-placeholder);
           color: #9ca3af;
           pointer-events: none;
-        }
-
-        .animate-slide-up {
-          animation: slideUp 0.3s ease-out;
-        }
-
-        @keyframes slideUp {
-          from {
-            transform: translateY(100%);
-          }
-          to {
-            transform: translateY(0);
-          }
         }
       `}</style>
     </>
