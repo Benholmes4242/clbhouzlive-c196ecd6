@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -70,7 +71,7 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-[100vw] max-h-[100vh] w-full h-full p-0 gap-0 flex items-center justify-center bg-black border-0">
+      <DialogContent className="max-w-[100vw] max-h-[100vh] w-full h-full p-0 gap-0 flex items-center justify-center bg-black border-0" hideClose>
         <div className="relative w-full h-full bg-black flex flex-col">
           {/* Top controls bar */}
           <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between p-4 bg-gradient-to-b from-black/60 to-transparent">
