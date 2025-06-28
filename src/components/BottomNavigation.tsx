@@ -2,24 +2,34 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { usePostCreationModal } from '@/hooks/usePostCreationModal';
-import NativeCameraSheet from '@/components/posts/NativeCameraSheet';
-import PostCreationModal from '@/components/posts/PostCreationModal';
+import { useTaggableEntities } from '@/hooks/useTaggableEntities';
+import { usePostSubmission } from '@/hooks/usePostSubmission';
+import { useSnapModal } from '@/hooks/useSnapModal';
+import SnapModal from '@/components/snap/SnapModal';
+import SnapComposerModal from '@/components/snap/SnapComposerModal';
+import SnapToast from '@/components/snap/SnapToast';
 import { navigationTabs } from './bottom-navigation/navigationTabs';
-import { useCameraHandlers } from './bottom-navigation/useCameraHandlers';
-import { usePostHandlers } from './bottom-navigation/usePostHandlers';
+
+interface TaggableEntity {
+  id: string;
+  entity_type: 'user' | 'golf_club' | 'business';
+  entity_id: string;
+  name: string;
+  username: string | null;
+}
 
 const BottomNavigation = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useSupabaseSession();
+  const { entities, searchEntities } = useTaggableEntities();
+  const { submitPost } = usePostSubmission();
   const [activeTab, setActiveTab] = useState('home');
-  const [showNativeSheet, setShowNativeSheet] = useState(false);
 
   const {
-    fileInputRef,
     captionInputRef,
-    isModalOpen,
+    isSnapModalOpen,
+    isComposerOpen,
     selectedFile,
     previewUrl,
     caption,
@@ -34,12 +44,15 @@ const BottomNavigation = () => {
     setSelectedTags,
     cursorPosition,
     setCursorPosition,
-    openModal,
-    closeModal
-  } = usePostCreationModal();
-
-  const { handleDirectUpload, handleCameraClick, handleLibraryClick, handleFileClick } = useCameraHandlers();
-  const { handleCaptionInput, selectMention, handleSubmitPost } = usePostHandlers();
+    showToast,
+    toastMessage,
+    openSnapModal,
+    closeSnapModal,
+    openComposer,
+    closeComposer,
+    showConfirmationToast,
+    hideToast
+  } = useSnapModal();
 
   useEffect(() => {
     const currentTab = navigationTabs.find(tab => tab.path === location.pathname);
@@ -51,10 +64,9 @@ const BottomNavigation = () => {
   }, [location.pathname]);
 
   const handleTabClick = (tab: { id: string; path: string | null; isAction?: boolean }) => {
-    if (tab.isAction && tab.id === 'share') {
+    if (tab.isAction && tab.id === 'snap') {
       if (!user) return;
-      // Directly trigger file upload without showing native sheet
-      handleDirectUpload(user);
+      openSnapModal();
     } else if (tab.path) {
       setActiveTab(tab.id);
       navigate(tab.path);
@@ -69,12 +81,165 @@ const BottomNavigation = () => {
     }
   };
 
-  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file || !user) return;
+  const handleCameraClick = () => {
+    if (!user) return;
+    closeSnapModal();
+    
+    setTimeout(() => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*,video/*';
+      input.capture = 'environment';
+      input.onchange = (e) => {
+        const target = e.target as HTMLInputElement;
+        const file = target.files?.[0];
+        if (file) {
+          openComposer(file);
+        }
+      };
+      input.click();
+    }, 100);
+  };
 
-    openModal(file);
-    event.target.value = '';
+  const handleImageClick = () => {
+    if (!user) return;
+    closeSnapModal();
+    
+    setTimeout(() => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.onchange = (e) => {
+        const target = e.target as HTMLInputElement;
+        const file = target.files?.[0];
+        if (file) {
+          openComposer(file);
+        }
+      };
+      input.click();
+    }, 100);
+  };
+
+  const handleVideoClick = () => {
+    if (!user) return;
+    closeSnapModal();
+    
+    setTimeout(() => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'video/*';
+      input.onchange = (e) => {
+        const target = e.target as HTMLInputElement;
+        const file = target.files?.[0];
+        if (file) {
+          openComposer(file);
+        }
+      };
+      input.click();
+    }, 100);
+  };
+
+  const handleCaptionInput = async (e: React.FormEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLDivElement;
+    const text = target.innerText;
+    setCaption(text);
+
+    const selection = window.getSelection();
+    if (selection && selection.rangeCount > 0) {
+      setCursorPosition(selection.getRangeAt(0).startOffset);
+    }
+
+    const words = text.split(/(\s+)/);
+    let currentPosition = 0;
+    let mentionWord = '';
+    
+    for (const word of words) {
+      if (currentPosition <= cursorPosition && cursorPosition <= currentPosition + word.length) {
+        if (word.startsWith('@') && word.length > 1) {
+          mentionWord = word;
+          break;
+        }
+      }
+      currentPosition += word.length;
+    }
+
+    if (mentionWord && mentionWord.length > 1) {
+      const query = mentionWord.slice(1);
+      await searchEntities(query);
+      
+      const uniqueEntities = entities.reduce((acc, entity) => {
+        const identifier = `${entity.entity_type}-${entity.entity_id}-${entity.username || entity.name}`;
+        if (!acc.find(item => 
+          `${item.entity_type}-${item.entity_id}-${item.username || item.name}` === identifier
+        )) {
+          acc.push(entity);
+        }
+        return acc;
+      }, [] as TaggableEntity[]);
+      
+      setMentionSuggestions(uniqueEntities);
+      setShowSuggestions(true);
+    } else {
+      setShowSuggestions(false);
+      setMentionSuggestions([]);
+    }
+  };
+
+  const selectMention = (entity: TaggableEntity) => {
+    const displayName = entity.username || entity.name;
+    
+    if (!selectedTags.find(tag => tag.id === entity.id)) {
+      setSelectedTags([...selectedTags, entity]);
+    }
+
+    const words = caption.split(/(\s+)/);
+    let currentPosition = 0;
+    
+    for (let i = 0; i < words.length; i++) {
+      const word = words[i];
+      if (currentPosition <= cursorPosition && cursorPosition <= currentPosition + word.length) {
+        if (word.startsWith('@')) {
+          words[i] = `@${displayName}`;
+          break;
+        }
+      }
+      currentPosition += word.length;
+    }
+    
+    const newCaption = words.join('');
+    setCaption(newCaption);
+    
+    if (captionInputRef.current) {
+      captionInputRef.current.innerText = newCaption;
+    }
+
+    setShowSuggestions(false);
+    setMentionSuggestions([]);
+  };
+
+  const handleSubmitPost = async () => {
+    if (!selectedFile || !user) return;
+
+    setIsSubmitting(true);
+    
+    try {
+      await submitPost({
+        user,
+        content: caption,
+        mediaFiles: [selectedFile],
+        selectedTags,
+        onSuccess: () => {
+          closeComposer();
+          showConfirmationToast("Your post is out there.");
+        },
+        onError: () => {
+          setIsSubmitting(false);
+        }
+      });
+    } catch (error) {
+      console.error('Error submitting post:', error);
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -110,42 +275,32 @@ const BottomNavigation = () => {
         </div>
       </nav>
 
-      <NativeCameraSheet
-        isOpen={showNativeSheet}
-        onClose={() => setShowNativeSheet(false)}
-        onCameraClick={() => handleCameraClick(user, setShowNativeSheet)}
-        onLibraryClick={() => handleLibraryClick(user, setShowNativeSheet)}
-        onFileClick={() => handleFileClick(user, setShowNativeSheet, openModal)}
-      />
-      
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/*,video/*"
-        style={{ display: 'none' }}
-        onChange={handleFileSelect}
+      <SnapModal
+        isOpen={isSnapModalOpen}
+        onClose={closeSnapModal}
+        onCameraClick={handleCameraClick}
+        onImageClick={handleImageClick}
+        onVideoClick={handleVideoClick}
       />
 
-      <PostCreationModal
-        isOpen={isModalOpen}
-        onClose={closeModal}
+      <SnapComposerModal
+        isOpen={isComposerOpen}
+        onClose={closeComposer}
         selectedFile={selectedFile}
         previewUrl={previewUrl}
         captionInputRef={captionInputRef}
-        onCaptionInput={(e) => handleCaptionInput(
-          e, caption, setCaption, cursorPosition, setCursorPosition, 
-          setShowSuggestions, setMentionSuggestions
-        )}
+        onCaptionInput={handleCaptionInput}
         showSuggestions={showSuggestions}
         mentionSuggestions={mentionSuggestions}
-        onSelectMention={(entity) => selectMention(
-          entity, caption, setCaption, cursorPosition, selectedTags, 
-          setSelectedTags, captionInputRef, setShowSuggestions, setMentionSuggestions
-        )}
-        onSubmit={() => handleSubmitPost(
-          selectedFile, user, caption, selectedTags, closeModal, setIsSubmitting
-        )}
+        onSelectMention={selectMention}
+        onSubmit={handleSubmitPost}
         isSubmitting={isSubmitting}
+      />
+
+      <SnapToast
+        message={toastMessage}
+        isVisible={showToast}
+        onHide={hideToast}
       />
     </>
   );
