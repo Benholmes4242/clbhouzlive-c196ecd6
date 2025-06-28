@@ -94,6 +94,7 @@ const BottomNavigation = () => {
         const target = e.target as HTMLInputElement;
         const file = target.files?.[0];
         if (file) {
+          console.log('Camera file selected:', file.name, file.type);
           openComposer(file);
         }
       };
@@ -113,6 +114,7 @@ const BottomNavigation = () => {
         const target = e.target as HTMLInputElement;
         const file = target.files?.[0];
         if (file) {
+          console.log('Image file selected:', file.name, file.type);
           openComposer(file);
         }
       };
@@ -132,6 +134,7 @@ const BottomNavigation = () => {
         const target = e.target as HTMLInputElement;
         const file = target.files?.[0];
         if (file) {
+          console.log('Video file selected:', file.name, file.type);
           openComposer(file);
         }
       };
@@ -218,7 +221,17 @@ const BottomNavigation = () => {
   };
 
   const handleSubmitPost = async () => {
-    if (!selectedFile || !user) return;
+    if (!selectedFile || !user) {
+      console.log('Cannot submit: missing file or user', { selectedFile: !!selectedFile, user: !!user });
+      return;
+    }
+
+    console.log('Starting post submission...', { 
+      fileName: selectedFile.name, 
+      fileType: selectedFile.type,
+      caption: caption,
+      selectedTags: selectedTags 
+    });
 
     setIsSubmitting(true);
     
@@ -229,10 +242,12 @@ const BottomNavigation = () => {
         mediaFiles: [selectedFile],
         selectedTags,
         onSuccess: () => {
+          console.log('Post submission successful');
           closeComposer();
-          showConfirmationToast("Your post is out there.");
+          showConfirmationToast("Your post is out there!");
         },
         onError: () => {
+          console.log('Post submission failed');
           setIsSubmitting(false);
         }
       });

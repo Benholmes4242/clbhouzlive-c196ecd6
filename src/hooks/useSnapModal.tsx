@@ -33,6 +33,7 @@ export const useSnapModal = () => {
   };
 
   const openComposer = (file: File) => {
+    console.log('Opening composer with file:', file.name, file.type);
     setSelectedFile(file);
     const url = URL.createObjectURL(file);
     setPreviewUrl(url);
@@ -41,12 +42,14 @@ export const useSnapModal = () => {
   };
 
   const closeComposer = () => {
+    console.log('Closing composer');
     setIsComposerOpen(false);
     setSelectedFile(null);
     setPreviewUrl('');
     setCaption('');
     setSelectedTags([]);
     setShowSuggestions(false);
+    setIsSubmitting(false);
     if (previewUrl) {
       URL.revokeObjectURL(previewUrl);
     }
