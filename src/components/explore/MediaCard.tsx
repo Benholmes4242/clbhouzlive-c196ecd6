@@ -2,7 +2,6 @@
 import React from 'react';
 import { Heart, MessageCircle, Share, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import VideoPreview from '@/components/posts/VideoPreview';
 import { MediaContentItem } from './types';
 
@@ -37,18 +36,6 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow }) => {
             className="w-full object-cover"
             loading="lazy"
           />
-        )}
-        
-        {/* Label Badge */}
-        {item.label && (
-          <div className="absolute top-2 left-2">
-            <Badge 
-              variant={item.label === 'Pro Tip' ? 'default' : 'secondary'}
-              className="text-xs"
-            >
-              {item.label}
-            </Badge>
-          </div>
         )}
       </div>
 
