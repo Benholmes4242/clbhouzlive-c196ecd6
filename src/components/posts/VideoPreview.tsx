@@ -11,7 +11,7 @@ interface VideoPreviewProps {
   className?: string;
   onFullscreen?: () => void;
   videoId: string;
-  isGridThumbnail?: boolean;
+  isGridThumbnail?: boolean; // New prop to indicate grid context
 }
 
 const VideoPreview = ({ 
@@ -26,21 +26,21 @@ const VideoPreview = ({
   const isMobile = useIsMobile();
   const { elementRef, isInView } = useIntersectionObserver({ threshold: 0.6 });
   
-  // For grid thumbnails: hover autoplay on desktop, random autoplay on mobile
+  // Don't auto-play in grid thumbnails
   const { videoRef, isPlaying, isLoading } = useVideoAutoplay({
-    isInView: isGridThumbnail && isMobile ? isInView : false,
-    isHovered: isGridThumbnail && !isMobile ? isHovered : false,
+    isInView: !isGridThumbnail && (isMobile ? isInView : false),
+    isHovered: !isGridThumbnail && (!isMobile ? isHovered : false),
     videoId
   });
 
   const handleMouseEnter = () => {
-    if (!isMobile && isGridThumbnail) {
+    if (!isMobile && !isGridThumbnail) {
       setIsHovered(true);
     }
   };
 
   const handleMouseLeave = () => {
-    if (!isMobile && isGridThumbnail) {
+    if (!isMobile && !isGridThumbnail) {
       setIsHovered(false);
     }
   };
@@ -49,20 +49,12 @@ const VideoPreview = ({
     e.stopPropagation();
     
     if (isGridThumbnail) {
-      // In grid view, clicking should open fullscreen or toggle play
-      if (onFullscreen) {
-        onFullscreen();
-      } else if (videoRef.current) {
-        if (videoRef.current.paused) {
-          videoRef.current.play().catch(console.error);
-        } else {
-          videoRef.current.pause();
-        }
-      }
+      // In grid view, clicking should open fullscreen
+      onFullscreen?.();
       return;
     }
     
-    // Non-grid context behavior
+    // Allow manual control on click in non-grid contexts
     if (videoRef.current) {
       if (videoRef.current.paused) {
         videoRef.current.play().catch(console.error);
@@ -70,6 +62,11 @@ const VideoPreview = ({
         videoRef.current.pause();
       }
     }
+  };
+
+  const handleFullscreen = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onFullscreen?.();
   };
 
   return (
@@ -91,26 +88,28 @@ const VideoPreview = ({
         preload="metadata"
       />
 
-      {/* Loading indicator - only show for non-grid thumbnails */}
+      {/* Loading indicator - only show in non-grid contexts */}
       {!isGridThumbnail && isLoading && (
         <div className="absolute inset-0 bg-black/10 flex items-center justify-center">
           <div className="animate-spin rounded-full h-8 w-8 border-2 border-white border-t-transparent"></div>
         </div>
       )}
 
-      {/* Fullscreen button - only for non-grid contexts */}
-      {!isGridThumbnail && (isHovered || isPlaying) && onFullscreen && (
+      {/* Controls overlay - only show enlarge button on hover and not in grid thumbnails */}
+      {!isGridThumbnail && (isHovered || isPlaying) && (
         <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
           <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onFullscreen();
-            }}
+            onClick={handleFullscreen}
             className="bg-black/70 text-white p-2 rounded-full hover:bg-black/80 transition-colors shadow-lg"
           >
             <Maximize2 className="h-4 w-4" />
           </button>
         </div>
+      )}
+
+      {/* Gradient overlay for better button visibility - only in non-grid contexts */}
+      {!isGridThumbnail && (isHovered || isPlaying) && (
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/30 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
       )}
     </div>
   );
