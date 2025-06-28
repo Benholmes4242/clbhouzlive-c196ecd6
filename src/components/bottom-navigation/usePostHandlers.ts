@@ -75,7 +75,8 @@ export const usePostHandlers = () => {
     const displayName = entity.username || entity.name;
     
     if (!selectedTags.find(tag => tag.id === entity.id)) {
-      setSelectedTags(prev => [...prev, entity]);
+      const newTags = [...selectedTags, entity];
+      setSelectedTags(newTags);
     }
 
     const words = caption.split(/(\s+)/);
