@@ -8,6 +8,7 @@ export interface ExploreContentItem {
   user?: {
     id: string;
     name: string;
+    username?: string;
     avatar: string;
     verified?: boolean;
   };
@@ -17,3 +18,22 @@ export interface ExploreContentItem {
   ctaDescription?: string;
   ctaButton?: string;
 }
+
+export interface CTAContentItem {
+  id: string;
+  type: 'cta';
+  title: string;
+  description: string;
+  src: string;
+  likes: number;
+}
+
+export const filterOptions = [
+  'All',
+  'Videos', 
+  'Photos',
+  'Pros',
+  'Tips',
+  'Trending',
+  'Clubs'
+];
