@@ -10,8 +10,40 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Masonry from 'react-masonry-css';
 
+// Define proper types for different content items
+interface BaseContentItem {
+  id: string;
+  type: string;
+}
+
+interface MediaContentItem extends BaseContentItem {
+  type: 'video' | 'image';
+  src: string;
+  title: string;
+  duration?: string;
+  user: {
+    name: string;
+    username: string;
+    avatar: string;
+    verified: boolean;
+  };
+  likes: number;
+  comments: number;
+  shares: number;
+  label?: string;
+  isFollowing: boolean;
+}
+
+interface CTAContentItem extends BaseContentItem {
+  type: 'cta';
+  title: string;
+  description: string;
+}
+
+type ExploreContentItem = MediaContentItem | CTAContentItem;
+
 // Enhanced mock data with more variety and engagement metrics
-const mockExploreContent = [
+const mockExploreContent: ExploreContentItem[] = [
   {
     id: '1',
     type: 'video',
@@ -73,7 +105,7 @@ const mockExploreContent = [
     src: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=700&fit=crop',
     title: 'Swing Analysis Breakdown',
     duration: '3:45',
-    user: { name: 'Golf Academy Pro', username: 'golfacademy', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face', verified: true },
+    user: { name: 'Golf Academy Pro', username: 'golfacademy', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face', verified: true },  
     likes: 445,
     comments: 67,
     shares: 34,
@@ -113,7 +145,7 @@ const Explore = () => {
   const { query, setQuery, results, loading } = useSearch();
   const [showResults, setShowResults] = useState(false);
   const [activeFilter, setActiveFilter] = useState('All');
-  const [content, setContent] = useState(mockExploreContent);
+  const [content, setContent] = useState<ExploreContentItem[]>(mockExploreContent);
   const [isLoading, setIsLoading] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
@@ -156,19 +188,21 @@ const Explore = () => {
   }, [isLoading]);
 
   const handleLike = (contentId: string) => {
-    setContent(prev => prev.map(item => 
-      item.id === contentId && item.type !== 'cta' 
-        ? { ...item, likes: item.likes + 1 }
-        : item
-    ));
+    setContent(prev => prev.map(item => {
+      if (item.id === contentId && item.type !== 'cta') {
+        return { ...item, likes: item.likes + 1 };
+      }
+      return item;
+    }));
   };
 
   const handleFollow = (contentId: string) => {
-    setContent(prev => prev.map(item => 
-      item.id === contentId && item.type !== 'cta'
-        ? { ...item, isFollowing: !item.isFollowing }
-        : item
-    ));
+    setContent(prev => prev.map(item => {
+      if (item.id === contentId && item.type !== 'cta') {
+        return { ...item, isFollowing: !item.isFollowing };
+      }
+      return item;
+    }));
   };
 
   const filteredContent = content.filter(item => {
