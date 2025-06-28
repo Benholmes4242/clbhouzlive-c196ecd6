@@ -84,41 +84,56 @@ const BottomNavigation = () => {
 
   const handleCameraClick = () => {
     if (!user) return;
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*,video/*';
-    input.capture = 'environment';
-    input.onchange = (e) => {
-      const target = e.target as HTMLInputElement;
-      const file = target.files?.[0];
-      if (file) {
-        openModal(file);
-      }
-    };
-    input.click();
+    // Close the sheet immediately for faster UX
     setShowNativeSheet(false);
+    
+    // Small delay to allow sheet to close smoothly, then trigger camera
+    setTimeout(() => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*,video/*';
+      input.capture = 'environment';
+      input.onchange = (e) => {
+        const target = e.target as HTMLInputElement;
+        const file = target.files?.[0];
+        if (file) {
+          openModal(file);
+        }
+      };
+      input.click();
+    }, 100);
   };
 
   const handleLibraryClick = () => {
     if (!user) return;
-    fileInputRef.current?.click();
+    // Close the sheet immediately for faster UX
     setShowNativeSheet(false);
+    
+    // Small delay to allow sheet to close smoothly, then trigger file picker
+    setTimeout(() => {
+      fileInputRef.current?.click();
+    }, 100);
   };
 
   const handleFileClick = () => {
     if (!user) return;
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '*/*';
-    input.onchange = (e) => {
-      const target = e.target as HTMLInputElement;
-      const file = target.files?.[0];
-      if (file) {
-        openModal(file);
-      }
-    };
-    input.click();
+    // Close the sheet immediately for faster UX
     setShowNativeSheet(false);
+    
+    // Small delay to allow sheet to close smoothly, then trigger file picker
+    setTimeout(() => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '*/*';
+      input.onchange = (e) => {
+        const target = e.target as HTMLInputElement;
+        const file = target.files?.[0];
+        if (file) {
+          openModal(file);
+        }
+      };
+      input.click();
+    }, 100);
   };
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
