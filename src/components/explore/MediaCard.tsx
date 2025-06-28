@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Heart, Play } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import { ExploreContentItem } from './types';
 import VideoPreview from '../posts/VideoPreview';
 import MediaModal from './MediaModal';
@@ -13,7 +13,6 @@ interface MediaCardProps {
 
 const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow }) => {
   const [imageError, setImageError] = useState(false);
-  const [imageLoaded, setImageLoaded] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   if (item.type === 'cta') return null;
@@ -42,15 +41,6 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow }) => {
       errorType: 'IMAGE_LOAD_FAILED'
     });
     setImageError(true);
-  };
-
-  const handleImageLoad = () => {
-    console.log('Image loaded successfully:', {
-      id: item.id,
-      src: item.src,
-      type: item.type
-    });
-    setImageLoaded(true);
   };
 
   // Fallback image for broken/missing images
@@ -114,23 +104,12 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow }) => {
               onFullscreen={handleCardClick}
             />
           ) : (
-            <>
-              {/* Loading placeholder */}
-              {!imageLoaded && !imageError && (
-                <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center">
-                  <div className="w-8 h-8 bg-gray-300 rounded animate-spin"></div>
-                </div>
-              )}
-              
-              <img
-                src={imageError ? fallbackImage : item.src}
-                alt={item.title || 'Content'}
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                onError={handleImageError}
-                onLoad={handleImageLoad}
-                style={{ display: imageLoaded || imageError ? 'block' : 'none' }}
-              />
-            </>
+            <img
+              src={imageError ? fallbackImage : item.src}
+              alt={item.title || 'Content'}
+              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              onError={handleImageError}
+            />
           )}
 
           {/* Like button overlay - hidden on mobile */}

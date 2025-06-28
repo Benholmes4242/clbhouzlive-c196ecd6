@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Maximize2, Play } from 'lucide-react';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useVideoAutoplay } from '@/hooks/useVideoAutoplay';
@@ -14,6 +14,9 @@ interface VideoPreviewProps {
   isGridThumbnail?: boolean;
 }
 
+// Cache for generated thumbnails to avoid regeneration
+const thumbnailCache = new Map<string, string>();
+
 const VideoPreview = ({ 
   src, 
   poster, 
@@ -26,6 +29,7 @@ const VideoPreview = ({
   const [hasVideoError, setHasVideoError] = useState(false);
   const [thumbnailSrc, setThumbnailSrc] = useState<string>('');
   const [thumbnailReady, setThumbnailReady] = useState(false);
+  const thumbnailGeneratedRef = useRef(false);
   const isMobile = useIsMobile();
   const { elementRef, isInView } = useIntersectionObserver({ threshold: 0.8 });
   
@@ -45,14 +49,31 @@ const VideoPreview = ({
     poster,
     isGridThumbnail,
     thumbnailReady,
-    hasValidSrc: !!src && src.length > 0
+    hasValidSrc: !!src && src.length > 0,
+    cachedThumbnail: thumbnailCache.has(videoId)
   });
 
-  // Generate thumbnail immediately for instant display
+  // Immediate thumbnail setup - check cache first, then generate
   useEffect(() => {
-    if (!src || !isGridThumbnail) return;
+    if (!src || !isGridThumbnail || thumbnailGeneratedRef.current) return;
 
-    // Use video element to generate thumbnail immediately
+    // Check if we have a cached thumbnail first
+    const cachedThumbnail = thumbnailCache.get(videoId);
+    if (cachedThumbnail) {
+      console.log('Using cached thumbnail for:', videoId);
+      setThumbnailSrc(cachedThumbnail);
+      setThumbnailReady(true);
+      thumbnailGeneratedRef.current = true;
+      return;
+    }
+
+    // If we have a poster, use it immediately while generating thumbnail
+    if (poster) {
+      setThumbnailSrc(poster);
+      setThumbnailReady(true);
+    }
+
+    // Generate thumbnail aggressively for instant display
     const video = document.createElement('video');
     video.crossOrigin = 'anonymous';
     video.muted = true;
@@ -60,6 +81,8 @@ const VideoPreview = ({
     video.preload = 'metadata';
     
     const generateThumbnail = () => {
+      if (thumbnailGeneratedRef.current) return;
+      
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       
@@ -67,24 +90,37 @@ const VideoPreview = ({
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         ctx.drawImage(video, 0, 0);
-        const dataURL = canvas.toDataURL('image/jpeg', 0.9);
+        const dataURL = canvas.toDataURL('image/jpeg', 0.8);
+        
+        // Cache the thumbnail for future use
+        thumbnailCache.set(videoId, dataURL);
+        
         setThumbnailSrc(dataURL);
         setThumbnailReady(true);
-        console.log('Thumbnail generated instantly for:', videoId);
+        thumbnailGeneratedRef.current = true;
+        console.log('Thumbnail generated and cached for:', videoId);
       }
     };
 
-    video.onloadeddata = () => {
-      video.currentTime = 0.1; // Get frame from beginning
-    };
-    
-    video.onseeked = generateThumbnail;
+    // Multiple event handlers to catch thumbnail generation as early as possible
+    video.onloadeddata = generateThumbnail;
     video.oncanplay = generateThumbnail;
+    video.onseeked = generateThumbnail;
+    
+    // Set video time to get first frame quickly
+    video.onloadedmetadata = () => {
+      video.currentTime = 0.1;
+    };
     
     video.onerror = () => {
       console.log('Video thumbnail generation failed for:', videoId);
       setHasVideoError(true);
-      setThumbnailReady(true); // Show fallback
+      if (!poster) {
+        // Only show fallback if no poster is available
+        setThumbnailSrc('https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center');
+      }
+      setThumbnailReady(true);
+      thumbnailGeneratedRef.current = true;
     };
     
     video.src = src;
@@ -93,7 +129,7 @@ const VideoPreview = ({
     return () => {
       video.src = '';
     };
-  }, [src, videoId, isGridThumbnail]);
+  }, [src, videoId, isGridThumbnail, poster]);
 
   const handleMouseEnter = () => {
     if (!isMobile && !isGridThumbnail && !isIOSSafari) {
@@ -131,7 +167,7 @@ const VideoPreview = ({
     );
   }
 
-  // For grid thumbnails, prioritize instant display
+  // For grid thumbnails, prioritize instant display with no loading states
   if (isGridThumbnail) {
     return (
       <div
@@ -139,12 +175,11 @@ const VideoPreview = ({
         className={`relative cursor-pointer group overflow-hidden bg-gray-900 ${className}`}
         onClick={handleClick}
       >
-        {/* Always show thumbnail first for instant display */}
+        {/* Always show thumbnail immediately - no loading states */}
         <img
           src={thumbnailSrc || poster || 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center'}
           alt="Video thumbnail"
           className="w-full h-full object-cover"
-          style={{ display: thumbnailReady || poster ? 'block' : 'none' }}
           onError={(e) => {
             const img = e.target as HTMLImageElement;
             if (img.src === thumbnailSrc && poster) {
@@ -170,19 +205,12 @@ const VideoPreview = ({
           />
         )}
         
-        {/* Small Instagram-style play icon in bottom-right corner */}
+        {/* Small Instagram-style play icon */}
         {shouldShowPlayIcon && (
           <div className="absolute bottom-2 right-2">
             <div className="w-6 h-6 bg-black/60 rounded-full flex items-center justify-center">
               <Play className="w-3 h-3 text-white fill-white ml-0.5" />
             </div>
-          </div>
-        )}
-        
-        {/* Loading indicator only when no thumbnail is ready */}
-        {!thumbnailReady && !poster && isLoading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-gray-900">
-            <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
           </div>
         )}
       </div>

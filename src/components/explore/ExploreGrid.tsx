@@ -43,6 +43,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     };
   }, [hasMore, isLoading, onLoadMore]);
 
+  // Only show skeleton loading on initial load, not during pagination
   if (isLoading && content.length === 0) {
     return (
       <div className="space-y-4">
@@ -67,7 +68,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
 
   return (
     <>
-      {/* Responsive Grid Layout */}
+      {/* Responsive Grid Layout - No loading states between content */}
       <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 md:gap-4">
         {content.map((item) => (
           <div key={item.id} className="aspect-square">
@@ -80,13 +81,11 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
         ))}
       </div>
       
-      {/* Infinite scroll sentinel */}
+      {/* Infinite scroll sentinel - minimal loading indicator */}
       <div id="scroll-sentinel" className="h-4">
-        {isLoading && (
-          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 md:gap-4 mt-4">
-            {[...Array(9)].map((_, i) => (
-              <div key={i} className="aspect-square bg-muted rounded-lg animate-pulse" />
-            ))}
+        {isLoading && content.length > 0 && (
+          <div className="flex justify-center py-4">
+            <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
           </div>
         )}
       </div>
