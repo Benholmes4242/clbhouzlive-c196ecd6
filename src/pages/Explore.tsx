@@ -3,6 +3,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Search } from 'lucide-react';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
+import FloatingPostButton from '@/components/posts/FloatingPostButton';
 import SearchResults from '@/components/search/SearchResults';
 import { useSearch } from '@/hooks/useSearch';
 import ExploreFilters from '@/components/explore/ExploreFilters';
@@ -131,6 +132,7 @@ const Explore = () => {
         />
       </main>
       
+      <FloatingPostButton />
       <BottomNavigation />
 
       <style>{`

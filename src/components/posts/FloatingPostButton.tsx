@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Camera } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -194,11 +195,14 @@ const FloatingPostButton = () => {
 
   if (!user) return null;
 
+  // Add class to hide button when modals are open
+  const shouldHideButton = showOptions || isModalOpen;
+
   return (
     <>
-      <div className="floating-post-button">
+      <div className={`post-button-container ${shouldHideButton ? 'hide-post-button' : ''}`}>
         <button 
-          className="post-btn"
+          className="post-button"
           onClick={handleButtonClick}
           aria-label="Create post"
         >
@@ -236,31 +240,35 @@ const FloatingPostButton = () => {
       />
 
       <style>{`
-        .floating-post-button {
+        .post-button-container {
           position: fixed;
-          bottom: 32px;
+          bottom: 60px;
           left: 50%;
           transform: translateX(-50%);
-          z-index: 1000;
+          z-index: 900;
         }
 
-        .post-btn {
+        .post-button {
+          width: 52px;
+          height: 52px;
           background-color: #2a2626;
-          color: #fff;
+          color: white;
           border: none;
           border-radius: 50%;
-          width: 43.5px;
-          height: 43.5px;
           display: flex;
           align-items: center;
           justify-content: center;
-          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
           cursor: pointer;
           transition: transform 0.2s ease;
         }
 
-        .post-btn:hover {
+        .post-button:hover {
           transform: scale(1.05);
+        }
+
+        .hide-post-button .post-button-container {
+          display: none !important;
         }
 
         [contenteditable]:empty:before {
