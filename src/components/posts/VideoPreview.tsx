@@ -28,7 +28,7 @@ const VideoPreview = ({
   const { elementRef, isInView } = useIntersectionObserver({ threshold: 0.6 });
   
   // Detect iOS Safari
-  const isIOSSafari = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  const isIOSSafari = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
   
   // Disable autoplay completely on iOS Safari for grid thumbnails to prevent NotSupportedError
   const shouldAutoplay = isGridThumbnail && !isIOSSafari;

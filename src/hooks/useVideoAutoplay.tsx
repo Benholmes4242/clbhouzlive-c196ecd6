@@ -1,4 +1,3 @@
-
 import { useRef, useEffect, useState } from 'react';
 
 interface UseVideoAutoplayProps {
@@ -19,7 +18,7 @@ export const useVideoAutoplay = ({
   const [isLoading, setIsLoading] = useState(false);
   
   // Detect iOS Safari
-  const isIOSSafari = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  const isIOSSafari = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
 
   useEffect(() => {
     const video = videoRef.current;
