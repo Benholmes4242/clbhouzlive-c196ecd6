@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -44,7 +45,10 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
     e.preventDefault();
     e.stopPropagation();
     
-    console.log('Share button clicked'); // Debug log
+    console.log('Share button clicked - Event type:', e.type);
+    console.log('Touch support:', 'ontouchstart' in window);
+    console.log('Navigator share available:', !!navigator.share);
+    console.log('User agent:', navigator.userAgent);
     
     const shareData = {
       title: item.title || 'Check out this content',
@@ -52,30 +56,63 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
       url: window.location.href
     };
 
+    console.log('Share data:', shareData);
+
     try {
-      if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
-        console.log('Using native share'); // Debug log
+      // Check for Web Share API support
+      if (navigator.share) {
+        console.log('Web Share API available');
+        
+        // Check if the data can be shared
+        if (navigator.canShare && !navigator.canShare(shareData)) {
+          console.log('Share data not supported, falling back to clipboard');
+          throw new Error('Share data not supported');
+        }
+        
+        console.log('Attempting native share...');
         await navigator.share(shareData);
+        console.log('Native share completed successfully');
+        
         toast({
           title: "Shared successfully",
           description: "Content shared via native sharing",
         });
       } else {
-        console.log('Using clipboard fallback'); // Debug log
-        // Fallback to clipboard
+        console.log('Web Share API not available, using clipboard fallback');
+        throw new Error('Web Share API not supported');
+      }
+    } catch (error) {
+      console.error('Share error:', error);
+      console.log('Error name:', error instanceof Error ? error.name : 'Unknown');
+      
+      // Don't show error toast if user cancelled the share
+      if (error instanceof Error && error.name === 'AbortError') {
+        console.log('User cancelled share dialog');
+        return;
+      }
+      
+      // Fallback to clipboard
+      try {
+        console.log('Attempting clipboard fallback...');
         await navigator.clipboard.writeText(window.location.href);
+        console.log('Clipboard write successful');
+        
         toast({
           title: "Link copied",
           description: "Link copied to clipboard",
         });
-      }
-    } catch (error) {
-      console.error('Error sharing:', error);
-      // Don't show error toast if user just cancelled the share
-      if (error instanceof Error && error.name !== 'AbortError') {
+      } catch (clipboardError) {
+        console.error('Clipboard error:', clipboardError);
+        
+        // Final fallback - show a simple alert with the URL
+        const url = window.location.href;
+        if (window.confirm(`Copy this link to share:\n\n${url}\n\nClick OK to continue.`)) {
+          console.log('User acknowledged share URL');
+        }
+        
         toast({
-          title: "Sharing failed",
-          description: "Could not share the content",
+          title: "Manual copy required",
+          description: "Please copy the URL from your browser's address bar",
           variant: "destructive",
         });
       }
@@ -224,8 +261,16 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
                 <Button 
                   variant="ghost" 
                   size="sm" 
-                  className="text-white hover:bg-white/20" 
+                  className="text-white hover:bg-white/20 active:bg-white/30 transition-colors" 
                   onClick={handleShare}
+                  onTouchStart={(e) => {
+                    console.log('Touch start detected on share button');
+                    e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.3)';
+                  }}
+                  onTouchEnd={(e) => {
+                    console.log('Touch end detected on share button');
+                    e.currentTarget.style.backgroundColor = '';
+                  }}
                 >
                   <Share className="h-5 w-5" />
                 </Button>
