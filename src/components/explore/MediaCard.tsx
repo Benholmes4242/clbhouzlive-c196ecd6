@@ -1,7 +1,6 @@
 
 import React from 'react';
-import { Heart, MessageCircle, Share, UserPlus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Heart } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import VideoPreview from '@/components/posts/VideoPreview';
 import { MediaContentItem } from './types';
@@ -10,11 +9,24 @@ interface MediaCardProps {
   item: MediaContentItem;
   onLike: (contentId: string) => void;
   onFollow: (contentId: string) => void;
+  onClick: (item: MediaContentItem) => void;
 }
 
-const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow }) => {
+const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onClick }) => {
+  const handleClick = () => {
+    onClick(item);
+  };
+
+  const handleLikeClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onLike(item.id);
+  };
+
   return (
-    <div className="bg-card rounded-lg overflow-hidden shadow-sm border border-border hover:shadow-md transition-shadow">
+    <div 
+      className="bg-card rounded-lg overflow-hidden shadow-sm border border-border hover:shadow-md transition-shadow cursor-pointer relative group"
+      onClick={handleClick}
+    >
       {/* Content */}
       <div className="relative">
         {item.type === 'video' ? (
@@ -23,9 +35,10 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow }) => {
               src={item.src}
               videoId={item.id}
               className="w-full"
+              isGridThumbnail={true}
             />
             {item.duration && (
-              <div className="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
+              <div className="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded z-10">
                 {item.duration}
               </div>
             )}
@@ -41,7 +54,7 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow }) => {
         
         {/* Label Badge */}
         {item.label && (
-          <div className="absolute top-2 left-2">
+          <div className="absolute top-2 left-2 z-10">
             <Badge 
               variant={item.label === 'Pro Tip' ? 'default' : 'secondary'}
               className="text-xs"
@@ -50,65 +63,20 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow }) => {
             </Badge>
           </div>
         )}
-      </div>
 
-      {/* User Info & Actions */}
-      <div className="p-3">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center space-x-2">
-            <img
-              src={item.user.avatar}
-              alt={item.user.name}
-              className="w-8 h-8 rounded-full object-cover"
-            />
-            <div>
-              <div className="flex items-center space-x-1">
-                <p className="text-sm font-medium">{item.user.name}</p>
-                {item.user.verified && (
-                  <div className="w-3 h-3 bg-blue-500 rounded-full flex items-center justify-center">
-                    <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
-                  </div>
-                )}
-              </div>
-              <p className="text-xs text-muted-foreground">@{item.user.username}</p>
-            </div>
-          </div>
-          
-          {!item.isFollowing && (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => onFollow(item.id)}
-              className="h-7 px-3 text-xs"
-            >
-              <UserPlus className="h-3 w-3 mr-1" />
-              Follow
-            </Button>
-          )}
+        {/* Embedded Like Counter */}
+        <div className="absolute bottom-2 left-2 z-10">
+          <button
+            onClick={handleLikeClick}
+            className="flex items-center space-x-1 bg-black/70 text-white px-2 py-1 rounded-full text-sm hover:bg-black/80 transition-colors"
+          >
+            <Heart className="h-3 w-3" />
+            <span>{item.likes.toLocaleString()}</span>
+          </button>
         </div>
 
-        {/* Engagement Stats */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <button
-              onClick={() => onLike(item.id)}
-              className="flex items-center space-x-1 hover:text-red-500 transition-colors"
-            >
-              <Heart className="h-4 w-4" />
-              <span className="text-sm">{item.likes.toLocaleString()}</span>
-            </button>
-            
-            <button className="flex items-center space-x-1 hover:text-blue-500 transition-colors">
-              <MessageCircle className="h-4 w-4" />
-              <span className="text-sm">{item.comments}</span>
-            </button>
-            
-            <button className="flex items-center space-x-1 hover:text-green-500 transition-colors">
-              <Share className="h-4 w-4" />
-              <span className="text-sm">{item.shares}</span>
-            </button>
-          </div>
-        </div>
+        {/* Hover overlay for better visual feedback */}
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
       </div>
     </div>
   );
