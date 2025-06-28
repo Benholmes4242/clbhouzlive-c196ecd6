@@ -38,7 +38,7 @@ const BottomNavigation = () => {
     closeModal
   } = usePostCreationModal();
 
-  const { handleCameraClick, handleLibraryClick, handleFileClick } = useCameraHandlers();
+  const { handleDirectUpload, handleCameraClick, handleLibraryClick, handleFileClick } = useCameraHandlers();
   const { handleCaptionInput, selectMention, handleSubmitPost } = usePostHandlers();
 
   useEffect(() => {
@@ -53,7 +53,8 @@ const BottomNavigation = () => {
   const handleTabClick = (tab: { id: string; path: string | null; isAction?: boolean }) => {
     if (tab.isAction && tab.id === 'share') {
       if (!user) return;
-      setShowNativeSheet(true);
+      // Directly trigger file upload without showing native sheet
+      handleDirectUpload(user);
     } else if (tab.path) {
       setActiveTab(tab.id);
       navigate(tab.path);

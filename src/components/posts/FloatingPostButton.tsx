@@ -45,7 +45,8 @@ const FloatingPostButton = () => {
 
   const handleButtonClick = () => {
     if (!user) return;
-    setShowNativeSheet(true);
+    // Directly trigger file picker instead of showing native sheet
+    fileInputRef.current?.click();
   };
 
   const handleCameraClick = () => {
@@ -160,7 +161,7 @@ const FloatingPostButton = () => {
     const displayName = entity.username || entity.name;
     
     if (!selectedTags.find(tag => tag.id === entity.id)) {
-      setSelectedTags(prev => [...prev, entity]);
+      setSelectedTags([...selectedTags, entity]);
     }
 
     const words = caption.split(/(\s+)/);
@@ -231,9 +232,9 @@ const FloatingPostButton = () => {
       <NativeCameraSheet
         isOpen={showNativeSheet}
         onClose={() => setShowNativeSheet(false)}
-        onCameraClick={handleCameraClick}
-        onLibraryClick={handleLibraryClick}
-        onFileClick={handleFileClick}
+        onCameraClick={() => {}}
+        onLibraryClick={() => {}}
+        onFileClick={() => {}}
       />
       
       <input

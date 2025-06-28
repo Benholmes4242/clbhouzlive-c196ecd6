@@ -4,6 +4,13 @@ import { usePostCreationModal } from '@/hooks/usePostCreationModal';
 export const useCameraHandlers = () => {
   const { fileInputRef, openModal } = usePostCreationModal();
 
+  const handleDirectUpload = (user: any) => {
+    if (!user) return;
+    
+    // Directly trigger the file picker without any intermediary modal
+    fileInputRef.current?.click();
+  };
+
   const handleCameraClick = (user: any, setShowNativeSheet: (show: boolean) => void) => {
     if (!user) return;
     // Close the sheet immediately for faster UX
@@ -59,6 +66,7 @@ export const useCameraHandlers = () => {
   };
 
   return {
+    handleDirectUpload,
     handleCameraClick,
     handleLibraryClick,
     handleFileClick
