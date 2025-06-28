@@ -1,34 +1,19 @@
 
-// Define proper types for different content items
-export interface BaseContentItem {
+export interface ExploreContentItem {
   id: string;
-  type: string;
-}
-
-export interface MediaContentItem extends BaseContentItem {
-  type: 'video' | 'image';
+  type: 'video' | 'image' | 'cta';
   src: string;
   title: string;
-  duration?: string;
-  user: {
-    name: string;
-    username: string;
-    avatar: string;
-    verified: boolean;
-  };
   likes: number;
-  comments: number;
-  shares: number;
+  user?: {
+    id: string;
+    name: string;
+    avatar: string;
+    verified?: boolean;
+  };
   label?: string;
-  isFollowing: boolean;
+  isFollowing?: boolean;
+  ctaTitle?: string;
+  ctaDescription?: string;
+  ctaButton?: string;
 }
-
-export interface CTAContentItem extends BaseContentItem {
-  type: 'cta';
-  title: string;
-  description: string;
-}
-
-export type ExploreContentItem = MediaContentItem | CTAContentItem;
-
-export const filterOptions = ['All', 'Pros', 'Clubs', 'Tips', 'Trending', 'New', 'Photos', 'Videos'];

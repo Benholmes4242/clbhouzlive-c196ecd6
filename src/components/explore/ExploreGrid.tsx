@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Masonry from 'react-masonry-css';
 import { ExploreContentItem } from './types';
 import ExploreContentCard from './ExploreContentCard';
@@ -18,6 +18,28 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({ content, onLike, onFollow, is
     700: 2,
     500: 2
   };
+
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {[...Array(12)].map((_, i) => (
+            <div key={i} className="aspect-square bg-muted rounded-lg animate-pulse" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (content.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <div className="text-6xl mb-4">📸</div>
+        <h3 className="text-lg font-semibold mb-2">No content yet</h3>
+        <p className="text-muted-foreground">Be the first to share something amazing!</p>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -39,13 +61,6 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({ content, onLike, onFollow, is
           </div>
         ))}
       </Masonry>
-
-      {/* Loading Indicator */}
-      {isLoading && (
-        <div className="flex justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-2 border-[#2a2626] border-t-transparent"></div>
-        </div>
-      )}
     </>
   );
 };
