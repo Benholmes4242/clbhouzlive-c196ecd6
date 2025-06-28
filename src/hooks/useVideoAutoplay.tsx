@@ -7,9 +7,11 @@ interface UseVideoAutoplayProps {
   videoId: string;
 }
 
-// Global state to track currently playing video
+// Global state to track currently playing video and mobile autoplay
 let currentlyPlayingVideo: string | null = null;
+let mobileAutoplayVideo: string | null = null;
 const videoInstances = new Map<string, HTMLVideoElement>();
+const mobileVideoPool: string[] = [];
 
 export const useVideoAutoplay = ({ isInView, isHovered, videoId }: UseVideoAutoplayProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -55,12 +57,41 @@ export const useVideoAutoplay = ({ isInView, isHovered, videoId }: UseVideoAutop
     setIsPlaying(false);
   }, [videoId]);
 
+  // Mobile random autoplay logic
+  const selectRandomMobileVideo = useCallback(() => {
+    if (mobileVideoPool.length === 0) return;
+    
+    // Pause current mobile autoplay video
+    if (mobileAutoplayVideo) {
+      const currentMobileVideo = videoInstances.get(mobileAutoplayVideo);
+      if (currentMobileVideo && !currentMobileVideo.paused) {
+        currentMobileVideo.pause();
+        currentMobileVideo.currentTime = 0;
+      }
+    }
+    
+    // Select new random video
+    const randomIndex = Math.floor(Math.random() * mobileVideoPool.length);
+    const selectedVideoId = mobileVideoPool[randomIndex];
+    const selectedVideo = videoInstances.get(selectedVideoId);
+    
+    if (selectedVideo) {
+      mobileAutoplayVideo = selectedVideoId;
+      selectedVideo.play().catch(console.error);
+    }
+  }, []);
+
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
     // Register video instance
     videoInstances.set(videoId, video);
+    
+    // Add to mobile video pool
+    if (!mobileVideoPool.includes(videoId)) {
+      mobileVideoPool.push(videoId);
+    }
 
     const handlePlay = () => setIsPlaying(true);
     const handlePause = () => setIsPlaying(false);
@@ -72,28 +103,65 @@ export const useVideoAutoplay = ({ isInView, isHovered, videoId }: UseVideoAutop
     video.addEventListener('loadstart', handleLoadStart);
     video.addEventListener('canplay', handleCanPlay);
 
+    // Mobile random autoplay timer
+    const isMobile = window.innerWidth < 768;
+    let mobileInterval: NodeJS.Timeout;
+    
+    if (isMobile && mobileVideoPool.length > 0 && !mobileAutoplayVideo) {
+      // Start random autoplay after a short delay
+      setTimeout(() => {
+        selectRandomMobileVideo();
+        
+        // Change video every 5 seconds
+        mobileInterval = setInterval(selectRandomMobileVideo, 5000);
+      }, 1000);
+    }
+
     return () => {
       video.removeEventListener('play', handlePlay);
       video.removeEventListener('pause', handlePause);
       video.removeEventListener('loadstart', handleLoadStart);
       video.removeEventListener('canplay', handleCanPlay);
+      
       videoInstances.delete(videoId);
+      const poolIndex = mobileVideoPool.indexOf(videoId);
+      if (poolIndex > -1) {
+        mobileVideoPool.splice(poolIndex, 1);
+      }
+      
       if (currentlyPlayingVideo === videoId) {
         currentlyPlayingVideo = null;
       }
+      if (mobileAutoplayVideo === videoId) {
+        mobileAutoplayVideo = null;
+      }
+      
+      if (mobileInterval) {
+        clearInterval(mobileInterval);
+      }
     };
-  }, [videoId]);
+  }, [videoId, selectRandomMobileVideo]);
 
-  // Handle autoplay based on hover (desktop) or in-view (mobile)
+  // Handle desktop hover and mobile in-view autoplay
   useEffect(() => {
-    const shouldPlay = isHovered || isInView;
+    const isMobile = window.innerWidth < 768;
     
-    if (shouldPlay && !isPlaying) {
-      playVideo();
-    } else if (!shouldPlay && isPlaying) {
-      pauseVideo();
+    if (!isMobile) {
+      // Desktop: hover behavior
+      if (isHovered && !isPlaying) {
+        playVideo();
+      } else if (!isHovered && isPlaying && currentlyPlayingVideo === videoId) {
+        pauseVideo();
+      }
+    } else {
+      // Mobile: in-view behavior (but respect random autoplay)
+      if (isInView && mobileAutoplayVideo === videoId && !isPlaying) {
+        playVideo();
+      } else if (!isInView && isPlaying && currentlyPlayingVideo === videoId) {
+        pauseVideo();
+      }
     }
-  }, [isHovered, isInView, isPlaying, playVideo, pauseVideo]);
+  }, [isHovered, isInView, isPlaying, playVideo, pauseVideo, videoId]);
 
   return {
     videoRef,
