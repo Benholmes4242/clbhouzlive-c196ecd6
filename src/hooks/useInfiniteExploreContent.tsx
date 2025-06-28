@@ -149,7 +149,41 @@ export const useInfiniteExploreContent = () => {
 
   // Initial load
   useEffect(() => {
-    loadMore();
+    // Reset state and start fresh
+    setContent([]);
+    setLoading(true);
+    setHasMore(true);
+    setOffset(0);
+    setRealPostsExhausted(false);
+    setMockOffset(0);
+    
+    // Load initial content
+    const loadInitialContent = async () => {
+      const realPosts = await fetchRealPosts(0);
+      
+      if (realPosts.length > 0) {
+        setContent(realPosts);
+        setOffset(POSTS_PER_PAGE);
+        
+        if (realPosts.length < POSTS_PER_PAGE) {
+          setRealPostsExhausted(true);
+          // Also load some mock data to fill the page
+          const mockPosts = getMockPosts(0);
+          setContent(prev => [...prev, ...mockPosts]);
+          setMockOffset(POSTS_PER_PAGE);
+        }
+      } else {
+        // No real posts, start with mock data
+        setRealPostsExhausted(true);
+        const mockPosts = getMockPosts(0);
+        setContent(mockPosts);
+        setMockOffset(POSTS_PER_PAGE);
+      }
+      
+      setLoading(false);
+    };
+    
+    loadInitialContent();
   }, []);
 
   return {
