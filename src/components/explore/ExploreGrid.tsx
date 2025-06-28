@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Masonry from 'react-masonry-css';
 import { ExploreContentItem } from './types';
@@ -14,24 +13,26 @@ interface ExploreGridProps {
 // Height classes for randomization
 const heightClasses = [
   'h-64',  // Small
-  'h-80',  // Medium
-  'h-96',  // Large  
   'h-72',  // Medium-small
+  'h-80',  // Medium
   'h-88',  // Medium-large
+  'h-96',  // Large  
 ];
 
-// Function to get a random height that's different from the previous one
-const getRandomHeight = (excludeHeight?: string): string => {
-  const availableHeights = excludeHeight 
-    ? heightClasses.filter(h => h !== excludeHeight)
+// Enhanced function to get a truly random height with better distribution
+const getRandomHeight = (excludeHeights: string[] = []): string => {
+  const availableHeights = excludeHeights.length > 0 
+    ? heightClasses.filter(h => !excludeHeights.includes(h))
     : heightClasses;
   
-  return availableHeights[Math.floor(Math.random() * availableHeights.length)];
+  // If we've excluded too many, reset and just exclude the first one
+  const finalHeights = availableHeights.length === 0 ? heightClasses.slice(1) : availableHeights;
+  
+  return finalHeights[Math.floor(Math.random() * finalHeights.length)];
 };
 
 const ExploreGrid: React.FC<ExploreGridProps> = ({ content, onLike, onFollow, isLoading }) => {
   const [itemHeights, setItemHeights] = useState<Record<string, string>>({});
-  const [columnLastHeights, setColumnLastHeights] = useState<Record<number, string>>({});
 
   const breakpointColumnsObj = {
     default: 4,
@@ -40,52 +41,86 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({ content, onLike, onFollow, is
     500: 2
   };
 
-  // Generate heights for content items with anti-uniformity logic
+  // Enhanced height generation with better anti-uniformity logic
   useEffect(() => {
     const newHeights: Record<string, string> = {};
-    const newColumnLastHeights: Record<number, string> = {};
+    const columnCount = window.innerWidth > 1100 ? 4 : window.innerWidth > 700 ? 3 : 2;
+    
+    // Track last few heights per column for better variety
+    const columnRecentHeights: Record<number, string[]> = {};
+    
+    // Initialize column tracking
+    for (let i = 0; i < columnCount; i++) {
+      columnRecentHeights[i] = [];
+    }
     
     content.forEach((item, index) => {
-      const columnCount = window.innerWidth > 1100 ? 4 : window.innerWidth > 700 ? 3 : 2;
       const columnIndex = index % columnCount;
       
-      // Get the last height used in this column
-      const lastHeightInColumn = newColumnLastHeights[columnIndex];
+      // Get recent heights for this column (last 2-3 items)
+      const recentHeightsInColumn = columnRecentHeights[columnIndex].slice(-2);
       
-      // Get a random height that's different from the last one in this column
-      const randomHeight = getRandomHeight(lastHeightInColumn);
+      // Also check adjacent columns for better distribution
+      const adjacentColumnHeights: string[] = [];
+      for (let col = 0; col < columnCount; col++) {
+        if (col !== columnIndex && columnRecentHeights[col].length > 0) {
+          adjacentColumnHeights.push(columnRecentHeights[col][columnRecentHeights[col].length - 1]);
+        }
+      }
+      
+      // Combine exclusions from same column and adjacent columns
+      const excludeHeights = [...recentHeightsInColumn, ...adjacentColumnHeights.slice(0, 1)];
+      
+      // Get a random height avoiding recent ones
+      const randomHeight = getRandomHeight(excludeHeights);
       
       newHeights[item.id] = randomHeight;
-      newColumnLastHeights[columnIndex] = randomHeight;
+      
+      // Update column tracking
+      columnRecentHeights[columnIndex].push(randomHeight);
+      
+      // Keep only last 3 heights per column to prevent memory buildup
+      if (columnRecentHeights[columnIndex].length > 3) {
+        columnRecentHeights[columnIndex] = columnRecentHeights[columnIndex].slice(-3);
+      }
     });
     
     setItemHeights(newHeights);
-    setColumnLastHeights(newColumnLastHeights);
   }, [content]);
 
-  // Handle window resize to recalculate heights if needed
+  // Handle window resize to recalculate heights
   useEffect(() => {
     const handleResize = () => {
-      // Trigger height recalculation on significant breakpoint changes
+      // Only recalculate if there's a significant change
+      const newColumnCount = window.innerWidth > 1100 ? 4 : window.innerWidth > 700 ? 3 : 2;
+      
+      // Trigger height recalculation with new column distribution
       const newHeights: Record<string, string> = {};
-      const newColumnLastHeights: Record<number, string> = {};
+      const columnRecentHeights: Record<number, string[]> = {};
+      
+      for (let i = 0; i < newColumnCount; i++) {
+        columnRecentHeights[i] = [];
+      }
       
       content.forEach((item, index) => {
-        const columnCount = window.innerWidth > 1100 ? 4 : window.innerWidth > 700 ? 3 : 2;
-        const columnIndex = index % columnCount;
-        
-        const lastHeightInColumn = newColumnLastHeights[columnIndex];
-        const randomHeight = getRandomHeight(lastHeightInColumn);
+        const columnIndex = index % newColumnCount;
+        const recentHeightsInColumn = columnRecentHeights[columnIndex].slice(-2);
+        const randomHeight = getRandomHeight(recentHeightsInColumn);
         
         newHeights[item.id] = randomHeight;
-        newColumnLastHeights[columnIndex] = randomHeight;
+        columnRecentHeights[columnIndex].push(randomHeight);
+        
+        if (columnRecentHeights[columnIndex].length > 3) {
+          columnRecentHeights[columnIndex] = columnRecentHeights[columnIndex].slice(-3);
+        }
       });
       
       setItemHeights(newHeights);
     };
 
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    const debouncedResize = debounce(handleResize, 300);
+    window.addEventListener('resize', debouncedResize);
+    return () => window.removeEventListener('resize', debouncedResize);
   }, [content]);
 
   return (
@@ -95,8 +130,9 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({ content, onLike, onFollow, is
         className="flex w-auto -ml-2"
         columnClassName="pl-2 bg-clip-padding"
       >
-        {content.map((item, index) => {
-          const dynamicHeight = itemHeights[item.id] || 'h-80';
+        {content.map((item) => {
+          // Use a more varied default if height isn't set yet
+          const dynamicHeight = itemHeights[item.id] || heightClasses[Math.floor(Math.random() * heightClasses.length)];
           
           return (
             <div key={item.id} className="mb-4">
@@ -120,6 +156,19 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({ content, onLike, onFollow, is
       )}
     </>
   );
+};
+
+// Simple debounce utility
+const debounce = (func: Function, wait: number) => {
+  let timeout: NodeJS.Timeout;
+  return function executedFunction(...args: any[]) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
 };
 
 export default ExploreGrid;
