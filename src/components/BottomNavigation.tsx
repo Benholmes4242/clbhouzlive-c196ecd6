@@ -62,7 +62,12 @@ const BottomNavigation = () => {
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                <Icon className={`h-5 w-5 ${isActive ? 'fill-current' : ''}`} />
+                <Icon 
+                  className="h-5 w-5" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  strokeWidth={2}
+                />
                 <span className="text-xs font-medium">{tab.label}</span>
                 {isActive && (
                   <div className={`absolute bottom-0 w-12 h-0.5 rounded-full left-1/2 -translate-x-1/2 ${
