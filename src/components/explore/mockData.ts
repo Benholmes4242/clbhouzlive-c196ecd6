@@ -43,16 +43,9 @@ export const mockExploreContent: ExploreContentItem[] = [
   },
   {
     id: '4',
-    type: 'video',
-    src: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=700&fit=crop',
-    title: 'Short Game Secrets',
-    duration: '3:45',
-    user: { name: 'Phil Mickelson', username: 'philmickelson', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face', verified: true },  
-    likes: 445,
-    comments: 67,
-    shares: 34,
-    label: 'Pro Tip',
-    isFollowing: true
+    type: 'cta',
+    title: 'Share Your Golf Moment',
+    description: 'Post your best shots and connect with golfers worldwide'
   },
   {
     id: '5',
@@ -67,17 +60,31 @@ export const mockExploreContent: ExploreContentItem[] = [
   },
   {
     id: '6',
+    type: 'video',
+    src: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=700&fit=crop',
+    title: 'Swing Analysis Breakdown',
+    duration: '3:45',
+    user: { name: 'Golf Academy Pro', username: 'golfacademy', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face', verified: true },  
+    likes: 445,
+    comments: 67,
+    shares: 34,
+    label: 'Pro Tip',
+    isFollowing: true
+  },
+  {
+    id: '7',
     type: 'image',
     src: 'https://images.unsplash.com/photo-1596727362302-b8d891c42ab8?w=400&h=350&fit=crop',
-    title: 'Perfect Golf Setup',
+    title: 'New Driver Setup',
     user: { name: 'Club Pro Mike', username: 'clubpromike', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=40&h=40&fit=crop&crop=face', verified: false },
     likes: 123,
     comments: 8,
     shares: 15,
+    label: 'From Clubhouse',
     isFollowing: false
   },
   {
-    id: '7',
+    id: '8',
     type: 'video',
     src: 'https://images.unsplash.com/photo-1566041510394-cf7c8fe21800?w=400&h=600&fit=crop',
     title: 'Course Tour: St. Andrews',
@@ -87,19 +94,6 @@ export const mockExploreContent: ExploreContentItem[] = [
     comments: 45,
     shares: 123,
     label: 'Trending',
-    isFollowing: false
-  },
-  {
-    id: '8',
-    type: 'video',
-    src: 'https://images.unsplash.com/photo-1593111774240-d529f12cf4bb?w=400&h=500&fit=crop',
-    title: 'Bunker Play Fundamentals',
-    duration: '2:45',
-    user: { name: 'Rory McIlroy', username: 'rorymcilroy', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face', verified: true },
-    likes: 678,
-    comments: 42,
-    shares: 89,
-    label: 'Pro Tip',
     isFollowing: false
   }
 ];

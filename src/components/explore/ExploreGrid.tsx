@@ -8,11 +8,10 @@ interface ExploreGridProps {
   content: ExploreContentItem[];
   onLike: (contentId: string) => void;
   onFollow: (contentId: string) => void;
-  onItemClick: (item: ExploreContentItem) => void;
   isLoading: boolean;
 }
 
-const ExploreGrid: React.FC<ExploreGridProps> = ({ content, onLike, onFollow, onItemClick, isLoading }) => {
+const ExploreGrid: React.FC<ExploreGridProps> = ({ content, onLike, onFollow, isLoading }) => {
   const breakpointColumnsObj = {
     default: 4,
     1100: 3,
@@ -32,8 +31,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({ content, onLike, onFollow, on
             <ExploreContentCard 
               item={item} 
               onLike={onLike} 
-              onFollow={onFollow}
-              onClick={onItemClick}
+              onFollow={onFollow} 
             />
           </div>
         ))}

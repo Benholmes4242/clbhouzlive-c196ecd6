@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Plus, X, Camera } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePostSubmission } from './PostSubmissionHandler';
 import PostContentForm from './PostContentForm';
@@ -76,7 +76,7 @@ const CreatePostDialog = ({ onPostCreated, variant = 'header' }: CreatePostDialo
             className="h-12 w-12 rounded-full text-white shadow-lg hover:shadow-xl transition-all duration-200"
             style={{ backgroundColor: '#2a2626' }}
           >
-            <Camera className="h-6 w-6" />
+            <Plus className="h-6 w-6" />
           </Button>
         );
       case 'bottom-nav':

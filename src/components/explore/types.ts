@@ -23,6 +23,12 @@ export interface MediaContentItem extends BaseContentItem {
   isFollowing: boolean;
 }
 
-export type ExploreContentItem = MediaContentItem;
+export interface CTAContentItem extends BaseContentItem {
+  type: 'cta';
+  title: string;
+  description: string;
+}
 
-export const filterOptions = ['Trending', 'Pros', 'Tips', 'Videos', 'Photos'];
+export type ExploreContentItem = MediaContentItem | CTAContentItem;
+
+export const filterOptions = ['Trending', 'Pros', 'Tips', 'Photos', 'Videos'];
