@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { X, Heart, MessageCircle, Share, Volume2, VolumeX } from 'lucide-react';
+import { ArrowLeft, Heart, MessageCircle, Share, Volume2, VolumeX } from 'lucide-react';
 import { ExploreContentItem } from './types';
 
 interface MediaModalProps {
@@ -59,14 +59,14 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-[100vw] max-h-[100vh] w-full h-full p-0 gap-0 flex items-center justify-center bg-black border-0">
         <div className="relative w-full h-full bg-black flex flex-col">
-          {/* Close button */}
+          {/* Back button - top left */}
           <Button 
             variant="ghost" 
             size="icon" 
             onClick={onClose}
-            className="absolute top-4 right-4 z-10 text-white hover:bg-white/20"
+            className="absolute top-4 left-4 z-10 text-white hover:bg-white/20 min-w-[40px] min-h-[40px]"
           >
-            <X className="h-5 w-5" />
+            <ArrowLeft className="h-5 w-5" />
           </Button>
 
           {/* Media Content */}
