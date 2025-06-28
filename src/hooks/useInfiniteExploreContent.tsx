@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { mockExploreContent } from '@/components/explore/mockData';
@@ -13,6 +12,18 @@ export const useInfiniteExploreContent = () => {
   const [offset, setOffset] = useState(0);
   const [realPostsExhausted, setRealPostsExhausted] = useState(false);
   const [mockOffset, setMockOffset] = useState(0);
+
+  const isValidImageUrl = (url: string): boolean => {
+    if (!url || typeof url !== 'string') return false;
+    // Check if it's a valid URL format
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      // If it's not a full URL, check if it's a relative path
+      return url.startsWith('/') || url.startsWith('http');
+    }
+  };
 
   const fetchRealPosts = async (currentOffset: number) => {
     try {
@@ -60,7 +71,7 @@ export const useInfiniteExploreContent = () => {
         const userProfile = profiles?.find(profile => profile.id === post.user_id);
         const media = (post.post_media || [])[0]; // Take first media item
         
-        if (!media) return null;
+        if (!media || !isValidImageUrl(media.media_url)) return null;
 
         return {
           id: post.id,
@@ -96,14 +107,19 @@ export const useInfiniteExploreContent = () => {
     
     let posts = mockExploreContent.slice(start, end);
     
+    // Filter out posts with invalid image URLs
+    posts = posts.filter(post => isValidImageUrl(post.src));
+    
     // If we need more posts and reached end, wrap around
     if (posts.length < POSTS_PER_PAGE && mockExploreContent.length > 0) {
       const remaining = POSTS_PER_PAGE - posts.length;
-      const wrappedPosts = mockExploreContent.slice(0, remaining);
-      posts = [...posts, ...wrappedPosts.map(post => ({
-        ...post,
-        id: `${post.id}-${Math.random()}` // Ensure unique IDs
-      }))];
+      const wrappedPosts = mockExploreContent.slice(0, remaining)
+        .filter(post => isValidImageUrl(post.src))
+        .map(post => ({
+          ...post,
+          id: `${post.id}-${Math.random()}` // Ensure unique IDs
+        }));
+      posts = [...posts, ...wrappedPosts];
     }
     
     return posts;

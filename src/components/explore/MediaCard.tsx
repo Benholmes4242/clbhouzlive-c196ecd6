@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Heart } from 'lucide-react';
 import { ExploreContentItem } from './types';
 import VideoPreview from '../posts/VideoPreview';
@@ -11,11 +11,25 @@ interface MediaCardProps {
 }
 
 const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow }) => {
+  const [imageError, setImageError] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
+
   if (item.type === 'cta') return null;
 
   const handleLike = () => {
     onLike(item.id);
   };
+
+  const handleImageError = () => {
+    setImageError(true);
+  };
+
+  const handleImageLoad = () => {
+    setImageLoaded(true);
+  };
+
+  // Fallback image for broken/missing images
+  const fallbackImage = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
 
   return (
     <div className="relative group cursor-pointer bg-white rounded-lg shadow-sm border overflow-hidden h-full">
@@ -29,11 +43,23 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow }) => {
             isGridThumbnail={true}
           />
         ) : (
-          <img
-            src={item.src}
-            alt={item.title}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-          />
+          <>
+            {/* Loading placeholder */}
+            {!imageLoaded && !imageError && (
+              <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center">
+                <div className="w-8 h-8 bg-gray-300 rounded"></div>
+              </div>
+            )}
+            
+            <img
+              src={imageError ? fallbackImage : item.src}
+              alt={item.title}
+              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              onError={handleImageError}
+              onLoad={handleImageLoad}
+              style={{ display: imageLoaded || imageError ? 'block' : 'none' }}
+            />
+          </>
         )}
         
         {/* Video duration overlay - only for videos and hidden on mobile */}
@@ -61,6 +87,9 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow }) => {
               src={item.user.avatar}
               alt={item.user.name}
               className="w-6 h-6 rounded-full border border-white/50"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face';
+              }}
             />
             <span className="text-white text-xs font-medium bg-black bg-opacity-60 px-2 py-1 rounded-full">
               {item.user.name}
