@@ -50,12 +50,13 @@ const VideoPreview = ({
     isGridThumbnail,
     thumbnailReady,
     hasValidSrc: !!src && src.length > 0,
-    cachedThumbnail: thumbnailCache.has(videoId)
+    cachedThumbnail: thumbnailCache.has(videoId),
+    isMobile
   });
 
-  // Aggressive thumbnail generation - start immediately and cache results
+  // Generate thumbnails for both grid and non-grid contexts to fix desktop display
   useEffect(() => {
-    if (!src || !isGridThumbnail) return;
+    if (!src) return;
 
     // Check if we already have a cached thumbnail
     const cachedThumbnail = thumbnailCache.get(videoId);
@@ -87,7 +88,7 @@ const VideoPreview = ({
       setThumbnailReady(true);
     }
 
-    // Generate thumbnail with aggressive settings for immediate display
+    // Generate thumbnail for all contexts to ensure desktop display works
     const generateThumbnailPromise = new Promise<string>((resolve, reject) => {
       const video = document.createElement('video');
       video.crossOrigin = 'anonymous';
@@ -164,7 +165,7 @@ const VideoPreview = ({
         thumbnailPromises.delete(videoId);
       });
 
-  }, [src, videoId, isGridThumbnail, poster]);
+  }, [src, videoId, poster]);
 
   const handleMouseEnter = () => {
     if (!isMobile && !isGridThumbnail && !isIOSSafari) {
@@ -282,6 +283,7 @@ const VideoPreview = ({
     );
   }
 
+  // For non-grid context (desktop explore), show thumbnail first to prevent black display
   return (
     <div
       ref={elementRef}
@@ -289,10 +291,19 @@ const VideoPreview = ({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
+      {/* Show thumbnail as base layer to prevent black display on desktop */}
+      {thumbnailSrc && !isPlaying && (
+        <img
+          src={thumbnailSrc}
+          alt="Video thumbnail"
+          className="w-full h-full object-cover absolute inset-0"
+        />
+      )}
+
       <video
         ref={videoRef}
         src={src}
-        poster={poster}
+        poster={thumbnailSrc || poster}
         className="w-full h-full object-cover"
         muted
         loop
