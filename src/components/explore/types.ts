@@ -5,6 +5,9 @@ export interface ExploreContentItem {
   src: string;
   title: string;
   likes: number;
+  comments?: number;
+  shares?: number;
+  duration?: string;
   user?: {
     id: string;
     name: string;
