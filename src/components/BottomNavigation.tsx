@@ -20,9 +20,6 @@ const BottomNavigation = () => {
     const currentTab = tabs.find(tab => tab.path === location.pathname);
     if (currentTab) {
       setActiveTab(currentTab.id);
-    } else {
-      // Default to home if no match found
-      setActiveTab('home');
     }
   }, [location.pathname]);
 
@@ -54,16 +51,16 @@ const BottomNavigation = () => {
               <button
                 key={tab.id}
                 onClick={() => handleTabClick(tab)}
-                className={`flex flex-col items-center justify-center space-y-1 transition-colors relative group ${
+                className={`flex flex-col items-center justify-center space-y-1 transition-colors relative ${
                   isActive
-                    ? 'text-black dark:text-white'
-                    : 'text-gray-500 dark:text-gray-400'
+                    ? 'text-green-600'
+                    : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
-                <Icon className={`h-5 w-5 ${isActive ? 'fill-current' : ''} ${!isActive ? 'group-hover:text-black dark:group-hover:text-white' : ''}`} />
-                <span className={`text-xs font-medium ${!isActive ? 'group-hover:text-black dark:group-hover:text-white' : ''}`}>{tab.label}</span>
+                <Icon className={`h-5 w-5 ${isActive ? 'fill-current' : ''}`} />
+                <span className="text-xs font-medium">{tab.label}</span>
                 {isActive && (
-                  <div className="absolute bottom-0 w-12 h-0.5 bg-black dark:bg-white rounded-full left-1/2 -translate-x-1/2" />
+                  <div className="absolute bottom-0 w-12 h-0.5 bg-green-600 rounded-full left-1/2 -translate-x-1/2" />
                 )}
               </button>
             );
