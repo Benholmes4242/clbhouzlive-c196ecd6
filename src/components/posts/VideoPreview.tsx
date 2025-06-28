@@ -296,7 +296,7 @@ const VideoPreview = ({
         <img
           src={thumbnailSrc}
           alt="Video thumbnail"
-          className="w-full h-full object-cover absolute inset-0"
+          className="w-full h-full object-cover absolute inset-0 z-10"
         />
       )}
 
@@ -304,7 +304,7 @@ const VideoPreview = ({
         ref={videoRef}
         src={src}
         poster={thumbnailSrc || poster}
-        className="w-full h-full object-cover"
+        className={`w-full h-full object-cover ${isPlaying ? 'z-20' : 'z-0'} relative`}
         muted
         loop
         playsInline
@@ -316,7 +316,7 @@ const VideoPreview = ({
 
       {/* Controls overlay - only show enlarge button on hover and not in grid thumbnails */}
       {!isGridThumbnail && isHovered && (
-        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-30">
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -331,7 +331,7 @@ const VideoPreview = ({
 
       {/* Gradient overlay for better button visibility - only in non-grid contexts */}
       {!isGridThumbnail && isHovered && (
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/30 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/30 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-25" />
       )}
     </div>
   );
