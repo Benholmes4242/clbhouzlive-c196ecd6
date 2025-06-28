@@ -20,6 +20,9 @@ const BottomNavigation = () => {
     const currentTab = tabs.find(tab => tab.path === location.pathname);
     if (currentTab) {
       setActiveTab(currentTab.id);
+    } else {
+      // Default to home if no match found
+      setActiveTab('home');
     }
   }, [location.pathname]);
 
