@@ -43,9 +43,16 @@ export const mockExploreContent: ExploreContentItem[] = [
   },
   {
     id: '4',
-    type: 'cta',
-    title: 'Share Your Golf Moment',
-    description: 'Post your best shots and connect with golfers worldwide'
+    type: 'video',
+    src: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=550&fit=crop',
+    title: 'Viral Golf Trick Shot',
+    duration: '0:45',
+    user: { name: 'Golf Tricks Pro', username: 'golftricks', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=40&h=40&fit=crop&crop=face', verified: true },
+    likes: 2156,
+    comments: 234,
+    shares: 445,
+    label: 'Trending',
+    isFollowing: false
   },
   {
     id: '5',
