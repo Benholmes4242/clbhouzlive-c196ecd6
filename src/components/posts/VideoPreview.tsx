@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Maximize2 } from 'lucide-react';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -23,6 +23,7 @@ const VideoPreview = ({
 }: VideoPreviewProps) => {
   const [isHovered, setIsHovered] = useState(false);
   const [hasVideoError, setHasVideoError] = useState(false);
+  const [thumbnailSrc, setThumbnailSrc] = useState<string>('');
   const isMobile = useIsMobile();
   const { elementRef } = useIntersectionObserver({ threshold: 0.6 });
   
@@ -39,6 +40,56 @@ const VideoPreview = ({
     hasValidSrc: !!src && src.length > 0,
     srcType: typeof src
   });
+
+  // Generate thumbnail from video on component mount
+  useEffect(() => {
+    if (!src || !isGridThumbnail) return;
+
+    const generateThumbnail = () => {
+      const video = document.createElement('video');
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      
+      video.crossOrigin = 'anonymous';
+      video.muted = true;
+      video.playsInline = true;
+      
+      video.onloadeddata = () => {
+        // Set canvas size to match video
+        canvas.width = video.videoWidth || 400;
+        canvas.height = video.videoHeight || 400;
+        
+        // Seek to 1 second to get a better frame
+        video.currentTime = 1;
+      };
+      
+      video.onseeked = () => {
+        if (ctx && video.videoWidth > 0 && video.videoHeight > 0) {
+          // Draw video frame to canvas
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          
+          // Convert canvas to data URL
+          const dataURL = canvas.toDataURL('image/jpeg', 0.8);
+          setThumbnailSrc(dataURL);
+          
+          console.log('Generated thumbnail for video:', videoId);
+        }
+      };
+      
+      video.onerror = () => {
+        console.log('Failed to generate thumbnail for:', videoId);
+        setHasVideoError(true);
+      };
+      
+      video.src = src;
+      video.load();
+    };
+
+    // Only generate thumbnail for grid view
+    if (isGridThumbnail) {
+      generateThumbnail();
+    }
+  }, [src, videoId, isGridThumbnail]);
 
   const handleMouseEnter = () => {
     if (!isMobile && isGridThumbnail && !isIOSSafari) {
@@ -77,9 +128,9 @@ const VideoPreview = ({
     );
   }
 
-  // For iOS Safari in grid thumbnails or when video has error, show a placeholder image
-  if ((isIOSSafari && isGridThumbnail) || hasVideoError) {
-    const fallbackImage = poster || 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
+  // For grid thumbnails, show the generated thumbnail or poster
+  if (isGridThumbnail) {
+    const displaySrc = thumbnailSrc || poster || 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
     
     return (
       <div
@@ -88,18 +139,23 @@ const VideoPreview = ({
         onClick={handleClick}
       >
         <img
-          src={fallbackImage}
+          src={displaySrc}
           alt="Video thumbnail"
           className="w-full h-full object-cover"
           onError={(e) => {
-            // If even the fallback image fails, show a simple placeholder
-            (e.target as HTMLImageElement).style.display = 'none';
+            // If thumbnail fails, try poster, then fallback
+            const img = e.target as HTMLImageElement;
+            if (img.src === thumbnailSrc && poster) {
+              img.src = poster;
+            } else if (img.src !== 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center') {
+              img.src = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
+            }
           }}
         />
         
         {/* Video play indicator */}
-        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20">
-          <div className="w-12 h-12 bg-white bg-opacity-80 rounded-full flex items-center justify-center">
+        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20 opacity-0 group-hover:opacity-100 transition-opacity">
+          <div className="w-12 h-12 bg-white bg-opacity-90 rounded-full flex items-center justify-center shadow-lg">
             <div className="w-0 h-0 border-l-4 border-l-gray-800 border-t-2 border-b-2 border-t-transparent border-b-transparent ml-1"></div>
           </div>
         </div>

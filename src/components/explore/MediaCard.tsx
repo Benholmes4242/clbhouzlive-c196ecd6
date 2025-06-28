@@ -110,13 +110,6 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow }) => {
             />
           </>
         )}
-        
-        {/* Video duration overlay - only for videos and hidden on mobile */}
-        {item.type === 'video' && item.duration && (
-          <div className="absolute top-2 right-2 bg-black bg-opacity-75 text-white text-xs px-2 py-1 rounded hidden md:block">
-            {item.duration}
-          </div>
-        )}
 
         {/* Like button overlay - hidden on mobile */}
         <div className="absolute bottom-2 left-2 hidden md:block">
