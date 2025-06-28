@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { Maximize2, CirclePlay } from 'lucide-react';
+import { Maximize2, Play } from 'lucide-react';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useVideoAutoplay } from '@/hooks/useVideoAutoplay';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -66,23 +66,16 @@ const VideoPreview = ({
       video.playsInline = true;
       
       video.onloadeddata = () => {
-        // Set canvas size to match video
         canvas.width = video.videoWidth || 400;
         canvas.height = video.videoHeight || 400;
-        
-        // Seek to 1 second to get a better frame
         video.currentTime = 1;
       };
       
       video.onseeked = () => {
         if (ctx && video.videoWidth > 0 && video.videoHeight > 0) {
-          // Draw video frame to canvas
           ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-          
-          // Convert canvas to data URL
           const dataURL = canvas.toDataURL('image/jpeg', 0.8);
           setThumbnailSrc(dataURL);
-          
           console.log('Generated thumbnail for video:', videoId);
         }
       };
@@ -96,7 +89,6 @@ const VideoPreview = ({
       video.load();
     };
 
-    // Only generate thumbnail for grid view
     if (isGridThumbnail) {
       generateThumbnail();
     }
@@ -118,7 +110,6 @@ const VideoPreview = ({
     e.stopPropagation();
     
     if (isGridThumbnail) {
-      // In grid view, clicking should open fullscreen
       onFullscreen?.();
       return;
     }
@@ -194,10 +185,12 @@ const VideoPreview = ({
           />
         )}
         
-        {/* Play icon overlay for non-autoplaying videos */}
+        {/* Small Instagram-style play icon in bottom-right corner */}
         {shouldShowPlayIcon && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20">
-            <CirclePlay className="w-12 h-12 text-white opacity-80" fill="white" />
+          <div className="absolute bottom-2 right-2">
+            <div className="w-6 h-6 bg-black/60 rounded-full flex items-center justify-center">
+              <Play className="w-3 h-3 text-white fill-white ml-0.5" />
+            </div>
           </div>
         )}
         

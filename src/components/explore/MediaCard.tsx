@@ -1,8 +1,9 @@
 
 import React, { useState } from 'react';
-import { Heart } from 'lucide-react';
+import { Heart, Play } from 'lucide-react';
 import { ExploreContentItem } from './types';
 import VideoPreview from '../posts/VideoPreview';
+import MediaModal from './MediaModal';
 
 interface MediaCardProps {
   item: ExploreContentItem;
@@ -13,6 +14,7 @@ interface MediaCardProps {
 const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow }) => {
   const [imageError, setImageError] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   if (item.type === 'cta') return null;
 
@@ -24,8 +26,13 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow }) => {
     hasValidSrc: !!item.src && item.src.length > 0
   });
 
-  const handleLike = () => {
+  const handleLike = (e: React.MouseEvent) => {
+    e.stopPropagation();
     onLike(item.id);
+  };
+
+  const handleCardClick = () => {
+    setIsModalOpen(true);
   };
 
   const handleImageError = () => {
@@ -66,83 +73,105 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow }) => {
     });
     
     return (
-      <div className="relative group cursor-pointer bg-white rounded-lg shadow-sm border overflow-hidden h-full">
-        <div className="relative w-full h-full overflow-hidden">
-          <img
-            src={fallbackImage}
-            alt={item.title || 'Content'}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-            onLoad={() => console.log('Fallback image loaded for:', item.id)}
-            onError={() => console.log('Even fallback image failed for:', item.id)}
-          />
+      <>
+        <div 
+          className="relative group cursor-pointer bg-white rounded-lg shadow-sm border overflow-hidden h-full"
+          onClick={handleCardClick}
+        >
+          <div className="relative w-full h-full overflow-hidden">
+            <img
+              src={fallbackImage}
+              alt={item.title || 'Content'}
+              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+              onLoad={() => console.log('Fallback image loaded for:', item.id)}
+              onError={() => console.log('Even fallback image failed for:', item.id)}
+            />
+          </div>
         </div>
-      </div>
+        <MediaModal 
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          item={{ ...item, src: fallbackImage }}
+        />
+      </>
     );
   }
 
   return (
-    <div className="relative group cursor-pointer bg-white rounded-lg shadow-sm border overflow-hidden h-full">
-      {/* Square Media Container */}
-      <div className="relative w-full h-full overflow-hidden">
-        {item.type === 'video' ? (
-          <VideoPreview
-            src={item.src}
-            videoId={item.id}
-            className="w-full h-full"
-            isGridThumbnail={true}
-          />
-        ) : (
-          <>
-            {/* Loading placeholder */}
-            {!imageLoaded && !imageError && (
-              <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center">
-                <div className="w-8 h-8 bg-gray-300 rounded animate-spin"></div>
-              </div>
-            )}
-            
-            <img
-              src={imageError ? fallbackImage : item.src}
-              alt={item.title || 'Content'}
-              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-              onError={handleImageError}
-              onLoad={handleImageLoad}
-              style={{ display: imageLoaded || imageError ? 'block' : 'none' }}
+    <>
+      <div 
+        className="relative group cursor-pointer bg-white rounded-lg shadow-sm border overflow-hidden h-full"
+        onClick={handleCardClick}
+      >
+        {/* Square Media Container */}
+        <div className="relative w-full h-full overflow-hidden">
+          {item.type === 'video' ? (
+            <VideoPreview
+              src={item.src}
+              videoId={item.id}
+              className="w-full h-full"
+              isGridThumbnail={true}
+              onFullscreen={handleCardClick}
             />
-          </>
-        )}
+          ) : (
+            <>
+              {/* Loading placeholder */}
+              {!imageLoaded && !imageError && (
+                <div className="absolute inset-0 bg-gray-200 animate-pulse flex items-center justify-center">
+                  <div className="w-8 h-8 bg-gray-300 rounded animate-spin"></div>
+                </div>
+              )}
+              
+              <img
+                src={imageError ? fallbackImage : item.src}
+                alt={item.title || 'Content'}
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                onError={handleImageError}
+                onLoad={handleImageLoad}
+                style={{ display: imageLoaded || imageError ? 'block' : 'none' }}
+              />
+            </>
+          )}
 
-        {/* Like button overlay - hidden on mobile */}
-        <div className="absolute bottom-2 left-2 hidden md:block">
-          <button
-            onClick={handleLike}
-            className="flex items-center space-x-1 bg-black bg-opacity-60 text-white px-2 py-1 rounded-full hover:bg-opacity-80 transition-all duration-200 text-sm"
-          >
-            <Heart className="h-3 w-3" />
-            <span className="font-medium">{item.likes}</span>
-          </button>
-        </div>
-
-        {/* User info overlay - hidden on mobile */}
-        {item.user && (
-          <div className="absolute top-2 left-2 flex items-center space-x-2 hidden md:flex">
-            <img
-              src={item.user.avatar}
-              alt={item.user.name}
-              className="w-6 h-6 rounded-full border border-white/50"
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face';
-              }}
-            />
-            <span className="text-white text-xs font-medium bg-black bg-opacity-60 px-2 py-1 rounded-full">
-              {item.user.name}
-            </span>
-            {item.user.verified && (
-              <span className="text-blue-400 text-xs">✓</span>
-            )}
+          {/* Like button overlay - hidden on mobile */}
+          <div className="absolute bottom-2 left-2 hidden md:block">
+            <button
+              onClick={handleLike}
+              className="flex items-center space-x-1 bg-black bg-opacity-60 text-white px-2 py-1 rounded-full hover:bg-opacity-80 transition-all duration-200 text-sm"
+            >
+              <Heart className="h-3 w-3" />
+              <span className="font-medium">{item.likes}</span>
+            </button>
           </div>
-        )}
+
+          {/* User info overlay - hidden on mobile */}
+          {item.user && (
+            <div className="absolute top-2 left-2 flex items-center space-x-2 hidden md:flex">
+              <img
+                src={item.user.avatar}
+                alt={item.user.name}
+                className="w-6 h-6 rounded-full border border-white/50"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face';
+                }}
+              />
+              <span className="text-white text-xs font-medium bg-black bg-opacity-60 px-2 py-1 rounded-full">
+                {item.user.name}
+              </span>
+              {item.user.verified && (
+                <span className="text-blue-400 text-xs">✓</span>
+              )}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+
+      <MediaModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        item={item}
+      />
+    </>
   );
 };
 
