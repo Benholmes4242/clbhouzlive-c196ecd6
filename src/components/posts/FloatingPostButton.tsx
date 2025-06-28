@@ -1,11 +1,10 @@
-
 import React, { useState } from 'react';
 import { Camera } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePostSubmission } from '@/hooks/usePostSubmission';
 import { useTaggableEntities } from '@/hooks/useTaggableEntities';
 import { usePostCreationModal } from '@/hooks/usePostCreationModal';
-import PostOptionsModal from './PostOptionsModal';
+import NativeCameraSheet from './NativeCameraSheet';
 import PostCreationModal from './PostCreationModal';
 
 interface TaggableEntity {
@@ -20,7 +19,7 @@ const FloatingPostButton = () => {
   const { user } = useSupabaseSession();
   const { submitPost } = usePostSubmission();
   const { entities, searchEntities } = useTaggableEntities();
-  const [showOptions, setShowOptions] = useState(false);
+  const [showNativeSheet, setShowNativeSheet] = useState(false);
   
   const {
     fileInputRef,
@@ -46,12 +45,11 @@ const FloatingPostButton = () => {
 
   const handleButtonClick = () => {
     if (!user) return;
-    setShowOptions(true);
+    setShowNativeSheet(true);
   };
 
   const handleCameraClick = () => {
     if (!user) return;
-    // Create a new file input for camera capture
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*,video/*';
@@ -64,14 +62,29 @@ const FloatingPostButton = () => {
       }
     };
     input.click();
-    setShowOptions(false);
+    setShowNativeSheet(false);
   };
 
   const handleLibraryClick = () => {
     if (!user) return;
-    // Use existing file input ref for library selection
     fileInputRef.current?.click();
-    setShowOptions(false);
+    setShowNativeSheet(false);
+  };
+
+  const handleFileClick = () => {
+    if (!user) return;
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '*/*';
+    input.onchange = (e) => {
+      const target = e.target as HTMLInputElement;
+      const file = target.files?.[0];
+      if (file) {
+        openModal(file);
+      }
+    };
+    input.click();
+    setShowNativeSheet(false);
   };
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -79,8 +92,6 @@ const FloatingPostButton = () => {
     if (!file || !user) return;
 
     openModal(file);
-
-    // Reset file input
     event.target.value = '';
   };
 
@@ -89,13 +100,11 @@ const FloatingPostButton = () => {
     const text = target.innerText;
     setCaption(text);
 
-    // Get cursor position
     const selection = window.getSelection();
     if (selection && selection.rangeCount > 0) {
       setCursorPosition(selection.getRangeAt(0).startOffset);
     }
 
-    // Find the word at cursor position that starts with @
     const words = text.split(/(\s+)/);
     let currentPosition = 0;
     let mentionWord = '';
@@ -114,7 +123,6 @@ const FloatingPostButton = () => {
       const query = mentionWord.slice(1);
       await searchEntities(query);
       
-      // Deduplicate entities
       const uniqueEntities = entities.reduce((acc, entity) => {
         const identifier = `${entity.entity_type}-${entity.entity_id}-${entity.username || entity.name}`;
         if (!acc.find(item => 
@@ -136,15 +144,12 @@ const FloatingPostButton = () => {
   const selectMention = (entity: TaggableEntity) => {
     const displayName = entity.username || entity.name;
     
-    // Add to selected tags if not already present
     if (!selectedTags.find(tag => tag.id === entity.id)) {
       setSelectedTags(prev => [...prev, entity]);
     }
 
-    // Replace the @ mention in the caption with styled version
     const words = caption.split(/(\s+)/);
     let currentPosition = 0;
-    let replacedText = '';
     
     for (let i = 0; i < words.length; i++) {
       const word = words[i];
@@ -160,7 +165,6 @@ const FloatingPostButton = () => {
     const newCaption = words.join('');
     setCaption(newCaption);
     
-    // Update the contentEditable div
     if (captionInputRef.current) {
       captionInputRef.current.innerText = newCaption;
     }
@@ -195,8 +199,7 @@ const FloatingPostButton = () => {
 
   if (!user) return null;
 
-  // Add class to hide button when modals are open
-  const shouldHideButton = showOptions || isModalOpen;
+  const shouldHideButton = showNativeSheet || isModalOpen;
 
   return (
     <>
@@ -210,11 +213,12 @@ const FloatingPostButton = () => {
         </button>
       </div>
 
-      <PostOptionsModal
-        isOpen={showOptions}
-        onClose={() => setShowOptions(false)}
+      <NativeCameraSheet
+        isOpen={showNativeSheet}
+        onClose={() => setShowNativeSheet(false)}
         onCameraClick={handleCameraClick}
         onLibraryClick={handleLibraryClick}
+        onFileClick={handleFileClick}
       />
       
       <input

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Home, Compass, Trophy, Flag, Camera } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -6,7 +5,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePostCreationModal } from '@/hooks/usePostCreationModal';
 import { usePostSubmission } from '@/hooks/usePostSubmission';
 import { useTaggableEntities } from '@/hooks/useTaggableEntities';
-import PostOptionsModal from '@/components/posts/PostOptionsModal';
+import NativeCameraSheet from '@/components/posts/NativeCameraSheet';
 import PostCreationModal from '@/components/posts/PostCreationModal';
 
 interface TaggableEntity {
@@ -24,7 +23,7 @@ const BottomNavigation = () => {
   const { submitPost } = usePostSubmission();
   const { entities, searchEntities } = useTaggableEntities();
   const [activeTab, setActiveTab] = useState('home');
-  const [showOptions, setShowOptions] = useState(false);
+  const [showNativeSheet, setShowNativeSheet] = useState(false);
 
   const {
     fileInputRef,
@@ -68,12 +67,11 @@ const BottomNavigation = () => {
   const handleTabClick = (tab: { id: string; path: string | null; isAction?: boolean }) => {
     if (tab.isAction && tab.id === 'share') {
       if (!user) return;
-      setShowOptions(true);
+      setShowNativeSheet(true);
     } else if (tab.path) {
       setActiveTab(tab.id);
       navigate(tab.path);
       
-      // Scroll to top on tab navigation
       setTimeout(() => {
         window.scrollTo({
           top: 0,
@@ -98,13 +96,29 @@ const BottomNavigation = () => {
       }
     };
     input.click();
-    setShowOptions(false);
+    setShowNativeSheet(false);
   };
 
   const handleLibraryClick = () => {
     if (!user) return;
     fileInputRef.current?.click();
-    setShowOptions(false);
+    setShowNativeSheet(false);
+  };
+
+  const handleFileClick = () => {
+    if (!user) return;
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '*/*';
+    input.onchange = (e) => {
+      const target = e.target as HTMLInputElement;
+      const file = target.files?.[0];
+      if (file) {
+        openModal(file);
+      }
+    };
+    input.click();
+    setShowNativeSheet(false);
   };
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -253,11 +267,12 @@ const BottomNavigation = () => {
         </div>
       </nav>
 
-      <PostOptionsModal
-        isOpen={showOptions}
-        onClose={() => setShowOptions(false)}
+      <NativeCameraSheet
+        isOpen={showNativeSheet}
+        onClose={() => setShowNativeSheet(false)}
         onCameraClick={handleCameraClick}
         onLibraryClick={handleLibraryClick}
+        onFileClick={handleFileClick}
       />
       
       <input
