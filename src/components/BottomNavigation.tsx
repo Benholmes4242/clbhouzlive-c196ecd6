@@ -53,14 +53,14 @@ const BottomNavigation = () => {
                 onClick={() => handleTabClick(tab)}
                 className={`flex flex-col items-center justify-center space-y-1 transition-colors relative ${
                   isActive
-                    ? 'text-green-600'
-                    : 'text-muted-foreground hover:text-foreground'
+                    ? 'text-white'
+                    : 'text-gray-500 hover:text-gray-300'
                 }`}
               >
                 <Icon className={`h-5 w-5 ${isActive ? 'fill-current' : ''}`} />
                 <span className="text-xs font-medium">{tab.label}</span>
                 {isActive && (
-                  <div className="absolute bottom-0 w-12 h-0.5 bg-green-600 rounded-full left-1/2 -translate-x-1/2" />
+                  <div className="absolute bottom-0 w-12 h-0.5 bg-white rounded-full left-1/2 -translate-x-1/2" />
                 )}
               </button>
             );
