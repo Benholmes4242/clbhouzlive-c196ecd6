@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -99,5 +100,19 @@
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Custom height utilities for explore grid */
+@layer utilities {
+  .h-88 {
+    height: 22rem;
+  }
+  
+  .line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
   }
 }

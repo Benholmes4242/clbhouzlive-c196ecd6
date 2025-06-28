@@ -12,10 +12,18 @@ interface ExploreContentCardProps {
 
 const ExploreContentCard: React.FC<ExploreContentCardProps> = ({ item, onLike, onFollow }) => {
   if (item.type === 'cta') {
-    return <CTACard item={item} />;
+    return (
+      <div className="h-full">
+        <CTACard item={item} />
+      </div>
+    );
   }
 
-  return <MediaCard item={item} onLike={onLike} onFollow={onFollow} />;
+  return (
+    <div className="h-full">
+      <MediaCard item={item} onLike={onLike} onFollow={onFollow} />
+    </div>
+  );
 };
 
 export default ExploreContentCard;
