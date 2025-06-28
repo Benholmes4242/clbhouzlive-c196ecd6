@@ -66,9 +66,6 @@ const BottomNavigation = () => {
                   strokeWidth={2}
                 />
                 <span className="text-xs font-medium">{tab.label}</span>
-                {isActive && (
-                  <div className="absolute bottom-0 w-12 h-0.5 rounded-full left-1/2 -translate-x-1/2 bg-[#2a2626]" />
-                )}
               </button>
             );
           })}
