@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -85,14 +84,12 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
 
             {/* Mute/Unmute button - top right (only for videos) */}
             {item.type === 'video' && (
-              <Button
-                variant="ghost"
-                size="icon"
+              <button
                 onClick={toggleMute}
-                className="text-white hover:bg-white/20 min-w-[40px] min-h-[40px]"
+                className="text-white min-w-[40px] min-h-[40px] flex items-center justify-center"
               >
-                {isMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
-              </Button>
+                {isMuted ? <VolumeX className="h-6 w-6" /> : <Volume2 className="h-6 w-6" />}
+              </button>
             )}
           </div>
 
