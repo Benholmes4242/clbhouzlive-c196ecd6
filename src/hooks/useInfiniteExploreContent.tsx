@@ -2,31 +2,12 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { mockExploreContent } from '@/components/explore/mockData';
-
-interface ExplorePost {
-  id: string;
-  type: 'video' | 'image';
-  src: string;
-  title: string;
-  likes: number;
-  comments?: number;
-  shares?: number;
-  duration?: string;
-  user?: {
-    id: string;
-    name: string;
-    username?: string;
-    avatar: string;
-    verified?: boolean;
-  };
-  label?: string;
-  isFollowing?: boolean;
-}
+import { ExploreContentItem } from '@/components/explore/types';
 
 const POSTS_PER_PAGE = 20;
 
 export const useInfiniteExploreContent = () => {
-  const [content, setContent] = useState<ExplorePost[]>([]);
+  const [content, setContent] = useState<ExploreContentItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(true);
   const [offset, setOffset] = useState(0);
@@ -100,7 +81,7 @@ export const useInfiniteExploreContent = () => {
           label: Math.random() > 0.6 ? ['Pro Tip', 'Trending', 'From Clubhouse'][Math.floor(Math.random() * 3)] : undefined,
           isFollowing: Math.random() > 0.5
         };
-      }).filter(Boolean) as ExplorePost[];
+      }).filter(Boolean) as ExploreContentItem[];
 
       return formattedPosts;
     } catch (error) {
