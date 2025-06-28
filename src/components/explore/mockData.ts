@@ -44,7 +44,7 @@ export const mockExploreContent: ExploreContentItem[] = [
   {
     id: '4',
     type: 'video',
-    src: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=700&fit=crop',
+    src: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=550&fit=crop',
     title: 'Viral Golf Trick Shot',
     duration: '0:45',
     user: { name: 'Golf Tricks Pro', username: 'golftricks', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=40&h=40&fit=crop&crop=face', verified: true },
@@ -68,7 +68,7 @@ export const mockExploreContent: ExploreContentItem[] = [
   {
     id: '6',
     type: 'video',
-    src: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=320&fit=crop',
+    src: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=700&fit=crop',
     title: 'Swing Analysis Breakdown',
     duration: '3:45',
     user: { name: 'Golf Academy Pro', username: 'golfacademy', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face', verified: true },  
@@ -106,7 +106,7 @@ export const mockExploreContent: ExploreContentItem[] = [
   {
     id: '9',
     type: 'video',
-    src: 'https://images.unsplash.com/photo-1593111774240-d529f12cf4bb?w=400&h=480&fit=crop',
+    src: 'https://images.unsplash.com/photo-1593111774240-d529f12cf4bb?w=400&h=550&fit=crop',
     title: 'Epic Golf Course Flyover',
     duration: '2:30',
     user: { name: 'Drone Golf Pro', username: 'dronegolfpro', avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face', verified: true },
