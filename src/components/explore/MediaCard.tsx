@@ -16,13 +16,17 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow }) => {
 
   if (item.type === 'cta') return null;
 
-  // Debug logging for blank thumbnails
-  console.log('MediaCard rendering:', {
+  // Enhanced debug logging for blank thumbnails
+  console.log('MediaCard rendering detailed:', {
     id: item.id,
     type: item.type,
     src: item.src,
     title: item.title,
-    hasValidSrc: !!item.src && item.src.length > 0
+    hasValidSrc: !!item.src && item.src.length > 0,
+    srcLength: item.src?.length || 0,
+    srcType: typeof item.src,
+    isBlankOrWhitespace: !item.src || item.src.trim() === '',
+    actualSrcValue: JSON.stringify(item.src)
   });
 
   const handleLike = () => {
@@ -30,21 +34,42 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow }) => {
   };
 
   const handleImageError = () => {
-    console.log('Image error for item:', item.id, item.src);
+    console.log('Image load error for item:', {
+      id: item.id, 
+      src: item.src,
+      errorType: 'IMAGE_LOAD_FAILED'
+    });
     setImageError(true);
   };
 
   const handleImageLoad = () => {
-    console.log('Image loaded successfully for item:', item.id);
+    console.log('Image loaded successfully:', {
+      id: item.id,
+      src: item.src,
+      type: item.type
+    });
     setImageLoaded(true);
   };
 
   // Fallback image for broken/missing images
   const fallbackImage = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
 
-  // If no valid src, show fallback immediately
-  if (!item.src || item.src.trim() === '') {
-    console.log('No valid src found for item:', item.id, 'using fallback');
+  // Enhanced validation for invalid src
+  const isInvalidSrc = !item.src || 
+                      item.src.trim() === '' || 
+                      item.src === 'null' || 
+                      item.src === 'undefined' ||
+                      item.src === '[object Object]' ||
+                      typeof item.src !== 'string';
+
+  if (isInvalidSrc) {
+    console.log('Invalid src detected, using fallback:', {
+      id: item.id,
+      originalSrc: item.src,
+      reason: 'INVALID_SRC_VALUE',
+      fallbackUsed: fallbackImage
+    });
+    
     return (
       <div className="relative group cursor-pointer bg-white rounded-lg shadow-sm border overflow-hidden h-full">
         <div className="relative w-full h-full overflow-hidden">
@@ -52,7 +77,13 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow }) => {
             src={fallbackImage}
             alt={item.title || 'Content'}
             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            onLoad={() => console.log('Fallback image loaded for:', item.id)}
+            onError={() => console.log('Even fallback image failed for:', item.id)}
           />
+          {/* Debug overlay for invalid src items */}
+          <div className="absolute top-1 left-1 bg-red-500 text-white text-xs px-1 py-0.5 rounded opacity-75">
+            Invalid Src
+          </div>
         </div>
       </div>
     );
@@ -63,12 +94,18 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow }) => {
       {/* Square Media Container */}
       <div className="relative w-full h-full overflow-hidden">
         {item.type === 'video' ? (
-          <VideoPreview
-            src={item.src}
-            videoId={item.id}
-            className="w-full h-full"
-            isGridThumbnail={true}
-          />
+          <>
+            <VideoPreview
+              src={item.src}
+              videoId={item.id}
+              className="w-full h-full"
+              isGridThumbnail={true}
+            />
+            {/* Debug overlay for videos */}
+            <div className="absolute top-1 right-1 bg-blue-500 text-white text-xs px-1 py-0.5 rounded opacity-75">
+              Video
+            </div>
+          </>
         ) : (
           <>
             {/* Loading placeholder */}
@@ -86,6 +123,11 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow }) => {
               onLoad={handleImageLoad}
               style={{ display: imageLoaded || imageError ? 'block' : 'none' }}
             />
+            
+            {/* Debug overlay for images */}
+            <div className="absolute top-1 right-1 bg-green-500 text-white text-xs px-1 py-0.5 rounded opacity-75">
+              {imageError ? 'Fallback' : 'Image'}
+            </div>
           </>
         )}
         

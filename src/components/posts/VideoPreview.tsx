@@ -30,6 +30,18 @@ const VideoPreview = ({
   // Detect iOS Safari
   const isIOSSafari = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
   
+  // Enhanced logging for video preview
+  console.log('VideoPreview rendering:', {
+    videoId,
+    src,
+    poster,
+    isGridThumbnail,
+    isIOSSafari,
+    isMobile,
+    hasValidSrc: !!src && src.length > 0,
+    srcType: typeof src
+  });
+  
   // Disable autoplay completely on iOS Safari for grid thumbnails to prevent NotSupportedError
   const shouldAutoplay = isGridThumbnail && !isIOSSafari;
   
@@ -79,10 +91,28 @@ const VideoPreview = ({
     }
   };
 
-  const handleVideoError = () => {
-    console.log('Video error for:', videoId);
+  const handleVideoError = (event: React.SyntheticEvent<HTMLVideoElement, Event>) => {
+    const error = (event.target as HTMLVideoElement).error;
+    console.log('Video error details:', {
+      videoId,
+      src,
+      errorCode: error?.code,
+      errorMessage: error?.message,
+      isIOSSafari,
+      isGridThumbnail
+    });
     setHasError(true);
   };
+
+  // Check for invalid video src
+  if (!src || src.trim() === '' || typeof src !== 'string') {
+    console.log('Invalid video src:', { videoId, src, type: typeof src });
+    return (
+      <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+        <div className="text-gray-500 text-sm">Invalid video source</div>
+      </div>
+    );
+  }
 
   return (
     <div
@@ -113,6 +143,16 @@ const VideoPreview = ({
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: `url(${poster})` }}
         />
+      )}
+
+      {/* Error state for videos */}
+      {hasError && (
+        <div className="absolute inset-0 bg-gray-200 flex items-center justify-center">
+          <div className="text-gray-500 text-sm text-center">
+            <div>Video Error</div>
+            {isIOSSafari && <div className="text-xs mt-1">iOS Safari</div>}
+          </div>
+        </div>
       )}
 
       {/* Loading indicator - only show in non-grid contexts */}
