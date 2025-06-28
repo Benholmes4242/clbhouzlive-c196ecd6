@@ -10,19 +10,15 @@ interface ExploreFiltersProps {
 
 const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterChange }) => {
   return (
-    <div className="sticky top-16 z-30 bg-background/95 backdrop-blur-sm border-b border-border pb-3 mb-6">
-      <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
+    <div className="sticky top-20 z-10 bg-background/95 backdrop-blur-sm pb-4 mb-6">
+      <div className="flex space-x-2 overflow-x-auto scrollbar-hide">
         {filterOptions.map((filter) => (
           <Button
             key={filter}
             variant={activeFilter === filter ? "default" : "outline"}
             size="sm"
             onClick={() => onFilterChange(filter)}
-            className={`whitespace-nowrap ${
-              activeFilter === filter 
-                ? 'bg-[#2a2626] text-white hover:bg-[#2a2626]/90' 
-                : 'hover:bg-muted'
-            }`}
+            className="whitespace-nowrap flex-shrink-0"
           >
             {filter}
           </Button>

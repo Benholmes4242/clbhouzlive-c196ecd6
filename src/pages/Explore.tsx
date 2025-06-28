@@ -4,11 +4,16 @@ import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
 import ExploreFilters from '@/components/explore/ExploreFilters';
 import ExploreGrid from '@/components/explore/ExploreGrid';
-import { useExploreContent } from '@/hooks/useExploreContent';
+import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 
 const Explore = () => {
   const [activeFilter, setActiveFilter] = useState('All');
-  const { content, loading, refetch } = useExploreContent();
+  const { 
+    content, 
+    loading, 
+    hasMore, 
+    loadMore 
+  } = useInfiniteExploreContent();
 
   const handleLike = (contentId: string) => {
     // Update likes optimistically - could be enhanced with actual API call
@@ -42,12 +47,14 @@ const Explore = () => {
           onFilterChange={setActiveFilter} 
         />
 
-        {/* Masonry Grid */}
+        {/* Masonry Grid with Infinite Scroll */}
         <ExploreGrid 
           content={filteredContent}
           onLike={handleLike}
           onFollow={handleFollow}
           isLoading={loading}
+          hasMore={hasMore}
+          onLoadMore={loadMore}
         />
       </main>
       
