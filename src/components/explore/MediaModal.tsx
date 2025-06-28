@@ -76,14 +76,12 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
           {/* Top controls bar */}
           <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between p-4 bg-gradient-to-b from-black/60 to-transparent">
             {/* Back button - top left */}
-            <Button 
-              variant="ghost" 
-              size="icon" 
+            <button 
               onClick={onClose}
-              className="text-white hover:bg-white/20 min-w-[40px] min-h-[40px]"
+              className="text-white min-w-[40px] min-h-[40px] flex items-center justify-center"
             >
-              <ArrowLeft className="h-5 w-5" />
-            </Button>
+              <ArrowLeft className="h-6 w-6" />
+            </button>
 
             {/* Mute/Unmute button - top right (only for videos) */}
             {item.type === 'video' && (
