@@ -23,10 +23,10 @@ const SnapModal = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-sm mx-auto rounded-2xl">
         <DialogTitle className="text-center text-lg font-semibold mb-6">
-          Create Snap
+          Capture a Moment
         </DialogTitle>
         <DialogDescription className="sr-only">
-          Choose how to create your snap
+          Choose how to capture your moment
         </DialogDescription>
         
         <div className="space-y-4 px-2">
