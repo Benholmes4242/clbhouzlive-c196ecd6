@@ -1,9 +1,9 @@
-
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Heart, MessageCircle, Share, Volume2, VolumeX } from 'lucide-react';
 import { ExploreContentItem } from './types';
+import { useToast } from '@/hooks/use-toast';
 
 interface MediaModalProps {
   isOpen: boolean;
@@ -15,6 +15,7 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
   const [isMuted, setIsMuted] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const [videoReady, setVideoReady] = useState(false);
+  const { toast } = useToast();
 
   if (!item) return null;
 
@@ -36,6 +37,38 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
     if (video) {
       video.muted = !video.muted;
       setIsMuted(video.muted);
+    }
+  };
+
+  const handleShare = async () => {
+    const shareData = {
+      title: item.title || 'Check out this content',
+      text: `Check out this ${item.type} from ${item.user?.name || 'clbhouz'}`,
+      url: window.location.href
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+        toast({
+          title: "Shared successfully",
+          description: "Content shared via native sharing",
+        });
+      } else {
+        // Fallback to clipboard
+        await navigator.clipboard.writeText(window.location.href);
+        toast({
+          title: "Link copied",
+          description: "Link copied to clipboard",
+        });
+      }
+    } catch (error) {
+      console.error('Error sharing:', error);
+      toast({
+        title: "Sharing failed",
+        description: "Could not share the content",
+        variant: "destructive",
+      });
     }
   };
 
@@ -171,7 +204,7 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
                 <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
                   <MessageCircle className="h-5 w-5" />
                 </Button>
-                <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
+                <Button variant="ghost" size="sm" className="text-white hover:bg-white/20" onClick={handleShare}>
                   <Share className="h-5 w-5" />
                 </Button>
               </div>
