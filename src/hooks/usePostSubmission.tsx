@@ -50,17 +50,31 @@ export const usePostSubmission = () => {
       return;
     }
 
+    // Check if we have videos to show appropriate feedback
+    const hasVideos = mediaFiles.some(file => file.type.startsWith('video/'));
+    
+    // Show immediate upload feedback for videos
+    if (hasVideos) {
+      toast({
+        title: "Uploading video...",
+        description: "Your video is being processed. This may take a moment.",
+        duration: 4000
+      });
+    }
+
     // Create optimistic post for immediate UI update
     const optimisticPost = createOptimisticPost(user, content, mediaFiles, selectedTags);
     
-    // Immediately call onSuccess to update UI
-    onSuccess();
+    // For videos, don't redirect immediately - wait for upload to complete
+    if (!hasVideos) {
+      onSuccess(); // Only call onSuccess immediately for non-video posts
+    }
 
-    // Start background upload process
+    // Start upload process
     let createdPostId: string | null = null;
     
     try {
-      console.log('Starting background post creation...');
+      console.log('Starting post creation...');
       
       // Create the post first
       const { data: postData, error: postError } = await supabase
@@ -82,7 +96,16 @@ export const usePostSubmission = () => {
 
       // Upload media files if any
       if (mediaFiles.length > 0) {
-        console.log('Uploading media files in background...');
+        console.log('Uploading media files...');
+        
+        // Show progress for videos
+        if (hasVideos) {
+          toast({
+            title: "Processing video...",
+            description: "Almost done! Your video is being uploaded.",
+            duration: 3000
+          });
+        }
         
         // Upload each file with retry logic
         for (const file of mediaFiles) {
@@ -110,12 +133,16 @@ export const usePostSubmission = () => {
               )
             });
             
-            // Continue with other files instead of failing completely
-            continue;
+            // Don't fail completely for videos - continue with other files
+            if (hasVideos) {
+              continue;
+            } else {
+              throw error; // For non-videos, fail as before
+            }
           }
         }
         
-        console.log('Background media upload completed');
+        console.log('Media upload completed');
       }
 
       // Create post tags if any
@@ -130,22 +157,18 @@ export const usePostSubmission = () => {
         console.log('Tag notifications created');
       }
 
-      console.log('Background upload process completed successfully');
+      console.log('Upload process completed successfully');
 
-      // Show success message for videos (only if there were videos)
-      const hasVideos = mediaFiles.some(file => file.type.startsWith('video/'));
+      // Show success message
       if (hasVideos) {
-        toast({
-          title: "Video processed!",
-          description: "Your video post is now live.",
-          duration: 3000
-        });
+        showToast("🎉 Video posted successfully!", '');
+        // Now call onSuccess for videos after successful upload
+        onSuccess();
+      } else {
+        showToast("Post shared! It's out there!", '🎉');
       }
 
-      // Show success toast
-      showToast("Post shared! It's out there!", '🎉');
-
-      // Broadcast success event for feed refresh - this will trigger feed refresh
+      // Broadcast success event for feed refresh
       window.dispatchEvent(new CustomEvent('postUploadCompleted', { 
         detail: { postId: postData.id, optimisticId: optimisticPost.id } 
       }));
@@ -154,7 +177,7 @@ export const usePostSubmission = () => {
       window.dispatchEvent(new CustomEvent('refreshFeed'));
 
     } catch (error) {
-      console.error('Error in background upload:', error);
+      console.error('Error in upload:', error);
       
       // If we created a post but subsequent operations failed, roll it back
       if (createdPostId) {
@@ -186,6 +209,9 @@ export const usePostSubmission = () => {
       window.dispatchEvent(new CustomEvent('postUploadFailed', { 
         detail: { optimisticId: optimisticPost.id } 
       }));
+
+      // Call onError to prevent redirect for failed uploads
+      onError();
     }
   };
 

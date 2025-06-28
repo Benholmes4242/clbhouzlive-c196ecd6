@@ -14,8 +14,12 @@ export const uploadMediaWithRetry = async (
       const fileExt = file.name.split('.').pop();
       const fileName = `${userId}/${Date.now()}-${attempt}.${fileExt}`;
       
-      // Set longer timeout for larger files
-      const timeoutMs = Math.max(120000, file.size / 1024 / 1024 * 10000); // At least 2 minutes, plus 10s per MB
+      // Set longer timeout for larger files, especially videos
+      const isVideo = file.type.startsWith('video/');
+      const baseTimeout = isVideo ? 300000 : 120000; // 5 minutes for videos, 2 for images
+      const timeoutMs = Math.max(baseTimeout, file.size / 1024 / 1024 * 15000); // 15s per MB
+      
+      console.log(`Uploading ${file.name} (attempt ${attempt}/${maxRetries}), timeout: ${timeoutMs}ms`);
       
       const uploadPromise = supabase.storage
         .from('post-media')
