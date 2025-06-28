@@ -12,7 +12,7 @@ const SiteBrandingCard = () => {
   const { toast } = useToast();
   const [faviconFile, setFaviconFile] = useState<File | null>(null);
   const [faviconUrl, setFaviconUrl] = useState('');
-  const [tabTitle, setTabTitle] = useState('clbhouz - The Golfer\'s Social Hub');
+  const [tabTitle, setTabTitle] = useState('clbhouz | golf\'s digital clubhouse');
 
   // Load saved settings on component mount
   useEffect(() => {
@@ -75,24 +75,42 @@ const SiteBrandingCard = () => {
     metaTitleElement.setAttribute('content', title);
   };
 
-  const updateFaviconInHead = (url: string) => {
+  const updateFaviconInHead = (url: string, addCacheBuster = false) => {
     console.log('Updating favicon to:', url);
+    
+    // Add cache busting parameter to force refresh
+    const finalUrl = addCacheBuster ? `${url}?v=${Date.now()}` : url;
+    
     // Remove existing favicon links
-    const existingFavicons = document.querySelectorAll('link[rel*="icon"]');
+    const existingFavicons = document.querySelectorAll('link[rel*="icon"], link[rel="apple-touch-icon"]');
     existingFavicons.forEach(link => link.remove());
 
-    // Create new favicon link
-    const link = document.createElement('link');
-    link.rel = 'icon';
-    link.href = url;
-    link.type = url.endsWith('.ico') ? 'image/x-icon' : 'image/png';
-    document.head.appendChild(link);
-    
-    // Also add apple-touch-icon for mobile
-    const appleLink = document.createElement('link');
-    appleLink.rel = 'apple-touch-icon';
-    appleLink.href = url;
-    document.head.appendChild(appleLink);
+    // Create multiple favicon formats for better compatibility
+    const faviconFormats = [
+      { rel: 'icon', type: 'image/x-icon', sizes: undefined },
+      { rel: 'icon', type: 'image/png', sizes: '32x32' },
+      { rel: 'icon', type: 'image/png', sizes: '16x16' },
+      { rel: 'apple-touch-icon', type: 'image/png', sizes: '180x180' },
+      { rel: 'shortcut icon', type: 'image/x-icon', sizes: undefined }
+    ];
+
+    faviconFormats.forEach(format => {
+      const link = document.createElement('link');
+      link.rel = format.rel;
+      link.href = finalUrl;
+      if (format.type) link.type = format.type;
+      if (format.sizes) link.setAttribute('sizes', format.sizes);
+      document.head.appendChild(link);
+    });
+
+    // Force browser to refresh favicon by temporarily adding and removing a link
+    const tempLink = document.createElement('link');
+    tempLink.rel = 'icon';
+    tempLink.href = 'data:,';
+    document.head.appendChild(tempLink);
+    setTimeout(() => {
+      document.head.removeChild(tempLink);
+    }, 100);
   };
 
   const handleUpdateBranding = () => {
@@ -111,7 +129,7 @@ const SiteBrandingCard = () => {
       // Create a URL for the uploaded file (temporary)
       const fileUrl = URL.createObjectURL(faviconFile);
       console.log('Updating favicon with file URL:', fileUrl);
-      updateFaviconInHead(fileUrl);
+      updateFaviconInHead(fileUrl, true);
       
       // Don't save blob URLs to localStorage as they're temporary
       localStorage.removeItem('site_favicon_url');
@@ -123,14 +141,14 @@ const SiteBrandingCard = () => {
       });
     } else if (faviconUrl.trim()) {
       console.log('Updating favicon with URL:', faviconUrl);
-      updateFaviconInHead(faviconUrl);
+      updateFaviconInHead(faviconUrl, true);
       
       // Save to localStorage for persistence
       localStorage.setItem('site_favicon_url', faviconUrl);
       
       toast({
         title: "Success",
-        description: "Favicon and tab title updated successfully!",
+        description: "Favicon and tab title updated successfully! The favicon may take a few minutes to update across all browsers due to caching.",
       });
     } else {
       toast({
@@ -149,9 +167,11 @@ const SiteBrandingCard = () => {
   const handleResetBranding = () => {
     console.log('Resetting branding to defaults');
     // Reset to defaults
-    const defaultTitle = 'clbhouz - The Golfer\'s Social Hub';
+    const defaultTitle = 'clbhouz | golf\'s digital clubhouse';
+    const defaultFavicon = 'https://www.clbhouz.co.uk/images/favicon.ico';
+    
     setTabTitle(defaultTitle);
-    setFaviconUrl('');
+    setFaviconUrl(defaultFavicon);
     setFaviconFile(null);
     
     // Clear localStorage
@@ -162,9 +182,8 @@ const SiteBrandingCard = () => {
     document.title = defaultTitle;
     updateTitleMeta(defaultTitle);
     
-    // Reset favicon to default
-    const existingFavicons = document.querySelectorAll('link[rel*="icon"]');
-    existingFavicons.forEach(link => link.remove());
+    // Reset favicon to default with cache busting
+    updateFaviconInHead(defaultFavicon, true);
     
     // Clear file input
     const fileInput = document.getElementById('favicon-file') as HTMLInputElement;
@@ -174,7 +193,7 @@ const SiteBrandingCard = () => {
     
     toast({
       title: "Reset Complete",
-      description: "Branding has been reset to default values.",
+      description: "Branding has been reset to default values with cache refresh.",
     });
   };
 
@@ -201,6 +220,16 @@ const SiteBrandingCard = () => {
         
         <div className="space-y-3">
           <Label>Favicon</Label>
+          
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+            <div className="flex items-start gap-2">
+              <AlertTriangle className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
+              <div className="text-sm text-blue-800">
+                <strong>For clbhouz.co.uk domain:</strong> Upload your favicon file to your hosting provider and use the full URL 
+                (e.g., https://www.clbhouz.co.uk/images/your-favicon.png) for it to show properly on your live site.
+              </div>
+            </div>
+          </div>
           
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
             <div className="flex items-start gap-2">
@@ -245,11 +274,11 @@ const SiteBrandingCard = () => {
                 id="favicon-url"
                 value={faviconUrl}
                 onChange={(e) => setFaviconUrl(e.target.value)}
-                placeholder="https://example.com/favicon.png"
+                placeholder="https://www.clbhouz.co.uk/images/favicon.png"
                 disabled={!!faviconFile}
               />
               <p className="text-xs text-muted-foreground mt-1">
-                Use a permanent URL for persistent favicons
+                Use a permanent URL for persistent favicons (recommended for live sites)
               </p>
             </div>
           </div>
@@ -261,8 +290,20 @@ const SiteBrandingCard = () => {
             Update Branding
           </Button>
           <Button variant="outline" onClick={handleResetBranding}>
-            Reset
+            Reset to Default
           </Button>
+        </div>
+        
+        <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+          <div className="text-sm text-gray-700">
+            <strong>Troubleshooting Tips:</strong>
+            <ul className="mt-1 list-disc list-inside space-y-1">
+              <li>Clear your browser cache and hard refresh (Ctrl+F5)</li>
+              <li>Try opening your site in an incognito/private window</li>
+              <li>Favicons can take 5-10 minutes to update due to browser caching</li>
+              <li>Ensure your favicon URL is publicly accessible</li>
+            </ul>
+          </div>
         </div>
       </CardContent>
     </Card>
