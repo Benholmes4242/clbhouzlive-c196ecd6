@@ -1,6 +1,5 @@
 
 import React from 'react';
-import Masonry from 'react-masonry-css';
 import { ExploreContentItem } from './types';
 import ExploreContentCard from './ExploreContentCard';
 
@@ -21,13 +20,6 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
   hasMore, 
   onLoadMore 
 }) => {
-  const breakpointColumnsObj = {
-    default: 4,
-    1100: 4,
-    700: 4,
-    500: 4
-  };
-
   // Intersection observer for infinite scroll
   React.useEffect(() => {
     const observer = new IntersectionObserver(
@@ -54,8 +46,8 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
   if (isLoading && content.length === 0) {
     return (
       <div className="space-y-4">
-        <div className="grid grid-cols-4 gap-4">
-          {[...Array(16)].map((_, i) => (
+        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 md:gap-4">
+          {[...Array(15)].map((_, i) => (
             <div key={i} className="aspect-square bg-muted rounded-lg animate-pulse" />
           ))}
         </div>
@@ -75,29 +67,24 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
 
   return (
     <>
-      <Masonry
-        breakpointCols={breakpointColumnsObj}
-        className="flex w-auto -ml-2"
-        columnClassName="pl-2 bg-clip-padding"
-      >
+      {/* Responsive Grid Layout */}
+      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 md:gap-4">
         {content.map((item) => (
-          <div key={item.id} className="mb-4">
-            <div className="w-full aspect-square relative overflow-hidden rounded-lg">
-              <ExploreContentCard 
-                item={item} 
-                onLike={onLike} 
-                onFollow={onFollow} 
-              />
-            </div>
+          <div key={item.id} className="aspect-square">
+            <ExploreContentCard 
+              item={item} 
+              onLike={onLike} 
+              onFollow={onFollow} 
+            />
           </div>
         ))}
-      </Masonry>
+      </div>
       
       {/* Infinite scroll sentinel */}
       <div id="scroll-sentinel" className="h-4">
         {isLoading && (
-          <div className="grid grid-cols-4 gap-4 mt-4">
-            {[...Array(8)].map((_, i) => (
+          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 md:gap-4 mt-4">
+            {[...Array(9)].map((_, i) => (
               <div key={i} className="aspect-square bg-muted rounded-lg animate-pulse" />
             ))}
           </div>

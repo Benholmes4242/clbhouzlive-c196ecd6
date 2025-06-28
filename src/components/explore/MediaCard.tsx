@@ -18,9 +18,9 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow }) => {
   };
 
   return (
-    <div className="relative group cursor-pointer bg-white rounded-lg shadow-sm border overflow-hidden">
+    <div className="relative group cursor-pointer bg-white rounded-lg shadow-sm border overflow-hidden h-full">
       {/* Square Media Container */}
-      <div className="relative w-full aspect-square overflow-hidden">
+      <div className="relative w-full h-full overflow-hidden">
         {item.type === 'video' ? (
           <VideoPreview
             src={item.src}
@@ -36,15 +36,15 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow }) => {
           />
         )}
         
-        {/* Video duration overlay - only for videos */}
+        {/* Video duration overlay - only for videos and hidden on mobile */}
         {item.type === 'video' && item.duration && (
-          <div className="absolute top-2 right-2 bg-black bg-opacity-75 text-white text-xs px-2 py-1 rounded">
+          <div className="absolute top-2 right-2 bg-black bg-opacity-75 text-white text-xs px-2 py-1 rounded hidden md:block">
             {item.duration}
           </div>
         )}
 
-        {/* Like button overlay */}
-        <div className="absolute bottom-2 left-2">
+        {/* Like button overlay - hidden on mobile */}
+        <div className="absolute bottom-2 left-2 hidden md:block">
           <button
             onClick={handleLike}
             className="flex items-center space-x-1 bg-black bg-opacity-60 text-white px-2 py-1 rounded-full hover:bg-opacity-80 transition-all duration-200 text-sm"
@@ -54,9 +54,9 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow }) => {
           </button>
         </div>
 
-        {/* User info overlay */}
+        {/* User info overlay - hidden on mobile */}
         {item.user && (
-          <div className="absolute top-2 left-2 flex items-center space-x-2">
+          <div className="absolute top-2 left-2 flex items-center space-x-2 hidden md:flex">
             <img
               src={item.user.avatar}
               alt={item.user.name}
