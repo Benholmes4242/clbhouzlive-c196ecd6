@@ -1,7 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Heart, MessageCircle, Share, Volume2, VolumeX } from 'lucide-react';
+import { ArrowLeft, Heart, MessageCircle, Volume2, VolumeX } from 'lucide-react';
 import { ExploreContentItem } from './types';
 import { useToast } from '@/hooks/use-toast';
 
@@ -38,68 +39,6 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
       video.muted = !video.muted;
       setIsMuted(video.muted);
     }
-  };
-
-  const handleShare = () => {
-    console.log('=== SHARE DEBUG START ===');
-    console.log('Share button clicked');
-    console.log('Navigator available:', !!navigator);
-    console.log('Navigator.share available:', !!navigator.share);
-    console.log('Navigator.clipboard available:', !!navigator.clipboard);
-    console.log('Current URL:', window.location.href);
-    console.log('User agent:', navigator.userAgent);
-    
-    // Simple alert to test if function is being called
-    alert('Share button was clicked! Check console for details.');
-    
-    // Try to share or copy link
-    const shareUrl = window.location.href;
-    
-    if (navigator.share) {
-      console.log('Attempting native share...');
-      navigator.share({
-        title: 'Check out this content from clbhouz',
-        url: shareUrl
-      }).then(() => {
-        console.log('Native share successful');
-        toast({
-          title: "Shared!",
-          description: "Content shared successfully"
-        });
-      }).catch((error) => {
-        console.log('Native share failed:', error);
-        if (error.name !== 'AbortError') {
-          // Try clipboard fallback
-          copyToClipboard(shareUrl);
-        }
-      });
-    } else if (navigator.clipboard) {
-      console.log('Using clipboard fallback...');
-      copyToClipboard(shareUrl);
-    } else {
-      console.log('No sharing methods available');
-      // Show URL in alert as final fallback
-      alert(`Share this link: ${shareUrl}`);
-    }
-    
-    console.log('=== SHARE DEBUG END ===');
-  };
-
-  const copyToClipboard = (url: string) => {
-    navigator.clipboard.writeText(url).then(() => {
-      console.log('Clipboard copy successful');
-      toast({
-        title: "Link copied!",
-        description: "Link has been copied to clipboard"
-      });
-    }).catch((error) => {
-      console.log('Clipboard copy failed:', error);
-      toast({
-        title: "Share failed",
-        description: "Could not copy link",
-        variant: "destructive"
-      });
-    });
   };
 
   // Instant video setup when modal opens
@@ -240,14 +179,6 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
                 </Button>
                 <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
                   <MessageCircle className="h-5 w-5" />
-                </Button>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="text-white hover:bg-white/20 active:bg-white/30" 
-                  onClick={handleShare}
-                >
-                  <Share className="h-5 w-5" />
                 </Button>
               </div>
             </div>
