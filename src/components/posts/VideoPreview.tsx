@@ -11,7 +11,7 @@ interface VideoPreviewProps {
   className?: string;
   onFullscreen?: () => void;
   videoId: string;
-  isGridThumbnail?: boolean; // New prop to indicate grid context
+  isGridThumbnail?: boolean;
 }
 
 const VideoPreview = ({ 
@@ -26,21 +26,22 @@ const VideoPreview = ({
   const isMobile = useIsMobile();
   const { elementRef, isInView } = useIntersectionObserver({ threshold: 0.6 });
   
-  // Don't auto-play in grid thumbnails
+  // For grid thumbnails, enable mobile autoplay and desktop hover
   const { videoRef, isPlaying, isLoading } = useVideoAutoplay({
-    isInView: !isGridThumbnail && (isMobile ? isInView : false),
-    isHovered: !isGridThumbnail && (!isMobile ? isHovered : false),
-    videoId
+    isInView: isGridThumbnail && isMobile ? isInView : false,
+    isHovered: isGridThumbnail && !isMobile ? isHovered : false,
+    videoId,
+    isGridContext: isGridThumbnail
   });
 
   const handleMouseEnter = () => {
-    if (!isMobile && !isGridThumbnail) {
+    if (!isMobile && isGridThumbnail) {
       setIsHovered(true);
     }
   };
 
   const handleMouseLeave = () => {
-    if (!isMobile && !isGridThumbnail) {
+    if (!isMobile && isGridThumbnail) {
       setIsHovered(false);
     }
   };
@@ -49,7 +50,7 @@ const VideoPreview = ({
     e.stopPropagation();
     
     if (isGridThumbnail) {
-      // In grid view, clicking should open fullscreen
+      // In grid view, clicking should open fullscreen or play/pause
       onFullscreen?.();
       return;
     }
@@ -62,11 +63,6 @@ const VideoPreview = ({
         videoRef.current.pause();
       }
     }
-  };
-
-  const handleFullscreen = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onFullscreen?.();
   };
 
   return (
@@ -99,7 +95,10 @@ const VideoPreview = ({
       {!isGridThumbnail && (isHovered || isPlaying) && (
         <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
           <button
-            onClick={handleFullscreen}
+            onClick={(e) => {
+              e.stopPropagation();
+              onFullscreen?.();
+            }}
             className="bg-black/70 text-white p-2 rounded-full hover:bg-black/80 transition-colors shadow-lg"
           >
             <Maximize2 className="h-4 w-4" />
