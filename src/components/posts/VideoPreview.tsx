@@ -22,7 +22,7 @@ const VideoPreview = ({
   isGridThumbnail = false 
 }: VideoPreviewProps) => {
   const [isHovered, setIsHovered] = useState(false);
-  const [hasError, setHasError] = useState(false);
+  const [hasVideoError, setHasVideoError] = useState(false);
   const isMobile = useIsMobile();
   const { elementRef } = useIntersectionObserver({ threshold: 0.6 });
   
@@ -62,17 +62,9 @@ const VideoPreview = ({
     }
   };
 
-  const handleVideoError = (event: React.SyntheticEvent<HTMLVideoElement, Event>) => {
-    const error = (event.target as HTMLVideoElement).error;
-    console.log('Video error details:', {
-      videoId,
-      src,
-      errorCode: error?.code,
-      errorMessage: error?.message,
-      isIOSSafari,
-      isGridThumbnail
-    });
-    setHasError(true);
+  const handleVideoError = () => {
+    console.log('Video error for:', videoId);
+    setHasVideoError(true);
   };
 
   // Check for invalid video src
@@ -80,7 +72,37 @@ const VideoPreview = ({
     console.log('Invalid video src:', { videoId, src, type: typeof src });
     return (
       <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-        <div className="text-gray-500 text-sm">Invalid video source</div>
+        <div className="text-gray-500 text-sm">No video</div>
+      </div>
+    );
+  }
+
+  // For iOS Safari in grid thumbnails or when video has error, show a placeholder image
+  if ((isIOSSafari && isGridThumbnail) || hasVideoError) {
+    const fallbackImage = poster || 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
+    
+    return (
+      <div
+        ref={elementRef}
+        className={`relative cursor-pointer group overflow-hidden bg-gray-200 ${className}`}
+        onClick={handleClick}
+      >
+        <img
+          src={fallbackImage}
+          alt="Video thumbnail"
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            // If even the fallback image fails, show a simple placeholder
+            (e.target as HTMLImageElement).style.display = 'none';
+          }}
+        />
+        
+        {/* Video play indicator */}
+        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20">
+          <div className="w-12 h-12 bg-white bg-opacity-80 rounded-full flex items-center justify-center">
+            <div className="w-0 h-0 border-l-4 border-l-gray-800 border-t-2 border-b-2 border-t-transparent border-b-transparent ml-1"></div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -102,30 +124,11 @@ const VideoPreview = ({
         onClick={handleClick}
         onError={handleVideoError}
         preload="metadata"
-        webkit-playsinline="true"
         controls={false}
       />
 
-      {/* Show poster image overlay on iOS Safari for grid thumbnails */}
-      {isIOSSafari && isGridThumbnail && poster && (
-        <div 
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: `url(${poster})` }}
-        />
-      )}
-
-      {/* Error state for videos */}
-      {hasError && (
-        <div className="absolute inset-0 bg-gray-200 flex items-center justify-center">
-          <div className="text-gray-500 text-sm text-center">
-            <div>Video Error</div>
-            {isIOSSafari && <div className="text-xs mt-1">iOS Safari</div>}
-          </div>
-        </div>
-      )}
-
       {/* Controls overlay - only show enlarge button on hover and not in grid thumbnails */}
-      {!isGridThumbnail && isHovered && !hasError && (
+      {!isGridThumbnail && isHovered && (
         <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
           <button
             onClick={(e) => {
@@ -140,7 +143,7 @@ const VideoPreview = ({
       )}
 
       {/* Gradient overlay for better button visibility - only in non-grid contexts */}
-      {!isGridThumbnail && isHovered && !hasError && (
+      {!isGridThumbnail && isHovered && (
         <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/30 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none" />
       )}
     </div>
