@@ -39,7 +39,7 @@ const SnapModal = ({
               <Camera className="h-6 w-6 text-[#ff6b00]" />
             </div>
             <div className="text-left">
-              <div className="font-semibold text-base">Take Video or Image</div>
+              <div className="font-semibold text-base">Capture Photo or Video</div>
               <div className="text-sm text-gray-500">Use your device camera</div>
             </div>
           </Button>
