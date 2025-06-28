@@ -1,27 +1,18 @@
+
 import React, { useState, useEffect } from 'react';
-import { Home, Compass, Trophy, Flag, Camera } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePostCreationModal } from '@/hooks/usePostCreationModal';
-import { usePostSubmission } from '@/hooks/usePostSubmission';
-import { useTaggableEntities } from '@/hooks/useTaggableEntities';
 import NativeCameraSheet from '@/components/posts/NativeCameraSheet';
 import PostCreationModal from '@/components/posts/PostCreationModal';
-
-interface TaggableEntity {
-  id: string;
-  entity_type: 'user' | 'golf_club' | 'business';
-  entity_id: string;
-  name: string;
-  username: string | null;
-}
+import { navigationTabs } from './bottom-navigation/navigationTabs';
+import { useCameraHandlers } from './bottom-navigation/useCameraHandlers';
+import { usePostHandlers } from './bottom-navigation/usePostHandlers';
 
 const BottomNavigation = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useSupabaseSession();
-  const { submitPost } = usePostSubmission();
-  const { entities, searchEntities } = useTaggableEntities();
   const [activeTab, setActiveTab] = useState('home');
   const [showNativeSheet, setShowNativeSheet] = useState(false);
 
@@ -47,16 +38,11 @@ const BottomNavigation = () => {
     closeModal
   } = usePostCreationModal();
 
-  const tabs = [
-    { id: 'home', label: 'Clubhouse', icon: Home, path: '/' },
-    { id: 'explore', label: 'Explore', icon: Compass, path: '/explore' },
-    { id: 'share', label: 'Share', icon: Camera, path: null, isAction: true },
-    { id: 'tour-central', label: 'Tour Central', icon: Trophy, path: '/tour-central' },
-    { id: 'courses', label: 'Courses', icon: Flag, path: '/courses' },
-  ];
+  const { handleCameraClick, handleLibraryClick, handleFileClick } = useCameraHandlers();
+  const { handleCaptionInput, selectMention, handleSubmitPost } = usePostHandlers();
 
   useEffect(() => {
-    const currentTab = tabs.find(tab => tab.path === location.pathname);
+    const currentTab = navigationTabs.find(tab => tab.path === location.pathname);
     if (currentTab) {
       setActiveTab(currentTab.id);
     } else if (location.pathname === '/') {
@@ -82,60 +68,6 @@ const BottomNavigation = () => {
     }
   };
 
-  const handleCameraClick = () => {
-    if (!user) return;
-    // Close the sheet immediately for faster UX
-    setShowNativeSheet(false);
-    
-    // Small delay to allow sheet to close smoothly, then trigger camera
-    setTimeout(() => {
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = 'image/*,video/*';
-      input.capture = 'environment';
-      input.onchange = (e) => {
-        const target = e.target as HTMLInputElement;
-        const file = target.files?.[0];
-        if (file) {
-          openModal(file);
-        }
-      };
-      input.click();
-    }, 100);
-  };
-
-  const handleLibraryClick = () => {
-    if (!user) return;
-    // Close the sheet immediately for faster UX
-    setShowNativeSheet(false);
-    
-    // Small delay to allow sheet to close smoothly, then trigger file picker
-    setTimeout(() => {
-      fileInputRef.current?.click();
-    }, 100);
-  };
-
-  const handleFileClick = () => {
-    if (!user) return;
-    // Close the sheet immediately for faster UX
-    setShowNativeSheet(false);
-    
-    // Small delay to allow sheet to close smoothly, then trigger file picker
-    setTimeout(() => {
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = '*/*';
-      input.onchange = (e) => {
-        const target = e.target as HTMLInputElement;
-        const file = target.files?.[0];
-        if (file) {
-          openModal(file);
-        }
-      };
-      input.click();
-    }, 100);
-  };
-
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file || !user) return;
@@ -144,117 +76,14 @@ const BottomNavigation = () => {
     event.target.value = '';
   };
 
-  const handleCaptionInput = async (e: React.FormEvent<HTMLDivElement>) => {
-    const target = e.target as HTMLDivElement;
-    const text = target.innerText;
-    setCaption(text);
-
-    const selection = window.getSelection();
-    if (selection && selection.rangeCount > 0) {
-      setCursorPosition(selection.getRangeAt(0).startOffset);
-    }
-
-    const words = text.split(/(\s+)/);
-    let currentPosition = 0;
-    let mentionWord = '';
-    
-    for (const word of words) {
-      if (currentPosition <= cursorPosition && cursorPosition <= currentPosition + word.length) {
-        if (word.startsWith('@') && word.length > 1) {
-          mentionWord = word;
-          break;
-        }
-      }
-      currentPosition += word.length;
-    }
-
-    if (mentionWord && mentionWord.length > 1) {
-      const query = mentionWord.slice(1);
-      await searchEntities(query);
-      
-      const uniqueEntities = entities.reduce((acc, entity) => {
-        const identifier = `${entity.entity_type}-${entity.entity_id}-${entity.username || entity.name}`;
-        if (!acc.find(item => 
-          `${item.entity_type}-${item.entity_id}-${item.username || item.name}` === identifier
-        )) {
-          acc.push(entity);
-        }
-        return acc;
-      }, [] as TaggableEntity[]);
-      
-      setMentionSuggestions(uniqueEntities);
-      setShowSuggestions(true);
-    } else {
-      setShowSuggestions(false);
-      setMentionSuggestions([]);
-    }
-  };
-
-  const selectMention = (entity: TaggableEntity) => {
-    const displayName = entity.username || entity.name;
-    
-    if (!selectedTags.find(tag => tag.id === entity.id)) {
-      setSelectedTags(prev => [...prev, entity]);
-    }
-
-    const words = caption.split(/(\s+)/);
-    let currentPosition = 0;
-    
-    for (let i = 0; i < words.length; i++) {
-      const word = words[i];
-      if (currentPosition <= cursorPosition && cursorPosition <= currentPosition + word.length) {
-        if (word.startsWith('@')) {
-          words[i] = `@${displayName}`;
-          break;
-        }
-      }
-      currentPosition += word.length;
-    }
-    
-    const newCaption = words.join('');
-    setCaption(newCaption);
-    
-    if (captionInputRef.current) {
-      captionInputRef.current.innerText = newCaption;
-    }
-
-    setShowSuggestions(false);
-    setMentionSuggestions([]);
-  };
-
-  const handleSubmitPost = async () => {
-    if (!selectedFile || !user) return;
-
-    setIsSubmitting(true);
-    
-    try {
-      await submitPost({
-        user,
-        content: caption,
-        mediaFiles: [selectedFile],
-        selectedTags,
-        onSuccess: () => {
-          closeModal();
-        },
-        onError: () => {
-          setIsSubmitting(false);
-        }
-      });
-    } catch (error) {
-      console.error('Error submitting post:', error);
-      setIsSubmitting(false);
-    }
-  };
-
   return (
     <>
       <nav className="fixed bottom-0 left-0 right-0 bg-background border-t border-border z-40">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-around h-16 relative">
-            {tabs.map((tab) => {
+            {navigationTabs.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
-              const isShareButton = tab.id === 'share';
               
               return (
                 <button
@@ -283,9 +112,9 @@ const BottomNavigation = () => {
       <NativeCameraSheet
         isOpen={showNativeSheet}
         onClose={() => setShowNativeSheet(false)}
-        onCameraClick={handleCameraClick}
-        onLibraryClick={handleLibraryClick}
-        onFileClick={handleFileClick}
+        onCameraClick={() => handleCameraClick(user, setShowNativeSheet)}
+        onLibraryClick={() => handleLibraryClick(user, setShowNativeSheet)}
+        onFileClick={() => handleFileClick(user, setShowNativeSheet, openModal)}
       />
       
       <input
@@ -302,11 +131,19 @@ const BottomNavigation = () => {
         selectedFile={selectedFile}
         previewUrl={previewUrl}
         captionInputRef={captionInputRef}
-        onCaptionInput={handleCaptionInput}
+        onCaptionInput={(e) => handleCaptionInput(
+          e, caption, setCaption, cursorPosition, setCursorPosition, 
+          setShowSuggestions, setMentionSuggestions
+        )}
         showSuggestions={showSuggestions}
         mentionSuggestions={mentionSuggestions}
-        onSelectMention={selectMention}
-        onSubmit={handleSubmitPost}
+        onSelectMention={(entity) => selectMention(
+          entity, caption, setCaption, cursorPosition, selectedTags, 
+          setSelectedTags, captionInputRef, setShowSuggestions, setMentionSuggestions
+        )}
+        onSubmit={() => handleSubmitPost(
+          selectedFile, user, caption, selectedTags, closeModal, setIsSubmitting
+        )}
         isSubmitting={isSubmitting}
       />
     </>
