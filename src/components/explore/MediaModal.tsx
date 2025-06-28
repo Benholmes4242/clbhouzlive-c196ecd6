@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Heart, MessageCircle, Share, Volume2, VolumeX } from 'lucide-react';
 import { ExploreContentItem } from './types';
@@ -40,7 +40,12 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
     }
   };
 
-  const handleShare = async () => {
+  const handleShare = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    console.log('Share button clicked'); // Debug log
+    
     const shareData = {
       title: item.title || 'Check out this content',
       text: `Check out this ${item.type} from ${item.user?.name || 'clbhouz'}`,
@@ -48,13 +53,15 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
     };
 
     try {
-      if (navigator.share) {
+      if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+        console.log('Using native share'); // Debug log
         await navigator.share(shareData);
         toast({
           title: "Shared successfully",
           description: "Content shared via native sharing",
         });
       } else {
+        console.log('Using clipboard fallback'); // Debug log
         // Fallback to clipboard
         await navigator.clipboard.writeText(window.location.href);
         toast({
@@ -64,11 +71,14 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
       }
     } catch (error) {
       console.error('Error sharing:', error);
-      toast({
-        title: "Sharing failed",
-        description: "Could not share the content",
-        variant: "destructive",
-      });
+      // Don't show error toast if user just cancelled the share
+      if (error instanceof Error && error.name !== 'AbortError') {
+        toast({
+          title: "Sharing failed",
+          description: "Could not share the content",
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -105,6 +115,13 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-[100vw] max-h-[100vh] w-full h-full p-0 gap-0 flex items-center justify-center bg-black border-0 [&>button]:hidden">
+        <DialogTitle className="sr-only">
+          {item.title || `${item.type} content`}
+        </DialogTitle>
+        <DialogDescription className="sr-only">
+          {item.type === 'video' ? 'Video content' : 'Image content'} from {item.user?.name || 'user'}
+        </DialogDescription>
+        
         <div className="relative w-full h-full bg-black flex flex-col">
           {/* Top controls bar */}
           <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between p-4 bg-gradient-to-b from-black/60 to-transparent">
@@ -204,7 +221,12 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
                 <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
                   <MessageCircle className="h-5 w-5" />
                 </Button>
-                <Button variant="ghost" size="sm" className="text-white hover:bg-white/20" onClick={handleShare}>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="text-white hover:bg-white/20" 
+                  onClick={handleShare}
+                >
                   <Share className="h-5 w-5" />
                 </Button>
               </div>
