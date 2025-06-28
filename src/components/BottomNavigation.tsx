@@ -54,7 +54,7 @@ const BottomNavigation = () => {
                 className={`flex flex-col items-center justify-center space-y-1 transition-colors relative ${
                   isActive
                     ? 'text-white'
-                    : 'text-gray-500 hover:text-gray-300'
+                    : 'text-gray-500 hover:text-black'
                 }`}
               >
                 <Icon className={`h-5 w-5 ${isActive ? 'fill-current' : ''}`} />
