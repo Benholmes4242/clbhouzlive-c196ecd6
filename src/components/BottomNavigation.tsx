@@ -48,7 +48,6 @@ const BottomNavigation = () => {
           {tabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
-            const isClubhouseTab = tab.id === 'home'; // First tab is the main clubhouse
             
             return (
               <button
@@ -56,9 +55,7 @@ const BottomNavigation = () => {
                 onClick={() => handleTabClick(tab)}
                 className={`flex flex-col items-center justify-center space-y-1 transition-colors relative ${
                   isActive
-                    ? isClubhouseTab 
-                      ? 'text-[#2a2626]'
-                      : 'text-green-600'
+                    ? 'text-[#2a2626]'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
@@ -70,9 +67,7 @@ const BottomNavigation = () => {
                 />
                 <span className="text-xs font-medium">{tab.label}</span>
                 {isActive && (
-                  <div className={`absolute bottom-0 w-12 h-0.5 rounded-full left-1/2 -translate-x-1/2 ${
-                    isClubhouseTab ? 'bg-[#2a2626]' : 'bg-green-600'
-                  }`} />
+                  <div className="absolute bottom-0 w-12 h-0.5 rounded-full left-1/2 -translate-x-1/2 bg-[#2a2626]" />
                 )}
               </button>
             );
