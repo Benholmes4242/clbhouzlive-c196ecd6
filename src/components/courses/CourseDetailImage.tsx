@@ -1,6 +1,5 @@
 
 import React from 'react';
-import CourseRankBadges from './CourseRankBadges';
 
 interface CourseDetailImageProps {
   thumbnailImage?: string;
@@ -13,11 +12,7 @@ interface CourseDetailImageProps {
 
 const CourseDetailImage = ({ 
   thumbnailImage, 
-  courseName, 
-  globalRank, 
-  regionalRank, 
-  usaRank, 
-  country 
+  courseName
 }: CourseDetailImageProps) => {
   if (!thumbnailImage) return null;
 
@@ -27,12 +22,6 @@ const CourseDetailImage = ({
         src={thumbnailImage}
         alt={courseName}
         className="w-full h-full object-cover"
-      />
-      <CourseRankBadges
-        globalRank={globalRank}
-        regionalRank={regionalRank}
-        usaRank={usaRank}
-        country={country}
       />
     </div>
   );

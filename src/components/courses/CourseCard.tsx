@@ -4,7 +4,6 @@ import { Badge } from '@/components/ui/badge';
 import { MapPin, Star } from 'lucide-react';
 import CourseDetailModal from './CourseDetailModal';
 import CoursePlayedButton from './CoursePlayedButton';
-import CourseRankBadges from './CourseRankBadges';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -124,15 +123,6 @@ const CourseCard: React.FC<CourseCardProps> = ({
               </div>
             )}
           </div>
-
-          {/* New rank badges system */}
-          <CourseRankBadges
-            globalRank={course.global_rank}
-            regionalRank={course.regional_rank}
-            usaRank={course.usa_rank}
-            country={course.country}
-            viewContext={viewContext}
-          />
 
           {/* Course Played Button - only show when explicitly requested and user can modify */}
           {showPlayedButton && !isViewingOtherUser && (
