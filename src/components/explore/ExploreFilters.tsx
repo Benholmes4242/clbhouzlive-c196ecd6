@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { filterOptions } from './types';
 
@@ -12,6 +13,7 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
   return (
     <div className="sticky top-16 z-30 bg-background/95 backdrop-blur-sm border-b border-border pb-3 mb-6">
       <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide">
+        <Filter className="h-4 w-4 text-muted-foreground flex-shrink-0" />
         {filterOptions.map((filter) => (
           <Button
             key={filter}

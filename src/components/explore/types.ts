@@ -31,4 +31,4 @@ export interface CTAContentItem extends BaseContentItem {
 
 export type ExploreContentItem = MediaContentItem | CTAContentItem;
 
-export const filterOptions = ['Trending', 'Pros', 'Tips', 'Photos', 'Videos'];
+export const filterOptions = ['All', 'Pros', 'Clubs', 'Tips', 'Trending', 'New', 'Photos', 'Videos'];
