@@ -14,6 +14,7 @@ interface MediaModalProps {
 const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
   const [isMuted, setIsMuted] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [videoReady, setVideoReady] = useState(false);
 
   if (!item) return null;
 
@@ -38,19 +39,32 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
     }
   };
 
-  // Auto-play video when modal opens
+  // Instant video setup when modal opens
   useEffect(() => {
     if (isOpen && item.type === 'video') {
+      setVideoReady(false);
+      
       const timer = setTimeout(() => {
         const video = document.getElementById('modal-video') as HTMLVideoElement;
         if (video) {
-          video.play().then(() => {
-            setIsPlaying(true);
-          }).catch(() => {
-            console.log('Autoplay blocked');
-          });
+          // Preload and prepare for instant playback
+          video.preload = 'auto';
+          video.oncanplaythrough = () => {
+            setVideoReady(true);
+            video.play().then(() => {
+              setIsPlaying(true);
+            }).catch(() => {
+              console.log('Autoplay blocked');
+              setVideoReady(true);
+            });
+          };
+          
+          video.onloadeddata = () => {
+            setVideoReady(true);
+          };
         }
-      }, 100);
+      }, 50);
+      
       return () => clearTimeout(timer);
     }
   }, [isOpen, item.type]);
@@ -59,15 +73,30 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-[100vw] max-h-[100vh] w-full h-full p-0 gap-0 flex items-center justify-center bg-black border-0">
         <div className="relative w-full h-full bg-black flex flex-col">
-          {/* Back button - top left */}
-          <Button 
-            variant="ghost" 
-            size="icon" 
-            onClick={onClose}
-            className="absolute top-4 left-4 z-10 text-white hover:bg-white/20 min-w-[40px] min-h-[40px]"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
+          {/* Top controls bar */}
+          <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between p-4 bg-gradient-to-b from-black/60 to-transparent">
+            {/* Back button - top left */}
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={onClose}
+              className="text-white hover:bg-white/20 min-w-[40px] min-h-[40px]"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+
+            {/* Mute/Unmute button - top right (only for videos) */}
+            {item.type === 'video' && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleMute}
+                className="text-white hover:bg-white/20 min-w-[40px] min-h-[40px]"
+              >
+                {isMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
+              </Button>
+            )}
+          </div>
 
           {/* Media Content */}
           <div className="flex-1 flex items-center justify-center relative">
@@ -83,22 +112,11 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
                   onClick={handleVideoClick}
                   onPlay={() => setIsPlaying(true)}
                   onPause={() => setIsPlaying(false)}
+                  preload="auto"
                 />
-                
-                {/* Video controls */}
-                <div className="absolute bottom-4 right-4 flex items-center space-x-2">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={toggleMute}
-                    className="text-white hover:bg-white/20 bg-black/40"
-                  >
-                    {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
-                  </Button>
-                </div>
 
                 {/* Play/Pause indicator */}
-                {!isPlaying && (
+                {!isPlaying && videoReady && (
                   <div 
                     className="absolute inset-0 flex items-center justify-center cursor-pointer"
                     onClick={handleVideoClick}
@@ -106,6 +124,13 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
                     <div className="w-16 h-16 bg-black/60 rounded-full flex items-center justify-center">
                       <div className="w-0 h-0 border-l-[12px] border-l-white border-y-[8px] border-y-transparent ml-1"></div>
                     </div>
+                  </div>
+                )}
+
+                {/* Loading indicator for video */}
+                {!videoReady && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-12 h-12 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                   </div>
                 )}
               </div>

@@ -25,6 +25,7 @@ const VideoPreview = ({
   const [isHovered, setIsHovered] = useState(false);
   const [hasVideoError, setHasVideoError] = useState(false);
   const [thumbnailSrc, setThumbnailSrc] = useState<string>('');
+  const [thumbnailReady, setThumbnailReady] = useState(false);
   const isMobile = useIsMobile();
   const { elementRef, isInView } = useIntersectionObserver({ threshold: 0.8 });
   
@@ -43,55 +44,55 @@ const VideoPreview = ({
     src,
     poster,
     isGridThumbnail,
-    isIOSSafari,
-    isMobile,
-    isInView,
-    isPlaying,
-    shouldShowPlayIcon,
-    hasValidSrc: !!src && src.length > 0,
-    srcType: typeof src
+    thumbnailReady,
+    hasValidSrc: !!src && src.length > 0
   });
 
-  // Generate thumbnail from video on component mount
+  // Generate thumbnail immediately for instant display
   useEffect(() => {
     if (!src || !isGridThumbnail) return;
 
+    // Use video element to generate thumbnail immediately
+    const video = document.createElement('video');
+    video.crossOrigin = 'anonymous';
+    video.muted = true;
+    video.playsInline = true;
+    video.preload = 'metadata';
+    
     const generateThumbnail = () => {
-      const video = document.createElement('video');
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
       
-      video.crossOrigin = 'anonymous';
-      video.muted = true;
-      video.playsInline = true;
-      
-      video.onloadeddata = () => {
-        canvas.width = video.videoWidth || 400;
-        canvas.height = video.videoHeight || 400;
-        video.currentTime = 1;
-      };
-      
-      video.onseeked = () => {
-        if (ctx && video.videoWidth > 0 && video.videoHeight > 0) {
-          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-          const dataURL = canvas.toDataURL('image/jpeg', 0.8);
-          setThumbnailSrc(dataURL);
-          console.log('Generated thumbnail for video:', videoId);
-        }
-      };
-      
-      video.onerror = () => {
-        console.log('Failed to generate thumbnail for:', videoId);
-        setHasVideoError(true);
-      };
-      
-      video.src = src;
-      video.load();
+      if (ctx && video.videoWidth > 0 && video.videoHeight > 0) {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        ctx.drawImage(video, 0, 0);
+        const dataURL = canvas.toDataURL('image/jpeg', 0.9);
+        setThumbnailSrc(dataURL);
+        setThumbnailReady(true);
+        console.log('Thumbnail generated instantly for:', videoId);
+      }
     };
 
-    if (isGridThumbnail) {
-      generateThumbnail();
-    }
+    video.onloadeddata = () => {
+      video.currentTime = 0.1; // Get frame from beginning
+    };
+    
+    video.onseeked = generateThumbnail;
+    video.oncanplay = generateThumbnail;
+    
+    video.onerror = () => {
+      console.log('Video thumbnail generation failed for:', videoId);
+      setHasVideoError(true);
+      setThumbnailReady(true); // Show fallback
+    };
+    
+    video.src = src;
+    video.load();
+
+    return () => {
+      video.src = '';
+    };
   }, [src, videoId, isGridThumbnail]);
 
   const handleMouseEnter = () => {
@@ -130,58 +131,42 @@ const VideoPreview = ({
     );
   }
 
-  // For grid thumbnails, show either the video (if autoplaying) or thumbnail with play icon
+  // For grid thumbnails, prioritize instant display
   if (isGridThumbnail) {
     return (
       <div
         ref={elementRef}
-        className={`relative cursor-pointer group overflow-hidden bg-gray-200 ${className}`}
+        className={`relative cursor-pointer group overflow-hidden bg-gray-900 ${className}`}
         onClick={handleClick}
       >
-        {!isIOSSafari ? (
-          <>
-            <video
-              ref={videoRef}
-              src={src}
-              className="w-full h-full object-cover"
-              muted
-              loop
-              playsInline
-              onError={handleVideoError}
-              preload="metadata"
-              style={{ display: isPlaying ? 'block' : 'none' }}
-            />
-            
-            {/* Thumbnail overlay when not playing */}
-            {!isPlaying && (
-              <img
-                src={thumbnailSrc || poster || 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center'}
-                alt="Video thumbnail"
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  const img = e.target as HTMLImageElement;
-                  if (img.src === thumbnailSrc && poster) {
-                    img.src = poster;
-                  } else if (img.src !== 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center') {
-                    img.src = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
-                  }
-                }}
-              />
-            )}
-          </>
-        ) : (
-          <img
-            src={thumbnailSrc || poster || 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center'}
-            alt="Video thumbnail"
-            className="w-full h-full object-cover"
-            onError={(e) => {
-              const img = e.target as HTMLImageElement;
-              if (img.src === thumbnailSrc && poster) {
-                img.src = poster;
-              } else if (img.src !== 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center') {
-                img.src = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
-              }
-            }}
+        {/* Always show thumbnail first for instant display */}
+        <img
+          src={thumbnailSrc || poster || 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center'}
+          alt="Video thumbnail"
+          className="w-full h-full object-cover"
+          style={{ display: thumbnailReady || poster ? 'block' : 'none' }}
+          onError={(e) => {
+            const img = e.target as HTMLImageElement;
+            if (img.src === thumbnailSrc && poster) {
+              img.src = poster;
+            } else if (img.src !== 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center') {
+              img.src = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
+            }
+          }}
+        />
+        
+        {/* Video element for autoplay (hidden initially) */}
+        {!isIOSSafari && (
+          <video
+            ref={videoRef}
+            src={src}
+            className="w-full h-full object-cover absolute inset-0"
+            muted
+            loop
+            playsInline
+            onError={handleVideoError}
+            preload="metadata"
+            style={{ display: isPlaying ? 'block' : 'none' }}
           />
         )}
         
@@ -194,9 +179,9 @@ const VideoPreview = ({
           </div>
         )}
         
-        {/* Loading indicator */}
-        {isLoading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30">
+        {/* Loading indicator only when no thumbnail is ready */}
+        {!thumbnailReady && !poster && isLoading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-gray-900">
             <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
           </div>
         )}
