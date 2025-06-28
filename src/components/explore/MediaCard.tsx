@@ -47,7 +47,7 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onClick }) => {
           <img
             src={item.src}
             alt={item.title}
-            className="w-full object-cover"
+            className="w-full h-auto object-cover"
             loading="lazy"
           />
         )}
