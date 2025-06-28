@@ -67,7 +67,7 @@ const SnapModal = ({
               <Image className="h-6 w-6 text-[#ff6b00]" />
             </div>
             <div className="text-left">
-              <div className="font-semibold text-base">Post an Image</div>
+              <div className="font-semibold text-base">Post a Photo</div>
               <div className="text-sm text-gray-500">Select from gallery</div>
             </div>
           </Button>
