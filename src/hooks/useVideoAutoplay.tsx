@@ -1,4 +1,6 @@
+
 import { useRef, useEffect, useState } from 'react';
+import { useVideoAutoplayManager } from './useVideoAutoplayManager';
 
 interface UseVideoAutoplayProps {
   isInView: boolean;
@@ -16,6 +18,7 @@ export const useVideoAutoplay = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const { setActiveVideo, isVideoActive } = useVideoAutoplayManager();
   
   // Detect iOS Safari
   const isIOSSafari = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
@@ -29,12 +32,20 @@ export const useVideoAutoplay = ({
       return;
     }
 
-    const shouldPlay = isInView || isHovered;
+    // In grid context, only autoplay if this video is the active one
+    const shouldPlay = isGridContext 
+      ? (isInView && isVideoActive(videoId))
+      : (isInView || isHovered);
 
     const handlePlay = async () => {
       if (!shouldPlay || isPlaying) return;
 
       try {
+        // In grid context, claim this video as active
+        if (isGridContext && isInView) {
+          setActiveVideo(videoId);
+        }
+
         setIsLoading(true);
         await video.play();
         setIsPlaying(true);
@@ -55,12 +66,21 @@ export const useVideoAutoplay = ({
         video.pause();
         setIsPlaying(false);
         console.log(`Video ${videoId} paused`);
+        
+        // Release active video if this was it
+        if (isGridContext && isVideoActive(videoId)) {
+          setActiveVideo(null);
+        }
       } catch (error) {
         console.log(`Video ${videoId} pause error:`, error);
       }
     };
 
-    if (shouldPlay) {
+    // Handle when video goes out of view in grid context
+    if (isGridContext && !isInView && isVideoActive(videoId)) {
+      setActiveVideo(null);
+      handlePause();
+    } else if (shouldPlay) {
       handlePlay();
     } else {
       handlePause();
@@ -71,12 +91,15 @@ export const useVideoAutoplay = ({
       if (video && isPlaying) {
         try {
           video.pause();
+          if (isGridContext && isVideoActive(videoId)) {
+            setActiveVideo(null);
+          }
         } catch (error) {
           // Ignore cleanup errors
         }
       }
     };
-  }, [isInView, isHovered, videoId, isPlaying, isIOSSafari, isGridContext]);
+  }, [isInView, isHovered, videoId, isPlaying, isIOSSafari, isGridContext, isVideoActive, setActiveVideo]);
 
   // Handle video events
   useEffect(() => {
@@ -94,6 +117,9 @@ export const useVideoAutoplay = ({
       console.log(`Video ${videoId} error:`, e);
       setIsPlaying(false);
       setIsLoading(false);
+      if (isGridContext && isVideoActive(videoId)) {
+        setActiveVideo(null);
+      }
     };
 
     video.addEventListener('loadstart', handleLoadStart);
@@ -109,11 +135,12 @@ export const useVideoAutoplay = ({
       video.removeEventListener('pause', handlePause);
       video.removeEventListener('error', handleError);
     };
-  }, [videoId]);
+  }, [videoId, isGridContext, isVideoActive, setActiveVideo]);
 
   return {
     videoRef,
     isPlaying,
-    isLoading
+    isLoading,
+    shouldShowPlayIcon: isGridContext && !isVideoActive(videoId) && !isLoading
   };
 };

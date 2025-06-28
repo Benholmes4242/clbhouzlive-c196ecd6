@@ -1,7 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
-import { Maximize2 } from 'lucide-react';
+import { Maximize2, CirclePlay } from 'lucide-react';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
+import { useVideoAutoplay } from '@/hooks/useVideoAutoplay';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface VideoPreviewProps {
@@ -25,7 +26,14 @@ const VideoPreview = ({
   const [hasVideoError, setHasVideoError] = useState(false);
   const [thumbnailSrc, setThumbnailSrc] = useState<string>('');
   const isMobile = useIsMobile();
-  const { elementRef } = useIntersectionObserver({ threshold: 0.6 });
+  const { elementRef, isInView } = useIntersectionObserver({ threshold: 0.8 });
+  
+  const { videoRef, isPlaying, isLoading, shouldShowPlayIcon } = useVideoAutoplay({
+    isInView,
+    isHovered,
+    videoId,
+    isGridContext: isGridThumbnail
+  });
   
   // Detect iOS Safari
   const isIOSSafari = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
@@ -37,6 +45,9 @@ const VideoPreview = ({
     isGridThumbnail,
     isIOSSafari,
     isMobile,
+    isInView,
+    isPlaying,
+    shouldShowPlayIcon,
     hasValidSrc: !!src && src.length > 0,
     srcType: typeof src
   });
@@ -92,13 +103,13 @@ const VideoPreview = ({
   }, [src, videoId, isGridThumbnail]);
 
   const handleMouseEnter = () => {
-    if (!isMobile && isGridThumbnail && !isIOSSafari) {
+    if (!isMobile && !isGridThumbnail && !isIOSSafari) {
       setIsHovered(true);
     }
   };
 
   const handleMouseLeave = () => {
-    if (!isMobile && isGridThumbnail && !isIOSSafari) {
+    if (!isMobile && !isGridThumbnail && !isIOSSafari) {
       setIsHovered(false);
     }
   };
@@ -128,37 +139,74 @@ const VideoPreview = ({
     );
   }
 
-  // For grid thumbnails, show the generated thumbnail or poster
+  // For grid thumbnails, show either the video (if autoplaying) or thumbnail with play icon
   if (isGridThumbnail) {
-    const displaySrc = thumbnailSrc || poster || 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
-    
     return (
       <div
         ref={elementRef}
         className={`relative cursor-pointer group overflow-hidden bg-gray-200 ${className}`}
         onClick={handleClick}
       >
-        <img
-          src={displaySrc}
-          alt="Video thumbnail"
-          className="w-full h-full object-cover"
-          onError={(e) => {
-            // If thumbnail fails, try poster, then fallback
-            const img = e.target as HTMLImageElement;
-            if (img.src === thumbnailSrc && poster) {
-              img.src = poster;
-            } else if (img.src !== 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center') {
-              img.src = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
-            }
-          }}
-        />
+        {!isIOSSafari ? (
+          <>
+            <video
+              ref={videoRef}
+              src={src}
+              className="w-full h-full object-cover"
+              muted
+              loop
+              playsInline
+              onError={handleVideoError}
+              preload="metadata"
+              style={{ display: isPlaying ? 'block' : 'none' }}
+            />
+            
+            {/* Thumbnail overlay when not playing */}
+            {!isPlaying && (
+              <img
+                src={thumbnailSrc || poster || 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center'}
+                alt="Video thumbnail"
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  const img = e.target as HTMLImageElement;
+                  if (img.src === thumbnailSrc && poster) {
+                    img.src = poster;
+                  } else if (img.src !== 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center') {
+                    img.src = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
+                  }
+                }}
+              />
+            )}
+          </>
+        ) : (
+          <img
+            src={thumbnailSrc || poster || 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center'}
+            alt="Video thumbnail"
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              const img = e.target as HTMLImageElement;
+              if (img.src === thumbnailSrc && poster) {
+                img.src = poster;
+              } else if (img.src !== 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center') {
+                img.src = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
+              }
+            }}
+          />
+        )}
         
-        {/* Video play indicator */}
-        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20 opacity-0 group-hover:opacity-100 transition-opacity">
-          <div className="w-12 h-12 bg-white bg-opacity-90 rounded-full flex items-center justify-center shadow-lg">
-            <div className="w-0 h-0 border-l-4 border-l-gray-800 border-t-2 border-b-2 border-t-transparent border-b-transparent ml-1"></div>
+        {/* Play icon overlay for non-autoplaying videos */}
+        {shouldShowPlayIcon && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20">
+            <CirclePlay className="w-12 h-12 text-white opacity-80" fill="white" />
           </div>
-        </div>
+        )}
+        
+        {/* Loading indicator */}
+        {isLoading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30">
+            <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        )}
       </div>
     );
   }
@@ -171,6 +219,7 @@ const VideoPreview = ({
       onMouseLeave={handleMouseLeave}
     >
       <video
+        ref={videoRef}
         src={src}
         poster={poster}
         className="w-full h-full object-cover"

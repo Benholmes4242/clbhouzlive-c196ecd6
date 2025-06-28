@@ -6,6 +6,7 @@ import ExploreFilters from '@/components/explore/ExploreFilters';
 import ExploreGrid from '@/components/explore/ExploreGrid';
 import MobileDebugConsole from '@/components/explore/MobileDebugConsole';
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
+import { VideoAutoplayProvider } from '@/hooks/useVideoAutoplayManager';
 
 const Explore = () => {
   const [activeFilter, setActiveFilter] = useState('All');
@@ -39,45 +40,47 @@ const Explore = () => {
   });
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      
-      <main className="container mx-auto px-4 py-6 pb-20">
-        {/* Sticky Filter Bar */}
-        <ExploreFilters 
-          activeFilter={activeFilter} 
-          onFilterChange={setActiveFilter} 
+    <VideoAutoplayProvider>
+      <div className="min-h-screen bg-background">
+        <Header />
+        
+        <main className="container mx-auto px-4 py-6 pb-20">
+          {/* Sticky Filter Bar */}
+          <ExploreFilters 
+            activeFilter={activeFilter} 
+            onFilterChange={setActiveFilter} 
+          />
+
+          {/* Masonry Grid with Infinite Scroll */}
+          <ExploreGrid 
+            content={filteredContent}
+            onLike={handleLike}
+            onFollow={handleFollow}
+            isLoading={loading}
+            hasMore={hasMore}
+            onLoadMore={loadMore}
+          />
+        </main>
+        
+        <BottomNavigation />
+
+        {/* Mobile Debug Console */}
+        <MobileDebugConsole 
+          isVisible={debugVisible}
+          onToggle={() => setDebugVisible(!debugVisible)}
         />
 
-        {/* Masonry Grid with Infinite Scroll */}
-        <ExploreGrid 
-          content={filteredContent}
-          onLike={handleLike}
-          onFollow={handleFollow}
-          isLoading={loading}
-          hasMore={hasMore}
-          onLoadMore={loadMore}
-        />
-      </main>
-      
-      <BottomNavigation />
-
-      {/* Mobile Debug Console */}
-      <MobileDebugConsole 
-        isVisible={debugVisible}
-        onToggle={() => setDebugVisible(!debugVisible)}
-      />
-
-      <style>{`
-        .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-      `}</style>
-    </div>
+        <style>{`
+          .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+          }
+          .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+          }
+        `}</style>
+      </div>
+    </VideoAutoplayProvider>
   );
 };
 
