@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
-import FloatingPostButton from '@/components/posts/FloatingPostButton';
 import ClubhouseFeedControls from '@/components/clubhouse/ClubhouseFeedControls';
 import CourseHighlightsCarousel from '@/components/clubhouse/CourseHighlightsCarousel';
 import ClubSpotlightCarousel from '@/components/clubhouse/ClubSpotlightCarousel';
@@ -67,7 +66,6 @@ const ClubhouseFeed = () => {
         </Tabs>
       </div>
 
-      <FloatingPostButton />
       <BottomNavigation />
     </div>
   );
