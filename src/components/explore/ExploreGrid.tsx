@@ -19,18 +19,6 @@ const heightClasses = [
   'h-96',  // Large  
 ];
 
-// Enhanced function to get a truly random height with better distribution
-const getRandomHeight = (excludeHeights: string[] = []): string => {
-  const availableHeights = excludeHeights.length > 0 
-    ? heightClasses.filter(h => !excludeHeights.includes(h))
-    : heightClasses;
-  
-  // If we've excluded too many, reset and just exclude the first one
-  const finalHeights = availableHeights.length === 0 ? heightClasses.slice(1) : availableHeights;
-  
-  return finalHeights[Math.floor(Math.random() * finalHeights.length)];
-};
-
 const ExploreGrid: React.FC<ExploreGridProps> = ({ content, onLike, onFollow, isLoading }) => {
   const [itemHeights, setItemHeights] = useState<Record<string, string>>({});
 
@@ -41,77 +29,127 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({ content, onLike, onFollow, is
     500: 2
   };
 
-  // Enhanced height generation with better anti-uniformity logic
+  // Completely randomized height assignment with strong anti-pattern logic
   useEffect(() => {
     const newHeights: Record<string, string> = {};
     const columnCount = window.innerWidth > 1100 ? 4 : window.innerWidth > 700 ? 3 : 2;
     
-    // Track last few heights per column for better variety
-    const columnRecentHeights: Record<number, string[]> = {};
-    
-    // Initialize column tracking
+    // Track the last several heights per column to prevent patterns
+    const columnHistory: Record<number, string[]> = {};
     for (let i = 0; i < columnCount; i++) {
-      columnRecentHeights[i] = [];
+      columnHistory[i] = [];
     }
-    
+
     content.forEach((item, index) => {
       const columnIndex = index % columnCount;
+      let attempts = 0;
+      let selectedHeight: string;
       
-      // Get recent heights for this column (last 2-3 items)
-      const recentHeightsInColumn = columnRecentHeights[columnIndex].slice(-2);
-      
-      // Also check adjacent columns for better distribution
-      const adjacentColumnHeights: string[] = [];
-      for (let col = 0; col < columnCount; col++) {
-        if (col !== columnIndex && columnRecentHeights[col].length > 0) {
-          adjacentColumnHeights.push(columnRecentHeights[col][columnRecentHeights[col].length - 1]);
+      do {
+        // Get a truly random height
+        selectedHeight = heightClasses[Math.floor(Math.random() * heightClasses.length)];
+        attempts++;
+        
+        // If we've tried too many times, just use any height that's not the immediate previous
+        if (attempts > 20) {
+          const lastHeight = columnHistory[columnIndex][columnHistory[columnIndex].length - 1];
+          const availableHeights = heightClasses.filter(h => h !== lastHeight);
+          selectedHeight = availableHeights[Math.floor(Math.random() * availableHeights.length)] || heightClasses[0];
+          break;
         }
-      }
+        
+      } while (shouldRejectHeight(selectedHeight, columnIndex, columnHistory, columnCount, index));
       
-      // Combine exclusions from same column and adjacent columns
-      const excludeHeights = [...recentHeightsInColumn, ...adjacentColumnHeights.slice(0, 1)];
+      newHeights[item.id] = selectedHeight;
       
-      // Get a random height avoiding recent ones
-      const randomHeight = getRandomHeight(excludeHeights);
+      // Update column history
+      columnHistory[columnIndex].push(selectedHeight);
       
-      newHeights[item.id] = randomHeight;
-      
-      // Update column tracking
-      columnRecentHeights[columnIndex].push(randomHeight);
-      
-      // Keep only last 3 heights per column to prevent memory buildup
-      if (columnRecentHeights[columnIndex].length > 3) {
-        columnRecentHeights[columnIndex] = columnRecentHeights[columnIndex].slice(-3);
+      // Keep only last 4 heights per column to prevent long-term patterns
+      if (columnHistory[columnIndex].length > 4) {
+        columnHistory[columnIndex] = columnHistory[columnIndex].slice(-4);
       }
     });
     
     setItemHeights(newHeights);
   }, [content]);
 
-  // Handle window resize to recalculate heights
+  // Function to determine if a height should be rejected to prevent patterns
+  const shouldRejectHeight = (
+    height: string, 
+    columnIndex: number, 
+    columnHistory: Record<number, string[]>, 
+    columnCount: number,
+    globalIndex: number
+  ): boolean => {
+    const currentColumnHistory = columnHistory[columnIndex];
+    
+    // Reject if it's the same as the last 2 items in this column
+    if (currentColumnHistory.length >= 2 && 
+        currentColumnHistory.slice(-2).every(h => h === height)) {
+      return true;
+    }
+    
+    // Reject if it's the same as the immediate previous item in this column
+    if (currentColumnHistory.length >= 1 && 
+        currentColumnHistory[currentColumnHistory.length - 1] === height) {
+      return true;
+    }
+    
+    // For items that would form a visual row, check adjacent columns
+    const rowPosition = Math.floor(globalIndex / columnCount);
+    const startOfRow = rowPosition * columnCount;
+    
+    // If we're not at the start of a row, check what's already been assigned in this row
+    if (globalIndex > startOfRow) {
+      for (let i = startOfRow; i < globalIndex; i++) {
+        const adjacentColumnIndex = i % columnCount;
+        const adjacentHeight = columnHistory[adjacentColumnIndex][columnHistory[adjacentColumnIndex].length - 1];
+        if (adjacentHeight === height) {
+          return true; // Reject to prevent horizontal patterns
+        }
+      }
+    }
+    
+    return false;
+  };
+
+  // Handle window resize to recalculate heights with new randomization
   useEffect(() => {
     const handleResize = () => {
-      // Only recalculate if there's a significant change
       const newColumnCount = window.innerWidth > 1100 ? 4 : window.innerWidth > 700 ? 3 : 2;
       
-      // Trigger height recalculation with new column distribution
+      // Force complete re-randomization on resize
       const newHeights: Record<string, string> = {};
-      const columnRecentHeights: Record<number, string[]> = {};
+      const columnHistory: Record<number, string[]> = {};
       
       for (let i = 0; i < newColumnCount; i++) {
-        columnRecentHeights[i] = [];
+        columnHistory[i] = [];
       }
       
       content.forEach((item, index) => {
         const columnIndex = index % newColumnCount;
-        const recentHeightsInColumn = columnRecentHeights[columnIndex].slice(-2);
-        const randomHeight = getRandomHeight(recentHeightsInColumn);
+        let attempts = 0;
+        let selectedHeight: string;
         
-        newHeights[item.id] = randomHeight;
-        columnRecentHeights[columnIndex].push(randomHeight);
+        do {
+          selectedHeight = heightClasses[Math.floor(Math.random() * heightClasses.length)];
+          attempts++;
+          
+          if (attempts > 20) {
+            const lastHeight = columnHistory[columnIndex][columnHistory[columnIndex].length - 1];
+            const availableHeights = heightClasses.filter(h => h !== lastHeight);
+            selectedHeight = availableHeights[Math.floor(Math.random() * availableHeights.length)] || heightClasses[0];
+            break;
+          }
+          
+        } while (shouldRejectHeight(selectedHeight, columnIndex, columnHistory, newColumnCount, index));
         
-        if (columnRecentHeights[columnIndex].length > 3) {
-          columnRecentHeights[columnIndex] = columnRecentHeights[columnIndex].slice(-3);
+        newHeights[item.id] = selectedHeight;
+        columnHistory[columnIndex].push(selectedHeight);
+        
+        if (columnHistory[columnIndex].length > 4) {
+          columnHistory[columnIndex] = columnHistory[columnIndex].slice(-4);
         }
       });
       
@@ -130,9 +168,13 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({ content, onLike, onFollow, is
         className="flex w-auto -ml-2"
         columnClassName="pl-2 bg-clip-padding"
       >
-        {content.map((item) => {
-          // Use a more varied default if height isn't set yet
-          const dynamicHeight = itemHeights[item.id] || heightClasses[Math.floor(Math.random() * heightClasses.length)];
+        {content.map((item, index) => {
+          // Use truly random height if not yet calculated, but ensure it's different from patterns
+          const dynamicHeight = itemHeights[item.id] || (() => {
+            // Emergency fallback with some randomness
+            const randomIndex = (index * 7 + Date.now()) % heightClasses.length;
+            return heightClasses[randomIndex];
+          })();
           
           return (
             <div key={item.id} className="mb-4">
