@@ -128,7 +128,11 @@ const CourseDetailModal = ({ course, isOpen, onClose, viewingUserId }: CourseDet
         <div className="space-y-6">
           <CourseDetailImage 
             thumbnailImage={course.thumbnail_image} 
-            courseName={course.name} 
+            courseName={course.name}
+            globalRank={course.global_rank}
+            regionalRank={course.regional_rank}
+            usaRank={course.usa_rank}
+            country={course.country}
           />
 
           <CourseDetailInfo 
