@@ -1,5 +1,5 @@
 
-import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
 
 interface VideoAutoplayContextType {
   activeVideoId: string | null;
@@ -9,7 +9,7 @@ interface VideoAutoplayContextType {
 
 const VideoAutoplayContext = createContext<VideoAutoplayContextType | undefined>(undefined);
 
-export const VideoAutoplayProvider = ({ children }: { children: ReactNode }) => {
+export const VideoAutoplayProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
 
   const setActiveVideo = useCallback((videoId: string | null) => {
@@ -21,14 +21,20 @@ export const VideoAutoplayProvider = ({ children }: { children: ReactNode }) => 
     return activeVideoId === videoId;
   }, [activeVideoId]);
 
+  const contextValue: VideoAutoplayContextType = {
+    activeVideoId,
+    setActiveVideo,
+    isVideoActive
+  };
+
   return (
-    <VideoAutoplayContext.Provider value={{ activeVideoId, setActiveVideo, isVideoActive }}>
+    <VideoAutoplayContext.Provider value={contextValue}>
       {children}
     </VideoAutoplayContext.Provider>
   );
 };
 
-export const useVideoAutoplayManager = () => {
+export const useVideoAutoplayManager = (): VideoAutoplayContextType => {
   const context = useContext(VideoAutoplayContext);
   if (!context) {
     throw new Error('useVideoAutoplayManager must be used within VideoAutoplayProvider');

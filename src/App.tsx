@@ -1,3 +1,4 @@
+
 import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -33,37 +34,39 @@ const queryClient = new QueryClient();
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <VideoAutoplayProvider>
-        <TooltipProvider>
+      <TooltipProvider>
+        <VideoAutoplayProvider>
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/create-profile" element={<CreateProfile />} />
-              <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/profile/:username" element={<UserProfilePage />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/explore" element={<Explore />} />
-              <Route path="/courses" element={<Courses />} />
-              <Route path="/courses/:userId" element={<UserCoursesPage />} />
-              <Route path="/my-ratings" element={<MyRatings />} />
-              <Route path="/news" element={<News />} />
-              <Route path="/tour-central" element={<TourCentral />} />
-              <Route path="/clubhouse" element={<ClubhouseFeed />} />
-              <Route path="/messages" element={<MessagesPage />} />
-              <Route path="/notifications" element={<NotificationsPage />} />
-              <Route path="/friends" element={<FriendsPage />} />
-              <Route path="/followers" element={<FollowersPage />} />
-              <Route path="/following" element={<FollowingPage />} />
-              <Route path="/admin-setup" element={<AdminSetupPage />} />
-              <Route path="/admin" element={<AdminPage />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+            <Suspense fallback={<div className="min-h-screen bg-background flex items-center justify-center">Loading...</div>}>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/auth" element={<Auth />} />
+                <Route path="/create-profile" element={<CreateProfile />} />
+                <Route path="/profile" element={<ProfilePage />} />
+                <Route path="/profile/:username" element={<UserProfilePage />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/explore" element={<Explore />} />
+                <Route path="/courses" element={<Courses />} />
+                <Route path="/courses/:userId" element={<UserCoursesPage />} />
+                <Route path="/my-ratings" element={<MyRatings />} />
+                <Route path="/news" element={<News />} />
+                <Route path="/tour-central" element={<TourCentral />} />
+                <Route path="/clubhouse" element={<ClubhouseFeed />} />
+                <Route path="/messages" element={<MessagesPage />} />
+                <Route path="/notifications" element={<NotificationsPage />} />
+                <Route path="/friends" element={<FriendsPage />} />
+                <Route path="/followers" element={<FollowersPage />} />
+                <Route path="/following" element={<FollowingPage />} />
+                <Route path="/admin-setup" element={<AdminSetupPage />} />
+                <Route path="/admin" element={<AdminPage />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
           </BrowserRouter>
-        </TooltipProvider>
-      </VideoAutoplayProvider>
+        </VideoAutoplayProvider>
+      </TooltipProvider>
     </QueryClientProvider>
   );
 }
