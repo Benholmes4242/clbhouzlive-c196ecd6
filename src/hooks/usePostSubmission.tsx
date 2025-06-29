@@ -1,4 +1,3 @@
-
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { validateFiles, getFileErrorMessage } from '@/components/posts/utils/fileValidation';
@@ -159,13 +158,12 @@ export const usePostSubmission = () => {
 
       console.log('Upload process completed successfully');
 
-      // Show success message
+      // Show single success message for all posts
+      showToast("Your Post Is Out There");
+
+      // Now call onSuccess for videos after successful upload
       if (hasVideos) {
-        showToast("🎉 Video posted successfully!", '');
-        // Now call onSuccess for videos after successful upload
         onSuccess();
-      } else {
-        showToast("Post shared! It's out there!", '🎉');
       }
 
       // Broadcast success event for feed refresh
