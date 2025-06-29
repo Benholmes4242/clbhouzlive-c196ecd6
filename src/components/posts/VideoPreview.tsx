@@ -56,9 +56,9 @@ const VideoPreview = ({
     isMobile
   });
 
-  // Generate thumbnails aggressively for grid context
+  // Generate thumbnails aggressively for both grid and non-grid contexts
   useEffect(() => {
-    if (!src || !isGridThumbnail) return;
+    if (!src) return;
 
     // Check if we already have a cached thumbnail
     const cachedThumbnail = thumbnailCache.get(videoId);
@@ -86,7 +86,7 @@ const VideoPreview = ({
       return;
     }
 
-    // Generate thumbnail immediately for grid thumbnails
+    // Generate thumbnail for all contexts
     const generateThumbnailPromise = new Promise<string>((resolve, reject) => {
       const video = document.createElement('video');
       video.crossOrigin = 'anonymous';
@@ -149,14 +149,14 @@ const VideoPreview = ({
       video.src = src;
       video.load();
 
-      // Shorter timeout for grid thumbnails
+      // Timeout for thumbnail generation
       setTimeout(() => {
         if (!resolved) {
           console.log('Thumbnail generation timeout for:', videoId);
           resolved = true;
           reject(new Error('Thumbnail generation timeout'));
         }
-      }, 2000);
+      }, 3000);
     });
 
     // Store the promise and handle results
@@ -185,7 +185,7 @@ const VideoPreview = ({
         thumbnailPromises.delete(videoId);
       });
 
-  }, [src, videoId, poster, isGridThumbnail]);
+  }, [src, videoId, poster]);
 
   const handleMouseEnter = () => {
     if (!isMobile && !isGridThumbnail && !isIOSSafari) {
@@ -315,7 +315,7 @@ const VideoPreview = ({
     );
   }
 
-  // For non-grid context (desktop explore), always show thumbnail to prevent black display
+  // For non-grid context (desktop explore), ensure proper thumbnail display
   return (
     <div
       ref={elementRef}
@@ -323,33 +323,70 @@ const VideoPreview = ({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      {/* Always show thumbnail as base layer on desktop */}
-      {thumbnailSrc && (
-        <img
-          src={thumbnailSrc}
-          alt="Video thumbnail"
-          className={`w-full h-full object-cover absolute inset-0 ${isPlaying ? 'z-10' : 'z-20'}`}
+      {/* Base layer - always show something */}
+      <div className="w-full h-full bg-gray-900 absolute inset-0">
+        {/* Show thumbnail if available */}
+        {thumbnailSrc ? (
+          <img
+            src={thumbnailSrc}
+            alt="Video thumbnail"
+            className="w-full h-full object-cover"
+            onError={() => setThumbnailError(true)}
+          />
+        ) : poster ? (
+          <img
+            src={poster}
+            alt="Video thumbnail"
+            className="w-full h-full object-cover"
+            onError={() => setThumbnailError(true)}
+          />
+        ) : (
+          // Fallback - show first frame of video
+          <video
+            src={src}
+            className="w-full h-full object-cover"
+            muted
+            playsInline
+            preload="metadata"
+            onLoadedData={(e) => {
+              const video = e.target as HTMLVideoElement;
+              if (video.videoWidth > 0 && video.videoHeight > 0 && !thumbnailSrc) {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                if (ctx) {
+                  canvas.width = video.videoWidth;
+                  canvas.height = video.videoHeight;
+                  ctx.drawImage(video, 0, 0);
+                  const dataURL = canvas.toDataURL('image/jpeg', 0.8);
+                  thumbnailCache.set(videoId, dataURL);
+                  setThumbnailSrc(dataURL);
+                }
+              }
+            }}
+            onError={handleVideoError}
+          />
+        )}
+      </div>
+
+      {/* Video overlay for autoplay */}
+      {isPlaying && (
+        <video
+          ref={videoRef}
+          src={src}
+          className="w-full h-full object-cover absolute inset-0 z-10"
+          muted
+          loop
+          playsInline
+          onClick={handleClick}
+          onError={handleVideoError}
+          preload="metadata"
+          controls={false}
         />
       )}
 
-      {/* Video element for autoplay overlay */}
-      <video
-        ref={videoRef}
-        src={src}
-        poster={thumbnailSrc || poster}
-        className={`w-full h-full object-cover ${isPlaying ? 'z-20' : 'z-0'} relative`}
-        muted
-        loop
-        playsInline
-        onClick={handleClick}
-        onError={handleVideoError}
-        preload="metadata"
-        controls={false}
-      />
-
       {/* Controls overlay - only show enlarge button on hover and not in grid thumbnails */}
       {!isGridThumbnail && isHovered && (
-        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-30">
+        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-20">
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -364,7 +401,7 @@ const VideoPreview = ({
 
       {/* Gradient overlay for better button visibility - only in non-grid contexts */}
       {!isGridThumbnail && isHovered && (
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/30 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-25" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/30 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-15" />
       )}
     </div>
   );
