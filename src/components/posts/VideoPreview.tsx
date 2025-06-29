@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Maximize2, Play } from 'lucide-react';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
@@ -29,6 +30,7 @@ const VideoPreview = ({
   const [hasVideoError, setHasVideoError] = useState(false);
   const [thumbnailSrc, setThumbnailSrc] = useState<string>('');
   const [thumbnailReady, setThumbnailReady] = useState(false);
+  const [thumbnailError, setThumbnailError] = useState(false);
   const isMobile = useIsMobile();
   const { elementRef, isInView } = useIntersectionObserver({ threshold: 0.8 });
   
@@ -48,14 +50,15 @@ const VideoPreview = ({
     poster,
     isGridThumbnail,
     thumbnailReady,
+    thumbnailSrc: !!thumbnailSrc,
     hasValidSrc: !!src && src.length > 0,
     cachedThumbnail: thumbnailCache.has(videoId),
     isMobile
   });
 
-  // Generate thumbnails for all contexts to ensure proper display
+  // Generate thumbnails aggressively for grid context
   useEffect(() => {
-    if (!src) return;
+    if (!src || !isGridThumbnail) return;
 
     // Check if we already have a cached thumbnail
     const cachedThumbnail = thumbnailCache.get(videoId);
@@ -73,21 +76,17 @@ const VideoPreview = ({
         setThumbnailSrc(dataURL);
         setThumbnailReady(true);
       }).catch(() => {
+        console.log('Existing promise failed for:', videoId);
+        setThumbnailError(true);
         if (poster) {
           setThumbnailSrc(poster);
+          setThumbnailReady(true);
         }
-        setThumbnailReady(true);
       });
       return;
     }
 
-    // Use poster immediately if available while generating real thumbnail
-    if (poster) {
-      setThumbnailSrc(poster);
-      setThumbnailReady(true);
-    }
-
-    // Generate thumbnail for all contexts
+    // Generate thumbnail immediately for grid thumbnails
     const generateThumbnailPromise = new Promise<string>((resolve, reject) => {
       const video = document.createElement('video');
       video.crossOrigin = 'anonymous';
@@ -100,48 +99,64 @@ const VideoPreview = ({
       const generateThumbnail = () => {
         if (resolved) return;
         
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        
-        if (ctx && video.videoWidth > 0 && video.videoHeight > 0) {
-          canvas.width = video.videoWidth;
-          canvas.height = video.videoHeight;
-          ctx.drawImage(video, 0, 0);
-          const dataURL = canvas.toDataURL('image/jpeg', 0.8);
+        try {
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
           
-          // Cache the thumbnail for future use
-          thumbnailCache.set(videoId, dataURL);
-          resolved = true;
-          resolve(dataURL);
-          
-          console.log('Real thumbnail generated and cached for:', videoId);
+          if (ctx && video.videoWidth > 0 && video.videoHeight > 0) {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0);
+            const dataURL = canvas.toDataURL('image/jpeg', 0.8);
+            
+            // Cache the thumbnail for future use
+            thumbnailCache.set(videoId, dataURL);
+            resolved = true;
+            resolve(dataURL);
+            
+            console.log('Real thumbnail generated and cached for:', videoId);
+          } else {
+            console.log('Video dimensions not ready for:', videoId);
+          }
+        } catch (error) {
+          console.log('Error generating thumbnail for:', videoId, error);
+          if (!resolved) {
+            resolved = true;
+            reject(error);
+          }
         }
       };
 
-      // Multiple event handlers to catch thumbnail generation as early as possible
+      // Multiple event handlers to catch thumbnail generation
       video.onloadeddata = generateThumbnail;
       video.oncanplay = generateThumbnail;
       video.onseeked = generateThumbnail;
       video.onloadedmetadata = () => {
-        // Seek to a small time to get the first frame
-        video.currentTime = 0.1;
+        // Seek to get the first meaningful frame
+        if (video.duration > 0) {
+          video.currentTime = Math.min(0.5, video.duration * 0.1);
+        }
       };
       
       video.onerror = () => {
-        resolved = true;
-        reject(new Error('Video thumbnail generation failed'));
+        console.log('Video error during thumbnail generation:', videoId);
+        if (!resolved) {
+          resolved = true;
+          reject(new Error('Video thumbnail generation failed'));
+        }
       };
       
       video.src = src;
       video.load();
 
-      // Cleanup timeout
+      // Shorter timeout for grid thumbnails
       setTimeout(() => {
         if (!resolved) {
+          console.log('Thumbnail generation timeout for:', videoId);
           resolved = true;
           reject(new Error('Thumbnail generation timeout'));
         }
-      }, 3000);
+      }, 2000);
     });
 
     // Store the promise and handle results
@@ -151,20 +166,26 @@ const VideoPreview = ({
       .then(dataURL => {
         setThumbnailSrc(dataURL);
         setThumbnailReady(true);
+        setThumbnailError(false);
         console.log('Real thumbnail ready for:', videoId);
       })
       .catch(() => {
         console.log('Thumbnail generation failed for:', videoId);
-        if (!poster) {
-          setHasVideoError(true);
+        setThumbnailError(true);
+        // Use poster as fallback
+        if (poster) {
+          setThumbnailSrc(poster);
+          setThumbnailReady(true);
+        } else {
+          // Show a placeholder or the video element itself
+          setThumbnailReady(true);
         }
-        setThumbnailReady(true);
       })
       .finally(() => {
         thumbnailPromises.delete(videoId);
       });
 
-  }, [src, videoId, poster]);
+  }, [src, videoId, poster, isGridThumbnail]);
 
   const handleMouseEnter = () => {
     if (!isMobile && !isGridThumbnail && !isIOSSafari) {
@@ -202,7 +223,7 @@ const VideoPreview = ({
     );
   }
 
-  // For grid thumbnails, show real thumbnails immediately or poster as fallback
+  // For grid thumbnails, prioritize showing thumbnails
   if (isGridThumbnail) {
     return (
       <div
@@ -210,35 +231,30 @@ const VideoPreview = ({
         className={`relative cursor-pointer group overflow-hidden bg-gray-900 ${className}`}
         onClick={handleClick}
       >
-        {/* Show thumbnail immediately - no loading states */}
-        {thumbnailSrc ? (
+        {/* Always try to show thumbnail first */}
+        {thumbnailSrc && !thumbnailError ? (
           <img
             src={thumbnailSrc}
             alt="Video thumbnail"
             className="w-full h-full object-cover"
             onError={(e) => {
-              const img = e.target as HTMLImageElement;
-              console.log('Thumbnail load error, using video as fallback');
-              // If thumbnail fails, show the video element itself
-              const videoEl = img.parentElement?.querySelector('video');
-              if (videoEl) {
-                videoEl.style.display = 'block';
-                img.style.display = 'none';
-              }
+              console.log('Thumbnail image load error for:', videoId);
+              setThumbnailError(true);
             }}
           />
-        ) : (
-          // Show video element directly if no thumbnail yet
+        ) : thumbnailReady && !thumbnailSrc && !poster ? (
+          // Fallback: show video element as thumbnail with specific styling
           <video
             src={src}
             className="w-full h-full object-cover"
             muted
             playsInline
             preload="metadata"
+            poster={poster}
             onLoadedData={(e) => {
-              // When video loads, try to extract thumbnail
+              // Try to extract thumbnail when video loads
               const video = e.target as HTMLVideoElement;
-              if (!thumbnailSrc && video.videoWidth > 0 && video.videoHeight > 0) {
+              if (video.videoWidth > 0 && video.videoHeight > 0) {
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
                 if (ctx) {
@@ -248,16 +264,33 @@ const VideoPreview = ({
                   const dataURL = canvas.toDataURL('image/jpeg', 0.8);
                   thumbnailCache.set(videoId, dataURL);
                   setThumbnailSrc(dataURL);
-                  setThumbnailReady(true);
+                  setThumbnailError(false);
                 }
               }
             }}
             onError={handleVideoError}
           />
+        ) : poster ? (
+          // Use poster as fallback
+          <img
+            src={poster}
+            alt="Video thumbnail"
+            className="w-full h-full object-cover"
+            onError={() => setThumbnailError(true)}
+          />
+        ) : (
+          // Loading state or error state
+          <div className="w-full h-full bg-gray-800 flex items-center justify-center">
+            {!thumbnailReady ? (
+              <div className="text-white text-xs">Loading...</div>
+            ) : (
+              <div className="text-white text-xs">No preview</div>
+            )}
+          </div>
         )}
         
         {/* Video element for autoplay (only when needed) */}
-        {!isIOSSafari && isPlaying && (
+        {!isIOSSafari && isPlaying && thumbnailSrc && (
           <video
             ref={videoRef}
             src={src}
