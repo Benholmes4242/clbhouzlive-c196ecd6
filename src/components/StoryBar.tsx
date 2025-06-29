@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
+import { Users } from 'lucide-react';
 import {
   Carousel,
   CarouselContent,
@@ -52,6 +53,11 @@ const StoryBar = () => {
     navigate(`/profile/${username}`);
   };
 
+  // Function to handle "All Friends" navigation
+  const handleAllFriends = () => {
+    navigate('/friends');
+  };
+
   if (loading) {
     return (
       <div className="sticky top-16 z-40 bg-background border-b border-border">
@@ -90,6 +96,23 @@ const StoryBar = () => {
                 />
               </CarouselItem>
             ))}
+            
+            {/* All Friends Circle */}
+            {user && (
+              <CarouselItem className="basis-auto pl-2">
+                <div className="flex flex-col items-center space-y-2">
+                  <button
+                    onClick={handleAllFriends}
+                    className="relative w-16 h-16 rounded-full border-2 border-muted-foreground bg-muted hover:bg-muted/80 transition-colors flex items-center justify-center"
+                  >
+                    <Users className="w-6 h-6 text-muted-foreground" />
+                  </button>
+                  <span className="text-xs text-center text-muted-foreground font-medium max-w-[60px] truncate">
+                    All Friends
+                  </span>
+                </div>
+              </CarouselItem>
+            )}
           </CarouselContent>
         </Carousel>
       </div>
