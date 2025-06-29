@@ -87,7 +87,8 @@ const TrendingFeed = () => {
         const { data: tags, error: tagsError } = await supabase
           .from('post_tags')
           .select(`
-            *,
+            post_id,
+            tagged_entity_id,
             taggable_entities (
               id,
               entity_type,
@@ -115,7 +116,7 @@ const TrendingFeed = () => {
         const tags = postTags?.filter(t => t.post_id === post.id).map((tag: any) => {
           // Handle the case where taggable_entities might be null
           if (!tag.taggable_entities) {
-            console.warn('Missing taggable_entities for tag:', tag.id);
+            console.warn('Missing taggable_entities for tag:', tag.tagged_entity_id);
             return null;
           }
           return {

@@ -19,9 +19,16 @@ interface VideoPost {
     description: string;
     thumbnail?: string;
     image?: string;
+    images?: string[];
     duration?: string;
     videoUrl?: string;
     youtubeId?: string;
+    golfCourse?: {
+      id: string;
+      name: string;
+      country: string;
+      region?: string;
+    };
   };
   stats: {
     likes: number;
@@ -43,6 +50,8 @@ interface PostCardProps {
 }
 
 const PostCard = ({ post }: PostCardProps) => {
+  console.log('PostCard rendering with golfClubTags:', post.golfClubTags);
+  
   return (
     <Card className="border-0 shadow-sm">
       <div className="p-4">
@@ -54,7 +63,7 @@ const PostCard = ({ post }: PostCardProps) => {
         
         <PostContent 
           content={post.content}
-          golfClubTags={post.golfClubTags}
+          golfClubTags={post.golfClubTags || []}
         />
 
         <div className="flex items-center justify-between">
@@ -66,4 +75,3 @@ const PostCard = ({ post }: PostCardProps) => {
 };
 
 export default PostCard;
-
