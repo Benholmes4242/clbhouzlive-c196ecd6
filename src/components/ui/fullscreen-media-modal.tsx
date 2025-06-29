@@ -46,7 +46,7 @@ const FullscreenMediaModal = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogOverlay className="bg-black/90 backdrop-blur-sm" />
       <DialogContent 
-        className="fixed inset-0 z-50 flex items-center justify-center p-4 border-0 bg-transparent shadow-none max-w-none w-full h-full"
+        className="fixed inset-0 z-50 border-0 bg-transparent shadow-none max-w-none w-full h-full p-0"
         onClick={handleBackdropClick}
       >
         <DialogTitle className="sr-only">{alt}</DialogTitle>
@@ -78,20 +78,20 @@ const FullscreenMediaModal = ({
           )}
         </div>
 
-        {/* Media Content */}
-        <div className="flex items-center justify-center w-full h-full max-w-[95vw] max-h-[95vh]">
+        {/* Media Content - Centered */}
+        <div className="absolute inset-0 flex items-center justify-center p-4">
           {mediaType === 'image' ? (
             <img
               src={mediaUrl}
               alt={alt}
-              className="max-w-full max-h-full w-auto h-auto object-contain"
+              className="max-w-full max-h-full object-contain"
               draggable={false}
             />
           ) : (
             <video
               ref={videoRef}
               src={mediaUrl}
-              className="max-w-full max-h-full w-auto h-auto object-contain"
+              className="max-w-full max-h-full object-contain"
               muted={isMuted}
               controls={false}
               loop
