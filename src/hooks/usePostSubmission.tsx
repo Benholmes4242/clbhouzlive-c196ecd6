@@ -26,7 +26,10 @@ export const usePostSubmission = () => {
     onSuccess,
     onError
   }: PostSubmissionParams) => {
-    if (!validatePostSubmission(user, content, mediaFiles)) return;
+    if (!validatePostSubmission(user, content, mediaFiles)) {
+      onError();
+      return;
+    }
 
     // Validate files before proceeding
     const validationResult = validateFiles(mediaFiles);
@@ -47,20 +50,16 @@ export const usePostSubmission = () => {
     // Create optimistic post for immediate UI update
     const optimisticPost = createOptimisticPost(user, content, mediaFiles, selectedTags);
     
-    // For videos, don't redirect immediately - wait for upload to complete
-    if (!hasVideoFiles) {
-      onSuccess(); // Only call onSuccess immediately for non-video posts
-    }
-
     // Start upload process
     let createdPostId: string | null = null;
     
     try {
-      console.log('Starting post creation...');
+      console.log('Starting post creation...', { content, mediaCount: mediaFiles.length });
       
       // Create the post first
       const postData = await createPost(user.id, content);
       createdPostId = postData.id;
+      console.log('Post created with ID:', createdPostId);
 
       // Upload media files if any
       if (mediaFiles.length > 0) {
@@ -69,37 +68,47 @@ export const usePostSubmission = () => {
           showVideoProcessingProgress();
         }
         
+        console.log('Starting media upload for', mediaFiles.length, 'files');
         await uploadMediaFiles(
           mediaFiles, 
           postData.id, 
           user.id,
           (file, error) => {
+            console.error('File upload error:', file.name, error);
             showFileUploadError(file, error, postData.id, user.id);
           }
         );
+        console.log('Media upload completed');
       }
 
       // Handle post tags
-      await handlePostTags(postData.id, selectedTags, user.id);
+      if (selectedTags.length > 0) {
+        console.log('Creating post tags for', selectedTags.length, 'tags');
+        await handlePostTags(postData.id, selectedTags, user.id);
+        console.log('Post tags created');
+      }
 
       console.log('Upload process completed successfully');
 
-      // Show single success message for all posts
+      // Show success message
       showSuccessMessage();
 
-      // Now call onSuccess for videos after successful upload
-      if (hasVideoFiles) {
-        onSuccess();
-      }
-
-      // Broadcast success events
+      // Broadcast success events for feed refresh
       broadcastPostSuccess(postData.id, optimisticPost.id);
+      
+      // Trigger feed refresh events
+      window.dispatchEvent(new CustomEvent('refreshFeed'));
+      window.dispatchEvent(new CustomEvent('postUploadCompleted'));
+
+      // Call onSuccess callback
+      onSuccess();
 
     } catch (error) {
-      console.error('Error in upload:', error);
+      console.error('Error in post submission:', error);
       
       // If we created a post but subsequent operations failed, roll it back
       if (createdPostId) {
+        console.log('Rolling back post due to error:', createdPostId);
         await rollbackPost(createdPostId);
       }
       
@@ -107,6 +116,7 @@ export const usePostSubmission = () => {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
       
       showUploadFailedError(errorMessage, () => {
+        console.log('Retrying post submission');
         submitPost({ user, content, mediaFiles, selectedTags, onSuccess: () => {}, onError });
       });
 

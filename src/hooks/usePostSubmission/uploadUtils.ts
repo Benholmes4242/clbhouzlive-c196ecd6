@@ -6,6 +6,8 @@ import { createPostTags, rollbackPost, createTagNotifications } from '@/componen
 import { TaggableEntity } from './types';
 
 export const createPost = async (userId: string, content: string) => {
+  console.log('Creating post in database...', { userId, contentLength: content?.length || 0 });
+  
   const { data: postData, error: postError } = await supabase
     .from('posts')
     .insert({
@@ -17,10 +19,10 @@ export const createPost = async (userId: string, content: string) => {
 
   if (postError) {
     console.error('Post creation error:', postError);
-    throw new Error('Failed to create post');
+    throw new Error(`Failed to create post: ${postError.message}`);
   }
 
-  console.log('Post created successfully:', postData.id);
+  console.log('Post created successfully:', postData);
   return postData;
 };
 
@@ -32,11 +34,14 @@ export const uploadMediaFiles = async (
 ) => {
   if (mediaFiles.length === 0) return;
 
-  console.log('Uploading media files...');
+  console.log('Starting media upload for', mediaFiles.length, 'files');
   
-  for (const file of mediaFiles) {
+  for (let i = 0; i < mediaFiles.length; i++) {
+    const file = mediaFiles[i];
     try {
+      console.log(`Uploading file ${i + 1}/${mediaFiles.length}:`, file.name, file.type, `${(file.size / 1024 / 1024).toFixed(2)}MB`);
       await uploadMediaWithRetry(file, postId, userId);
+      console.log(`Successfully uploaded file ${i + 1}/${mediaFiles.length}:`, file.name);
     } catch (error) {
       console.error(`Failed to upload ${file.name} after retries:`, error);
       onFileError(file, error);
@@ -44,12 +49,12 @@ export const uploadMediaFiles = async (
       // For videos, continue with other files instead of failing completely
       const isVideo = file.type.startsWith('video/');
       if (!isVideo) {
-        throw error;
+        throw new Error(`Failed to upload ${file.name}: ${error}`);
       }
     }
   }
   
-  console.log('Media upload completed');
+  console.log('All media files processed');
 };
 
 export const handlePostTags = async (
@@ -59,7 +64,7 @@ export const handlePostTags = async (
 ) => {
   if (selectedTags.length === 0) return;
 
-  console.log('Creating post tags...');
+  console.log('Creating post tags...', { postId, tagCount: selectedTags.length });
   await createPostTags(postId, selectedTags, userId);
   console.log('Post tags created');
 

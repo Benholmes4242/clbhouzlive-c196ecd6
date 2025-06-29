@@ -25,6 +25,8 @@ const TrendingFeed = () => {
     queryFn: async () => {
       if (!user?.id) return [];
 
+      console.log('Fetching followed users posts for user:', user.id);
+
       // Get users that current user follows
       const { data: follows } = await supabase
         .from('user_follows')
@@ -45,11 +47,12 @@ const TrendingFeed = () => {
       ) || [];
       
       const allConnectedUserIds = [...new Set([...followedUserIds, ...friendUserIds])];
+      console.log('Connected user IDs:', allConnectedUserIds);
 
       if (allConnectedUserIds.length === 0) return [];
 
       // Get posts from these users
-      const { data: posts } = await supabase
+      const { data: posts, error: postsError } = await supabase
         .from('posts')
         .select(`
           *
@@ -58,7 +61,13 @@ const TrendingFeed = () => {
         .order('created_at', { ascending: false })
         .limit(20);
 
+      if (postsError) {
+        console.error('Error fetching followed posts:', postsError);
+        return [];
+      }
+
       if (!posts) return [];
+      console.log('Fetched', posts.length, 'posts from followed users');
 
       // Get user profiles for all post authors
       const { data: profiles } = await supabase
@@ -112,9 +121,12 @@ const TrendingFeed = () => {
         };
       });
 
+      console.log('Formatted posts:', formattedPosts.length);
       return formattedPosts;
     },
     enabled: !!user?.id,
+    staleTime: 30000, // Consider data fresh for 30 seconds
+    refetchInterval: 60000, // Refetch every minute
   });
 
   // Listen for feed refresh events
@@ -180,6 +192,13 @@ const TrendingFeed = () => {
     }
     return acc;
   }, [] as UserPostWithType[]);
+
+  console.log('Final post counts:', {
+    userPosts: userPosts.length,
+    followedPosts: filteredFollowedPosts.length,
+    uniquePosts: uniqueUserPosts.length,
+    optimisticPosts: optimisticPosts.length
+  });
 
   // Combine all content
   const allContent: (VideoPost | UserPostWithType)[] = [
