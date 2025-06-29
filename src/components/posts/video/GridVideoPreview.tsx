@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useVideoAutoplay } from '@/hooks/useVideoAutoplay';
 import { Play } from 'lucide-react';
@@ -11,6 +11,8 @@ const GridVideoPreview = ({
   className = "", 
   videoId 
 }: GridVideoPreviewProps) => {
+  const [isHovered, setIsHovered] = useState(false);
+  
   const { ref: containerRef, isInView } = useIntersectionObserver({
     threshold: 0.5,
     rootMargin: '0px'
@@ -18,7 +20,7 @@ const GridVideoPreview = ({
 
   const { videoRef, isPlaying, isLoading, shouldShowPlayIcon } = useVideoAutoplay({
     isInView,
-    isHovered: false,
+    isHovered,
     videoId,
     isGridContext: true
   });
@@ -27,6 +29,7 @@ const GridVideoPreview = ({
     videoId,
     src,
     isInView,
+    isHovered,
     isPlaying,
     isLoading,
     shouldShowPlayIcon
@@ -36,6 +39,8 @@ const GridVideoPreview = ({
     <div 
       ref={containerRef} 
       className={`relative ${className}`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       <video
         ref={videoRef}

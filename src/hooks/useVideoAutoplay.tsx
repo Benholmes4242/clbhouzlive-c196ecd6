@@ -1,6 +1,6 @@
-
 import { useRef, useEffect, useState } from 'react';
 import { useVideoAutoplayManager } from './useVideoAutoplayManager';
+import { useIsMobile } from './use-mobile';
 
 interface UseVideoAutoplayProps {
   isInView: boolean;
@@ -19,6 +19,7 @@ export const useVideoAutoplay = ({
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { setActiveVideo, isVideoActive } = useVideoAutoplayManager();
+  const isMobile = useIsMobile();
   
   // Detect iOS Safari
   const isIOSSafari = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
@@ -32,26 +33,31 @@ export const useVideoAutoplay = ({
       return;
     }
 
-    // In grid context, only autoplay if this video is the active one
+    // On mobile/tablet devices, don't autoplay at all - keep videos static
+    if (isMobile) {
+      return;
+    }
+
+    // In grid context, only autoplay if this video is the active one and hovered
     const shouldPlay = isGridContext 
-      ? (isInView && isVideoActive(videoId))
-      : (isInView || isHovered);
+      ? (isInView && isVideoActive(videoId) && isHovered)
+      : (isInView && isHovered); // For standard video, only play on hover
 
     const handlePlay = async () => {
       if (!shouldPlay || isPlaying) return;
 
       try {
         // In grid context, claim this video as active
-        if (isGridContext && isInView) {
+        if (isGridContext && isInView && isHovered) {
           setActiveVideo(videoId);
         }
 
         setIsLoading(true);
         await video.play();
         setIsPlaying(true);
-        console.log(`Video ${videoId} started playing`);
+        console.log(`Video ${videoId} started playing on hover`);
       } catch (error) {
-        // Silently handle autoplay failures (common on mobile)
+        // Silently handle autoplay failures
         console.log(`Video ${videoId} autoplay blocked:`, error);
         setIsPlaying(false);
       } finally {
@@ -76,8 +82,8 @@ export const useVideoAutoplay = ({
       }
     };
 
-    // Handle when video goes out of view in grid context
-    if (isGridContext && !isInView && isVideoActive(videoId)) {
+    // Handle when video goes out of view or hover ends
+    if (isGridContext && (!isInView || !isHovered) && isVideoActive(videoId)) {
       setActiveVideo(null);
       handlePause();
     } else if (shouldPlay) {
@@ -99,7 +105,7 @@ export const useVideoAutoplay = ({
         }
       }
     };
-  }, [isInView, isHovered, videoId, isPlaying, isIOSSafari, isGridContext, isVideoActive, setActiveVideo]);
+  }, [isInView, isHovered, videoId, isPlaying, isIOSSafari, isGridContext, isVideoActive, setActiveVideo, isMobile]);
 
   // Handle video events
   useEffect(() => {
@@ -141,6 +147,7 @@ export const useVideoAutoplay = ({
     videoRef,
     isPlaying,
     isLoading,
-    shouldShowPlayIcon: isGridContext && !isVideoActive(videoId) && !isLoading
+    // On mobile, always show play icon. On desktop, show when not active and not loading
+    shouldShowPlayIcon: isMobile ? true : (isGridContext && !isVideoActive(videoId) && !isLoading)
   };
 };
