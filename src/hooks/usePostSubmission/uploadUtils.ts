@@ -1,6 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { uploadMediaWithRetry, getFileErrorMessage } from '@/components/posts/utils/mediaUpload';
+import { uploadMediaWithRetry } from '@/components/posts/utils/mediaUpload';
+import { getFileErrorMessage } from '@/components/posts/utils/fileValidation';
 import { createPostTags, rollbackPost, createTagNotifications } from '@/components/posts/utils/postOperations';
 import { TaggableEntity } from './types';
 
