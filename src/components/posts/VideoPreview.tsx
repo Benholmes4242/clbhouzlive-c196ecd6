@@ -41,7 +41,7 @@ const VideoPreview = ({
   });
   
   // Detect iOS Safari
-  const isIOSSafari = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+  const isIOSSafari = /iPad|iPhone|iPod/.test(navigator.userUser) && !(window as any).MSStream;
   
   console.log('VideoPreview rendering:', {
     videoId,
@@ -54,7 +54,7 @@ const VideoPreview = ({
     isMobile
   });
 
-  // Generate thumbnails for both grid and non-grid contexts to fix desktop display
+  // Generate thumbnails for all contexts to ensure proper display
   useEffect(() => {
     if (!src) return;
 
@@ -88,7 +88,7 @@ const VideoPreview = ({
       setThumbnailReady(true);
     }
 
-    // Generate thumbnail for all contexts to ensure desktop display works
+    // Generate thumbnail for all contexts
     const generateThumbnailPromise = new Promise<string>((resolve, reject) => {
       const video = document.createElement('video');
       video.crossOrigin = 'anonymous';
@@ -283,7 +283,7 @@ const VideoPreview = ({
     );
   }
 
-  // For non-grid context (desktop explore), show thumbnail first to prevent black display
+  // For non-grid context (desktop explore), always show thumbnail to prevent black display
   return (
     <div
       ref={elementRef}
@@ -291,15 +291,16 @@ const VideoPreview = ({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      {/* Show thumbnail as base layer to prevent black display on desktop */}
-      {thumbnailSrc && !isPlaying && (
+      {/* Always show thumbnail as base layer on desktop */}
+      {thumbnailSrc && (
         <img
           src={thumbnailSrc}
           alt="Video thumbnail"
-          className="w-full h-full object-cover absolute inset-0 z-10"
+          className={`w-full h-full object-cover absolute inset-0 ${isPlaying ? 'z-10' : 'z-20'}`}
         />
       )}
 
+      {/* Video element for autoplay overlay */}
       <video
         ref={videoRef}
         src={src}
