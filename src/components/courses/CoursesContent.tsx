@@ -6,15 +6,25 @@ import MyCourses from './MyCourses';
 import FriendsCourses from './FriendsCourses';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Button } from '@/components/ui/button';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { User } from 'lucide-react';
 
-const CoursesContent = () => {
+interface CoursesContentProps {
+  username?: string;
+  displayName?: string;
+}
+
+const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }) => {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState('explore');
+
+  // Check if we're on a user courses page
+  const isUserCoursesPage = location.pathname.includes('/user/') && location.pathname.includes('/courses');
+  const isOwnProfile = !username;
 
   // Check for tab parameter in URL
   useEffect(() => {
@@ -32,12 +42,25 @@ const CoursesContent = () => {
     setActiveTab(value);
   };
 
+  // Dynamic subtitle logic
+  const getSubtitle = () => {
+    if (isUserCoursesPage) {
+      if (isOwnProfile) {
+        return "Here's how you rank the world's best golf courses.";
+      } else {
+        const firstName = displayName?.split(' ')[0] || displayName || 'this user';
+        return `Explore how ${firstName} ranks the world's best golf courses.`;
+      }
+    }
+    return "Top 100 Courses. One Epic Checklist.";
+  };
+
   return (
     <div className="space-y-6">
       <div className="text-center">
         <h1 className="text-3xl font-bold mb-2">Golf Courses</h1>
         <p className="text-muted-foreground">
-          Top 100 Courses. One Epic Checklist.
+          {getSubtitle()}
         </p>
       </div>
 
