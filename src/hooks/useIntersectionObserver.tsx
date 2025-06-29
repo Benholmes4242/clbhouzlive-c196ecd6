@@ -34,5 +34,5 @@ export const useIntersectionObserver = ({
     };
   }, [threshold, rootMargin]);
 
-  return { elementRef, isInView };
+  return { ref: elementRef, isInView };
 };

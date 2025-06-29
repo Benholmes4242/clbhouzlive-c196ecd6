@@ -1,6 +1,5 @@
 
 import React, { useState } from 'react';
-import PostModal from '@/components/posts/PostModal';
 import { useActivityPosts } from './hooks/useActivityPosts';
 import { ActivityPost, SocialActivityProps } from './types/ActivityTypes';
 import ActivityHeader from './components/ActivityHeader';
@@ -15,16 +14,10 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
 }) => {
   const { posts, loading, fetchUserPosts } = useActivityPosts(userId);
   const [selectedPost, setSelectedPost] = useState<ActivityPost | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handlePostClick = (post: ActivityPost) => {
-    setSelectedPost(post);
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedPost(null);
+    // Click functionality removed - posts are no longer clickable
+    console.log('Post clicked but modal functionality removed:', post.id);
   };
 
   const handlePostUpdated = () => {
@@ -33,7 +26,6 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
 
   const handlePostDeleted = () => {
     fetchUserPosts();
-    handleCloseModal();
   };
 
   // Get the correct attribution text
@@ -87,15 +79,6 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
           <p className="text-muted-foreground">No posts yet.</p>
         </div>
       )}
-
-      <PostModal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        post={selectedPost}
-        isOwnPost={isOwnProfile}
-        onPostUpdated={handlePostUpdated}
-        onPostDeleted={handlePostDeleted}
-      />
     </div>
   );
 };

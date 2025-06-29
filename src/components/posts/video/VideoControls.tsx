@@ -3,22 +3,23 @@ import React from 'react';
 import { Maximize2 } from 'lucide-react';
 
 interface VideoControlsProps {
+  isPlaying: boolean;
+  isLoading: boolean;
   isHovered: boolean;
-  isGridThumbnail: boolean;
-  onFullscreen?: () => void;
+  onPlayPause: () => void;
 }
 
-const VideoControls = ({ isHovered, isGridThumbnail, onFullscreen }: VideoControlsProps) => {
-  if (isGridThumbnail || !isHovered) return null;
+const VideoControls = ({ isPlaying, isLoading, isHovered, onPlayPause }: VideoControlsProps) => {
+  if (!isHovered) return null;
 
   return (
     <>
-      {/* Controls overlay - only show enlarge button on hover and not in grid thumbnails */}
+      {/* Controls overlay - only show enlarge button on hover */}
       <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-20">
         <button
           onClick={(e) => {
             e.stopPropagation();
-            onFullscreen?.();
+            onPlayPause();
           }}
           className="bg-black/70 text-white p-2 rounded-full hover:bg-black/80 transition-colors shadow-lg"
         >
@@ -26,7 +27,7 @@ const VideoControls = ({ isHovered, isGridThumbnail, onFullscreen }: VideoContro
         </button>
       </div>
 
-      {/* Gradient overlay for better button visibility - only in non-grid contexts */}
+      {/* Gradient overlay for better button visibility */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/30 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-15" />
     </>
   );

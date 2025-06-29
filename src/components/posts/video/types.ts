@@ -20,3 +20,9 @@ export interface StandardVideoPreviewProps {
   className?: string;
   videoId: string;
 }
+
+export interface ThumbnailState {
+  thumbnailSrc: string;
+  thumbnailReady: boolean;
+  thumbnailError: boolean;
+}
