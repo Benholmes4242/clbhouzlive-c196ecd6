@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Bell, CircleUserRound, Ellipsis, Shield } from 'lucide-react';
+import { Bell, CircleUserRound, Settings, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from "react-router-dom";
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
@@ -148,7 +148,7 @@ const HeaderNavigation = () => {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon">
-              <Ellipsis className="h-5 w-5" />
+              <Settings className="h-5 w-5" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
@@ -183,7 +183,7 @@ const HeaderNavigation = () => {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="icon">
-            <Ellipsis className="h-5 w-5" />
+            <Settings className="h-5 w-5" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48">
