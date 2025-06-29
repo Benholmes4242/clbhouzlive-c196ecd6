@@ -4,9 +4,11 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ChevronDown, ChevronUp, Star, Edit, Trash2 } from 'lucide-react';
+import { ChevronDown, ChevronUp, Star, Edit } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import EditRatingModal from './EditRatingModal';
+import ReviewMediaDisplay from './ReviewMediaDisplay';
 
 interface CourseReviewsProps {
   courseId: string;
@@ -22,6 +24,13 @@ interface ReviewData {
   user_id: string;
   display_name?: string | null;
   username?: string | null;
+  profile_photo_url?: string | null;
+  media?: Array<{
+    id: string;
+    media_url: string;
+    media_type: 'image' | 'video';
+    file_name?: string;
+  }>;
 }
 
 const CourseReviews = ({ courseId, courseName, currentUser }: CourseReviewsProps) => {
@@ -51,18 +60,29 @@ const CourseReviews = ({ courseId, courseName, currentUser }: CourseReviewsProps
 
       const { data: profilesData, error: profilesError } = await supabase
         .from('user_profiles')
-        .select('id, display_name, username')
+        .select('id, display_name, username, profile_photo_url')
         .in('id', userIds);
 
       if (profilesError) throw profilesError;
 
+      // Get review media for each rating
+      const { data: mediaData, error: mediaError } = await supabase
+        .from('course_review_media')
+        .select('id, review_id, media_url, media_type, file_name')
+        .in('review_id', ratingsData.map(r => r.id));
+
+      if (mediaError) throw mediaError;
+
       // Combine the data
       const reviewsWithProfiles = ratingsData.map(rating => {
         const profile = profilesData?.find(p => p.id === rating.user_id);
+        const media = mediaData?.filter(m => m.review_id === rating.id) || [];
         return {
           ...rating,
           display_name: profile?.display_name,
-          username: profile?.username
+          username: profile?.username,
+          profile_photo_url: profile?.profile_photo_url,
+          media
         };
       });
 
@@ -132,12 +152,16 @@ const CourseReviews = ({ courseId, courseName, currentUser }: CourseReviewsProps
                 {reviews?.map((review) => (
                   <div key={review.id} className="border-b pb-4 last:border-b-0">
                     <div className="flex items-start gap-3">
-                      {/* User Avatar */}
-                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                        <span className="text-sm font-medium text-primary">
+                      {/* User Avatar with Profile Photo */}
+                      <Avatar className="w-10 h-10 flex-shrink-0">
+                        <AvatarImage 
+                          src={review.profile_photo_url || undefined} 
+                          alt={getUserDisplayName(review)}
+                        />
+                        <AvatarFallback className="bg-primary/10 text-primary">
                           {getUserInitials(review)}
-                        </span>
-                      </div>
+                        </AvatarFallback>
+                      </Avatar>
                       
                       <div className="flex-1 space-y-2">
                         {/* User Name and Rating */}
@@ -178,6 +202,11 @@ const CourseReviews = ({ courseId, courseName, currentUser }: CourseReviewsProps
                           <p className="text-sm text-muted-foreground leading-relaxed">
                             {review.review}
                           </p>
+                        )}
+
+                        {/* Review Media */}
+                        {review.media && review.media.length > 0 && (
+                          <ReviewMediaDisplay media={review.media} />
                         )}
                       </div>
                     </div>

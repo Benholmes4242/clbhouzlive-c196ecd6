@@ -22,6 +22,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Star, Check, Trophy, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import ReviewMediaUpload from './ReviewMediaUpload';
 
 interface Course {
   id: string;
@@ -53,8 +54,8 @@ const PostPlayRatingModal = ({
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showRemoveDialog, setShowRemoveDialog] = useState(false);
   const [hasMarkedAsPlayed, setHasMarkedAsPlayed] = useState(false);
+  const [selectedMedia, setSelectedMedia] = useState<File[]>([]);
 
-  // Fetch existing rating if in edit mode
   const { data: existingRating } = useQuery({
     queryKey: ['user-course-rating', course?.id],
     queryFn: async () => {
@@ -139,9 +140,11 @@ const PostPlayRatingModal = ({
   });
 
   const submitRatingMutation = useMutation({
-    mutationFn: async ({ rating, reviewText }: { rating: number; reviewText: string }) => {
+    mutationFn: async ({ rating, reviewText, mediaFiles }: { rating: number; reviewText: string; mediaFiles: File[] }) => {
       const { data: userResponse } = await supabase.auth.getUser();
       if (!userResponse.user || !course) throw new Error('Not authenticated or no course');
+
+      let ratingId: string;
 
       if (isEditMode && existingRating) {
         // Update existing rating
@@ -155,18 +158,55 @@ const PostPlayRatingModal = ({
           .eq('id', existingRating.id);
         
         if (error) throw error;
+        ratingId = existingRating.id;
       } else {
         // Create new rating
-        const { error } = await supabase
+        const { data: newRating, error } = await supabase
           .from('course_ratings')
           .insert({
             course_id: course.id,
             user_id: userResponse.user.id,
             rating,
             review: reviewText || null
-          });
+          })
+          .select()
+          .single();
         
         if (error) throw error;
+        ratingId = newRating.id;
+      }
+
+      // Upload media files if any
+      if (mediaFiles.length > 0) {
+        const uploadPromises = mediaFiles.map(async (file) => {
+          const fileExt = file.name.split('.').pop();
+          const fileName = `${userResponse.user.id}/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+          
+          const { error: uploadError } = await supabase.storage
+            .from('course-review-media')
+            .upload(fileName, file);
+
+          if (uploadError) throw uploadError;
+
+          const { data: urlData } = supabase.storage
+            .from('course-review-media')
+            .getPublicUrl(fileName);
+
+          // Save media record to database
+          const { error: mediaError } = await supabase
+            .from('course_review_media')
+            .insert({
+              review_id: ratingId,
+              media_url: urlData.publicUrl,
+              media_type: file.type.startsWith('video/') ? 'video' : 'image',
+              file_name: file.name,
+              file_size: file.size
+            });
+
+          if (mediaError) throw mediaError;
+        });
+
+        await Promise.all(uploadPromises);
       }
     },
     onSuccess: () => {
@@ -255,28 +295,6 @@ const PostPlayRatingModal = ({
     },
   });
 
-  const handleSubmit = () => {
-    if (!selectedRating) {
-      toast({
-        title: "Rating Required",
-        description: "Please select a rating before submitting.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    setIsSubmitting(true);
-    submitRatingMutation.mutate({ 
-      rating: selectedRating, 
-      reviewText: review.trim() 
-    });
-  };
-
-  const handleRemoveFromPlayed = () => {
-    setShowRemoveDialog(false);
-    removeFromPlayedMutation.mutate();
-  };
-
   const handleSkip = () => {
     // Course is already marked as played, just close the modal
     toast({
@@ -301,6 +319,32 @@ const PostPlayRatingModal = ({
     onClose();
     resetForm();
     setHasMarkedAsPlayed(false);
+  };
+
+  const handleSubmit = () => {
+    if (!selectedRating) {
+      toast({
+        title: "Rating Required",
+        description: "Please select a rating before submitting.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    submitRatingMutation.mutate({ 
+      rating: selectedRating, 
+      reviewText: review.trim(),
+      mediaFiles: selectedMedia
+    });
+  };
+
+  const handleMediaSelected = (files: File[]) => {
+    setSelectedMedia(prev => [...prev, ...files]);
+  };
+
+  const handleRemoveMedia = (index: number) => {
+    setSelectedMedia(prev => prev.filter((_, i) => i !== index));
   };
 
   // Generate rating options from 0.5 to 10 in 0.5 increments
@@ -418,6 +462,18 @@ const PostPlayRatingModal = ({
                   <div className="text-xs text-muted-foreground text-right">
                     {review.length}/500
                   </div>
+                </div>
+
+                {/* Media Upload Section */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">
+                    Add photos or videos (optional)
+                  </label>
+                  <ReviewMediaUpload
+                    onMediaSelected={handleMediaSelected}
+                    selectedMedia={selectedMedia}
+                    onRemoveMedia={handleRemoveMedia}
+                  />
                 </div>
 
                 {/* Action Buttons */}
