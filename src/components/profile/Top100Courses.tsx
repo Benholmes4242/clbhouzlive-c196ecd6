@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -43,7 +44,7 @@ const Top100Courses: React.FC<Top100CoursesProps> = ({
 
   const handleRegionClick = async (regionKey: string) => {
     if (isOwnProfile) {
-      // For own profile, go to courses page
+      // For own profile, go to courses page with my-courses tab
       navigate('/courses?tab=my-courses');
     } else {
       // For other users, get their username and redirect to their courses page

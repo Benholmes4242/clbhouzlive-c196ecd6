@@ -12,12 +12,14 @@ const getCourseRanking = (course: any) => {
   return 9999;
 };
 
-// Custom sorting function for user courses
+// Custom sorting function for user courses - prioritize user ratings
 const getSortedUserCourses = (userCourses: any[]) => {
+  // Get courses with ratings - sort by highest rating first
   const rated = userCourses
     .filter(c => c.rating !== null && c.rating !== undefined)
     .sort((a, b) => b.rating - a.rating);
   
+  // Get courses without ratings - sort by best ranking
   const unrated = userCourses
     .filter(c => c.rating === null || c.rating === undefined)
     .sort((a, b) => {

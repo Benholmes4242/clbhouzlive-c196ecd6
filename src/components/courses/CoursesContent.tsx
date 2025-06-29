@@ -1,19 +1,28 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import CourseExplorer from './CourseExplorer';
 import MyCourses from './MyCourses';
 import FriendsCourses from './FriendsCourses';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { User } from 'lucide-react';
 
 const CoursesContent = () => {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState('explore');
+
+  // Check for tab parameter in URL
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    if (tabParam && (tabParam === 'explore' || tabParam === 'friends-courses' || tabParam === 'my-courses')) {
+      setActiveTab(tabParam);
+    }
+  }, [searchParams]);
 
   const handleTabChange = (value: string) => {
     if (!user && (value === 'my-courses' || value === 'friends-courses')) {

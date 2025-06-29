@@ -44,8 +44,10 @@ const UserCoursesTabs: React.FC<UserCoursesTabsProps> = ({
                   key={userCourse.id} 
                   course={userCourse.golf_courses}
                   viewingUserId={targetUserId}
-                  showPlayedButton={false}
+                  showPlayedButton={isOwnProfile}
                   viewContext="global"
+                  userRating={userCourse.rating}
+                  isReadOnly={!isOwnProfile}
                 />
               ))}
             </div>
@@ -65,8 +67,10 @@ const UserCoursesTabs: React.FC<UserCoursesTabsProps> = ({
                   key={`${userCourse.id}-recent`} 
                   course={userCourse.golf_courses}
                   viewingUserId={targetUserId}
-                  showPlayedButton={false}
+                  showPlayedButton={isOwnProfile}
                   viewContext="global"
+                  userRating={userCourse.rating}
+                  isReadOnly={!isOwnProfile}
                 />
               ))}
             </div>
