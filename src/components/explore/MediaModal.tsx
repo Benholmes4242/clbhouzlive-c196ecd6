@@ -113,14 +113,14 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
             </button>
           )}
 
-          {/* Centered Media Content */}
-          <div className="flex-1 flex items-center justify-center relative w-full h-full">
+          {/* Centered Media Content - Fixed container */}
+          <div className="absolute inset-0 flex items-center justify-center p-4">
             {item.type === 'video' ? (
-              <div className="relative w-full h-full flex items-center justify-center">
+              <div className="relative flex items-center justify-center max-w-full max-h-full">
                 <video
                   id="modal-video"
                   src={item.src}
-                  className="max-w-full max-h-full object-contain cursor-pointer"
+                  className="block object-contain cursor-pointer"
                   muted={isMuted}
                   loop
                   playsInline
@@ -129,10 +129,10 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
                   onPause={() => setIsPlaying(false)}
                   preload="auto"
                   style={{
+                    maxWidth: 'calc(100vw - 2rem)',
+                    maxHeight: 'calc(100vh - 2rem)',
                     width: 'auto',
-                    height: 'auto',
-                    maxWidth: '100vw',
-                    maxHeight: '100vh'
+                    height: 'auto'
                   }}
                 />
 
@@ -159,12 +159,12 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
               <img
                 src={item.src}
                 alt={item.title || 'Content'}
-                className="max-w-full max-h-full object-contain"
+                className="block object-contain"
                 style={{
+                  maxWidth: 'calc(100vw - 2rem)',
+                  maxHeight: 'calc(100vh - 2rem)',
                   width: 'auto',
-                  height: 'auto',
-                  maxWidth: '100vw',
-                  maxHeight: '100vh'
+                  height: 'auto'
                 }}
               />
             )}
