@@ -35,12 +35,11 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({ username }) => 
     queryFn: async () => {
       if (!targetUserId) return [];
 
-      // Get courses from user_top100_courses table
+      // Get courses from user_top100_courses table (no rating column here)
       const { data: top100Data, error: top100Error } = await supabase
         .from('user_top100_courses')
         .select(`
           course_id,
-          rating,
           played_date,
           golf_courses (
             id,
@@ -84,9 +83,17 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({ username }) => 
 
       if (ratedError) throw ratedError;
 
-      // Combine and deduplicate
-      const allCourses = [...(top100Data || []), ...(ratedData || [])];
-      const uniqueCourses = allCourses.filter((course, index, self) => 
+      // Combine and deduplicate, ensuring consistent structure
+      const combinedCourses = [
+        ...(top100Data || []).map(course => ({
+          ...course,
+          rating: null // Add rating field for consistency
+        })),
+        ...(ratedData || [])
+      ];
+
+      // Remove duplicates based on course_id
+      const uniqueCourses = combinedCourses.filter((course, index, self) => 
         index === self.findIndex(c => c.course_id === course.course_id)
       );
 
@@ -142,7 +149,7 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({ username }) => 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredCourses.map((userCourse) => (
               <CourseCard 
-                key={userCourse.id} 
+                key={userCourse.id || userCourse.course_id} 
                 course={userCourse.golf_courses}
                 viewingUserId={targetUserId}
                 showPlayedButton={isOwnProfile}
