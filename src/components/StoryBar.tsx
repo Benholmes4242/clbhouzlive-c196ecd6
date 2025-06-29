@@ -95,35 +95,6 @@ const StoryBar = () => {
                 />
               </CarouselItem>
             ))}
-            
-            {/* All Friends Circle */}
-            {user && (
-              <CarouselItem className="basis-auto pl-2">
-                <div className="flex flex-col items-center min-w-0">
-                  <button
-                    onClick={handleAllFriends}
-                    className="focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-full mb-2"
-                    style={{ '--tw-ring-color': '#b66b41' } as React.CSSProperties}
-                  >
-                    <div 
-                      className="w-16 h-16 rounded-full p-0.5 hover:scale-105 transition-transform flex items-center justify-center"
-                      style={{ background: 'linear-gradient(to top right, #b66b41, #8b5a34)' }}
-                    >
-                      <div className="w-full h-full rounded-full overflow-hidden">
-                        <img
-                          src="/lovable-uploads/15646f15-4cc1-41f9-bb31-e217d9bd0d99.png"
-                          alt="All Friends"
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    </div>
-                  </button>
-                  <span className="text-xs text-center text-muted-foreground max-w-16 truncate">
-                    All Friends
-                  </span>
-                </div>
-              </CarouselItem>
-            )}
           </CarouselContent>
         </Carousel>
       </div>
