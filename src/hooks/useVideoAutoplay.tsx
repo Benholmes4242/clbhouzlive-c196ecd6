@@ -50,13 +50,18 @@ export const useVideoAutoplay = ({
       return;
     }
 
-    // On mobile/tablet devices, don't autoplay at all - keep videos static
-    if (isMobile) {
+    // For grid context on mobile/tablet devices, don't autoplay to preserve performance
+    // For main feed context, allow autoplay on all devices
+    if (isMobile && isGridContext) {
       return;
     }
 
     // Determine if video should play
-    const shouldPlay = isInView && isHovered;
+    // On mobile in main feed context, autoplay when in view (no hover required)
+    // On desktop, require both in view and hovered
+    const shouldPlay = isGridContext 
+      ? (isInView && isHovered) 
+      : (isMobile ? isInView : (isInView && isHovered));
 
     const handlePlay = async () => {
       if (!shouldPlay || isPlaying) return;
@@ -70,7 +75,7 @@ export const useVideoAutoplay = ({
         setIsLoading(true);
         await video.play();
         setIsPlaying(true);
-        console.log(`Video ${videoId} started playing on hover`);
+        console.log(`Video ${videoId} started playing on ${isMobile ? 'mobile' : 'desktop'}`);
       } catch (error) {
         // Silently handle autoplay failures
         console.log(`Video ${videoId} autoplay blocked:`, error);
@@ -159,7 +164,11 @@ export const useVideoAutoplay = ({
     videoRef,
     isPlaying,
     isLoading,
-    // On mobile, always show play icon. On desktop, show when not playing and not loading
-    shouldShowPlayIcon: isMobile ? true : (!isPlaying && !isLoading)
+    // For main feed context on mobile, show play icon only when not playing and not loading
+    // For grid context on mobile, always show play icon
+    // For desktop, show when not playing and not loading
+    shouldShowPlayIcon: isGridContext 
+      ? (isMobile ? true : (!isPlaying && !isLoading))
+      : (!isPlaying && !isLoading)
   };
 };
