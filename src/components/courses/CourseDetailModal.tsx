@@ -136,9 +136,6 @@ const CourseDetailModal = ({ course, isOpen, onClose, viewingUserId }: CourseDet
           />
 
           <CourseDetailInfo 
-            region={course.region}
-            country={course.country}
-            sub_country={course.sub_country}
             description={course.description}
           />
 
