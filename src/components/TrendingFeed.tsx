@@ -280,7 +280,13 @@ const TrendingFeed = () => {
             }}
           />
         ) : (
-          <PostCard key={item.id} post={item} />
+          <PostCard 
+            key={item.id} 
+            post={{
+              ...item,
+              golfClubTags: item.golfClubTags || []
+            }} 
+          />
         )
       ))}
     </div>

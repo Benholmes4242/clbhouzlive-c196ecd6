@@ -13,9 +13,16 @@ export interface VideoPost {
     description: string;
     thumbnail?: string;
     image?: string;
+    images?: string[];
     duration?: string;
     videoUrl?: string;
     youtubeId?: string;
+    golfCourse?: {
+      id: string;
+      name: string;
+      country: string;
+      region?: string;
+    };
   };
   stats: {
     likes: number;
@@ -23,11 +30,17 @@ export interface VideoPost {
     shares: number;
   };
   timeAgo: string;
+  golfClubTags?: {
+    id: string;
+    entity_type: 'golf_club';
+    entity_id: string;
+    name: string;
+    username: string | null;
+  }[];
 }
 
 export interface UserPostWithType {
   id: string;
-  type: 'user_post';
   content: string | null;
   created_at: string;
   user: {
@@ -36,16 +49,17 @@ export interface UserPostWithType {
     username: string | null;
     profile_photo_url: string | null;
   };
-  post_media: Array<{
+  post_media: {
     id: string;
     media_type: 'image' | 'video';
     media_url: string;
-  }>;
-  post_tags: Array<{
+  }[];
+  post_tags: {
     id: string;
     entity_type: 'user' | 'golf_club' | 'business';
     entity_id: string;
     name: string;
     username: string | null;
-  }>;
+  }[];
+  type: 'user_post';
 }
