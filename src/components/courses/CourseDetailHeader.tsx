@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { MapPin, ExternalLink, Golf } from 'lucide-react';
+import { MapPin, ExternalLink, Target } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -119,7 +119,7 @@ const CourseDetailHeader = ({ course }: CourseDetailHeaderProps) => {
               onClick={handleAddToPlayed}
               className="flex items-center gap-2 text-green-700 border-green-300 hover:bg-green-50"
             >
-              <Golf className="h-4 w-4" />
+              <Target className="h-4 w-4" />
               Add to My Played
             </Button>
           )}
