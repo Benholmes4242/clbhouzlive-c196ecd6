@@ -8,6 +8,8 @@ interface CourseRankBadgesProps {
   usaRank: number | null;
   country: string;
   viewContext?: 'global' | 'regional' | 'usa' | 'europe';
+  userRating?: number | null;
+  showUserRating?: boolean;
 }
 
 const CourseRankBadges = ({ 
@@ -15,7 +17,9 @@ const CourseRankBadges = ({
   regionalRank, 
   usaRank, 
   country, 
-  viewContext = 'global' 
+  viewContext = 'global',
+  userRating,
+  showUserRating = false
 }: CourseRankBadgesProps) => {
   // Check for GB&I countries - including all possible variations
   const isGBI = ['United Kingdom', 'Ireland', 'England', 'Scotland', 'Wales', 'Northern Ireland', 'Isle of Man', 'Britain & Ireland'].includes(country);
@@ -63,12 +67,25 @@ const CourseRankBadges = ({
     return null;
   };
 
+  // Player rating badge
+  const getPlayerRatingBadge = () => {
+    if (showUserRating && userRating !== null && userRating !== undefined) {
+      return (
+        <Badge variant="secondary" className="bg-teal-100 text-teal-800 border-teal-300">
+          {userRating}/10
+        </Badge>
+      );
+    }
+    return null;
+  };
+
   const regionalBadge = getRegionalRankBadge();
   const worldwideBadge = getWorldwideRankBadge();
+  const playerRatingBadge = getPlayerRatingBadge();
 
   return (
     <>
-      {/* If there's a worldwide ranking, show it on top left and regional below it */}
+      {/* Left side: Worldwide and Regional rankings */}
       {worldwideBadge ? (
         <>
           <div className="absolute top-2 left-2">
@@ -81,12 +98,18 @@ const CourseRankBadges = ({
           )}
         </>
       ) : (
-        /* If no worldwide ranking, show regional on the left in the top position */
         regionalBadge && (
           <div className="absolute top-2 left-2">
             {regionalBadge}
           </div>
         )
+      )}
+
+      {/* Right side: Player rating badge */}
+      {playerRatingBadge && (
+        <div className="absolute top-2 right-2">
+          {playerRatingBadge}
+        </div>
       )}
     </>
   );

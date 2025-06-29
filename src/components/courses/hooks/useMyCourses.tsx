@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -35,13 +34,13 @@ export const useMyCourses = () => {
   const { user } = useSupabaseSession();
   const [activeTab, setActiveTab] = useState('all');
 
-  // Fetch user's played courses from user_courses table
+  // Fetch user's played courses from user_courses table with ratings
   const { data: playedCourses = [], isLoading: isLoadingPlayed } = useQuery({
     queryKey: ['user-played-courses', user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
       
-      const { data, error } = await supabase
+      const { data: courses, error: coursesError } = await supabase
         .from('user_courses')
         .select(`
           *,
@@ -51,19 +50,37 @@ export const useMyCourses = () => {
         .eq('played', true)
         .order('played_date', { ascending: false });
 
-      if (error) throw error;
-      return data || [];
+      if (coursesError) throw coursesError;
+
+      const { data: ratings, error: ratingsError } = await supabase
+        .from('course_ratings')
+        .select('course_id, rating')
+        .eq('user_id', user.id);
+
+      if (ratingsError) throw ratingsError;
+
+      const ratingsMap = new Map();
+      ratings?.forEach(rating => {
+        ratingsMap.set(rating.course_id, rating.rating);
+      });
+
+      const coursesWithRatings = courses?.map(course => ({
+        ...course,
+        rating: ratingsMap.get(course.course_id) || null
+      })) || [];
+
+      return coursesWithRatings;
     },
     enabled: !!user?.id,
   });
 
-  // Fetch user's Top 100 courses
+  // Fetch user's Top 100 courses with ratings
   const { data: top100CoursesRaw = [], isLoading: isLoadingTop100 } = useQuery({
     queryKey: ['user-top100-courses', user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
       
-      const { data, error } = await supabase
+      const { data: courses, error: coursesError } = await supabase
         .from('user_top100_courses')
         .select(`
           *,
@@ -73,13 +90,30 @@ export const useMyCourses = () => {
         .eq('played', true)
         .order('played_date', { ascending: false });
 
-      if (error) throw error;
-      return data || [];
+      if (coursesError) throw coursesError;
+
+      const { data: ratings, error: ratingsError } = await supabase
+        .from('course_ratings')
+        .select('course_id, rating')
+        .eq('user_id', user.id);
+
+      if (ratingsError) throw ratingsError;
+
+      const ratingsMap = new Map();
+      ratings?.forEach(rating => {
+        ratingsMap.set(rating.course_id, rating.rating);
+      });
+
+      const coursesWithRatings = courses?.map(course => ({
+        ...course,
+        rating: ratingsMap.get(course.course_id) || null
+      })) || [];
+
+      return coursesWithRatings;
     },
     enabled: !!user?.id,
   });
 
-  // Fetch user's average rating
   const { data: averageRating } = useQuery({
     queryKey: ['user-average-rating', user?.id],
     queryFn: async () => {

@@ -36,9 +36,18 @@ interface CourseDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
   viewingUserId?: string;
+  showUserRating?: boolean;
+  userRating?: number | null;
 }
 
-const CourseDetailModal = ({ course, isOpen, onClose, viewingUserId }: CourseDetailModalProps) => {
+const CourseDetailModal = ({ 
+  course, 
+  isOpen, 
+  onClose, 
+  viewingUserId,
+  showUserRating = false,
+  userRating
+}: CourseDetailModalProps) => {
   const { data: currentUserResponse } = useQuery({
     queryKey: ['current-user'],
     queryFn: async () => {
@@ -97,7 +106,7 @@ const CourseDetailModal = ({ course, isOpen, onClose, viewingUserId }: CourseDet
     enabled: !!course?.id,
   });
 
-  const { data: userRating } = useQuery({
+  const { data: userRatingData } = useQuery({
     queryKey: ['user-course-rating', course?.id, viewingUserId || currentUser?.id],
     queryFn: async () => {
       const userId = viewingUserId || currentUser?.id;
@@ -133,6 +142,8 @@ const CourseDetailModal = ({ course, isOpen, onClose, viewingUserId }: CourseDet
             regionalRank={course.regional_rank}
             usaRank={course.usa_rank}
             country={course.country}
+            showUserRating={showUserRating}
+            userRating={userRating}
           />
 
           <CourseDetailInfo 
@@ -166,7 +177,7 @@ const CourseDetailModal = ({ course, isOpen, onClose, viewingUserId }: CourseDet
               ratingStats={ratingStats}
               currentUser={currentUser}
               userCourse={userCourse}
-              userRating={userRating}
+              userRating={userRatingData}
             />
           )}
 

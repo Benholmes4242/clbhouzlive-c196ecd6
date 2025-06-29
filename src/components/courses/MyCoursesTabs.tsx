@@ -9,6 +9,7 @@ interface Course {
   id: string;
   golf_courses: any;
   source: string;
+  rating?: number | null;
 }
 
 interface MyCoursesTabsProps {
@@ -53,6 +54,8 @@ const MyCoursesTabs = ({
                   course={userCourse.golf_courses}
                   viewingUserId={userId}
                   showPlayedButton={false}
+                  userRating={userCourse.rating || null}
+                  showUserRating={true}
                 />
               ))}
             </div>
@@ -83,6 +86,8 @@ const MyCoursesTabs = ({
                   course={userCourse.golf_courses}
                   viewingUserId={userId}
                   showPlayedButton={false}
+                  userRating={userCourse.rating || null}
+                  showUserRating={true}
                 />
               ))}
             </div>
@@ -111,6 +116,8 @@ const MyCoursesTabs = ({
                   course={userCourse.golf_courses}
                   viewingUserId={userId}
                   showPlayedButton={false}
+                  userRating={userCourse.rating || null}
+                  showUserRating={true}
                 />
               ))}
             </div>

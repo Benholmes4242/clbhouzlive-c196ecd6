@@ -48,6 +48,7 @@ const UserCoursesTabs: React.FC<UserCoursesTabsProps> = ({
                   viewContext="global"
                   userRating={userCourse.rating}
                   isReadOnly={!isOwnProfile}
+                  showUserRating={true}
                 />
               ))}
             </div>
@@ -71,6 +72,7 @@ const UserCoursesTabs: React.FC<UserCoursesTabsProps> = ({
                   viewContext="global"
                   userRating={userCourse.rating}
                   isReadOnly={!isOwnProfile}
+                  showUserRating={true}
                 />
               ))}
             </div>

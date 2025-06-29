@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -34,6 +33,7 @@ interface CourseCardProps {
   showPlayedButton?: boolean;
   userRating?: number | null;
   isReadOnly?: boolean;
+  showUserRating?: boolean;
 }
 
 // Helper function to format description text with line breaks
@@ -48,7 +48,6 @@ const formatDescription = (description: string) => {
     ));
 };
 
-// Helper function to format location display
 const formatLocation = (course: Course) => {
   const parts = [];
   
@@ -74,7 +73,8 @@ const CourseCard: React.FC<CourseCardProps> = ({
   viewingUserId,
   showPlayedButton = true,
   userRating,
-  isReadOnly = false
+  isReadOnly = false,
+  showUserRating = false
 }) => {
   const { user } = useSupabaseSession();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -137,16 +137,9 @@ const CourseCard: React.FC<CourseCardProps> = ({
             usaRank={course.usa_rank}
             country={course.country}
             viewContext={viewContext}
+            userRating={userRating}
+            showUserRating={showUserRating}
           />
-
-          {/* User Rating Badge */}
-          {userRating && (
-            <div className="absolute top-3 left-3">
-              <Badge variant="secondary" className="shadow-lg bg-blue-600 text-white">
-                ★ {userRating}
-              </Badge>
-            </div>
-          )}
 
           {/* Course Played Button - only show when explicitly requested and user can modify */}
           {showPlayedButton && !isViewingOtherUser && !isReadOnly && (
@@ -199,6 +192,8 @@ const CourseCard: React.FC<CourseCardProps> = ({
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         viewingUserId={viewingUserId}
+        showUserRating={showUserRating}
+        userRating={userRating}
       />
     </>
   );
