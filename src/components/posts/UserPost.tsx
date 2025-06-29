@@ -23,6 +23,7 @@ import { SwipeCarousel } from '@/components/ui/swipe-carousel';
 import EditPostDialog from './EditPostDialog';
 import TaggedText from './TaggedText';
 import VideoPreview from './VideoPreview';
+import CoursePostBadge from './CoursePostBadge';
 import { showToast } from '@/utils/toast';
 
 interface PostMedia {
@@ -68,6 +69,9 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
   const displayName = post.user.display_name || post.user.username || 'User';
   const timeAgo = formatDistanceToNow(new Date(post.created_at), { addSuffix: true });
   const isOwnPost = user?.id === post.user.id;
+
+  // Find golf club tags to show as course badges
+  const golfClubTags = post.post_tags?.filter(tag => tag.entity_type === 'golf_club') || [];
 
   const handleDeletePost = async () => {
     if (!isOwnPost || isDeleting) return;
@@ -188,6 +192,24 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
         {post.content && (
           <div className="text-sm mb-3">
             <TaggedText text={post.content} tags={post.post_tags} />
+          </div>
+        )}
+
+        {/* Golf Course Badges - Show above media when golf clubs are tagged */}
+        {golfClubTags.length > 0 && (
+          <div className="mb-3">
+            {golfClubTags.map((tag) => (
+              <CoursePostBadge
+                key={tag.id}
+                course={{
+                  id: tag.entity_id,
+                  name: tag.name,
+                  country: '', // We don't have country info in post tags
+                  region: undefined
+                }}
+                className="mb-2 last:mb-0"
+              />
+            ))}
           </div>
         )}
 

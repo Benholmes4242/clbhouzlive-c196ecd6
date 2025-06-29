@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import PostMediaPreview from '../posts/PostMediaPreview';
 import CaptionInput from '../posts/CaptionInput';
 import CourseTagInput from '../posts/CourseTagInput';
+import CoursePostBadge from '../posts/CoursePostBadge';
 
 interface TaggableEntity {
   id: string;
@@ -63,6 +64,11 @@ const SnapComposerModal = ({
         </DialogDescription>
         
         <div className="space-y-4">
+          {/* Course badge appears above media when course is selected */}
+          {selectedCourse && (
+            <CoursePostBadge course={selectedCourse} />
+          )}
+
           <PostMediaPreview file={selectedFile} previewUrl={previewUrl} />
 
           <div className="relative">

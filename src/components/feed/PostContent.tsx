@@ -2,6 +2,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Play, Pause, Maximize2 } from 'lucide-react';
 import { SwipeCarousel } from '@/components/ui/swipe-carousel';
+import CoursePostBadge from '../posts/CoursePostBadge';
 
 interface PostContentProps {
   content: {
@@ -13,6 +14,12 @@ interface PostContentProps {
     duration?: string;
     videoUrl?: string;
     youtubeId?: string;
+    golfCourse?: {
+      id: string;
+      name: string;
+      country: string;
+      region?: string;
+    };
   };
   onVideoClick?: () => void;
 }
@@ -67,6 +74,11 @@ const PostContent = ({ content, onVideoClick }: PostContentProps) => {
   return (
     <>
       <p className="text-sm mb-3">{content.description}</p>
+      
+      {/* Golf Course Badge - Show above media when available */}
+      {content.golfCourse && (
+        <CoursePostBadge course={content.golfCourse} />
+      )}
       
       <div className="relative rounded-lg overflow-hidden mb-3">
         {content.type === 'video' ? (
