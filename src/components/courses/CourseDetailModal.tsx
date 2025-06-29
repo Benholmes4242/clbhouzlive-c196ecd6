@@ -150,22 +150,6 @@ const CourseDetailModal = ({
             description={course.description}
           />
 
-          {/* Mark as Played Button - show only if user is logged in and viewing their own profile */}
-          {canModifyCourseStatus && (
-            <div className="flex justify-center">
-              <CoursePlayedButton
-                courseId={course.id}
-                courseName={course.name}
-                userCourse={userCourse}
-                canModifyCourseStatus={true}
-                currentUserId={currentUser?.id}
-                course={course}
-                showButton={true}
-                variant="standalone"
-              />
-            </div>
-          )}
-
           {/* Show rating stats for everyone */}
           <CourseRatingStats ratingStats={ratingStats} />
 

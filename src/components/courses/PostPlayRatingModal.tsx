@@ -52,6 +52,7 @@ const PostPlayRatingModal = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showRemoveDialog, setShowRemoveDialog] = useState(false);
+  const [hasMarkedAsPlayed, setHasMarkedAsPlayed] = useState(false);
 
   // Fetch existing rating if in edit mode
   const { data: existingRating } = useQuery({
@@ -86,6 +87,56 @@ const PostPlayRatingModal = ({
       setReview(existingRating.review || '');
     }
   }, [existingRating, isEditMode]);
+
+  // Mark course as played when modal opens (if not in edit mode)
+  useEffect(() => {
+    if (isOpen && !isEditMode && !hasMarkedAsPlayed && course) {
+      markAsPlayedMutation.mutate();
+    }
+  }, [isOpen, isEditMode, hasMarkedAsPlayed, course]);
+
+  const markAsPlayedMutation = useMutation({
+    mutationFn: async () => {
+      const { data: userResponse } = await supabase.auth.getUser();
+      if (!userResponse.user || !course) throw new Error('Not authenticated or no course');
+
+      // Check if already in user_courses
+      const { data: existingCourse, error: checkError } = await supabase
+        .from('user_courses')
+        .select('id')
+        .eq('course_id', course.id)
+        .eq('user_id', userResponse.user.id)
+        .maybeSingle();
+
+      if (checkError && checkError.code !== 'PGRST116') throw checkError;
+
+      if (!existingCourse) {
+        const { error } = await supabase
+          .from('user_courses')
+          .insert({
+            course_id: course.id,
+            user_id: userResponse.user.id,
+            played: true,
+          });
+        
+        if (error) throw error;
+      }
+    },
+    onSuccess: () => {
+      setHasMarkedAsPlayed(true);
+      queryClient.invalidateQueries({ queryKey: ['user-course', course?.id] });
+      queryClient.invalidateQueries({ queryKey: ['my-courses'] });
+      queryClient.invalidateQueries({ queryKey: ['trackerStats'] });
+    },
+    onError: (error) => {
+      console.error('Error marking course as played:', error);
+      toast({
+        title: "Error",
+        description: "Failed to mark course as played. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
 
   const submitRatingMutation = useMutation({
     mutationFn: async ({ rating, reviewText }: { rating: number; reviewText: string }) => {
@@ -227,6 +278,11 @@ const PostPlayRatingModal = ({
   };
 
   const handleSkip = () => {
+    // Course is already marked as played, just close the modal
+    toast({
+      title: "Course Added",
+      description: `${course?.name} has been added to your played courses`,
+    });
     onClose();
     resetForm();
   };
@@ -244,6 +300,7 @@ const PostPlayRatingModal = ({
   const handleClose = () => {
     onClose();
     resetForm();
+    setHasMarkedAsPlayed(false);
   };
 
   // Generate rating options from 0.5 to 10 in 0.5 increments
