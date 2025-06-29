@@ -109,11 +109,11 @@ const StoryBar = () => {
                       className="w-16 h-16 rounded-full p-0.5 hover:scale-105 transition-transform flex items-center justify-center"
                       style={{ background: 'linear-gradient(to top right, #b66b41, #8b5a34)' }}
                     >
-                      <div className="w-full h-full bg-white rounded-full flex items-center justify-center border-2 border-background overflow-hidden">
+                      <div className="w-full h-full rounded-full overflow-hidden">
                         <img
                           src="/lovable-uploads/15646f15-4cc1-41f9-bb31-e217d9bd0d99.png"
                           alt="All Friends"
-                          className="w-10 h-10 object-cover"
+                          className="w-full h-full object-cover"
                         />
                       </div>
                     </div>
