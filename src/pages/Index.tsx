@@ -8,7 +8,6 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { removeDuplicatePosts } from '@/utils/postCleanup';
-import { VideoAutoplayProvider } from '@/hooks/useVideoAutoplayManager';
 
 const Index = () => {
   const { user, loading } = useSupabaseSession();
@@ -70,20 +69,18 @@ const Index = () => {
 
   // Show authenticated user content - this is the main feed
   return (
-    <VideoAutoplayProvider>
-      <div className="min-h-screen bg-background">
-        <Header />
-        <StoryBar />
-        
-        <main className="container mx-auto px-4 py-6">
-          <div className="max-w-2xl mx-auto">
-            <TrendingFeed />
-          </div>
-        </main>
-        
-        <BottomNavigation />
-      </div>
-    </VideoAutoplayProvider>
+    <div className="min-h-screen bg-background">
+      <Header />
+      <StoryBar />
+      
+      <main className="container mx-auto px-4 py-6">
+        <div className="max-w-2xl mx-auto">
+          <TrendingFeed />
+        </div>
+      </main>
+      
+      <BottomNavigation />
+    </div>
   );
 };
 
