@@ -32,7 +32,8 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow }) => {
   };
 
   const handleMediaClick = () => {
-    if (!isInvalidSrc) {
+    // Only open media for image and video types, not CTA
+    if (!isInvalidSrc && (item.type === 'image' || item.type === 'video')) {
       openMedia(imageError ? fallbackImage : item.src, item.type, item.title);
     }
   };
