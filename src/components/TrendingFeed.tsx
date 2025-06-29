@@ -103,7 +103,7 @@ const TrendingFeed = () => {
           console.error('Error fetching post tags:', tagsError);
         } else {
           postTags = tags || [];
-          console.log('Fetched post tags:', postTags.length);
+          console.log('Followed posts - Fetched post tags:', postTags.length);
         }
       } catch (error) {
         console.error('Failed to fetch post tags:', error);
@@ -147,7 +147,7 @@ const TrendingFeed = () => {
         };
       });
 
-      console.log('Formatted posts:', formattedPosts.length);
+      console.log('Formatted followed posts:', formattedPosts.length);
       return formattedPosts;
     },
     enabled: !!user?.id,
