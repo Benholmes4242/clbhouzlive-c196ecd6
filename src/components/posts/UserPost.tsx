@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -24,6 +23,8 @@ import EditPostDialog from './EditPostDialog';
 import TaggedText from './TaggedText';
 import VideoPreview from './VideoPreview';
 import CoursePostBadge from './CoursePostBadge';
+import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
+import { useFullscreenMedia } from '@/hooks/useFullscreenMedia';
 import { showToast } from '@/utils/toast';
 
 interface PostMedia {
@@ -65,6 +66,7 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
   const { toast } = useToast();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const { isOpen, currentMedia, openMedia, closeMedia } = useFullscreenMedia();
 
   const displayName = post.user.display_name || post.user.username || 'User';
   const timeAgo = formatDistanceToNow(new Date(post.created_at), { addSuffix: true });
@@ -119,6 +121,10 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
     }
   };
 
+  const handleMediaClick = (mediaUrl: string, mediaType: 'image' | 'video') => {
+    openMedia(mediaUrl, mediaType);
+  };
+
   // Create carousel items from media
   const carouselItems = post.post_media?.map((media, index) => (
     <div key={media.id} className="w-full aspect-square">
@@ -126,15 +132,18 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
         <img
           src={media.media_url}
           alt="Post content"
-          className="w-full h-full object-cover object-center"
+          className="w-full h-full object-cover object-center cursor-pointer"
           loading="lazy"
+          onClick={() => handleMediaClick(media.media_url, 'image')}
         />
       ) : (
-        <VideoPreview
-          src={media.media_url}
-          className="w-full h-full"
-          videoId={`user-post-${post.id}-${index}`}
-        />
+        <div onClick={() => handleMediaClick(media.media_url, 'video')}>
+          <VideoPreview
+            src={media.media_url}
+            className="w-full h-full cursor-pointer"
+            videoId={`user-post-${post.id}-${index}`}
+          />
+        </div>
       )}
     </div>
   )) || [];
@@ -276,6 +285,14 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
         onOpenChange={setEditDialogOpen}
         post={post}
         onPostUpdated={onPostUpdated}
+      />
+
+      <FullscreenMediaModal
+        isOpen={isOpen}
+        onClose={closeMedia}
+        mediaUrl={currentMedia?.url || ''}
+        mediaType={currentMedia?.type || 'image'}
+        alt={currentMedia?.alt}
       />
     </>
   );

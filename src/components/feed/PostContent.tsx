@@ -1,8 +1,9 @@
-
 import React, { useRef, useEffect, useState } from 'react';
 import { Play, Pause, Maximize2 } from 'lucide-react';
 import { SwipeCarousel } from '@/components/ui/swipe-carousel';
 import CoursePostBadge from '../posts/CoursePostBadge';
+import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
+import { useFullscreenMedia } from '@/hooks/useFullscreenMedia';
 
 interface PostContentProps {
   content: {
@@ -35,6 +36,7 @@ const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentPr
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showControls, setShowControls] = useState(false);
+  const { isOpen, currentMedia, openMedia, closeMedia } = useFullscreenMedia();
 
   const handleVideoClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -66,6 +68,14 @@ const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentPr
   const getYouTubeThumbnail = (youtubeId: string) => {
     // Try different quality options in order of preference
     return `https://img.youtube.com/vi/${youtubeId}/maxresdefault.jpg`;
+  };
+
+  const handleImageClick = (imageUrl: string) => {
+    openMedia(imageUrl, 'image');
+  };
+
+  const handleVideoFullscreen = (videoUrl: string) => {
+    openMedia(videoUrl, 'video');
   };
 
   // Get all images for carousel
@@ -185,7 +195,7 @@ const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentPr
                 {/* Fullscreen Button */}
                 <div className={`absolute top-2 right-2 transition-opacity ${showControls ? 'opacity-100' : 'opacity-0'}`}>
                   <button
-                    onClick={handleFullscreen}
+                    onClick={() => handleVideoFullscreen(content.videoUrl!)}
                     className="bg-black/70 text-white p-2 rounded-full hover:bg-black/80 transition-colors"
                   >
                     <Maximize2 className="h-4 w-4" />
@@ -202,30 +212,41 @@ const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentPr
             ) : null}
           </div>
         ) : allImages.length > 1 ? (
-          // Multiple images - use new SwipeCarousel
+          // Multiple images - use SwipeCarousel with click handlers
           <SwipeCarousel
             items={allImages.map((imageUrl, index) => (
               <img
                 key={index}
                 src={imageUrl}
                 alt={`Post content ${index + 1}`}
-                className="w-full h-80 object-cover object-center"
+                className="w-full h-80 object-cover object-center cursor-pointer"
                 loading="lazy"
+                onClick={() => handleImageClick(imageUrl)}
               />
             ))}
             showDots={true}
             showArrows={false}
           />
         ) : allImages.length === 1 ? (
-          // Single image
+          // Single image with click handler
           <img
             src={allImages[0]}
             alt="Post content"
-            className="w-full h-80 object-cover object-center"
+            className="w-full h-80 object-cover object-center cursor-pointer"
             loading="lazy"
+            onClick={() => handleImageClick(allImages[0])}
           />
         ) : null}
       </div>
+
+      {/* Fullscreen Media Modal */}
+      <FullscreenMediaModal
+        isOpen={isOpen}
+        onClose={closeMedia}
+        mediaUrl={currentMedia?.url || ''}
+        mediaType={currentMedia?.type || 'image'}
+        alt={currentMedia?.alt}
+      />
     </>
   );
 };
