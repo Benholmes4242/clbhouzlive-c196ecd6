@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -42,6 +41,7 @@ interface CourseDetailModalProps {
   viewingUserId?: string;
   showUserRating?: boolean;
   userRating?: number | null;
+  isFromUserCoursesPage?: boolean; // New prop to indicate if opened from a user's courses page
 }
 
 const CourseDetailModal = ({ 
@@ -50,7 +50,8 @@ const CourseDetailModal = ({
   onClose, 
   viewingUserId,
   showUserRating = false,
-  userRating
+  userRating,
+  isFromUserCoursesPage = false
 }: CourseDetailModalProps) => {
   const { user } = useSupabaseSession();
   const [showRatingModal, setShowRatingModal] = React.useState(false);
@@ -73,6 +74,26 @@ const CourseDetailModal = ({
 
       const { data, error } = await supabase
         .from('user_courses')
+        .select('*')
+        .eq('course_id', course.id)
+        .eq('user_id', userId)
+        .maybeSingle();
+
+      if (error && error.code !== 'PGRST116') throw error;
+      return data;
+    },
+    enabled: !!(viewingUserId || currentUser?.id) && !!course?.id,
+  });
+
+  // Check if course is in user's Top 100 courses
+  const { data: userTop100Course } = useQuery({
+    queryKey: ['user-top100-course', course?.id, viewingUserId || currentUser?.id],
+    queryFn: async () => {
+      const userId = viewingUserId || currentUser?.id;
+      if (!userId || !course?.id) return null;
+
+      const { data, error } = await supabase
+        .from('user_top100_courses')
         .select('*')
         .eq('course_id', course.id)
         .eq('user_id', userId)
@@ -140,7 +161,8 @@ const CourseDetailModal = ({
     setShowRatingModal(true);
   };
 
-  const isAlreadyPlayed = userCourse?.played;
+  // Determine if course is already played based on multiple sources
+  const isAlreadyPlayed = isFromUserCoursesPage || userCourse?.played || userTop100Course?.played;
   const canModify = user && !isViewingOtherUser;
 
   if (!course) return null;
@@ -204,7 +226,7 @@ const CourseDetailModal = ({
             <CourseRatingStats ratingStats={ratingStats} />
 
             {/* Show rating form only if user is viewing their own profile and has played the course */}
-            {!isViewingOtherUser && userCourse?.played && (
+            {!isViewingOtherUser && isAlreadyPlayed && (
               <CourseDetailRatingSection
                 courseId={course.id}
                 courseName={course.name}

@@ -34,6 +34,7 @@ interface CourseCardProps {
   userRating?: number | null;
   isReadOnly?: boolean;
   showUserRating?: boolean;
+  isFromUserCoursesPage?: boolean; // New prop to indicate context
 }
 
 // Helper function to format description text with line breaks
@@ -74,7 +75,8 @@ const CourseCard: React.FC<CourseCardProps> = ({
   showPlayedButton = true,
   userRating,
   isReadOnly = false,
-  showUserRating = false
+  showUserRating = false,
+  isFromUserCoursesPage = false
 }) => {
   const { user } = useSupabaseSession();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -156,7 +158,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
           )}
 
           {/* Show played status for other users (read-only) */}
-          {(isViewingOtherUser || isReadOnly) && userCourse?.played && (
+          {(isViewingOtherUser || isReadOnly) && (userCourse?.played || isFromUserCoursesPage) && (
             <div className="absolute bottom-3 right-3">
               <Badge variant="default" className="shadow-lg">
                 Played
@@ -194,6 +196,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
         viewingUserId={viewingUserId}
         showUserRating={showUserRating}
         userRating={userRating}
+        isFromUserCoursesPage={isFromUserCoursesPage}
       />
     </>
   );
