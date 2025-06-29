@@ -26,21 +26,32 @@ export const usePostSubmission = () => {
     onSuccess,
     onError
   }: PostSubmissionParams) => {
+    console.log('Starting post submission...', { 
+      userId: user?.id, 
+      contentLength: content?.length || 0,
+      mediaCount: mediaFiles?.length || 0,
+      tagCount: selectedTags?.length || 0
+    });
+
     if (!validatePostSubmission(user, content, mediaFiles)) {
+      console.error('Post validation failed');
       onError();
       return;
     }
 
     // Validate files before proceeding
-    const validationResult = validateFiles(mediaFiles);
-    if (!validationResult.isValid) {
-      showValidationError(validationResult.error!);
-      onError();
-      return;
+    if (mediaFiles && mediaFiles.length > 0) {
+      const validationResult = validateFiles(mediaFiles);
+      if (!validationResult.isValid) {
+        console.error('File validation failed:', validationResult.error);
+        showValidationError(validationResult.error!);
+        onError();
+        return;
+      }
     }
 
     // Check if we have videos to show appropriate feedback
-    const hasVideoFiles = hasVideos(mediaFiles);
+    const hasVideoFiles = mediaFiles ? hasVideos(mediaFiles) : false;
     
     // Show immediate upload feedback for videos
     if (hasVideoFiles) {
@@ -48,21 +59,21 @@ export const usePostSubmission = () => {
     }
 
     // Create optimistic post for immediate UI update
-    const optimisticPost = createOptimisticPost(user, content, mediaFiles, selectedTags);
+    const optimisticPost = createOptimisticPost(user, content, mediaFiles || [], selectedTags || []);
     
     // Start upload process
     let createdPostId: string | null = null;
     
     try {
-      console.log('Starting post creation...', { content, mediaCount: mediaFiles.length });
+      console.log('Creating post in database...');
       
       // Create the post first
-      const postData = await createPost(user.id, content);
+      const postData = await createPost(user.id, content || '');
       createdPostId = postData.id;
-      console.log('Post created with ID:', createdPostId);
+      console.log('Post created successfully with ID:', createdPostId);
 
       // Upload media files if any
-      if (mediaFiles.length > 0) {
+      if (mediaFiles && mediaFiles.length > 0) {
         // Show progress for videos
         if (hasVideoFiles) {
           showVideoProcessingProgress();
@@ -78,17 +89,17 @@ export const usePostSubmission = () => {
             showFileUploadError(file, error, postData.id, user.id);
           }
         );
-        console.log('Media upload completed');
+        console.log('Media upload completed successfully');
       }
 
       // Handle post tags
-      if (selectedTags.length > 0) {
+      if (selectedTags && selectedTags.length > 0) {
         console.log('Creating post tags for', selectedTags.length, 'tags');
         await handlePostTags(postData.id, selectedTags, user.id);
-        console.log('Post tags created');
+        console.log('Post tags created successfully');
       }
 
-      console.log('Upload process completed successfully');
+      console.log('Post submission completed successfully');
 
       // Show success message
       showSuccessMessage();
@@ -109,15 +120,20 @@ export const usePostSubmission = () => {
       // If we created a post but subsequent operations failed, roll it back
       if (createdPostId) {
         console.log('Rolling back post due to error:', createdPostId);
-        await rollbackPost(createdPostId);
+        try {
+          await rollbackPost(createdPostId);
+          console.log('Post rollback completed');
+        } catch (rollbackError) {
+          console.error('Error during rollback:', rollbackError);
+        }
       }
       
       // Show retry option with specific error message
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      const errorMessage = error instanceof Error ? error.message : 'Failed to create post. Please try again.';
       
       showUploadFailedError(errorMessage, () => {
         console.log('Retrying post submission');
-        submitPost({ user, content, mediaFiles, selectedTags, onSuccess: () => {}, onError });
+        submitPost({ user, content, mediaFiles, selectedTags, onSuccess, onError });
       });
 
       // Broadcast error event for UI cleanup

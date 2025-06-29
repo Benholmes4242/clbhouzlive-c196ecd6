@@ -1,18 +1,21 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import { uploadMediaWithRetry } from '@/components/posts/utils/mediaUpload';
-import { getFileErrorMessage } from '@/components/posts/utils/fileValidation';
 import { createPostTags, rollbackPost, createTagNotifications } from '@/components/posts/utils/postOperations';
 import { TaggableEntity } from './types';
 
 export const createPost = async (userId: string, content: string) => {
   console.log('Creating post in database...', { userId, contentLength: content?.length || 0 });
   
+  if (!userId) {
+    throw new Error('User ID is required to create a post');
+  }
+
   const { data: postData, error: postError } = await supabase
     .from('posts')
     .insert({
       user_id: userId,
-      content: content.trim() || null
+      content: content?.trim() || null
     })
     .select()
     .single();
@@ -20,6 +23,10 @@ export const createPost = async (userId: string, content: string) => {
   if (postError) {
     console.error('Post creation error:', postError);
     throw new Error(`Failed to create post: ${postError.message}`);
+  }
+
+  if (!postData) {
+    throw new Error('No post data returned from database');
   }
 
   console.log('Post created successfully:', postData);
@@ -32,16 +39,15 @@ export const uploadMediaFiles = async (
   userId: string,
   onFileError: (file: File, error: any) => void
 ) => {
-  if (mediaFiles.length === 0) return;
+  if (!mediaFiles || mediaFiles.length === 0) return;
 
   console.log('Starting media upload for', mediaFiles.length, 'files');
   
-  for (let i = 0; i < mediaFiles.length; i++) {
-    const file = mediaFiles[i];
+  const uploadPromises = mediaFiles.map(async (file, index) => {
     try {
-      console.log(`Uploading file ${i + 1}/${mediaFiles.length}:`, file.name, file.type, `${(file.size / 1024 / 1024).toFixed(2)}MB`);
+      console.log(`Uploading file ${index + 1}/${mediaFiles.length}:`, file.name, file.type, `${(file.size / 1024 / 1024).toFixed(2)}MB`);
       await uploadMediaWithRetry(file, postId, userId);
-      console.log(`Successfully uploaded file ${i + 1}/${mediaFiles.length}:`, file.name);
+      console.log(`Successfully uploaded file ${index + 1}/${mediaFiles.length}:`, file.name);
     } catch (error) {
       console.error(`Failed to upload ${file.name} after retries:`, error);
       onFileError(file, error);
@@ -52,9 +58,11 @@ export const uploadMediaFiles = async (
         throw new Error(`Failed to upload ${file.name}: ${error}`);
       }
     }
-  }
-  
-  console.log('All media files processed');
+  });
+
+  // Wait for all uploads to complete
+  await Promise.all(uploadPromises);
+  console.log('All media files processed successfully');
 };
 
 export const handlePostTags = async (
@@ -62,7 +70,7 @@ export const handlePostTags = async (
   selectedTags: TaggableEntity[], 
   userId: string
 ) => {
-  if (selectedTags.length === 0) return;
+  if (!selectedTags || selectedTags.length === 0) return;
 
   console.log('Creating post tags...', { postId, tagCount: selectedTags.length });
   await createPostTags(postId, selectedTags, userId);
