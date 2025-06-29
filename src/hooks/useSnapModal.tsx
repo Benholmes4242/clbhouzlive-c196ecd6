@@ -9,6 +9,13 @@ interface TaggableEntity {
   username: string | null;
 }
 
+interface GolfCourse {
+  id: string;
+  name: string;
+  country: string;
+  region?: string;
+}
+
 export const useSnapModal = () => {
   const captionInputRef = useRef<HTMLDivElement>(null);
   const [isSnapModalOpen, setIsSnapModalOpen] = useState(false);
@@ -23,6 +30,7 @@ export const useSnapModal = () => {
   const [cursorPosition, setCursorPosition] = useState(0);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [selectedCourse, setSelectedCourse] = useState<GolfCourse | null>(null);
 
   const openSnapModal = () => {
     setIsSnapModalOpen(true);
@@ -48,6 +56,7 @@ export const useSnapModal = () => {
     setPreviewUrl('');
     setCaption('');
     setSelectedTags([]);
+    setSelectedCourse(null);
     setShowSuggestions(false);
     setIsSubmitting(false);
     if (previewUrl) {
@@ -85,6 +94,8 @@ export const useSnapModal = () => {
     setCursorPosition,
     showToast,
     toastMessage,
+    selectedCourse,
+    setSelectedCourse,
     openSnapModal,
     closeSnapModal,
     openComposer,

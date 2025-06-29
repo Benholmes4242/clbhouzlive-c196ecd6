@@ -18,6 +18,13 @@ interface TaggableEntity {
   username: string | null;
 }
 
+interface GolfCourse {
+  id: string;
+  name: string;
+  country: string;
+  region?: string;
+}
+
 const BottomNavigation = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -46,6 +53,8 @@ const BottomNavigation = () => {
     setCursorPosition,
     showToast,
     toastMessage,
+    selectedCourse,
+    setSelectedCourse,
     openSnapModal,
     closeSnapModal,
     openComposer,
@@ -230,17 +239,32 @@ const BottomNavigation = () => {
       fileName: selectedFile.name, 
       fileType: selectedFile.type,
       caption: caption,
-      selectedTags: selectedTags 
+      selectedTags: selectedTags,
+      selectedCourse: selectedCourse
     });
 
     setIsSubmitting(true);
     
     try {
+      // Add course as a tag if selected
+      let tagsToSubmit = [...selectedTags];
+      if (selectedCourse) {
+        // Create a course entity for tagging
+        const courseEntity: TaggableEntity = {
+          id: selectedCourse.id,
+          entity_type: 'golf_club',
+          entity_id: selectedCourse.id,
+          name: selectedCourse.name,
+          username: null
+        };
+        tagsToSubmit.push(courseEntity);
+      }
+
       await submitPost({
         user,
         content: caption,
         mediaFiles: [selectedFile],
-        selectedTags,
+        selectedTags: tagsToSubmit,
         onSuccess: () => {
           console.log('Post submission successful');
           closeComposer();
@@ -310,6 +334,8 @@ const BottomNavigation = () => {
         onSelectMention={selectMention}
         onSubmit={handleSubmitPost}
         isSubmitting={isSubmitting}
+        selectedCourse={selectedCourse}
+        onCourseSelect={setSelectedCourse}
       />
 
       <SnapToast

@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/compone
 import { Button } from '@/components/ui/button';
 import PostMediaPreview from '../posts/PostMediaPreview';
 import CaptionInput from '../posts/CaptionInput';
+import CourseTagInput from '../posts/CourseTagInput';
 
 interface TaggableEntity {
   id: string;
@@ -11,6 +12,13 @@ interface TaggableEntity {
   entity_id: string;
   name: string;
   username: string | null;
+}
+
+interface GolfCourse {
+  id: string;
+  name: string;
+  country: string;
+  region?: string;
 }
 
 interface SnapComposerModalProps {
@@ -25,6 +33,8 @@ interface SnapComposerModalProps {
   onSelectMention: (entity: TaggableEntity) => void;
   onSubmit: () => void;
   isSubmitting: boolean;
+  selectedCourse?: GolfCourse | null;
+  onCourseSelect?: (course: GolfCourse | null) => void;
 }
 
 const SnapComposerModal = ({
@@ -38,7 +48,9 @@ const SnapComposerModal = ({
   mentionSuggestions,
   onSelectMention,
   onSubmit,
-  isSubmitting
+  isSubmitting,
+  selectedCourse,
+  onCourseSelect
 }: SnapComposerModalProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -81,6 +93,19 @@ const SnapComposerModal = ({
               </div>
             )}
           </div>
+
+          {onCourseSelect && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Golf Course?
+              </label>
+              <CourseTagInput
+                selectedCourse={selectedCourse || null}
+                onCourseSelect={onCourseSelect}
+                placeholder="Start typing to find a course..."
+              />
+            </div>
+          )}
 
           <div className="flex gap-2 justify-end">
             <Button
