@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -294,6 +295,10 @@ const PostPlayRatingModal = ({
       });
     },
   });
+
+  const handleRemoveFromPlayed = () => {
+    removeFromPlayedMutation.mutate();
+  };
 
   const handleSkip = () => {
     // Course is already marked as played, just close the modal
