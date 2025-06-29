@@ -37,26 +37,36 @@ const VideoPreview = ({
     );
   }
 
-  // Use appropriate component based on context
-  if (isGridThumbnail) {
+  // Add error boundary for video components
+  try {
+    // Use appropriate component based on context
+    if (isGridThumbnail) {
+      return (
+        <GridVideoPreview
+          src={src}
+          poster={poster}
+          className={className}
+          videoId={videoId}
+        />
+      );
+    }
+
     return (
-      <GridVideoPreview
+      <StandardVideoPreview
         src={src}
         poster={poster}
         className={className}
         videoId={videoId}
       />
     );
+  } catch (error) {
+    console.error('Error rendering VideoPreview:', error);
+    return (
+      <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+        <div className="text-gray-500 text-sm">Video unavailable</div>
+      </div>
+    );
   }
-
-  return (
-    <StandardVideoPreview
-      src={src}
-      poster={poster}
-      className={className}
-      videoId={videoId}
-    />
-  );
 };
 
 export default VideoPreview;

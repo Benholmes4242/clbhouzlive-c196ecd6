@@ -45,6 +45,26 @@ const StandardVideoPreview = ({
     }
   };
 
+  // Fallback if video autoplay is not available
+  if (!videoRef) {
+    console.log('VideoRef not available, showing static video');
+    return (
+      <div 
+        className={`relative group ${className}`}
+        onClick={handleVideoClick}
+      >
+        <video
+          src={src}
+          poster={poster}
+          className="w-full h-full object-cover cursor-pointer"
+          muted
+          loop
+          playsInline
+        />
+      </div>
+    );
+  }
+
   return (
     <div 
       ref={containerRef}

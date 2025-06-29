@@ -35,6 +35,28 @@ const GridVideoPreview = ({
     shouldShowPlayIcon
   });
 
+  // Fallback if video autoplay is not available
+  if (!videoRef) {
+    console.log('VideoRef not available, showing static video');
+    return (
+      <div className={`relative ${className}`}>
+        <video
+          src={src}
+          poster={poster}
+          className="w-full h-full object-cover"
+          muted
+          loop
+          playsInline
+        />
+        <div className="absolute bottom-2 right-2">
+          <div className="w-8 h-8 bg-black/60 rounded-full flex items-center justify-center">
+            <Play className="h-4 w-4 text-white ml-0.5" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div 
       ref={containerRef} 

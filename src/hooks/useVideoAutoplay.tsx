@@ -1,3 +1,4 @@
+
 import { useRef, useEffect, useState } from 'react';
 import { useVideoAutoplayManager } from './useVideoAutoplayManager';
 import { useIsMobile } from './use-mobile';
@@ -18,7 +19,23 @@ export const useVideoAutoplay = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { setActiveVideo, isVideoActive } = useVideoAutoplayManager();
+  
+  // Add error handling for context
+  let videoAutoplayManager;
+  try {
+    videoAutoplayManager = useVideoAutoplayManager();
+  } catch (error) {
+    console.error('VideoAutoplayManager not available:', error);
+    // Return default values when context is not available
+    return {
+      videoRef,
+      isPlaying: false,
+      isLoading: false,
+      shouldShowPlayIcon: true
+    };
+  }
+
+  const { setActiveVideo, isVideoActive } = videoAutoplayManager;
   const isMobile = useIsMobile();
   
   // Detect iOS Safari
@@ -118,7 +135,7 @@ export const useVideoAutoplay = ({
       console.log(`Video ${videoId} error:`, e);
       setIsPlaying(false);
       setIsLoading(false);
-      if (isGridContext && isVideoActive(videoId)) {
+      if (isGridContext && isVideoActive && isVideoActive(videoId)) {
         setActiveVideo(null);
       }
     };
