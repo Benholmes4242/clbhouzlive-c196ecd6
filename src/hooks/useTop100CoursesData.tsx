@@ -7,11 +7,12 @@ export const useTop100CoursesData = (userId: string, isOwnProfile: boolean) => {
   const [regionProgress, setRegionProgress] = useState<Record<string, { played: number; total: number }>>({});
   const queryClient = useQueryClient();
 
-  // Query to get the user's played courses
+  // Query to get the user's played courses from both user_top100_courses and course_ratings
   const { data: playedCoursesData, isLoading } = useQuery({
     queryKey: ['userTop100Courses', userId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Get courses from user_top100_courses table
+      const { data: top100Data, error: top100Error } = await supabase
         .from('user_top100_courses')
         .select(`
           course_id,
@@ -29,8 +30,36 @@ export const useTop100CoursesData = (userId: string, isOwnProfile: boolean) => {
         .eq('user_id', userId)
         .eq('played', true);
 
-      if (error) throw error;
-      return data || [];
+      if (top100Error) throw top100Error;
+
+      // Get courses from course_ratings table (courses that have been rated are considered played)
+      const { data: ratedData, error: ratedError } = await supabase
+        .from('course_ratings')
+        .select(`
+          course_id,
+          golf_courses (
+            id,
+            name,
+            country,
+            region,
+            continent,
+            global_rank,
+            regional_rank,
+            usa_rank
+          )
+        `)
+        .eq('user_id', userId);
+
+      if (ratedError) throw ratedError;
+
+      // Combine both datasets and remove duplicates
+      const allPlayedCourses = [...(top100Data || []), ...(ratedData || [])];
+      const uniqueCourses = allPlayedCourses.filter((course, index, self) => 
+        index === self.findIndex(c => c.course_id === course.course_id)
+      );
+
+      console.log('All played courses for user:', userId, uniqueCourses);
+      return uniqueCourses || [];
     },
     enabled: !!userId,
   });
@@ -46,6 +75,7 @@ export const useTop100CoursesData = (userId: string, isOwnProfile: boolean) => {
         .order('global_rank', { nullsFirst: false });
 
       if (error) throw error;
+      console.log('All Top 100 courses:', data);
       return data || [];
     },
   });
@@ -57,6 +87,8 @@ export const useTop100CoursesData = (userId: string, isOwnProfile: boolean) => {
     const playedCourseIds = new Set(
       playedCoursesData.map(pc => pc.course_id)
     );
+
+    console.log('Played course IDs:', Array.from(playedCourseIds));
 
     const progress: Record<string, { played: number; total: number }> = {
       'britain-ireland': { played: 0, total: 0 },
@@ -84,10 +116,14 @@ export const useTop100CoursesData = (userId: string, isOwnProfile: boolean) => {
         if (isPlayed) progress['britain-ireland'].played++;
       } else if (course.country === 'Continental Europe' && course.regional_rank && course.regional_rank <= 100) {
         progress['europe'].total++;
-        if (isPlayed) progress['europe'].played++;
+        if (isPlayed) {
+          console.log('Continental Europe course marked as played:', course);
+          progress['europe'].played++;
+        }
       }
     });
 
+    console.log('Final progress calculation:', progress);
     setRegionProgress(progress);
   }, [allCoursesData, playedCoursesData]);
 
