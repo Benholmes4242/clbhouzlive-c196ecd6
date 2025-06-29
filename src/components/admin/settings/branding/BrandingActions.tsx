@@ -3,7 +3,7 @@ import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Upload } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { updateTitleMeta, updateFaviconInHead } from './faviconUtils';
+import { updateTitleMeta, updateFaviconInHead, verifyFaviconLoaded } from './faviconUtils';
 
 interface BrandingActionsProps {
   tabTitle: string;
@@ -15,7 +15,7 @@ interface BrandingActionsProps {
 const BrandingActions = ({ tabTitle, faviconFile, faviconUrl, onReset }: BrandingActionsProps) => {
   const { toast } = useToast();
 
-  const handleUpdateBranding = () => {
+  const handleUpdateBranding = async () => {
     console.log('Updating branding with:', { tabTitle, faviconUrl, faviconFile });
     
     // Save tab title to localStorage and update document
@@ -31,6 +31,18 @@ const BrandingActions = ({ tabTitle, faviconFile, faviconUrl, onReset }: Brandin
       // Create a URL for the uploaded file (temporary)
       const fileUrl = URL.createObjectURL(faviconFile);
       console.log('Updating favicon with file URL:', fileUrl);
+      
+      // Verify the file can be loaded as an image
+      const isValid = await verifyFaviconLoaded(fileUrl);
+      if (!isValid) {
+        toast({
+          title: "Error",
+          description: "The selected file cannot be used as a favicon. Please choose a valid image file.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
       updateFaviconInHead(fileUrl, true);
       
       // Don't save blob URLs to localStorage as they're temporary
@@ -38,11 +50,23 @@ const BrandingActions = ({ tabTitle, faviconFile, faviconUrl, onReset }: Brandin
       
       toast({
         title: "Warning",
-        description: "File uploads are temporary and will be lost when you refresh the page. Use a permanent URL for persistent favicons.",
+        description: "File uploads are temporary and will be lost when you refresh the page. Use a permanent URL for persistent favicons. The favicon should appear shortly.",
         variant: "destructive",
       });
     } else if (faviconUrl.trim()) {
       console.log('Updating favicon with URL:', faviconUrl);
+      
+      // Verify the URL can be loaded as an image
+      const isValid = await verifyFaviconLoaded(faviconUrl);
+      if (!isValid) {
+        toast({
+          title: "Error",
+          description: "The favicon URL cannot be loaded. Please check the URL and ensure it's a valid, publicly accessible image.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
       updateFaviconInHead(faviconUrl, true);
       
       // Save to localStorage for persistence
@@ -50,7 +74,7 @@ const BrandingActions = ({ tabTitle, faviconFile, faviconUrl, onReset }: Brandin
       
       toast({
         title: "Success",
-        description: "Favicon and tab title updated successfully! The favicon may take a few minutes to update across all browsers due to caching.",
+        description: "Favicon and tab title updated successfully! The favicon should appear within a few seconds. You may need to refresh the page or clear browser cache if it doesn't appear immediately.",
       });
     } else {
       toast({

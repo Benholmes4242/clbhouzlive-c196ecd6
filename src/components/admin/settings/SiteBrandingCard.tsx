@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Globe } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { updateTitleMeta, updateFaviconInHead } from './branding/faviconUtils';
+import { updateTitleMeta, updateFaviconInHead, verifyFaviconLoaded } from './branding/faviconUtils';
 import TabTitleSection from './branding/TabTitleSection';
 import FaviconSection from './branding/FaviconSection';
 import BrandingActions from './branding/BrandingActions';
@@ -34,7 +34,18 @@ const SiteBrandingCard = () => {
     // Only apply favicon if it's a valid URL (not a blob URL)
     if (savedFaviconUrl && !savedFaviconUrl.startsWith('blob:')) {
       setFaviconUrl(savedFaviconUrl);
-      updateFaviconInHead(savedFaviconUrl);
+      
+      // Verify the saved favicon URL is still valid before applying
+      verifyFaviconLoaded(savedFaviconUrl).then(isValid => {
+        if (isValid) {
+          updateFaviconInHead(savedFaviconUrl, true);
+          console.log('Applied saved favicon:', savedFaviconUrl);
+        } else {
+          console.log('Saved favicon URL is no longer valid, removing from storage');
+          localStorage.removeItem('site_favicon_url');
+          setFaviconUrl('');
+        }
+      });
     } else if (savedFaviconUrl && savedFaviconUrl.startsWith('blob:')) {
       // Clear invalid blob URLs from localStorage
       localStorage.removeItem('site_favicon_url');
@@ -53,7 +64,7 @@ const SiteBrandingCard = () => {
     console.log('Resetting branding to defaults');
     // Reset to defaults
     const defaultTitle = 'clbhouz | golf\'s digital clubhouse';
-    const defaultFavicon = 'https://www.clbhouz.co.uk/images/favicon.ico';
+    const defaultFavicon = 'https://iiil.io/FRnqBFp.png';
     
     setTabTitle(defaultTitle);
     setFaviconUrl(defaultFavicon);
@@ -78,7 +89,7 @@ const SiteBrandingCard = () => {
     
     toast({
       title: "Reset Complete",
-      description: "Branding has been reset to default values with cache refresh.",
+      description: "Branding has been reset to default values. The favicon should update shortly.",
     });
   };
 
