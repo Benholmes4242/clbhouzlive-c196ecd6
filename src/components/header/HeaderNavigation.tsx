@@ -138,7 +138,7 @@ const HeaderNavigation = () => {
     return (
       <>
         <Button variant="ghost" size="icon" onClick={handleNotificationsClick}>
-          <Bell className="h-5 w-5" />
+          <Bell className="h-4 w-4" />
         </Button>
 
         <Button variant="ghost" size="icon" onClick={handleProfileClick}>
@@ -168,7 +168,7 @@ const HeaderNavigation = () => {
   return (
     <>
       <Button variant="ghost" size="icon" className="relative" onClick={handleNotificationsClick}>
-        <Bell className="h-5 w-5" />
+        <Bell className="h-4 w-4" />
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
             {unreadCount > 9 ? '9+' : unreadCount}
