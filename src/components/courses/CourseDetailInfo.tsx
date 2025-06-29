@@ -23,7 +23,6 @@ const CourseDetailInfo = ({ description }: CourseDetailInfoProps) => {
       {/* Description */}
       {description && (
         <div>
-          <h3 className="font-semibold mb-2">About This Course</h3>
           <p className="text-muted-foreground leading-relaxed">
             {formatDescription(description)}
           </p>

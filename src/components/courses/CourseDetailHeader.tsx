@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { MapPin, ExternalLink, Target } from 'lucide-react';
+import { MapPin, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -105,22 +105,6 @@ const CourseDetailHeader = ({ course }: CourseDetailHeaderProps) => {
                 <ExternalLink className="h-4 w-4" />
                 Visit Website
               </a>
-            </Button>
-          )}
-        </div>
-
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold">About This Course</h3>
-          
-          {canAddToPlayed && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleAddToPlayed}
-              className="flex items-center gap-2 text-green-700 border-green-300 hover:bg-green-50"
-            >
-              <Target className="h-4 w-4" />
-              Add to My Played
             </Button>
           )}
         </div>

@@ -1,7 +1,10 @@
 
+
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import { Target } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -13,6 +16,8 @@ import CourseDetailRatingSection from './CourseDetailRatingSection';
 import CourseRatingStats from './CourseRatingStats';
 import CourseReviews from './CourseReviews';
 import CourseDetailMapSection from './CourseDetailMapSection';
+import PostPlayRatingModal from './PostPlayRatingModal';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 interface Course {
   id: string;
@@ -48,6 +53,9 @@ const CourseDetailModal = ({
   showUserRating = false,
   userRating
 }: CourseDetailModalProps) => {
+  const { user } = useSupabaseSession();
+  const [showRatingModal, setShowRatingModal] = React.useState(false);
+
   const { data: currentUserResponse } = useQuery({
     queryKey: ['current-user'],
     queryFn: async () => {
@@ -125,58 +133,91 @@ const CourseDetailModal = ({
     enabled: !!(viewingUserId || currentUser?.id) && !!course?.id,
   });
 
+  const handleAddToPlayed = () => {
+    setShowRatingModal(true);
+  };
+
+  const isAlreadyPlayed = userCourse?.played;
+  const canAddToPlayed = user && !isAlreadyPlayed && !isViewingOtherUser;
+
   if (!course) return null;
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <CourseDetailHeader course={course} />
+    <>
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <CourseDetailHeader course={course} />
 
-        <div className="space-y-6">
-          <CourseDetailImage 
-            thumbnailImage={course.thumbnail_image} 
-            courseName={course.name}
-            globalRank={course.global_rank}
-            regionalRank={course.regional_rank}
-            usaRank={course.usa_rank}
-            country={course.country}
-            showUserRating={showUserRating}
-            userRating={userRating}
-          />
-
-          <CourseDetailInfo 
-            description={course.description}
-          />
-
-          {/* Show rating stats for everyone */}
-          <CourseRatingStats ratingStats={ratingStats} />
-
-          {/* Show rating form only if user is viewing their own profile and has played the course */}
-          {!isViewingOtherUser && userCourse?.played && (
-            <CourseDetailRatingSection
-              courseId={course.id}
+          <div className="space-y-6">
+            <CourseDetailImage 
+              thumbnailImage={course.thumbnail_image} 
               courseName={course.name}
-              ratingStats={ratingStats}
-              currentUser={currentUser}
-              userCourse={userCourse}
-              userRating={userRatingData}
+              globalRank={course.global_rank}
+              regionalRank={course.regional_rank}
+              usaRank={course.usa_rank}
+              country={course.country}
+              showUserRating={showUserRating}
+              userRating={userRating}
             />
-          )}
 
-          <CourseReviews 
-            courseId={course.id} 
-            courseName={course.name}
-            currentUser={currentUser}
-          />
+            {/* About This Course section with Add to My Played button */}
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold">About This Course</h2>
+              
+              {canAddToPlayed && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleAddToPlayed}
+                  className="flex items-center gap-2 text-green-700 border-green-300 hover:bg-green-50"
+                >
+                  <Target className="h-4 w-4" />
+                  Add to My Played
+                </Button>
+              )}
+            </div>
 
-          <CourseDetailMapSection
-            latitude={course.latitude}
-            longitude={course.longitude}
-            courseName={course.name}
-          />
-        </div>
-      </DialogContent>
-    </Dialog>
+            <CourseDetailInfo 
+              description={course.description}
+            />
+
+            {/* Show rating stats for everyone */}
+            <CourseRatingStats ratingStats={ratingStats} />
+
+            {/* Show rating form only if user is viewing their own profile and has played the course */}
+            {!isViewingOtherUser && userCourse?.played && (
+              <CourseDetailRatingSection
+                courseId={course.id}
+                courseName={course.name}
+                ratingStats={ratingStats}
+                currentUser={currentUser}
+                userCourse={userCourse}
+                userRating={userRatingData}
+              />
+            )}
+
+            <CourseReviews 
+              courseId={course.id} 
+              courseName={course.name}
+              currentUser={currentUser}
+            />
+
+            <CourseDetailMapSection
+              latitude={course.latitude}
+              longitude={course.longitude}
+              courseName={course.name}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Rating Modal */}
+      <PostPlayRatingModal
+        course={course}
+        isOpen={showRatingModal}
+        onClose={() => setShowRatingModal(false)}
+      />
+    </>
   );
 };
 
