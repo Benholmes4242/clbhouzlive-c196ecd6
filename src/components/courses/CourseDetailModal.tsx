@@ -1,5 +1,4 @@
 
-
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -137,8 +136,12 @@ const CourseDetailModal = ({
     setShowRatingModal(true);
   };
 
+  const handleEditRating = () => {
+    setShowRatingModal(true);
+  };
+
   const isAlreadyPlayed = userCourse?.played;
-  const canAddToPlayed = user && !isAlreadyPlayed && !isViewingOtherUser;
+  const canModify = user && !isViewingOtherUser;
 
   if (!course) return null;
 
@@ -160,20 +163,36 @@ const CourseDetailModal = ({
               userRating={userRating}
             />
 
-            {/* About This Course section with Add to My Played button */}
+            {/* About This Course section with Add to My Played button - moved here */}
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold">About This Course</h2>
               
-              {canAddToPlayed && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleAddToPlayed}
-                  className="flex items-center gap-2 text-green-700 border-green-300 hover:bg-green-50"
-                >
-                  <Target className="h-4 w-4" />
-                  Add to My Played
-                </Button>
+              {user && (
+                <div>
+                  {!isAlreadyPlayed ? (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleAddToPlayed}
+                      disabled={!canModify}
+                      className="flex items-center gap-2 text-green-700 border-green-300 hover:bg-green-50"
+                    >
+                      <Target className="h-4 w-4" />
+                      Add to My Played
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={canModify ? handleEditRating : undefined}
+                      disabled={!canModify}
+                      className="flex items-center gap-2 text-green-700 border-green-300 bg-green-50 cursor-pointer disabled:cursor-default"
+                    >
+                      <Target className="h-4 w-4" />
+                      Played
+                    </Button>
+                  )}
+                </div>
               )}
             </div>
 
@@ -216,6 +235,7 @@ const CourseDetailModal = ({
         course={course}
         isOpen={showRatingModal}
         onClose={() => setShowRatingModal(false)}
+        isEditMode={isAlreadyPlayed}
       />
     </>
   );

@@ -1,11 +1,7 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { MapPin, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import PostPlayRatingModal from './PostPlayRatingModal';
 
 interface Course {
   id: string;
@@ -29,28 +25,6 @@ interface CourseDetailHeaderProps {
 }
 
 const CourseDetailHeader = ({ course }: CourseDetailHeaderProps) => {
-  const { user } = useSupabaseSession();
-  const [showRatingModal, setShowRatingModal] = useState(false);
-
-  // Check if user has already played this course
-  const { data: userCourse } = useQuery({
-    queryKey: ['user-course', course.id, user?.id],
-    queryFn: async () => {
-      if (!user?.id) return null;
-
-      const { data, error } = await supabase
-        .from('user_courses')
-        .select('*')
-        .eq('course_id', course.id)
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      if (error && error.code !== 'PGRST116') throw error;
-      return data;
-    },
-    enabled: !!user?.id,
-  });
-
   const formatLocation = (course: Course) => {
     const parts = [];
     
@@ -70,53 +44,37 @@ const CourseDetailHeader = ({ course }: CourseDetailHeaderProps) => {
     return parts.join(', ');
   };
 
-  const handleAddToPlayed = () => {
-    setShowRatingModal(true);
-  };
-
-  const isAlreadyPlayed = userCourse?.played;
-  const canAddToPlayed = user && !isAlreadyPlayed;
-
   return (
-    <>
-      <div className="flex flex-col space-y-4">
-        <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <h2 className="text-2xl font-bold text-foreground mb-2">{course.name}</h2>
-            <div className="flex items-center gap-1 text-muted-foreground mb-4">
-              <MapPin className="h-4 w-4 flex-shrink-0" />
-              <span>{formatLocation(course)}</span>
-            </div>
+    <div className="flex flex-col space-y-4">
+      <div className="flex items-start justify-between">
+        <div className="flex-1">
+          <h2 className="text-2xl font-bold text-foreground mb-2">{course.name}</h2>
+          <div className="flex items-center gap-1 text-muted-foreground mb-4">
+            <MapPin className="h-4 w-4 flex-shrink-0" />
+            <span>{formatLocation(course)}</span>
           </div>
-          
-          {course.website_url && (
-            <Button
-              variant="outline"
-              size="sm"
-              asChild
-              className="ml-4"
-            >
-              <a
-                href={course.website_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2"
-              >
-                <ExternalLink className="h-4 w-4" />
-                Visit Website
-              </a>
-            </Button>
-          )}
         </div>
+        
+        {course.website_url && (
+          <Button
+            variant="outline"
+            size="sm"
+            asChild
+            className="ml-4"
+          >
+            <a
+              href={course.website_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2"
+            >
+              <ExternalLink className="h-4 w-4" />
+              Visit Website
+            </a>
+          </Button>
+        )}
       </div>
-
-      {/* Rating Modal */}
-      <PostPlayRatingModal
-        course={course}
-        isOpen={showRatingModal}
-        onClose={() => setShowRatingModal(false)}
-      />
-    </>
+    </div>
   );
 };
 
