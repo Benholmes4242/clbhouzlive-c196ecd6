@@ -75,7 +75,7 @@ const CourseRankBadges = ({
             {worldwideBadge}
           </div>
           {regionalBadge && (
-            <div className="absolute top-12 left-2">
+            <div className="absolute top-10 left-2">
               {regionalBadge}
             </div>
           )}
