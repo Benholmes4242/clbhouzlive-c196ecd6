@@ -64,6 +64,7 @@ const FloatingPostButton = () => {
         const target = e.target as HTMLInputElement;
         const file = target.files?.[0];
         if (file) {
+          // Always open modal after file selection
           openModal(file);
         }
       };
@@ -96,6 +97,7 @@ const FloatingPostButton = () => {
         const target = e.target as HTMLInputElement;
         const file = target.files?.[0];
         if (file) {
+          // Always open modal after file selection
           openModal(file);
         }
       };
@@ -107,6 +109,7 @@ const FloatingPostButton = () => {
     const file = event.target.files?.[0];
     if (!file || !user) return;
 
+    // Always open modal after file selection
     openModal(file);
     event.target.value = '';
   };
@@ -232,9 +235,9 @@ const FloatingPostButton = () => {
       <NativeCameraSheet
         isOpen={showNativeSheet}
         onClose={() => setShowNativeSheet(false)}
-        onCameraClick={() => {}}
-        onLibraryClick={() => {}}
-        onFileClick={() => {}}
+        onCameraClick={handleCameraClick}
+        onLibraryClick={handleLibraryClick}
+        onFileClick={handleFileClick}
       />
       
       <input

@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -104,6 +103,7 @@ const BottomNavigation = () => {
         const file = target.files?.[0];
         if (file) {
           console.log('Camera file selected:', file.name, file.type);
+          // Always open composer after file selection
           openComposer(file);
         }
       };
@@ -124,6 +124,7 @@ const BottomNavigation = () => {
         const file = target.files?.[0];
         if (file) {
           console.log('Image file selected:', file.name, file.type);
+          // Always open composer after file selection
           openComposer(file);
         }
       };
@@ -144,6 +145,7 @@ const BottomNavigation = () => {
         const file = target.files?.[0];
         if (file) {
           console.log('Video file selected:', file.name, file.type);
+          // Always open composer after file selection
           openComposer(file);
         }
       };
