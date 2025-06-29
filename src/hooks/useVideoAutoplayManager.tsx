@@ -9,7 +9,11 @@ interface VideoAutoplayContextType {
 
 const VideoAutoplayContext = createContext<VideoAutoplayContextType | undefined>(undefined);
 
-export const VideoAutoplayProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+interface VideoAutoplayProviderProps {
+  children: ReactNode;
+}
+
+export const VideoAutoplayProvider: React.FC<VideoAutoplayProviderProps> = ({ children }) => {
   const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
 
   const setActiveVideo = useCallback((videoId: string | null) => {
