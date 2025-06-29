@@ -32,6 +32,8 @@ interface CourseCardProps {
   viewContext?: 'global' | 'regional' | 'usa' | 'europe';
   viewingUserId?: string;
   showPlayedButton?: boolean;
+  userRating?: number | null;
+  isReadOnly?: boolean;
 }
 
 // Helper function to format description text with line breaks
@@ -70,7 +72,9 @@ const CourseCard: React.FC<CourseCardProps> = ({
   course, 
   viewContext = 'global', 
   viewingUserId,
-  showPlayedButton = true
+  showPlayedButton = true,
+  userRating,
+  isReadOnly = false
 }) => {
   const { user } = useSupabaseSession();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -135,8 +139,17 @@ const CourseCard: React.FC<CourseCardProps> = ({
             viewContext={viewContext}
           />
 
+          {/* User Rating Badge */}
+          {userRating && (
+            <div className="absolute top-3 left-3">
+              <Badge variant="secondary" className="shadow-lg bg-blue-600 text-white">
+                ★ {userRating}
+              </Badge>
+            </div>
+          )}
+
           {/* Course Played Button - only show when explicitly requested and user can modify */}
-          {showPlayedButton && !isViewingOtherUser && (
+          {showPlayedButton && !isViewingOtherUser && !isReadOnly && (
             <CoursePlayedButton
               courseId={course.id}
               courseName={course.name}
@@ -150,7 +163,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
           )}
 
           {/* Show played status for other users (read-only) */}
-          {isViewingOtherUser && userCourse?.played && (
+          {(isViewingOtherUser || isReadOnly) && userCourse?.played && (
             <div className="absolute bottom-3 right-3">
               <Badge variant="default" className="shadow-lg">
                 Played
