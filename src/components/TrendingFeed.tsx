@@ -81,25 +81,36 @@ const TrendingFeed = () => {
         .select('*')
         .in('post_id', posts.map(p => p.id));
 
-      // Get post tags for all posts
-      const { data: postTags } = await supabase
-        .from('post_tags')
-        .select(`
-          *,
-          taggable_entities (*)
-        `)
-        .in('post_id', posts.map(p => p.id));
+      // Get post tags for all posts - with better error handling
+      let postTags = [];
+      try {
+        const { data: tags, error: tagsError } = await supabase
+          .from('post_tags')
+          .select(`
+            *,
+            taggable_entities (*)
+          `)
+          .in('post_id', posts.map(p => p.id));
+
+        if (tagsError) {
+          console.error('Error fetching post tags:', tagsError);
+        } else {
+          postTags = tags || [];
+        }
+      } catch (error) {
+        console.error('Failed to fetch post tags:', error);
+      }
 
       // Format posts with related data
       const formattedPosts = posts.map(post => {
         const userProfile = profiles?.find(profile => profile.id === post.user_id);
         const media = postMedia?.filter(m => m.post_id === post.id) || [];
         const tags = postTags?.filter(t => t.post_id === post.id).map((tag: any) => ({
-          id: tag.taggable_entities.id,
-          entity_type: tag.taggable_entities.entity_type,
-          entity_id: tag.taggable_entities.entity_id,
-          name: tag.taggable_entities.name,
-          username: tag.taggable_entities.username
+          id: tag.taggable_entities?.id || tag.id,
+          entity_type: tag.taggable_entities?.entity_type || 'user',
+          entity_id: tag.taggable_entities?.entity_id || '',
+          name: tag.taggable_entities?.name || 'Unknown',
+          username: tag.taggable_entities?.username || null
         })) || [];
 
         return {
@@ -125,22 +136,25 @@ const TrendingFeed = () => {
       return formattedPosts;
     },
     enabled: !!user?.id,
-    staleTime: 30000, // Consider data fresh for 30 seconds
-    refetchInterval: 60000, // Refetch every minute
+    staleTime: 5000, // Consider data fresh for only 5 seconds to catch new posts quickly
+    refetchInterval: 10000, // Refetch every 10 seconds to catch new posts
   });
 
   // Listen for feed refresh events
   useEffect(() => {
     const handleFeedRefresh = () => {
-      console.log('Feed refresh triggered');
+      console.log('Feed refresh triggered - refetching all data');
       refetchUserPosts();
       refetchFollowedPosts();
     };
 
     const handlePostCompleted = () => {
-      console.log('Post upload completed, refreshing feed');
-      refetchUserPosts();
-      refetchFollowedPosts();
+      console.log('Post upload completed, refreshing feed immediately');
+      // Force immediate refetch
+      setTimeout(() => {
+        refetchUserPosts();
+        refetchFollowedPosts();
+      }, 1000); // Small delay to ensure database is updated
     };
 
     const handlePostDeleted = () => {
@@ -176,13 +190,10 @@ const TrendingFeed = () => {
     !video.content.description.includes('Working on my swing at the driving range')
   );
 
-  // Filter out current user's posts from the followed users posts to avoid duplicates
-  const filteredFollowedPosts = followedUsersPosts.filter(post => post.user.id !== user?.id);
-
-  // Convert posts to the correct type and deduplicate by ID
+  // Convert posts to the correct type and include ALL user posts (including current user's)
   const allUserPosts: UserPostWithType[] = [
     ...userPosts.map(post => ({ ...post, type: 'user_post' as const })),
-    ...filteredFollowedPosts.map(post => ({ ...post, type: 'user_post' as const }))
+    ...followedUsersPosts.map(post => ({ ...post, type: 'user_post' as const }))
   ];
 
   // Deduplicate posts by ID to prevent showing the same post twice
@@ -193,11 +204,13 @@ const TrendingFeed = () => {
     return acc;
   }, [] as UserPostWithType[]);
 
-  console.log('Final post counts:', {
+  // Log post counts for debugging
+  console.log('TrendingFeed - Final post counts:', {
     userPosts: userPosts.length,
-    followedPosts: filteredFollowedPosts.length,
+    followedPosts: followedUsersPosts.length,
     uniquePosts: uniqueUserPosts.length,
-    optimisticPosts: optimisticPosts.length
+    optimisticPosts: optimisticPosts.length,
+    totalToShow: uniqueUserPosts.length + optimisticPosts.length
   });
 
   // Combine all content
@@ -242,10 +255,12 @@ const TrendingFeed = () => {
             key={item.id} 
             post={item} 
             onPostUpdated={() => {
+              console.log('Post updated, refreshing feeds');
               refetchUserPosts();
               refetchFollowedPosts();
             }}
             onPostDeleted={() => {
+              console.log('Post deleted, refreshing feeds');
               refetchUserPosts();
               refetchFollowedPosts();
             }}

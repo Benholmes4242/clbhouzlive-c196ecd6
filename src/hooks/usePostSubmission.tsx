@@ -99,7 +99,7 @@ export const usePostSubmission = () => {
         console.log('Post tags created successfully');
       }
 
-      console.log('Post submission completed successfully');
+      console.log('Post submission completed successfully - triggering feed refresh');
 
       // Show success message
       showSuccessMessage();
@@ -107,9 +107,12 @@ export const usePostSubmission = () => {
       // Broadcast success events for feed refresh
       broadcastPostSuccess(postData.id, optimisticPost.id);
       
-      // Trigger feed refresh events
-      window.dispatchEvent(new CustomEvent('refreshFeed'));
-      window.dispatchEvent(new CustomEvent('postUploadCompleted'));
+      // Trigger feed refresh events with a slight delay to ensure database consistency
+      setTimeout(() => {
+        console.log('Dispatching feed refresh events');
+        window.dispatchEvent(new CustomEvent('refreshFeed'));
+        window.dispatchEvent(new CustomEvent('postUploadCompleted'));
+      }, 500);
 
       // Call onSuccess callback
       onSuccess();
