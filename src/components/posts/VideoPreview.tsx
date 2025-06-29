@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { Maximize2, Play } from 'lucide-react';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
@@ -41,7 +40,7 @@ const VideoPreview = ({
   });
   
   // Detect iOS Safari
-  const isIOSSafari = /iPad|iPhone|iPod/.test(navigator.userUser) && !(window as any).MSStream;
+  const isIOSSafari = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
   
   console.log('VideoPreview rendering:', {
     videoId,
