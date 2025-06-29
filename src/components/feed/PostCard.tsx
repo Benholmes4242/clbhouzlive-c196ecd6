@@ -29,6 +29,13 @@ interface VideoPost {
     shares: number;
   };
   timeAgo: string;
+  golfClubTags?: {
+    id: string;
+    entity_type: 'golf_club';
+    entity_id: string;
+    name: string;
+    username: string | null;
+  }[];
 }
 
 interface PostCardProps {
@@ -47,6 +54,7 @@ const PostCard = ({ post }: PostCardProps) => {
         
         <PostContent 
           content={post.content}
+          golfClubTags={post.golfClubTags}
         />
 
         <div className="flex items-center justify-between">
@@ -58,3 +66,4 @@ const PostCard = ({ post }: PostCardProps) => {
 };
 
 export default PostCard;
+

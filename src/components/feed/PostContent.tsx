@@ -22,9 +22,16 @@ interface PostContentProps {
     };
   };
   onVideoClick?: () => void;
+  golfClubTags?: {
+    id: string;
+    entity_type: 'golf_club';
+    entity_id: string;
+    name: string;
+    username: string | null;
+  }[];
 }
 
-const PostContent = ({ content, onVideoClick }: PostContentProps) => {
+const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [showControls, setShowControls] = useState(false);
@@ -75,9 +82,25 @@ const PostContent = ({ content, onVideoClick }: PostContentProps) => {
     <>
       <p className="text-sm mb-3">{content.description}</p>
       
-      {/* Golf Course Badge - Show above media when available */}
-      {content.golfCourse && (
-        <CoursePostBadge course={content.golfCourse} />
+      {/* Golf Course Badge - Show above media when available from either source */}
+      {(content.golfCourse || golfClubTags.length > 0) && (
+        <>
+          {content.golfCourse && (
+            <CoursePostBadge course={content.golfCourse} />
+          )}
+          {golfClubTags.map((tag) => (
+            <CoursePostBadge
+              key={tag.id}
+              course={{
+                id: tag.entity_id,
+                name: tag.name,
+                country: 'Scotland', // Default fallback since we don't have country in tags
+                region: undefined
+              }}
+              className="mb-2 last:mb-0"
+            />
+          ))}
+        </>
       )}
       
       <div className="relative rounded-lg overflow-hidden mb-3">
