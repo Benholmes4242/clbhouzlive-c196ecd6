@@ -73,7 +73,7 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="fixed inset-0 z-50 flex items-center justify-center p-0 border-0 bg-black/95 max-w-none max-h-none w-full h-full [&>button]:hidden">
+      <DialogContent className="fixed inset-0 z-50 bg-black/95 border-0 p-0 max-w-none max-h-none w-screen h-screen flex items-center justify-center [&>button]:hidden">
         <DialogTitle className="sr-only">
           {item.title || `${item.type} content`}
         </DialogTitle>
@@ -101,7 +101,7 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
         )}
 
         {/* Centered Media Content */}
-        <div className="flex items-center justify-center w-full h-full p-8">
+        <div className="w-full h-full flex items-center justify-center p-8">
           {item.type === 'video' ? (
             <div className="relative flex items-center justify-center">
               <video
