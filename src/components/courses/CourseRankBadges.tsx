@@ -68,18 +68,25 @@ const CourseRankBadges = ({
 
   return (
     <>
-      {/* Regional rank badge on the left */}
-      {regionalBadge && (
-        <div className="absolute top-2 left-2">
-          {regionalBadge}
-        </div>
-      )}
-      
-      {/* Worldwide rank badge on the right */}
-      {worldwideBadge && (
-        <div className="absolute top-2 right-2">
-          {worldwideBadge}
-        </div>
+      {/* If there's a worldwide ranking, show it on the left and regional on the right */}
+      {worldwideBadge ? (
+        <>
+          <div className="absolute top-2 left-2">
+            {worldwideBadge}
+          </div>
+          {regionalBadge && (
+            <div className="absolute top-2 right-2">
+              {regionalBadge}
+            </div>
+          )}
+        </>
+      ) : (
+        /* If no worldwide ranking, show regional on the left as before */
+        regionalBadge && (
+          <div className="absolute top-2 left-2">
+            {regionalBadge}
+          </div>
+        )
       )}
     </>
   );
