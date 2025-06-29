@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, Heart, MessageCircle, Volume2, VolumeX } from 'lucide-react';
+import { X, Heart, MessageCircle, Volume2, VolumeX } from 'lucide-react';
 import { ExploreContentItem } from './types';
 import { useToast } from '@/hooks/use-toast';
 
@@ -41,6 +41,13 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
     }
   };
 
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    // Only close if clicking the backdrop itself, not the content
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   // Instant video setup when modal opens
   useEffect(() => {
     if (isOpen && item.type === 'video') {
@@ -73,7 +80,10 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-[100vw] max-h-[100vh] w-full h-full p-0 gap-0 bg-black border-0 [&>button]:hidden">
+      <DialogContent 
+        className="fixed inset-0 z-[9999] max-w-none max-h-none w-full h-full p-0 gap-0 bg-black/90 border-0 [&>button]:hidden"
+        onClick={handleBackdropClick}
+      >
         <DialogTitle className="sr-only">
           {item.title || `${item.type} content`}
         </DialogTitle>
@@ -81,27 +91,29 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
           {item.type === 'video' ? 'Video content' : 'Image content'} from {item.user?.name || 'user'}
         </DialogDescription>
         
-        <div className="relative w-full h-full bg-black flex flex-col overflow-hidden">
-          {/* Top controls bar */}
-          <div className="absolute top-0 left-0 right-0 z-10 flex items-center justify-between p-4 bg-gradient-to-b from-black/60 to-transparent">
-            {/* Back button - top left */}
-            <button 
-              onClick={onClose}
-              className="text-white min-w-[40px] min-h-[40px] flex items-center justify-center hover:bg-white/20 rounded-full transition-colors"
-            >
-              <ArrowLeft className="h-6 w-6" />
-            </button>
+        {/* Modal backdrop that prevents interaction with background */}
+        <div className="fixed inset-0 bg-black/90 z-[9998]" onClick={handleBackdropClick} />
+        
+        {/* Content container */}
+        <div className="relative w-full h-full flex flex-col overflow-hidden z-[9999]" onClick={(e) => e.stopPropagation()}>
+          {/* Single close button - top right */}
+          <button 
+            onClick={onClose}
+            className="absolute top-4 right-4 z-[10000] text-white bg-black/50 hover:bg-black/70 rounded-full p-2 transition-colors"
+            aria-label="Close modal"
+          >
+            <X className="h-6 w-6" />
+          </button>
 
-            {/* Mute/Unmute button - top right (only for videos) */}
-            {item.type === 'video' && (
-              <button
-                onClick={toggleMute}
-                className="text-white min-w-[40px] min-h-[40px] flex items-center justify-center hover:bg-white/20 rounded-full transition-colors"
-              >
-                {isMuted ? <VolumeX className="h-6 w-6" /> : <Volume2 className="h-6 w-6" />}
-              </button>
-            )}
-          </div>
+          {/* Mute/Unmute button - top left (only for videos) */}
+          {item.type === 'video' && (
+            <button
+              onClick={toggleMute}
+              className="absolute top-4 left-4 z-[10000] text-white bg-black/50 hover:bg-black/70 rounded-full p-2 transition-colors"
+            >
+              {isMuted ? <VolumeX className="h-6 w-6" /> : <Volume2 className="h-6 w-6" />}
+            </button>
+          )}
 
           {/* Centered Media Content */}
           <div className="flex-1 flex items-center justify-center relative p-4 md:p-8">

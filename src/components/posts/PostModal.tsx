@@ -64,6 +64,13 @@ const PostModal = ({ isOpen, onClose, post, isOwnPost = false, onPostUpdated, on
   const displayName = post.user?.display_name || post.user?.username || 'User';
   const timeAgo = formatDistanceToNow(new Date(post.created_at), { addSuffix: true });
 
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    // Only close if clicking the backdrop itself, not the content
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
   const handleDeletePost = async () => {
     if (!isOwnPost || isDeleting) return;
 
@@ -150,31 +157,35 @@ const PostModal = ({ isOpen, onClose, post, isOwnPost = false, onPostUpdated, on
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-[100vw] max-h-[100vh] w-full h-full p-0 gap-0 bg-black border-0 [&>button]:hidden overflow-hidden">
-          <div className="relative w-full h-full bg-black flex flex-col">
-            {/* Close button */}
-            <Button 
-              variant="ghost" 
-              size="icon" 
+        <DialogContent 
+          className="fixed inset-0 z-[9999] max-w-none max-h-none w-full h-full p-0 gap-0 bg-black/90 border-0 [&>button]:hidden overflow-hidden"
+          onClick={handleBackdropClick}
+        >
+          {/* Modal backdrop that prevents interaction with background */}
+          <div className="fixed inset-0 bg-black/90 z-[9998]" onClick={handleBackdropClick} />
+          
+          {/* Content container */}
+          <div className="relative w-full h-full flex flex-col z-[9999]" onClick={(e) => e.stopPropagation()}>
+            {/* Single close button - top right */}
+            <button 
               onClick={onClose}
-              className="absolute top-4 right-4 z-10 text-white hover:bg-white/20 rounded-full"
+              className="absolute top-4 right-4 z-[10000] text-white bg-black/50 hover:bg-black/70 rounded-full p-2 transition-colors"
+              aria-label="Close modal"
             >
-              <X className="h-4 w-4" />
-            </Button>
+              <X className="h-6 w-6" />
+            </button>
 
-            {/* Options menu for own posts */}
+            {/* Options menu for own posts - top left */}
             {isOwnPost && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    size="icon"
-                    className="absolute top-4 left-4 z-10 text-white hover:bg-white/20 rounded-full"
+                  <button 
+                    className="absolute top-4 left-4 z-[10000] text-white bg-black/50 hover:bg-black/70 rounded-full p-2 transition-colors"
                   >
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
+                    <MoreHorizontal className="h-6 w-6" />
+                  </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start">
+                <DropdownMenuContent align="start" className="bg-white z-[10001]">
                   <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
                     <Edit className="h-4 w-4 mr-2" />
                     Edit Post
@@ -218,7 +229,7 @@ const PostModal = ({ isOpen, onClose, post, isOwnPost = false, onPostUpdated, on
             )}
 
             {/* Action buttons at bottom */}
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center space-x-4 z-10">
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center space-x-4 z-[10000]">
               <Button variant="ghost" size="sm" className="text-white hover:bg-white/20 hover:text-red-500 rounded-full">
                 <Heart className="h-4 w-4 mr-1" />
                 Like
