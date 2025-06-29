@@ -12,13 +12,7 @@ const UserCoursesHeader: React.FC<UserCoursesHeaderProps> = ({
 }) => {
   return (
     <div className="text-center">
-      <h1 className="text-3xl font-bold mb-2">{displayName} Courses</h1>
-      <p className="text-muted-foreground">
-        {isOwnProfile 
-          ? 'Track your golf course journey' 
-          : `View ${displayName.replace("'s", '')}'s golf course checklist`
-        }
-      </p>
+      <h1 className="text-3xl font-bold">{displayName} Courses</h1>
     </div>
   );
 };

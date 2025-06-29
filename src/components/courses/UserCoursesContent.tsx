@@ -1,74 +1,100 @@
 
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { useUserCoursesData } from './user/useUserCoursesData';
+import { useTop100CoursesData } from '@/hooks/useTop100CoursesData';
 import UserCoursesHeader from './user/UserCoursesHeader';
-import UserCoursesStats from './user/UserCoursesStats';
-import UserCoursesTabs from './user/UserCoursesTabs';
-import { 
-  SignInRequiredState, 
-  LoadingState, 
-  UserNotFoundState 
-} from './user/UserCoursesEmptyStates';
+import UserCoursesRegionalTiles from './user/UserCoursesRegionalTiles';
+import CourseCard from './CourseCard';
+import { EmptyTop100State } from './user/UserCoursesEmptyStates';
 
 interface UserCoursesContentProps {
   username?: string;
 }
 
 const UserCoursesContent: React.FC<UserCoursesContentProps> = ({ username }) => {
+  const [activeFilter, setActiveFilter] = useState<string | null>(null);
+  
   const {
-    currentUser,
-    targetUserProfile,
     targetUserId,
     displayName,
     isOwnProfile,
-    activeTab,
-    setActiveTab,
     top100CoursesRaw,
-    isLoadingTop100,
-    averageRating,
-    recentCourses,
-    handleAverageRatingClick
+    isLoadingTop100
   } = useUserCoursesData(username);
 
-  // Handle different states
-  if (!currentUser && !isOwnProfile) {
-    return <SignInRequiredState />;
-  }
+  const { regionProgress, isLoading: isLoadingProgress } = useTop100CoursesData(
+    targetUserId || '',
+    isOwnProfile
+  );
 
-  if (!isOwnProfile && !targetUserProfile && username) {
-    return <LoadingState />;
-  }
+  // Filter courses based on active filter
+  const filteredCourses = useMemo(() => {
+    if (!activeFilter || !top100CoursesRaw.length) {
+      return top100CoursesRaw;
+    }
 
-  if (!isOwnProfile && !targetUserProfile && username) {
-    return <UserNotFoundState />;
-  }
+    return top100CoursesRaw.filter((userCourse) => {
+      const course = userCourse.golf_courses;
+      if (!course) return false;
 
-  const totalTop100Played = top100CoursesRaw.length;
+      switch (activeFilter) {
+        case 'britain-ireland':
+          return course.country === 'Britain & Ireland' && course.regional_rank && course.regional_rank <= 100;
+        case 'europe':
+          return course.country === 'Continental Europe' && course.regional_rank && course.regional_rank <= 100;
+        case 'usa':
+          return course.country === 'USA' && course.regional_rank && course.regional_rank <= 100;
+        case 'global':
+          return course.global_rank && course.global_rank <= 100;
+        default:
+          return true;
+      }
+    });
+  }, [top100CoursesRaw, activeFilter]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <UserCoursesHeader 
         displayName={displayName} 
         isOwnProfile={isOwnProfile} 
       />
 
-      <UserCoursesStats
-        totalTop100Played={totalTop100Played}
-        averageRating={averageRating}
-        isOwnProfile={isOwnProfile}
-        onAverageRatingClick={handleAverageRatingClick}
+      <UserCoursesRegionalTiles
+        regionProgress={regionProgress}
+        activeFilter={activeFilter}
+        onFilterChange={setActiveFilter}
+        isLoading={isLoadingProgress}
       />
 
-      <UserCoursesTabs
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        top100Courses={top100CoursesRaw}
-        recentCourses={recentCourses}
-        isLoadingTop100={isLoadingTop100}
-        targetUserId={targetUserId}
-        isOwnProfile={isOwnProfile}
-        displayName={displayName}
-      />
+      <div className="space-y-4">
+        {isLoadingTop100 ? (
+          <div className="text-center py-8">Loading courses...</div>
+        ) : filteredCourses.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredCourses.map((userCourse) => (
+              <CourseCard 
+                key={userCourse.id} 
+                course={userCourse.golf_courses}
+                viewingUserId={targetUserId}
+                showPlayedButton={isOwnProfile}
+                viewContext="global"
+                userRating={userCourse.rating}
+                isReadOnly={!isOwnProfile}
+                showUserRating={true}
+                isFromUserCoursesPage={true}
+              />
+            ))}
+          </div>
+        ) : activeFilter ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">
+              No courses found in the selected region.
+            </p>
+          </div>
+        ) : (
+          <EmptyTop100State isOwnProfile={isOwnProfile} displayName={displayName} />
+        )}
+      </div>
     </div>
   );
 };

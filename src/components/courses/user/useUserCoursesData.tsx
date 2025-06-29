@@ -1,5 +1,4 @@
 
-import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -34,7 +33,6 @@ const getSortedUserCourses = (userCourses: any[]) => {
 export const useUserCoursesData = (username?: string) => {
   const { user: currentUser } = useSupabaseSession();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('top100');
 
   const isOwnProfile = !username;
 
@@ -131,19 +129,6 @@ export const useUserCoursesData = (username?: string) => {
     enabled: !!targetUserId,
   });
 
-  // Calculate recent courses
-  const thirtyDaysAgo = new Date();
-  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-  const recentCourses = top100CoursesRaw
-    .filter((userCourse) => {
-      if (!userCourse.played_date) return false;
-      const playedDate = new Date(userCourse.played_date);
-      return playedDate >= thirtyDaysAgo;
-    })
-    .sort((a, b) => new Date(b.played_date || 0).getTime() - new Date(a.played_date || 0).getTime())
-    .slice(0, 6);
-
   const handleAverageRatingClick = () => {
     if (isOwnProfile) {
       navigate('/my-ratings');
@@ -160,12 +145,9 @@ export const useUserCoursesData = (username?: string) => {
     targetUserId,
     displayName,
     isOwnProfile,
-    activeTab,
-    setActiveTab,
     top100CoursesRaw,
     isLoadingTop100,
     averageRating,
-    recentCourses,
     handleAverageRatingClick
   };
 };
