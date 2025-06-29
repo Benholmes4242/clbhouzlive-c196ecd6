@@ -10,11 +10,8 @@ const UserCoursesHeader: React.FC<UserCoursesHeaderProps> = ({
   displayName, 
   isOwnProfile 
 }) => {
-  return (
-    <div className="text-center">
-      <h1 className="text-3xl font-bold">{displayName} Courses</h1>
-    </div>
-  );
+  // Remove the header text as it's redundant with the tab navigation
+  return null;
 };
 
 export default UserCoursesHeader;

@@ -3,7 +3,6 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Star } from 'lucide-react';
 import CourseDetailModal from './CourseDetailModal';
-import CoursePlayedButton from './CoursePlayedButton';
 import CourseRankBadges from './CourseRankBadges';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -34,7 +33,7 @@ interface CourseCardProps {
   userRating?: number | null;
   isReadOnly?: boolean;
   showUserRating?: boolean;
-  isFromUserCoursesPage?: boolean; // New prop to indicate context
+  isFromUserCoursesPage?: boolean;
 }
 
 // Helper function to format description text with line breaks
@@ -101,7 +100,6 @@ const CourseCard: React.FC<CourseCardProps> = ({
     enabled: !!(viewingUserId || user?.id),
   });
 
-  const canModifyCourseStatus = user && (!viewingUserId || viewingUserId === user.id);
   const isViewingOtherUser = viewingUserId && viewingUserId !== user?.id;
 
   const handleCardClick = () => {
@@ -132,7 +130,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
             )}
           </div>
 
-          {/* Course Rank Badges */}
+          {/* Course Rank Badges - keep these as they're part of the design */}
           <CourseRankBadges
             globalRank={course.global_rank}
             regionalRank={course.regional_rank}
@@ -142,29 +140,6 @@ const CourseCard: React.FC<CourseCardProps> = ({
             userRating={userRating}
             showUserRating={showUserRating}
           />
-
-          {/* Course Played Button - only show when explicitly requested and user can modify */}
-          {showPlayedButton && !isViewingOtherUser && !isReadOnly && (
-            <CoursePlayedButton
-              courseId={course.id}
-              courseName={course.name}
-              userCourse={userCourse}
-              canModifyCourseStatus={!!canModifyCourseStatus}
-              currentUserId={user?.id}
-              viewingUserId={viewingUserId}
-              course={course}
-              showButton={true}
-            />
-          )}
-
-          {/* Show played status for other users (read-only) */}
-          {(isViewingOtherUser || isReadOnly) && (userCourse?.played || isFromUserCoursesPage) && (
-            <div className="absolute bottom-3 right-3">
-              <Badge variant="default" className="shadow-lg">
-                Played
-              </Badge>
-            </div>
-          )}
         </div>
         
         <CardHeader className="pb-2">
@@ -185,6 +160,15 @@ const CourseCard: React.FC<CourseCardProps> = ({
             <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
               {formatDescription(course.description)}
             </p>
+          )}
+
+          {/* Show played status as a pill in the content area instead of overlay */}
+          {(isFromUserCoursesPage || (isViewingOtherUser && userCourse?.played)) && (
+            <div className="mt-3">
+              <Badge variant="default" className="text-xs">
+                Played
+              </Badge>
+            </div>
           )}
         </CardContent>
       </Card>
