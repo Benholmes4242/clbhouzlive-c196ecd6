@@ -2,13 +2,19 @@
 import React from 'react';
 import GridVideoPreview from './video/GridVideoPreview';
 import StandardVideoPreview from './video/StandardVideoPreview';
-import { VideoPreviewProps } from './video/types';
+
+interface VideoPreviewProps {
+  src: string;
+  poster?: string;
+  className?: string;
+  videoId: string;
+  isGridThumbnail?: boolean;
+}
 
 const VideoPreview = ({ 
   src, 
   poster, 
   className = "", 
-  onFullscreen, 
   videoId, 
   isGridThumbnail = false 
 }: VideoPreviewProps) => {
@@ -38,7 +44,6 @@ const VideoPreview = ({
         src={src}
         poster={poster}
         className={className}
-        onFullscreen={onFullscreen}
         videoId={videoId}
       />
     );
@@ -49,7 +54,6 @@ const VideoPreview = ({
       src={src}
       poster={poster}
       className={className}
-      onFullscreen={onFullscreen}
       videoId={videoId}
     />
   );

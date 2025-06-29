@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -21,7 +22,6 @@ import {
 import { SwipeCarousel } from '@/components/ui/swipe-carousel';
 import EditPostDialog from './EditPostDialog';
 import TaggedText from './TaggedText';
-import PostModal from './PostModal';
 import VideoPreview from './VideoPreview';
 import { showToast } from '@/utils/toast';
 
@@ -64,19 +64,10 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
   const { toast } = useToast();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const displayName = post.user.display_name || post.user.username || 'User';
   const timeAgo = formatDistanceToNow(new Date(post.created_at), { addSuffix: true });
   const isOwnPost = user?.id === post.user.id;
-
-  const handlePostClick = useCallback(() => {
-    setIsModalOpen(true);
-  }, []);
-
-  const handleCloseModal = useCallback(() => {
-    setIsModalOpen(false);
-  }, []);
 
   const handleDeletePost = async () => {
     if (!isOwnPost || isDeleting) return;
@@ -138,7 +129,6 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
         <VideoPreview
           src={media.media_url}
           className="w-full h-full"
-          onFullscreen={handlePostClick}
           videoId={`user-post-${post.id}-${index}`}
         />
       )}
@@ -203,7 +193,7 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
 
         {/* Post Media using SwipeCarousel */}
         {carouselItems.length > 0 && (
-          <div className="mb-3 cursor-pointer" onClick={handlePostClick}>
+          <div className="mb-3">
             <div className="rounded-lg overflow-hidden">
               <SwipeCarousel
                 items={carouselItems}
@@ -264,13 +254,6 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
         onOpenChange={setEditDialogOpen}
         post={post}
         onPostUpdated={onPostUpdated}
-      />
-
-      <PostModal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        post={post}
-        isOwnPost={isOwnPost}
       />
     </>
   );
