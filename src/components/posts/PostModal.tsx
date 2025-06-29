@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -119,21 +120,25 @@ const PostModal = ({ isOpen, onClose, post, isOwnPost = false, onPostUpdated, on
     post_media: post.post_media || []
   };
 
-  // Create carousel items from media
+  // Create carousel items from media with proper centering
   const carouselItems = post.post_media?.map((media, index) => (
     <div key={media.id} className="w-full h-full flex items-center justify-center">
       {media.media_type === 'image' ? (
         <img
           src={media.media_url}
           alt="Post content"
-          className="max-w-full max-h-full object-contain"
+          className="max-w-full max-h-full w-auto h-auto object-contain"
           loading="lazy"
+          style={{
+            maxHeight: '80vh',
+            maxWidth: '90vw'
+          }}
         />
       ) : (
-        <div className="w-full h-full max-w-full max-h-full flex items-center justify-center">
+        <div className="w-full h-full flex items-center justify-center">
           <VideoPreview
             src={media.media_url}
-            className="w-full h-full max-w-full max-h-full"
+            className="max-w-full max-h-full w-auto h-auto"
             onFullscreen={() => {}}
             videoId={`modal-post-${post.id}-${index}`}
           />
@@ -145,14 +150,14 @@ const PostModal = ({ isOpen, onClose, post, isOwnPost = false, onPostUpdated, on
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-[95vw] max-h-[95vh] w-full h-full p-0 gap-0 flex items-center justify-center">
-          <div className="relative w-full h-full bg-black flex items-center justify-center">
+        <DialogContent className="max-w-[100vw] max-h-[100vh] w-full h-full p-0 gap-0 bg-black border-0 [&>button]:hidden overflow-hidden">
+          <div className="relative w-full h-full bg-black flex flex-col">
             {/* Close button */}
             <Button 
               variant="ghost" 
               size="icon" 
               onClick={onClose}
-              className="absolute top-4 right-4 z-10 text-white hover:bg-white/20"
+              className="absolute top-4 right-4 z-10 text-white hover:bg-white/20 rounded-full"
             >
               <X className="h-4 w-4" />
             </Button>
@@ -164,7 +169,7 @@ const PostModal = ({ isOpen, onClose, post, isOwnPost = false, onPostUpdated, on
                   <Button 
                     variant="ghost" 
                     size="icon"
-                    className="absolute top-4 left-4 z-10 text-white hover:bg-white/20"
+                    className="absolute top-4 left-4 z-10 text-white hover:bg-white/20 rounded-full"
                   >
                     <MoreHorizontal className="h-4 w-4" />
                   </Button>
@@ -186,39 +191,43 @@ const PostModal = ({ isOpen, onClose, post, isOwnPost = false, onPostUpdated, on
               </DropdownMenu>
             )}
 
-            {/* Media Content */}
+            {/* Centered Media Content */}
             {carouselItems.length > 0 ? (
-              <div className="w-full h-full relative">
-                <SwipeCarousel
-                  items={carouselItems}
-                  showDots={carouselItems.length > 1}
-                  showArrows={false}
-                  className="h-full"
-                />
+              <div className="flex-1 flex items-center justify-center relative p-4 md:p-8">
+                <div className="w-full h-full flex items-center justify-center">
+                  <SwipeCarousel
+                    items={carouselItems}
+                    showDots={carouselItems.length > 1}
+                    showArrows={false}
+                    className="h-full max-w-full flex items-center justify-center"
+                  />
+                </div>
               </div>
             ) : (
-              // Text-only post
-              <div className="p-8 text-white text-center">
-                <div className="text-lg mb-4">
-                  <TaggedText text={post.content || ''} tags={post.post_tags || []} />
-                </div>
-                <div className="text-sm text-white/70">
-                  {displayName} • {timeAgo}
+              // Text-only post - centered
+              <div className="flex-1 flex items-center justify-center p-8 text-white text-center">
+                <div className="max-w-2xl">
+                  <div className="text-lg mb-4">
+                    <TaggedText text={post.content || ''} tags={post.post_tags || []} />
+                  </div>
+                  <div className="text-sm text-white/70">
+                    {displayName} • {timeAgo}
+                  </div>
                 </div>
               </div>
             )}
 
             {/* Action buttons at bottom */}
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center space-x-4">
-              <Button variant="ghost" size="sm" className="text-white hover:bg-white/20 hover:text-red-500">
+            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex items-center space-x-4 z-10">
+              <Button variant="ghost" size="sm" className="text-white hover:bg-white/20 hover:text-red-500 rounded-full">
                 <Heart className="h-4 w-4 mr-1" />
                 Like
               </Button>
-              <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
+              <Button variant="ghost" size="sm" className="text-white hover:bg-white/20 rounded-full">
                 <MessageCircle className="h-4 w-4 mr-1" />
                 Comment
               </Button>
-              <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
+              <Button variant="ghost" size="sm" className="text-white hover:bg-white/20 rounded-full">
                 <Share className="h-4 w-4 mr-1" />
                 Share
               </Button>
