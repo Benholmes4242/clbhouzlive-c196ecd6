@@ -47,10 +47,11 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
     }
   };
 
-  // Instant video setup when modal opens
+  // Auto-play video when modal opens
   useEffect(() => {
     if (isOpen && item.type === 'video') {
       setVideoReady(false);
+      setIsPlaying(false);
       
       const timer = setTimeout(() => {
         const video = document.getElementById('modal-video') as HTMLVideoElement;
@@ -70,7 +71,7 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
             setVideoReady(true);
           };
         }
-      }, 50);
+      }, 100);
       
       return () => clearTimeout(timer);
     }
@@ -79,7 +80,7 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
-        className="fixed inset-0 z-[9999] max-w-none max-h-none w-full h-full p-0 gap-0 bg-black/90 border-0 [&>button]:hidden"
+        className="fixed inset-0 z-[9999] max-w-none max-h-none w-screen h-screen p-0 gap-0 bg-black border-0 [&>button]:hidden"
         onClick={handleBackdropClick}
       >
         <DialogTitle className="sr-only">
@@ -89,38 +90,36 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
           {item.type === 'video' ? 'Video content' : 'Image content'} from {item.user?.name || 'user'}
         </DialogDescription>
         
-        {/* Modal backdrop that prevents interaction with background */}
-        <div className="fixed inset-0 bg-black/90 z-[10000]" onClick={handleBackdropClick} />
-        
-        {/* Content container */}
-        <div className="relative w-full h-full flex flex-col overflow-hidden z-[10001]" onClick={(e) => e.stopPropagation()}>
-          {/* Single close button - top right */}
+        {/* Fullscreen black container */}
+        <div className="w-screen h-screen bg-black flex flex-col relative" onClick={(e) => e.stopPropagation()}>
+          
+          {/* Close button - top right */}
           <button 
             onClick={onClose}
-            className="absolute top-4 right-4 z-[10002] text-white hover:text-gray-300 transition-colors"
+            className="absolute top-6 right-6 z-50 text-white hover:text-gray-300 transition-colors bg-black/50 rounded-full p-2"
             aria-label="Close modal"
           >
-            <X className="h-8 w-8" />
+            <X className="h-6 w-6" />
           </button>
 
           {/* Mute/Unmute button - top left (only for videos) */}
           {item.type === 'video' && (
             <button
               onClick={toggleMute}
-              className="absolute top-4 left-4 z-[10002] text-white hover:text-gray-300 transition-colors"
+              className="absolute top-6 left-6 z-50 text-white hover:text-gray-300 transition-colors bg-black/50 rounded-full p-2"
             >
-              {isMuted ? <VolumeX className="h-8 w-8" /> : <Volume2 className="h-8 w-8" />}
+              {isMuted ? <VolumeX className="h-6 w-6" /> : <Volume2 className="h-6 w-6" />}
             </button>
           )}
 
-          {/* Centered Media Content - Full screen container */}
-          <div className="flex-1 flex items-center justify-center p-8">
+          {/* Centered Media Content */}
+          <div className="flex-1 flex items-center justify-center">
             {item.type === 'video' ? (
-              <div className="relative flex items-center justify-center w-full h-full">
+              <div className="relative flex items-center justify-center">
                 <video
                   id="modal-video"
                   src={item.src}
-                  className="max-w-full max-h-full object-contain cursor-pointer"
+                  className="max-w-[90vw] max-h-[80vh] w-auto h-auto object-contain cursor-pointer"
                   muted={isMuted}
                   loop
                   playsInline
@@ -153,13 +152,13 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
               <img
                 src={item.src}
                 alt={item.title || 'Content'}
-                className="max-w-full max-h-full object-contain"
+                className="max-w-[90vw] max-h-[80vh] w-auto h-auto object-contain"
               />
             )}
           </div>
 
           {/* Bottom overlay with user info and actions */}
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 z-[10002]">
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-6 z-40">
             <div className="flex items-center justify-between text-white max-w-6xl mx-auto">
               <div className="flex items-center space-x-3">
                 {item.user && (
@@ -167,15 +166,15 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
                     <img
                       src={item.user.avatar}
                       alt={item.user.name}
-                      className="w-8 h-8 rounded-full border border-white/20"
+                      className="w-10 h-10 rounded-full border-2 border-white/30"
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face';
                       }}
                     />
                     <div>
-                      <div className="font-semibold text-sm">{item.user.name}</div>
+                      <div className="font-semibold text-base">{item.user.name}</div>
                       {item.title && (
-                        <div className="text-xs text-white/80">{item.title}</div>
+                        <div className="text-sm text-white/80">{item.title}</div>
                       )}
                     </div>
                   </>
@@ -183,11 +182,11 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
               </div>
               
               <div className="flex items-center space-x-4">
-                <Button variant="ghost" size="sm" className="text-white hover:bg-white/20 hover:text-red-500">
-                  <Heart className="h-5 w-5 mr-1" />
-                  <span className="text-sm">{item.likes}</span>
+                <Button variant="ghost" size="sm" className="text-white hover:bg-white/20 hover:text-red-500 rounded-full">
+                  <Heart className="h-5 w-5 mr-2" />
+                  <span className="text-sm font-medium">{item.likes}</span>
                 </Button>
-                <Button variant="ghost" size="sm" className="text-white hover:bg-white/20">
+                <Button variant="ghost" size="sm" className="text-white hover:bg-white/20 rounded-full">
                   <MessageCircle className="h-5 w-5" />
                 </Button>
               </div>
