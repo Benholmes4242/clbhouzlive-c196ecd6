@@ -42,7 +42,6 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
   };
 
   const handleBackdropClick = (e: React.MouseEvent) => {
-    // Only close if clicking the backdrop itself, not the content
     if (e.target === e.currentTarget) {
       onClose();
     }
@@ -56,7 +55,6 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
       const timer = setTimeout(() => {
         const video = document.getElementById('modal-video') as HTMLVideoElement;
         if (video) {
-          // Preload and prepare for instant playback
           video.preload = 'auto';
           video.oncanplaythrough = () => {
             setVideoReady(true);
@@ -92,37 +90,37 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
         </DialogDescription>
         
         {/* Modal backdrop that prevents interaction with background */}
-        <div className="fixed inset-0 bg-black/90 z-[9998]" onClick={handleBackdropClick} />
+        <div className="fixed inset-0 bg-black/90 z-[10000]" onClick={handleBackdropClick} />
         
         {/* Content container */}
-        <div className="relative w-full h-full flex flex-col overflow-hidden z-[9999]" onClick={(e) => e.stopPropagation()}>
+        <div className="relative w-full h-full flex flex-col overflow-hidden z-[10001]" onClick={(e) => e.stopPropagation()}>
           {/* Single close button - top right */}
           <button 
             onClick={onClose}
-            className="absolute top-4 right-4 z-[10000] text-white bg-black/50 hover:bg-black/70 rounded-full p-2 transition-colors"
+            className="absolute top-4 right-4 z-[10002] text-white hover:text-gray-300 transition-colors"
             aria-label="Close modal"
           >
-            <X className="h-6 w-6" />
+            <X className="h-8 w-8" />
           </button>
 
           {/* Mute/Unmute button - top left (only for videos) */}
           {item.type === 'video' && (
             <button
               onClick={toggleMute}
-              className="absolute top-4 left-4 z-[10000] text-white bg-black/50 hover:bg-black/70 rounded-full p-2 transition-colors"
+              className="absolute top-4 left-4 z-[10002] text-white hover:text-gray-300 transition-colors"
             >
-              {isMuted ? <VolumeX className="h-6 w-6" /> : <Volume2 className="h-6 w-6" />}
+              {isMuted ? <VolumeX className="h-8 w-8" /> : <Volume2 className="h-8 w-8" />}
             </button>
           )}
 
           {/* Centered Media Content */}
-          <div className="flex-1 flex items-center justify-center relative p-4 md:p-8">
+          <div className="flex-1 flex items-center justify-center relative w-full h-full">
             {item.type === 'video' ? (
-              <div className="relative flex items-center justify-center w-full h-full">
+              <div className="relative w-full h-full flex items-center justify-center">
                 <video
                   id="modal-video"
                   src={item.src}
-                  className="max-w-full max-h-full w-auto h-auto object-contain cursor-pointer"
+                  className="max-w-full max-h-full object-contain cursor-pointer"
                   muted={isMuted}
                   loop
                   playsInline
@@ -131,8 +129,10 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
                   onPause={() => setIsPlaying(false)}
                   preload="auto"
                   style={{
-                    maxHeight: '80vh',
-                    maxWidth: '90vw'
+                    width: 'auto',
+                    height: 'auto',
+                    maxWidth: '100vw',
+                    maxHeight: '100vh'
                   }}
                 />
 
@@ -159,17 +159,19 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
               <img
                 src={item.src}
                 alt={item.title || 'Content'}
-                className="max-w-full max-h-full w-auto h-auto object-contain"
+                className="max-w-full max-h-full object-contain"
                 style={{
-                  maxHeight: '80vh',
-                  maxWidth: '90vw'
+                  width: 'auto',
+                  height: 'auto',
+                  maxWidth: '100vw',
+                  maxHeight: '100vh'
                 }}
               />
             )}
           </div>
 
           {/* Bottom overlay with user info and actions */}
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4">
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 z-[10002]">
             <div className="flex items-center justify-between text-white max-w-6xl mx-auto">
               <div className="flex items-center space-x-3">
                 {item.user && (
