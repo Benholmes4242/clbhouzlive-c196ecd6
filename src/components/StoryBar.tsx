@@ -99,10 +99,10 @@ const StoryBar = () => {
             {/* All Friends Circle */}
             {user && (
               <CarouselItem className="basis-auto pl-2">
-                <div className="flex flex-col items-center space-y-2 min-w-0">
+                <div className="flex flex-col items-center min-w-0">
                   <button
                     onClick={handleAllFriends}
-                    className="focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-full"
+                    className="focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-full mb-2"
                     style={{ '--tw-ring-color': '#b66b41' } as React.CSSProperties}
                   >
                     <div 
