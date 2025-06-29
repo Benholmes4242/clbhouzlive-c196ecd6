@@ -44,6 +44,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
 
   // Dynamic subtitle logic
   const getSubtitle = () => {
+    // If we're on a user courses page (like /user/username/courses)
     if (isUserCoursesPage) {
       if (isOwnProfile) {
         return "Here's how you rank the world's best golf courses.";
@@ -52,6 +53,13 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
         return `Explore how ${firstName} ranks the world's best golf courses.`;
       }
     }
+    
+    // If we're on the main courses page but viewing "My Courses" tab
+    if (activeTab === 'my-courses') {
+      return "Here's how you rank the world's best golf courses.";
+    }
+    
+    // Default subtitle for explore and other tabs
     return "Top 100 Courses. One Epic Checklist.";
   };
 
