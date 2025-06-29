@@ -161,15 +161,6 @@ const CourseCard: React.FC<CourseCardProps> = ({
               {formatDescription(course.description)}
             </p>
           )}
-
-          {/* Show played status as a pill in the content area instead of overlay */}
-          {(isFromUserCoursesPage || (isViewingOtherUser && userCourse?.played)) && (
-            <div className="mt-3">
-              <Badge variant="default" className="text-xs">
-                Played
-              </Badge>
-            </div>
-          )}
         </CardContent>
       </Card>
 
