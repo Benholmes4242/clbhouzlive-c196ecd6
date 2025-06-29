@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -130,7 +129,7 @@ const CourseDetailModal = ({ course, isOpen, onClose, viewingUserId }: CourseDet
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto relative">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto relative" hideCloseButton={true}>
         {/* Custom close button with proper event handling */}
         <button
           onClick={handleCloseClick}
