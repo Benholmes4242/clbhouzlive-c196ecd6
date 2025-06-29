@@ -38,17 +38,15 @@ export const useVideoAutoplay = ({
       return;
     }
 
-    // In grid context, only autoplay if this video is the active one and hovered
-    const shouldPlay = isGridContext 
-      ? (isInView && isVideoActive(videoId) && isHovered)
-      : (isInView && isHovered); // For standard video, only play on hover
+    // Determine if video should play
+    const shouldPlay = isInView && isHovered;
 
     const handlePlay = async () => {
       if (!shouldPlay || isPlaying) return;
 
       try {
-        // In grid context, claim this video as active
-        if (isGridContext && isInView && isHovered) {
+        // In grid context, claim this video as active when starting to play
+        if (isGridContext) {
           setActiveVideo(videoId);
         }
 
@@ -66,7 +64,7 @@ export const useVideoAutoplay = ({
     };
 
     const handlePause = () => {
-      if (shouldPlay || !isPlaying) return;
+      if (shouldPlay) return;
 
       try {
         video.pause();
@@ -82,13 +80,10 @@ export const useVideoAutoplay = ({
       }
     };
 
-    // Handle when video goes out of view or hover ends
-    if (isGridContext && (!isInView || !isHovered) && isVideoActive(videoId)) {
-      setActiveVideo(null);
-      handlePause();
-    } else if (shouldPlay) {
+    // Handle play/pause based on conditions
+    if (shouldPlay) {
       handlePlay();
-    } else {
+    } else if (isPlaying) {
       handlePause();
     }
 
@@ -147,7 +142,7 @@ export const useVideoAutoplay = ({
     videoRef,
     isPlaying,
     isLoading,
-    // On mobile, always show play icon. On desktop, show when not active and not loading
-    shouldShowPlayIcon: isMobile ? true : (isGridContext && !isVideoActive(videoId) && !isLoading)
+    // On mobile, always show play icon. On desktop, show when not playing and not loading
+    shouldShowPlayIcon: isMobile ? true : (!isPlaying && !isLoading)
   };
 };
