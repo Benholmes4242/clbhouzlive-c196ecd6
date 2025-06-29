@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -12,7 +13,6 @@ import CourseDetailRatingSection from './CourseDetailRatingSection';
 import CourseRatingStats from './CourseRatingStats';
 import CourseReviews from './CourseReviews';
 import CourseDetailMapSection from './CourseDetailMapSection';
-import CoursePlayedButton from './CoursePlayedButton';
 
 interface Course {
   id: string;
@@ -126,8 +126,6 @@ const CourseDetailModal = ({
   });
 
   if (!course) return null;
-
-  const canModifyCourseStatus = currentUser && !isViewingOtherUser;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
