@@ -6,6 +6,8 @@ import UserCoursesHeader from './user/UserCoursesHeader';
 import UserCoursesRegionalTiles from './user/UserCoursesRegionalTiles';
 import CourseCard from './CourseCard';
 import { EmptyTop100State } from './user/UserCoursesEmptyStates';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 interface UserCoursesContentProps {
   username?: string;
@@ -27,13 +29,80 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({ username }) => 
     isOwnProfile
   );
 
+  // Query to get all played courses (from both tables) for filtering
+  const { data: allPlayedCourses = [] } = useQuery({
+    queryKey: ['allPlayedCourses', targetUserId],
+    queryFn: async () => {
+      if (!targetUserId) return [];
+
+      // Get courses from user_top100_courses table
+      const { data: top100Data, error: top100Error } = await supabase
+        .from('user_top100_courses')
+        .select(`
+          course_id,
+          rating,
+          played_date,
+          golf_courses (
+            id,
+            name,
+            country,
+            region,
+            continent,
+            global_rank,
+            regional_rank,
+            usa_rank,
+            description,
+            thumbnail_image
+          )
+        `)
+        .eq('user_id', targetUserId)
+        .eq('played', true);
+
+      if (top100Error) throw top100Error;
+
+      // Get courses from course_ratings table
+      const { data: ratedData, error: ratedError } = await supabase
+        .from('course_ratings')
+        .select(`
+          course_id,
+          rating,
+          created_at,
+          golf_courses (
+            id,
+            name,
+            country,
+            region,
+            continent,
+            global_rank,
+            regional_rank,
+            usa_rank,
+            description,
+            thumbnail_image
+          )
+        `)
+        .eq('user_id', targetUserId);
+
+      if (ratedError) throw ratedError;
+
+      // Combine and deduplicate
+      const allCourses = [...(top100Data || []), ...(ratedData || [])];
+      const uniqueCourses = allCourses.filter((course, index, self) => 
+        index === self.findIndex(c => c.course_id === course.course_id)
+      );
+
+      return uniqueCourses;
+    },
+    enabled: !!targetUserId,
+  });
+
   // Filter courses based on active filter
   const filteredCourses = useMemo(() => {
-    if (!activeFilter || !top100CoursesRaw.length) {
+    if (!activeFilter) {
       return top100CoursesRaw;
     }
 
-    return top100CoursesRaw.filter((userCourse) => {
+    // Use the combined played courses data for filtering
+    return allPlayedCourses.filter((userCourse) => {
       const course = userCourse.golf_courses;
       if (!course) return false;
 
@@ -50,7 +119,7 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({ username }) => 
           return true;
       }
     });
-  }, [top100CoursesRaw, activeFilter]);
+  }, [top100CoursesRaw, allPlayedCourses, activeFilter]);
 
   return (
     <div className="space-y-8">
