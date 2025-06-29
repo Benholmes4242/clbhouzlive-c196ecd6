@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
-import { Users } from 'lucide-react';
 import {
   Carousel,
   CarouselContent,
@@ -103,11 +102,23 @@ const StoryBar = () => {
                 <div className="flex flex-col items-center space-y-2">
                   <button
                     onClick={handleAllFriends}
-                    className="relative w-16 h-16 rounded-full border-2 border-muted-foreground bg-muted hover:bg-muted/80 transition-colors flex items-center justify-center"
+                    className="focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-full"
+                    style={{ '--tw-ring-color': '#b66b41' } as React.CSSProperties}
                   >
-                    <Users className="w-6 h-6 text-muted-foreground" />
+                    <div 
+                      className="w-16 h-16 rounded-full p-0.5 hover:scale-105 transition-transform flex items-center justify-center"
+                      style={{ background: 'linear-gradient(to top right, #b66b41, #8b5a34)' }}
+                    >
+                      <div className="w-full h-full bg-white rounded-full flex items-center justify-center border-2 border-background overflow-hidden">
+                        <img
+                          src="/lovable-uploads/15646f15-4cc1-41f9-bb31-e217d9bd0d99.png"
+                          alt="All Friends"
+                          className="w-10 h-10 object-cover"
+                        />
+                      </div>
+                    </div>
                   </button>
-                  <span className="text-xs text-center text-muted-foreground font-medium max-w-[60px] truncate">
+                  <span className="text-xs text-center text-muted-foreground max-w-16 truncate">
                     All Friends
                   </span>
                 </div>
