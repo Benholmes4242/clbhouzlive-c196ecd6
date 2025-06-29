@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
+import { X, Flag } from 'lucide-react';
 
 interface RegionalProgress {
   played: number;
@@ -35,8 +35,9 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
     },
     {
       key: 'usa',
-      label: 'Top 100 USA Played',
-      progress: regionProgress['usa'] || { played: 0, total: 100 }
+      label: 'Top100USA',
+      progress: regionProgress['usa'] || { played: 0, total: 100 },
+      isFlag: true
     },
     {
       key: 'global',
@@ -73,13 +74,26 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
             }`}
             onClick={() => onFilterChange(activeFilter === tile.key ? null : tile.key)}
           >
-            <CardContent className="p-4 text-center">
-              <div className="text-sm text-muted-foreground mb-1">
-                {tile.label}
-              </div>
-              <div className="text-2xl font-bold">
-                {tile.progress.played} / {tile.progress.total}
-              </div>
+            <CardContent className="p-4">
+              {tile.isFlag ? (
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
+                    <Flag className="h-4 w-4 text-white" />
+                  </div>
+                  <div className="text-sm font-bold text-gray-900">
+                    {tile.label}
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center">
+                  <div className="text-sm text-muted-foreground mb-1">
+                    {tile.label}
+                  </div>
+                  <div className="text-2xl font-bold">
+                    {tile.progress.played} / {tile.progress.total}
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
         ))}
