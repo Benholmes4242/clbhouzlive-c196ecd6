@@ -1,7 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Volume2, VolumeX } from 'lucide-react';
-import { Dialog, DialogContent, DialogOverlay, DialogTitle } from '@/components/ui/dialog';
 
 interface FullscreenMediaModalProps {
   isOpen: boolean;
@@ -42,66 +41,62 @@ const FullscreenMediaModal = ({
     }
   };
 
+  // Don't render if not open
+  if (!isOpen) return null;
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogOverlay className="bg-black/90 backdrop-blur-sm" />
-      <DialogContent 
-        className="fixed inset-0 z-50 border-0 bg-transparent shadow-none max-w-none w-full h-full p-0"
-        onClick={handleBackdropClick}
-      >
-        <DialogTitle className="sr-only">{alt}</DialogTitle>
-        
-        {/* Top Controls */}
-        <div className="absolute top-4 left-4 right-4 z-10 flex justify-between pointer-events-none">
-          {/* Back Arrow - Top Left */}
+    <div 
+      className="fixed inset-0 z-50 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4"
+      onClick={handleBackdropClick}
+    >
+      {/* Top Controls */}
+      <div className="absolute top-4 left-4 right-4 z-10 flex justify-between pointer-events-none">
+        {/* Back Arrow - Top Left */}
+        <button
+          onClick={onClose}
+          className="flex items-center justify-center w-10 h-10 text-white hover:bg-white/10 rounded-full transition-colors pointer-events-auto"
+          aria-label="Go back"
+        >
+          <ArrowLeft className="h-6 w-6" />
+        </button>
+
+        {/* Mute/Unmute - Top Right (Only for videos) */}
+        {mediaType === 'video' && (
           <button
-            onClick={onClose}
+            onClick={handleMuteToggle}
             className="flex items-center justify-center w-10 h-10 text-white hover:bg-white/10 rounded-full transition-colors pointer-events-auto"
-            aria-label="Go back"
+            aria-label={isMuted ? "Unmute" : "Mute"}
           >
-            <ArrowLeft className="h-6 w-6" />
+            {isMuted ? (
+              <VolumeX className="h-6 w-6" />
+            ) : (
+              <Volume2 className="h-6 w-6" />
+            )}
           </button>
+        )}
+      </div>
 
-          {/* Mute/Unmute - Top Right (Only for videos) */}
-          {mediaType === 'video' && (
-            <button
-              onClick={handleMuteToggle}
-              className="flex items-center justify-center w-10 h-10 text-white hover:bg-white/10 rounded-full transition-colors pointer-events-auto"
-              aria-label={isMuted ? "Unmute" : "Mute"}
-            >
-              {isMuted ? (
-                <VolumeX className="h-6 w-6" />
-              ) : (
-                <Volume2 className="h-6 w-6" />
-              )}
-            </button>
-          )}
-        </div>
-
-        {/* Media Content - Centered */}
-        <div className="absolute inset-0 flex items-center justify-center p-4">
-          {mediaType === 'image' ? (
-            <img
-              src={mediaUrl}
-              alt={alt}
-              className="max-w-full max-h-full object-contain"
-              draggable={false}
-            />
-          ) : (
-            <video
-              ref={videoRef}
-              src={mediaUrl}
-              className="max-w-full max-h-full object-contain"
-              muted={isMuted}
-              controls={false}
-              loop
-              playsInline
-              autoPlay
-            />
-          )}
-        </div>
-      </DialogContent>
-    </Dialog>
+      {/* Media Content - Centered and properly sized */}
+      {mediaType === 'image' ? (
+        <img
+          src={mediaUrl}
+          alt={alt}
+          className="max-w-[90vw] max-h-[90vh] w-auto h-auto object-contain"
+          draggable={false}
+        />
+      ) : (
+        <video
+          ref={videoRef}
+          src={mediaUrl}
+          className="max-w-[90vw] max-h-[90vh] w-auto h-auto object-contain"
+          muted={isMuted}
+          controls={false}
+          loop
+          playsInline
+          autoPlay
+        />
+      )}
+    </div>
   );
 };
 
