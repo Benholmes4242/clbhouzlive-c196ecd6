@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
@@ -8,7 +9,6 @@ import {
   CarouselContent,
   CarouselItem,
 } from "@/components/ui/carousel";
-import { Users } from 'lucide-react';
 import StoryItem from './StoryBar/StoryItem';
 import { useStoryData } from './StoryBar/useStoryData';
 
@@ -52,11 +52,6 @@ const StoryBar = () => {
     navigate(`/profile/${username}`);
   };
 
-  // Function to handle "All Friends" navigation
-  const handleAllFriends = () => {
-    navigate('/friends');
-  };
-
   if (loading) {
     return (
       <div className="sticky top-16 z-40 bg-background border-b border-border">
@@ -95,32 +90,6 @@ const StoryBar = () => {
                 />
               </CarouselItem>
             ))}
-            
-            {/* All Friends Circle */}
-            <CarouselItem className="basis-auto pl-2">
-              <div className="flex flex-col items-center space-y-2 min-w-0">
-                <div className="relative">
-                  <button
-                    type="button"
-                    onClick={handleAllFriends}
-                    aria-label="View all friends"
-                    className="focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-full"
-                  >
-                    <div 
-                      className="w-16 h-16 rounded-full p-0.5 hover:scale-105 transition-transform"
-                      style={{ background: 'linear-gradient(to top right, #3b82f6, #1d4ed8)' }}
-                    >
-                      <div className="w-full h-full bg-muted rounded-full flex items-center justify-center border-2 border-background">
-                        <Users className="h-8 w-8 text-blue-600" />
-                      </div>
-                    </div>
-                  </button>
-                </div>
-                <span className="text-xs text-center text-muted-foreground max-w-16 truncate">
-                  All Friends
-                </span>
-              </div>
-            </CarouselItem>
           </CarouselContent>
         </Carousel>
       </div>
