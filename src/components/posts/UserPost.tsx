@@ -204,7 +204,7 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
                 course={{
                   id: tag.entity_id,
                   name: tag.name,
-                  country: '', // We don't have country info in post tags
+                  country: 'Scotland', // Default fallback since we don't have country in tags
                   region: undefined
                 }}
                 className="mb-2 last:mb-0"

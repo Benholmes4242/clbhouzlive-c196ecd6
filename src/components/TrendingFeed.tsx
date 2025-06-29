@@ -81,14 +81,20 @@ const TrendingFeed = () => {
         .select('*')
         .in('post_id', posts.map(p => p.id));
 
-      // Get post tags for all posts - with better error handling
+      // Get post tags with proper entity information
       let postTags = [];
       try {
         const { data: tags, error: tagsError } = await supabase
           .from('post_tags')
           .select(`
             *,
-            taggable_entities (*)
+            taggable_entities (
+              id,
+              entity_type,
+              entity_id,
+              name,
+              username
+            )
           `)
           .in('post_id', posts.map(p => p.id));
 
@@ -96,6 +102,7 @@ const TrendingFeed = () => {
           console.error('Error fetching post tags:', tagsError);
         } else {
           postTags = tags || [];
+          console.log('Fetched post tags:', postTags.length);
         }
       } catch (error) {
         console.error('Failed to fetch post tags:', error);
@@ -105,13 +112,20 @@ const TrendingFeed = () => {
       const formattedPosts = posts.map(post => {
         const userProfile = profiles?.find(profile => profile.id === post.user_id);
         const media = postMedia?.filter(m => m.post_id === post.id) || [];
-        const tags = postTags?.filter(t => t.post_id === post.id).map((tag: any) => ({
-          id: tag.taggable_entities?.id || tag.id,
-          entity_type: tag.taggable_entities?.entity_type || 'user',
-          entity_id: tag.taggable_entities?.entity_id || '',
-          name: tag.taggable_entities?.name || 'Unknown',
-          username: tag.taggable_entities?.username || null
-        })) || [];
+        const tags = postTags?.filter(t => t.post_id === post.id).map((tag: any) => {
+          // Handle the case where taggable_entities might be null
+          if (!tag.taggable_entities) {
+            console.warn('Missing taggable_entities for tag:', tag.id);
+            return null;
+          }
+          return {
+            id: tag.taggable_entities.id,
+            entity_type: tag.taggable_entities.entity_type,
+            entity_id: tag.taggable_entities.entity_id,
+            name: tag.taggable_entities.name,
+            username: tag.taggable_entities.username
+          };
+        }).filter(Boolean) || []; // Filter out null entries
 
         return {
           id: post.id,
