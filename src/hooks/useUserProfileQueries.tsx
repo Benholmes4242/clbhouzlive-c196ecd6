@@ -8,11 +8,19 @@ export const useUserProfileQueries = () => {
   const { username } = useParams<{ username: string }>();
   const { user: currentUser } = useSupabaseSession();
 
+  console.log('useUserProfileQueries - username:', username);
+  console.log('useUserProfileQueries - currentUser:', currentUser);
+
   // Fetch the user profile by username or ID
-  const { data: profile, isLoading } = useQuery({
+  const { data: profile, isLoading, error } = useQuery({
     queryKey: ['userProfile', username],
     queryFn: async () => {
-      if (!username) return null;
+      if (!username) {
+        console.log('No username provided');
+        return null;
+      }
+      
+      console.log('Fetching profile for username:', username);
       
       // First try to find by username
       let { data, error } = await supabase
@@ -22,8 +30,11 @@ export const useUserProfileQueries = () => {
         .eq('is_public', true)
         .maybeSingle();
       
+      console.log('Query by username result:', { data, error });
+      
       // If not found by username, try to find by ID (fallback for users without usernames)
       if (!data && !error) {
+        console.log('No data found by username, trying by ID');
         const { data: idData, error: idError } = await supabase
           .from('user_profiles')
           .select('*')
@@ -31,14 +42,22 @@ export const useUserProfileQueries = () => {
           .eq('is_public', true)
           .maybeSingle();
         
+        console.log('Query by ID result:', { data: idData, error: idError });
         data = idData;
         error = idError;
       }
       
-      if (error) throw error;
+      if (error) {
+        console.error('Profile query error:', error);
+        throw error;
+      }
+      
+      console.log('Final profile data:', data);
       return data;
     },
     enabled: !!username,
+    retry: 3,
+    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
   // Fetch current user profile to get user_type
@@ -53,7 +72,10 @@ export const useUserProfileQueries = () => {
         .eq('id', currentUser.id)
         .maybeSingle();
       
-      if (error) throw error;
+      if (error) {
+        console.error('Current user profile error:', error);
+        throw error;
+      }
       return data;
     },
     enabled: !!currentUser?.id,
@@ -91,6 +113,14 @@ export const useUserProfileQueries = () => {
       };
     },
     enabled: !!currentUser?.id && !!profile?.id && currentUser.id !== profile.id,
+  });
+
+  console.log('useUserProfileQueries - final state:', {
+    profile,
+    isLoading,
+    error,
+    relationshipStatus,
+    currentUser: currentUserProfile ? { ...currentUser, ...currentUserProfile } : currentUser
   });
 
   return {

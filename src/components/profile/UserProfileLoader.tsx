@@ -7,10 +7,15 @@ interface UserProfileLoaderProps {
 }
 
 const UserProfileLoader: React.FC<UserProfileLoaderProps> = ({ isLoading, profile }) => {
+  console.log('UserProfileLoader - isLoading:', isLoading, 'profile:', profile);
+  
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <span className="text-muted-foreground text-base">Loading profile...</span>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <span className="text-muted-foreground text-base">Loading profile...</span>
+        </div>
       </div>
     );
   }
@@ -18,7 +23,12 @@ const UserProfileLoader: React.FC<UserProfileLoaderProps> = ({ isLoading, profil
   if (!profile) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
-        <span className="text-muted-foreground text-base">User not found or profile is private</span>
+        <div className="text-center">
+          <span className="text-muted-foreground text-base">User not found or profile is private</span>
+          <p className="text-sm text-muted-foreground mt-2">
+            The profile you're looking for might not exist or isn't public.
+          </p>
+        </div>
       </div>
     );
   }

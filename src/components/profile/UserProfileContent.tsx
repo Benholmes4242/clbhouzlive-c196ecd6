@@ -23,8 +23,14 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({
   const { user } = useSupabaseSession();
   const isOwnProfile = user?.id === profile.id;
 
-  console.log('UserProfileContent - profile user_type:', profile?.user_type);
-  console.log('UserProfileContent - current user type:', currentUser?.user_type);
+  console.log('UserProfileContent - profile:', profile);
+  console.log('UserProfileContent - isOwnProfile:', isOwnProfile);
+  console.log('UserProfileContent - user.id:', user?.id, 'profile.id:', profile?.id);
+
+  if (!profile) {
+    console.log('UserProfileContent - No profile data');
+    return null;
+  }
 
   return (
     <div className="max-w-2xl mx-auto px-4">
