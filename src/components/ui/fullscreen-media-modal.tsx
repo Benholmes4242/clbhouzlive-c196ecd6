@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Volume2, VolumeX } from 'lucide-react';
-import { Dialog, DialogContent, DialogOverlay } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogOverlay, DialogTitle } from '@/components/ui/dialog';
 
 interface FullscreenMediaModalProps {
   isOpen: boolean;
@@ -46,9 +46,11 @@ const FullscreenMediaModal = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogOverlay className="bg-black/90 backdrop-blur-sm" />
       <DialogContent 
-        className="fixed inset-0 z-50 flex items-center justify-center p-0 border-0 bg-transparent shadow-none max-w-none w-full h-full"
+        className="fixed inset-0 z-50 flex items-center justify-center p-4 border-0 bg-transparent shadow-none max-w-none w-full h-full"
         onClick={handleBackdropClick}
       >
+        <DialogTitle className="sr-only">{alt}</DialogTitle>
+        
         {/* Top Controls */}
         <div className="absolute top-4 left-4 right-4 z-10 flex justify-between pointer-events-none">
           {/* Back Arrow - Top Left */}
@@ -77,19 +79,19 @@ const FullscreenMediaModal = ({
         </div>
 
         {/* Media Content */}
-        <div className="flex items-center justify-center w-full h-full p-4 pointer-events-none">
+        <div className="flex items-center justify-center w-full h-full max-w-[95vw] max-h-[95vh]">
           {mediaType === 'image' ? (
             <img
               src={mediaUrl}
               alt={alt}
-              className="max-w-full max-h-full object-contain"
+              className="max-w-full max-h-full w-auto h-auto object-contain"
               draggable={false}
             />
           ) : (
             <video
               ref={videoRef}
               src={mediaUrl}
-              className="max-w-full max-h-full object-contain"
+              className="max-w-full max-h-full w-auto h-auto object-contain"
               muted={isMuted}
               controls={false}
               loop
