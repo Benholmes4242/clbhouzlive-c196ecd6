@@ -113,14 +113,14 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
             </button>
           )}
 
-          {/* Centered Media Content - Fixed container */}
-          <div className="absolute inset-0 flex items-center justify-center p-4">
+          {/* Centered Media Content - Full screen container */}
+          <div className="flex-1 flex items-center justify-center p-8">
             {item.type === 'video' ? (
-              <div className="relative flex items-center justify-center max-w-full max-h-full">
+              <div className="relative flex items-center justify-center w-full h-full">
                 <video
                   id="modal-video"
                   src={item.src}
-                  className="block object-contain cursor-pointer"
+                  className="max-w-full max-h-full object-contain cursor-pointer"
                   muted={isMuted}
                   loop
                   playsInline
@@ -128,12 +128,6 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
                   onPlay={() => setIsPlaying(true)}
                   onPause={() => setIsPlaying(false)}
                   preload="auto"
-                  style={{
-                    maxWidth: 'calc(100vw - 2rem)',
-                    maxHeight: 'calc(100vh - 2rem)',
-                    width: 'auto',
-                    height: 'auto'
-                  }}
                 />
 
                 {/* Play/Pause indicator */}
@@ -159,13 +153,7 @@ const MediaModal = ({ isOpen, onClose, item }: MediaModalProps) => {
               <img
                 src={item.src}
                 alt={item.title || 'Content'}
-                className="block object-contain"
-                style={{
-                  maxWidth: 'calc(100vw - 2rem)',
-                  maxHeight: 'calc(100vh - 2rem)',
-                  width: 'auto',
-                  height: 'auto'
-                }}
+                className="max-w-full max-h-full object-contain"
               />
             )}
           </div>
