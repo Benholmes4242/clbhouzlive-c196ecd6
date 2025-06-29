@@ -2,7 +2,6 @@
 import React from 'react';
 import { useNavigate } from "react-router-dom";
 import HeaderNavigation from './header/HeaderNavigation';
-import HeaderUserMenu from './header/HeaderUserMenu';
 import HeaderSearch from './header/HeaderSearch';
 
 const Header = () => {
@@ -34,7 +33,6 @@ const Header = () => {
           {/* Navigation Icons - Fixed positioning */}
           <div className="flex items-center space-x-4 flex-shrink-0">
             <HeaderNavigation />
-            <HeaderUserMenu />
           </div>
         </div>
       </div>
