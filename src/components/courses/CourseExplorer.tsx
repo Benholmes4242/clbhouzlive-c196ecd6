@@ -21,8 +21,8 @@ const CourseExplorer = () => {
         .select('*');
 
       if (selectedRegion === 'all') {
-        // Show all courses in randomized order
-        query = query.order('random()');
+        // Show all courses in randomized order - no filtering needed
+        query = query.order('created_at', { ascending: false });
       } else if (selectedRegion === 'britain-ireland') {
         // Show courses where primary country is "Britain & Ireland" and have regional rank
         query = query
