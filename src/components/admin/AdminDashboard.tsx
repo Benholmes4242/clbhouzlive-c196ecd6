@@ -9,6 +9,7 @@ import Analytics from './Analytics';
 import TeamManagement from './TeamManagement';
 import AdminSettings from './AdminSettings';
 import GolfCoursesManagement from './GolfCoursesManagement';
+import CountryFlagsManagement from './CountryFlagsManagement';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Upload } from 'lucide-react';
 
@@ -56,6 +57,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ users, onRoleChange, us
         return <UserManagement users={users} onRoleChange={onRoleChange} />;
       case 'golf-courses':
         return <GolfCoursesManagement />;
+      case 'country-flags':
+        return <CountryFlagsManagement />;
       case 'courses':
         return (
           <div className="space-y-6">

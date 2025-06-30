@@ -20,7 +20,8 @@ import {
   TrendingUp, 
   UserCheck, 
   Settings as SettingsIcon,
-  MapPin
+  MapPin,
+  Flag
 } from "lucide-react";
 
 const menuItems = [
@@ -41,6 +42,12 @@ const menuItems = [
     icon: MapPin,
     value: "golf-courses",
     requiredRole: "limited_admin", // Available to both admin and limited_admin
+  },
+  {
+    title: "Country Flags",
+    icon: Flag,
+    value: "country-flags",
+    requiredRole: "admin",
   },
   {
     title: "Course Import",
