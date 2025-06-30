@@ -91,66 +91,78 @@ const BottomNavigation = () => {
 
   const handleCameraClick = () => {
     if (!user) return;
+    console.log('Camera click - closing snap modal');
     closeSnapModal();
     
-    setTimeout(() => {
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = 'image/*,video/*';
-      input.capture = 'environment';
-      input.onchange = (e) => {
-        const target = e.target as HTMLInputElement;
-        const file = target.files?.[0];
-        if (file) {
-          console.log('Camera file selected:', file.name, file.type);
-          // Always open composer after file selection
+    // Create input for camera capture
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*,video/*';
+    input.capture = 'environment';
+    
+    input.onchange = (e) => {
+      const target = e.target as HTMLInputElement;
+      const file = target.files?.[0];
+      if (file) {
+        console.log('Camera file selected:', file.name, file.type);
+        // Ensure composer opens immediately after file selection
+        setTimeout(() => {
           openComposer(file);
-        }
-      };
-      input.click();
-    }, 100);
+        }, 100);
+      }
+    };
+    
+    input.click();
   };
 
   const handleImageClick = () => {
     if (!user) return;
+    console.log('Image click - closing snap modal');
     closeSnapModal();
     
-    setTimeout(() => {
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = 'image/*';
-      input.onchange = (e) => {
-        const target = e.target as HTMLInputElement;
-        const file = target.files?.[0];
-        if (file) {
-          console.log('Image file selected:', file.name, file.type);
-          // Always open composer after file selection
+    // Create input for image selection
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    
+    input.onchange = (e) => {
+      const target = e.target as HTMLInputElement;
+      const file = target.files?.[0];
+      if (file) {
+        console.log('Image file selected:', file.name, file.type);
+        // Ensure composer opens immediately after file selection
+        setTimeout(() => {
           openComposer(file);
-        }
-      };
-      input.click();
-    }, 100);
+        }, 100);
+      }
+    };
+    
+    input.click();
   };
 
   const handleVideoClick = () => {
     if (!user) return;
+    console.log('Video click - closing snap modal');
     closeSnapModal();
     
-    setTimeout(() => {
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = 'video/*';
-      input.onchange = (e) => {
-        const target = e.target as HTMLInputElement;
-        const file = target.files?.[0];
-        if (file) {
-          console.log('Video file selected:', file.name, file.type);
-          // Always open composer after file selection
+    // Create input for video selection
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'video/*';
+    
+    input.onchange = (e) => {
+      const target = e.target as HTMLInputElement;
+      const file = target.files?.[0];
+      if (file) {
+        console.log('Video file selected:', file.name, file.type);
+        // Ensure composer opens immediately after file selection
+        setTimeout(() => {
           openComposer(file);
-        }
-      };
-      input.click();
-    }, 100);
+        }, 100);
+      }
+    };
+    
+    input.click();
   };
 
   const handleCaptionInput = async (e: React.FormEvent<HTMLDivElement>) => {
