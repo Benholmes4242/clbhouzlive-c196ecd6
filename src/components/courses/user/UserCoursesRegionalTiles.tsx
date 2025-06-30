@@ -131,7 +131,7 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
                           }}
                         >
                           {tile.flag === 'earth' ? (
-                            <Earth className="w-8 h-6 text-blue-600 flex-shrink-0" />
+                            <Earth className="w-8 h-6 text-gray-600 flex-shrink-0" />
                           ) : (
                             <CountryFlag country={tile.country} size="lg" className="flex-shrink-0" />
                           )}
