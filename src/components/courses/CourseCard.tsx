@@ -143,7 +143,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
         </div>
         
         <CardHeader className="pb-2">
-          <h3 className="font-semibold text-lg leading-tight line-clamp-2 group-hover:text-primary transition-colors">
+          <h3 className="font-semibold text-lg leading-tight line-clamp-2 group-hover:text-[#b66b41] transition-colors">
             {course.name}
           </h3>
         </CardHeader>

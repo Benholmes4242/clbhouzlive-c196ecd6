@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { X, Earth } from 'lucide-react';
@@ -75,10 +74,10 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
         {/* All Courses Button */}
         <button
           onClick={() => onFilterChange(null)}
-          className={`text-lg font-bold whitespace-nowrap px-3 py-1.5 rounded-full transition-all duration-200 hover:scale-105 ${
+          className={`text-lg font-bold whitespace-nowrap px-3 py-1.5 rounded-full transition-all duration-200 hover:scale-105 hover:text-[#b66b41] ${
             activeFilter === null 
               ? "bg-green-100 text-green-800" 
-              : "text-foreground hover:text-foreground"
+              : "text-foreground"
           }`}
         >
           All Courses
@@ -99,10 +98,10 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
                       <TooltipTrigger asChild>
                         <button
                           onClick={() => onFilterChange(activeFilter === tile.key ? null : tile.key)}
-                          className={`flex items-center gap-2 cursor-pointer transition-all duration-200 hover:scale-105 whitespace-nowrap flex-shrink-0 px-3 py-1.5 rounded-full ${
+                          className={`flex items-center gap-2 cursor-pointer transition-all duration-200 hover:scale-105 hover:text-[#b66b41] whitespace-nowrap flex-shrink-0 px-3 py-1.5 rounded-full ${
                             activeFilter === tile.key 
                               ? 'bg-green-100 text-green-800' 
-                              : 'text-foreground hover:text-foreground'
+                              : 'text-foreground'
                           }`}
                           style={{ scrollSnapAlign: 'start' }}
                         >
@@ -138,7 +137,7 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
             variant="ghost"
             size="sm"
             onClick={() => onFilterChange(null)}
-            className="h-auto p-1 text-muted-foreground hover:text-foreground"
+            className="h-auto p-1 text-muted-foreground hover:text-[#b66b41]"
           >
             <X className="h-3 w-3" />
           </Button>

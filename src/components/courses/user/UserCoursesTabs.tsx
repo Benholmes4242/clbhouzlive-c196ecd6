@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import CourseCard from '../CourseCard';
@@ -28,8 +27,18 @@ const UserCoursesTabs: React.FC<UserCoursesTabsProps> = ({
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
       <TabsList className="grid w-full grid-cols-2">
-        <TabsTrigger value="top100">Top 100</TabsTrigger>
-        <TabsTrigger value="recent">Recent</TabsTrigger>
+        <TabsTrigger 
+          value="top100"
+          className="hover:text-[#b66b41] data-[state=active]:text-[#b66b41]"
+        >
+          Top 100
+        </TabsTrigger>
+        <TabsTrigger 
+          value="recent"
+          className="hover:text-[#b66b41] data-[state=active]:text-[#b66b41]"
+        >
+          Recent
+        </TabsTrigger>
       </TabsList>
 
       <TabsContent value="top100" className="mt-6">

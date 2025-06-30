@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -91,7 +90,7 @@ const CourseExplorer = () => {
       case 'usa':
         return 'usa';
       case 'europe':
-        return 'europe';
+        return 'europe';  
       case 'global':
         return 'global';
       default:
@@ -120,7 +119,11 @@ const CourseExplorer = () => {
           </SelectTrigger>
           <SelectContent>
             {regionOptions.map((region) => (
-              <SelectItem key={region.value} value={region.value}>
+              <SelectItem 
+                key={region.value} 
+                value={region.value}
+                className="hover:text-[#b66b41] focus:text-[#b66b41]"
+              >
                 {region.label}
               </SelectItem>
             ))}
