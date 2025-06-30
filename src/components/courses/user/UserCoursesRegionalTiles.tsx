@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { X, Earth } from 'lucide-react';
@@ -87,7 +88,7 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
         {/* Enhanced Swipeable Flag Bar */}
         <div className="flex-1 relative">
           <div 
-            className="overflow-x-auto scrollbar-hide scroll-smooth"
+            className="overflow-x-auto scroll-smooth"
             style={{
               scrollbarWidth: 'none',
               msOverflowStyle: 'none',
@@ -95,8 +96,15 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
               overscrollBehaviorX: 'contain'
             }}
           >
+            <style>
+              {`
+                .scrollbar-hide::-webkit-scrollbar {
+                  display: none;
+                }
+              `}
+            </style>
             <div 
-              className="flex items-center gap-6 pb-2 px-4"
+              className="flex items-center gap-6 pb-2 px-4 scrollbar-hide"
               style={{ 
                 scrollSnapType: 'x proximity',
                 minWidth: 'max-content'
@@ -156,18 +164,9 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
           </Button>
         </div>
       )}
-      
-      <style jsx>{`
-        .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-      `}</style>
     </div>
   );
 };
 
 export default UserCoursesRegionalTiles;
+
