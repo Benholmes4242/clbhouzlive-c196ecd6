@@ -36,7 +36,7 @@ const CourseRankBadges = ({
   if (globalRank && globalRank <= 100) {
     rankingBadges.push({
       rank: globalRank,
-      icon: <Earth className="h-4 w-4 text-blue-600" />,
+      icon: <Earth className="h-4 w-4 text-blue-600 flex-shrink-0" />,
       tooltip: "Worldwide Ranking"
     });
   }
@@ -45,19 +45,19 @@ const CourseRankBadges = ({
   if (isGBI && regionalRank && regionalRank <= 100) {
     rankingBadges.push({
       rank: regionalRank,
-      icon: <CountryFlag country="Britain & Ireland" size="md" />,
+      icon: <CountryFlag country="Britain & Ireland" size="md" className="flex-shrink-0" />,
       tooltip: "GB&I Ranking"
     });
   } else if (isUSA && usaRank && usaRank <= 100) {
     rankingBadges.push({
       rank: usaRank,
-      icon: <CountryFlag country="USA" size="md" />,
+      icon: <CountryFlag country="USA" size="md" className="flex-shrink-0" />,
       tooltip: "USA Ranking"
     });
   } else if (isEurope && regionalRank && regionalRank <= 100) {
     rankingBadges.push({
       rank: regionalRank,
-      icon: <CountryFlag country="Continental Europe" size="md" />,
+      icon: <CountryFlag country="Continental Europe" size="md" className="flex-shrink-0" />,
       tooltip: "Continental Europe Ranking"
     });
   }
@@ -76,9 +76,11 @@ const CourseRankBadges = ({
           {rankingBadges.map((badge, index) => (
             <Tooltip key={index}>
               <TooltipTrigger asChild>
-                <div className="flex items-center gap-1.5 px-2 py-1 bg-gray-100/90 backdrop-blur-sm rounded-xl shadow-sm">
-                  {badge.icon}
-                  <span className="text-sm font-bold text-gray-800">{badge.rank}</span>
+                <div className="flex items-center gap-2 px-2.5 py-1.5 bg-gray-100/90 backdrop-blur-sm rounded-xl shadow-sm min-w-[52px]">
+                  <div className="w-4 h-4 flex items-center justify-center">
+                    {badge.icon}
+                  </div>
+                  <span className="text-sm font-bold text-gray-800 leading-none">{badge.rank}</span>
                 </div>
               </TooltipTrigger>
               <TooltipContent>
@@ -94,8 +96,8 @@ const CourseRankBadges = ({
         <div className="absolute top-2 right-2">
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="flex items-center px-2 py-1 bg-teal-100/90 backdrop-blur-sm rounded-xl shadow-sm">
-                <span className="text-sm font-bold text-teal-800">{playerRatingBadge.content}</span>
+              <div className="flex items-center px-2.5 py-1.5 bg-teal-100/90 backdrop-blur-sm rounded-xl shadow-sm">
+                <span className="text-sm font-bold text-teal-800 leading-none">{playerRatingBadge.content}</span>
               </div>
             </TooltipTrigger>
             <TooltipContent>
