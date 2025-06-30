@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -342,7 +341,11 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
           />
 
           <div className="flex gap-3 pt-4 border-t">
-            <Button type="submit" disabled={saveMutation.isPending}>
+            <Button 
+              type="submit" 
+              disabled={saveMutation.isPending}
+              className="bg-[#b66b41] hover:bg-[#a55a3a] text-white"
+            >
               {saveMutation.isPending ? 'Saving...' : (isCreating ? 'Create Course' : 'Save Changes')}
             </Button>
             <Button type="button" variant="outline" onClick={onClose}>

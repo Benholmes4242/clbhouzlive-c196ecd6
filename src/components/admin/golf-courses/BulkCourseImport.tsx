@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -689,7 +688,7 @@ const BulkCourseImport: React.FC = () => {
       <Button 
         onClick={handleImport} 
         disabled={isImporting}
-        className="w-full"
+        className="w-full bg-[#b66b41] hover:bg-[#a55a3a] text-white"
       >
         {isImporting ? 'Importing...' : 'Import All Courses'}
       </Button>
