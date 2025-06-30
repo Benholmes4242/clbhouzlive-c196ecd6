@@ -106,7 +106,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
               value="friends-courses"
               className="data-[state=active]:text-foreground"
             >
-              Friend's Fairways
+              Top 100 Explorer
             </TabsTrigger>
           )}
           <TabsTrigger 
