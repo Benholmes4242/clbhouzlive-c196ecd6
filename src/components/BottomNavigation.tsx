@@ -15,6 +15,7 @@ const BottomNavigation = () => {
   const { user } = useSupabaseSession();
   const { activeTab, handleTabClick } = useNavigationHandlers();
   const { submitPost } = usePostSubmission();
+  const { handleCaptionInput, selectMention } = usePostHandlers();
   
   const {
     captionInputRef,
@@ -50,8 +51,6 @@ const BottomNavigation = () => {
     closeSnapModal,
     openComposer
   );
-
-  const { handleCaptionInput, selectMention } = usePostHandlers();
 
   const handleSubmitPost = async () => {
     if (!user) {

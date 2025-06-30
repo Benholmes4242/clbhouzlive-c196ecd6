@@ -45,38 +45,39 @@ export const useSnapModal = () => {
   const openComposer = (file: File) => {
     console.log('OpenComposer called with file:', file.name, file.type);
     
-    // Clear any existing state first
-    setSelectedFile(null);
-    setPreviewUrl('');
+    // Close snap modal first
+    setIsSnapModalOpen(false);
+    
+    // Clean previous state
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
     
     // Set new file and preview
     setSelectedFile(file);
     const url = URL.createObjectURL(file);
     setPreviewUrl(url);
     
-    // Force close snap modal immediately
-    setIsSnapModalOpen(false);
-    
-    // Force open composer with a slight delay to ensure state is clean
+    // Open composer with a small delay to ensure snap modal is closed
     setTimeout(() => {
       console.log('Opening composer modal now');
       setIsComposerOpen(true);
-    }, 50);
+    }, 100);
   };
 
   const closeComposer = () => {
     console.log('Closing composer');
     setIsComposerOpen(false);
     setSelectedFile(null);
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
     setPreviewUrl('');
     setCaption('');
     setSelectedTags([]);
     setSelectedCourse(null);
     setShowSuggestions(false);
     setIsSubmitting(false);
-    if (previewUrl) {
-      URL.revokeObjectURL(previewUrl);
-    }
   };
 
   const showConfirmationToast = (message: string) => {
