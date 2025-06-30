@@ -86,21 +86,21 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
         <TabsList className={`grid w-full ${user ? 'grid-cols-3' : 'grid-cols-2'}`}>
           <TabsTrigger 
             value="explore"
-            className="hover:text-[#b66b41] data-[state=active]:text-[#b66b41]"
+            className="data-[state=active]:text-foreground"
           >
             Explore
           </TabsTrigger>
           {user && (
             <TabsTrigger 
               value="friends-courses"
-              className="hover:text-[#b66b41] data-[state=active]:text-[#b66b41]"
+              className="data-[state=active]:text-foreground"
             >
               Friend's Fairways
             </TabsTrigger>
           )}
           <TabsTrigger 
             value="my-courses"
-            className="hover:text-[#b66b41] data-[state=active]:text-[#b66b41]"
+            className="data-[state=active]:text-foreground"
           >
             My Courses
           </TabsTrigger>
