@@ -2,7 +2,7 @@
 import React, { useState, useCallback } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { MoreHorizontal, Heart, MessageCircle, Share, Edit, Trash2 } from 'lucide-react';
+import { MoreHorizontal, Edit, Trash2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { supabase } from '@/integrations/supabase/client';
@@ -24,6 +24,8 @@ import EditPostDialog from './EditPostDialog';
 import TaggedText from './TaggedText';
 import VideoPreview from './VideoPreview';
 import CoursePostBadge from './CoursePostBadge';
+import EmojiReactions from './EmojiReactions';
+import InlineCommentPreview from './InlineCommentPreview';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { useFullscreenMedia } from '@/hooks/useFullscreenMedia';
 import { showToast } from '@/utils/toast';
@@ -67,6 +69,7 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
   const { toast } = useToast();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
   const { isOpen, currentMedia, openMedia, closeMedia } = useFullscreenMedia();
 
   const displayName = post.user.display_name || post.user.username || 'User';
@@ -75,6 +78,12 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
 
   // Find golf club tags to show as course badges
   const golfClubTags = post.post_tags?.filter(tag => tag.entity_type === 'golf_club') || [];
+
+  // Handle caption truncation
+  const shouldTruncate = post.content && post.content.length > 150;
+  const displayContent = shouldTruncate && !isExpanded 
+    ? post.content!.substring(0, 150) + '...' 
+    : post.content;
 
   const handleDeletePost = async () => {
     if (!isOwnPost || isDeleting) return;
@@ -105,9 +114,7 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
 
       if (postError) throw postError;
 
-      // Show delete toast
       showToast("Post deleted");
-
       onPostDeleted?.();
 
     } catch (error) {
@@ -126,22 +133,22 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
     openMedia(mediaUrl, mediaType);
   };
 
-  // Create carousel items from media
+  // Create carousel items from media with improved centering
   const carouselItems = post.post_media?.map((media, index) => (
-    <div key={media.id} className="w-full aspect-square">
+    <div key={media.id} className="w-full aspect-square bg-black rounded-lg overflow-hidden">
       {media.media_type === 'image' ? (
         <img
           src={media.media_url}
           alt="Post content"
-          className="w-full h-full object-cover object-center cursor-pointer"
+          className="w-full h-full object-contain cursor-pointer"
           loading="lazy"
           onClick={() => handleMediaClick(media.media_url, 'image')}
         />
       ) : (
-        <div onClick={() => handleMediaClick(media.media_url, 'video')}>
+        <div className="w-full h-full flex items-center justify-center" onClick={() => handleMediaClick(media.media_url, 'video')}>
           <VideoPreview
             src={media.media_url}
-            className="w-full h-full cursor-pointer"
+            className="w-full h-full object-contain cursor-pointer"
             videoId={`user-post-${post.id}-${index}`}
           />
         </div>
@@ -197,13 +204,6 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
           )}
         </div>
 
-        {/* Post Content with Tagged Text */}
-        {post.content && (
-          <div className="text-sm mb-3">
-            <TaggedText text={post.content} tags={post.post_tags} />
-          </div>
-        )}
-
         {/* Golf Course Badges - Show above media when golf clubs are tagged */}
         {golfClubTags.length > 0 && (
           <div className="mb-3">
@@ -213,7 +213,7 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
                 course={{
                   id: tag.entity_id,
                   name: tag.name,
-                  country: 'Scotland', // Default fallback since we don't have country in tags
+                  country: 'Scotland',
                   region: undefined
                 }}
                 className="mb-2 last:mb-0"
@@ -222,7 +222,7 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
           </div>
         )}
 
-        {/* Post Media using SwipeCarousel */}
+        {/* Post Media using SwipeCarousel with improved centering */}
         {carouselItems.length > 0 && (
           <div className="mb-3">
             <div className="rounded-lg overflow-hidden">
@@ -235,21 +235,34 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
           </div>
         )}
 
-        {/* Post Actions */}
-        <div className="flex items-center space-x-4 pt-2 border-t">
-          <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-red-500">
-            <Heart className="h-4 w-4 mr-1" />
-            Like
-          </Button>
-          <Button variant="ghost" size="sm" className="text-muted-foreground">
-            <MessageCircle className="h-4 w-4 mr-1" />
-            Comment
-          </Button>
-          <Button variant="ghost" size="sm" className="text-muted-foreground">
-            <Share className="h-4 w-4 mr-1" />
-            Share
-          </Button>
-        </div>
+        {/* Post Content with Threaded Caption */}
+        {post.content && (
+          <div className="text-sm mb-3">
+            <TaggedText text={displayContent} tags={post.post_tags} />
+            {shouldTruncate && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-muted-foreground hover:text-foreground p-0 h-auto font-normal text-sm ml-1"
+                onClick={() => setIsExpanded(!isExpanded)}
+              >
+                {isExpanded ? 'Show less' : 'Read more...'}
+              </Button>
+            )}
+          </div>
+        )}
+
+        {/* Emoji Reactions */}
+        <EmojiReactions 
+          postId={post.id}
+          onReact={(emoji) => console.log('Reacted with:', emoji, 'to post:', post.id)}
+        />
+
+        {/* Inline Comment Preview */}
+        <InlineCommentPreview 
+          postId={post.id}
+          onViewAllComments={() => console.log('View all comments for post:', post.id)}
+        />
       </div>
     </Card>
   );
