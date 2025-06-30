@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -107,14 +108,14 @@ const CourseExplorer = () => {
           placeholder="Search courses, countries, or regions..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10"
+          className="pl-10 focus:ring-[#b66b41] focus:border-[#b66b41]"
         />
       </div>
 
       {/* Region Selection */}
       <div className="flex justify-start">
         <Select value={selectedRegion} onValueChange={setSelectedRegion}>
-          <SelectTrigger className="w-[200px]">
+          <SelectTrigger className="w-[200px] focus:ring-[#b66b41] focus:border-[#b66b41]">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

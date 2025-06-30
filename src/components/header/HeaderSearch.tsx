@@ -88,7 +88,7 @@ const HeaderSearch = () => {
           <input
             type="text"
             placeholder="Search players, courses, or content..."
-            className="w-full pl-10 pr-4 py-2 bg-muted rounded-full border border-border focus:outline-none focus:ring-2 focus:ring-amber-500"
+            className="w-full pl-10 pr-4 py-2 bg-muted rounded-full border border-border focus:outline-none focus:ring-2 focus:ring-[#b66b41]"
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
@@ -128,7 +128,7 @@ const HeaderSearch = () => {
             <input
               type="text"
               placeholder="Search players, courses, or content..."
-              className="w-full pl-10 pr-4 py-2 bg-muted rounded-full border border-border focus:outline-none focus:ring-2 focus:ring-amber-500"
+              className="w-full pl-10 pr-4 py-2 bg-muted rounded-full border border-border focus:outline-none focus:ring-2 focus:ring-[#b66b41]"
               value={query}
               onChange={(e) => {
                 setQuery(e.target.value);
