@@ -30,18 +30,22 @@ export const usePostSubmission = () => {
       userId: user?.id, 
       contentLength: content?.length || 0,
       mediaCount: mediaFiles?.length || 0,
-      tagCount: selectedTags?.length || 0
+      tagCount: selectedTags?.length || 0,
+      mediaFiles: mediaFiles
     });
 
-    if (!validatePostSubmission(user, content, mediaFiles)) {
+    // Ensure mediaFiles is always an array
+    const validMediaFiles = Array.isArray(mediaFiles) ? mediaFiles : [];
+
+    if (!validatePostSubmission(user, content, validMediaFiles)) {
       console.error('Post validation failed');
       onError();
       return;
     }
 
-    // Validate files before proceeding
-    if (mediaFiles && mediaFiles.length > 0) {
-      const validationResult = validateFiles(mediaFiles);
+    // Validate files before proceeding - only if we have media files
+    if (validMediaFiles.length > 0) {
+      const validationResult = validateFiles(validMediaFiles);
       if (!validationResult.isValid) {
         console.error('File validation failed:', validationResult.error);
         showValidationError(validationResult.error!);
@@ -51,7 +55,7 @@ export const usePostSubmission = () => {
     }
 
     // Check if we have videos to show appropriate feedback
-    const hasVideoFiles = mediaFiles ? hasVideos(mediaFiles) : false;
+    const hasVideoFiles = validMediaFiles.length > 0 ? hasVideos(validMediaFiles) : false;
     
     // Show immediate upload feedback for videos
     if (hasVideoFiles) {
@@ -59,7 +63,7 @@ export const usePostSubmission = () => {
     }
 
     // Create optimistic post for immediate UI update
-    const optimisticPost = createOptimisticPost(user, content, mediaFiles || [], selectedTags || []);
+    const optimisticPost = createOptimisticPost(user, content, validMediaFiles, selectedTags || []);
     
     // Start upload process
     let createdPostId: string | null = null;
@@ -73,15 +77,15 @@ export const usePostSubmission = () => {
       console.log('Post created successfully with ID:', createdPostId);
 
       // Upload media files if any
-      if (mediaFiles && mediaFiles.length > 0) {
+      if (validMediaFiles.length > 0) {
         // Show progress for videos
         if (hasVideoFiles) {
           showVideoProcessingProgress();
         }
         
-        console.log('Starting media upload for', mediaFiles.length, 'files');
+        console.log('Starting media upload for', validMediaFiles.length, 'files');
         await uploadMediaFiles(
-          mediaFiles, 
+          validMediaFiles, 
           postData.id, 
           user.id,
           (file, error) => {
@@ -136,7 +140,7 @@ export const usePostSubmission = () => {
       
       showUploadFailedError(errorMessage, () => {
         console.log('Retrying post submission');
-        submitPost({ user, content, mediaFiles, selectedTags, onSuccess, onError });
+        submitPost({ user, content, mediaFiles: validMediaFiles, selectedTags, onSuccess, onError });
       });
 
       // Broadcast error event for UI cleanup

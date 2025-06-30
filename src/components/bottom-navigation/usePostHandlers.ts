@@ -1,5 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
+import { usePostSubmission } from '@/hooks/usePostSubmission';
 
 interface TaggableEntity {
   id: string;
@@ -17,6 +18,8 @@ interface GolfCourse {
 }
 
 export const usePostHandlers = () => {
+  const { submitPost } = usePostSubmission();
+
   const handleCaptionInput = (
     e: React.FormEvent<HTMLDivElement>,
     caption: string,
@@ -93,45 +96,42 @@ export const usePostHandlers = () => {
     setIsSubmitting: (submitting: boolean) => void,
     showConfirmationToast: (message: string) => void
   ) => {
-    if (!selectedFile || !user) return;
+    if (!user) {
+      console.error('No user found for post submission');
+      showConfirmationToast('You must be logged in to post.');
+      return;
+    }
 
     setIsSubmitting(true);
     
+    console.log('Starting post submission with:', {
+      hasFile: !!selectedFile,
+      caption,
+      tagCount: selectedTags.length,
+      course: selectedCourse?.name
+    });
+
+    // Convert single file to array for submission
+    const mediaFiles = selectedFile ? [selectedFile] : [];
+
     try {
-      // Upload file to storage
-      const fileExt = selectedFile.name.split('.').pop();
-      const fileName = `${user.id}/${Date.now()}.${fileExt}`;
-      
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('post-media')
-        .upload(fileName, selectedFile);
-
-      if (uploadError) throw uploadError;
-
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('post-media')
-        .getPublicUrl(fileName);
-
-      // Create post
-      const postData = {
-        user_id: user.id,
+      await submitPost({
+        user,
         content: caption,
-        media_url: publicUrl,
-        media_type: selectedFile.type.startsWith('video') ? 'video' : 'image',
-        golf_course_id: selectedCourse?.id || null
-      };
-
-      const { error: postError } = await supabase
-        .from('posts')
-        .insert([postData]);
-
-      if (postError) throw postError;
-
-      closeComposer();
-      showConfirmationToast('Post shared successfully!');
+        mediaFiles,
+        selectedTags,
+        onSuccess: () => {
+          console.log('Post submission successful');
+          closeComposer();
+          showConfirmationToast('Post shared successfully!');
+        },
+        onError: () => {
+          console.error('Post submission failed');
+          showConfirmationToast('Failed to share post. Please try again.');
+        }
+      });
     } catch (error) {
-      console.error('Error submitting post:', error);
+      console.error('Error in handleSubmitPost:', error);
       showConfirmationToast('Failed to share post. Please try again.');
     } finally {
       setIsSubmitting(false);
