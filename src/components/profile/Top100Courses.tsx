@@ -43,23 +43,29 @@ const Top100Courses: React.FC<Top100CoursesProps> = ({
   ];
 
   const handleRegionClick = async (regionKey: string) => {
-    if (isOwnProfile) {
-      // For own profile, go to courses page with my-courses tab
-      navigate('/courses?tab=my-courses');
-    } else {
-      // For other users, get their username and redirect to their courses page
-      const { data: userProfile } = await supabase
-        .from('user_profiles')
-        .select('username')
-        .eq('id', userId)
-        .maybeSingle();
-      
-      if (userProfile?.username) {
-        navigate(`/user/${userProfile.username}/courses`);
+    try {
+      if (isOwnProfile) {
+        // For own profile, go to courses page with my-courses tab
+        navigate('/courses?tab=my-courses');
       } else {
-        // Fallback to using user ID if no username
-        navigate(`/user/${userId}/courses`);
+        // For other users, get their username and redirect to their courses page
+        const { data: userProfile } = await supabase
+          .from('user_profiles')
+          .select('username')
+          .eq('id', userId)
+          .maybeSingle();
+        
+        if (userProfile?.username) {
+          // Navigate to the user's dedicated courses page which will show the My Courses tab by default
+          navigate(`/user/${userProfile.username}/courses`);
+        } else {
+          console.warn('No username found for user:', userId);
+          // Fallback - this shouldn't normally happen but provides a backup
+          navigate(`/user/${userId}/courses`);
+        }
       }
+    } catch (error) {
+      console.error('Error navigating to courses:', error);
     }
   };
 
