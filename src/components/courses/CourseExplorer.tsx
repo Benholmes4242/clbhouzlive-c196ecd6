@@ -9,7 +9,7 @@ import CourseCard from './CourseCard';
 import { Skeleton } from '@/components/ui/skeleton';
 
 const CourseExplorer = () => {
-  const [selectedRegion, setSelectedRegion] = useState<string>('britain-ireland');
+  const [selectedRegion, setSelectedRegion] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
 
   // Fetch courses based on selected region using correct filtering logic
@@ -20,7 +20,10 @@ const CourseExplorer = () => {
         .from('golf_courses')
         .select('*');
 
-      if (selectedRegion === 'britain-ireland') {
+      if (selectedRegion === 'all') {
+        // Show all courses in randomized order
+        query = query.order('random()');
+      } else if (selectedRegion === 'britain-ireland') {
         // Show courses where primary country is "Britain & Ireland" and have regional rank
         query = query
           .eq('country', 'Britain & Ireland')
@@ -38,7 +41,7 @@ const CourseExplorer = () => {
           .eq('country', 'Continental Europe')
           .not('regional_rank', 'is', null)
           .order('regional_rank', { ascending: true });
-      } else {
+      } else if (selectedRegion === 'global') {
         // Global - show all courses with global ranks
         query = query
           .not('global_rank', 'is', null)
@@ -71,6 +74,7 @@ const CourseExplorer = () => {
   );
 
   const regionOptions = [
+    { value: 'all', label: 'All Courses' },
     { value: 'britain-ireland', label: 'Britain & Ireland' },
     { value: 'usa', label: 'United States' },
     { value: 'europe', label: 'Continental Europe' },
