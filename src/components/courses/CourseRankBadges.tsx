@@ -37,7 +37,8 @@ const CourseRankBadges = ({
     rankingBadges.push({
       rank: globalRank,
       icon: <Earth className="h-4 w-4 text-blue-600 flex-shrink-0" />,
-      tooltip: "Worldwide Ranking"
+      tooltip: "Worldwide Ranking",
+      isGlobal: true
     });
   }
 
@@ -46,19 +47,22 @@ const CourseRankBadges = ({
     rankingBadges.push({
       rank: regionalRank,
       icon: <CountryFlag country="Britain & Ireland" size="md" className="flex-shrink-0" />,
-      tooltip: "GB&I Ranking"
+      tooltip: "GB&I Ranking",
+      isGlobal: false
     });
   } else if (isUSA && usaRank && usaRank <= 100) {
     rankingBadges.push({
       rank: usaRank,
       icon: <CountryFlag country="USA" size="md" className="flex-shrink-0" />,
-      tooltip: "USA Ranking"
+      tooltip: "USA Ranking",
+      isGlobal: false
     });
   } else if (isEurope && regionalRank && regionalRank <= 100) {
     rankingBadges.push({
       rank: regionalRank,
       icon: <CountryFlag country="Continental Europe" size="md" className="flex-shrink-0" />,
-      tooltip: "Continental Europe Ranking"
+      tooltip: "Continental Europe Ranking",
+      isGlobal: false
     });
   }
 
@@ -76,7 +80,7 @@ const CourseRankBadges = ({
           {rankingBadges.map((badge, index) => (
             <Tooltip key={index}>
               <TooltipTrigger asChild>
-                <div className="flex items-center gap-2 px-2.5 py-1.5 bg-gray-100/90 backdrop-blur-sm rounded-xl shadow-sm min-w-[52px]">
+                <div className={`flex items-center px-2.5 py-1.5 bg-gray-100/90 backdrop-blur-sm rounded-xl shadow-sm min-w-[52px] ${badge.isGlobal ? 'gap-3' : 'gap-2'}`}>
                   <div className="w-4 h-4 flex items-center justify-center">
                     {badge.icon}
                   </div>
