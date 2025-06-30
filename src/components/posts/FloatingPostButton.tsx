@@ -13,6 +13,8 @@ const FloatingPostButton = () => {
   const handleDirectUpload = (user: any) => {
     if (!user) return;
     
+    console.log('Direct upload triggered');
+    
     // Create input for file selection
     const input = document.createElement('input');
     input.type = 'file';
@@ -22,8 +24,10 @@ const FloatingPostButton = () => {
       const target = e.target as HTMLInputElement;
       const file = target.files?.[0];
       if (file) {
-        console.log('File selected:', file.name, file.type);
-        openComposer(file);
+        console.log('File selected via direct upload:', file.name, file.type);
+        setTimeout(() => {
+          openComposer(file);
+        }, 100);
       }
     };
     
@@ -32,6 +36,7 @@ const FloatingPostButton = () => {
 
   const handleCameraClick = (user: any, setShowNativeSheet: (show: boolean) => void) => {
     if (!user) return;
+    console.log('Camera click triggered');
     setShowNativeSheet(false);
     
     // Create input for camera capture
@@ -45,7 +50,9 @@ const FloatingPostButton = () => {
       const file = target.files?.[0];
       if (file) {
         console.log('Camera file selected:', file.name, file.type);
-        openComposer(file);
+        setTimeout(() => {
+          openComposer(file);
+        }, 100);
       }
     };
     
@@ -54,6 +61,7 @@ const FloatingPostButton = () => {
 
   const handleLibraryClick = (user: any, setShowNativeSheet: (show: boolean) => void) => {
     if (!user) return;
+    console.log('Library click triggered');
     setShowNativeSheet(false);
     
     // Create input for library selection
@@ -66,7 +74,9 @@ const FloatingPostButton = () => {
       const file = target.files?.[0];
       if (file) {
         console.log('Library file selected:', file.name, file.type);
-        openComposer(file);
+        setTimeout(() => {
+          openComposer(file);
+        }, 100);
       }
     };
     
@@ -75,12 +85,14 @@ const FloatingPostButton = () => {
 
   const handleFileClick = (user: any, setShowNativeSheet: (show: boolean) => void) => {
     if (!user) return;
+    console.log('File click triggered');
     setShowNativeSheet(false);
     handleDirectUpload(user);
   };
 
   const handleButtonClick = () => {
     if (!user) return;
+    console.log('Floating button clicked');
     // Directly trigger file picker and open composer
     handleDirectUpload(user);
   };

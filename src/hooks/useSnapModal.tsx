@@ -33,10 +33,12 @@ export const useSnapModal = () => {
   const [selectedCourse, setSelectedCourse] = useState<GolfCourse | null>(null);
 
   const openSnapModal = () => {
+    console.log('Opening snap modal');
     setIsSnapModalOpen(true);
   };
 
   const closeSnapModal = () => {
+    console.log('Closing snap modal');
     setIsSnapModalOpen(false);
   };
 
@@ -46,7 +48,12 @@ export const useSnapModal = () => {
     const url = URL.createObjectURL(file);
     setPreviewUrl(url);
     setIsSnapModalOpen(false);
-    setIsComposerOpen(true);
+    
+    // Use a timeout to ensure the snap modal is fully closed before opening composer
+    setTimeout(() => {
+      console.log('Setting composer open state to true');
+      setIsComposerOpen(true);
+    }, 100);
   };
 
   const closeComposer = () => {

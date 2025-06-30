@@ -18,8 +18,9 @@ export const useMediaHandlers = (closeSnapModal: () => void, openComposer: (file
         console.log('Camera file selected:', file.name, file.type);
         // Ensure composer opens immediately after file selection
         setTimeout(() => {
+          console.log('Opening composer for camera file');
           openComposer(file);
-        }, 100);
+        }, 200);
       }
     };
     
@@ -43,8 +44,9 @@ export const useMediaHandlers = (closeSnapModal: () => void, openComposer: (file
         console.log('Image file selected:', file.name, file.type);
         // Ensure composer opens immediately after file selection
         setTimeout(() => {
+          console.log('Opening composer for image file');
           openComposer(file);
-        }, 100);
+        }, 200);
       }
     };
     
@@ -68,8 +70,9 @@ export const useMediaHandlers = (closeSnapModal: () => void, openComposer: (file
         console.log('Video file selected:', file.name, file.type);
         // Ensure composer opens immediately after file selection
         setTimeout(() => {
+          console.log('Opening composer for video file');
           openComposer(file);
-        }, 100);
+        }, 200);
       }
     };
     
