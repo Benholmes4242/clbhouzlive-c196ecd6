@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import CourseExplorer from './CourseExplorer';
 import MyCourses from './MyCourses';
 import FriendsCourses from './FriendsCourses';
+import UserCoursesContent from './UserCoursesContent';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Button } from '@/components/ui/button';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
@@ -105,9 +106,14 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
         )}
 
         <TabsContent value="my-courses" className="mt-6">
-          {user ? (
+          {username ? (
+            // Viewing another user's courses
+            <UserCoursesContent username={username} />
+          ) : user ? (
+            // Viewing own courses
             <MyCourses />
           ) : (
+            // Not logged in
             <Card>
               <CardContent className="p-8 text-center">
                 <User className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
