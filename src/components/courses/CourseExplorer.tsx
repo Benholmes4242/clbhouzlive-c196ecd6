@@ -108,7 +108,7 @@ const CourseExplorer = () => {
           placeholder="Search courses, countries, or regions..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="pl-10 border-input focus-visible:ring-[#b66b41] focus-visible:border-[#b66b41]"
+          className="pl-10 border-border focus-visible:ring-0 focus-visible:ring-offset-0 focus-visible:border-[#b66b41]"
         />
       </div>
 
