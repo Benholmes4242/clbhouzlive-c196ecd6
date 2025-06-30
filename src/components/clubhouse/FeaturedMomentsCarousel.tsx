@@ -1,12 +1,11 @@
 
 import React from 'react';
-import { Clock, ChevronRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
-import VideoPreview from '@/components/posts/VideoPreview';
+import { Card, CardContent } from '@/components/ui/card';
+import { SwipeCarousel } from '@/components/ui/swipe-carousel';
+import { MapPin, Heart, TrendingUp } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 
-interface UserPost {
+interface ClubhousePost {
   id: string;
   content: string | null;
   created_at: string;
@@ -17,11 +16,19 @@ interface UserPost {
     profile_photo_url: string | null;
     user_type: 'individual' | 'club' | 'pro_shop' | 'academy' | 'tour_event' | 'other' | null;
     business_name: string | null;
+    eg_handicap_index?: number | null;
   };
   post_media: {
     id: string;
     media_type: 'image' | 'video';
     media_url: string;
+  }[];
+  post_tags: {
+    id: string;
+    entity_type: 'user' | 'golf_club' | 'business';
+    entity_id: string;
+    name: string;
+    username: string | null;
   }[];
   stats?: {
     likes: number;
@@ -31,140 +38,116 @@ interface UserPost {
 }
 
 interface FeaturedMomentsCarouselProps {
-  userPosts?: UserPost[];
-  loading?: boolean;
+  userPosts: ClubhousePost[];
+  loading: boolean;
 }
 
-const FeaturedMomentsCarousel = ({ userPosts = [], loading = false }: FeaturedMomentsCarouselProps) => {
-  // Filter for video posts and limit to show variety
-  const videoMoments = userPosts
-    .filter(post => post.post_media.some(media => media.media_type === 'video'))
-    .slice(0, 12) // Show up to 12 videos for good variety
-    .map(post => {
-      const videoMedia = post.post_media.find(media => media.media_type === 'video');
-      const displayName = post.user.display_name || post.user.business_name || post.user.username || 'User';
-      const username = post.user.username || `user_${post.user.id.slice(0, 8)}`;
-      
-      // Generate title from content or use fallback
-      const title = post.content 
-        ? post.content.length > 60 
-          ? post.content.substring(0, 60) + '...' 
-          : post.content
-        : 'Golf moment';
-      
-      return {
-        id: post.id,
-        title,
-        user: username,
-        displayName,
-        timeAgo: formatDistanceToNow(new Date(post.created_at), { addSuffix: true }),
-        videoUrl: videoMedia!.media_url,
-        type: 'video' as const,
-        duration: '0:30', // Default duration - could be enhanced with actual video duration
-        userGenerated: true,
-        userProfile: post.user,
-        stats: post.stats
-      };
-    });
-
+const FeaturedMomentsCarousel: React.FC<FeaturedMomentsCarouselProps> = ({ 
+  userPosts, 
+  loading 
+}) => {
   if (loading) {
     return (
       <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold">Featured Moments</h2>
+        <div className="flex items-center gap-2 mb-4">
+          <TrendingUp className="h-5 w-5 text-[#b66b41]" />
+          <h2 className="text-xl font-bold">Featured Moments</h2>
         </div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="flex gap-4 overflow-hidden">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="space-y-2">
-              <div className="bg-muted rounded-lg aspect-square animate-pulse" />
-              <div className="bg-muted rounded h-4 animate-pulse" />
-              <div className="bg-muted rounded h-3 w-3/4 animate-pulse" />
-            </div>
+            <div key={i} className="min-w-[280px] h-64 bg-gray-200 rounded-xl animate-pulse" />
           ))}
         </div>
       </div>
     );
   }
 
-  if (videoMoments.length === 0) {
-    return (
-      <div className="mb-8">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-semibold">Featured Moments</h2>
-        </div>
-        <div className="text-center py-8 text-muted-foreground">
-          <p>No video content available yet.</p>
-          <p className="text-sm mt-1">Be the first to share your golf moments!</p>
-        </div>
-      </div>
-    );
+  // Sort posts by likes and get top featured ones
+  const featuredPosts = userPosts
+    .filter(post => post.post_media.length > 0)
+    .sort((a, b) => (b.stats?.likes || 0) - (a.stats?.likes || 0))
+    .slice(0, 8);
+
+  if (featuredPosts.length === 0) {
+    return null;
   }
+
+  const carouselItems = featuredPosts.map((post) => {
+    const displayName = post.user.display_name || post.user.username || 'Golf Enthusiast';
+    const timeAgo = formatDistanceToNow(new Date(post.created_at), { addSuffix: true });
+    const golfClub = post.post_tags.find(tag => tag.entity_type === 'golf_club');
+    const thumbnail = post.post_media[0]?.media_url;
+
+    return (
+      <Card key={post.id} className="min-w-[280px] group cursor-pointer hover:shadow-lg transition-all duration-300">
+        <CardContent className="p-0">
+          <div className="relative">
+            <img
+              src={thumbnail}
+              alt="Featured moment"
+              className="w-full h-48 object-cover rounded-t-lg group-hover:scale-105 transition-transform duration-300"
+            />
+            
+            {/* Overlay with post info */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent rounded-t-lg" />
+            
+            <div className="absolute bottom-4 left-4 right-4 text-white">
+              <div className="flex items-center gap-2 mb-2">
+                <img
+                  src={post.user.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face'}
+                  alt={displayName}
+                  className="w-8 h-8 rounded-full object-cover border-2 border-white/50"
+                />
+                <div>
+                  <p className="font-semibold text-sm">{displayName}</p>
+                  <p className="text-xs text-white/80">{timeAgo}</p>
+                </div>
+              </div>
+              
+              {golfClub && (
+                <div className="flex items-center gap-1 text-xs text-white/90 mb-1">
+                  <MapPin className="h-3 w-3" />
+                  <span>{golfClub.name}</span>
+                </div>
+              )}
+              
+              <div className="flex items-center gap-3 text-xs">
+                <div className="flex items-center gap-1">
+                  <Heart className="h-3 w-3 fill-current text-red-400" />
+                  <span>{post.stats?.likes || 0}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span>💬</span>
+                  <span>{post.stats?.comments || 0}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="p-4">
+            <p className="text-sm text-muted-foreground line-clamp-2">
+              {post.content || 'Amazing golf moment shared with the community!'}
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  });
 
   return (
     <div className="mb-8">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold">Featured Moments</h2>
-        <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-          View All <ChevronRight className="h-4 w-4 ml-1" />
-        </Button>
+      <div className="flex items-center gap-2 mb-4">
+        <TrendingUp className="h-5 w-5 text-[#b66b41]" />
+        <h2 className="text-xl font-bold">Featured Moments</h2>
+        <span className="text-sm text-muted-foreground">Community Highlights</span>
       </div>
-      <Carousel className="w-full">
-        <CarouselContent className="-ml-2 md:-ml-4">
-          {videoMoments.map((moment) => (
-            <CarouselItem key={moment.id} className="pl-2 md:pl-4 basis-full sm:basis-1/2 lg:basis-1/3">
-              <div className="cursor-pointer group space-y-3">
-                {/* Thumbnail Container - Square aspect ratio for better consistency */}
-                <div className="relative rounded-lg overflow-hidden bg-black aspect-square">
-                  <VideoPreview
-                    src={moment.videoUrl}
-                    videoId={`featured-${moment.id}`}
-                    className="w-full h-full object-cover object-center"
-                  />
-                  
-                  {/* Duration badge */}
-                  <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-1.5 py-0.5 rounded text-center font-medium">
-                    {moment.duration}
-                  </div>
-
-                  {/* View count overlay if available */}
-                  {moment.stats && moment.stats.views > 0 && (
-                    <div className="absolute top-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded-full">
-                      {moment.stats.views} views
-                    </div>
-                  )}
-                </div>
-                
-                {/* Content below thumbnail */}
-                <div className="space-y-1">
-                  {moment.title && (
-                    <h3 className="text-sm font-medium line-clamp-2 leading-snug">
-                      {moment.title}
-                    </h3>
-                  )}
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <span>@{moment.user}</span>
-                    <span>•</span>
-                    <div className="flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      <span>{moment.timeAgo}</span>
-                    </div>
-                  </div>
-                  
-                  {/* Engagement stats */}
-                  {moment.stats && (
-                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                      <span>{moment.stats.likes} likes</span>
-                      <span>{moment.stats.comments} comments</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </CarouselItem>
-          ))}
-        </CarouselContent>
-        <CarouselPrevious className="hidden sm:flex" />
-        <CarouselNext className="hidden sm:flex" />
-      </Carousel>
+      
+      <SwipeCarousel
+        items={carouselItems}
+        showDots={false}
+        showArrows={true}
+        className="px-1"
+      />
     </div>
   );
 };
