@@ -73,6 +73,17 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
     return "Top 100 Courses. One Epic Checklist.";
   };
 
+  // Dynamic tab label for "My Courses" tab
+  const getMyCoursesTabLabel = () => {
+    if (isOwnProfile) {
+      return "My Courses";
+    } else {
+      const firstName = displayName?.split(' ')[0] || displayName || 'User';
+      // Handle proper apostrophe formatting (even for names ending in 's')
+      return `${firstName}'s Courses`;
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="text-center">
@@ -102,7 +113,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
             value="my-courses"
             className="data-[state=active]:text-foreground"
           >
-            My Courses
+            {getMyCoursesTabLabel()}
           </TabsTrigger>
         </TabsList>
 
