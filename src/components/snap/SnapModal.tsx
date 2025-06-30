@@ -25,7 +25,7 @@ const SnapModal = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-sm mx-auto rounded-2xl">
-        <DialogTitle className="text-center text-lg font-semibold mb-6">
+        <DialogTitle className="text-center text-lg font-semibold mb-4">
           Capture a Moment
         </DialogTitle>
         <DialogDescription className="sr-only">
@@ -36,11 +36,11 @@ const SnapModal = ({
           {isMobile && (
             <Button
               onClick={onCameraClick}
-              className="w-full flex items-center gap-4 justify-start h-16 bg-white border-2 border-[#ff6b00] hover:bg-orange-50 text-gray-900 rounded-xl transition-colors duration-200"
+              className="w-full flex items-center gap-4 justify-start h-16 bg-white border-2 border-[#b66b41] hover:bg-orange-50 text-gray-900 rounded-xl transition-colors duration-200"
               variant="outline"
             >
               <div className="w-12 h-12 flex items-center justify-center bg-orange-50 rounded-lg">
-                <Camera className="h-6 w-6 text-[#ff6b00]" />
+                <Camera className="h-6 w-6 text-[#b66b41]" />
               </div>
               <div className="text-left">
                 <div className="font-semibold text-base">Capture Photo or Video</div>
@@ -51,11 +51,11 @@ const SnapModal = ({
           
           <Button
             onClick={onVideoClick}
-            className="w-full flex items-center gap-4 justify-start h-16 bg-white border-2 border-[#ff6b00] hover:bg-orange-50 text-gray-900 rounded-xl transition-colors duration-200"
+            className="w-full flex items-center gap-4 justify-start h-16 bg-white border-2 border-[#b66b41] hover:bg-orange-50 text-gray-900 rounded-xl transition-colors duration-200"
             variant="outline"
           >
             <div className="w-12 h-12 flex items-center justify-center bg-orange-50 rounded-lg">
-              <Video className="h-6 w-6 text-[#ff6b00]" />
+              <Video className="h-6 w-6 text-[#b66b41]" />
             </div>
             <div className="text-left">
               <div className="font-semibold text-base">Post a Video</div>
@@ -65,11 +65,11 @@ const SnapModal = ({
           
           <Button
             onClick={onImageClick}
-            className="w-full flex items-center gap-4 justify-start h-16 bg-white border-2 border-[#ff6b00] hover:bg-orange-50 text-gray-900 rounded-xl transition-colors duration-200"
+            className="w-full flex items-center gap-4 justify-start h-16 bg-white border-2 border-[#b66b41] hover:bg-orange-50 text-gray-900 rounded-xl transition-colors duration-200"
             variant="outline"
           >
             <div className="w-12 h-12 flex items-center justify-center bg-orange-50 rounded-lg">
-              <Image className="h-6 w-6 text-[#ff6b00]" />
+              <Image className="h-6 w-6 text-[#b66b41]" />
             </div>
             <div className="text-left">
               <div className="font-semibold text-base">Post a Photo</div>
