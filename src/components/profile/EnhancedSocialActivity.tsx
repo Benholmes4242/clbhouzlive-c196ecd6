@@ -28,7 +28,7 @@ const EnhancedSocialActivity: React.FC<EnhancedSocialActivityProps> = ({
   const regularPosts = posts.slice(2);
 
   const getContentTypeIcon = (post: ActivityPost) => {
-    const hasVideo = post.media.some(m => m.media_type === 'video');
+    const hasVideo = post.post_media.some(m => m.media_type === 'video');
     return hasVideo ? <Play className="h-4 w-4" /> : <ImageIcon className="h-4 w-4" />;
   };
 
@@ -100,9 +100,9 @@ const EnhancedSocialActivity: React.FC<EnhancedSocialActivityProps> = ({
                   {pinnedPosts.map((post) => (
                     <div key={`pinned-${post.id}`} className="relative group cursor-pointer">
                       <div className="aspect-square relative overflow-hidden rounded-lg border-2 border-[#b66b41]/30">
-                        {post.media[0] && (
+                        {post.post_media[0] && (
                           <img
-                            src={post.media[0].media_url}
+                            src={post.post_media[0].media_url}
                             alt="Pinned post"
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                           />
@@ -139,9 +139,9 @@ const EnhancedSocialActivity: React.FC<EnhancedSocialActivityProps> = ({
                     {regularPosts.map((post) => (
                       <div key={post.id} className="aspect-square relative group cursor-pointer">
                         <div className="w-full h-full overflow-hidden rounded-lg">
-                          {post.media[0] && (
+                          {post.post_media[0] && (
                             <img
-                              src={post.media[0].media_url}
+                              src={post.post_media[0].media_url}
                               alt="Post"
                               className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                             />
@@ -160,9 +160,9 @@ const EnhancedSocialActivity: React.FC<EnhancedSocialActivityProps> = ({
                     {regularPosts.map((post) => (
                       <div key={post.id} className="flex gap-3 p-3 bg-gray-50 rounded-lg">
                         <div className="w-16 h-16 flex-shrink-0">
-                          {post.media[0] && (
+                          {post.post_media[0] && (
                             <img
-                              src={post.media[0].media_url}
+                              src={post.post_media[0].media_url}
                               alt="Post"
                               className="w-full h-full object-cover rounded-lg"
                             />
