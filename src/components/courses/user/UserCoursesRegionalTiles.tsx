@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
+import { X, Globe } from 'lucide-react';
 import CountryFlag from '@/components/ui/country-flag';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -49,7 +49,7 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
       key: 'global',
       label: 'Top 100 Worldwide Played',
       country: 'Worldwide',
-      flag: '🌍',
+      flag: 'globe',
       progress: regionProgress['global'] || { played: 0, total: 100 }
     }
   ];
@@ -57,7 +57,7 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
   if (isLoading) {
     return (
       <div className="mb-8">
-        <div className="flex items-center gap-4 overflow-x-auto pb-2">
+        <div className="flex justify-evenly items-center gap-4 overflow-x-auto pb-2">
           {[1, 2, 3, 4].map((i) => (
             <div key={i} className="flex items-center gap-2 animate-pulse">
               <div className="w-6 h-4 bg-gray-200 rounded"></div>
@@ -71,15 +71,15 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
 
   return (
     <div className="mb-8">
-      <div className="flex items-center gap-4 mb-4">
+      <div className="flex items-center gap-6 mb-4">
         {/* All Courses Button */}
         <Button
           variant={activeFilter === null ? "default" : "ghost"}
           size="sm"
           onClick={() => onFilterChange(null)}
-          className={`text-sm font-medium ${
+          className={`text-sm font-medium whitespace-nowrap ${
             activeFilter === null 
-              ? "bg-primary text-primary-foreground" 
+              ? "bg-green-100 text-green-800 hover:bg-green-200" 
               : "text-muted-foreground hover:text-foreground"
           }`}
         >
@@ -87,39 +87,33 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
         </Button>
 
         {/* Draggable Flag Bar */}
-        <div className="relative flex-1">
+        <div className="flex-1 relative">
           {/* Gradient overlays for draggable hint */}
-          <div className="absolute left-0 top-0 bottom-0 w-4 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none opacity-50" />
-          <div className="absolute right-0 top-0 bottom-0 w-4 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none opacity-50" />
+          <div className="absolute left-0 top-0 bottom-0 w-4 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none opacity-50 md:hidden" />
+          <div className="absolute right-0 top-0 bottom-0 w-4 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none opacity-50 md:hidden" />
           
-          <div className="overflow-x-auto scrollbar-hide">
-            <div className="flex items-center gap-6 pb-2" style={{ scrollSnapType: 'x mandatory' }}>
+          <div className="overflow-x-auto scrollbar-hide md:overflow-visible">
+            <div className="flex md:justify-evenly items-center gap-6 md:gap-4 pb-2" style={{ scrollSnapType: 'x mandatory' }}>
               <TooltipProvider>
                 {tiles.map((tile) => {
-                  const percentage = tile.progress.total > 0 ? Math.round((tile.progress.played / tile.progress.total) * 100) : 0;
-                  
                   return (
                     <Tooltip key={tile.key}>
                       <TooltipTrigger asChild>
                         <button
                           onClick={() => onFilterChange(activeFilter === tile.key ? null : tile.key)}
-                          className={`flex items-center gap-2 cursor-pointer transition-all duration-200 hover:scale-105 whitespace-nowrap ${
+                          className={`flex items-center gap-2 cursor-pointer transition-all duration-200 hover:scale-105 whitespace-nowrap flex-shrink-0 ${
                             activeFilter === tile.key ? 'opacity-100' : 'opacity-70 hover:opacity-100'
                           }`}
                           style={{ scrollSnapAlign: 'start' }}
                         >
-                          <CountryFlag country={tile.country} size="lg" />
+                          {tile.flag === 'globe' ? (
+                            <Globe className="w-8 h-6 text-blue-600" />
+                          ) : (
+                            <CountryFlag country={tile.country} size="lg" />
+                          )}
                           <span className="text-lg font-bold">
                             {tile.progress.played} / {tile.progress.total}
                           </span>
-                          
-                          {/* Optional: Progress bar beneath the count */}
-                          <div className="absolute -bottom-1 left-0 right-0 h-1 bg-gray-200 rounded-full overflow-hidden">
-                            <div 
-                              className="h-full bg-green-600 rounded-full transition-all duration-300"
-                              style={{ width: `${percentage}%` }}
-                            />
-                          </div>
                         </button>
                       </TooltipTrigger>
                       <TooltipContent>
