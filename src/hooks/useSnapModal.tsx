@@ -43,17 +43,25 @@ export const useSnapModal = () => {
   };
 
   const openComposer = (file: File) => {
-    console.log('Opening composer with file:', file.name, file.type);
+    console.log('OpenComposer called with file:', file.name, file.type);
+    
+    // Clear any existing state first
+    setSelectedFile(null);
+    setPreviewUrl('');
+    
+    // Set new file and preview
     setSelectedFile(file);
     const url = URL.createObjectURL(file);
     setPreviewUrl(url);
+    
+    // Force close snap modal immediately
     setIsSnapModalOpen(false);
     
-    // Use a timeout to ensure the snap modal is fully closed before opening composer
+    // Force open composer with a slight delay to ensure state is clean
     setTimeout(() => {
-      console.log('Setting composer open state to true');
+      console.log('Opening composer modal now');
       setIsComposerOpen(true);
-    }, 100);
+    }, 50);
   };
 
   const closeComposer = () => {

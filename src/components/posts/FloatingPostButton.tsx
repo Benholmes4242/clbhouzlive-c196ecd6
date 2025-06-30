@@ -25,9 +25,8 @@ const FloatingPostButton = () => {
       const file = target.files?.[0];
       if (file) {
         console.log('File selected via direct upload:', file.name, file.type);
-        setTimeout(() => {
-          openComposer(file);
-        }, 100);
+        // Open composer immediately without delay
+        openComposer(file);
       }
     };
     
@@ -36,65 +35,70 @@ const FloatingPostButton = () => {
 
   const handleCameraClick = (user: any, setShowNativeSheet: (show: boolean) => void) => {
     if (!user) return;
-    console.log('Camera click triggered');
+    console.log('Camera click triggered - closing sheet');
     setShowNativeSheet(false);
     
-    // Create input for camera capture
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*,video/*';
-    input.capture = 'environment';
-    
-    input.onchange = (e) => {
-      const target = e.target as HTMLInputElement;
-      const file = target.files?.[0];
-      if (file) {
-        console.log('Camera file selected:', file.name, file.type);
-        setTimeout(() => {
+    // Small delay to ensure sheet closes first
+    setTimeout(() => {
+      // Create input for camera capture
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*,video/*';
+      input.capture = 'environment';
+      
+      input.onchange = (e) => {
+        const target = e.target as HTMLInputElement;
+        const file = target.files?.[0];
+        if (file) {
+          console.log('Camera file selected:', file.name, file.type);
           openComposer(file);
-        }, 100);
-      }
-    };
-    
-    input.click();
+        }
+      };
+      
+      input.click();
+    }, 100);
   };
 
   const handleLibraryClick = (user: any, setShowNativeSheet: (show: boolean) => void) => {
     if (!user) return;
-    console.log('Library click triggered');
+    console.log('Library click triggered - closing sheet');
     setShowNativeSheet(false);
     
-    // Create input for library selection
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*,video/*';
-    
-    input.onchange = (e) => {
-      const target = e.target as HTMLInputElement;
-      const file = target.files?.[0];
-      if (file) {
-        console.log('Library file selected:', file.name, file.type);
-        setTimeout(() => {
+    // Small delay to ensure sheet closes first
+    setTimeout(() => {
+      // Create input for library selection
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*,video/*';
+      
+      input.onchange = (e) => {
+        const target = e.target as HTMLInputElement;
+        const file = target.files?.[0];
+        if (file) {
+          console.log('Library file selected:', file.name, file.type);
           openComposer(file);
-        }, 100);
-      }
-    };
-    
-    input.click();
+        }
+      };
+      
+      input.click();
+    }, 100);
   };
 
   const handleFileClick = (user: any, setShowNativeSheet: (show: boolean) => void) => {
     if (!user) return;
     console.log('File click triggered');
     setShowNativeSheet(false);
-    handleDirectUpload(user);
+    
+    // Small delay then trigger direct upload
+    setTimeout(() => {
+      handleDirectUpload(user);
+    }, 100);
   };
 
   const handleButtonClick = () => {
     if (!user) return;
-    console.log('Floating button clicked');
-    // Directly trigger file picker and open composer
-    handleDirectUpload(user);
+    console.log('Floating button clicked - showing native sheet');
+    setShowNativeSheet(true);
   };
 
   if (!user) return null;
