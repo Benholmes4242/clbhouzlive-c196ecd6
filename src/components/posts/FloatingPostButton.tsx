@@ -3,14 +3,81 @@ import React, { useState } from 'react';
 import { Camera } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useSnapModal } from '@/hooks/useSnapModal';
-import { useCameraHandlers } from '@/components/bottom-navigation/useCameraHandlers';
 import NativeCameraSheet from './NativeCameraSheet';
 
 const FloatingPostButton = () => {
   const { user } = useSupabaseSession();
   const { openComposer } = useSnapModal();
-  const { handleDirectUpload, handleCameraClick, handleLibraryClick, handleFileClick } = useCameraHandlers();
   const [showNativeSheet, setShowNativeSheet] = useState(false);
+
+  const handleDirectUpload = (user: any) => {
+    if (!user) return;
+    
+    // Create input for file selection
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*,video/*';
+    
+    input.onchange = (e) => {
+      const target = e.target as HTMLInputElement;
+      const file = target.files?.[0];
+      if (file) {
+        console.log('File selected:', file.name, file.type);
+        openComposer(file);
+      }
+    };
+    
+    input.click();
+  };
+
+  const handleCameraClick = (user: any, setShowNativeSheet: (show: boolean) => void) => {
+    if (!user) return;
+    setShowNativeSheet(false);
+    
+    // Create input for camera capture
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*,video/*';
+    input.capture = 'environment';
+    
+    input.onchange = (e) => {
+      const target = e.target as HTMLInputElement;
+      const file = target.files?.[0];
+      if (file) {
+        console.log('Camera file selected:', file.name, file.type);
+        openComposer(file);
+      }
+    };
+    
+    input.click();
+  };
+
+  const handleLibraryClick = (user: any, setShowNativeSheet: (show: boolean) => void) => {
+    if (!user) return;
+    setShowNativeSheet(false);
+    
+    // Create input for library selection
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*,video/*';
+    
+    input.onchange = (e) => {
+      const target = e.target as HTMLInputElement;
+      const file = target.files?.[0];
+      if (file) {
+        console.log('Library file selected:', file.name, file.type);
+        openComposer(file);
+      }
+    };
+    
+    input.click();
+  };
+
+  const handleFileClick = (user: any, setShowNativeSheet: (show: boolean) => void) => {
+    if (!user) return;
+    setShowNativeSheet(false);
+    handleDirectUpload(user);
+  };
 
   const handleButtonClick = () => {
     if (!user) return;
