@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { X, Earth } from 'lucide-react';
@@ -74,7 +75,7 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
         {/* All Courses Button */}
         <button
           onClick={() => onFilterChange(null)}
-          className={`text-lg font-bold whitespace-nowrap px-3 py-1.5 rounded-full transition-all duration-200 hover:scale-105 hover:text-[#b66b41] ${
+          className={`text-lg font-bold whitespace-nowrap px-3 py-1.5 rounded-full transition-all duration-200 hover:scale-105 hover:text-[#b66b41] flex-shrink-0 ${
             activeFilter === null 
               ? "bg-green-100 text-green-800" 
               : "text-foreground"
@@ -83,16 +84,26 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
           All Courses
         </button>
 
-        {/* Draggable Flag Bar */}
+        {/* Enhanced Swipeable Flag Bar */}
         <div className="flex-1 relative">
-          {/* Gradient overlays for draggable hint */}
-          <div className="absolute left-0 top-0 bottom-0 w-4 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none opacity-50 md:hidden" />
-          <div className="absolute right-0 top-0 bottom-0 w-4 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none opacity-50 md:hidden" />
-          
-          <div className="overflow-x-auto scrollbar-hide md:overflow-visible">
-            <div className="flex md:justify-evenly items-center gap-6 md:gap-4 pb-2" style={{ scrollSnapType: 'x mandatory' }}>
+          <div 
+            className="overflow-x-auto scrollbar-hide scroll-smooth"
+            style={{
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+              WebkitOverflowScrolling: 'touch',
+              overscrollBehaviorX: 'contain'
+            }}
+          >
+            <div 
+              className="flex items-center gap-6 pb-2 px-4"
+              style={{ 
+                scrollSnapType: 'x proximity',
+                minWidth: 'max-content'
+              }}
+            >
               <TooltipProvider>
-                {tiles.map((tile) => {
+                {tiles.map((tile, index) => {
                   return (
                     <Tooltip key={tile.key}>
                       <TooltipTrigger asChild>
@@ -103,12 +114,14 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
                               ? 'bg-green-100 text-green-800' 
                               : 'text-foreground'
                           }`}
-                          style={{ scrollSnapAlign: 'start' }}
+                          style={{ 
+                            scrollSnapAlign: index === 0 ? 'start' : index === tiles.length - 1 ? 'end' : 'center'
+                          }}
                         >
                           {tile.flag === 'earth' ? (
-                            <Earth className="w-8 h-6 text-blue-600" />
+                            <Earth className="w-8 h-6 text-blue-600 flex-shrink-0" />
                           ) : (
-                            <CountryFlag country={tile.country} size="lg" />
+                            <CountryFlag country={tile.country} size="lg" className="flex-shrink-0" />
                           )}
                           <span className="text-lg font-bold">
                             {tile.progress.played} / {tile.progress.total}
@@ -143,6 +156,16 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
           </Button>
         </div>
       )}
+      
+      <style jsx>{`
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
     </div>
   );
 };
