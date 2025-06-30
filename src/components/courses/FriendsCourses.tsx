@@ -1,110 +1,59 @@
-import React, { useState } from 'react';
-import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+
+import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import FriendSelector from './friends/FriendSelector';
-import FriendStatistics from './friends/FriendStatistics';
-import FriendCourseTabs from './friends/FriendCourseTabs';
-import EmptyFriendsState from './friends/EmptyFriendsState';
-import { useFriendData } from './friends/useFriendData';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Compass, Users, Globe } from 'lucide-react';
 
 const FriendsCourses = () => {
-  const { user } = useSupabaseSession();
   const navigate = useNavigate();
-  const [selectedFriendId, setSelectedFriendId] = useState<string>('');
-  const [activeTab, setActiveTab] = useState('top100');
-
-  console.log('FriendsCourses: Rendering with user:', user?.id);
-
-  const {
-    friends,
-    isLoadingFriends,
-    friendPlayedCourses,
-    friendTop100Courses,
-    isLoadingTop100,
-    friendAverageRating
-  } = useFriendData(user?.id, selectedFriendId);
-
-  console.log('FriendsCourses: Data from useFriendData:', {
-    friends: friends.length,
-    isLoadingFriends,
-    selectedFriendId
-  });
-
-  const selectedFriend = friends.find(f => f.friend_id === selectedFriendId);
-  const friendName = selectedFriend?.user_profiles?.display_name || selectedFriend?.user_profiles?.username || 'Friend';
-  const friendUsername = selectedFriend?.user_profiles?.username;
-
-  // Calculate statistics
-  const totalTop100Played = friendTop100Courses.length;
-
-  // Filter recent courses to only include those played within the last 30 days
-  const thirtyDaysAgo = new Date();
-  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-  const recentCourses = [...friendPlayedCourses, ...friendTop100Courses]
-    .filter((userCourse) => {
-      if (!userCourse.played_date) return false;
-      const playedDate = new Date(userCourse.played_date);
-      return playedDate >= thirtyDaysAgo;
-    })
-    .sort((a, b) => new Date(b.played_date || 0).getTime() - new Date(a.played_date || 0).getTime())
-    .slice(0, 6);
-
-  const handleAverageRatingClick = () => {
-    if (selectedFriendId) {
-      // Use username if available, otherwise use the friend's ID
-      const identifier = friendUsername || selectedFriendId;
-      const paramName = friendUsername ? 'user' : 'userId';
-      console.log('Navigating to friend ratings:', identifier, 'using param:', paramName);
-      navigate(`/my-ratings?${paramName}=${identifier}`);
-    }
-  };
-
-  if (isLoadingFriends) {
-    console.log('FriendsCourses: Still loading friends...');
-    return (
-      <div className="text-center py-8">
-        <div className="text-muted-foreground">Loading your friends...</div>
-      </div>
-    );
-  }
-
-  if (friends.length === 0) {
-    console.log('FriendsCourses: No friends found, showing empty state');
-    return <EmptyFriendsState />;
-  }
-
-  console.log('FriendsCourses: Rendering with friends:', friends.length);
 
   return (
     <div className="space-y-6">
-      <FriendSelector
-        friends={friends}
-        selectedFriendId={selectedFriendId}
-        onFriendSelect={setSelectedFriendId}
-      />
+      <Card className="bg-gradient-to-r from-[#b66b41]/10 to-green-50 border-[#b66b41]/20">
+        <CardContent className="p-8 text-center">
+          <div className="max-w-2xl mx-auto">
+            <Compass className="h-16 w-16 text-[#b66b41] mx-auto mb-4" />
+            
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              Welcome to Top 100 Explorer!
+            </h2>
+            
+            <p className="text-gray-600 mb-6 leading-relaxed">
+              We've redesigned this page into a comprehensive discovery experience. 
+              Explore Top 100 courses played by your friends and the entire Clbhouz community, 
+              see user-generated content, and discover your next golfing destination.
+            </p>
 
-      {selectedFriendId && (
-        <>
-          <FriendStatistics
-            friendName={friendName}
-            friendUsername={friendUsername}
-            totalTop100Played={totalTop100Played}
-            averageRating={friendAverageRating}
-            onAverageRatingClick={handleAverageRatingClick}
-          />
+            <div className="grid md:grid-cols-3 gap-4 mb-8">
+              <div className="bg-white p-4 rounded-lg border">
+                <Users className="h-8 w-8 text-[#b66b41] mb-2" />
+                <h3 className="font-semibold mb-1">Friends Activity</h3>
+                <p className="text-sm text-gray-600">See what Top 100 courses your friends have played</p>
+              </div>
+              
+              <div className="bg-white p-4 rounded-lg border">
+                <Globe className="h-8 w-8 text-[#b66b41] mb-2" />
+                <h3 className="font-semibold mb-1">Community Feed</h3>
+                <p className="text-sm text-gray-600">Discover courses through user photos and videos</p>
+              </div>
+              
+              <div className="bg-white p-4 rounded-lg border">
+                <Compass className="h-8 w-8 text-[#b66b41] mb-2" />
+                <h3 className="font-semibold mb-1">Interactive Filters</h3>
+                <p className="text-sm text-gray-600">Filter by region, search courses, and explore maps</p>
+              </div>
+            </div>
 
-          <FriendCourseTabs
-            friendName={friendName}
-            selectedFriendId={selectedFriendId}
-            activeTab={activeTab}
-            onTabChange={setActiveTab}
-            friendTop100Courses={friendTop100Courses}
-            recentCourses={recentCourses}
-            isLoadingTop100={isLoadingTop100}
-          />
-        </>
-      )}
+            <Button 
+              onClick={() => navigate('/top100-explorer')}
+              className="bg-[#b66b41] hover:bg-[#9a5a37] text-white px-8 py-3 text-lg"
+            >
+              Launch Top 100 Explorer
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

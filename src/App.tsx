@@ -1,4 +1,3 @@
-
 import React, { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -25,6 +24,7 @@ const NotificationsPage = lazy(() => import("./pages/NotificationsPage"));
 const FriendsPage = lazy(() => import("./pages/FriendsPage"));
 const FollowersPage = lazy(() => import("./pages/FollowersPage"));
 const FollowingPage = lazy(() => import("./pages/FollowingPage"));
+const Top100Explorer = lazy(() => import("./pages/Top100Explorer"));
 const AdminSetupPage = lazy(() => import("./pages/AdminSetupPage"));
 const AdminPage = lazy(() => import("./pages/AdminPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -75,6 +75,7 @@ const App: React.FC = () => {
                 <Route path="/friends" element={<FriendsPage />} />
                 <Route path="/followers" element={<FollowersPage />} />
                 <Route path="/following" element={<FollowingPage />} />
+                <Route path="/top100-explorer" element={<Top100Explorer />} />
                 <Route path="/admin-setup" element={<AdminSetupPage />} />
                 <Route path="/admin" element={<AdminPage />} />
                 <Route path="*" element={<NotFound />} />
