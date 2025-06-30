@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -57,7 +56,7 @@ const SnapComposerModal = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md mx-auto">
         <DialogTitle className="text-center text-lg font-semibold">
-          Create Snap
+          Create a Moment
         </DialogTitle>
         <DialogDescription className="sr-only">
           Add caption and post your snap
