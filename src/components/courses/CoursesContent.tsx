@@ -20,7 +20,12 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const location = useLocation();
-  const [activeTab, setActiveTab] = useState('explore');
+  
+  // Default to 'my-courses' if username is provided (viewing another user's courses)
+  const [activeTab, setActiveTab] = useState(() => {
+    if (username) return 'my-courses';
+    return 'explore';
+  });
 
   // Check if we're on a user courses page
   const isUserCoursesPage = location.pathname.includes('/user/') && location.pathname.includes('/courses');
@@ -31,8 +36,11 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
     const tabParam = searchParams.get('tab');
     if (tabParam && (tabParam === 'explore' || tabParam === 'friends-courses' || tabParam === 'my-courses')) {
       setActiveTab(tabParam);
+    } else if (username) {
+      // Default to my-courses for user profile pages
+      setActiveTab('my-courses');
     }
-  }, [searchParams]);
+  }, [searchParams, username]);
 
   const handleTabChange = (value: string) => {
     if (!user && (value === 'my-courses' || value === 'friends-courses')) {
