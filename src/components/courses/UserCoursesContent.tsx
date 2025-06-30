@@ -35,7 +35,7 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({ username }) => 
     queryFn: async () => {
       if (!targetUserId) return [];
 
-      // Get courses from user_top100_courses table (no rating column here)
+      // Get courses from user_top100_courses table
       const { data: top100Data, error: top100Error } = await supabase
         .from('user_top100_courses')
         .select(`
@@ -87,17 +87,35 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({ username }) => 
       const combinedCourses = [
         ...(top100Data || []).map(course => ({
           ...course,
-          rating: null // Add rating field for consistency
+          rating: null, // Add rating field for consistency
+          id: `top100-${course.course_id}` // Unique ID for deduplication
         })),
-        ...(ratedData || [])
+        ...(ratedData || []).map(course => ({
+          ...course,
+          played_date: course.created_at, // Use rating date as played date
+          id: `rating-${course.course_id}` // Unique ID for deduplication
+        }))
       ];
 
-      // Remove duplicates based on course_id
-      const uniqueCourses = combinedCourses.filter((course, index, self) => 
-        index === self.findIndex(c => c.course_id === course.course_id)
-      );
+      // Remove duplicates based on course_id, preferring rated courses over top100 courses
+      const uniqueCoursesMap = new Map();
+      
+      combinedCourses.forEach(course => {
+        const courseId = course.course_id;
+        const existing = uniqueCoursesMap.get(courseId);
+        
+        if (!existing) {
+          uniqueCoursesMap.set(courseId, course);
+        } else {
+          // Prefer courses with ratings over those without
+          if (course.rating !== null && course.rating !== undefined && 
+              (existing.rating === null || existing.rating === undefined)) {
+            uniqueCoursesMap.set(courseId, course);
+          }
+        }
+      });
 
-      return uniqueCourses;
+      return Array.from(uniqueCoursesMap.values());
     },
     enabled: !!targetUserId,
   });
@@ -105,7 +123,8 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({ username }) => 
   // Filter courses based on active filter
   const filteredCourses = useMemo(() => {
     if (!activeFilter) {
-      return top100CoursesRaw;
+      // When no filter is active, show all played courses (not just top100CoursesRaw)
+      return allPlayedCourses;
     }
 
     // Use the combined played courses data for filtering
@@ -126,7 +145,7 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({ username }) => 
           return true;
       }
     });
-  }, [top100CoursesRaw, allPlayedCourses, activeFilter]);
+  }, [allPlayedCourses, activeFilter]);
 
   return (
     <div className="space-y-8">
@@ -149,7 +168,7 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({ username }) => 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredCourses.map((userCourse) => (
               <CourseCard 
-                key={userCourse.id || userCourse.course_id} 
+                key={userCourse.id} 
                 course={userCourse.golf_courses}
                 viewingUserId={targetUserId}
                 showPlayedButton={isOwnProfile}
