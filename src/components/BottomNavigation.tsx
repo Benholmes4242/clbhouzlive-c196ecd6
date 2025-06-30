@@ -1,14 +1,13 @@
 
 import React from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useSnapModal } from '@/hooks/useSnapModal';
+import { usePostFlow } from '@/hooks/usePostFlow';
 import { usePostSubmission } from '@/hooks/usePostSubmission';
-import SnapModal from '@/components/snap/SnapModal';
-import SnapComposerModal from '@/components/snap/SnapComposerModal';
+import GalleryPicker from '@/components/post/GalleryPicker';
+import CreateMomentModal from '@/components/post/CreateMomentModal';
 import SnapToast from '@/components/snap/SnapToast';
 import NavigationBar from './bottom-navigation/NavigationBar';
 import { useNavigationHandlers } from './bottom-navigation/useNavigationHandlers';
-import { useMediaHandlers } from './bottom-navigation/useMediaHandlers';
 import { usePostHandlers } from './bottom-navigation/usePostHandlers';
 
 const BottomNavigation = () => {
@@ -19,7 +18,7 @@ const BottomNavigation = () => {
   
   const {
     captionInputRef,
-    isSnapModalOpen,
+    isGalleryOpen,
     isComposerOpen,
     selectedFile,
     previewUrl,
@@ -39,18 +38,13 @@ const BottomNavigation = () => {
     toastMessage,
     selectedCourse,
     setSelectedCourse,
-    openSnapModal,
-    closeSnapModal,
+    openGallery,
+    closeGallery,
     openComposer,
     closeComposer,
     showConfirmationToast,
     hideToast
-  } = useSnapModal();
-
-  const { handleCameraClick, handleImageClick, handleVideoClick } = useMediaHandlers(
-    closeSnapModal,
-    openComposer
-  );
+  } = usePostFlow();
 
   const handleSubmitPost = async () => {
     if (!user) {
@@ -96,7 +90,12 @@ const BottomNavigation = () => {
   };
 
   const onTabClick = (tab: { id: string; path: string | null; isAction?: boolean }) => {
-    handleTabClick(tab, user, openSnapModal);
+    if (tab.isAction && tab.id === 'post') {
+      if (!user) return;
+      openGallery();
+    } else {
+      handleTabClick(tab, user, () => {});
+    }
   };
 
   const onCaptionInput = (e: React.FormEvent<HTMLDivElement>) => {
@@ -132,15 +131,13 @@ const BottomNavigation = () => {
         onTabClick={onTabClick}
       />
 
-      <SnapModal
-        isOpen={isSnapModalOpen}
-        onClose={closeSnapModal}
-        onCameraClick={() => handleCameraClick(user)}
-        onImageClick={() => handleImageClick(user)}
-        onVideoClick={() => handleVideoClick(user)}
+      <GalleryPicker
+        isOpen={isGalleryOpen}
+        onClose={closeGallery}
+        onFileSelected={openComposer}
       />
 
-      <SnapComposerModal
+      <CreateMomentModal
         isOpen={isComposerOpen}
         onClose={closeComposer}
         selectedFile={selectedFile}
