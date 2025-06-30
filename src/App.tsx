@@ -1,3 +1,4 @@
+
 import React, { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -18,7 +19,6 @@ const UserCoursesPage = lazy(() => import("./pages/UserCoursesPage"));
 const MyRatings = lazy(() => import("./pages/MyRatings"));
 const News = lazy(() => import("./pages/News"));
 const TourCentral = lazy(() => import("./pages/TourCentral"));
-const ClubhouseFeed = lazy(() => import("./pages/ClubhouseFeed"));
 const MessagesPage = lazy(() => import("./pages/MessagesPage"));
 const NotificationsPage = lazy(() => import("./pages/NotificationsPage"));
 const FriendsPage = lazy(() => import("./pages/FriendsPage"));
@@ -69,7 +69,6 @@ const App: React.FC = () => {
                 <Route path="/my-ratings" element={<MyRatings />} />
                 <Route path="/news" element={<News />} />
                 <Route path="/tour-central" element={<TourCentral />} />
-                <Route path="/clubhouse" element={<ClubhouseFeed />} />
                 <Route path="/messages" element={<MessagesPage />} />
                 <Route path="/notifications" element={<NotificationsPage />} />
                 <Route path="/friends" element={<FriendsPage />} />
