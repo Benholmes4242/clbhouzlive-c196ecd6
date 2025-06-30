@@ -36,7 +36,7 @@ const CourseRankBadges = ({
   if (globalRank && globalRank <= 100) {
     rankingBadges.push({
       rank: globalRank,
-      icon: <Earth className="h-5 w-5 text-blue-600" />,
+      icon: <Earth className="h-5 w-5 text-gray-600" />,
       tooltip: "Worldwide Ranking"
     });
   }
