@@ -57,6 +57,7 @@ const Top100Courses: React.FC<Top100CoursesProps> = ({
       if (userProfile?.username) {
         navigate(`/user/${userProfile.username}/courses`);
       } else {
+        // Fallback to using user ID if no username
         navigate(`/user/${userId}/courses`);
       }
     }
