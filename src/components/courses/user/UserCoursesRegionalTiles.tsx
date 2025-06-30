@@ -78,7 +78,7 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
           className={`text-lg font-bold whitespace-nowrap px-3 py-1.5 rounded-full transition-all duration-200 hover:scale-105 ${
             activeFilter === null 
               ? "bg-green-100 text-green-800" 
-              : "text-muted-foreground hover:text-foreground"
+              : "text-foreground hover:text-foreground"
           }`}
         >
           All Courses
