@@ -21,43 +21,24 @@ const CountryFlag: React.FC<CountryFlagProps> = ({
     lg: 'w-8 h-6'
   };
 
-  // Using flag emoji as fallback if react-flag-kit doesn't work
-  const flagEmojis: Record<string, string> = {
-    'US': '🇺🇸',
-    'GB': '🇬🇧',
-    'IE': '🇮🇪',
-    'FR': '🇫🇷',
-    'DE': '🇩🇪',
-    'ES': '🇪🇸',
-    'IT': '🇮🇹',
-    'PT': '🇵🇹',
-    'NL': '🇳🇱',
-    'BE': '🇧🇪',
-    'CH': '🇨🇭',
-    'AT': '🇦🇹',
-    'DK': '🇩🇰',
-    'SE': '🇸🇪',
-    'NO': '🇳🇴',
-    'FI': '🇫🇮',
-    'AU': '🇦🇺',
-    'NZ': '🇳🇿',
-    'ZA': '🇿🇦',
-    'JP': '🇯🇵',
-    'CA': '🇨🇦',
-    'MX': '🇲🇽',
-    'BR': '🇧🇷',
-    'AR': '🇦🇷',
-    'CL': '🇨🇱',
-    'EU': '🇪🇺'
+  // Use flag-icons CSS library approach with inline SVG data
+  const getFlagImageUrl = (code: string) => {
+    // Using flag-icons.css approach - we'll use SVG flags from a CDN
+    return `https://flagicons.lipis.dev/flags/4x3/${code.toLowerCase()}.svg`;
   };
 
   return (
-    <span 
-      className={`inline-block ${sizeClasses[size]} ${className}`}
+    <img
+      src={getFlagImageUrl(flagCode)}
+      alt={`${country} flag`}
+      className={`inline-block ${sizeClasses[size]} ${className} rounded-sm object-cover border border-gray-200`}
       title={country}
-    >
-      {flagEmojis[flagCode] || '🏳️'}
-    </span>
+      onError={(e) => {
+        // Fallback to a default flag if the image fails to load
+        const target = e.target as HTMLImageElement;
+        target.src = `https://flagicons.lipis.dev/flags/4x3/gb.svg`;
+      }}
+    />
   );
 };
 
