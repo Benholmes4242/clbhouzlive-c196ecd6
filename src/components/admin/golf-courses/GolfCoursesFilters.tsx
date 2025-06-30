@@ -27,12 +27,12 @@ const GolfCoursesFilters: React.FC<GolfCoursesFiltersProps> = ({
             placeholder="Search golf courses by name or country..."
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="pl-10"
+            className="pl-10 focus:ring-[#b66b41] focus:border-[#b66b41]"
           />
         </div>
       </div>
       <Select value={selectedRegion} onValueChange={onRegionChange}>
-        <SelectTrigger className="w-full sm:w-48">
+        <SelectTrigger className="w-full sm:w-48 focus:ring-[#b66b41] focus:border-[#b66b41]">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
