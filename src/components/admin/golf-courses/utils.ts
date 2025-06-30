@@ -15,13 +15,14 @@ export const filterCoursesByRegion = (
     filtered = filtered.filter(course => {
       switch (selectedRegion) {
         case 'britain-ireland':
-          return course.country === 'United Kingdom' || course.country === 'Ireland';
-        case 'europe':
-          return course.continent === 'Europe' && course.country !== 'United Kingdom' && course.country !== 'Ireland';
+          return course.country === 'Britain & Ireland';
         case 'usa':
-          return course.country === 'United States';
+          return course.country === 'USA';
+        case 'europe':
+          return course.country === 'Continental Europe';
         case 'worldwide':
-          return course.continent !== 'Europe' && course.country !== 'United States';
+          // Show courses with global_rank or courses from worldwide regions
+          return course.global_rank !== null || course.country === 'Worldwide';
         default:
           return true;
       }
@@ -32,7 +33,8 @@ export const filterCoursesByRegion = (
   if (searchTerm) {
     filtered = filtered.filter(course =>
       course.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      course.country.toLowerCase().includes(searchTerm.toLowerCase())
+      course.country.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (course.region && course.region.toLowerCase().includes(searchTerm.toLowerCase()))
     );
   }
 
