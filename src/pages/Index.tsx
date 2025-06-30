@@ -1,13 +1,9 @@
 
-import React, { useEffect, useState } from 'react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import React, { useEffect } from 'react';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
 import StoryBar from '@/components/StoryBar';
-import ClubhouseFeedControls from '@/components/clubhouse/ClubhouseFeedControls';
-import FeaturedMomentsCarousel from '@/components/clubhouse/FeaturedMomentsCarousel';
-import EnhancedPostsFeed from '@/components/clubhouse/EnhancedPostsFeed';
-import { useClubhouseContent } from '@/hooks/useClubhouseContent';
+import TrendingFeed from '@/components/TrendingFeed';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
@@ -16,10 +12,6 @@ import { removeDuplicatePosts } from '@/utils/postCleanup';
 const Index = () => {
   const { user, loading } = useSupabaseSession();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('feed');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [feedFilter, setFeedFilter] = useState<'trending' | 'friends' | 'videos' | 'photos' | 'courses' | 'all'>('all');
-  const { posts, loading: postsLoading } = useClubhouseContent();
 
   // Clean up duplicate posts when user is loaded
   useEffect(() => {
@@ -78,64 +70,18 @@ const Index = () => {
     );
   }
 
-  // Show authenticated user content - this is the main Clubhouse feed
+  // Show authenticated user content - this is the main feed
   return (
     <div className="min-h-screen bg-background">
       <Header />
       <StoryBar />
       
-      <div className="container mx-auto px-4 py-6 pb-20">
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-center">Clubhouse</h1>
-          <p className="text-muted-foreground text-center mt-2">
-            Your premium golf community experience
-          </p>
+      <main className="container mx-auto px-4 py-6">
+        <div className="max-w-2xl mx-auto">
+          <TrendingFeed />
         </div>
-
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="feed">Feed</TabsTrigger>
-            <TabsTrigger value="events">Events</TabsTrigger>
-            <TabsTrigger value="community">Community</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="feed" className="space-y-6 mt-6">
-            <ClubhouseFeedControls 
-              searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
-              feedFilter={feedFilter}
-              setFeedFilter={setFeedFilter}
-            />
-            
-            <FeaturedMomentsCarousel userPosts={posts} loading={postsLoading} />
-            
-            <EnhancedPostsFeed 
-              posts={posts} 
-              loading={postsLoading} 
-              filter={feedFilter}
-            />
-          </TabsContent>
-
-          <TabsContent value="events" className="mt-6">
-            <div className="bg-card rounded-lg p-6 shadow-sm border">
-              <h2 className="text-xl font-semibold mb-4">Upcoming Events</h2>
-              <p className="text-muted-foreground">
-                Premium events and tournaments will be displayed here.
-              </p>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="community" className="mt-6">
-            <div className="bg-card rounded-lg p-6 shadow-sm border">
-              <h2 className="text-xl font-semibold mb-4">Community Features</h2>
-              <p className="text-muted-foreground">
-                Member discussions and exclusive content coming soon.
-              </p>
-            </div>
-          </TabsContent>
-        </Tabs>
-      </div>
-
+      </main>
+      
       <BottomNavigation />
     </div>
   );

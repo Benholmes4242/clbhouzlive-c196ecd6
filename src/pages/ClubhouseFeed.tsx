@@ -4,14 +4,15 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
 import ClubhouseFeedControls from '@/components/clubhouse/ClubhouseFeedControls';
+import CourseHighlightsCarousel from '@/components/clubhouse/CourseHighlightsCarousel';
+import ClubSpotlightCarousel from '@/components/clubhouse/ClubSpotlightCarousel';
 import FeaturedMomentsCarousel from '@/components/clubhouse/FeaturedMomentsCarousel';
-import EnhancedPostsFeed from '@/components/clubhouse/EnhancedPostsFeed';
+import TopPlayerContentCarousel from '@/components/clubhouse/TopPlayerContentCarousel';
 import { useClubhouseContent } from '@/hooks/useClubhouseContent';
 
 const ClubhouseFeed = () => {
   const [activeTab, setActiveTab] = useState('feed');
   const [searchQuery, setSearchQuery] = useState('');
-  const [feedFilter, setFeedFilter] = useState<'trending' | 'friends' | 'videos' | 'photos' | 'courses' | 'all'>('all');
   const { posts, loading } = useClubhouseContent();
 
   return (
@@ -37,17 +38,12 @@ const ClubhouseFeed = () => {
             <ClubhouseFeedControls 
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
-              feedFilter={feedFilter}
-              setFeedFilter={setFeedFilter}
             />
             
             <FeaturedMomentsCarousel userPosts={posts} loading={loading} />
-            
-            <EnhancedPostsFeed 
-              posts={posts} 
-              loading={loading} 
-              filter={feedFilter}
-            />
+            <TopPlayerContentCarousel userPosts={posts} loading={loading} />
+            <CourseHighlightsCarousel />
+            <ClubSpotlightCarousel />
           </TabsContent>
 
           <TabsContent value="events" className="mt-6">
