@@ -3,6 +3,7 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
+import CountryFlag from '@/components/ui/country-flag';
 
 interface RegionalProgress {
   played: number;
@@ -26,21 +27,25 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
     {
       key: 'britain-ireland',
       label: 'Top 100 GB&I Played',
+      country: 'Britain & Ireland',
       progress: regionProgress['britain-ireland'] || { played: 0, total: 100 }
     },
     {
       key: 'europe',
       label: 'Top 100 Continental Europe Played',
+      country: 'Continental Europe',
       progress: regionProgress['europe'] || { played: 0, total: 100 }
     },
     {
       key: 'usa',
       label: 'Top 100 USA Played',
+      country: 'USA',
       progress: regionProgress['usa'] || { played: 0, total: 100 }
     },
     {
       key: 'global',
       label: 'Top 100 Worldwide Played',
+      country: 'Worldwide',
       progress: regionProgress['global'] || { played: 0, total: 100 }
     }
   ];
@@ -74,8 +79,11 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
             onClick={() => onFilterChange(activeFilter === tile.key ? null : tile.key)}
           >
             <CardContent className="p-4 text-center">
-              <div className="text-sm text-muted-foreground mb-1">
-                {tile.label}
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <CountryFlag country={tile.country} size="sm" />
+                <div className="text-sm text-muted-foreground">
+                  {tile.label}
+                </div>
               </div>
               <div className="text-2xl font-bold">
                 {tile.progress.played} / {tile.progress.total}
