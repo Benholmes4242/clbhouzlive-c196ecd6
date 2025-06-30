@@ -1,6 +1,9 @@
 
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
+import { Earth } from 'lucide-react';
+import CountryFlag from '@/components/ui/country-flag';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface CourseRankBadgesProps {
   globalRank: number | null;
@@ -26,92 +29,82 @@ const CourseRankBadges = ({
   const isUSA = ['United States', 'USA'].includes(country);
   const isEurope = country === 'Continental Europe';
 
-  // Determine regional rank display
-  const getRegionalRankBadge = () => {
-    if (isGBI && regionalRank && regionalRank <= 100) {
-      return (
-        <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-300">
-          {regionalRank} GB&I
-        </Badge>
-      );
-    }
-    
-    if (isUSA && usaRank && usaRank <= 100) {
-      return (
-        <Badge variant="secondary" className="bg-red-100 text-red-800 border-red-300">
-          {usaRank} USA
-        </Badge>
-      );
-    }
-    
-    if (isEurope && regionalRank && regionalRank <= 100) {
-      return (
-        <Badge variant="secondary" className="bg-blue-100 text-blue-800 border-blue-300">
-          {regionalRank} Continental Europe
-        </Badge>
-      );
-    }
-    
-    return null;
-  };
+  // Create array of ranking badges to display
+  const rankingBadges = [];
 
-  // Determine worldwide rank display
-  const getWorldwideRankBadge = () => {
-    if (globalRank && globalRank <= 100) {
-      return (
-        <Badge variant="secondary" className="bg-yellow-100 text-yellow-800 border-yellow-300">
-          {globalRank} Worldwide
-        </Badge>
-      );
-    }
-    return null;
-  };
+  // Add worldwide ranking first (highest priority)
+  if (globalRank && globalRank <= 100) {
+    rankingBadges.push({
+      rank: globalRank,
+      icon: <Earth className="h-4 w-4 text-blue-600" />,
+      tooltip: "Worldwide Ranking"
+    });
+  }
 
-  // Player rating badge
-  const getPlayerRatingBadge = () => {
-    if (showUserRating && userRating !== null && userRating !== undefined) {
-      return (
-        <Badge variant="secondary" className="bg-teal-100 text-teal-800 border-teal-300">
-          {userRating}/10
-        </Badge>
-      );
-    }
-    return null;
-  };
+  // Add regional ranking second
+  if (isGBI && regionalRank && regionalRank <= 100) {
+    rankingBadges.push({
+      rank: regionalRank,
+      icon: <CountryFlag country="Britain & Ireland" size="md" />,
+      tooltip: "GB&I Ranking"
+    });
+  } else if (isUSA && usaRank && usaRank <= 100) {
+    rankingBadges.push({
+      rank: usaRank,
+      icon: <CountryFlag country="USA" size="md" />,
+      tooltip: "USA Ranking"
+    });
+  } else if (isEurope && regionalRank && regionalRank <= 100) {
+    rankingBadges.push({
+      rank: regionalRank,
+      icon: <CountryFlag country="Continental Europe" size="md" />,
+      tooltip: "Continental Europe Ranking"
+    });
+  }
 
-  const regionalBadge = getRegionalRankBadge();
-  const worldwideBadge = getWorldwideRankBadge();
-  const playerRatingBadge = getPlayerRatingBadge();
+  // Player rating badge (separate from rankings)
+  const playerRatingBadge = showUserRating && userRating !== null && userRating !== undefined ? {
+    content: `${userRating}/10`,
+    tooltip: "Your Rating"
+  } : null;
 
   return (
-    <>
-      {/* Left side: Worldwide and Regional rankings */}
-      {worldwideBadge ? (
-        <>
-          <div className="absolute top-2 left-2">
-            {worldwideBadge}
-          </div>
-          {regionalBadge && (
-            <div className="absolute top-10 left-2">
-              {regionalBadge}
-            </div>
-          )}
-        </>
-      ) : (
-        regionalBadge && (
-          <div className="absolute top-2 left-2">
-            {regionalBadge}
-          </div>
-        )
+    <TooltipProvider>
+      {/* Left side: Ranking badges (stacked vertically) */}
+      {rankingBadges.length > 0 && (
+        <div className="absolute top-2 left-2 flex flex-col gap-1">
+          {rankingBadges.map((badge, index) => (
+            <Tooltip key={index}>
+              <TooltipTrigger asChild>
+                <div className="flex items-center gap-1.5 px-2 py-1 bg-gray-100/90 backdrop-blur-sm rounded-xl shadow-sm">
+                  <span className="text-sm font-bold text-gray-800">{badge.rank}</span>
+                  {badge.icon}
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{badge.tooltip}</p>
+              </TooltipContent>
+            </Tooltip>
+          ))}
+        </div>
       )}
 
       {/* Right side: Player rating badge */}
       {playerRatingBadge && (
         <div className="absolute top-2 right-2">
-          {playerRatingBadge}
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center px-2 py-1 bg-teal-100/90 backdrop-blur-sm rounded-xl shadow-sm">
+                <span className="text-sm font-bold text-teal-800">{playerRatingBadge.content}</span>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{playerRatingBadge.tooltip}</p>
+            </TooltipContent>
+          </Tooltip>
         </div>
       )}
-    </>
+    </TooltipProvider>
   );
 };
 
