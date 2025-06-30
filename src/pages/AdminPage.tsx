@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from "@/components/Header";
@@ -50,7 +49,12 @@ const AdminPage = () => {
       <div className="min-h-screen bg-background">
         <Header />
         <div className="container mx-auto px-4 py-8">
-          <AdminLoading />
+          <div className="flex items-center justify-center">
+            <div 
+              className="animate-spin rounded-full h-8 w-8 border-b-2"
+              style={{ borderBottomColor: '#b66b41' }}
+            ></div>
+          </div>
         </div>
       </div>
     );

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from "@/components/Header";
@@ -35,7 +34,13 @@ const Settings = () => {
       <div className="min-h-screen bg-background">
         <Header />
         <div className="flex items-center justify-center min-h-[60vh]">
-          <span className="text-muted-foreground text-base">Loading...</span>
+          <div className="text-center">
+            <div 
+              className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4"
+              style={{ borderBottomColor: '#b66b41' }}
+            ></div>
+            <span className="text-muted-foreground text-base">Loading...</span>
+          </div>
         </div>
         <BottomNavigation />
       </div>
