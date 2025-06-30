@@ -85,50 +85,31 @@ const HeaderNavigation = () => {
     try {
       console.log('Starting logout process...');
       
-      // Clear any localStorage items that might contain user data
-      const keysToRemove = [];
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key && (key.includes('supabase') || key.includes('user') || key.includes('auth'))) {
-          keysToRemove.push(key);
-        }
-      }
-      keysToRemove.forEach(key => localStorage.removeKey(key));
-      
-      // Clear sessionStorage as well
-      const sessionKeysToRemove = [];
-      for (let i = 0; i < sessionStorage.length; i++) {
-        const key = sessionStorage.key(i);
-        if (key && (key.includes('supabase') || key.includes('user') || key.includes('auth'))) {
-          sessionKeysToRemove.push(key);
-        }
-      }
-      sessionKeysToRemove.forEach(key => sessionStorage.removeItem(key));
-      
-      // Sign out from Supabase
+      // Sign out from Supabase first
       const { error } = await supabase.auth.signOut();
       if (error) {
         console.error('Error during Supabase logout:', error);
+        // Continue with logout process even if Supabase logout fails
       } else {
         console.log('Supabase logout successful');
       }
       
-      // Force navigation to landing page
-      console.log('Redirecting to landing page...');
-      navigate('/', { replace: true });
+      // Clear any cached data in localStorage and sessionStorage
+      try {
+        localStorage.clear();
+        sessionStorage.clear();
+      } catch (storageError) {
+        console.warn('Error clearing storage:', storageError);
+      }
       
-      // Force page reload to ensure complete state reset
-      setTimeout(() => {
-        window.location.href = '/';
-      }, 100);
+      // Force navigation to landing page and reload
+      console.log('Redirecting to landing page...');
+      window.location.href = '/';
       
     } catch (error) {
       console.error('Error during logout:', error);
-      // Still navigate to home page even if logout fails
-      navigate('/', { replace: true });
-      setTimeout(() => {
-        window.location.href = '/';
-      }, 100);
+      // Force redirect even if logout fails
+      window.location.href = '/';
     }
   };
 
