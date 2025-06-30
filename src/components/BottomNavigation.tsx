@@ -2,6 +2,7 @@
 import React from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useSnapModal } from '@/hooks/useSnapModal';
+import { usePostSubmission } from '@/hooks/usePostSubmission';
 import SnapModal from '@/components/snap/SnapModal';
 import SnapComposerModal from '@/components/snap/SnapComposerModal';
 import SnapToast from '@/components/snap/SnapToast';
@@ -13,6 +14,7 @@ import { usePostHandlers } from './bottom-navigation/usePostHandlers';
 const BottomNavigation = () => {
   const { user } = useSupabaseSession();
   const { activeTab, handleTabClick } = useNavigationHandlers();
+  const { submitPost } = usePostSubmission();
   
   const {
     captionInputRef,
@@ -49,7 +51,50 @@ const BottomNavigation = () => {
     openComposer
   );
 
-  const { handleCaptionInput, selectMention, handleSubmitPost } = usePostHandlers();
+  const { handleCaptionInput, selectMention } = usePostHandlers();
+
+  const handleSubmitPost = async () => {
+    if (!user) {
+      console.error('No user found for post submission');
+      showConfirmationToast('You must be logged in to post.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    console.log('Starting post submission with:', {
+      hasFile: !!selectedFile,
+      caption,
+      tagCount: selectedTags.length,
+      course: selectedCourse?.name
+    });
+
+    // Convert single file to array for submission
+    const mediaFiles = selectedFile ? [selectedFile] : [];
+
+    try {
+      await submitPost({
+        user,
+        content: caption,
+        mediaFiles,
+        selectedTags,
+        onSuccess: () => {
+          console.log('Post submission successful');
+          closeComposer();
+          showConfirmationToast('Post shared successfully!');
+        },
+        onError: () => {
+          console.error('Post submission failed');
+          showConfirmationToast('Failed to share post. Please try again.');
+        }
+      });
+    } catch (error) {
+      console.error('Error in handleSubmitPost:', error);
+      showConfirmationToast('Failed to share post. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const onTabClick = (tab: { id: string; path: string | null; isAction?: boolean }) => {
     handleTabClick(tab, user, openSnapModal);
@@ -81,19 +126,6 @@ const BottomNavigation = () => {
     );
   };
 
-  const onSubmitPost = () => {
-    handleSubmitPost(
-      selectedFile,
-      user,
-      caption,
-      selectedTags,
-      selectedCourse,
-      closeComposer,
-      setIsSubmitting,
-      showConfirmationToast
-    );
-  };
-
   return (
     <>
       <NavigationBar
@@ -119,7 +151,7 @@ const BottomNavigation = () => {
         showSuggestions={showSuggestions}
         mentionSuggestions={mentionSuggestions}
         onSelectMention={onSelectMention}
-        onSubmit={onSubmitPost}
+        onSubmit={handleSubmitPost}
         isSubmitting={isSubmitting}
         selectedCourse={selectedCourse}
         onCourseSelect={setSelectedCourse}

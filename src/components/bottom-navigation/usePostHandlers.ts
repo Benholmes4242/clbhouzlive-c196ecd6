@@ -1,6 +1,5 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { usePostSubmission } from '@/hooks/usePostSubmission';
 
 interface TaggableEntity {
   id: string;
@@ -18,8 +17,6 @@ interface GolfCourse {
 }
 
 export const usePostHandlers = () => {
-  const { submitPost } = usePostSubmission();
-
   const handleCaptionInput = (
     e: React.FormEvent<HTMLDivElement>,
     caption: string,
@@ -86,61 +83,8 @@ export const usePostHandlers = () => {
     }
   };
 
-  const handleSubmitPost = async (
-    selectedFile: File | null,
-    user: any,
-    caption: string,
-    selectedTags: TaggableEntity[],
-    selectedCourse: GolfCourse | null,
-    closeComposer: () => void,
-    setIsSubmitting: (submitting: boolean) => void,
-    showConfirmationToast: (message: string) => void
-  ) => {
-    if (!user) {
-      console.error('No user found for post submission');
-      showConfirmationToast('You must be logged in to post.');
-      return;
-    }
-
-    setIsSubmitting(true);
-    
-    console.log('Starting post submission with:', {
-      hasFile: !!selectedFile,
-      caption,
-      tagCount: selectedTags.length,
-      course: selectedCourse?.name
-    });
-
-    // Convert single file to array for submission
-    const mediaFiles = selectedFile ? [selectedFile] : [];
-
-    try {
-      await submitPost({
-        user,
-        content: caption,
-        mediaFiles,
-        selectedTags,
-        onSuccess: () => {
-          console.log('Post submission successful');
-          closeComposer();
-          showConfirmationToast('Post shared successfully!');
-        },
-        onError: () => {
-          console.error('Post submission failed');
-          showConfirmationToast('Failed to share post. Please try again.');
-        }
-      });
-    } catch (error) {
-      console.error('Error in handleSubmitPost:', error);
-      showConfirmationToast('Failed to share post. Please try again.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   return {
     handleCaptionInput,
-    selectMention,
-    handleSubmitPost
+    selectMention
   };
 };
