@@ -1,5 +1,4 @@
 
-
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { X, Earth } from 'lucide-react';
@@ -85,29 +84,34 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
           All Courses
         </button>
 
-        {/* Enhanced Swipeable Flag Bar */}
-        <div className="flex-1 relative">
+        {/* Mobile-Optimized Swipeable Flag Bar */}
+        <div className="flex-1 relative overflow-hidden">
           <div 
             className="overflow-x-auto scroll-smooth"
             style={{
               scrollbarWidth: 'none',
               msOverflowStyle: 'none',
               WebkitOverflowScrolling: 'touch',
-              overscrollBehaviorX: 'contain'
+              overscrollBehaviorX: 'contain',
+              maxWidth: '100%'
             }}
           >
             <style>
               {`
-                .scrollbar-hide::-webkit-scrollbar {
+                .mobile-scroll-container::-webkit-scrollbar {
                   display: none;
+                }
+                .mobile-scroll-container {
+                  scroll-snap-type: x mandatory;
+                  scroll-padding: 0 16px;
                 }
               `}
             </style>
             <div 
-              className="flex items-center gap-6 pb-2 px-4 scrollbar-hide"
+              className="flex items-center gap-6 pb-2 px-4 mobile-scroll-container"
               style={{ 
-                scrollSnapType: 'x proximity',
-                minWidth: 'max-content'
+                minWidth: 'max-content',
+                width: 'max-content'
               }}
             >
               <TooltipProvider>
@@ -169,4 +173,3 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
 };
 
 export default UserCoursesRegionalTiles;
-
