@@ -73,18 +73,16 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
     <div className="mb-8">
       <div className="flex items-center gap-6 mb-4">
         {/* All Courses Button */}
-        <Button
-          variant={activeFilter === null ? "default" : "ghost"}
-          size="sm"
+        <button
           onClick={() => onFilterChange(null)}
-          className={`text-sm font-medium whitespace-nowrap ${
+          className={`text-sm font-medium whitespace-nowrap px-3 py-1.5 rounded-full transition-all duration-200 hover:scale-105 ${
             activeFilter === null 
-              ? "bg-green-100 text-green-800 hover:bg-green-200" 
+              ? "bg-green-100 text-green-800" 
               : "text-muted-foreground hover:text-foreground"
           }`}
         >
           All Courses
-        </Button>
+        </button>
 
         {/* Draggable Flag Bar */}
         <div className="flex-1 relative">
@@ -101,8 +99,10 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
                       <TooltipTrigger asChild>
                         <button
                           onClick={() => onFilterChange(activeFilter === tile.key ? null : tile.key)}
-                          className={`flex items-center gap-2 cursor-pointer transition-all duration-200 hover:scale-105 whitespace-nowrap flex-shrink-0 ${
-                            activeFilter === tile.key ? 'opacity-100' : 'opacity-70 hover:opacity-100'
+                          className={`flex items-center gap-2 cursor-pointer transition-all duration-200 hover:scale-105 whitespace-nowrap flex-shrink-0 px-3 py-1.5 rounded-full ${
+                            activeFilter === tile.key 
+                              ? 'bg-green-100 text-green-800' 
+                              : 'text-foreground hover:text-foreground'
                           }`}
                           style={{ scrollSnapAlign: 'start' }}
                         >
