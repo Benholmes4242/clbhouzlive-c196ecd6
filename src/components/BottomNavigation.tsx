@@ -92,10 +92,20 @@ const BottomNavigation = () => {
   const onTabClick = (tab: { id: string; path: string | null; isAction?: boolean }) => {
     if (tab.isAction && tab.id === 'post') {
       if (!user) return;
+      console.log('Post tab clicked, opening gallery');
       openGallery();
     } else {
       handleTabClick(tab, user, () => {});
     }
+  };
+
+  const handleFileSelected = (file: File) => {
+    console.log('BottomNavigation handleFileSelected called with:', {
+      name: file.name,
+      type: file.type,
+      size: file.size
+    });
+    openComposer(file);
   };
 
   const onCaptionInput = (e: React.FormEvent<HTMLDivElement>) => {
@@ -134,7 +144,7 @@ const BottomNavigation = () => {
       <GalleryPicker
         isOpen={isGalleryOpen}
         onClose={closeGallery}
-        onFileSelected={openComposer}
+        onFileSelected={handleFileSelected}
       />
 
       <CreateMomentModal

@@ -39,9 +39,18 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected }: GalleryPickerProps) 
   };
 
   const handleFilesSelected = (files: File[]) => {
+    console.log('GalleryPicker handleFilesSelected called with:', files);
     if (files.length > 0) {
-      console.log('Gallery file selected:', files[0].name, files[0].type);
-      onFileSelected(files[0]);
+      const selectedFile = files[0];
+      console.log('Selected file details:', {
+        name: selectedFile.name,
+        type: selectedFile.type,
+        size: selectedFile.size
+      });
+      console.log('Calling onFileSelected with:', selectedFile);
+      onFileSelected(selectedFile);
+    } else {
+      console.log('No files selected');
     }
   };
 
