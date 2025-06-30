@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { X, Globe } from 'lucide-react';
+import { X, Earth } from 'lucide-react';
 import CountryFlag from '@/components/ui/country-flag';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -49,7 +49,7 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
       key: 'global',
       label: 'Top 100 Worldwide Played',
       country: 'Worldwide',
-      flag: 'globe',
+      flag: 'earth',
       progress: regionProgress['global'] || { played: 0, total: 100 }
     }
   ];
@@ -75,7 +75,7 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
         {/* All Courses Button */}
         <button
           onClick={() => onFilterChange(null)}
-          className={`text-sm font-medium whitespace-nowrap px-3 py-1.5 rounded-full transition-all duration-200 hover:scale-105 ${
+          className={`text-lg font-bold whitespace-nowrap px-3 py-1.5 rounded-full transition-all duration-200 hover:scale-105 ${
             activeFilter === null 
               ? "bg-green-100 text-green-800" 
               : "text-muted-foreground hover:text-foreground"
@@ -106,8 +106,8 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
                           }`}
                           style={{ scrollSnapAlign: 'start' }}
                         >
-                          {tile.flag === 'globe' ? (
-                            <Globe className="w-8 h-6 text-blue-600" />
+                          {tile.flag === 'earth' ? (
+                            <Earth className="w-8 h-6 text-blue-600" />
                           ) : (
                             <CountryFlag country={tile.country} size="lg" />
                           )}
