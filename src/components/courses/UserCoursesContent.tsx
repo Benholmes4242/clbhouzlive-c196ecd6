@@ -13,6 +13,49 @@ interface UserCoursesContentProps {
   username?: string;
 }
 
+// Helper function to get the best ranking for sorting
+const getCourseRanking = (course: any) => {
+  if (course.regional_rank) return course.regional_rank;
+  if (course.global_rank) return course.global_rank;
+  return 9999;
+};
+
+// Custom sorting function for user courses - prioritize user ratings first
+const getSortedUserCourses = (userCourses: any[]) => {
+  console.log('Sorting user courses in UserCoursesContent:', userCourses.map(c => ({ 
+    name: c.golf_courses?.name, 
+    rating: c.rating 
+  })));
+  
+  // Sort all courses by rating in descending order (10 first, then 9, 8, etc., null/undefined last)
+  const sortedCourses = userCourses.sort((a, b) => {
+    const aRating = a.rating;
+    const bRating = b.rating;
+    
+    // If both have ratings, sort by rating descending (10, 9, 8, ...)
+    if (aRating !== null && aRating !== undefined && bRating !== null && bRating !== undefined) {
+      console.log(`Comparing ratings: ${a.golf_courses?.name} (${aRating}) vs ${b.golf_courses?.name} (${bRating})`);
+      return bRating - aRating;
+    }
+    
+    // If only one has a rating, put the rated one first
+    if (aRating !== null && aRating !== undefined) return -1;
+    if (bRating !== null && bRating !== undefined) return 1;
+    
+    // If neither has a rating, sort by official ranking
+    const aRank = getCourseRanking(a.golf_courses);
+    const bRank = getCourseRanking(b.golf_courses);
+    return aRank - bRank;
+  });
+  
+  console.log('Final sorted order in UserCoursesContent:', sortedCourses.map(c => ({ 
+    name: c.golf_courses?.name, 
+    rating: c.rating 
+  })));
+  
+  return sortedCourses;
+};
+
 const UserCoursesContent: React.FC<UserCoursesContentProps> = ({ username }) => {
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   
@@ -115,20 +158,33 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({ username }) => 
         }
       });
 
-      return Array.from(uniqueCoursesMap.values());
+      const rawCourses = Array.from(uniqueCoursesMap.values());
+      console.log('Raw combined courses before sorting:', rawCourses.map(c => ({ 
+        name: c.golf_courses?.name, 
+        rating: c.rating 
+      })));
+      
+      // Apply sorting here to ensure proper order
+      return getSortedUserCourses(rawCourses);
     },
     enabled: !!targetUserId,
   });
 
   // Filter courses based on active filter
   const filteredCourses = useMemo(() => {
+    let coursesToFilter = allPlayedCourses;
+    
     if (!activeFilter) {
-      // When no filter is active, show all played courses (not just top100CoursesRaw)
-      return allPlayedCourses;
+      // When no filter is active, use all played courses
+      console.log('No filter active, showing all courses in sorted order:', coursesToFilter.map(c => ({ 
+        name: c.golf_courses?.name, 
+        rating: c.rating 
+      })));
+      return coursesToFilter;
     }
 
-    // Use the combined played courses data for filtering
-    return allPlayedCourses.filter((userCourse) => {
+    // Filter based on region
+    const filtered = coursesToFilter.filter((userCourse) => {
       const course = userCourse.golf_courses;
       if (!course) return false;
 
@@ -145,6 +201,13 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({ username }) => 
           return true;
       }
     });
+    
+    console.log('Filtered courses:', filtered.map(c => ({ 
+      name: c.golf_courses?.name, 
+      rating: c.rating 
+    })));
+    
+    return filtered;
   }, [allPlayedCourses, activeFilter]);
 
   return (
