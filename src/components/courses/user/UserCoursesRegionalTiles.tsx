@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { X, Earth } from 'lucide-react';
 import CountryFlag from '@/components/ui/country-flag';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface RegionalProgress {
   played: number;
@@ -23,6 +24,8 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
   onFilterChange,
   isLoading
 }) => {
+  const isMobile = useIsMobile();
+
   const tiles = [
     {
       key: 'britain-ireland',
@@ -71,68 +74,85 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
 
   return (
     <div className="mb-8">
-      <div className="flex items-center gap-4 mb-4">
+      <div className="flex flex-col gap-4 mb-4">
         {/* All Courses Button */}
-        <button
-          onClick={() => onFilterChange(null)}
-          className={`text-sm font-semibold whitespace-nowrap px-4 py-2 rounded-full transition-all duration-200 hover:scale-105 hover:text-[#b66b41] flex-shrink-0 ${
-            activeFilter === null 
-              ? "bg-green-100 text-green-800" 
-              : "text-foreground bg-gray-100"
-          }`}
-        >
-          All Courses
-        </button>
-
-        {/* Horizontally Swipeable Flag Bar */}
-        <div className="flex-1 relative">
-          <div 
-            className="overflow-x-auto scroll-smooth"
-            style={{
-              scrollbarWidth: 'none',
-              msOverflowStyle: 'none',
-              WebkitOverflowScrolling: 'touch',
-              overscrollBehaviorX: 'contain'
-            }}
+        <div className="flex justify-center">
+          <button
+            onClick={() => onFilterChange(null)}
+            className={`text-sm font-semibold whitespace-nowrap px-4 py-2 rounded-full transition-all duration-200 hover:scale-105 hover:text-[#b66b41] ${
+              activeFilter === null 
+                ? "bg-green-100 text-green-800" 
+                : "text-foreground bg-gray-100"
+            }`}
           >
-            <style>
-              {`
-                .swipe-container::-webkit-scrollbar {
-                  display: none;
-                }
-                .swipe-container {
-                  scroll-snap-type: x proximity;
-                  scroll-padding: 0 16px;
-                  -webkit-overflow-scrolling: touch;
-                  overscroll-behavior-x: contain;
-                }
-                .swipe-item {
-                  scroll-snap-align: center;
-                }
-              `}
-            </style>
+            All Courses
+          </button>
+        </div>
+
+        {/* Regional Filter Tiles */}
+        <div className="relative w-full">
+          {/* Desktop: Spread across full width */}
+          {!isMobile ? (
+            <div className="grid grid-cols-4 gap-3">
+              <TooltipProvider>
+                {tiles.map((tile) => (
+                  <Tooltip key={tile.key}>
+                    <TooltipTrigger asChild>
+                      <button
+                        onClick={() => onFilterChange(activeFilter === tile.key ? null : tile.key)}
+                        className={`flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 hover:scale-105 hover:text-[#b66b41] whitespace-nowrap px-3 py-2 rounded-full ${
+                          activeFilter === tile.key 
+                            ? 'bg-green-100 text-green-800' 
+                            : 'text-foreground bg-gray-100'
+                        }`}
+                      >
+                        {tile.flag === 'earth' ? (
+                          <Earth className="w-5 h-4 text-gray-600 flex-shrink-0" />
+                        ) : (
+                          <CountryFlag country={tile.country} size="md" className="flex-shrink-0" />
+                        )}
+                        <span className="text-sm font-semibold">
+                          {tile.progress.played} / {tile.progress.total}
+                        </span>
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{tile.label}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                ))}
+              </TooltipProvider>
+            </div>
+          ) : (
+            /* Mobile: Horizontally scrollable with bounce */
             <div 
-              className="flex items-center gap-3 pb-2 px-2 swipe-container"
-              style={{ 
-                minWidth: 'max-content',
-                width: 'max-content'
+              className="overflow-x-auto scrollbar-hide"
+              style={{
+                WebkitOverflowScrolling: 'touch',
+                overscrollBehaviorX: 'contain'
               }}
             >
-              <TooltipProvider>
-                {tiles.map((tile, index) => {
-                  return (
+              <div 
+                className="flex items-center gap-3 pb-2 px-4"
+                style={{ 
+                  minWidth: 'max-content',
+                  width: 'max-content'
+                }}
+              >
+                <TooltipProvider>
+                  {tiles.map((tile) => (
                     <Tooltip key={tile.key}>
                       <TooltipTrigger asChild>
                         <button
                           onClick={() => onFilterChange(activeFilter === tile.key ? null : tile.key)}
-                          className={`flex items-center gap-2 cursor-pointer transition-all duration-200 hover:scale-105 hover:text-[#b66b41] whitespace-nowrap flex-shrink-0 px-3 py-2 rounded-full swipe-item ${
+                          className={`flex items-center gap-2 cursor-pointer transition-all duration-200 hover:scale-105 hover:text-[#b66b41] whitespace-nowrap flex-shrink-0 px-3 py-2 rounded-full ${
                             activeFilter === tile.key 
                               ? 'bg-green-100 text-green-800' 
                               : 'text-foreground bg-gray-100'
                           }`}
                         >
                           {tile.flag === 'earth' ? (
-                            <Earth className="w-6 h-4 text-gray-600 flex-shrink-0" />
+                            <Earth className="w-5 h-4 text-gray-600 flex-shrink-0" />
                           ) : (
                             <CountryFlag country={tile.country} size="md" className="flex-shrink-0" />
                           )}
@@ -145,17 +165,17 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
                         <p>{tile.label}</p>
                       </TooltipContent>
                     </Tooltip>
-                  );
-                })}
-              </TooltipProvider>
+                  ))}
+                </TooltipProvider>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
 
       {/* Active Filter Indicator */}
       {activeFilter && (
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
           <span>
             Showing {tiles.find(t => t.key === activeFilter)?.label.replace(' Played', '')} courses
           </span>
