@@ -300,29 +300,7 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
 
   return (
     <>
-      {isOwnPost ? (
-        <ContextMenu>
-          <ContextMenuTrigger>
-            <PostContent />
-          </ContextMenuTrigger>
-          <ContextMenuContent>
-            <ContextMenuItem onClick={() => setEditDialogOpen(true)}>
-              <Edit className="h-4 w-4 mr-2" />
-              Edit Post
-            </ContextMenuItem>
-            <ContextMenuItem 
-              onClick={handleDeletePost}
-              disabled={isDeleting}
-              className="text-red-600"
-            >
-              <Trash2 className="h-4 w-4 mr-2" />
-              {isDeleting ? 'Deleting...' : 'Delete Post'}
-            </ContextMenuItem>
-          </ContextMenuContent>
-        </ContextMenu>
-      ) : (
-        <PostContent />
-      )}
+      <PostContent />
 
       <EditPostDialog 
         open={editDialogOpen}
