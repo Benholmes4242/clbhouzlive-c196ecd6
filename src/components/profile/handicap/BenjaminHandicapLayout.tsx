@@ -24,7 +24,7 @@ const BenjaminHandicapLayout: React.FC = () => {
                   <img 
                     src="/lovable-uploads/41a64d83-afc2-42f1-a446-b6a8b45a0043.png" 
                     alt="England Golf" 
-                    className="h-6 w-auto opacity-80"
+                    className="h-12 w-auto opacity-80"
                   />
                   <span className="text-xs text-gray-500">Powered by England Golf</span>
                 </div>
