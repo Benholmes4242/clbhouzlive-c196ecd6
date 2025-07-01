@@ -1,10 +1,8 @@
 
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Play, Image as ImageIcon } from 'lucide-react';
 import { useActivityPosts } from './hooks/useActivityPosts';
-import { ActivityPost } from './types/ActivityTypes';
+import VideoPreview from '@/components/posts/VideoPreview';
 
 interface EnhancedSocialActivityProps {
   userId: string;
@@ -18,11 +16,6 @@ const EnhancedSocialActivity: React.FC<EnhancedSocialActivityProps> = ({
   profileDisplayName
 }) => {
   const { posts, loading, fetchUserPosts } = useActivityPosts(userId);
-
-  const getContentTypeIcon = (post: ActivityPost) => {
-    const hasVideo = post.post_media.some(m => m.media_type === 'video');
-    return hasVideo ? <Play className="h-4 w-4" /> : <ImageIcon className="h-4 w-4" />;
-  };
 
   if (loading) {
     return (
@@ -50,20 +43,26 @@ const EnhancedSocialActivity: React.FC<EnhancedSocialActivityProps> = ({
       ) : (
         <div className="grid grid-cols-3 gap-1">
           {posts.map((post) => (
-            <div key={post.id} className="aspect-square relative group cursor-pointer">
+            <div key={post.id} className="aspect-square relative cursor-pointer">
               <div className="w-full h-full overflow-hidden rounded-lg">
                 {post.post_media[0] && (
-                  <img
-                    src={post.post_media[0].media_url}
-                    alt="Post"
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                  />
+                  <>
+                    {post.post_media[0].media_type === 'video' ? (
+                      <VideoPreview
+                        src={post.post_media[0].media_url}
+                        className="w-full h-full"
+                        videoId={`profile-${post.id}`}
+                        isGridThumbnail={true}
+                      />
+                    ) : (
+                      <img
+                        src={post.post_media[0].media_url}
+                        alt="Post"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                      />
+                    )}
+                  </>
                 )}
-                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Badge variant="secondary" className="text-xs">
-                    {getContentTypeIcon(post)}
-                  </Badge>
-                </div>
               </div>
             </div>
           ))}
