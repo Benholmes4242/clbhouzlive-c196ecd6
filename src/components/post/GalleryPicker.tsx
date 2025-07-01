@@ -159,20 +159,33 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
   };
 
   const handleConfirmSelection = () => {
+    console.log('handleConfirmSelection called with selectedFiles count:', selectedFiles.length);
+    console.log('selectedFiles details:', selectedFiles.map(f => ({ name: f.name, type: f.type, size: f.size })));
+    console.log('onMultipleFilesSelected function exists:', !!onMultipleFilesSelected);
+    console.log('onFileSelected function exists:', !!onFileSelected);
+    
     if (selectedFiles.length > 0) {
       if (onMultipleFilesSelected) {
+        console.log('Calling onMultipleFilesSelected with', selectedFiles.length, 'files');
         onMultipleFilesSelected(selectedFiles);
+        console.log('onMultipleFilesSelected call completed');
       } else {
+        console.log('onMultipleFilesSelected not available, falling back to onFileSelected with first file:', selectedFiles[0].name);
         // Fallback to single file if multiple not supported
         onFileSelected(selectedFiles[0]);
+        console.log('onFileSelected fallback call completed');
       }
       
+      console.log('Cleaning up preview URLs and closing gallery');
       // Clean up
       previewUrls.forEach(url => URL.revokeObjectURL(url));
       setSelectedFiles([]);
       setPreviewUrls([]);
       setIsMultiSelectMode(false);
       onClose();
+      console.log('Gallery cleanup and close completed');
+    } else {
+      console.warn('handleConfirmSelection called but no files selected');
     }
   };
 
