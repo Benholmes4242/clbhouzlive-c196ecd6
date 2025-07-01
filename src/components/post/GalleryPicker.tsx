@@ -29,15 +29,21 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
     userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'undefined'
   });
 
-  // Force mobile detection for mobile devices that might not be detected by screen width
-  const isTouchDevice = typeof window !== 'undefined' && 'ontouchstart' in window;
-  const isActuallyMobile = isMobile || isTouchDevice || (typeof navigator !== 'undefined' && /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+  // Force mobile detection based on multiple factors
+  const isTouchDevice = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
+  const isSmallScreen = typeof window !== 'undefined' && window.innerWidth <= 1024; // Increase breakpoint
+  const isMobileUserAgent = typeof navigator !== 'undefined' && /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Tablet/i.test(navigator.userAgent);
+  const isActuallyMobile = isMobile || isTouchDevice || isSmallScreen || isMobileUserAgent;
   
-  console.log('🟡 Mobile detection:', {
+  console.log('🟡 Enhanced mobile detection:', {
     isMobile,
     isTouchDevice,
+    isSmallScreen,
+    isMobileUserAgent,
     isActuallyMobile,
-    hasNavigator: typeof navigator !== 'undefined'
+    windowWidth: typeof window !== 'undefined' ? window.innerWidth : 'N/A',
+    maxTouchPoints: typeof navigator !== 'undefined' ? navigator.maxTouchPoints : 'N/A',
+    userAgent: typeof navigator !== 'undefined' ? navigator.userAgent.substring(0, 50) + '...' : 'N/A'
   });
 
   const handleCameraClick = () => {
@@ -406,23 +412,43 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
           <MultiSelectPreview />
         ) : (
           <div className="space-y-6">
-            <Button
-              onClick={handlePhotoClick}
-              className="w-full h-20 bg-white border-2 border-[#b66b41] text-[#b66b41] hover:bg-[#b66b41] hover:text-white transition-all duration-200 rounded-xl flex items-center justify-center gap-3 text-lg font-semibold"
-              variant="outline"
+            <button
+              onTouchStart={(e) => {
+                console.log('🔴 DESKTOP PHOTO BUTTON TOUCH START');
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+              onClick={(e) => {
+                console.log('🔴 DESKTOP PHOTO BUTTON CLICKED');
+                e.preventDefault();
+                e.stopPropagation();
+                handlePhotoClick();
+              }}
+              className="w-full h-20 bg-white border-2 border-[#b66b41] text-[#b66b41] hover:bg-[#b66b41] hover:text-white transition-all duration-200 rounded-xl flex items-center justify-center gap-3 text-lg font-semibold cursor-pointer touch-manipulation"
+              style={{ WebkitTapHighlightColor: 'transparent' }}
             >
               <Image className="h-6 w-6" />
               Select Photos
-            </Button>
+            </button>
 
-            <Button
-              onClick={handleVideoClick}
-              className="w-full h-20 bg-white border-2 border-[#b66b41] text-[#b66b41] hover:bg-[#b66b41] hover:text-white transition-all duration-200 rounded-xl flex items-center justify-center gap-3 text-lg font-semibold"
-              variant="outline"
+            <button
+              onTouchStart={(e) => {
+                console.log('🔴 DESKTOP VIDEO BUTTON TOUCH START');
+                e.preventDefault();
+                e.stopPropagation();
+              }}
+              onClick={(e) => {
+                console.log('🔴 DESKTOP VIDEO BUTTON CLICKED');
+                e.preventDefault();
+                e.stopPropagation();
+                handleVideoClick();
+              }}
+              className="w-full h-20 bg-white border-2 border-[#b66b41] text-[#b66b41] hover:bg-[#b66b41] hover:text-white transition-all duration-200 rounded-xl flex items-center justify-center gap-3 text-lg font-semibold cursor-pointer touch-manipulation"
+              style={{ WebkitTapHighlightColor: 'transparent' }}
             >
               <Video className="h-6 w-6" />
               Select Videos
-            </Button>
+            </button>
 
             <p className="text-center text-sm text-gray-500 mt-8 px-2">
               Select multiple files to create carousel posts with swipeable media.
