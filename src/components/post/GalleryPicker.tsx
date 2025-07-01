@@ -335,16 +335,31 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
               <div className="bg-purple-200 p-2 text-xs rounded">
                 🟣 DEBUG: About to render CAPTURE button
               </div>
+              
+              {/* Simple test button first */}
               <button
-                onTouchStart={(e) => {
-                  console.log('🔴 MOBILE CAPTURE BUTTON TOUCH START');
-                  e.preventDefault();
-                  e.stopPropagation();
+                onClick={() => {
+                  console.log('🟢 SIMPLE TEST BUTTON CLICKED!');
+                  alert('TEST BUTTON WORKS!');
                 }}
-                onClick={(e) => {
+                style={{ 
+                  width: '100%',
+                  height: '60px',
+                  backgroundColor: 'lime',
+                  border: '3px solid black',
+                  fontSize: '18px',
+                  fontWeight: 'bold'
+                }}
+              >
+                🟢 TAP HERE - TEST BUTTON
+              </button>
+              
+              <button
+                onTouchStart={() => {
+                  console.log('🔴 MOBILE CAPTURE BUTTON TOUCH START');
+                }}
+                onClick={() => {
                   console.log('🔴 MOBILE CAPTURE BUTTON CLICKED - Event triggered');
-                  e.preventDefault();
-                  e.stopPropagation();
                   handleCameraClick();
                 }}
                 style={{ 
@@ -359,7 +374,9 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
                   alignItems: 'flex-start',
                   gap: '16px',
                   cursor: 'pointer',
-                  WebkitTapHighlightColor: 'transparent'
+                  WebkitTapHighlightColor: 'transparent',
+                  zIndex: 999,
+                  position: 'relative'
                 }}
               >
                 <Camera className="h-6 w-6 mt-1 flex-shrink-0" />
