@@ -1,8 +1,10 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from "@/components/Header";
 import BottomNavigation from '@/components/BottomNavigation';
 import UserAccountInfo from '@/components/profile/UserAccountInfo';
+import EmailChangeSection from '@/components/profile/EmailChangeSection';
 import { useProfileData } from '@/hooks/useProfileData';
 
 const Settings = () => {
@@ -76,7 +78,7 @@ const Settings = () => {
   return (
     <div className="min-h-screen bg-background pb-28">
       <Header />
-      <div className="max-w-2xl mx-auto px-4 py-6">
+      <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
         <h1 className="text-2xl font-bold mb-6">Settings</h1>
         
         <UserAccountInfo
@@ -84,6 +86,8 @@ const Settings = () => {
           userEmail={user?.email}
           onProfileUpdate={handleProfileUpdate}
         />
+
+        <EmailChangeSection currentEmail={user?.email} />
       </div>
       <BottomNavigation />
     </div>

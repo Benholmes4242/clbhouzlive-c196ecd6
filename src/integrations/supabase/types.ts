@@ -259,6 +259,42 @@ export type Database = {
         }
         Relationships: []
       }
+      logos: {
+        Row: {
+          category: string
+          created_at: string
+          file_name: string
+          file_size: number | null
+          file_url: string
+          id: string
+          mime_type: string | null
+          updated_at: string
+          uploaded_by: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          file_name: string
+          file_size?: number | null
+          file_url: string
+          id?: string
+          mime_type?: string | null
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          file_name?: string
+          file_size?: number | null
+          file_url?: string
+          id?: string
+          mime_type?: string | null
+          updated_at?: string
+          uploaded_by?: string | null
+        }
+        Relationships: []
+      }
       messages: {
         Row: {
           content: string
@@ -684,11 +720,14 @@ export type Database = {
           eg_handicap_index: number | null
           eg_recent_rounds: Json | null
           eg_visible: boolean | null
+          email_change_requested_at: string | null
+          email_change_token: string | null
           home_club: string | null
           id: string
           is_public: boolean | null
           location: string | null
           logo_url: string | null
+          pending_email: string | null
           phone: string | null
           profile_photo_url: string | null
           social_links: Json | null
@@ -712,11 +751,14 @@ export type Database = {
           eg_handicap_index?: number | null
           eg_recent_rounds?: Json | null
           eg_visible?: boolean | null
+          email_change_requested_at?: string | null
+          email_change_token?: string | null
           home_club?: string | null
           id: string
           is_public?: boolean | null
           location?: string | null
           logo_url?: string | null
+          pending_email?: string | null
           phone?: string | null
           profile_photo_url?: string | null
           social_links?: Json | null
@@ -740,11 +782,14 @@ export type Database = {
           eg_handicap_index?: number | null
           eg_recent_rounds?: Json | null
           eg_visible?: boolean | null
+          email_change_requested_at?: string | null
+          email_change_token?: string | null
           home_club?: string | null
           id?: string
           is_public?: boolean | null
           location?: string | null
           logo_url?: string | null
+          pending_email?: string | null
           phone?: string | null
           profile_photo_url?: string | null
           social_links?: Json | null

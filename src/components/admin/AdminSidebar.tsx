@@ -21,7 +21,8 @@ import {
   UserCheck, 
   Settings as SettingsIcon,
   MapPin,
-  Flag
+  Flag,
+  Image
 } from "lucide-react";
 
 const menuItems = [
@@ -42,6 +43,12 @@ const menuItems = [
     icon: MapPin,
     value: "golf-courses",
     requiredRole: "limited_admin", // Available to both admin and limited_admin
+  },
+  {
+    title: "Logos",
+    icon: Image,
+    value: "logos",
+    requiredRole: "admin",
   },
   {
     title: "Country Flags",

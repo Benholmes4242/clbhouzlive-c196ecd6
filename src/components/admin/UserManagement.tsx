@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Table,
@@ -28,7 +29,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, Trash2 } from 'lucide-react';
+import { Loader2, Trash2, Mail } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import type { AdminUser } from '@/hooks/useAdmin';
@@ -82,6 +83,35 @@ const UserManagement: React.FC<UserManagementProps> = ({ users, onRoleChange }) 
       console.error('Error updating role:', error);
       // Revert the optimistic update on error
       setLocalUsers(users);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handlePasswordReset = async (userId: string, userEmail: string) => {
+    setActionLoading(userId);
+    
+    try {
+      const { error } = await supabase.auth.admin.generateLink({
+        type: 'recovery',
+        email: userEmail,
+      });
+      
+      if (error) {
+        throw error;
+      }
+      
+      toast({
+        title: "Success",
+        description: `Password reset email sent to ${userEmail}`,
+      });
+    } catch (error: any) {
+      console.error('Error sending password reset:', error);
+      toast({
+        title: "Error",
+        description: `Failed to send password reset: ${error.message}`,
+        variant: "destructive",
+      });
     } finally {
       setActionLoading(null);
     }
@@ -191,6 +221,36 @@ const UserManagement: React.FC<UserManagementProps> = ({ users, onRoleChange }) 
                         <SelectItem value="admin">Admin</SelectItem>
                       </SelectContent>
                     </Select>
+                    
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={actionLoading === user.id}
+                          className="text-blue-600 hover:text-blue-600"
+                        >
+                          <Mail className="w-4 h-4" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Send Password Reset</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This will send a password reset email to <strong>{user.email}</strong>. 
+                            The user will receive an email with instructions to reset their password.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => handlePasswordReset(user.id, user.email)}
+                          >
+                            Send Reset Email
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                     
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
