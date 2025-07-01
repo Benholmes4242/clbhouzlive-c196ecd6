@@ -18,7 +18,6 @@ const ThomasHandicapLayout: React.FC = () => {
               <div>
                 <h4 className="text-red-500 text-sm font-medium mb-0">My Handicap Index®</h4>
                 <div className="text-4xl font-bold text-gray-900 mt-1">7.2</div>
-                <div className="text-sm text-gray-600 mt-1">Low Index: 7.1</div>
               </div>
               <div className="flex flex-col items-end">
                 <div className="flex items-center gap-2 mb-1">
@@ -35,23 +34,9 @@ const ThomasHandicapLayout: React.FC = () => {
               </div>
             </div>
             
-            {/* Membership Number and Home Club */}
-            <div className="text-sm text-gray-600 mt-2 space-y-1">
-              <div><span className="font-medium">Membership Number:</span> 101B494608</div>
-              <div><span className="font-medium">Home Club:</span> Sundridge Park</div>
-            </div>
-
-            {/* Regional Stats */}
-            <div className="flex gap-2 mt-3">
-              <div className="bg-gray-800 text-white px-3 py-1 rounded text-xs font-medium">
-                15% Sundridge Park
-              </div>
-              <div className="bg-gray-800 text-white px-3 py-1 rounded text-xs font-medium">
-                9% Kent
-              </div>
-              <div className="bg-gray-800 text-white px-3 py-1 rounded text-xs font-medium">
-                8% England
-              </div>
+            {/* Home Club - Compact spacing */}
+            <div className="text-sm text-gray-600 mt-2">
+              <span className="font-medium">Home Club:</span> Sundridge Park
             </div>
           </div>
         </CardContent>
