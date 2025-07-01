@@ -26,10 +26,12 @@ const ThomasHandicapLayout: React.FC = () => {
                     alt="England Golf" 
                     className="h-12 w-auto opacity-80"
                   />
-                  <span className="text-xs text-gray-500">Powered by England Golf</span>
-                </div>
-                <div className="text-xs text-gray-500">
-                  Last Updated: Today
+                  <div className="flex flex-col">
+                    <span className="text-xs text-gray-500">Powered by England Golf</span>
+                    <div className="text-xs text-gray-500">
+                      Last Updated: Today
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
