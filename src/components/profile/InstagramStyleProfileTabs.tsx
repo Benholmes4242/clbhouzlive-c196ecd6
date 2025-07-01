@@ -28,7 +28,7 @@ const InstagramStyleProfileTabs: React.FC<InstagramStyleProfileTabsProps> = ({
           <span className="text-sm font-medium">Activity</span>
           {activeTab === 'activity' && (
             <div 
-              className="w-1.5 h-1.5 rounded-full bg-[#b66b41] ml-1"
+              className="w-1.5 h-1.5 rounded-full bg-[#6e9277] ml-1"
             />
           )}
         </TabsTrigger>
@@ -40,7 +40,7 @@ const InstagramStyleProfileTabs: React.FC<InstagramStyleProfileTabsProps> = ({
           <span className="text-sm font-medium">Top 100</span>
           {activeTab === 'courses' && (
             <div 
-              className="w-1.5 h-1.5 rounded-full bg-[#b66b41] ml-1"
+              className="w-1.5 h-1.5 rounded-full bg-[#6e9277] ml-1"
             />
           )}
         </TabsTrigger>

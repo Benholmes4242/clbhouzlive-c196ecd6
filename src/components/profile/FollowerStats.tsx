@@ -9,9 +9,10 @@ interface FollowerStatsProps {
   userId: string;
   userType?: string;
   username?: string;
+  compact?: boolean;
 }
 
-const FollowerStats: React.FC<FollowerStatsProps> = ({ userId, userType = 'individual', username }) => {
+const FollowerStats: React.FC<FollowerStatsProps> = ({ userId, userType = 'individual', username, compact = false }) => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user: currentUser } = useSupabaseSession();
@@ -147,34 +148,46 @@ const FollowerStats: React.FC<FollowerStatsProps> = ({ userId, userType = 'indiv
   });
 
   return (
-    <div className="flex justify-center gap-8 py-4 border-y border-border">
+    <div className={compact ? "flex items-center gap-4" : "flex justify-center gap-8 py-4 border-y border-border"}>
       <div 
-        className={`text-center ${isOwnProfile ? 'cursor-pointer hover:bg-muted/50 px-2 py-1 rounded' : 'px-2 py-1'}`} 
+        className={`text-center ${isOwnProfile ? 'cursor-pointer hover:bg-muted/50 rounded' : ''} ${
+          compact ? 'py-0' : 'px-2 py-1'
+        }`} 
         onClick={isOwnProfile ? handleFollowingClick : undefined}
       >
-        <div className="text-xl font-bold">
+        <div className={compact ? "text-sm font-semibold" : "text-xl font-bold"}>
           {isLoadingFollowing ? '...' : followingCount}
         </div>
-        <div className="text-sm text-muted-foreground">Following</div>
+        <div className={compact ? "text-xs text-muted-foreground" : "text-sm text-muted-foreground"}>
+          Following
+        </div>
       </div>
       <div 
-        className={`text-center ${isOwnProfile ? 'cursor-pointer hover:bg-muted/50 px-2 py-1 rounded' : 'px-2 py-1'}`} 
+        className={`text-center ${isOwnProfile ? 'cursor-pointer hover:bg-muted/50 rounded' : ''} ${
+          compact ? 'py-0' : 'px-2 py-1'
+        }`} 
         onClick={isOwnProfile ? handleFollowersClick : undefined}
       >
-        <div className="text-xl font-bold">
+        <div className={compact ? "text-sm font-semibold" : "text-xl font-bold"}>
           {isLoadingFollowers ? '...' : followerCount}
         </div>
-        <div className="text-sm text-muted-foreground">Followers</div>
+        <div className={compact ? "text-xs text-muted-foreground" : "text-sm text-muted-foreground"}>
+          Followers
+        </div>
       </div>
       {isIndividual && (
         <div 
-          className={`text-center ${isOwnProfile ? 'cursor-pointer hover:bg-muted/50 px-2 py-1 rounded' : 'px-2 py-1'}`} 
+          className={`text-center ${isOwnProfile ? 'cursor-pointer hover:bg-muted/50 rounded' : ''} ${
+            compact ? 'py-0' : 'px-2 py-1'
+          }`} 
           onClick={isOwnProfile ? handleFriendsClick : undefined}
         >
-          <div className="text-xl font-bold">
+          <div className={compact ? "text-sm font-semibold" : "text-xl font-bold"}>
             {isLoadingFriends ? '...' : friendsCount}
           </div>
-          <div className="text-sm text-muted-foreground">Friends</div>
+          <div className={compact ? "text-xs text-muted-foreground" : "text-sm text-muted-foreground"}>
+            Friends
+          </div>
         </div>
       )}
     </div>

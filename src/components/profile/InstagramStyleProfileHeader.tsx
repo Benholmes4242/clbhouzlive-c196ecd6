@@ -45,9 +45,19 @@ const InstagramStyleProfileHeader: React.FC<InstagramStyleProfileHeaderProps> = 
             <p className="text-sm text-gray-600 truncate">@{username}</p>
           )}
           
-          {/* Action Buttons Row - directly under username */}
+          {/* Follower Stats - moved up beneath name/username */}
+          <div className="mt-2">
+            <FollowerStats 
+              userId={profile?.id} 
+              userType={profile?.user_type || 'individual'} 
+              username={profile?.username}
+              compact={true}
+            />
+          </div>
+          
+          {/* Action Buttons Row - now after stats */}
           {!isOwnProfile && currentUser && (
-            <div className="mt-2">
+            <div className="mt-3">
               <UserProfileActions
                 targetUserId={profile.id}
                 currentUserId={currentUser.id}
@@ -61,19 +71,11 @@ const InstagramStyleProfileHeader: React.FC<InstagramStyleProfileHeaderProps> = 
           )}
           
           {bio && (
-            <p className="text-sm text-gray-800 mt-2 line-clamp-2">{bio}</p>
+            <p className="text-sm text-gray-800 mt-3 line-clamp-2">{bio}</p>
           )}
         </div>
       </div>
 
-      {/* Stats Row - Followers, Following, Friends */}
-      <div>
-        <FollowerStats 
-          userId={profile?.id} 
-          userType={profile?.user_type || 'individual'} 
-          username={profile?.username}
-        />
-      </div>
     </div>
   );
 };

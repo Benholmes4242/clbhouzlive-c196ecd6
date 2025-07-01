@@ -37,8 +37,9 @@ const ProfilePageLayout: React.FC<ProfilePageLayoutProps> = ({
         relationshipStatus={relationshipStatus}
       />
 
-      {/* Tab Navigation - positioned directly after header with no extra border */}
-      <InstagramStyleProfileTabs
+      {/* Tab Navigation - positioned with spacing after removing divider */}
+      <div className="mt-4">
+        <InstagramStyleProfileTabs
         activeTab={activeTab}
         onTabChange={setActiveTab}
         children={{
@@ -60,7 +61,8 @@ const ProfilePageLayout: React.FC<ProfilePageLayoutProps> = ({
             />
           )
         }}
-      />
+        />
+      </div>
     </div>
   );
 };
