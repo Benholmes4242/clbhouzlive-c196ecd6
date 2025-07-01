@@ -43,7 +43,7 @@ const Index = () => {
           {/* Logo */}
           <div className="flex justify-center">
             <img
-              src="/lovable-uploads/5fa9376f-a5bf-4e86-803b-147ab6b1097e.png"
+              src="/lovable-uploads/cfa68cd0-ff45-4b63-8910-d4126bb9aa88.png"
               alt="clbhouz"
               className="w-auto max-h-48 object-contain"
             />
