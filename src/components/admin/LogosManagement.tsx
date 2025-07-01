@@ -40,7 +40,7 @@ const LogosManagement = () => {
 
   const categories = {
     handicap_bodies: 'Official Golf Handicap & Regulatory Bodies',
-    golf_clubs: 'Golf Clubs',
+    golf_courses: 'Golf Courses',
     universities: 'Universities',
     golf_tours: 'Golf Tours'
   };
@@ -278,11 +278,18 @@ const LogosManagement = () => {
       {/* Logo Tabs */}
       <Tabs defaultValue="handicap_bodies" className="w-full">
         <TabsList className="grid w-full grid-cols-4">
-          {Object.entries(categories).map(([key, label]) => (
-            <TabsTrigger key={key} value={key} className="text-xs">
-              {label.split(' ')[0]}
-            </TabsTrigger>
-          ))}
+          <TabsTrigger value="handicap_bodies" className="text-xs">
+            Official Golf Handicap & Regulatory Bodies
+          </TabsTrigger>
+          <TabsTrigger value="golf_courses" className="text-xs">
+            Golf Courses
+          </TabsTrigger>
+          <TabsTrigger value="universities" className="text-xs">
+            Universities
+          </TabsTrigger>
+          <TabsTrigger value="golf_tours" className="text-xs">
+            Golf Tours
+          </TabsTrigger>
         </TabsList>
         
         {Object.entries(categories).map(([key, label]) => (
