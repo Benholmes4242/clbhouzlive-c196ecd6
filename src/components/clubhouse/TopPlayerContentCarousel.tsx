@@ -3,6 +3,7 @@ import React from 'react';
 import { UserPlus, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import VideoPreview from '@/components/posts/VideoPreview';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useProfileActions } from '@/components/profile/actions/useProfileActions';
@@ -138,6 +139,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, currentUserId }) => {
   };
 
   const displayHandicap = player.handicap !== null ? `${player.handicap} HCP` : 'No HCP';
+  const isCurrentUser = currentUserId === player.id;
 
   return (
     <div className="relative bg-card rounded-lg overflow-hidden shadow-sm border hover:shadow-md transition-shadow cursor-pointer">
@@ -161,7 +163,20 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, currentUserId }) => {
       
       <div className="absolute bottom-4 left-4 right-4">
         <div className="flex items-center gap-3 mb-3">
-          <img src={player.avatar} alt={player.name} className="w-8 h-8 rounded-full object-cover object-center border-2 border-white" />
+          <Avatar 
+            className="w-8 h-8"
+            isCurrentUser={isCurrentUser}
+            showRing={true}
+          >
+            <AvatarImage 
+              src={player.avatar} 
+              alt={player.name}
+              className="object-cover object-center"
+            />
+            <AvatarFallback className="bg-muted text-muted-foreground">
+              {player.name.charAt(0)}
+            </AvatarFallback>
+          </Avatar>
           <div className="flex-1 min-w-0">
             <h3 className="text-white font-semibold text-sm mb-1">{player.name}</h3>
             <div className="flex items-center gap-2 text-white/80 text-xs">
