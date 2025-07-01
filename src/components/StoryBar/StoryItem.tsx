@@ -59,11 +59,11 @@ const StoryItem: React.FC<StoryItemProps> = ({
             onClick={() => onOtherProfileClick(story.username)}
             aria-label={`View ${story.user}'s profile`}
             className="focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-full"
-            style={{ '--tw-ring-color': '#b66b41' } as React.CSSProperties}
+            style={{ '--tw-ring-color': '#6e9277' } as React.CSSProperties}
           >
             <div 
               className="w-16 h-16 rounded-full p-0.5 hover:scale-105 transition-transform"
-              style={{ background: 'linear-gradient(to top right, #b66b41, #8b5a34)' }}
+              style={{ background: 'linear-gradient(to top right, #6e9277, #5a7a63)' }}
             >
               {story.avatar ? (
                 <img
