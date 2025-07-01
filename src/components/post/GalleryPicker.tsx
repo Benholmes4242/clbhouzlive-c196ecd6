@@ -292,7 +292,12 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
             <div className="space-y-4">
               {/* Capture Button */}
               <Button
-                onClick={handleCameraClick}
+                onClick={(e) => {
+                  console.log('🔴 CAPTURE BUTTON CLICKED - Event triggered');
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleCameraClick();
+                }}
                 className="w-full h-auto p-4 bg-white border-2 border-[#b66b41] text-[#b66b41] hover:bg-[#b66b41] hover:text-white transition-all duration-200 rounded-xl flex items-start gap-4"
                 variant="outline"
               >
@@ -305,7 +310,12 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
 
               {/* Post Photo Button */}
               <Button
-                onClick={handlePhotoClick}
+                onClick={(e) => {
+                  console.log('🔴 PHOTO BUTTON CLICKED - Event triggered');
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handlePhotoClick();
+                }}
                 className="w-full h-auto p-4 bg-white border-2 border-[#b66b41] text-[#b66b41] hover:bg-[#b66b41] hover:text-white transition-all duration-200 rounded-xl flex items-start gap-4"
                 variant="outline"
               >
@@ -318,7 +328,12 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
 
               {/* Post Video Button */}
               <Button
-                onClick={handleVideoClick}
+                onClick={(e) => {
+                  console.log('🔴 VIDEO BUTTON CLICKED - Event triggered');
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleVideoClick();
+                }}
                 className="w-full h-auto p-4 bg-white border-2 border-[#b66b41] text-[#b66b41] hover:bg-[#b66b41] hover:text-white transition-all duration-200 rounded-xl flex items-start gap-4"
                 variant="outline"
               >
