@@ -30,6 +30,7 @@ const InlineMyCoursesTab: React.FC<InlineMyCoursesTabProps> = ({
           lastUpdated={profile?.updated_at}
           isOwnProfile={isOwnProfile}
           onEGConnect={onEGConnect}
+          userUsername={profile?.username || username}
         />
       )}
       
