@@ -79,7 +79,7 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
   // Fetch golf course details if there are golf club tags
   useEffect(() => {
     const fetchGolfCourse = async () => {
-      if (golfClubTags.length > 0) {
+      if (golfClubTags.length > 0 && !golfCourse) {
         try {
           const { data: courseData, error } = await supabase
             .from('golf_courses')
@@ -87,29 +87,17 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
             .eq('id', golfClubTags[0].entity_id)
             .single();
 
-          if (error) {
-            console.error('Error fetching golf course:', error);
-          } else {
-            console.log('Fetched golf course:', courseData);
+          if (!error && courseData) {
             setGolfCourse(courseData);
           }
         } catch (error) {
-          console.error('Error in fetchGolfCourse:', error);
+          console.error('Error fetching golf course:', error);
         }
       }
     };
 
     fetchGolfCourse();
-  }, [golfClubTags]);
-  
-  // Debug logging
-  console.log('UserPost - Post data:', {
-    postId: post.id,
-    totalTags: post.post_tags?.length || 0,
-    golfClubTags: golfClubTags.length,
-    golfClubTagsData: golfClubTags,
-    fetchedGolfCourse: golfCourse
-  });
+  }, [golfClubTags.length > 0 ? golfClubTags[0]?.entity_id : null, golfCourse]);
 
   const handleDeletePost = async () => {
     if (!isOwnPost || isDeleting) return;
