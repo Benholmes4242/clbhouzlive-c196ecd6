@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { AlertTriangle, User, Mail, Trash2, Lock } from 'lucide-react';
+import { AlertTriangle, User, Lock, Trash2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import DeleteAccountModal from './DeleteAccountModal';
@@ -25,7 +25,6 @@ const UserAccountInfo: React.FC<UserAccountInfoProps> = ({
   onProfileUpdate
 }) => {
   const [fullName, setFullName] = useState(profile?.display_name || '');
-  const [email, setEmail] = useState(userEmail || '');
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   
@@ -50,20 +49,6 @@ const UserAccountInfo: React.FC<UserAccountInfoProps> = ({
         .eq('id', profile.id);
 
       if (profileError) throw profileError;
-
-      // Update email if changed
-      if (email !== userEmail) {
-        const { error: emailError } = await supabase.auth.updateUser({
-          email: email
-        });
-
-        if (emailError) throw emailError;
-
-        toast({
-          title: "Email updated",
-          description: "Please check your new email address for verification.",
-        });
-      }
 
       onProfileUpdate();
       toast({
@@ -168,30 +153,10 @@ const UserAccountInfo: React.FC<UserAccountInfoProps> = ({
               />
             </div>
 
-            {/* Email Section */}
-            <div className="space-y-2">
-              <Label htmlFor="email" className="flex items-center gap-2">
-                <Mail className="h-4 w-4" />
-                Email Address
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email address"
-              />
-              {email !== userEmail && (
-                <p className="text-sm text-amber-600">
-                  Changing your email will require verification of the new address.
-                </p>
-              )}
-            </div>
-
             {/* Save Changes Button */}
             <Button
               onClick={handleUpdateProfile}
-              disabled={isUpdating || (fullName === (profile?.display_name || '') && email === userEmail)}
+              disabled={isUpdating || (fullName === (profile?.display_name || ''))}
               className="w-full"
             >
               {isUpdating ? 'Updating...' : 'Save Changes'}
