@@ -26,7 +26,7 @@ const InstagramStyleProfileHeader: React.FC<InstagramStyleProfileHeaderProps> = 
   const bio = profile?.bio;
 
   return (
-    <div className="bg-white border-b border-gray-200 p-4">
+    <div className="bg-white p-4">
       {/* Profile Photo and Basic Info */}
       <div className="flex items-center space-x-4 mb-4">
         <div className="flex-shrink-0">
@@ -67,7 +67,7 @@ const InstagramStyleProfileHeader: React.FC<InstagramStyleProfileHeaderProps> = 
       </div>
 
       {/* Stats Row - Followers, Following, Friends */}
-      <div className="mb-2">
+      <div>
         <FollowerStats 
           userId={profile?.id} 
           userType={profile?.user_type || 'individual'} 

@@ -19,34 +19,28 @@ const InstagramStyleProfileTabs: React.FC<InstagramStyleProfileTabsProps> = ({
 }) => {
   return (
     <Tabs value={activeTab} onValueChange={onTabChange} className="w-full">
-      <TabsList className="grid w-full grid-cols-2 sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b h-auto">
+      <TabsList className="grid w-full grid-cols-2 h-auto bg-transparent border-0 p-0">
         <TabsTrigger 
           value="activity"
-          className="flex flex-col items-center gap-1 py-3 relative data-[state=active]:bg-transparent hover:bg-muted/50 data-[state=active]:text-foreground data-[state=active]:shadow-none"
+          className="flex items-center justify-center gap-2 py-4 relative data-[state=active]:bg-transparent hover:bg-muted/50 data-[state=active]:text-foreground data-[state=active]:shadow-none border-0"
         >
-          <div className="flex items-center gap-2">
-            <Camera className="h-4 w-4" />
-            <span className="text-sm font-medium">Activity</span>
-          </div>
+          <Camera className="h-4 w-4" />
+          <span className="text-sm font-medium">Activity</span>
           {activeTab === 'activity' && (
             <div 
-              className="w-1.5 h-1.5 rounded-full bg-[#b66b41] mt-1 animate-fade-in"
-              style={{ marginTop: '4px' }}
+              className="w-1.5 h-1.5 rounded-full bg-[#b66b41] ml-1"
             />
           )}
         </TabsTrigger>
         <TabsTrigger 
           value="courses"
-          className="flex flex-col items-center gap-1 py-3 relative data-[state=active]:bg-transparent hover:bg-muted/50 data-[state=active]:text-foreground data-[state=active]:shadow-none"
+          className="flex items-center justify-center gap-2 py-4 relative data-[state=active]:bg-transparent hover:bg-muted/50 data-[state=active]:text-foreground data-[state=active]:shadow-none border-0"
         >
-          <div className="flex items-center gap-2">
-            <Trophy className="h-4 w-4" />
-            <span className="text-sm font-medium">Top 100</span>
-          </div>
+          <Trophy className="h-4 w-4" />
+          <span className="text-sm font-medium">Top 100</span>
           {activeTab === 'courses' && (
             <div 
-              className="w-1.5 h-1.5 rounded-full bg-[#b66b41] mt-1 animate-fade-in"
-              style={{ marginTop: '4px' }}
+              className="w-1.5 h-1.5 rounded-full bg-[#b66b41] ml-1"
             />
           )}
         </TabsTrigger>
