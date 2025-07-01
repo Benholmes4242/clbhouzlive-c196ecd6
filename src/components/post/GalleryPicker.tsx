@@ -417,33 +417,23 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
 
               {/* Post Photo Button */}
               <button
-                onTouchStart={() => console.log('🟢 TOUCH START on Photo Button')}
-                onTouchEnd={() => console.log('🟢 TOUCH END on Photo Button')} 
-                onMouseDown={() => console.log('🟢 MOUSE DOWN on Photo Button')}
-                onMouseUp={() => console.log('🟢 MOUSE UP on Photo Button')}
-                onPointerDown={() => console.log('🟢 POINTER DOWN on Photo Button')}
-                onPointerUp={() => console.log('🟢 POINTER UP on Photo Button')}
                 onClick={() => {
                   console.log('🔴 MOBILE PHOTO BUTTON CLICKED - Event triggered');
+                  alert('Red button clicked!'); // Add alert to confirm
                   handlePhotoClick();
                 }}
                 style={{ 
                   width: '100%',
                   height: 'auto',
                   padding: '16px',
-                  backgroundColor: 'red', // Make it very obvious
+                  backgroundColor: 'red',
                   border: '2px solid #b66b41',
                   color: 'white',
                   borderRadius: '12px',
                   display: 'flex',
                   alignItems: 'flex-start',
                   gap: '16px',
-                  cursor: 'pointer',
-                  userSelect: 'none',
-                  WebkitUserSelect: 'none',
-                  WebkitTouchCallout: 'none',
-                  zIndex: 9999,
-                  position: 'relative'
+                  cursor: 'pointer'
                 }}
               >
                 <Image className="h-6 w-6 mt-1 flex-shrink-0" />
