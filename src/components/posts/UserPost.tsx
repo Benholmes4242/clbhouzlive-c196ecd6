@@ -24,6 +24,7 @@ import EditPostDialog from './EditPostDialog';
 import TaggedText from './TaggedText';
 import VideoPreview from './VideoPreview';
 import CoursePostBadge from './CoursePostBadge';
+import GolfCoursePin from './GolfCoursePin';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { useFullscreenMedia } from '@/hooks/useFullscreenMedia';
 import { showToast } from '@/utils/toast';
@@ -75,6 +76,14 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
 
   // Find golf club tags to show as course badges
   const golfClubTags = post.post_tags?.filter(tag => tag.entity_type === 'golf_club') || [];
+  
+  // Debug logging
+  console.log('UserPost - Post data:', {
+    postId: post.id,
+    totalTags: post.post_tags?.length || 0,
+    golfClubTags: golfClubTags.length,
+    golfClubTagsData: golfClubTags
+  });
 
   const handleDeletePost = async () => {
     if (!isOwnPost || isDeleting) return;
@@ -128,7 +137,15 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
 
   // Create carousel items from media
   const carouselItems = post.post_media?.map((media, index) => (
-    <div key={media.id} className="w-full aspect-square">
+    <div key={media.id} className="w-full aspect-square relative">
+      {/* Golf Course Pin overlay on each media item */}
+      {golfClubTags.length > 0 && (
+        <GolfCoursePin 
+          courseName={golfClubTags[0].name}
+          className="absolute top-2 right-2 z-10"
+        />
+      )}
+      
       {media.media_type === 'image' ? (
         <img
           src={media.media_url}
@@ -212,7 +229,7 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
                 key={tag.id}
                 course={{
                   id: tag.entity_id,
-                  name: tag.name,
+                  name: tag.name, 
                   country: 'Scotland', // Default fallback since we don't have country in tags
                   region: undefined
                 }}

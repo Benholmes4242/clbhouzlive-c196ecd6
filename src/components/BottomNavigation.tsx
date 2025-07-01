@@ -65,18 +65,39 @@ const BottomNavigation = () => {
       hasMultipleFiles: selectedFiles.length > 0,
       caption,
       tagCount: localSelectedTags.length,
-      course: selectedCourse?.name
+      course: selectedCourse ? {
+        id: selectedCourse.id,
+        name: selectedCourse.name,
+        country: selectedCourse.country
+      } : null
     });
 
     // Use multiple files if available, otherwise use single file
     const mediaFiles = selectedFiles.length > 0 ? selectedFiles : (selectedFile ? [selectedFile] : []);
+
+    // Create golf course tag if a course is selected
+    const finalTags = [...localSelectedTags];
+    if (selectedCourse) {
+      console.log('Adding golf course tag:', selectedCourse);
+      
+      // Add golf course as a tag
+      finalTags.push({
+        id: `golf-club-${selectedCourse.id}`,
+        entity_type: 'golf_club',
+        entity_id: selectedCourse.id,
+        name: selectedCourse.name,
+        username: null
+      });
+    }
+
+    console.log('Final tags to submit:', finalTags);
 
     try {
       await submitPost({
         user,
         content: caption,
         mediaFiles,
-        selectedTags: localSelectedTags,
+        selectedTags: finalTags,
         onSuccess: () => {
           console.log('Post submission successful');
           closeComposer();
