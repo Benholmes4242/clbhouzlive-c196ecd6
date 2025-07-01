@@ -41,14 +41,6 @@ const ThomasHandicapLayout: React.FC = () => {
           </div>
         </CardContent>
       </Card>
-
-      {/* Top 100 Profile Header */}
-      <div className="mt-6 mb-4">
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">Thomas's Top 100 Golf Courses</h2>
-        <p className="text-sm text-gray-500">
-          Here's how Thomas has ranked the world's best golf courses based on the ones they've played.
-        </p>
-      </div>
     </div>
   );
 };

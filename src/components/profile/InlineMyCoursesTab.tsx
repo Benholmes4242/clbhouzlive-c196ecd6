@@ -20,6 +20,16 @@ const InlineMyCoursesTab: React.FC<InlineMyCoursesTabProps> = ({
   onRegionClick,
   onEGConnect
 }) => {
+  // Determine the display name for the header
+  const getDisplayName = () => {
+    if (isOwnProfile) {
+      return 'My';
+    }
+    return profile?.display_name || profile?.username || 'User\'s';
+  };
+
+  const displayName = getDisplayName();
+
   return (
     <div className="space-y-6 p-4">
       {/* Handicap Card - only for individual users */}
@@ -35,6 +45,19 @@ const InlineMyCoursesTab: React.FC<InlineMyCoursesTabProps> = ({
         />
       )}
       
+      {/* Top 100 Profile Header */}
+      <div className="mt-6 mb-4">
+        <h2 className="text-xl font-semibold text-gray-900 mb-2">
+          {isOwnProfile ? 'My Top 100 Golf Courses' : `${displayName}'s Top 100 Golf Courses`}
+        </h2>
+        <p className="text-sm text-gray-500">
+          {isOwnProfile 
+            ? "Here's how you've ranked the world's best golf courses based on the ones you've played."
+            : `Here's how ${displayName} has ranked the world's best golf courses based on the ones they've played.`
+          }
+        </p>
+      </div>
+
       {/* My Courses Content - embedded inline */}
       <div className="mt-6">
         <UserCoursesContent username={username} />
