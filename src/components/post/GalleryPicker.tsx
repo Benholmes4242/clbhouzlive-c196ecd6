@@ -317,12 +317,24 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
           {isMultiSelectMode ? (
             <MultiSelectPreview />
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-4" style={{ backgroundColor: 'lightblue', padding: '10px', border: '2px solid red' }}>
               <div className="bg-yellow-200 p-2 text-xs rounded">
                 🟡 DEBUG: Mobile sheet content rendering - buttons should appear below
               </div>
               
+              <div className="bg-green-200 p-2 text-xs rounded">
+                🟢 DEBUG: Button container - {isMultiSelectMode ? 'MULTI-SELECT MODE' : 'NORMAL MODE'}
+              </div>
+              
+              {/* Test div to ensure content shows */}
+              <div className="bg-red-200 p-4 text-center font-bold">
+                🔴 TEST: Can you see this red box? If yes, buttons should render below.
+              </div>
+              
               {/* Capture Button */}
+              <div className="bg-purple-200 p-2 text-xs rounded">
+                🟣 DEBUG: About to render CAPTURE button
+              </div>
               <button
                 onTouchStart={(e) => {
                   console.log('🔴 MOBILE CAPTURE BUTTON TOUCH START');
@@ -335,8 +347,20 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
                   e.stopPropagation();
                   handleCameraClick();
                 }}
-                className="w-full h-auto p-4 bg-white border-2 border-[#b66b41] text-[#b66b41] hover:bg-[#b66b41] hover:text-white transition-all duration-200 rounded-xl flex items-start gap-4 cursor-pointer touch-manipulation"
-                style={{ WebkitTapHighlightColor: 'transparent' }}
+                style={{ 
+                  width: '100%',
+                  height: 'auto',
+                  padding: '16px',
+                  backgroundColor: 'white',
+                  border: '2px solid #b66b41',
+                  color: '#b66b41',
+                  borderRadius: '12px',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '16px',
+                  cursor: 'pointer',
+                  WebkitTapHighlightColor: 'transparent'
+                }}
               >
                 <Camera className="h-6 w-6 mt-1 flex-shrink-0" />
                 <div className="text-left">
@@ -344,6 +368,10 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
                   <div className="text-sm opacity-70 font-normal">High quality camera</div>
                 </div>
               </button>
+              
+              <div className="bg-purple-200 p-2 text-xs rounded">
+                🟣 DEBUG: CAPTURE button rendered - PHOTO button coming next
+              </div>
 
               {/* Post Photo Button */}
               <button
