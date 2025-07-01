@@ -333,7 +333,7 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
   );
 
   // Mobile Version - Bottom Sheet  
-  if (isActuallyMobile) {
+  if (true) { // Force mobile version for debugging
     console.log('🟡 Rendering MOBILE version with Sheet');
     return (
       <Sheet open={isOpen} onOpenChange={handleClose}>
