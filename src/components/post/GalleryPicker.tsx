@@ -96,6 +96,12 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
   const handlePhotoClick = () => {
     console.log('📸 PHOTO BUTTON CLICKED');
     
+    // Store to localStorage for persistent tracking
+    localStorage.setItem('photo_flow_debug', JSON.stringify({
+      step: 'button_clicked',
+      timestamp: Date.now()
+    }));
+    
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
@@ -107,8 +113,18 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
       multiple: input.multiple
     });
     
+    localStorage.setItem('photo_flow_debug', JSON.stringify({
+      step: 'input_created',
+      timestamp: Date.now()
+    }));
+    
     input.onchange = (e) => {
       console.log('📸 PHOTO INPUT CHANGE EVENT TRIGGERED');
+      localStorage.setItem('photo_flow_debug', JSON.stringify({
+        step: 'change_event_triggered',
+        timestamp: Date.now()
+      }));
+      
       const target = e.target as HTMLInputElement;
       const files = target.files;
       console.log('📸 Photo input change event triggered', { 
@@ -120,6 +136,11 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
       if (files && files.length > 0) {
         const fileArray = Array.from(files);
         console.log('📸 Photo files selected:', fileArray.length, 'files');
+        localStorage.setItem('photo_flow_debug', JSON.stringify({
+          step: 'files_selected',
+          fileCount: fileArray.length,
+          timestamp: Date.now()
+        }));
         
         if (fileArray.length === 1) {
           console.log('📸 Single photo selected, calling onFileSelected with:', fileArray[0].name);
@@ -136,12 +157,21 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
         }
       } else {
         console.warn('📸 No files selected from photo input');
+        localStorage.setItem('photo_flow_debug', JSON.stringify({
+          step: 'no_files_selected',
+          timestamp: Date.now()
+        }));
       }
     };
     
     console.log('📸 About to trigger photo input click');
     input.click();
     console.log('📸 Photo input click triggered');
+    
+    localStorage.setItem('photo_flow_debug', JSON.stringify({
+      step: 'click_triggered',
+      timestamp: Date.now()
+    }));
   };
 
   const handleVideoClick = () => {
