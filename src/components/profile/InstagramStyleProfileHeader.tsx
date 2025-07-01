@@ -12,14 +12,12 @@ interface InstagramStyleProfileHeaderProps {
     isFollowing: boolean;
     friendStatus: 'pending' | 'accepted' | null;
   } | null;
-  postCount?: number;
 }
 
 const InstagramStyleProfileHeader: React.FC<InstagramStyleProfileHeaderProps> = ({
   profile,
   currentUser,
-  relationshipStatus,
-  postCount = 0
+  relationshipStatus
 }) => {
   const { user } = useSupabaseSession();
   const isOwnProfile = user?.id === profile?.id;
@@ -29,8 +27,8 @@ const InstagramStyleProfileHeader: React.FC<InstagramStyleProfileHeaderProps> = 
 
   return (
     <div className="bg-white border-b border-gray-200 p-4">
+      {/* Profile Photo and Basic Info */}
       <div className="flex items-center space-x-4 mb-4">
-        {/* Profile Photo */}
         <div className="flex-shrink-0">
           <ProfilePhotoManager
             user={isOwnProfile ? user : null}
@@ -39,7 +37,6 @@ const InstagramStyleProfileHeader: React.FC<InstagramStyleProfileHeaderProps> = 
           />
         </div>
 
-        {/* Profile Info */}
         <div className="flex-1 min-w-0">
           <h1 className="text-xl font-bold text-gray-900 truncate">
             {displayName}
@@ -53,19 +50,13 @@ const InstagramStyleProfileHeader: React.FC<InstagramStyleProfileHeaderProps> = 
         </div>
       </div>
 
-      {/* Stats Row */}
+      {/* Stats Row - Followers, Following, Friends */}
       <div className="mb-4">
-        <div className="flex justify-around text-center">
-          <div>
-            <div className="text-lg font-bold text-gray-900">{postCount}</div>
-            <div className="text-xs text-gray-600">Posts</div>
-          </div>
-          <FollowerStats 
-            userId={profile?.id} 
-            userType={profile?.user_type || 'individual'} 
-            username={profile?.username}
-          />
-        </div>
+        <FollowerStats 
+          userId={profile?.id} 
+          userType={profile?.user_type || 'individual'} 
+          username={profile?.username}
+        />
       </div>
 
       {/* Action Buttons */}

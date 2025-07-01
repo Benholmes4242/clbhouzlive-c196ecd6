@@ -14,7 +14,7 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   profileDisplayName
 }) => {
   return (
-    <div className="space-y-4">
+    <div className="p-4">
       <EnhancedSocialActivity
         userId={userId}
         isOwnProfile={isOwnProfile}

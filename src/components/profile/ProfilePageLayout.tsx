@@ -15,7 +15,6 @@ interface ProfilePageLayoutProps {
   regionProgress: any;
   onRegionClick: (region: string) => void;
   onEGConnect: () => void;
-  postCount?: number;
 }
 
 const ProfilePageLayout: React.FC<ProfilePageLayoutProps> = ({
@@ -24,8 +23,7 @@ const ProfilePageLayout: React.FC<ProfilePageLayoutProps> = ({
   relationshipStatus,
   regionProgress,
   onRegionClick,
-  onEGConnect,
-  postCount = 0
+  onEGConnect
 }) => {
   const [activeTab, setActiveTab] = useState('activity');
   const isOwnProfile = currentUser?.id === profile?.id;
@@ -37,7 +35,6 @@ const ProfilePageLayout: React.FC<ProfilePageLayoutProps> = ({
         profile={profile}
         currentUser={currentUser}
         relationshipStatus={relationshipStatus}
-        postCount={postCount}
       />
 
       {/* Tab Navigation */}
