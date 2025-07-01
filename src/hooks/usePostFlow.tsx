@@ -1,5 +1,5 @@
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 interface TaggableEntity {
   id: string;
@@ -32,14 +32,41 @@ export const usePostFlow = () => {
   const [toastMessage, setToastMessage] = useState('');
   const [selectedCourse, setSelectedCourse] = useState<GolfCourse | null>(null);
 
+  // Clean up preview URL when component unmounts or file changes
+  useEffect(() => {
+    return () => {
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    };
+  }, [previewUrl]);
+
   const openGallery = () => {
     console.log('Opening gallery picker');
+    // Reset state when opening gallery
+    resetState();
     setIsGalleryOpen(true);
   };
 
   const closeGallery = () => {
     console.log('Closing gallery picker');
     setIsGalleryOpen(false);
+    // Don't reset state here - allow user to try again
+  };
+
+  const resetState = () => {
+    console.log('Resetting post flow state');
+    // Clean up existing preview URL
+    if (previewUrl) {
+      URL.revokeObjectURL(previewUrl);
+    }
+    setSelectedFile(null);
+    setPreviewUrl('');
+    setCaption('');
+    setSelectedTags([]);
+    setSelectedCourse(null);
+    setShowSuggestions(false);
+    setIsSubmitting(false);
   };
 
   const openComposer = (file: File) => {
@@ -49,7 +76,7 @@ export const usePostFlow = () => {
     setIsGalleryOpen(false);
     
     // Clean previous state
-    if (previewUrl) {
+    if (previewUrl && previewUrl !== URL.createObjectURL(file)) {
       URL.revokeObjectURL(previewUrl);
     }
     
@@ -68,16 +95,7 @@ export const usePostFlow = () => {
   const closeComposer = () => {
     console.log('Closing composer');
     setIsComposerOpen(false);
-    setSelectedFile(null);
-    if (previewUrl) {
-      URL.revokeObjectURL(previewUrl);
-    }
-    setPreviewUrl('');
-    setCaption('');
-    setSelectedTags([]);
-    setSelectedCourse(null);
-    setShowSuggestions(false);
-    setIsSubmitting(false);
+    resetState();
   };
 
   const showConfirmationToast = (message: string) => {
@@ -117,6 +135,7 @@ export const usePostFlow = () => {
     openComposer,
     closeComposer,
     showConfirmationToast,
-    hideToast
+    hideToast,
+    resetState
   };
 };

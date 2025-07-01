@@ -1,37 +1,45 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Camera, Image, Video } from 'lucide-react';
+import { Camera, Image, Video, X, Check } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface GalleryPickerProps {
   isOpen: boolean;
   onClose: () => void;
   onFileSelected: (file: File) => void;
+  onMultipleFilesSelected?: (files: File[]) => void;
 }
 
-const GalleryPicker = ({ isOpen, onClose, onFileSelected }: GalleryPickerProps) => {
+const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelected }: GalleryPickerProps) => {
   const isMobile = useIsMobile();
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const [isMultiSelectMode, setIsMultiSelectMode] = useState(false);
 
   const handleCameraClick = () => {
     if (!isMobile) return;
     
-    console.log('Camera click - opening camera');
+    console.log('Camera click - opening high quality camera');
     
-    // Create input for camera capture
+    // Create input for camera capture with high quality settings
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*,video/*';
     input.capture = 'environment';
     
+    // Add attributes for high quality capture
+    input.setAttribute('capture', 'camera');
+    
     input.onchange = (e) => {
       const target = e.target as HTMLInputElement;
       const file = target.files?.[0];
       if (file) {
-        console.log('Camera file selected:', file.name, file.type);
+        console.log('Camera file selected:', file.name, file.type, `${(file.size / 1024 / 1024).toFixed(2)}MB`);
         onFileSelected(file);
+        onClose();
       }
     };
     
@@ -44,14 +52,25 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected }: GalleryPickerProps) 
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
-    input.multiple = false;
+    input.multiple = true;
     
     input.onchange = (e) => {
       const target = e.target as HTMLInputElement;
-      const file = target.files?.[0];
-      if (file) {
-        console.log('Photo file selected:', file.name, file.type);
-        onFileSelected(file);
+      const files = target.files;
+      if (files && files.length > 0) {
+        const fileArray = Array.from(files);
+        console.log('Photo files selected:', fileArray.length, 'files');
+        
+        if (fileArray.length === 1) {
+          onFileSelected(fileArray[0]);
+          onClose();
+        } else {
+          // Multiple files selected - enter multi-select mode
+          setSelectedFiles(fileArray);
+          const urls = fileArray.map(file => URL.createObjectURL(file));
+          setPreviewUrls(urls);
+          setIsMultiSelectMode(true);
+        }
       }
     };
     
@@ -64,76 +83,183 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected }: GalleryPickerProps) 
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'video/*';
-    input.multiple = false;
+    input.multiple = true;
     
     input.onchange = (e) => {
       const target = e.target as HTMLInputElement;
-      const file = target.files?.[0];
-      if (file) {
-        console.log('Video file selected:', file.name, file.type);
-        onFileSelected(file);
+      const files = target.files;
+      if (files && files.length > 0) {
+        const fileArray = Array.from(files);
+        console.log('Video files selected:', fileArray.length, 'files');
+        
+        if (fileArray.length === 1) {
+          onFileSelected(fileArray[0]);
+          onClose();
+        } else {
+          // Multiple files selected
+          setSelectedFiles(fileArray);
+          const urls = fileArray.map(file => URL.createObjectURL(file));
+          setPreviewUrls(urls);
+          setIsMultiSelectMode(true);
+        }
       }
     };
     
     input.click();
   };
 
+  const handleFileRemove = (index: number) => {
+    const newFiles = selectedFiles.filter((_, i) => i !== index);
+    const newUrls = previewUrls.filter((_, i) => i !== index);
+    
+    // Clean up removed URL
+    URL.revokeObjectURL(previewUrls[index]);
+    
+    setSelectedFiles(newFiles);
+    setPreviewUrls(newUrls);
+    
+    if (newFiles.length === 0) {
+      setIsMultiSelectMode(false);
+    }
+  };
+
+  const handleConfirmSelection = () => {
+    if (selectedFiles.length > 0) {
+      if (onMultipleFilesSelected) {
+        onMultipleFilesSelected(selectedFiles);
+      } else {
+        // Fallback to single file if multiple not supported
+        onFileSelected(selectedFiles[0]);
+      }
+      
+      // Clean up
+      previewUrls.forEach(url => URL.revokeObjectURL(url));
+      setSelectedFiles([]);
+      setPreviewUrls([]);
+      setIsMultiSelectMode(false);
+      onClose();
+    }
+  };
+
+  const handleClose = () => {
+    // Clean up preview URLs
+    previewUrls.forEach(url => URL.revokeObjectURL(url));
+    setSelectedFiles([]);
+    setPreviewUrls([]);
+    setIsMultiSelectMode(false);
+    onClose();
+  };
+
+  // Multi-select preview component
+  const MultiSelectPreview = () => (
+    <div className="space-y-4">
+      <div className="text-center">
+        <h3 className="text-lg font-semibold mb-2">Selected Media ({selectedFiles.length})</h3>
+        <p className="text-sm text-gray-500">Review your selection below</p>
+      </div>
+      
+      <div className="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto">
+        {previewUrls.map((url, index) => {
+          const file = selectedFiles[index];
+          const isVideo = file.type.startsWith('video/');
+          
+          return (
+            <div key={index} className="relative group">
+              {isVideo ? (
+                <video 
+                  src={url} 
+                  className="w-full h-24 object-cover rounded-lg"
+                  muted
+                />
+              ) : (
+                <img 
+                  src={url} 
+                  alt={`Preview ${index + 1}`}
+                  className="w-full h-24 object-cover rounded-lg"
+                />
+              )}
+              <button
+                onClick={() => handleFileRemove(index)}
+                className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+              >
+                <X size={12} />
+              </button>
+            </div>
+          );
+        })}
+      </div>
+      
+      <div className="flex gap-2">
+        <Button onClick={handleClose} variant="outline" className="flex-1">
+          Cancel
+        </Button>
+        <Button onClick={handleConfirmSelection} className="flex-1 bg-[#b66b41] hover:bg-[#a55a3a] text-white">
+          <Check size={16} className="mr-2" />
+          Use Selected ({selectedFiles.length})
+        </Button>
+      </div>
+    </div>
+  );
+
   // Mobile Version - Bottom Sheet
   if (isMobile) {
     return (
-      <Sheet open={isOpen} onOpenChange={onClose}>
+      <Sheet open={isOpen} onOpenChange={handleClose}>
         <SheetContent side="bottom" className="h-auto p-6 rounded-t-2xl">
           <SheetHeader className="mb-6">
             <SheetTitle className="text-center text-xl font-semibold">
-              Create a Moment
+              {isMultiSelectMode ? 'Selected Media' : 'Create a Moment'}
             </SheetTitle>
           </SheetHeader>
           
-          <div className="space-y-4">
-            {/* Capture Button */}
-            <Button
-              onClick={handleCameraClick}
-              className="w-full h-auto p-4 bg-white border-2 border-[#b66b41] text-[#b66b41] hover:bg-[#b66b41] hover:text-white transition-all duration-200 rounded-xl flex items-start gap-4"
-              variant="outline"
-            >
-              <Camera className="h-6 w-6 mt-1 flex-shrink-0" />
-              <div className="text-left">
-                <div className="font-bold text-base">Capture a Photo or Video</div>
-                <div className="text-sm opacity-70 font-normal">Use your device camera</div>
-              </div>
-            </Button>
+          {isMultiSelectMode ? (
+            <MultiSelectPreview />
+          ) : (
+            <div className="space-y-4">
+              {/* Capture Button */}
+              <Button
+                onClick={handleCameraClick}
+                className="w-full h-auto p-4 bg-white border-2 border-[#b66b41] text-[#b66b41] hover:bg-[#b66b41] hover:text-white transition-all duration-200 rounded-xl flex items-start gap-4"
+                variant="outline"
+              >
+                <Camera className="h-6 w-6 mt-1 flex-shrink-0" />
+                <div className="text-left">
+                  <div className="font-bold text-base">Capture Photo or Video</div>
+                  <div className="text-sm opacity-70 font-normal">High quality camera</div>
+                </div>
+              </Button>
 
-            {/* Post Photo Button */}
-            <Button
-              onClick={handlePhotoClick}
-              className="w-full h-auto p-4 bg-white border-2 border-[#b66b41] text-[#b66b41] hover:bg-[#b66b41] hover:text-white transition-all duration-200 rounded-xl flex items-start gap-4"
-              variant="outline"
-            >
-              <Image className="h-6 w-6 mt-1 flex-shrink-0" />
-              <div className="text-left">
-                <div className="font-bold text-base">Post a Photo</div>
-                <div className="text-sm opacity-70 font-normal">Select from gallery</div>
-              </div>
-            </Button>
+              {/* Post Photo Button */}
+              <Button
+                onClick={handlePhotoClick}
+                className="w-full h-auto p-4 bg-white border-2 border-[#b66b41] text-[#b66b41] hover:bg-[#b66b41] hover:text-white transition-all duration-200 rounded-xl flex items-start gap-4"
+                variant="outline"
+              >
+                <Image className="h-6 w-6 mt-1 flex-shrink-0" />
+                <div className="text-left">
+                  <div className="font-bold text-base">Select Photos</div>
+                  <div className="text-sm opacity-70 font-normal">Single or multiple selection</div>
+                </div>
+              </Button>
 
-            {/* Post Video Button */}
-            <Button
-              onClick={handleVideoClick}
-              className="w-full h-auto p-4 bg-white border-2 border-[#b66b41] text-[#b66b41] hover:bg-[#b66b41] hover:text-white transition-all duration-200 rounded-xl flex items-start gap-4"
-              variant="outline"
-            >
-              <Video className="h-6 w-6 mt-1 flex-shrink-0" />
-              <div className="text-left">
-                <div className="font-bold text-base">Post a Video</div>
-                <div className="text-sm opacity-70 font-normal">Select from gallery</div>
-              </div>
-            </Button>
+              {/* Post Video Button */}
+              <Button
+                onClick={handleVideoClick}
+                className="w-full h-auto p-4 bg-white border-2 border-[#b66b41] text-[#b66b41] hover:bg-[#b66b41] hover:text-white transition-all duration-200 rounded-xl flex items-start gap-4"
+                variant="outline"
+              >
+                <Video className="h-6 w-6 mt-1 flex-shrink-0" />
+                <div className="text-left">
+                  <div className="font-bold text-base">Select Videos</div>
+                  <div className="text-sm opacity-70 font-normal">Single or multiple selection</div>
+                </div>
+              </Button>
 
-            {/* Helper Text */}
-            <p className="text-center text-sm text-gray-500 mt-6 px-4">
-              After selection, you'll be able to write a caption, tag a golf club, and post.
-            </p>
-          </div>
+              <p className="text-center text-sm text-gray-500 mt-6 px-4">
+                Select multiple files to create a carousel post with swipeable media.
+              </p>
+            </div>
+          )}
         </SheetContent>
       </Sheet>
     );
@@ -141,40 +267,41 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected }: GalleryPickerProps) 
 
   // Desktop Version - Dialog Modal
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-md mx-auto p-8 rounded-2xl shadow-2xl animate-scale-in">
         <DialogHeader className="mb-8">
           <DialogTitle className="text-center text-2xl font-semibold">
-            Create a Moment
+            {isMultiSelectMode ? 'Selected Media' : 'Create a Moment'}
           </DialogTitle>
         </DialogHeader>
         
-        <div className="space-y-6">
-          {/* Post Photo Button */}
-          <Button
-            onClick={handlePhotoClick}
-            className="w-full h-20 bg-white border-2 border-[#b66b41] text-[#b66b41] hover:bg-[#b66b41] hover:text-white transition-all duration-200 rounded-xl flex items-center justify-center gap-3 text-lg font-semibold"
-            variant="outline"
-          >
-            <Image className="h-6 w-6" />
-            Post a Photo
-          </Button>
+        {isMultiSelectMode ? (
+          <MultiSelectPreview />
+        ) : (
+          <div className="space-y-6">
+            <Button
+              onClick={handlePhotoClick}
+              className="w-full h-20 bg-white border-2 border-[#b66b41] text-[#b66b41] hover:bg-[#b66b41] hover:text-white transition-all duration-200 rounded-xl flex items-center justify-center gap-3 text-lg font-semibold"
+              variant="outline"
+            >
+              <Image className="h-6 w-6" />
+              Select Photos
+            </Button>
 
-          {/* Post Video Button */}
-          <Button
-            onClick={handleVideoClick}
-            className="w-full h-20 bg-white border-2 border-[#b66b41] text-[#b66b41] hover:bg-[#b66b41] hover:text-white transition-all duration-200 rounded-xl flex items-center justify-center gap-3 text-lg font-semibold"
-            variant="outline"
-          >
-            <Video className="h-6 w-6" />
-            Post a Video
-          </Button>
+            <Button
+              onClick={handleVideoClick}
+              className="w-full h-20 bg-white border-2 border-[#b66b41] text-[#b66b41] hover:bg-[#b66b41] hover:text-white transition-all duration-200 rounded-xl flex items-center justify-center gap-3 text-lg font-semibold"
+              variant="outline"
+            >
+              <Video className="h-6 w-6" />
+              Select Videos
+            </Button>
 
-          {/* Helper Text */}
-          <p className="text-center text-sm text-gray-500 mt-8 px-2">
-            You'll be able to write a caption and tag friends or clubs after selecting your media.
-          </p>
-        </div>
+            <p className="text-center text-sm text-gray-500 mt-8 px-2">
+              Select multiple files to create carousel posts with swipeable media.
+            </p>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );

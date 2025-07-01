@@ -46,6 +46,9 @@ const BottomNavigation = () => {
     hideToast
   } = usePostFlow();
 
+  // State for multiple files
+  const [selectedFiles, setSelectedFiles] = React.useState<File[]>([]);
+
   const handleSubmitPost = async () => {
     if (!user) {
       console.error('No user found for post submission');
@@ -57,13 +60,14 @@ const BottomNavigation = () => {
     
     console.log('Starting post submission with:', {
       hasFile: !!selectedFile,
+      hasMultipleFiles: selectedFiles.length > 0,
       caption,
       tagCount: selectedTags.length,
       course: selectedCourse?.name
     });
 
-    // Convert single file to array for submission
-    const mediaFiles = selectedFile ? [selectedFile] : [];
+    // Use multiple files if available, otherwise use single file
+    const mediaFiles = selectedFiles.length > 0 ? selectedFiles : (selectedFile ? [selectedFile] : []);
 
     try {
       await submitPost({
@@ -74,6 +78,7 @@ const BottomNavigation = () => {
         onSuccess: () => {
           console.log('Post submission successful');
           closeComposer();
+          setSelectedFiles([]);
           showConfirmationToast('Post shared successfully!');
         },
         onError: () => {
@@ -105,7 +110,18 @@ const BottomNavigation = () => {
       type: file.type,
       size: file.size
     });
+    setSelectedFiles([]); // Clear multiple files when single file selected
     openComposer(file);
+  };
+
+  const handleMultipleFilesSelected = (files: File[]) => {
+    console.log('BottomNavigation handleMultipleFilesSelected called with:', {
+      count: files.length,
+      files: files.map(f => ({ name: f.name, type: f.type, size: f.size }))
+    });
+    setSelectedFiles(files);
+    // Use the first file for the composer preview
+    openComposer(files[0]);
   };
 
   const onCaptionInput = (e: React.FormEvent<HTMLDivElement>) => {
@@ -145,12 +161,14 @@ const BottomNavigation = () => {
         isOpen={isGalleryOpen}
         onClose={closeGallery}
         onFileSelected={handleFileSelected}
+        onMultipleFilesSelected={handleMultipleFilesSelected}
       />
 
       <CreateMomentModal
         isOpen={isComposerOpen}
         onClose={closeComposer}
         selectedFile={selectedFile}
+        selectedFiles={selectedFiles}
         previewUrl={previewUrl}
         captionInputRef={captionInputRef}
         onCaptionInput={onCaptionInput}
