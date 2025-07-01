@@ -22,7 +22,6 @@ import { SwipeCarousel } from '@/components/ui/swipe-carousel';
 import EditPostDialog from './EditPostDialog';
 import TaggedText from './TaggedText';
 import VideoPreview from './VideoPreview';
-import CoursePostBadge from './CoursePostBadge';
 import GolfCoursePin from './GolfCoursePin';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { useFullscreenMedia } from '@/hooks/useFullscreenMedia';
@@ -169,6 +168,7 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
       {golfCourse && (
         <GolfCoursePin 
           courseName={golfCourse.name}
+          courseRegion={golfCourse.region}
           className="absolute top-2 right-2 z-10"
         />
       )}
@@ -245,21 +245,6 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
         {post.content && (
           <div className="text-sm mb-3">
             <TaggedText text={post.content} tags={post.post_tags} />
-          </div>
-        )}
-
-        {/* Golf Course Badges - Show above media when golf course is found */}
-        {golfCourse && (
-          <div className="mb-3">
-            <CoursePostBadge
-              course={{
-                id: golfCourse.id,
-                name: golfCourse.name, 
-                country: golfCourse.country || 'Unknown',
-                region: golfCourse.region
-              }}
-              className="mb-2"
-            />
           </div>
         )}
 

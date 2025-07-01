@@ -1,7 +1,8 @@
+
 import React, { useRef, useEffect, useState } from 'react';
 import { Play, Pause, Maximize2 } from 'lucide-react';
 import { SwipeCarousel } from '@/components/ui/swipe-carousel';
-import CoursePostBadge from '../posts/CoursePostBadge';
+import GolfCoursePin from '../posts/GolfCoursePin';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { useFullscreenMedia } from '@/hooks/useFullscreenMedia';
 
@@ -88,30 +89,34 @@ const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentPr
 
   const allImages = getAllImages();
 
+  // Create image elements with golf course pin overlay
+  const createImageWithPin = (imageUrl: string, index: number) => (
+    <div key={index} className="relative">
+      <img
+        src={imageUrl}
+        alt={`Post content ${index + 1}`}
+        className="w-full h-80 object-cover object-center cursor-pointer"
+        loading="lazy"
+        onClick={() => handleImageClick(imageUrl)}
+      />
+      {/* Golf Course Pin overlay */}
+      {content.golfCourse && (
+        <GolfCoursePin 
+          courseName={content.golfCourse.name}
+          courseRegion={content.golfCourse.region}
+        />
+      )}
+      {golfClubTags.length > 0 && !content.golfCourse && (
+        <GolfCoursePin 
+          courseName={golfClubTags[0].name}
+        />
+      )}
+    </div>
+  );
+
   return (
     <>
       <p className="text-sm mb-3">{content.description}</p>
-      
-      {/* Golf Course Badge - Show above media when available from either source */}
-      {(content.golfCourse || golfClubTags.length > 0) && (
-        <>
-          {content.golfCourse && (
-            <CoursePostBadge course={content.golfCourse} />
-          )}
-          {golfClubTags.map((tag) => (
-            <CoursePostBadge
-              key={tag.id}
-              course={{
-                id: tag.entity_id,
-                name: tag.name,
-                country: 'Scotland', // Default fallback since we don't have country in tags
-                region: undefined
-              }}
-              className="mb-2 last:mb-0"
-            />
-          ))}
-        </>
-      )}
       
       <div className="relative rounded-lg overflow-hidden mb-3">
         {content.type === 'video' ? (
@@ -138,6 +143,18 @@ const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentPr
                         }
                       }}
                     />
+                    {/* Golf Course Pin overlay on video thumbnail */}
+                    {content.golfCourse && (
+                      <GolfCoursePin 
+                        courseName={content.golfCourse.name}
+                        courseRegion={content.golfCourse.region}
+                      />
+                    )}
+                    {golfClubTags.length > 0 && !content.golfCourse && (
+                      <GolfCoursePin 
+                        courseName={golfClubTags[0].name}
+                      />
+                    )}
                     <div className="absolute inset-0 bg-black/20 flex items-center justify-center group-hover:bg-black/30 transition-all">
                       <div className="bg-white/90 rounded-full p-4 group-hover:scale-110 transition-transform shadow-lg">
                         <Play className="h-8 w-8 text-red-600 fill-current ml-1" />
@@ -178,6 +195,19 @@ const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentPr
                   preload="metadata"
                 />
                 
+                {/* Golf Course Pin overlay on video */}
+                {content.golfCourse && (
+                  <GolfCoursePin 
+                    courseName={content.golfCourse.name}
+                    courseRegion={content.golfCourse.region}
+                  />
+                )}
+                {golfClubTags.length > 0 && !content.golfCourse && (
+                  <GolfCoursePin 
+                    courseName={golfClubTags[0].name}
+                  />
+                )}
+                
                 {/* Video Controls Overlay */}
                 <div className={`absolute inset-0 flex items-center justify-center transition-opacity ${showControls || !isPlaying ? 'opacity-100' : 'opacity-0'}`}>
                   <div 
@@ -193,7 +223,7 @@ const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentPr
                 </div>
 
                 {/* Fullscreen Button */}
-                <div className={`absolute top-2 right-2 transition-opacity ${showControls ? 'opacity-100' : 'opacity-0'}`}>
+                <div className={`absolute top-2 left-2 transition-opacity ${showControls ? 'opacity-100' : 'opacity-0'}`}>
                   <button
                     onClick={() => handleVideoFullscreen(content.videoUrl!)}
                     className="bg-black/70 text-white p-2 rounded-full hover:bg-black/80 transition-colors"
@@ -204,7 +234,7 @@ const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentPr
 
                 {/* Duration Badge */}
                 {content.duration && (
-                  <div className="absolute bottom-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
+                  <div className="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
                     {content.duration}
                   </div>
                 )}
@@ -212,30 +242,15 @@ const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentPr
             ) : null}
           </div>
         ) : allImages.length > 1 ? (
-          // Multiple images - use SwipeCarousel with click handlers
+          // Multiple images - use SwipeCarousel with click handlers and pins
           <SwipeCarousel
-            items={allImages.map((imageUrl, index) => (
-              <img
-                key={index}
-                src={imageUrl}
-                alt={`Post content ${index + 1}`}
-                className="w-full h-80 object-cover object-center cursor-pointer"
-                loading="lazy"
-                onClick={() => handleImageClick(imageUrl)}
-              />
-            ))}
+            items={allImages.map((imageUrl, index) => createImageWithPin(imageUrl, index))}
             showDots={true}
             showArrows={false}
           />
         ) : allImages.length === 1 ? (
-          // Single image with click handler
-          <img
-            src={allImages[0]}
-            alt="Post content"
-            className="w-full h-80 object-cover object-center cursor-pointer"
-            loading="lazy"
-            onClick={() => handleImageClick(allImages[0])}
-          />
+          // Single image with click handler and pin
+          createImageWithPin(allImages[0], 0)
         ) : null}
       </div>
 

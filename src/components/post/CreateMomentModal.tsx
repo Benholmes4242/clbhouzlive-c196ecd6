@@ -2,8 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { X, ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import CourseTagInput from '../posts/CourseTagInput';
+import GolfCoursePin from '../posts/GolfCoursePin';
 import { useTaggableEntities } from '@/hooks/useTaggableEntities';
 
 interface TaggableEntity {
@@ -173,12 +174,12 @@ const CreateMomentModal = ({
     
     return (
       <div className="relative">
-        {/* Golf course badge positioned above media */}
+        {/* Golf course pin overlay on preview */}
         {selectedCourse && (
-          <div className="absolute top-2 left-2 z-10 bg-black/70 text-white px-2 py-1 rounded-full text-xs flex items-center gap-1">
-            <MapPin size={12} />
-            <span>{selectedCourse.name}</span>
-          </div>
+          <GolfCoursePin 
+            courseName={selectedCourse.name}
+            courseRegion={selectedCourse.region}
+          />
         )}
         
         {isVideo ? (
@@ -213,7 +214,7 @@ const CreateMomentModal = ({
             </button>
             
             {/* Media counter */}
-            <div className="absolute bottom-2 right-2 bg-black/70 text-white px-2 py-1 rounded-full text-sm">
+            <div className="absolute bottom-2 left-2 bg-black/70 text-white px-2 py-1 rounded-full text-sm">
               {currentMediaIndex + 1} / {mediaFiles.length}
             </div>
           </>
