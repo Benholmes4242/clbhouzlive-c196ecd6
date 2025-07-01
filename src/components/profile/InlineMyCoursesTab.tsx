@@ -1,14 +1,14 @@
 
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Trophy } from 'lucide-react';
+import HandicapCard from './HandicapCard';
+import Top100Interactive from './Top100Interactive';
+import UserCoursesContent from '@/components/courses/UserCoursesContent';
 
 interface InlineMyCoursesTabProps {
   profile: any;
-  regionProgress: Record<string, { played: number; total: number }>;
+  regionProgress: any;
   isOwnProfile: boolean;
-  username: string;
+  username?: string;
   onRegionClick: (region: string) => void;
   onEGConnect: () => void;
 }
@@ -21,37 +21,32 @@ const InlineMyCoursesTab: React.FC<InlineMyCoursesTabProps> = ({
   onRegionClick,
   onEGConnect
 }) => {
-  // Calculate total courses played across all regions
-  const totalPlayedCourses = Object.values(regionProgress).reduce(
-    (sum, region) => sum + region.played, 
-    0
-  );
-
   return (
-    <div className="p-4 space-y-6">
-      {/* Summary Stats Card */}
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <Trophy className="h-5 w-5 text-[#b66b41]" />
-              <h3 className="font-semibold text-lg">Course Statistics</h3>
-            </div>
-            <Badge variant="secondary" className="text-[#b66b41] border-[#b66b41]">
-              {totalPlayedCourses} courses played
-            </Badge>
-          </div>
-          
-          <div className="text-center py-8">
-            <div className="text-3xl font-bold text-[#b66b41] mb-2">
-              {totalPlayedCourses}
-            </div>
-            <p className="text-muted-foreground">
-              Total Top 100 courses played
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="space-y-6 p-4">
+      {/* Handicap Card - only for individual users */}
+      {profile?.user_type === 'individual' && (
+        <HandicapCard
+          handicapIndex={profile?.eg_handicap_index}
+          egAppConnected={profile?.eg_app_connected || false}
+          lastUpdated={profile?.updated_at}
+          isOwnProfile={isOwnProfile}
+          onEGConnect={onEGConnect}
+        />
+      )}
+      
+      {/* Top 100 Interactive - only for individual users */}
+      {profile?.user_type === 'individual' && (
+        <Top100Interactive
+          regionProgress={regionProgress}
+          onRegionClick={onRegionClick}
+          isOwnProfile={isOwnProfile}
+        />
+      )}
+      
+      {/* My Courses Content - embedded inline */}
+      <div className="mt-6">
+        <UserCoursesContent username={username} />
+      </div>
     </div>
   );
 };
