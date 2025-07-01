@@ -291,58 +291,73 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
           ) : (
             <div className="space-y-4">
               {/* Capture Button */}
-              <Button
+              <button
+                onTouchStart={(e) => {
+                  console.log('🔴 CAPTURE BUTTON TOUCH START');
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
                 onClick={(e) => {
                   console.log('🔴 CAPTURE BUTTON CLICKED - Event triggered');
                   e.preventDefault();
                   e.stopPropagation();
                   handleCameraClick();
                 }}
-                className="w-full h-auto p-4 bg-white border-2 border-[#b66b41] text-[#b66b41] hover:bg-[#b66b41] hover:text-white transition-all duration-200 rounded-xl flex items-start gap-4"
-                variant="outline"
+                className="w-full h-auto p-4 bg-white border-2 border-[#b66b41] text-[#b66b41] hover:bg-[#b66b41] hover:text-white transition-all duration-200 rounded-xl flex items-start gap-4 cursor-pointer touch-manipulation"
+                style={{ WebkitTapHighlightColor: 'transparent' }}
               >
                 <Camera className="h-6 w-6 mt-1 flex-shrink-0" />
                 <div className="text-left">
                   <div className="font-bold text-base">Capture Photo or Video</div>
                   <div className="text-sm opacity-70 font-normal">High quality camera</div>
                 </div>
-              </Button>
+              </button>
 
               {/* Post Photo Button */}
-              <Button
+              <button
+                onTouchStart={(e) => {
+                  console.log('🔴 PHOTO BUTTON TOUCH START');
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
                 onClick={(e) => {
                   console.log('🔴 PHOTO BUTTON CLICKED - Event triggered');
                   e.preventDefault();
                   e.stopPropagation();
                   handlePhotoClick();
                 }}
-                className="w-full h-auto p-4 bg-white border-2 border-[#b66b41] text-[#b66b41] hover:bg-[#b66b41] hover:text-white transition-all duration-200 rounded-xl flex items-start gap-4"
-                variant="outline"
+                className="w-full h-auto p-4 bg-white border-2 border-[#b66b41] text-[#b66b41] hover:bg-[#b66b41] hover:text-white transition-all duration-200 rounded-xl flex items-start gap-4 cursor-pointer touch-manipulation"
+                style={{ WebkitTapHighlightColor: 'transparent' }}
               >
                 <Image className="h-6 w-6 mt-1 flex-shrink-0" />
                 <div className="text-left">
                   <div className="font-bold text-base">Select Photos</div>
                   <div className="text-sm opacity-70 font-normal">Single or multiple selection</div>
                 </div>
-              </Button>
+              </button>
 
               {/* Post Video Button */}
-              <Button
+              <button
+                onTouchStart={(e) => {
+                  console.log('🔴 VIDEO BUTTON TOUCH START');
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
                 onClick={(e) => {
                   console.log('🔴 VIDEO BUTTON CLICKED - Event triggered');
                   e.preventDefault();
                   e.stopPropagation();
                   handleVideoClick();
                 }}
-                className="w-full h-auto p-4 bg-white border-2 border-[#b66b41] text-[#b66b41] hover:bg-[#b66b41] hover:text-white transition-all duration-200 rounded-xl flex items-start gap-4"
-                variant="outline"
+                className="w-full h-auto p-4 bg-white border-2 border-[#b66b41] text-[#b66b41] hover:bg-[#b66b41] hover:text-white transition-all duration-200 rounded-xl flex items-start gap-4 cursor-pointer touch-manipulation"
+                style={{ WebkitTapHighlightColor: 'transparent' }}
               >
                 <Video className="h-6 w-6 mt-1 flex-shrink-0" />
                 <div className="text-left">
                   <div className="font-bold text-base">Select Videos</div>
                   <div className="text-sm opacity-70 font-normal">Single or multiple selection</div>
                 </div>
-              </Button>
+              </button>
 
               <p className="text-center text-sm text-gray-500 mt-6 px-4">
                 Select multiple files to create a carousel post with swipeable media.
