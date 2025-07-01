@@ -20,7 +20,7 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
   const [isMultiSelectMode, setIsMultiSelectMode] = useState(false);
 
   const handleCameraClick = () => {
-    console.log('Camera click - mobile camera capture starting', { isMobile });
+    console.log('🎥 CAMERA BUTTON CLICKED - mobile camera capture starting', { isMobile });
     
     // Create input for camera capture with high quality settings
     const input = document.createElement('input');
@@ -33,10 +33,18 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
       input.setAttribute('capture', 'camera');
     }
     
+    console.log('🎥 Camera input created with attributes:', {
+      type: input.type,
+      accept: input.accept,
+      capture: input.capture,
+      hasOnChange: !!input.onchange
+    });
+    
     input.onchange = (e) => {
+      console.log('🎥 CAMERA INPUT CHANGE EVENT TRIGGERED');
       const target = e.target as HTMLInputElement;
       const file = target.files?.[0];
-      console.log('Camera input change event triggered', { 
+      console.log('🎥 Camera input change event triggered', { 
         hasFile: !!file, 
         fileName: file?.name,
         fileType: file?.type,
@@ -44,31 +52,39 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
       });
       
       if (file) {
-        console.log('Calling onFileSelected with camera file:', file.name);
+        console.log('🎥 Calling onFileSelected with camera file:', file.name);
         onFileSelected(file);
-        console.log('Closing gallery after camera selection');
+        console.log('🎥 Closing gallery after camera selection');
         onClose();
       } else {
-        console.warn('No file selected from camera input');
+        console.warn('🎥 No file selected from camera input');
       }
     };
     
-    console.log('Triggering camera input click');
+    console.log('🎥 About to trigger camera input click');
     input.click();
+    console.log('🎥 Camera input click triggered');
   };
 
   const handlePhotoClick = () => {
-    console.log('Photo selection clicked');
+    console.log('📸 PHOTO BUTTON CLICKED');
     
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
     input.multiple = true;
     
+    console.log('📸 Photo input created with attributes:', {
+      type: input.type,
+      accept: input.accept,
+      multiple: input.multiple
+    });
+    
     input.onchange = (e) => {
+      console.log('📸 PHOTO INPUT CHANGE EVENT TRIGGERED');
       const target = e.target as HTMLInputElement;
       const files = target.files;
-      console.log('Photo input change event triggered', { 
+      console.log('📸 Photo input change event triggered', { 
         hasFiles: !!files, 
         fileCount: files?.length || 0,
         filesDetails: files ? Array.from(files).map(f => ({ name: f.name, type: f.type, size: `${(f.size / 1024 / 1024).toFixed(2)}MB` })) : []
@@ -76,15 +92,15 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
       
       if (files && files.length > 0) {
         const fileArray = Array.from(files);
-        console.log('Photo files selected:', fileArray.length, 'files');
+        console.log('📸 Photo files selected:', fileArray.length, 'files');
         
         if (fileArray.length === 1) {
-          console.log('Single photo selected, calling onFileSelected with:', fileArray[0].name);
+          console.log('📸 Single photo selected, calling onFileSelected with:', fileArray[0].name);
           onFileSelected(fileArray[0]);
-          console.log('Closing gallery after single photo selection');
+          console.log('📸 Closing gallery after single photo selection');
           onClose();
         } else {
-          console.log('Multiple photos selected, entering multi-select mode');
+          console.log('📸 Multiple photos selected, entering multi-select mode');
           // Multiple files selected - enter multi-select mode
           setSelectedFiles(fileArray);
           const urls = fileArray.map(file => URL.createObjectURL(file));
@@ -92,26 +108,34 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
           setIsMultiSelectMode(true);
         }
       } else {
-        console.warn('No files selected from photo input');
+        console.warn('📸 No files selected from photo input');
       }
     };
     
-    console.log('Triggering photo input click');
+    console.log('📸 About to trigger photo input click');
     input.click();
+    console.log('📸 Photo input click triggered');
   };
 
   const handleVideoClick = () => {
-    console.log('Video selection clicked');
+    console.log('🎬 VIDEO BUTTON CLICKED');
     
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'video/*';
     input.multiple = true;
     
+    console.log('🎬 Video input created with attributes:', {
+      type: input.type,
+      accept: input.accept,
+      multiple: input.multiple
+    });
+    
     input.onchange = (e) => {
+      console.log('🎬 VIDEO INPUT CHANGE EVENT TRIGGERED');
       const target = e.target as HTMLInputElement;
       const files = target.files;
-      console.log('Video input change event triggered', { 
+      console.log('🎬 Video input change event triggered', { 
         hasFiles: !!files, 
         fileCount: files?.length || 0,
         filesDetails: files ? Array.from(files).map(f => ({ name: f.name, type: f.type, size: `${(f.size / 1024 / 1024).toFixed(2)}MB` })) : []
@@ -119,15 +143,15 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
       
       if (files && files.length > 0) {
         const fileArray = Array.from(files);
-        console.log('Video files selected:', fileArray.length, 'files');
+        console.log('🎬 Video files selected:', fileArray.length, 'files');
         
         if (fileArray.length === 1) {
-          console.log('Single video selected, calling onFileSelected with:', fileArray[0].name);
+          console.log('🎬 Single video selected, calling onFileSelected with:', fileArray[0].name);
           onFileSelected(fileArray[0]);
-          console.log('Closing gallery after single video selection');
+          console.log('🎬 Closing gallery after single video selection');
           onClose();
         } else {
-          console.log('Multiple videos selected, entering multi-select mode');
+          console.log('🎬 Multiple videos selected, entering multi-select mode');
           // Multiple files selected
           setSelectedFiles(fileArray);
           const urls = fileArray.map(file => URL.createObjectURL(file));
@@ -135,12 +159,13 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
           setIsMultiSelectMode(true);
         }
       } else {
-        console.warn('No files selected from video input');
+        console.warn('🎬 No files selected from video input');
       }
     };
     
-    console.log('Triggering video input click');
+    console.log('🎬 About to trigger video input click');
     input.click();
+    console.log('🎬 Video input click triggered');
   };
 
   const handleFileRemove = (index: number) => {
@@ -159,33 +184,34 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
   };
 
   const handleConfirmSelection = () => {
-    console.log('handleConfirmSelection called with selectedFiles count:', selectedFiles.length);
-    console.log('selectedFiles details:', selectedFiles.map(f => ({ name: f.name, type: f.type, size: f.size })));
-    console.log('onMultipleFilesSelected function exists:', !!onMultipleFilesSelected);
-    console.log('onFileSelected function exists:', !!onFileSelected);
+    console.log('✅ CONFIRM SELECTION BUTTON CLICKED');
+    console.log('✅ selectedFiles count:', selectedFiles.length);
+    console.log('✅ selectedFiles details:', selectedFiles.map(f => ({ name: f.name, type: f.type, size: f.size })));
+    console.log('✅ onMultipleFilesSelected function exists:', !!onMultipleFilesSelected);
+    console.log('✅ onFileSelected function exists:', !!onFileSelected);
     
     if (selectedFiles.length > 0) {
       if (onMultipleFilesSelected) {
-        console.log('Calling onMultipleFilesSelected with', selectedFiles.length, 'files');
+        console.log('✅ Calling onMultipleFilesSelected with', selectedFiles.length, 'files');
         onMultipleFilesSelected(selectedFiles);
-        console.log('onMultipleFilesSelected call completed');
+        console.log('✅ onMultipleFilesSelected call completed');
       } else {
-        console.log('onMultipleFilesSelected not available, falling back to onFileSelected with first file:', selectedFiles[0].name);
+        console.log('✅ onMultipleFilesSelected not available, falling back to onFileSelected with first file:', selectedFiles[0].name);
         // Fallback to single file if multiple not supported
         onFileSelected(selectedFiles[0]);
-        console.log('onFileSelected fallback call completed');
+        console.log('✅ onFileSelected fallback call completed');
       }
       
-      console.log('Cleaning up preview URLs and closing gallery');
+      console.log('✅ Cleaning up preview URLs and closing gallery');
       // Clean up
       previewUrls.forEach(url => URL.revokeObjectURL(url));
       setSelectedFiles([]);
       setPreviewUrls([]);
       setIsMultiSelectMode(false);
       onClose();
-      console.log('Gallery cleanup and close completed');
+      console.log('✅ Gallery cleanup and close completed');
     } else {
-      console.warn('handleConfirmSelection called but no files selected');
+      console.warn('✅ handleConfirmSelection called but no files selected');
     }
   };
 
