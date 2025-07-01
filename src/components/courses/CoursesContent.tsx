@@ -22,29 +22,32 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
   const [searchParams] = useSearchParams();
   const location = useLocation();
   
-  // Default to 'my-courses' if username is provided (viewing another user's courses)
+  // Default to 'explore' since we're removing my-courses tab
   const [activeTab, setActiveTab] = useState(() => {
-    if (username) return 'my-courses';
-    return 'explore';
+    if (username) return 'my-courses'; // Keep for user profile pages
+    return 'explore'; // Default to explore for main courses page
   });
 
   // Check if we're on a user courses page
   const isUserCoursesPage = location.pathname.includes('/user/') && location.pathname.includes('/courses');
   const isOwnProfile = !username;
 
-  // Check for tab parameter in URL
+  // Check for tab parameter in URL - only allow explore and friends-courses for main page
   useEffect(() => {
     const tabParam = searchParams.get('tab');
-    if (tabParam && (tabParam === 'explore' || tabParam === 'friends-courses' || tabParam === 'my-courses')) {
+    if (tabParam && (tabParam === 'explore' || tabParam === 'friends-courses')) {
       setActiveTab(tabParam);
     } else if (username) {
       // Default to my-courses for user profile pages
       setActiveTab('my-courses');
+    } else {
+      // Default to explore for main courses page
+      setActiveTab('explore');
     }
   }, [searchParams, username]);
 
   const handleTabChange = (value: string) => {
-    if (!user && (value === 'my-courses' || value === 'friends-courses')) {
+    if (!user && value === 'friends-courses') {
       navigate('/auth');
       return;
     }
@@ -53,7 +56,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
 
   // Dynamic subtitle logic
   const getSubtitle = () => {
-    // Only show custom subtitles when on "My Courses" tab
+    // Only show custom subtitles when on "My Courses" tab (user profile pages only)
     if (activeTab === 'my-courses') {
       // If we're on a user courses page (like /user/username/courses)
       if (isUserCoursesPage) {
@@ -65,7 +68,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
         }
       }
       
-      // If we're on the main courses page viewing "My Courses" tab
+      // If we're on the main courses page viewing "My Courses" tab (shouldn't happen now)
       return "Here's how you rank the world's best golf courses.";
     }
     
@@ -94,28 +97,50 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
       </div>
 
       <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-        <TabsList className={`grid w-full ${user ? 'grid-cols-3' : 'grid-cols-2'}`}>
-          <TabsTrigger 
-            value="explore"
-            className="data-[state=active]:text-foreground"
-          >
-            Explore
-          </TabsTrigger>
-          {user && (
+        {/* Only show My Courses tab on user profile pages, not on main courses page */}
+        {username ? (
+          // User profile courses page - show all tabs including My Courses
+          <TabsList className={`grid w-full ${user ? 'grid-cols-3' : 'grid-cols-2'}`}>
             <TabsTrigger 
-              value="friends-courses"
+              value="explore"
               className="data-[state=active]:text-foreground"
             >
-              Top 100 Explorer
+              Explore
             </TabsTrigger>
-          )}
-          <TabsTrigger 
-            value="my-courses"
-            className="data-[state=active]:text-foreground"
-          >
-            {getMyCoursesTabLabel()}
-          </TabsTrigger>
-        </TabsList>
+            {user && (
+              <TabsTrigger 
+                value="friends-courses"
+                className="data-[state=active]:text-foreground"
+              >
+                Top 100 Explorer
+              </TabsTrigger>
+            )}
+            <TabsTrigger 
+              value="my-courses"
+              className="data-[state=active]:text-foreground"
+            >
+              {getMyCoursesTabLabel()}
+            </TabsTrigger>
+          </TabsList>
+        ) : (
+          // Main courses page - only show Explore and Top 100 Explorer tabs
+          <TabsList className={`grid w-full ${user ? 'grid-cols-2' : 'grid-cols-1'}`}>
+            <TabsTrigger 
+              value="explore"
+              className="data-[state=active]:text-foreground"
+            >
+              Explore
+            </TabsTrigger>
+            {user && (
+              <TabsTrigger 
+                value="friends-courses"
+                className="data-[state=active]:text-foreground"
+              >
+                Top 100 Explorer
+              </TabsTrigger>
+            )}
+          </TabsList>
+        )}
 
         <TabsContent value="explore" className="mt-6">
           <CourseExplorer />
@@ -127,33 +152,12 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
           </TabsContent>
         )}
 
-        <TabsContent value="my-courses" className="mt-6">
-          {username ? (
-            // Viewing another user's courses
+        {/* Only render My Courses content on user profile pages */}
+        {username && (
+          <TabsContent value="my-courses" className="mt-6">
             <UserCoursesContent username={username} />
-          ) : user ? (
-            // Viewing own courses
-            <MyCourses />
-          ) : (
-            // Not logged in
-            <Card>
-              <CardContent className="p-8 text-center">
-                <User className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                <h3 className="text-lg font-semibold mb-2">Sign in to track your courses</h3>
-                <p className="text-muted-foreground mb-4">
-                  Create an account to track which courses you've played and manage your golf journey
-                </p>
-                <Button 
-                  onClick={() => navigate('/auth')}
-                  className="text-white hover:opacity-90"
-                  style={{ backgroundColor: '#322F30' }}
-                >
-                  Sign In
-                </Button>
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
+          </TabsContent>
+        )}
       </Tabs>
     </div>
   );
