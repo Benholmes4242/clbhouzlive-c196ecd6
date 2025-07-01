@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import BenjaminHandicapLayout from './handicap/BenjaminHandicapLayout';
-import StandardHandicapCard from './handicap/StandardHandicapCard';
 import HandicapConnectModal from './handicap/HandicapConnectModal';
 import ManualHandicapModal from './handicap/ManualHandicapModal';
 import ManualHandicapCard from './handicap/ManualHandicapCard';
@@ -45,56 +44,78 @@ const HandicapCard: React.FC<HandicapCardProps> = ({
     );
   }
 
-  // For own profile with no handicap set
-  if (isOwnProfile && (handicapIndex === null || handicapIndex === undefined)) {
-    return (
-      <>
-        <StandardHandicapCard
-          handicapIndex={handicapIndex}
-          egAppConnected={egAppConnected}
-          lastUpdated={lastUpdated}
-          isOwnProfile={isOwnProfile}
-          onEGConnect={() => setConnectModalOpen(true)}
-          onManualAdd={() => setManualModalOpen(true)}
-        />
-        
-        <HandicapConnectModal
-          open={connectModalOpen}
-          onOpenChange={setConnectModalOpen}
-          onConnect={handleOfficialConnect}
-        />
-        
-        <ManualHandicapModal
-          open={manualModalOpen}
-          onOpenChange={setManualModalOpen}
-          onSave={handleManualSave}
-        />
-      </>
-    );
-  }
-
-  // For own profile with handicap set
-  if (isOwnProfile && (handicapIndex !== null && handicapIndex !== undefined)) {
-    const isOfficial = currentProfile?.handicap_governing_body;
-
-    if (isOfficial) {
-      return (
-        <OfficialHandicapCard
-          handicapIndex={handicapIndex}
-          homeClub={currentProfile?.home_club || 'Unknown Club'}
-          governingBody={currentProfile.handicap_governing_body}
-          lastUpdated={lastUpdated || new Date().toISOString()}
-        />
-      );
-    } else {
+  // For profiles with no handicap set
+  if (handicapIndex === null || handicapIndex === undefined) {
+    // If viewing own profile, show connection options
+    if (isOwnProfile) {
       return (
         <>
-          <ManualHandicapCard
-            handicapIndex={handicapIndex}
-            homeClub={currentProfile?.home_club || 'Unknown Club'}
-            onEdit={() => setManualModalOpen(true)}
+          <div className="bg-white rounded-lg border shadow-sm p-6">
+            <h3 className="font-semibold text-lg mb-4">My Handicap Index®</h3>
+            <p className="text-gray-500 mb-4">Connect your handicap to showcase your skill level</p>
+            <div className="space-y-3">
+              <button 
+                onClick={() => setConnectModalOpen(true)}
+                className="w-full bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded font-medium"
+              >
+                Connect Official Handicap
+              </button>
+              <button 
+                onClick={() => setManualModalOpen(true)}
+                className="w-full border border-gray-300 hover:bg-gray-50 text-gray-700 py-2 px-4 rounded"
+              >
+                Manually Input Handicap
+              </button>
+            </div>
+          </div>
+          
+          <HandicapConnectModal
+            open={connectModalOpen}
+            onOpenChange={setConnectModalOpen}
+            onConnect={handleOfficialConnect}
           />
           
+          <ManualHandicapModal
+            open={manualModalOpen}
+            onOpenChange={setManualModalOpen}
+            onSave={handleManualSave}
+          />
+        </>
+      );
+    } else {
+      // If viewing someone else's profile with no handicap, show nothing or a simple message
+      return (
+        <div className="bg-white rounded-lg border shadow-sm p-6">
+          <h3 className="font-semibold text-lg mb-2">Handicap Index®</h3>
+          <p className="text-gray-500">No handicap information available</p>
+        </div>
+      );
+    }
+  }
+
+  // For profiles with handicap set - show the same layout regardless of who's viewing
+  const isOfficial = currentProfile?.handicap_governing_body;
+
+  if (isOfficial) {
+    return (
+      <OfficialHandicapCard
+        handicapIndex={handicapIndex}
+        homeClub={currentProfile?.home_club || 'Unknown Club'}
+        governingBody={currentProfile.handicap_governing_body}
+        lastUpdated={lastUpdated || new Date().toISOString()}
+      />
+    );
+  } else {
+    return (
+      <>
+        <ManualHandicapCard
+          handicapIndex={handicapIndex}
+          homeClub={currentProfile?.home_club || 'Unknown Club'}
+          onEdit={isOwnProfile ? () => setManualModalOpen(true) : () => {}}
+          showEditButton={isOwnProfile}
+        />
+        
+        {isOwnProfile && (
           <ManualHandicapModal
             open={manualModalOpen}
             onOpenChange={setManualModalOpen}
@@ -104,21 +125,10 @@ const HandicapCard: React.FC<HandicapCardProps> = ({
               homeClub: currentProfile?.home_club || ''
             }}
           />
-        </>
-      );
-    }
+        )}
+      </>
+    );
   }
-
-  // For other users' profiles (viewing someone else)
-  return (
-    <StandardHandicapCard
-      handicapIndex={handicapIndex}
-      egAppConnected={egAppConnected}
-      lastUpdated={lastUpdated}
-      isOwnProfile={isOwnProfile}
-      onEGConnect={onEGConnect}
-    />
-  );
 
   async function handleOfficialConnect(data: {
     governingBody: string;
