@@ -237,11 +237,28 @@ const CreateMomentModal = ({
     );
   };
 
-  // Remove duplicate entities and use entities from hook or fallback to props
-  const uniqueEntities = entities.length > 0 ? entities : mentionSuggestions;
-  const deduplicatedEntities = uniqueEntities.filter((entity, index, self) => 
-    index === self.findIndex(e => e.id === entity.id)
-  );
+  // Properly deduplicate entities - first by entity_id, then by username/name combination
+  const allEntities = entities.length > 0 ? entities : mentionSuggestions;
+  const deduplicatedEntities = allEntities.reduce((acc, entity) => {
+    // Check if we already have this entity by entity_id
+    const existingByEntityId = acc.find(item => item.entity_id === entity.entity_id && item.entity_type === entity.entity_type);
+    if (existingByEntityId) {
+      return acc; // Skip if already exists by entity_id
+    }
+    
+    // Check if we already have this entity by username/name combination
+    const displayName = entity.username || entity.name;
+    const existingByDisplayName = acc.find(item => {
+      const itemDisplayName = item.username || item.name;
+      return itemDisplayName === displayName && item.entity_type === entity.entity_type;
+    });
+    
+    if (!existingByDisplayName) {
+      acc.push(entity);
+    }
+    
+    return acc;
+  }, [] as TaggableEntity[]);
   
   const showActiveSuggestions = localShowSuggestions || showSuggestions;
 
@@ -281,7 +298,7 @@ const CreateMomentModal = ({
               <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-md shadow-lg max-h-40 overflow-y-auto z-50 mt-1">
                 {deduplicatedEntities.map((entity) => (
                   <div
-                    key={entity.id}
+                    key={`${entity.entity_type}-${entity.entity_id}-${entity.id}`}
                     className="px-3 py-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2 transition-colors"
                     onClick={() => handleSelectMention(entity)}
                   >
