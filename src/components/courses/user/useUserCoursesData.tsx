@@ -1,3 +1,4 @@
+
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -12,10 +13,18 @@ const getCourseRanking = (course: any) => {
 
 // Custom sorting function for user courses - prioritize user ratings first
 const getSortedUserCourses = (userCourses: any[]) => {
-  // Get courses with ratings - sort by highest rating first (this is the user's personal ranking)
+  console.log('Sorting user courses:', userCourses.map(c => ({ 
+    name: c.golf_courses?.name, 
+    rating: c.rating 
+  })));
+  
+  // Get courses with ratings - sort by highest rating first (10 at top, 0 at bottom)
   const rated = userCourses
     .filter(c => c.rating !== null && c.rating !== undefined)
-    .sort((a, b) => b.rating - a.rating);
+    .sort((a, b) => {
+      console.log(`Comparing ${a.golf_courses?.name} (${a.rating}) vs ${b.golf_courses?.name} (${b.rating})`);
+      return b.rating - a.rating; // Descending order: 10, 9, 8, ..., 1, 0
+    });
   
   // Get courses without ratings - sort by best official ranking (global/regional)
   const unrated = userCourses
@@ -26,8 +35,14 @@ const getSortedUserCourses = (userCourses: any[]) => {
       return aRank - bRank;
     });
 
+  const sortedCourses = [...rated, ...unrated];
+  console.log('Final sorted order:', sortedCourses.map(c => ({ 
+    name: c.golf_courses?.name, 
+    rating: c.rating 
+  })));
+  
   // Return rated courses first (user's personal ranking), then unrated courses by official ranking
-  return [...rated, ...unrated];
+  return sortedCourses;
 };
 
 export const useUserCoursesData = (username?: string) => {
@@ -103,6 +118,11 @@ export const useUserCoursesData = (username?: string) => {
         ...course,
         rating: ratingsMap.get(course.course_id) || null
       })) || [];
+      
+      console.log('Raw courses with ratings:', coursesWithRatings.map(c => ({ 
+        name: c.golf_courses?.name, 
+        rating: c.rating 
+      })));
       
       return getSortedUserCourses(coursesWithRatings);
     },
