@@ -318,15 +318,19 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
             <MultiSelectPreview />
           ) : (
             <div className="space-y-4">
+              <div className="bg-yellow-200 p-2 text-xs rounded">
+                🟡 DEBUG: Mobile sheet content rendering - buttons should appear below
+              </div>
+              
               {/* Capture Button */}
               <button
                 onTouchStart={(e) => {
-                  console.log('🔴 CAPTURE BUTTON TOUCH START');
+                  console.log('🔴 MOBILE CAPTURE BUTTON TOUCH START');
                   e.preventDefault();
                   e.stopPropagation();
                 }}
                 onClick={(e) => {
-                  console.log('🔴 CAPTURE BUTTON CLICKED - Event triggered');
+                  console.log('🔴 MOBILE CAPTURE BUTTON CLICKED - Event triggered');
                   e.preventDefault();
                   e.stopPropagation();
                   handleCameraClick();
@@ -344,12 +348,12 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
               {/* Post Photo Button */}
               <button
                 onTouchStart={(e) => {
-                  console.log('🔴 PHOTO BUTTON TOUCH START');
+                  console.log('🔴 MOBILE PHOTO BUTTON TOUCH START');
                   e.preventDefault();
                   e.stopPropagation();
                 }}
                 onClick={(e) => {
-                  console.log('🔴 PHOTO BUTTON CLICKED - Event triggered');
+                  console.log('🔴 MOBILE PHOTO BUTTON CLICKED - Event triggered');
                   e.preventDefault();
                   e.stopPropagation();
                   handlePhotoClick();
@@ -367,12 +371,12 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
               {/* Post Video Button */}
               <button
                 onTouchStart={(e) => {
-                  console.log('🔴 VIDEO BUTTON TOUCH START');
+                  console.log('🔴 MOBILE VIDEO BUTTON TOUCH START');
                   e.preventDefault();
                   e.stopPropagation();
                 }}
                 onClick={(e) => {
-                  console.log('🔴 VIDEO BUTTON CLICKED - Event triggered');
+                  console.log('🔴 MOBILE VIDEO BUTTON CLICKED - Event triggered');
                   e.preventDefault();
                   e.stopPropagation();
                   handleVideoClick();
