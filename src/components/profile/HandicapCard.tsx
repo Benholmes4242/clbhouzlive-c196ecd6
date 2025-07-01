@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -151,35 +150,32 @@ const HandicapCard: React.FC<HandicapCardProps> = ({
 
       {/* My Handicap Card - Stacked Below */}
       <Card className="bg-white border shadow-sm">
-        <CardContent className="p-6">
-          <div className="space-y-4">
-            {/* Title */}
-            <h4 className="text-red-500 text-sm font-medium">My Handicap Index®</h4>
-            
-            {/* Main Handicap Value */}
-            <div className="text-4xl font-bold text-gray-900">4.5</div>
-            
-            {/* Home Club */}
-            <div className="text-sm text-gray-600">
-              <span className="font-medium">Home Club:</span> Sundridge Park
-            </div>
-            
-            {/* Last Updated */}
-            <div className="text-sm text-gray-600">
-              Last Updated: Today
-            </div>
-            
-            {/* England Golf Logo */}
-            <div className="flex items-center justify-between mt-4">
-              <div></div>
+        <CardContent className="p-4">
+          <div className="space-y-3">
+            {/* Top Row: Title and England Golf Logo */}
+            <div className="flex items-center justify-between">
+              <h4 className="text-red-500 text-sm font-medium">My Handicap Index®</h4>
               <div className="flex items-center gap-2">
                 <img 
                   src="/lovable-uploads/41a64d83-afc2-42f1-a446-b6a8b45a0043.png" 
                   alt="England Golf" 
-                  className="h-6 w-6 opacity-80"
+                  className="h-8 w-auto opacity-80"
                 />
                 <span className="text-xs text-gray-500">Powered by England Golf</span>
               </div>
+            </div>
+            
+            {/* Last Updated - Below England Golf */}
+            <div className="text-xs text-gray-500 text-right">
+              Last Updated: Today
+            </div>
+            
+            {/* Main Handicap Value */}
+            <div className="text-4xl font-bold text-gray-900">4.5</div>
+            
+            {/* Home Club - Compact spacing */}
+            <div className="text-sm text-gray-600">
+              <span className="font-medium">Home Club:</span> Sundridge Park
             </div>
           </div>
         </CardContent>
