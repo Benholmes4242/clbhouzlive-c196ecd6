@@ -45,8 +45,8 @@ const InlineMyCoursesTab: React.FC<InlineMyCoursesTabProps> = ({
         />
       )}
       
-      {/* Top 100 Profile Header */}
-      <div className="mt-6 mb-4">
+      {/* Top 100 Profile Header - Center Aligned with Extra Spacing */}
+      <div className="mt-8 mb-4 text-center">
         <h2 className="text-xl font-semibold text-gray-900 mb-2">
           {isOwnProfile ? 'My Top 100 Golf Courses' : `${displayName}'s Top 100 Golf Courses`}
         </h2>

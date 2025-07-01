@@ -37,32 +37,30 @@ const ProfilePageLayout: React.FC<ProfilePageLayoutProps> = ({
         relationshipStatus={relationshipStatus}
       />
 
-      {/* Tab Navigation - positioned directly after header */}
-      <div className="border-t border-gray-200">
-        <InstagramStyleProfileTabs
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-          children={{
-            activity: (
-              <ActivityFeed
-                userId={profile?.id}
-                isOwnProfile={isOwnProfile}
-                profileDisplayName={profile?.display_name}
-              />
-            ),
-            courses: (
-              <InlineMyCoursesTab
-                profile={profile}
-                regionProgress={regionProgress}
-                isOwnProfile={isOwnProfile}
-                username={profile?.username}
-                onRegionClick={onRegionClick}
-                onEGConnect={onEGConnect}
-              />
-            )
-          }}
-        />
-      </div>
+      {/* Tab Navigation - positioned directly after header with no extra border */}
+      <InstagramStyleProfileTabs
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        children={{
+          activity: (
+            <ActivityFeed
+              userId={profile?.id}
+              isOwnProfile={isOwnProfile}
+              profileDisplayName={profile?.display_name}
+            />
+          ),
+          courses: (
+            <InlineMyCoursesTab
+              profile={profile}
+              regionProgress={regionProgress}
+              isOwnProfile={isOwnProfile}
+              username={profile?.username}
+              onRegionClick={onRegionClick}
+              onEGConnect={onEGConnect}
+            />
+          )
+        }}
+      />
     </div>
   );
 };
