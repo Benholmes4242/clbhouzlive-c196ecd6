@@ -1,5 +1,4 @@
-
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MoreHorizontal, Heart, MessageCircle, Share, Edit, Trash2 } from 'lucide-react';
@@ -68,6 +67,7 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
   const { toast } = useToast();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [golfCourse, setGolfCourse] = useState<any>(null);
   const { isOpen, currentMedia, openMedia, closeMedia } = useFullscreenMedia();
 
   const displayName = post.user.display_name || post.user.username || 'User';
@@ -77,12 +77,39 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
   // Find golf club tags to show as course badges
   const golfClubTags = post.post_tags?.filter(tag => tag.entity_type === 'golf_club') || [];
   
+  // Fetch golf course details if there are golf club tags
+  useEffect(() => {
+    const fetchGolfCourse = async () => {
+      if (golfClubTags.length > 0) {
+        try {
+          const { data: courseData, error } = await supabase
+            .from('golf_courses')
+            .select('id, name, country, region')
+            .eq('id', golfClubTags[0].entity_id)
+            .single();
+
+          if (error) {
+            console.error('Error fetching golf course:', error);
+          } else {
+            console.log('Fetched golf course:', courseData);
+            setGolfCourse(courseData);
+          }
+        } catch (error) {
+          console.error('Error in fetchGolfCourse:', error);
+        }
+      }
+    };
+
+    fetchGolfCourse();
+  }, [golfClubTags]);
+  
   // Debug logging
   console.log('UserPost - Post data:', {
     postId: post.id,
     totalTags: post.post_tags?.length || 0,
     golfClubTags: golfClubTags.length,
-    golfClubTagsData: golfClubTags
+    golfClubTagsData: golfClubTags,
+    fetchedGolfCourse: golfCourse
   });
 
   const handleDeletePost = async () => {
@@ -139,9 +166,9 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
   const carouselItems = post.post_media?.map((media, index) => (
     <div key={media.id} className="w-full aspect-square relative">
       {/* Golf Course Pin overlay on each media item */}
-      {golfClubTags.length > 0 && (
+      {golfCourse && (
         <GolfCoursePin 
-          courseName={golfClubTags[0].name}
+          courseName={golfCourse.name}
           className="absolute top-2 right-2 z-10"
         />
       )}
@@ -221,21 +248,18 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
           </div>
         )}
 
-        {/* Golf Course Badges - Show above media when golf clubs are tagged */}
-        {golfClubTags.length > 0 && (
+        {/* Golf Course Badges - Show above media when golf course is found */}
+        {golfCourse && (
           <div className="mb-3">
-            {golfClubTags.map((tag) => (
-              <CoursePostBadge
-                key={tag.id}
-                course={{
-                  id: tag.entity_id,
-                  name: tag.name, 
-                  country: 'Scotland', // Default fallback since we don't have country in tags
-                  region: undefined
-                }}
-                className="mb-2 last:mb-0"
-              />
-            ))}
+            <CoursePostBadge
+              course={{
+                id: golfCourse.id,
+                name: golfCourse.name, 
+                country: golfCourse.country || 'Unknown',
+                region: golfCourse.region
+              }}
+              className="mb-2"
+            />
           </div>
         )}
 

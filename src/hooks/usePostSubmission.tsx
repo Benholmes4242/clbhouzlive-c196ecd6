@@ -1,155 +1,154 @@
 
-import { validateFiles } from '@/components/posts/utils/fileValidation';
-import { rollbackPost } from '@/components/posts/utils/postOperations';
-import { createOptimisticPost } from '@/components/posts/utils/optimisticPost';
-import { PostSubmissionParams } from './usePostSubmission/types';
-import { validatePostSubmission, hasVideos } from './usePostSubmission/validation';
-import { createPost, uploadMediaFiles, handlePostTags } from './usePostSubmission/uploadUtils';
-import { usePostNotifications } from './usePostSubmission/notifications';
-import { broadcastPostSuccess, broadcastPostError } from './usePostSubmission/events';
+import { useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+
+interface PostSubmissionData {
+  user: any;
+  content: string;
+  mediaFiles: File[];
+  selectedTags: any[];
+  courseInfo?: {
+    id: string;
+    name: string;
+    country: string;
+  } | null;
+  onSuccess?: () => void;
+  onError?: () => void;
+}
 
 export const usePostSubmission = () => {
-  const {
-    showValidationError,
-    showVideoUploadProgress,
-    showVideoProcessingProgress,
-    showFileUploadError,
-    showUploadFailedError,
-    showSuccessMessage
-  } = usePostNotifications();
+  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const submitPost = async ({
     user,
     content,
     mediaFiles,
     selectedTags,
+    courseInfo,
     onSuccess,
     onError
-  }: PostSubmissionParams) => {
-    console.log('Starting post submission...', { 
-      userId: user?.id, 
-      contentLength: content?.length || 0,
-      mediaCount: mediaFiles?.length || 0,
-      tagCount: selectedTags?.length || 0,
-      mediaFiles: mediaFiles
-    });
+  }: PostSubmissionData) => {
+    setIsSubmitting(true);
 
-    // Ensure mediaFiles is always an array
-    const validMediaFiles = Array.isArray(mediaFiles) ? mediaFiles : [];
-
-    if (!validatePostSubmission(user, content, validMediaFiles)) {
-      console.error('Post validation failed');
-      onError();
-      return;
-    }
-
-    // Validate files before proceeding - only if we have media files
-    if (validMediaFiles.length > 0) {
-      const validationResult = validateFiles(validMediaFiles);
-      if (!validationResult.isValid) {
-        console.error('File validation failed:', validationResult.error);
-        showValidationError(validationResult.error!);
-        onError();
-        return;
-      }
-    }
-
-    // Check if we have videos to show appropriate feedback
-    const hasVideoFiles = validMediaFiles.length > 0 ? hasVideos(validMediaFiles) : false;
-    
-    // Show immediate upload feedback for videos
-    if (hasVideoFiles) {
-      showVideoUploadProgress();
-    }
-
-    // Create optimistic post for immediate UI update
-    const optimisticPost = createOptimisticPost(user, content, validMediaFiles, selectedTags || []);
-    
-    // Start upload process
-    let createdPostId: string | null = null;
-    
     try {
-      console.log('Creating post in database...');
-      
-      // Create the post first
-      const postData = await createPost(user.id, content || '');
-      createdPostId = postData.id;
-      console.log('Post created successfully with ID:', createdPostId);
-
-      // Upload media files if any
-      if (validMediaFiles.length > 0) {
-        // Show progress for videos
-        if (hasVideoFiles) {
-          showVideoProcessingProgress();
-        }
-        
-        console.log('Starting media upload for', validMediaFiles.length, 'files');
-        await uploadMediaFiles(
-          validMediaFiles, 
-          postData.id, 
-          user.id,
-          (file, error) => {
-            console.error('File upload error:', file.name, error);
-            showFileUploadError(file, error, postData.id, user.id);
-          }
-        );
-        console.log('Media upload completed successfully');
-      }
-
-      // Handle post tags
-      if (selectedTags && selectedTags.length > 0) {
-        console.log('Creating post tags for', selectedTags.length, 'tags');
-        await handlePostTags(postData.id, selectedTags, user.id);
-        console.log('Post tags created successfully');
-      }
-
-      console.log('Post submission completed successfully - triggering feed refresh');
-
-      // Show success message
-      showSuccessMessage();
-
-      // Broadcast success events for feed refresh
-      broadcastPostSuccess(postData.id, optimisticPost.id);
-      
-      // Trigger feed refresh events with a slight delay to ensure database consistency
-      setTimeout(() => {
-        console.log('Dispatching feed refresh events');
-        window.dispatchEvent(new CustomEvent('refreshFeed'));
-        window.dispatchEvent(new CustomEvent('postUploadCompleted'));
-      }, 500);
-
-      // Call onSuccess callback
-      onSuccess();
-
-    } catch (error) {
-      console.error('Error in post submission:', error);
-      
-      // If we created a post but subsequent operations failed, roll it back
-      if (createdPostId) {
-        console.log('Rolling back post due to error:', createdPostId);
-        try {
-          await rollbackPost(createdPostId);
-          console.log('Post rollback completed');
-        } catch (rollbackError) {
-          console.error('Error during rollback:', rollbackError);
-        }
-      }
-      
-      // Show retry option with specific error message
-      const errorMessage = error instanceof Error ? error.message : 'Failed to create post. Please try again.';
-      
-      showUploadFailedError(errorMessage, () => {
-        console.log('Retrying post submission');
-        submitPost({ user, content, mediaFiles: validMediaFiles, selectedTags, onSuccess, onError });
+      console.log('Creating post with data:', {
+        userId: user.id,
+        content,
+        mediaFilesCount: mediaFiles.length,
+        tagsCount: selectedTags.length,
+        courseInfo
       });
 
-      // Broadcast error event for UI cleanup
-      broadcastPostError(optimisticPost.id);
+      // Create the post
+      const { data: postData, error: postError } = await supabase
+        .from('posts')
+        .insert({
+          user_id: user.id,
+          content: content || null
+        })
+        .select()
+        .single();
 
-      // Call onError to prevent redirect for failed uploads
-      onError();
+      if (postError) throw postError;
+
+      console.log('Post created:', postData);
+
+      // Upload media files
+      if (mediaFiles.length > 0) {
+        for (const file of mediaFiles) {
+          const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
+          const fileExtension = file.name.split('.').pop();
+          const fullFileName = `${fileName}.${fileExtension}`;
+          
+          // Upload file to storage
+          const { error: uploadError } = await supabase.storage
+            .from('post-media')
+            .upload(`${user.id}/${fullFileName}`, file);
+
+          if (uploadError) throw uploadError;
+
+          // Get public URL
+          const { data: { publicUrl } } = supabase.storage
+            .from('post-media')
+            .getPublicUrl(`${user.id}/${fullFileName}`);
+
+          // Create media record
+          const { error: mediaError } = await supabase
+            .from('post_media')
+            .insert({
+              post_id: postData.id,
+              media_type: file.type.startsWith('image/') ? 'image' : 'video',
+              media_url: publicUrl
+            });
+
+          if (mediaError) throw mediaError;
+        }
+      }
+
+      // Create user tags
+      for (const tag of selectedTags) {
+        console.log('Creating tag:', tag);
+        
+        const { error: tagError } = await supabase
+          .from('post_tags')
+          .insert({
+            post_id: postData.id,
+            tagged_by_user_id: user.id,
+            tagged_entity_id: tag.entity_id
+          });
+
+        if (tagError) {
+          console.error('Error creating tag:', tagError);
+        }
+      }
+
+      // Create golf course tag if course is selected
+      if (courseInfo) {
+        console.log('Creating golf course tag for:', courseInfo);
+        
+        const { error: courseTagError } = await supabase
+          .from('post_tags')
+          .insert({
+            post_id: postData.id,
+            tagged_by_user_id: user.id,
+            tagged_entity_id: courseInfo.id
+          });
+
+        if (courseTagError) {
+          console.error('Error creating golf course tag:', courseTagError);
+        } else {
+          console.log('Golf course tag created successfully');
+        }
+      }
+
+      // Dispatch success event
+      window.dispatchEvent(new CustomEvent('postCompleted', {
+        detail: { 
+          optimisticId: null,
+          realPost: postData 
+        }
+      }));
+
+      onSuccess?.();
+      
+    } catch (error) {
+      console.error('Error submitting post:', error);
+      onError?.();
+      
+      toast({
+        title: "Error",
+        description: "Failed to create post. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  return { submitPost };
+  return {
+    submitPost,
+    isSubmitting
+  };
 };

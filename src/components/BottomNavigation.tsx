@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePostFlow } from '@/hooks/usePostFlow';
@@ -7,8 +6,8 @@ import GalleryPicker from '@/components/post/GalleryPicker';
 import CreateMomentModal from '@/components/post/CreateMomentModal';
 import SnapToast from '@/components/snap/SnapToast';
 import NavigationBar from './bottom-navigation/NavigationBar';
-import { useNavigationHandlers } from './bottom-navigation/useNavigationHandlers';
-import { usePostHandlers } from './bottom-navigation/usePostHandlers';
+import { useNavigationHandlers } from './bottom-navigation/NavigationBarHandlers';
+import { usePostHandlers } from './bottom-navigation/PostHandlers';
 
 const BottomNavigation = () => {
   const { user } = useSupabaseSession();
@@ -75,22 +74,18 @@ const BottomNavigation = () => {
     // Use multiple files if available, otherwise use single file
     const mediaFiles = selectedFiles.length > 0 ? selectedFiles : (selectedFile ? [selectedFile] : []);
 
-    // Create golf course tag if a course is selected
-    const finalTags = [...localSelectedTags];
-    if (selectedCourse) {
-      console.log('Adding golf course tag:', selectedCourse);
-      
-      // Add golf course as a tag
-      finalTags.push({
-        id: `golf-club-${selectedCourse.id}`,
-        entity_type: 'golf_club',
-        entity_id: selectedCourse.id,
-        name: selectedCourse.name,
-        username: null
-      });
-    }
+    // Create tags array - this will be handled by the post submission hook
+    let finalTags = [...localSelectedTags];
+
+    // Add golf course information to be handled by post submission
+    const courseInfo = selectedCourse ? {
+      id: selectedCourse.id,
+      name: selectedCourse.name,
+      country: selectedCourse.country
+    } : null;
 
     console.log('Final tags to submit:', finalTags);
+    console.log('Course info to submit:', courseInfo);
 
     try {
       await submitPost({
@@ -98,6 +93,7 @@ const BottomNavigation = () => {
         content: caption,
         mediaFiles,
         selectedTags: finalTags,
+        courseInfo: courseInfo, // Pass course info separately
         onSuccess: () => {
           console.log('Post submission successful');
           closeComposer();
