@@ -24,7 +24,20 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
     isOpen,
     isMobile,
     isMultiSelectMode,
-    selectedFilesCount: selectedFiles.length
+    selectedFilesCount: selectedFiles.length,
+    windowWidth: typeof window !== 'undefined' ? window.innerWidth : 'undefined',
+    userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'undefined'
+  });
+
+  // Force mobile detection for mobile devices that might not be detected by screen width
+  const isTouchDevice = typeof window !== 'undefined' && 'ontouchstart' in window;
+  const isActuallyMobile = isMobile || isTouchDevice || (typeof navigator !== 'undefined' && /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+  
+  console.log('🟡 Mobile detection:', {
+    isMobile,
+    isTouchDevice,
+    isActuallyMobile,
+    hasNavigator: typeof navigator !== 'undefined'
   });
 
   const handleCameraClick = () => {
@@ -283,8 +296,8 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
     </div>
   );
 
-  // Mobile Version - Bottom Sheet
-  if (isMobile) {
+  // Mobile Version - Bottom Sheet  
+  if (isActuallyMobile) {
     console.log('🟡 Rendering MOBILE version with Sheet');
     return (
       <Sheet open={isOpen} onOpenChange={handleClose}>
