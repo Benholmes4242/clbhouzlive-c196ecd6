@@ -12,8 +12,6 @@ interface HandicapCardProps {
   trend?: 'up' | 'down' | 'stable';
   isOwnProfile: boolean;
   onEGConnect: () => void;
-  username?: string;
-  isManualHandicap?: boolean;
 }
 
 const HandicapCard: React.FC<HandicapCardProps> = ({
@@ -22,9 +20,7 @@ const HandicapCard: React.FC<HandicapCardProps> = ({
   lastUpdated,
   trend = 'stable',
   isOwnProfile,
-  onEGConnect,
-  username,
-  isManualHandicap = false
+  onEGConnect
 }) => {
   const getTrendIcon = () => {
     switch (trend) {
@@ -46,22 +42,8 @@ const HandicapCard: React.FC<HandicapCardProps> = ({
     });
   };
 
-  // Format handicap according to the specified logic
-  const formatHandicap = (handicap: number) => {
-    if (handicap < 0) {
-      return `+${Math.abs(handicap)}`;
-    }
-    return handicap.toString();
-  };
-
-  // Check if this is Ben Holmes' profile
-  const isBenHolmes = username === 'benjaminholmes';
-  
-  // Determine if we should show official logo
-  const shouldShowOfficialLogo = isBenHolmes && egAppConnected && !isManualHandicap;
-
   return (
-    <Card className="bg-gradient-to-br from-green-50 to-white border-2 border-green-200 shadow-sm relative overflow-hidden">
+    <Card className="bg-gradient-to-br from-green-50 to-white border-2 border-green-200 shadow-sm">
       <CardContent className="p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-semibold text-lg">Handicap Index</h3>
@@ -72,7 +54,7 @@ const HandicapCard: React.FC<HandicapCardProps> = ({
                 variant="outline" 
                 className="text-lg font-bold px-3 py-1 bg-white border-green-300"
               >
-                {formatHandicap(handicapIndex)}
+                {handicapIndex > 0 ? '+' : ''}{handicapIndex}
               </Badge>
             </div>
           )}
@@ -84,22 +66,6 @@ const HandicapCard: React.FC<HandicapCardProps> = ({
               <Calendar className="h-4 w-4 mr-2" />
               Last updated: {formatLastUpdated(lastUpdated)}
             </div>
-            
-            {/* Show England Golf branding only for Ben Holmes with official connection */}
-            {shouldShowOfficialLogo && (
-              <div className="flex items-center justify-between">
-                <div className="text-xs text-gray-500">
-                  Powered by England Golf
-                </div>
-                <div className="flex items-center gap-2">
-                  <img 
-                    src="/lovable-uploads/e382c3c9-f826-43bf-8f36-cdcaccbd0685.png" 
-                    alt="England Golf" 
-                    className="h-8 w-8 opacity-80 hover:opacity-100 transition-opacity"
-                  />
-                </div>
-              </div>
-            )}
             
             {!egAppConnected && isOwnProfile && (
               <Button 
@@ -124,17 +90,6 @@ const HandicapCard: React.FC<HandicapCardProps> = ({
                 Add Handicap
               </Button>
             )}
-          </div>
-        )}
-
-        {/* England Golf logo positioned in top-right corner for Ben Holmes */}
-        {shouldShowOfficialLogo && (
-          <div className="absolute top-4 right-4">
-            <img 
-              src="/lovable-uploads/e382c3c9-f826-43bf-8f36-cdcaccbd0685.png" 
-              alt="England Golf" 
-              className="h-6 w-6 opacity-60 hover:opacity-90 transition-opacity"
-            />
           </div>
         )}
       </CardContent>

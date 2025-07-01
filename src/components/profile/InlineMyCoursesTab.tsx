@@ -30,8 +30,6 @@ const InlineMyCoursesTab: React.FC<InlineMyCoursesTabProps> = ({
           lastUpdated={profile?.updated_at}
           isOwnProfile={isOwnProfile}
           onEGConnect={onEGConnect}
-          username={profile?.username || username}
-          isManualHandicap={false} // TODO: Add logic to determine if handicap is manual
         />
       )}
       
