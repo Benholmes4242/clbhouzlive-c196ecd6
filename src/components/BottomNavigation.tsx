@@ -130,8 +130,11 @@ const BottomNavigation = () => {
       type: file.type,
       size: file.size
     });
+    console.log('Setting local selected tags to empty array');
     setLocalSelectedTags([]);
+    console.log('Calling openComposer with file:', file.name);
     openComposer(file);
+    console.log('openComposer call completed');
   };
 
   const handleMultipleFilesSelected = (files: File[]) => {

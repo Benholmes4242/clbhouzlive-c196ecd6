@@ -81,10 +81,11 @@ export const usePostFlow = () => {
   };
 
   const openComposer = (file: File, additionalFiles: File[] = []) => {
-    console.log('Opening composer with file:', file.name, file.type);
-    console.log('Additional files:', additionalFiles.length);
+    console.log('usePostFlow openComposer called with file:', file.name, file.type);
+    console.log('Additional files count:', additionalFiles.length);
     
     // Close gallery first
+    console.log('Closing gallery in openComposer');
     setIsGalleryOpen(false);
     
     // Clean previous state
@@ -95,19 +96,24 @@ export const usePostFlow = () => {
     
     // Set new files and previews
     const allFiles = [file, ...additionalFiles];
+    console.log('Setting selectedFile to:', file.name);
     setSelectedFile(file);
+    console.log('Setting selectedFiles to array of length:', allFiles.length);
     setSelectedFiles(allFiles);
     
     const mainUrl = URL.createObjectURL(file);
     const allUrls = allFiles.map(f => URL.createObjectURL(f));
     
+    console.log('Creating preview URLs - main:', mainUrl);
+    console.log('Creating preview URLs - all count:', allUrls.length);
     setPreviewUrl(mainUrl);
     setPreviewUrls(allUrls);
     
     // Open composer with a small delay to ensure gallery is closed
     setTimeout(() => {
-      console.log('Opening composer modal now');
+      console.log('usePostFlow - Opening composer modal now, isComposerOpen will be set to true');
       setIsComposerOpen(true);
+      console.log('usePostFlow - isComposerOpen set to true');
     }, 100);
   };
 
