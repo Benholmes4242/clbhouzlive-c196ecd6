@@ -106,6 +106,7 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
     input.type = 'file';
     input.accept = 'image/*';
     input.multiple = true;
+    // Don't set capture attribute - this goes directly to photo library
     
     console.log('📸 Photo input created with attributes:', {
       type: input.type,
