@@ -1,4 +1,5 @@
 
+
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -91,37 +92,55 @@ export const useUserCoursesData = (username?: string) => {
     queryFn: async () => {
       if (!targetUserId) return [];
       
-      const { data: courses, error: coursesError } = await supabase
+      // First, get all courses the user has played from user_top100_courses
+      const { data: playedCourses, error: playedError } = await supabase
         .from('user_top100_courses')
         .select(`
-          *,
+          course_id,
+          played_date,
           golf_courses (*)
         `)
         .eq('user_id', targetUserId)
         .eq('played', true);
 
-      if (coursesError) throw coursesError;
+      if (playedError) {
+        console.error('Error fetching played courses:', playedError);
+        throw playedError;
+      }
+
+      console.log('Played courses from user_top100_courses:', playedCourses);
       
-      const { data: ratings, error: ratingsError } = await supabase
+      // Then, get all ratings for this user
+      const { data: userRatings, error: ratingsError } = await supabase
         .from('course_ratings')
         .select('course_id, rating')
         .eq('user_id', targetUserId);
 
-      if (ratingsError) throw ratingsError;
+      if (ratingsError) {
+        console.error('Error fetching user ratings:', ratingsError);
+        throw ratingsError;
+      }
+
+      console.log('User ratings:', userRatings);
       
+      // Create a map of course ratings
       const ratingsMap = new Map();
-      ratings?.forEach(rating => {
+      userRatings?.forEach(rating => {
         ratingsMap.set(rating.course_id, rating.rating);
       });
       
-      const coursesWithRatings = courses?.map(course => ({
+      console.log('Ratings map:', Array.from(ratingsMap.entries()));
+      
+      // Combine played courses with their ratings
+      const coursesWithRatings = playedCourses?.map(course => ({
         ...course,
         rating: ratingsMap.get(course.course_id) || null
       })) || [];
       
       console.log('Raw courses with ratings:', coursesWithRatings.map(c => ({ 
         name: c.golf_courses?.name, 
-        rating: c.rating 
+        rating: c.rating,
+        course_id: c.course_id
       })));
       
       return getSortedUserCourses(coursesWithRatings);
@@ -171,3 +190,4 @@ export const useUserCoursesData = (username?: string) => {
     handleAverageRatingClick
   };
 };
+
