@@ -22,7 +22,7 @@ import { SwipeCarousel } from '@/components/ui/swipe-carousel';
 import EditPostDialog from './EditPostDialog';
 import TaggedText from './TaggedText';
 import VideoPreview from './VideoPreview';
-import GolfCoursePin from './GolfCoursePin';
+import CoursePostBadge from './CoursePostBadge';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { useFullscreenMedia } from '@/hooks/useFullscreenMedia';
 import { showToast } from '@/utils/toast';
@@ -164,13 +164,19 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
   // Create carousel items from media
   const carouselItems = post.post_media?.map((media, index) => (
     <div key={media.id} className="w-full aspect-square relative">
-      {/* Golf Course Pin overlay on each media item */}
+      {/* Golf Course Badge overlay on each media item */}
       {golfCourse && (
-        <GolfCoursePin 
-          courseName={golfCourse.name}
-          courseRegion={golfCourse.region}
-          className="absolute top-2 right-2 z-10"
-        />
+        <div className="absolute top-2 right-2 z-10">
+          <CoursePostBadge 
+            course={{
+              id: golfCourse.id,
+              name: golfCourse.name,
+              country: golfCourse.country,
+              region: golfCourse.region
+            }}
+            className="m-0"
+          />
+        </div>
       )}
       
       {media.media_type === 'image' ? (

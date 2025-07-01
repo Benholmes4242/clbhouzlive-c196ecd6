@@ -2,7 +2,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Play, Pause, Maximize2 } from 'lucide-react';
 import { SwipeCarousel } from '@/components/ui/swipe-carousel';
-import GolfCoursePin from '../posts/GolfCoursePin';
+import CoursePostBadge from '../posts/CoursePostBadge';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { useFullscreenMedia } from '@/hooks/useFullscreenMedia';
 
@@ -99,17 +99,32 @@ const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentPr
         loading="lazy"
         onClick={() => handleImageClick(imageUrl)}
       />
-      {/* Golf Course Pin overlay */}
+      {/* Golf Course Badge overlay */}
       {content.golfCourse && (
-        <GolfCoursePin 
-          courseName={content.golfCourse.name}
-          courseRegion={content.golfCourse.region}
-        />
+        <div className="absolute top-2 right-2 z-10">
+          <CoursePostBadge 
+            course={{
+              id: content.golfCourse.id,
+              name: content.golfCourse.name,
+              country: content.golfCourse.country,
+              region: content.golfCourse.region
+            }}
+            className="m-0"
+          />
+        </div>
       )}
       {golfClubTags.length > 0 && !content.golfCourse && (
-        <GolfCoursePin 
-          courseName={golfClubTags[0].name}
-        />
+        <div className="absolute top-2 right-2 z-10">
+          <CoursePostBadge 
+            course={{
+              id: golfClubTags[0].entity_id,
+              name: golfClubTags[0].name,
+              country: 'Unknown',
+              region: undefined
+            }}
+            className="m-0"
+          />
+        </div>
       )}
     </div>
   );
@@ -143,17 +158,32 @@ const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentPr
                         }
                       }}
                     />
-                    {/* Golf Course Pin overlay on video thumbnail */}
+                    {/* Golf Course Badge overlay on video thumbnail */}
                     {content.golfCourse && (
-                      <GolfCoursePin 
-                        courseName={content.golfCourse.name}
-                        courseRegion={content.golfCourse.region}
-                      />
+                      <div className="absolute top-2 right-2 z-10">
+                        <CoursePostBadge 
+                          course={{
+                            id: content.golfCourse.id,
+                            name: content.golfCourse.name,
+                            country: content.golfCourse.country,
+                            region: content.golfCourse.region
+                          }}
+                          className="m-0"
+                        />
+                      </div>
                     )}
                     {golfClubTags.length > 0 && !content.golfCourse && (
-                      <GolfCoursePin 
-                        courseName={golfClubTags[0].name}
-                      />
+                      <div className="absolute top-2 right-2 z-10">
+                        <CoursePostBadge 
+                          course={{
+                            id: golfClubTags[0].entity_id,
+                            name: golfClubTags[0].name,
+                            country: 'Unknown',
+                            region: undefined
+                          }}
+                          className="m-0"
+                        />
+                      </div>
                     )}
                     <div className="absolute inset-0 bg-black/20 flex items-center justify-center group-hover:bg-black/30 transition-all">
                       <div className="bg-white/90 rounded-full p-4 group-hover:scale-110 transition-transform shadow-lg">
@@ -195,17 +225,32 @@ const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentPr
                   preload="metadata"
                 />
                 
-                {/* Golf Course Pin overlay on video */}
+                {/* Golf Course Badge overlay on video */}
                 {content.golfCourse && (
-                  <GolfCoursePin 
-                    courseName={content.golfCourse.name}
-                    courseRegion={content.golfCourse.region}
-                  />
+                  <div className="absolute top-2 right-2 z-10">
+                    <CoursePostBadge 
+                      course={{
+                        id: content.golfCourse.id,
+                        name: content.golfCourse.name,
+                        country: content.golfCourse.country,
+                        region: content.golfCourse.region
+                      }}
+                      className="m-0"
+                    />
+                  </div>
                 )}
                 {golfClubTags.length > 0 && !content.golfCourse && (
-                  <GolfCoursePin 
-                    courseName={golfClubTags[0].name}
-                  />
+                  <div className="absolute top-2 right-2 z-10">
+                    <CoursePostBadge 
+                      course={{
+                        id: golfClubTags[0].entity_id,
+                        name: golfClubTags[0].name,
+                        country: 'Unknown',
+                        region: undefined
+                      }}
+                      className="m-0"
+                    />
+                  </div>
                 )}
                 
                 {/* Video Controls Overlay */}
