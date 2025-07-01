@@ -1,6 +1,7 @@
 
 import React from 'react';
 import EnhancedSocialActivity from './EnhancedSocialActivity';
+import { VideoAutoplayProvider } from '@/hooks/useVideoAutoplayManager';
 
 interface ActivityFeedProps {
   userId: string;
@@ -14,11 +15,13 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   profileDisplayName
 }) => {
   return (
-    <EnhancedSocialActivity
-      userId={userId}
-      isOwnProfile={isOwnProfile}
-      profileDisplayName={profileDisplayName}
-    />
+    <VideoAutoplayProvider>
+      <EnhancedSocialActivity
+        userId={userId}
+        isOwnProfile={isOwnProfile}
+        profileDisplayName={profileDisplayName}
+      />
+    </VideoAutoplayProvider>
   );
 };
 

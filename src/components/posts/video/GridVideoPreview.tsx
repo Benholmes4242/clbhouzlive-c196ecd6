@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useVideoAutoplay } from '@/hooks/useVideoAutoplay';
+import { useThumbnailGenerator } from './ThumbnailGenerator';
 import { Play } from 'lucide-react';
 import { GridVideoPreviewProps } from './types';
 
@@ -12,6 +13,7 @@ const GridVideoPreview = ({
   videoId 
 }: GridVideoPreviewProps) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [thumbnailError, setThumbnailError] = useState(false);
   
   const { ref: containerRef, isInView } = useIntersectionObserver({
     threshold: 0.5,
@@ -25,6 +27,8 @@ const GridVideoPreview = ({
     isGridContext: true
   });
 
+  const { thumbnailSrc, thumbnailReady } = useThumbnailGenerator(src, videoId, poster);
+
   console.log('GridVideoPreview rendering:', {
     videoId,
     src,
@@ -32,7 +36,9 @@ const GridVideoPreview = ({
     isHovered,
     isPlaying,
     isLoading,
-    shouldShowPlayIcon
+    shouldShowPlayIcon,
+    thumbnailReady,
+    thumbnailSrc: thumbnailSrc ? 'available' : 'none'
   });
 
   // Fallback if video autoplay is not available
@@ -42,11 +48,12 @@ const GridVideoPreview = ({
       <div className={`relative ${className}`}>
         <video
           src={src}
-          poster={poster}
+          poster={poster || thumbnailSrc}
           className="w-full h-full object-cover"
           muted
           loop
           playsInline
+          onError={() => setThumbnailError(true)}
         />
         <div className="absolute bottom-2 right-2">
           <div className="w-8 h-8 bg-black/60 rounded-full flex items-center justify-center">
@@ -67,11 +74,12 @@ const GridVideoPreview = ({
       <video
         ref={videoRef}
         src={src}
-        poster={poster}
+        poster={poster || thumbnailSrc}
         className="w-full h-full object-cover"
         muted
         loop
         playsInline
+        onError={() => setThumbnailError(true)}
       />
 
       {/* Play icon overlay - positioned in bottom right corner */}
@@ -87,6 +95,14 @@ const GridVideoPreview = ({
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/20">
           <div className="w-8 h-8 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      )}
+
+      {/* Error fallback */}
+      {thumbnailError && !isPlaying && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-gray-100 text-gray-400">
+          <Play className="w-6 h-6 mb-1" />
+          <span className="text-xs">Video</span>
         </div>
       )}
     </div>
