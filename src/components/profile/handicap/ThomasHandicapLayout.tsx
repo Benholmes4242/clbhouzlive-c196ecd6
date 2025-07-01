@@ -1,0 +1,63 @@
+
+import React from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import ThomasHandicapPerformanceChart from './ThomasHandicapPerformanceChart';
+
+const ThomasHandicapLayout: React.FC = () => {
+  return (
+    <div className="space-y-6 p-6">
+      {/* Performance Graph - Full Width */}
+      <ThomasHandicapPerformanceChart />
+
+      {/* My Handicap Card - Stacked Below */}
+      <Card className="bg-white border shadow-sm">
+        <CardContent className="p-3">
+          <div className="space-y-0">
+            {/* Top Row: Title and England Golf Logo */}
+            <div className="flex items-start justify-between mb-1">
+              <div>
+                <h4 className="text-red-500 text-sm font-medium mb-0">My Handicap Index®</h4>
+                <div className="text-4xl font-bold text-gray-900 mt-1">7.2</div>
+                <div className="text-sm text-gray-600 mt-1">Low Index: 7.1</div>
+              </div>
+              <div className="flex flex-col items-end">
+                <div className="flex items-center gap-2 mb-1">
+                  <img 
+                    src="/lovable-uploads/41a64d83-afc2-42f1-a446-b6a8b45a0043.png" 
+                    alt="England Golf" 
+                    className="h-6 w-auto opacity-80"
+                  />
+                  <span className="text-xs text-gray-500">Powered by England Golf</span>
+                </div>
+                <div className="text-xs text-gray-500">
+                  Last Updated: Today
+                </div>
+              </div>
+            </div>
+            
+            {/* Membership Number and Home Club */}
+            <div className="text-sm text-gray-600 mt-2 space-y-1">
+              <div><span className="font-medium">Membership Number:</span> 101B494608</div>
+              <div><span className="font-medium">Home Club:</span> Sundridge Park</div>
+            </div>
+
+            {/* Regional Stats */}
+            <div className="flex gap-2 mt-3">
+              <div className="bg-gray-800 text-white px-3 py-1 rounded text-xs font-medium">
+                15% Sundridge Park
+              </div>
+              <div className="bg-gray-800 text-white px-3 py-1 rounded text-xs font-medium">
+                9% Kent
+              </div>
+              <div className="bg-gray-800 text-white px-3 py-1 rounded text-xs font-medium">
+                8% England
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+export default ThomasHandicapLayout;

@@ -1,8 +1,8 @@
-
 import React, { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import BenjaminHandicapLayout from './handicap/BenjaminHandicapLayout';
+import ThomasHandicapLayout from './handicap/ThomasHandicapLayout';
 import HandicapConnectModal from './handicap/HandicapConnectModal';
 import ManualHandicapModal from './handicap/ManualHandicapModal';
 import ManualHandicapCard from './handicap/ManualHandicapCard';
@@ -34,12 +34,24 @@ const HandicapCard: React.FC<HandicapCardProps> = ({
 
   // Check if this is Benjamin Holmes' profile
   const isBenjaminHolmes = userUsername === 'benjaminholmes';
+  
+  // Check if this is Thomas Holmes' profile
+  const isThomasHolmes = userUsername === 'dannyholmes';
 
   // Render Benjamin's special layout
   if (isBenjaminHolmes && (handicapIndex !== null && handicapIndex !== undefined)) {
     return (
       <div className="bg-white rounded-lg border shadow-sm">
         <BenjaminHandicapLayout />
+      </div>
+    );
+  }
+
+  // Render Thomas's special layout
+  if (isThomasHolmes && (handicapIndex !== null && handicapIndex !== undefined)) {
+    return (
+      <div className="bg-white rounded-lg border shadow-sm">
+        <ThomasHandicapLayout />
       </div>
     );
   }
