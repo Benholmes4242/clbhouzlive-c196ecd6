@@ -52,7 +52,7 @@ const AdminPage = () => {
           <div className="flex items-center justify-center">
             <div 
               className="animate-spin rounded-full h-8 w-8 border-b-2"
-              style={{ borderBottomColor: '#b66b41' }}
+              style={{ borderBottomColor: '#6e9277' }}
             ></div>
           </div>
         </div>

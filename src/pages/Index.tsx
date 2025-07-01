@@ -27,7 +27,7 @@ const Index = () => {
         <div className="text-center">
           <div 
             className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto"
-            style={{ borderBottomColor: '#b66b41' }}
+            style={{ borderBottomColor: '#6e9277' }}
           ></div>
           <p className="mt-2 text-muted-foreground">Loading...</p>
         </div>

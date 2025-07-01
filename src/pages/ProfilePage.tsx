@@ -49,7 +49,7 @@ const ProfilePage = () => {
           <div className="text-center">
             <div 
               className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4"
-              style={{ borderBottomColor: '#b66b41' }}
+              style={{ borderBottomColor: '#6e9277' }}
             ></div>
             <span className="text-muted-foreground text-base">Loading...</span>
           </div>
