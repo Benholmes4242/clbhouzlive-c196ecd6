@@ -29,7 +29,7 @@ const ActionsDropdown: React.FC<ActionsDropdownProps> = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="sm" className="px-2 py-1">
+        <Button variant="outline" size="sm" className="px-2 py-1 h-7 w-7 flex-shrink-0">
           <MoreHorizontal className="w-3 h-3" />
         </Button>
       </DropdownMenuTrigger>

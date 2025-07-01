@@ -45,49 +45,57 @@ const UserProfileActions: React.FC<UserProfileActionsProps> = ({
   };
 
   return (
-    <div className="flex items-center gap-2">
-      {/* Friend Button */}
-      {canSendFriendRequest && (
-        <FriendButton
-          friendStatus={friendStatus}
-          loading={loading}
-          onFriendRequest={() => handleFriendRequest(friendStatus)}
-        />
-      )}
-
-      {/* Follow Button */}
-      <FollowButton
-        isFollowing={isFollowing}
-        loading={loading}
-        onFollow={() => handleFollow(isFollowing)}
-        friendStatus={friendStatus}
-      />
-
-      {/* Followers Button */}
-      <Button 
-        variant="outline" 
-        size="sm"
-        onClick={handleFollowersClick}
-        className="px-3 py-1 text-xs"
+    <div className="w-full overflow-x-auto scrollbar-hide">
+      <div 
+        className="flex items-center gap-2 min-w-max px-1 py-1"
+        style={{ 
+          scrollBehavior: 'smooth',
+          WebkitOverflowScrolling: 'touch'
+        }}
       >
-        <Users className="w-3 h-3 mr-1" />
-        Followers
-      </Button>
+        {/* Friend Button */}
+        {canSendFriendRequest && (
+          <FriendButton
+            friendStatus={friendStatus}
+            loading={loading}
+            onFriendRequest={() => handleFriendRequest(friendStatus)}
+          />
+        )}
 
-      {/* Message Button */}
-      {canMessage && (
-        <MessageButton friendStatus={friendStatus} />
-      )}
-
-      {/* Actions Dropdown */}
-      {canSendFriendRequest && (
-        <ActionsDropdown
-          friendStatus={friendStatus}
+        {/* Follow Button */}
+        <FollowButton
+          isFollowing={isFollowing}
           loading={loading}
-          onRemoveFriend={handleRemoveFriend}
-          username={username}
+          onFollow={() => handleFollow(isFollowing)}
+          friendStatus={friendStatus}
         />
-      )}
+
+        {/* Followers Button */}
+        <Button 
+          variant="outline" 
+          size="sm"
+          onClick={handleFollowersClick}
+          className="px-2 py-1 text-xs h-7 flex-shrink-0"
+        >
+          <Users className="w-3 h-3 mr-1" />
+          Followers
+        </Button>
+
+        {/* Message Button */}
+        {canMessage && (
+          <MessageButton friendStatus={friendStatus} />
+        )}
+
+        {/* Actions Dropdown */}
+        {canSendFriendRequest && (
+          <ActionsDropdown
+            friendStatus={friendStatus}
+            loading={loading}
+            onRemoveFriend={handleRemoveFriend}
+            username={username}
+          />
+        )}
+      </div>
     </div>
   );
 };

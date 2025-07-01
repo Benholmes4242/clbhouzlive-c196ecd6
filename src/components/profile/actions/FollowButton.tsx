@@ -35,7 +35,7 @@ const FollowButton: React.FC<FollowButtonProps> = ({
       size="sm"
       onClick={onFollow}
       disabled={loading}
-      className="px-3 py-1 text-xs"
+      className="px-2 py-1 text-xs h-7 flex-shrink-0"
     >
       {getButtonIcon()}
       <span className="ml-1">{getButtonText()}</span>

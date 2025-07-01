@@ -18,10 +18,10 @@ const MessageButton: React.FC<MessageButtonProps> = ({ friendStatus }) => {
       variant="outline" 
       size="sm"
       onClick={handleMessageClick}
-      className="px-3 py-1 text-xs"
+      className="px-2 py-1 text-xs h-7 flex-shrink-0"
     >
-      <MessageCircle className="w-3 h-3" />
-      <span className="ml-1">Message</span>
+      <MessageCircle className="w-3 h-3 mr-1" />
+      Message
     </Button>
   );
 };
