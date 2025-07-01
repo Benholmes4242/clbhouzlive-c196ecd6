@@ -36,7 +36,6 @@ const InstagramStyleProfileHeader: React.FC<InstagramStyleProfileHeaderProps> = 
             user={isOwnProfile ? user : null}
             profile={profile}
             onProfileUpdate={() => {}}
-            size="lg"
           />
         </div>
 
