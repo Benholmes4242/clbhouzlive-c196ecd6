@@ -355,9 +355,6 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
               </button>
               
               <button
-                onTouchStart={() => {
-                  console.log('🔴 MOBILE CAPTURE BUTTON TOUCH START');
-                }}
                 onClick={() => {
                   console.log('🔴 MOBILE CAPTURE BUTTON CLICKED - Event triggered');
                   handleCameraClick();
@@ -373,10 +370,7 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
                   display: 'flex',
                   alignItems: 'flex-start',
                   gap: '16px',
-                  cursor: 'pointer',
-                  WebkitTapHighlightColor: 'transparent',
-                  zIndex: 999,
-                  position: 'relative'
+                  cursor: 'pointer'
                 }}
               >
                 <Camera className="h-6 w-6 mt-1 flex-shrink-0" />
@@ -392,19 +386,23 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
 
               {/* Post Photo Button */}
               <button
-                onTouchStart={(e) => {
-                  console.log('🔴 MOBILE PHOTO BUTTON TOUCH START');
-                  e.preventDefault();
-                  e.stopPropagation();
-                }}
-                onClick={(e) => {
+                onClick={() => {
                   console.log('🔴 MOBILE PHOTO BUTTON CLICKED - Event triggered');
-                  e.preventDefault();
-                  e.stopPropagation();
                   handlePhotoClick();
                 }}
-                className="w-full h-auto p-4 bg-white border-2 border-[#b66b41] text-[#b66b41] hover:bg-[#b66b41] hover:text-white transition-all duration-200 rounded-xl flex items-start gap-4 cursor-pointer touch-manipulation"
-                style={{ WebkitTapHighlightColor: 'transparent' }}
+                style={{ 
+                  width: '100%',
+                  height: 'auto',
+                  padding: '16px',
+                  backgroundColor: 'white',
+                  border: '2px solid #b66b41',
+                  color: '#b66b41',
+                  borderRadius: '12px',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '16px',
+                  cursor: 'pointer'
+                }}
               >
                 <Image className="h-6 w-6 mt-1 flex-shrink-0" />
                 <div className="text-left">
@@ -415,19 +413,23 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
 
               {/* Post Video Button */}
               <button
-                onTouchStart={(e) => {
-                  console.log('🔴 MOBILE VIDEO BUTTON TOUCH START');
-                  e.preventDefault();
-                  e.stopPropagation();
-                }}
-                onClick={(e) => {
+                onClick={() => {
                   console.log('🔴 MOBILE VIDEO BUTTON CLICKED - Event triggered');
-                  e.preventDefault();
-                  e.stopPropagation();
                   handleVideoClick();
                 }}
-                className="w-full h-auto p-4 bg-white border-2 border-[#b66b41] text-[#b66b41] hover:bg-[#b66b41] hover:text-white transition-all duration-200 rounded-xl flex items-start gap-4 cursor-pointer touch-manipulation"
-                style={{ WebkitTapHighlightColor: 'transparent' }}
+                style={{ 
+                  width: '100%',
+                  height: 'auto',
+                  padding: '16px',
+                  backgroundColor: 'white',
+                  border: '2px solid #b66b41',
+                  color: '#b66b41',
+                  borderRadius: '12px',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '16px',
+                  cursor: 'pointer'
+                }}
               >
                 <Video className="h-6 w-6 mt-1 flex-shrink-0" />
                 <div className="text-left">
