@@ -219,24 +219,37 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
           </div>
           
           {isOwnPost && (
-            <DropdownMenu>
+            <DropdownMenu modal={false}>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="hover:bg-muted">
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuContent 
+                align="end" 
+                className="w-48 bg-background border shadow-lg z-[100]"
+                sideOffset={5}
+                avoidCollisions={true}
+              >
                 <DropdownMenuItem 
-                  onClick={() => setEditDialogOpen(true)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setEditDialogOpen(true);
+                  }}
                   className="cursor-pointer"
                 >
                   <Edit className="h-4 w-4 mr-2" />
                   Edit Post
                 </DropdownMenuItem>
                 <DropdownMenuItem 
-                  onClick={handleDeletePost}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleDeletePost();
+                  }}
                   disabled={isDeleting}
-                  className="text-red-600 cursor-pointer focus:text-red-600"
+                  className="text-destructive cursor-pointer focus:text-destructive focus:bg-destructive/10"
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
                   {isDeleting ? 'Deleting...' : 'Delete Post'}
