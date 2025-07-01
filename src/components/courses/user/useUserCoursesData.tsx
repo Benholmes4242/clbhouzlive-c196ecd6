@@ -1,5 +1,3 @@
-
-
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -19,30 +17,31 @@ const getSortedUserCourses = (userCourses: any[]) => {
     rating: c.rating 
   })));
   
-  // Get courses with ratings - sort by highest rating first (10 at top, 0 at bottom)
-  const rated = userCourses
-    .filter(c => c.rating !== null && c.rating !== undefined)
-    .sort((a, b) => {
-      console.log(`Comparing ${a.golf_courses?.name} (${a.rating}) vs ${b.golf_courses?.name} (${b.rating})`);
-      return b.rating - a.rating; // Descending order: 10, 9, 8, ..., 1, 0
-    });
+  // Sort all courses by rating in descending order (10 first, then 9, 8, etc., null/undefined last)
+  const sortedCourses = userCourses.sort((a, b) => {
+    const aRating = a.rating;
+    const bRating = b.rating;
+    
+    // If both have ratings, sort by rating descending (10, 9, 8, ...)
+    if (aRating !== null && aRating !== undefined && bRating !== null && bRating !== undefined) {
+      return bRating - aRating;
+    }
+    
+    // If only one has a rating, put the rated one first
+    if (aRating !== null && aRating !== undefined) return -1;
+    if (bRating !== null && bRating !== undefined) return 1;
+    
+    // If neither has a rating, sort by official ranking
+    const aRank = getCourseRanking(a.golf_courses);
+    const bRank = getCourseRanking(b.golf_courses);
+    return aRank - bRank;
+  });
   
-  // Get courses without ratings - sort by best official ranking (global/regional)
-  const unrated = userCourses
-    .filter(c => c.rating === null || c.rating === undefined)
-    .sort((a, b) => {
-      const aRank = getCourseRanking(a.golf_courses);
-      const bRank = getCourseRanking(b.golf_courses);
-      return aRank - bRank;
-    });
-
-  const sortedCourses = [...rated, ...unrated];
   console.log('Final sorted order:', sortedCourses.map(c => ({ 
     name: c.golf_courses?.name, 
     rating: c.rating 
   })));
   
-  // Return rated courses first (user's personal ranking), then unrated courses by official ranking
   return sortedCourses;
 };
 
@@ -137,7 +136,7 @@ export const useUserCoursesData = (username?: string) => {
         rating: ratingsMap.get(course.course_id) || null
       })) || [];
       
-      console.log('Raw courses with ratings:', coursesWithRatings.map(c => ({ 
+      console.log('Raw courses with ratings before sorting:', coursesWithRatings.map(c => ({ 
         name: c.golf_courses?.name, 
         rating: c.rating,
         course_id: c.course_id
@@ -190,4 +189,3 @@ export const useUserCoursesData = (username?: string) => {
     handleAverageRatingClick
   };
 };
-
