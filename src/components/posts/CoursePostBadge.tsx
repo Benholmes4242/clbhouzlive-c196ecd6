@@ -34,10 +34,7 @@ const CoursePostBadge = ({ course, className = "" }: CoursePostBadgeProps) => {
         onClick={handleCourseClick}
       >
         <MapPin className="h-3 w-3 mr-1 text-white" />
-        <span className="hover:underline max-w-32 truncate">{course.name}</span>
-        {course.region && (
-          <span className="text-white/80 ml-1 hidden sm:inline">• {course.region}</span>
-        )}
+        <span className="hover:underline">{course.name}</span>
       </Badge>
     </div>
   );
