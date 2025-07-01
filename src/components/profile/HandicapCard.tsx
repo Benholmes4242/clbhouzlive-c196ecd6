@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
@@ -38,7 +39,7 @@ const HandicapCard: React.FC<HandicapCardProps> = ({
   // Check if this is Thomas Holmes' profile
   const isThomasHolmes = userUsername === 'dannyholmes';
 
-  // Render Benjamin's special layout
+  // Render Benjamin's special layout (only when he has a handicap)
   if (isBenjaminHolmes && (handicapIndex !== null && handicapIndex !== undefined)) {
     return (
       <div className="bg-white rounded-lg border shadow-sm">
@@ -47,7 +48,7 @@ const HandicapCard: React.FC<HandicapCardProps> = ({
     );
   }
 
-  // Render Thomas's special layout
+  // Render Thomas's special layout (only when he has a handicap)
   if (isThomasHolmes && (handicapIndex !== null && handicapIndex !== undefined)) {
     return (
       <div className="bg-white rounded-lg border shadow-sm">
