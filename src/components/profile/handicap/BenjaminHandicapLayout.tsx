@@ -41,6 +41,14 @@ const BenjaminHandicapLayout: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+
+      {/* Top 100 Profile Header */}
+      <div className="mt-6 mb-4">
+        <h2 className="text-xl font-semibold text-gray-900 mb-2">My Top 100 Golf Courses</h2>
+        <p className="text-sm text-gray-500">
+          Here's how you've ranked the world's best golf courses based on the ones you've played.
+        </p>
+      </div>
     </div>
   );
 };
