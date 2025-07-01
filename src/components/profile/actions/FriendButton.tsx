@@ -17,25 +17,26 @@ const FriendButton: React.FC<FriendButtonProps> = ({
   const getButtonText = () => {
     if (loading) return "Loading...";
     if (friendStatus === 'accepted') return "Friends";
-    if (friendStatus === 'pending') return "Request Sent";
-    return "Add Friend";
+    if (friendStatus === 'pending') return "Pending";
+    return "Friend";
   };
 
   const getButtonIcon = () => {
-    if (friendStatus === 'accepted') return <UserCheck className="w-4 h-4" />;
-    if (friendStatus === 'pending') return <UserMinus className="w-4 h-4" />;
-    return <UserPlus className="w-4 h-4" />;
+    if (friendStatus === 'accepted') return <UserCheck className="w-3 h-3" />;
+    if (friendStatus === 'pending') return <UserMinus className="w-3 h-3" />;
+    return <UserPlus className="w-3 h-3" />;
   };
 
   return (
     <Button
       variant={friendStatus === 'accepted' ? "secondary" : "outline"}
+      size="sm"
       onClick={onFriendRequest}
       disabled={loading || friendStatus === 'accepted'}
-      className="flex-1 max-w-32"
+      className="px-3 py-1 text-xs"
     >
       {getButtonIcon()}
-      <span className="ml-2">{getButtonText()}</span>
+      <span className="ml-1">{getButtonText()}</span>
     </Button>
   );
 };

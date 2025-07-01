@@ -16,11 +16,12 @@ const MessageButton: React.FC<MessageButtonProps> = ({ friendStatus }) => {
   return (
     <Button 
       variant="outline" 
+      size="sm"
       onClick={handleMessageClick}
-      className="flex-1 max-w-32"
+      className="px-3 py-1 text-xs"
     >
-      <MessageCircle className="w-4 h-4" />
-      <span className="ml-2">Message</span>
+      <MessageCircle className="w-3 h-3" />
+      <span className="ml-1">Message</span>
     </Button>
   );
 };

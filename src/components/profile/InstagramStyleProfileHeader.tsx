@@ -44,33 +44,36 @@ const InstagramStyleProfileHeader: React.FC<InstagramStyleProfileHeaderProps> = 
           {username && (
             <p className="text-sm text-gray-600 truncate">@{username}</p>
           )}
+          
+          {/* Action Buttons Row - directly under username */}
+          {!isOwnProfile && currentUser && (
+            <div className="mt-2">
+              <UserProfileActions
+                targetUserId={profile.id}
+                currentUserId={currentUser.id}
+                isFollowing={relationshipStatus?.isFollowing || false}
+                friendStatus={relationshipStatus?.friendStatus || null}
+                username={profile.username || profile.display_name || 'User'}
+                targetUserType={profile.user_type || 'individual'}
+                currentUserType={currentUser.user_type || 'individual'}
+              />
+            </div>
+          )}
+          
           {bio && (
-            <p className="text-sm text-gray-800 mt-1 line-clamp-2">{bio}</p>
+            <p className="text-sm text-gray-800 mt-2 line-clamp-2">{bio}</p>
           )}
         </div>
       </div>
 
       {/* Stats Row - Followers, Following, Friends */}
-      <div className="mb-4">
+      <div className="mb-2">
         <FollowerStats 
           userId={profile?.id} 
           userType={profile?.user_type || 'individual'} 
           username={profile?.username}
         />
       </div>
-
-      {/* Action Buttons */}
-      {!isOwnProfile && currentUser && (
-        <UserProfileActions
-          targetUserId={profile.id}
-          currentUserId={currentUser.id}
-          isFollowing={relationshipStatus?.isFollowing || false}
-          friendStatus={relationshipStatus?.friendStatus || null}
-          username={profile.username || profile.display_name || 'User'}
-          targetUserType={profile.user_type || 'individual'}
-          currentUserType={currentUser.user_type || 'individual'}
-        />
-      )}
     </div>
   );
 };

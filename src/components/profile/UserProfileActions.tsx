@@ -5,6 +5,9 @@ import MessageButton from './actions/MessageButton';
 import FriendButton from './actions/FriendButton';
 import ActionsDropdown from './actions/ActionsDropdown';
 import { useProfileActions } from './actions/useProfileActions';
+import { Button } from '@/components/ui/button';
+import { Users } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface UserProfileActionsProps {
   targetUserId: string;
@@ -25,6 +28,7 @@ const UserProfileActions: React.FC<UserProfileActionsProps> = ({
   targetUserType = 'individual',
   currentUserType = 'individual'
 }) => {
+  const navigate = useNavigate();
   const { loading, handleFollow, handleFriendRequest, handleRemoveFriend } = useProfileActions({
     targetUserId,
     currentUserId
@@ -36,46 +40,54 @@ const UserProfileActions: React.FC<UserProfileActionsProps> = ({
   // Allow messaging between friends or if either is a business/club
   const canMessage = friendStatus === 'accepted' || targetUserType !== 'individual' || currentUserType !== 'individual';
 
-  console.log('UserProfileActions - targetUserType:', targetUserType, 'currentUserType:', currentUserType);
-  console.log('UserProfileActions - canSendFriendRequest:', canSendFriendRequest);
+  const handleFollowersClick = () => {
+    navigate(`/profile/${username}/followers`);
+  };
 
   return (
-    <div className="space-y-4">
-      {/* Primary action buttons */}
-      <div className="flex items-center justify-center gap-3">
-        <FollowButton
-          isFollowing={isFollowing}
-          loading={loading}
-          onFollow={() => handleFollow(isFollowing)}
+    <div className="flex items-center gap-2">
+      {/* Friend Button */}
+      {canSendFriendRequest && (
+        <FriendButton
           friendStatus={friendStatus}
+          loading={loading}
+          onFriendRequest={() => handleFriendRequest(friendStatus)}
         />
+      )}
 
-        {/* Only show friend button if both users are individuals */}
-        {canSendFriendRequest && (
-          <FriendButton
-            friendStatus={friendStatus}
-            loading={loading}
-            onFriendRequest={() => handleFriendRequest(friendStatus)}
-          />
-        )}
-      </div>
+      {/* Follow Button */}
+      <FollowButton
+        isFollowing={isFollowing}
+        loading={loading}
+        onFollow={() => handleFollow(isFollowing)}
+        friendStatus={friendStatus}
+      />
 
-      {/* Secondary action buttons */}
-      <div className="flex items-center justify-center gap-3">
-        {canMessage && (
-          <MessageButton friendStatus={friendStatus} />
-        )}
-        
-        {/* Only show actions dropdown if both users are individuals */}
-        {canSendFriendRequest && (
-          <ActionsDropdown
-            friendStatus={friendStatus}
-            loading={loading}
-            onRemoveFriend={handleRemoveFriend}
-            username={username}
-          />
-        )}
-      </div>
+      {/* Followers Button */}
+      <Button 
+        variant="outline" 
+        size="sm"
+        onClick={handleFollowersClick}
+        className="px-3 py-1 text-xs"
+      >
+        <Users className="w-3 h-3 mr-1" />
+        Followers
+      </Button>
+
+      {/* Message Button */}
+      {canMessage && (
+        <MessageButton friendStatus={friendStatus} />
+      )}
+
+      {/* Actions Dropdown */}
+      {canSendFriendRequest && (
+        <ActionsDropdown
+          friendStatus={friendStatus}
+          loading={loading}
+          onRemoveFriend={handleRemoveFriend}
+          username={username}
+        />
+      )}
     </div>
   );
 };

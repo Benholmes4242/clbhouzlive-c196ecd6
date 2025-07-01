@@ -29,8 +29,8 @@ const ActionsDropdown: React.FC<ActionsDropdownProps> = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon">
-          <MoreHorizontal className="w-4 h-4" />
+        <Button variant="outline" size="sm" className="px-2 py-1">
+          <MoreHorizontal className="w-3 h-3" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">

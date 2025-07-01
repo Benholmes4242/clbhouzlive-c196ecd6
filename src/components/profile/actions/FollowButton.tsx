@@ -22,7 +22,7 @@ const FollowButton: React.FC<FollowButtonProps> = ({
   };
 
   const getButtonIcon = () => {
-    return isFollowing ? <UserCheck className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />;
+    return isFollowing ? <UserCheck className="w-3 h-3" /> : <UserPlus className="w-3 h-3" />;
   };
 
   const getButtonVariant = () => {
@@ -32,12 +32,13 @@ const FollowButton: React.FC<FollowButtonProps> = ({
   return (
     <Button
       variant={getButtonVariant()}
+      size="sm"
       onClick={onFollow}
       disabled={loading}
-      className="flex-1 max-w-32"
+      className="px-3 py-1 text-xs"
     >
       {getButtonIcon()}
-      <span className="ml-2">{getButtonText()}</span>
+      <span className="ml-1">{getButtonText()}</span>
     </Button>
   );
 };
