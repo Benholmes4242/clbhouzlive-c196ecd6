@@ -3,6 +3,7 @@ import React, { useState, useMemo } from 'react';
 import { useUserCoursesData } from './user/useUserCoursesData';
 import { useTop100CoursesData } from '@/hooks/useTop100CoursesData';
 import UserCoursesHeader from './user/UserCoursesHeader';
+import UserCoursesRegionalTiles from './user/UserCoursesRegionalTiles';
 import CourseCard from './CourseCard';
 import { EmptyTop100State } from './user/UserCoursesEmptyStates';
 import { useQuery } from '@tanstack/react-query';
@@ -151,6 +152,13 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({ username }) => 
       <UserCoursesHeader 
         displayName={displayName} 
         isOwnProfile={isOwnProfile} 
+      />
+
+      <UserCoursesRegionalTiles
+        regionProgress={regionProgress}
+        activeFilter={activeFilter}
+        onFilterChange={setActiveFilter}
+        isLoading={isLoadingProgress}
       />
 
       <div className="space-y-4">

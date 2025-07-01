@@ -71,44 +71,48 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
 
   return (
     <div className="mb-8">
-      <div className="flex items-center gap-6 mb-4">
+      <div className="flex items-center gap-4 mb-4">
         {/* All Courses Button */}
         <button
           onClick={() => onFilterChange(null)}
-          className={`text-lg font-bold whitespace-nowrap px-3 py-1.5 rounded-full transition-all duration-200 hover:scale-105 hover:text-[#b66b41] flex-shrink-0 ${
+          className={`text-sm font-semibold whitespace-nowrap px-4 py-2 rounded-full transition-all duration-200 hover:scale-105 hover:text-[#b66b41] flex-shrink-0 ${
             activeFilter === null 
               ? "bg-green-100 text-green-800" 
-              : "text-foreground"
+              : "text-foreground bg-gray-100"
           }`}
         >
           All Courses
         </button>
 
-        {/* Mobile-Optimized Swipeable Flag Bar */}
-        <div className="flex-1 relative overflow-hidden">
+        {/* Horizontally Swipeable Flag Bar */}
+        <div className="flex-1 relative">
           <div 
             className="overflow-x-auto scroll-smooth"
             style={{
               scrollbarWidth: 'none',
               msOverflowStyle: 'none',
               WebkitOverflowScrolling: 'touch',
-              overscrollBehaviorX: 'contain',
-              maxWidth: '100%'
+              overscrollBehaviorX: 'contain'
             }}
           >
             <style>
               {`
-                .mobile-scroll-container::-webkit-scrollbar {
+                .swipe-container::-webkit-scrollbar {
                   display: none;
                 }
-                .mobile-scroll-container {
-                  scroll-snap-type: x mandatory;
+                .swipe-container {
+                  scroll-snap-type: x proximity;
                   scroll-padding: 0 16px;
+                  -webkit-overflow-scrolling: touch;
+                  overscroll-behavior-x: contain;
+                }
+                .swipe-item {
+                  scroll-snap-align: center;
                 }
               `}
             </style>
             <div 
-              className="flex items-center gap-6 pb-2 px-4 mobile-scroll-container"
+              className="flex items-center gap-3 pb-2 px-2 swipe-container"
               style={{ 
                 minWidth: 'max-content',
                 width: 'max-content'
@@ -121,21 +125,18 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
                       <TooltipTrigger asChild>
                         <button
                           onClick={() => onFilterChange(activeFilter === tile.key ? null : tile.key)}
-                          className={`flex items-center gap-2 cursor-pointer transition-all duration-200 hover:scale-105 hover:text-[#b66b41] whitespace-nowrap flex-shrink-0 px-3 py-1.5 rounded-full ${
+                          className={`flex items-center gap-2 cursor-pointer transition-all duration-200 hover:scale-105 hover:text-[#b66b41] whitespace-nowrap flex-shrink-0 px-3 py-2 rounded-full swipe-item ${
                             activeFilter === tile.key 
                               ? 'bg-green-100 text-green-800' 
-                              : 'text-foreground'
+                              : 'text-foreground bg-gray-100'
                           }`}
-                          style={{ 
-                            scrollSnapAlign: index === 0 ? 'start' : index === tiles.length - 1 ? 'end' : 'center'
-                          }}
                         >
                           {tile.flag === 'earth' ? (
-                            <Earth className="w-8 h-6 text-gray-600 flex-shrink-0" />
+                            <Earth className="w-6 h-4 text-gray-600 flex-shrink-0" />
                           ) : (
-                            <CountryFlag country={tile.country} size="lg" className="flex-shrink-0" />
+                            <CountryFlag country={tile.country} size="md" className="flex-shrink-0" />
                           )}
-                          <span className="text-lg font-bold">
+                          <span className="text-sm font-semibold">
                             {tile.progress.played} / {tile.progress.total}
                           </span>
                         </button>
