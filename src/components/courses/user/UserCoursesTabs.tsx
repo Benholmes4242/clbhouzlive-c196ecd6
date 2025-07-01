@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import CourseCard from '../CourseCard';
@@ -26,18 +27,30 @@ const UserCoursesTabs: React.FC<UserCoursesTabsProps> = ({
 }) => {
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-      <TabsList className="grid w-full grid-cols-2">
+      <TabsList className="grid w-full grid-cols-2 h-auto">
         <TabsTrigger 
           value="top100"
-          className="hover:text-[#b66b41] data-[state=active]:text-[#b66b41]"
+          className="flex flex-col items-center gap-1 py-3 relative data-[state=active]:bg-transparent hover:bg-muted/50 data-[state=active]:text-foreground data-[state=active]:shadow-none"
         >
-          Top 100
+          <span className="text-sm font-medium">Top 100</span>
+          {activeTab === 'top100' && (
+            <div 
+              className="w-1.5 h-1.5 rounded-full bg-[#b66b41] mt-1 animate-fade-in"
+              style={{ marginTop: '4px' }}
+            />
+          )}
         </TabsTrigger>
         <TabsTrigger 
           value="recent"
-          className="hover:text-[#b66b41] data-[state=active]:text-[#b66b41]"
+          className="flex flex-col items-center gap-1 py-3 relative data-[state=active]:bg-transparent hover:bg-muted/50 data-[state=active]:text-foreground data-[state=active]:shadow-none"
         >
-          Recent
+          <span className="text-sm font-medium">Recent</span>
+          {activeTab === 'recent' && (
+            <div 
+              className="w-1.5 h-1.5 rounded-full bg-[#b66b41] mt-1 animate-fade-in"
+              style={{ marginTop: '4px' }}
+            />
+          )}
         </TabsTrigger>
       </TabsList>
 

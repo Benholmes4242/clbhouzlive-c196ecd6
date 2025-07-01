@@ -37,10 +37,16 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
             <TabsTrigger 
               key={tab.id}
               value={tab.id}
-              className="flex flex-col gap-1 py-3 px-2 data-[state=active]:bg-white data-[state=active]:text-[#b66b41] text-gray-600 hover:text-[#b66b41] transition-colors"
+              className="flex flex-col gap-1 py-3 px-2 relative data-[state=active]:bg-transparent data-[state=active]:text-foreground text-gray-600 hover:text-[#b66b41] transition-colors data-[state=active]:shadow-none"
             >
               <IconComponent className="h-4 w-4" />
               <span className="text-xs font-medium">{tab.label}</span>
+              {activeTab === tab.id && (
+                <div 
+                  className="w-1.5 h-1.5 rounded-full bg-[#b66b41] animate-fade-in"
+                  style={{ marginTop: '4px' }}
+                />
+              )}
             </TabsTrigger>
           );
         })}

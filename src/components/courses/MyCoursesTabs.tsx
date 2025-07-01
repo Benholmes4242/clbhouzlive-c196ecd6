@@ -35,10 +35,43 @@ const MyCoursesTabs = ({
 }: MyCoursesTabsProps) => {
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-      <TabsList className="grid w-full grid-cols-3">
-        <TabsTrigger value="all">All Courses</TabsTrigger>
-        <TabsTrigger value="top100">Top 100</TabsTrigger>
-        <TabsTrigger value="recent">Recent</TabsTrigger>
+      <TabsList className="grid w-full grid-cols-3 h-auto">
+        <TabsTrigger 
+          value="all"
+          className="flex flex-col items-center gap-1 py-3 relative data-[state=active]:bg-transparent hover:bg-muted/50 data-[state=active]:text-foreground data-[state=active]:shadow-none"
+        >
+          <span className="text-sm font-medium">All Courses</span>
+          {activeTab === 'all' && (
+            <div 
+              className="w-1.5 h-1.5 rounded-full bg-[#b66b41] mt-1 animate-fade-in"
+              style={{ marginTop: '4px' }}
+            />
+          )}
+        </TabsTrigger>
+        <TabsTrigger 
+          value="top100"
+          className="flex flex-col items-center gap-1 py-3 relative data-[state=active]:bg-transparent hover:bg-muted/50 data-[state=active]:text-foreground data-[state=active]:shadow-none"
+        >
+          <span className="text-sm font-medium">Top 100</span>
+          {activeTab === 'top100' && (
+            <div 
+              className="w-1.5 h-1.5 rounded-full bg-[#b66b41] mt-1 animate-fade-in"
+              style={{ marginTop: '4px' }}
+            />
+          )}
+        </TabsTrigger>
+        <TabsTrigger 
+          value="recent"
+          className="flex flex-col items-center gap-1 py-3 relative data-[state=active]:bg-transparent hover:bg-muted/50 data-[state=active]:text-foreground data-[state=active]:shadow-none"
+        >
+          <span className="text-sm font-medium">Recent</span>
+          {activeTab === 'recent' && (
+            <div 
+              className="w-1.5 h-1.5 rounded-full bg-[#b66b41] mt-1 animate-fade-in"
+              style={{ marginTop: '4px' }}
+            />
+          )}
+        </TabsTrigger>
       </TabsList>
 
       <TabsContent value="all" className="mt-6">
