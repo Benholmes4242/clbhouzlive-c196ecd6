@@ -14,12 +14,12 @@ const BenjaminHandicapLayout: React.FC = () => {
         <CardContent className="p-3">
           <div className="space-y-0">
             {/* Top Row: Title and England Golf Logo */}
-            <div className="flex items-center justify-between mb-1">
+            <div className="flex items-start justify-between mb-1">
               <div>
                 <h4 className="text-red-500 text-sm font-medium mb-0">My Handicap Index®</h4>
                 <div className="text-4xl font-bold text-gray-900 mt-1">4.5</div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 mt-6">
                 <img 
                   src="/lovable-uploads/41a64d83-afc2-42f1-a446-b6a8b45a0043.png" 
                   alt="England Golf" 
