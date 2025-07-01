@@ -3,7 +3,7 @@ import React from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePostFlow } from '@/hooks/usePostFlow';
 import { usePostSubmission } from '@/hooks/usePostSubmission';
-import SimpleMobileGallery from '@/components/post/SimpleMobileGallery';
+import GalleryPicker from '@/components/post/GalleryPicker';
 import CreateMomentModal from '@/components/post/CreateMomentModal';
 import SnapToast from '@/components/snap/SnapToast';
 import NavigationBar from './bottom-navigation/NavigationBar';
@@ -185,7 +185,7 @@ const BottomNavigation = () => {
         onTabClick={onTabClick}
       />
 
-      <SimpleMobileGallery
+      <GalleryPicker
         isOpen={isGalleryOpen}
         onClose={closeGallery}
         onFileSelected={handleFileSelected}

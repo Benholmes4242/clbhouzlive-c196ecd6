@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -19,211 +18,50 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [isMultiSelectMode, setIsMultiSelectMode] = useState(false);
 
-  // Debug logging for component state
-  console.log('🟡 GalleryPicker render:', {
-    isOpen,
-    isMobile,
-    isMultiSelectMode,
-    selectedFilesCount: selectedFiles.length,
-    windowWidth: typeof window !== 'undefined' ? window.innerWidth : 'undefined',
-    userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : 'undefined'
-  });
-
-  // Force mobile detection based on multiple factors
-  const isTouchDevice = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
-  const isSmallScreen = typeof window !== 'undefined' && window.innerWidth <= 1024; // Increase breakpoint
-  const isMobileUserAgent = typeof navigator !== 'undefined' && /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile|Tablet/i.test(navigator.userAgent);
-  const isActuallyMobile = isMobile || isTouchDevice || isSmallScreen || isMobileUserAgent;
-  
-  console.log('🟡 Enhanced mobile detection:', {
-    isMobile,
-    isTouchDevice,
-    isSmallScreen,
-    isMobileUserAgent,
-    isActuallyMobile,
-    windowWidth: typeof window !== 'undefined' ? window.innerWidth : 'N/A',
-    maxTouchPoints: typeof navigator !== 'undefined' ? navigator.maxTouchPoints : 'N/A',
-    userAgent: typeof navigator !== 'undefined' ? navigator.userAgent.substring(0, 50) + '...' : 'N/A'
-  });
-
-  const handleCameraClick = () => {
-    console.log('🎥 CAMERA BUTTON CLICKED - mobile camera capture starting', { isMobile });
-    
-    // Create input for camera capture with high quality settings
+  const createFileInput = (accept: string, multiple: boolean = true, capture?: string) => {
     const input = document.createElement('input');
     input.type = 'file';
-    input.accept = 'image/*,video/*';
-    
-    // For mobile devices, add capture attribute
-    if (isMobile) {
-      input.capture = 'environment';
-      input.setAttribute('capture', 'camera');
+    input.accept = accept;
+    input.multiple = multiple;
+    if (capture && isMobile) {
+      input.setAttribute('capture', capture);
     }
+    return input;
+  };
+
+  const handleFileSelection = (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+
+    const fileArray = Array.from(files);
     
-    console.log('🎥 Camera input created with attributes:', {
-      type: input.type,
-      accept: input.accept,
-      capture: input.capture,
-      hasOnChange: !!input.onchange
-    });
-    
-    input.onchange = (e) => {
-      console.log('🎥 CAMERA INPUT CHANGE EVENT TRIGGERED');
-      const target = e.target as HTMLInputElement;
-      const file = target.files?.[0];
-      console.log('🎥 Camera input change event triggered', { 
-        hasFile: !!file, 
-        fileName: file?.name,
-        fileType: file?.type,
-        fileSize: file ? `${(file.size / 1024 / 1024).toFixed(2)}MB` : 'N/A'
-      });
-      
-      if (file) {
-        console.log('🎥 Calling onFileSelected with camera file:', file.name);
-        onFileSelected(file);
-        console.log('🎥 Closing gallery after camera selection');
-        onClose();
-      } else {
-        console.warn('🎥 No file selected from camera input');
-      }
-    };
-    
-    console.log('🎥 About to trigger camera input click');
+    if (fileArray.length === 1) {
+      onFileSelected(fileArray[0]);
+      onClose();
+    } else {
+      // Multiple files - enter multi-select mode
+      setSelectedFiles(fileArray);
+      const urls = fileArray.map(file => URL.createObjectURL(file));
+      setPreviewUrls(urls);
+      setIsMultiSelectMode(true);
+    }
+  };
+
+  const handleCameraClick = () => {
+    const input = createFileInput('image/*,video/*', false, 'environment');
+    input.onchange = (e) => handleFileSelection((e.target as HTMLInputElement).files);
     input.click();
-    console.log('🎥 Camera input click triggered');
   };
 
   const handlePhotoClick = () => {
-    console.log('📸 PHOTO BUTTON CLICKED');
-    
-    // Store to localStorage for persistent tracking
-    localStorage.setItem('photo_flow_debug', JSON.stringify({
-      step: 'button_clicked',
-      timestamp: Date.now()
-    }));
-    
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/jpeg,image/jpg,image/png,image/gif,image/webp'; // Specific formats only
-    input.multiple = true;
-    input.setAttribute('data-source', 'library'); // Hint for photo library
-    
-    console.log('📸 Photo input created with attributes:', {
-      type: input.type,
-      accept: input.accept,
-      multiple: input.multiple
-    });
-    
-    localStorage.setItem('photo_flow_debug', JSON.stringify({
-      step: 'input_created',
-      timestamp: Date.now()
-    }));
-    
-    input.onchange = (e) => {
-      console.log('📸 PHOTO INPUT CHANGE EVENT TRIGGERED');
-      localStorage.setItem('photo_flow_debug', JSON.stringify({
-        step: 'change_event_triggered',
-        timestamp: Date.now()
-      }));
-      
-      const target = e.target as HTMLInputElement;
-      const files = target.files;
-      console.log('📸 Photo input change event triggered', { 
-        hasFiles: !!files, 
-        fileCount: files?.length || 0,
-        filesDetails: files ? Array.from(files).map(f => ({ name: f.name, type: f.type, size: `${(f.size / 1024 / 1024).toFixed(2)}MB` })) : []
-      });
-      
-      if (files && files.length > 0) {
-        const fileArray = Array.from(files);
-        console.log('📸 Photo files selected:', fileArray.length, 'files');
-        localStorage.setItem('photo_flow_debug', JSON.stringify({
-          step: 'files_selected',
-          fileCount: fileArray.length,
-          timestamp: Date.now()
-        }));
-        
-        if (fileArray.length === 1) {
-          console.log('📸 Single photo selected, calling onFileSelected with:', fileArray[0].name);
-          onFileSelected(fileArray[0]);
-          console.log('📸 Closing gallery after single photo selection');
-          onClose();
-        } else {
-          console.log('📸 Multiple photos selected, entering multi-select mode');
-          // Multiple files selected - enter multi-select mode
-          setSelectedFiles(fileArray);
-          const urls = fileArray.map(file => URL.createObjectURL(file));
-          setPreviewUrls(urls);
-          setIsMultiSelectMode(true);
-        }
-      } else {
-        console.warn('📸 No files selected from photo input');
-        localStorage.setItem('photo_flow_debug', JSON.stringify({
-          step: 'no_files_selected',
-          timestamp: Date.now()
-        }));
-      }
-    };
-    
-    console.log('📸 About to trigger photo input click');
+    const input = createFileInput('image/jpeg,image/jpg,image/png,image/gif,image/webp');
+    input.onchange = (e) => handleFileSelection((e.target as HTMLInputElement).files);
     input.click();
-    console.log('📸 Photo input click triggered');
-    
-    localStorage.setItem('photo_flow_debug', JSON.stringify({
-      step: 'click_triggered',
-      timestamp: Date.now()
-    }));
   };
 
   const handleVideoClick = () => {
-    console.log('🎬 VIDEO BUTTON CLICKED');
-    
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'video/*';
-    input.multiple = true;
-    
-    console.log('🎬 Video input created with attributes:', {
-      type: input.type,
-      accept: input.accept,
-      multiple: input.multiple
-    });
-    
-    input.onchange = (e) => {
-      console.log('🎬 VIDEO INPUT CHANGE EVENT TRIGGERED');
-      const target = e.target as HTMLInputElement;
-      const files = target.files;
-      console.log('🎬 Video input change event triggered', { 
-        hasFiles: !!files, 
-        fileCount: files?.length || 0,
-        filesDetails: files ? Array.from(files).map(f => ({ name: f.name, type: f.type, size: `${(f.size / 1024 / 1024).toFixed(2)}MB` })) : []
-      });
-      
-      if (files && files.length > 0) {
-        const fileArray = Array.from(files);
-        console.log('🎬 Video files selected:', fileArray.length, 'files');
-        
-        if (fileArray.length === 1) {
-          console.log('🎬 Single video selected, calling onFileSelected with:', fileArray[0].name);
-          onFileSelected(fileArray[0]);
-          console.log('🎬 Closing gallery after single video selection');
-          onClose();
-        } else {
-          console.log('🎬 Multiple videos selected, entering multi-select mode');
-          // Multiple files selected
-          setSelectedFiles(fileArray);
-          const urls = fileArray.map(file => URL.createObjectURL(file));
-          setPreviewUrls(urls);
-          setIsMultiSelectMode(true);
-        }
-      } else {
-        console.warn('🎬 No files selected from video input');
-      }
-    };
-    
-    console.log('🎬 About to trigger video input click');
+    const input = createFileInput('video/*');
+    input.onchange = (e) => handleFileSelection((e.target as HTMLInputElement).files);
     input.click();
-    console.log('🎬 Video input click triggered');
   };
 
   const handleFileRemove = (index: number) => {
@@ -242,34 +80,19 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
   };
 
   const handleConfirmSelection = () => {
-    console.log('✅ CONFIRM SELECTION BUTTON CLICKED');
-    console.log('✅ selectedFiles count:', selectedFiles.length);
-    console.log('✅ selectedFiles details:', selectedFiles.map(f => ({ name: f.name, type: f.type, size: f.size })));
-    console.log('✅ onMultipleFilesSelected function exists:', !!onMultipleFilesSelected);
-    console.log('✅ onFileSelected function exists:', !!onFileSelected);
-    
     if (selectedFiles.length > 0) {
       if (onMultipleFilesSelected) {
-        console.log('✅ Calling onMultipleFilesSelected with', selectedFiles.length, 'files');
         onMultipleFilesSelected(selectedFiles);
-        console.log('✅ onMultipleFilesSelected call completed');
       } else {
-        console.log('✅ onMultipleFilesSelected not available, falling back to onFileSelected with first file:', selectedFiles[0].name);
-        // Fallback to single file if multiple not supported
         onFileSelected(selectedFiles[0]);
-        console.log('✅ onFileSelected fallback call completed');
       }
       
-      console.log('✅ Cleaning up preview URLs and closing gallery');
       // Clean up
       previewUrls.forEach(url => URL.revokeObjectURL(url));
       setSelectedFiles([]);
       setPreviewUrls([]);
       setIsMultiSelectMode(false);
       onClose();
-      console.log('✅ Gallery cleanup and close completed');
-    } else {
-      console.warn('✅ handleConfirmSelection called but no files selected');
     }
   };
 
@@ -333,9 +156,55 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
     </div>
   );
 
+  const PickerContent = () => (
+    <>
+      {isMultiSelectMode ? (
+        <MultiSelectPreview />
+      ) : (
+        <div className="space-y-4">
+          <Button
+            onClick={handleCameraClick}
+            className="w-full h-auto p-4 bg-white border-2 border-[#b66b41] text-[#b66b41] hover:bg-[#b66b41] hover:text-white transition-all duration-200 rounded-xl flex items-start gap-4 cursor-pointer"
+          >
+            <Camera className="h-6 w-6 mt-1 flex-shrink-0" />
+            <div className="text-left">
+              <div className="font-bold text-base">Capture Photo or Video</div>
+              <div className="text-sm opacity-70 font-normal">High quality camera</div>
+            </div>
+          </Button>
+
+          <Button
+            onClick={handlePhotoClick}
+            className="w-full h-auto p-4 bg-white border-2 border-[#b66b41] text-[#b66b41] hover:bg-[#b66b41] hover:text-white transition-all duration-200 rounded-xl flex items-start gap-4 cursor-pointer"
+          >
+            <Image className="h-6 w-6 mt-1 flex-shrink-0" />
+            <div className="text-left">
+              <div className="font-bold text-base">Select Photos</div>
+              <div className="text-sm opacity-70 font-normal">Single or multiple selection</div>
+            </div>
+          </Button>
+
+          <Button
+            onClick={handleVideoClick}
+            className="w-full h-auto p-4 bg-white border-2 border-[#b66b41] text-[#b66b41] hover:bg-[#b66b41] hover:text-white transition-all duration-200 rounded-xl flex items-start gap-4 cursor-pointer"
+          >
+            <Video className="h-6 w-6 mt-1 flex-shrink-0" />
+            <div className="text-left">
+              <div className="font-bold text-base">Select Videos</div>
+              <div className="text-sm opacity-70 font-normal">Single or multiple selection</div>
+            </div>
+          </Button>
+
+          <p className="text-center text-sm text-gray-500 mt-6 px-4">
+            Select multiple files to create a carousel post with swipeable media.
+          </p>
+        </div>
+      )}
+    </>
+  );
+
   // Mobile Version - Bottom Sheet  
-  if (true) { // Force mobile version for debugging
-    console.log('🟡 Rendering MOBILE version with Sheet');
+  if (isMobile) {
     return (
       <Sheet open={isOpen} onOpenChange={handleClose}>
         <SheetContent side="bottom" className="h-auto p-6 rounded-t-2xl">
@@ -344,145 +213,13 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
               {isMultiSelectMode ? 'Selected Media' : 'Create a Moment'}
             </SheetTitle>
           </SheetHeader>
-          
-          {isMultiSelectMode ? (
-            <MultiSelectPreview />
-          ) : (
-            <div className="space-y-4" style={{ backgroundColor: 'lightblue', padding: '10px', border: '2px solid red' }}>
-              <div className="bg-yellow-200 p-2 text-xs rounded">
-                🟡 DEBUG: Mobile sheet content rendering - buttons should appear below
-              </div>
-              
-              <div className="bg-green-200 p-2 text-xs rounded">
-                🟢 DEBUG: Button container - {isMultiSelectMode ? 'MULTI-SELECT MODE' : 'NORMAL MODE'}
-              </div>
-              
-              {/* Test div to ensure content shows */}
-              <div className="bg-red-200 p-4 text-center font-bold">
-                🔴 TEST: Can you see this red box? If yes, buttons should render below.
-              </div>
-              
-              {/* Capture Button */}
-              <div className="bg-purple-200 p-2 text-xs rounded">
-                🟣 DEBUG: About to render CAPTURE button
-              </div>
-              
-              {/* Simple test button first */}
-              <button
-                onClick={() => {
-                  console.log('🟢 SIMPLE TEST BUTTON CLICKED!');
-                  alert('TEST BUTTON WORKS!');
-                }}
-                style={{ 
-                  width: '100%',
-                  height: '60px',
-                  backgroundColor: 'lime',
-                  border: '3px solid black',
-                  fontSize: '18px',
-                  fontWeight: 'bold'
-                }}
-              >
-                🟢 TAP HERE - TEST BUTTON
-              </button>
-              
-              <button
-                onClick={() => {
-                  console.log('🔴 MOBILE CAPTURE BUTTON CLICKED - Event triggered');
-                  handleCameraClick();
-                }}
-                style={{ 
-                  width: '100%',
-                  height: 'auto',
-                  padding: '16px',
-                  backgroundColor: 'white',
-                  border: '2px solid #b66b41',
-                  color: '#b66b41',
-                  borderRadius: '12px',
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: '16px',
-                  cursor: 'pointer'
-                }}
-              >
-                <Camera className="h-6 w-6 mt-1 flex-shrink-0" />
-                <div className="text-left">
-                  <div className="font-bold text-base">Capture Photo or Video</div>
-                  <div className="text-sm opacity-70 font-normal">High quality camera</div>
-                </div>
-              </button>
-              
-              <div className="bg-purple-200 p-2 text-xs rounded">
-                🟣 DEBUG: CAPTURE button rendered - PHOTO button coming next
-              </div>
-
-              {/* Post Photo Button */}
-              <button
-                onClick={() => {
-                  console.log('🔴 MOBILE PHOTO BUTTON CLICKED - Event triggered');
-                  localStorage.setItem('debug_click', 'button_clicked_' + Date.now());
-                  alert('Red button clicked! Check localStorage.');
-                  handlePhotoClick();
-                }}
-                style={{ 
-                  width: '100%',
-                  height: 'auto',
-                  padding: '16px',
-                  backgroundColor: 'red',
-                  border: '2px solid #b66b41',
-                  color: 'white',
-                  borderRadius: '12px',
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: '16px',
-                  cursor: 'pointer'
-                }}
-              >
-                <Image className="h-6 w-6 mt-1 flex-shrink-0" />
-                <div className="text-left">
-                  <div className="font-bold text-base">Select Photos</div>
-                  <div className="text-sm opacity-70 font-normal">Single or multiple selection</div>
-                </div>
-              </button>
-
-              {/* Post Video Button */}
-              <button
-                onClick={() => {
-                  console.log('🔴 MOBILE VIDEO BUTTON CLICKED - Event triggered');
-                  handleVideoClick();
-                }}
-                style={{ 
-                  width: '100%',
-                  height: 'auto',
-                  padding: '16px',
-                  backgroundColor: 'white',
-                  border: '2px solid #b66b41',
-                  color: '#b66b41',
-                  borderRadius: '12px',
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: '16px',
-                  cursor: 'pointer'
-                }}
-              >
-                <Video className="h-6 w-6 mt-1 flex-shrink-0" />
-                <div className="text-left">
-                  <div className="font-bold text-base">Select Videos</div>
-                  <div className="text-sm opacity-70 font-normal">Single or multiple selection</div>
-                </div>
-              </button>
-
-              <p className="text-center text-sm text-gray-500 mt-6 px-4">
-                Select multiple files to create a carousel post with swipeable media.
-              </p>
-            </div>
-          )}
+          <PickerContent />
         </SheetContent>
       </Sheet>
     );
   }
 
   // Desktop Version - Dialog Modal
-  console.log('🟡 Rendering DESKTOP version with Dialog');
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-md mx-auto p-8 rounded-2xl shadow-2xl animate-scale-in">
@@ -491,54 +228,7 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
             {isMultiSelectMode ? 'Selected Media' : 'Create a Moment'}
           </DialogTitle>
         </DialogHeader>
-        
-        {isMultiSelectMode ? (
-          <MultiSelectPreview />
-        ) : (
-          <div className="space-y-6">
-            <button
-              onTouchStart={(e) => {
-                console.log('🔴 DESKTOP PHOTO BUTTON TOUCH START');
-                e.preventDefault();
-                e.stopPropagation();
-              }}
-              onClick={(e) => {
-                console.log('🔴 DESKTOP PHOTO BUTTON CLICKED');
-                e.preventDefault();
-                e.stopPropagation();
-                handlePhotoClick();
-              }}
-              className="w-full h-20 bg-white border-2 border-[#b66b41] text-[#b66b41] hover:bg-[#b66b41] hover:text-white transition-all duration-200 rounded-xl flex items-center justify-center gap-3 text-lg font-semibold cursor-pointer touch-manipulation"
-              style={{ WebkitTapHighlightColor: 'transparent' }}
-            >
-              <Image className="h-6 w-6" />
-              Select Photos
-            </button>
-
-            <button
-              onTouchStart={(e) => {
-                console.log('🔴 DESKTOP VIDEO BUTTON TOUCH START');
-                e.preventDefault();
-                e.stopPropagation();
-              }}
-              onClick={(e) => {
-                console.log('🔴 DESKTOP VIDEO BUTTON CLICKED');
-                e.preventDefault();
-                e.stopPropagation();
-                handleVideoClick();
-              }}
-              className="w-full h-20 bg-white border-2 border-[#b66b41] text-[#b66b41] hover:bg-[#b66b41] hover:text-white transition-all duration-200 rounded-xl flex items-center justify-center gap-3 text-lg font-semibold cursor-pointer touch-manipulation"
-              style={{ WebkitTapHighlightColor: 'transparent' }}
-            >
-              <Video className="h-6 w-6" />
-              Select Videos
-            </button>
-
-            <p className="text-center text-sm text-gray-500 mt-8 px-2">
-              Select multiple files to create carousel posts with swipeable media.
-            </p>
-          </div>
-        )}
+        <PickerContent />
       </DialogContent>
     </Dialog>
   );
