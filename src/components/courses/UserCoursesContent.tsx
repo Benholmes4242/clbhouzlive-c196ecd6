@@ -3,7 +3,6 @@ import React, { useState, useMemo } from 'react';
 import { useUserCoursesData } from './user/useUserCoursesData';
 import { useTop100CoursesData } from '@/hooks/useTop100CoursesData';
 import UserCoursesHeader from './user/UserCoursesHeader';
-import UserCoursesRegionalTiles from './user/UserCoursesRegionalTiles';
 import CourseCard from './CourseCard';
 import { EmptyTop100State } from './user/UserCoursesEmptyStates';
 import { useQuery } from '@tanstack/react-query';
@@ -154,18 +153,11 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({ username }) => 
         isOwnProfile={isOwnProfile} 
       />
 
-      <UserCoursesRegionalTiles
-        regionProgress={regionProgress}
-        activeFilter={activeFilter}
-        onFilterChange={setActiveFilter}
-        isLoading={isLoadingProgress}
-      />
-
       <div className="space-y-4">
         {isLoadingTop100 ? (
           <div className="text-center py-8">Loading courses...</div>
         ) : filteredCourses.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {filteredCourses.map((userCourse) => (
               <CourseCard 
                 key={userCourse.id} 

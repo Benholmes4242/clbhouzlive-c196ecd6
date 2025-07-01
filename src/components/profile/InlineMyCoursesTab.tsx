@@ -1,7 +1,6 @@
 
 import React from 'react';
 import HandicapCard from './HandicapCard';
-import Top100Interactive from './Top100Interactive';
 import UserCoursesContent from '@/components/courses/UserCoursesContent';
 
 interface InlineMyCoursesTabProps {
@@ -31,15 +30,6 @@ const InlineMyCoursesTab: React.FC<InlineMyCoursesTabProps> = ({
           lastUpdated={profile?.updated_at}
           isOwnProfile={isOwnProfile}
           onEGConnect={onEGConnect}
-        />
-      )}
-      
-      {/* Top 100 Interactive - only for individual users */}
-      {profile?.user_type === 'individual' && (
-        <Top100Interactive
-          regionProgress={regionProgress}
-          onRegionClick={onRegionClick}
-          isOwnProfile={isOwnProfile}
         />
       )}
       
