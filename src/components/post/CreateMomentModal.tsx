@@ -2,9 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
 import CourseTagInput from '../posts/CourseTagInput';
-import CoursePostBadge from '../posts/CoursePostBadge';
 import { useTaggableEntities } from '@/hooks/useTaggableEntities';
 
 interface TaggableEntity {
@@ -65,6 +64,15 @@ const CreateMomentModal = ({
   const mediaFiles = selectedFiles && selectedFiles.length > 0 ? selectedFiles : (selectedFile ? [selectedFile] : []);
   const hasMultipleMedia = mediaFiles.length > 1;
 
+  // Reset state when modal opens/closes
+  useEffect(() => {
+    if (isOpen) {
+      setCurrentMediaIndex(0);
+      setCaption('');
+      setSelectedTags([]);
+    }
+  }, [isOpen]);
+
   // Handle caption input with mention detection
   const handleCaptionInput = async (e: React.FormEvent<HTMLDivElement>) => {
     const target = e.currentTarget;
@@ -104,6 +112,12 @@ const CreateMomentModal = ({
   const handleSelectMention = (entity: TaggableEntity) => {
     console.log('Selecting mention:', entity);
     
+    // Prevent duplicate tags
+    if (selectedTags.find(tag => tag.id === entity.id)) {
+      setLocalShowSuggestions(false);
+      return;
+    }
+    
     const words = caption.split(' ');
     const lastWordIndex = words.length - 1;
     
@@ -127,10 +141,8 @@ const CreateMomentModal = ({
         selection?.addRange(range);
       }
       
-      // Add to selected tags if not already present
-      if (!selectedTags.find(tag => tag.id === entity.id)) {
-        setSelectedTags(prev => [...prev, entity]);
-      }
+      // Add to selected tags
+      setSelectedTags(prev => [...prev, entity]);
     }
     
     setLocalShowSuggestions(false);
@@ -161,6 +173,14 @@ const CreateMomentModal = ({
     
     return (
       <div className="relative">
+        {/* Golf course badge positioned above media */}
+        {selectedCourse && (
+          <div className="absolute top-2 left-2 z-10 bg-black/70 text-white px-2 py-1 rounded-full text-xs flex items-center gap-1">
+            <MapPin size={12} />
+            <span>{selectedCourse.name}</span>
+          </div>
+        )}
+        
         {isVideo ? (
           <video
             src={currentUrl}
@@ -217,8 +237,12 @@ const CreateMomentModal = ({
     );
   };
 
-  // Use entities from hook or fallback to props
-  const activeSuggestions = entities.length > 0 ? entities : mentionSuggestions;
+  // Remove duplicate entities and use entities from hook or fallback to props
+  const uniqueEntities = entities.length > 0 ? entities : mentionSuggestions;
+  const deduplicatedEntities = uniqueEntities.filter((entity, index, self) => 
+    index === self.findIndex(e => e.id === entity.id)
+  );
+  
   const showActiveSuggestions = localShowSuggestions || showSuggestions;
 
   return (
@@ -232,11 +256,6 @@ const CreateMomentModal = ({
         </DialogDescription>
         
         <div className="space-y-4">
-          {/* Course badge appears above media when course is selected */}
-          {selectedCourse && (
-            <CoursePostBadge course={selectedCourse} />
-          )}
-
           {/* Media Preview */}
           {getCurrentMediaPreview()}
           
@@ -258,9 +277,9 @@ const CreateMomentModal = ({
               style={{ minHeight: '80px' }}
             />
 
-            {showActiveSuggestions && activeSuggestions.length > 0 && (
+            {showActiveSuggestions && deduplicatedEntities.length > 0 && (
               <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-md shadow-lg max-h-40 overflow-y-auto z-50 mt-1">
-                {activeSuggestions.map((entity) => (
+                {deduplicatedEntities.map((entity) => (
                   <div
                     key={entity.id}
                     className="px-3 py-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2 transition-colors"

@@ -21,6 +21,7 @@ const BottomNavigation = () => {
     isGalleryOpen,
     isComposerOpen,
     selectedFile,
+    selectedFiles,
     previewUrl,
     caption,
     setCaption,
@@ -43,11 +44,11 @@ const BottomNavigation = () => {
     openComposer,
     closeComposer,
     showConfirmationToast,
-    hideToast
+    hideToast,
+    resetState
   } = usePostFlow();
 
-  // State for multiple files and selected tags
-  const [selectedFiles, setSelectedFiles] = React.useState<File[]>([]);
+  // State for tags handled in CreateMomentModal
   const [localSelectedTags, setLocalSelectedTags] = React.useState<any[]>([]);
 
   const handleSubmitPost = async () => {
@@ -79,7 +80,6 @@ const BottomNavigation = () => {
         onSuccess: () => {
           console.log('Post submission successful');
           closeComposer();
-          setSelectedFiles([]);
           setLocalSelectedTags([]);
           showConfirmationToast('Post shared successfully!');
         },
@@ -112,8 +112,7 @@ const BottomNavigation = () => {
       type: file.type,
       size: file.size
     });
-    setSelectedFiles([]); // Clear multiple files when single file selected
-    setLocalSelectedTags([]); // Reset tags
+    setLocalSelectedTags([]);
     openComposer(file);
   };
 
@@ -122,10 +121,9 @@ const BottomNavigation = () => {
       count: files.length,
       files: files.map(f => ({ name: f.name, type: f.type, size: f.size }))
     });
-    setSelectedFiles(files);
-    setLocalSelectedTags([]); // Reset tags
-    // Use the first file for the composer preview
-    openComposer(files[0]);
+    setLocalSelectedTags([]);
+    // Pass the first file as main file and the rest as additional files
+    openComposer(files[0], files.slice(1));
   };
 
   const onCaptionInput = (e: React.FormEvent<HTMLDivElement>) => {

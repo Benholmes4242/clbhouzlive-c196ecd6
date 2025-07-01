@@ -21,7 +21,9 @@ export const usePostFlow = () => {
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [isComposerOpen, setIsComposerOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previewUrl, setPreviewUrl] = useState<string>('');
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [caption, setCaption] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -32,45 +34,55 @@ export const usePostFlow = () => {
   const [toastMessage, setToastMessage] = useState('');
   const [selectedCourse, setSelectedCourse] = useState<GolfCourse | null>(null);
 
-  // Clean up preview URL when component unmounts or file changes
+  // Clean up preview URLs when component unmounts or files change
   useEffect(() => {
     return () => {
       if (previewUrl) {
         URL.revokeObjectURL(previewUrl);
       }
+      previewUrls.forEach(url => URL.revokeObjectURL(url));
     };
-  }, [previewUrl]);
+  }, [previewUrl, previewUrls]);
 
   const openGallery = () => {
     console.log('Opening gallery picker');
-    // Reset state when opening gallery
-    resetState();
     setIsGalleryOpen(true);
   };
 
   const closeGallery = () => {
     console.log('Closing gallery picker');
     setIsGalleryOpen(false);
-    // Don't reset state here - allow user to try again
   };
 
   const resetState = () => {
     console.log('Resetting post flow state');
-    // Clean up existing preview URL
+    
+    // Clean up existing preview URLs
     if (previewUrl) {
       URL.revokeObjectURL(previewUrl);
     }
+    previewUrls.forEach(url => URL.revokeObjectURL(url));
+    
+    // Reset all state
     setSelectedFile(null);
+    setSelectedFiles([]);
     setPreviewUrl('');
+    setPreviewUrls([]);
     setCaption('');
     setSelectedTags([]);
     setSelectedCourse(null);
     setShowSuggestions(false);
     setIsSubmitting(false);
+    
+    // Clear caption input
+    if (captionInputRef.current) {
+      captionInputRef.current.textContent = '';
+    }
   };
 
-  const openComposer = (file: File) => {
+  const openComposer = (file: File, additionalFiles: File[] = []) => {
     console.log('Opening composer with file:', file.name, file.type);
+    console.log('Additional files:', additionalFiles.length);
     
     // Close gallery first
     setIsGalleryOpen(false);
@@ -79,11 +91,18 @@ export const usePostFlow = () => {
     if (previewUrl && previewUrl !== URL.createObjectURL(file)) {
       URL.revokeObjectURL(previewUrl);
     }
+    previewUrls.forEach(url => URL.revokeObjectURL(url));
     
-    // Set new file and preview
+    // Set new files and previews
+    const allFiles = [file, ...additionalFiles];
     setSelectedFile(file);
-    const url = URL.createObjectURL(file);
-    setPreviewUrl(url);
+    setSelectedFiles(allFiles);
+    
+    const mainUrl = URL.createObjectURL(file);
+    const allUrls = allFiles.map(f => URL.createObjectURL(f));
+    
+    setPreviewUrl(mainUrl);
+    setPreviewUrls(allUrls);
     
     // Open composer with a small delay to ensure gallery is closed
     setTimeout(() => {
@@ -113,7 +132,9 @@ export const usePostFlow = () => {
     isGalleryOpen,
     isComposerOpen,
     selectedFile,
+    selectedFiles,
     previewUrl,
+    previewUrls,
     caption,
     setCaption,
     isSubmitting,
