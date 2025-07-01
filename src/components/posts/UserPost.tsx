@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
@@ -113,7 +114,10 @@ const UserPost: React.FC<UserPostProps> = ({ post, onPostUpdated, onPostDeleted 
 
         {post.post_media.length > 0 && (
           <div className="mb-3">
-            <MediaCarousel media={post.post_media} />
+            <MediaCarousel 
+              mediaUrls={post.post_media.map(media => media.media_url)}
+              mediaTypes={post.post_media.map(media => media.media_type)}
+            />
           </div>
         )}
 
@@ -141,10 +145,10 @@ const UserPost: React.FC<UserPostProps> = ({ post, onPostUpdated, onPostDeleted 
 
       {showOptionsModal && (
         <PostOptionsModal
-          post={post}
+          isOpen={showOptionsModal}
           onClose={() => setShowOptionsModal(false)}
-          onPostUpdated={onPostUpdated}
-          onPostDeleted={onPostDeleted}
+          onCameraClick={() => {}}
+          onLibraryClick={() => {}}
         />
       )}
     </Card>

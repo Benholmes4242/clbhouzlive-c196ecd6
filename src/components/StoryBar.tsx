@@ -83,10 +83,17 @@ const StoryBar = () => {
             {stories.map((story) => (
               <CarouselItem key={story.id} className="basis-auto pl-2">
                 <StoryItem
-                  story={story}
-                  onYourProfileClick={handleYourProfile}
-                  onOtherProfileClick={handleOtherProfile}
-                  hasProfile={!!userProfile}
+                  id={story.id}
+                  username={story.username}
+                  displayName={story.user}
+                  avatar={story.avatar}
+                  onClick={() => {
+                    if (story.type === 'add') {
+                      handleYourProfile();
+                    } else {
+                      handleOtherProfile(story.username);
+                    }
+                  }}
                 />
               </CarouselItem>
             ))}
