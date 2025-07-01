@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
@@ -82,17 +83,10 @@ const StoryBar = () => {
             {stories.map((story) => (
               <CarouselItem key={story.id} className="basis-auto pl-2">
                 <StoryItem
-                  id={story.id}
-                  username={story.username}
-                  displayName={story.user}
-                  avatar={story.avatar}
-                  onClick={() => {
-                    if (story.type === 'add') {
-                      handleYourProfile();
-                    } else {
-                      handleOtherProfile(story.username);
-                    }
-                  }}
+                  story={story}
+                  onYourProfileClick={handleYourProfile}
+                  onOtherProfileClick={handleOtherProfile}
+                  hasProfile={!!userProfile}
                 />
               </CarouselItem>
             ))}
