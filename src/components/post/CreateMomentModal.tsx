@@ -57,10 +57,9 @@ const CreateMomentModal = ({
 }: CreateMomentModalProps) => {
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   const [caption, setCaption] = useState('');
-  const [cursorPosition, setCursorPosition] = useState(0);
   const [localShowSuggestions, setLocalShowSuggestions] = useState(false);
-  const [localMentionSuggestions, setLocalMentionSuggestions] = useState<TaggableEntity[]>([]);
-  const { searchEntities } = useTaggableEntities();
+  const [selectedTags, setSelectedTags] = useState<TaggableEntity[]>([]);
+  const { entities, searchEntities } = useTaggableEntities();
 
   // Determine which files to use - multiple files take precedence
   const mediaFiles = selectedFiles && selectedFiles.length > 0 ? selectedFiles : (selectedFile ? [selectedFile] : []);
@@ -72,30 +71,29 @@ const CreateMomentModal = ({
     const text = target.textContent || '';
     setCaption(text);
 
-    // Get cursor position
-    const selection = window.getSelection();
-    if (selection && selection.rangeCount > 0) {
-      const range = selection.getRangeAt(0);
-      setCursorPosition(range.startOffset);
-    }
+    console.log('Caption input changed:', text);
 
-    // Check for mentions
+    // Check for mentions - look for @ followed by at least 1 character
+    const mentionRegex = /@(\w+)$/;
     const words = text.split(' ');
     const lastWord = words[words.length - 1];
     
+    console.log('Last word:', lastWord);
+    
     if (lastWord.startsWith('@') && lastWord.length > 1) {
       const query = lastWord.substring(1);
+      console.log('Searching for mentions with query:', query);
       setLocalShowSuggestions(true);
       
       // Search for entities
       try {
         await searchEntities(query);
+        console.log('Search completed, entities found:', entities.length);
       } catch (error) {
         console.error('Error searching entities:', error);
       }
     } else {
       setLocalShowSuggestions(false);
-      setLocalMentionSuggestions([]);
     }
 
     // Also call the original handler
@@ -104,28 +102,46 @@ const CreateMomentModal = ({
 
   // Handle mention selection
   const handleSelectMention = (entity: TaggableEntity) => {
+    console.log('Selecting mention:', entity);
+    
     const words = caption.split(' ');
     const lastWordIndex = words.length - 1;
     
     if (words[lastWordIndex].startsWith('@')) {
-      words[lastWordIndex] = `@${entity.username || entity.name}`;
+      // Replace the @partial with @username
+      const displayName = entity.username || entity.name;
+      words[lastWordIndex] = `@${displayName}`;
       const newCaption = words.join(' ') + ' ';
       
       // Update the contentEditable div
       if (captionInputRef.current) {
         captionInputRef.current.textContent = newCaption;
         setCaption(newCaption);
+        
+        // Move cursor to end
+        const range = document.createRange();
+        const selection = window.getSelection();
+        range.selectNodeContents(captionInputRef.current);
+        range.collapse(false);
+        selection?.removeAllRanges();
+        selection?.addRange(range);
+      }
+      
+      // Add to selected tags if not already present
+      if (!selectedTags.find(tag => tag.id === entity.id)) {
+        setSelectedTags(prev => [...prev, entity]);
       }
     }
     
     setLocalShowSuggestions(false);
-    setLocalMentionSuggestions([]);
     onSelectMention(entity);
     
     // Focus back to input
-    if (captionInputRef.current) {
-      captionInputRef.current.focus();
-    }
+    setTimeout(() => {
+      if (captionInputRef.current) {
+        captionInputRef.current.focus();
+      }
+    }, 100);
   };
 
   const handlePrevious = () => {
@@ -201,8 +217,8 @@ const CreateMomentModal = ({
     );
   };
 
-  // Use local suggestions or fallback to props
-  const activeSuggestions = localMentionSuggestions.length > 0 ? localMentionSuggestions : mentionSuggestions;
+  // Use entities from hook or fallback to props
+  const activeSuggestions = entities.length > 0 ? entities : mentionSuggestions;
   const showActiveSuggestions = localShowSuggestions || showSuggestions;
 
   return (
@@ -247,13 +263,15 @@ const CreateMomentModal = ({
                 {activeSuggestions.map((entity) => (
                   <div
                     key={entity.id}
-                    className="px-3 py-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2"
+                    className="px-3 py-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2 transition-colors"
                     onClick={() => handleSelectMention(entity)}
                   >
                     <div className="flex flex-col">
-                      <span className="font-medium text-blue-600">@{entity.username || entity.name}</span>
+                      <span className="font-medium text-blue-600">
+                        @{entity.username || entity.name}
+                      </span>
                       <span className="text-xs text-gray-500 capitalize">
-                        {entity.entity_type.replace('_', ' ')}
+                        {entity.entity_type.replace('_', ' ')} • {entity.name}
                       </span>
                     </div>
                   </div>
@@ -261,6 +279,26 @@ const CreateMomentModal = ({
               </div>
             )}
           </div>
+
+          {/* Show selected tags */}
+          {selectedTags.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {selectedTags.map((tag) => (
+                <div
+                  key={tag.id}
+                  className="inline-flex items-center gap-1 bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs"
+                >
+                  <span>@{tag.username || tag.name}</span>
+                  <button
+                    onClick={() => setSelectedTags(prev => prev.filter(t => t.id !== tag.id))}
+                    className="ml-1 text-blue-600 hover:text-blue-800"
+                  >
+                    <X size={12} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
 
           {onCourseSelect && (
             <div>

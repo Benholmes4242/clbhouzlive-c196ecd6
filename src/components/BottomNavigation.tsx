@@ -46,8 +46,9 @@ const BottomNavigation = () => {
     hideToast
   } = usePostFlow();
 
-  // State for multiple files
+  // State for multiple files and selected tags
   const [selectedFiles, setSelectedFiles] = React.useState<File[]>([]);
+  const [localSelectedTags, setLocalSelectedTags] = React.useState<any[]>([]);
 
   const handleSubmitPost = async () => {
     if (!user) {
@@ -62,7 +63,7 @@ const BottomNavigation = () => {
       hasFile: !!selectedFile,
       hasMultipleFiles: selectedFiles.length > 0,
       caption,
-      tagCount: selectedTags.length,
+      tagCount: localSelectedTags.length,
       course: selectedCourse?.name
     });
 
@@ -74,11 +75,12 @@ const BottomNavigation = () => {
         user,
         content: caption,
         mediaFiles,
-        selectedTags,
+        selectedTags: localSelectedTags,
         onSuccess: () => {
           console.log('Post submission successful');
           closeComposer();
           setSelectedFiles([]);
+          setLocalSelectedTags([]);
           showConfirmationToast('Post shared successfully!');
         },
         onError: () => {
@@ -111,6 +113,7 @@ const BottomNavigation = () => {
       size: file.size
     });
     setSelectedFiles([]); // Clear multiple files when single file selected
+    setLocalSelectedTags([]); // Reset tags
     openComposer(file);
   };
 
@@ -120,6 +123,7 @@ const BottomNavigation = () => {
       files: files.map(f => ({ name: f.name, type: f.type, size: f.size }))
     });
     setSelectedFiles(files);
+    setLocalSelectedTags([]); // Reset tags
     // Use the first file for the composer preview
     openComposer(files[0]);
   };
@@ -137,6 +141,11 @@ const BottomNavigation = () => {
   };
 
   const onSelectMention = (entity: any) => {
+    // Add to local selected tags
+    if (!localSelectedTags.find(tag => tag.id === entity.id)) {
+      setLocalSelectedTags(prev => [...prev, entity]);
+    }
+
     selectMention(
       entity,
       caption,
@@ -166,7 +175,10 @@ const BottomNavigation = () => {
 
       <CreateMomentModal
         isOpen={isComposerOpen}
-        onClose={closeComposer}
+        onClose={() => {
+          closeComposer();
+          setLocalSelectedTags([]);
+        }}
         selectedFile={selectedFile}
         selectedFiles={selectedFiles}
         previewUrl={previewUrl}

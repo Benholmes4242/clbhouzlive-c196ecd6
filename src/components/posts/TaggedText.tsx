@@ -16,7 +16,12 @@ interface TaggedTextProps {
 const TaggedText = ({ text, tags = [] }: TaggedTextProps) => {
   const navigate = useNavigate();
 
-  const handleTagClick = (tag: any) => {
+  const handleTagClick = (tag: any, event: React.MouseEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    console.log('Tag clicked:', tag);
+    
     if (tag.entity_type === 'user') {
       navigate(`/profile/${tag.entity_id}`);
     } else if (tag.entity_type === 'golf_club') {
@@ -33,6 +38,8 @@ const TaggedText = ({ text, tags = [] }: TaggedTextProps) => {
       return text;
     }
 
+    console.log('Rendering text with tags:', { text, tags });
+
     // Create a map of tag identifiers to tag objects for faster lookup
     const tagMap = new Map();
     tags.forEach(tag => {
@@ -40,56 +47,60 @@ const TaggedText = ({ text, tags = [] }: TaggedTextProps) => {
       const nameIdentifier = `@${tag.name}`;
       tagMap.set(usernameIdentifier, tag);
       tagMap.set(nameIdentifier, tag);
+      
+      // Also map by display name for more flexible matching
+      const displayName = tag.username || tag.name;
+      tagMap.set(`@${displayName}`, tag);
     });
 
-    // Find all @mentions in the text using a more comprehensive regex
-    const mentionRegex = /@[a-zA-Z0-9_\s]+/g;
-    const parts = [];
-    let lastIndex = 0;
-    let match;
+    console.log('Tag map:', Array.from(tagMap.entries()));
 
-    while ((match = mentionRegex.exec(text)) !== null) {
-      // Add text before the mention
-      if (match.index > lastIndex) {
-        parts.push(text.substring(lastIndex, match.index));
-      }
+    // Split text by words and process each word
+    const words = text.split(' ');
+    const result = [];
 
-      const mention = match[0].trim();
-      // Find matching tag by checking both username and name patterns
-      const matchingTag = Array.from(tagMap.values()).find(tag => 
-        mention === `@${tag.username}` || mention === `@${tag.name}`
-      );
+    for (let i = 0; i < words.length; i++) {
+      const word = words[i];
+      
+      if (word.startsWith('@')) {
+        // Check if this @mention matches any of our tags
+        const matchingTag = tagMap.get(word) || Array.from(tagMap.values()).find(tag => {
+          const displayName = tag.username || tag.name;
+          return word === `@${displayName}`;
+        });
 
-      if (matchingTag) {
-        // Display the full name/username with consistent blue styling
-        const displayName = matchingTag.username || matchingTag.name;
-        parts.push(
-          <button
-            key={`tag-${match.index}-${matchingTag.id}`}
-            onClick={() => handleTagClick(matchingTag)}
-            className="text-blue-500 hover:text-blue-700 hover:underline font-medium cursor-pointer bg-transparent border-none p-0 inline"
-          >
-            @{displayName}
-          </button>
-        );
+        if (matchingTag) {
+          // Render as clickable link
+          const displayName = matchingTag.username || matchingTag.name;
+          result.push(
+            <button
+              key={`tag-${i}-${matchingTag.id}`}
+              onClick={(e) => handleTagClick(matchingTag, e)}
+              className="text-blue-500 hover:text-blue-700 hover:underline font-medium cursor-pointer bg-transparent border-none p-0 inline"
+            >
+              @{displayName}
+            </button>
+          );
+        } else {
+          // Render as blue text but not clickable
+          result.push(
+            <span key={`mention-${i}`} className="text-blue-500 font-medium">
+              {word}
+            </span>
+          );
+        }
       } else {
-        // If no matching tag found, render as plain text but still styled
-        parts.push(
-          <span key={`mention-${match.index}`} className="text-blue-500 font-medium">
-            {mention}
-          </span>
-        );
+        // Regular text
+        result.push(word);
       }
 
-      lastIndex = match.index + match[0].length;
+      // Add space between words (except for the last word)
+      if (i < words.length - 1) {
+        result.push(' ');
+      }
     }
 
-    // Add remaining text after the last mention
-    if (lastIndex < text.length) {
-      parts.push(text.substring(lastIndex));
-    }
-
-    return parts.length > 0 ? parts : text;
+    return result.length > 0 ? result : text;
   };
 
   return <span>{renderTextWithTags()}</span>;
