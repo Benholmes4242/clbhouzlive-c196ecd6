@@ -416,21 +416,10 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
 
               {/* Post Photo Button */}
               <button
-                onMouseDown={() => {
-                  console.log('🟠 MOBILE PHOTO BUTTON MOUSE DOWN');
-                  alert('Mouse Down!');
-                }}
-                onTouchStart={() => {
-                  console.log('🟠 MOBILE PHOTO BUTTON TOUCH START');  
-                  alert('Touch Start!');
-                }}
-                onPointerDown={() => {
-                  console.log('🟠 MOBILE PHOTO BUTTON POINTER DOWN');
-                  alert('Pointer Down!');
-                }}
-                onClick={() => {
-                  console.log('🔴 MOBILE PHOTO BUTTON CLICKED - Event triggered');
-                  alert('Click triggered!');
+                onPointerDown={(e) => {
+                  console.log('🟠 MOBILE PHOTO BUTTON POINTER DOWN - TRIGGERING FILE PICKER');
+                  e.preventDefault();
+                  e.stopPropagation();
                   handlePhotoClick();
                 }}
                 style={{ 
