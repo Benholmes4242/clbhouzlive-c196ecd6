@@ -31,6 +31,7 @@ const InlineMyCoursesTab: React.FC<InlineMyCoursesTabProps> = ({
           isOwnProfile={isOwnProfile}
           onEGConnect={onEGConnect}
           userUsername={profile?.username || username}
+          profile={profile}
         />
       )}
       

@@ -4,7 +4,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Calendar } from 'lucide-react';
-import HandicapActions from './HandicapActions';
 
 interface StandardHandicapCardProps {
   handicapIndex?: number | null;
@@ -12,6 +11,7 @@ interface StandardHandicapCardProps {
   lastUpdated?: string | null;
   isOwnProfile: boolean;
   onEGConnect: () => void;
+  onManualAdd?: () => void;
 }
 
 const StandardHandicapCard: React.FC<StandardHandicapCardProps> = ({
@@ -19,7 +19,8 @@ const StandardHandicapCard: React.FC<StandardHandicapCardProps> = ({
   egAppConnected,
   lastUpdated,
   isOwnProfile,
-  onEGConnect
+  onEGConnect,
+  onManualAdd
 }) => {
   const formatHandicap = (handicap: number) => {
     if (handicap < 0) {
@@ -41,7 +42,7 @@ const StandardHandicapCard: React.FC<StandardHandicapCardProps> = ({
     <Card className="bg-gradient-to-br from-green-50 to-white border-2 border-green-200 shadow-sm">
       <CardContent className="p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-semibold text-lg">Handicap Index</h3>
+          <h3 className="font-semibold text-lg">My Handicap Index®</h3>
           {handicapIndex !== null && handicapIndex !== undefined && (
             <div className="flex items-center gap-2">
               <Badge 
@@ -77,7 +78,23 @@ const StandardHandicapCard: React.FC<StandardHandicapCardProps> = ({
               {isOwnProfile ? 'Connect your handicap to showcase your skill level' : 'No handicap information available'}
             </p>
             {isOwnProfile && (
-              <HandicapActions onEGConnect={onEGConnect} />
+              <div className="space-y-3">
+                <Button 
+                  onClick={onEGConnect}
+                  className="w-full bg-red-600 hover:bg-red-700"
+                >
+                  Connect Official Handicap
+                </Button>
+                {onManualAdd && (
+                  <Button 
+                    onClick={onManualAdd}
+                    variant="outline"
+                    className="w-full"
+                  >
+                    Manually Input Handicap
+                  </Button>
+                )}
+              </div>
             )}
           </div>
         )}
