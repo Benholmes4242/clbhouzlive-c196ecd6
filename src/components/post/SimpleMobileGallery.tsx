@@ -66,7 +66,11 @@ const SimpleMobileGallery = ({ isOpen, onClose, onFileSelected, onMultipleFilesS
         
         <div className="space-y-4">
           <button
-            onClick={handlePhotoClick}
+            onClick={() => {
+              alert('Simple button works!');
+              console.log('SIMPLE BUTTON CLICKED');
+              handlePhotoClick();
+            }}
             style={{ 
               width: '100%',
               height: 'auto',
