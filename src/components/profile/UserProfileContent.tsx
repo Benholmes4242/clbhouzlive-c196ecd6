@@ -48,7 +48,6 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({
       regionProgress={regionProgress}
       onRegionClick={handleRegionClick}
       onEGConnect={handleEGConnect}
-      postCount={0} // TODO: Get actual post count for this user
     />
   );
 };

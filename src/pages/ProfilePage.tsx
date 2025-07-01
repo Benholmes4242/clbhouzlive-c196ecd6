@@ -96,7 +96,6 @@ const ProfilePage = () => {
         regionProgress={regionProgress}
         onRegionClick={handleRegionClick}
         onEGConnect={handleEGConnect}
-        postCount={0} // TODO: Get actual post count
       />
       
       <BottomNavigation />
