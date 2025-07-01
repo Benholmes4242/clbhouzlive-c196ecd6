@@ -19,6 +19,14 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [isMultiSelectMode, setIsMultiSelectMode] = useState(false);
 
+  // Debug logging for component state
+  console.log('🟡 GalleryPicker render:', {
+    isOpen,
+    isMobile,
+    isMultiSelectMode,
+    selectedFilesCount: selectedFiles.length
+  });
+
   const handleCameraClick = () => {
     console.log('🎥 CAMERA BUTTON CLICKED - mobile camera capture starting', { isMobile });
     
@@ -277,6 +285,7 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
 
   // Mobile Version - Bottom Sheet
   if (isMobile) {
+    console.log('🟡 Rendering MOBILE version with Sheet');
     return (
       <Sheet open={isOpen} onOpenChange={handleClose}>
         <SheetContent side="bottom" className="h-auto p-6 rounded-t-2xl">
@@ -370,6 +379,7 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
   }
 
   // Desktop Version - Dialog Modal
+  console.log('🟡 Rendering DESKTOP version with Dialog');
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="max-w-md mx-auto p-8 rounded-2xl shadow-2xl animate-scale-in">
