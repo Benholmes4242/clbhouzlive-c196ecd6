@@ -1,4 +1,3 @@
-
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -11,14 +10,14 @@ const getCourseRanking = (course: any) => {
   return 9999;
 };
 
-// Custom sorting function for user courses - prioritize user ratings
+// Custom sorting function for user courses - prioritize user ratings first
 const getSortedUserCourses = (userCourses: any[]) => {
-  // Get courses with ratings - sort by highest rating first
+  // Get courses with ratings - sort by highest rating first (this is the user's personal ranking)
   const rated = userCourses
     .filter(c => c.rating !== null && c.rating !== undefined)
     .sort((a, b) => b.rating - a.rating);
   
-  // Get courses without ratings - sort by best ranking
+  // Get courses without ratings - sort by best official ranking (global/regional)
   const unrated = userCourses
     .filter(c => c.rating === null || c.rating === undefined)
     .sort((a, b) => {
@@ -27,6 +26,7 @@ const getSortedUserCourses = (userCourses: any[]) => {
       return aRank - bRank;
     });
 
+  // Return rated courses first (user's personal ranking), then unrated courses by official ranking
   return [...rated, ...unrated];
 };
 
