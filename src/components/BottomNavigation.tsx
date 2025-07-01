@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePostFlow } from '@/hooks/usePostFlow';
@@ -6,8 +7,8 @@ import GalleryPicker from '@/components/post/GalleryPicker';
 import CreateMomentModal from '@/components/post/CreateMomentModal';
 import SnapToast from '@/components/snap/SnapToast';
 import NavigationBar from './bottom-navigation/NavigationBar';
-import { useNavigationHandlers } from './bottom-navigation/NavigationBarHandlers';
-import { usePostHandlers } from './bottom-navigation/PostHandlers';
+import { useNavigationHandlers } from '@/hooks/useNavigationHandlers';
+import { usePostHandlers } from '@/hooks/usePostHandlers';
 
 const BottomNavigation = () => {
   const { user } = useSupabaseSession();
