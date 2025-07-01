@@ -77,9 +77,9 @@ const HandicapCard: React.FC<HandicapCardProps> = ({
   const isBenjaminHolmes = userUsername === 'benjaminholmes';
 
   const renderBenjaminHandicapLayout = () => (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 p-6">
-      {/* Left side - Performance Graph */}
-      <div className="lg:col-span-2">
+    <div className="space-y-6 p-6">
+      {/* Performance Graph - Full Width */}
+      <div className="w-full">
         <h3 className="text-lg font-semibold mb-4">My Handicap Performance</h3>
         <div className="h-64 w-full">
           <ResponsiveContainer width="100%" height="100%">
@@ -149,60 +149,41 @@ const HandicapCard: React.FC<HandicapCardProps> = ({
         </div>
       </div>
 
-      {/* Right side - Handicap Details Card */}
-      <div className="lg:col-span-1">
-        <Card className="bg-white border shadow-sm relative">
-          <CardContent className="p-6">
-            <div className="text-right mb-4">
-              <h4 className="text-red-500 text-sm font-medium mb-2">My Handicap Index®</h4>
-              <div className="text-4xl font-bold text-gray-900 mb-2">4.5</div>
-              <div className="text-sm text-gray-600 mb-4">Low Index: 2.8</div>
-              
-              <div className="text-sm text-gray-600 space-y-1 mb-4">
-                <div>Membership Number: 1013726541</div>
-                <div>Home Club: Sundridge Park</div>
-              </div>
-
-              <div className="mb-4">
-                <div className="text-sm text-gray-600 mb-2">You are in the top</div>
-                <div className="flex gap-2">
-                  <Badge className="bg-gray-700 text-white text-xs px-3 py-1">
-                    <div className="text-center">
-                      <div className="font-bold">6%</div>
-                      <div className="text-xs">Sundridge Park</div>
-                    </div>
-                  </Badge>
-                  <Badge className="bg-gray-700 text-white text-xs px-3 py-1">
-                    <div className="text-center">
-                      <div className="font-bold">4%</div>
-                      <div className="text-xs">Kent</div>
-                    </div>
-                  </Badge>
-                  <Badge className="bg-gray-700 text-white text-xs px-3 py-1">
-                    <div className="text-center">
-                      <div className="font-bold">3%</div>
-                      <div className="text-xs">England</div>
-                    </div>
-                  </Badge>
-                </div>
-              </div>
-
-              <div className="text-sm text-gray-600 mb-4">
-                Last Updated: Today
+      {/* My Handicap Card - Stacked Below */}
+      <Card className="bg-white border shadow-sm">
+        <CardContent className="p-6">
+          <div className="space-y-4">
+            {/* Title */}
+            <h4 className="text-red-500 text-sm font-medium">My Handicap Index®</h4>
+            
+            {/* Main Handicap Value */}
+            <div className="text-4xl font-bold text-gray-900">4.5</div>
+            
+            {/* Home Club */}
+            <div className="text-sm text-gray-600">
+              <span className="font-medium">Home Club:</span> Sundridge Park
+            </div>
+            
+            {/* Last Updated */}
+            <div className="text-sm text-gray-600">
+              Last Updated: Today
+            </div>
+            
+            {/* England Golf Logo */}
+            <div className="flex items-center justify-between mt-4">
+              <div></div>
+              <div className="flex items-center gap-2">
+                <img 
+                  src="/lovable-uploads/41a64d83-afc2-42f1-a446-b6a8b45a0043.png" 
+                  alt="England Golf" 
+                  className="h-6 w-6 opacity-80"
+                />
+                <span className="text-xs text-gray-500">Powered by England Golf</span>
               </div>
             </div>
-
-            {/* England Golf logo - positioned at bottom right */}
-            <div className="absolute bottom-4 right-4">
-              <img 
-                src="/lovable-uploads/41a64d83-afc2-42f1-a446-b6a8b45a0043.png" 
-                alt="England Golf" 
-                className="h-8 w-8 opacity-80"
-              />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 
