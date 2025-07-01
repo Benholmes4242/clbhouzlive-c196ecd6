@@ -419,7 +419,8 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
               <button
                 onClick={() => {
                   console.log('🔴 MOBILE PHOTO BUTTON CLICKED - Event triggered');
-                  alert('Red button clicked!'); // Add alert to confirm
+                  localStorage.setItem('debug_click', 'button_clicked_' + Date.now());
+                  alert('Red button clicked! Check localStorage.');
                   handlePhotoClick();
                 }}
                 style={{ 
