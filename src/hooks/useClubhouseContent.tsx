@@ -41,7 +41,9 @@ export const useClubhouseContent = () => {
   const fetchRandomContent = async () => {
     setLoading(true);
     try {
-      // Fetch posts with videos from all users across the platform
+      console.log('Fetching clubhouse content - all posts with media');
+      
+      // Fetch all posts with media (not just videos)
       const { data: postsData, error } = await supabase
         .from('posts')
         .select(`
@@ -49,38 +51,35 @@ export const useClubhouseContent = () => {
           content,
           created_at,
           user_id,
-          post_media!inner (
+          post_media (
             id,
             media_type,
             media_url
-          ),
-          post_tags (
-            tagged_entity_id,
-            taggable_entities (
-              id,
-              entity_type,
-              entity_id,
-              name,
-              username
-            )
           )
         `)
-        .eq('post_media.media_type', 'video')
         .order('created_at', { ascending: false })
-        .limit(100); // Get more posts to have variety
+        .limit(50);
 
       if (error) {
         console.error('Error fetching posts:', error);
         return;
       }
 
+      console.log('Clubhouse - Raw posts data:', postsData);
+
       if (!postsData || postsData.length === 0) {
+        console.log('No posts found for clubhouse');
         setPosts([]);
         return;
       }
 
+      // Filter posts that have media
+      const postsWithMedia = postsData.filter(post => post.post_media && post.post_media.length > 0);
+      console.log('Posts with media:', postsWithMedia.length);
+
       // Get unique user IDs
-      const userIds = [...new Set(postsData.map(post => post.user_id))];
+      const userIds = [...new Set(postsWithMedia.map(post => post.user_id))];
+      console.log('Fetching profiles for users:', userIds);
       
       // Get user profiles for all post authors with handicap data
       const { data: profiles, error: profilesError } = await supabase
@@ -93,9 +92,51 @@ export const useClubhouseContent = () => {
         return;
       }
 
+      console.log('Clubhouse - Fetched profiles:', profiles);
+
+      // Get post tags
+      const postIds = postsWithMedia.map(p => p.id);
+      const { data: postTagsRaw, error: tagsError } = await supabase
+        .from('post_tags')
+        .select(`
+          post_id,
+          tagged_entity_id
+        `)
+        .in('post_id', postIds);
+
+      let postTags = [];
+      if (postTagsRaw && postTagsRaw.length > 0) {
+        const entityIds = postTagsRaw.map(tag => tag.tagged_entity_id);
+        
+        const { data: entities, error: entitiesError } = await supabase
+          .from('taggable_entities')
+          .select('*')
+          .in('id', entityIds);
+
+        if (!entitiesError && entities) {
+          postTags = postTagsRaw.map(tag => {
+            const entity = entities.find(e => e.id === tag.tagged_entity_id);
+            if (entity) {
+              return {
+                post_id: tag.post_id,
+                id: entity.id,
+                entity_type: entity.entity_type,
+                entity_id: entity.entity_id,
+                name: entity.name,
+                username: entity.username
+              };
+            }
+            return null;
+          }).filter(Boolean);
+        }
+      }
+
+      console.log('Clubhouse - Post tags:', postTags);
+
       // Format posts with user data including handicap
-      const formattedPosts = postsData.map(post => {
+      const formattedPosts = postsWithMedia.map(post => {
         const userProfile = profiles?.find(profile => profile.id === post.user_id);
+        const tags = postTags?.filter((t: any) => t.post_id === post.id) || [];
         
         return {
           id: post.id,
@@ -115,24 +156,20 @@ export const useClubhouseContent = () => {
             media_type: media.media_type as 'image' | 'video',
             media_url: media.media_url
           })),
-          post_tags: (post.post_tags || []).map((tag: any) => ({
-            id: tag.taggable_entities?.id || '',
-            entity_type: tag.taggable_entities?.entity_type as 'user' | 'golf_club' | 'business' || 'user',
-            entity_id: tag.taggable_entities?.entity_id || '',
-            name: tag.taggable_entities?.name || '',
-            username: tag.taggable_entities?.username || null
-          })),
+          post_tags: tags,
           stats: {
-            likes: Math.floor(Math.random() * 100), // Placeholder until we have actual engagement data
+            likes: Math.floor(Math.random() * 100),
             comments: Math.floor(Math.random() * 50),
             views: Math.floor(Math.random() * 1000)
           }
         };
       });
 
+      console.log('Clubhouse - Final formatted posts:', formattedPosts.length);
+
       // Sort by a blend of recent and random content for discovery
       const sortedPosts = formattedPosts.sort((a, b) => {
-        const aScore = new Date(a.created_at).getTime() + Math.random() * 86400000; // Add random factor
+        const aScore = new Date(a.created_at).getTime() + Math.random() * 86400000;
         const bScore = new Date(b.created_at).getTime() + Math.random() * 86400000;
         return bScore - aScore;
       });
@@ -148,6 +185,22 @@ export const useClubhouseContent = () => {
 
   useEffect(() => {
     fetchRandomContent();
+  }, []);
+
+  // Listen for new posts
+  useEffect(() => {
+    const handlePostCompleted = () => {
+      console.log('Post completed event received in clubhouse, refetching');
+      setTimeout(() => {
+        fetchRandomContent();
+      }, 1000);
+    };
+
+    window.addEventListener('postCompleted', handlePostCompleted);
+    
+    return () => {
+      window.removeEventListener('postCompleted', handlePostCompleted);
+    };
   }, []);
 
   return {

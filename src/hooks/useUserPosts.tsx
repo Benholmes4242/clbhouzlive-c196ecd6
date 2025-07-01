@@ -43,6 +43,8 @@ export const useUserPosts = () => {
     }
 
     try {
+      console.log('Fetching posts for all users (not just current user)');
+      
       const { data: postsData, error } = await supabase
         .from('posts')
         .select(`
@@ -63,7 +65,10 @@ export const useUserPosts = () => {
         return;
       }
 
+      console.log('Raw posts data:', postsData);
+
       if (!postsData || postsData.length === 0) {
+        console.log('No posts found');
         setPosts([]);
         setLoading(false);
         return;
@@ -71,6 +76,8 @@ export const useUserPosts = () => {
 
       // Get user profiles for all post authors
       const userIds = [...new Set(postsData.map(post => post.user_id))];
+      console.log('Fetching profiles for user IDs:', userIds);
+      
       const { data: profiles, error: profilesError } = await supabase
         .from('user_profiles')
         .select('id, display_name, username, profile_photo_url')
@@ -81,52 +88,67 @@ export const useUserPosts = () => {
         return;
       }
 
-      // Get post tags with proper entity information
-      let postTags = [];
-      try {
-        const { data: tags, error: tagsError } = await supabase
-          .from('post_tags')
-          .select(`
-            post_id,
-            tagged_entity_id,
-            taggable_entities (
-              id,
-              entity_type,
-              entity_id,
-              name,
-              username
-            )
-          `)
-          .in('post_id', postsData.map(p => p.id));
+      console.log('Fetched profiles:', profiles);
 
-        if (tagsError) {
-          console.error('Error fetching post tags:', tagsError);
+      // Get post tags with proper entity information - using a more direct approach
+      const postIds = postsData.map(p => p.id);
+      console.log('Fetching tags for post IDs:', postIds);
+      
+      const { data: postTagsRaw, error: tagsError } = await supabase
+        .from('post_tags')
+        .select(`
+          post_id,
+          tagged_entity_id
+        `)
+        .in('post_id', postIds);
+
+      if (tagsError) {
+        console.error('Error fetching post tags:', tagsError);
+      }
+
+      console.log('Raw post tags:', postTagsRaw);
+
+      // Now get the taggable entities for these tags
+      let postTags = [];
+      if (postTagsRaw && postTagsRaw.length > 0) {
+        const entityIds = postTagsRaw.map(tag => tag.tagged_entity_id);
+        console.log('Fetching entities for IDs:', entityIds);
+        
+        const { data: entities, error: entitiesError } = await supabase
+          .from('taggable_entities')
+          .select('*')
+          .in('id', entityIds);
+
+        if (entitiesError) {
+          console.error('Error fetching taggable entities:', entitiesError);
         } else {
-          postTags = tags || [];
-          console.log('User posts - Fetched post tags:', postTags.length);
+          console.log('Fetched entities:', entities);
+          
+          // Map the tags with their entities
+          postTags = postTagsRaw.map(tag => {
+            const entity = entities?.find(e => e.id === tag.tagged_entity_id);
+            if (entity) {
+              return {
+                post_id: tag.post_id,
+                id: entity.id,
+                entity_type: entity.entity_type,
+                entity_id: entity.entity_id,
+                name: entity.name,
+                username: entity.username
+              };
+            }
+            return null;
+          }).filter(Boolean);
+          
+          console.log('Mapped post tags:', postTags);
         }
-      } catch (error) {
-        console.error('Failed to fetch post tags:', error);
       }
 
       const formattedPosts = postsData.map(post => {
         const userProfile = profiles?.find(profile => profile.id === post.user_id);
-        const tags = postTags?.filter((t: any) => t.post_id === post.id).map((tag: any) => {
-          // Handle the case where taggable_entities might be null
-          if (!tag.taggable_entities) {
-            console.warn('Missing taggable_entities for tag:', tag.tagged_entity_id);
-            return null;
-          }
-          return {
-            id: tag.taggable_entities.id,
-            entity_type: tag.taggable_entities.entity_type,
-            entity_id: tag.taggable_entities.entity_id,
-            name: tag.taggable_entities.name,
-            username: tag.taggable_entities.username
-          };
-        }).filter(Boolean) || []; // Filter out null entries
+        const tags = postTags?.filter((t: any) => t.post_id === post.id) || [];
         
-        return {
+        const formattedPost = {
           id: post.id,
           content: post.content,
           created_at: post.created_at,
@@ -143,12 +165,22 @@ export const useUserPosts = () => {
           })),
           post_tags: tags
         };
+        
+        console.log(`Post ${post.id} formatted:`, {
+          id: formattedPost.id,
+          user: formattedPost.user.display_name || formattedPost.user.username,
+          mediaCount: formattedPost.post_media.length,
+          tagCount: formattedPost.post_tags.length,
+          tags: formattedPost.post_tags.map(t => t.name)
+        });
+        
+        return formattedPost;
       });
 
-      console.log('User posts formatted with tags:', formattedPosts.length, 'posts');
+      console.log('Final formatted posts:', formattedPosts.length, 'posts');
       setPosts(formattedPosts);
     } catch (error) {
-      console.error('Error fetching posts:', error);
+      console.error('Error in fetchPosts:', error);
     } finally {
       setLoading(false);
     }
@@ -157,6 +189,22 @@ export const useUserPosts = () => {
   useEffect(() => {
     fetchPosts();
   }, [user]);
+
+  // Listen for post creation events
+  useEffect(() => {
+    const handlePostCompleted = () => {
+      console.log('Post completed event received, refetching posts');
+      setTimeout(() => {
+        fetchPosts();
+      }, 1000); // Small delay to ensure database is updated
+    };
+
+    window.addEventListener('postCompleted', handlePostCompleted);
+    
+    return () => {
+      window.removeEventListener('postCompleted', handlePostCompleted);
+    };
+  }, []);
 
   return {
     posts,

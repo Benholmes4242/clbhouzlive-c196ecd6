@@ -13,7 +13,7 @@ export const useActivityPosts = (userId?: string) => {
       return;
     }
 
-    console.log('Fetching posts for userId:', userId);
+    console.log('ActivityPosts - Fetching posts for userId:', userId);
     setLoading(true);
 
     try {
@@ -29,80 +29,69 @@ export const useActivityPosts = (userId?: string) => {
             id,
             media_type,
             media_url
-          ),
-          post_tags (
-            tagged_entity_id,
-            taggable_entities (
-              id,
-              entity_type,
-              entity_id,
-              name,
-              username
-            )
           )
         `)
         .eq('user_id', userId)
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Error with posts query:', error);
-        // Try basic posts query as fallback
-        const { data: basicPosts, error: basicError } = await supabase
-          .from('posts')
-          .select('id, content, created_at, user_id')
-          .eq('user_id', userId)
-          .order('created_at', { ascending: false });
-
-        if (basicError) {
-          console.error('Error fetching basic posts:', basicError);
-          setPosts([]);
-          setLoading(false);
-          return;
-        }
-
-        console.log('Basic posts found:', basicPosts?.length || 0);
-
-        // Get user profile for the posts
-        const { data: userProfile, error: profileError } = await supabase
-          .from('user_profiles')
-          .select('id, display_name, username, profile_photo_url')
-          .eq('id', userId)
-          .single();
-
-        if (profileError) {
-          console.error('Error fetching user profile:', profileError);
-        }
-
-        // Format basic posts without media and tags for now
-        const formattedBasicPosts = (basicPosts || []).map(post => ({
-          id: post.id,
-          type: 'post' as const,
-          content: post.content || '',
-          likes: 0,
-          comments: 0,
-          shares: 0,
-          timeAgo: new Date(post.created_at).toLocaleDateString(),
-          created_at: post.created_at,
-          post_media: [],
-          post_tags: [],
-          user: {
-            id: userId,
-            display_name: userProfile?.display_name || null,
-            username: userProfile?.username || null,
-            profile_photo_url: userProfile?.profile_photo_url || null
-          },
-          image: undefined
-        }));
-
-        console.log('Formatted basic posts:', formattedBasicPosts.length);
-        setPosts(formattedBasicPosts);
+        console.error('ActivityPosts - Error with posts query:', error);
+        setPosts([]);
         setLoading(false);
         return;
       }
 
-      // Process successful query results
-      console.log('Posts data:', postsData);
+      console.log('ActivityPosts - Raw posts data:', postsData);
+
+      if (!postsData || postsData.length === 0) {
+        console.log('ActivityPosts - No posts found for user');
+        setPosts([]);
+        setLoading(false);
+        return;
+      }
+
+      // Get post tags
+      const postIds = postsData.map(p => p.id);
+      console.log('ActivityPosts - Fetching tags for posts:', postIds);
       
+      const { data: postTagsRaw, error: tagsError } = await supabase
+        .from('post_tags')
+        .select(`
+          post_id,
+          tagged_entity_id
+        `)
+        .in('post_id', postIds);
+
+      let postTags = [];
+      if (postTagsRaw && postTagsRaw.length > 0) {
+        const entityIds = postTagsRaw.map(tag => tag.tagged_entity_id);
+        console.log('ActivityPosts - Fetching entities for IDs:', entityIds);
+        
+        const { data: entities, error: entitiesError } = await supabase
+          .from('taggable_entities')
+          .select('*')
+          .in('id', entityIds);
+
+        if (!entitiesError && entities) {
+          postTags = postTagsRaw.map(tag => {
+            const entity = entities.find(e => e.id === tag.tagged_entity_id);
+            if (entity) {
+              return {
+                post_id: tag.post_id,
+                id: entity.id,
+                entity_type: entity.entity_type,
+                entity_id: entity.entity_id,
+                name: entity.name,
+                username: entity.username
+              };
+            }
+            return null;
+          }).filter(Boolean);
+        }
+      }
+
+      console.log('ActivityPosts - Mapped post tags:', postTags);
+
       // Get user profile for the posts
       const { data: userProfile, error: profileError } = await supabase
         .from('user_profiles')
@@ -111,43 +100,41 @@ export const useActivityPosts = (userId?: string) => {
         .single();
 
       if (profileError) {
-        console.error('Error fetching user profile:', profileError);
+        console.error('ActivityPosts - Error fetching user profile:', profileError);
       }
 
-      const formattedPosts = (postsData || []).map(post => ({
-        id: post.id,
-        type: 'post' as const,
-        content: post.content || '',
-        likes: 0,
-        comments: 0,
-        shares: 0,
-        timeAgo: new Date(post.created_at).toLocaleDateString(),
-        created_at: post.created_at,
-        post_media: (post.post_media || []).map(media => ({
-          id: media.id,
-          media_type: media.media_type as 'image' | 'video',
-          media_url: media.media_url
-        })),
-        post_tags: (post.post_tags || []).map((tag: any) => ({
-          id: tag.taggable_entities?.id || '',
-          entity_type: tag.taggable_entities?.entity_type as 'user' | 'golf_club' | 'business' || 'user',
-          entity_id: tag.taggable_entities?.entity_id || '',
-          name: tag.taggable_entities?.name || '',
-          username: tag.taggable_entities?.username || null
-        })),
-        user: {
-          id: userId,
-          display_name: userProfile?.display_name || null,
-          username: userProfile?.username || null,
-          profile_photo_url: userProfile?.profile_photo_url || null
-        },
-        image: post.post_media?.find(media => media.media_type === 'image')?.media_url
-      }));
+      const formattedPosts = postsData.map(post => {
+        const tags = postTags?.filter((t: any) => t.post_id === post.id) || [];
+        
+        return {
+          id: post.id,
+          type: 'post' as const,
+          content: post.content || '',
+          likes: 0,
+          comments: 0,
+          shares: 0,
+          timeAgo: new Date(post.created_at).toLocaleDateString(),
+          created_at: post.created_at,
+          post_media: (post.post_media || []).map(media => ({
+            id: media.id,
+            media_type: media.media_type as 'image' | 'video',
+            media_url: media.media_url
+          })),
+          post_tags: tags,
+          user: {
+            id: userId,
+            display_name: userProfile?.display_name || null,
+            username: userProfile?.username || null,
+            profile_photo_url: userProfile?.profile_photo_url || null
+          },
+          image: post.post_media?.find(media => media.media_type === 'image')?.media_url
+        };
+      });
 
-      console.log('Formatted posts:', formattedPosts);
+      console.log('ActivityPosts - Final formatted posts:', formattedPosts.length);
       setPosts(formattedPosts);
     } catch (error) {
-      console.error('Error fetching posts:', error);
+      console.error('ActivityPosts - Error fetching posts:', error);
       setPosts([]);
     } finally {
       setLoading(false);
@@ -157,6 +144,22 @@ export const useActivityPosts = (userId?: string) => {
   useEffect(() => {
     fetchUserPosts();
   }, [userId]);
+
+  // Listen for post updates
+  useEffect(() => {
+    const handlePostCompleted = () => {
+      console.log('ActivityPosts - Post completed event received, refetching');
+      setTimeout(() => {
+        fetchUserPosts();
+      }, 1000);
+    };
+
+    window.addEventListener('postCompleted', handlePostCompleted);
+    
+    return () => {
+      window.removeEventListener('postCompleted', handlePostCompleted);
+    };
+  }, []);
 
   return { posts, loading, fetchUserPosts };
 };
