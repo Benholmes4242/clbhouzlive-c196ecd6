@@ -218,32 +218,31 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
             </div>
           </div>
           
-          {isOwnPost ? (
+          {isOwnPost && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" className="hover:bg-muted">
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem 
+                  onClick={() => setEditDialogOpen(true)}
+                  className="cursor-pointer"
+                >
                   <Edit className="h-4 w-4 mr-2" />
                   Edit Post
                 </DropdownMenuItem>
                 <DropdownMenuItem 
                   onClick={handleDeletePost}
                   disabled={isDeleting}
-                  className="text-red-600"
+                  className="text-red-600 cursor-pointer focus:text-red-600"
                 >
                   <Trash2 className="h-4 w-4 mr-2" />
                   {isDeleting ? 'Deleting...' : 'Delete Post'}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-          ) : (
-            <Button variant="ghost" size="icon">
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
           )}
         </div>
 
