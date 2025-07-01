@@ -14,13 +14,11 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   profileDisplayName
 }) => {
   return (
-    <div className="p-4">
-      <EnhancedSocialActivity
-        userId={userId}
-        isOwnProfile={isOwnProfile}
-        profileDisplayName={profileDisplayName}
-      />
-    </div>
+    <EnhancedSocialActivity
+      userId={userId}
+      isOwnProfile={isOwnProfile}
+      profileDisplayName={profileDisplayName}
+    />
   );
 };
 
