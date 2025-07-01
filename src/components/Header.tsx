@@ -18,7 +18,7 @@ const Header = () => {
           {/* Logo - Fixed positioning */}
           <div className="flex items-center flex-shrink-0">
             <img
-              src="/lovable-uploads/88ad3559-c25d-4f55-9203-aa0d4d644c88.png"
+              src="/lovable-uploads/5fa9376f-a5bf-4e86-803b-147ab6b1097e.png"
               alt="clbhouz Logo"
               className="h-10 w-auto cursor-pointer object-contain"
               onClick={handleLogoClick}
