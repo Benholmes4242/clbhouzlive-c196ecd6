@@ -416,8 +416,21 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
 
               {/* Post Photo Button */}
               <button
+                onMouseDown={() => {
+                  console.log('🟠 MOBILE PHOTO BUTTON MOUSE DOWN');
+                  alert('Mouse Down!');
+                }}
+                onTouchStart={() => {
+                  console.log('🟠 MOBILE PHOTO BUTTON TOUCH START');  
+                  alert('Touch Start!');
+                }}
+                onPointerDown={() => {
+                  console.log('🟠 MOBILE PHOTO BUTTON POINTER DOWN');
+                  alert('Pointer Down!');
+                }}
                 onClick={() => {
                   console.log('🔴 MOBILE PHOTO BUTTON CLICKED - Event triggered');
+                  alert('Click triggered!');
                   handlePhotoClick();
                 }}
                 style={{ 
@@ -431,7 +444,10 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
                   display: 'flex',
                   alignItems: 'flex-start',
                   gap: '16px',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  userSelect: 'none',
+                  WebkitUserSelect: 'none',
+                  WebkitTouchCallout: 'none'
                 }}
               >
                 <Image className="h-6 w-6 mt-1 flex-shrink-0" />
