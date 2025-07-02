@@ -171,7 +171,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, currentUserId }) => {
           <img 
             src={player.avatar} 
             alt={player.name} 
-            className="w-16 h-16 rounded-[14px] object-cover object-center border-2 border-white cursor-pointer hover:border-white/80 transition-colors" 
+            className="w-16 h-16 rounded-[14px] object-cover object-center border-2 border-white cursor-pointer hover:border-white/80 transition-colors hq-image" 
             onClick={handleProfileClick}
           />
           <div className="flex-1 min-w-0">

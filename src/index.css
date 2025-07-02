@@ -81,4 +81,44 @@
   }
 }
 
-/* Rest of existing styles */
+/* High-quality image rendering for thumbnails and avatars */
+.hq-image {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  image-rendering: optimize-contrast;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  will-change: transform;
+  filter: contrast(1.05) saturate(1.05) brightness(1.02);
+}
+
+/* Anti-aliasing for better text and image quality */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* High DPI optimizations */
+@media (min-resolution: 2dppx), (min-resolution: 192dpi) {
+  .hq-image {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    filter: contrast(1.08) saturate(1.08) brightness(1.03);
+  }
+}
+
+/* Prevent white dots/artifacts in rounded images */
+.rounded-image-container {
+  overflow: hidden;
+  position: relative;
+  isolation: isolate;
+}
+
+.rounded-image-container::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  z-index: 1;
+  pointer-events: none;
+}

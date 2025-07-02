@@ -37,11 +37,11 @@ const StoryItem: React.FC<StoryItemProps> = ({
           >
             {hasProfile && story.avatar ? (
               // User has a profile photo - show with green ring
-              <div className="w-20 h-20 rounded-[18px] p-0.5 bg-gradient-to-tr from-green-500 to-green-700 hover:opacity-80 transition-opacity">
+              <div className="w-20 h-20 rounded-[18px] p-0.5 bg-gradient-to-tr from-green-500 to-green-700 hover:opacity-80 transition-opacity rounded-image-container">
                 <img
                   src={story.avatar}
                   alt={story.user}
-                  className="w-full h-full rounded-[15px] object-cover border-2 border-background"
+                  className="w-full h-full rounded-[15px] object-cover border-2 border-background hq-image"
                 />
               </div>
             ) : (
@@ -62,14 +62,14 @@ const StoryItem: React.FC<StoryItemProps> = ({
             style={{ '--tw-ring-color': '#6e9277' } as React.CSSProperties}
           >
             <div 
-              className="w-20 h-20 rounded-[18px] p-0.5 hover:opacity-80 transition-opacity"
+              className="w-20 h-20 rounded-[18px] p-0.5 hover:opacity-80 transition-opacity rounded-image-container"
               style={{ background: 'linear-gradient(to top right, #6e9277, #5a7a63)' }}
             >
               {story.avatar ? (
                 <img
                   src={story.avatar}
                   alt={story.user}
-                  className="w-full h-full rounded-[15px] object-cover border-2 border-background"
+                  className="w-full h-full rounded-[15px] object-cover border-2 border-background hq-image"
                   onError={(e) => {
                     console.log('Image failed to load:', story.avatar);
                     e.currentTarget.style.display = 'none';
