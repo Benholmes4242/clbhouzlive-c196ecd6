@@ -178,11 +178,11 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
       {isMultiSelectMode ? (
         <MultiSelectPreview />
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-2">
           {isMobile && (
             <Button
               onClick={handleCameraClick}
-              className="w-full h-12 px-4 bg-white border border-gray-300 text-gray-700 hover:border-gray-400 transition-all duration-200 rounded-lg flex items-center gap-3 cursor-pointer text-sm font-medium"
+              className="w-full h-10 px-3 bg-white border border-gray-300 text-gray-700 hover:border-gray-400 transition-all duration-200 rounded-lg flex items-center gap-3 cursor-pointer text-sm font-medium"
             >
               Capture Photo or Video
             </Button>
@@ -190,19 +190,19 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
 
           <Button
             onClick={handlePhotoClick}
-            className="w-full h-12 px-4 bg-white border border-gray-300 text-gray-700 hover:border-gray-400 transition-all duration-200 rounded-lg flex items-center gap-3 cursor-pointer text-sm font-medium"
+            className="w-full h-10 px-3 bg-white border border-gray-300 text-gray-700 hover:border-gray-400 transition-all duration-200 rounded-lg flex items-center gap-3 cursor-pointer text-sm font-medium"
           >
             Select Photos
           </Button>
 
           <Button
             onClick={handleVideoClick}
-            className="w-full h-12 px-4 bg-white border border-gray-300 text-gray-700 hover:border-gray-400 transition-all duration-200 rounded-lg flex items-center gap-3 cursor-pointer text-sm font-medium"
+            className="w-full h-10 px-3 bg-white border border-gray-300 text-gray-700 hover:border-gray-400 transition-all duration-200 rounded-lg flex items-center gap-3 cursor-pointer text-sm font-medium"
           >
             Select Videos
           </Button>
 
-          <p className="text-center text-sm text-gray-500 mt-4 px-2 leading-relaxed">
+          <p className="text-center text-xs text-gray-500 mt-1 px-1">
             Select multiple files to create a carousel post with swipeable media.
           </p>
         </div>
@@ -225,9 +225,9 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
           {/* Top accent bar */}
           <div className="absolute top-0 left-0 w-full h-0.5 bg-[#6e9277] rounded-t-xl" />
           
-          <div className="p-3 pt-4">
-            <SheetHeader className="mb-3">
-              <SheetTitle className="text-center text-lg font-semibold">
+          <div className="p-2 pt-3 pb-2">
+            <SheetHeader className="mb-2">
+              <SheetTitle className="text-center text-base font-semibold">
                 {isMultiSelectMode ? 'Selected Media' : 'Create a Moment'}
               </SheetTitle>
             </SheetHeader>
@@ -257,9 +257,9 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
         {/* Top accent bar */}
         <div className="absolute top-0 left-0 w-full h-0.5 bg-[#6e9277] rounded-t-xl" />
         
-        <div className="p-3 pt-4">
-          <DialogHeader className="mb-3">
-            <DialogTitle className="text-center text-lg font-semibold">
+        <div className="p-2 pt-3 pb-2">
+          <DialogHeader className="mb-2">
+            <DialogTitle className="text-center text-base font-semibold">
               {isMultiSelectMode ? 'Selected Media' : 'Create a Moment'}
             </DialogTitle>
           </DialogHeader>
