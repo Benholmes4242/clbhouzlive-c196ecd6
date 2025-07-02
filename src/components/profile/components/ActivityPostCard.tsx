@@ -4,6 +4,7 @@ import { ActivityPost } from '../types/ActivityTypes';
 import VideoPreview from '@/components/posts/VideoPreview';
 import CourseTag from '@/components/posts/CourseTag';
 import { Camera, Play } from 'lucide-react';
+import HighQualityImage from '@/components/ui/high-quality-image';
 
 interface ActivityPostCardProps {
   post: ActivityPost;
@@ -32,7 +33,7 @@ const ActivityPostCard = ({ post, attributionText, onClick }: ActivityPostCardPr
 
   return (
     <div 
-      className="relative aspect-square bg-gray-100 cursor-pointer group overflow-hidden"
+      className="relative aspect-square bg-gray-100 cursor-pointer group overflow-hidden rounded-lg"
       onClick={handleClick}
     >
       {hasMedia && firstMedia ? (
@@ -45,10 +46,12 @@ const ActivityPostCard = ({ post, attributionText, onClick }: ActivityPostCardPr
               isGridThumbnail={true}
             />
           ) : (
-            <img
+            <HighQualityImage
               src={firstMedia.media_url}
               alt="Post media"
-              className="w-full h-full object-cover"
+              className="w-full h-full"
+              width={300}
+              height={300}
               onError={(e) => {
                 // Fallback to placeholder on image error
                 const target = e.target as HTMLImageElement;

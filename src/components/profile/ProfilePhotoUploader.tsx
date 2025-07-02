@@ -2,6 +2,7 @@
 import React, { useRef } from "react";
 import { Camera, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import HighQualityImage from '@/components/ui/high-quality-image';
 
 interface ProfilePhotoUploaderProps {
   profilePhotoPreview: string | null;
@@ -38,12 +39,14 @@ const ProfilePhotoUploader: React.FC<ProfilePhotoUploaderProps> = ({
           if (e.key === "Enter" || e.key === " ") handlePhotoClick();
         }}
       >
-        <div className="w-24 h-24 bg-muted border-2 border-dashed border-amber-700 rounded-full flex items-center justify-center overflow-hidden">
+        <div className="w-24 h-24 bg-muted border-2 border-dashed border-amber-700 rounded-[14px] flex items-center justify-center overflow-hidden">
           {profilePhotoPreview ? (
-            <img
+            <HighQualityImage
               src={profilePhotoPreview}
               alt="Profile preview"
-              className="object-cover w-full h-full"
+              className="w-full h-full"
+              width={96}
+              height={96}
             />
           ) : (
             <Camera className="h-8 w-8 text-amber-700" />

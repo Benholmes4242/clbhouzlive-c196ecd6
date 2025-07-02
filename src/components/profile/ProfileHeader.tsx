@@ -1,6 +1,7 @@
 
 import React, { useRef, useState } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import HighQualityImage from '@/components/ui/high-quality-image';
 
 interface ProfileHeaderProps {
   photoPreview: string | null;
@@ -75,7 +76,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           {/* Avatar circle with green border, absolutely NO background, shadow, or padding */}
           <div
             className={
-              "w-40 h-40 md:w-52 md:h-52 rounded-full border-4 border-green-700 overflow-hidden flex items-center justify-center object-cover transition-all relative duration-200" +
+              "w-40 h-40 md:w-52 md:h-52 rounded-[18px] border-4 border-green-700 overflow-hidden flex items-center justify-center object-cover transition-all relative duration-200" +
               (shouldShowClickCursor ? " group-hover:opacity-80" : "")
             }
             style={{
@@ -86,14 +87,12 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             }}
           >
             {hasPhoto ? (
-              <img
+              <HighQualityImage
                 src={photoPreview || profilePhotoUrl!}
                 alt="Profile"
-                className="w-full h-full object-cover select-none"
-                draggable={false}
-                crossOrigin="anonymous"
-                loading="lazy"
-                style={{ background: "transparent" }}
+                className="w-full h-full select-none"
+                width={200}
+                height={200}
               />
             ) : (
               <UserPlaceholderIcon />
@@ -136,11 +135,12 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         <Dialog open={showEnlargedPhoto} onOpenChange={setShowEnlargedPhoto}>
           <DialogContent className="max-w-fit w-auto p-0 bg-transparent border-none shadow-none">
             <div className="w-80 h-80 mx-auto relative">
-              <img
+              <HighQualityImage
                 src={photoPreview || profilePhotoUrl!}
                 alt="Profile photo"
-                className="w-full h-full object-cover rounded-full shadow-2xl"
-                crossOrigin="anonymous"
+                className="w-full h-full rounded-[18px] shadow-2xl"
+                width={320}
+                height={320}
               />
               {/* Custom close button positioned outside the circle */}
               <button
