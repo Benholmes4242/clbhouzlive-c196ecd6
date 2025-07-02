@@ -216,16 +216,16 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
       <Sheet open={isOpen} onOpenChange={handleClose}>
         <SheetContent 
           side="bottom" 
-          className="h-auto p-0 rounded-t-xl border-t-4 border-t-[#6e9277] bg-white"
+          className="h-auto p-0 rounded-t-xl border-t-4 border-t-[#6e9277] bg-white relative"
           style={{
             transform: isOpen ? 'translateY(0)' : 'translateY(100%)',
             transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
           }}
         >
           {/* Top accent bar */}
-          <div className="w-full h-0.5 bg-[#6e9277]" />
+          <div className="absolute top-0 left-0 w-full h-0.5 bg-[#6e9277] rounded-t-xl" />
           
-          <div className="p-3">
+          <div className="p-3 pt-4">
             <SheetHeader className="mb-3">
               <SheetTitle className="text-center text-lg font-semibold">
                 {isMultiSelectMode ? 'Selected Media' : 'Create a Moment'}
@@ -235,7 +235,7 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
           </div>
           
           {/* Bottom accent bar */}
-          <div className="w-full h-0.5 bg-[#6e9277]" />
+          <div className="absolute bottom-0 left-0 w-full h-0.5 bg-[#6e9277] rounded-b-xl" />
         </SheetContent>
       </Sheet>
     );
@@ -245,7 +245,7 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent 
-        className="max-w-sm mx-auto p-0 rounded-xl shadow-2xl animate-scale-in bg-white border-0"
+        className="max-w-sm mx-auto p-0 rounded-xl shadow-2xl animate-scale-in bg-white border-0 relative"
         style={{
           position: 'fixed',
           bottom: '120px', // Rise from nav bar area
@@ -255,9 +255,9 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
         }}
       >
         {/* Top accent bar */}
-        <div className="w-full h-0.5 bg-[#6e9277] rounded-t-xl" />
+        <div className="absolute top-0 left-0 w-full h-0.5 bg-[#6e9277] rounded-t-xl" />
         
-        <div className="p-3">
+        <div className="p-3 pt-4">
           <DialogHeader className="mb-3">
             <DialogTitle className="text-center text-lg font-semibold">
               {isMultiSelectMode ? 'Selected Media' : 'Create a Moment'}
@@ -267,7 +267,7 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
         </div>
         
         {/* Bottom accent bar */}
-        <div className="w-full h-0.5 bg-[#6e9277] rounded-b-xl" />
+        <div className="absolute bottom-0 left-0 w-full h-0.5 bg-[#6e9277] rounded-b-xl" />
       </DialogContent>
     </Dialog>
   );
