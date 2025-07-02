@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { validateFiles } from '@/components/posts/utils/fileValidation';
 
 interface PostSubmissionData {
   user: any;
@@ -33,12 +34,25 @@ export const usePostSubmission = () => {
     setIsSubmitting(true);
 
     try {
+      // Validate files first
+      const validation = validateFiles(mediaFiles);
+      if (!validation.isValid) {
+        toast({
+          title: "Upload Error",
+          description: validation.error,
+          variant: "destructive"
+        });
+        onError?.();
+        return;
+      }
+
       console.log('Creating post with data:', {
         userId: user.id,
         content,
         mediaFilesCount: mediaFiles.length,
         tagsCount: selectedTags.length,
-        courseInfo
+        courseInfo,
+        fileDetails: mediaFiles.map(f => ({ name: f.name, size: f.size, type: f.type }))
       });
 
       // Create the post
@@ -55,36 +69,68 @@ export const usePostSubmission = () => {
 
       console.log('Post created:', postData);
 
-      // Upload media files
+      // Upload media files with error handling for each file
       if (mediaFiles.length > 0) {
-        for (const file of mediaFiles) {
-          const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
-          const fileExtension = file.name.split('.').pop();
-          const fullFileName = `${fileName}.${fileExtension}`;
-          
-          // Upload file to storage
-          const { error: uploadError } = await supabase.storage
-            .from('post-media')
-            .upload(`${user.id}/${fullFileName}`, file);
+        const uploadPromises = mediaFiles.map(async (file, index) => {
+          try {
+            const fileName = `${Date.now()}-${index}-${Math.random().toString(36).substring(2, 15)}`;
+            const fileExtension = file.name.split('.').pop();
+            const fullFileName = `${fileName}.${fileExtension}`;
+            
+            console.log(`Uploading file ${index + 1}/${mediaFiles.length}: ${file.name} (${file.size} bytes)`);
+            
+            // Upload file to storage with progress tracking
+            const { error: uploadError } = await supabase.storage
+              .from('post-media')
+              .upload(`${user.id}/${fullFileName}`, file, {
+                upsert: false,
+                duplex: 'half'
+              });
 
-          if (uploadError) throw uploadError;
+            if (uploadError) {
+              console.error(`Upload error for file ${file.name}:`, uploadError);
+              throw uploadError;
+            }
 
-          // Get public URL
-          const { data: { publicUrl } } = supabase.storage
-            .from('post-media')
-            .getPublicUrl(`${user.id}/${fullFileName}`);
+            // Get public URL
+            const { data: { publicUrl } } = supabase.storage
+              .from('post-media')
+              .getPublicUrl(`${user.id}/${fullFileName}`);
 
-          // Create media record
-          const { error: mediaError } = await supabase
-            .from('post_media')
-            .insert({
-              post_id: postData.id,
-              media_type: file.type.startsWith('image/') ? 'image' : 'video',
-              media_url: publicUrl
-            });
+            console.log(`Successfully uploaded ${file.name}, public URL: ${publicUrl}`);
 
-          if (mediaError) throw mediaError;
+            // Create media record
+            const { error: mediaError } = await supabase
+              .from('post_media')
+              .insert({
+                post_id: postData.id,
+                media_type: file.type.startsWith('image/') ? 'image' : 'video',
+                media_url: publicUrl
+              });
+
+            if (mediaError) {
+              console.error(`Media record error for file ${file.name}:`, mediaError);
+              throw mediaError;
+            }
+
+            return { success: true, fileName: file.name };
+          } catch (error) {
+            console.error(`Failed to process file ${file.name}:`, error);
+            return { success: false, fileName: file.name, error };
+          }
+        });
+
+        // Wait for all uploads to complete
+        const uploadResults = await Promise.all(uploadPromises);
+        const failedUploads = uploadResults.filter(result => !result.success);
+        
+        if (failedUploads.length > 0) {
+          console.error('Some uploads failed:', failedUploads);
+          const failedFileNames = failedUploads.map(f => f.fileName).join(', ');
+          throw new Error(`Failed to upload: ${failedFileNames}`);
         }
+
+        console.log('All media files uploaded successfully');
       }
 
       // Create user tags
@@ -176,9 +222,21 @@ export const usePostSubmission = () => {
       console.error('Error submitting post:', error);
       onError?.();
       
+      // Provide more specific error messages
+      let errorMessage = "Failed to create post. Please try again.";
+      if (error instanceof Error) {
+        if (error.message.includes('Failed to upload')) {
+          errorMessage = `Upload failed: ${error.message}`;
+        } else if (error.message.includes('Network')) {
+          errorMessage = "Network error. Please check your connection and try again.";
+        } else if (error.message.includes('size')) {
+          errorMessage = "File too large. Please try with smaller files.";
+        }
+      }
+      
       toast({
         title: "Error",
-        description: "Failed to create post. Please try again.",
+        description: errorMessage,
         variant: "destructive"
       });
     } finally {

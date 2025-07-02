@@ -142,6 +142,13 @@ const BottomNavigation = () => {
       count: files.length,
       files: files.map(f => ({ name: f.name, type: f.type, size: f.size }))
     });
+    
+    if (files.length === 0) {
+      console.error('No files received in handleMultipleFilesSelected');
+      showConfirmationToast('No files were selected. Please try again.');
+      return;
+    }
+    
     setLocalSelectedTags([]);
     // Pass the first file as main file and the rest as additional files
     openComposer(files[0], files.slice(1));

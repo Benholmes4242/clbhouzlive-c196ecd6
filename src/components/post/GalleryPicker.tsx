@@ -30,14 +30,22 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
   };
 
   const handleFileSelection = (files: FileList | null) => {
-    if (!files || files.length === 0) return;
+    if (!files || files.length === 0) {
+      console.log('No files selected');
+      return;
+    }
 
     const fileArray = Array.from(files);
+    console.log(`GalleryPicker handleFileSelection: ${fileArray.length} files selected`, {
+      files: fileArray.map(f => ({ name: f.name, type: f.type, size: f.size }))
+    });
     
     if (fileArray.length === 1) {
+      console.log('Single file selected, calling onFileSelected and closing');
       onFileSelected(fileArray[0]);
       onClose();
     } else {
+      console.log('Multiple files selected, entering multi-select mode');
       // Multiple files - enter multi-select mode
       setSelectedFiles(fileArray);
       const urls = fileArray.map(file => URL.createObjectURL(file));
@@ -47,18 +55,21 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
   };
 
   const handleCameraClick = () => {
+    console.log('Camera button clicked');
     const input = createFileInput('image/*,video/*', false, 'environment');
     input.onchange = (e) => handleFileSelection((e.target as HTMLInputElement).files);
     input.click();
   };
 
   const handlePhotoClick = () => {
+    console.log('Photo gallery button clicked (allows multiple)');
     const input = createFileInput('image/jpeg,image/jpg,image/png,image/gif,image/webp');
     input.onchange = (e) => handleFileSelection((e.target as HTMLInputElement).files);
     input.click();
   };
 
   const handleVideoClick = () => {
+    console.log('Video gallery button clicked (allows multiple)');
     const input = createFileInput('video/*');
     input.onchange = (e) => handleFileSelection((e.target as HTMLInputElement).files);
     input.click();
@@ -80,10 +91,14 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
   };
 
   const handleConfirmSelection = () => {
+    console.log(`GalleryPicker handleConfirmSelection: ${selectedFiles.length} files to confirm`);
+    
     if (selectedFiles.length > 0) {
       if (onMultipleFilesSelected) {
+        console.log('Calling onMultipleFilesSelected with files:', selectedFiles.map(f => f.name));
         onMultipleFilesSelected(selectedFiles);
       } else {
+        console.log('onMultipleFilesSelected not available, falling back to single file');
         onFileSelected(selectedFiles[0]);
       }
       
@@ -93,6 +108,8 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
       setPreviewUrls([]);
       setIsMultiSelectMode(false);
       onClose();
+    } else {
+      console.log('No files to confirm selection');
     }
   };
 
