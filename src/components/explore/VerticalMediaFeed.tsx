@@ -208,7 +208,7 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
                   {/* Video Controls */}
                   <button
                     onClick={() => setIsMuted(!isMuted)}
-                    className="absolute top-16 right-4 z-10 flex items-center justify-center w-10 h-10 text-white bg-black/50 hover:bg-black/70 rounded-full transition-colors"
+                    className="absolute top-4 right-16 z-10 flex items-center justify-center w-10 h-10 text-white bg-black/50 hover:bg-black/70 rounded-full transition-colors"
                   >
                     {isMuted ? <VolumeX className="h-5 w-5" /> : <Volume2 className="h-5 w-5" />}
                   </button>
