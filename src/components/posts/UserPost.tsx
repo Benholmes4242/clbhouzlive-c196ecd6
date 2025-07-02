@@ -28,6 +28,8 @@ import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { useFullscreenMedia } from '@/hooks/useFullscreenMedia';
 import { showToast } from '@/utils/toast';
 import HighQualityImage from '@/components/ui/high-quality-image';
+import PostViewerModal from './PostViewerModal';
+import { usePostViewer } from '@/hooks/usePostViewer';
 
 interface PostMedia {
   id: string;
@@ -59,18 +61,21 @@ interface UserPostData {
 
 interface UserPostProps {
   post: UserPostData;
+  allUserPosts?: UserPostData[];
+  source?: 'clubhouse' | 'profile';
   onPostUpdated?: () => void;
   onPostDeleted?: () => void;
 }
 
-const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
+const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated, onPostDeleted }: UserPostProps) => {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const { toast } = useToast();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [golfCourse, setGolfCourse] = useState<any>(null);
-  const { isOpen, currentMedia, openMedia, closeMedia } = useFullscreenMedia();
+  const { isOpen, currentPost, allUserPosts: viewerPosts, openPostViewer, closePostViewer } = usePostViewer({ source });
+  const { isOpen: isFullscreenOpen, currentMedia, openMedia, closeMedia } = useFullscreenMedia();
 
   const displayName = post.user.display_name || post.user.username || 'User';
   const timeAgo = formatDistanceToNow(new Date(post.created_at), { addSuffix: true });
@@ -152,8 +157,38 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
     navigate(`/profile/${post.user.username}`);
   };
 
+  const handlePostClick = () => {
+    // Transform post data to match PostViewerModal interface
+    const transformedPost = {
+      ...post,
+      golfCourse: golfCourse ? {
+        id: golfCourse.id,
+        name: golfCourse.name,
+        country: golfCourse.country,
+        region: golfCourse.region
+      } : undefined
+    };
+    
+    const transformedPosts = allUserPosts.map(p => ({
+      ...p,
+      golfCourse: golfCourse ? {
+        id: golfCourse.id,
+        name: golfCourse.name,
+        country: golfCourse.country,
+        region: golfCourse.region
+      } : undefined
+    }));
+    
+    openPostViewer(transformedPost, transformedPosts);
+  };
+
   const handleMediaClick = (mediaUrl: string, mediaType: 'image' | 'video') => {
-    openMedia(mediaUrl, mediaType, undefined, golfCourse ? { id: golfCourse.id, name: golfCourse.name, country: golfCourse.country } : undefined);
+    // On mobile or when viewer is available, open post viewer, otherwise use fullscreen
+    if (source === 'clubhouse' || source === 'profile') {
+      handlePostClick();
+    } else {
+      openMedia(mediaUrl, mediaType, undefined, golfCourse ? { id: golfCourse.id, name: golfCourse.name, country: golfCourse.country } : undefined);
+    }
   };
 
   // Create carousel items from media
@@ -312,8 +347,19 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
         onPostUpdated={onPostUpdated}
       />
 
+      {/* Post Viewer Modal for clubhouse and profile sources */}
+      {(source === 'clubhouse' || source === 'profile') && currentPost && (
+        <PostViewerModal
+          isOpen={isOpen}
+          onClose={closePostViewer}
+          initialPost={currentPost}
+          allUserPosts={viewerPosts}
+        />
+      )}
+
+      {/* Fallback fullscreen modal for other sources */}
       <FullscreenMediaModal
-        isOpen={isOpen}
+        isOpen={isFullscreenOpen}
         onClose={closeMedia}
         mediaUrl={currentMedia?.url || ''}
         mediaType={currentMedia?.type || 'image'}
