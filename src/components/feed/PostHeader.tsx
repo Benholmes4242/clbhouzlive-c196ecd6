@@ -2,6 +2,7 @@
 import React from 'react';
 import { MoreHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 interface PostHeaderProps {
   user: {
@@ -15,17 +16,28 @@ interface PostHeaderProps {
 }
 
 const PostHeader = ({ user, type, timeAgo }: PostHeaderProps) => {
+  const navigate = useNavigate();
+
+  const handleProfileClick = () => {
+    navigate(`/profile/${user.username}`);
+  };
   return (
     <div className="flex items-center justify-between mb-3">
       <div className="flex items-center space-x-3">
         <img
           src={user.avatar}
           alt={user.name}
-          className="w-10 h-10 rounded-full object-cover"
+          className="w-12 h-12 rounded-full object-cover cursor-pointer hover:opacity-80 transition-opacity border-2 border-gray-200"
+          onClick={handleProfileClick}
         />
         <div>
           <div className="flex items-center space-x-1">
-            <span className="font-semibold text-sm">{user.name}</span>
+            <span 
+              className="font-semibold text-sm cursor-pointer hover:text-primary transition-colors"
+              onClick={handleProfileClick}
+            >
+              {user.name}
+            </span>
             {user.verified && (
               <div className="w-4 h-4 bg-green-600 rounded-full flex items-center justify-center">
                 <div className="w-2 h-2 bg-white rounded-full" />
@@ -35,7 +47,16 @@ const PostHeader = ({ user, type, timeAgo }: PostHeaderProps) => {
               <span className="text-xs bg-red-500 text-white px-2 py-0.5 rounded">YouTube</span>
             )}
           </div>
-          <span className="text-xs text-muted-foreground">{user.username} • {timeAgo}</span>
+          <span className="text-xs text-muted-foreground">
+            <span 
+              className="cursor-pointer hover:text-foreground transition-colors"
+              onClick={handleProfileClick}
+            >
+              {user.username}
+            </span>
+            {' • '}
+            {timeAgo}
+          </span>
         </div>
       </div>
       <Button variant="ghost" size="icon">

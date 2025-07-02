@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MoreHorizontal, Heart, MessageCircle, Share, Edit, Trash2 } from 'lucide-react';
@@ -62,6 +63,7 @@ interface UserPostProps {
 }
 
 const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
+  const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const { toast } = useToast();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -145,6 +147,10 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
     }
   };
 
+  const handleProfileClick = () => {
+    navigate(`/profile/${post.user.username}`);
+  };
+
   const handleMediaClick = (mediaUrl: string, mediaType: 'image' | 'video') => {
     openMedia(mediaUrl, mediaType);
   };
@@ -196,11 +202,17 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
             <img
               src={post.user.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
               alt={displayName}
-              className="w-10 h-10 rounded-full object-cover"
+              className="w-12 h-12 rounded-full object-cover cursor-pointer hover:opacity-80 transition-opacity border-2 border-gray-200"
+              onClick={handleProfileClick}
             />
             <div>
               <div className="flex items-center space-x-1">
-                <span className="font-semibold text-sm">{displayName}</span>
+                <span 
+                  className="font-semibold text-sm cursor-pointer hover:text-primary transition-colors"
+                  onClick={handleProfileClick}
+                >
+                  {displayName}
+                </span>
               </div>
               <span className="text-xs text-muted-foreground">{timeAgo}</span>
             </div>
