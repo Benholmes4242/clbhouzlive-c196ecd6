@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { VideoAutoplayProvider } from '@/hooks/useVideoAutoplayManager';
+import PasswordProtection from "@/components/PasswordProtection";
 import Index from "./pages/Index";
 
 const Auth = lazy(() => import("./pages/Auth"));
@@ -43,7 +44,8 @@ const App: React.FC = () => {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <VideoAutoplayProvider>
-          <BrowserRouter>
+          <PasswordProtection>
+            <BrowserRouter>
             <Suspense fallback={
               <div className="min-h-screen bg-background flex items-center justify-center">
                 <div className="text-center">
@@ -81,9 +83,10 @@ const App: React.FC = () => {
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
-            <Toaster />
-            <Sonner />
-          </BrowserRouter>
+              <Toaster />
+              <Sonner />
+            </BrowserRouter>
+          </PasswordProtection>
         </VideoAutoplayProvider>
       </TooltipProvider>
     </QueryClientProvider>
