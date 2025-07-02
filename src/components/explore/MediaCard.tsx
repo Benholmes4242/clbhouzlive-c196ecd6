@@ -164,6 +164,7 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, ...props 
         mediaUrl={currentMedia?.url || ''}
         mediaType={currentMedia?.type || 'image'}
         alt={currentMedia?.alt}
+        golfCourse={item.golfCourse}
       />
     </>
   );

@@ -1,6 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Volume2, VolumeX } from 'lucide-react';
+import GolfCoursePin from '../posts/GolfCoursePin';
 
 interface FullscreenMediaModalProps {
   isOpen: boolean;
@@ -8,6 +9,11 @@ interface FullscreenMediaModalProps {
   mediaUrl: string;
   mediaType: 'image' | 'video';
   alt?: string;
+  golfCourse?: {
+    id: string;
+    name: string;
+    country: string;
+  };
 }
 
 const FullscreenMediaModal = ({ 
@@ -15,7 +21,8 @@ const FullscreenMediaModal = ({
   onClose, 
   mediaUrl, 
   mediaType, 
-  alt = "Media content" 
+  alt = "Media content",
+  golfCourse
 }: FullscreenMediaModalProps) => {
   const [isMuted, setIsMuted] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -82,27 +89,39 @@ const FullscreenMediaModal = ({
             )}
           </button>
         )}
+
+        {/* Golf Course Badge - Top Right */}
+        {golfCourse && (
+          <GolfCoursePin 
+            courseName={golfCourse.name}
+            courseRegion={golfCourse.country}
+          />
+        )}
       </div>
 
       {/* Media Content - Centered and properly sized */}
       {mediaType === 'image' ? (
-        <img
-          src={mediaUrl}
-          alt={alt}
-          className="max-w-[90vw] max-h-[90vh] w-auto h-auto object-contain"
-          draggable={false}
-        />
+        <div className="relative">
+          <img
+            src={mediaUrl}
+            alt={alt}
+            className="max-w-[90vw] max-h-[90vh] w-auto h-auto object-contain"
+            draggable={false}
+          />
+        </div>
       ) : (
-        <video
-          ref={videoRef}
-          src={mediaUrl}
-          className="max-w-[90vw] max-h-[90vh] w-auto h-auto object-contain"
-          muted={isMuted}
-          controls={false}
-          loop
-          playsInline
-          autoPlay
-        />
+        <div className="relative">
+          <video
+            ref={videoRef}
+            src={mediaUrl}
+            className="max-w-[90vw] max-h-[90vh] w-auto h-auto object-contain"
+            muted={isMuted}
+            controls={false}
+            loop
+            playsInline
+            autoPlay
+          />
+        </div>
       )}
     </div>
   );

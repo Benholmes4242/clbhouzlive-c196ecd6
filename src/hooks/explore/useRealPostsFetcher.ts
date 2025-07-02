@@ -6,6 +6,7 @@ import { isValidImageUrl } from './urlValidation';
 export const useRealPostsFetcher = () => {
   const fetchRealPosts = async (currentOffset: number, postsPerPage: number): Promise<ExploreContentItem[]> => {
     try {
+      console.log('=== EXPLORE FETCH DEBUG ===');
       console.log('Fetching real posts from offset:', currentOffset);
       
       const { data: postsData, error } = await supabase
