@@ -23,7 +23,7 @@ export const useRealPostsFetcher = () => {
           post_tags (
             id,
             tagged_entity_id,
-            taggable_entities!inner (
+            taggable_entities (
               id,
               entity_type,
               entity_id,
