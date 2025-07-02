@@ -102,7 +102,7 @@ const FullscreenMediaModal = ({
                   name: golfCourse.name,
                   country: golfCourse.country
                 }}
-                className="relative top-0 right-0"
+                className="relative top-0 right-0 mr-2"
               />
             </div>
           )}

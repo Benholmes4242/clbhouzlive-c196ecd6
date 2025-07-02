@@ -194,7 +194,7 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
                   
                   {/* Golf Course Badge */}
                   {item.golfCourse && (
-                    <div className="absolute top-4 right-4 z-10">
+                    <div className="absolute top-4 right-8 z-10">
                       <CoursePostBadge 
                         course={{
                           id: item.golfCourse.id,
@@ -226,7 +226,7 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
                   
                   {/* Golf Course Badge */}
                   {item.golfCourse && (
-                    <div className="absolute top-4 right-4 z-10">
+                    <div className="absolute top-4 right-8 z-10">
                       <CoursePostBadge 
                         course={{
                           id: item.golfCourse.id,
