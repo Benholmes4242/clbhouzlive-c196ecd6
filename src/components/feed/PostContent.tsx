@@ -5,6 +5,7 @@ import { SwipeCarousel } from '@/components/ui/swipe-carousel';
 import CoursePostBadge from '../posts/CoursePostBadge';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { useFullscreenMedia } from '@/hooks/useFullscreenMedia';
+import HighQualityImage from '@/components/ui/high-quality-image';
 
 interface PostContentProps {
   content: {
@@ -92,11 +93,10 @@ const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentPr
   // Create image elements with golf course pin overlay
   const createImageWithPin = (imageUrl: string, index: number) => (
     <div key={index} className="relative">
-      <img
+      <HighQualityImage
         src={imageUrl}
         alt={`Post content ${index + 1}`}
-        className="w-full h-80 object-cover object-center cursor-pointer"
-        loading="lazy"
+        className="w-full h-80 cursor-pointer"
         onClick={() => handleImageClick(imageUrl)}
       />
       {/* Golf Course Badge overlay */}
@@ -143,11 +143,10 @@ const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentPr
                     className="relative cursor-pointer group"
                     onClick={handleYouTubeClick}
                   >
-                    <img
+                    <HighQualityImage
                       src={content.thumbnail || getYouTubeThumbnail(content.youtubeId)}
                       alt="Video thumbnail"
-                      className="w-full h-80 object-cover object-center"
-                      loading="lazy"
+                      className="w-full h-80"
                       onError={(e) => {
                         // Fallback to lower quality if maxres fails
                         const target = e.target as HTMLImageElement;

@@ -7,6 +7,7 @@ import VideoPreview from '@/components/posts/VideoPreview';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useProfileActions } from '@/components/profile/actions/useProfileActions';
 import { useNavigate } from 'react-router-dom';
+import HighQualityImage from '@/components/ui/high-quality-image';
 
 interface UserPost {
   id: string;
@@ -155,7 +156,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, currentUserId }) => {
           className="w-full h-48 object-cover object-center"
         />
       ) : (
-        <img src={player.contentImage} alt={player.name} className="w-full h-48 object-cover object-center" />
+        <HighQualityImage src={player.contentImage} alt={player.name} className="w-full h-48" />
       )}
       
       <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
@@ -168,10 +169,12 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, currentUserId }) => {
       
       <div className="absolute bottom-4 left-4 right-4">
         <div className="flex items-center gap-3 mb-3">
-          <img 
+          <HighQualityImage 
             src={player.avatar} 
             alt={player.name} 
-            className="w-16 h-16 rounded-[14px] object-cover object-center border-2 border-white cursor-pointer hover:border-white/80 transition-colors hq-image" 
+            className="w-16 h-16 rounded-[14px] border-2 border-white cursor-pointer hover:border-white/80 transition-colors" 
+            width={64}
+            height={64}
             onClick={handleProfileClick}
           />
           <div className="flex-1 min-w-0">
