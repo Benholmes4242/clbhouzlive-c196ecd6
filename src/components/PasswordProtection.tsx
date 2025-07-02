@@ -43,7 +43,7 @@ const PasswordProtection: React.FC<PasswordProtectionProps> = ({ children }) => 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (password === 'mypassword') {
+    if (password === 'Gsieieh**@&995') {
       setIsAuthenticated(true);
       const currentDomain = window.location.hostname;
       localStorage.setItem('siteAuthenticated', 'true');
