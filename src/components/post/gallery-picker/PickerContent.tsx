@@ -39,7 +39,7 @@ const PickerContent: React.FC<PickerContentProps> = ({
         Select Videos
       </Button>
 
-      <p className="text-center text-xs text-gray-500 mt-2 px-2 leading-relaxed">
+      <p className="text-center text-xs text-gray-500 mt-1 px-2 leading-relaxed">
         Select multiple files to create a carousel post with swipeable media.
       </p>
     </div>

@@ -116,7 +116,7 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
           {/* Top accent bar */}
           <div className="absolute top-0 left-0 w-full h-0.5 bg-[#6e9277] rounded-t-xl" />
           
-          <div className="px-2 pt-2 pb-2">
+          <div className="px-2 pt-2 pb-1">
             <SheetHeader className="mb-2">
               <SheetTitle className="text-center text-sm font-semibold">
                 {isMultiSelectMode ? 'Selected Media' : 'Create a Moment'}
@@ -155,7 +155,7 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
         {/* Top accent bar */}
         <div className="absolute top-0 left-0 w-full h-0.5 bg-[#6e9277] rounded-t-xl" />
         
-        <div className="px-2 pt-2 pb-2">
+        <div className="px-2 pt-2 pb-1">
           <DialogHeader className="mb-2">
             <DialogTitle className="text-center text-sm font-semibold">
               {isMultiSelectMode ? 'Selected Media' : 'Create a Moment'}
