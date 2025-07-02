@@ -282,7 +282,7 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white"
+                          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-muted text-white hover:text-foreground"
                           onClick={() => navigateMedia('prev')}
                           disabled={currentMediaIndex === 0}
                         >
@@ -291,7 +291,7 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white"
+                          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-muted text-white hover:text-foreground"
                           onClick={() => navigateMedia('next')}
                           disabled={currentMediaIndex === currentPost.post_media.length - 1}
                         >
@@ -308,7 +308,7 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="absolute left-4 bottom-4 bg-black/50 hover:bg-black/70 text-white"
+                      className="absolute left-4 bottom-4 bg-black/50 hover:bg-muted text-white hover:text-foreground"
                       onClick={() => navigatePost('prev')}
                       disabled={currentPostIndex === 0}
                     >
@@ -317,7 +317,7 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="absolute right-4 bottom-4 bg-black/50 hover:bg-black/70 text-white"
+                      className="absolute right-4 bottom-4 bg-black/50 hover:bg-muted text-white hover:text-foreground"
                       onClick={() => navigatePost('next')}
                     >
                       <ChevronRight className="h-5 w-5" />
@@ -344,14 +344,6 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                         <p className="text-xs text-muted-foreground">{timeAgo}</p>
                       </div>
                     </div>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      onClick={onClose}
-                      className="hover:bg-muted"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
                   </div>
                   
                   {currentPost.content && (
