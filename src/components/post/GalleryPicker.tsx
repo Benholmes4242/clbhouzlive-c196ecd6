@@ -179,16 +179,18 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
         <MultiSelectPreview />
       ) : (
         <div className="space-y-4">
-          <Button
-            onClick={handleCameraClick}
-            className="w-full h-auto p-4 bg-white border-2 border-[#b66b41] text-[#b66b41] hover:bg-[#b66b41] hover:text-white transition-all duration-200 rounded-xl flex items-start gap-4 cursor-pointer"
-          >
-            <Camera className="h-6 w-6 mt-1 flex-shrink-0" />
-            <div className="text-left">
-              <div className="font-bold text-base">Capture Photo or Video</div>
-              <div className="text-sm opacity-70 font-normal">High quality camera</div>
-            </div>
-          </Button>
+          {isMobile && (
+            <Button
+              onClick={handleCameraClick}
+              className="w-full h-auto p-4 bg-white border-2 border-[#b66b41] text-[#b66b41] hover:bg-[#b66b41] hover:text-white transition-all duration-200 rounded-xl flex items-start gap-4 cursor-pointer"
+            >
+              <Camera className="h-6 w-6 mt-1 flex-shrink-0" />
+              <div className="text-left">
+                <div className="font-bold text-base">Capture Photo or Video</div>
+                <div className="text-sm opacity-70 font-normal">High quality camera</div>
+              </div>
+            </Button>
+          )}
 
           <Button
             onClick={handlePhotoClick}
