@@ -69,6 +69,9 @@ export const useRealPostsFetcher = () => {
         .map(tag => tag.taggable_entities?.entity_id)
         .filter(Boolean);
 
+      console.log('Golf course IDs found:', golfCourseIds);
+      console.log('Post tags data:', postsData.map(p => ({ id: p.id, tags: p.post_tags })));
+
       let golfCourses: any[] = [];
       if (golfCourseIds.length > 0) {
         const { data: coursesData } = await supabase

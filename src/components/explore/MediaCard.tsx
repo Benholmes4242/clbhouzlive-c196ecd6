@@ -24,7 +24,8 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, ...props 
     type: item.type,
     src: item.src,
     title: item.title,
-    hasValidSrc: !!item.src && item.src.length > 0
+    hasValidSrc: !!item.src && item.src.length > 0,
+    golfCourse: item.golfCourse
   });
 
   const handleLike = (e: React.MouseEvent) => {
