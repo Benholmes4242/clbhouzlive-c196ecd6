@@ -20,7 +20,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
         src="/lovable-uploads/cfa68cd0-ff45-4b63-8910-d4126bb9aa88.png"
         alt="clbhouz Logo"
         className="mb-6"
-        style={{ width: 200, maxWidth: "80%" }}
+        style={{ width: 250, maxWidth: "80%" }}
       />
       {children}
       <button
