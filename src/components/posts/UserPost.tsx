@@ -27,6 +27,7 @@ import CoursePostBadge from './CoursePostBadge';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { useFullscreenMedia } from '@/hooks/useFullscreenMedia';
 import { showToast } from '@/utils/toast';
+import HighQualityImage from '@/components/ui/high-quality-image';
 
 interface PostMedia {
   id: string;
@@ -199,12 +200,14 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
         {/* Post Header */}
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center space-x-3">
-            <img
-              src={post.user.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
-              alt={displayName}
-              className="w-16 h-16 rounded-[14px] object-cover cursor-pointer hover:opacity-80 transition-opacity border-2 border-gray-200 hq-image"
-              onClick={handleProfileClick}
-            />
+              <HighQualityImage
+                src={post.user.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
+                alt={displayName}
+                className="w-16 h-16 rounded-[14px] border-2 border-gray-200 cursor-pointer hover:opacity-80 transition-opacity"
+                width={64}
+                height={64}
+                onClick={handleProfileClick}
+              />
             <div>
               <div className="flex items-center space-x-1">
                 <span 

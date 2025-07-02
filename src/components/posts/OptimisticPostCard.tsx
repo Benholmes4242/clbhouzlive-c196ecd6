@@ -1,5 +1,6 @@
 
 import React from 'react';
+import HighQualityImage from '@/components/ui/high-quality-image';
 import { Card } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
@@ -40,12 +41,15 @@ const OptimisticPostCard = ({ post, onRetry }: OptimisticPostCardProps) => {
       <div className="p-4">
         {/* Header */}
         <div className="flex items-center gap-3 mb-3">
-          <Avatar className="h-10 w-10">
-            <AvatarImage src={post.user.profile_photo_url || undefined} />
-            <AvatarFallback>
-              {post.user.display_name?.[0] || post.user.username?.[0] || 'U'}
-            </AvatarFallback>
-          </Avatar>
+          <div className="h-10 w-10 rounded-full overflow-hidden">
+            <HighQualityImage
+              src={post.user.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
+              alt={post.user.display_name || post.user.username || 'User'}
+              className="w-full h-full"
+              width={40}
+              height={40}
+            />
+          </div>
           <div className="flex-1">
             <div className="flex items-center gap-2">
               <h3 className="font-semibold text-sm">

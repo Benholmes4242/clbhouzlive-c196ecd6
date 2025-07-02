@@ -3,6 +3,7 @@ import React from 'react';
 import { MoreHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import HighQualityImage from '@/components/ui/high-quality-image';
 
 interface PostHeaderProps {
   user: {
@@ -24,10 +25,12 @@ const PostHeader = ({ user, type, timeAgo }: PostHeaderProps) => {
   return (
     <div className="flex items-center justify-between mb-3">
       <div className="flex items-center space-x-3">
-        <img
+        <HighQualityImage
           src={user.avatar}
           alt={user.name}
-          className="w-16 h-16 rounded-[14px] object-cover cursor-pointer hover:opacity-80 transition-opacity border-2 border-gray-200 hq-image"
+          className="w-16 h-16 rounded-[14px] border-2 border-gray-200 cursor-pointer hover:opacity-80 transition-opacity"
+          width={64}
+          height={64}
           onClick={handleProfileClick}
         />
         <div>
