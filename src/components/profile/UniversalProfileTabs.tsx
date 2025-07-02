@@ -25,15 +25,13 @@ const UniversalProfileTabs: React.FC<UniversalProfileTabsProps> = ({
   return (
     <div className="mt-6">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className={`grid w-full ${isOwnProfile ? 'grid-cols-3' : 'grid-cols-2'} mb-6`}>
+        <TabsList className="grid w-full grid-cols-3 mb-6">
           <TabsTrigger value="activity" className="text-sm font-medium">
             Activity
           </TabsTrigger>
-          {isOwnProfile && (
-            <TabsTrigger value="handicap" className="text-sm font-medium">
-              Handicap & Rounds
-            </TabsTrigger>
-          )}
+          <TabsTrigger value="handicap" className="text-sm font-medium">
+            Handicap & Rounds
+          </TabsTrigger>
           <TabsTrigger value="top100" className="text-sm font-medium">
             Top 100
           </TabsTrigger>
@@ -48,11 +46,9 @@ const UniversalProfileTabs: React.FC<UniversalProfileTabsProps> = ({
           />
         </TabsContent>
 
-        {isOwnProfile && (
-          <TabsContent value="handicap" className="mt-0">
-            <HandicapSection userId={userId} profile={profile} />
-          </TabsContent>
-        )}
+        <TabsContent value="handicap" className="mt-0">
+          <HandicapSection userId={userId} profile={profile} />
+        </TabsContent>
 
         <TabsContent value="top100" className="mt-0">
           <UserCoursesContent username={profile?.username} />
