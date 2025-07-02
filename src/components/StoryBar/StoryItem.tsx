@@ -33,21 +33,21 @@ const StoryItem: React.FC<StoryItemProps> = ({
             type="button"
             onClick={onYourProfileClick}
             aria-label="View your profile"
-            className="focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 rounded-full"
+            className="focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 rounded-[14px]"
           >
             {hasProfile && story.avatar ? (
               // User has a profile photo - show with green ring
-              <div className="w-16 h-16 rounded-full p-0.5 bg-gradient-to-tr from-green-500 to-green-700 hover:opacity-80 transition-opacity">
+              <div className="w-16 h-16 rounded-[14px] p-0.5 bg-gradient-to-tr from-green-500 to-green-700 hover:opacity-80 transition-opacity">
                 <img
                   src={story.avatar}
                   alt={story.user}
-                  className="w-full h-full rounded-full object-cover border-2 border-background"
+                  className="w-full h-full rounded-[12px] object-cover border-2 border-background"
                 />
               </div>
             ) : (
               // User doesn't have a profile photo - show plus icon with green ring
-              <div className="w-16 h-16 rounded-full p-0.5 bg-gradient-to-tr from-green-500 to-green-700 hover:opacity-80 transition-opacity flex items-center justify-center">
-                <div className="w-full h-full bg-muted border-2 border-dashed border-gray-400 rounded-full flex items-center justify-center hover:bg-muted/80 transition-colors">
+              <div className="w-16 h-16 rounded-[14px] p-0.5 bg-gradient-to-tr from-green-500 to-green-700 hover:opacity-80 transition-opacity flex items-center justify-center">
+                <div className="w-full h-full bg-muted border-2 border-dashed border-gray-400 rounded-[12px] flex items-center justify-center hover:bg-muted/80 transition-colors">
                   <Plus className="h-6 w-6 text-muted-foreground" />
                 </div>
               </div>
@@ -58,18 +58,18 @@ const StoryItem: React.FC<StoryItemProps> = ({
             type="button"
             onClick={() => onOtherProfileClick(story.username)}
             aria-label={`View ${story.user}'s profile`}
-            className="focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-full"
+            className="focus:outline-none focus:ring-2 focus:ring-offset-2 rounded-[14px]"
             style={{ '--tw-ring-color': '#6e9277' } as React.CSSProperties}
           >
             <div 
-              className="w-16 h-16 rounded-full p-0.5 hover:opacity-80 transition-opacity"
+              className="w-16 h-16 rounded-[14px] p-0.5 hover:opacity-80 transition-opacity"
               style={{ background: 'linear-gradient(to top right, #6e9277, #5a7a63)' }}
             >
               {story.avatar ? (
                 <img
                   src={story.avatar}
                   alt={story.user}
-                  className="w-full h-full rounded-full object-cover border-2 border-background"
+                  className="w-full h-full rounded-[12px] object-cover border-2 border-background"
                   onError={(e) => {
                     console.log('Image failed to load:', story.avatar);
                     e.currentTarget.style.display = 'none';
@@ -77,7 +77,7 @@ const StoryItem: React.FC<StoryItemProps> = ({
                   }}
                 />
               ) : null}
-              <div className={`w-full h-full bg-muted rounded-full flex items-center justify-center border-2 border-background ${story.avatar ? 'hidden' : ''}`}>
+              <div className={`w-full h-full bg-muted rounded-[12px] flex items-center justify-center border-2 border-background ${story.avatar ? 'hidden' : ''}`}>
                 <User className="h-8 w-8 text-muted-foreground" />
               </div>
             </div>

@@ -27,7 +27,7 @@ const PostHeader = ({ user, type, timeAgo }: PostHeaderProps) => {
         <img
           src={user.avatar}
           alt={user.name}
-          className="w-16 h-16 rounded-full object-cover cursor-pointer hover:opacity-80 transition-opacity border-2 border-gray-200"
+          className="w-16 h-16 rounded-[14px] object-cover cursor-pointer hover:opacity-80 transition-opacity border-2 border-gray-200"
           onClick={handleProfileClick}
         />
         <div>
