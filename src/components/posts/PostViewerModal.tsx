@@ -67,6 +67,31 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
   const displayName = currentPost.user.display_name || currentPost.user.username || 'User';
   const timeAgo = formatDistanceToNow(new Date(currentPost.created_at), { addSuffix: true });
 
+  // Extract golf course from either golfCourse field or post_tags
+  const getGolfCourse = () => {
+    if (currentPost.golfCourse) {
+      return currentPost.golfCourse;
+    }
+    
+    // Look for golf course in post_tags
+    const golfCourseTag = currentPost.post_tags?.find(tag => 
+      tag.tagged_entity?.entity_type === 'golf_club'
+    );
+    
+    if (golfCourseTag?.tagged_entity) {
+      return {
+        id: golfCourseTag.tagged_entity.entity_id,
+        name: golfCourseTag.tagged_entity.name,
+        country: '', // May not be available in tagged entity
+        region: ''
+      };
+    }
+    
+    return null;
+  };
+
+  const golfCourse = getGolfCourse();
+
   const navigatePost = useCallback((direction: 'prev' | 'next') => {
     let newIndex = currentPostIndex;
     
@@ -181,10 +206,10 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                     )}
                     
                     {/* Golf Course Badge */}
-                    {currentPost.golfCourse && (
+                    {golfCourse && (
                       <div className="absolute top-4 right-4 z-10">
                         <CoursePostBadge 
-                          course={currentPost.golfCourse}
+                          course={golfCourse}
                           className="m-0"
                         />
                       </div>
@@ -267,10 +292,10 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                     )}
 
                     {/* Golf Course Badge */}
-                    {currentPost.golfCourse && (
+                    {golfCourse && (
                       <div className="absolute top-4 right-4 z-10">
                         <CoursePostBadge 
-                          course={currentPost.golfCourse}
+                          course={golfCourse}
                           className="m-0"
                         />
                       </div>
