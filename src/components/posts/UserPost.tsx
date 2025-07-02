@@ -152,7 +152,7 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
   };
 
   const handleMediaClick = (mediaUrl: string, mediaType: 'image' | 'video') => {
-    openMedia(mediaUrl, mediaType);
+    openMedia(mediaUrl, mediaType, undefined, golfCourse ? { id: golfCourse.id, name: golfCourse.name, country: golfCourse.country } : undefined);
   };
 
   // Create carousel items from media
@@ -315,6 +315,7 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
         mediaUrl={currentMedia?.url || ''}
         mediaType={currentMedia?.type || 'image'}
         alt={currentMedia?.alt}
+        golfCourse={currentMedia?.golfCourse}
       />
     </>
   );

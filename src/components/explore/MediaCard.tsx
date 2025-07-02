@@ -41,7 +41,7 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, ...props 
       if (props.onMediaClick) {
         props.onMediaClick(item);
       } else {
-        openMedia(imageError ? fallbackImage : item.src, item.type, item.title);
+        openMedia(imageError ? fallbackImage : item.src, item.type, item.title, item.golfCourse);
       }
     }
   };
@@ -165,7 +165,7 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, ...props 
         mediaUrl={currentMedia?.url || ''}
         mediaType={currentMedia?.type || 'image'}
         alt={currentMedia?.alt}
-        golfCourse={item.golfCourse}
+        golfCourse={currentMedia?.golfCourse}
       />
     </>
   );
