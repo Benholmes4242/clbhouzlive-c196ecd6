@@ -202,13 +202,13 @@ const UserPost = ({ post, onPostUpdated, onPostDeleted }: UserPostProps) => {
             <img
               src={post.user.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
               alt={displayName}
-              className="w-12 h-12 rounded-full object-cover cursor-pointer hover:opacity-80 transition-opacity border-2 border-gray-200"
+              className="w-16 h-16 rounded-full object-cover cursor-pointer hover:opacity-80 transition-opacity border-2 border-gray-200"
               onClick={handleProfileClick}
             />
             <div>
               <div className="flex items-center space-x-1">
                 <span 
-                  className="font-semibold text-sm cursor-pointer hover:text-primary transition-colors"
+                  className="font-semibold text-sm cursor-pointer hover:text-gray-400 transition-colors"
                   onClick={handleProfileClick}
                 >
                   {displayName}

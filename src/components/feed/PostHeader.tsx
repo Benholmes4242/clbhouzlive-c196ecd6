@@ -27,13 +27,13 @@ const PostHeader = ({ user, type, timeAgo }: PostHeaderProps) => {
         <img
           src={user.avatar}
           alt={user.name}
-          className="w-12 h-12 rounded-full object-cover cursor-pointer hover:opacity-80 transition-opacity border-2 border-gray-200"
+          className="w-16 h-16 rounded-full object-cover cursor-pointer hover:opacity-80 transition-opacity border-2 border-gray-200"
           onClick={handleProfileClick}
         />
         <div>
           <div className="flex items-center space-x-1">
             <span 
-              className="font-semibold text-sm cursor-pointer hover:text-primary transition-colors"
+              className="font-semibold text-sm cursor-pointer hover:text-gray-400 transition-colors"
               onClick={handleProfileClick}
             >
               {user.name}
