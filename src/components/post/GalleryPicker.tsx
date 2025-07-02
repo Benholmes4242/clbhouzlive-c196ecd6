@@ -178,43 +178,31 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
       {isMultiSelectMode ? (
         <MultiSelectPreview />
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {isMobile && (
             <Button
               onClick={handleCameraClick}
-              className="w-full h-auto p-4 bg-white border-2 border-[#b66b41] text-[#b66b41] hover:bg-[#b66b41] hover:text-white transition-all duration-200 rounded-xl flex items-start gap-4 cursor-pointer"
+              className="w-full h-12 px-4 bg-white border border-gray-300 text-gray-700 hover:border-gray-400 transition-all duration-200 rounded-lg flex items-center gap-3 cursor-pointer text-sm font-medium"
             >
-              <Camera className="h-6 w-6 mt-1 flex-shrink-0" />
-              <div className="text-left">
-                <div className="font-bold text-base">Capture Photo or Video</div>
-                <div className="text-sm opacity-70 font-normal">High quality camera</div>
-              </div>
+              📷 Capture Photo or Video
             </Button>
           )}
 
           <Button
             onClick={handlePhotoClick}
-            className="w-full h-auto p-4 bg-white border-2 border-[#b66b41] text-[#b66b41] hover:bg-[#b66b41] hover:text-white transition-all duration-200 rounded-xl flex items-start gap-4 cursor-pointer"
+            className="w-full h-12 px-4 bg-white border border-gray-300 text-gray-700 hover:border-gray-400 transition-all duration-200 rounded-lg flex items-center gap-3 cursor-pointer text-sm font-medium"
           >
-            <Image className="h-6 w-6 mt-1 flex-shrink-0" />
-            <div className="text-left">
-              <div className="font-bold text-base">Select Photos</div>
-              <div className="text-sm opacity-70 font-normal">Single or multiple selection</div>
-            </div>
+            🖼️ Select Photos
           </Button>
 
           <Button
             onClick={handleVideoClick}
-            className="w-full h-auto p-4 bg-white border-2 border-[#b66b41] text-[#b66b41] hover:bg-[#b66b41] hover:text-white transition-all duration-200 rounded-xl flex items-start gap-4 cursor-pointer"
+            className="w-full h-12 px-4 bg-white border border-gray-300 text-gray-700 hover:border-gray-400 transition-all duration-200 rounded-lg flex items-center gap-3 cursor-pointer text-sm font-medium"
           >
-            <Video className="h-6 w-6 mt-1 flex-shrink-0" />
-            <div className="text-left">
-              <div className="font-bold text-base">Select Videos</div>
-              <div className="text-sm opacity-70 font-normal">Single or multiple selection</div>
-            </div>
+            🎥 Select Videos
           </Button>
 
-          <p className="text-center text-sm text-gray-500 mt-6 px-4">
+          <p className="text-center text-sm text-gray-500 mt-4 px-2 leading-relaxed">
             Select multiple files to create a carousel post with swipeable media.
           </p>
         </div>
@@ -226,13 +214,28 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
   if (isMobile) {
     return (
       <Sheet open={isOpen} onOpenChange={handleClose}>
-        <SheetContent side="bottom" className="h-auto p-6 rounded-t-2xl">
-          <SheetHeader className="mb-6">
-            <SheetTitle className="text-center text-xl font-semibold">
-              {isMultiSelectMode ? 'Selected Media' : 'Create a Moment'}
-            </SheetTitle>
-          </SheetHeader>
-          <PickerContent />
+        <SheetContent 
+          side="bottom" 
+          className="h-auto p-0 rounded-t-xl border-t-4 border-t-[#6e9277] bg-white"
+          style={{
+            transform: isOpen ? 'translateY(0)' : 'translateY(100%)',
+            transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+          }}
+        >
+          {/* Top accent bar */}
+          <div className="w-full h-1 bg-[#6e9277]" />
+          
+          <div className="p-6">
+            <SheetHeader className="mb-4">
+              <SheetTitle className="text-center text-lg font-semibold">
+                {isMultiSelectMode ? 'Selected Media' : 'Create a Moment'}
+              </SheetTitle>
+            </SheetHeader>
+            <PickerContent />
+          </div>
+          
+          {/* Bottom accent bar */}
+          <div className="w-full h-1 bg-[#6e9277]" />
         </SheetContent>
       </Sheet>
     );
@@ -241,13 +244,30 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
   // Desktop Version - Dialog Modal
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="max-w-md mx-auto p-8 rounded-2xl shadow-2xl animate-scale-in">
-        <DialogHeader className="mb-8">
-          <DialogTitle className="text-center text-2xl font-semibold">
-            {isMultiSelectMode ? 'Selected Media' : 'Create a Moment'}
-          </DialogTitle>
-        </DialogHeader>
-        <PickerContent />
+      <DialogContent 
+        className="max-w-sm mx-auto p-0 rounded-xl shadow-2xl animate-scale-in bg-white border-0"
+        style={{
+          position: 'fixed',
+          bottom: '120px', // Rise from nav bar area
+          left: '50%',
+          transform: 'translateX(-50%)',
+          margin: 0
+        }}
+      >
+        {/* Top accent bar */}
+        <div className="w-full h-1 bg-[#6e9277] rounded-t-xl" />
+        
+        <div className="p-6">
+          <DialogHeader className="mb-4">
+            <DialogTitle className="text-center text-lg font-semibold">
+              {isMultiSelectMode ? 'Selected Media' : 'Create a Moment'}
+            </DialogTitle>
+          </DialogHeader>
+          <PickerContent />
+        </div>
+        
+        {/* Bottom accent bar */}
+        <div className="w-full h-1 bg-[#6e9277] rounded-b-xl" />
       </DialogContent>
     </Dialog>
   );
