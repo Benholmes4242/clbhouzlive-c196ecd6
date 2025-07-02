@@ -12,6 +12,16 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [isMultiSelectMode, setIsMultiSelectMode] = useState(false);
 
+  // Handle close function
+  const handleClose = () => {
+    // Clean up preview URLs
+    previewUrls.forEach(url => URL.revokeObjectURL(url));
+    setSelectedFiles([]);
+    setPreviewUrls([]);
+    setIsMultiSelectMode(false);
+    onClose();
+  };
+
   // Handle click outside to close
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -98,14 +108,7 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
     }
   };
 
-  const handleClose = () => {
-    // Clean up preview URLs
-    previewUrls.forEach(url => URL.revokeObjectURL(url));
-    setSelectedFiles([]);
-    setPreviewUrls([]);
-    setIsMultiSelectMode(false);
-    onClose();
-  };
+  // Remove the old handleClose function since it's now defined above
 
   const multiSelectPreview = (
     <MultiSelectPreview
