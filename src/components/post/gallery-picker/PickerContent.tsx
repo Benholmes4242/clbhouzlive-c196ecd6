@@ -19,6 +19,7 @@ const PickerContent: React.FC<PickerContentProps> = ({
       {isMobile && (
         <Button
           onClick={onCameraClick}
+          variant="outline"
           className="w-full h-8 px-3 bg-white border border-gray-300 text-gray-700 hover:border-gray-400 focus:border-gray-500 focus:outline-none transition-all duration-200 rounded-lg flex items-center gap-2 cursor-pointer text-xs font-medium"
         >
           Capture Photo or Video
@@ -27,6 +28,7 @@ const PickerContent: React.FC<PickerContentProps> = ({
 
       <Button
         onClick={onPhotoClick}
+        variant="outline"
         className="w-full h-8 px-3 bg-white border border-gray-300 text-gray-700 hover:border-gray-400 focus:border-gray-500 focus:outline-none transition-all duration-200 rounded-lg flex items-center gap-2 cursor-pointer text-xs font-medium"
       >
         Select Photos
@@ -34,6 +36,7 @@ const PickerContent: React.FC<PickerContentProps> = ({
 
       <Button
         onClick={onVideoClick}
+        variant="outline"
         className="w-full h-8 px-3 bg-white border border-gray-300 text-gray-700 hover:border-gray-400 focus:border-gray-500 focus:outline-none transition-all duration-200 rounded-lg flex items-center gap-2 cursor-pointer text-xs font-medium"
       >
         Select Videos
