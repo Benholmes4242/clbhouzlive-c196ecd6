@@ -46,33 +46,33 @@ const CourseDetailHeader = ({ course }: CourseDetailHeaderProps) => {
 
   return (
     <div className="flex flex-col space-y-4">
-      <div className="flex items-start justify-between">
-        <div className="flex-1">
-          <h2 className="text-2xl font-bold text-foreground mb-2">{course.name}</h2>
-          <div className="flex items-center gap-1 text-muted-foreground mb-4">
-            <MapPin className="h-4 w-4 flex-shrink-0" />
-            <span>{formatLocation(course)}</span>
-          </div>
+      <div>
+        <h2 className="text-2xl font-bold text-foreground mb-2">{course.name}</h2>
+        <div className="flex items-center gap-2 text-muted-foreground mb-4">
+          <MapPin className="h-4 w-4 flex-shrink-0" />
+          <span>{formatLocation(course)}</span>
+          {course.website_url && (
+            <>
+              <span className="text-muted-foreground">—</span>
+              <Button
+                variant="outline"
+                size="sm"
+                asChild
+                className="h-auto py-1 px-2 text-xs"
+              >
+                <a
+                  href={course.website_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1"
+                >
+                  <ExternalLink className="h-3 w-3" />
+                  Visit Website
+                </a>
+              </Button>
+            </>
+          )}
         </div>
-        
-        {course.website_url && (
-          <Button
-            variant="outline"
-            size="sm"
-            asChild
-            className="ml-4"
-          >
-            <a
-              href={course.website_url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2"
-            >
-              <ExternalLink className="h-4 w-4" />
-              Visit Website
-            </a>
-          </Button>
-        )}
       </div>
     </div>
   );
