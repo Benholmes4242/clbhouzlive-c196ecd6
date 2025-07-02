@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import VideoPreview from '@/components/posts/VideoPreview';
 import { formatDistanceToNow } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 
 interface UserPost {
   id: string;
@@ -36,6 +37,7 @@ interface FeaturedMomentsCarouselProps {
 }
 
 const FeaturedMomentsCarousel = ({ userPosts = [], loading = false }: FeaturedMomentsCarouselProps) => {
+  const navigate = useNavigate();
   // Filter for video posts and limit to show variety
   const videoMoments = userPosts
     .filter(post => post.post_media.some(media => media.media_type === 'video'))
@@ -134,25 +136,48 @@ const FeaturedMomentsCarousel = ({ userPosts = [], loading = false }: FeaturedMo
                   )}
                 </div>
                 
-                {/* Content below thumbnail */}
-                <div className="space-y-1">
+                {/* Content below thumbnail with profile info */}
+                <div className="space-y-2">
+                  {/* User profile section */}
+                  <div className="flex items-center gap-3">
+                    <img 
+                      src={moment.userProfile.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'} 
+                      alt={moment.displayName} 
+                      className="w-10 h-10 rounded-full object-cover object-center cursor-pointer hover:opacity-80 transition-opacity border-2 border-gray-200"
+                      onClick={() => navigate(`/profile/${moment.userProfile.username}`)}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <h4 
+                        className="text-sm font-medium cursor-pointer hover:text-primary transition-colors truncate"
+                        onClick={() => navigate(`/profile/${moment.userProfile.username}`)}
+                      >
+                        {moment.displayName}
+                      </h4>
+                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                        <span 
+                          className="cursor-pointer hover:text-foreground transition-colors"
+                          onClick={() => navigate(`/profile/${moment.userProfile.username}`)}
+                        >
+                          @{moment.user}
+                        </span>
+                        <span>•</span>
+                        <div className="flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          <span>{moment.timeAgo}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
                   {moment.title && (
-                    <h3 className="text-sm font-medium line-clamp-2 leading-snug">
+                    <h3 className="text-sm font-medium line-clamp-2 leading-snug pl-13">
                       {moment.title}
                     </h3>
                   )}
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                    <span>@{moment.user}</span>
-                    <span>•</span>
-                    <div className="flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      <span>{moment.timeAgo}</span>
-                    </div>
-                  </div>
                   
                   {/* Engagement stats */}
                   {moment.stats && (
-                    <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                    <div className="flex items-center gap-3 text-xs text-muted-foreground pl-13">
                       <span>{moment.stats.likes} likes</span>
                       <span>{moment.stats.comments} comments</span>
                     </div>

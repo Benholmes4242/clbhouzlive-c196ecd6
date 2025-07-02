@@ -6,6 +6,7 @@ import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious
 import VideoPreview from '@/components/posts/VideoPreview';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useProfileActions } from '@/components/profile/actions/useProfileActions';
+import { useNavigate } from 'react-router-dom';
 
 interface UserPost {
   id: string;
@@ -124,17 +125,23 @@ interface PlayerCardProps {
 }
 
 const PlayerCard: React.FC<PlayerCardProps> = ({ player, currentUserId }) => {
+  const navigate = useNavigate();
   const { handleFollow } = useProfileActions({
     targetUserId: player.id,
     currentUserId: currentUserId || ''
   });
 
-  const handleFollowClick = async () => {
+  const handleFollowClick = async (e: React.MouseEvent) => {
+    e.stopPropagation();
     if (!currentUserId || currentUserId === player.id) return;
     
     console.log('Follow button clicked for user:', player.id);
     // Since we don't have follow status in this context, we'll assume not following and follow
     await handleFollow(false);
+  };
+
+  const handleProfileClick = () => {
+    navigate(`/profile/${player.username}`);
   };
 
   const displayHandicap = player.handicap !== null ? `${player.handicap} HCP` : 'No HCP';
@@ -161,13 +168,28 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, currentUserId }) => {
       
       <div className="absolute bottom-4 left-4 right-4">
         <div className="flex items-center gap-3 mb-3">
-          <img src={player.avatar} alt={player.name} className="w-8 h-8 rounded-full object-cover object-center border-2 border-white" />
+          <img 
+            src={player.avatar} 
+            alt={player.name} 
+            className="w-12 h-12 rounded-full object-cover object-center border-2 border-white cursor-pointer hover:border-white/80 transition-colors" 
+            onClick={handleProfileClick}
+          />
           <div className="flex-1 min-w-0">
-            <h3 className="text-white font-semibold text-sm mb-1">{player.name}</h3>
+            <h3 
+              className="text-white font-semibold text-sm mb-1 cursor-pointer hover:text-white/80 transition-colors" 
+              onClick={handleProfileClick}
+            >
+              {player.name}
+            </h3>
             <div className="flex items-center gap-2 text-white/80 text-xs">
               <span>{displayHandicap}</span>
               <span>•</span>
-              <span>@{player.username}</span>
+              <span 
+                className="cursor-pointer hover:text-white/60 transition-colors"
+                onClick={handleProfileClick}
+              >
+                @{player.username}
+              </span>
             </div>
           </div>
         </div>
