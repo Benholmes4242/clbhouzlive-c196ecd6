@@ -1,6 +1,4 @@
-import React, { useState } from 'react';
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import React, { useState, useEffect, useRef } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import MultiSelectPreview from './gallery-picker/MultiSelectPreview';
 import PickerContent from './gallery-picker/PickerContent';
@@ -9,9 +7,27 @@ import { GalleryPickerProps } from './gallery-picker/types';
 
 const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelected }: GalleryPickerProps) => {
   const isMobile = useIsMobile();
+  const pickerRef = useRef<HTMLDivElement>(null);
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [isMultiSelectMode, setIsMultiSelectMode] = useState(false);
+
+  // Handle click outside to close
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (pickerRef.current && !pickerRef.current.contains(event.target as Node)) {
+        handleClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
 
   const handleMultipleFiles = (files: File[], urls: string[]) => {
     setSelectedFiles(files);
@@ -101,66 +117,25 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
     />
   );
 
-  // Mobile Version - Bottom Sheet  
-  if (isMobile) {
-    return (
-      <Sheet open={isOpen} onOpenChange={handleClose}>
-        <SheetContent 
-          side="bottom" 
-          className="h-auto p-0 rounded-t-xl border-t-2 border-t-[#6e9277] bg-white relative"
-          style={{
-            transform: isOpen ? 'translateY(0)' : 'translateY(100%)',
-            transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-          }}
-        >
-          {/* Top accent bar */}
-          <div className="absolute top-0 left-0 w-full h-0.5 bg-[#6e9277] rounded-t-xl" />
-          
-          <div className="px-2 pt-2 pb-1">
-            <SheetHeader className="mb-2">
-              <SheetTitle className="text-center text-sm font-semibold">
-                {isMultiSelectMode ? 'Selected Media' : 'Create a Moment'}
-              </SheetTitle>
-            </SheetHeader>
-            <PickerContent
-              isMultiSelectMode={isMultiSelectMode}
-              isMobile={isMobile}
-              onCameraClick={handleCameraClick}
-              onPhotoClick={handlePhotoClick}
-              onVideoClick={handleVideoClick}
-              multiSelectPreview={multiSelectPreview}
-            />
-          </div>
-          
-          {/* Bottom accent bar */}
-          <div className="absolute bottom-0 left-0 w-full h-0.5 bg-[#6e9277] rounded-b-xl" />
-        </SheetContent>
-      </Sheet>
-    );
-  }
-
-  // Desktop Version - Dialog Modal
+  // Single slide-down container for both mobile and desktop
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent 
-        className="max-w-xs mx-auto p-0 rounded-xl shadow-2xl animate-scale-in bg-white border-0 relative"
-        style={{
-          position: 'fixed',
-          bottom: '120px', // Rise from nav bar area
-          left: '50%',
-          transform: 'translateX(-50%)',
-          margin: 0
-        }}
-      >
+    <div 
+      ref={pickerRef}
+      className={`fixed left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300 ease-out ${
+        isOpen 
+          ? 'bottom-20 opacity-100 translate-y-0' 
+          : 'bottom-16 opacity-0 translate-y-2 pointer-events-none'
+      }`}
+    >
+      <div className="bg-white rounded-xl shadow-2xl border border-gray-200 relative overflow-hidden min-w-[280px] max-w-[320px]">
         {/* Top accent bar */}
-        <div className="absolute top-0 left-0 w-full h-0.5 bg-[#6e9277] rounded-t-xl" />
+        <div className="absolute top-0 left-0 w-full h-0.5 bg-[#6e9277]" />
         
-        <div className="px-2 pt-2 pb-1">
-          <DialogHeader className="mb-2">
-            <DialogTitle className="text-center text-sm font-semibold">
-              {isMultiSelectMode ? 'Selected Media' : 'Create a Moment'}
-            </DialogTitle>
-          </DialogHeader>
+        <div className="px-3 pt-3 pb-2">
+          <h3 className="text-center text-sm font-semibold mb-2">
+            {isMultiSelectMode ? 'Selected Media' : 'Create a Moment'}
+          </h3>
+          
           <PickerContent
             isMultiSelectMode={isMultiSelectMode}
             isMobile={isMobile}
@@ -172,9 +147,9 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
         </div>
         
         {/* Bottom accent bar */}
-        <div className="absolute bottom-0 left-0 w-full h-0.5 bg-[#6e9277] rounded-b-xl" />
-      </DialogContent>
-    </Dialog>
+        <div className="absolute bottom-0 left-0 w-full h-0.5 bg-[#6e9277]" />
+      </div>
+    </div>
   );
 };
 
