@@ -86,8 +86,8 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
         onPostCreated={fetchUserPosts}
       />
 
-      {/* Grid layout for square posts */}
-      <div className="grid grid-cols-3 gap-1 mt-4">
+      {/* Grid layout for square posts - increased rounded corners */}
+      <div className="grid grid-cols-3 gap-2 mt-4">
         {posts.map((post) => (
           <ActivityPostCard
             key={post.id}

@@ -1,8 +1,8 @@
 
 import React from 'react';
-import ProfilePageLayout from './ProfilePageLayout';
-import { useTop100CoursesData } from '@/hooks/useTop100CoursesData';
-import { useNavigate } from 'react-router-dom';
+import InstagramStyleProfileHeader from './InstagramStyleProfileHeader';
+import UniversalProfileTabs from './UniversalProfileTabs';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 interface UserProfileContentProps {
   profile: any;
@@ -18,37 +18,27 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({
   currentUser,
   relationshipStatus
 }) => {
-  const navigate = useNavigate();
-  const isOwnProfile = currentUser?.id === profile?.id;
-
-  const { regionProgress } = useTop100CoursesData(
-    profile?.id || '',
-    isOwnProfile
-  );
-
-  const handleRegionClick = (region: string) => {
-    if (profile.username) {
-      navigate(`/user/${profile.username}/courses`);
-    }
-  };
-
-  const handleEGConnect = () => {
-    // Not applicable for viewing other users
-  };
+  const { user } = useSupabaseSession();
+  const isOwnProfile = user?.id === profile?.id;
 
   if (!profile) {
     return null;
   }
 
   return (
-    <ProfilePageLayout
-      profile={profile}
-      currentUser={currentUser}
-      relationshipStatus={relationshipStatus}
-      regionProgress={regionProgress}
-      onRegionClick={handleRegionClick}
-      onEGConnect={handleEGConnect}
-    />
+    <div className="max-w-4xl mx-auto">
+      <InstagramStyleProfileHeader 
+        profile={profile}
+        currentUser={currentUser}
+        relationshipStatus={relationshipStatus}
+      />
+      
+      <UniversalProfileTabs
+        userId={profile?.id}
+        profile={profile}
+        isOwnProfile={isOwnProfile}
+      />
+    </div>
   );
 };
 

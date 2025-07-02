@@ -33,7 +33,7 @@ const ActivityPostCard = ({ post, attributionText, onClick }: ActivityPostCardPr
 
   return (
     <div 
-      className="relative aspect-square bg-gray-100 cursor-pointer group overflow-hidden rounded-lg"
+      className="relative aspect-square bg-gray-100 cursor-pointer group overflow-hidden rounded-xl"
       onClick={handleClick}
     >
       {hasMedia && firstMedia ? (
@@ -41,7 +41,7 @@ const ActivityPostCard = ({ post, attributionText, onClick }: ActivityPostCardPr
           {firstMedia.media_type === 'video' ? (
             <VideoPreview
               src={firstMedia.media_url}
-              className="w-full h-full"
+              className="w-full h-full rounded-[inherit]"
               videoId={`activity-${post.id}`}
               isGridThumbnail={true}
             />
