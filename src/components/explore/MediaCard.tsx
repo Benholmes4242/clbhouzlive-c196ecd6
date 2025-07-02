@@ -10,9 +10,10 @@ interface MediaCardProps {
   item: ExploreContentItem;
   onLike: (contentId: string) => void;
   onFollow: (contentId: string) => void;
+  onMediaClick?: (item: ExploreContentItem) => void;
 }
 
-const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow }) => {
+const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, ...props }) => {
   const [imageError, setImageError] = useState(false);
   const { isOpen, currentMedia, openMedia, closeMedia } = useFullscreenMedia();
 
@@ -34,7 +35,12 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow }) => {
   const handleMediaClick = () => {
     // Only open media for image and video types, not CTA
     if (!isInvalidSrc && (item.type === 'image' || item.type === 'video')) {
-      openMedia(imageError ? fallbackImage : item.src, item.type, item.title);
+      // Call the onMediaClick prop instead of opening the fullscreen modal
+      if (props.onMediaClick) {
+        props.onMediaClick(item);
+      } else {
+        openMedia(imageError ? fallbackImage : item.src, item.type, item.title);
+      }
     }
   };
 

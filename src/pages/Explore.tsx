@@ -5,8 +5,10 @@ import BottomNavigation from '@/components/BottomNavigation';
 import ExploreFilters from '@/components/explore/ExploreFilters';
 import ExploreGrid from '@/components/explore/ExploreGrid';
 import MobileDebugConsole from '@/components/explore/MobileDebugConsole';
+import VerticalMediaFeed from '@/components/explore/VerticalMediaFeed';
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 import { VideoAutoplayProvider } from '@/hooks/useVideoAutoplayManager';
+import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
 
 const Explore = () => {
   const [activeFilter, setActiveFilter] = useState('All');
@@ -17,6 +19,13 @@ const Explore = () => {
     hasMore, 
     loadMore 
   } = useInfiniteExploreContent();
+  
+  const { 
+    isOpen: isFeedOpen, 
+    initialItem, 
+    openFeed, 
+    closeFeed 
+  } = useVerticalMediaFeed();
 
   const handleLike = (contentId: string) => {
     // Update likes optimistically - could be enhanced with actual API call
@@ -26,6 +35,10 @@ const Explore = () => {
   const handleFollow = (contentId: string) => {
     // Update follow status optimistically - could be enhanced with actual API call
     // For now, this is just visual feedback
+  };
+
+  const handleMediaClick = (item: any) => {
+    openFeed(item);
   };
 
   const filteredContent = content.filter(item => {
@@ -56,6 +69,7 @@ const Explore = () => {
             content={filteredContent}
             onLike={handleLike}
             onFollow={handleFollow}
+            onMediaClick={handleMediaClick}
             isLoading={loading}
             hasMore={hasMore}
             onLoadMore={loadMore}
@@ -69,6 +83,18 @@ const Explore = () => {
           isVisible={debugVisible}
           onToggle={() => setDebugVisible(!debugVisible)}
         />
+
+        {/* Vertical Media Feed */}
+        {initialItem && (
+          <VerticalMediaFeed
+            isOpen={isFeedOpen}
+            onClose={closeFeed}
+            initialItem={initialItem}
+            allContent={content}
+            onLike={handleLike}
+            onFollow={handleFollow}
+          />
+        )}
 
         <style>{`
           .scrollbar-hide {

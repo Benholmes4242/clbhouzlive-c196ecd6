@@ -8,9 +8,11 @@ interface ExploreContentCardProps {
   item: ExploreContentItem;
   onLike: (contentId: string) => void;
   onFollow: (contentId: string) => void;
+  onMediaClick?: (item: ExploreContentItem) => void;
 }
 
-const ExploreContentCard: React.FC<ExploreContentCardProps> = ({ item, onLike, onFollow }) => {
+
+const ExploreContentCard: React.FC<ExploreContentCardProps> = ({ item, onLike, onFollow, onMediaClick }) => {
   if (item.type === 'cta') {
     return (
       <div className="h-full">
@@ -21,7 +23,7 @@ const ExploreContentCard: React.FC<ExploreContentCardProps> = ({ item, onLike, o
 
   return (
     <div className="h-full">
-      <MediaCard item={item} onLike={onLike} onFollow={onFollow} />
+      <MediaCard item={item} onLike={onLike} onFollow={onFollow} onMediaClick={onMediaClick} />
     </div>
   );
 };

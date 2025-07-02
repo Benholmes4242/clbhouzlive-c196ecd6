@@ -7,6 +7,7 @@ interface ExploreGridProps {
   content: ExploreContentItem[];
   onLike: (contentId: string) => void;
   onFollow: (contentId: string) => void;
+  onMediaClick?: (item: ExploreContentItem) => void;
   isLoading: boolean;
   hasMore: boolean;
   onLoadMore: () => void;
@@ -16,6 +17,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
   content, 
   onLike, 
   onFollow, 
+  onMediaClick,
   isLoading, 
   hasMore, 
   onLoadMore 
@@ -76,6 +78,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
               item={item} 
               onLike={onLike} 
               onFollow={onFollow} 
+              onMediaClick={onMediaClick}
             />
           </div>
         ))}
