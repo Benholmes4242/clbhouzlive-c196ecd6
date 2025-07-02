@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Volume2, VolumeX } from 'lucide-react';
-import GolfCoursePin from '../posts/GolfCoursePin';
+import CoursePostBadge from '../posts/CoursePostBadge';
 
 interface FullscreenMediaModalProps {
   isOpen: boolean;
@@ -96,9 +96,13 @@ const FullscreenMediaModal = ({
           {/* Golf Course Badge - Top Right */}
           {golfCourse && (
             <div className="pointer-events-auto">
-              <GolfCoursePin 
-                courseName={golfCourse.name}
-                courseRegion={golfCourse.country}
+              <CoursePostBadge 
+                course={{
+                  id: golfCourse.id,
+                  name: golfCourse.name,
+                  country: golfCourse.country
+                }}
+                className="relative top-0 right-0"
               />
             </div>
           )}
