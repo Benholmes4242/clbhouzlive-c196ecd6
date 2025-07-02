@@ -49,7 +49,7 @@ const ActivityPostCard = ({ post, attributionText, onClick }: ActivityPostCardPr
             <HighQualityImage
               src={firstMedia.media_url}
               alt="Post media"
-              className="w-full h-full"
+              className="w-full h-full rounded-[inherit]"
               width={300}
               height={300}
               onError={(e) => {

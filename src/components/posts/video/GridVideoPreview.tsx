@@ -49,7 +49,7 @@ const GridVideoPreview = ({
         <video
           src={src}
           poster={poster || thumbnailSrc}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover rounded-[inherit]"
           muted
           loop
           playsInline
@@ -75,7 +75,7 @@ const GridVideoPreview = ({
         ref={videoRef}
         src={src}
         poster={poster || thumbnailSrc}
-        className="w-full h-full object-cover"
+        className="w-full h-full object-cover rounded-[inherit]"
         muted
         loop
         playsInline
