@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { X, Heart, MessageCircle, Share2, Volume2, VolumeX } from 'lucide-react';
 import { ExploreContentItem } from './types';
 import VideoPreview from '../posts/VideoPreview';
+import GolfCoursePin from '../posts/GolfCoursePin';
 
 interface VerticalMediaFeedProps {
   isOpen: boolean;
@@ -170,6 +171,14 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
                     controls={false}
                   />
                   
+                  {/* Golf Course Badge */}
+                  {item.golfCourse && (
+                    <GolfCoursePin 
+                      courseName={item.golfCourse.name}
+                      courseRegion={item.golfCourse.country}
+                    />
+                  )}
+                  
                   {/* Video Controls */}
                   <button
                     onClick={() => setIsMuted(!isMuted)}
@@ -179,14 +188,24 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
                   </button>
                 </div>
               ) : (
-                <img
-                  src={item.src}
-                  alt={item.title}
-                  className="w-full h-full object-contain"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
-                  }}
-                />
+                <div className="relative w-full h-full">
+                  <img
+                    src={item.src}
+                    alt={item.title}
+                    className="w-full h-full object-contain"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
+                    }}
+                  />
+                  
+                  {/* Golf Course Badge */}
+                  {item.golfCourse && (
+                    <GolfCoursePin 
+                      courseName={item.golfCourse.name}
+                      courseRegion={item.golfCourse.country}
+                    />
+                  )}
+                </div>
               )}
             </div>
 
@@ -258,10 +277,6 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
         ))}
       </div>
 
-      {/* Progress Indicator */}
-      <div className="absolute top-4 right-16 z-20 text-white text-sm bg-black/50 px-2 py-1 rounded">
-        {currentIndex + 1} / {filteredContent.length}
-      </div>
 
       <style>{`
         .snap-y.snap-mandatory div::-webkit-scrollbar {

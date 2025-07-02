@@ -20,6 +20,11 @@ export interface ExploreContentItem {
   ctaTitle?: string;
   ctaDescription?: string;
   ctaButton?: string;
+  golfCourse?: {
+    id: string;
+    name: string;
+    country: string;
+  };
 }
 
 export interface CTAContentItem {
