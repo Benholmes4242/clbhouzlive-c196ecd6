@@ -2,9 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from "@/components/Header";
 import BottomNavigation from '@/components/BottomNavigation';
-import ProfilePageLayout from '@/components/profile/ProfilePageLayout';
+import InstagramStyleProfileHeader from '@/components/profile/InstagramStyleProfileHeader';
+import UniversalProfileTabs from '@/components/profile/UniversalProfileTabs';
 import { useProfileData } from '@/hooks/useProfileData';
-import { useTop100CoursesData } from '@/hooks/useTop100CoursesData';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
@@ -19,26 +19,12 @@ const ProfilePage = () => {
     updateProfileField
   } = useProfileData();
 
-  const { regionProgress, isLoading: isLoadingTop100 } = useTop100CoursesData(
-    user?.id || '',
-    true
-  );
-
   // Redirect to auth page if user is not logged in
   useEffect(() => {
     if (!loading && !user) {
       navigate('/auth', { replace: true });
     }
   }, [user, loading, navigate]);
-
-  const handleRegionClick = (region: string) => {
-    navigate('/courses?tab=my-courses');
-  };
-
-  const handleEGConnect = () => {
-    // TODO: Implement EG App connection
-    console.log('Connect to EG App');
-  };
 
   // Show loading while checking authentication
   if (loading) {
@@ -86,17 +72,22 @@ const ProfilePage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background pb-28">
       <Header />
       
-      <ProfilePageLayout
-        profile={profile}
-        currentUser={user}
-        relationshipStatus={null} // Own profile, no relationship status needed
-        regionProgress={regionProgress}
-        onRegionClick={handleRegionClick}
-        onEGConnect={handleEGConnect}
-      />
+      <div className="max-w-4xl mx-auto">
+        <InstagramStyleProfileHeader 
+          profile={profile}
+          currentUser={user}
+          relationshipStatus={null}
+        />
+        
+        <UniversalProfileTabs
+          userId={profile?.id}
+          profile={profile}
+          isOwnProfile={true}
+        />
+      </div>
       
       <BottomNavigation />
     </div>
