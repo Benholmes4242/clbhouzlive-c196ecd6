@@ -107,7 +107,7 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
       <Sheet open={isOpen} onOpenChange={handleClose}>
         <SheetContent 
           side="bottom" 
-          className="h-auto p-0 rounded-t-xl border-t-4 border-t-[#6e9277] bg-white relative"
+          className="h-auto p-0 rounded-t-xl border-t-2 border-t-[#6e9277] bg-white relative"
           style={{
             transform: isOpen ? 'translateY(0)' : 'translateY(100%)',
             transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
@@ -116,9 +116,9 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
           {/* Top accent bar */}
           <div className="absolute top-0 left-0 w-full h-0.5 bg-[#6e9277] rounded-t-xl" />
           
-          <div className="px-3 pt-4 pb-4">
-            <SheetHeader className="mb-3">
-              <SheetTitle className="text-center text-lg font-semibold">
+          <div className="px-2 pt-2 pb-2">
+            <SheetHeader className="mb-2">
+              <SheetTitle className="text-center text-sm font-semibold">
                 {isMultiSelectMode ? 'Selected Media' : 'Create a Moment'}
               </SheetTitle>
             </SheetHeader>
@@ -143,7 +143,7 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent 
-        className="max-w-sm mx-auto p-0 rounded-xl shadow-2xl animate-scale-in bg-white border-0 relative"
+        className="max-w-xs mx-auto p-0 rounded-xl shadow-2xl animate-scale-in bg-white border-0 relative"
         style={{
           position: 'fixed',
           bottom: '120px', // Rise from nav bar area
@@ -155,9 +155,9 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
         {/* Top accent bar */}
         <div className="absolute top-0 left-0 w-full h-0.5 bg-[#6e9277] rounded-t-xl" />
         
-        <div className="px-3 pt-4 pb-4">
-          <DialogHeader className="mb-3">
-            <DialogTitle className="text-center text-lg font-semibold">
+        <div className="px-2 pt-2 pb-2">
+          <DialogHeader className="mb-2">
+            <DialogTitle className="text-center text-sm font-semibold">
               {isMultiSelectMode ? 'Selected Media' : 'Create a Moment'}
             </DialogTitle>
           </DialogHeader>
