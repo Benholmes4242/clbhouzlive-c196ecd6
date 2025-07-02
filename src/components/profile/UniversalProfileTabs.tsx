@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import SocialActivity from './SocialActivity';
-import Top100Courses from './Top100Courses';
 import HandicapSection from './HandicapSection';
+import UserCoursesContent from '@/components/courses/UserCoursesContent';
 
 interface UniversalProfileTabsProps {
   userId: string;
@@ -55,18 +55,7 @@ const UniversalProfileTabs: React.FC<UniversalProfileTabsProps> = ({
         )}
 
         <TabsContent value="top100" className="mt-0">
-          <div className="space-y-4">
-            <div className="text-center">
-              <h2 className="text-xl font-semibold mb-2">{top100Title}</h2>
-              <p className="text-sm text-muted-foreground">
-                Track and showcase the world's best golf courses
-              </p>
-            </div>
-            <Top100Courses 
-              userId={userId} 
-              isOwnProfile={isOwnProfile}
-            />
-          </div>
+          <UserCoursesContent username={profile?.username} />
         </TabsContent>
       </Tabs>
     </div>
