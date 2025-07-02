@@ -26,6 +26,7 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
   const [isMuted, setIsMuted] = useState(true);
   const scrollViewRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<{ [key: number]: HTMLDivElement }>({});
+  const videoRefs = useRef<{ [key: number]: HTMLVideoElement }>({});
 
   // Filter content by type and set initial index
   useEffect(() => {
@@ -52,6 +53,24 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
       setCurrentIndex(newIndex);
     }
   }, [currentIndex, filteredContent.length]);
+
+  // Auto-play/pause videos based on current index
+  useEffect(() => {
+    Object.keys(videoRefs.current).forEach((key) => {
+      const index = parseInt(key);
+      const video = videoRefs.current[index];
+      
+      if (video) {
+        if (index === currentIndex) {
+          // Play current video
+          video.play().catch(console.error);
+        } else {
+          // Pause other videos
+          video.pause();
+        }
+      }
+    });
+  }, [currentIndex]);
 
   // Scroll to specific index
   const scrollToIndex = (index: number) => {
@@ -162,9 +181,11 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
               {item.type === 'video' ? (
                 <div className="relative w-full h-full">
                   <video
+                    ref={(el) => {
+                      if (el) videoRefs.current[index] = el;
+                    }}
                     src={item.src}
                     className="w-full h-full object-cover"
-                    autoPlay={index === currentIndex}
                     muted={isMuted}
                     loop
                     playsInline
