@@ -73,18 +73,38 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
       return currentPost.golfCourse;
     }
     
-    // Look for golf course in post_tags
-    const golfCourseTag = currentPost.post_tags?.find(tag => 
-      tag.tagged_entity?.entity_type === 'golf_club'
-    );
+    // Look for golf course in post_tags - handle both formats
+    const golfCourseTag = currentPost.post_tags?.find(tag => {
+      // Handle the format from profile activity posts
+      if (tag.entity_type === 'golf_club') {
+        return true;
+      }
+      // Handle the format from other sources
+      if (tag.tagged_entity?.entity_type === 'golf_club') {
+        return true;
+      }
+      return false;
+    });
     
-    if (golfCourseTag?.tagged_entity) {
-      return {
-        id: golfCourseTag.tagged_entity.entity_id,
-        name: golfCourseTag.tagged_entity.name,
-        country: '', // May not be available in tagged entity
-        region: ''
-      };
+    if (golfCourseTag) {
+      // Profile activity format
+      if (golfCourseTag.entity_type === 'golf_club') {
+        return {
+          id: golfCourseTag.entity_id,
+          name: golfCourseTag.name,
+          country: '',
+          region: ''
+        };
+      }
+      // Other format
+      if (golfCourseTag.tagged_entity) {
+        return {
+          id: golfCourseTag.tagged_entity.entity_id,
+          name: golfCourseTag.tagged_entity.name,
+          country: '',
+          region: ''
+        };
+      }
     }
     
     return null;
