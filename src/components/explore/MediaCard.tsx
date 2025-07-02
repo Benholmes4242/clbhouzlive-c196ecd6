@@ -36,6 +36,7 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, ...props 
   const handleMediaClick = () => {
     // Only open media for image and video types, not CTA
     if (!isInvalidSrc && (item.type === 'image' || item.type === 'video')) {
+      console.log('MediaCard handleMediaClick - item.golfCourse:', item.golfCourse);
       // Call the onMediaClick prop instead of opening the fullscreen modal
       if (props.onMediaClick) {
         props.onMediaClick(item);

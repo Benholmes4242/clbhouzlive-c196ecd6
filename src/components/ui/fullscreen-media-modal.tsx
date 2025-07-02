@@ -24,6 +24,7 @@ const FullscreenMediaModal = ({
   alt = "Media content",
   golfCourse
 }: FullscreenMediaModalProps) => {
+  console.log('FullscreenMediaModal - golfCourse:', golfCourse);
   const [isMuted, setIsMuted] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -65,7 +66,7 @@ const FullscreenMediaModal = ({
       onClick={handleBackdropClick}
     >
       {/* Top Controls */}
-      <div className="absolute top-4 left-4 right-4 z-10 flex justify-between pointer-events-none">
+      <div className="absolute top-4 left-4 right-4 z-10 flex justify-between items-start pointer-events-none">
         {/* Back Arrow - Top Left */}
         <button
           onClick={onClose}
@@ -75,28 +76,33 @@ const FullscreenMediaModal = ({
           <ArrowLeft className="h-6 w-6" />
         </button>
 
-        {/* Mute/Unmute - Top Right (Only for videos) */}
-        {mediaType === 'video' && (
-          <button
-            onClick={handleMuteToggle}
-            className="flex items-center justify-center w-10 h-10 text-white hover:bg-white/10 rounded-full transition-colors pointer-events-auto"
-            aria-label={isMuted ? "Unmute" : "Mute"}
-          >
-            {isMuted ? (
-              <VolumeX className="h-6 w-6" />
-            ) : (
-              <Volume2 className="h-6 w-6" />
-            )}
-          </button>
-        )}
+        {/* Right side controls */}
+        <div className="flex items-start gap-2">
+          {/* Mute/Unmute - Top Right (Only for videos) */}
+          {mediaType === 'video' && (
+            <button
+              onClick={handleMuteToggle}
+              className="flex items-center justify-center w-10 h-10 text-white hover:bg-white/10 rounded-full transition-colors pointer-events-auto"
+              aria-label={isMuted ? "Unmute" : "Mute"}
+            >
+              {isMuted ? (
+                <VolumeX className="h-6 w-6" />
+              ) : (
+                <Volume2 className="h-6 w-6" />
+              )}
+            </button>
+          )}
 
-        {/* Golf Course Badge - Top Right */}
-        {golfCourse && (
-          <GolfCoursePin 
-            courseName={golfCourse.name}
-            courseRegion={golfCourse.country}
-          />
-        )}
+          {/* Golf Course Badge - Top Right */}
+          {golfCourse && (
+            <div className="pointer-events-auto">
+              <GolfCoursePin 
+                courseName={golfCourse.name}
+                courseRegion={golfCourse.country}
+              />
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Media Content - Centered and properly sized */}
