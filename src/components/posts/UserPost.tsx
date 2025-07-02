@@ -27,7 +27,7 @@ import CoursePostBadge from './CoursePostBadge';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { useFullscreenMedia } from '@/hooks/useFullscreenMedia';
 import { showToast } from '@/utils/toast';
-import HighQualityImage from '@/components/ui/high-quality-image';
+import LazyImage from '@/components/ui/lazy-image';
 import PostViewerModal from './PostViewerModal';
 import { usePostViewer } from '@/hooks/usePostViewer';
 
@@ -235,7 +235,7 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
         {/* Post Header */}
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center space-x-3">
-              <HighQualityImage
+              <LazyImage
                 src={post.user.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
                 alt={displayName}
                 className="w-16 h-16 rounded-[14px] border-2 border-gray-200 cursor-pointer hover:opacity-80 transition-opacity"

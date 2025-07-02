@@ -31,12 +31,10 @@ const HighQualityImage: React.FC<HighQualityImageProps> = ({
   }, [src]);
 
   const handleImageLoad = () => {
-    console.log('Image loaded successfully:', src);
     setIsLoading(false);
   };
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    console.log('Image failed to load:', src, 'Error:', e);
     setHasError(true);
     setIsLoading(false);
     if (onError) {
@@ -46,19 +44,14 @@ const HighQualityImage: React.FC<HighQualityImageProps> = ({
 
   // Generate optimized image URL if it's from Supabase storage
   const getOptimizedImageUrl = (url: string) => {
-    console.log('Processing image URL:', url);
-    
     // If it's a Supabase storage URL, we can add optimization parameters
     if (url.includes('supabase') && url.includes('storage')) {
-      // Force high quality and proper sizing for crisp images
       const separator = url.includes('?') ? '&' : '?';
-      // Use higher quality and force resize for consistent crisp rendering
-      const optimizedUrl = `${url}${separator}quality=100&resize=contain&width=${width || 160}&height=${height || 160}&format=webp`;
-      console.log('Optimized URL:', optimizedUrl);
+      // Optimize for fast loading with reasonable quality
+      const optimizedUrl = `${url}${separator}quality=75&resize=contain&width=${width || 400}&height=${height || 400}&format=webp`;
       return optimizedUrl;
     }
     
-    console.log('URL not optimized (not Supabase storage):', url);
     return url;
   };
 

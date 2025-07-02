@@ -5,7 +5,7 @@ import { SwipeCarousel } from '@/components/ui/swipe-carousel';
 import CoursePostBadge from '../posts/CoursePostBadge';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { useFullscreenMedia } from '@/hooks/useFullscreenMedia';
-import HighQualityImage from '@/components/ui/high-quality-image';
+import LazyImage from '@/components/ui/lazy-image';
 
 interface PostContentProps {
   content: {
@@ -93,7 +93,7 @@ const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentPr
   // Create image elements with golf course pin overlay
   const createImageWithPin = (imageUrl: string, index: number) => (
     <div key={index} className="relative">
-      <HighQualityImage
+      <LazyImage
         src={imageUrl}
         alt={`Post content ${index + 1}`}
         className="w-full h-80 cursor-pointer"
@@ -143,7 +143,7 @@ const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentPr
                     className="relative cursor-pointer group"
                     onClick={handleYouTubeClick}
                   >
-                    <HighQualityImage
+                    <LazyImage
                       src={content.thumbnail || getYouTubeThumbnail(content.youtubeId)}
                       alt="Video thumbnail"
                       className="w-full h-80"

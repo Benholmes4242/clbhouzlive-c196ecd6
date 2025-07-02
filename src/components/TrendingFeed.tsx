@@ -59,7 +59,7 @@ const TrendingFeed = () => {
         `)
         .in('user_id', allConnectedUserIds)
         .order('created_at', { ascending: false })
-        .limit(20);
+        .limit(10);
 
       if (postsError) {
         console.error('Error fetching followed posts:', postsError);
@@ -151,8 +151,8 @@ const TrendingFeed = () => {
       return formattedPosts;
     },
     enabled: !!user?.id,
-    staleTime: 5000, // Consider data fresh for only 5 seconds to catch new posts quickly
-    refetchInterval: 10000, // Refetch every 10 seconds to catch new posts
+    staleTime: 60000, // Consider data fresh for 1 minute
+    refetchInterval: 30000, // Refetch every 30 seconds
   });
 
   // Listen for feed refresh events

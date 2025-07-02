@@ -55,7 +55,7 @@ export const useExploreContent = () => {
           )
         `)
         .order('created_at', { ascending: false })
-        .limit(50);
+        .limit(20);
 
       if (error) {
         console.error('Error fetching posts:', error);

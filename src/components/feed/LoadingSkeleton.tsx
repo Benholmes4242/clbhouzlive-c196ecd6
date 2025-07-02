@@ -1,24 +1,36 @@
 
 import React from 'react';
-import { Card } from '@/components/ui/card';
 
 const LoadingSkeleton = () => {
   return (
     <div className="space-y-6 pb-20">
-      {[1, 2, 3].map((i) => (
-        <Card key={i} className="border-0 shadow-sm animate-pulse">
-          <div className="p-4">
-            <div className="flex items-center space-x-3 mb-3">
-              <div className="w-10 h-10 bg-gray-200 rounded-full"></div>
-              <div className="space-y-1">
-                <div className="h-4 bg-gray-200 rounded w-24"></div>
-                <div className="h-3 bg-gray-200 rounded w-32"></div>
-              </div>
+      {[1, 2].map((i) => (
+        <div key={i} className="bg-card rounded-lg border border-border p-4 space-y-4">
+          {/* User header */}
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-muted rounded-full animate-pulse" />
+            <div className="space-y-2">
+              <div className="h-4 w-24 bg-muted rounded animate-pulse" />
+              <div className="h-3 w-16 bg-muted rounded animate-pulse" />
             </div>
-            <div className="h-4 bg-gray-200 rounded mb-3"></div>
-            <div className="h-80 bg-gray-200 rounded"></div>
           </div>
-        </Card>
+          
+          {/* Content */}
+          <div className="space-y-2">
+            <div className="h-4 w-full bg-muted rounded animate-pulse" />
+            <div className="h-4 w-3/4 bg-muted rounded animate-pulse" />
+          </div>
+          
+          {/* Media placeholder */}
+          <div className="h-80 bg-muted rounded-lg animate-pulse" />
+          
+          {/* Actions */}
+          <div className="flex items-center space-x-4">
+            <div className="h-8 w-16 bg-muted rounded animate-pulse" />
+            <div className="h-8 w-20 bg-muted rounded animate-pulse" />
+            <div className="h-8 w-16 bg-muted rounded animate-pulse" />
+          </div>
+        </div>
       ))}
     </div>
   );

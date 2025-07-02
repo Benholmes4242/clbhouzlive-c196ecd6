@@ -57,7 +57,7 @@ const StoryBar = () => {
       <div className="sticky top-16 z-40 bg-background border-b border-border">
         <div className="px-4 py-2">
           <div className="flex space-x-4">
-            {[1, 2, 3, 4, 5].map((i) => (
+            {[1, 2, 3].map((i) => (
               <div key={i} className="flex flex-col items-center space-y-1">
                 <div className="w-20 h-20 bg-muted rounded-[18px] animate-pulse" />
                 <div className="h-3 w-16 bg-muted rounded animate-pulse" />
