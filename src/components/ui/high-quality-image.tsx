@@ -50,9 +50,10 @@ const HighQualityImage: React.FC<HighQualityImageProps> = ({
     
     // If it's a Supabase storage URL, we can add optimization parameters
     if (url.includes('supabase') && url.includes('storage')) {
-      // Add quality and resize parameters for better thumbnails
+      // Force high quality and proper sizing for crisp images
       const separator = url.includes('?') ? '&' : '?';
-      const optimizedUrl = `${url}${separator}quality=95&resize=contain&width=${width || 160}&height=${height || 160}`;
+      // Use higher quality and force resize for consistent crisp rendering
+      const optimizedUrl = `${url}${separator}quality=100&resize=contain&width=${width || 160}&height=${height || 160}&format=webp`;
       console.log('Optimized URL:', optimizedUrl);
       return optimizedUrl;
     }
@@ -76,12 +77,13 @@ const HighQualityImage: React.FC<HighQualityImageProps> = ({
           isLoading ? 'opacity-0' : 'opacity-100'
         }`}
         style={{
-          imageRendering: 'crisp-edges',
+          imageRendering: 'auto',
           backfaceVisibility: 'hidden',
           transform: 'translateZ(0)',
-          filter: 'contrast(1.08) saturate(1.08) brightness(1.02)',
+          filter: 'contrast(1.1) saturate(1.1) brightness(1.05)',
           WebkitFontSmoothing: 'antialiased',
-          MozOsxFontSmoothing: 'grayscale'
+          MozOsxFontSmoothing: 'grayscale',
+          maxWidth: '100%'
         }}
         onLoad={handleImageLoad}
         onError={handleImageError}
