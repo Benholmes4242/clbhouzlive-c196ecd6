@@ -1,0 +1,96 @@
+import React, { useState, useEffect } from 'react';
+
+interface HighQualityImageProps {
+  src: string;
+  alt: string;
+  className?: string;
+  width?: number;
+  height?: number;
+  onError?: (e: React.SyntheticEvent<HTMLImageElement>) => void;
+  onClick?: () => void;
+}
+
+const HighQualityImage: React.FC<HighQualityImageProps> = ({
+  src,
+  alt,
+  className = '',
+  width,
+  height,
+  onError,
+  onClick
+}) => {
+  const [imageSrc, setImageSrc] = useState<string>(src);
+  const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
+
+  useEffect(() => {
+    // Reset states when src changes
+    setImageSrc(src);
+    setIsLoading(true);
+    setHasError(false);
+  }, [src]);
+
+  const handleImageLoad = () => {
+    setIsLoading(false);
+  };
+
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    console.log('Image failed to load:', src);
+    setHasError(true);
+    setIsLoading(false);
+    if (onError) {
+      onError(e);
+    }
+  };
+
+  // Generate optimized image URL if it's from Supabase storage
+  const getOptimizedImageUrl = (url: string) => {
+    // If it's a Supabase storage URL, we can add optimization parameters
+    if (url.includes('supabase') && url.includes('storage')) {
+      // Add quality and resize parameters for better thumbnails
+      const separator = url.includes('?') ? '&' : '?';
+      return `${url}${separator}quality=90&resize=contain&width=${width || 160}&height=${height || 160}`;
+    }
+    return url;
+  };
+
+  const optimizedSrc = getOptimizedImageUrl(imageSrc);
+
+  return (
+    <div className={`relative ${className}`} onClick={onClick}>
+      {isLoading && (
+        <div className="absolute inset-0 bg-muted animate-pulse rounded-[inherit]" />
+      )}
+      
+      <img
+        src={optimizedSrc}
+        alt={alt}
+        className={`w-full h-full object-cover rounded-[inherit] transition-opacity duration-200 ${
+          isLoading ? 'opacity-0' : 'opacity-100'
+        }`}
+        style={{
+          imageRendering: 'crisp-edges',
+          backfaceVisibility: 'hidden',
+          transform: 'translateZ(0)',
+          filter: 'contrast(1.08) saturate(1.08) brightness(1.02)',
+          WebkitFontSmoothing: 'antialiased',
+          MozOsxFontSmoothing: 'grayscale'
+        }}
+        onLoad={handleImageLoad}
+        onError={handleImageError}
+        width={width}
+        height={height}
+        loading="lazy"
+        decoding="async"
+      />
+      
+      {hasError && (
+        <div className="absolute inset-0 bg-muted rounded-[inherit] flex items-center justify-center">
+          <div className="text-xs text-muted-foreground">Failed to load</div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default HighQualityImage;
