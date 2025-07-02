@@ -16,9 +16,20 @@ const PasswordProtection: React.FC<PasswordProtectionProps> = ({ children }) => 
 
   // Check if user is already authenticated on component mount
   useEffect(() => {
+    // Force re-authentication on every session regardless of localStorage
+    // This ensures no one can bypass the password protection
     const storedAuth = localStorage.getItem('siteAuthenticated');
-    if (storedAuth === 'true') {
+    const currentDomain = window.location.hostname;
+    const storedDomain = localStorage.getItem('authenticatedDomain');
+    
+    // Only authenticate if stored auth exists AND domain matches current domain
+    if (storedAuth === 'true' && storedDomain === currentDomain) {
       setIsAuthenticated(true);
+    } else {
+      // Clear any stale authentication
+      localStorage.removeItem('siteAuthenticated');
+      localStorage.removeItem('authenticatedDomain');
+      setIsAuthenticated(false);
     }
   }, []);
 
@@ -27,7 +38,9 @@ const PasswordProtection: React.FC<PasswordProtectionProps> = ({ children }) => 
     
     if (password === 'mypassword') {
       setIsAuthenticated(true);
+      const currentDomain = window.location.hostname;
       localStorage.setItem('siteAuthenticated', 'true');
+      localStorage.setItem('authenticatedDomain', currentDomain);
       setError('');
     } else {
       setError('Incorrect password. Please try again.');
