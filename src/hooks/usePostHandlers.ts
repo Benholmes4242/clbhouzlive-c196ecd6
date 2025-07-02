@@ -10,7 +10,7 @@ export const usePostHandlers = () => {
     setMentionSuggestions: (suggestions: any[]) => void
   ) => {
     const target = e.currentTarget;
-    const text = target.textContent || '';
+    const text = target.textContent || target.innerText || '';
     setCaption(text);
     
     // Handle mention detection logic here
