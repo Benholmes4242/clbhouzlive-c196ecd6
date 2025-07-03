@@ -73,7 +73,7 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
     }
     
     // Default subtitle for explore and friends-courses tabs
-    return "Top 100 Courses. One Epic Checklist.";
+    return "Global Top 100 Courses. One Epic Checklist.";
   };
 
   // Dynamic tab label for "My Courses" tab
