@@ -77,10 +77,9 @@ const PasswordProtection: React.FC<PasswordProtectionProps> = ({ children }) => 
               </div>
             </div>
             
-            {/* Title */}
             <div>
               <p className="text-muted-foreground text-center leading-relaxed">
-                As I was going to St. Ives, I met a man with seven wives. Every wife had seven sacks. Every sack had seven cats. Every cat has seven kittens. Kittens, cats, sacks, and wives; how many were going to St. Ives?
+                Enter password for access
               </p>
             </div>
             
