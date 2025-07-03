@@ -102,7 +102,7 @@ const ClbhouzMomentsCarousel: React.FC = () => {
         `)
         .not('user_id', 'eq', user.id) // Still exclude current user's posts
         .order('created_at', { ascending: false })
-        .limit(20);
+        .limit(50); // Get more posts to have better selection per user
 
       if (error) throw error;
 
@@ -111,8 +111,19 @@ const ClbhouzMomentsCarousel: React.FC = () => {
         return;
       }
 
+      // Group posts by user and get the most recent post per user
+      const userPostsMap = new Map<string, any>();
+      posts.forEach(post => {
+        if (!userPostsMap.has(post.user_id) || 
+            new Date(post.created_at) > new Date(userPostsMap.get(post.user_id).created_at)) {
+          userPostsMap.set(post.user_id, post);
+        }
+      });
+
+      const uniqueUserPosts = Array.from(userPostsMap.values());
+
       // Get user profiles for these posts
-      const userIds = [...new Set(posts.map(post => post.user_id))];
+      const userIds = uniqueUserPosts.map(post => post.user_id);
       const { data: profiles, error: profilesError } = await supabase
         .from('user_profiles')
         .select('id, display_name, username, profile_photo_url')
@@ -144,13 +155,38 @@ const ClbhouzMomentsCarousel: React.FC = () => {
             name
           )
         `)
-        .in('post_id', posts.map(p => p.id))
+        .in('post_id', uniqueUserPosts.map(p => p.id))
         .limit(50);
 
       if (tagsError) throw tagsError;
 
+      // For users without videos in their latest post, get any images from their other posts
+      const usersNeedingImages = uniqueUserPosts.filter(post => 
+        !post.post_media?.some(media => media.media_type === 'video')
+      ).map(post => post.user_id);
+
+      let additionalImages: any[] = [];
+      if (usersNeedingImages.length > 0) {
+        const { data: imagePosts, error: imageError } = await supabase
+          .from('posts')
+          .select(`
+            user_id,
+            post_media!inner (
+              media_url,
+              media_type
+            )
+          `)
+          .in('user_id', usersNeedingImages)
+          .eq('post_media.media_type', 'image')
+          .limit(usersNeedingImages.length * 3); // Get a few images per user
+
+        if (!imageError && imagePosts) {
+          additionalImages = imagePosts;
+        }
+      }
+
       // Transform the data
-      const transformedMoments: MomentPost[] = posts.map(post => {
+      const transformedMoments: MomentPost[] = uniqueUserPosts.map(post => {
         const userProfile = profiles?.find(p => p.id === post.user_id);
         const isFollowing = followedUserIds.has(post.user_id);
         
@@ -167,14 +203,22 @@ const ClbhouzMomentsCarousel: React.FC = () => {
         // Check if post has video content
         const hasVideo = post.post_media?.some(media => media.media_type === 'video');
         
-        // For posts without videos, create a mock video entry using profile photo
+        // Get media to use - prefer videos, then post images, then additional images
         let mediaToUse = post.post_media || [];
-        if (!hasVideo && userProfile?.profile_photo_url) {
-          mediaToUse = [{
-            id: `profile-${post.id}`,
-            media_url: userProfile.profile_photo_url,
-            media_type: 'image' // We'll handle this as a static image that looks like video
-          }];
+        
+        if (!hasVideo) {
+          // Look for images in this post first
+          const postImages = post.post_media?.filter(media => media.media_type === 'image') || [];
+          
+          if (postImages.length > 0) {
+            mediaToUse = [postImages[0]]; // Use first image from the post
+          } else {
+            // Look for images from user's other posts
+            const userImages = additionalImages.filter(img => img.user_id === post.user_id);
+            if (userImages.length > 0 && userImages[0].post_media?.length > 0) {
+              mediaToUse = [userImages[0].post_media[0]];
+            }
+          }
         }
         
         return {
@@ -195,10 +239,10 @@ const ClbhouzMomentsCarousel: React.FC = () => {
         };
       });
 
-      // Filter to only include posts that have some media (video or profile photo)
-      const postsWithMedia = transformedMoments.filter(moment => 
-        moment.media && moment.media.length > 0
-      );
+      // Filter to only include posts that have some media and limit to reasonable number
+      const postsWithMedia = transformedMoments
+        .filter(moment => moment.media && moment.media.length > 0)
+        .slice(0, 10); // Limit to 10 unique users
 
       setMoments(postsWithMedia);
     } catch (error) {
