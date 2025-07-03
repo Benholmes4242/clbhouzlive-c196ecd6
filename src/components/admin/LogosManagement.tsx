@@ -6,7 +6,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Upload, Trash2, Loader2 } from 'lucide-react';
+import { Upload, Trash2, Loader2, Sun, Moon } from 'lucide-react';
+import { useTheme } from '@/components/theme-provider';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -33,12 +34,15 @@ interface Logo {
 
 const LogosManagement = () => {
   const { toast } = useToast();
+  const { theme } = useTheme();
   const [logos, setLogos] = useState<Logo[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
 
   const categories = {
+    app_logo_light: 'App Logo - Light Mode',
+    app_logo_dark: 'App Logo - Dark Mode',
     handicap_bodies: 'Official Golf Handicap & Regulatory Bodies',
     golf_courses: 'Golf Courses',
     universities: 'Universities',
@@ -169,6 +173,107 @@ const LogosManagement = () => {
     return logos.filter(logo => logo.category === category);
   };
 
+  const getCurrentAppLogo = () => {
+    const lightLogos = getLogosByCategory('app_logo_light');
+    const darkLogos = getLogosByCategory('app_logo_dark');
+    
+    if (theme === 'dark') {
+      return darkLogos.length > 0 ? darkLogos[0] : lightLogos[0];
+    } else if (theme === 'light') {
+      return lightLogos.length > 0 ? lightLogos[0] : null;
+    } else {
+      // System theme - check if user prefers dark
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      return prefersDark && darkLogos.length > 0 ? darkLogos[0] : lightLogos[0];
+    }
+  };
+
+  const AppLogoPreview = () => {
+    const lightLogos = getLogosByCategory('app_logo_light');
+    const darkLogos = getLogosByCategory('app_logo_dark');
+    const currentLogo = getCurrentAppLogo();
+    
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Sun className="h-5 w-5" />
+            App Logos
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Current Active Logo Preview */}
+          <div className="text-center space-y-4">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <span className="text-sm text-muted-foreground">Current Active Logo</span>
+              {theme === 'dark' ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+            </div>
+            <div className="mx-auto w-48 h-32 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 flex items-center justify-center overflow-hidden">
+              {currentLogo ? (
+                <img
+                  src={currentLogo.file_url}
+                  alt="Current app logo"
+                  className="max-w-full max-h-full object-contain"
+                />
+              ) : (
+                <span className="text-gray-400 text-sm">No logo uploaded</span>
+              )}
+            </div>
+          </div>
+
+          {/* Light and Dark Mode Logos Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Light Mode Logo */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Sun className="h-4 w-4" />
+                <span className="font-medium">Light Mode Logo</span>
+                <span className="text-xs text-muted-foreground">({lightLogos.length})</span>
+              </div>
+              <div className="bg-white border rounded-lg p-4 min-h-[120px] flex items-center justify-center">
+                {lightLogos.length > 0 ? (
+                  <div className="text-center space-y-2">
+                    <img
+                      src={lightLogos[0].file_url}
+                      alt="Light mode logo"
+                      className="max-h-16 max-w-full object-contain mx-auto"
+                    />
+                    <p className="text-xs text-gray-600">{lightLogos[0].file_name}</p>
+                  </div>
+                ) : (
+                  <span className="text-gray-400 text-sm">No light mode logo</span>
+                )}
+              </div>
+            </div>
+
+            {/* Dark Mode Logo */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Moon className="h-4 w-4" />
+                <span className="font-medium">Dark Mode Logo</span>
+                <span className="text-xs text-muted-foreground">({darkLogos.length})</span>
+              </div>
+              <div className="bg-gray-900 border rounded-lg p-4 min-h-[120px] flex items-center justify-center">
+                {darkLogos.length > 0 ? (
+                  <div className="text-center space-y-2">
+                    <img
+                      src={darkLogos[0].file_url}
+                      alt="Dark mode logo"
+                      className="max-h-16 max-w-full object-contain mx-auto"
+                    />
+                    <p className="text-xs text-gray-300">{darkLogos[0].file_name}</p>
+                  </div>
+                ) : (
+                  <span className="text-gray-400 text-sm">No dark mode logo</span>
+                )}
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
+
   const LogoGrid = ({ category }: { category: string }) => {
     const categoryLogos = getLogosByCategory(category);
 
@@ -227,8 +332,11 @@ const LogosManagement = () => {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold mb-2">Logos Management</h2>
-        <p className="text-muted-foreground">Manage uploaded logos across different categories</p>
+        <p className="text-muted-foreground">Manage app logos and uploaded logos across different categories</p>
       </div>
+
+      {/* App Logo Preview */}
+      <AppLogoPreview />
 
       {/* Upload Section */}
       <Card>
@@ -276,10 +384,18 @@ const LogosManagement = () => {
       </Card>
 
       {/* Logo Tabs */}
-      <Tabs defaultValue="handicap_bodies" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+      <Tabs defaultValue="app_logo_light" className="w-full">
+        <TabsList className="grid w-full grid-cols-6">
+          <TabsTrigger value="app_logo_light" className="text-xs">
+            <Sun className="w-3 h-3 mr-1" />
+            Light Logo
+          </TabsTrigger>
+          <TabsTrigger value="app_logo_dark" className="text-xs">
+            <Moon className="w-3 h-3 mr-1" />
+            Dark Logo
+          </TabsTrigger>
           <TabsTrigger value="handicap_bodies" className="text-xs">
-            Official Golf Handicap & Regulatory Bodies
+            Handicap Bodies
           </TabsTrigger>
           <TabsTrigger value="golf_courses" className="text-xs">
             Golf Courses

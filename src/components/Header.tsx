@@ -3,9 +3,11 @@ import React from 'react';
 import { useNavigate } from "react-router-dom";
 import HeaderNavigation from './header/HeaderNavigation';
 import HeaderSearch from './header/HeaderSearch';
+import { useAppLogo } from '@/hooks/useAppLogo';
 
 const Header = () => {
   const navigate = useNavigate();
+  const { currentLogo } = useAppLogo();
 
   const handleLogoClick = () => {
     navigate('/');
@@ -18,7 +20,7 @@ const Header = () => {
           {/* Logo - Fixed positioning */}
           <div className="flex items-center flex-shrink-0">
             <img
-              src="/lovable-uploads/181fd40d-ced5-420c-bff8-27c2ef146377.png"
+              src={currentLogo?.file_url || "/lovable-uploads/181fd40d-ced5-420c-bff8-27c2ef146377.png"}
               alt="clbhouz Logo"
               className="h-10 w-auto cursor-pointer object-contain"
               onClick={handleLogoClick}
