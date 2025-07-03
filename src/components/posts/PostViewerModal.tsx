@@ -182,40 +182,26 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
           {...swipeHandlers}
         >
           {isMobile ? (
-            // Mobile Layout - Full Screen
-            <div className="flex flex-col h-full bg-black">
-              {/* Header */}
-              <div className="flex items-center justify-between p-4 bg-background">
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  onClick={onClose}
-                  className="hover:bg-muted"
-                >
-                  <ArrowLeft className="h-5 w-5" />
-                </Button>
-                <div className="flex items-center space-x-3">
-                  <HighQualityImage
-                    src={currentPost.user.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
-                    alt={displayName}
-                    className="w-8 h-8 rounded-full"
-                    width={32}
-                    height={32}
-                  />
-                  <span className="font-semibold text-sm">{displayName}</span>
-                </div>
-                <div className="w-10" />
-              </div>
+            // Mobile Layout - Full Screen (Explore-style)
+            <div className="relative w-full h-full bg-black">
+              {/* Close Button - Top Left */}
+              <button
+                onClick={onClose}
+                className="absolute top-4 left-4 z-20 flex items-center justify-center w-10 h-10 text-white hover:bg-white/10 rounded-full transition-colors"
+                aria-label="Close"
+              >
+                <X className="h-6 w-6" />
+              </button>
 
-              {/* Media Content */}
-              <div className="flex-1 relative bg-black">
+              {/* Media Content - Full Screen */}
+              <div className="relative w-full h-full flex items-center justify-center">
                 {currentMedia && (
                   <>
                     {currentMedia.media_type === 'video' ? (
                       <VideoPreview
                         src={currentMedia.media_url}
-                        className="w-full h-full object-contain"
-                        videoId={`post-viewer-${currentPost.id}-${currentMediaIndex}`}
+                        className="w-full h-full object-cover"
+                        videoId={`post-viewer-mobile-${currentPost.id}-${currentMediaIndex}`}
                       />
                     ) : (
                       <HighQualityImage
@@ -225,7 +211,7 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                       />
                     )}
                     
-                    {/* Golf Course Badge */}
+                    {/* Golf Course Badge - Top Right */}
                     {golfCourse && (
                       <div className="absolute top-4 right-4 z-10">
                         <CoursePostBadge 
@@ -235,13 +221,14 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                       </div>
                     )}
 
-                    {/* Media Navigation Dots */}
+                    {/* Media Navigation Dots - Bottom Center */}
                     {hasMultipleMedia && (
-                      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                      <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 flex space-x-2 z-10">
                         {currentPost.post_media.map((_, index) => (
-                          <div
+                          <button
                             key={index}
-                            className={`w-2 h-2 rounded-full ${
+                            onClick={() => setCurrentMediaIndex(index)}
+                            className={`w-2 h-2 rounded-full transition-colors ${
                               index === currentMediaIndex ? 'bg-white' : 'bg-white/50'
                             }`}
                           />
@@ -250,45 +237,92 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                     )}
                   </>
                 )}
-
-                {/* End of posts indicator */}
-                {isAtEnd && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-                    <div className="bg-background rounded-lg p-4 text-center">
-                      <p className="text-sm text-muted-foreground">You've reached the end</p>
-                    </div>
-                  </div>
-                )}
               </div>
 
-              {/* Bottom Actions */}
-              <div className="p-4 bg-background">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center space-x-4">
-                    <Button variant="ghost" size="sm" className="hover:text-red-500">
-                      <Heart className="h-5 w-5 mr-1" />
-                      Like
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      onClick={() => setShowComments(true)}
-                    >
-                      <MessageCircle className="h-5 w-5 mr-1" />
-                      Comment
-                    </Button>
-                    <Button variant="ghost" size="sm">
-                      <Share className="h-5 w-5 mr-1" />
-                      Share
-                    </Button>
+              {/* User Info & Caption - Bottom Left */}
+              <div className="absolute bottom-4 left-4 z-10 max-w-[60%]">
+                <div className="flex items-center space-x-3 mb-2">
+                  <HighQualityImage
+                    src={currentPost.user.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
+                    alt={displayName}
+                    className="w-8 h-8 rounded-full border border-white/50"
+                    width={32}
+                    height={32}
+                  />
+                  <div>
+                    <div className="text-white font-semibold text-sm">
+                      {displayName}
+                    </div>
+                    <div className="text-white/70 text-xs">
+                      {timeAgo}
+                    </div>
                   </div>
-                  <span className="text-xs text-muted-foreground">{timeAgo}</span>
                 </div>
                 
                 {currentPost.content && (
-                  <p className="text-sm">{currentPost.content}</p>
+                  <p className="text-white text-sm leading-relaxed bg-black/30 p-2 rounded max-w-full">
+                    {currentPost.content}
+                  </p>
                 )}
               </div>
+
+              {/* Action Buttons - Right Side */}
+              <div className="absolute right-4 bottom-20 z-10 flex flex-col space-y-4">
+                {/* Like Button */}
+                <button className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform">
+                  <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
+                    <Heart className="h-6 w-6" />
+                  </div>
+                  <span className="text-xs font-medium">0</span>
+                </button>
+
+                {/* Comment Button */}
+                <button 
+                  onClick={() => setShowComments(true)}
+                  className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform"
+                >
+                  <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
+                    <MessageCircle className="h-6 w-6" />
+                  </div>
+                  <span className="text-xs font-medium">0</span>
+                </button>
+
+                {/* Share Button */}
+                <button className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform">
+                  <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
+                    <Share className="h-6 w-6" />
+                  </div>
+                </button>
+              </div>
+
+              {/* Post Navigation - Bottom Edge (for multiple posts) */}
+              {hasMultiplePosts && (
+                <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-4 z-10">
+                  <button
+                    onClick={() => navigatePost('prev')}
+                    disabled={currentPostIndex === 0}
+                    className="flex items-center justify-center w-8 h-8 bg-black/50 rounded-full text-white disabled:opacity-50"
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => navigatePost('next')}
+                    disabled={currentPostIndex === allUserPosts.length - 1}
+                    className="flex items-center justify-center w-8 h-8 bg-black/50 rounded-full text-white disabled:opacity-50"
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </button>
+                </div>
+              )}
+
+              {/* End of posts indicator */}
+              {isAtEnd && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-30">
+                  <div className="bg-background rounded-lg p-4 text-center">
+                    <p className="text-sm text-muted-foreground">You've reached the end</p>
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             // Desktop Layout - Instagram Style
