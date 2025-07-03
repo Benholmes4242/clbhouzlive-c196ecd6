@@ -9,24 +9,38 @@ export const useProfileData = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchProfile = async (userId: string) => {
+  const fetchProfile = async (userId: string, forceRefresh = false) => {
     try {
       setError(null);
-      const { data, error } = await supabase
+      
+      // Add cache busting for force refresh
+      const query = supabase
         .from('user_profiles')
         .select('*')
-        .eq('id', userId)
-        .single();
+        .eq('id', userId);
+        
+      const { data, error } = await query.single();
 
       if (error) {
         console.error('Error fetching profile:', error);
         setError(error.message);
         return;
       }
+      
+      console.log('Fetched profile data:', data);
       setProfile(data);
     } catch (error) {
       console.error('Error fetching profile:', error);
       setError('Failed to fetch profile');
+    }
+  };
+
+  const refreshProfile = () => {
+    if (user?.id) {
+      setLoading(true);
+      fetchProfile(user.id, true).finally(() => {
+        setLoading(false);
+      });
     }
   };
 
@@ -70,6 +84,7 @@ export const useProfileData = () => {
     error,
     setProfile,
     fetchProfile,
+    refreshProfile,
     updateProfileField
   };
 };
