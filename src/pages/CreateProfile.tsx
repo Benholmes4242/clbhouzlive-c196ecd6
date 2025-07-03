@@ -62,7 +62,14 @@ const CreateProfile = () => {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    
+    // Clean username by removing spaces and converting to lowercase
+    if (name === 'username') {
+      const cleanedValue = value.replace(/\s+/g, '').replace('@', '').toLowerCase();
+      setFormData(prev => ({ ...prev, [name]: cleanedValue }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleSelectChange = (field: string, value: string) => {
@@ -126,7 +133,8 @@ const CreateProfile = () => {
 
     if (userType === 'individual') {
       profileData.display_name = formData.name;
-      profileData.username = formData.username;
+      // Clean username one more time before saving to ensure no spaces
+      profileData.username = formData.username.replace(/\s+/g, '').replace('@', '').toLowerCase();
       // Only set home_club if it's not "Not applicable" or empty
       if (formData.homeClub && formData.homeClub.toLowerCase() !== 'not applicable') {
         profileData.home_club = formData.homeClub;

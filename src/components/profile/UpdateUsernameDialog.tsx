@@ -28,15 +28,26 @@ const UpdateUsernameDialog: React.FC<UpdateUsernameDialogProps> = ({
   const [username, setUsername] = useState(currentUsername || "");
   const [saving, setSaving] = useState(false);
 
+  // Function to clean username - remove spaces and convert to lowercase
+  const cleanUsername = (value: string) => {
+    return value.replace(/\s+/g, '').replace('@', '').toLowerCase();
+  };
+
+  // Handle username input change with automatic space removal
+  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const cleanedValue = cleanUsername(e.target.value);
+    setUsername(cleanedValue);
+  };
+
   const handleSave = async () => {
     setSaving(true);
     try {
-      const cleanUsername = username.replace('@', '').toLowerCase();
+      const cleanedUsername = cleanUsername(username);
       
       const { error } = await supabase
         .from('user_profiles')
         .update({ 
-          username: cleanUsername,
+          username: cleanedUsername,
           updated_at: new Date().toISOString()
         })
         .eq('id', userId);
@@ -74,11 +85,11 @@ const UpdateUsernameDialog: React.FC<UpdateUsernameDialogProps> = ({
             <Input
               id="username"
               value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              onChange={handleUsernameChange}
               placeholder="benjaminholmes"
             />
             <p className="text-xs text-muted-foreground">
-              Your username will appear as @{username.replace('@', '')}
+              Your username will appear as @{username}. Spaces will be automatically removed.
             </p>
           </div>
         </div>

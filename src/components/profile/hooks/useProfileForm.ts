@@ -37,10 +37,20 @@ export const useProfileForm = (
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    
+    // Clean username by removing spaces and converting to lowercase
+    if (name === 'username') {
+      const cleanedValue = value.replace(/\s+/g, '').replace('@', '').toLowerCase();
+      setFormData(prev => ({
+        ...prev,
+        [name]: cleanedValue
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   };
 
   const handleHandicapChange = (value: string) => {
@@ -69,7 +79,8 @@ export const useProfileForm = (
       };
 
       if (!isUsernameSet) {
-        updateData.username = formData.username || null;
+        // Clean username one more time before saving to ensure no spaces
+        updateData.username = formData.username ? formData.username.replace(/\s+/g, '').replace('@', '').toLowerCase() : null;
       }
 
       await supabase
