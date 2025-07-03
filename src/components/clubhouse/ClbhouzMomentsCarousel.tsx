@@ -35,135 +35,13 @@ interface MomentPost {
 const ClbhouzMomentsCarousel: React.FC = () => {
   const { user } = useSupabaseSession();
   const { toast } = useToast();
+  const [moments, setMoments] = useState<MomentPost[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   const [isMobile, setIsMobile] = useState(false);
   const carouselRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<{ [key: string]: HTMLVideoElement }>({});
-
-  // Mock data for demonstration
-  const mockMoments: MomentPost[] = [
-    {
-      id: '1',
-      content: 'Amazing round at Augusta National! The greens were perfect and the weather couldn\'t have been better. What a dream come true!',
-      created_at: '2024-01-15T10:30:00Z',
-      user_id: 'user1',
-      media: [{
-        id: 'media1',
-        media_url: 'https://images.unsplash.com/photo-1533618363240-b1e2aa9b1c92?w=400',
-        media_type: 'video'
-      }],
-      user_profile: {
-        id: 'user1',
-        display_name: 'Tiger Woods',
-        username: 'tigerwoods',
-        profile_photo_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
-      },
-      course_tags: [{ course_name: 'Augusta National Golf Club' }],
-      user_tags: [{ user_name: 'Phil Mickelson' }, { user_name: 'Rory McIlroy' }],
-      is_following: false,
-    },
-    {
-      id: '2', 
-      content: 'First time playing St Andrews Old Course! The history and tradition here is incredible. Every hole tells a story.',
-      created_at: '2024-01-14T14:20:00Z',
-      user_id: 'user2',
-      media: [{
-        id: 'media2',
-        media_url: 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400',
-        media_type: 'video'
-      }],
-      user_profile: {
-        id: 'user2',
-        display_name: 'Jordan Spieth',
-        username: 'jordanspieth',
-        profile_photo_url: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
-      },
-      course_tags: [{ course_name: 'St Andrews Links (Old Course)' }],
-      is_following: false,
-    },
-    {
-      id: '3',
-      content: 'Sunset golf at Pebble Beach is pure magic. The views from the 18th hole are unmatched anywhere in the world!',
-      created_at: '2024-01-13T18:45:00Z',
-      user_id: 'user3',
-      media: [{
-        id: 'media3',
-        media_url: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400',
-        media_type: 'video'
-      }],
-      user_profile: {
-        id: 'user3',
-        display_name: 'Justin Thomas',
-        username: 'justinthomas',
-        profile_photo_url: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face',
-      },
-      course_tags: [{ course_name: 'Pebble Beach Golf Links' }],
-      user_tags: [{ user_name: 'Rickie Fowler' }],
-      is_following: false,
-    },
-    {
-      id: '4',
-      content: 'Links golf at its finest! Royal County Down never disappoints. The mountain views are absolutely breathtaking.',
-      created_at: '2024-01-12T11:15:00Z',
-      user_id: 'user4',
-      media: [{
-        id: 'media4',
-        media_url: 'https://images.unsplash.com/photo-1593111774240-d529f12cf4bb?w=400',
-        media_type: 'video'
-      }],
-      user_profile: {
-        id: 'user4',
-        display_name: 'Rory McIlroy',
-        username: 'rorymcilroy',
-        profile_photo_url: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100&h=100&fit=crop&crop=face',
-      },
-      course_tags: [{ course_name: 'Royal County Down Golf Club' }],
-      is_following: false,
-    },
-    {
-      id: '5',
-      content: 'Desert golf in Scotland! Castle Stuart is such a unique experience. The coastal winds make every shot interesting.',
-      created_at: '2024-01-11T16:30:00Z',
-      user_id: 'user5',
-      media: [{
-        id: 'media5',
-        media_url: 'https://images.unsplash.com/photo-1592919505780-303950717480?w=400',
-        media_type: 'video'
-      }],
-      user_profile: {
-        id: 'user5',
-        display_name: 'Collin Morikawa',
-        username: 'collinmorikawa',
-        profile_photo_url: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&h=100&fit=crop&crop=face',
-      },
-      course_tags: [{ course_name: 'Castle Stuart Golf Links' }],
-      user_tags: [{ user_name: 'Viktor Hovland' }],
-      is_following: false,
-    },
-    {
-      id: '6',
-      content: 'Championship golf at Kiawah Island! The Ocean Course is a true test of golf. Wind is everything here.',
-      created_at: '2024-01-10T09:45:00Z',
-      user_id: 'user6',
-      media: [{
-        id: 'media6',
-        media_url: 'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=400',
-        media_type: 'video'
-      }],
-      user_profile: {
-        id: 'user6',
-        display_name: 'Bryson DeChambeau',
-        username: 'brysondechambeau',
-        profile_photo_url: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop&crop=face',
-      },
-      course_tags: [{ course_name: 'Kiawah Island Golf Resort' }],
-      is_following: false,
-    }
-  ];
-
-  const [moments, setMoments] = useState<MomentPost[]>(mockMoments);
 
   const nextSlide = () => {
     const maxIndex = isMobile ? moments.length - 1 : moments.length - 4;
@@ -195,6 +73,140 @@ const ClbhouzMomentsCarousel: React.FC = () => {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      fetchMoments();
+    }
+  }, [user]);
+
+  const fetchMoments = async () => {
+    if (!user) return;
+
+    try {
+      setIsLoading(true);
+      
+      // Get all posts with media (both video and image posts)
+      const { data: posts, error } = await supabase
+        .from('posts')
+        .select(`
+          id,
+          content,
+          created_at,
+          user_id,
+          post_media (
+            id,
+            media_url,
+            media_type
+          )
+        `)
+        .not('user_id', 'eq', user.id) // Still exclude current user's posts
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      if (error) throw error;
+
+      if (!posts || posts.length === 0) {
+        setMoments([]);
+        return;
+      }
+
+      // Get user profiles for these posts
+      const userIds = [...new Set(posts.map(post => post.user_id))];
+      const { data: profiles, error: profilesError } = await supabase
+        .from('user_profiles')
+        .select('id, display_name, username, profile_photo_url')
+        .in('id', userIds);
+
+      if (profilesError) throw profilesError;
+
+      // Get follow relationships
+      const { data: followedUsers, error: followError } = await supabase
+        .from('user_follows')
+        .select('following_id')
+        .eq('follower_id', user.id)
+        .in('following_id', userIds);
+
+      if (followError) throw followError;
+
+      const followedUserIds = new Set(followedUsers?.map(f => f.following_id) || []);
+
+      // Get course and user tags for posts
+      const { data: postTags, error: tagsError } = await supabase
+        .from('post_tags')
+        .select(`
+          post_id,
+          tagged_entity_id,
+          taggable_entities!inner (
+            id,
+            entity_type,
+            entity_id,
+            name
+          )
+        `)
+        .in('post_id', posts.map(p => p.id))
+        .limit(50);
+
+      if (tagsError) throw tagsError;
+
+      // Transform the data
+      const transformedMoments: MomentPost[] = posts.map(post => {
+        const userProfile = profiles?.find(p => p.id === post.user_id);
+        const isFollowing = followedUserIds.has(post.user_id);
+        
+        // Get tags for this post
+        const postTagsData = postTags?.filter(tag => tag.post_id === post.id) || [];
+        const courseTags = postTagsData
+          .filter(tag => tag.taggable_entities?.entity_type === 'course' || tag.taggable_entities?.entity_type === 'golf_club')
+          .map(tag => ({ course_name: tag.taggable_entities?.name || '' }));
+        
+        const userTags = postTagsData
+          .filter(tag => tag.taggable_entities?.entity_type === 'user')
+          .map(tag => ({ user_name: tag.taggable_entities?.name || '' }));
+
+        // Check if post has video content
+        const hasVideo = post.post_media?.some(media => media.media_type === 'video');
+        
+        // For posts without videos, create a mock video entry using profile photo
+        let mediaToUse = post.post_media || [];
+        if (!hasVideo && userProfile?.profile_photo_url) {
+          mediaToUse = [{
+            id: `profile-${post.id}`,
+            media_url: userProfile.profile_photo_url,
+            media_type: 'image' // We'll handle this as a static image that looks like video
+          }];
+        }
+        
+        return {
+          id: post.id,
+          content: post.content || '',
+          created_at: post.created_at,
+          user_id: post.user_id,
+          media: mediaToUse,
+          user_profile: {
+            id: userProfile?.id || '',
+            display_name: userProfile?.display_name || 'Unknown User',
+            username: userProfile?.username || '',
+            profile_photo_url: userProfile?.profile_photo_url || '',
+          },
+          course_tags: courseTags,
+          user_tags: userTags,
+          is_following: isFollowing,
+        };
+      });
+
+      // Filter to only include posts that have some media (video or profile photo)
+      const postsWithMedia = transformedMoments.filter(moment => 
+        moment.media && moment.media.length > 0
+      );
+
+      setMoments(postsWithMedia);
+    } catch (error) {
+      console.error('Error fetching moments:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleFollow = async (userId: string, momentId: string) => {
     if (!user) return;
@@ -361,21 +373,31 @@ const ClbhouzMomentsCarousel: React.FC = () => {
                   console.log('Open moment:', moment.id);
                 }}
               >
-                {/* Video Background */}
+                {/* Video/Image Background */}
                 <div className="relative aspect-[9/16] bg-black">
                   {moment.media[0] && (
-                    <video
-                      ref={el => {
-                        if (el) videoRefs.current[moment.id] = el;
-                      }}
-                      className="w-full h-full object-cover"
-                      loop
-                      muted
-                      playsInline
-                      poster={moment.media[0].media_url}
-                    >
-                      <source src={moment.media[0].media_url} type="video/mp4" />
-                    </video>
+                    <>
+                      {moment.media[0].media_type === 'video' ? (
+                        <video
+                          ref={el => {
+                            if (el) videoRefs.current[moment.id] = el;
+                          }}
+                          className="w-full h-full object-cover"
+                          loop
+                          muted
+                          playsInline
+                          poster={moment.media[0].media_url}
+                        >
+                          <source src={moment.media[0].media_url} type="video/mp4" />
+                        </video>
+                      ) : (
+                        <img
+                          src={moment.media[0].media_url}
+                          alt={moment.user_profile.display_name}
+                          className="w-full h-full object-cover"
+                        />
+                      )}
+                    </>
                   )}
                   
                   {/* Overlay */}
