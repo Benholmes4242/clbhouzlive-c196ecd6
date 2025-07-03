@@ -13,7 +13,6 @@ const NotificationsPage = () => {
   const { 
     notifications, 
     isLoading, 
-    handleFriendRequest, 
     markAllNonFriendRequestsAsRead 
   } = useNotifications();
 
@@ -64,8 +63,6 @@ const NotificationsPage = () => {
           ) : (
             <NotificationsList
               notifications={notifications}
-              onAcceptFriendRequest={(friendRequestId) => handleFriendRequest(friendRequestId, 'accept')}
-              onDeclineFriendRequest={(friendRequestId) => handleFriendRequest(friendRequestId, 'decline')}
             />
           )}
         </div>

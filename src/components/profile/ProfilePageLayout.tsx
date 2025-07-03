@@ -10,7 +10,6 @@ interface ProfilePageLayoutProps {
   currentUser: any;
   relationshipStatus: {
     isFollowing: boolean;
-    friendStatus: 'pending' | 'accepted' | null;
   } | null;
   regionProgress: any;
   onRegionClick: (region: string) => void;

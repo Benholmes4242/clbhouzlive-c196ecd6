@@ -44,8 +44,9 @@ export const useNotifications = (): UseNotificationsReturn => {
     markAsReadMutation.mutate(notificationIds);
   };
 
-  const handleFriendRequest = (friendRequestId: string, action: 'accept' | 'decline') => {
-    handleFriendRequestMutation.mutate({ friendRequestId, action });
+  // Friend request functionality removed - only follow system remains
+  const handleFriendRequest = () => {
+    console.log('Friend request functionality removed');
   };
 
   const markAllNonFriendRequestsAsRead = () => {

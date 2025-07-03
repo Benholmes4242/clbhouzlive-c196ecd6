@@ -10,7 +10,6 @@ interface InstagramStyleProfileHeaderProps {
   currentUser: any;
   relationshipStatus: {
     isFollowing: boolean;
-    friendStatus: 'pending' | 'accepted' | null;
   } | null;
 }
 
@@ -62,7 +61,6 @@ const InstagramStyleProfileHeader: React.FC<InstagramStyleProfileHeaderProps> = 
                 targetUserId={profile.id}
                 currentUserId={currentUser.id}
                 isFollowing={relationshipStatus?.isFollowing || false}
-                friendStatus={relationshipStatus?.friendStatus || null}
                 username={profile.username || profile.display_name || 'User'}
                 targetUserType={profile.user_type || 'individual'}
                 currentUserType={currentUser.user_type || 'individual'}

@@ -12,50 +12,44 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 const FriendsPage = () => {
   const { user } = useSupabaseSession();
 
-  const { data: friends, isLoading } = useQuery({
-    queryKey: ['friends', user?.id],
+  const { data: following, isLoading } = useQuery({
+    queryKey: ['following', user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
       
-      console.log('Fetching friends for user:', user.id);
+      console.log('Fetching following for user:', user.id);
       
-      // Get all accepted friendships where current user is involved
-      const { data: friendships, error: friendshipError } = await supabase
-        .from('user_friends')
-        .select('user_id, friend_id')
-        .or(`and(user_id.eq.${user.id},status.eq.accepted),and(friend_id.eq.${user.id},status.eq.accepted)`);
+      // Get all users the current user follows
+      const { data: followData, error: followError } = await supabase
+        .from('user_follows')
+        .select('following_id')
+        .eq('follower_id', user.id);
 
-      if (friendshipError) {
-        console.error('Error fetching friendships:', friendshipError);
-        throw friendshipError;
+      if (followError) {
+        console.error('Error fetching following relationships:', followError);
+        throw followError;
       }
       
-      if (!friendships || friendships.length === 0) {
-        console.log('No friendships found');
+      if (!followData || followData.length === 0) {
+        console.log('Not following anyone');
         return [];
       }
 
-      // Extract friend IDs (excluding current user)
-      const friendIds = friendships.map(friendship => 
-        friendship.user_id === user.id ? friendship.friend_id : friendship.user_id
-      );
+      console.log('Following IDs found:', followData.map(f => f.following_id));
 
-      console.log('Friend IDs found:', friendIds);
-
-      if (friendIds.length === 0) return [];
-
-      // Get profile data for all friends
+      // Then get the profile data for each person being followed
+      const followingIds = followData.map(f => f.following_id);
       const { data: profiles, error: profileError } = await supabase
         .from('user_profiles')
         .select('id, display_name, username, profile_photo_url, bio')
-        .in('id', friendIds);
+        .in('id', followingIds);
 
       if (profileError) {
-        console.error('Error fetching friend profiles:', profileError);
+        console.error('Error fetching following profiles:', profileError);
         throw profileError;
       }
 
-      console.log('Friend profiles:', profiles);
+      console.log('Following profiles:', profiles);
       return profiles || [];
     },
     enabled: !!user?.id,
@@ -66,7 +60,7 @@ const FriendsPage = () => {
       <div className="min-h-screen bg-background pb-28">
         <Header />
         <div className="max-w-2xl mx-auto px-4 py-6">
-          <div className="text-center">Loading friends...</div>
+          <div className="text-center">Loading following...</div>
         </div>
         <BottomNavigation />
       </div>
@@ -79,12 +73,12 @@ const FriendsPage = () => {
       <div className="max-w-2xl mx-auto px-4 py-6">
         <div className="flex items-center gap-2 mb-6">
           <UserCheck className="h-6 w-6" />
-          <h1 className="text-2xl font-bold">Friends</h1>
+          <h1 className="text-2xl font-bold">Following</h1>
         </div>
 
-        {friends && friends.length > 0 ? (
+        {following && following.length > 0 ? (
           <div className="space-y-3">
-            {friends.map((profile) => (
+            {following.map((profile) => (
               <Card key={profile.id}>
                 <CardContent className="p-4">
                   <div className="flex items-center justify-between">
@@ -116,7 +110,7 @@ const FriendsPage = () => {
           </div>
         ) : (
           <div className="text-center py-8 text-muted-foreground">
-            No friends yet.
+            Not following anyone yet.
           </div>
         )}
       </div>

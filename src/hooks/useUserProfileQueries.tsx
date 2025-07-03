@@ -81,7 +81,7 @@ export const useUserProfileQueries = () => {
     enabled: !!currentUser?.id,
   });
 
-  // Check relationship status with current user
+  // Check relationship status with current user (follow-only system)
   const { data: relationshipStatus } = useQuery({
     queryKey: ['relationshipStatus', currentUser?.id, profile?.id],
     queryFn: async () => {
@@ -95,21 +95,8 @@ export const useUserProfileQueries = () => {
         .eq('following_id', profile.id)
         .maybeSingle();
 
-      // Check friend status - look for bidirectional relationships
-      const { data: friendData } = await supabase
-        .from('user_friends')
-        .select('status')
-        .or(`and(user_id.eq.${currentUser.id},friend_id.eq.${profile.id}),and(user_id.eq.${profile.id},friend_id.eq.${currentUser.id})`)
-        .maybeSingle();
-
-      // Properly type the friend status
-      const friendStatus = friendData?.status;
-      const validFriendStatus: 'pending' | 'accepted' | null = 
-        friendStatus === 'pending' || friendStatus === 'accepted' ? friendStatus as 'pending' | 'accepted' : null;
-
       return {
-        isFollowing: !!followData,
-        friendStatus: validFriendStatus
+        isFollowing: !!followData
       };
     },
     enabled: !!currentUser?.id && !!profile?.id && currentUser.id !== profile.id,

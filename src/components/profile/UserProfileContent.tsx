@@ -9,7 +9,6 @@ interface UserProfileContentProps {
   currentUser: any;
   relationshipStatus: {
     isFollowing: boolean;
-    friendStatus: 'pending' | 'accepted' | null;
   } | null;
 }
 

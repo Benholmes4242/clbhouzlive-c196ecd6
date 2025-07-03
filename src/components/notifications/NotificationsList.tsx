@@ -1,22 +1,16 @@
-
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Bell, CheckCircle, UserPlus, Tag, MessageSquare } from 'lucide-react';
+import { Bell, UserPlus, Tag, MessageSquare } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import FriendRequestNotification from './FriendRequestNotification';
 import FollowNotification from './FollowNotification';
 import TagNotification from './TagNotification';
 
 interface NotificationsListProps {
   notifications: any[];
-  onAcceptFriendRequest: (friendRequestId: string) => void;
-  onDeclineFriendRequest: (friendRequestId: string) => void;
 }
 
 const NotificationsList: React.FC<NotificationsListProps> = ({ 
-  notifications, 
-  onAcceptFriendRequest, 
-  onDeclineFriendRequest 
+  notifications
 }) => {
   const navigate = useNavigate();
 
@@ -41,35 +35,11 @@ const NotificationsList: React.FC<NotificationsListProps> = ({
     }
   };
 
-  const handleFriendAcceptedClick = (notification: any) => {
-    const friendUsername = notification.data?.accepter_username;
-    if (friendUsername) {
-      navigate(`/profile/${friendUsername}`);
-    }
-  };
-
   return (
     <Card>
       <CardContent className="p-0">
         {notifications.map((notification) => {
           console.log('Rendering notification:', notification); // Debug log
-
-          if (notification.type === 'friend_request') {
-            const friendRequestId = notification.data?.friend_request_id;
-            if (!friendRequestId) {
-              console.warn('Friend request notification missing friend_request_id:', notification);
-              return null;
-            }
-            
-            return (
-              <FriendRequestNotification
-                key={notification.id}
-                notification={notification}
-                onAccept={() => onAcceptFriendRequest(friendRequestId)}
-                onDecline={() => onDeclineFriendRequest(friendRequestId)}
-              />
-            );
-          }
           
           if (notification.type === 'follow') {
             return (
@@ -86,28 +56,6 @@ const NotificationsList: React.FC<NotificationsListProps> = ({
                 key={notification.id}
                 notification={notification}
               />
-            );
-          }
-
-          if (notification.type === 'friend_accepted') {
-            return (
-              <div 
-                key={notification.id} 
-                className="flex items-center gap-3 p-4 border-b border-border cursor-pointer hover:bg-muted/50"
-                onClick={() => handleFriendAcceptedClick(notification)}
-              >
-                <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <CheckCircle className="h-5 w-5 text-green-600" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-sm">{notification.title}</p>
-                  <p className="text-sm text-muted-foreground">{notification.message}</p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {formatTimeAgo(notification.created_at)}
-                  </p>
-                  <p className="text-xs text-blue-600 mt-1">Tap to view profile</p>
-                </div>
-              </div>
             );
           }
 
@@ -131,6 +79,11 @@ const NotificationsList: React.FC<NotificationsListProps> = ({
                 </div>
               </div>
             );
+          }
+
+          // Skip deprecated friend request and friend accepted notifications
+          if (notification.type === 'friend_request' || notification.type === 'friend_accepted') {
+            return null;
           }
 
           // Fallback for unknown notification types

@@ -1,9 +1,4 @@
-
 import React from 'react';
-import FollowButton from './actions/FollowButton';
-import MessageButton from './actions/MessageButton';
-import FriendButton from './actions/FriendButton';
-import ActionsDropdown from './actions/ActionsDropdown';
 import { useProfileActions } from './actions/useProfileActions';
 import { Button } from '@/components/ui/button';
 import { Users, Check } from 'lucide-react';
@@ -15,7 +10,6 @@ interface UserProfileActionsProps {
   targetUserId: string;
   currentUserId: string;
   isFollowing: boolean;
-  friendStatus: 'pending' | 'accepted' | null;
   username: string;
   targetUserType?: string;
   currentUserType?: string;
@@ -25,13 +19,12 @@ const UserProfileActions: React.FC<UserProfileActionsProps> = ({
   targetUserId,
   currentUserId,
   isFollowing,
-  friendStatus,
   username,
   targetUserType = 'individual',
   currentUserType = 'individual'
 }) => {
   const navigate = useNavigate();
-  const { loading, handleFollow, handleFriendRequest, handleRemoveFriend } = useProfileActions({
+  const { loading, handleFollow } = useProfileActions({
     targetUserId,
     currentUserId
   });
@@ -52,19 +45,13 @@ const UserProfileActions: React.FC<UserProfileActionsProps> = ({
     enabled: !!targetUserId && !!currentUserId,
   });
 
-  // Only allow friend requests between individual users (both must be individual)
-  const canSendFriendRequest = targetUserType === 'individual' && currentUserType === 'individual';
-  
-  // Allow messaging between friends or if either is a business/club
-  const canMessage = friendStatus === 'accepted' || targetUserType !== 'individual' || currentUserType !== 'individual';
-
   const handleFollowersClick = () => {
     navigate(`/profile/${username}/followers`);
   };
 
   const handleMessageClick = () => {
-    // Navigate to messages - placeholder for now
-    console.log('Navigate to messages');
+    // Navigate to messages with the target user
+    navigate(`/messages?friend=${targetUserId}`);
   };
 
   return (
@@ -76,62 +63,30 @@ const UserProfileActions: React.FC<UserProfileActionsProps> = ({
           WebkitOverflowScrolling: 'touch'
         }}
       >
-        {/* Friend Button */}
-        {canSendFriendRequest && (
-          <Button
-            variant={friendStatus === 'accepted' ? "secondary" : "outline"}
-            size="sm"
-            onClick={() => handleFriendRequest(friendStatus)}
-            disabled={loading || friendStatus === 'accepted'}
-            className="px-2 py-1 text-xs h-7 flex-shrink-0"
-          >
-            {friendStatus === 'accepted' ? (
-              <>
-                <Check className="w-3 h-3 mr-1" />
-                Friends ✓
-              </>
-            ) : (
-              <>
-                Request Friend
-              </>
-            )}
-          </Button>
-        )}
-
         {/* Follow Button */}
         <Button
           variant={isFollowing ? "secondary" : "default"}
           size="sm"
           onClick={() => handleFollow(isFollowing)}
           disabled={loading}
-          className="px-2 py-1 text-xs h-7 flex-shrink-0"
+          className="px-3 py-1 text-xs h-7 flex-shrink-0"
         >
           {isFollowing ? (
             <>
               <Check className="w-3 h-3 mr-1" />
-              Following ✓
+              Following
             </>
           ) : (
             'Follow'
           )}
         </Button>
 
-        {/* Followed Button (shows if target user follows current user) */}
-        <Button 
-          variant="outline" 
-          size="sm"
-          disabled
-          className="px-2 py-1 text-xs h-7 flex-shrink-0"
-        >
-          {targetUserFollowsMe ? (
-            <>
-              <Check className="w-3 h-3 mr-1" />
-              Followed ✓
-            </>
-          ) : (
-            'Followed'
-          )}
-        </Button>
+        {/* Follows You Badge (shows if target user follows current user) */}
+        {targetUserFollowsMe && (
+          <div className="px-2 py-1 text-xs h-7 flex-shrink-0 bg-muted text-muted-foreground rounded-md flex items-center">
+            Follows you
+          </div>
+        )}
 
         {/* Followers Button */}
         <Button 
@@ -153,16 +108,6 @@ const UserProfileActions: React.FC<UserProfileActionsProps> = ({
         >
           Message
         </Button>
-
-        {/* Actions Dropdown */}
-        {canSendFriendRequest && (
-          <ActionsDropdown
-            friendStatus={friendStatus}
-            loading={loading}
-            onRemoveFriend={handleRemoveFriend}
-            username={username}
-          />
-        )}
       </div>
     </div>
   );
