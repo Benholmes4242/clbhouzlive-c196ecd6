@@ -77,8 +77,6 @@ INSERT INTO public.badges (name, display_name, description, emoji, category, tie
 -- Engagement / Community Badges  
 ('content_creator', 'Content Creator', 'Shared 10+ Moments (photo/video posts)', '📸', 'engagement', 'bronze', 10, 'posts_created'),
 ('course_reviewer', 'Course Reviewer', 'Wrote 10+ reviews for different courses', '📝', 'engagement', 'bronze', 10, 'reviews_written'),
-('social_sharer', 'Social Sharer', 'Shared 25+ posts from others', '🔁', 'community', 'silver', 25, 'posts_shared'),
-('club_connector', 'Club Connector', 'Followed 50+ users', '🤝', 'community', 'silver', 50, 'users_followed'),
 ('active_rounder', 'Active Rounder', 'Logged 10 rounds with handicap info', '🕐', 'engagement', 'bronze', 10, 'rounds_logged'),
 ('pro_tips_contributor', 'Pro Tips Contributor', 'Posted 5+ tips tagged "Pro Tips"', '🎯', 'engagement', 'gold', 5, 'pro_tips_posted');
 
