@@ -43,22 +43,17 @@ export const useUserPosts = () => {
     }
 
     try {
-      console.log('Fetching posts for all users (not just current user)');
-      
+      // Fetch only recent posts for faster loading
       const { data: postsData, error } = await supabase
         .from('posts')
         .select(`
           id,
           content,
           created_at,
-          user_id,
-          post_media (
-            id,
-            media_type,
-            media_url
-          )
+          user_id
         `)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(10); // Limit initial load for performance
 
       if (error) {
         console.error('Error fetching posts:', error);
@@ -74,81 +69,57 @@ export const useUserPosts = () => {
         return;
       }
 
-      // Get user profiles for all post authors
+      // Get user profiles and media in parallel for faster loading
       const userIds = [...new Set(postsData.map(post => post.user_id))];
-      console.log('Fetching profiles for user IDs:', userIds);
+      const postIds = postsData.map(p => p.id);
       
-      const { data: profiles, error: profilesError } = await supabase
-        .from('user_profiles')
-        .select('id, display_name, username, profile_photo_url')
-        .in('id', userIds);
+      const [profilesResponse, mediaResponse] = await Promise.all([
+        supabase
+          .from('user_profiles')
+          .select('id, display_name, username, profile_photo_url')
+          .in('id', userIds),
+        supabase
+          .from('post_media')
+          .select('id, media_type, media_url, post_id')
+          .in('post_id', postIds)
+      ]);
 
-      if (profilesError) {
-        console.error('Error fetching profiles:', profilesError);
+      if (profilesResponse.error) {
+        console.error('Error fetching profiles:', profilesResponse.error);
         return;
       }
 
-      console.log('Fetched profiles:', profiles);
+      const profiles = profilesResponse.data;
+      const postMedia = mediaResponse.data;
 
-      // Get post tags with proper entity information - using a more direct approach
-      const postIds = postsData.map(p => p.id);
-      console.log('Fetching tags for post IDs:', postIds);
-      
-      const { data: postTagsRaw, error: tagsError } = await supabase
+      // Get tags in a simplified way for better performance
+      const { data: postTags } = await supabase
         .from('post_tags')
         .select(`
           post_id,
-          tagged_entity_id
+          tagged_entity_id,
+          taggable_entities!inner (
+            id,
+            entity_type,
+            entity_id,
+            name
+          )
         `)
-        .in('post_id', postIds);
-
-      if (tagsError) {
-        console.error('Error fetching post tags:', tagsError);
-      }
-
-      console.log('Raw post tags:', postTagsRaw);
-
-      // Now get the taggable entities for these tags
-      let postTags = [];
-      if (postTagsRaw && postTagsRaw.length > 0) {
-        const entityIds = postTagsRaw.map(tag => tag.tagged_entity_id);
-        console.log('Fetching entities for IDs:', entityIds);
-        
-        const { data: entities, error: entitiesError } = await supabase
-          .from('taggable_entities')
-          .select('*')
-          .in('id', entityIds);
-
-        if (entitiesError) {
-          console.error('Error fetching taggable entities:', entitiesError);
-        } else {
-          console.log('Fetched entities:', entities);
-          
-          // Map the tags with their entities
-          postTags = postTagsRaw.map(tag => {
-            const entity = entities?.find(e => e.id === tag.tagged_entity_id);
-            if (entity) {
-              return {
-                post_id: tag.post_id,
-                id: entity.id,
-                entity_type: entity.entity_type,
-                entity_id: entity.entity_id,
-                name: entity.name,
-                username: entity.username
-              };
-            }
-            return null;
-          }).filter(Boolean);
-          
-          console.log('Mapped post tags:', postTags);
-        }
-      }
+        .in('post_id', postIds)
+        .limit(30); // Limit tags for performance
 
       const formattedPosts = postsData.map(post => {
         const userProfile = profiles?.find(profile => profile.id === post.user_id);
-        const tags = postTags?.filter((t: any) => t.post_id === post.id) || [];
+        const media = postMedia?.filter(m => m.post_id === post.id) || [];
+        const tags = postTags?.filter((t: any) => t.post_id === post.id).map((tag: any) => ({
+          id: tag.taggable_entities?.id || tag.tagged_entity_id,
+          entity_type: tag.taggable_entities?.entity_type || 'user',
+          entity_id: tag.taggable_entities?.entity_id || tag.tagged_entity_id,
+          name: tag.taggable_entities?.name || 'Unknown',
+          username: tag.taggable_entities?.username || null
+        })) || [];
         
-        const formattedPost = {
+        return {
           id: post.id,
           content: post.content,
           created_at: post.created_at,
@@ -158,26 +129,15 @@ export const useUserPosts = () => {
             username: userProfile?.username || null,
             profile_photo_url: userProfile?.profile_photo_url || null
           },
-          post_media: (post.post_media || []).map(media => ({
-            id: media.id,
-            media_type: media.media_type as 'image' | 'video',
-            media_url: media.media_url
+          post_media: media.map(m => ({
+            id: m.id,
+            media_type: m.media_type as 'image' | 'video',
+            media_url: m.media_url
           })),
           post_tags: tags
         };
-        
-        console.log(`Post ${post.id} formatted:`, {
-          id: formattedPost.id,
-          user: formattedPost.user.display_name || formattedPost.user.username,
-          mediaCount: formattedPost.post_media.length,
-          tagCount: formattedPost.post_tags.length,
-          tags: formattedPost.post_tags.map(t => t.name)
-        });
-        
-        return formattedPost;
       });
 
-      console.log('Final formatted posts:', formattedPosts.length, 'posts');
       setPosts(formattedPosts);
     } catch (error) {
       console.error('Error in fetchPosts:', error);

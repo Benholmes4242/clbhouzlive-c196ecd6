@@ -25,14 +25,7 @@ const StandardVideoPreview = ({
     isGridContext: false
   });
 
-  console.log('StandardVideoPreview rendering:', {
-    videoId,
-    src,
-    isInView,
-    isHovered,
-    isPlaying,
-    isLoading
-  });
+  // Removed console.log for performance
 
   const handleVideoClick = () => {
     const video = videoRef.current;
@@ -47,7 +40,6 @@ const StandardVideoPreview = ({
 
   // Fallback if video autoplay is not available
   if (!videoRef) {
-    console.log('VideoRef not available, showing static video');
     return (
       <div 
         className={`relative group ${className}`}
@@ -60,6 +52,7 @@ const StandardVideoPreview = ({
           muted
           loop
           playsInline
+          preload="none"
         />
       </div>
     );
@@ -81,6 +74,7 @@ const StandardVideoPreview = ({
         muted
         loop
         playsInline
+        preload="none"
       />
 
       <VideoControls

@@ -19,26 +19,26 @@ const TrendingFeed = () => {
   const { optimisticPosts } = useOptimisticPosts();
   const { videos: externalVideos, loading: externalVideosLoading } = useExternalVideos();
 
-  // Get posts from followed users and friends
+  // Get posts from followed users and friends with reduced data
   const { data: followedUsersPosts = [], isLoading: followedPostsLoading, refetch: refetchFollowedPosts } = useQuery({
     queryKey: ['followedUsersPosts', user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
 
-      console.log('Fetching followed users posts for user:', user.id);
-
-      // Get users that current user follows
+      // Get users that current user follows (limit to reduce query complexity)
       const { data: follows } = await supabase
         .from('user_follows')
         .select('following_id')
-        .eq('follower_id', user.id);
+        .eq('follower_id', user.id)
+        .limit(20);
 
-      // Get users that are friends (accepted status)
+      // Get users that are friends (accepted status, limit for performance)
       const { data: friends } = await supabase
         .from('user_friends')
         .select('user_id, friend_id')
         .or(`user_id.eq.${user.id},friend_id.eq.${user.id}`)
-        .eq('status', 'accepted');
+        .eq('status', 'accepted')
+        .limit(20);
 
       // Combine followed users and friends
       const followedUserIds = follows?.map(f => f.following_id) || [];
@@ -47,19 +47,21 @@ const TrendingFeed = () => {
       ) || [];
       
       const allConnectedUserIds = [...new Set([...followedUserIds, ...friendUserIds])];
-      console.log('Connected user IDs:', allConnectedUserIds);
 
       if (allConnectedUserIds.length === 0) return [];
 
-      // Get posts from these users
+      // Get posts from these users (reduced limit for faster loading)
       const { data: posts, error: postsError } = await supabase
         .from('posts')
         .select(`
-          *
+          id,
+          content,
+          created_at,
+          user_id
         `)
         .in('user_id', allConnectedUserIds)
         .order('created_at', { ascending: false })
-        .limit(10);
+        .limit(5);
 
       if (postsError) {
         console.error('Error fetching followed posts:', postsError);
@@ -67,66 +69,52 @@ const TrendingFeed = () => {
       }
 
       if (!posts) return [];
-      console.log('Fetched', posts.length, 'posts from followed users');
 
-      // Get user profiles for all post authors
-      const { data: profiles } = await supabase
-        .from('user_profiles')
-        .select('id, display_name, username, profile_photo_url')
-        .in('id', posts.map(p => p.user_id));
+      // Get user profiles and media in parallel for faster loading
+      const [profilesResponse, mediaResponse] = await Promise.all([
+        supabase
+          .from('user_profiles')
+          .select('id, display_name, username, profile_photo_url')
+          .in('id', posts.map(p => p.user_id)),
+        supabase
+          .from('post_media')
+          .select('id, media_type, media_url, post_id')
+          .in('post_id', posts.map(p => p.id))
+      ]);
 
-      // Get post media for all posts
-      const { data: postMedia } = await supabase
-        .from('post_media')
-        .select('*')
-        .in('post_id', posts.map(p => p.id));
+      const profiles = profilesResponse.data;
+      const postMedia = mediaResponse.data;
 
-      // Get post tags with proper entity information
+      // Simplified tags fetch for performance
       let postTags = [];
-      try {
-        const { data: tags, error: tagsError } = await supabase
-          .from('post_tags')
-          .select(`
-            post_id,
-            tagged_entity_id,
-            taggable_entities (
-              id,
-              entity_type,
-              entity_id,
-              name,
-              username
-            )
-          `)
-          .in('post_id', posts.map(p => p.id));
+      const { data: tags } = await supabase
+        .from('post_tags')
+        .select(`
+          post_id,
+          tagged_entity_id,
+          taggable_entities!inner (
+            id,
+            entity_type,
+            entity_id,
+            name
+          )
+        `)
+        .in('post_id', posts.map(p => p.id))
+        .limit(50); // Limit to improve performance
 
-        if (tagsError) {
-          console.error('Error fetching post tags:', tagsError);
-        } else {
-          postTags = tags || [];
-          console.log('Followed posts - Fetched post tags:', postTags.length);
-        }
-      } catch (error) {
-        console.error('Failed to fetch post tags:', error);
-      }
+      postTags = tags || [];
 
       // Format posts with related data
       const formattedPosts = posts.map(post => {
         const userProfile = profiles?.find(profile => profile.id === post.user_id);
         const media = postMedia?.filter(m => m.post_id === post.id) || [];
-        const tags = postTags?.filter(t => t.post_id === post.id).map((tag: any) => {
-          // Handle the case where taggable_entities might be null
-          if (!tag.taggable_entities) {
-            console.warn('Missing taggable_entities for tag:', tag.tagged_entity_id);
-            return null;
-          }
-          return {
-            id: tag.taggable_entities.id,
-            entity_type: tag.taggable_entities.entity_type,
-            entity_id: tag.taggable_entities.entity_id,
-            name: tag.taggable_entities.name,
-            username: tag.taggable_entities.username
-          };
-        }).filter(Boolean) || []; // Filter out null entries
+        const tags = postTags?.filter(t => t.post_id === post.id).map((tag: any) => ({
+          id: tag.taggable_entities?.id || tag.tagged_entity_id,
+          entity_type: tag.taggable_entities?.entity_type || 'user',
+          entity_id: tag.taggable_entities?.entity_id || tag.tagged_entity_id,
+          name: tag.taggable_entities?.name || 'Unknown',
+          username: tag.taggable_entities?.username || null
+        })) || [];
 
         return {
           id: post.id,
@@ -147,12 +135,11 @@ const TrendingFeed = () => {
         };
       });
 
-      console.log('Formatted followed posts:', formattedPosts.length);
       return formattedPosts;
     },
     enabled: !!user?.id,
-    staleTime: 60000, // Consider data fresh for 1 minute
-    refetchInterval: 30000, // Refetch every 30 seconds
+    staleTime: 300000, // Consider data fresh for 5 minutes
+    refetchInterval: false, // Disable auto-refetch for performance
   });
 
   // Listen for feed refresh events
