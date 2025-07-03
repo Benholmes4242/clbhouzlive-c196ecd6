@@ -64,6 +64,20 @@ const Index = () => {
             <p className="text-muted-foreground text-sm">
               Welcome to your digital clubhouse for all things golf
             </p>
+            
+            {/* App Store Buttons */}
+            <div className="flex items-center justify-center gap-8 mt-6">
+              <img
+                src="/lovable-uploads/8537a2c1-2486-42b9-9783-1b1992d30507.png"
+                alt="Download on the App Store"
+                className="h-12 w-auto object-contain"
+              />
+              <img
+                src="/lovable-uploads/1cacfaf3-2385-4a3d-865f-2834c60f5a07.png"
+                alt="Get it on Google Play"
+                className="h-12 w-auto object-contain"
+              />
+            </div>
           </div>
         </div>
       </div>
