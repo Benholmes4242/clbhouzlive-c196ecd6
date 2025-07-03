@@ -46,8 +46,19 @@ const EmailChangeSection: React.FC<EmailChangeSectionProps> = ({ currentEmail })
 
     setLoading(true);
     try {
-      const { error } = await supabase.auth.updateUser({
-        email: newEmail
+      // First get the current user
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError || !user) {
+        throw new Error('User not found');
+      }
+
+      // Use service role to update email without confirmation
+      const { error } = await supabase.functions.invoke('update-user-email', {
+        body: {
+          userId: user.id,
+          newEmail: newEmail
+        }
       });
 
       if (error) {
@@ -55,13 +66,19 @@ const EmailChangeSection: React.FC<EmailChangeSectionProps> = ({ currentEmail })
       }
 
       toast({
-        title: "Email Change Initiated",
-        description: "Please check both your old and new email addresses for confirmation links to complete the change.",
+        title: "Email Updated Successfully",
+        description: "Your email address has been changed. Please sign in again with your new email.",
       });
 
       // Clear form
       setNewEmail('');
       setConfirmEmail('');
+      
+      // Sign out user to force re-login with new email
+      setTimeout(() => {
+        supabase.auth.signOut();
+      }, 2000);
+      
     } catch (error: any) {
       console.error('Error changing email:', error);
       toast({
@@ -144,16 +161,16 @@ const EmailChangeSection: React.FC<EmailChangeSectionProps> = ({ currentEmail })
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Change Email Address</AlertDialogTitle>
-              <AlertDialogDescription>
+               <AlertDialogDescription>
                 You are about to change your email from <strong>{currentEmail}</strong> to <strong>{newEmail}</strong>.
                 <br /><br />
-                You will receive confirmation emails at both addresses. You must confirm the change from both emails to complete the process.
+                Your email will be updated immediately and you will need to sign in again with your new email address.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
               <AlertDialogAction onClick={handleEmailChange}>
-                Send Confirmation Emails
+                Change Email Now
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
