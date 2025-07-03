@@ -8,6 +8,7 @@ import CourseHighlightsCarousel from '@/components/clubhouse/CourseHighlightsCar
 import ClubSpotlightCarousel from '@/components/clubhouse/ClubSpotlightCarousel';
 import FeaturedMomentsCarousel from '@/components/clubhouse/FeaturedMomentsCarousel';
 import TopPlayerContentCarousel from '@/components/clubhouse/TopPlayerContentCarousel';
+import ClbhouzMomentsCarousel from '@/components/clubhouse/ClbhouzMomentsCarousel';
 import { useClubhouseContent } from '@/hooks/useClubhouseContent';
 
 const ClubhouseFeed = () => {
@@ -40,6 +41,7 @@ const ClubhouseFeed = () => {
               setSearchQuery={setSearchQuery}
             />
             
+            <ClbhouzMomentsCarousel />
             <FeaturedMomentsCarousel userPosts={posts} loading={loading} />
             <TopPlayerContentCarousel userPosts={posts} loading={loading} />
             <CourseHighlightsCarousel />
