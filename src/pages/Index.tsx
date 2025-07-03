@@ -54,7 +54,7 @@ const Index = () => {
             <Button 
               onClick={() => navigate('/auth')}
               className="w-full py-3 text-lg text-white hover:opacity-90"
-              style={{ backgroundColor: '#322F30' }}
+              style={{ backgroundColor: '#000000' }}
               size="lg"
             >
               Get Started
