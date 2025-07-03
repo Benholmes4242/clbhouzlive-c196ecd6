@@ -70,7 +70,7 @@ const Index = () => {
               <img
                 src="/lovable-uploads/d02dbc03-bcf3-4ae0-8cbd-8a7ace06b902.png"
                 alt="Download on Google Play and App Store"
-                className="w-auto max-w-xs object-contain"
+                className="w-auto max-w-32 object-contain"
               />
             </div>
           </div>
