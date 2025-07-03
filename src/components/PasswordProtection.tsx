@@ -103,6 +103,7 @@ const PasswordProtection: React.FC<PasswordProtectionProps> = ({ children }) => 
               
               <Button 
                 type="submit" 
+                variant="secondary"
                 className="w-full"
                 disabled={!password.trim()}
               >
