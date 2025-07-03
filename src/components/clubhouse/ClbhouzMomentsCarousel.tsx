@@ -243,7 +243,18 @@ const ClbhouzMomentsCarousel: React.FC = () => {
   }
 
   if (moments.length === 0) {
-    return null; // Don't show the carousel if there are no moments
+    // Show empty state instead of null for debugging
+    return (
+      <div className="w-full mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold">Discover Golf Moments</h2>
+          <p className="text-sm text-muted-foreground">From golfers you might like</p>
+        </div>
+        <div className="w-full h-64 bg-muted rounded-lg flex items-center justify-center">
+          <span className="text-muted-foreground">No moments available at this time</span>
+        </div>
+      </div>
+    );
   }
 
   return (
