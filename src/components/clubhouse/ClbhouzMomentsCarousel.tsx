@@ -493,25 +493,23 @@ const ClbhouzMomentsCarousel: React.FC = () => {
                     )}
                   </div>
 
-                  {/* Follow Button - Always visible at bottom */}
-                  <div className="absolute bottom-0 left-0 right-0 bg-black/60 backdrop-blur-sm">
-                    <div className="p-3">
-                      {!moment.is_following ? (
-                        <button
-                          className="w-full py-2 px-4 bg-white/20 hover:bg-white/30 text-white text-sm font-medium rounded-lg border border-white/30 transition-all duration-200 hover:scale-105"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleFollow(moment.user_id, moment.id);
-                          }}
-                        >
-                          FOLLOW
-                        </button>
-                      ) : (
-                        <div className="w-full py-2 px-4 bg-green-500/20 text-green-300 text-sm font-medium rounded-lg border border-green-500/30 text-center">
-                          FOLLOWING
-                        </div>
-                      )}
-                    </div>
+                  {/* Follow Button - Subtle at bottom */}
+                  <div className="absolute bottom-3 left-3 right-3">
+                    {!moment.is_following ? (
+                      <button
+                        className="py-1.5 px-3 bg-white/20 hover:bg-white/30 text-white text-xs font-medium rounded-md border border-white/30 transition-all duration-200"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleFollow(moment.user_id, moment.id);
+                        }}
+                      >
+                        FOLLOW
+                      </button>
+                    ) : (
+                      <div className="py-1.5 px-3 bg-gray-400/20 text-gray-300 text-xs font-medium rounded-md border border-gray-400/30">
+                        FOLLOWING
+                      </div>
+                    )}
                   </div>
                 </div>
               </Card>
