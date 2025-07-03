@@ -68,7 +68,7 @@ const Index = () => {
             {/* App Store Buttons */}
             <div className="flex flex-col items-center space-y-3 mt-6">
               <img
-                src="/lovable-uploads/9a83d756-9770-4171-83fd-5306a6e23613.png"
+                src="/lovable-uploads/d02dbc03-bcf3-4ae0-8cbd-8a7ace06b902.png"
                 alt="Download on Google Play and App Store"
                 className="w-auto max-w-sm object-contain"
               />
