@@ -185,7 +185,10 @@ const CourseDetailModal = ({
               userRating={userRating}
             />
 
-            {/* About This Course section with Add to My Played button - moved here */}
+            {/* Community Rating moved above About This Course for better visibility */}
+            <CourseRatingStats ratingStats={ratingStats} />
+
+            {/* About This Course section with Add to My Played button */}
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold">About This Course</h2>
               
@@ -221,9 +224,6 @@ const CourseDetailModal = ({
             <CourseDetailInfo 
               description={course.description}
             />
-
-            {/* Show rating stats for everyone */}
-            <CourseRatingStats ratingStats={ratingStats} />
 
             {/* Show rating form only if user is viewing their own profile and has played the course */}
             {!isViewingOtherUser && isAlreadyPlayed && (
