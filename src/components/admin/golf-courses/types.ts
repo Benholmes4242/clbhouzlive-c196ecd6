@@ -69,9 +69,10 @@ export const subCountryOptions: Record<string, string[]> = {
     'England', 'Scotland', 'Wales', 'Ireland', 'Northern Ireland'
   ],
   'Continental Europe': [
-    'France', 'Germany', 'Spain', 'Italy', 'Portugal', 'Netherlands', 'Belgium',
-    'Switzerland', 'Austria', 'Denmark', 'Sweden', 'Norway', 'Finland', 'Czech Republic',
-    'Poland', 'Hungary', 'Slovenia', 'Croatia', 'Greece', 'Turkey', 'Russia'
+    'Austria', 'Belgium', 'Bulgaria', 'Czech Republic', 'Denmark', 'Estonia', 'Finland', 'France',
+    'Germany', 'Greece', 'Hungary', 'Iceland', 'Italy', 'Latvia', 'Lithuania', 'Luxembourg',
+    'Netherlands', 'Norway', 'Poland', 'Portugal', 'Slovenia', 'Slovakia', 'Spain',
+    'Sweden', 'Switzerland', 'Turkey', 'Russia', 'Croatia'
   ],
   'Worldwide': [
     'Australia', 'New Zealand', 'South Africa', 'Japan', 'South Korea', 'China',

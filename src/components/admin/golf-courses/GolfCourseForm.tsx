@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -51,10 +50,10 @@ const subCountryOptions: Record<string, string[]> = {
     'Wisconsin', 'Wyoming', 'District of Columbia'
   ],
   'Continental Europe': [
-    'Austria', 'Belgium', 'Czech Republic', 'Denmark', 'Estonia', 'Finland', 'France', 
+    'Austria', 'Belgium', 'Bulgaria', 'Czech Republic', 'Denmark', 'Estonia', 'Finland', 'France', 
     'Germany', 'Greece', 'Hungary', 'Iceland', 'Italy', 'Latvia', 'Lithuania', 'Luxembourg', 
     'Netherlands', 'Norway', 'Poland', 'Portugal', 'Slovakia', 'Slovenia', 'Spain', 
-    'Sweden', 'Switzerland', 'Ireland', 'Northern Ireland', 'Scotland', 'England', 'Wales'
+    'Sweden', 'Switzerland', 'Turkey', 'Ireland', 'Northern Ireland', 'Scotland', 'England', 'Wales'
   ]
 };
 
