@@ -354,52 +354,26 @@ const ClbhouzMomentsCarousel: React.FC = () => {
       </div>
       
       <div className="relative">
-        {/* Desktop Navigation Arrows */}
-        {!isMobile && (
-          <>
-            {currentIndex > 0 && (
-              <Button
-                variant="outline"
-                size="icon"
-                className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-background/80 backdrop-blur-sm"
-                onClick={prevSlide}
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-            )}
-            
-            {currentIndex < moments.length - 4 && (
-              <Button
-                variant="outline"
-                size="icon"
-                className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-background/80 backdrop-blur-sm"
-                onClick={nextSlide}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            )}
-          </>
-        )}
-
-        {/* Carousel Container */}
+        {/* Scrollable Carousel Container */}
         <div 
-          ref={swipeRef}
-          className="overflow-hidden rounded-lg touch-pan-y"
+          ref={carouselRef}
+          className="overflow-x-auto overflow-y-hidden scrollbar-hide touch-pan-x"
+          style={{
+            scrollbarWidth: 'none',
+            msOverflowStyle: 'none',
+            WebkitOverflowScrolling: 'touch'
+          }}
         >
           <div 
-            className={`flex transition-transform duration-300 ease-out ${
-              isMobile ? 'gap-0' : 'gap-4'
-            }`}
+            className="flex gap-4 pb-2"
             style={{
-              transform: `translateX(-${currentIndex * (isMobile ? 100 : 25)}%)`,
+              width: 'max-content'
             }}
           >
             {moments.map((moment) => (
               <Card
                 key={moment.id}
-                className={`flex-shrink-0 relative overflow-hidden group cursor-pointer ${
-                  isMobile ? 'w-full' : 'w-1/4'
-                }`}
+                className="flex-shrink-0 relative overflow-hidden group cursor-pointer w-64 md:w-72"
                 onMouseEnter={() => {
                   if (!isMobile) {
                     setHoveredCard(moment.id);
@@ -497,7 +471,7 @@ const ClbhouzMomentsCarousel: React.FC = () => {
                   <div className="absolute bottom-3 left-3 right-3">
                     {!moment.is_following ? (
                       <button
-                        className="py-1.5 px-3 bg-white/20 hover:bg-white/30 text-white text-xs font-medium rounded-md border border-white/30 transition-all duration-200"
+                        className="py-1.5 px-3 bg-black/50 hover:bg-black/60 text-white text-xs font-medium rounded-md border border-white/20 transition-all duration-200"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleFollow(moment.user_id, moment.id);
@@ -506,7 +480,7 @@ const ClbhouzMomentsCarousel: React.FC = () => {
                         FOLLOW
                       </button>
                     ) : (
-                      <div className="py-1.5 px-3 bg-gray-400/20 text-gray-300 text-xs font-medium rounded-md border border-gray-400/30">
+                      <div className="py-1.5 px-3 bg-black/40 text-gray-300 text-xs font-medium rounded-md border border-gray-400/20">
                         FOLLOWING
                       </div>
                     )}
@@ -516,21 +490,6 @@ const ClbhouzMomentsCarousel: React.FC = () => {
             ))}
           </div>
         </div>
-
-        {/* Mobile Swipe Indicators */}
-        {isMobile && (
-          <div className="flex justify-center mt-4 gap-1">
-            {moments.map((_, index) => (
-              <button
-                key={index}
-                className={`w-2 h-2 rounded-full transition-all ${
-                  index === currentIndex ? 'bg-primary' : 'bg-muted-foreground/30'
-                }`}
-                onClick={() => setCurrentIndex(index)}
-              />
-            ))}
-          </div>
-        )}
       </div>
     </div>
   );
