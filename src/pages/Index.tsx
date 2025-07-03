@@ -4,6 +4,7 @@ import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
 import StoryBar from '@/components/StoryBar';
 import TrendingFeed from '@/components/TrendingFeed';
+import ClbhouzMomentsCarousel from '@/components/clubhouse/ClbhouzMomentsCarousel';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
@@ -91,7 +92,8 @@ const Index = () => {
       <StoryBar />
       
       <main className="container mx-auto px-4 py-6">
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-2xl mx-auto space-y-6">
+          <ClbhouzMomentsCarousel />
           <TrendingFeed />
         </div>
       </main>
