@@ -69,6 +69,51 @@ export type Database = {
         }
         Relationships: []
       }
+      badges: {
+        Row: {
+          category: Database["public"]["Enums"]["badge_category"]
+          created_at: string | null
+          criteria_type: string
+          criteria_value: number
+          description: string
+          display_name: string
+          emoji: string
+          id: string
+          is_active: boolean | null
+          name: string
+          tier: Database["public"]["Enums"]["badge_tier"]
+          updated_at: string | null
+        }
+        Insert: {
+          category: Database["public"]["Enums"]["badge_category"]
+          created_at?: string | null
+          criteria_type: string
+          criteria_value: number
+          description: string
+          display_name: string
+          emoji: string
+          id?: string
+          is_active?: boolean | null
+          name: string
+          tier: Database["public"]["Enums"]["badge_tier"]
+          updated_at?: string | null
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["badge_category"]
+          created_at?: string | null
+          criteria_type?: string
+          criteria_value?: number
+          description?: string
+          display_name?: string
+          emoji?: string
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          tier?: Database["public"]["Enums"]["badge_tier"]
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       course_media: {
         Row: {
           course_id: string
@@ -522,6 +567,44 @@ export type Database = {
         }
         Relationships: []
       }
+      user_badges: {
+        Row: {
+          badge_id: string
+          created_at: string | null
+          earned_at: string | null
+          id: string
+          is_notified: boolean | null
+          progress_value: number | null
+          user_id: string
+        }
+        Insert: {
+          badge_id: string
+          created_at?: string | null
+          earned_at?: string | null
+          id?: string
+          is_notified?: boolean | null
+          progress_value?: number | null
+          user_id: string
+        }
+        Update: {
+          badge_id?: string
+          created_at?: string | null
+          earned_at?: string | null
+          id?: string
+          is_notified?: boolean | null
+          progress_value?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_badges_badge_id_fkey"
+            columns: ["badge_id"]
+            isOneToOne: false
+            referencedRelation: "badges"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_bag: {
         Row: {
           brand: string
@@ -885,6 +968,12 @@ export type Database = {
       }
     }
     Functions: {
+      check_and_award_badges: {
+        Args: { user_id_param: string }
+        Returns: {
+          newly_awarded_badges: Json
+        }[]
+      }
       get_all_users_admin: {
         Args: Record<PropertyKey, never>
         Returns: {
@@ -901,6 +990,10 @@ export type Database = {
           role: Database["public"]["Enums"]["app_role"]
         }[]
       }
+      get_user_top100_courses_count: {
+        Args: { user_id_param: string }
+        Returns: number
+      }
       has_role: {
         Args: {
           _user_id: string
@@ -915,6 +1008,8 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "user" | "limited_admin"
+      badge_category: "top_100_courses" | "engagement" | "community" | "special"
+      badge_tier: "bronze" | "silver" | "gold" | "platinum" | "diamond"
       business_type:
         | "golf_club"
         | "pro_shop"
@@ -1051,6 +1146,8 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user", "limited_admin"],
+      badge_category: ["top_100_courses", "engagement", "community", "special"],
+      badge_tier: ["bronze", "silver", "gold", "platinum", "diamond"],
       business_type: [
         "golf_club",
         "pro_shop",

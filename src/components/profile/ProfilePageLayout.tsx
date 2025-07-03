@@ -4,6 +4,7 @@ import InstagramStyleProfileHeader from './InstagramStyleProfileHeader';
 import InstagramStyleProfileTabs from './InstagramStyleProfileTabs';
 import ActivityFeed from './ActivityFeed';
 import InlineMyCoursesTab from './InlineMyCoursesTab';
+import BadgeCarousel from '@/components/badges/BadgeCarousel';
 
 interface ProfilePageLayoutProps {
   profile: any;
@@ -58,6 +59,11 @@ const ProfilePageLayout: React.FC<ProfilePageLayoutProps> = ({
               onRegionClick={onRegionClick}
               onEGConnect={onEGConnect}
             />
+          ),
+          badges: (
+            <div className="p-4">
+              <BadgeCarousel userId={profile?.id} />
+            </div>
           )
         }}
         />
