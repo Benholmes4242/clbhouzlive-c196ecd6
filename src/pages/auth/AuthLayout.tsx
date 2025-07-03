@@ -17,7 +17,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
   <div className="min-h-screen flex items-center justify-center bg-background px-4">
     <div className="bg-muted rounded-lg shadow-md p-6 w-full max-w-md mx-auto flex flex-col items-center">
       <img
-        src="/lovable-uploads/cfa68cd0-ff45-4b63-8910-d4126bb9aa88.png"
+        src="/lovable-uploads/89ff7484-a64e-4256-9fd3-2b3a86d333ee.png"
         alt="clbhouz Logo"
         className="mb-6"
         style={{ width: 250, maxWidth: "80%" }}
