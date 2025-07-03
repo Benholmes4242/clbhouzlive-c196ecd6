@@ -10,11 +10,30 @@ import NavigationBar from './bottom-navigation/NavigationBar';
 import { useNavigationHandlers } from '@/hooks/useNavigationHandlers';
 import { usePostHandlers } from '@/hooks/usePostHandlers';
 
+// Hook to detect desktop (≥1024px)
+const useIsDesktop = () => {
+  const [isDesktop, setIsDesktop] = React.useState<boolean>(false);
+
+  React.useEffect(() => {
+    const checkIsDesktop = () => {
+      setIsDesktop(window.innerWidth >= 1024);
+    };
+
+    checkIsDesktop();
+    window.addEventListener('resize', checkIsDesktop);
+    
+    return () => window.removeEventListener('resize', checkIsDesktop);
+  }, []);
+
+  return isDesktop;
+};
+
 const BottomNavigation = () => {
   const { user } = useSupabaseSession();
   const { activeTab, handleTabClick } = useNavigationHandlers();
   const { submitPost } = usePostSubmission();
   const { handleCaptionInput, selectMention } = usePostHandlers();
+  const isDesktop = useIsDesktop();
   
   const {
     captionInputRef,
@@ -117,8 +136,18 @@ const BottomNavigation = () => {
   const onTabClick = (tab: { id: string; path: string | null; isAction?: boolean }) => {
     if (tab.isAction && tab.id === 'post') {
       if (!user) return;
-      console.log('Post tab clicked, opening gallery');
-      openGallery();
+      
+      if (isDesktop) {
+        // Desktop: Skip gallery picker, go directly to Create a Moment modal
+        console.log('Post tab clicked on desktop, opening Create a Moment modal directly');
+        setLocalSelectedTags([]);
+        // Open composer directly without files - modal will handle file upload UI
+        openComposer();
+      } else {
+        // Mobile: Keep existing flow with gallery picker
+        console.log('Post tab clicked on mobile, opening gallery picker');
+        openGallery();
+      }
     } else {
       handleTabClick(tab, user, () => {});
     }
