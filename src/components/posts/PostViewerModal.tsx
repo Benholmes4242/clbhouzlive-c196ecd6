@@ -194,20 +194,20 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
               </button>
 
               {/* Media Content - Full Screen */}
-              <div className="relative w-full h-full flex items-center justify-center">
+              <div className="absolute inset-0 flex items-center justify-center bg-black">
                 {currentMedia && (
                   <>
                     {currentMedia.media_type === 'video' ? (
                       <VideoPreview
                         src={currentMedia.media_url}
-                        className="w-full h-full object-cover"
+                        className="max-w-full max-h-full object-contain"
                         videoId={`post-viewer-mobile-${currentPost.id}-${currentMediaIndex}`}
                       />
                     ) : (
                       <HighQualityImage
                         src={currentMedia.media_url}
                         alt="Post content"
-                        className="w-full h-full object-contain"
+                        className="max-w-full max-h-full object-contain"
                       />
                     )}
                     
