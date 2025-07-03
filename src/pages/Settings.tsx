@@ -5,6 +5,7 @@ import Header from "@/components/Header";
 import BottomNavigation from '@/components/BottomNavigation';
 import UserAccountInfo from '@/components/profile/UserAccountInfo';
 import EmailChangeSection from '@/components/profile/EmailChangeSection';
+import NotificationSettings from '@/components/settings/NotificationSettings';
 import ThemeToggle from '@/components/ui/theme-toggle';
 import { useProfileData } from '@/hooks/useProfileData';
 
@@ -81,6 +82,8 @@ const Settings = () => {
       <Header />
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
         <h1 className="text-2xl font-bold mb-6">Settings</h1>
+        
+        <NotificationSettings />
         
         <ThemeToggle />
         

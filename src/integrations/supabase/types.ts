@@ -537,6 +537,39 @@ export type Database = {
         }
         Relationships: []
       }
+      push_notification_tokens: {
+        Row: {
+          created_at: string | null
+          device_id: string | null
+          id: string
+          is_active: boolean | null
+          platform: string
+          token: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          device_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          platform: string
+          token: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          device_id?: string | null
+          id?: string
+          is_active?: boolean | null
+          platform?: string
+          token?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       taggable_entities: {
         Row: {
           created_at: string
@@ -810,6 +843,7 @@ export type Database = {
           is_public: boolean | null
           location: string | null
           logo_url: string | null
+          notification_preferences: Json | null
           pending_email: string | null
           phone: string | null
           profile_photo_url: string | null
@@ -841,6 +875,7 @@ export type Database = {
           is_public?: boolean | null
           location?: string | null
           logo_url?: string | null
+          notification_preferences?: Json | null
           pending_email?: string | null
           phone?: string | null
           profile_photo_url?: string | null
@@ -872,6 +907,7 @@ export type Database = {
           is_public?: boolean | null
           location?: string | null
           logo_url?: string | null
+          notification_preferences?: Json | null
           pending_email?: string | null
           phone?: string | null
           profile_photo_url?: string | null
@@ -1004,6 +1040,16 @@ export type Database = {
       is_admin: {
         Args: Record<PropertyKey, never>
         Returns: boolean
+      }
+      send_push_notification: {
+        Args: {
+          target_user_id: string
+          notification_type: string
+          title: string
+          message: string
+          data?: Json
+        }
+        Returns: undefined
       }
     }
     Enums: {
