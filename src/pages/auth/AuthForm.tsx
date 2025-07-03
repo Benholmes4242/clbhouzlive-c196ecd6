@@ -201,7 +201,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
           type="submit" 
           disabled={resetSubmitting} 
           className="w-full mb-3 text-white hover:opacity-90"
-          style={{ backgroundColor: '#322F30' }}
+          style={{ backgroundColor: '#000000' }}
         >
           {resetSubmitting ? "Sending..." : "Send Reset Email"}
         </Button>
@@ -301,7 +301,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
             type="submit" 
             disabled={submitting || (isSignUp && usernameAvailable !== true)} 
             className="w-full mb-3 text-white hover:opacity-90"
-            style={{ backgroundColor: '#322F30' }}
+            style={{ backgroundColor: '#000000' }}
           >
             {isSignUp ? (submitting ? "Signing up..." : "Sign Up") : (submitting ? "Signing in..." : "Sign In")}
           </Button>
