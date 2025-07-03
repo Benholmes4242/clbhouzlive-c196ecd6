@@ -39,6 +39,7 @@ const LogosManagement = () => {
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [pendingUpload, setPendingUpload] = useState<File | null>(null);
 
   const categories = {
     app_logo_light: 'App Logo - Light Mode',
@@ -74,7 +75,7 @@ const LogosManagement = () => {
     }
   };
 
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file || !selectedCategory) {
       toast({
@@ -84,17 +85,22 @@ const LogosManagement = () => {
       });
       return;
     }
+    setPendingUpload(file);
+  };
+
+  const handleSaveLogo = async () => {
+    if (!pendingUpload || !selectedCategory) return;
 
     setUploading(true);
     try {
-      const fileExt = file.name.split('.').pop();
+      const fileExt = pendingUpload.name.split('.').pop();
       const fileName = `${Date.now()}.${fileExt}`;
       const filePath = `${selectedCategory}/${fileName}`;
 
       // Upload to storage
       const { error: uploadError } = await supabase.storage
         .from('logos')
-        .upload(filePath, file);
+        .upload(filePath, pendingUpload);
 
       if (uploadError) throw uploadError;
 
@@ -107,22 +113,27 @@ const LogosManagement = () => {
       const { error: dbError } = await supabase
         .from('logos')
         .insert({
-          file_name: file.name,
+          file_name: pendingUpload.name,
           file_url: data.publicUrl,
           category: selectedCategory,
-          file_size: file.size,
-          mime_type: file.type,
+          file_size: pendingUpload.size,
+          mime_type: pendingUpload.type,
         });
 
       if (dbError) throw dbError;
 
       toast({
         title: "Success",
-        description: "Logo uploaded successfully",
+        description: "Logo uploaded and set as active successfully",
       });
 
       fetchLogos();
-      event.target.value = '';
+      setPendingUpload(null);
+      setSelectedCategory('');
+      
+      // Clear the file input
+      const fileInput = document.getElementById('logo-file') as HTMLInputElement;
+      if (fileInput) fileInput.value = '';
     } catch (error: any) {
       console.error('Error uploading logo:', error);
       toast({
@@ -369,11 +380,61 @@ const LogosManagement = () => {
                 id="logo-file"
                 type="file"
                 accept="image/*"
-                onChange={handleFileUpload}
+                onChange={handleFileSelect}
                 disabled={uploading || !selectedCategory}
               />
             </div>
           </div>
+          
+          {/* Preview and Save Section */}
+          {pendingUpload && (
+            <div className="space-y-4 p-4 border rounded-lg bg-muted/50">
+              <div className="flex items-center gap-2 mb-2">
+                <span className="font-medium">Preview:</span>
+                <span className="text-sm text-muted-foreground">{pendingUpload.name}</span>
+              </div>
+              <div className="flex justify-center">
+                <div className="w-32 h-24 border rounded-lg overflow-hidden bg-white flex items-center justify-center">
+                  <img
+                    src={URL.createObjectURL(pendingUpload)}
+                    alt="Logo preview"
+                    className="max-w-full max-h-full object-contain"
+                  />
+                </div>
+              </div>
+              <div className="flex gap-2 justify-center">
+                <Button 
+                  onClick={handleSaveLogo}
+                  disabled={uploading}
+                  className="flex items-center gap-2"
+                >
+                  {uploading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="w-4 h-4" />
+                      Save Logo
+                    </>
+                  )}
+                </Button>
+                <Button 
+                  variant="outline"
+                  onClick={() => {
+                    setPendingUpload(null);
+                    const fileInput = document.getElementById('logo-file') as HTMLInputElement;
+                    if (fileInput) fileInput.value = '';
+                  }}
+                  disabled={uploading}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          )}
+          
           {uploading && (
             <div className="flex items-center justify-center py-4">
               <Loader2 className="w-6 h-6 animate-spin mr-2" />
