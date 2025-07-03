@@ -1,12 +1,40 @@
 
 import { supabase } from '@/integrations/supabase/client';
 
+export const uploadMultipleMediaWithRetry = async (
+  files: File[], 
+  postId: string, 
+  userId: string, 
+  maxRetries = 3
+): Promise<void> => {
+  console.log(`Starting batch upload for ${files.length} files`);
+  
+  if (!files.length || !postId || !userId) {
+    throw new Error('Missing required parameters for media upload');
+  }
+
+  // Upload files in parallel with a limit to avoid overwhelming the server
+  const concurrentUploads = 3;
+  const chunks = [];
+  
+  for (let i = 0; i < files.length; i += concurrentUploads) {
+    chunks.push(files.slice(i, i + concurrentUploads));
+  }
+
+  for (const chunk of chunks) {
+    const uploadPromises = chunk.map(file => uploadMediaWithRetry(file, postId, userId, maxRetries));
+    await Promise.all(uploadPromises);
+  }
+  
+  console.log(`Successfully uploaded all ${files.length} files`);
+};
+
 export const uploadMediaWithRetry = async (
   file: File, 
   postId: string, 
   userId: string, 
   maxRetries = 3
-): Promise<void> => {
+): Promise<string> => {
   console.log(`Starting upload for ${file.name}, size: ${(file.size / 1024 / 1024).toFixed(2)}MB`);
   
   if (!file || !postId || !userId) {
@@ -18,7 +46,7 @@ export const uploadMediaWithRetry = async (
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
       const fileExt = file.name.split('.').pop() || 'unknown';
-      const fileName = `${userId}/${Date.now()}-${attempt}.${fileExt}`;
+      const fileName = `${userId}/${postId}/${Date.now()}-${attempt}.${fileExt}`;
       
       // Set longer timeout for larger files, especially videos
       const isVideo = file.type.startsWith('video/');
@@ -73,7 +101,7 @@ export const uploadMediaWithRetry = async (
       }
       
       console.log(`Successfully uploaded ${file.name} on attempt ${attempt}`);
-      return; // Success, exit retry loop
+      return publicUrl; // Return the URL for success case
       
     } catch (error) {
       console.error(`Upload attempt ${attempt} failed for ${file.name}:`, error);

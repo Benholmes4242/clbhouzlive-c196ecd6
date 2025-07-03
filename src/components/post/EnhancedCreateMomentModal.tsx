@@ -1,0 +1,242 @@
+import React, { useState, useEffect } from 'react';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { X } from 'lucide-react';
+import CourseTagInput from '../posts/CourseTagInput';
+import GolfCoursePin from '../posts/GolfCoursePin';
+import EnhancedMediaUpload from '../posts/EnhancedMediaUpload';
+import { useTaggableEntities } from '@/hooks/useTaggableEntities';
+
+interface TaggableEntity {
+  id: string;
+  entity_type: 'user' | 'golf_club' | 'business';
+  entity_id: string;
+  name: string;
+  username: string | null;
+}
+
+interface GolfCourse {
+  id: string;
+  name: string;
+  country: string;
+  region?: string;
+}
+
+interface EnhancedCreateMomentModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (data: {
+    caption: string;
+    files: File[];
+    tags: TaggableEntity[];
+    course?: GolfCourse | null;
+  }) => void;
+  isSubmitting: boolean;
+  initialFiles?: File[];
+  selectedCourse?: GolfCourse | null;
+  onCourseSelect?: (course: GolfCourse | null) => void;
+}
+
+const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
+  isOpen,
+  onClose,
+  onSubmit,
+  isSubmitting,
+  initialFiles = [],
+  selectedCourse,
+  onCourseSelect
+}) => {
+  const [caption, setCaption] = useState('');
+  const [files, setFiles] = useState<File[]>(initialFiles);
+  const [selectedTags, setSelectedTags] = useState<TaggableEntity[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const { entities, searchEntities } = useTaggableEntities();
+
+  // Reset state when modal opens/closes
+  useEffect(() => {
+    if (isOpen) {
+      setCaption('');
+      setSelectedTags([]);
+      setFiles(initialFiles);
+    }
+  }, [isOpen, initialFiles]);
+
+  // Handle caption input with mention detection
+  const handleCaptionChange = async (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const text = e.target.value;
+    setCaption(text);
+
+    // Check for mentions - look for @ followed by at least 1 character
+    const words = text.split(' ');
+    const lastWord = words[words.length - 1];
+    
+    if (lastWord.startsWith('@') && lastWord.length > 1) {
+      const query = lastWord.substring(1);
+      setShowSuggestions(true);
+      
+      try {
+        await searchEntities(query);
+      } catch (error) {
+        console.error('Error searching entities:', error);
+      }
+    } else {
+      setShowSuggestions(false);
+    }
+  };
+
+  // Handle mention selection
+  const handleSelectMention = (entity: TaggableEntity) => {
+    // Prevent duplicate tags
+    if (selectedTags.find(tag => tag.id === entity.id)) {
+      setShowSuggestions(false);
+      return;
+    }
+    
+    const words = caption.split(' ');
+    const lastWordIndex = words.length - 1;
+    
+    if (words[lastWordIndex].startsWith('@')) {
+      // Replace the @partial with @username
+      const displayName = entity.username || entity.name;
+      words[lastWordIndex] = `@${displayName}`;
+      const newCaption = words.join(' ') + ' ';
+      
+      setCaption(newCaption);
+      setSelectedTags(prev => [...prev, entity]);
+    }
+    
+    setShowSuggestions(false);
+  };
+
+  const handleSubmit = () => {
+    if (files.length === 0) return;
+
+    onSubmit({
+      caption,
+      files,
+      tags: selectedTags,
+      course: selectedCourse
+    });
+  };
+
+  const handleCancel = () => {
+    setCaption('');
+    setFiles([]);
+    setSelectedTags([]);
+    onClose();
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogTitle className="text-center text-lg font-semibold">
+          Create a Moment
+        </DialogTitle>
+        <DialogDescription className="sr-only">
+          Upload media files, add caption and post your moment
+        </DialogDescription>
+        
+        <div className="space-y-6">
+          {/* Enhanced Media Upload Section */}
+          <div>
+            <EnhancedMediaUpload
+              onFilesChange={setFiles}
+              maxFiles={10}
+              initialFiles={initialFiles}
+              acceptedTypes={['image/*', 'video/*']}
+              disabled={isSubmitting}
+            />
+          </div>
+
+          {/* Caption Input */}
+          <div className="relative">
+            <textarea
+              value={caption}
+              onChange={handleCaptionChange}
+              placeholder="Write about your moment... Use @ to tag people or businesses"
+              className="w-full min-h-[100px] p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-primary focus:border-transparent"
+              disabled={isSubmitting}
+              rows={4}
+            />
+
+            {/* Mention Suggestions */}
+            {showSuggestions && entities.length > 0 && (
+              <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-md shadow-lg max-h-40 overflow-y-auto z-50 mt-1">
+                {entities.map((entity) => (
+                  <div
+                    key={`${entity.entity_type}-${entity.entity_id}-${entity.id}`}
+                    className="px-3 py-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2 transition-colors"
+                    onClick={() => handleSelectMention(entity)}
+                  >
+                    <div className="flex flex-col">
+                      <span className="font-medium text-blue-600">
+                        @{entity.username || entity.name}
+                      </span>
+                      <span className="text-xs text-gray-500 capitalize">
+                        {entity.entity_type.replace('_', ' ')} • {entity.name}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Selected Tags */}
+          {selectedTags.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {selectedTags.map((tag) => (
+                <div
+                  key={tag.id}
+                  className="inline-flex items-center gap-1 bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs"
+                >
+                  <span>@{tag.username || tag.name}</span>
+                  <button
+                    onClick={() => setSelectedTags(prev => prev.filter(t => t.id !== tag.id))}
+                    className="ml-1 text-blue-600 hover:text-blue-800"
+                  >
+                    <X size={12} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Golf Course Selection */}
+          {onCourseSelect && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Golf Course (Optional)
+              </label>
+              <CourseTagInput
+                selectedCourse={selectedCourse || null}
+                onCourseSelect={onCourseSelect}
+                placeholder="Start typing to find a course..."
+              />
+            </div>
+          )}
+
+          {/* Action Buttons */}
+          <div className="flex gap-3 justify-end pt-4 border-t">
+            <Button
+              variant="outline"
+              onClick={handleCancel}
+              disabled={isSubmitting}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSubmit}
+              disabled={isSubmitting || files.length === 0}
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              {isSubmitting ? 'Posting...' : `Post ${files.length > 0 ? `(${files.length} file${files.length > 1 ? 's' : ''})` : ''}`}
+            </Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export default EnhancedCreateMomentModal;

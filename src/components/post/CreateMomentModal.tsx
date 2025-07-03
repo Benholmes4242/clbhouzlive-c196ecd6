@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import CourseTagInput from '../posts/CourseTagInput';
 import GolfCoursePin from '../posts/GolfCoursePin';
+import EnhancedMediaUpload from '../posts/EnhancedMediaUpload';
 import { useTaggableEntities } from '@/hooks/useTaggableEntities';
 
 interface TaggableEntity {

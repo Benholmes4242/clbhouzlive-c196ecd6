@@ -4,7 +4,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePostFlow } from '@/hooks/usePostFlow';
 import { usePostSubmission } from '@/hooks/usePostSubmission';
 import GalleryPicker from '@/components/post/GalleryPicker';
-import CreateMomentModal from '@/components/post/CreateMomentModal';
+import EnhancedCreateMomentModal from '@/components/post/EnhancedCreateMomentModal';
 import SnapToast from '@/components/snap/SnapToast';
 import NavigationBar from './bottom-navigation/NavigationBar';
 import { useNavigationHandlers } from '@/hooks/useNavigationHandlers';
@@ -199,22 +199,41 @@ const BottomNavigation = () => {
         onMultipleFilesSelected={handleMultipleFilesSelected}
       />
 
-      <CreateMomentModal
+      <EnhancedCreateMomentModal
         isOpen={isComposerOpen}
         onClose={() => {
           closeComposer();
           setLocalSelectedTags([]);
         }}
-        selectedFile={selectedFile}
-        selectedFiles={selectedFiles}
-        previewUrl={previewUrl}
-        captionInputRef={captionInputRef}
-        onCaptionInput={onCaptionInput}
-        showSuggestions={showSuggestions}
-        mentionSuggestions={mentionSuggestions}
-        onSelectMention={onSelectMention}
-        onSubmit={handleSubmitPost}
+        onSubmit={async (data) => {
+          setIsSubmitting(true);
+          try {
+            await submitPost({
+              user,
+              content: data.caption,
+              mediaFiles: data.files,
+              selectedTags: data.tags,
+              courseInfo: data.course,
+              onSuccess: () => {
+                console.log('Post submission successful');
+                closeComposer();
+                setLocalSelectedTags([]);
+                showConfirmationToast('Post shared successfully!');
+              },
+              onError: () => {
+                console.error('Post submission failed');
+                showConfirmationToast('Failed to share post. Please try again.');
+              }
+            });
+          } catch (error) {
+            console.error('Error in enhanced post submission:', error);
+            showConfirmationToast('Failed to share post. Please try again.');
+          } finally {
+            setIsSubmitting(false);
+          }
+        }}
         isSubmitting={isSubmitting}
+        initialFiles={selectedFiles.length > 0 ? selectedFiles : (selectedFile ? [selectedFile] : [])}
         selectedCourse={selectedCourse}
         onCourseSelect={setSelectedCourse}
       />
