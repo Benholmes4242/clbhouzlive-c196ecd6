@@ -172,160 +172,155 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
 
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent 
-          className={`${
-            isMobile 
-              ? 'fixed inset-0 w-screen h-screen max-w-none m-0 p-0 rounded-none' 
-              : 'max-w-6xl w-full h-[90vh] p-0'
-          } bg-background border-0 shadow-2xl`}
-          {...swipeHandlers}
-        >
-          {isMobile ? (
-            // Mobile Layout - Full Screen (Explore-style)
-            <div className="relative w-full h-full bg-black">
-              {/* Close Button - Top Left */}
-              <button
-                onClick={onClose}
-                className="absolute top-4 left-4 z-20 flex items-center justify-center w-10 h-10 text-white hover:bg-white/10 rounded-full transition-colors"
-                aria-label="Close"
-              >
-                <X className="h-6 w-6" />
-              </button>
+      {isMobile ? (
+        // Mobile Layout - Direct Full Screen without Dialog wrapper
+        isOpen && (
+          <div className="fixed inset-0 w-full h-full bg-black z-50 overflow-hidden" {...swipeHandlers}>
+            {/* Close Button - Top Left */}
+            <button
+              onClick={onClose}
+              className="absolute top-4 left-4 z-20 flex items-center justify-center w-10 h-10 text-white hover:bg-white/10 rounded-full transition-colors"
+              aria-label="Close"
+            >
+              <X className="h-6 w-6" />
+            </button>
 
-              {/* Media Content - Full Screen */}
-              <div className="absolute inset-0 flex items-center justify-center bg-black">
-                {currentMedia && (
-                  <>
-                    {currentMedia.media_type === 'video' ? (
-                      <VideoPreview
-                        src={currentMedia.media_url}
-                        className="max-w-full max-h-full object-contain"
-                        videoId={`post-viewer-mobile-${currentPost.id}-${currentMediaIndex}`}
-                      />
-                    ) : (
-                      <HighQualityImage
-                        src={currentMedia.media_url}
-                        alt="Post content"
-                        className="max-w-full max-h-full object-contain"
-                      />
-                    )}
-                    
-                    {/* Golf Course Badge - Top Right */}
-                    {golfCourse && (
-                      <div className="absolute top-4 right-4 z-10">
-                        <CoursePostBadge 
-                          course={golfCourse}
-                          className="m-0"
-                        />
-                      </div>
-                    )}
-
-                    {/* Media Navigation Dots - Bottom Center */}
-                    {hasMultipleMedia && (
-                      <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 flex space-x-2 z-10">
-                        {currentPost.post_media.map((_, index) => (
-                          <button
-                            key={index}
-                            onClick={() => setCurrentMediaIndex(index)}
-                            className={`w-2 h-2 rounded-full transition-colors ${
-                              index === currentMediaIndex ? 'bg-white' : 'bg-white/50'
-                            }`}
-                          />
-                        ))}
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
-
-              {/* User Info & Caption - Bottom Left */}
-              <div className="absolute bottom-4 left-4 z-10 max-w-[60%]">
-                <div className="flex items-center space-x-3 mb-2">
-                  <HighQualityImage
-                    src={currentPost.user.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
-                    alt={displayName}
-                    className="w-8 h-8 rounded-full border border-white/50"
-                    width={32}
-                    height={32}
-                  />
-                  <div>
-                    <div className="text-white font-semibold text-sm">
-                      {displayName}
-                    </div>
-                    <div className="text-white/70 text-xs">
-                      {timeAgo}
-                    </div>
-                  </div>
-                </div>
-                
-                {currentPost.content && (
-                  <p className="text-white text-sm leading-relaxed bg-black/30 p-2 rounded max-w-full">
-                    {currentPost.content}
-                  </p>
-                )}
-              </div>
-
-              {/* Action Buttons - Right Side */}
-              <div className="absolute right-4 bottom-20 z-10 flex flex-col space-y-4">
-                {/* Like Button */}
-                <button className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform">
-                  <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
-                    <Heart className="h-6 w-6" />
-                  </div>
-                  <span className="text-xs font-medium">0</span>
-                </button>
-
-                {/* Comment Button */}
-                <button 
-                  onClick={() => setShowComments(true)}
-                  className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform"
-                >
-                  <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
-                    <MessageCircle className="h-6 w-6" />
-                  </div>
-                  <span className="text-xs font-medium">0</span>
-                </button>
-
-                {/* Share Button */}
-                <button className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform">
-                  <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
-                    <Share className="h-6 w-6" />
-                  </div>
-                </button>
-              </div>
-
-              {/* Post Navigation - Bottom Edge (for multiple posts) */}
-              {hasMultiplePosts && (
-                <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-4 z-10">
-                  <button
-                    onClick={() => navigatePost('prev')}
-                    disabled={currentPostIndex === 0}
-                    className="flex items-center justify-center w-8 h-8 bg-black/50 rounded-full text-white disabled:opacity-50"
-                  >
-                    <ChevronLeft className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => navigatePost('next')}
-                    disabled={currentPostIndex === allUserPosts.length - 1}
-                    className="flex items-center justify-center w-8 h-8 bg-black/50 rounded-full text-white disabled:opacity-50"
-                  >
-                    <ChevronRight className="h-4 w-4" />
-                  </button>
-                </div>
-              )}
-
-              {/* End of posts indicator */}
-              {isAtEnd && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-30">
-                  <div className="bg-background rounded-lg p-4 text-center">
-                    <p className="text-sm text-muted-foreground">You've reached the end</p>
-                  </div>
-                </div>
+            {/* Media Content - Centered Full Screen */}
+            <div className="w-full h-full flex items-center justify-center">
+              {currentMedia && (
+                <>
+                  {currentMedia.media_type === 'video' ? (
+                    <VideoPreview
+                      src={currentMedia.media_url}
+                      className="w-full h-full object-contain"
+                      videoId={`post-viewer-mobile-${currentPost.id}-${currentMediaIndex}`}
+                    />
+                  ) : (
+                    <HighQualityImage
+                      src={currentMedia.media_url}
+                      alt="Post content"
+                      className="w-full h-full object-contain"
+                    />
+                  )}
+                </>
               )}
             </div>
-          ) : (
-            // Desktop Layout - Instagram Style
+
+            {/* Golf Course Badge - Top Right */}
+            {golfCourse && (
+              <div className="absolute top-4 right-4 z-10">
+                <CoursePostBadge 
+                  course={golfCourse}
+                  className="m-0"
+                />
+              </div>
+            )}
+
+            {/* Media Navigation Dots - Bottom Center */}
+            {hasMultipleMedia && (
+              <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 flex space-x-2 z-10">
+                {currentPost.post_media.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentMediaIndex(index)}
+                    className={`w-2 h-2 rounded-full transition-colors ${
+                      index === currentMediaIndex ? 'bg-white' : 'bg-white/50'
+                    }`}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* User Info & Caption - Bottom Left */}
+            <div className="absolute bottom-4 left-4 z-10 max-w-[60%]">
+              <div className="flex items-center space-x-3 mb-2">
+                <HighQualityImage
+                  src={currentPost.user.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
+                  alt={displayName}
+                  className="w-8 h-8 rounded-full border border-white/50"
+                  width={32}
+                  height={32}
+                />
+                <div>
+                  <div className="text-white font-semibold text-sm">
+                    {displayName}
+                  </div>
+                  <div className="text-white/70 text-xs">
+                    {timeAgo}
+                  </div>
+                </div>
+              </div>
+              
+              {currentPost.content && (
+                <p className="text-white text-sm leading-relaxed bg-black/30 p-2 rounded max-w-full">
+                  {currentPost.content}
+                </p>
+              )}
+            </div>
+
+            {/* Action Buttons - Right Side */}
+            <div className="absolute right-4 bottom-20 z-10 flex flex-col space-y-4">
+              {/* Like Button */}
+              <button className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform">
+                <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
+                  <Heart className="h-6 w-6" />
+                </div>
+                <span className="text-xs font-medium">0</span>
+              </button>
+
+              {/* Comment Button */}
+              <button 
+                onClick={() => setShowComments(true)}
+                className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform"
+              >
+                <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
+                  <MessageCircle className="h-6 w-6" />
+                </div>
+                <span className="text-xs font-medium">0</span>
+              </button>
+
+              {/* Share Button */}
+              <button className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform">
+                <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
+                  <Share className="h-6 w-6" />
+                </div>
+              </button>
+            </div>
+
+            {/* Post Navigation - Bottom Edge (for multiple posts) */}
+            {hasMultiplePosts && (
+              <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-4 z-10">
+                <button
+                  onClick={() => navigatePost('prev')}
+                  disabled={currentPostIndex === 0}
+                  className="flex items-center justify-center w-8 h-8 bg-black/50 rounded-full text-white disabled:opacity-50"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => navigatePost('next')}
+                  disabled={currentPostIndex === allUserPosts.length - 1}
+                  className="flex items-center justify-center w-8 h-8 bg-black/50 rounded-full text-white disabled:opacity-50"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              </div>
+            )}
+
+            {/* End of posts indicator */}
+            {isAtEnd && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-30">
+                <div className="bg-background rounded-lg p-4 text-center">
+                  <p className="text-sm text-muted-foreground">You've reached the end</p>
+                </div>
+              </div>
+            )}
+          </div>
+        )
+      ) : (
+        // Desktop Layout - Instagram Style
+        <Dialog open={isOpen} onOpenChange={onClose}>
+          <DialogContent className="max-w-6xl w-full h-[90vh] p-0 bg-background border-0 shadow-2xl">
             <div className="flex h-full rounded-lg overflow-hidden">
               {/* Left Side - Media */}
               <div className="flex-1 bg-black relative">
@@ -458,9 +453,9 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                 </div>
               </div>
             </div>
-          )}
-        </DialogContent>
-      </Dialog>
+          </DialogContent>
+        </Dialog>
+      )}
 
       {/* Mobile Comments Drawer */}
       {isMobile && (
