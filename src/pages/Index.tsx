@@ -66,7 +66,7 @@ const Index = () => {
             </p>
             
             {/* App Store Buttons */}
-            <div className="flex items-center justify-center gap-8 mt-8">
+            <div className="flex items-center justify-center gap-8 mt-12">
               <img
                 src="/lovable-uploads/8537a2c1-2486-42b9-9783-1b1992d30507.png"
                 alt="Download on the App Store"
