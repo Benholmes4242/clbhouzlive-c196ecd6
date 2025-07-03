@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Lock } from 'lucide-react';
+import { DoorClosed } from 'lucide-react';
 
 interface PasswordProtectionProps {
   children: React.ReactNode;
@@ -73,7 +73,7 @@ const PasswordProtection: React.FC<PasswordProtectionProps> = ({ children }) => 
             {/* Lock Icon */}
             <div className="flex justify-center">
               <div className="w-16 h-16 rounded-full bg-muted/20 flex items-center justify-center">
-                <Lock className="h-8 w-8 text-muted-foreground" />
+                <DoorClosed className="h-8 w-8 text-muted-foreground" />
               </div>
             </div>
             
