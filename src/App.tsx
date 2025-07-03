@@ -5,6 +5,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { VideoAutoplayProvider } from '@/hooks/useVideoAutoplayManager';
+import { ThemeProvider } from '@/components/theme-provider';
 import PasswordProtection from "@/components/PasswordProtection";
 import Index from "./pages/Index";
 
@@ -41,10 +42,11 @@ const queryClient = new QueryClient({
 
 const App: React.FC = () => {
   return (
-    <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <VideoAutoplayProvider>
-          <PasswordProtection>
+    <ThemeProvider defaultTheme="system" storageKey="clbhouz-ui-theme">
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <VideoAutoplayProvider>
+            <PasswordProtection>
             <BrowserRouter>
             <Suspense fallback={
               <div className="min-h-screen bg-background flex items-center justify-center">
@@ -90,6 +92,7 @@ const App: React.FC = () => {
         </VideoAutoplayProvider>
       </TooltipProvider>
     </QueryClientProvider>
+    </ThemeProvider>
   );
 };
 
