@@ -471,8 +471,8 @@ const ClbhouzMomentsCarousel: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Follow Button - Subtle at bottom */}
-                  <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2">
+                  {/* Follow Button - Above course tag */}
+                  <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2">
                     {!moment.is_following ? (
                       <button
                         className="bg-black/80 text-white hover:bg-black/90 cursor-pointer transition-all duration-200 hover:shadow-sm px-3 py-1.5 rounded-full text-xs font-medium border-0 backdrop-blur-sm inline-flex items-center justify-center"
@@ -490,8 +490,8 @@ const ClbhouzMomentsCarousel: React.FC = () => {
                     )}
                   </div>
 
-                  {/* Course/Tags Info */}
-                  <div className="absolute bottom-3 left-3 right-3 text-white">
+                  {/* Course/Tags Info - Almost at bottom */}
+                  <div className="absolute bottom-1 left-3 right-3 text-white">
                     {moment.course_tags && moment.course_tags.length > 0 && (
                       <div className="flex items-center gap-1 mb-1">
                         <MapPin className="h-3 w-3" />
