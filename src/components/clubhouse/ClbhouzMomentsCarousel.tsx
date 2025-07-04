@@ -497,7 +497,7 @@ const ClbhouzMomentsCarousel: React.FC = () => {
                   <div className="absolute bottom-3 left-3 right-3">
                     {!moment.is_following ? (
                       <button
-                        className="py-1.5 px-3 bg-white/20 hover:bg-white/30 text-white text-xs font-medium rounded-md border border-white/30 transition-all duration-200"
+                        className="bg-black/80 text-white hover:bg-black/90 cursor-pointer transition-all duration-200 hover:shadow-sm px-2 py-1 rounded-full text-xs font-medium border-0 backdrop-blur-sm"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleFollow(moment.user_id, moment.id);
@@ -506,7 +506,7 @@ const ClbhouzMomentsCarousel: React.FC = () => {
                         FOLLOW
                       </button>
                     ) : (
-                      <div className="py-1.5 px-3 bg-gray-400/20 text-gray-300 text-xs font-medium rounded-md border border-gray-400/30">
+                      <div className="bg-black/80 text-white px-2 py-1 rounded-full text-xs font-medium border-0 backdrop-blur-sm">
                         FOLLOWING
                       </div>
                     )}
