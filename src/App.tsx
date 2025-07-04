@@ -42,7 +42,7 @@ const queryClient = new QueryClient({
 
 const App: React.FC = () => {
   return (
-    <ThemeProvider defaultTheme="system" storageKey="clbhouz-ui-theme">
+    <ThemeProvider defaultTheme="light" storageKey="clbhouz-ui-theme">
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <VideoAutoplayProvider>
