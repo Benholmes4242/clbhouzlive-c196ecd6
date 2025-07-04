@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Volume2, VolumeX } from 'lucide-react';
 import CoursePostBadge from '../posts/CoursePostBadge';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface FullscreenMediaModalProps {
   isOpen: boolean;
@@ -27,6 +28,7 @@ const FullscreenMediaModal = ({
   console.log('FullscreenMediaModal - golfCourse:', golfCourse);
   const [isMuted, setIsMuted] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const isMobile = useIsMobile();
 
   // Auto-play video when modal opens
   useEffect(() => {
@@ -54,13 +56,16 @@ const FullscreenMediaModal = ({
 
   return (
     <div 
-      className="fixed top-0 left-0 right-0 bottom-0 w-full h-full z-[999999] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4"
+      className={`fixed top-0 left-0 right-0 bottom-0 w-full z-[999999] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 ${
+        isMobile ? '' : 'h-full'
+      }`}
       style={{ 
         position: 'fixed',
         top: 0,
         left: 0,
         width: '100vw',
-        height: '100vh',
+        height: isMobile ? '90vh' : '100vh',
+        maxHeight: isMobile ? '90vh' : '100vh',
         zIndex: 999999
       }}
       onClick={handleBackdropClick}
@@ -115,7 +120,9 @@ const FullscreenMediaModal = ({
           <img
             src={mediaUrl}
             alt={alt}
-            className="max-w-[90vw] max-h-[90vh] w-auto h-auto object-contain"
+            className={`max-w-[90vw] w-auto h-auto object-contain ${
+              isMobile ? 'max-h-[75vh]' : 'max-h-[90vh]'
+            }`}
             draggable={false}
           />
         </div>
@@ -124,7 +131,9 @@ const FullscreenMediaModal = ({
           <video
             ref={videoRef}
             src={mediaUrl}
-            className="max-w-[90vw] max-h-[90vh] w-auto h-auto object-contain"
+            className={`max-w-[90vw] w-auto h-auto object-contain ${
+              isMobile ? 'max-h-[75vh]' : 'max-h-[90vh]'
+            }`}
             muted={isMuted}
             controls={false}
             loop

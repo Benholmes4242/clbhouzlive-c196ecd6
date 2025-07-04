@@ -173,9 +173,11 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
   return (
     <>
       {isMobile ? (
-        // Mobile Layout - Direct Full Screen without Dialog wrapper
+        // Mobile Layout - Optimized for mobile viewport
         isOpen && (
-          <div className="fixed inset-0 w-full h-full bg-black z-50 overflow-hidden" {...swipeHandlers}>
+          <div className="fixed inset-0 w-full bg-black z-50 overflow-hidden" 
+               style={{ height: '100vh', maxHeight: '90vh' }}
+               {...swipeHandlers}>
             {/* Close Button - Top Left */}
             <button
               onClick={onClose}
