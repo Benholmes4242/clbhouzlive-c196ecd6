@@ -102,6 +102,17 @@ const PostPlayRatingModal = ({
       const { data: userResponse } = await supabase.auth.getUser();
       if (!userResponse.user || !course) throw new Error('Not authenticated or no course');
 
+      // Get course ranking data to check if it's a top 100 course
+      const { data: courseData, error: courseError } = await supabase
+        .from('golf_courses')
+        .select('global_rank, regional_rank, usa_rank')
+        .eq('id', course.id)
+        .single();
+
+      if (courseError) throw courseError;
+
+      const isTop100Course = courseData?.global_rank || courseData?.regional_rank || courseData?.usa_rank;
+
       // Check if already in user_courses
       const { data: existingCourse, error: checkError } = await supabase
         .from('user_courses')
@@ -123,12 +134,37 @@ const PostPlayRatingModal = ({
         
         if (error) throw error;
       }
+
+      // If it's a top 100 course, also add to user_top100_courses
+      if (isTop100Course) {
+        const { error: top100Error } = await supabase
+          .from('user_top100_courses')
+          .upsert({
+            course_id: course.id,
+            user_id: userResponse.user.id,
+            played: true,
+            played_date: new Date().toISOString().split('T')[0],
+          });
+        if (top100Error) throw top100Error;
+      }
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       setHasMarkedAsPlayed(true);
       queryClient.invalidateQueries({ queryKey: ['user-course', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['my-courses'] });
       queryClient.invalidateQueries({ queryKey: ['trackerStats'] });
+      queryClient.invalidateQueries({ queryKey: ['user-top100-course', course?.id] });
+      queryClient.invalidateQueries({ queryKey: ['top100-courses'] });
+      
+      // Trigger badge checking for the user
+      try {
+        const { data: userResponse } = await supabase.auth.getUser();
+        if (userResponse.user) {
+          await supabase.rpc('check_and_award_badges', { user_id_param: userResponse.user.id });
+        }
+      } catch (error) {
+        console.error('Error checking badges:', error);
+      }
     },
     onError: (error) => {
       console.error('Error marking course as played:', error);
@@ -256,24 +292,37 @@ const PostPlayRatingModal = ({
         .eq('user_id', userResponse.user.id)
         .eq('course_id', course.id);
       
-      if (courseError && courseError.code !== 'PGRST116') {
-        // If not found in user_courses, try user_top100_courses
-        const { error: top100Error } = await supabase
-          .from('user_top100_courses')
-          .delete()
-          .eq('user_id', userResponse.user.id)
-          .eq('course_id', course.id);
-        
-        if (top100Error) throw top100Error;
+      // Also try to remove from user_top100_courses (might be in both tables)
+      const { error: top100Error } = await supabase
+        .from('user_top100_courses')
+        .update({ played: false, played_date: null })
+        .eq('user_id', userResponse.user.id)
+        .eq('course_id', course.id);
+      
+      // Don't throw error if not found in top100 courses
+      if (top100Error && top100Error.code !== 'PGRST116') {
+        console.warn('Error updating top100 courses:', top100Error);
       }
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ['course-rating-stats', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['user-course-rating', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['course-reviews', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['user-course', course?.id] });
+      queryClient.invalidateQueries({ queryKey: ['user-top100-course', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['userTop100Courses'] });
       queryClient.invalidateQueries({ queryKey: ['userTop100CoursesInRegion'] });
+      queryClient.invalidateQueries({ queryKey: ['top100-courses'] });
+      
+      // Trigger badge checking for the user
+      try {
+        const { data: userResponse } = await supabase.auth.getUser();
+        if (userResponse.user) {
+          await supabase.rpc('check_and_award_badges', { user_id_param: userResponse.user.id });
+        }
+      } catch (error) {
+        console.error('Error checking badges:', error);
+      }
       
       toast({
         title: "Course Removed",

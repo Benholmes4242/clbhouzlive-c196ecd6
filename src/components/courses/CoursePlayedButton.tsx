@@ -57,13 +57,50 @@ const CoursePlayedButton = ({
       if (!currentUserId) throw new Error('Not authenticated');
       if (!canModifyCourseStatus) throw new Error('Cannot modify other users courses');
 
+      // First, get the course data to check if it's a top 100 course
+      const { data: courseData, error: courseError } = await supabase
+        .from('golf_courses')
+        .select('global_rank, regional_rank, usa_rank')
+        .eq('id', courseId)
+        .single();
+
+      if (courseError) throw courseError;
+
+      const isTop100Course = courseData?.global_rank || courseData?.regional_rank || courseData?.usa_rank;
+
       if (userCourse) {
+        // Update existing user_courses record
         const { error } = await supabase
           .from('user_courses')
           .update({ played: !userCourse.played })
           .eq('id', userCourse.id);
         if (error) throw error;
+
+        // If it's a top 100 course, also manage user_top100_courses table
+        if (isTop100Course) {
+          if (!userCourse.played) {
+            // Adding to played, so insert/update in user_top100_courses
+            const { error: top100Error } = await supabase
+              .from('user_top100_courses')
+              .upsert({
+                course_id: courseId,
+                user_id: currentUserId,
+                played: true,
+                played_date: new Date().toISOString().split('T')[0],
+              });
+            if (top100Error) throw top100Error;
+          } else {
+            // Removing from played, so update user_top100_courses
+            const { error: top100Error } = await supabase
+              .from('user_top100_courses')
+              .update({ played: false, played_date: null })
+              .eq('course_id', courseId)
+              .eq('user_id', currentUserId);
+            if (top100Error) throw top100Error;
+          }
+        }
       } else {
+        // Insert new user_courses record
         const { error } = await supabase
           .from('user_courses')
           .insert({
@@ -72,12 +109,36 @@ const CoursePlayedButton = ({
             played: true,
           });
         if (error) throw error;
+
+        // If it's a top 100 course, also add to user_top100_courses
+        if (isTop100Course) {
+          const { error: top100Error } = await supabase
+            .from('user_top100_courses')
+            .upsert({
+              course_id: courseId,
+              user_id: currentUserId,
+              played: true,
+              played_date: new Date().toISOString().split('T')[0],
+            });
+          if (top100Error) throw top100Error;
+        }
       }
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       queryClient.invalidateQueries({ queryKey: ['user-course', courseId] });
       queryClient.invalidateQueries({ queryKey: ['my-courses'] });
       queryClient.invalidateQueries({ queryKey: ['trackerStats'] });
+      queryClient.invalidateQueries({ queryKey: ['user-top100-course', courseId] });
+      queryClient.invalidateQueries({ queryKey: ['top100-courses'] });
+      
+      // Trigger badge checking for the user
+      if (currentUserId) {
+        try {
+          await supabase.rpc('check_and_award_badges', { user_id_param: currentUserId });
+        } catch (error) {
+          console.error('Error checking badges:', error);
+        }
+      }
       
       // If marking as played (not unplaying), show rating modal
       if (!userCourse?.played) {
