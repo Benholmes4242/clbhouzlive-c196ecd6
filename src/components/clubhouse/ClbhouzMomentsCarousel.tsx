@@ -418,7 +418,7 @@ const ClbhouzMomentsCarousel: React.FC = () => {
                 }}
               >
                 {/* Video/Image Background */}
-                <div className="relative aspect-[9/16] bg-black">
+                <div className={`relative bg-black ${isMobile ? 'aspect-[4/5]' : 'aspect-[9/16]'}`}>
                   {moment.media[0] && (
                     <>
                       {moment.media[0].media_type === 'video' ? (
