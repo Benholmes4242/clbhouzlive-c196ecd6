@@ -55,18 +55,21 @@ const BadgeDisplay: React.FC<BadgeDisplayProps> = ({
         <span>{badge.display_name}</span>
       </Badge>
 
-      {showProgress && !isEarned && (
+      {showProgress && (
         <div className="mt-2 w-full">
           <div className="flex justify-between text-xs text-muted-foreground mb-1">
             <span>{progress}/{badge.criteria_value}</span>
-            <span>{Math.round(progressPercentage)}%</span>
+            {!isEarned && <span>{Math.round(progressPercentage)}%</span>}
+            {isEarned && <span className="text-green-600 font-medium">✓ Earned!</span>}
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
-            <div
-              className="bg-primary h-2 rounded-full transition-all duration-300"
-              style={{ width: `${progressPercentage}%` }}
-            />
-          </div>
+          {!isEarned && (
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div
+                className="bg-primary h-2 rounded-full transition-all duration-300"
+                style={{ width: `${progressPercentage}%` }}
+              />
+            </div>
+          )}
         </div>
       )}
 
