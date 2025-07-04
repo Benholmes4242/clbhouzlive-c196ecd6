@@ -48,7 +48,13 @@ const BadgeCarousel: React.FC<BadgeCarouselProps> = ({
   const earnedBadges = getEarnedBadges();
   const top100Badges = getBadgesByCategory('top_100_courses');
   const engagementBadges = getBadgesByCategory('engagement');
-  const communityBadges = getBadgesByCategory('community');
+
+  // Filter specific badges for Activity tab
+  const activityBadges = engagementBadges.filter(bp => 
+    bp.badge.name === 'pro_tips_contributor' || 
+    bp.badge.name === 'course_reviewer' || 
+    bp.badge.name === 'active_rounder'
+  );
 
   const displayBadges = showOnlyEarned ? earnedBadges : badgeProgress;
 
@@ -75,30 +81,23 @@ const BadgeCarousel: React.FC<BadgeCarouselProps> = ({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <Tabs defaultValue="all" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="all" className="text-xs">
-              All ({displayBadges.length})
+        <Tabs defaultValue="engagement" className="w-full">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="engagement" className="text-xs">
+              <Star className="h-3 w-3 mr-1" />
+              Activity
             </TabsTrigger>
             <TabsTrigger value="top100" className="text-xs">
               <Target className="h-3 w-3 mr-1" />
               Top 100
             </TabsTrigger>
-            <TabsTrigger value="engagement" className="text-xs">
-              <Star className="h-3 w-3 mr-1" />
-              Activity
-            </TabsTrigger>
-            <TabsTrigger value="community" className="text-xs">
-              <Users className="h-3 w-3 mr-1" />
-              Social
-            </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="all" className="mt-4">
+          <TabsContent value="engagement" className="mt-4">
             <ScrollArea className="w-full">
               <div className="flex space-x-3 pb-4">
-                {displayBadges.length > 0 ? (
-                  displayBadges.map((badgeProgress) => (
+                {activityBadges.length > 0 ? (
+                  activityBadges.map((badgeProgress) => (
                     <div key={badgeProgress.badge.id} className="flex-shrink-0">
                       <BadgeDisplay
                         badge={badgeProgress.badge}
@@ -111,9 +110,9 @@ const BadgeCarousel: React.FC<BadgeCarouselProps> = ({
                   ))
                 ) : (
                   <div className="text-center text-muted-foreground py-8 w-full">
-                    <Trophy className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>No badges earned yet</p>
-                    <p className="text-sm">Start playing courses and engaging with the community!</p>
+                    <Star className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>No activity badges yet</p>
+                    <p className="text-sm">Start engaging with the community to earn badges!</p>
                   </div>
                 )}
               </div>
@@ -138,41 +137,6 @@ const BadgeCarousel: React.FC<BadgeCarouselProps> = ({
             </ScrollArea>
           </TabsContent>
 
-          <TabsContent value="engagement" className="mt-4">
-            <ScrollArea className="w-full">
-              <div className="flex space-x-3 pb-4">
-                {engagementBadges.map((badgeProgress) => (
-                  <div key={badgeProgress.badge.id} className="flex-shrink-0">
-                    <BadgeDisplay
-                      badge={badgeProgress.badge}
-                      isEarned={badgeProgress.is_earned}
-                      progress={badgeProgress.current_progress}
-                      showProgress={!showOnlyEarned}
-                      size="md"
-                    />
-                  </div>
-                ))}
-              </div>
-            </ScrollArea>
-          </TabsContent>
-
-          <TabsContent value="community" className="mt-4">
-            <ScrollArea className="w-full">
-              <div className="flex space-x-3 pb-4">
-                {communityBadges.map((badgeProgress) => (
-                  <div key={badgeProgress.badge.id} className="flex-shrink-0">
-                    <BadgeDisplay
-                      badge={badgeProgress.badge}
-                      isEarned={badgeProgress.is_earned}
-                      progress={badgeProgress.current_progress}
-                      showProgress={!showOnlyEarned}
-                      size="md"
-                    />
-                  </div>
-                ))}
-              </div>
-            </ScrollArea>
-          </TabsContent>
         </Tabs>
       </CardContent>
     </Card>
