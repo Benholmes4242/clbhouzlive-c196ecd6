@@ -161,7 +161,8 @@ const BottomNavigation = () => {
     });
     console.log('Setting local selected tags to empty array');
     setLocalSelectedTags([]);
-    console.log('Calling openComposer with file:', file.name);
+    console.log('Closing gallery and opening composer with file:', file.name);
+    closeGallery(); // Ensure gallery is closed before opening composer
     openComposer(file);
     console.log('openComposer call completed');
   };
