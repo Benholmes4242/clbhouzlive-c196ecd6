@@ -348,10 +348,9 @@ const ClbhouzMomentsCarousel: React.FC = () => {
 
   return (
     <div className="w-full mb-6">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg font-semibold">Discover Golf Moments</h2>
-        <p className="text-sm text-muted-foreground">From golfers you might like</p>
-      </div>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold">Golfers you may like</h2>
+        </div>
       
       <div className="relative">
         {/* Desktop Navigation Arrows */}
