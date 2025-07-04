@@ -178,14 +178,21 @@ const SuggestedUsers = () => {
                   )}
                 </p>
               </div>
-              <Button
-                size="sm"
-                variant="outline"
-                className="text-xs px-3 py-1 h-auto"
-                onClick={() => handleFollow(suggestedUser.id)}
-              >
-                Follow
-              </Button>
+              <div className="flex flex-col items-end gap-1">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="text-xs px-3 py-1 h-auto"
+                  onClick={() => handleFollow(suggestedUser.id)}
+                >
+                  Follow
+                </Button>
+                {suggestedUser.home_club && (
+                  <span className="text-xs text-muted-foreground text-right">
+                    {suggestedUser.home_club}
+                  </span>
+                )}
+              </div>
             </div>
           ))}
         </div>
