@@ -20,15 +20,15 @@ const Header = () => {
           {/* Logo - Fixed positioning */}
           <div className="flex items-center flex-shrink-0 gap-3">
             <img
+              src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
+              alt="Logo Mark"
+              className="h-10 w-auto object-contain"
+            />
+            <img
               src={currentLogo?.file_url || "/lovable-uploads/181fd40d-ced5-420c-bff8-27c2ef146377.png"}
               alt="clbhouz Logo"
               className="h-10 w-auto cursor-pointer object-contain"
               onClick={handleLogoClick}
-            />
-            <img
-              src="/lovable-uploads/07c8207e-a9d0-437b-a96d-8241dbf0017d.png"
-              alt="Logo Mark"
-              className="h-10 w-auto object-contain self-end"
             />
           </div>
 
