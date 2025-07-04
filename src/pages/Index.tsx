@@ -9,10 +9,12 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { removeDuplicatePosts } from '@/utils/postCleanup';
+import { useAppLogo } from '@/hooks/useAppLogo';
 
 const Index = () => {
   const { user, loading } = useSupabaseSession();
   const navigate = useNavigate();
+  const { currentLogo } = useAppLogo();
 
   // Clean up duplicate posts when user is loaded
   useEffect(() => {
@@ -44,7 +46,7 @@ const Index = () => {
           {/* Logo */}
           <div className="flex justify-center">
             <img
-              src="/lovable-uploads/181fd40d-ced5-420c-bff8-27c2ef146377.png"
+              src={currentLogo?.file_url || "/lovable-uploads/181fd40d-ced5-420c-bff8-27c2ef146377.png"}
               alt="clbhouz"
               className="w-auto max-h-48 object-contain"
             />
