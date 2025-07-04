@@ -28,7 +28,7 @@ const Header = () => {
             <img
               src="/lovable-uploads/07c8207e-a9d0-437b-a96d-8241dbf0017d.png"
               alt="Logo Mark"
-              className="h-8 w-auto object-contain"
+              className="h-8 w-auto object-contain self-end"
             />
           </div>
 
