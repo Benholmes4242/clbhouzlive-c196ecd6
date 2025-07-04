@@ -471,8 +471,27 @@ const ClbhouzMomentsCarousel: React.FC = () => {
                     </div>
                   </div>
 
+                  {/* Follow Button - Subtle at bottom */}
+                  <div className="absolute bottom-12 left-1/2 transform -translate-x-1/2">
+                    {!moment.is_following ? (
+                      <button
+                        className="bg-black/80 text-white hover:bg-black/90 cursor-pointer transition-all duration-200 hover:shadow-sm px-3 py-1.5 rounded-full text-xs font-medium border-0 backdrop-blur-sm inline-flex items-center justify-center"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleFollow(moment.user_id, moment.id);
+                        }}
+                      >
+                        Follow
+                      </button>
+                    ) : (
+                      <div className="bg-black/80 text-white px-3 py-1.5 rounded-full text-xs font-medium border-0 backdrop-blur-sm inline-flex items-center justify-center">
+                        Following
+                      </div>
+                    )}
+                  </div>
+
                   {/* Course/Tags Info */}
-                  <div className="absolute bottom-16 left-3 right-3 text-white">
+                  <div className="absolute bottom-3 left-3 right-3 text-white">
                     {moment.course_tags && moment.course_tags.length > 0 && (
                       <div className="flex items-center gap-1 mb-1">
                         <MapPin className="h-3 w-3" />
@@ -488,25 +507,6 @@ const ClbhouzMomentsCarousel: React.FC = () => {
                         <span className="text-xs drop-shadow-lg">
                           with {moment.user_tags.map(tag => tag.user_name).join(', ')}
                         </span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Follow Button - Subtle at bottom */}
-                  <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2">
-                    {!moment.is_following ? (
-                      <button
-                        className="bg-black/80 text-white hover:bg-black/90 cursor-pointer transition-all duration-200 hover:shadow-sm px-3 py-1.5 rounded-full text-xs font-medium border-0 backdrop-blur-sm inline-flex items-center justify-center"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleFollow(moment.user_id, moment.id);
-                        }}
-                      >
-                        Follow
-                      </button>
-                    ) : (
-                      <div className="bg-black/80 text-white px-3 py-1.5 rounded-full text-xs font-medium border-0 backdrop-blur-sm inline-flex items-center justify-center">
-                        Following
                       </div>
                     )}
                   </div>
