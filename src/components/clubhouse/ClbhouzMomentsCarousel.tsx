@@ -43,16 +43,18 @@ const ClbhouzMomentsCarousel: React.FC = () => {
   const carouselRef = useRef<HTMLDivElement>(null);
   const videoRefs = useRef<{ [key: string]: HTMLVideoElement }>({});
 
+  const cardsPerView = isMobile ? 2 : 4;
+  
   const nextSlide = () => {
-    const maxIndex = isMobile ? moments.length - 1 : moments.length - 4;
+    const maxIndex = Math.max(0, moments.length - cardsPerView);
     if (currentIndex < maxIndex) {
-      setCurrentIndex(prev => prev + 1);
+      setCurrentIndex(prev => Math.min(prev + cardsPerView, maxIndex));
     }
   };
 
   const prevSlide = () => {
     if (currentIndex > 0) {
-      setCurrentIndex(prev => prev - 1);
+      setCurrentIndex(prev => Math.max(prev - cardsPerView, 0));
     }
   };
 
@@ -300,28 +302,27 @@ const ClbhouzMomentsCarousel: React.FC = () => {
     }
   };
 
-  const getVisibleCards = () => {
-    const cardsToShow = isMobile ? 1 : 4;
-    return moments.slice(currentIndex, currentIndex + cardsToShow);
-  };
-
-  // Auto-play videos when they come into view on mobile
+  // Auto-play videos when they come into view on mobile (2 cards at a time)
   useEffect(() => {
     if (isMobile && moments.length > 0) {
-      const currentMoment = moments[currentIndex];
-      if (currentMoment) {
-        // Play current video
-        handleVideoPlay(currentMoment.id);
-        
-        // Pause all other videos
-        moments.forEach(moment => {
-          if (moment.id !== currentMoment.id) {
-            handleVideoPause(moment.id);
-          }
-        });
-      }
+      // Play videos for the current pair of visible cards
+      const visibleCards = moments.slice(currentIndex, currentIndex + cardsPerView);
+      
+      // Play visible videos
+      visibleCards.forEach(moment => {
+        if (moment.media[0]?.media_type === 'video') {
+          handleVideoPlay(moment.id);
+        }
+      });
+      
+      // Pause all other videos
+      moments.forEach(moment => {
+        if (!visibleCards.some(visible => visible.id === moment.id)) {
+          handleVideoPause(moment.id);
+        }
+      });
     }
-  }, [currentIndex, isMobile, moments]);
+  }, [currentIndex, isMobile, moments, cardsPerView]);
 
   if (isLoading) {
     return (
@@ -367,7 +368,7 @@ const ClbhouzMomentsCarousel: React.FC = () => {
               </Button>
             )}
             
-            {currentIndex < moments.length - 4 && (
+            {currentIndex < moments.length - cardsPerView && (
               <Button
                 variant="outline"
                 size="icon"
@@ -387,17 +388,17 @@ const ClbhouzMomentsCarousel: React.FC = () => {
         >
           <div 
             className={`flex transition-transform duration-300 ease-out ${
-              isMobile ? 'gap-0' : 'gap-4'
+              isMobile ? 'gap-3 px-2' : 'gap-4'
             }`}
             style={{
-              transform: `translateX(-${currentIndex * (isMobile ? 100 : 25)}%)`,
+              transform: `translateX(-${currentIndex * (isMobile ? 50 : 25)}%)`,
             }}
           >
             {moments.map((moment) => (
               <Card
                 key={moment.id}
                 className={`flex-shrink-0 relative overflow-hidden group cursor-pointer ${
-                  isMobile ? 'w-full' : 'w-1/4'
+                  isMobile ? 'w-[47%]' : 'w-1/4'
                 }`}
                 onMouseEnter={() => {
                   if (!isMobile) {
@@ -519,13 +520,13 @@ const ClbhouzMomentsCarousel: React.FC = () => {
         {/* Mobile Swipe Indicators */}
         {isMobile && (
           <div className="flex justify-center mt-4 gap-1">
-            {moments.map((_, index) => (
+            {Array.from({ length: Math.ceil(moments.length / cardsPerView) }).map((_, groupIndex) => (
               <button
-                key={index}
+                key={groupIndex}
                 className={`w-2 h-2 rounded-full transition-all ${
-                  index === currentIndex ? 'bg-primary' : 'bg-muted-foreground/30'
+                  Math.floor(currentIndex / cardsPerView) === groupIndex ? 'bg-primary' : 'bg-muted-foreground/30'
                 }`}
-                onClick={() => setCurrentIndex(index)}
+                onClick={() => setCurrentIndex(groupIndex * cardsPerView)}
               />
             ))}
           </div>
