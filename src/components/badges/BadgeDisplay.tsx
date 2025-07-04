@@ -62,14 +62,15 @@ const BadgeDisplay: React.FC<BadgeDisplayProps> = ({
             {!isEarned && <span>{Math.round(progressPercentage)}%</span>}
             {isEarned && <span className="text-green-600 font-medium">✓ Earned!</span>}
           </div>
-          {!isEarned && (
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div
-                className="bg-primary h-2 rounded-full transition-all duration-300"
-                style={{ width: `${progressPercentage}%` }}
-              />
-            </div>
-          )}
+          <div className="w-full bg-gray-200 rounded-full h-2">
+            <div
+              className={cn(
+                "h-2 rounded-full transition-all duration-300",
+                isEarned ? "bg-green-500" : "bg-primary"
+              )}
+              style={{ width: isEarned ? "100%" : `${progressPercentage}%` }}
+            />
+          </div>
         </div>
       )}
 
