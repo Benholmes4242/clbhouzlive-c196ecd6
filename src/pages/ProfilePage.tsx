@@ -76,21 +76,6 @@ const ProfilePage = () => {
     <div className="min-h-screen bg-background pb-28">
       <Header />
       
-      {/* Temporary refresh button - remove after testing */}
-      {process.env.NODE_ENV === 'development' && (
-        <div className="p-4 bg-yellow-100 border-b">
-          <button 
-            onClick={refreshProfile}
-            className="px-4 py-2 bg-blue-500 text-white rounded text-sm"
-          >
-            Force Refresh Profile Data
-          </button>
-          <span className="ml-2 text-sm text-gray-600">
-            Current username: {profile?.username || 'Not set'}
-          </span>
-        </div>
-      )}
-      
       <div className="max-w-4xl mx-auto">
         <InstagramStyleProfileHeader 
           profile={profile}
