@@ -28,7 +28,7 @@ export const handleFileSelection = (
   if (fileArray.length === 1) {
     console.log('Single file selected, calling onFileSelected');
     onFileSelected(fileArray[0]);
-    // Don't close immediately - let the parent component handle closing after composer opens
+    onClose(); // Close the gallery picker after single file selection
   } else {
     console.log('Multiple files selected, entering multi-select mode');
     const urls = fileArray.map(file => URL.createObjectURL(file));
