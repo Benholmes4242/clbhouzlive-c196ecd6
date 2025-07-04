@@ -66,7 +66,7 @@ const StoryItem: React.FC<StoryItemProps> = ({
           >
             <div 
               className="w-20 h-20 rounded-[18px] p-0.5 hover:opacity-80 transition-opacity"
-              style={{ background: 'linear-gradient(to top right, #f7931e, #e8871a)' }}
+              style={{ background: 'linear-gradient(to top right, #000000, #333333)' }}
             >
               {story.avatar ? (
                 <HighQualityImage
