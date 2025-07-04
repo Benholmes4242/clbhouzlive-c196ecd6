@@ -34,11 +34,11 @@ const StoryItem: React.FC<StoryItemProps> = ({
             type="button"
             onClick={onYourProfileClick}
             aria-label="View your profile"
-            className="focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 rounded-[18px]"
+            className="focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 rounded-[18px]"
           >
             {hasProfile && story.avatar ? (
               // User has a profile photo - show with green ring
-              <div className="w-20 h-20 rounded-[18px] p-0.5 bg-gradient-to-tr from-green-500 to-green-700 hover:opacity-80 transition-opacity">
+              <div className="w-20 h-20 rounded-[18px] p-0.5 bg-gradient-to-tr from-orange-500 to-orange-700 hover:opacity-80 transition-opacity">
                 <HighQualityImage
                   src={story.avatar}
                   alt={story.user}
@@ -49,7 +49,7 @@ const StoryItem: React.FC<StoryItemProps> = ({
               </div>
             ) : (
               // User doesn't have a profile photo - show plus icon with green ring
-              <div className="w-20 h-20 rounded-[18px] p-0.5 bg-gradient-to-tr from-green-500 to-green-700 hover:opacity-80 transition-opacity flex items-center justify-center">
+              <div className="w-20 h-20 rounded-[18px] p-0.5 bg-gradient-to-tr from-orange-500 to-orange-700 hover:opacity-80 transition-opacity flex items-center justify-center">
                 <div className="w-full h-full bg-muted border-2 border-dashed border-gray-400 rounded-[15px] flex items-center justify-center hover:bg-muted/80 transition-colors">
                   <Plus className="h-6 w-6 text-muted-foreground" />
                 </div>
