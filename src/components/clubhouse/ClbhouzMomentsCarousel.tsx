@@ -494,7 +494,7 @@ const ClbhouzMomentsCarousel: React.FC = () => {
                   </div>
 
                   {/* Follow Button - Subtle at bottom */}
-                  <div className="absolute bottom-3 left-3 right-3">
+                  <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2">
                     {!moment.is_following ? (
                       <button
                         className="bg-black/80 text-white hover:bg-black/90 cursor-pointer transition-all duration-200 hover:shadow-sm px-3 py-1.5 rounded-full text-xs font-medium border-0 backdrop-blur-sm inline-flex items-center justify-center"
