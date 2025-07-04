@@ -172,7 +172,7 @@ const SuggestedUsers = () => {
                   {suggestedUser.display_name}
                 </p>
                 <p className="text-xs text-muted-foreground truncate">
-                  {suggestedUser.home_club ? `${suggestedUser.home_club}` : 'Golf enthusiast'}
+                  Golf enthusiast
                   {suggestedUser.mutualConnections && suggestedUser.mutualConnections > 0 && (
                     <span> • {suggestedUser.mutualConnections} mutual</span>
                   )}
