@@ -42,18 +42,18 @@ const Index = () => {
   if (!user) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4">
-        <div className="text-center space-y-8 max-w-md w-full">
+        <div className="text-center space-y-6 md:space-y-8 max-w-md w-full">
           {/* Logo */}
-          <div className="flex justify-center items-center gap-4">
+          <div className="flex justify-center items-center gap-2 md:gap-4">
             <img
               src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
               alt="Logo Mark"
-              className="w-auto h-32 object-contain"
+              className="w-auto h-16 md:h-24 lg:h-32 object-contain"
             />
             <img
               src={currentLogo?.file_url || "/lovable-uploads/4e825850-f4fd-4fed-90ac-429e1b988009.png"}
               alt="clbhouz"
-              className="w-auto max-h-48 object-contain"
+              className="w-auto max-h-20 md:max-h-32 lg:max-h-48 object-contain"
             />
           </div>
           
@@ -74,16 +74,16 @@ const Index = () => {
             </p>
             
             {/* App Store Buttons */}
-            <div className="flex items-center justify-center gap-8" style={{ marginTop: '2cm' }}>
+            <div className="flex items-center justify-center gap-4 md:gap-8 mt-8 md:mt-12">
               <img
                 src="/lovable-uploads/8537a2c1-2486-42b9-9783-1b1992d30507.png"
                 alt="Download on the App Store"
-                className="h-12 w-auto object-contain"
+                className="h-10 md:h-12 w-auto object-contain"
               />
               <img
                 src="/lovable-uploads/1cacfaf3-2385-4a3d-865f-2834c60f5a07.png"
                 alt="Get it on Google Play"
-                className="h-12 w-auto object-contain"
+                className="h-10 md:h-12 w-auto object-contain"
               />
             </div>
           </div>
