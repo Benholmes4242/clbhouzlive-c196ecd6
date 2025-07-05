@@ -84,7 +84,14 @@ const StandardVideoPreview = ({
           muted
           loop
           playsInline
-          onError={() => setThumbnailError(true)}
+          crossOrigin="anonymous"
+          onError={(e) => {
+            console.error('Video playback error:', e, 'src:', src);
+            setThumbnailError(true);
+          }}
+          onLoadStart={() => console.log('Video load started:', src)}
+          onCanPlay={() => console.log('Video can play:', src)}
+          onPlay={() => console.log('Video playing:', src)}
         />
       )}
 
@@ -97,7 +104,10 @@ const StandardVideoPreview = ({
           muted
           loop
           playsInline
-          preload="none"
+          crossOrigin="anonymous"
+          preload="metadata"
+          onError={(e) => console.error('Hidden video error:', e, 'src:', src)}
+          onLoadedMetadata={() => console.log('Video metadata loaded:', src)}
         />
       )}
 

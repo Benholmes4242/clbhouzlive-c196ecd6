@@ -72,13 +72,14 @@ export const useVideoAutoplay = ({
           setActiveVideo(videoId);
         }
 
+        console.log(`Attempting to play video ${videoId}, shouldPlay: ${shouldPlay}, isPlaying: ${isPlaying}`);
         setIsLoading(true);
         await video.play();
         setIsPlaying(true);
         console.log(`Video ${videoId} started playing on ${isMobile ? 'mobile' : 'desktop'}`);
       } catch (error) {
         // Silently handle autoplay failures
-        console.log(`Video ${videoId} autoplay blocked:`, error);
+        console.error(`Video ${videoId} autoplay blocked:`, error);
         setIsPlaying(false);
       } finally {
         setIsLoading(false);
@@ -103,6 +104,15 @@ export const useVideoAutoplay = ({
     };
 
     // Handle play/pause based on conditions
+    console.log(`Video ${videoId} conditions:`, {
+      shouldPlay,
+      isPlaying,
+      isInView,
+      isHovered,
+      isMobile,
+      isGridContext
+    });
+    
     if (shouldPlay) {
       handlePlay();
     } else if (isPlaying) {
