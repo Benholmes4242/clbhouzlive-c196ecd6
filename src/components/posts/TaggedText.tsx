@@ -40,67 +40,93 @@ const TaggedText = ({ text, tags = [] }: TaggedTextProps) => {
 
     console.log('Rendering text with tags:', { text, tags });
 
-    // Create a map of tag identifiers to tag objects for faster lookup
+    // Create a comprehensive mapping of possible @mentions to tag objects
     const tagMap = new Map();
     tags.forEach(tag => {
-      const usernameIdentifier = `@${tag.username}`;
-      const nameIdentifier = `@${tag.name}`;
-      tagMap.set(usernameIdentifier, tag);
-      tagMap.set(nameIdentifier, tag);
-      
-      // Also map by display name for more flexible matching
-      const displayName = tag.username || tag.name;
-      tagMap.set(`@${displayName}`, tag);
+      // Map by username
+      if (tag.username) {
+        tagMap.set(`@${tag.username}`, tag);
+        tagMap.set(`@${tag.username.toLowerCase()}`, tag);
+      }
+      // Map by name
+      if (tag.name) {
+        tagMap.set(`@${tag.name}`, tag);
+        tagMap.set(`@${tag.name.toLowerCase()}`, tag);
+        // Also handle name with spaces replaced by nothing or underscores
+        const nameNoSpaces = tag.name.replace(/\s+/g, '');
+        const nameWithUnderscores = tag.name.replace(/\s+/g, '_');
+        tagMap.set(`@${nameNoSpaces}`, tag);
+        tagMap.set(`@${nameWithUnderscores}`, tag);
+        tagMap.set(`@${nameNoSpaces.toLowerCase()}`, tag);
+        tagMap.set(`@${nameWithUnderscores.toLowerCase()}`, tag);
+      }
     });
 
     console.log('Tag map:', Array.from(tagMap.entries()));
 
-    // Split text by words and process each word
-    const words = text.split(' ');
-    const result = [];
+    // Use regex to find all @mentions and replace them
+    const mentionRegex = /@[\w\s]+/g;
+    const parts = [];
+    let lastIndex = 0;
+    let match;
 
-    for (let i = 0; i < words.length; i++) {
-      const word = words[i];
+    while ((match = mentionRegex.exec(text)) !== null) {
+      // Add text before the mention
+      if (match.index > lastIndex) {
+        parts.push(text.slice(lastIndex, match.index));
+      }
+
+      const mention = match[0].trim();
+      console.log('Processing mention:', mention);
+
+      // Try to find matching tag
+      let matchingTag = tagMap.get(mention) || tagMap.get(mention.toLowerCase());
       
-      if (word.startsWith('@')) {
-        // Check if this @mention matches any of our tags
-        const matchingTag = tagMap.get(word) || Array.from(tagMap.values()).find(tag => {
-          const displayName = tag.username || tag.name;
-          return word === `@${displayName}`;
-        });
+      // If no direct match, try partial matching
+      if (!matchingTag) {
+        const mentionWithoutAt = mention.slice(1).toLowerCase();
+        for (const tag of tags) {
+          if (tag.name && tag.name.toLowerCase().includes(mentionWithoutAt)) {
+            matchingTag = tag;
+            break;
+          }
+          if (tag.username && tag.username.toLowerCase().includes(mentionWithoutAt)) {
+            matchingTag = tag;
+            break;
+          }
+        }
+      }
 
-        if (matchingTag) {
-          // Render as clickable link
-          const displayName = matchingTag.username || matchingTag.name;
-          result.push(
-            <button
-              key={`tag-${i}-${matchingTag.id}`}
+      if (matchingTag) {
+        // Use the person's display name (name) instead of username for better UX
+        const displayName = matchingTag.name || matchingTag.username;
+        parts.push(
+          <button
+            key={`tag-${match.index}-${matchingTag.id}`}
             onClick={(e) => handleTagClick(matchingTag, e)}
             className="text-blue-400 hover:text-blue-300 hover:underline font-medium cursor-pointer bg-transparent border-none p-0 inline"
-            >
-              @{displayName}
-            </button>
-          );
-        } else {
-          // Render as blue text but not clickable
-          result.push(
-            <span key={`mention-${i}`} className="text-blue-400 font-medium">
-              {word}
-            </span>
-          );
-        }
+          >
+            @{displayName}
+          </button>
+        );
       } else {
-        // Regular text
-        result.push(word);
+        // Render as blue text but not clickable
+        parts.push(
+          <span key={`mention-${match.index}`} className="text-blue-400 font-medium">
+            {mention}
+          </span>
+        );
       }
 
-      // Add space between words (except for the last word)
-      if (i < words.length - 1) {
-        result.push(' ');
-      }
+      lastIndex = match.index + match[0].length;
     }
 
-    return result.length > 0 ? result : text;
+    // Add remaining text after last mention
+    if (lastIndex < text.length) {
+      parts.push(text.slice(lastIndex));
+    }
+
+    return parts.length > 0 ? parts : text;
   };
 
   return <span>{renderTextWithTags()}</span>;
