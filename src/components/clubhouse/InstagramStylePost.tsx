@@ -6,6 +6,8 @@ import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { supabase } from '@/integrations/supabase/client';
 import CoursePostBadge from '@/components/posts/CoursePostBadge';
+import VideoPlayer from '@/components/ui/video-player';
+import { useVideoAutoplay } from '@/hooks/useVideoAutoplay';
 
 import LazyImage from '@/components/ui/lazy-image';
 import PostViewerModal from '@/components/posts/PostViewerModal';
@@ -53,6 +55,9 @@ const InstagramStylePost: React.FC<InstagramStylePostProps> = ({ post, allUserPo
   const [golfCourse, setGolfCourse] = useState<any>(null);
   const [showComments, setShowComments] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  
+  // Add video autoplay functionality
+  const { ref: autoplayRef, shouldAutoplay, handleMouseEnter, handleMouseLeave } = useVideoAutoplay();
   
   const { isOpen, currentPost, allUserPosts: viewerPosts, openPostViewer, closePostViewer } = usePostViewer({ source: 'clubhouse' });
 
@@ -149,13 +154,19 @@ const InstagramStylePost: React.FC<InstagramStylePostProps> = ({ post, allUserPo
 
   return (
     <>
-      <div className="relative w-full bg-black">
+      <div ref={autoplayRef} className="relative w-full bg-black" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
         {/* Media Container - Full width, responsive height */}
         <div className="relative w-full aspect-[4/5] md:aspect-[3/4] cursor-pointer" onClick={handleMediaClick}>
           {currentMedia.media_type === 'video' ? (
-            <div className="w-full h-full bg-muted flex items-center justify-center">
-              <span className="text-sm text-muted-foreground">Video unavailable</span>
-            </div>
+            <VideoPlayer
+              src={currentMedia.media_url}
+              autoplay={shouldAutoplay}
+              muted={true}
+              loop={true}
+              className="w-full h-full"
+              showVideoIcon={false}
+              showOverlayControls={false}
+            />
           ) : (
             <LazyImage
               src={currentMedia.media_url}
