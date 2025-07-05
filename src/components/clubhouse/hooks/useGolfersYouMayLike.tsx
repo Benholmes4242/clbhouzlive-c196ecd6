@@ -32,7 +32,7 @@ export const useGolfersYouMayLike = () => {
     const currentOffset = reset ? 0 : offset;
 
     try {
-      // First, get video posts with their media
+      // First, get ONLY video posts with their media - be very strict
       const { data: videoPosts, error: postsError } = await supabase
         .from('posts')
         .select(`
@@ -48,6 +48,7 @@ export const useGolfersYouMayLike = () => {
         `)
         .eq('post_media.media_type', 'video')
         .neq('user_id', user.id)
+        .not('post_media.media_url', 'is', null)
         .order('created_at', { ascending: false })
         .range(currentOffset, currentOffset + ITEMS_PER_PAGE * 3 - 1);
 
@@ -80,17 +81,24 @@ export const useGolfersYouMayLike = () => {
         const userId = post.user_id;
         const userProfile = profileMap.get(userId);
         
-        if (!userMap.has(userId) && userProfile && post.post_media.length > 0) {
+        // Extra validation: make sure we have media and it's actually a video
+        const mediaItem = post.post_media[0];
+        const isValidVideo = mediaItem && 
+                           mediaItem.media_type === 'video' && 
+                           mediaItem.media_url && 
+                           mediaItem.media_url.length > 0;
+        
+        if (!userMap.has(userId) && userProfile && isValidVideo) {
           userMap.set(userId, {
             id: userId,
             display_name: userProfile.display_name,
             username: userProfile.username,
             profile_photo_url: userProfile.profile_photo_url,
             most_recent_video: {
-              id: post.post_media[0].id,
-              media_url: post.post_media[0].media_url,
+              id: mediaItem.id,
+              media_url: mediaItem.media_url,
               post_id: post.id,
-              created_at: post.post_media[0].created_at
+              created_at: mediaItem.created_at
             }
           });
         }
@@ -127,17 +135,30 @@ export const useGolfersYouMayLike = () => {
       console.log('Processed golfers with video data:', processedGolfers.map(g => ({
         name: g.display_name || g.username,
         videoUrl: g.most_recent_video.media_url,
-        hasValidVideo: !!g.most_recent_video.media_url && g.most_recent_video.media_url.length > 0
+        hasValidVideo: !!g.most_recent_video.media_url && g.most_recent_video.media_url.length > 0,
+        isVideo: g.most_recent_video.media_url?.includes('video') || g.most_recent_video.media_url?.includes('.mp4') || g.most_recent_video.media_url?.includes('.mov')
       })));
 
+      // Final filter to ensure ONLY users with actual video URLs make it through
+      const videoOnlyGolfers = processedGolfers.filter(golfer => {
+        const hasVideo = golfer.most_recent_video.media_url && 
+                        golfer.most_recent_video.media_url.length > 0;
+        
+        if (!hasVideo) {
+          console.warn(`Filtering out ${golfer.display_name || golfer.username} - no valid video URL`);
+        }
+        
+        return hasVideo;
+      });
+
       if (reset) {
-        setGolfers(processedGolfers);
+        setGolfers(videoOnlyGolfers);
       } else {
-        setGolfers(prev => [...prev, ...processedGolfers]);
+        setGolfers(prev => [...prev, ...videoOnlyGolfers]);
       }
 
-      setOffset(currentOffset + processedGolfers.length);
-      setHasMore(processedGolfers.length === ITEMS_PER_PAGE);
+      setOffset(currentOffset + videoOnlyGolfers.length);
+      setHasMore(videoOnlyGolfers.length === ITEMS_PER_PAGE);
 
     } catch (error) {
       console.error('Error fetching golfers you may like:', error);
