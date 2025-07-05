@@ -12,6 +12,7 @@ import VideoPreview from './VideoPreview';
 import CoursePostBadge from './CoursePostBadge';
 import CommentsDrawer from './CommentsDrawer';
 import EnhancedCreateMomentModal from '../post/EnhancedCreateMomentModal';
+import TaggedText from './TaggedText';
 import { formatDistanceToNow } from 'date-fns';
 
 interface PostMedia {
@@ -296,9 +297,12 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
               </div>
               
               {currentPost.content && (
-                <p className="text-white text-sm leading-relaxed bg-black/30 p-2 rounded max-w-full">
-                  {currentPost.content}
-                </p>
+                <div className="text-white text-sm leading-relaxed bg-black/30 p-2 rounded max-w-full">
+                  <TaggedText 
+                    text={currentPost.content} 
+                    tags={currentPost.post_tags?.map(tag => tag.tagged_entity || tag) || []} 
+                  />
+                </div>
               )}
             </div>
 
@@ -498,7 +502,12 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                   </div>
                   
                   {currentPost.content && (
-                    <p className="text-sm mt-3">{currentPost.content}</p>
+                    <div className="text-sm mt-3">
+                      <TaggedText 
+                        text={currentPost.content} 
+                        tags={currentPost.post_tags?.map(tag => tag.tagged_entity || tag) || []} 
+                      />
+                    </div>
                   )}
                 </div>
 

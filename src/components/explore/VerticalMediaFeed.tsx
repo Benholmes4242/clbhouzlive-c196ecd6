@@ -9,6 +9,7 @@ import { ExploreContentItem } from './types';
 import VideoPreview from '../posts/VideoPreview';
 import CoursePostBadge from '../posts/CoursePostBadge';
 import EnhancedCreateMomentModal from '../post/EnhancedCreateMomentModal';
+import TaggedText from '../posts/TaggedText';
 
 interface VerticalMediaFeedProps {
   isOpen: boolean;
@@ -315,9 +316,12 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
               )}
               
               {item.title && (
-                <p className="text-white text-sm leading-relaxed bg-black/30 p-2 rounded">
-                  {item.title}
-                </p>
+                <div className="text-white text-sm leading-relaxed bg-black/30 p-2 rounded">
+                  <TaggedText 
+                    text={item.title} 
+                    tags={[]} 
+                  />
+                </div>
               )}
             </div>
 

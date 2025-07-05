@@ -75,8 +75,8 @@ const TaggedText = ({ text, tags = [] }: TaggedTextProps) => {
           result.push(
             <button
               key={`tag-${i}-${matchingTag.id}`}
-              onClick={(e) => handleTagClick(matchingTag, e)}
-              className="text-blue-500 hover:text-blue-700 hover:underline font-medium cursor-pointer bg-transparent border-none p-0 inline"
+            onClick={(e) => handleTagClick(matchingTag, e)}
+            className="text-blue-400 hover:text-blue-300 hover:underline font-medium cursor-pointer bg-transparent border-none p-0 inline"
             >
               @{displayName}
             </button>
@@ -84,7 +84,7 @@ const TaggedText = ({ text, tags = [] }: TaggedTextProps) => {
         } else {
           // Render as blue text but not clickable
           result.push(
-            <span key={`mention-${i}`} className="text-blue-500 font-medium">
+            <span key={`mention-${i}`} className="text-blue-400 font-medium">
               {word}
             </span>
           );
