@@ -30,6 +30,8 @@ export const usePostUpdate = () => {
     setIsUpdating(true);
     
     try {
+      console.log('Starting post update for:', postId, data);
+
       // 1. Update post content
       const { error: postError } = await supabase
         .from('posts')
@@ -39,80 +41,69 @@ export const usePostUpdate = () => {
         })
         .eq('id', postId);
 
-      if (postError) throw postError;
-
-      // 2. Handle media updates
-      if (data.files.length > 0) {
-        // Upload new media files
-        const mediaUploads = await Promise.all(
-          data.files.map(async (file) => {
-            const fileExt = file.name.split('.').pop();
-            const fileName = `${postId}_${Date.now()}.${fileExt}`;
-            
-            const { data: uploadData, error: uploadError } = await supabase.storage
-              .from('post-media')
-              .upload(fileName, file);
-
-            if (uploadError) throw uploadError;
-
-            const { data: { publicUrl } } = supabase.storage
-              .from('post-media')
-              .getPublicUrl(fileName);
-
-            return {
-              post_id: postId,
-              media_url: publicUrl,
-              media_type: file.type.startsWith('image/') ? 'image' : 'video'
-            };
-          })
-        );
-
-        // Insert new media records
-        if (mediaUploads.length > 0) {
-          const { error: mediaError } = await supabase
-            .from('post_media')
-            .insert(mediaUploads);
-
-          if (mediaError) throw mediaError;
-        }
+      if (postError) {
+        console.error('Post update error:', postError);
+        throw postError;
       }
+      console.log('Post content updated successfully');
 
-      // 3. Update post tags (mentions)
-      // First, remove existing tags
+      // 2. Update post tags (mentions) - First remove existing tags
       const { error: deleteTagsError } = await supabase
         .from('post_tags')
         .delete()
         .eq('post_id', postId);
 
-      if (deleteTagsError) throw deleteTagsError;
+      if (deleteTagsError) {
+        console.error('Delete tags error:', deleteTagsError);
+        throw deleteTagsError;
+      }
+      console.log('Existing tags deleted');
 
-      // Insert new tags
+      // Get current user
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      if (userError || !user) {
+        throw new Error('User not authenticated');
+      }
+
+      // Insert new user tags
       if (data.tags.length > 0) {
-        const user = await supabase.auth.getUser();
         const tagInserts = data.tags.map(tag => ({
           post_id: postId,
           tagged_entity_id: tag.id,
-          tagged_by_user_id: user.data.user?.id
+          tagged_by_user_id: user.id
         }));
 
+        console.log('Inserting tags:', tagInserts);
         const { error: tagsError } = await supabase
           .from('post_tags')
           .insert(tagInserts);
 
-        if (tagsError) throw tagsError;
+        if (tagsError) {
+          console.error('Tags insert error:', tagsError);
+          throw tagsError;
+        }
+        console.log('User tags inserted successfully');
       }
 
-      // 4. Handle course tagging
+      // 3. Handle course tagging
       if (data.course) {
+        console.log('Processing course tag:', data.course);
+        
         // Find or create course entity in taggable_entities
-        let courseEntity = await supabase
+        let { data: courseEntity, error: courseEntityError } = await supabase
           .from('taggable_entities')
           .select('id')
           .eq('entity_type', 'golf_club')
-          .eq('name', data.course.name)
+          .eq('entity_id', data.course.id)
           .maybeSingle();
 
-        if (!courseEntity.data) {
+        if (courseEntityError) {
+          console.error('Course entity lookup error:', courseEntityError);
+          throw courseEntityError;
+        }
+
+        if (!courseEntity) {
+          console.log('Creating new course entity');
           // Create course entity
           const { data: newEntity, error: entityError } = await supabase
             .from('taggable_entities')
@@ -125,23 +116,31 @@ export const usePostUpdate = () => {
             .select('id')
             .single();
 
-          if (entityError) throw entityError;
-          courseEntity.data = newEntity;
+          if (entityError) {
+            console.error('Entity creation error:', entityError);
+            throw entityError;
+          }
+          courseEntity = newEntity;
+          console.log('Course entity created:', courseEntity);
         }
 
         // Add course tag
-        const user = await supabase.auth.getUser();
         const { error: courseTagError } = await supabase
           .from('post_tags')
           .insert({
             post_id: postId,
-            tagged_entity_id: courseEntity.data.id,
-            tagged_by_user_id: user.data.user?.id
+            tagged_entity_id: courseEntity.id,
+            tagged_by_user_id: user.id
           });
 
-        if (courseTagError) throw courseTagError;
+        if (courseTagError) {
+          console.error('Course tag error:', courseTagError);
+          throw courseTagError;
+        }
+        console.log('Course tag added successfully');
       }
 
+      console.log('All updates completed successfully');
       toast({
         title: "Success!",
         description: "Your updates have been saved!",
@@ -152,7 +151,7 @@ export const usePostUpdate = () => {
       return { success: true };
 
     } catch (error) {
-      console.error('Error updating post:', error);
+      console.error('Full error updating post:', error);
       toast({
         title: "Error",
         description: "Failed to save updates. Please try again.",

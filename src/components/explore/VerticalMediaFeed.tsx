@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePostUpdate } from '@/hooks/usePostUpdate';
+import { usePostData } from '@/hooks/usePostData';
 import { ExploreContentItem } from './types';
 import VideoPreview from '../posts/VideoPreview';
 import CoursePostBadge from '../posts/CoursePostBadge';
