@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, MapPin, Users } from 'lucide-react';
+import { ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 import { supabase } from '@/integrations/supabase/client';
@@ -25,9 +25,6 @@ interface MomentPost {
   };
   course_tags?: Array<{
     course_name: string;
-  }>;
-  user_tags?: Array<{
-    user_name: string;
   }>;
   is_following: boolean;
 }
@@ -192,15 +189,11 @@ const ClbhouzMomentsCarousel: React.FC = () => {
         const userProfile = profiles?.find(p => p.id === post.user_id);
         const isFollowing = followedUserIds.has(post.user_id);
         
-        // Get tags for this post
+        // Get tags for this post - only course tags needed for display
         const postTagsData = postTags?.filter(tag => tag.post_id === post.id) || [];
         const courseTags = postTagsData
           .filter(tag => tag.taggable_entities?.entity_type === 'course' || tag.taggable_entities?.entity_type === 'golf_club')
           .map(tag => ({ course_name: tag.taggable_entities?.name || '' }));
-        
-        const userTags = postTagsData
-          .filter(tag => tag.taggable_entities?.entity_type === 'user')
-          .map(tag => ({ user_name: tag.taggable_entities?.name || '' }));
 
         // Check if post has video content
         const hasVideo = post.post_media?.some(media => media.media_type === 'video');
@@ -236,7 +229,6 @@ const ClbhouzMomentsCarousel: React.FC = () => {
             profile_photo_url: userProfile?.profile_photo_url || '',
           },
           course_tags: courseTags,
-          user_tags: userTags,
           is_following: isFollowing,
         };
       });
@@ -498,15 +490,6 @@ const ClbhouzMomentsCarousel: React.FC = () => {
                         <MapPin className="h-3 w-3" />
                         <span className="text-xs drop-shadow-lg">
                           {moment.course_tags[0].course_name}
-                        </span>
-                      </div>
-                    )}
-                    
-                    {moment.user_tags && moment.user_tags.length > 0 && (
-                      <div className="flex items-center gap-1">
-                        <Users className="h-3 w-3" />
-                        <span className="text-xs drop-shadow-lg">
-                          with {moment.user_tags.map(tag => tag.user_name).join(', ')}
                         </span>
                       </div>
                     )}
