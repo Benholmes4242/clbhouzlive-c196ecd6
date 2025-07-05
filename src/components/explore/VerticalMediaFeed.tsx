@@ -174,13 +174,13 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
           : item
       ));
       
-      // Update the all content array as well if parent component provides a callback
-      // This would need to be passed as a prop for full sync
-      
-      // Close modal after successful update
+      // Close edit modal
       setEditModalOpen(false);
       setEditingItem(null);
       setEditCourse(null);
+      
+      // Close the main modal to return to the page the user was on
+      onClose();
     }
   };
 

@@ -140,12 +140,12 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
     const result = await updatePost(currentPost.id, data, existingMediaUrls);
     
     if (result.success) {
-      // Update local state would ideally happen here
-      // For now, the success toast is handled by the hook
-      
-      // Close modal after successful update
+      // Close edit modal
       setEditModalOpen(false);
       setEditCourse(null);
+      
+      // Close the main modal to return to the page the user was on
+      onClose();
     }
   };
 
