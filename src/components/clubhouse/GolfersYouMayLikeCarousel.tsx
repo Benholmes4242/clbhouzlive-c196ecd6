@@ -191,12 +191,12 @@ const GolferCard: React.FC<GolferCardProps> = ({ golfer, currentUserId, isMobile
               height={40}
               onClick={handleProfileClick}
             />
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 overflow-hidden">
               <TooltipProvider delayDuration={300}>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <h3 
-                      className="text-white font-semibold text-sm leading-tight cursor-pointer hover:text-white/80 transition-colors truncate max-w-full" 
+                      className="text-white font-semibold text-sm leading-tight cursor-pointer hover:text-white/80 transition-colors overflow-hidden text-ellipsis whitespace-nowrap w-full block" 
                       onClick={handleProfileClick}
                     >
                       {displayName}
@@ -211,7 +211,7 @@ const GolferCard: React.FC<GolferCardProps> = ({ golfer, currentUserId, isMobile
               <TooltipProvider delayDuration={300}>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <div className="text-white/80 text-xs truncate max-w-full">
+                    <div className="text-white/80 text-xs overflow-hidden text-ellipsis whitespace-nowrap w-full">
                       <span 
                         className="cursor-pointer hover:text-white/60 transition-colors"
                         onClick={handleProfileClick}
