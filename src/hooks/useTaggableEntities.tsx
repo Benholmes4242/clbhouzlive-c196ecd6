@@ -26,17 +26,32 @@ export const useTaggableEntities = () => {
         .from('taggable_entities')
         .select('*')
         .or(`name.ilike.%${query}%,username.ilike.%${query}%`)
-        .limit(10);
+        .limit(20); // Get more results initially to allow for deduplication
 
       if (error) throw error;
       
-      // Type assertion to ensure entity_type is properly typed
+      // Type assertion and deduplication
       const typedData = (data || []).map(item => ({
         ...item,
         entity_type: item.entity_type as 'user' | 'golf_club' | 'business'
       }));
       
-      setEntities(typedData);
+      // Deduplicate by entity_id and entity_type combination
+      const uniqueEntities = typedData.reduce((acc: TaggableEntity[], current) => {
+        const exists = acc.find(item => 
+          item.entity_id === current.entity_id && 
+          item.entity_type === current.entity_type
+        );
+        
+        if (!exists) {
+          acc.push(current);
+        }
+        
+        return acc;
+      }, []);
+      
+      // Limit to 10 results after deduplication
+      setEntities(uniqueEntities.slice(0, 10));
     } catch (error) {
       console.error('Error searching entities:', error);
       setEntities([]);
