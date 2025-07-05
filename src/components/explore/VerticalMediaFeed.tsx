@@ -6,7 +6,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePostUpdate } from '@/hooks/usePostUpdate';
 import { usePostData } from '@/hooks/usePostData';
 import { ExploreContentItem } from './types';
-import VideoPreview from '../posts/VideoPreview';
+
 import CoursePostBadge from '../posts/CoursePostBadge';
 import EnhancedCreateMomentModal from '../post/EnhancedCreateMomentModal';
 import TaggedText from '../posts/TaggedText';
@@ -232,13 +232,10 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
             <div className="relative w-full h-full flex items-center justify-center">
               {item.type === 'video' ? (
                 <div className="relative w-full h-full">
-                  {/* Always show thumbnail first, video plays when autoplay triggers */}
-                  <VideoPreview
-                    src={item.src}
-                    videoId={`vertical-feed-${item.id}`}
-                    className="w-full h-full object-cover"
-                    isGridThumbnail={false}
-                  />
+                  {/* Video unavailable placeholder */}
+                  <div className="w-full h-full bg-muted flex items-center justify-center">
+                    <span className="text-white text-sm">Video unavailable</span>
+                  </div>
                   
                   {/* Golf Course Badge */}
                   {item.golfCourse && (

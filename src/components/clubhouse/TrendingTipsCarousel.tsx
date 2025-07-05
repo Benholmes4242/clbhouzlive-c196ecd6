@@ -4,7 +4,7 @@ import { ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
-import VideoPreview from '@/components/posts/VideoPreview';
+
 import { trendingTips } from '@/data/clubhouseFeedData';
 
 const TrendingTipsCarousel = () => {
@@ -23,11 +23,9 @@ const TrendingTipsCarousel = () => {
               <div className="bg-card rounded-lg overflow-hidden shadow-sm border hover:shadow-md transition-shadow cursor-pointer">
                 <div className="relative">
                   {tip.type === 'video' ? (
-                    <VideoPreview
-                      src={tip.image}
-                      videoId={`tip-${tip.id}`}
-                      className="w-full h-40"
-                    />
+                    <div className="w-full h-40 bg-muted flex items-center justify-center">
+                      <span className="text-sm text-muted-foreground">Video unavailable</span>
+                    </div>
                   ) : (
                     <img src={tip.image} alt={tip.title} className="w-full h-40 object-cover" />
                   )}

@@ -24,7 +24,7 @@ import {
 import { SwipeCarousel } from '@/components/ui/swipe-carousel';
 import EditPostDialog from './EditPostDialog';
 import TaggedText from './TaggedText';
-import VideoPreview from './VideoPreview';
+
 import CoursePostBadge from './CoursePostBadge';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { useFullscreenMedia } from '@/hooks/useFullscreenMedia';
@@ -263,12 +263,9 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
         />
       ) : (
         <div onClick={() => handleMediaClick(media.media_url, 'video')}>
-          <VideoPreview
-            src={media.media_url}
-            className="w-full h-full cursor-pointer"
-            videoId={`user-post-${post.id}-${index}`}
-            isGridThumbnail={true}
-          />
+          <div className="w-full h-full bg-muted flex items-center justify-center cursor-pointer">
+            <span className="text-sm text-muted-foreground">Video unavailable</span>
+          </div>
         </div>
       )}
     </div>
@@ -454,11 +451,9 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
         {/* Media Container - Full width, responsive height */}
         <div className="relative w-full aspect-[4/5] cursor-pointer" onClick={() => handleMediaClick(currentMedia.media_url, currentMedia.media_type)}>
           {currentMedia.media_type === 'video' ? (
-            <VideoPreview
-              src={currentMedia.media_url}
-              className="w-full h-full object-cover"
-              videoId={`mobile-post-${post.id}-${currentMediaIndex}`}
-            />
+            <div className="w-full h-full bg-muted flex items-center justify-center">
+              <span className="text-white text-sm">Video unavailable</span>
+            </div>
           ) : (
             <LazyImage
               src={currentMedia.media_url}

@@ -8,7 +8,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePostUpdate } from '@/hooks/usePostUpdate';
 import HighQualityImage from '@/components/ui/high-quality-image';
-import VideoPreview from './VideoPreview';
+
 import CoursePostBadge from './CoursePostBadge';
 import CommentsDrawer from './CommentsDrawer';
 import EnhancedCreateMomentModal from '../post/EnhancedCreateMomentModal';
@@ -235,11 +235,9 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
               {currentMedia && (
                 <>
                   {currentMedia.media_type === 'video' ? (
-                    <VideoPreview
-                      src={currentMedia.media_url}
-                      className="w-full h-full object-contain"
-                      videoId={`post-viewer-mobile-${currentPost.id}-${currentMediaIndex}`}
-                    />
+                    <div className="w-full h-full bg-muted flex items-center justify-center">
+                      <span className="text-white text-sm">Video unavailable</span>
+                    </div>
                   ) : (
                     <HighQualityImage
                       src={currentMedia.media_url}
@@ -409,11 +407,9 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                 {currentMedia && (
                   <>
                     {currentMedia.media_type === 'video' ? (
-                      <VideoPreview
-                        src={currentMedia.media_url}
-                        className="w-full h-full object-contain"
-                        videoId={`post-viewer-desktop-${currentPost.id}-${currentMediaIndex}`}
-                      />
+                      <div className="w-full h-full bg-muted flex items-center justify-center">
+                        <span className="text-white text-sm">Video unavailable</span>
+                      </div>
                     ) : (
                       <HighQualityImage
                         src={currentMedia.media_url}

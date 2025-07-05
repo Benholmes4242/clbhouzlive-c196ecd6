@@ -4,7 +4,7 @@ import { Clock, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import VideoPreview from '@/components/posts/VideoPreview';
+
 import { formatDistanceToNow } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 
@@ -118,11 +118,9 @@ const FeaturedMomentsCarousel = ({ userPosts = [], loading = false }: FeaturedMo
               <div className="cursor-pointer group space-y-3">
                 {/* Thumbnail Container - Square aspect ratio for better consistency */}
                 <div className="relative rounded-lg overflow-hidden bg-black aspect-square">
-                  <VideoPreview
-                    src={moment.videoUrl}
-                    videoId={`featured-${moment.id}`}
-                    className="w-full h-full object-cover object-center"
-                  />
+                  <div className="w-full h-full bg-muted flex items-center justify-center">
+                    <span className="text-sm text-muted-foreground">Video unavailable</span>
+                  </div>
                   
                   {/* Duration badge */}
                   <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-1.5 py-0.5 rounded text-center font-medium">

@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { ActivityPost } from '../types/ActivityTypes';
-import VideoPreview from '@/components/posts/VideoPreview';
+
 import CourseTag from '@/components/posts/CourseTag';
 import { Camera, Play } from 'lucide-react';
 import HighQualityImage from '@/components/ui/high-quality-image';

@@ -1,7 +1,7 @@
 import React from 'react';
 import InstagramStylePost from './InstagramStylePost';
 import LoadingSkeleton from '@/components/feed/LoadingSkeleton';
-import { VideoAutoplayProvider } from '@/hooks/useVideoAutoplayManager';
+
 
 interface UserPost {
   id: string;
@@ -52,7 +52,6 @@ const InstagramStyleFeed: React.FC<InstagramStyleFeedProps> = ({ userPosts = [],
   }
 
   return (
-    <VideoAutoplayProvider>
       <div className="w-full">
         {/* Instagram-style full-width posts */}
         <div className="space-y-0">
@@ -65,7 +64,6 @@ const InstagramStyleFeed: React.FC<InstagramStyleFeedProps> = ({ userPosts = [],
           ))}
         </div>
       </div>
-    </VideoAutoplayProvider>
   );
 };
 

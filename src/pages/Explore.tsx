@@ -7,7 +7,7 @@ import ExploreGrid from '@/components/explore/ExploreGrid';
 import MobileDebugConsole from '@/components/explore/MobileDebugConsole';
 import VerticalMediaFeed from '@/components/explore/VerticalMediaFeed';
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
-import { VideoAutoplayProvider } from '@/hooks/useVideoAutoplayManager';
+
 import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
 
 const Explore = () => {
@@ -53,7 +53,6 @@ const Explore = () => {
   });
 
   return (
-    <VideoAutoplayProvider>
       <div className="min-h-screen bg-background">
         <Header />
         
@@ -106,7 +105,6 @@ const Explore = () => {
           }
         `}</style>
       </div>
-    </VideoAutoplayProvider>
   );
 };
 

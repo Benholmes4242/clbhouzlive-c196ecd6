@@ -3,7 +3,7 @@ import React from 'react';
 import { UserPlus, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
-import VideoPreview from '@/components/posts/VideoPreview';
+
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useProfileActions } from '@/components/profile/actions/useProfileActions';
 import { useNavigate } from 'react-router-dom';
@@ -150,11 +150,9 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, currentUserId }) => {
   return (
     <div className="relative bg-card rounded-lg overflow-hidden shadow-sm border hover:shadow-md transition-shadow cursor-pointer">
       {player.type === 'video' ? (
-        <VideoPreview
-          src={player.contentImage}
-          videoId={`player-${player.id}`}
-          className="w-full h-48 object-cover object-center"
-        />
+        <div className="w-full h-48 bg-muted flex items-center justify-center">
+          <span className="text-sm text-muted-foreground">Video unavailable</span>
+        </div>
       ) : (
         <HighQualityImage src={player.contentImage} alt={player.name} className="w-full h-48" />
       )}

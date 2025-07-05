@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Heart } from 'lucide-react';
 import { ExploreContentItem } from './types';
-import VideoPreview from '../posts/VideoPreview';
+
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { useFullscreenMedia } from '@/hooks/useFullscreenMedia';
 
@@ -111,12 +111,9 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, ...props 
         {/* Square Media Container */}
         <div className="relative w-full h-full overflow-hidden">
           {item.type === 'video' ? (
-            <VideoPreview
-              src={item.src}
-              videoId={item.id}
-              className="w-full h-full"
-              isGridThumbnail={true}
-            />
+            <div className="w-full h-full bg-muted flex items-center justify-center">
+              <span className="text-sm text-muted-foreground">Video unavailable</span>
+            </div>
           ) : (
             <img
               src={imageError ? fallbackImage : item.src}

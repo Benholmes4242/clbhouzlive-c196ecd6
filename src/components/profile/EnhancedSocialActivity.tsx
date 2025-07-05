@@ -2,9 +2,9 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { useActivityPosts } from './hooks/useActivityPosts';
-import VideoPreview from '@/components/posts/VideoPreview';
+
 import { Camera, Play } from 'lucide-react';
-import { VideoAutoplayProvider } from '@/hooks/useVideoAutoplayManager';
+
 
 interface EnhancedSocialActivityProps {
   userId: string;

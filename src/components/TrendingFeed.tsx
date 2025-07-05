@@ -4,7 +4,7 @@ import PostCard from './feed/PostCard';
 import UserPost from './posts/UserPost';
 import OptimisticPostCard from './posts/OptimisticPostCard';
 import LoadingSkeleton from './feed/LoadingSkeleton';
-import { VideoAutoplayProvider } from '@/hooks/useVideoAutoplayManager';
+
 import { useUserPosts } from '@/hooks/useUserPosts';
 import { useOptimisticPosts } from '@/hooks/useOptimisticPosts';
 import { useExternalVideos } from '@/hooks/useExternalVideos';
@@ -238,7 +238,6 @@ const TrendingFeed = () => {
   }
 
   return (
-    <VideoAutoplayProvider>
       <div className="space-y-6 pb-20">
         {/* Show optimistic posts first */}
         {optimisticPosts.map((optimisticPost) => (
@@ -280,7 +279,6 @@ const TrendingFeed = () => {
           )
         ))}
       </div>
-    </VideoAutoplayProvider>
   );
 };
 

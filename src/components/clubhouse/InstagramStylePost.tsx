@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { supabase } from '@/integrations/supabase/client';
 import CoursePostBadge from '@/components/posts/CoursePostBadge';
-import VideoPreview from '@/components/posts/VideoPreview';
+
 import LazyImage from '@/components/ui/lazy-image';
 import PostViewerModal from '@/components/posts/PostViewerModal';
 import { usePostViewer } from '@/hooks/usePostViewer';
@@ -153,12 +153,9 @@ const InstagramStylePost: React.FC<InstagramStylePostProps> = ({ post, allUserPo
         {/* Media Container - Full width, responsive height */}
         <div className="relative w-full aspect-[4/5] md:aspect-[3/4] cursor-pointer" onClick={handleMediaClick}>
           {currentMedia.media_type === 'video' ? (
-            <VideoPreview
-              src={currentMedia.media_url}
-              videoId={`instagram-post-${post.id}-${currentMediaIndex}`}
-              className="w-full h-full object-cover"
-              isGridThumbnail={false}
-            />
+            <div className="w-full h-full bg-muted flex items-center justify-center">
+              <span className="text-sm text-muted-foreground">Video unavailable</span>
+            </div>
           ) : (
             <LazyImage
               src={currentMedia.media_url}

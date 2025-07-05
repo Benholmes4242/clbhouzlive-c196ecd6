@@ -4,7 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { VideoAutoplayProvider } from '@/hooks/useVideoAutoplayManager';
+
 import { ThemeProvider } from '@/components/theme-provider';
 import PasswordProtection from "@/components/PasswordProtection";
 import Index from "./pages/Index";
@@ -45,7 +45,6 @@ const App: React.FC = () => {
     <ThemeProvider defaultTheme="light" storageKey="clbhouz-ui-theme">
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
-          <VideoAutoplayProvider>
             <PasswordProtection>
             <BrowserRouter>
             <Suspense fallback={
@@ -89,7 +88,6 @@ const App: React.FC = () => {
               <Sonner />
             </BrowserRouter>
           </PasswordProtection>
-        </VideoAutoplayProvider>
       </TooltipProvider>
     </QueryClientProvider>
     </ThemeProvider>

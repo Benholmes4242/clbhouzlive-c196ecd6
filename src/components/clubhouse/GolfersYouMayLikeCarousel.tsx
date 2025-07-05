@@ -3,7 +3,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import VideoPreview from '@/components/posts/VideoPreview';
+
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useProfileActions } from '@/components/profile/actions/useProfileActions';
 import { useNavigate } from 'react-router-dom';
@@ -170,12 +170,9 @@ const GolferCard: React.FC<GolferCardProps> = ({ golfer, currentUserId, isMobile
     >
       {/* Video Background */}
       <div className="w-full h-80 relative">
-        <VideoPreview
-          src={golfer.most_recent_video.media_url}
-          videoId={`golfer-carousel-${golfer.id}`}
-          className="w-full h-full object-cover"
-          isGridThumbnail={true}
-        />
+        <div className="w-full h-full bg-muted flex items-center justify-center">
+          <span className="text-sm text-muted-foreground">Video unavailable</span>
+        </div>
         
         {/* Dark overlay gradient */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />

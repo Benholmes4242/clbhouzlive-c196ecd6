@@ -3,7 +3,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Play, Pause, Maximize2 } from 'lucide-react';
 import { SwipeCarousel } from '@/components/ui/swipe-carousel';
 import CoursePostBadge from '../posts/CoursePostBadge';
-import VideoPreview from '../posts/VideoPreview';
+
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { useFullscreenMedia } from '@/hooks/useFullscreenMedia';
 import LazyImage from '@/components/ui/lazy-image';
@@ -214,12 +214,9 @@ const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentPr
                 onMouseEnter={() => setShowControls(true)}
                 onMouseLeave={() => setShowControls(false)}
               >
-                <VideoPreview
-                  src={content.videoUrl}
-                  videoId={`post-content-${content.videoUrl.split('/').pop()}`}
-                  className="w-full h-80 object-cover object-center cursor-pointer"
-                  isGridThumbnail={false}
-                />
+                <div className="w-full h-80 bg-muted flex items-center justify-center cursor-pointer">
+                  <span className="text-sm text-muted-foreground">Video unavailable</span>
+                </div>
                 
                 {/* Golf Course Badge overlay on video */}
                 {content.golfCourse && (
