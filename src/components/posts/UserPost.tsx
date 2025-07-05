@@ -279,26 +279,14 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
   )) || [];
 
   const PostContent = () => {
-    const [isHovered, setIsHovered] = useState(false);
-    const { ref: autoplayRef, shouldAutoplay, handleMouseEnter, handleMouseLeave } = useVideoAutoplay();
-    
-    // Add intersection observer for scroll-based autoplay on desktop too
-    const { ref: postRef, isInView } = useIntersectionObserver({
-      threshold: 0.5,
+    const { ref: autoplayRef, shouldAutoplay, handleMouseEnter, handleMouseLeave } = useVideoAutoplay({
+      enabled: true,
+      threshold: 0.3,
       rootMargin: '0px'
     });
 
-    // Auto-hover for videos when in view to trigger autoplay on desktop
-    useEffect(() => {
-      if (isInView && post.post_media?.some(media => media.media_type === 'video')) {
-        setIsHovered(true);
-      } else {
-        setIsHovered(false);
-      }
-    }, [isInView, post.post_media]);
-
     return (
-      <Card ref={postRef} className="border-0 shadow-sm">
+      <Card ref={autoplayRef} className="border-0 shadow-sm">
         <div className="p-4" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
           {/* Post Header */}
           <div className="flex items-center justify-between mb-3">
