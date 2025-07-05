@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Play } from 'lucide-react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 
 interface ReviewMedia {
   id: string;
@@ -59,6 +59,7 @@ const ReviewMediaDisplay = ({ media }: ReviewMediaDisplayProps) => {
       {/* Lightbox Modal */}
       <Dialog open={!!selectedMedia} onOpenChange={() => setSelectedMedia(null)}>
         <DialogContent className="max-w-4xl max-h-[90vh] p-0">
+          <DialogTitle className="sr-only">Review Media</DialogTitle>
           {selectedMedia && (
             <div className="relative w-full h-full">
               {selectedMedia.media_type === 'video' ? (

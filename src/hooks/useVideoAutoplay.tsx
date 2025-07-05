@@ -51,7 +51,6 @@ export const useVideoAutoplay = ({
     }
 
     // For grid context on mobile/tablet devices, don't autoplay to preserve performance
-    // For main feed context, allow autoplay on all devices
     if (isMobile && isGridContext) {
       return;
     }
@@ -64,25 +63,20 @@ export const useVideoAutoplay = ({
 
       // For grid context, check if another video is already active
       if (isGridContext && activeVideoId && activeVideoId !== videoId) {
-        console.log(`Video ${videoId} waiting - another video ${activeVideoId} is active`);
         return;
       }
 
       try {
         // In grid context, claim this video as active when starting to play
         if (isGridContext && activeVideoId !== videoId) {
-          console.log(`Setting active video: ${videoId}`);
           setActiveVideo(videoId);
         }
 
-        console.log(`Attempting to play video ${videoId}, shouldPlay: ${shouldPlay}, isPlaying: ${isPlaying}`);
         setIsLoading(true);
         await video.play();
         setIsPlaying(true);
-        console.log(`Video ${videoId} started playing on ${isMobile ? 'mobile' : 'desktop'}`);
       } catch (error) {
         // Silently handle autoplay failures
-        console.error(`Video ${videoId} autoplay blocked:`, error);
         setIsPlaying(false);
       } finally {
         setIsLoading(false);
@@ -96,28 +90,15 @@ export const useVideoAutoplay = ({
       try {
         video.pause();
         setIsPlaying(false);
-        console.log(`Video ${videoId} paused - out of view`);
         
         // Release active video if this was it
         if (isGridContext && isVideoActive(videoId)) {
-          console.log(`Releasing active video: ${videoId}`);
           setActiveVideo(null);
         }
       } catch (error) {
-        console.log(`Video ${videoId} pause error:`, error);
+        // Ignore pause errors
       }
     };
-
-    // Handle play/pause based on conditions
-    console.log(`Video ${videoId} conditions:`, {
-      shouldPlay,
-      isPlaying,
-      isInView,
-      isHovered,
-      isMobile,
-      isGridContext,
-      activeVideoId
-    });
     
     if (shouldPlay && !isPlaying) {
       handlePlay();
@@ -131,7 +112,6 @@ export const useVideoAutoplay = ({
         try {
           video.pause();
           if (isGridContext && isVideoActive(videoId)) {
-            console.log(`Cleanup: Releasing active video: ${videoId}`);
             setActiveVideo(null);
           }
         } catch (error) {
@@ -139,7 +119,7 @@ export const useVideoAutoplay = ({
         }
       }
     };
-  }, [isInView, isHovered, videoId, isPlaying, isIOSSafari, isGridContext, isVideoActive, setActiveVideo, isMobile, activeVideoId]);
+  }, [isInView, videoId, isPlaying, isIOSSafari, isGridContext, isVideoActive, setActiveVideo, isMobile, activeVideoId]);
 
   // Handle video events
   useEffect(() => {
@@ -153,8 +133,7 @@ export const useVideoAutoplay = ({
       setIsLoading(false);
     };
     const handlePause = () => setIsPlaying(false);
-    const handleError = (e: Event) => {
-      console.log(`Video ${videoId} error:`, e);
+    const handleError = () => {
       setIsPlaying(false);
       setIsLoading(false);
       if (isGridContext && isVideoActive && isVideoActive(videoId)) {

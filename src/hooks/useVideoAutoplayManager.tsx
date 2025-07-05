@@ -17,7 +17,6 @@ export const VideoAutoplayProvider: React.FC<VideoAutoplayProviderProps> = ({ ch
   const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
 
   const setActiveVideo = useCallback((videoId: string | null) => {
-    console.log('Setting active video:', videoId);
     setActiveVideoId(videoId);
   }, []);
 

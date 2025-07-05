@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { ArrowLeft, Heart, MessageCircle, Share, ChevronLeft, ChevronRight, X, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -402,6 +402,7 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
         // Desktop Layout - Instagram Style
         <Dialog open={isOpen} onOpenChange={onClose}>
           <DialogContent className="max-w-6xl w-full h-[90vh] p-0 bg-background border-0 shadow-2xl">
+            <DialogTitle className="sr-only">Post Viewer</DialogTitle>
             <div className="flex h-full rounded-lg overflow-hidden">
               {/* Left Side - Media */}
               <div className="flex-1 bg-black relative">
