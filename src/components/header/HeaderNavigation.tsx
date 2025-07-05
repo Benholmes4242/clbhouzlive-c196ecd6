@@ -118,21 +118,21 @@ const HeaderNavigation = () => {
   if (!user) {
     return (
       <>
-        <Button variant="ghost" size="icon" onClick={handleNotificationsClick}>
+        <Button variant="ghost" size="sm" className="p-2 md:p-3 flex-shrink-0" onClick={handleNotificationsClick}>
           <Bell className="h-4 w-4" />
         </Button>
 
-        <Button variant="ghost" size="icon" onClick={handleProfileClick}>
-          <CircleUserRound className="h-5 w-5" />
+        <Button variant="ghost" size="sm" className="p-2 md:p-3 flex-shrink-0" onClick={handleProfileClick}>
+          <CircleUserRound className="h-4 w-4 md:h-5 md:w-5" />
         </Button>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <Settings className="h-5 w-5" />
+            <Button variant="ghost" size="sm" className="p-2 md:p-3 flex-shrink-0">
+              <Settings className="h-4 w-4 md:h-5 md:w-5" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-48">
+          <DropdownMenuContent align="end" className="w-48 mr-2">
             <DropdownMenuItem onClick={() => navigate('/settings')}>
               Settings
             </DropdownMenuItem>
@@ -148,7 +148,7 @@ const HeaderNavigation = () => {
 
   return (
     <>
-      <Button variant="ghost" size="icon" className="relative" onClick={handleNotificationsClick}>
+      <Button variant="ghost" size="sm" className="relative p-2 md:p-3 flex-shrink-0" onClick={handleNotificationsClick}>
         <Bell className="h-4 w-4" />
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
@@ -157,17 +157,17 @@ const HeaderNavigation = () => {
         )}
       </Button>
 
-      <Button variant="ghost" size="icon" onClick={handleProfileClick}>
-        <CircleUserRound className="h-5 w-5" />
+      <Button variant="ghost" size="sm" className="p-2 md:p-3 flex-shrink-0" onClick={handleProfileClick}>
+        <CircleUserRound className="h-4 w-4 md:h-5 md:w-5" />
       </Button>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon">
-            <Settings className="h-5 w-5" />
+          <Button variant="ghost" size="sm" className="p-2 md:p-3 flex-shrink-0">
+            <Settings className="h-4 w-4 md:h-5 md:w-5" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-48">
+        <DropdownMenuContent align="end" className="w-48 mr-2">
           <DropdownMenuItem onClick={() => navigate('/settings')}>
             Settings
           </DropdownMenuItem>
