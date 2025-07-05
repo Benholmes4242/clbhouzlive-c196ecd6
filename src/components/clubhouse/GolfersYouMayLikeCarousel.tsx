@@ -191,13 +191,21 @@ const GolferCard: React.FC<GolferCardProps> = ({ golfer, currentUserId, isMobile
               height={40}
               onClick={handleProfileClick}
             />
-            <div className="flex-1 min-w-0 overflow-hidden">
+            <div className="flex-1 min-w-0" style={{ maxWidth: 'calc(100% - 52px)' }}>
               <TooltipProvider delayDuration={300}>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <h3 
-                      className="text-white font-semibold text-sm leading-tight cursor-pointer hover:text-white/80 transition-colors overflow-hidden text-ellipsis whitespace-nowrap w-full block" 
+                      className="text-white font-semibold text-sm cursor-pointer hover:text-white/80 transition-colors"
                       onClick={handleProfileClick}
+                      style={{
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        lineHeight: '1.2',
+                        display: 'block',
+                        width: '100%'
+                      }}
                     >
                       {displayName}
                     </h3>
@@ -211,13 +219,17 @@ const GolferCard: React.FC<GolferCardProps> = ({ golfer, currentUserId, isMobile
               <TooltipProvider delayDuration={300}>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <div className="text-white/80 text-xs overflow-hidden text-ellipsis whitespace-nowrap w-full">
-                      <span 
-                        className="cursor-pointer hover:text-white/60 transition-colors"
-                        onClick={handleProfileClick}
-                      >
-                        @{username}
-                      </span>
+                    <div 
+                      className="text-white/80 text-xs cursor-pointer hover:text-white/60 transition-colors"
+                      onClick={handleProfileClick}
+                      style={{
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        width: '100%'
+                      }}
+                    >
+                      @{username}
                     </div>
                   </TooltipTrigger>
                   <TooltipContent className="hidden md:block">
