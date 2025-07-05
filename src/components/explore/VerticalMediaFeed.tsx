@@ -10,6 +10,7 @@ import { ExploreContentItem } from './types';
 import CoursePostBadge from '../posts/CoursePostBadge';
 import EnhancedCreateMomentModal from '../post/EnhancedCreateMomentModal';
 import TaggedText from '../posts/TaggedText';
+import VideoPlayer from '@/components/ui/video-player';
 
 interface VerticalMediaFeedProps {
   isOpen: boolean;
@@ -232,10 +233,16 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
             <div className="relative w-full h-full flex items-center justify-center">
               {item.type === 'video' ? (
                 <div className="relative w-full h-full">
-                  {/* Video unavailable placeholder */}
-                  <div className="w-full h-full bg-muted flex items-center justify-center">
-                    <span className="text-white text-sm">Video unavailable</span>
-                  </div>
+                  <VideoPlayer
+                    src={item.src}
+                    autoplay={index === currentIndex}
+                    muted={isMuted}
+                    loop={true}
+                    className="w-full h-full"
+                    showVideoIcon={false}
+                    showOverlayControls={false}
+                    videoId={`vertical-${item.id}`}
+                  />
                   
                   {/* Golf Course Badge */}
                   {item.golfCourse && (

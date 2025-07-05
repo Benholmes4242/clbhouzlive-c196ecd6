@@ -6,6 +6,7 @@ import { ExploreContentItem } from './types';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { useFullscreenMedia } from '@/hooks/useFullscreenMedia';
 import VideoPlayer from '@/components/ui/video-player';
+import { useVideoAutoplay } from '@/hooks/useVideoAutoplay';
 
 interface MediaCardProps {
   item: ExploreContentItem;
@@ -17,6 +18,10 @@ interface MediaCardProps {
 const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, ...props }) => {
   const [imageError, setImageError] = useState(false);
   const { isOpen, currentMedia, openMedia, closeMedia } = useFullscreenMedia();
+  const { ref: autoplayRef, shouldAutoplay, handleMouseEnter, handleMouseLeave } = useVideoAutoplay({
+    enabled: true,
+    threshold: 0.5
+  });
 
   if (item.type === 'cta') return null;
 
@@ -78,8 +83,11 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, ...props 
     return (
       <>
         <div 
+          ref={autoplayRef}
           className="relative group bg-white rounded-lg shadow-sm border overflow-hidden h-full cursor-pointer"
           onClick={handleMediaClick}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
         >
           <div className="relative w-full h-full overflow-hidden">
             <img
@@ -106,15 +114,18 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, ...props 
   return (
     <>
       <div 
+        ref={autoplayRef}
         className="relative group bg-white rounded-lg shadow-sm border overflow-hidden h-full cursor-pointer"
         onClick={handleMediaClick}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
       >
         {/* Square Media Container */}
         <div className="relative w-full h-full overflow-hidden">
           {item.type === 'video' ? (
             <VideoPlayer
               src={item.src}
-              autoplay={false}
+              autoplay={shouldAutoplay}
               muted={true}
               loop={true}
               className="w-full h-full"
