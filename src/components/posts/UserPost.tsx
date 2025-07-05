@@ -35,6 +35,7 @@ import { showToast } from '@/utils/toast';
 import LazyImage from '@/components/ui/lazy-image';
 import PostViewerModal from './PostViewerModal';
 import { usePostViewer } from '@/hooks/usePostViewer';
+import { usePostDeletion } from '@/hooks/usePostDeletion';
 
 interface PostMedia {
   id: string;
@@ -78,8 +79,8 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
   const { toast } = useToast();
   const isMobile = useIsMobile();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
   const [golfCourse, setGolfCourse] = useState<any>(null);
+  const { deletePost } = usePostDeletion();
   
   // Mobile-specific state for Instagram-style layout
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
@@ -121,49 +122,13 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
   }, [golfClubTags.length > 0 ? golfClubTags[0]?.entity_id : null, golfCourse]);
 
   const handleDeletePost = async () => {
-    if (!isOwnPost || isDeleting) return;
+    if (!isOwnPost) return;
 
     const confirmDelete = window.confirm('Are you sure you want to delete this post?');
     if (!confirmDelete) return;
 
-    setIsDeleting(true);
-    try {
-      const { error: tagsError } = await supabase
-        .from('post_tags')
-        .delete()
-        .eq('post_id', post.id);
-
-      if (tagsError) throw tagsError;
-
-      const { error: mediaError } = await supabase
-        .from('post_media')
-        .delete()
-        .eq('post_id', post.id);
-
-      if (mediaError) throw mediaError;
-
-      const { error: postError } = await supabase
-        .from('posts')
-        .delete()
-        .eq('id', post.id);
-
-      if (postError) throw postError;
-
-      // Show delete toast
-      showToast("Post deleted");
-
-      onPostDeleted?.();
-
-    } catch (error) {
-      console.error('Error deleting post:', error);
-      toast({
-        title: "Error",
-        description: "Failed to delete post. Please try again.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsDeleting(false);
-    }
+    await deletePost(post.id);
+    onPostDeleted?.();
   };
 
   const handleProfileClick = () => {
@@ -344,11 +309,10 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
                       e.stopPropagation();
                       handleDeletePost();
                     }}
-                    disabled={isDeleting}
                     className="text-destructive cursor-pointer focus:text-destructive focus:bg-destructive/10"
                   >
                     <Trash2 className="h-4 w-4 mr-2" />
-                    {isDeleting ? 'Deleting...' : 'Delete Post'}
+                    Delete Post
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
