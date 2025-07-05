@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -86,7 +87,19 @@ export const useGolfersYouMayLike = () => {
         const isValidVideo = mediaItem && 
                            mediaItem.media_type === 'video' && 
                            mediaItem.media_url && 
-                           mediaItem.media_url.length > 0;
+                           mediaItem.media_url.length > 0 &&
+                           // STRICT: Ensure it's not an image masquerading as video
+                           !mediaItem.media_url.includes('.jpg') &&
+                           !mediaItem.media_url.includes('.jpeg') &&
+                           !mediaItem.media_url.includes('.png') &&
+                           !mediaItem.media_url.includes('.gif') &&
+                           !mediaItem.media_url.includes('.webp') &&
+                           // Must contain video indicators
+                           (mediaItem.media_url.includes('.mp4') || 
+                            mediaItem.media_url.includes('.mov') || 
+                            mediaItem.media_url.includes('.webm') || 
+                            mediaItem.media_url.includes('.avi') ||
+                            mediaItem.media_url.includes('video'));
         
         if (!userMap.has(userId) && userProfile && isValidVideo) {
           userMap.set(userId, {
@@ -139,16 +152,43 @@ export const useGolfersYouMayLike = () => {
         isVideo: g.most_recent_video.media_url?.includes('video') || g.most_recent_video.media_url?.includes('.mp4') || g.most_recent_video.media_url?.includes('.mov')
       })));
 
-      // Final filter to ensure ONLY users with actual video URLs make it through
+      // FINAL TRIPLE-CHECK: Absolutely no photos allowed
       const videoOnlyGolfers = processedGolfers.filter(golfer => {
-        const hasVideo = golfer.most_recent_video.media_url && 
-                        golfer.most_recent_video.media_url.length > 0;
+        const mediaUrl = golfer.most_recent_video.media_url;
         
-        if (!hasVideo) {
-          console.warn(`Filtering out ${golfer.display_name || golfer.username} - no valid video URL`);
+        // Must have a valid media URL
+        if (!mediaUrl || mediaUrl.length === 0) {
+          console.warn(`Filtering out ${golfer.display_name || golfer.username} - no media URL`);
+          return false;
         }
-        
-        return hasVideo;
+
+        // ABSOLUTELY NO IMAGE EXTENSIONS ALLOWED
+        const isImage = mediaUrl.includes('.jpg') || 
+                       mediaUrl.includes('.jpeg') || 
+                       mediaUrl.includes('.png') || 
+                       mediaUrl.includes('.gif') || 
+                       mediaUrl.includes('.webp') ||
+                       mediaUrl.includes('image');
+
+        if (isImage) {
+          console.warn(`BLOCKING IMAGE: ${golfer.display_name || golfer.username} - contains image extension: ${mediaUrl}`);
+          return false;
+        }
+
+        // Must contain video indicators
+        const isVideo = mediaUrl.includes('.mp4') || 
+                       mediaUrl.includes('.mov') || 
+                       mediaUrl.includes('.webm') || 
+                       mediaUrl.includes('.avi') ||
+                       mediaUrl.includes('video');
+
+        if (!isVideo) {
+          console.warn(`BLOCKING NON-VIDEO: ${golfer.display_name || golfer.username} - no video indicators: ${mediaUrl}`);
+          return false;
+        }
+
+        console.log(`✅ APPROVED VIDEO: ${golfer.display_name || golfer.username} - ${mediaUrl}`);
+        return true;
       });
 
       if (reset) {
