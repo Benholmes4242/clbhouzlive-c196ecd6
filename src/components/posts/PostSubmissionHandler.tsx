@@ -1,5 +1,5 @@
 
-import { usePostSubmission } from '@/hooks/usePostSubmission';
+import { useOptimisticPostSubmission } from '@/hooks/useOptimisticPostSubmission';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
 
 // Re-export types for backward compatibility
@@ -15,4 +15,4 @@ interface PostSubmissionHandlerProps {
 }
 
 // Export the hooks for use in components
-export { usePostSubmission, usePostDeletion };
+export { useOptimisticPostSubmission, usePostDeletion };

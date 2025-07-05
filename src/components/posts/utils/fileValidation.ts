@@ -5,17 +5,11 @@ interface ValidationResult {
 }
 
 export const validateFiles = (mediaFiles: File[]): ValidationResult => {
-  const maxSize = 500 * 1024 * 1024; // Increased to 500MB for longer videos
   const supportedVideoTypes = ['video/mp4', 'video/mov', 'video/quicktime', 'video/avi', 'video/x-msvideo', 'video/webm'];
   const supportedImageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
   
   for (const file of mediaFiles) {
-    if (file.size > maxSize) {
-      return {
-        isValid: false,
-        error: `File "${file.name}" is too large. Maximum size is 500MB.`
-      };
-    }
+    // No file size limit - allow any size video/image
     
     const isVideo = file.type.startsWith('video/');
     const isImage = file.type.startsWith('image/');
@@ -46,11 +40,7 @@ export const validateFiles = (mediaFiles: File[]): ValidationResult => {
 };
 
 export const getFileErrorMessage = (file: File, error: any): string => {
-  const maxSize = 500 * 1024 * 1024; // 500MB
-  
-  if (file.size > maxSize) {
-    return `File too large: ${file.name} exceeds 500MB limit`;
-  }
+  // No file size limit - removed size check
   
   if (error?.message?.includes('timeout')) {
     return 'Upload timed out. Please check your connection and try again';

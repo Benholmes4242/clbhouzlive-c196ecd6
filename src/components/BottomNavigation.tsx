@@ -2,7 +2,7 @@
 import React from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePostFlow } from '@/hooks/usePostFlow';
-import { usePostSubmission } from '@/hooks/usePostSubmission';
+import { useOptimisticPostSubmission } from '@/hooks/useOptimisticPostSubmission';
 import GalleryPicker from '@/components/post/GalleryPicker';
 import EnhancedCreateMomentModal from '@/components/post/EnhancedCreateMomentModal';
 import SnapToast from '@/components/snap/SnapToast';
@@ -31,7 +31,7 @@ const useIsDesktop = () => {
 const BottomNavigation = () => {
   const { user } = useSupabaseSession();
   const { activeTab, handleTabClick } = useNavigationHandlers();
-  const { submitPost } = usePostSubmission();
+  const { submitPost } = useOptimisticPostSubmission();
   const { handleCaptionInput, selectMention } = usePostHandlers();
   const isDesktop = useIsDesktop();
   

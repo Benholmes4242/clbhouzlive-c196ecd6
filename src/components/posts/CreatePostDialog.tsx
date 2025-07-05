@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from '@/components/ui/button';
 import { Plus, X } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { usePostSubmission } from './PostSubmissionHandler';
+import { useOptimisticPostSubmission } from './PostSubmissionHandler';
 import PostContentForm from './PostContentForm';
 
 interface TaggableEntity {
@@ -22,7 +22,7 @@ interface CreatePostDialogProps {
 
 const CreatePostDialog = ({ onPostCreated, variant = 'header' }: CreatePostDialogProps) => {
   const { user } = useSupabaseSession();
-  const { submitPost } = usePostSubmission();
+  const { submitPost } = useOptimisticPostSubmission();
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
