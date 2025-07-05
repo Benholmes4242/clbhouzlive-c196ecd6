@@ -29,40 +29,7 @@ const GridVideoPreview = ({
 
   const { thumbnailSrc, thumbnailReady } = useThumbnailGenerator(src, videoId, poster);
 
-  console.log('GridVideoPreview rendering:', {
-    videoId,
-    src,
-    isInView,
-    isHovered,
-    isPlaying,
-    isLoading,
-    shouldShowPlayIcon,
-    thumbnailReady,
-    thumbnailSrc: thumbnailSrc ? 'available' : 'none'
-  });
-
-  // Fallback if video autoplay is not available
-  if (!videoRef) {
-    console.log('VideoRef not available, showing static video');
-    return (
-      <div className={`relative ${className}`}>
-        <video
-          src={src}
-          poster={poster || thumbnailSrc}
-          className="w-full h-full object-cover rounded-[inherit]"
-          muted
-          loop
-          playsInline
-          onError={() => setThumbnailError(true)}
-        />
-        <div className="absolute bottom-2 right-2">
-          <div className="w-8 h-8 bg-black/60 rounded-full flex items-center justify-center">
-            <Play className="h-4 w-4 text-white ml-0.5" />
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const effectiveThumbnail = thumbnailSrc || poster || 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
 
   return (
     <div 
@@ -71,16 +38,41 @@ const GridVideoPreview = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <video
-        ref={videoRef}
-        src={src}
-        poster={poster || thumbnailSrc}
-        className="w-full h-full object-cover rounded-[inherit]"
-        muted
-        loop
-        playsInline
-        onError={() => setThumbnailError(true)}
-      />
+      {/* Show thumbnail image when not playing */}
+      {!isPlaying && (
+        <img
+          src={effectiveThumbnail}
+          alt="Video thumbnail"
+          className="w-full h-full object-cover rounded-[inherit]"
+          onError={() => setThumbnailError(true)}
+        />
+      )}
+
+      {/* Show video when playing */}
+      {isPlaying && videoRef && (
+        <video
+          ref={videoRef}
+          src={src}
+          className="w-full h-full object-cover rounded-[inherit]"
+          muted
+          loop
+          playsInline
+          onError={() => setThumbnailError(true)}
+        />
+      )}
+
+      {/* Hidden video ref for autoplay management */}
+      {!isPlaying && videoRef && (
+        <video
+          ref={videoRef}
+          src={src}
+          className="hidden"
+          muted
+          loop
+          playsInline
+          preload="none"
+        />
+      )}
 
       {/* Play icon overlay - positioned in bottom right corner */}
       {shouldShowPlayIcon && (
