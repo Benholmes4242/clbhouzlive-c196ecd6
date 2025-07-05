@@ -77,83 +77,37 @@ const FollowerStats: React.FC<FollowerStatsProps> = ({ userId, userType = 'indiv
     gcTime: 0, // Don't keep in cache
   });
 
-  // Get friends count - only for individual users
-  const { data: friendsCount = 0, isLoading: isLoadingFriends } = useQuery({
-    queryKey: ['friendsCount', userId],
-    queryFn: async () => {
-      if (!isIndividual || !userId) {
-        console.log('FollowerStats: Not individual user or no userId for friends count');
-        return 0;
-      }
-      
-      console.log('Fetching friends count for user:', userId);
-      const { count, error } = await supabase
-        .from('user_friends')
-        .select('*', { count: 'exact', head: true })
-        .or(`and(user_id.eq.${userId},status.eq.accepted),and(friend_id.eq.${userId},status.eq.accepted)`);
-      
-      if (error) {
-        console.error('Error fetching friends count:', error);
-        return 0;
-      }
-      
-      console.log('Friends count result:', count);
-      return count || 0;
-    },
-    enabled: isIndividual && !!userId,
-    staleTime: 0, // No caching - always fetch fresh data
-    gcTime: 0, // Don't keep in cache
-  });
-
+  // Get friends count - REMOVED (feature deprecated)
+  
+  // Navigation handlers
   const handleFollowingClick = () => {
-    if (isOwnProfile) {
-      queryClient.invalidateQueries({ queryKey: ['following'] });
-      queryClient.invalidateQueries({ queryKey: ['followingCount'] });
-      navigate('/following');
-    } else if (username) {
-      console.log('Navigate to following for user:', username);
-      // TODO: Implement /profile/:username/following route
+    if (username) {
+      navigate(`/following${isOwnProfile ? '' : `/${username}`}`);
     }
   };
 
   const handleFollowersClick = () => {
-    if (isOwnProfile) {
-      queryClient.invalidateQueries({ queryKey: ['followers'] });
-      queryClient.invalidateQueries({ queryKey: ['followerCount'] });
-      navigate('/followers');
-    } else if (username) {
-      console.log('Navigate to followers for user:', username);
-      // TODO: Implement /profile/:username/followers route
-    }
-  };
-
-  const handleFriendsClick = () => {
-    if (isOwnProfile) {
-      queryClient.invalidateQueries({ queryKey: ['friends'] });
-      queryClient.invalidateQueries({ queryKey: ['friendsCount'] });
-      navigate('/friends');
-    } else if (username) {
-      console.log('Navigate to friends for user:', username);
-      // TODO: Implement /profile/:username/friends route
+    if (username) {
+      navigate(`/followers${isOwnProfile ? '' : `/${username}`}`);
     }
   };
 
   console.log('FollowerStats rendering - counts:', { 
     followerCount, 
     followingCount, 
-    friendsCount,
     isLoadingFollowers,
     isLoadingFollowing,
-    isLoadingFriends
+    isOwnProfile
   });
 
   return (
     <div className={compact ? "flex items-center gap-4" : "flex justify-center gap-8 py-4 border-y border-border"}>
+      {/* Following - Always show and always clickable */}
       <div 
-        className={`text-center ${isOwnProfile ? 'cursor-pointer hover:bg-muted/50 rounded' : ''} ${
-          compact ? 'py-0' : 'px-2 py-1'
+        className={`text-center cursor-pointer hover:bg-muted/50 rounded transition-colors ${
+          compact ? 'py-1 px-2' : 'px-2 py-1'
         }`} 
-        onClick={isOwnProfile ? handleFollowingClick : undefined}
+        onClick={handleFollowingClick}
       >
         <div className={compact ? "text-sm font-semibold" : "text-xl font-bold"}>
           {isLoadingFollowing ? '...' : followingCount}
@@ -162,34 +116,21 @@ const FollowerStats: React.FC<FollowerStatsProps> = ({ userId, userType = 'indiv
           Following
         </div>
       </div>
+
+      {/* Followers/Follows you - Logic based on profile ownership */}
       <div 
-        className={`text-center ${isOwnProfile ? 'cursor-pointer hover:bg-muted/50 rounded' : ''} ${
-          compact ? 'py-0' : 'px-2 py-1'
+        className={`text-center cursor-pointer hover:bg-muted/50 rounded transition-colors ${
+          compact ? 'py-1 px-2' : 'px-2 py-1'
         }`} 
-        onClick={isOwnProfile ? handleFollowersClick : undefined}
+        onClick={handleFollowersClick}
       >
         <div className={compact ? "text-sm font-semibold" : "text-xl font-bold"}>
           {isLoadingFollowers ? '...' : followerCount}
         </div>
         <div className={compact ? "text-xs text-muted-foreground" : "text-sm text-muted-foreground"}>
-          Followers
+          {isOwnProfile ? 'Follows you' : 'Followers'}
         </div>
       </div>
-      {isIndividual && (
-        <div 
-          className={`text-center ${isOwnProfile ? 'cursor-pointer hover:bg-muted/50 rounded' : ''} ${
-            compact ? 'py-0' : 'px-2 py-1'
-          }`} 
-          onClick={isOwnProfile ? handleFriendsClick : undefined}
-        >
-          <div className={compact ? "text-sm font-semibold" : "text-xl font-bold"}>
-            {isLoadingFriends ? '...' : friendsCount}
-          </div>
-          <div className={compact ? "text-xs text-muted-foreground" : "text-sm text-muted-foreground"}>
-            Friends
-          </div>
-        </div>
-      )}
     </div>
   );
 };

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useProfileActions } from './actions/useProfileActions';
 import { Button } from '@/components/ui/button';
-import { Users, Check } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -45,10 +45,6 @@ const UserProfileActions: React.FC<UserProfileActionsProps> = ({
     enabled: !!targetUserId && !!currentUserId,
   });
 
-  const handleFollowersClick = () => {
-    navigate(`/profile/${username}/followers`);
-  };
-
   const handleMessageClick = () => {
     // Navigate to messages with the target user
     navigate(`/messages?friend=${targetUserId}`);
@@ -87,17 +83,6 @@ const UserProfileActions: React.FC<UserProfileActionsProps> = ({
             Follows you
           </div>
         )}
-
-        {/* Followers Button */}
-        <Button 
-          variant="outline" 
-          size="sm"
-          onClick={handleFollowersClick}
-          className="px-2 py-1 text-xs h-7 flex-shrink-0"
-        >
-          <Users className="w-3 h-3 mr-1" />
-          Followers
-        </Button>
 
         {/* Message Button */}
         <Button 
