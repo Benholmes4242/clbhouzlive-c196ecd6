@@ -62,6 +62,7 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
   const [isAtEnd, setIsAtEnd] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [isEditSubmitting, setIsEditSubmitting] = useState(false);
+  const [editCourse, setEditCourse] = useState<any>(null);
 
   // Find initial post index
   useEffect(() => {
@@ -119,6 +120,7 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
   const golfCourse = getGolfCourse();
 
   const handleEdit = (post: PostData) => {
+    setEditCourse(golfCourse);
     setEditModalOpen(true);
   };
 
@@ -570,14 +572,17 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
       {/* Edit Modal */}
       <EnhancedCreateMomentModal
         isOpen={editModalOpen}
-        onClose={() => setEditModalOpen(false)}
+        onClose={() => {
+          setEditModalOpen(false);
+          setEditCourse(null);
+        }}
         onSubmit={handleEditSubmit}
         isSubmitting={isEditSubmitting}
         editMode={true}
         initialCaption={currentPost.content || ''}
         existingMediaUrls={currentPost.post_media?.map(m => m.media_url) || []}
-        selectedCourse={golfCourse}
-        onCourseSelect={() => {}} // TODO: Implement course selection for edit
+        selectedCourse={editCourse}
+        onCourseSelect={setEditCourse}
       />
     </>
   );

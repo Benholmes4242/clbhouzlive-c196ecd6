@@ -35,6 +35,7 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<ExploreContentItem | null>(null);
   const [isEditSubmitting, setIsEditSubmitting] = useState(false);
+  const [editCourse, setEditCourse] = useState<any>(null);
 
   // Filter content by type and set initial index
   useEffect(() => {
@@ -148,6 +149,7 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
 
   const handleEdit = (item: ExploreContentItem) => {
     setEditingItem(item);
+    setEditCourse(item.golfCourse || null);
     setEditModalOpen(true);
   };
 
@@ -389,14 +391,15 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
         onClose={() => {
           setEditModalOpen(false);
           setEditingItem(null);
+          setEditCourse(null);
         }}
         onSubmit={handleEditSubmit}
         isSubmitting={isEditSubmitting}
         editMode={true}
         initialCaption={editingItem?.title || ''}
         existingMediaUrls={editingItem ? [editingItem.src] : []}
-        selectedCourse={editingItem?.golfCourse || null}
-        onCourseSelect={() => {}} // TODO: Implement course selection for edit
+        selectedCourse={editCourse}
+        onCourseSelect={setEditCourse}
       />
 
       <style>{`
