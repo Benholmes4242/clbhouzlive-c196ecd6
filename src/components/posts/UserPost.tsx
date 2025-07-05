@@ -4,6 +4,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MoreHorizontal, Heart, MessageCircle, Share, Edit, Trash2, ChevronLeft, ChevronRight, Play, Pause, Volume2, VolumeX } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { formatDistanceToNow } from 'date-fns';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { supabase } from '@/integrations/supabase/client';
@@ -381,6 +382,14 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
 
   // Mobile Instagram-style layout
   const MobileInstagramPost = () => {
+    const [isHovered, setIsHovered] = useState(false);
+    
+    // Add intersection observer for scroll-based autoplay
+    const { ref: containerRef, isInView } = useIntersectionObserver({
+      threshold: 0.5,
+      rootMargin: '0px'
+    });
+
     if (!post.post_media || post.post_media.length === 0) {
       return (
         <div className="bg-background p-4 border-b">
@@ -407,18 +416,19 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
     const currentMedia = post.post_media[currentMediaIndex];
     
     return (
-      <div className="relative w-full bg-black">
+      <div 
+        ref={containerRef}
+        className="relative w-full bg-black"
+        onTouchStart={() => setIsHovered(true)}
+        onTouchEnd={() => setIsHovered(false)}
+      >
         {/* Media Container - Full width, responsive height */}
         <div className="relative w-full aspect-[4/5] cursor-pointer" onClick={() => handleMediaClick(currentMedia.media_url, currentMedia.media_type)}>
           {currentMedia.media_type === 'video' ? (
-            <video
-              ref={videoRef}
+            <VideoPreview
               src={currentMedia.media_url}
               className="w-full h-full object-cover"
-              muted={isVideoMuted}
-              loop
-              playsInline
-              preload="metadata"
+              videoId={`mobile-post-${post.id}-${currentMediaIndex}`}
             />
           ) : (
             <LazyImage
@@ -471,35 +481,6 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
                 className="bg-black/40 backdrop-blur-sm border border-white/20"
               />
             </div>
-          )}
-
-          {/* Video Controls */}
-          {currentMedia.media_type === 'video' && (
-            <>
-              {/* Play/Pause Center Button */}
-              <div className="absolute inset-0 flex items-center justify-center z-10">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="w-16 h-16 rounded-full bg-black/40 backdrop-blur-sm text-white hover:bg-black/60 transition-all"
-                  onClick={handleVideoToggle}
-                >
-                  {isVideoPlaying ? <Pause className="h-8 w-8" /> : <Play className="h-8 w-8 ml-1" />}
-                </Button>
-              </div>
-
-              {/* Mute/Unmute - Only show if no golf course tag to avoid overlap */}
-              {!golfCourse && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm text-white hover:bg-black/60 z-20"
-                  onClick={handleMuteToggle}
-                >
-                  {isVideoMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
-                </Button>
-              )}
-            </>
           )}
 
           {/* Multi-media navigation */}
