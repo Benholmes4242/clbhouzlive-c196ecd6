@@ -44,9 +44,14 @@ const Index = () => {
       <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4">
         <div className="text-center space-y-8 max-w-md w-full">
           {/* Logo */}
-          <div className="flex justify-center">
+          <div className="flex justify-center items-center gap-4">
             <img
-              src="/lovable-uploads/7a19af1c-602a-488b-976d-9f69088df2c6.png"
+              src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
+              alt="Logo Mark"
+              className="w-auto h-32 object-contain"
+            />
+            <img
+              src={currentLogo?.file_url || "/lovable-uploads/181fd40d-ced5-420c-bff8-27c2ef146377.png"}
               alt="clbhouz"
               className="w-auto max-h-48 object-contain"
             />
