@@ -267,6 +267,7 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
             src={media.media_url}
             className="w-full h-full cursor-pointer"
             videoId={`user-post-${post.id}-${index}`}
+            isGridThumbnail={true}
           />
         </div>
       )}
