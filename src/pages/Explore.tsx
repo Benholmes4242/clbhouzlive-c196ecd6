@@ -9,7 +9,6 @@ import VerticalMediaFeed from '@/components/explore/VerticalMediaFeed';
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 import { VideoAutoplayProvider } from '@/hooks/useVideoAutoplayManager';
 import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
-import VideoDebugger from '@/components/debug/VideoDebugger';
 
 const Explore = () => {
   const [activeFilter, setActiveFilter] = useState('All');
@@ -57,14 +56,6 @@ const Explore = () => {
     <VideoAutoplayProvider>
       <div className="min-h-screen bg-background">
         <Header />
-        
-        {/* Debug section - temporarily added to test video issues */}
-        <div className="p-4 border-b">
-          <VideoDebugger 
-            src="https://ybxkehyomcakqjvuhnna.supabase.co/storage/v1/object/public/post-media/6a5bcbb9-c22c-4655-ad8e-088b2858ca3e/1751650791446-0-oszuwd6b64h.mov"
-            videoId="debug-test-video"
-          />
-        </div>
         
         <main className="container mx-auto px-4 py-6 pb-20">
           {/* Sticky Filter Bar */}

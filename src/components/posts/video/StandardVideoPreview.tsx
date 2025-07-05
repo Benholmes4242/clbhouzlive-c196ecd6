@@ -13,7 +13,6 @@ const StandardVideoPreview = ({
   className = "", 
   videoId 
 }: StandardVideoPreviewProps) => {
-  const [isHovered, setIsHovered] = useState(false);
   const [thumbnailError, setThumbnailError] = useState(false);
 
   const { ref: containerRef, isInView } = useIntersectionObserver({
@@ -23,7 +22,7 @@ const StandardVideoPreview = ({
 
   const { videoRef, isPlaying, isLoading, shouldShowPlayIcon } = useVideoAutoplay({
     isInView,
-    isHovered,
+    isHovered: true, // Always true to prevent hover issues
     videoId,
     isGridContext: false
   });
@@ -61,8 +60,6 @@ const StandardVideoPreview = ({
     <div 
       ref={containerRef}
       className={`relative group ${className}`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
       onClick={handleVideoClick}
     >
       {/* Show thumbnail when not playing */}
@@ -85,6 +82,7 @@ const StandardVideoPreview = ({
           loop
           playsInline
           crossOrigin="anonymous"
+          style={{ objectPosition: 'center' }}
           onError={(e) => {
             console.error('Video playback error:', e, 'src:', src);
             setThumbnailError(true);

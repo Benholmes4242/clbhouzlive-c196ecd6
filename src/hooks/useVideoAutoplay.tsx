@@ -56,13 +56,8 @@ export const useVideoAutoplay = ({
       return;
     }
 
-    // Determine if video should play
-    // For debugging: make videos autoplay when in view (no hover required)
-    // On mobile in main feed context, autoplay when in view (no hover required)
-    // On desktop, temporarily remove hover requirement for testing
-    const shouldPlay = isGridContext 
-      ? isInView  // Simplified for debugging - just require in view
-      : (isMobile ? isInView : isInView); // Also simplified for main feed
+    // Determine if video should play - completely remove hover requirement
+    const shouldPlay = isInView;
 
     const handlePlay = async () => {
       if (!shouldPlay || isPlaying) return;
@@ -88,12 +83,13 @@ export const useVideoAutoplay = ({
     };
 
     const handlePause = () => {
-      if (shouldPlay) return;
+      // Only pause if video is going out of view
+      if (isInView) return;
 
       try {
         video.pause();
         setIsPlaying(false);
-        console.log(`Video ${videoId} paused`);
+        console.log(`Video ${videoId} paused - out of view`);
         
         // Release active video if this was it
         if (isGridContext && isVideoActive(videoId)) {
@@ -114,9 +110,9 @@ export const useVideoAutoplay = ({
       isGridContext
     });
     
-    if (shouldPlay) {
+    if (shouldPlay && !isPlaying) {
       handlePlay();
-    } else if (isPlaying) {
+    } else if (!shouldPlay && isPlaying) {
       handlePause();
     }
 

@@ -12,7 +12,6 @@ const GridVideoPreview = ({
   className = "", 
   videoId 
 }: GridVideoPreviewProps) => {
-  const [isHovered, setIsHovered] = useState(false);
   const [thumbnailError, setThumbnailError] = useState(false);
   
   const { ref: containerRef, isInView } = useIntersectionObserver({
@@ -22,7 +21,7 @@ const GridVideoPreview = ({
 
   const { videoRef, isPlaying, isLoading, shouldShowPlayIcon } = useVideoAutoplay({
     isInView,
-    isHovered,
+    isHovered: true, // Always true to prevent hover issues
     videoId,
     isGridContext: true
   });
@@ -35,8 +34,6 @@ const GridVideoPreview = ({
     <div 
       ref={containerRef} 
       className={`relative ${className}`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
     >
       {/* Show thumbnail image when not playing */}
       {!isPlaying && (
