@@ -3,6 +3,7 @@ import { X, Heart, MessageCircle, Share2, Volume2, VolumeX, MoreHorizontal, Edit
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useToast } from '@/hooks/use-toast';
 import { ExploreContentItem } from './types';
 import VideoPreview from '../posts/VideoPreview';
 import CoursePostBadge from '../posts/CoursePostBadge';
@@ -26,6 +27,7 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
   onFollow
 }) => {
   const { user } = useSupabaseSession();
+  const { toast } = useToast();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [filteredContent, setFilteredContent] = useState<ExploreContentItem[]>([]);
   const [isMuted, setIsMuted] = useState(true);
@@ -166,11 +168,28 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
       // TODO: Implement actual post update logic here
       console.log('Updating post:', editingItem.id, data);
       
+      // Simulate successful update
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Show success toast
+      toast({
+        title: "Success!",
+        description: "Your updates have been saved!",
+        className: "bg-green-600 text-white border-green-600",
+        duration: 3000,
+      });
+      
       // Close modal after successful update
       setEditModalOpen(false);
       setEditingItem(null);
     } catch (error) {
       console.error('Error updating post:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save updates. Please try again.",
+        variant: "destructive",
+        duration: 3000,
+      });
     } finally {
       setIsEditSubmitting(false);
     }

@@ -5,7 +5,9 @@ import { X } from 'lucide-react';
 import CourseTagInput from '../posts/CourseTagInput';
 import GolfCoursePin from '../posts/GolfCoursePin';
 import EnhancedMediaUpload from '../posts/EnhancedMediaUpload';
+import RichTextInput from '../posts/RichTextInput';
 import { useTaggableEntities } from '@/hooks/useTaggableEntities';
+import { useToast } from '@/hooks/use-toast';
 
 interface TaggableEntity {
   id: string;
@@ -60,6 +62,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
   const [selectedTags, setSelectedTags] = useState<TaggableEntity[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const { entities, searchEntities } = useTaggableEntities();
+  const { toast } = useToast();
   const [isInitialized, setIsInitialized] = useState(false);
 
   // Reset state when modal opens/closes
@@ -81,8 +84,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
   }, [isOpen, editMode, initialCaption, initialTags, initialFiles, isInitialized]);
 
   // Handle caption input with mention detection
-  const handleCaptionChange = async (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const text = e.target.value;
+  const handleCaptionChange = async (text: string) => {
     setCaption(text);
 
     // Check for mentions - look for @ followed by at least 1 character
@@ -165,13 +167,12 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
 
           {/* Caption Input */}
           <div className="relative">
-            <textarea
+            <RichTextInput
               value={caption}
               onChange={handleCaptionChange}
               placeholder="Write about your moment... Use @ to tag people or businesses"
-              className="w-full min-h-[100px] p-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-primary focus:border-transparent"
+              selectedTags={selectedTags}
               disabled={isSubmitting}
-              rows={4}
             />
 
             {/* Mention Suggestions */}

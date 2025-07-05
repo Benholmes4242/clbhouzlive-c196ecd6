@@ -6,6 +6,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useSwipeable } from 'react-swipeable';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useToast } from '@/hooks/use-toast';
 import HighQualityImage from '@/components/ui/high-quality-image';
 import VideoPreview from './VideoPreview';
 import CoursePostBadge from './CoursePostBadge';
@@ -55,6 +56,7 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
   onNavigate
 }) => {
   const { user } = useSupabaseSession();
+  const { toast } = useToast();
   const isMobile = useIsMobile();
   const [currentPostIndex, setCurrentPostIndex] = useState(0);
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
@@ -135,10 +137,27 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
       // TODO: Implement actual post update logic here
       console.log('Updating post:', currentPost.id, data);
       
+      // Simulate successful update
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Show success toast
+      toast({
+        title: "Success!",
+        description: "Your updates have been saved!",
+        className: "bg-green-600 text-white border-green-600",
+        duration: 3000,
+      });
+      
       // Close modal after successful update
       setEditModalOpen(false);
     } catch (error) {
       console.error('Error updating post:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save updates. Please try again.",
+        variant: "destructive",
+        duration: 3000,
+      });
     } finally {
       setIsEditSubmitting(false);
     }
