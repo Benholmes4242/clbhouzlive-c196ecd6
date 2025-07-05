@@ -32,45 +32,66 @@ export const useGolfersYouMayLike = () => {
     const currentOffset = reset ? 0 : offset;
 
     try {
-      // First, get users who have video posts
-      const { data: usersWithVideos, error: usersError } = await supabase
-        .from('user_profiles')
+      // First, get video posts with their media
+      const { data: videoPosts, error: postsError } = await supabase
+        .from('posts')
         .select(`
           id,
-          display_name,
-          username,
-          profile_photo_url,
+          user_id,
+          created_at,
           post_media!inner(
             id,
             media_url,
-            post_id,
-            created_at,
-            posts!inner(
-              user_id
-            )
+            media_type,
+            created_at
           )
         `)
         .eq('post_media.media_type', 'video')
-        .neq('id', user.id)
-        .order('post_media.created_at', { ascending: false })
-        .range(currentOffset, currentOffset + ITEMS_PER_PAGE - 1);
+        .neq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .range(currentOffset, currentOffset + ITEMS_PER_PAGE * 3 - 1);
 
-      if (usersError) throw usersError;
+      if (postsError) throw postsError;
 
-      if (!usersWithVideos || usersWithVideos.length === 0) {
+      if (!videoPosts || videoPosts.length === 0) {
         setHasMore(false);
         setLoading(false);
         return;
       }
 
+      // Get unique user IDs from video posts
+      const userIds = [...new Set(videoPosts.map(post => post.user_id))];
+      
+      // Get user profiles for these users
+      const { data: userProfiles, error: profilesError } = await supabase
+        .from('user_profiles')
+        .select('id, display_name, username, profile_photo_url')
+        .in('id', userIds);
+
+      if (profilesError) throw profilesError;
+
+      // Create a map of user profiles for quick lookup
+      const profileMap = new Map(userProfiles?.map(profile => [profile.id, profile]) || []);
+      
       // Process and deduplicate users, keeping only the most recent video per user
       const userMap = new Map<string, any>();
       
-      usersWithVideos.forEach(user => {
-        if (!userMap.has(user.id)) {
-          userMap.set(user.id, {
-            ...user,
-            most_recent_video: user.post_media[0] // Already ordered by created_at desc
+      videoPosts.forEach(post => {
+        const userId = post.user_id;
+        const userProfile = profileMap.get(userId);
+        
+        if (!userMap.has(userId) && userProfile && post.post_media.length > 0) {
+          userMap.set(userId, {
+            id: userId,
+            display_name: userProfile.display_name,
+            username: userProfile.username,
+            profile_photo_url: userProfile.profile_photo_url,
+            most_recent_video: {
+              id: post.post_media[0].id,
+              media_url: post.post_media[0].media_url,
+              post_id: post.id,
+              created_at: post.post_media[0].created_at
+            }
           });
         }
       });
@@ -78,12 +99,12 @@ export const useGolfersYouMayLike = () => {
       const uniqueUsers = Array.from(userMap.values());
 
       // Get follow status for these users
-      const userIds = uniqueUsers.map(u => u.id);
+      const followUserIds = uniqueUsers.map(u => u.id);
       const { data: followData, error: followError } = await supabase
         .from('user_follows')
         .select('following_id')
         .eq('follower_id', user.id)
-        .in('following_id', userIds);
+        .in('following_id', followUserIds);
 
       if (followError) throw followError;
 
@@ -102,6 +123,12 @@ export const useGolfersYouMayLike = () => {
         },
         is_following: followingIds.has(golfer.id)
       }));
+
+      console.log('Processed golfers with video data:', processedGolfers.map(g => ({
+        name: g.display_name || g.username,
+        videoUrl: g.most_recent_video.media_url,
+        hasValidVideo: !!g.most_recent_video.media_url && g.most_recent_video.media_url.length > 0
+      })));
 
       if (reset) {
         setGolfers(processedGolfers);
