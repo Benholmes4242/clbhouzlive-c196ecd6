@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { ArrowLeft, Heart, MessageCircle, Share, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { ArrowLeft, Heart, MessageCircle, Share, ChevronLeft, ChevronRight, X, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useSwipeable } from 'react-swipeable';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import HighQualityImage from '@/components/ui/high-quality-image';
 import VideoPreview from './VideoPreview';
 import CoursePostBadge from './CoursePostBadge';
@@ -51,6 +53,7 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
   allUserPosts,
   onNavigate
 }) => {
+  const { user } = useSupabaseSession();
   const isMobile = useIsMobile();
   const [currentPostIndex, setCurrentPostIndex] = useState(0);
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
@@ -111,6 +114,16 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
   };
 
   const golfCourse = getGolfCourse();
+
+  const handleEdit = (post: PostData) => {
+    // Implement edit functionality
+    console.log('Edit clicked for:', post.id);
+  };
+
+  const handleDelete = (post: PostData) => {
+    // Implement delete functionality
+    console.log('Delete clicked for:', post.id);
+  };
 
   const navigatePost = useCallback((direction: 'prev' | 'next') => {
     let newIndex = currentPostIndex;
@@ -287,6 +300,39 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                   <Share className="h-6 w-6" />
                 </div>
               </button>
+
+              {/* More Options Button - Only show for own posts */}
+              {user && currentPost.user.id === user.id && (
+                <DropdownMenu modal={false}>
+                  <DropdownMenuTrigger asChild>
+                    <button className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform">
+                      <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
+                        <MoreHorizontal className="h-6 w-6" />
+                      </div>
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent 
+                    align="end" 
+                    className="w-48 bg-background border shadow-lg z-[100]"
+                    sideOffset={8}
+                  >
+                    <DropdownMenuItem 
+                      onClick={() => handleEdit(currentPost)}
+                      className="cursor-pointer"
+                    >
+                      <Edit className="mr-2 h-4 w-4" />
+                      Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      onClick={() => handleDelete(currentPost)}
+                      className="cursor-pointer text-destructive focus:text-destructive"
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </div>
 
             {/* Post Navigation - Bottom Edge (for multiple posts) */}
@@ -451,6 +497,37 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                         Share
                       </Button>
                     </div>
+                    
+                    {/* More Options - Only show for own posts */}
+                    {user && currentPost.user.id === user.id && (
+                      <DropdownMenu modal={false}>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="sm">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent 
+                          align="end" 
+                          className="w-48 bg-background border shadow-lg z-[100]"
+                          sideOffset={8}
+                        >
+                          <DropdownMenuItem 
+                            onClick={() => handleEdit(currentPost)}
+                            className="cursor-pointer"
+                          >
+                            <Edit className="mr-2 h-4 w-4" />
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => handleDelete(currentPost)}
+                            className="cursor-pointer text-destructive focus:text-destructive"
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    )}
                   </div>
                 </div>
               </div>

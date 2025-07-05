@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { X, Heart, MessageCircle, Share2, Volume2, VolumeX } from 'lucide-react';
+import { X, Heart, MessageCircle, Share2, Volume2, VolumeX, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { ExploreContentItem } from './types';
 import VideoPreview from '../posts/VideoPreview';
 import CoursePostBadge from '../posts/CoursePostBadge';
@@ -21,6 +24,7 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
   onLike,
   onFollow
 }) => {
+  const { user } = useSupabaseSession();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [filteredContent, setFilteredContent] = useState<ExploreContentItem[]>([]);
   const [isMuted, setIsMuted] = useState(true);
@@ -136,6 +140,16 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
   const handleComment = () => {
     // Implement comment functionality
     console.log('Comment clicked');
+  };
+
+  const handleEdit = (item: ExploreContentItem) => {
+    // Implement edit functionality
+    console.log('Edit clicked for:', item.id);
+  };
+
+  const handleDelete = (item: ExploreContentItem) => {
+    // Implement delete functionality
+    console.log('Delete clicked for:', item.id);
   };
 
   if (!isOpen || filteredContent.length === 0) return null;
@@ -303,6 +317,39 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
                   <Share2 className="h-6 w-6" />
                 </div>
               </button>
+
+              {/* More Options Button - Only show for own posts */}
+              {user && item.user.id === user.id && (
+                <DropdownMenu modal={false}>
+                  <DropdownMenuTrigger asChild>
+                    <button className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform">
+                      <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
+                        <MoreHorizontal className="h-6 w-6" />
+                      </div>
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent 
+                    align="end" 
+                    className="w-48 bg-background border shadow-lg z-[100]"
+                    sideOffset={8}
+                  >
+                    <DropdownMenuItem 
+                      onClick={() => handleEdit(item)}
+                      className="cursor-pointer"
+                    >
+                      <Edit className="mr-2 h-4 w-4" />
+                      Edit
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      onClick={() => handleDelete(item)}
+                      className="cursor-pointer text-destructive focus:text-destructive"
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </div>
           </div>
         ))}
