@@ -1,0 +1,74 @@
+import React from 'react';
+import { SwipeCarousel } from '@/components/ui/swipe-carousel';
+import VideoPlayer from '@/components/ui/video-player';
+import CoursePostBadge from '../CoursePostBadge';
+import { PostMedia, GolfCourse } from './types';
+
+interface UserPostMediaProps {
+  media: PostMedia[];
+  golfCourse: GolfCourse | null;
+  shouldAutoplay: boolean;
+  onMediaClick: (mediaUrl: string, mediaType: 'image' | 'video') => void;
+}
+
+export const UserPostMedia: React.FC<UserPostMediaProps> = ({
+  media,
+  golfCourse,
+  shouldAutoplay,
+  onMediaClick
+}) => {
+  if (!media || media.length === 0) return null;
+
+  const carouselItems = media.map((mediaItem) => (
+    <div key={mediaItem.id} className="w-full aspect-square relative">
+      {/* Golf Course Badge overlay on each media item */}
+      {golfCourse && (
+        <div className="absolute top-2 right-2 z-10">
+          <CoursePostBadge 
+            course={{
+              id: golfCourse.id,
+              name: golfCourse.name,
+              country: golfCourse.country,
+              region: golfCourse.region
+            }}
+            className="m-0"
+          />
+        </div>
+      )}
+      
+      {mediaItem.media_type === 'image' ? (
+        <img
+          src={mediaItem.media_url}
+          alt="Post content"
+          className="w-full h-full object-cover object-center cursor-pointer"
+          loading="lazy"
+          onClick={() => onMediaClick(mediaItem.media_url, 'image')}
+        />
+      ) : (
+        <VideoPlayer
+          src={mediaItem.media_url}
+          autoplay={shouldAutoplay}
+          muted={true}
+          loop={true}
+          className="w-full h-full"
+          showVideoIcon={true}
+          showOverlayControls={false}
+          onClick={() => onMediaClick(mediaItem.media_url, 'video')}
+          videoId={`carousel-${mediaItem.id}`}
+        />
+      )}
+    </div>
+  ));
+
+  return (
+    <div className="mb-3">
+      <div className="rounded-lg overflow-hidden">
+        <SwipeCarousel
+          items={carouselItems}
+          showDots={carouselItems.length > 1}
+          showArrows={false}
+        />
+      </div>
+    </div>
+  );
+};

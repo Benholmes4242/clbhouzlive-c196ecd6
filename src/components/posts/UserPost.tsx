@@ -1,69 +1,13 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { MoreHorizontal, Heart, MessageCircle, Share, Edit, Trash2, ChevronLeft, ChevronRight, Play, Pause, Volume2, VolumeX } from 'lucide-react';
+import React from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
-import { formatDistanceToNow } from 'date-fns';
-import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { useSwipeable } from 'react-swipeable';
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuTrigger,
-} from '@/components/ui/context-menu';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { SwipeCarousel } from '@/components/ui/swipe-carousel';
-import EditPostDialog from './EditPostDialog';
-import TaggedText from './TaggedText';
-import VideoPlayer from '@/components/ui/video-player';
-import { useVideoAutoplay } from '@/hooks/useVideoAutoplay';
-
-import CoursePostBadge from './CoursePostBadge';
-import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
-import { useFullscreenMedia } from '@/hooks/useFullscreenMedia';
-import { showToast } from '@/utils/toast';
-import LazyImage from '@/components/ui/lazy-image';
 import PostViewerModal from './PostViewerModal';
-import { usePostViewer } from '@/hooks/usePostViewer';
-import { usePostDeletion } from '@/hooks/usePostDeletion';
-
-interface PostMedia {
-  id: string;
-  media_type: 'image' | 'video';
-  media_url: string;
-}
-
-interface PostTag {
-  id: string;
-  entity_type: 'user' | 'golf_club' | 'business';
-  entity_id: string;
-  name: string;
-  username: string | null;
-}
-
-interface UserPostData {
-  id: string;
-  content: string | null;
-  created_at: string;
-  user: {
-    id: string;
-    display_name: string | null;
-    username: string | null;
-    profile_photo_url: string | null;
-  };
-  post_media: PostMedia[];
-  post_tags: PostTag[];
-}
+import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
+import { 
+  DesktopUserPost, 
+  MobileUserPost, 
+  useUserPostLogic,
+  UserPostData
+} from './user-post';
 
 interface UserPostProps {
   post: UserPostData;
@@ -74,91 +18,30 @@ interface UserPostProps {
 }
 
 const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated, onPostDeleted }: UserPostProps) => {
-  const navigate = useNavigate();
-  const { user } = useSupabaseSession();
-  const { toast } = useToast();
   const isMobile = useIsMobile();
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [golfCourse, setGolfCourse] = useState<any>(null);
-  const { deletePost } = usePostDeletion();
   
-  // Mobile-specific state for Instagram-style layout
-  const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
-  const [isVideoMuted, setIsVideoMuted] = useState(true);
-  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
-  const videoRef = React.useRef<HTMLVideoElement>(null);
-  
-  const { isOpen, currentPost, allUserPosts: viewerPosts, openPostViewer, closePostViewer } = usePostViewer({ source });
-  const { isOpen: isFullscreenOpen, currentMedia, openMedia, closeMedia } = useFullscreenMedia();
-
-  const displayName = post.user.display_name || post.user.username || 'User';
-  const timeAgo = formatDistanceToNow(new Date(post.created_at), { addSuffix: true });
-  const isOwnPost = user?.id === post.user.id;
-
-  // Find golf club tags to show as course badges
-  const golfClubTags = post.post_tags?.filter(tag => tag.entity_type === 'golf_club') || [];
-  
-  // Fetch golf course details if there are golf club tags
-  useEffect(() => {
-    const fetchGolfCourse = async () => {
-      if (golfClubTags.length > 0 && !golfCourse) {
-        try {
-          const { data: courseData, error } = await supabase
-            .from('golf_courses')
-            .select('id, name, country, region')
-            .eq('id', golfClubTags[0].entity_id)
-            .single();
-
-          if (!error && courseData) {
-            setGolfCourse(courseData);
-          }
-        } catch (error) {
-          console.error('Error fetching golf course:', error);
-        }
-      }
-    };
-
-    fetchGolfCourse();
-  }, [golfClubTags.length > 0 ? golfClubTags[0]?.entity_id : null, golfCourse]);
-
-  const handleDeletePost = async () => {
-    if (!isOwnPost) return;
-
-    const confirmDelete = window.confirm('Are you sure you want to delete this post?');
-    if (!confirmDelete) return;
-
-    await deletePost(post.id);
-    onPostDeleted?.();
-  };
-
-  const handleProfileClick = () => {
-    navigate(`/profile/${post.user.username}`);
-  };
-
-  const handlePostClick = () => {
-    // Transform post data to match PostViewerModal interface
-    const transformedPost = {
-      ...post,
-      golfCourse: golfCourse ? {
-        id: golfCourse.id,
-        name: golfCourse.name,
-        country: golfCourse.country,
-        region: golfCourse.region
-      } : undefined
-    };
-    
-    const transformedPosts = allUserPosts.map(p => ({
-      ...p,
-      golfCourse: golfCourse ? {
-        id: golfCourse.id,
-        name: golfCourse.name,
-        country: golfCourse.country,
-        region: golfCourse.region
-      } : undefined
-    }));
-    
-    openPostViewer(transformedPost, transformedPosts);
-  };
+  const {
+    displayName,
+    timeAgo,
+    isOwnPost,
+    golfCourse,
+    handleDeletePost,
+    handleProfileClick,
+    handlePostClick,
+    isPostViewerOpen,
+    currentPost,
+    viewerPosts,
+    closePostViewer,
+    isFullscreenOpen,
+    currentMedia,
+    openMedia,
+    closeMedia
+  } = useUserPostLogic({
+    post,
+    allUserPosts,
+    source,
+    onPostDeleted
+  });
 
   const handleMediaClick = (mediaUrl: string, mediaType: 'image' | 'video') => {
     // On mobile, always use post viewer for tap-to-expand functionality
@@ -171,427 +54,35 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
     }
   };
 
-  // Mobile video control handlers
-  const handleVideoToggle = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (videoRef.current) {
-      if (videoRef.current.paused) {
-        videoRef.current.play().catch(console.error);
-        setIsVideoPlaying(true);
-      } else {
-        videoRef.current.pause();
-        setIsVideoPlaying(false);
-      }
-    }
-  };
-
-  const handleMuteToggle = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (videoRef.current) {
-      videoRef.current.muted = !videoRef.current.muted;
-      setIsVideoMuted(videoRef.current.muted);
-    }
-  };
-
-  const handlePrevMedia = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setCurrentMediaIndex(prev => prev > 0 ? prev - 1 : post.post_media.length - 1);
-  };
-
-  const handleNextMedia = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setCurrentMediaIndex(prev => prev < post.post_media.length - 1 ? prev + 1 : 0);
-  };
-
-  // Create carousel items from media
-  const carouselItems = (shouldAutoplay: boolean) => post.post_media?.map((media, index) => (
-    <div key={media.id} className="w-full aspect-square relative">
-      {/* Golf Course Badge overlay on each media item */}
-      {golfCourse && (
-        <div className="absolute top-2 right-2 z-10">
-          <CoursePostBadge 
-            course={{
-              id: golfCourse.id,
-              name: golfCourse.name,
-              country: golfCourse.country,
-              region: golfCourse.region
-            }}
-            className="m-0"
-          />
-        </div>
-      )}
-      
-      {media.media_type === 'image' ? (
-        <img
-          src={media.media_url}
-          alt="Post content"
-          className="w-full h-full object-cover object-center cursor-pointer"
-          loading="lazy"
-          onClick={() => handleMediaClick(media.media_url, 'image')}
-        />
-      ) : (
-        <VideoPlayer
-          src={media.media_url}
-          autoplay={shouldAutoplay}
-          muted={true}
-          loop={true}
-          className="w-full h-full"
-          showVideoIcon={true}
-          showOverlayControls={false}
-          onClick={() => handleMediaClick(media.media_url, 'video')}
-          videoId={`carousel-${media.id}`}
-        />
-      )}
-    </div>
-  )) || [];
-
-  const PostContent = () => {
-    const { ref: autoplayRef, shouldAutoplay, handleMouseEnter, handleMouseLeave } = useVideoAutoplay({
-      enabled: true,
-      threshold: 0.3,
-      rootMargin: '0px'
-    });
-
-    return (
-      <Card ref={autoplayRef} className="border-0 shadow-sm">
-        <div className="p-4" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
-          {/* Post Header */}
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center space-x-3">
-                <LazyImage
-                  src={post.user.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
-                  alt={displayName}
-                  className="w-16 h-16 rounded-[14px] border-2 border-gray-200 cursor-pointer hover:opacity-80 transition-opacity"
-                  width={64}
-                  height={64}
-                  onClick={handleProfileClick}
-                />
-              <div>
-                <div className="flex items-center space-x-1">
-                  <span 
-                    className="font-semibold text-sm cursor-pointer hover:text-gray-400 transition-colors"
-                    onClick={handleProfileClick}
-                  >
-                    {displayName}
-                  </span>
-                </div>
-                <span className="text-xs text-muted-foreground">{timeAgo}</span>
-              </div>
-            </div>
-            
-            {isOwnPost && (
-              <DropdownMenu modal={false}>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="hover:bg-muted">
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent 
-                  align="end" 
-                  className="w-48 bg-background border shadow-lg z-[100]"
-                  sideOffset={5}
-                  avoidCollisions={true}
-                >
-                  <DropdownMenuItem 
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setEditDialogOpen(true);
-                    }}
-                    className="cursor-pointer"
-                  >
-                    <Edit className="h-4 w-4 mr-2" />
-                    Edit Post
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      handleDeletePost();
-                    }}
-                    className="text-destructive cursor-pointer focus:text-destructive focus:bg-destructive/10"
-                  >
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Delete Post
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
-          </div>
-
-          {/* Post Content with Tagged Text */}
-          {post.content && (
-            <div className="text-sm mb-3">
-              <TaggedText text={post.content} tags={post.post_tags} />
-            </div>
-          )}
-
-          {/* Post Media using SwipeCarousel */}
-          {post.post_media && post.post_media.length > 0 && (
-            <div className="mb-3">
-              <div className="rounded-lg overflow-hidden">
-                <SwipeCarousel
-                  items={carouselItems(shouldAutoplay)}
-                  showDots={carouselItems(shouldAutoplay).length > 1}
-                  showArrows={false}
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Post Actions */}
-          <div className="flex items-center space-x-4 pt-2 border-t">
-            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-red-500">
-              <Heart className="h-4 w-4 mr-1" />
-              Like
-            </Button>
-            <Button variant="ghost" size="sm" className="text-muted-foreground">
-              <MessageCircle className="h-4 w-4 mr-1" />
-              Comment
-            </Button>
-            <Button variant="ghost" size="sm" className="text-muted-foreground">
-              <Share className="h-4 w-4 mr-1" />
-              Share
-            </Button>
-          </div>
-        </div>
-      </Card>
-    );
-  };
-
-  // Mobile Instagram-style layout
-  const MobileInstagramPost = () => {
-    const [isHovered, setIsHovered] = useState(false);
-    
-    // Add intersection observer for scroll-based autoplay
-    const { ref: containerRef, isInView } = useIntersectionObserver({
-      threshold: 0.5,
-      rootMargin: '0px'
-    });
-
-    // Swipe handlers for media navigation
-    const swipeHandlers = useSwipeable({
-      onSwipedLeft: (eventData) => {
-        if (post.post_media.length > 1) {
-          eventData.event.preventDefault();
-          eventData.event.stopPropagation();
-          setCurrentMediaIndex(prev => prev < post.post_media.length - 1 ? prev + 1 : 0);
-        }
-      },
-      onSwipedRight: (eventData) => {
-        if (post.post_media.length > 1) {
-          eventData.event.preventDefault();
-          eventData.event.stopPropagation();
-          setCurrentMediaIndex(prev => prev > 0 ? prev - 1 : post.post_media.length - 1);
-        }
-      },
-      onSwiping: (eventData) => {
-        if (post.post_media.length > 1) {
-          eventData.event.preventDefault();
-          eventData.event.stopPropagation();
-        }
-      },
-      preventScrollOnSwipe: true,
-      trackMouse: false,
-      trackTouch: true,
-      delta: 50,
-      touchEventOptions: { passive: false }
-    });
-
-    // Auto-hover for videos when in view to trigger autoplay
-    useEffect(() => {
-      if (isInView && post.post_media?.[currentMediaIndex]?.media_type === 'video') {
-        setIsHovered(true);
-      } else {
-        setIsHovered(false);
-      }
-    }, [isInView, currentMediaIndex, post.post_media]);
-
-    if (!post.post_media || post.post_media.length === 0) {
-      return (
-        <div className="bg-background p-4 border-b">
-          <div className="flex items-center space-x-3 mb-3">
-            <LazyImage
-              src={post.user.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
-              alt={displayName}
-              className="w-8 h-8 rounded-full cursor-pointer"
-              width={32}
-              height={32}
-              onClick={handleProfileClick}
-            />
-            <div className="text-sm">
-              <span className="font-semibold cursor-pointer" onClick={handleProfileClick}>
-                {displayName}
-              </span>
-              <span className="ml-2">{post.content}</span>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    const currentMedia = post.post_media[currentMediaIndex];
-    
-    return (
-      <div 
-        ref={containerRef}
-        className="relative w-full bg-black"
-        onTouchStart={() => setIsHovered(true)}
-        onTouchEnd={() => setIsHovered(false)}
-      >
-        {/* Media Container - Full width, responsive height */}
-        <div 
-          {...swipeHandlers}
-          className="relative w-full aspect-[4/5] cursor-pointer" 
-          onClick={() => handleMediaClick(currentMedia.media_url, currentMedia.media_type)}
-        >
-          {currentMedia.media_type === 'video' ? (
-            <VideoPlayer
-              src={currentMedia.media_url}
-              autoplay={isHovered}
-              muted={true}
-              loop={true}
-              className="w-full h-full"
-              showVideoIcon={false}
-              showOverlayControls={false}
-              videoId={`mobile-${currentMedia.id}`}
-            />
-          ) : (
-            <LazyImage
-              src={currentMedia.media_url}
-              alt="Post content"
-              className="w-full h-full object-cover"
-            />
-          )}
-
-          {/* User Info Overlay - Top Left - Streamlined */}
-          <div className="absolute top-3 left-2.5 flex items-center space-x-2 z-20">
-            <div className="bg-black/40 backdrop-blur-sm rounded-full p-1.5 flex items-center space-x-2 max-w-[140px]">
-              <LazyImage
-                src={post.user.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
-                alt={displayName}
-                className="w-6 h-6 rounded-full border border-white/20 cursor-pointer flex-shrink-0"
-                width={24}
-                height={24}
-                onClick={() => {
-                  handleProfileClick();
-                }}
-              />
-              <div className="text-white text-xs min-w-0">
-                <div 
-                  className="font-semibold cursor-pointer hover:opacity-80 leading-tight whitespace-nowrap overflow-hidden text-ellipsis"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleProfileClick();
-                  }}
-                  title={displayName}
-                >
-                  {displayName}
-                </div>
-                <div className="text-xs opacity-80 leading-tight whitespace-nowrap overflow-hidden text-ellipsis">
-                  @{post.user.username}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Location Tag - Top Right */}
-          {golfCourse && (
-            <div className="absolute top-3 right-3 z-20">
-              <CoursePostBadge 
-                course={{
-                  id: golfCourse.id,
-                  name: golfCourse.name,
-                  country: golfCourse.country,
-                  region: golfCourse.region
-                }}
-                className="bg-black/40 backdrop-blur-sm border border-white/20 text-xs"
-              />
-            </div>
-          )}
-
-          {/* Multi-media navigation - dots indicator only on mobile */}
-          {post.post_media.length > 1 && (
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-20">
-              {post.post_media.map((_, index) => (
-                <div
-                  key={index}
-                  className={`w-2 h-2 rounded-full transition-all ${
-                    index === currentMediaIndex ? 'bg-white' : 'bg-white/40'
-                  }`}
-                />
-              ))}
-            </div>
-          )}
-
-          {/* Engagement Icons - Bottom Right */}
-          <div className="absolute bottom-4 right-4 flex flex-col space-y-3 z-20">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-sm text-white hover:bg-black/60 hover:text-red-500 transition-all"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <Heart className="h-5 w-5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-sm text-white hover:bg-black/60 transition-all"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <MessageCircle className="h-5 w-5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="w-12 h-12 rounded-full bg-black/40 backdrop-blur-sm text-white hover:bg-black/60 transition-all"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <Share className="h-5 w-5" />
-            </Button>
-          </div>
-        </div>
-
-        {/* Caption & Comments Area - Below Media */}
-        {post.content && (
-          <div className="bg-background p-4 border-b">
-            <div className="text-sm">
-              <div className="mb-1">
-                <span className="font-semibold cursor-pointer hover:opacity-80" onClick={handleProfileClick}>
-                  {displayName}
-                </span>
-                <span className="text-muted-foreground text-xs ml-1">
-                  · {timeAgo}
-                </span>
-              </div>
-              <div>{post.content}</div>
-            </div>
-            
-            <div className="mt-3 space-y-2 text-sm text-muted-foreground">
-              <div>View all comments</div>
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  };
-
   return (
     <>
-      {isMobile ? <MobileInstagramPost /> : <PostContent />}
-
-      <EditPostDialog 
-        open={editDialogOpen}
-        onOpenChange={setEditDialogOpen}
-        post={post}
-        onPostUpdated={onPostUpdated}
-      />
+      {isMobile ? (
+        <MobileUserPost
+          post={post}
+          displayName={displayName}
+          timeAgo={timeAgo}
+          golfCourse={golfCourse}
+          onProfileClick={handleProfileClick}
+          onMediaClick={handleMediaClick}
+        />
+      ) : (
+        <DesktopUserPost
+          post={post}
+          displayName={displayName}
+          timeAgo={timeAgo}
+          isOwnPost={isOwnPost}
+          golfCourse={golfCourse}
+          onProfileClick={handleProfileClick}
+          onDeletePost={handleDeletePost}
+          onPostUpdated={onPostUpdated}
+          onMediaClick={handleMediaClick}
+        />
+      )}
 
       {/* Post Viewer Modal for clubhouse and profile sources */}
       {(source === 'clubhouse' || source === 'profile') && currentPost && (
         <PostViewerModal
-          isOpen={isOpen}
+          isOpen={isPostViewerOpen}
           onClose={closePostViewer}
           initialPost={currentPost}
           allUserPosts={viewerPosts}
