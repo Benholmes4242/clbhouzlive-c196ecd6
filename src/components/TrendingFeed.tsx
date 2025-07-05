@@ -4,6 +4,7 @@ import PostCard from './feed/PostCard';
 import UserPost from './posts/UserPost';
 import OptimisticPostCard from './posts/OptimisticPostCard';
 import LoadingSkeleton from './feed/LoadingSkeleton';
+import { VideoAutoplayProvider } from '@/hooks/useVideoAutoplayManager';
 import { useUserPosts } from '@/hooks/useUserPosts';
 import { useOptimisticPosts } from '@/hooks/useOptimisticPosts';
 import { useExternalVideos } from '@/hooks/useExternalVideos';
@@ -237,47 +238,49 @@ const TrendingFeed = () => {
   }
 
   return (
-    <div className="space-y-6 pb-20">
-      {/* Show optimistic posts first */}
-      {optimisticPosts.map((optimisticPost) => (
-        <OptimisticPostCard 
-          key={optimisticPost.id} 
-          post={optimisticPost}
-          onRetry={() => {
-            // Handle retry logic here if needed
-            console.log('Retry upload for:', optimisticPost.id);
-          }}
-        />
-      ))}
-      
-      {/* Show actual posts */}
-      {sortedContent.map((item) => (
-        item.type === 'user_post' ? (
-          <UserPost 
-            key={item.id} 
-            post={item} 
-            onPostUpdated={() => {
-              console.log('Post updated, refreshing feeds');
-              refetchUserPosts();
-              refetchFollowedPosts();
-            }}
-            onPostDeleted={() => {
-              console.log('Post deleted, refreshing feeds');
-              refetchUserPosts();
-              refetchFollowedPosts();
+    <VideoAutoplayProvider>
+      <div className="space-y-6 pb-20">
+        {/* Show optimistic posts first */}
+        {optimisticPosts.map((optimisticPost) => (
+          <OptimisticPostCard 
+            key={optimisticPost.id} 
+            post={optimisticPost}
+            onRetry={() => {
+              // Handle retry logic here if needed
+              console.log('Retry upload for:', optimisticPost.id);
             }}
           />
-        ) : (
-          <PostCard 
-            key={item.id} 
-            post={{
-              ...item,
-              golfClubTags: item.golfClubTags || []
-            }} 
-          />
-        )
-      ))}
-    </div>
+        ))}
+        
+        {/* Show actual posts */}
+        {sortedContent.map((item) => (
+          item.type === 'user_post' ? (
+            <UserPost 
+              key={item.id} 
+              post={item} 
+              onPostUpdated={() => {
+                console.log('Post updated, refreshing feeds');
+                refetchUserPosts();
+                refetchFollowedPosts();
+              }}
+              onPostDeleted={() => {
+                console.log('Post deleted, refreshing feeds');
+                refetchUserPosts();
+                refetchFollowedPosts();
+              }}
+            />
+          ) : (
+            <PostCard 
+              key={item.id} 
+              post={{
+                ...item,
+                golfClubTags: item.golfClubTags || []
+              }} 
+            />
+          )
+        ))}
+      </div>
+    </VideoAutoplayProvider>
   );
 };
 

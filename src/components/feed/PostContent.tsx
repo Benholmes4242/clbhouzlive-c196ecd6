@@ -3,6 +3,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Play, Pause, Maximize2 } from 'lucide-react';
 import { SwipeCarousel } from '@/components/ui/swipe-carousel';
 import CoursePostBadge from '../posts/CoursePostBadge';
+import VideoPreview from '../posts/VideoPreview';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { useFullscreenMedia } from '@/hooks/useFullscreenMedia';
 import LazyImage from '@/components/ui/lazy-image';
@@ -213,15 +214,11 @@ const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentPr
                 onMouseEnter={() => setShowControls(true)}
                 onMouseLeave={() => setShowControls(false)}
               >
-                <video
-                  ref={videoRef}
+                <VideoPreview
                   src={content.videoUrl}
+                  videoId={`post-content-${content.videoUrl.split('/').pop()}`}
                   className="w-full h-80 object-cover object-center cursor-pointer"
-                  onClick={handleVideoClick}
-                  muted
-                  loop
-                  playsInline
-                  preload="metadata"
+                  isGridThumbnail={false}
                 />
                 
                 {/* Golf Course Badge overlay on video */}
@@ -252,20 +249,6 @@ const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentPr
                   </div>
                 )}
                 
-                {/* Video Controls Overlay */}
-                <div className={`absolute inset-0 flex items-center justify-center transition-opacity ${showControls || !isPlaying ? 'opacity-100' : 'opacity-0'}`}>
-                  <div 
-                    className="bg-white/90 rounded-full p-3 hover:scale-110 transition-transform cursor-pointer"
-                    onClick={handleVideoClick}
-                  >
-                    {isPlaying ? (
-                      <Pause className="h-6 w-6 text-green-600" />
-                    ) : (
-                      <Play className="h-6 w-6 text-green-600 fill-current" />
-                    )}
-                  </div>
-                </div>
-
                 {/* Fullscreen Button */}
                 <div className={`absolute top-2 left-2 transition-opacity ${showControls ? 'opacity-100' : 'opacity-0'}`}>
                   <button

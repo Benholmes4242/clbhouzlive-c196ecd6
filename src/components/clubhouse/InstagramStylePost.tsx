@@ -153,14 +153,11 @@ const InstagramStylePost: React.FC<InstagramStylePostProps> = ({ post, allUserPo
         {/* Media Container - Full width, responsive height */}
         <div className="relative w-full aspect-[4/5] md:aspect-[3/4] cursor-pointer" onClick={handleMediaClick}>
           {currentMedia.media_type === 'video' ? (
-            <video
-              ref={videoRef}
+            <VideoPreview
               src={currentMedia.media_url}
+              videoId={`instagram-post-${post.id}-${currentMediaIndex}`}
               className="w-full h-full object-cover"
-              muted={isVideoMuted}
-              loop
-              playsInline
-              preload="metadata"
+              isGridThumbnail={false}
             />
           ) : (
             <LazyImage
