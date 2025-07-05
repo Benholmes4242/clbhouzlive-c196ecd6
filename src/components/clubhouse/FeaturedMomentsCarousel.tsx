@@ -3,6 +3,7 @@ import React from 'react';
 import { Clock, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import VideoPreview from '@/components/posts/VideoPreview';
 import { formatDistanceToNow } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -147,19 +148,38 @@ const FeaturedMomentsCarousel = ({ userPosts = [], loading = false }: FeaturedMo
                       onClick={() => navigate(`/profile/${moment.userProfile.username}`)}
                     />
                     <div className="flex-1 min-w-0">
-                      <h4 
-                        className="text-sm font-medium cursor-pointer hover:text-gray-400 transition-colors truncate"
-                        onClick={() => navigate(`/profile/${moment.userProfile.username}`)}
-                      >
-                        {moment.displayName}
-                      </h4>
+                      <TooltipProvider delayDuration={300}>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <h4 
+                              className="text-sm font-medium cursor-pointer hover:text-gray-400 transition-colors truncate max-w-full"
+                              onClick={() => navigate(`/profile/${moment.userProfile.username}`)}
+                            >
+                              {moment.displayName}
+                            </h4>
+                          </TooltipTrigger>
+                          <TooltipContent className="hidden md:block">
+                            <p>{moment.displayName}</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                      
                       <div className="flex items-center gap-1 text-xs text-muted-foreground">
-                        <span 
-                          className="cursor-pointer hover:text-foreground transition-colors"
-                          onClick={() => navigate(`/profile/${moment.userProfile.username}`)}
-                        >
-                          @{moment.user}
-                        </span>
+                        <TooltipProvider delayDuration={300}>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <span 
+                                className="cursor-pointer hover:text-foreground transition-colors truncate max-w-20"
+                                onClick={() => navigate(`/profile/${moment.userProfile.username}`)}
+                              >
+                                @{moment.user}
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent className="hidden md:block">
+                              <p>@{moment.user}</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                         <span>•</span>
                         <div className="flex items-center gap-1">
                           <Clock className="h-3 w-3" />

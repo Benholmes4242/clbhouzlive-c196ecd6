@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import VideoPreview from '@/components/posts/VideoPreview';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useProfileActions } from '@/components/profile/actions/useProfileActions';
@@ -191,21 +192,39 @@ const GolferCard: React.FC<GolferCardProps> = ({ golfer, currentUserId, isMobile
               onClick={handleProfileClick}
             />
             <div className="flex-1 min-w-0">
-              <h3 
-                className="text-white font-semibold text-sm leading-tight cursor-pointer hover:text-white/80 transition-colors truncate" 
-                onClick={handleProfileClick}
-                title={displayName}
-              >
-                {displayName}
-              </h3>
-              <div className="text-white/80 text-xs truncate" title={`@${username}`}>
-                <span 
-                  className="cursor-pointer hover:text-white/60 transition-colors"
-                  onClick={handleProfileClick}
-                >
-                  @{username}
-                </span>
-              </div>
+              <TooltipProvider delayDuration={300}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <h3 
+                      className="text-white font-semibold text-sm leading-tight cursor-pointer hover:text-white/80 transition-colors truncate max-w-full" 
+                      onClick={handleProfileClick}
+                    >
+                      {displayName}
+                    </h3>
+                  </TooltipTrigger>
+                  <TooltipContent className="hidden md:block">
+                    <p>{displayName}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              
+              <TooltipProvider delayDuration={300}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="text-white/80 text-xs truncate max-w-full">
+                      <span 
+                        className="cursor-pointer hover:text-white/60 transition-colors"
+                        onClick={handleProfileClick}
+                      >
+                        @{username}
+                      </span>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent className="hidden md:block">
+                    <p>@{username}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
           </div>
         </div>
