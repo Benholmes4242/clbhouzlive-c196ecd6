@@ -60,10 +60,11 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
   const [selectedTags, setSelectedTags] = useState<TaggableEntity[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const { entities, searchEntities } = useTaggableEntities();
+  const [isInitialized, setIsInitialized] = useState(false);
 
   // Reset state when modal opens/closes
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && !isInitialized) {
       if (editMode) {
         setCaption(initialCaption);
         setSelectedTags(initialTags);
@@ -73,8 +74,11 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
         setSelectedTags([]);
         setFiles(initialFiles);
       }
+      setIsInitialized(true);
+    } else if (!isOpen) {
+      setIsInitialized(false);
     }
-  }, [isOpen, initialFiles, editMode, initialCaption, initialTags]);
+  }, [isOpen, editMode, initialCaption, initialTags, initialFiles, isInitialized]);
 
   // Handle caption input with mention detection
   const handleCaptionChange = async (e: React.ChangeEvent<HTMLTextAreaElement>) => {
