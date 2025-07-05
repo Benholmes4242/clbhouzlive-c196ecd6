@@ -25,7 +25,7 @@ const Header = () => {
               className="h-12 w-auto object-contain"
             />
             <img
-              src={currentLogo?.file_url || "/lovable-uploads/181fd40d-ced5-420c-bff8-27c2ef146377.png"}
+              src={currentLogo?.file_url || "/lovable-uploads/4e825850-f4fd-4fed-90ac-429e1b988009.png"}
               alt="clbhouz Logo"
               className="h-12 w-auto cursor-pointer object-contain hover:opacity-80 transition-opacity"
               onClick={handleLogoClick}

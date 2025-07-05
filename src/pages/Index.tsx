@@ -51,7 +51,7 @@ const Index = () => {
               className="w-auto h-32 object-contain"
             />
             <img
-              src={currentLogo?.file_url || "/lovable-uploads/181fd40d-ced5-420c-bff8-27c2ef146377.png"}
+              src={currentLogo?.file_url || "/lovable-uploads/4e825850-f4fd-4fed-90ac-429e1b988009.png"}
               alt="clbhouz"
               className="w-auto max-h-48 object-contain"
             />
