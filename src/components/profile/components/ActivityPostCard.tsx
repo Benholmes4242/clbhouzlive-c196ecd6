@@ -39,12 +39,9 @@ const ActivityPostCard = ({ post, attributionText, onClick }: ActivityPostCardPr
       {hasMedia && firstMedia ? (
         <>
           {firstMedia.media_type === 'video' ? (
-            <VideoPreview
-              src={firstMedia.media_url}
-              className="w-full h-full rounded-[inherit]"
-              videoId={`activity-${post.id}`}
-              isGridThumbnail={true}
-            />
+            <div className="w-full h-full bg-muted flex items-center justify-center rounded-[inherit]">
+              <span className="text-sm text-muted-foreground">Video unavailable</span>
+            </div>
           ) : (
             <HighQualityImage
               src={firstMedia.media_url}

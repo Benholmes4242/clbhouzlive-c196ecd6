@@ -30,7 +30,6 @@ const EnhancedSocialActivity: React.FC<EnhancedSocialActivityProps> = ({
   }
 
   return (
-    <VideoAutoplayProvider>
       <div className="p-4">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
@@ -54,14 +53,11 @@ const EnhancedSocialActivity: React.FC<EnhancedSocialActivityProps> = ({
                   <div className="w-full h-full">
                     {hasMedia && firstMedia ? (
                       <>
-                        {firstMedia.media_type === 'video' ? (
-                          <VideoPreview
-                            src={firstMedia.media_url}
-                            className="w-full h-full"
-                            videoId={`enhanced-profile-${post.id}`}
-                            isGridThumbnail={true}
-                          />
-                        ) : (
+        {firstMedia.media_type === 'video' ? (
+          <div className="w-full h-full bg-muted flex items-center justify-center">
+            <span className="text-sm text-muted-foreground">Video unavailable</span>
+          </div>
+        ) : (
                           <img
                             src={firstMedia.media_url}
                             alt="Post"
@@ -101,7 +97,6 @@ const EnhancedSocialActivity: React.FC<EnhancedSocialActivityProps> = ({
           </div>
         )}
       </div>
-    </VideoAutoplayProvider>
   );
 };
 
