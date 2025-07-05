@@ -273,112 +273,131 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
     </div>
   )) || [];
 
-  const PostContent = () => (
-    <Card className="border-0 shadow-sm">
-      <div className="p-4">
-        {/* Post Header */}
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center space-x-3">
-              <LazyImage
-                src={post.user.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
-                alt={displayName}
-                className="w-16 h-16 rounded-[14px] border-2 border-gray-200 cursor-pointer hover:opacity-80 transition-opacity"
-                width={64}
-                height={64}
-                onClick={handleProfileClick}
-              />
-            <div>
-              <div className="flex items-center space-x-1">
-                <span 
-                  className="font-semibold text-sm cursor-pointer hover:text-gray-400 transition-colors"
+  const PostContent = () => {
+    const [isHovered, setIsHovered] = useState(false);
+    
+    // Add intersection observer for scroll-based autoplay on desktop too
+    const { ref: postRef, isInView } = useIntersectionObserver({
+      threshold: 0.5,
+      rootMargin: '0px'
+    });
+
+    // Auto-hover for videos when in view to trigger autoplay on desktop
+    useEffect(() => {
+      if (isInView && post.post_media?.some(media => media.media_type === 'video')) {
+        setIsHovered(true);
+      } else {
+        setIsHovered(false);
+      }
+    }, [isInView, post.post_media]);
+
+    return (
+      <Card ref={postRef} className="border-0 shadow-sm">
+        <div className="p-4">
+          {/* Post Header */}
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center space-x-3">
+                <LazyImage
+                  src={post.user.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
+                  alt={displayName}
+                  className="w-16 h-16 rounded-[14px] border-2 border-gray-200 cursor-pointer hover:opacity-80 transition-opacity"
+                  width={64}
+                  height={64}
                   onClick={handleProfileClick}
-                >
-                  {displayName}
-                </span>
+                />
+              <div>
+                <div className="flex items-center space-x-1">
+                  <span 
+                    className="font-semibold text-sm cursor-pointer hover:text-gray-400 transition-colors"
+                    onClick={handleProfileClick}
+                  >
+                    {displayName}
+                  </span>
+                </div>
+                <span className="text-xs text-muted-foreground">{timeAgo}</span>
               </div>
-              <span className="text-xs text-muted-foreground">{timeAgo}</span>
             </div>
+            
+            {isOwnPost && (
+              <DropdownMenu modal={false}>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="hover:bg-muted">
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent 
+                  align="end" 
+                  className="w-48 bg-background border shadow-lg z-[100]"
+                  sideOffset={5}
+                  avoidCollisions={true}
+                >
+                  <DropdownMenuItem 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setEditDialogOpen(true);
+                    }}
+                    className="cursor-pointer"
+                  >
+                    <Edit className="h-4 w-4 mr-2" />
+                    Edit Post
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleDeletePost();
+                    }}
+                    disabled={isDeleting}
+                    className="text-destructive cursor-pointer focus:text-destructive focus:bg-destructive/10"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    {isDeleting ? 'Deleting...' : 'Delete Post'}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
-          
-          {isOwnPost && (
-            <DropdownMenu modal={false}>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="hover:bg-muted">
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent 
-                align="end" 
-                className="w-48 bg-background border shadow-lg z-[100]"
-                sideOffset={5}
-                avoidCollisions={true}
-              >
-                <DropdownMenuItem 
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setEditDialogOpen(true);
-                  }}
-                  className="cursor-pointer"
-                >
-                  <Edit className="h-4 w-4 mr-2" />
-                  Edit Post
-                </DropdownMenuItem>
-                <DropdownMenuItem 
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleDeletePost();
-                  }}
-                  disabled={isDeleting}
-                  className="text-destructive cursor-pointer focus:text-destructive focus:bg-destructive/10"
-                >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  {isDeleting ? 'Deleting...' : 'Delete Post'}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+
+          {/* Post Content with Tagged Text */}
+          {post.content && (
+            <div className="text-sm mb-3">
+              <TaggedText text={post.content} tags={post.post_tags} />
+            </div>
           )}
-        </div>
 
-        {/* Post Content with Tagged Text */}
-        {post.content && (
-          <div className="text-sm mb-3">
-            <TaggedText text={post.content} tags={post.post_tags} />
-          </div>
-        )}
-
-        {/* Post Media using SwipeCarousel */}
-        {carouselItems.length > 0 && (
-          <div className="mb-3">
-            <div className="rounded-lg overflow-hidden">
-              <SwipeCarousel
-                items={carouselItems}
-                showDots={carouselItems.length > 1}
-                showArrows={false}
-              />
+          {/* Post Media using SwipeCarousel */}
+          {carouselItems.length > 0 && (
+            <div className="mb-3">
+              <div className="rounded-lg overflow-hidden">
+                <SwipeCarousel
+                  items={carouselItems}
+                  showDots={carouselItems.length > 1}
+                  showArrows={false}
+                />
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Post Actions */}
-        <div className="flex items-center space-x-4 pt-2 border-t">
-          <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-red-500">
-            <Heart className="h-4 w-4 mr-1" />
-            Like
-          </Button>
-          <Button variant="ghost" size="sm" className="text-muted-foreground">
-            <MessageCircle className="h-4 w-4 mr-1" />
-            Comment
-          </Button>
-          <Button variant="ghost" size="sm" className="text-muted-foreground">
-            <Share className="h-4 w-4 mr-1" />
-            Share
-          </Button>
+          {/* Post Actions */}
+          <div className="flex items-center space-x-4 pt-2 border-t">
+            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-red-500">
+              <Heart className="h-4 w-4 mr-1" />
+              Like
+            </Button>
+            <Button variant="ghost" size="sm" className="text-muted-foreground">
+              <MessageCircle className="h-4 w-4 mr-1" />
+              Comment
+            </Button>
+            <Button variant="ghost" size="sm" className="text-muted-foreground">
+              <Share className="h-4 w-4 mr-1" />
+              Share
+            </Button>
+          </div>
         </div>
-      </div>
-    </Card>
-  );
+      </Card>
+    );
+  };
 
   // Mobile Instagram-style layout
   const MobileInstagramPost = () => {
@@ -389,6 +408,15 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
       threshold: 0.5,
       rootMargin: '0px'
     });
+
+    // Auto-hover for videos when in view to trigger autoplay
+    useEffect(() => {
+      if (isInView && post.post_media?.[currentMediaIndex]?.media_type === 'video') {
+        setIsHovered(true);
+      } else {
+        setIsHovered(false);
+      }
+    }, [isInView, currentMediaIndex, post.post_media]);
 
     if (!post.post_media || post.post_media.length === 0) {
       return (
