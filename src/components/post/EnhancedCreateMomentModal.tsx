@@ -112,19 +112,13 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
       return;
     }
     
-    const words = caption.split(' ');
-    const lastWordIndex = words.length - 1;
+    // Use regex to replace the last @ mention
+    const mentionRegex = /@(\w+)$/;
+    const displayName = entity.username || entity.name;
+    const newCaption = caption.replace(mentionRegex, `@${displayName} `);
     
-    if (words[lastWordIndex].startsWith('@')) {
-      // Replace the @partial with @username
-      const displayName = entity.username || entity.name;
-      words[lastWordIndex] = `@${displayName}`;
-      const newCaption = words.join(' ') + ' ';
-      
-      setCaption(newCaption);
-      setSelectedTags(prev => [...prev, entity]);
-    }
-    
+    setCaption(newCaption);
+    setSelectedTags(prev => [...prev, entity]);
     setShowSuggestions(false);
   };
 
