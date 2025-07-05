@@ -9,6 +9,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useSwipeable } from 'react-swipeable';
 import {
   ContextMenu,
   ContextMenuContent,
@@ -403,6 +404,24 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
       rootMargin: '0px'
     });
 
+    // Swipe handlers for media navigation
+    const swipeHandlers = useSwipeable({
+      onSwipedLeft: () => {
+        if (post.post_media.length > 1) {
+          setCurrentMediaIndex(prev => prev < post.post_media.length - 1 ? prev + 1 : 0);
+        }
+      },
+      onSwipedRight: () => {
+        if (post.post_media.length > 1) {
+          setCurrentMediaIndex(prev => prev > 0 ? prev - 1 : post.post_media.length - 1);
+        }
+      },
+      preventScrollOnSwipe: true,
+      trackMouse: false,
+      trackTouch: true,
+      delta: 50
+    });
+
     // Auto-hover for videos when in view to trigger autoplay
     useEffect(() => {
       if (isInView && post.post_media?.[currentMediaIndex]?.media_type === 'video') {
@@ -445,7 +464,11 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
         onTouchEnd={() => setIsHovered(false)}
       >
         {/* Media Container - Full width, responsive height */}
-        <div className="relative w-full aspect-[4/5] cursor-pointer" onClick={() => handleMediaClick(currentMedia.media_url, currentMedia.media_type)}>
+        <div 
+          {...swipeHandlers}
+          className="relative w-full aspect-[4/5] cursor-pointer" 
+          onClick={() => handleMediaClick(currentMedia.media_url, currentMedia.media_type)}
+        >
           {currentMedia.media_type === 'video' ? (
             <VideoPlayer
               src={currentMedia.media_url}
@@ -509,38 +532,18 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
             </div>
           )}
 
-          {/* Multi-media navigation */}
+          {/* Multi-media navigation - dots indicator only on mobile */}
           {post.post_media.length > 1 && (
-            <>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 backdrop-blur-sm text-white hover:bg-black/60 z-20"
-                onClick={handlePrevMedia}
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 backdrop-blur-sm text-white hover:bg-black/60 z-20"
-                onClick={handleNextMedia}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-
-              {/* Dots indicator */}
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-20">
-                {post.post_media.map((_, index) => (
-                  <div
-                    key={index}
-                    className={`w-2 h-2 rounded-full transition-all ${
-                      index === currentMediaIndex ? 'bg-white' : 'bg-white/40'
-                    }`}
-                  />
-                ))}
-              </div>
-            </>
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-20">
+              {post.post_media.map((_, index) => (
+                <div
+                  key={index}
+                  className={`w-2 h-2 rounded-full transition-all ${
+                    index === currentMediaIndex ? 'bg-white' : 'bg-white/40'
+                  }`}
+                />
+              ))}
+            </div>
           )}
 
           {/* Engagement Icons - Bottom Right */}

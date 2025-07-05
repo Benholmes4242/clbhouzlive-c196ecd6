@@ -8,6 +8,8 @@ import { supabase } from '@/integrations/supabase/client';
 import CoursePostBadge from '@/components/posts/CoursePostBadge';
 import VideoPlayer from '@/components/ui/video-player';
 import { useVideoAutoplay } from '@/hooks/useVideoAutoplay';
+import { useSwipeable } from 'react-swipeable';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 import LazyImage from '@/components/ui/lazy-image';
 import PostViewerModal from '@/components/posts/PostViewerModal';
@@ -49,6 +51,7 @@ interface InstagramStylePostProps {
 const InstagramStylePost: React.FC<InstagramStylePostProps> = ({ post, allUserPosts = [] }) => {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
+  const isMobile = useIsMobile();
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   const [isVideoMuted, setIsVideoMuted] = useState(true);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
@@ -64,6 +67,24 @@ const InstagramStylePost: React.FC<InstagramStylePostProps> = ({ post, allUserPo
   const displayName = post.user.display_name || post.user.username || 'User';
   const timeAgo = formatDistanceToNow(new Date(post.created_at), { addSuffix: true });
   const golfClubTags = post.post_tags?.filter(tag => tag.entity_type === 'golf_club') || [];
+
+  // Swipe handlers for media navigation
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: () => {
+      if (post.post_media.length > 1) {
+        setCurrentMediaIndex(prev => prev < post.post_media.length - 1 ? prev + 1 : 0);
+      }
+    },
+    onSwipedRight: () => {
+      if (post.post_media.length > 1) {
+        setCurrentMediaIndex(prev => prev > 0 ? prev - 1 : post.post_media.length - 1);
+      }
+    },
+    preventScrollOnSwipe: true,
+    trackMouse: false,
+    trackTouch: true,
+    delta: 50
+  });
 
   // Fetch golf course details
   useEffect(() => {
@@ -156,7 +177,11 @@ const InstagramStylePost: React.FC<InstagramStylePostProps> = ({ post, allUserPo
     <>
       <div ref={autoplayRef} className="relative w-full bg-black" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
         {/* Media Container - Full width, responsive height */}
-        <div className="relative w-full aspect-[4/5] md:aspect-[3/4] cursor-pointer" onClick={handleMediaClick}>
+        <div 
+          {...swipeHandlers}
+          className="relative w-full aspect-[4/5] md:aspect-[3/4] cursor-pointer" 
+          onClick={handleMediaClick}
+        >
           {currentMedia.media_type === 'video' ? (
             <VideoPlayer
               src={currentMedia.media_url}
@@ -245,25 +270,29 @@ const InstagramStylePost: React.FC<InstagramStylePostProps> = ({ post, allUserPo
             </>
           )}
 
-          {/* Multi-image navigation */}
+          {/* Multi-image navigation - only show arrows on desktop */}
           {post.post_media.length > 1 && (
             <>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 backdrop-blur-sm text-white hover:bg-black/60 z-20"
-                onClick={handlePrevMedia}
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 backdrop-blur-sm text-white hover:bg-black/60 z-20"
-                onClick={handleNextMedia}
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
+              {!isMobile && (
+                <>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 backdrop-blur-sm text-white hover:bg-black/60 z-20"
+                    onClick={handlePrevMedia}
+                  >
+                    <ChevronLeft className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 backdrop-blur-sm text-white hover:bg-black/60 z-20"
+                    onClick={handleNextMedia}
+                  >
+                    <ChevronRight className="h-4 w-4" />
+                  </Button>
+                </>
+              )}
 
               {/* Dots indicator */}
               <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-20">
