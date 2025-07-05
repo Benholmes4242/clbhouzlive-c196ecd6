@@ -232,16 +232,12 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
             <div className="relative w-full h-full flex items-center justify-center">
               {item.type === 'video' ? (
                 <div className="relative w-full h-full">
-                  <video
-                    ref={(el) => {
-                      if (el) videoRefs.current[index] = el;
-                    }}
+                  {/* Always show thumbnail first, video plays when autoplay triggers */}
+                  <VideoPreview
                     src={item.src}
+                    videoId={`vertical-feed-${item.id}`}
                     className="w-full h-full object-cover"
-                    muted={isMuted}
-                    loop
-                    playsInline
-                    controls={false}
+                    isGridThumbnail={false}
                   />
                   
                   {/* Golf Course Badge */}

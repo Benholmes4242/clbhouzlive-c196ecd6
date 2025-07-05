@@ -132,7 +132,7 @@ const GolferCard: React.FC<GolferCardProps> = ({ golfer, currentUserId, isMobile
 
   // Intersection observer to detect when card is visible for mobile auto-play
   useEffect(() => {
-    if (!cardRef.current || !isMobile) return;
+    if (!cardRef.current) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -143,7 +143,7 @@ const GolferCard: React.FC<GolferCardProps> = ({ golfer, currentUserId, isMobile
 
     observer.observe(cardRef.current);
     return () => observer.disconnect();
-  }, [isMobile]);
+  }, []);
 
   const handleFollowClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
