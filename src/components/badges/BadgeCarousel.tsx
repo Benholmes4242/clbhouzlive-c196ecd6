@@ -82,48 +82,28 @@ const BadgeCarousel: React.FC<BadgeCarouselProps> = ({
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="engagement" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="engagement" className="text-xs">
-              <Star className="h-3 w-3 mr-1" />
+          <TabsList className="grid w-full grid-cols-2 bg-muted/30 p-1 h-12 rounded-xl">
+            <TabsTrigger 
+              value="engagement" 
+              className="text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-lg transition-all duration-200"
+            >
+              <Trophy className="h-4 w-4 mr-2" />
               Activity
             </TabsTrigger>
-            <TabsTrigger value="top100" className="text-xs">
-              <Target className="h-3 w-3 mr-1" />
+            <TabsTrigger 
+              value="top100" 
+              className="text-sm font-medium data-[state=active]:bg-white data-[state=active]:shadow-sm rounded-lg transition-all duration-200"
+            >
+              <Target className="h-4 w-4 mr-2" />
               Top 100
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="engagement" className="mt-4">
-            <ScrollArea className="w-full">
-              <div className="flex space-x-3 pb-4">
-                {activityBadges.length > 0 ? (
-                  activityBadges.map((badgeProgress) => (
-                    <div key={badgeProgress.badge.id} className="flex-shrink-0">
-                      <BadgeDisplay
-                        badge={badgeProgress.badge}
-                        isEarned={badgeProgress.is_earned}
-                        progress={badgeProgress.current_progress}
-                        showProgress={!showOnlyEarned}
-                        size="md"
-                      />
-                    </div>
-                  ))
-                ) : (
-                  <div className="text-center text-muted-foreground py-8 w-full">
-                    <Star className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                    <p>No activity badges yet</p>
-                    <p className="text-sm">Start engaging with the community to earn badges!</p>
-                  </div>
-                )}
-              </div>
-            </ScrollArea>
-          </TabsContent>
-
-          <TabsContent value="top100" className="mt-4">
-            <ScrollArea className="w-full">
-              <div className="flex space-x-3 pb-4">
-                {top100Badges.map((badgeProgress) => (
-                  <div key={badgeProgress.badge.id} className="flex-shrink-0">
+          <TabsContent value="engagement" className="mt-6">
+            <div className="space-y-3">
+              {activityBadges.length > 0 ? (
+                activityBadges.map((badgeProgress) => (
+                  <div key={badgeProgress.badge.id} className="w-full">
                     <BadgeDisplay
                       badge={badgeProgress.badge}
                       isEarned={badgeProgress.is_earned}
@@ -132,9 +112,31 @@ const BadgeCarousel: React.FC<BadgeCarouselProps> = ({
                       size="md"
                     />
                   </div>
-                ))}
-              </div>
-            </ScrollArea>
+                ))
+              ) : (
+                <div className="text-center text-muted-foreground py-12 w-full">
+                  <Trophy className="h-16 w-16 mx-auto mb-4 opacity-30" />
+                  <p className="text-lg font-medium">No activity badges yet</p>
+                  <p className="text-sm opacity-75 mt-1">Start engaging with the community to earn badges!</p>
+                </div>
+              )}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="top100" className="mt-6">
+            <div className="space-y-3">
+              {top100Badges.map((badgeProgress) => (
+                <div key={badgeProgress.badge.id} className="w-full">
+                  <BadgeDisplay
+                    badge={badgeProgress.badge}
+                    isEarned={badgeProgress.is_earned}
+                    progress={badgeProgress.current_progress}
+                    showProgress={!showOnlyEarned}
+                    size="md"
+                  />
+                </div>
+              ))}
+            </div>
           </TabsContent>
 
         </Tabs>
