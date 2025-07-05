@@ -59,9 +59,6 @@ const GridVideoPreview = ({
             console.error('Grid video playback error:', e, 'src:', src);
             setThumbnailError(true);
           }}
-          onLoadStart={() => console.log('Grid video load started:', src)}
-          onCanPlay={() => console.log('Grid video can play:', src)}
-          onPlay={() => console.log('Grid video playing:', src)}
         />
       )}
 
@@ -77,7 +74,6 @@ const GridVideoPreview = ({
           crossOrigin="anonymous"
           preload="metadata"
           onError={(e) => console.error('Hidden grid video error:', e, 'src:', src)}
-          onLoadedMetadata={() => console.log('Grid video metadata loaded:', src)}
         />
       )}
 

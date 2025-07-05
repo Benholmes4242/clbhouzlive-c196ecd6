@@ -35,7 +35,7 @@ export const useVideoAutoplay = ({
     };
   }
 
-  const { setActiveVideo, isVideoActive } = videoAutoplayManager;
+  const { activeVideoId, setActiveVideo, isVideoActive } = videoAutoplayManager;
   const isMobile = useIsMobile();
   
   // Detect iOS Safari
@@ -62,9 +62,16 @@ export const useVideoAutoplay = ({
     const handlePlay = async () => {
       if (!shouldPlay || isPlaying) return;
 
+      // For grid context, check if another video is already active
+      if (isGridContext && activeVideoId && activeVideoId !== videoId) {
+        console.log(`Video ${videoId} waiting - another video ${activeVideoId} is active`);
+        return;
+      }
+
       try {
         // In grid context, claim this video as active when starting to play
-        if (isGridContext) {
+        if (isGridContext && activeVideoId !== videoId) {
+          console.log(`Setting active video: ${videoId}`);
           setActiveVideo(videoId);
         }
 
@@ -93,6 +100,7 @@ export const useVideoAutoplay = ({
         
         // Release active video if this was it
         if (isGridContext && isVideoActive(videoId)) {
+          console.log(`Releasing active video: ${videoId}`);
           setActiveVideo(null);
         }
       } catch (error) {
@@ -107,7 +115,8 @@ export const useVideoAutoplay = ({
       isInView,
       isHovered,
       isMobile,
-      isGridContext
+      isGridContext,
+      activeVideoId
     });
     
     if (shouldPlay && !isPlaying) {
@@ -122,6 +131,7 @@ export const useVideoAutoplay = ({
         try {
           video.pause();
           if (isGridContext && isVideoActive(videoId)) {
+            console.log(`Cleanup: Releasing active video: ${videoId}`);
             setActiveVideo(null);
           }
         } catch (error) {
@@ -129,7 +139,7 @@ export const useVideoAutoplay = ({
         }
       }
     };
-  }, [isInView, isHovered, videoId, isPlaying, isIOSSafari, isGridContext, isVideoActive, setActiveVideo, isMobile]);
+  }, [isInView, isHovered, videoId, isPlaying, isIOSSafari, isGridContext, isVideoActive, setActiveVideo, isMobile, activeVideoId]);
 
   // Handle video events
   useEffect(() => {
