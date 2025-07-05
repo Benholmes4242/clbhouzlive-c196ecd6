@@ -406,20 +406,31 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
 
     // Swipe handlers for media navigation
     const swipeHandlers = useSwipeable({
-      onSwipedLeft: () => {
+      onSwipedLeft: (eventData) => {
         if (post.post_media.length > 1) {
+          eventData.event.preventDefault();
+          eventData.event.stopPropagation();
           setCurrentMediaIndex(prev => prev < post.post_media.length - 1 ? prev + 1 : 0);
         }
       },
-      onSwipedRight: () => {
+      onSwipedRight: (eventData) => {
         if (post.post_media.length > 1) {
+          eventData.event.preventDefault();
+          eventData.event.stopPropagation();
           setCurrentMediaIndex(prev => prev > 0 ? prev - 1 : post.post_media.length - 1);
+        }
+      },
+      onSwiping: (eventData) => {
+        if (post.post_media.length > 1) {
+          eventData.event.preventDefault();
+          eventData.event.stopPropagation();
         }
       },
       preventScrollOnSwipe: true,
       trackMouse: false,
       trackTouch: true,
-      delta: 50
+      delta: 50,
+      touchEventOptions: { passive: false }
     });
 
     // Auto-hover for videos when in view to trigger autoplay
