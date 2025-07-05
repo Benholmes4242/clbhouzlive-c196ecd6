@@ -76,7 +76,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           {/* Avatar circle with green border, absolutely NO background, shadow, or padding */}
           <div
             className={
-              "w-40 h-40 md:w-52 md:h-52 rounded-[18px] border-4 border-black overflow-hidden flex items-center justify-center object-cover transition-all relative duration-200" +
+              "w-40 h-40 md:w-52 md:h-52 rounded-[18px] border-4 border-gray-400 overflow-hidden flex items-center justify-center object-cover transition-all relative duration-200" +
               (shouldShowClickCursor ? " group-hover:opacity-80" : "")
             }
             style={{
