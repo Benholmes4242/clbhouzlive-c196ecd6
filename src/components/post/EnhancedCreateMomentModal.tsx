@@ -91,10 +91,12 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
     
     if (lastWord.startsWith('@') && lastWord.length > 1) {
       const query = lastWord.substring(1);
+      console.log('Searching for:', query); // Debug log
       setShowSuggestions(true);
       
       try {
         await searchEntities(query);
+        console.log('Search results:', entities); // Debug log
       } catch (error) {
         console.error('Error searching entities:', error);
       }
@@ -198,6 +200,14 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                     </div>
                   </div>
                 ))}
+              </div>
+            )}
+
+            {/* Debug Info - Remove this after fixing */}
+            {showSuggestions && (
+              <div className="absolute top-full left-0 right-0 bg-red-100 border border-red-200 rounded-md p-2 z-40 mt-12 text-xs">
+                <p>Debug: showSuggestions={showSuggestions.toString()}, entities.length={entities.length}</p>
+                <p>Entities: {JSON.stringify(entities.map(e => e.name), null, 2)}</p>
               </div>
             )}
           </div>
