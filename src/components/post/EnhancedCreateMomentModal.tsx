@@ -82,6 +82,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
 
   // Handle caption input with mention detection
   const handleCaptionChange = async (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    console.log('handleCaptionChange called with:', e.target.value); // Debug log
     const text = e.target.value;
     setCaption(text);
 
@@ -89,18 +90,21 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
     const words = text.split(' ');
     const lastWord = words[words.length - 1];
     
+    console.log('Last word:', lastWord, 'Length:', lastWord.length); // Debug log
+    
     if (lastWord.startsWith('@') && lastWord.length > 1) {
       const query = lastWord.substring(1);
-      console.log('Searching for:', query); // Debug log
+      console.log('Mention detected! Searching for:', query); // Debug log
       setShowSuggestions(true);
       
       try {
         await searchEntities(query);
-        console.log('Search results:', entities); // Debug log
+        console.log('Search completed. Entities found:', entities.length); // Debug log
       } catch (error) {
         console.error('Error searching entities:', error);
       }
     } else {
+      console.log('No mention detected, hiding suggestions'); // Debug log
       setShowSuggestions(false);
     }
   };
