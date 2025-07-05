@@ -5,6 +5,7 @@ import { ExploreContentItem } from './types';
 
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { useFullscreenMedia } from '@/hooks/useFullscreenMedia';
+import VideoPlayer from '@/components/ui/video-player';
 
 interface MediaCardProps {
   item: ExploreContentItem;
@@ -111,9 +112,16 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, ...props 
         {/* Square Media Container */}
         <div className="relative w-full h-full overflow-hidden">
           {item.type === 'video' ? (
-            <div className="w-full h-full bg-muted flex items-center justify-center">
-              <span className="text-sm text-muted-foreground">Video unavailable</span>
-            </div>
+            <VideoPlayer
+              src={item.src}
+              autoplay={false}
+              muted={true}
+              loop={true}
+              className="w-full h-full"
+              showVideoIcon={true}
+              showOverlayControls={false}
+              videoId={`explore-${item.id}`}
+            />
           ) : (
             <img
               src={imageError ? fallbackImage : item.src}
