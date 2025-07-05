@@ -200,29 +200,30 @@ const InstagramStylePost: React.FC<InstagramStylePostProps> = ({ post, allUserPo
             />
           )}
 
-          {/* User Info Overlay - Top Left - Made smaller */}
-          <div className="absolute top-3 left-3 flex items-center space-x-2 z-20">
-            <div className="bg-black/40 backdrop-blur-sm rounded-full p-1.5 flex items-center space-x-2">
+          {/* User Info Overlay - Top Left - Streamlined */}
+          <div className="absolute top-3 left-2.5 flex items-center space-x-2 z-20">
+            <div className="bg-black/40 backdrop-blur-sm rounded-full p-1.5 flex items-center space-x-2 max-w-[140px]">
               <LazyImage
                 src={post.user.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
                 alt={displayName}
-                className="w-6 h-6 rounded-full border border-white/20 cursor-pointer"
+                className="w-6 h-6 rounded-full border border-white/20 cursor-pointer flex-shrink-0"
                 width={24}
                 height={24}
                 onClick={handleProfileClick}
               />
-              <div className="text-white text-xs">
+              <div className="text-white text-xs min-w-0">
                 <div 
-                  className="font-semibold cursor-pointer hover:opacity-80 leading-tight"
+                  className="font-semibold cursor-pointer hover:opacity-80 leading-tight whitespace-nowrap overflow-hidden text-ellipsis"
                   onClick={(e) => {
                     e.stopPropagation();
                     handleProfileClick();
                   }}
+                  title={displayName}
                 >
                   {displayName}
                 </div>
-                <div className="text-xs opacity-80 leading-tight">
-                  @{post.user.username} • {timeAgo}
+                <div className="text-xs opacity-80 leading-tight whitespace-nowrap overflow-hidden text-ellipsis">
+                  @{post.user.username}
                 </div>
               </div>
             </div>
@@ -344,16 +345,20 @@ const InstagramStylePost: React.FC<InstagramStylePostProps> = ({ post, allUserPo
         {post.content && (
           <div className="bg-background p-4 border-b">
             <div className="text-sm">
-              <span className="font-semibold cursor-pointer hover:opacity-80" onClick={handleProfileClick}>
-                {displayName}
-              </span>
-              <span className="ml-2">{post.content}</span>
+              <div className="mb-1">
+                <span className="font-semibold cursor-pointer hover:opacity-80" onClick={handleProfileClick}>
+                  {displayName}
+                </span>
+                <span className="text-muted-foreground text-xs ml-1">
+                  · {timeAgo}
+                </span>
+              </div>
+              <div>{post.content}</div>
             </div>
             
             {/* Mock comments - in a real app this would come from a comments API */}
             <div className="mt-3 space-y-2 text-sm text-muted-foreground">
               <div>View all comments</div>
-              <div className="text-xs">{timeAgo}</div>
             </div>
           </div>
         )}
