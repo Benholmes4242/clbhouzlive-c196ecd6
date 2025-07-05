@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Play, Pause, Volume2, VolumeX, Maximize2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useThumbnailGenerator } from '@/components/posts/video/ThumbnailGenerator';
 
 interface VideoPlayerProps {
   src: string;
@@ -15,6 +16,7 @@ interface VideoPlayerProps {
   onClick?: () => void;
   showOverlayControls?: boolean;
   showVideoIcon?: boolean;
+  videoId?: string; // Add videoId for thumbnail generation
 }
 
 const VideoPlayer: React.FC<VideoPlayerProps> = ({
@@ -29,12 +31,20 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   onPause,
   onClick,
   showOverlayControls = true,
-  showVideoIcon = false
+  showVideoIcon = false,
+  videoId
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(muted);
   const [showControls, setShowControls] = useState(false);
+  
+  // Generate thumbnail for better UX
+  const thumbnailId = videoId || `video-${src.split('/').pop()?.split('.')[0] || 'unknown'}`;
+  const { thumbnailSrc, thumbnailReady } = useThumbnailGenerator(src, thumbnailId, poster);
+  
+  // Use generated thumbnail or fallback to provided poster
+  const effectivePoster = thumbnailReady && thumbnailSrc ? thumbnailSrc : poster;
 
   useEffect(() => {
     const video = videoRef.current;
@@ -61,17 +71,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     };
 
     const handleCanPlay = () => {
-      // Ensure video can be played when it's ready
+      // Immediate autoplay without delay for smooth UX
       if (autoplay && video.paused) {
-        const playVideo = async () => {
-          try {
-            video.currentTime = 0; // Reset to start
-            await video.play();
-          } catch (error) {
-            console.log('Autoplay prevented:', error);
-          }
-        };
-        playVideo();
+        video.currentTime = 0; // Reset to start
+        video.play().catch(error => {
+          console.log('Autoplay prevented:', error);
+        });
       }
     };
 
@@ -80,28 +85,13 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     video.addEventListener('volumechange', handleVolumeChange);
     video.addEventListener('canplay', handleCanPlay);
 
-    // Immediate autoplay attempt if specified
+    // Immediate autoplay attempt if specified - remove artificial delay
     if (autoplay) {
-      const playVideo = async () => {
-        try {
-          video.currentTime = 0; // Start from beginning
-          await video.play();
-        } catch (error) {
-          console.log('Autoplay prevented:', error);
-          // For mobile, we might need user interaction first
-        }
-      };
-      
-      // Small delay to ensure video is ready
-      const timeoutId = setTimeout(playVideo, 100);
-      
-      return () => {
-        clearTimeout(timeoutId);
-        video.removeEventListener('play', handlePlay);
-        video.removeEventListener('pause', handlePause);
-        video.removeEventListener('volumechange', handleVolumeChange);
-        video.removeEventListener('canplay', handleCanPlay);
-      };
+      video.currentTime = 0; // Start from beginning
+      video.play().catch(error => {
+        console.log('Autoplay prevented:', error);
+        // For mobile, we might need user interaction first
+      });
     }
 
     return () => {
@@ -160,7 +150,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       <video
         ref={videoRef}
         src={src}
-        poster={poster}
+        poster={effectivePoster}
         className="w-full h-full object-cover cursor-pointer"
         playsInline
         muted={muted}

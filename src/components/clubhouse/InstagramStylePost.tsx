@@ -202,6 +202,7 @@ const InstagramStylePost: React.FC<InstagramStylePostProps> = ({ post, allUserPo
               className="w-full h-full"
               showVideoIcon={false}
               showOverlayControls={false}
+              videoId={`instagram-${currentMedia.id}`}
             />
           ) : (
             <LazyImage

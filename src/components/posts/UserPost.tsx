@@ -274,6 +274,7 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
           showVideoIcon={true}
           showOverlayControls={false}
           onClick={() => handleMediaClick(media.media_url, 'video')}
+          videoId={`carousel-${media.id}`}
         />
       )}
     </div>
@@ -489,6 +490,7 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
               className="w-full h-full"
               showVideoIcon={false}
               showOverlayControls={false}
+              videoId={`mobile-${currentMedia.id}`}
             />
           ) : (
             <LazyImage
