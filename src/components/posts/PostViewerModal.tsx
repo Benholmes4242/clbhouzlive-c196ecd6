@@ -7,6 +7,7 @@ import { useSwipeable } from 'react-swipeable';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePostUpdate } from '@/hooks/usePostUpdate';
+import { usePostDeletion } from '@/hooks/usePostDeletion';
 import HighQualityImage from '@/components/ui/high-quality-image';
 import VideoPlayer from '@/components/ui/video-player';
 
@@ -59,6 +60,7 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
 }) => {
   const { user } = useSupabaseSession();
   const { updatePost, isUpdating } = usePostUpdate();
+  const { deletePost } = usePostDeletion();
   const isMobile = useIsMobile();
   const [currentPostIndex, setCurrentPostIndex] = useState(0);
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
@@ -151,9 +153,14 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
     }
   };
 
-  const handleDelete = (post: PostData) => {
-    // Implement delete functionality
-    console.log('Delete clicked for:', post.id);
+  const handleDelete = async (post: PostData) => {
+    const confirmDelete = window.confirm('Are you sure you want to delete this post?');
+    if (!confirmDelete) return;
+
+    await deletePost(post.id);
+    
+    // Close the modal after successful deletion
+    onClose();
   };
 
   const navigatePost = useCallback((direction: 'prev' | 'next') => {
