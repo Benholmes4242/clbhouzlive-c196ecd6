@@ -43,6 +43,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     // Set initial properties
     video.muted = muted;
     video.loop = loop;
+    video.playsInline = true; // Critical for mobile autoplay
+    video.setAttribute('playsinline', 'true'); // iOS compatibility
 
     const handlePlay = () => {
       setIsPlaying(true);
@@ -58,26 +60,55 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       setIsMuted(video.muted);
     };
 
+    const handleCanPlay = () => {
+      // Ensure video can be played when it's ready
+      if (autoplay && video.paused) {
+        const playVideo = async () => {
+          try {
+            video.currentTime = 0; // Reset to start
+            await video.play();
+          } catch (error) {
+            console.log('Autoplay prevented:', error);
+          }
+        };
+        playVideo();
+      }
+    };
+
     video.addEventListener('play', handlePlay);
     video.addEventListener('pause', handlePause);
     video.addEventListener('volumechange', handleVolumeChange);
+    video.addEventListener('canplay', handleCanPlay);
 
-    // Autoplay if specified and video is loaded
+    // Immediate autoplay attempt if specified
     if (autoplay) {
       const playVideo = async () => {
         try {
+          video.currentTime = 0; // Start from beginning
           await video.play();
         } catch (error) {
           console.log('Autoplay prevented:', error);
+          // For mobile, we might need user interaction first
         }
       };
-      playVideo();
+      
+      // Small delay to ensure video is ready
+      const timeoutId = setTimeout(playVideo, 100);
+      
+      return () => {
+        clearTimeout(timeoutId);
+        video.removeEventListener('play', handlePlay);
+        video.removeEventListener('pause', handlePause);
+        video.removeEventListener('volumechange', handleVolumeChange);
+        video.removeEventListener('canplay', handleCanPlay);
+      };
     }
 
     return () => {
       video.removeEventListener('play', handlePlay);
       video.removeEventListener('pause', handlePause);
       video.removeEventListener('volumechange', handleVolumeChange);
+      video.removeEventListener('canplay', handleCanPlay);
     };
   }, [autoplay, muted, loop, onPlay, onPause]);
 
@@ -132,7 +163,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         poster={poster}
         className="w-full h-full object-cover cursor-pointer"
         playsInline
+        muted={muted}
+        loop={loop}
         preload="metadata"
+        webkit-playsinline="true"
+        x5-playsinline="true"
         onClick={handleVideoClick}
       />
 
