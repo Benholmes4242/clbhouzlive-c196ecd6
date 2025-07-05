@@ -10,12 +10,20 @@ interface MediaFile {
   id: string;
 }
 
+interface ExistingMedia {
+  url: string;
+  id: string;
+  type: 'image' | 'video';
+}
+
 interface EnhancedMediaUploadProps {
   onFilesChange: (files: File[]) => void;
   maxFiles?: number;
   acceptedTypes?: string[];
   disabled?: boolean;
   initialFiles?: File[];
+  existingMediaUrls?: string[];
+  onExistingMediaRemove?: (url: string) => void;
   className?: string;
 }
 
@@ -25,6 +33,8 @@ const EnhancedMediaUpload: React.FC<EnhancedMediaUploadProps> = ({
   acceptedTypes = ['image/*', 'video/*'],
   disabled = false,
   initialFiles = [],
+  existingMediaUrls = [],
+  onExistingMediaRemove,
   className
 }) => {
   const { toast } = useToast();
@@ -35,6 +45,16 @@ const EnhancedMediaUpload: React.FC<EnhancedMediaUploadProps> = ({
       id: uuidv4()
     }));
   });
+
+  const [existingMedia, setExistingMedia] = useState<ExistingMedia[]>(() => {
+    return existingMediaUrls.map(url => ({
+      url,
+      id: uuidv4(),
+      type: url.includes('video') || url.includes('.mp4') || url.includes('.mov') ? 'video' : 'image'
+    }));
+  });
+
+  const totalMediaCount = mediaFiles.length + existingMedia.length;
 
   // Validate file size and type
   const validateFiles = (files: File[]): File[] => {
@@ -54,7 +74,7 @@ const EnhancedMediaUpload: React.FC<EnhancedMediaUploadProps> = ({
       }
 
       // Check if we've reached max files
-      if (mediaFiles.length + validFiles.length >= maxFiles) {
+      if (totalMediaCount + validFiles.length >= maxFiles) {
         toast({
           title: "Too many files",
           description: `Maximum ${maxFiles} files allowed`,
@@ -115,7 +135,20 @@ const EnhancedMediaUpload: React.FC<EnhancedMediaUploadProps> = ({
         description: `${validFiles.length} file(s) added successfully`,
       });
     }
-  }, [mediaFiles.length, maxFiles, acceptedTypes, onFilesChange, toast]);
+  }, [totalMediaCount, maxFiles, acceptedTypes, onFilesChange, toast]);
+
+  const handleRemoveExistingMedia = useCallback((mediaId: string) => {
+    setExistingMedia(prev => {
+      const mediaToRemove = prev.find(m => m.id === mediaId);
+      const updated = prev.filter(m => m.id !== mediaId);
+      
+      if (mediaToRemove && onExistingMediaRemove) {
+        onExistingMediaRemove(mediaToRemove.url);
+      }
+      
+      return updated;
+    });
+  }, [onExistingMediaRemove]);
 
   const handleRemoveFile = useCallback((fileId: string) => {
     setMediaFiles(prev => {
@@ -175,16 +208,51 @@ const EnhancedMediaUpload: React.FC<EnhancedMediaUploadProps> = ({
   return (
     <div className={`space-y-4 ${className}`}>
       {/* Show dropzone only if we haven't reached max files */}
-      {mediaFiles.length < maxFiles && (
+      {totalMediaCount < maxFiles && (
         <MediaDropzone
           onFilesSelected={handleFilesSelected}
-          maxFiles={maxFiles - mediaFiles.length}
+          maxFiles={maxFiles - totalMediaCount}
           acceptedTypes={acceptedTypes}
           disabled={disabled}
         />
       )}
 
-      {/* Show preview grid if we have files */}
+      {/* Show existing media */}
+      {existingMedia.length > 0 && (
+        <div>
+          <p className="text-sm text-muted-foreground mb-2">Current Media:</p>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {existingMedia.map((media) => (
+              <div key={media.id} className="relative group">
+                <div className="aspect-square rounded-lg overflow-hidden bg-muted">
+                  {media.type === 'video' ? (
+                    <video 
+                      src={media.url} 
+                      className="w-full h-full object-cover"
+                      muted
+                    />
+                  ) : (
+                    <img 
+                      src={media.url} 
+                      alt="Existing media"
+                      className="w-full h-full object-cover"
+                    />
+                  )}
+                </div>
+                <button
+                  onClick={() => handleRemoveExistingMedia(media.id)}
+                  className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                  disabled={disabled}
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Show preview grid for new files */}
       <MediaPreviewGrid
         mediaFiles={mediaFiles}
         onRemoveFile={handleRemoveFile}

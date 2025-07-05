@@ -158,6 +158,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
               onFilesChange={setFiles}
               maxFiles={10}
               initialFiles={initialFiles}
+              existingMediaUrls={editMode ? existingMediaUrls : []}
               acceptedTypes={['image/*', 'video/*']}
               disabled={isSubmitting}
             />
