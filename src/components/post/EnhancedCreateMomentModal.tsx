@@ -82,7 +82,6 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
 
   // Handle caption input with mention detection
   const handleCaptionChange = async (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    console.log('handleCaptionChange called with:', JSON.stringify(e.target.value)); // Debug log
     const text = e.target.value;
     setCaption(text);
 
@@ -91,22 +90,16 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
     const mentionRegex = /@(\w+)$/;
     const match = text.match(mentionRegex);
     
-    console.log('Text for regex:', JSON.stringify(text)); // Debug log
-    console.log('Regex match:', match); // Debug log
-    
     if (match && match[1].length >= 1) {
       const query = match[1];
-      console.log('Mention detected! Searching for:', query); // Debug log
       setShowSuggestions(true);
       
       try {
         await searchEntities(query);
-        console.log('Search completed. Entities found:', entities.length); // Debug log
       } catch (error) {
         console.error('Error searching entities:', error);
       }
     } else {
-      console.log('No mention detected, hiding suggestions'); // Debug log
       setShowSuggestions(false);
     }
   };
@@ -206,14 +199,6 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                     </div>
                   </div>
                 ))}
-              </div>
-            )}
-
-            {/* Debug Info - Remove this after fixing */}
-            {showSuggestions && (
-              <div className="absolute top-full left-0 right-0 bg-red-100 border border-red-200 rounded-md p-2 z-40 mt-12 text-xs">
-                <p>Debug: showSuggestions={showSuggestions.toString()}, entities.length={entities.length}</p>
-                <p>Entities: {JSON.stringify(entities.map(e => e.name), null, 2)}</p>
               </div>
             )}
           </div>
