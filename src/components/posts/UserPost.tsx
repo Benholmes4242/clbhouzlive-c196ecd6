@@ -487,22 +487,22 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
             />
           )}
 
-          {/* User Info Overlay - Top Left */}
-          <div className="absolute top-4 left-4 flex items-center space-x-3 z-20">
-            <div className="bg-black/40 backdrop-blur-sm rounded-full p-2 flex items-center space-x-3">
+          {/* User Info Overlay - Top Left - Made smaller */}
+          <div className="absolute top-3 left-3 flex items-center space-x-2 z-20">
+            <div className="bg-black/40 backdrop-blur-sm rounded-full p-1.5 flex items-center space-x-2">
               <LazyImage
                 src={post.user.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
                 alt={displayName}
-                className="w-8 h-8 rounded-full border border-white/20 cursor-pointer"
-                width={32}
-                height={32}
+                className="w-6 h-6 rounded-full border border-white/20 cursor-pointer"
+                width={24}
+                height={24}
                 onClick={() => {
                   handleProfileClick();
                 }}
               />
-              <div className="text-white text-sm">
+              <div className="text-white text-xs">
                 <div 
-                  className="font-semibold cursor-pointer hover:opacity-80"
+                  className="font-semibold cursor-pointer hover:opacity-80 leading-tight"
                   onClick={(e) => {
                     e.stopPropagation();
                     handleProfileClick();
@@ -510,7 +510,7 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
                 >
                   {displayName}
                 </div>
-                <div className="text-xs opacity-80">
+                <div className="text-xs opacity-80 leading-tight">
                   @{post.user.username} • {timeAgo}
                 </div>
               </div>
@@ -519,7 +519,7 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
 
           {/* Location Tag - Top Right */}
           {golfCourse && (
-            <div className="absolute top-4 right-4 z-20">
+            <div className="absolute top-3 right-3 z-20">
               <CoursePostBadge 
                 course={{
                   id: golfCourse.id,
@@ -527,7 +527,7 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
                   country: golfCourse.country,
                   region: golfCourse.region
                 }}
-                className="bg-black/40 backdrop-blur-sm border border-white/20"
+                className="bg-black/40 backdrop-blur-sm border border-white/20 text-xs"
               />
             </div>
           )}
