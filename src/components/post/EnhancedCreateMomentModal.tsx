@@ -35,6 +35,11 @@ interface EnhancedCreateMomentModalProps {
   initialFiles?: File[];
   selectedCourse?: GolfCourse | null;
   onCourseSelect?: (course: GolfCourse | null) => void;
+  // Edit mode props
+  editMode?: boolean;
+  initialCaption?: string;
+  initialTags?: TaggableEntity[];
+  existingMediaUrls?: string[];
 }
 
 const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
@@ -44,7 +49,11 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
   isSubmitting,
   initialFiles = [],
   selectedCourse,
-  onCourseSelect
+  onCourseSelect,
+  editMode = false,
+  initialCaption = '',
+  initialTags = [],
+  existingMediaUrls = []
 }) => {
   const [caption, setCaption] = useState('');
   const [files, setFiles] = useState<File[]>(initialFiles);
@@ -55,11 +64,17 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
   // Reset state when modal opens/closes
   useEffect(() => {
     if (isOpen) {
-      setCaption('');
-      setSelectedTags([]);
-      setFiles(initialFiles);
+      if (editMode) {
+        setCaption(initialCaption);
+        setSelectedTags(initialTags);
+        setFiles(initialFiles);
+      } else {
+        setCaption('');
+        setSelectedTags([]);
+        setFiles(initialFiles);
+      }
     }
-  }, [isOpen, initialFiles]);
+  }, [isOpen, initialFiles, editMode, initialCaption, initialTags]);
 
   // Handle caption input with mention detection
   const handleCaptionChange = async (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -109,7 +124,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
   };
 
   const handleSubmit = () => {
-    if (files.length === 0) return;
+    if (files.length === 0 && existingMediaUrls.length === 0) return;
 
     onSubmit({
       caption,
@@ -130,10 +145,10 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogTitle className="text-center text-lg font-semibold">
-          Create a Moment
+          {editMode ? 'Edit Moment' : 'Create a Moment'}
         </DialogTitle>
         <DialogDescription className="sr-only">
-          Upload media files, add caption and post your moment
+          {editMode ? 'Edit your moment details and media' : 'Upload media files, add caption and post your moment'}
         </DialogDescription>
         
         <div className="space-y-6">
@@ -227,10 +242,13 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
             </Button>
             <Button
               onClick={handleSubmit}
-              disabled={isSubmitting || files.length === 0}
+              disabled={isSubmitting || (files.length === 0 && existingMediaUrls.length === 0)}
               className="bg-primary text-primary-foreground hover:bg-primary/90"
             >
-              {isSubmitting ? 'Posting...' : `Post ${files.length > 0 ? `(${files.length} file${files.length > 1 ? 's' : ''})` : ''}`}
+              {isSubmitting 
+                ? (editMode ? 'Updating...' : 'Posting...') 
+                : (editMode ? 'Update' : `Post ${files.length > 0 ? `(${files.length} file${files.length > 1 ? 's' : ''})` : ''}`)
+              }
             </Button>
           </div>
         </div>

@@ -10,6 +10,7 @@ import HighQualityImage from '@/components/ui/high-quality-image';
 import VideoPreview from './VideoPreview';
 import CoursePostBadge from './CoursePostBadge';
 import CommentsDrawer from './CommentsDrawer';
+import EnhancedCreateMomentModal from '../post/EnhancedCreateMomentModal';
 import { formatDistanceToNow } from 'date-fns';
 
 interface PostMedia {
@@ -59,6 +60,8 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   const [showComments, setShowComments] = useState(false);
   const [isAtEnd, setIsAtEnd] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [isEditSubmitting, setIsEditSubmitting] = useState(false);
 
   // Find initial post index
   useEffect(() => {
@@ -116,8 +119,27 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
   const golfCourse = getGolfCourse();
 
   const handleEdit = (post: PostData) => {
-    // Implement edit functionality
-    console.log('Edit clicked for:', post.id);
+    setEditModalOpen(true);
+  };
+
+  const handleEditSubmit = async (data: {
+    caption: string;
+    files: File[];
+    tags: any[];
+    course?: any;
+  }) => {
+    setIsEditSubmitting(true);
+    try {
+      // TODO: Implement actual post update logic here
+      console.log('Updating post:', currentPost.id, data);
+      
+      // Close modal after successful update
+      setEditModalOpen(false);
+    } catch (error) {
+      console.error('Error updating post:', error);
+    } finally {
+      setIsEditSubmitting(false);
+    }
   };
 
   const handleDelete = (post: PostData) => {
@@ -544,6 +566,19 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
           postId={currentPost.id}
         />
       )}
+
+      {/* Edit Modal */}
+      <EnhancedCreateMomentModal
+        isOpen={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        onSubmit={handleEditSubmit}
+        isSubmitting={isEditSubmitting}
+        editMode={true}
+        initialCaption={currentPost.content || ''}
+        existingMediaUrls={currentPost.post_media?.map(m => m.media_url) || []}
+        selectedCourse={golfCourse}
+        onCourseSelect={() => {}} // TODO: Implement course selection for edit
+      />
     </>
   );
 };

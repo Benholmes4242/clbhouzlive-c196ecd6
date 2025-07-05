@@ -6,6 +6,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { ExploreContentItem } from './types';
 import VideoPreview from '../posts/VideoPreview';
 import CoursePostBadge from '../posts/CoursePostBadge';
+import EnhancedCreateMomentModal from '../post/EnhancedCreateMomentModal';
 
 interface VerticalMediaFeedProps {
   isOpen: boolean;
@@ -31,6 +32,9 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
   const scrollViewRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<{ [key: number]: HTMLDivElement }>({});
   const videoRefs = useRef<{ [key: number]: HTMLVideoElement }>({});
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editingItem, setEditingItem] = useState<ExploreContentItem | null>(null);
+  const [isEditSubmitting, setIsEditSubmitting] = useState(false);
 
   // Filter content by type and set initial index
   useEffect(() => {
@@ -143,8 +147,31 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
   };
 
   const handleEdit = (item: ExploreContentItem) => {
-    // Implement edit functionality
-    console.log('Edit clicked for:', item.id);
+    setEditingItem(item);
+    setEditModalOpen(true);
+  };
+
+  const handleEditSubmit = async (data: {
+    caption: string;
+    files: File[];
+    tags: any[];
+    course?: any;
+  }) => {
+    if (!editingItem) return;
+    
+    setIsEditSubmitting(true);
+    try {
+      // TODO: Implement actual post update logic here
+      console.log('Updating post:', editingItem.id, data);
+      
+      // Close modal after successful update
+      setEditModalOpen(false);
+      setEditingItem(null);
+    } catch (error) {
+      console.error('Error updating post:', error);
+    } finally {
+      setIsEditSubmitting(false);
+    }
   };
 
   const handleDelete = (item: ExploreContentItem) => {
@@ -355,6 +382,22 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
         ))}
       </div>
 
+
+      {/* Edit Modal */}
+      <EnhancedCreateMomentModal
+        isOpen={editModalOpen}
+        onClose={() => {
+          setEditModalOpen(false);
+          setEditingItem(null);
+        }}
+        onSubmit={handleEditSubmit}
+        isSubmitting={isEditSubmitting}
+        editMode={true}
+        initialCaption={editingItem?.title || ''}
+        existingMediaUrls={editingItem ? [editingItem.src] : []}
+        selectedCourse={editingItem?.golfCourse || null}
+        onCourseSelect={() => {}} // TODO: Implement course selection for edit
+      />
 
       <style>{`
         .snap-y.snap-mandatory div::-webkit-scrollbar {
