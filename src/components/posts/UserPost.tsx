@@ -24,6 +24,8 @@ import {
 import { SwipeCarousel } from '@/components/ui/swipe-carousel';
 import EditPostDialog from './EditPostDialog';
 import TaggedText from './TaggedText';
+import VideoPlayer from '@/components/ui/video-player';
+import { useVideoAutoplay } from '@/hooks/useVideoAutoplay';
 
 import CoursePostBadge from './CoursePostBadge';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
@@ -262,11 +264,16 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
           onClick={() => handleMediaClick(media.media_url, 'image')}
         />
       ) : (
-        <div onClick={() => handleMediaClick(media.media_url, 'video')}>
-          <div className="w-full h-full bg-muted flex items-center justify-center cursor-pointer">
-            <span className="text-sm text-muted-foreground">Video unavailable</span>
-          </div>
-        </div>
+        <VideoPlayer
+          src={media.media_url}
+          autoplay={false}
+          muted={true}
+          loop={true}
+          className="w-full h-full"
+          showVideoIcon={true}
+          showOverlayControls={false}
+          onClick={() => handleMediaClick(media.media_url, 'video')}
+        />
       )}
     </div>
   )) || [];
@@ -451,9 +458,15 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
         {/* Media Container - Full width, responsive height */}
         <div className="relative w-full aspect-[4/5] cursor-pointer" onClick={() => handleMediaClick(currentMedia.media_url, currentMedia.media_type)}>
           {currentMedia.media_type === 'video' ? (
-            <div className="w-full h-full bg-muted flex items-center justify-center">
-              <span className="text-white text-sm">Video unavailable</span>
-            </div>
+            <VideoPlayer
+              src={currentMedia.media_url}
+              autoplay={isHovered}
+              muted={true}
+              loop={true}
+              className="w-full h-full"
+              showVideoIcon={false}
+              showOverlayControls={false}
+            />
           ) : (
             <LazyImage
               src={currentMedia.media_url}

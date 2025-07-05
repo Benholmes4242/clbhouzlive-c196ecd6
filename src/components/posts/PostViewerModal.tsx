@@ -8,6 +8,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePostUpdate } from '@/hooks/usePostUpdate';
 import HighQualityImage from '@/components/ui/high-quality-image';
+import VideoPlayer from '@/components/ui/video-player';
 
 import CoursePostBadge from './CoursePostBadge';
 import CommentsDrawer from './CommentsDrawer';
@@ -235,9 +236,14 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
               {currentMedia && (
                 <>
                   {currentMedia.media_type === 'video' ? (
-                    <div className="w-full h-full bg-muted flex items-center justify-center">
-                      <span className="text-white text-sm">Video unavailable</span>
-                    </div>
+                    <VideoPlayer
+                      src={currentMedia.media_url}
+                      autoplay={true}
+                      muted={true}
+                      loop={true}
+                      className="w-full h-full"
+                      showOverlayControls={true}
+                    />
                   ) : (
                     <HighQualityImage
                       src={currentMedia.media_url}
@@ -407,9 +413,14 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                 {currentMedia && (
                   <>
                     {currentMedia.media_type === 'video' ? (
-                      <div className="w-full h-full bg-muted flex items-center justify-center">
-                        <span className="text-white text-sm">Video unavailable</span>
-                      </div>
+                      <VideoPlayer
+                        src={currentMedia.media_url}
+                        autoplay={true}
+                        muted={true}
+                        loop={true}
+                        className="w-full h-full"
+                        showOverlayControls={true}
+                      />
                     ) : (
                       <HighQualityImage
                         src={currentMedia.media_url}

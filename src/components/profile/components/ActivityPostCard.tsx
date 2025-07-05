@@ -5,6 +5,8 @@ import { ActivityPost } from '../types/ActivityTypes';
 import CourseTag from '@/components/posts/CourseTag';
 import { Camera, Play } from 'lucide-react';
 import HighQualityImage from '@/components/ui/high-quality-image';
+import VideoPlayer from '@/components/ui/video-player';
+import { useVideoAutoplay } from '@/hooks/useVideoAutoplay';
 
 interface ActivityPostCardProps {
   post: ActivityPost;
@@ -13,6 +15,8 @@ interface ActivityPostCardProps {
 }
 
 const ActivityPostCard = ({ post, attributionText, onClick }: ActivityPostCardProps) => {
+  const { ref: autoplayRef, shouldAutoplay, handleMouseEnter, handleMouseLeave } = useVideoAutoplay();
+  
   const handleClick = () => {
     onClick(post);
   };
@@ -33,15 +37,25 @@ const ActivityPostCard = ({ post, attributionText, onClick }: ActivityPostCardPr
 
   return (
     <div 
+      ref={autoplayRef}
       className="relative aspect-square bg-gray-100 cursor-pointer group overflow-hidden rounded-xl"
       onClick={handleClick}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       {hasMedia && firstMedia ? (
         <>
           {firstMedia.media_type === 'video' ? (
-            <div className="w-full h-full bg-muted flex items-center justify-center rounded-[inherit]">
-              <span className="text-sm text-muted-foreground">Video unavailable</span>
-            </div>
+            <VideoPlayer
+              src={firstMedia.media_url}
+              autoplay={shouldAutoplay}
+              muted={true}
+              loop={true}
+              className="w-full h-full rounded-[inherit]"
+              showVideoIcon={true}
+              showOverlayControls={false}
+              onClick={handleClick}
+            />
           ) : (
             <HighQualityImage
               src={firstMedia.media_url}
