@@ -82,18 +82,20 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
 
   // Handle caption input with mention detection
   const handleCaptionChange = async (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    console.log('handleCaptionChange called with:', e.target.value); // Debug log
+    console.log('handleCaptionChange called with:', JSON.stringify(e.target.value)); // Debug log
     const text = e.target.value;
     setCaption(text);
 
     // Check for mentions - look for @ followed by at least 1 character
-    const words = text.split(' ');
-    const lastWord = words[words.length - 1];
+    // Use regex to find the last @ mention in the text
+    const mentionRegex = /@(\w+)$/;
+    const match = text.match(mentionRegex);
     
-    console.log('Last word:', lastWord, 'Length:', lastWord.length); // Debug log
+    console.log('Text for regex:', JSON.stringify(text)); // Debug log
+    console.log('Regex match:', match); // Debug log
     
-    if (lastWord.startsWith('@') && lastWord.length > 1) {
-      const query = lastWord.substring(1);
+    if (match && match[1].length >= 1) {
+      const query = match[1];
       console.log('Mention detected! Searching for:', query); // Debug log
       setShowSuggestions(true);
       
