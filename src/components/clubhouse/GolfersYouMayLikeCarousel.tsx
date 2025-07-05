@@ -119,6 +119,9 @@ interface GolferCardProps {
 const GolferCard: React.FC<GolferCardProps> = ({ golfer, currentUserId, isMobile }) => {
   const navigate = useNavigate();
   const [isHovered, setIsHovered] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+  
   const { handleFollow } = useProfileActions({
     targetUserId: golfer.id,
     currentUserId: currentUserId || ''
@@ -126,6 +129,21 @@ const GolferCard: React.FC<GolferCardProps> = ({ golfer, currentUserId, isMobile
 
   const displayName = golfer.display_name || golfer.username || 'User';
   const username = golfer.username || `user_${golfer.id.slice(0, 8)}`;
+
+  // Intersection observer to detect when card is visible for mobile auto-play
+  useEffect(() => {
+    if (!cardRef.current || !isMobile) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting && entry.intersectionRatio > 0.5);
+      },
+      { threshold: 0.5 }
+    );
+
+    observer.observe(cardRef.current);
+    return () => observer.disconnect();
+  }, [isMobile]);
 
   const handleFollowClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -138,8 +156,12 @@ const GolferCard: React.FC<GolferCardProps> = ({ golfer, currentUserId, isMobile
     navigate(`/profile/${username}`);
   };
 
+  // Determine if video should auto-play
+  const shouldAutoPlay = isMobile ? isVisible : isHovered;
+
   return (
     <div 
+      ref={cardRef}
       className="relative bg-card rounded-lg overflow-hidden shadow-sm border hover:shadow-md transition-shadow cursor-pointer flex-shrink-0 snap-start"
       style={{ width: isMobile ? 'calc(50% - 8px)' : 'calc(25% - 12px)' }}
       onMouseEnter={() => !isMobile && setIsHovered(true)}
@@ -149,32 +171,34 @@ const GolferCard: React.FC<GolferCardProps> = ({ golfer, currentUserId, isMobile
       <div className="w-full h-80 relative">
         <VideoPreview
           src={golfer.most_recent_video.media_url}
-          videoId={`golfer-${golfer.id}`}
+          videoId={`golfer-carousel-${golfer.id}`}
           className="w-full h-full object-cover"
+          isGridThumbnail={true}
         />
         
         {/* Dark overlay gradient */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
         
-        {/* User info overlay */}
-        <div className="absolute bottom-4 left-4 right-4">
-          <div className="flex items-center gap-3 mb-3">
+        {/* User info overlay - Top */}
+        <div className="absolute top-4 left-4 right-4">
+          <div className="flex items-center gap-3">
             <HighQualityImage 
               src={golfer.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'} 
               alt={displayName} 
-              className="w-12 h-12 rounded-full border-2 border-white cursor-pointer hover:border-white/80 transition-colors" 
-              width={48}
-              height={48}
+              className="w-10 h-10 rounded-full border-2 border-white cursor-pointer hover:border-white/80 transition-colors flex-shrink-0" 
+              width={40}
+              height={40}
               onClick={handleProfileClick}
             />
             <div className="flex-1 min-w-0">
               <h3 
-                className="text-white font-semibold text-sm mb-1 cursor-pointer hover:text-white/80 transition-colors truncate" 
+                className="text-white font-semibold text-sm leading-tight cursor-pointer hover:text-white/80 transition-colors truncate" 
                 onClick={handleProfileClick}
+                title={displayName}
               >
                 {displayName}
               </h3>
-              <div className="text-white/80 text-xs">
+              <div className="text-white/80 text-xs truncate" title={`@${username}`}>
                 <span 
                   className="cursor-pointer hover:text-white/60 transition-colors"
                   onClick={handleProfileClick}
@@ -184,12 +208,15 @@ const GolferCard: React.FC<GolferCardProps> = ({ golfer, currentUserId, isMobile
               </div>
             </div>
           </div>
-          
+        </div>
+        
+        {/* Follow Button - Bottom */}
+        <div className="absolute bottom-4 left-4 right-4">
           {currentUserId && currentUserId !== golfer.id && (
             <Button 
               size="sm" 
               variant={golfer.is_following ? "secondary" : "default"}
-              className={`w-full ${
+              className={`w-full text-sm font-medium ${
                 golfer.is_following 
                   ? "bg-white/20 backdrop-blur-sm border border-white/30 text-white hover:bg-white/30"
                   : "bg-white text-black hover:bg-white/90"
