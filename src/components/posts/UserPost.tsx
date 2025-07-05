@@ -238,7 +238,7 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
   };
 
   // Create carousel items from media
-  const carouselItems = post.post_media?.map((media, index) => (
+  const carouselItems = (shouldAutoplay: boolean) => post.post_media?.map((media, index) => (
     <div key={media.id} className="w-full aspect-square relative">
       {/* Golf Course Badge overlay on each media item */}
       {golfCourse && (
@@ -266,7 +266,7 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
       ) : (
         <VideoPlayer
           src={media.media_url}
-          autoplay={false}
+          autoplay={shouldAutoplay}
           muted={true}
           loop={true}
           className="w-full h-full"
@@ -280,6 +280,7 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
 
   const PostContent = () => {
     const [isHovered, setIsHovered] = useState(false);
+    const { ref: autoplayRef, shouldAutoplay, handleMouseEnter, handleMouseLeave } = useVideoAutoplay();
     
     // Add intersection observer for scroll-based autoplay on desktop too
     const { ref: postRef, isInView } = useIntersectionObserver({
@@ -298,7 +299,7 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
 
     return (
       <Card ref={postRef} className="border-0 shadow-sm">
-        <div className="p-4">
+        <div className="p-4" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
           {/* Post Header */}
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center space-x-3">
@@ -372,12 +373,12 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
           )}
 
           {/* Post Media using SwipeCarousel */}
-          {carouselItems.length > 0 && (
+          {post.post_media && post.post_media.length > 0 && (
             <div className="mb-3">
               <div className="rounded-lg overflow-hidden">
                 <SwipeCarousel
-                  items={carouselItems}
-                  showDots={carouselItems.length > 1}
+                  items={carouselItems(shouldAutoplay)}
+                  showDots={carouselItems(shouldAutoplay).length > 1}
                   showArrows={false}
                 />
               </div>
