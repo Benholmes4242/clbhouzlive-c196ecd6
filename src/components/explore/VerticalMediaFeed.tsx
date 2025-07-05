@@ -3,7 +3,7 @@ import { X, Heart, MessageCircle, Share2, Volume2, VolumeX, MoreHorizontal, Edit
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useToast } from '@/hooks/use-toast';
+import { usePostUpdate } from '@/hooks/usePostUpdate';
 import { ExploreContentItem } from './types';
 import VideoPreview from '../posts/VideoPreview';
 import CoursePostBadge from '../posts/CoursePostBadge';
@@ -27,7 +27,7 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
   onFollow
 }) => {
   const { user } = useSupabaseSession();
-  const { toast } = useToast();
+  const { updatePost, isUpdating } = usePostUpdate();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [filteredContent, setFilteredContent] = useState<ExploreContentItem[]>([]);
   const [isMuted, setIsMuted] = useState(true);
@@ -36,7 +36,6 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
   const videoRefs = useRef<{ [key: number]: HTMLVideoElement }>({});
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<ExploreContentItem | null>(null);
-  const [isEditSubmitting, setIsEditSubmitting] = useState(false);
   const [editCourse, setEditCourse] = useState<any>(null);
 
   // Filter content by type and set initial index
@@ -163,35 +162,24 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
   }) => {
     if (!editingItem) return;
     
-    setIsEditSubmitting(true);
-    try {
-      // TODO: Implement actual post update logic here
-      console.log('Updating post:', editingItem.id, data);
+    const existingMediaUrls = [editingItem.src];
+    const result = await updatePost(editingItem.id, data, existingMediaUrls);
+    
+    if (result.success) {
+      // Update the local state to reflect changes immediately
+      setFilteredContent(prev => prev.map(item => 
+        item.id === editingItem.id 
+          ? { ...item, title: data.caption, golfCourse: data.course }
+          : item
+      ));
       
-      // Simulate successful update
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Show success toast
-      toast({
-        title: "Success!",
-        description: "Your updates have been saved!",
-        className: "bg-green-600 text-white border-green-600",
-        duration: 3000,
-      });
+      // Update the all content array as well if parent component provides a callback
+      // This would need to be passed as a prop for full sync
       
       // Close modal after successful update
       setEditModalOpen(false);
       setEditingItem(null);
-    } catch (error) {
-      console.error('Error updating post:', error);
-      toast({
-        title: "Error",
-        description: "Failed to save updates. Please try again.",
-        variant: "destructive",
-        duration: 3000,
-      });
-    } finally {
-      setIsEditSubmitting(false);
+      setEditCourse(null);
     }
   };
 
@@ -413,7 +401,7 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
           setEditCourse(null);
         }}
         onSubmit={handleEditSubmit}
-        isSubmitting={isEditSubmitting}
+        isSubmitting={isUpdating}
         editMode={true}
         initialCaption={editingItem?.title || ''}
         existingMediaUrls={editingItem ? [editingItem.src] : []}
