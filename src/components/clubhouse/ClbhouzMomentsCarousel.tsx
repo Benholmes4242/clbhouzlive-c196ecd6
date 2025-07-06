@@ -422,7 +422,6 @@ const ClbhouzMomentsCarousel: React.FC = () => {
                           loop
                           muted
                           playsInline
-                          poster={moment.media[0].media_url}
                         >
                           <source src={moment.media[0].media_url} type="video/mp4" />
                         </video>
