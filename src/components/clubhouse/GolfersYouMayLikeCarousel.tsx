@@ -119,9 +119,8 @@ interface GolferCardProps {
 
 const GolferCard: React.FC<GolferCardProps> = ({ golfer, currentUserId, isMobile }) => {
   const navigate = useNavigate();
-  const [isHovered, setIsHovered] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
   
   const { handleFollow } = useProfileActions({
     targetUserId: golfer.id,
@@ -131,20 +130,17 @@ const GolferCard: React.FC<GolferCardProps> = ({ golfer, currentUserId, isMobile
   const displayName = golfer.display_name || golfer.username || 'User';
   const username = golfer.username || `user_${golfer.id.slice(0, 8)}`;
 
-  // Intersection observer to detect when card is visible for mobile auto-play
+  // Auto-start video playback when component mounts
   useEffect(() => {
-    if (!cardRef.current) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        setIsVisible(entry.isIntersecting && entry.intersectionRatio > 0.5);
-      },
-      { threshold: 0.5 }
-    );
-
-    observer.observe(cardRef.current);
-    return () => observer.disconnect();
-  }, []);
+    const video = videoRef.current;
+    if (video && golfer.most_recent_video?.media_url) {
+      // Ensure video starts playing immediately
+      video.currentTime = 0;
+      video.play().catch(error => {
+        console.log('Autoplay prevented for golfer video:', error);
+      });
+    }
+  }, [golfer.most_recent_video?.media_url]);
 
   const handleFollowClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -157,22 +153,31 @@ const GolferCard: React.FC<GolferCardProps> = ({ golfer, currentUserId, isMobile
     navigate(`/profile/${username}`);
   };
 
-  // Determine if video should auto-play
-  const shouldAutoPlay = isMobile ? isVisible : isHovered;
-
   return (
     <div 
       ref={cardRef}
-      className="relative bg-card rounded-lg overflow-hidden shadow-sm border hover:shadow-md transition-shadow cursor-pointer flex-shrink-0 snap-start"
+      className="relative bg-card rounded-lg overflow-hidden shadow-sm border hover:shadow-md transition-shadow cursor-pointer flex-shrink-0 snap-start carousel-card"
       style={{ width: isMobile ? 'calc(50% - 8px)' : 'calc(25% - 12px)' }}
-      onMouseEnter={() => !isMobile && setIsHovered(true)}
-      onMouseLeave={() => !isMobile && setIsHovered(false)}
     >
       {/* Video Background */}
       <div className="w-full h-80 relative">
-        <div className="w-full h-full bg-muted flex items-center justify-center">
-          <span className="text-sm text-muted-foreground">Video unavailable</span>
-        </div>
+        {golfer.most_recent_video?.media_url ? (
+          <video
+            ref={videoRef}
+            src={golfer.most_recent_video.media_url}
+            className="w-full h-full object-cover"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            onError={() => console.log('Video failed to load:', golfer.most_recent_video?.media_url)}
+          />
+        ) : (
+          <div className="w-full h-full bg-muted flex items-center justify-center">
+            <span className="text-sm text-muted-foreground">Video unavailable</span>
+          </div>
+        )}
         
         {/* Dark overlay gradient */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
