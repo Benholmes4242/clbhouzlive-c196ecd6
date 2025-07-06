@@ -9,6 +9,42 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      admin_audit_log: {
+        Row: {
+          action: string
+          admin_user_id: string
+          created_at: string
+          details: Json | null
+          id: string
+          ip_address: string | null
+          target_email: string | null
+          target_user_id: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          action: string
+          admin_user_id: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: string | null
+          target_email?: string | null
+          target_user_id?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          action?: string
+          admin_user_id?: string
+          created_at?: string
+          details?: Json | null
+          id?: string
+          ip_address?: string | null
+          target_email?: string | null
+          target_user_id?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       admin_invitations: {
         Row: {
           created_at: string
@@ -836,6 +872,8 @@ export type Database = {
           eg_handicap_index: number | null
           eg_recent_rounds: Json | null
           eg_visible: boolean | null
+          email_change_cooldown_until: string | null
+          email_change_count: number | null
           email_change_requested_at: string | null
           email_change_token: string | null
           home_club: string | null
@@ -868,6 +906,8 @@ export type Database = {
           eg_handicap_index?: number | null
           eg_recent_rounds?: Json | null
           eg_visible?: boolean | null
+          email_change_cooldown_until?: string | null
+          email_change_count?: number | null
           email_change_requested_at?: string | null
           email_change_token?: string | null
           home_club?: string | null
@@ -900,6 +940,8 @@ export type Database = {
           eg_handicap_index?: number | null
           eg_recent_rounds?: Json | null
           eg_visible?: boolean | null
+          email_change_cooldown_until?: string | null
+          email_change_count?: number | null
           email_change_requested_at?: string | null
           email_change_token?: string | null
           home_club?: string | null
@@ -1004,6 +1046,10 @@ export type Database = {
       }
     }
     Functions: {
+      can_change_email: {
+        Args: { user_id_param: string }
+        Returns: boolean
+      }
       check_and_award_badges: {
         Args: { user_id_param: string }
         Returns: {

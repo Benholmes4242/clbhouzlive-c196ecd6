@@ -46,18 +46,11 @@ const EmailChangeSection: React.FC<EmailChangeSectionProps> = ({ currentEmail })
 
     setLoading(true);
     try {
-      // First get the current user
-      const { data: { user }, error: userError } = await supabase.auth.getUser();
-      
-      if (userError || !user) {
-        throw new Error('User not found');
-      }
-
-      // Use service role to update email without confirmation
-      const { error } = await supabase.functions.invoke('update-user-email', {
+      // Use secure email change endpoint
+      const { data, error } = await supabase.functions.invoke('secure-email-change', {
         body: {
-          userId: user.id,
-          newEmail: newEmail
+          newEmail: newEmail,
+          currentEmail: currentEmail
         }
       });
 
@@ -65,9 +58,13 @@ const EmailChangeSection: React.FC<EmailChangeSectionProps> = ({ currentEmail })
         throw error;
       }
 
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
       toast({
         title: "Email Updated Successfully",
-        description: "Your email address has been changed. Please sign in again with your new email.",
+        description: `Your email address has been changed. You'll be signed out in a few seconds to re-authenticate with your new email.`,
       });
 
       // Clear form
@@ -77,13 +74,23 @@ const EmailChangeSection: React.FC<EmailChangeSectionProps> = ({ currentEmail })
       // Sign out user to force re-login with new email
       setTimeout(() => {
         supabase.auth.signOut();
-      }, 2000);
+      }, 3000);
       
     } catch (error: any) {
       console.error('Error changing email:', error);
+      
+      let errorMessage = error.message || "Failed to change email";
+      
+      // Handle specific error cases
+      if (error.message?.includes('cooldown')) {
+        errorMessage = "Email change is in cooldown period. Please wait before changing your email again.";
+      } else if (error.message?.includes('already in use')) {
+        errorMessage = "This email address is already in use by another account.";
+      }
+      
       toast({
         title: "Error",
-        description: error.message || "Failed to change email",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

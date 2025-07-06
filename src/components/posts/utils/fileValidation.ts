@@ -9,10 +9,21 @@ export const validateFiles = (mediaFiles: File[]): ValidationResult => {
   const supportedImageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
   
   for (const file of mediaFiles) {
-    // No file size limit - allow any size video/image
+    // Add file size limits for security
+    const maxFileSize = 50 * 1024 * 1024; // 50MB limit
+    if (file.size > maxFileSize) {
+      return {
+        isValid: false,
+        error: `File "${file.name}" is too large. Maximum file size is 50MB.`
+      };
+    }
     
     const isVideo = file.type.startsWith('video/');
     const isImage = file.type.startsWith('image/');
+    
+    // Verify MIME type matches file extension for security
+    const fileName = file.name.toLowerCase();
+    const fileExtension = fileName.split('.').pop();
     
     if (isVideo && !supportedVideoTypes.includes(file.type)) {
       return {
@@ -26,6 +37,27 @@ export const validateFiles = (mediaFiles: File[]): ValidationResult => {
         isValid: false,
         error: `Image format "${file.type}" is not supported. Please use JPEG, PNG, GIF, or WebP format.`
       };
+    }
+    
+    // Additional extension validation for security
+    if (isImage) {
+      const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+      if (!fileExtension || !imageExtensions.includes(fileExtension)) {
+        return {
+          isValid: false,
+          error: `File "${file.name}" does not have a valid image extension.`
+        };
+      }
+    }
+    
+    if (isVideo) {
+      const videoExtensions = ['mp4', 'mov', 'avi', 'webm'];
+      if (!fileExtension || !videoExtensions.includes(fileExtension)) {
+        return {
+          isValid: false,
+          error: `File "${file.name}" does not have a valid video extension.`
+        };
+      }
     }
     
     if (!isVideo && !isImage) {

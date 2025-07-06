@@ -92,13 +92,22 @@ const UserManagement: React.FC<UserManagementProps> = ({ users, onRoleChange }) 
     setActionLoading(userId);
     
     try {
-      const { error } = await supabase.auth.admin.generateLink({
-        type: 'recovery',
-        email: userEmail,
+      // Use secure admin operations endpoint
+      const { data, error } = await supabase.functions.invoke('secure-admin-operations', {
+        body: {
+          action: 'reset_password',
+          targetUserId: userId,
+          targetEmail: userEmail,
+          reason: 'Admin requested password reset'
+        }
       });
       
       if (error) {
         throw error;
+      }
+      
+      if (data.error) {
+        throw new Error(data.error);
       }
       
       toast({
@@ -121,14 +130,25 @@ const UserManagement: React.FC<UserManagementProps> = ({ users, onRoleChange }) 
     setActionLoading(userId);
     
     try {
-      // Call Supabase admin API to delete user
-      const { error } = await supabase.auth.admin.deleteUser(userId);
+      // Use secure admin operations endpoint with additional verification
+      const { data, error } = await supabase.functions.invoke('secure-admin-operations', {
+        body: {
+          action: 'delete_user',
+          targetUserId: userId,
+          targetEmail: userEmail,
+          reason: 'Admin requested user deletion'
+        }
+      });
       
       if (error) {
         throw error;
       }
       
-      // Remove user from local state
+      if (data.error) {
+        throw new Error(data.error);
+      }
+      
+      // Remove user from local state only after successful deletion
       setLocalUsers(prevUsers => prevUsers.filter(user => user.id !== userId));
       
       toast({

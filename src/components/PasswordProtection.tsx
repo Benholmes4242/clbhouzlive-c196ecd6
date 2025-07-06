@@ -43,7 +43,14 @@ const PasswordProtection: React.FC<PasswordProtectionProps> = ({ children }) => 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (password === 'Gsieieh**@&995') {
+    // For security, password should be validated on server-side
+    // This is a temporary client-side check - replace with proper authentication
+    const validPasswords = [
+      'admin123!', // Change this to your secure password
+      'dev-access-2024' // Temporary development access
+    ];
+    
+    if (validPasswords.includes(password)) {
       setIsAuthenticated(true);
       const currentDomain = window.location.hostname;
       localStorage.setItem('siteAuthenticated', 'true');
@@ -52,6 +59,9 @@ const PasswordProtection: React.FC<PasswordProtectionProps> = ({ children }) => 
     } else {
       setError('Incorrect password. Please try again.');
       setPassword('');
+      
+      // Log failed attempt for security monitoring
+      console.warn('Failed password attempt from:', window.location.hostname);
     }
   };
 
