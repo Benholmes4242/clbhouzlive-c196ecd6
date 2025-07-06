@@ -50,11 +50,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     const video = videoRef.current;
     if (!video) return;
 
-    // Set initial properties
+    // Set initial properties for optimized loading
     video.muted = muted;
     video.loop = loop;
     video.playsInline = true; // Critical for mobile autoplay
     video.setAttribute('playsinline', 'true'); // iOS compatibility
+    video.preload = 'metadata'; // Preload metadata for faster start
 
     const handlePlay = () => {
       setIsPlaying(true);
@@ -70,10 +71,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       setIsMuted(video.muted);
     };
 
-    const handleCanPlay = () => {
-      // Immediate autoplay without delay for smooth UX
+    const handleLoadedMetadata = () => {
+      // Optimize for immediate autoplay when ready
       if (autoplay && video.paused) {
-        video.currentTime = 0; // Reset to start
+        video.currentTime = 0;
         video.play().catch(error => {
           console.log('Autoplay prevented:', error);
         });
@@ -83,14 +84,16 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     video.addEventListener('play', handlePlay);
     video.addEventListener('pause', handlePause);
     video.addEventListener('volumechange', handleVolumeChange);
-    video.addEventListener('canplay', handleCanPlay);
+    video.addEventListener('loadedmetadata', handleLoadedMetadata);
 
-    // Immediate autoplay attempt if specified - remove artificial delay
+    // Immediate autoplay attempt with optimization
     if (autoplay) {
-      video.currentTime = 0; // Start from beginning
-      video.play().catch(error => {
-        console.log('Autoplay prevented:', error);
-        // For mobile, we might need user interaction first
+      video.currentTime = 0;
+      // Use requestAnimationFrame for smoother autoplay timing
+      requestAnimationFrame(() => {
+        video.play().catch(error => {
+          console.log('Autoplay prevented:', error);
+        });
       });
     }
 
@@ -98,7 +101,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       video.removeEventListener('play', handlePlay);
       video.removeEventListener('pause', handlePause);
       video.removeEventListener('volumechange', handleVolumeChange);
-      video.removeEventListener('canplay', handleCanPlay);
+      video.removeEventListener('loadedmetadata', handleLoadedMetadata);
     };
   }, [autoplay, muted, loop, onPlay, onPause]);
 

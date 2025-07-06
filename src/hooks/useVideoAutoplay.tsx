@@ -11,8 +11,8 @@ interface UseVideoAutoplayOptions {
 export const useVideoAutoplay = (options: UseVideoAutoplayOptions = {}) => {
   const {
     enabled = true,
-    threshold = 0.6, // Changed to 60% visibility for better UX
-    rootMargin = '0px'
+    threshold = 0.5, // 50% visibility as requested
+    rootMargin = '300px' // Preload when within 300px of viewport
   } = options;
 
   const isMobile = useIsMobile();
@@ -25,21 +25,16 @@ export const useVideoAutoplay = (options: UseVideoAutoplayOptions = {}) => {
     rootMargin
   });
 
-  // Update autoplay state based on hover and visibility
+  // Update autoplay state based on visibility only (removed hover requirement for desktop)
   useEffect(() => {
     if (!enabled) {
       setShouldAutoplay(false);
       return;
     }
 
-    if (isMobile) {
-      // Mobile: autoplay when scrolled into view
-      setShouldAutoplay(isInView);
-    } else {
-      // Desktop: autoplay on hover AND when in view
-      setShouldAutoplay(isHovered && isInView);
-    }
-  }, [enabled, isMobile, isHovered, isInView]);
+    // Both mobile and desktop: autoplay when scrolled into view
+    setShouldAutoplay(isInView);
+  }, [enabled, isInView]);
 
   const handleMouseEnter = () => {
     if (!isMobile) {

@@ -35,8 +35,8 @@ export const DesktopUserPost: React.FC<DesktopUserPostProps> = ({
   
   const { ref: autoplayRef, shouldAutoplay, handleMouseEnter, handleMouseLeave } = useVideoAutoplay({
     enabled: true,
-    threshold: 0.3,
-    rootMargin: '0px'
+    threshold: 0.5, // 50% visibility for autoplay
+    rootMargin: '300px' // Preload when within 300px
   });
 
   const handleEditClick = () => {
