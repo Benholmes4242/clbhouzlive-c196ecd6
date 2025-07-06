@@ -4,6 +4,7 @@ import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
 import StoryBar from '@/components/StoryBar';
 import TrendingFeed from '@/components/TrendingFeed';
+import ClubhouzMomentsCarousel from '@/components/clubhouse/ClubhouzMomentsCarousel';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Button } from '@/components/ui/button';
@@ -97,6 +98,7 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <StoryBar />
+      <ClubhouzMomentsCarousel />
       
       <main className="container mx-auto px-4 py-6">
         <div className="max-w-2xl mx-auto space-y-6">
