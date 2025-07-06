@@ -8,7 +8,7 @@ import CourseHighlightsCarousel from '@/components/clubhouse/CourseHighlightsCar
 import ClubSpotlightCarousel from '@/components/clubhouse/ClubSpotlightCarousel';
 import FeaturedMomentsCarousel from '@/components/clubhouse/FeaturedMomentsCarousel';
 import TopPlayerContentCarousel from '@/components/clubhouse/TopPlayerContentCarousel';
-import ClbhouzMomentsCarousel from '@/components/clubhouse/ClbhouzMomentsCarousel';
+
 import InstagramStyleFeed from '@/components/clubhouse/InstagramStyleFeed';
 import { useClubhouseContent } from '@/hooks/useClubhouseContent';
 
@@ -44,7 +44,6 @@ const ClubhouseFeed = () => {
               />
               
               <div className="space-y-6">
-                <ClbhouzMomentsCarousel />
                 <FeaturedMomentsCarousel userPosts={posts} loading={loading} />
                 <TopPlayerContentCarousel userPosts={posts} loading={loading} />
                 <CourseHighlightsCarousel />
