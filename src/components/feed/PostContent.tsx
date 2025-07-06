@@ -3,7 +3,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Play, Pause, Maximize2 } from 'lucide-react';
 import { SwipeCarousel } from '@/components/ui/swipe-carousel';
 import CoursePostBadge from '../posts/CoursePostBadge';
-
+import VideoPlayer from '@/components/ui/video-player';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { useFullscreenMedia } from '@/hooks/useFullscreenMedia';
 import LazyImage from '@/components/ui/lazy-image';
@@ -208,62 +208,18 @@ const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentPr
                   </div>
                 )}
               </>
-            ) : content.videoUrl ? (
-              <div 
-                className="relative"
-                onMouseEnter={() => setShowControls(true)}
-                onMouseLeave={() => setShowControls(false)}
-              >
-                <div className="w-full h-80 bg-muted flex items-center justify-center cursor-pointer">
-                  <span className="text-sm text-muted-foreground">Video unavailable</span>
-                </div>
-                
-                {/* Golf Course Badge overlay on video */}
-                {content.golfCourse && (
-                  <div className="absolute top-2 right-2 z-10">
-                    <CoursePostBadge 
-                      course={{
-                        id: content.golfCourse.id,
-                        name: content.golfCourse.name,
-                        country: content.golfCourse.country,
-                        region: content.golfCourse.region
-                      }}
-                      className="m-0"
-                    />
-                  </div>
-                )}
-                {golfClubTags.length > 0 && !content.golfCourse && (
-                  <div className="absolute top-2 right-2 z-10">
-                    <CoursePostBadge 
-                      course={{
-                        id: golfClubTags[0].entity_id,
-                        name: golfClubTags[0].name,
-                        country: 'Unknown',
-                        region: undefined
-                      }}
-                      className="m-0"
-                    />
-                  </div>
-                )}
-                
-                {/* Fullscreen Button */}
-                <div className={`absolute top-2 left-2 transition-opacity ${showControls ? 'opacity-100' : 'opacity-0'}`}>
-                  <button
-                    onClick={() => handleVideoFullscreen(content.videoUrl!)}
-                    className="bg-black/70 text-white p-2 rounded-full hover:bg-black/80 transition-colors"
-                  >
-                    <Maximize2 className="h-4 w-4" />
-                  </button>
-                </div>
-
-                {/* Duration Badge */}
-                {content.duration && (
-                  <div className="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded">
-                    {content.duration}
-                  </div>
-                )}
-              </div>
-            ) : null}
+              ) : content.videoUrl ? (
+                <VideoPlayer
+                  src={content.videoUrl}
+                  autoplay={false}
+                  muted={true}
+                  loop={true}
+                  className="w-full h-80"
+                  showOverlayControls={true}
+                  showMuteButton={true}
+                  isInFeed={true}
+                />
+              ) : null}
           </div>
         ) : allImages.length > 1 ? (
           // Multiple images - use SwipeCarousel with click handlers and pins

@@ -1,11 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
+import { ChevronLeft, ChevronRight, MapPin, Volume2, VolumeX } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 
 interface MomentPost {
   id: string;
@@ -32,6 +33,7 @@ interface MomentPost {
 const ClbhouzMomentsCarousel: React.FC = () => {
   const { user } = useSupabaseSession();
   const { toast } = useToast();
+  const { isGloballyMuted, toggleGlobalMute } = useGlobalAudio();
   const [moments, setMoments] = useState<MomentPost[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
@@ -283,6 +285,7 @@ const ClbhouzMomentsCarousel: React.FC = () => {
   const handleVideoPlay = (videoId: string) => {
     const video = videoRefs.current[videoId];
     if (video && video.paused) {
+      video.muted = isGloballyMuted;
       video.play().catch(console.error);
     }
   };
@@ -293,6 +296,15 @@ const ClbhouzMomentsCarousel: React.FC = () => {
       video.pause();
     }
   };
+
+  // Update video mute state when global mute changes
+  useEffect(() => {
+    Object.values(videoRefs.current).forEach(video => {
+      if (video) {
+        video.muted = isGloballyMuted;
+      }
+    });
+  }, [isGloballyMuted]);
 
   // Auto-play videos when they come into view on mobile (2 cards at a time)
   useEffect(() => {
@@ -420,9 +432,8 @@ const ClbhouzMomentsCarousel: React.FC = () => {
                           }}
                           className="w-full h-full object-cover"
                           loop
-                          muted
+                          muted={isGloballyMuted}
                           playsInline
-                          poster={moment.media[0].media_url}
                         >
                           <source src={moment.media[0].media_url} type="video/mp4" />
                         </video>
@@ -445,8 +456,29 @@ const ClbhouzMomentsCarousel: React.FC = () => {
                     }`}
                   />
                   
-                  {/* User Info Overlay */}
-                  <div className="absolute top-3 left-3 flex items-center gap-2">
+                   {/* Mute/Unmute Button - Top Left */}
+                   {moment.media[0].media_type === 'video' && (
+                     <div className="absolute top-3 left-3 z-20">
+                       <Button
+                         variant="ghost"
+                         size="icon"
+                         className="w-8 h-8 rounded-full bg-black/50 hover:bg-black/70 text-white hover:text-white"
+                         onClick={(e) => {
+                           e.stopPropagation();
+                           toggleGlobalMute();
+                         }}
+                       >
+                         {isGloballyMuted ? (
+                           <VolumeX className="h-4 w-4" />
+                         ) : (
+                           <Volume2 className="h-4 w-4" />
+                         )}
+                       </Button>
+                     </div>
+                   )}
+                   
+                   {/* User Info Overlay */}
+                  <div className="absolute top-3 right-3 flex items-center gap-2">
                     <img
                       src={moment.user_profile.profile_photo_url || '/placeholder.svg'}
                       alt={moment.user_profile.display_name}

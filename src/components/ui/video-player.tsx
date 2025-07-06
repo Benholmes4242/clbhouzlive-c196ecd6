@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect } from 'react';
 import { Play, Pause, Volume2, VolumeX, Maximize2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useThumbnailGenerator } from '@/components/posts/video/ThumbnailGenerator';
+import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 
 interface VideoPlayerProps {
   src: string;
@@ -17,6 +18,8 @@ interface VideoPlayerProps {
   showOverlayControls?: boolean;
   showVideoIcon?: boolean;
   videoId?: string; // Add videoId for thumbnail generation
+  showMuteButton?: boolean; // Control whether to show mute button in top-left
+  isInFeed?: boolean; // Indicates if this video is in the main feed
 }
 
 const VideoPlayer: React.FC<VideoPlayerProps> = ({
@@ -32,12 +35,15 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   onClick,
   showOverlayControls = true,
   showVideoIcon = false,
-  videoId
+  videoId,
+  showMuteButton = true,
+  isInFeed = false
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(muted);
   const [showControls, setShowControls] = useState(false);
+  const { isGloballyMuted, setGlobalMute } = useGlobalAudio();
   
   // Generate thumbnail for better UX
   const thumbnailId = videoId || `video-${src.split('/').pop()?.split('.')[0] || 'unknown'}`;
@@ -51,7 +57,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     if (!video) return;
 
     // Set initial properties for optimized loading
-    video.muted = muted;
+    video.muted = isInFeed ? isGloballyMuted : muted;
     video.loop = loop;
     video.playsInline = true; // Critical for mobile autoplay
     video.setAttribute('playsinline', 'true'); // iOS compatibility
@@ -103,7 +109,16 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       video.removeEventListener('volumechange', handleVolumeChange);
       video.removeEventListener('loadedmetadata', handleLoadedMetadata);
     };
-  }, [autoplay, muted, loop, onPlay, onPause]);
+  }, [autoplay, muted, loop, onPlay, onPause, isGloballyMuted, isInFeed]);
+
+  // Update video mute state when global mute state changes (for feed videos)
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !isInFeed) return;
+    
+    video.muted = isGloballyMuted;
+    setIsMuted(isGloballyMuted);
+  }, [isGloballyMuted, isInFeed]);
 
   const togglePlayPause = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -122,8 +137,14 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     const video = videoRef.current;
     if (!video) return;
 
-    video.muted = !video.muted;
-    setIsMuted(video.muted);
+    const newMutedState = !video.muted;
+    video.muted = newMutedState;
+    setIsMuted(newMutedState);
+    
+    // Update global mute state if this is a feed video
+    if (isInFeed) {
+      setGlobalMute(newMutedState);
+    }
   };
 
   const handleFullscreen = (e: React.MouseEvent) => {
@@ -181,7 +202,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             onClick={togglePlayPause}
             variant="ghost"
             size="icon"
-            className="h-12 w-12 rounded-full bg-black/50 hover:bg-black/70 text-white hover:text-white"
+            className="h-12 w-12 rounded-full bg-black/50 hover:bg-black/70 text-white hover:text-white border-0"
           >
             {isPlaying ? (
               <Pause className="h-6 w-6" />
@@ -193,11 +214,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       )}
 
       {/* Corner Controls */}
-      {showOverlayControls && (
+      {showOverlayControls && showMuteButton && (
         <div className={`absolute top-2 left-2 flex space-x-2 transition-opacity ${
-          showControls ? 'opacity-100' : 'opacity-0'
+          showControls || isInFeed ? 'opacity-100' : 'opacity-0'
         }`}>
-          {/* Mute Button */}
+          {/* Mute Button - Always visible for feed videos */}
           <Button
             onClick={toggleMute}
             variant="ghost"
@@ -211,15 +232,17 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             )}
           </Button>
 
-          {/* Fullscreen Button */}
-          <Button
-            onClick={handleFullscreen}
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 rounded-full bg-black/50 hover:bg-black/70 text-white hover:text-white"
-          >
-            <Maximize2 className="h-4 w-4" />
-          </Button>
+          {/* Fullscreen Button - Only show on hover for non-feed videos */}
+          {!isInFeed && (
+            <Button
+              onClick={handleFullscreen}
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 rounded-full bg-black/50 hover:bg-black/70 text-white hover:text-white"
+            >
+              <Maximize2 className="h-4 w-4" />
+            </Button>
+          )}
         </div>
       )}
     </div>

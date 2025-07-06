@@ -201,7 +201,9 @@ const InstagramStylePost: React.FC<InstagramStylePostProps> = ({ post, allUserPo
               loop={true}
               className="w-full h-full"
               showVideoIcon={false}
-              showOverlayControls={false}
+              showOverlayControls={true}
+              showMuteButton={true}
+              isInFeed={true}
               videoId={`instagram-${currentMedia.id}`}
             />
           ) : (

@@ -52,7 +52,9 @@ export const UserPostMedia: React.FC<UserPostMediaProps> = ({
           loop={true}
           className="w-full h-full"
           showVideoIcon={true}
-          showOverlayControls={false}
+          showOverlayControls={true}
+          showMuteButton={true}
+          isInFeed={true}
           onClick={() => onMediaClick(mediaItem.media_url, 'video')}
           videoId={`carousel-${mediaItem.id}`}
         />
