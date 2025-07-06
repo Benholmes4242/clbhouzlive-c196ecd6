@@ -1,12 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Heart, MessageCircle, Share } from 'lucide-react';
+import { Heart, MessageCircle, Share, MoreHorizontal, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { useSwipeable } from 'react-swipeable';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import VideoPlayer from '@/components/ui/video-player';
 import LazyImage from '@/components/ui/lazy-image';
 import CoursePostBadge from '../CoursePostBadge';
 import { UserPostData, GolfCourse } from './types';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 interface MobileUserPostProps {
   post: UserPostData;
@@ -15,6 +22,7 @@ interface MobileUserPostProps {
   golfCourse: GolfCourse | null;
   onProfileClick: () => void;
   onMediaClick: (mediaUrl: string, mediaType: 'image' | 'video') => void;
+  onDeletePost: () => void;
 }
 
 export const MobileUserPost: React.FC<MobileUserPostProps> = ({
@@ -23,15 +31,20 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
   timeAgo,
   golfCourse,
   onProfileClick,
-  onMediaClick
+  onMediaClick,
+  onDeletePost
 }) => {
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
+  const { user } = useSupabaseSession();
   
   const { ref: containerRef, isInView } = useIntersectionObserver({
     threshold: 0.5,
     rootMargin: '0px'
   });
+
+  // Check if this is the user's own post
+  const isOwnPost = user?.id === post.user.id;
 
   const swipeHandlers = useSwipeable({
     onSwipedLeft: (eventData) => {
@@ -127,7 +140,7 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
         )}
 
         {/* User Info Overlay */}
-        <div className="absolute top-3 left-2.5 flex items-center space-x-2 z-20">
+        <div className="absolute top-3 left-2.5 flex items-center justify-between w-[calc(100%-20px)] z-20">
           <div className="bg-black/40 backdrop-blur-sm rounded-full p-1.5 flex items-center space-x-2 max-w-[140px]">
             <LazyImage
               src={post.user.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
@@ -154,11 +167,45 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
               </div>
             </div>
           </div>
+
+          {/* Options Menu for Own Posts */}
+          {isOwnPost && (
+            <DropdownMenu modal={false}>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="w-8 h-8 rounded-full bg-black/40 backdrop-blur-sm text-white hover:bg-black/60 transition-all"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent 
+                align="end" 
+                className="w-48 bg-background border shadow-lg z-[200]"
+                sideOffset={5}
+                avoidCollisions={true}
+              >
+                <DropdownMenuItem 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onDeletePost();
+                  }}
+                  className="text-destructive cursor-pointer focus:text-destructive focus:bg-destructive/10"
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete Post
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
 
         {/* Location Tag */}
         {golfCourse && (
-          <div className="absolute top-3 right-3 z-20">
+          <div className="absolute top-16 right-3 z-20">
             <CoursePostBadge 
               course={{
                 id: golfCourse.id,

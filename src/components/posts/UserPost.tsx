@@ -64,6 +64,7 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
           golfCourse={golfCourse}
           onProfileClick={handleProfileClick}
           onMediaClick={handleMediaClick}
+          onDeletePost={handleDeletePost}
         />
       ) : (
         <DesktopUserPost
