@@ -121,6 +121,7 @@ const GolferCard: React.FC<GolferCardProps> = ({ golfer, currentUserId, isMobile
   const navigate = useNavigate();
   const cardRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [isInView, setIsInView] = useState(false);
   
   const { handleFollow } = useProfileActions({
     targetUserId: golfer.id,
@@ -130,16 +131,33 @@ const GolferCard: React.FC<GolferCardProps> = ({ golfer, currentUserId, isMobile
   const displayName = golfer.display_name || golfer.username || 'User';
   const username = golfer.username || `user_${golfer.id.slice(0, 8)}`;
 
-  // Auto-start video playback when component mounts
+  // Intersection Observer for in-view autoplay
   useEffect(() => {
     const video = videoRef.current;
-    if (video && golfer.most_recent_video?.media_url) {
-      // Ensure video starts playing immediately
-      video.currentTime = 0;
-      video.play().catch(error => {
-        console.log('Autoplay prevented for golfer video:', error);
-      });
-    }
+    if (!video) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        const isVisible = entry.isIntersecting && entry.intersectionRatio >= 0.5;
+        setIsInView(isVisible);
+        
+        if (isVisible) {
+          video.currentTime = 0;
+          video.play().catch(error => {
+            console.log('Autoplay prevented for golfer video:', error);
+          });
+        } else {
+          video.pause();
+        }
+      },
+      { 
+        threshold: 0.5,
+        rootMargin: '0px'
+      }
+    );
+
+    observer.observe(video);
+    return () => observer.disconnect();
   }, [golfer.most_recent_video?.media_url]);
 
   const handleFollowClick = async (e: React.MouseEvent) => {
@@ -153,6 +171,9 @@ const GolferCard: React.FC<GolferCardProps> = ({ golfer, currentUserId, isMobile
     navigate(`/profile/${username}`);
   };
 
+  // Generate poster image from profile photo or use default
+  const posterImage = golfer.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face';
+
   return (
     <div 
       ref={cardRef}
@@ -165,6 +186,7 @@ const GolferCard: React.FC<GolferCardProps> = ({ golfer, currentUserId, isMobile
           <video
             ref={videoRef}
             src={golfer.most_recent_video.media_url}
+            poster={posterImage}
             className="w-full h-full object-cover"
             autoPlay
             muted
@@ -174,8 +196,13 @@ const GolferCard: React.FC<GolferCardProps> = ({ golfer, currentUserId, isMobile
             onError={() => console.log('Video failed to load:', golfer.most_recent_video?.media_url)}
           />
         ) : (
-          <div className="w-full h-full bg-muted flex items-center justify-center">
-            <span className="text-sm text-muted-foreground">Video unavailable</span>
+          <div 
+            className="w-full h-full bg-cover bg-center bg-no-repeat flex items-center justify-center"
+            style={{ backgroundImage: `url(${posterImage})` }}
+          >
+            <div className="bg-black/50 text-white text-sm px-3 py-1 rounded">
+              Video unavailable
+            </div>
           </div>
         )}
         
