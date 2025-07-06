@@ -163,7 +163,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const handleVideoClick = () => {
     if (onClick) {
       onClick();
-    } else if (!showOverlayControls) {
+    } else {
+      // Always allow video click to toggle play/pause for feed videos
       togglePlayPause({} as React.MouseEvent);
     }
   };
