@@ -181,11 +181,23 @@ const ClubhouzMomentsCarousel: React.FC = () => {
   const [canScrollRight, setCanScrollRight] = useState(true);
   const isMobile = useIsMobile();
 
-  // Filter posts with video content and valid users
-  const moments = posts.filter(post => 
+  // Filter posts with video content and valid users, then deduplicate by user
+  const filteredPosts = posts.filter(post => 
     post.post_media.some(media => media.media_type === 'video' || media.media_type === 'image') &&
     post.user.id !== user?.id // Don't show current user's posts
-  ).slice(0, 20); // Limit for performance
+  );
+
+  // Deduplicate by user - keep only the most recent post per user
+  const userPostMap = new Map<string, typeof filteredPosts[0]>();
+  
+  filteredPosts.forEach(post => {
+    const existingPost = userPostMap.get(post.user.id);
+    if (!existingPost || new Date(post.created_at) > new Date(existingPost.created_at)) {
+      userPostMap.set(post.user.id, post);
+    }
+  });
+
+  const moments = Array.from(userPostMap.values()).slice(0, 20); // Limit for performance
 
   console.log('ClubhouzMomentsCarousel - moments:', moments.length);
 
