@@ -36,12 +36,12 @@ export const useBackgroundUpload = () => {
       failedFiles: []
     })));
 
-    // Show immediate success toast
-    toast({
-      title: "Post Created!",
-      description: `Your moment is now live! ${mediaFiles.length > 0 ? 'Media files are uploading in the background.' : ''}`,
-      variant: "default"
-    });
+    // Removed redundant toast - center confirmation box is sufficient
+    // toast({
+    //   title: "Post Created!",
+    //   description: `Your moment is now live! ${mediaFiles.length > 0 ? 'Media files are uploading in the background.' : ''}`,
+    //   variant: "default"
+    // });
 
     if (mediaFiles.length === 0) return;
 
