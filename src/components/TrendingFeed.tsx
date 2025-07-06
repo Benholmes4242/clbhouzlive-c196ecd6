@@ -62,7 +62,7 @@ const TrendingFeed = () => {
         `)
         .in('user_id', allConnectedUserIds)
         .order('created_at', { ascending: false })
-        .limit(5);
+        .limit(10);
 
       if (postsError) {
         console.error('Error fetching followed posts:', postsError);
@@ -146,13 +146,11 @@ const TrendingFeed = () => {
   // Listen for feed refresh events
   useEffect(() => {
     const handleFeedRefresh = () => {
-      console.log('Feed refresh triggered - refetching all data');
       refetchUserPosts();
       refetchFollowedPosts();
     };
 
     const handlePostCompleted = () => {
-      console.log('Post upload completed, refreshing feed immediately');
       // Force immediate refetch
       setTimeout(() => {
         refetchUserPosts();
@@ -161,7 +159,6 @@ const TrendingFeed = () => {
     };
 
     const handlePostDeleted = () => {
-      console.log('Post deleted, refreshing feed');
       refetchUserPosts();
       refetchFollowedPosts();
     };
@@ -207,14 +204,7 @@ const TrendingFeed = () => {
     return acc;
   }, [] as UserPostWithType[]);
 
-  // Log post counts for debugging
-  console.log('TrendingFeed - Final post counts:', {
-    userPosts: userPosts.length,
-    followedPosts: followedUsersPosts.length,
-    uniquePosts: uniqueUserPosts.length,
-    optimisticPosts: optimisticPosts.length,
-    totalToShow: uniqueUserPosts.length + optimisticPosts.length
-  });
+  // Removed excessive logging for performance
 
   // Combine all content
   const allContent: (VideoPost | UserPostWithType)[] = [
@@ -246,7 +236,6 @@ const TrendingFeed = () => {
             post={optimisticPost}
             onRetry={() => {
               // Handle retry logic here if needed
-              console.log('Retry upload for:', optimisticPost.id);
             }}
           />
         ))}
@@ -257,13 +246,11 @@ const TrendingFeed = () => {
             <UserPost 
               key={item.id} 
               post={item} 
-              onPostUpdated={() => {
-                console.log('Post updated, refreshing feeds');
+            onPostUpdated={() => {
                 refetchUserPosts();
                 refetchFollowedPosts();
               }}
               onPostDeleted={() => {
-                console.log('Post deleted, refreshing feeds');
                 refetchUserPosts();
                 refetchFollowedPosts();
               }}

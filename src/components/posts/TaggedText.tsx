@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 interface TaggedTextProps {
@@ -13,14 +13,12 @@ interface TaggedTextProps {
   }>;
 }
 
-const TaggedText = ({ text, tags = [] }: TaggedTextProps) => {
+const TaggedText = React.memo(({ text, tags = [] }: TaggedTextProps) => {
   const navigate = useNavigate();
 
   const handleTagClick = (tag: any, event: React.MouseEvent) => {
     event.preventDefault();
     event.stopPropagation();
-    
-    console.log('Tag clicked:', tag);
     
     if (tag.entity_type === 'user') {
       navigate(`/profile/${tag.entity_id}`);
@@ -33,12 +31,10 @@ const TaggedText = ({ text, tags = [] }: TaggedTextProps) => {
     }
   };
 
-  const renderTextWithTags = () => {
+  const renderedContent = useMemo(() => {
     if (!text || tags.length === 0) {
       return text;
     }
-
-    console.log('Rendering text with tags:', { text, tags });
 
     // Create a comprehensive mapping of possible @mentions to tag objects
     const tagMap = new Map();
@@ -62,8 +58,6 @@ const TaggedText = ({ text, tags = [] }: TaggedTextProps) => {
       }
     });
 
-    console.log('Tag map:', Array.from(tagMap.entries()));
-
     // Use regex to find all @mentions and replace them
     const mentionRegex = /@[\w\s]+/g;
     const parts = [];
@@ -77,8 +71,6 @@ const TaggedText = ({ text, tags = [] }: TaggedTextProps) => {
       }
 
       const mention = match[0].trim();
-      console.log('Processing mention:', mention);
-
       // Try to find matching tag
       let matchingTag = tagMap.get(mention) || tagMap.get(mention.toLowerCase());
       
@@ -127,9 +119,9 @@ const TaggedText = ({ text, tags = [] }: TaggedTextProps) => {
     }
 
     return parts.length > 0 ? parts : text;
-  };
+  }, [text, tags]);
 
-  return <span>{renderTextWithTags()}</span>;
-};
+  return <span>{renderedContent}</span>;
+});
 
 export default TaggedText;
