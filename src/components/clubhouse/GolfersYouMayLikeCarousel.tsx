@@ -183,25 +183,40 @@ const GolferCard: React.FC<GolferCardProps> = ({ golfer, currentUserId, isMobile
       {/* Video Background */}
       <div className="w-full h-80 relative">
         {golfer.most_recent_video?.media_url ? (
-          <video
-            ref={videoRef}
-            src={golfer.most_recent_video.media_url}
-            poster={posterImage}
-            className="w-full h-full object-cover"
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="auto"
-            onError={() => console.log('Video failed to load:', golfer.most_recent_video?.media_url)}
-          />
+          <>
+            {/* Always show poster image as background */}
+            <div 
+              className="absolute inset-0 w-full h-full bg-cover bg-center bg-no-repeat"
+              style={{ backgroundImage: `url(${posterImage})` }}
+            />
+            <video
+              ref={videoRef}
+              src={golfer.most_recent_video.media_url}
+              poster={posterImage}
+              className="absolute inset-0 w-full h-full object-cover"
+              autoPlay={false}
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              onLoadStart={() => console.log('Video loading started:', golfer.id)}
+              onCanPlay={() => console.log('Video can play:', golfer.id)}
+              onError={(e) => {
+                console.log('Video failed to load:', golfer.most_recent_video?.media_url, e);
+                // Hide video on error to show poster background
+                if (videoRef.current) {
+                  videoRef.current.style.display = 'none';
+                }
+              }}
+            />
+          </>
         ) : (
           <div 
-            className="w-full h-full bg-cover bg-center bg-no-repeat flex items-center justify-center"
+            className="w-full h-full bg-cover bg-center bg-no-repeat flex items-center justify-end flex-col pb-4"
             style={{ backgroundImage: `url(${posterImage})` }}
           >
             <div className="bg-black/50 text-white text-sm px-3 py-1 rounded">
-              Video unavailable
+              No video available
             </div>
           </div>
         )}
