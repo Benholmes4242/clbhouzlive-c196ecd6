@@ -342,7 +342,7 @@ const ClbhouzMomentsCarousel: React.FC = () => {
   return (
     <div className="w-full mb-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold">Clbhouz Moments</h2>
+          <h2 className="text-lg font-semibold">clbhouz moments</h2>
         </div>
       
       <div className="relative">
