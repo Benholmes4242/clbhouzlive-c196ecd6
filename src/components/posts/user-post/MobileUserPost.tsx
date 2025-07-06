@@ -1,12 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Heart, MessageCircle, Share, MoreHorizontal, Trash2 } from 'lucide-react';
+import { Heart, MessageCircle, Share } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { useSwipeable } from 'react-swipeable';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import VideoPlayer from '@/components/ui/video-player';
@@ -168,39 +162,6 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
             </div>
           </div>
 
-          {/* Options Menu for Own Posts */}
-          {isOwnPost && (
-            <DropdownMenu modal={false}>
-              <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="w-8 h-8 rounded-full bg-black/40 backdrop-blur-sm text-white hover:bg-black/60 transition-all"
-                  onClick={(e) => e.stopPropagation()}
-                >
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent 
-                align="end" 
-                className="w-48 bg-background border shadow-lg z-[200]"
-                sideOffset={5}
-                avoidCollisions={true}
-              >
-                <DropdownMenuItem 
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    onDeletePost();
-                  }}
-                  className="text-destructive cursor-pointer focus:text-destructive focus:bg-destructive/10"
-                >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Delete Post
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
         </div>
 
         {/* Location Tag */}
