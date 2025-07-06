@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import FollowButton from '@/components/profile/actions/FollowButton';
 import { useProfileActions } from '@/components/profile/actions/useProfileActions';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -150,11 +151,23 @@ const MomentCard: React.FC<MomentCardProps> = ({ moment, currentUserId }) => {
           {/* Bottom Section - Golf Course Tag & Follow Button */}
           <div className="space-y-2">
             {golfCourseTag && (
-              <div className="bg-black/40 backdrop-blur-sm rounded-full px-2 py-1 self-start">
-                <p className="text-white text-xs font-medium truncate">
-                  {golfCourseTag.name}
-                </p>
-              </div>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="bg-black/40 backdrop-blur-sm rounded-full px-2 py-1 self-start cursor-default">
+                      <p className="text-white text-xs font-medium truncate max-w-[120px]">
+                        {golfCourseTag.name}
+                      </p>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent 
+                    side="top"
+                    className="hidden md:block bg-gray-900 text-white border-gray-700 shadow-lg rounded-md px-2 py-1 text-xs max-w-[200px] z-[300]"
+                  >
+                    {golfCourseTag.name}
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             )}
             
             {currentUserId !== moment.user.id && (
