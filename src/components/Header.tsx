@@ -15,8 +15,8 @@ const Header = () => {
 
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-b border-border">
-      <div className="container mx-auto px-4 max-w-full overflow-hidden box-border">
-        <div className="flex items-center justify-between h-16 max-w-full overflow-hidden">
+      <div className="container mx-auto px-4 max-w-full box-border">
+        <div className="flex items-center justify-between h-16 max-w-full">
           {/* Logo - Enlarged and optimized positioning */}
           <div className="flex items-center flex-shrink-0 gap-1 md:gap-2 py-1 min-w-0">
             <img
@@ -33,7 +33,7 @@ const Header = () => {
           </div>
 
           {/* Search Bar - Responsive with proper constraints */}
-          <div className="flex-1 max-w-md mx-2 md:mx-4 min-w-0 hidden sm:block">
+          <div className="flex-1 max-w-md mx-2 md:mx-4 min-w-0 hidden sm:block relative z-[60]">
             <HeaderSearch />
           </div>
 
