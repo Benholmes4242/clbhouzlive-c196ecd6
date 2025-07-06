@@ -220,8 +220,7 @@ const InstagramStylePost: React.FC<InstagramStylePostProps> = ({ post, allUserPo
         {/* Media Container - Full width, responsive height */}
         <div 
           {...swipeHandlers}
-          className="relative w-full aspect-[4/5] md:aspect-[3/4] cursor-pointer" 
-          onClick={handleMediaClick}
+          className="relative w-full aspect-[4/5] md:aspect-[3/4]" 
         >
           {currentMedia.media_type === 'video' ? (
             <VideoPlayer
@@ -241,7 +240,8 @@ const InstagramStylePost: React.FC<InstagramStylePostProps> = ({ post, allUserPo
             <LazyImage
               src={currentMedia.media_url}
               alt="Post content"
-              className="w-full h-full object-cover"
+              className="w-full h-full object-cover cursor-pointer"
+              onClick={handleMediaClick}
             />
           )}
 
