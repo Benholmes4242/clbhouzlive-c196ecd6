@@ -171,7 +171,7 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
                 country: golfCourse.country,
                 region: golfCourse.region
               }}
-              className="bg-black/40 backdrop-blur-sm border border-white/20 text-xs"
+              className="text-xs"
             />
           )}
         </div>
