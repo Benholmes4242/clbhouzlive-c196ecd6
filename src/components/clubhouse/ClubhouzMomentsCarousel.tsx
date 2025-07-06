@@ -22,6 +22,8 @@ interface MomentUser {
 }
 
 const ClubhouzMomentsCarousel: React.FC = () => {
+  console.log('ClubhouzMomentsCarousel: Component starting to render');
+  
   const { user } = useSupabaseSession();
   const { toast } = useToast();
   const isMobile = useIsMobile();
@@ -30,11 +32,21 @@ const ClubhouzMomentsCarousel: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [followingStates, setFollowingStates] = useState<Record<string, boolean>>({});
 
+  console.log('ClubhouzMomentsCarousel: State initialized, user:', user?.id);
+
   const cardsPerView = isMobile ? 2 : 4;
 
   useEffect(() => {
+    console.log('ClubhouzMomentsCarousel: useEffect triggered, user:', user?.id);
+    
     const fetchData = async () => {
-      if (!user) return;
+      if (!user) {
+        console.log('ClubhouzMomentsCarousel: No user, skipping fetch');
+        setIsLoading(false);
+        return;
+      }
+      
+      console.log('ClubhouzMomentsCarousel: Starting data fetch');
       
       try {
         // Get posts with videos
