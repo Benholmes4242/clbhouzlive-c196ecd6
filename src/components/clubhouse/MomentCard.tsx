@@ -146,23 +146,25 @@ const MomentCard: React.FC<MomentCardProps> = ({ moment, currentUserId }) => {
           {/* Bottom Section - Golf Course Tag & Follow Button */}
           <div className="space-y-2">
             {golfCourseTag && (
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className="bg-black/40 backdrop-blur-sm rounded-full px-2 py-1 self-center cursor-default max-w-[160px]">
-                      <p className="text-white text-xs font-medium truncate">
-                        {golfCourseTag.name}
-                      </p>
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent 
-                    side="top"
-                    className="hidden md:block bg-gray-900 text-white border-gray-700 shadow-lg rounded-md px-2 py-1 text-xs max-w-[200px] z-[300]"
-                  >
-                    {golfCourseTag.name}
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              <div className="flex justify-center">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="bg-black/40 backdrop-blur-sm rounded-full px-2 py-1 cursor-default max-w-[160px]">
+                        <p className="text-white text-xs font-medium truncate">
+                          {golfCourseTag.name}
+                        </p>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent 
+                      side="top"
+                      className="hidden md:block bg-gray-900 text-white border-gray-700 shadow-lg rounded-md px-2 py-1 text-xs max-w-[200px] z-[300]"
+                    >
+                      {golfCourseTag.name}
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </div>
             )}
             
             {currentUserId !== moment.user.id && (
