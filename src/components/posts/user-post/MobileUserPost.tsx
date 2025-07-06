@@ -162,11 +162,8 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
             </div>
           </div>
 
-        </div>
-
-        {/* Location Tag */}
-        {golfCourse && (
-          <div className="absolute top-12 right-3 z-20">
+          {/* Location Tag */}
+          {golfCourse && (
             <CoursePostBadge 
               course={{
                 id: golfCourse.id,
@@ -176,8 +173,9 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
               }}
               className="bg-black/40 backdrop-blur-sm border border-white/20 text-xs"
             />
-          </div>
-        )}
+          )}
+        </div>
+
 
         {/* Media Navigation Dots */}
         {post.post_media.length > 1 && (
