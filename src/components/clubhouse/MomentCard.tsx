@@ -150,11 +150,9 @@ const MomentCard: React.FC<MomentCardProps> = ({ moment, currentUserId }) => {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <div className="bg-black/40 backdrop-blur-sm rounded-full px-2 py-1 cursor-default max-w-[160px]">
-                        <p className="text-white text-xs font-medium truncate">
-                          {golfCourseTag.name}
-                        </p>
-                      </div>
+                      <span className="bg-black/60 text-white rounded-full px-3 py-1.5 text-xs font-medium cursor-default max-w-[160px] truncate">
+                        {golfCourseTag.name}
+                      </span>
                     </TooltipTrigger>
                     <TooltipContent 
                       side="top"
