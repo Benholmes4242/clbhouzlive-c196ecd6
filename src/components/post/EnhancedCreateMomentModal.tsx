@@ -8,6 +8,7 @@ import EnhancedMediaUpload from '../posts/EnhancedMediaUpload';
 import RichTextInput from '../posts/RichTextInput';
 import { useTaggableEntities } from '@/hooks/useTaggableEntities';
 import { useToast } from '@/hooks/use-toast';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface TaggableEntity {
   id: string;
@@ -65,6 +66,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
   const { toast } = useToast();
   const [isInitialized, setIsInitialized] = useState(false);
   const [modalMode, setModalMode] = useState<'selection' | 'upload'>('selection');
+  const isMobile = useIsMobile();
 
   // Reset state when modal opens/closes
   useEffect(() => {
@@ -243,17 +245,19 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
             {modalMode === 'selection' ? (
               /* Action Selection View */
               <div className="space-y-3">
-                {/* Capture Photo or Video */}
-                <button
-                  onClick={handleCaptureClick}
-                  className="w-full flex items-center gap-4 p-3 bg-gray-50 hover:bg-orange-50 rounded-xl transition-colors"
-                  disabled={isSubmitting}
-                >
-                  <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
-                    <Camera className="w-5 h-5 text-orange-600" />
-                  </div>
-                  <span className="text-gray-800 font-medium">Capture Photo or Video</span>
-                </button>
+                {/* Capture Photo or Video - Mobile Only */}
+                {isMobile && (
+                  <button
+                    onClick={handleCaptureClick}
+                    className="w-full flex items-center gap-4 p-3 bg-gray-50 hover:bg-orange-50 rounded-xl transition-colors"
+                    disabled={isSubmitting}
+                  >
+                    <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                      <Camera className="w-5 h-5 text-orange-600" />
+                    </div>
+                    <span className="text-gray-800 font-medium">Capture Photo or Video</span>
+                  </button>
+                )}
 
                 {/* Select Photos */}
                 <button
