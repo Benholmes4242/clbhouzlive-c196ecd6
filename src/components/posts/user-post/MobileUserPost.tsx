@@ -166,7 +166,7 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
 
         {/* Location Tag */}
         {golfCourse && (
-          <div className="absolute top-16 right-3 z-20">
+          <div className="absolute top-12 right-3 z-20">
             <CoursePostBadge 
               course={{
                 id: golfCourse.id,
