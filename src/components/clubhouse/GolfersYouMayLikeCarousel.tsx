@@ -134,7 +134,7 @@ const GolferCard: React.FC<GolferCardProps> = ({ golfer, currentUserId, isMobile
   // Intersection Observer for in-view autoplay
   useEffect(() => {
     const video = videoRef.current;
-    if (!video) return;
+    if (!video || !golfer.most_recent_video?.media_url) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -142,21 +142,32 @@ const GolferCard: React.FC<GolferCardProps> = ({ golfer, currentUserId, isMobile
         setIsInView(isVisible);
         
         if (isVisible) {
+          // Reset video to start and attempt play
           video.currentTime = 0;
-          video.play().catch(error => {
-            console.log('Autoplay prevented for golfer video:', error);
-          });
+          const playPromise = video.play();
+          
+          if (playPromise !== undefined) {
+            playPromise.catch(error => {
+              console.log('Desktop autoplay prevented, video will show poster:', error);
+              // Don't hide video, let poster show through
+            });
+          }
         } else {
           video.pause();
         }
       },
       { 
         threshold: 0.5,
-        rootMargin: '0px'
+        rootMargin: '50px' // Start loading earlier
       }
     );
 
-    observer.observe(video);
+    // Observe the card container instead of video for better detection
+    const card = cardRef.current;
+    if (card) {
+      observer.observe(card);
+    }
+    
     return () => observer.disconnect();
   }, [golfer.most_recent_video?.media_url]);
 
@@ -193,19 +204,31 @@ const GolferCard: React.FC<GolferCardProps> = ({ golfer, currentUserId, isMobile
               ref={videoRef}
               src={golfer.most_recent_video.media_url}
               poster={posterImage}
-              className="absolute inset-0 w-full h-full object-cover"
+              className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-300"
+              style={{ opacity: isInView ? 1 : 0 }}
               autoPlay={false}
               muted
               loop
               playsInline
               preload="metadata"
-              onLoadStart={() => console.log('Video loading started:', golfer.id)}
-              onCanPlay={() => console.log('Video can play:', golfer.id)}
+              onLoadStart={() => {
+                console.log('Video loading started:', golfer.id);
+              }}
+              onCanPlay={() => {
+                console.log('Video can play:', golfer.id);
+                // Only show video if it's ready to play
+                if (videoRef.current) {
+                  videoRef.current.style.opacity = '1';
+                }
+              }}
+              onLoadedData={() => {
+                console.log('Video loaded data:', golfer.id);
+              }}
               onError={(e) => {
                 console.log('Video failed to load:', golfer.most_recent_video?.media_url, e);
-                // Hide video on error to show poster background
+                // Keep video hidden on error to show poster background
                 if (videoRef.current) {
-                  videoRef.current.style.display = 'none';
+                  videoRef.current.style.opacity = '0';
                 }
               }}
             />
