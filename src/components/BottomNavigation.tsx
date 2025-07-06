@@ -137,17 +137,11 @@ const BottomNavigation = () => {
     if (tab.isAction && tab.id === 'post') {
       if (!user) return;
       
-      if (isDesktop) {
-        // Desktop: Skip gallery picker, go directly to Create a Moment modal
-        console.log('Post tab clicked on desktop, opening Create a Moment modal directly');
-        setLocalSelectedTags([]);
-        // Open composer directly without files - modal will handle file upload UI
-        openComposer();
-      } else {
-        // Mobile: Keep existing flow with gallery picker
-        console.log('Post tab clicked on mobile, opening gallery picker');
-        openGallery();
-      }
+      // Both mobile and desktop now use the new EnhancedCreateMomentModal
+      console.log('Post tab clicked, opening Create a Moment modal directly');
+      setLocalSelectedTags([]);
+      // Open composer directly without files - modal will handle file upload UI
+      openComposer();
     } else {
       handleTabClick(tab, user, () => {});
     }
