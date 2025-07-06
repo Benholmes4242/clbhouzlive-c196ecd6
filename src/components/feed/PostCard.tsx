@@ -50,7 +50,7 @@ interface PostCardProps {
 }
 
 const PostCard = ({ post }: PostCardProps) => {
-  console.log('PostCard rendering with golfClubTags:', post.golfClubTags);
+  // Removed excessive logging for performance
   
   return (
     <Card className="border-0 shadow-sm">

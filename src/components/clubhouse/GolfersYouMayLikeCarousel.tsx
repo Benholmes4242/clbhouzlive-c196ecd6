@@ -132,61 +132,57 @@ const GolferCard: React.FC<GolferCardProps> = ({ golfer, currentUserId, isMobile
   const displayName = golfer.display_name || golfer.username || 'User';
   const username = golfer.username || `user_${golfer.id.slice(0, 8)}`;
 
-  // Intersection Observer for mobile autoplay only
+  // Video control logic - separate for mobile and desktop
   useEffect(() => {
     const video = videoRef.current;
-    if (!video || !golfer.most_recent_video?.media_url || !isMobile) return;
+    if (!video || !golfer.most_recent_video?.media_url) return;
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        const isVisible = entry.isIntersecting && entry.intersectionRatio >= 0.5;
-        setIsInView(isVisible);
-        
-        if (isVisible) {
-          video.currentTime = 0;
-          const playPromise = video.play();
+    let observer: IntersectionObserver | null = null;
+
+    if (isMobile) {
+      // Mobile: autoplay based on intersection
+      observer = new IntersectionObserver(
+        ([entry]) => {
+          const isVisible = entry.isIntersecting && entry.intersectionRatio >= 0.5;
+          setIsInView(isVisible);
           
-          if (playPromise !== undefined) {
-            playPromise.catch(error => {
-              console.log('Mobile autoplay prevented:', error);
+          if (isVisible && !isHovered) { // Don't conflict with hover
+            video.currentTime = 0;
+            video.play().catch(() => {
+              // Silent fail for autoplay prevention
             });
+          } else if (!isVisible) {
+            video.pause();
           }
-        } else {
-          video.pause();
+        },
+        { 
+          threshold: 0.5,
+          rootMargin: '50px'
         }
-      },
-      { 
-        threshold: 0.5,
-        rootMargin: '50px'
-      }
-    );
+      );
 
-    const card = cardRef.current;
-    if (card) {
-      observer.observe(card);
-    }
-    
-    return () => observer.disconnect();
-  }, [golfer.most_recent_video?.media_url, isMobile]);
-
-  // Desktop hover autoplay
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video || !golfer.most_recent_video?.media_url || isMobile) return;
-
-    if (isHovered) {
-      video.currentTime = 0;
-      const playPromise = video.play();
-      
-      if (playPromise !== undefined) {
-        playPromise.catch(error => {
-          console.log('Desktop hover autoplay prevented:', error);
-        });
+      const card = cardRef.current;
+      if (card) {
+        observer.observe(card);
       }
     } else {
-      video.pause();
+      // Desktop: autoplay based on hover only
+      if (isHovered) {
+        video.currentTime = 0;
+        video.play().catch(() => {
+          // Silent fail for autoplay prevention
+        });
+      } else {
+        video.pause();
+      }
     }
-  }, [isHovered, golfer.most_recent_video?.media_url, isMobile]);
+    
+    return () => {
+      if (observer) {
+        observer.disconnect();
+      }
+    };
+  }, [golfer.most_recent_video?.media_url, isMobile, isHovered]);
 
   const handleFollowClick = async (e: React.MouseEvent) => {
     e.stopPropagation();

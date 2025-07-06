@@ -25,14 +25,7 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, ...props 
 
   if (item.type === 'cta') return null;
 
-  console.log('MediaCard rendering:', {
-    id: item.id,
-    type: item.type,
-    src: item.src,
-    title: item.title,
-    hasValidSrc: !!item.src && item.src.length > 0,
-    golfCourse: item.golfCourse
-  });
+  // Removed excessive logging for performance
 
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();

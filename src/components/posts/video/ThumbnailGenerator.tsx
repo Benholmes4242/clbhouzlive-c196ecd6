@@ -14,7 +14,6 @@ export const useThumbnailGenerator = (src: string, videoId: string, poster?: str
     // Check if we already have a cached thumbnail
     const cachedThumbnail = thumbnailCache.get(videoId);
     if (cachedThumbnail) {
-      console.log('Using cached thumbnail for:', videoId);
       setThumbnailSrc(cachedThumbnail);
       setThumbnailReady(true);
       return;
@@ -27,7 +26,6 @@ export const useThumbnailGenerator = (src: string, videoId: string, poster?: str
         setThumbnailSrc(dataURL);
         setThumbnailReady(true);
       }).catch(() => {
-        console.log('Existing promise failed for:', videoId);
         setThumbnailError(true);
         if (poster) {
           setThumbnailSrc(poster);
@@ -46,10 +44,8 @@ export const useThumbnailGenerator = (src: string, videoId: string, poster?: str
         setThumbnailSrc(dataURL);
         setThumbnailReady(true);
         setThumbnailError(false);
-        console.log('Real thumbnail ready for:', videoId);
       })
       .catch(() => {
-        console.log('Thumbnail generation failed for:', videoId);
         setThumbnailError(true);
         // Use poster as fallback
         if (poster) {

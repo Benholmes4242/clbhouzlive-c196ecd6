@@ -92,13 +92,7 @@ const FollowerStats: React.FC<FollowerStatsProps> = ({ userId, userType = 'indiv
     }
   };
 
-  console.log('FollowerStats rendering - counts:', { 
-    followerCount, 
-    followingCount, 
-    isLoadingFollowers,
-    isLoadingFollowing,
-    isOwnProfile
-  });
+  // Removed excessive logging for performance
 
   return (
     <div className={compact ? "flex items-center gap-4" : "flex justify-center gap-8 py-4 border-y border-border"}>

@@ -30,13 +30,10 @@ export const generateVideoThumbnail = (src: string, videoId: string): Promise<st
           thumbnailCache.set(videoId, dataURL);
           resolved = true;
           resolve(dataURL);
-          
-          console.log('Real thumbnail generated and cached for:', videoId);
         } else {
-          console.log('Video dimensions not ready for:', videoId);
+          // Video dimensions not ready, will retry
         }
       } catch (error) {
-        console.log('Error generating thumbnail for:', videoId, error);
         if (!resolved) {
           resolved = true;
           reject(error);
@@ -56,7 +53,6 @@ export const generateVideoThumbnail = (src: string, videoId: string): Promise<st
     };
     
     video.onerror = () => {
-      console.log('Video error during thumbnail generation:', videoId);
       if (!resolved) {
         resolved = true;
         reject(new Error('Video thumbnail generation failed'));
@@ -69,7 +65,6 @@ export const generateVideoThumbnail = (src: string, videoId: string): Promise<st
     // Timeout for thumbnail generation
     setTimeout(() => {
       if (!resolved) {
-        console.log('Thumbnail generation timeout for:', videoId);
         resolved = true;
         reject(new Error('Thumbnail generation timeout'));
       }

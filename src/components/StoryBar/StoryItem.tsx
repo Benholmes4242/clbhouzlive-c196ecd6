@@ -19,12 +19,7 @@ const StoryItem: React.FC<StoryItemProps> = ({
 }) => {
   const isYourProfile = story.type === 'add';
   
-  console.log('Rendering story item:', { 
-    user: story.user, 
-    type: story.type, 
-    hasAvatar: !!story.avatar,
-    avatar: story.avatar 
-  });
+  // Removed excessive logging for performance
 
   return (
     <div className="flex flex-col items-center space-y-1 min-w-0">

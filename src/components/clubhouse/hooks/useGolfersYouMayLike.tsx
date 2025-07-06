@@ -145,20 +145,14 @@ export const useGolfersYouMayLike = () => {
         is_following: followingIds.has(golfer.id)
       }));
 
-      console.log('Processed golfers with video data:', processedGolfers.map(g => ({
-        name: g.display_name || g.username,
-        videoUrl: g.most_recent_video.media_url,
-        hasValidVideo: !!g.most_recent_video.media_url && g.most_recent_video.media_url.length > 0,
-        isVideo: g.most_recent_video.media_url?.includes('video') || g.most_recent_video.media_url?.includes('.mp4') || g.most_recent_video.media_url?.includes('.mov')
-      })));
-
+      // Removed excessive logging for performance
+      
       // FINAL TRIPLE-CHECK: Absolutely no photos allowed
       const videoOnlyGolfers = processedGolfers.filter(golfer => {
         const mediaUrl = golfer.most_recent_video.media_url;
         
         // Must have a valid media URL
         if (!mediaUrl || mediaUrl.length === 0) {
-          console.warn(`Filtering out ${golfer.display_name || golfer.username} - no media URL`);
           return false;
         }
 
@@ -171,7 +165,6 @@ export const useGolfersYouMayLike = () => {
                        mediaUrl.includes('image');
 
         if (isImage) {
-          console.warn(`BLOCKING IMAGE: ${golfer.display_name || golfer.username} - contains image extension: ${mediaUrl}`);
           return false;
         }
 
@@ -182,13 +175,7 @@ export const useGolfersYouMayLike = () => {
                        mediaUrl.includes('.avi') ||
                        mediaUrl.includes('video');
 
-        if (!isVideo) {
-          console.warn(`BLOCKING NON-VIDEO: ${golfer.display_name || golfer.username} - no video indicators: ${mediaUrl}`);
-          return false;
-        }
-
-        console.log(`✅ APPROVED VIDEO: ${golfer.display_name || golfer.username} - ${mediaUrl}`);
-        return true;
+        return isVideo;
       });
 
       if (reset) {

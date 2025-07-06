@@ -59,7 +59,7 @@ const NotificationsList: React.FC<NotificationsListProps> = ({
     <Card>
       <CardContent className="p-0">
         {notifications.map((notification) => {
-          console.log('Rendering notification:', notification); // Debug log
+          // Removed excessive logging for performance
           
           if (notification.type === 'follow') {
             return (
