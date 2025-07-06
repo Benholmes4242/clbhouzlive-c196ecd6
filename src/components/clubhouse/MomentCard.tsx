@@ -166,7 +166,7 @@ const MomentCard: React.FC<MomentCardProps> = ({ moment, currentUserId }) => {
             )}
             
             {currentUserId !== moment.user.id && (
-              <div className="flex justify-end">
+              <div className="flex justify-center">
                 <FollowButton
                   isFollowing={isFollowing}
                   loading={loading}

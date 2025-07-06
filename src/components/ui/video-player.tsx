@@ -206,7 +206,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             onClick={togglePlayPause}
             variant="ghost"
             size="icon"
-            className="h-12 w-12 rounded-full bg-black/50 hover:bg-black/70 text-white hover:text-white border-0"
+            className="h-12 w-12 rounded-full bg-black/40 hover:bg-black/60 text-white hover:text-white border-0 backdrop-blur-sm"
           >
             {isPlaying ? (
               <Pause className="h-6 w-6" />
@@ -227,7 +227,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
             onClick={toggleMute}
             variant="ghost"
             size="icon"
-            className="h-8 w-8 rounded-full bg-black/50 hover:bg-black/70 text-white hover:text-white"
+            className="h-8 w-8 rounded-full bg-black/40 hover:bg-black/60 text-white hover:text-white backdrop-blur-sm"
           >
             {isMuted ? (
               <VolumeX className="h-4 w-4" />
@@ -242,7 +242,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
               onClick={handleFullscreen}
               variant="ghost"
               size="icon"
-              className="h-8 w-8 rounded-full bg-black/50 hover:bg-black/70 text-white hover:text-white"
+              className="h-8 w-8 rounded-full bg-black/40 hover:bg-black/60 text-white hover:text-white backdrop-blur-sm"
             >
               <Maximize2 className="h-4 w-4" />
             </Button>

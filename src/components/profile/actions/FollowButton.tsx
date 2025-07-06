@@ -31,11 +31,11 @@ const FollowButton: React.FC<FollowButtonProps> = ({
 
   return (
     <Button
-      variant={getButtonVariant()}
+      variant="ghost"
       size="sm"
       onClick={onFollow}
       disabled={loading}
-      className="px-2 py-1 text-xs h-7 flex-shrink-0"
+      className="px-3 py-1.5 text-xs h-7 flex-shrink-0 bg-black/40 hover:bg-black/60 text-white hover:text-white backdrop-blur-sm rounded-md"
     >
       {getButtonIcon()}
       <span className="ml-1">{getButtonText()}</span>
