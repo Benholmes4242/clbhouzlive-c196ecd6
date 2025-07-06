@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { X } from 'lucide-react';
+import { X, Camera, Image, Video } from 'lucide-react';
 import CourseTagInput from '../posts/CourseTagInput';
 import GolfCoursePin from '../posts/GolfCoursePin';
 import EnhancedMediaUpload from '../posts/EnhancedMediaUpload';
@@ -64,6 +64,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
   const { entities, searchEntities } = useTaggableEntities();
   const { toast } = useToast();
   const [isInitialized, setIsInitialized] = useState(false);
+  const [modalMode, setModalMode] = useState<'selection' | 'upload'>('selection');
 
   // Reset state when modal opens/closes
   useEffect(() => {
@@ -72,14 +73,17 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
         setCaption(initialCaption);
         setSelectedTags(initialTags);
         setFiles(initialFiles);
+        setModalMode('upload'); // Skip selection for edit mode
       } else {
         setCaption('');
         setSelectedTags([]);
         setFiles(initialFiles);
+        setModalMode(initialFiles.length > 0 ? 'upload' : 'selection');
       }
       setIsInitialized(true);
     } else if (!isOpen) {
       setIsInitialized(false);
+      setModalMode('selection');
     }
   }, [isOpen, editMode, initialCaption, initialTags, initialFiles, isInitialized]);
 
@@ -139,122 +143,264 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
     setCaption('');
     setFiles([]);
     setSelectedTags([]);
+    setModalMode('selection');
     onClose();
   };
 
+  // Action button handlers
+  const handleCaptureClick = () => {
+    // Use camera API if available, otherwise fallback to file input
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      // For now, trigger file input with camera preference
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*,video/*';
+      input.capture = 'environment'; // Use rear camera
+      input.onchange = (event) => {
+        const selectedFiles = Array.from((event.target as HTMLInputElement).files || []);
+        if (selectedFiles.length > 0) {
+          setFiles(selectedFiles);
+          setModalMode('upload');
+        }
+      };
+      input.click();
+    } else {
+      // Fallback for devices without camera API
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*,video/*';
+      input.onchange = (event) => {
+        const selectedFiles = Array.from((event.target as HTMLInputElement).files || []);
+        if (selectedFiles.length > 0) {
+          setFiles(selectedFiles);
+          setModalMode('upload');
+        }
+      };
+      input.click();
+    }
+  };
+
+  const handleSelectPhotos = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.multiple = true;
+    input.onchange = (event) => {
+      const selectedFiles = Array.from((event.target as HTMLInputElement).files || []);
+      if (selectedFiles.length > 0) {
+        setFiles(selectedFiles);
+        setModalMode('upload');
+      }
+    };
+    input.click();
+  };
+
+  const handleSelectVideos = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'video/*';
+    input.multiple = true;
+    input.onchange = (event) => {
+      const selectedFiles = Array.from((event.target as HTMLInputElement).files || []);
+      if (selectedFiles.length > 0) {
+        setFiles(selectedFiles);
+        setModalMode('upload');
+      }
+    };
+    input.click();
+  };
+
+  const handleBackToSelection = () => {
+    setFiles([]);
+    setCaption('');
+    setSelectedTags([]);
+    setModalMode('selection');
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogTitle className="text-center text-lg font-semibold">
-          {editMode ? 'Edit Moment' : 'Create a Moment'}
-        </DialogTitle>
-        <DialogDescription className="sr-only">
-          {editMode ? 'Edit your moment details and media' : 'Upload media files, add caption and post your moment'}
-        </DialogDescription>
-        
-        <div className="space-y-6">
-          {/* Enhanced Media Upload Section */}
-          <div>
-            <EnhancedMediaUpload
-              onFilesChange={setFiles}
-              maxFiles={10}
-              initialFiles={initialFiles}
-              existingMediaUrls={editMode ? existingMediaUrls : []}
-              acceptedTypes={['image/*', 'video/*']}
-              disabled={isSubmitting}
-            />
-          </div>
+    <>
+      {/* Bottom Sheet Overlay */}
+      {isOpen && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center">
+          {/* Semi-transparent background */}
+          <div 
+            className="absolute inset-0 bg-black/50 transition-opacity"
+            onClick={onClose}
+          />
+          
+          {/* Bottom Sheet Modal */}
+          <div className="relative w-full max-w-lg bg-white rounded-t-2xl p-4 animate-slide-in-up max-h-[90vh] overflow-y-auto">
+            {/* Drag indicator */}
+            <div className="w-9 h-1 bg-gray-300 rounded-full mx-auto mb-4" />
+            
+            {/* Header */}
+            <div className="text-center mb-6">
+              <h2 className="text-lg font-semibold text-gray-900">
+                {editMode ? 'Edit Moment' : 'Create a Moment'}
+              </h2>
+            </div>
 
-          {/* Caption Input */}
-          <div className="relative">
-            <RichTextInput
-              value={caption}
-              onChange={handleCaptionChange}
-              placeholder="Write about your moment... Use @ to tag people or businesses"
-              selectedTags={selectedTags}
-              disabled={isSubmitting}
-            />
-
-            {/* Mention Suggestions */}
-            {showSuggestions && entities.length > 0 && (
-              <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-md shadow-lg max-h-40 overflow-y-auto z-50 mt-1">
-                {entities.map((entity) => (
-                  <div
-                    key={`${entity.entity_type}-${entity.entity_id}-${entity.id}`}
-                    className="px-3 py-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2 transition-colors"
-                    onClick={() => handleSelectMention(entity)}
-                  >
-                    <div className="flex flex-col">
-                      <span className="font-medium text-blue-600">
-                        @{entity.username || entity.name}
-                      </span>
-                      <span className="text-xs text-gray-500 capitalize">
-                        {entity.entity_type.replace('_', ' ')} • {entity.name}
-                      </span>
-                    </div>
+            {modalMode === 'selection' ? (
+              /* Action Selection View */
+              <div className="space-y-3">
+                {/* Capture Photo or Video */}
+                <button
+                  onClick={handleCaptureClick}
+                  className="w-full flex items-center gap-4 p-3 bg-gray-50 hover:bg-orange-50 rounded-xl transition-colors"
+                  disabled={isSubmitting}
+                >
+                  <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                    <Camera className="w-5 h-5 text-orange-600" />
                   </div>
-                ))}
+                  <span className="text-gray-800 font-medium">Capture Photo or Video</span>
+                </button>
+
+                {/* Select Photos */}
+                <button
+                  onClick={handleSelectPhotos}
+                  className="w-full flex items-center gap-4 p-3 bg-gray-50 hover:bg-orange-50 rounded-xl transition-colors"
+                  disabled={isSubmitting}
+                >
+                  <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                    <Image className="w-5 h-5 text-orange-600" />
+                  </div>
+                  <span className="text-gray-800 font-medium">Select Photos</span>
+                </button>
+
+                {/* Select Videos */}
+                <button
+                  onClick={handleSelectVideos}
+                  className="w-full flex items-center gap-4 p-3 bg-gray-50 hover:bg-orange-50 rounded-xl transition-colors"
+                  disabled={isSubmitting}
+                >
+                  <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
+                    <Video className="w-5 h-5 text-orange-600" />
+                  </div>
+                  <span className="text-gray-800 font-medium">Select Videos</span>
+                </button>
+
+                {/* Helper Text */}
+                <p className="text-xs text-gray-500 mt-2 px-1">
+                  Select multiple files to create a carousel post with swipeable media.
+                </p>
+              </div>
+            ) : (
+              /* Upload View */
+              <div className="space-y-6">
+                {/* Back Button */}
+                <button
+                  onClick={handleBackToSelection}
+                  className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors mb-4"
+                >
+                  <X className="w-4 h-4" />
+                  <span className="text-sm">Back to options</span>
+                </button>
+
+                {/* Enhanced Media Upload Section */}
+                <div>
+                  <EnhancedMediaUpload
+                    onFilesChange={setFiles}
+                    maxFiles={10}
+                    initialFiles={files}
+                    existingMediaUrls={editMode ? existingMediaUrls : []}
+                    acceptedTypes={['image/*', 'video/*']}
+                    disabled={isSubmitting}
+                  />
+                </div>
+
+                {/* Caption Input */}
+                <div className="relative">
+                  <RichTextInput
+                    value={caption}
+                    onChange={handleCaptionChange}
+                    placeholder="Write about your moment... Use @ to tag people or businesses"
+                    selectedTags={selectedTags}
+                    disabled={isSubmitting}
+                  />
+
+                  {/* Mention Suggestions */}
+                  {showSuggestions && entities.length > 0 && (
+                    <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-md shadow-lg max-h-40 overflow-y-auto z-50 mt-1">
+                      {entities.map((entity) => (
+                        <div
+                          key={`${entity.entity_type}-${entity.entity_id}-${entity.id}`}
+                          className="px-3 py-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2 transition-colors"
+                          onClick={() => handleSelectMention(entity)}
+                        >
+                          <div className="flex flex-col">
+                            <span className="font-medium text-blue-600">
+                              @{entity.username || entity.name}
+                            </span>
+                            <span className="text-xs text-gray-500 capitalize">
+                              {entity.entity_type.replace('_', ' ')} • {entity.name}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Selected Tags */}
+                {selectedTags.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {selectedTags.map((tag) => (
+                      <div
+                        key={tag.id}
+                        className="inline-flex items-center gap-1 bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs"
+                      >
+                        <span>@{tag.username || tag.name}</span>
+                        <button
+                          onClick={() => setSelectedTags(prev => prev.filter(t => t.id !== tag.id))}
+                          className="ml-1 text-blue-600 hover:text-blue-800"
+                        >
+                          <X size={12} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Golf Course Selection */}
+                {onCourseSelect && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Golf Course (Optional)
+                    </label>
+                    <CourseTagInput
+                      selectedCourse={selectedCourse || null}
+                      onCourseSelect={onCourseSelect}
+                      placeholder="Start typing to find a course..."
+                    />
+                  </div>
+                )}
+
+                {/* Action Buttons */}
+                <div className="flex gap-3 justify-end pt-4 border-t">
+                  <Button
+                    variant="outline"
+                    onClick={handleCancel}
+                    disabled={isSubmitting}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={handleSubmit}
+                    disabled={isSubmitting || (files.length === 0 && existingMediaUrls.length === 0)}
+                    className="bg-primary text-primary-foreground hover:bg-primary/90"
+                  >
+                    {isSubmitting 
+                      ? (editMode ? 'Updating...' : 'Posting...') 
+                      : (editMode ? 'Update' : `Post ${files.length > 0 ? `(${files.length} file${files.length > 1 ? 's' : ''})` : ''}`)
+                    }
+                  </Button>
+                </div>
               </div>
             )}
           </div>
-
-          {/* Selected Tags */}
-          {selectedTags.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {selectedTags.map((tag) => (
-                <div
-                  key={tag.id}
-                  className="inline-flex items-center gap-1 bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs"
-                >
-                  <span>@{tag.username || tag.name}</span>
-                  <button
-                    onClick={() => setSelectedTags(prev => prev.filter(t => t.id !== tag.id))}
-                    className="ml-1 text-blue-600 hover:text-blue-800"
-                  >
-                    <X size={12} />
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {/* Golf Course Selection */}
-          {onCourseSelect && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Golf Course (Optional)
-              </label>
-              <CourseTagInput
-                selectedCourse={selectedCourse || null}
-                onCourseSelect={onCourseSelect}
-                placeholder="Start typing to find a course..."
-              />
-            </div>
-          )}
-
-          {/* Action Buttons */}
-          <div className="flex gap-3 justify-end pt-4 border-t">
-            <Button
-              variant="outline"
-              onClick={handleCancel}
-              disabled={isSubmitting}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={handleSubmit}
-              disabled={isSubmitting || (files.length === 0 && existingMediaUrls.length === 0)}
-              className="bg-primary text-primary-foreground hover:bg-primary/90"
-            >
-              {isSubmitting 
-                ? (editMode ? 'Updating...' : 'Posting...') 
-                : (editMode ? 'Update' : `Post ${files.length > 0 ? `(${files.length} file${files.length > 1 ? 's' : ''})` : ''}`)
-              }
-            </Button>
-          </div>
         </div>
-      </DialogContent>
-    </Dialog>
+      )}
+    </>
   );
 };
 
