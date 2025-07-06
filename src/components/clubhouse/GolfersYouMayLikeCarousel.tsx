@@ -122,6 +122,7 @@ const GolferCard: React.FC<GolferCardProps> = ({ golfer, currentUserId, isMobile
   const cardRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isInView, setIsInView] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   
   const { handleFollow } = useProfileActions({
     targetUserId: golfer.id,
@@ -131,10 +132,10 @@ const GolferCard: React.FC<GolferCardProps> = ({ golfer, currentUserId, isMobile
   const displayName = golfer.display_name || golfer.username || 'User';
   const username = golfer.username || `user_${golfer.id.slice(0, 8)}`;
 
-  // Intersection Observer for in-view autoplay
+  // Intersection Observer for mobile autoplay only
   useEffect(() => {
     const video = videoRef.current;
-    if (!video || !golfer.most_recent_video?.media_url) return;
+    if (!video || !golfer.most_recent_video?.media_url || !isMobile) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {
@@ -142,14 +143,12 @@ const GolferCard: React.FC<GolferCardProps> = ({ golfer, currentUserId, isMobile
         setIsInView(isVisible);
         
         if (isVisible) {
-          // Reset video to start and attempt play
           video.currentTime = 0;
           const playPromise = video.play();
           
           if (playPromise !== undefined) {
             playPromise.catch(error => {
-              console.log('Desktop autoplay prevented, video will show poster:', error);
-              // Don't hide video, let poster show through
+              console.log('Mobile autoplay prevented:', error);
             });
           }
         } else {
@@ -158,18 +157,36 @@ const GolferCard: React.FC<GolferCardProps> = ({ golfer, currentUserId, isMobile
       },
       { 
         threshold: 0.5,
-        rootMargin: '50px' // Start loading earlier
+        rootMargin: '50px'
       }
     );
 
-    // Observe the card container instead of video for better detection
     const card = cardRef.current;
     if (card) {
       observer.observe(card);
     }
     
     return () => observer.disconnect();
-  }, [golfer.most_recent_video?.media_url]);
+  }, [golfer.most_recent_video?.media_url, isMobile]);
+
+  // Desktop hover autoplay
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !golfer.most_recent_video?.media_url || isMobile) return;
+
+    if (isHovered) {
+      video.currentTime = 0;
+      const playPromise = video.play();
+      
+      if (playPromise !== undefined) {
+        playPromise.catch(error => {
+          console.log('Desktop hover autoplay prevented:', error);
+        });
+      }
+    } else {
+      video.pause();
+    }
+  }, [isHovered, golfer.most_recent_video?.media_url, isMobile]);
 
   const handleFollowClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -192,7 +209,11 @@ const GolferCard: React.FC<GolferCardProps> = ({ golfer, currentUserId, isMobile
       style={{ width: isMobile ? 'calc(50% - 8px)' : 'calc(25% - 12px)' }}
     >
       {/* Video Background */}
-      <div className="w-full h-80 relative">
+      <div 
+        className="w-full h-80 relative"
+        onMouseEnter={() => !isMobile && setIsHovered(true)}
+        onMouseLeave={() => !isMobile && setIsHovered(false)}
+      >
         {golfer.most_recent_video?.media_url ? (
           <>
             {/* Always show poster image as background */}
@@ -204,28 +225,18 @@ const GolferCard: React.FC<GolferCardProps> = ({ golfer, currentUserId, isMobile
               ref={videoRef}
               src={golfer.most_recent_video.media_url}
               poster={posterImage}
-              className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-300"
-              style={{ opacity: isInView ? 1 : 0 }}
+              className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
+              style={{ 
+                opacity: isMobile 
+                  ? (isInView ? 1 : 0)  // Mobile: show when in view
+                  : (isHovered ? 1 : 0) // Desktop: show only on hover
+              }}
               autoPlay={false}
               muted
               loop
               playsInline
-              preload="metadata"
-              onLoadStart={() => {
-                console.log('Video loading started:', golfer.id);
-              }}
-              onCanPlay={() => {
-                console.log('Video can play:', golfer.id);
-                // Only show video if it's ready to play
-                if (videoRef.current) {
-                  videoRef.current.style.opacity = '1';
-                }
-              }}
-              onLoadedData={() => {
-                console.log('Video loaded data:', golfer.id);
-              }}
+              preload={isMobile ? "metadata" : "auto"}
               onError={(e) => {
-                console.log('Video failed to load:', golfer.most_recent_video?.media_url, e);
                 // Keep video hidden on error to show poster background
                 if (videoRef.current) {
                   videoRef.current.style.opacity = '0';
