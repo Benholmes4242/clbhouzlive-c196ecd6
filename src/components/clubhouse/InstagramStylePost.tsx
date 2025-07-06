@@ -14,6 +14,9 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import LazyImage from '@/components/ui/lazy-image';
 import PostViewerModal from '@/components/posts/PostViewerModal';
 import { usePostViewer } from '@/hooks/usePostViewer';
+import { useVideoVisibility } from '@/hooks/useVideoVisibility';
+import { useVideoPlaybackManager } from '@/contexts/VideoPlaybackManager';
+import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 
 interface PostMedia {
   id: string;
@@ -58,15 +61,39 @@ const InstagramStylePost: React.FC<InstagramStylePostProps> = ({ post, allUserPo
   const [golfCourse, setGolfCourse] = useState<any>(null);
   const [showComments, setShowComments] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const { isGloballyMuted, toggleGlobalMute } = useGlobalAudio();
+  const { registerVideo, unregisterVideo, pauseAllOtherVideos } = useVideoPlaybackManager();
+  const { isOpen, currentPost, allUserPosts: viewerPosts, openPostViewer, closePostViewer } = usePostViewer({ source: 'clubhouse' });
   
   // Add video autoplay functionality
   const { ref: autoplayRef, shouldAutoplay, handleMouseEnter, handleMouseLeave } = useVideoAutoplay();
   
-  const { isOpen, currentPost, allUserPosts: viewerPosts, openPostViewer, closePostViewer } = usePostViewer({ source: 'clubhouse' });
+  const currentMedia = post.post_media[currentMediaIndex];
 
   const displayName = post.user.display_name || post.user.username || 'User';
   const timeAgo = formatDistanceToNow(new Date(post.created_at), { addSuffix: true });
   const golfClubTags = post.post_tags?.filter(tag => tag.entity_type === 'golf_club') || [];
+
+  // Use video visibility hook for intersection observer
+  const { containerRef, isVisible } = useVideoVisibility({
+    threshold: 0.5,
+    videoRef,
+    shouldAutoplay: true,
+    globallyMuted: isGloballyMuted,
+    onEnterView: () => {
+      if (videoRef.current && currentMedia?.media_type === 'video') {
+        pauseAllOtherVideos(post.id);
+      }
+    }
+  });
+
+  // Register/unregister video with playback manager
+  useEffect(() => {
+    if (videoRef.current && currentMedia?.media_type === 'video') {
+      registerVideo(post.id, videoRef.current);
+      return () => unregisterVideo(post.id);
+    }
+  }, [post.id, currentMedia?.media_type, registerVideo, unregisterVideo]);
 
   // Swipe handlers for media navigation
   const swipeHandlers = useSwipeable({
@@ -180,13 +207,16 @@ const InstagramStylePost: React.FC<InstagramStylePostProps> = ({ post, allUserPo
     setCurrentMediaIndex(prev => prev < post.post_media.length - 1 ? prev + 1 : 0);
   };
 
-  const currentMedia = post.post_media[currentMediaIndex];
-
   if (!currentMedia) return null;
 
   return (
     <>
-      <div ref={autoplayRef} className="relative w-full bg-black" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+      <div 
+        ref={containerRef}
+        className="relative w-full bg-black" 
+        onMouseEnter={handleMouseEnter} 
+        onMouseLeave={handleMouseLeave}
+      >
         {/* Media Container - Full width, responsive height */}
         <div 
           {...swipeHandlers}
@@ -205,6 +235,7 @@ const InstagramStylePost: React.FC<InstagramStylePostProps> = ({ post, allUserPo
               showMuteButton={true}
               isInFeed={true}
               videoId={`instagram-${currentMedia.id}`}
+              videoRef={videoRef}
             />
           ) : (
             <LazyImage

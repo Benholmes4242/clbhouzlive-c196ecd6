@@ -20,6 +20,7 @@ interface VideoPlayerProps {
   videoId?: string; // Add videoId for thumbnail generation
   showMuteButton?: boolean; // Control whether to show mute button in top-left
   isInFeed?: boolean; // Indicates if this video is in the main feed
+  videoRef?: React.RefObject<HTMLVideoElement>; // Allow external ref
 }
 
 const VideoPlayer: React.FC<VideoPlayerProps> = ({
@@ -37,9 +38,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   showVideoIcon = false,
   videoId,
   showMuteButton = true,
-  isInFeed = false
+  isInFeed = false,
+  videoRef: externalVideoRef
 }) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const internalVideoRef = useRef<HTMLVideoElement>(null);
+  const videoRef = externalVideoRef || internalVideoRef;
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(muted);
   const [showControls, setShowControls] = useState(false);
