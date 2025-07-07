@@ -30,6 +30,7 @@ interface CoursePlayedButtonProps {
   course?: Course;
   showButton?: boolean;
   variant?: 'overlay' | 'standalone'; // New prop to control display style
+  positioning?: 'top-right' | 'bottom-right'; // New prop for positioning
 }
 
 const CoursePlayedButton = ({ 
@@ -41,7 +42,8 @@ const CoursePlayedButton = ({
   viewingUserId,
   course,
   showButton = true,
-  variant = 'overlay' // Default to overlay for backward compatibility
+  variant = 'overlay', // Default to overlay for backward compatibility
+  positioning = 'top-right' // Default to top-right for backward compatibility
 }: CoursePlayedButtonProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -229,10 +231,21 @@ const CoursePlayedButton = ({
     );
   }
 
+  // Get positioning classes based on prop
+  const getPositioningClasses = () => {
+    switch (positioning) {
+      case 'bottom-right':
+        return 'absolute bottom-3 right-3';
+      case 'top-right':
+      default:
+        return 'absolute top-3 right-3';
+    }
+  };
+
   // Original overlay variant for use in cards
   return (
     <>
-      <div className="absolute top-3 right-3">
+      <div className={getPositioningClasses()}>
         {canModifyCourseStatus ? (
           <Button
             size="sm"

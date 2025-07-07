@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { MapPin, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import CourseRankBadges from './CourseRankBadges';
+import CoursePlayedButton from './CoursePlayedButton';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -128,18 +129,41 @@ const CourseCard: React.FC<CourseCardProps> = ({
                 <Star className="h-12 w-12 text-white opacity-50" />
               </div>
             )}
+            
+            {/* Overlay Container - positioned relative to image */}
+            <div className="absolute inset-0">
+              {/* Ranking badges - positioned at bottom-left */}
+              <CourseRankBadges
+                globalRank={course.global_rank}
+                regionalRank={course.regional_rank}
+                usaRank={course.usa_rank}
+                country={course.country}
+                viewContext={viewContext}
+                userRating={userRating}
+                showUserRating={showUserRating}
+                positioning="bottom-left"
+              />
+              
+              {/* Played button - positioned at bottom-right */}
+              {showPlayedButton && (
+                <CoursePlayedButton
+                  courseId={course.id}
+                  courseName={course.name}
+                  userCourse={userCourse}
+                  canModifyCourseStatus={!isViewingOtherUser && !!user}
+                  currentUserId={user?.id}
+                  viewingUserId={viewingUserId}
+                  course={{
+                    id: course.id,
+                    name: course.name,
+                    thumbnail_image: course.thumbnail_image
+                  }}
+                  variant="overlay"
+                  positioning="bottom-right"
+                />
+              )}
+            </div>
           </div>
-
-          {/* Course Rank Badges - keep these as they're part of the design */}
-          <CourseRankBadges
-            globalRank={course.global_rank}
-            regionalRank={course.regional_rank}
-            usaRank={course.usa_rank}
-            country={course.country}
-            viewContext={viewContext}
-            userRating={userRating}
-            showUserRating={showUserRating}
-          />
         </div>
         
         <CardHeader className="pb-2">

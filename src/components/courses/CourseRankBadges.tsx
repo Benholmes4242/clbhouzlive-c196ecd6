@@ -13,6 +13,7 @@ interface CourseRankBadgesProps {
   viewContext?: 'global' | 'regional' | 'usa' | 'europe';
   userRating?: number | null;
   showUserRating?: boolean;
+  positioning?: 'top-left' | 'bottom-left';
 }
 
 const CourseRankBadges = ({ 
@@ -22,7 +23,8 @@ const CourseRankBadges = ({
   country, 
   viewContext = 'global',
   userRating,
-  showUserRating = false
+  showUserRating = false,
+  positioning = 'top-left'
 }: CourseRankBadgesProps) => {
   // Check for GB&I countries - including all possible variations
   const isGBI = ['United Kingdom', 'Ireland', 'England', 'Scotland', 'Wales', 'Northern Ireland', 'Isle of Man', 'Britain & Ireland'].includes(country);
@@ -68,11 +70,22 @@ const CourseRankBadges = ({
     tooltip: "Your Rating"
   } : null;
 
+  // Determine positioning classes
+  const getPositioningClasses = () => {
+    switch (positioning) {
+      case 'bottom-left':
+        return 'absolute bottom-2 left-2 flex flex-col gap-1';
+      case 'top-left':
+      default:
+        return 'absolute top-2 left-2 flex flex-col gap-1';
+    }
+  };
+
   return (
     <TooltipProvider>
-      {/* Left side: Ranking badges (stacked vertically) */}
+      {/* Ranking badges */}
       {rankingBadges.length > 0 && (
-        <div className="absolute top-2 left-2 flex flex-col gap-1">
+        <div className={getPositioningClasses()}>
           {rankingBadges.map((badge, index) => (
             <Tooltip key={index}>
               <TooltipTrigger asChild>
@@ -89,8 +102,8 @@ const CourseRankBadges = ({
         </div>
       )}
 
-      {/* Right side: Player rating badge */}
-      {playerRatingBadge && (
+      {/* Player rating badge - only show on top-right for backward compatibility */}
+      {playerRatingBadge && positioning === 'top-left' && (
         <div className="absolute top-2 right-2">
           <Tooltip>
             <TooltipTrigger asChild>
