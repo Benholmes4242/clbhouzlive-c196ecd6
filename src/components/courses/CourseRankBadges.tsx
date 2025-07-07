@@ -74,10 +74,10 @@ const CourseRankBadges = ({
   const getPositioningClasses = () => {
     switch (positioning) {
       case 'bottom-left':
-        return 'absolute bottom-2 left-2 flex flex-col gap-1';
+        return 'absolute bottom-4 left-4 flex flex-col gap-1 z-10';
       case 'top-left':
       default:
-        return 'absolute top-2 left-2 flex flex-col gap-1';
+        return 'absolute top-2 left-2 flex flex-col gap-1 z-10';
     }
   };
 

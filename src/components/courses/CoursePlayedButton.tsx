@@ -235,10 +235,10 @@ const CoursePlayedButton = ({
   const getPositioningClasses = () => {
     switch (positioning) {
       case 'bottom-right':
-        return 'absolute bottom-3 right-3';
+        return 'absolute bottom-4 right-4 z-10';
       case 'top-right':
       default:
-        return 'absolute top-3 right-3';
+        return 'absolute top-3 right-3 z-10';
     }
   };
 
