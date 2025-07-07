@@ -204,22 +204,14 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
     addDebugInfo('Select photos clicked');
     const input = document.createElement('input');
     input.type = 'file';
-    input.accept = 'image/*';
+    input.accept = 'image/jpeg,image/jpg,image/png,image/gif,image/webp,image/heic';
     input.multiple = true;
-    input.style.position = 'absolute';
-    input.style.opacity = '0';
-    input.style.pointerEvents = 'none';
-    
-    // Add to DOM temporarily for iOS compatibility
-    document.body.appendChild(input);
+    // Remove capture attribute completely and don't set any iOS-specific attributes
     
     input.onchange = (event) => {
       addDebugInfo('Photo input changed');
       const selectedFiles = Array.from((event.target as HTMLInputElement).files || []);
       addDebugInfo(`Selected photo files: ${selectedFiles.length}`);
-      
-      // Clean up
-      document.body.removeChild(input);
       
       if (selectedFiles.length > 0) {
         addDebugInfo('Setting photo files and switching to upload mode');
@@ -230,10 +222,8 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
       }
     };
     
-    // Add error handling
     input.onerror = () => {
       addDebugInfo('Photo input error occurred');
-      document.body.removeChild(input);
     };
     
     input.click();
@@ -243,22 +233,14 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
     addDebugInfo('Select videos clicked');
     const input = document.createElement('input');
     input.type = 'file';
-    input.accept = 'video/*';
+    input.accept = 'video/mp4,video/mov,video/avi,video/quicktime';
     input.multiple = true;
-    input.style.position = 'absolute';
-    input.style.opacity = '0';
-    input.style.pointerEvents = 'none';
-    
-    // Add to DOM temporarily for iOS compatibility
-    document.body.appendChild(input);
+    // Remove capture attribute completely and don't set any iOS-specific attributes
     
     input.onchange = (event) => {
       addDebugInfo('Video input changed');
       const selectedFiles = Array.from((event.target as HTMLInputElement).files || []);
       addDebugInfo(`Selected video files: ${selectedFiles.length}`);
-      
-      // Clean up
-      document.body.removeChild(input);
       
       if (selectedFiles.length > 0) {
         addDebugInfo('Setting video files and switching to upload mode');
@@ -269,10 +251,8 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
       }
     };
     
-    // Add error handling
     input.onerror = () => {
       addDebugInfo('Video input error occurred');
-      document.body.removeChild(input);
     };
     
     input.click();
