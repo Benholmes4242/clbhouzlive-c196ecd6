@@ -58,6 +58,8 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
   initialTags = [],
   existingMediaUrls = []
 }) => {
+  console.log('EnhancedCreateMomentModal render:', { isOpen, editMode, initialFilesCount: initialFiles.length });
+  
   const [caption, setCaption] = useState('');
   const [files, setFiles] = useState<File[]>(initialFiles);
   const [selectedTags, setSelectedTags] = useState<TaggableEntity[]>([]);
@@ -67,6 +69,8 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
   const [isInitialized, setIsInitialized] = useState(false);
   const [modalMode, setModalMode] = useState<'selection' | 'upload'>('selection');
   const isMobile = useIsMobile();
+  
+  console.log('Modal state:', { modalMode, isMobile, filesCount: files.length, isInitialized });
 
   // Reset state when modal opens/closes
   useEffect(() => {
@@ -268,13 +272,27 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
               </h2>
             </div>
 
+            {(() => {
+              console.log('Rendering modal content, modalMode:', modalMode);
+              console.log('Rendering modal overlay, isOpen:', isOpen);
+              return null;
+            })()}
+
             {modalMode === 'selection' ? (
               /* Action Selection View */
               <div className="space-y-3">
+                {(() => {
+                  console.log('Rendering selection buttons, isMobile:', isMobile);
+                  return null;
+                })()}
+                
                 {/* Capture Photo or Video - Mobile Only */}
                 {isMobile && (
                   <button
-                    onClick={handleCaptureClick}
+                    onClick={() => {
+                      console.log('Capture button clicked on mobile');
+                      handleCaptureClick();
+                    }}
                     className="w-full flex items-center gap-4 p-3 bg-gray-50 hover:bg-orange-50 rounded-xl transition-colors"
                     disabled={isSubmitting}
                   >
@@ -287,7 +305,10 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
 
                 {/* Select Photos */}
                 <button
-                  onClick={handleSelectPhotos}
+                  onClick={() => {
+                    console.log('Select photos button clicked');
+                    handleSelectPhotos();
+                  }}
                   className="w-full flex items-center gap-4 p-3 bg-gray-50 hover:bg-orange-50 rounded-xl transition-colors"
                   disabled={isSubmitting}
                 >
@@ -299,7 +320,10 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
 
                 {/* Select Videos */}
                 <button
-                  onClick={handleSelectVideos}
+                  onClick={() => {
+                    console.log('Select videos button clicked');
+                    handleSelectVideos();
+                  }}
                   className="w-full flex items-center gap-4 p-3 bg-gray-50 hover:bg-orange-50 rounded-xl transition-colors"
                   disabled={isSubmitting}
                 >
