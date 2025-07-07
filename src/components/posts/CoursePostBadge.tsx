@@ -21,9 +21,7 @@ const CoursePostBadge = ({ course, className = "" }: CoursePostBadgeProps) => {
 
   const handleCourseClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    // Navigate to course-specific feed - for now using courses page
-    // TODO: Implement course-specific feed page
-    navigate(`/courses`);
+    navigate(`/courses/${course.id}`);
   };
 
   return (

@@ -33,7 +33,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
       // Navigate to user profile using their username
       navigate(`/profile/${result.username}`);
     } else if (result.type === 'course') {
-      navigate(`/courses?course=${result.id}`);
+      navigate(`/courses/${result.id}`);
     }
     onResultClick(result);
   };

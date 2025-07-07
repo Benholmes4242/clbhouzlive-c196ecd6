@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Star, ArrowLeft, Calendar, MessageSquare } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import CourseDetailModal from './CourseDetailModal';
+
 
 interface RatedCourse {
   id: string;
@@ -36,8 +36,6 @@ const MyRatingsContent = () => {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [selectedCourse, setSelectedCourse] = useState<RatedCourse['golf_courses'] | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Get the user parameter from URL to determine whose ratings to show
   const viewingUsername = searchParams.get('user');
@@ -147,8 +145,7 @@ const MyRatingsContent = () => {
   };
 
   const handleCourseClick = (course: RatedCourse['golf_courses']) => {
-    setSelectedCourse(course);
-    setIsModalOpen(true);
+    navigate(`/courses/${course.id}`);
   };
 
   if (isLoading) {
@@ -270,12 +267,6 @@ const MyRatingsContent = () => {
           </div>
         )}
       </div>
-
-      <CourseDetailModal
-        course={selectedCourse}
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-      />
     </>
   );
 };

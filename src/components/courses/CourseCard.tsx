@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Star } from 'lucide-react';
-import CourseDetailModal from './CourseDetailModal';
+import { useNavigate } from 'react-router-dom';
 import CourseRankBadges from './CourseRankBadges';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -77,8 +77,8 @@ const CourseCard: React.FC<CourseCardProps> = ({
   showUserRating = false,
   isFromUserCoursesPage = false
 }) => {
+  const navigate = useNavigate();
   const { user } = useSupabaseSession();
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Fetch user's course status
   const { data: userCourse } = useQuery({
@@ -103,7 +103,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
   const isViewingOtherUser = viewingUserId && viewingUserId !== user?.id;
 
   const handleCardClick = () => {
-    setIsModalOpen(true);
+    navigate(`/courses/${course.id}`);
   };
 
   return (
@@ -163,16 +163,6 @@ const CourseCard: React.FC<CourseCardProps> = ({
           )}
         </CardContent>
       </Card>
-
-      <CourseDetailModal
-        course={course}
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        viewingUserId={viewingUserId}
-        showUserRating={showUserRating}
-        userRating={userRating}
-        isFromUserCoursesPage={isFromUserCoursesPage}
-      />
     </>
   );
 };
