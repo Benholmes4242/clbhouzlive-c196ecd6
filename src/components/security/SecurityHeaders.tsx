@@ -21,8 +21,8 @@ export const SecurityHeaders = () => {
     // Referrer Policy
     setMetaTag('referrer', 'strict-origin-when-cross-origin');
     
-    // Permissions Policy
-    setMetaTag('permissions-policy', 'geolocation=(), microphone=(), camera=()');
+    // Permissions Policy - Allow camera and microphone for same-origin content
+    setMetaTag('permissions-policy', 'geolocation=(), microphone=(self), camera=(self)');
     
     // X-Content-Type-Options
     setMetaTag('x-content-type-options', 'nosniff');

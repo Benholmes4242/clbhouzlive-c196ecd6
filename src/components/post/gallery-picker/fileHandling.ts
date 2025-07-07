@@ -3,9 +3,20 @@ export const createFileInput = (accept: string, multiple: boolean = true, captur
   input.type = 'file';
   input.accept = accept;
   input.multiple = multiple;
-  if (capture && isMobile) {
-    input.setAttribute('capture', capture);
+  
+  // Add mobile-specific attributes for better compatibility
+  if (isMobile) {
+    if (capture) {
+      input.setAttribute('capture', capture);
+    }
+    // Add mobile-specific styling to ensure visibility
+    input.style.position = 'absolute';
+    input.style.visibility = 'hidden';
+    input.style.width = '0';
+    input.style.height = '0';
   }
+  
+  console.log('Created file input with:', { accept, multiple, capture, isMobile });
   return input;
 };
 
@@ -15,8 +26,10 @@ export const handleFileSelection = (
   onMultipleFiles: (files: File[], urls: string[]) => void,
   onClose: () => void
 ) => {
+  console.log('handleFileSelection called with:', { files, hasFiles: !!files, fileCount: files?.length || 0 });
+  
   if (!files || files.length === 0) {
-    console.log('No files selected');
+    console.log('No files selected - this might be the issue on mobile');
     return;
   }
 

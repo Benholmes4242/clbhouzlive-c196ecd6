@@ -51,23 +51,44 @@ const GalleryPicker = ({ isOpen, onClose, onFileSelected, onMultipleFilesSelecte
   };
 
   const handleCameraClick = () => {
-    console.log('Camera button clicked');
+    console.log('Camera button clicked - mobile device:', isMobile);
     const input = createFileInput('image/*,video/*', false, 'environment', isMobile);
-    input.onchange = (e) => handleFileSelectionWrapper((e.target as HTMLInputElement).files);
+    input.onchange = (e) => {
+      console.log('Camera input change event fired');
+      handleFileSelectionWrapper((e.target as HTMLInputElement).files);
+    };
+    input.onerror = (e) => {
+      console.error('Camera input error:', e);
+    };
+    console.log('About to trigger input.click()');
     input.click();
   };
 
   const handlePhotoClick = () => {
-    console.log('Photo gallery button clicked (allows multiple)');
+    console.log('Photo gallery button clicked (allows multiple) - mobile device:', isMobile);
     const input = createFileInput('image/jpeg,image/jpg,image/png,image/gif,image/webp');
-    input.onchange = (e) => handleFileSelectionWrapper((e.target as HTMLInputElement).files);
+    input.onchange = (e) => {
+      console.log('Photo input change event fired');
+      handleFileSelectionWrapper((e.target as HTMLInputElement).files);
+    };
+    input.onerror = (e) => {
+      console.error('Photo input error:', e);
+    };
+    console.log('About to trigger photo input.click()');
     input.click();
   };
 
   const handleVideoClick = () => {
-    console.log('Video gallery button clicked (allows multiple)');
+    console.log('Video gallery button clicked (allows multiple) - mobile device:', isMobile);
     const input = createFileInput('video/*');
-    input.onchange = (e) => handleFileSelectionWrapper((e.target as HTMLInputElement).files);
+    input.onchange = (e) => {
+      console.log('Video input change event fired');
+      handleFileSelectionWrapper((e.target as HTMLInputElement).files);
+    };
+    input.onerror = (e) => {
+      console.error('Video input error:', e);
+    };
+    console.log('About to trigger video input.click()');
     input.click();
   };
 
