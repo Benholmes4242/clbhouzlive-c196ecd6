@@ -194,8 +194,8 @@ const CourseDetailPage = () => {
 
       {/* White Section Below Image */}
       <div className="bg-background p-4">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          {/* Community Vote Score - Left */}
+        <div className="max-w-6xl mx-auto flex items-start justify-between">
+          {/* Community Vote Score - Left aligned with course title */}
           <div className="flex items-center gap-2">
             <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
             <span className="text-xl font-semibold text-foreground">
@@ -206,7 +206,7 @@ const CourseDetailPage = () => {
             </span>
           </div>
           
-          {/* Visit Website Button - Right (Below Add to Played) */}
+          {/* Visit Website Button - Right aligned, stacked under Add to Played */}
           {course.website_url && (
             <Button
               variant="outline"
