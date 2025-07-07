@@ -70,20 +70,26 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
 
   // Reset state when modal opens/closes
   useEffect(() => {
+    console.log('Modal state effect triggered:', { isOpen, isInitialized, editMode, initialFilesCount: initialFiles.length });
     if (isOpen && !isInitialized) {
       if (editMode) {
+        console.log('Initializing in edit mode');
         setCaption(initialCaption);
         setSelectedTags(initialTags);
         setFiles(initialFiles);
         setModalMode('upload'); // Skip selection for edit mode
       } else {
+        console.log('Initializing in create mode');
         setCaption('');
         setSelectedTags([]);
         setFiles(initialFiles);
-        setModalMode(initialFiles.length > 0 ? 'upload' : 'selection');
+        const mode = initialFiles.length > 0 ? 'upload' : 'selection';
+        console.log('Setting modal mode to:', mode);
+        setModalMode(mode);
       }
       setIsInitialized(true);
     } else if (!isOpen) {
+      console.log('Modal closed, resetting state');
       setIsInitialized(false);
       setModalMode('selection');
     }
@@ -151,6 +157,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
 
   // Action button handlers
   const handleCaptureClick = () => {
+    console.log('Mobile capture clicked');
     // Use camera API if available, otherwise fallback to file input
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       // For now, trigger file input with camera preference
@@ -159,8 +166,11 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
       input.accept = 'image/*,video/*';
       input.capture = 'environment'; // Use rear camera
       input.onchange = (event) => {
+        console.log('Camera input changed');
         const selectedFiles = Array.from((event.target as HTMLInputElement).files || []);
+        console.log('Selected files from camera:', selectedFiles.length);
         if (selectedFiles.length > 0) {
+          console.log('Setting files and switching to upload mode');
           setFiles(selectedFiles);
           setModalMode('upload');
         }
@@ -168,12 +178,16 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
       input.click();
     } else {
       // Fallback for devices without camera API
+      console.log('Using fallback camera input');
       const input = document.createElement('input');
       input.type = 'file';
       input.accept = 'image/*,video/*';
       input.onchange = (event) => {
+        console.log('Fallback camera input changed');
         const selectedFiles = Array.from((event.target as HTMLInputElement).files || []);
+        console.log('Selected files from fallback camera:', selectedFiles.length);
         if (selectedFiles.length > 0) {
+          console.log('Setting files and switching to upload mode');
           setFiles(selectedFiles);
           setModalMode('upload');
         }
@@ -183,30 +197,42 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
   };
 
   const handleSelectPhotos = () => {
+    console.log('Select photos clicked');
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
     input.multiple = true;
     input.onchange = (event) => {
+      console.log('Photo input changed');
       const selectedFiles = Array.from((event.target as HTMLInputElement).files || []);
+      console.log('Selected photo files:', selectedFiles.length, selectedFiles.map(f => f.name));
       if (selectedFiles.length > 0) {
+        console.log('Setting photo files and switching to upload mode');
         setFiles(selectedFiles);
         setModalMode('upload');
+      } else {
+        console.log('No photo files selected');
       }
     };
     input.click();
   };
 
   const handleSelectVideos = () => {
+    console.log('Select videos clicked');
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'video/*';
     input.multiple = true;
     input.onchange = (event) => {
+      console.log('Video input changed');
       const selectedFiles = Array.from((event.target as HTMLInputElement).files || []);
+      console.log('Selected video files:', selectedFiles.length, selectedFiles.map(f => f.name));
       if (selectedFiles.length > 0) {
+        console.log('Setting video files and switching to upload mode');
         setFiles(selectedFiles);
         setModalMode('upload');
+      } else {
+        console.log('No video files selected');
       }
     };
     input.click();
