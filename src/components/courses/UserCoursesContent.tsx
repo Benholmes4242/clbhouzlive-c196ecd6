@@ -11,6 +11,8 @@ import { supabase } from '@/integrations/supabase/client';
 
 interface UserCoursesContentProps {
   username?: string;
+  isOwnProfile?: boolean;
+  displayName?: string;
 }
 
 // Helper function to get the best ranking for sorting
@@ -56,20 +58,28 @@ const getSortedUserCourses = (userCourses: any[]) => {
   return sortedCourses;
 };
 
-const UserCoursesContent: React.FC<UserCoursesContentProps> = ({ username }) => {
+const UserCoursesContent: React.FC<UserCoursesContentProps> = ({ 
+  username,
+  isOwnProfile = false,
+  displayName
+}) => {
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   
   const {
     targetUserId,
-    displayName,
-    isOwnProfile,
+    displayName: hookDisplayName,
+    isOwnProfile: hookIsOwnProfile,
     top100CoursesRaw,
     isLoadingTop100
   } = useUserCoursesData(username);
 
+  // Use props if provided, fallback to hook values
+  const finalDisplayName = displayName || hookDisplayName;
+  const finalIsOwnProfile = isOwnProfile !== undefined ? isOwnProfile : hookIsOwnProfile;
+
   const { regionProgress, isLoading: isLoadingProgress } = useTop100CoursesData(
     targetUserId || '',
-    isOwnProfile
+    finalIsOwnProfile
   );
 
   // Query to get all played courses (from both tables) for filtering
@@ -213,8 +223,8 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({ username }) => 
   return (
     <div className="space-y-8">
       <UserCoursesHeader 
-        displayName={displayName} 
-        isOwnProfile={isOwnProfile} 
+        displayName={finalDisplayName} 
+        isOwnProfile={finalIsOwnProfile} 
       />
 
       <UserCoursesRegionalTiles
@@ -236,7 +246,7 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({ username }) => 
                 viewingUserId={targetUserId}
                 viewContext="global"
                 userRating={userCourse.rating}
-                isReadOnly={!isOwnProfile}
+                isReadOnly={!finalIsOwnProfile}
                 showUserRating={true}
                 isFromUserCoursesPage={true}
               />
@@ -249,7 +259,7 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({ username }) => 
             </p>
           </div>
         ) : (
-          <EmptyTop100State isOwnProfile={isOwnProfile} displayName={displayName} />
+          <EmptyTop100State isOwnProfile={finalIsOwnProfile} displayName={finalDisplayName} />
         )}
       </div>
     </div>
