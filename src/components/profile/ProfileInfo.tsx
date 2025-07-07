@@ -66,6 +66,7 @@ const ProfileInfo: React.FC<ProfileInfoProps> = ({
           isOwnProfile={isOwnProfile}
           userId={userId}
           onProfileUpdate={handleProfileUpdate}
+          userType={userType}
         />
       )}
 

@@ -24,7 +24,7 @@ export const useSearch = () => {
     
     const { data, error } = await supabase
       .from('user_profiles')
-      .select('id, display_name, username, home_club, profile_photo_url')
+      .select('id, display_name, username, home_club, profile_photo_url, user_type')
       .or(`display_name.ilike.%${searchTerm}%,username.ilike.%${searchTerm}%,home_club.ilike.%${searchTerm}%`)
       .eq('is_public', true)
       .limit(10);
@@ -40,7 +40,7 @@ export const useSearch = () => {
       id: user.id,
       type: 'user' as const,
       title: user.display_name || user.username || 'Anonymous User',
-      subtitle: user.home_club ? `Home Club: ${user.home_club}` : 'No home club set',
+      subtitle: user.home_club ? `Home Club: ${user.home_club}` : (user.user_type === 'individual' ? 'No home club set' : ''),
       username: user.username || user.id,
       image: user.profile_photo_url || undefined
     }));

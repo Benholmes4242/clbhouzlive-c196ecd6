@@ -10,13 +10,15 @@ interface HomeClubSectionProps {
   isOwnProfile: boolean;
   userId?: string;
   onProfileUpdate: () => void;
+  userType?: string;
 }
 
 const HomeClubSection: React.FC<HomeClubSectionProps> = ({
   homeClub,
   isOwnProfile,
   userId,
-  onProfileUpdate
+  onProfileUpdate,
+  userType
 }) => {
   const [editingClub, setEditingClub] = useState(false);
   const [clubInput, setClubInput] = useState(homeClub || '');
@@ -90,7 +92,7 @@ const HomeClubSection: React.FC<HomeClubSectionProps> = ({
             </div>
           ) : (
             <div className="flex items-center gap-2">
-              <span>{homeClub || 'No home club set'}</span>
+              <span>{homeClub || (userType === 'individual' ? 'No home club set' : '')}</span>
               {isOwnProfile && (
                 <Button
                   size="sm"
