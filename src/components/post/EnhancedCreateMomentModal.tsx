@@ -58,8 +58,6 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
   initialTags = [],
   existingMediaUrls = []
 }) => {
-  console.log('EnhancedCreateMomentModal render:', { isOpen, editMode, initialFilesCount: initialFiles.length });
-  
   const [caption, setCaption] = useState('');
   const [files, setFiles] = useState<File[]>(initialFiles);
   const [selectedTags, setSelectedTags] = useState<TaggableEntity[]>([]);
@@ -70,32 +68,37 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
   const [modalMode, setModalMode] = useState<'selection' | 'upload'>('selection');
   const isMobile = useIsMobile();
   
-  console.log('Modal state:', { modalMode, isMobile, filesCount: files.length, isInitialized });
+  // Mobile debugging state
+  const [debugInfo, setDebugInfo] = useState<string[]>([]);
+  
+  const addDebugInfo = (info: string) => {
+    setDebugInfo(prev => [...prev.slice(-4), `${new Date().toLocaleTimeString()}: ${info}`]);
+  };
 
   // Reset state when modal opens/closes
   useEffect(() => {
-    console.log('Modal state effect triggered:', { isOpen, isInitialized, editMode, initialFilesCount: initialFiles.length });
     if (isOpen && !isInitialized) {
       if (editMode) {
-        console.log('Initializing in edit mode');
+        addDebugInfo('Initializing in edit mode');
         setCaption(initialCaption);
         setSelectedTags(initialTags);
         setFiles(initialFiles);
         setModalMode('upload'); // Skip selection for edit mode
       } else {
-        console.log('Initializing in create mode');
+        addDebugInfo('Initializing in create mode');
         setCaption('');
         setSelectedTags([]);
         setFiles(initialFiles);
         const mode = initialFiles.length > 0 ? 'upload' : 'selection';
-        console.log('Setting modal mode to:', mode);
+        addDebugInfo(`Setting modal mode to: ${mode}`);
         setModalMode(mode);
       }
       setIsInitialized(true);
     } else if (!isOpen) {
-      console.log('Modal closed, resetting state');
+      addDebugInfo('Modal closed, resetting state');
       setIsInitialized(false);
       setModalMode('selection');
+      setDebugInfo([]); // Clear debug info when modal closes
     }
   }, [isOpen, editMode, initialCaption, initialTags, initialFiles, isInitialized]);
 
@@ -161,7 +164,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
 
   // Action button handlers
   const handleCaptureClick = () => {
-    console.log('Mobile capture clicked');
+    addDebugInfo('Mobile capture clicked');
     // Use camera API if available, otherwise fallback to file input
     if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
       // For now, trigger file input with camera preference
@@ -170,11 +173,11 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
       input.accept = 'image/*,video/*';
       input.capture = 'environment'; // Use rear camera
       input.onchange = (event) => {
-        console.log('Camera input changed');
+        addDebugInfo('Camera input changed');
         const selectedFiles = Array.from((event.target as HTMLInputElement).files || []);
-        console.log('Selected files from camera:', selectedFiles.length);
+        addDebugInfo(`Selected files from camera: ${selectedFiles.length}`);
         if (selectedFiles.length > 0) {
-          console.log('Setting files and switching to upload mode');
+          addDebugInfo('Setting files and switching to upload mode');
           setFiles(selectedFiles);
           setModalMode('upload');
         }
@@ -182,16 +185,16 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
       input.click();
     } else {
       // Fallback for devices without camera API
-      console.log('Using fallback camera input');
+      addDebugInfo('Using fallback camera input');
       const input = document.createElement('input');
       input.type = 'file';
       input.accept = 'image/*,video/*';
       input.onchange = (event) => {
-        console.log('Fallback camera input changed');
+        addDebugInfo('Fallback camera input changed');
         const selectedFiles = Array.from((event.target as HTMLInputElement).files || []);
-        console.log('Selected files from fallback camera:', selectedFiles.length);
+        addDebugInfo(`Selected files from fallback camera: ${selectedFiles.length}`);
         if (selectedFiles.length > 0) {
-          console.log('Setting files and switching to upload mode');
+          addDebugInfo('Setting files and switching to upload mode');
           setFiles(selectedFiles);
           setModalMode('upload');
         }
@@ -201,42 +204,42 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
   };
 
   const handleSelectPhotos = () => {
-    console.log('Select photos clicked');
+    addDebugInfo('Select photos clicked');
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
     input.multiple = true;
     input.onchange = (event) => {
-      console.log('Photo input changed');
+      addDebugInfo('Photo input changed');
       const selectedFiles = Array.from((event.target as HTMLInputElement).files || []);
-      console.log('Selected photo files:', selectedFiles.length, selectedFiles.map(f => f.name));
+      addDebugInfo(`Selected photo files: ${selectedFiles.length}`);
       if (selectedFiles.length > 0) {
-        console.log('Setting photo files and switching to upload mode');
+        addDebugInfo('Setting photo files and switching to upload mode');
         setFiles(selectedFiles);
         setModalMode('upload');
       } else {
-        console.log('No photo files selected');
+        addDebugInfo('No photo files selected');
       }
     };
     input.click();
   };
 
   const handleSelectVideos = () => {
-    console.log('Select videos clicked');
+    addDebugInfo('Select videos clicked');
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'video/*';
     input.multiple = true;
     input.onchange = (event) => {
-      console.log('Video input changed');
+      addDebugInfo('Video input changed');
       const selectedFiles = Array.from((event.target as HTMLInputElement).files || []);
-      console.log('Selected video files:', selectedFiles.length, selectedFiles.map(f => f.name));
+      addDebugInfo(`Selected video files: ${selectedFiles.length}`);
       if (selectedFiles.length > 0) {
-        console.log('Setting video files and switching to upload mode');
+        addDebugInfo('Setting video files and switching to upload mode');
         setFiles(selectedFiles);
         setModalMode('upload');
       } else {
-        console.log('No video files selected');
+        addDebugInfo('No video files selected');
       }
     };
     input.click();
@@ -270,6 +273,23 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
               <h2 className="text-lg font-semibold text-gray-900">
                 {editMode ? 'Edit Moment' : 'Create a Moment'}
               </h2>
+              
+              {/* Debug Info Panel - Only show on mobile */}
+              {isMobile && debugInfo.length > 0 && (
+                <div className="mt-4 p-2 bg-blue-50 border border-blue-200 rounded text-xs text-left">
+                  <div className="font-medium text-blue-800 mb-1">Debug Info:</div>
+                  {debugInfo.map((info, index) => (
+                    <div key={index} className="text-blue-600">{info}</div>
+                  ))}
+                </div>
+              )}
+              
+              {/* Mobile Info Display */}
+              {isMobile && (
+                <div className="mt-2 text-xs text-gray-500">
+                  Mode: {modalMode} | Mobile: {isMobile ? 'Yes' : 'No'} | Files: {files.length}
+                </div>
+              )}
             </div>
 
             {(() => {
@@ -290,7 +310,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                 {isMobile && (
                   <button
                     onClick={() => {
-                      console.log('Capture button clicked on mobile');
+                      addDebugInfo('Capture button clicked on mobile');
                       handleCaptureClick();
                     }}
                     className="w-full flex items-center gap-4 p-3 bg-gray-50 hover:bg-orange-50 rounded-xl transition-colors"
@@ -306,7 +326,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                 {/* Select Photos */}
                 <button
                   onClick={() => {
-                    console.log('Select photos button clicked');
+                    addDebugInfo('Select photos button clicked');
                     handleSelectPhotos();
                   }}
                   className="w-full flex items-center gap-4 p-3 bg-gray-50 hover:bg-orange-50 rounded-xl transition-colors"
@@ -321,7 +341,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                 {/* Select Videos */}
                 <button
                   onClick={() => {
-                    console.log('Select videos button clicked');
+                    addDebugInfo('Select videos button clicked');
                     handleSelectVideos();
                   }}
                   className="w-full flex items-center gap-4 p-3 bg-gray-50 hover:bg-orange-50 rounded-xl transition-colors"
