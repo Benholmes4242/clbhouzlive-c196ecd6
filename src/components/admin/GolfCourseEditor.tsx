@@ -7,6 +7,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useForm } from 'react-hook-form';
@@ -23,6 +33,9 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
   const [selectedSubCountry, setSelectedSubCountry] = useState('');
   const [courseImageUrl, setCourseImageUrl] = useState<string | null>(null);
   const [isFormInitialized, setIsFormInitialized] = useState(false);
+  const [showDuplicateWarning, setShowDuplicateWarning] = useState(false);
+  const [duplicateCourses, setDuplicateCourses] = useState<any[]>([]);
+  const [pendingFormData, setPendingFormData] = useState<any>(null);
   
   // New state for Top 100s section
   const [regionalRankingRegion, setRegionalRankingRegion] = useState('');
@@ -153,20 +166,49 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
       
       // Check for duplicates when creating a new course
       if (isCreating) {
-        const { data: existingCourses, error: duplicateCheckError } = await supabase
+        // First check for exact matches
+        const { data: exactMatches, error: exactCheckError } = await supabase
           .from('golf_courses')
           .select('id, name, country, sub_country')
           .eq('name', data.name)
           .eq('country', selectedCountry)
           .eq('sub_country', selectedSubCountry);
         
-        if (duplicateCheckError) {
-          console.error('Error checking for duplicates:', duplicateCheckError);
+        if (exactCheckError) {
+          console.error('Error checking for exact duplicates:', exactCheckError);
           throw new Error('Failed to check for duplicate courses');
         }
         
-        if (existingCourses && existingCourses.length > 0) {
+        if (exactMatches && exactMatches.length > 0) {
           throw new Error(`A golf course named "${data.name}" already exists in ${selectedSubCountry}, ${selectedCountry}. Please choose a different name or verify this is not a duplicate.`);
+        }
+
+        // Check for partial matches (same country/sub_country, similar name)
+        const { data: partialMatches, error: partialCheckError } = await supabase
+          .from('golf_courses')
+          .select('id, name, country, sub_country')
+          .eq('country', selectedCountry)
+          .eq('sub_country', selectedSubCountry)
+          .like('name', `%${data.name.split(' ')[0]}%`); // Check if first word of name exists
+        
+        if (partialCheckError) {
+          console.error('Error checking for partial duplicates:', partialCheckError);
+          throw new Error('Failed to check for similar courses');
+        }
+
+        if (partialMatches && partialMatches.length > 0) {
+          const similarCourses = partialMatches.filter(course => 
+            course.name.toLowerCase() !== data.name.toLowerCase() &&
+            course.name.toLowerCase().includes(data.name.toLowerCase().split(' ')[0])
+          );
+          
+          if (similarCourses.length > 0) {
+            // Store data and show warning
+            setDuplicateCourses(similarCourses);
+            setPendingFormData(data);
+            setShowDuplicateWarning(true);
+            return; // Don't proceed with save
+          }
         }
       }
       
@@ -237,6 +279,34 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
       toast({
         title: "Error",
         description: `Failed to ${isCreating ? 'create' : 'update'} golf course: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Delete course mutation
+  const deleteCourseMutation = useMutation({
+    mutationFn: async () => {
+      if (!course?.id) throw new Error('No course ID provided');
+      
+      const { error } = await supabase
+        .from('golf_courses')
+        .delete()
+        .eq('id', course.id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Golf course deleted successfully",
+      });
+      queryClient.invalidateQueries({ queryKey: ['admin-golf-courses'] });
+      onClose();
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: `Failed to delete golf course: ${error.message}`,
         variant: "destructive",
       });
     },
@@ -320,6 +390,72 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
     deleteReviewMutation.mutate(reviewId);
   };
 
+  const handleDeleteCourse = () => {
+    if (window.confirm(`Are you sure you want to delete "${course?.name}"? This action cannot be undone.`)) {
+      deleteCourseMutation.mutate();
+    }
+  };
+
+  const handleOverrideDuplicate = () => {
+    if (pendingFormData) {
+      // Auto-determine continent based on country
+      let continent: "North America" | "South America" | "Europe" | "Asia" | "Africa" | "Oceania" | null = null;
+      if (selectedCountry === 'USA') {
+        continent = 'North America';
+      } else if (selectedCountry === 'Britain & Ireland' || selectedCountry === 'Continental Europe') {
+        continent = 'Europe';
+      }
+      
+      // Proceed with save, bypassing duplicate check
+      const courseData = {
+        name: pendingFormData.name,
+        country: selectedCountry,
+        sub_country: selectedSubCountry,
+        region: pendingFormData.region || null,
+        continent: continent,
+        global_rank: globalRank ? parseInt(globalRank) : null,
+        regional_rank: regionalRank ? parseInt(regionalRank) : null,
+        country_rank: null,
+        description: pendingFormData.description || null,
+        thumbnail_image: courseImageUrl || null,
+        website_url: pendingFormData.website_url || null,
+        latitude: pendingFormData.latitude ? parseFloat(pendingFormData.latitude) : null,
+        longitude: pendingFormData.longitude ? parseFloat(pendingFormData.longitude) : null,
+      };
+
+      supabase
+        .from('golf_courses')
+        .insert(courseData)
+        .select()
+        .single()
+        .then(({ data: result, error }) => {
+          if (error) {
+            toast({
+              title: "Error",
+              description: `Failed to create golf course: ${error.message}`,
+              variant: "destructive",
+            });
+          } else {
+            toast({
+              title: "Success",
+              description: "Golf course created successfully",
+            });
+            queryClient.invalidateQueries({ queryKey: ['admin-golf-courses'] });
+            onClose();
+          }
+        });
+    }
+    setShowDuplicateWarning(false);
+    setPendingFormData(null);
+    setDuplicateCourses([]);
+  };
+
+  const handleCancelDuplicate = () => {
+    setShowDuplicateWarning(false);
+    setPendingFormData(null);
+    setDuplicateCourses([]);
+  };
+
   const handleImageChange = (imageUrl: string | null) => {
     console.log('=== EDITOR: Image changed to:', imageUrl);
     setCourseImageUrl(imageUrl);
@@ -331,57 +467,98 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
   }
 
   return (
-    <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>
-            {isCreating ? 'Create New Golf Course' : `Edit ${course?.name}`}
-          </DialogTitle>
-        </DialogHeader>
+    <>
+      <Dialog open={true} onOpenChange={onClose}>
+        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>
+              {isCreating ? 'Create New Golf Course' : `Edit ${course?.name}`}
+            </DialogTitle>
+          </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <GolfCourseForm
-            register={register}
-            selectedCountry={selectedCountry}
-            setSelectedCountry={setSelectedCountry}
-            selectedSubCountry={selectedSubCountry}
-            setSelectedSubCountry={setSelectedSubCountry}
-            selectedContinent=""
-            setSelectedContinent={() => {}}
-            errors={errors}
-            currentImageUrl={courseImageUrl}
-            onImageChange={handleImageChange}
-            regionalRankingRegion={regionalRankingRegion}
-            setRegionalRankingRegion={setRegionalRankingRegion}
-            regionalRank={regionalRank}
-            setRegionalRank={setRegionalRank}
-            globalRank={globalRank}
-            setGlobalRank={setGlobalRank}
-          />
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <GolfCourseForm
+              register={register}
+              selectedCountry={selectedCountry}
+              setSelectedCountry={setSelectedCountry}
+              selectedSubCountry={selectedSubCountry}
+              setSelectedSubCountry={setSelectedSubCountry}
+              selectedContinent=""
+              setSelectedContinent={() => {}}
+              errors={errors}
+              currentImageUrl={courseImageUrl}
+              onImageChange={handleImageChange}
+              regionalRankingRegion={regionalRankingRegion}
+              setRegionalRankingRegion={setRegionalRankingRegion}
+              regionalRank={regionalRank}
+              setRegionalRank={setRegionalRank}
+              globalRank={globalRank}
+              setGlobalRank={setGlobalRank}
+            />
 
-          <div className="flex gap-3 pt-4 border-t">
-            <Button 
-              type="submit" 
-              disabled={saveMutation.isPending}
-              className="bg-[#b66b41] hover:bg-[#a55a3a] text-white"
-            >
-              {saveMutation.isPending ? 'Saving...' : (isCreating ? 'Create Course' : 'Save Changes')}
-            </Button>
-            <Button type="button" variant="outline" onClick={onClose}>
+            <div className="flex justify-between items-center pt-4 border-t">
+              <div className="flex gap-3">
+                <Button 
+                  type="submit" 
+                  disabled={saveMutation.isPending}
+                  className="bg-[#b66b41] hover:bg-[#a55a3a] text-white"
+                >
+                  {saveMutation.isPending ? 'Saving...' : (isCreating ? 'Create Course' : 'Save Changes')}
+                </Button>
+                <Button type="button" variant="outline" onClick={onClose}>
+                  Cancel
+                </Button>
+              </div>
+              
+              {!isCreating && course && (
+                <Button 
+                  type="button" 
+                  variant="destructive" 
+                  onClick={handleDeleteCourse}
+                  disabled={deleteCourseMutation.isPending}
+                >
+                  {deleteCourseMutation.isPending ? 'Deleting...' : 'Delete Course'}
+                </Button>
+              )}
+            </div>
+          </form>
+
+          {!isCreating && course && (
+            <CourseReviewsSection
+              ratings={ratings}
+              ratingsLoading={ratingsLoading}
+              onDeleteReview={handleDeleteReview}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Duplicate Warning Dialog */}
+      <AlertDialog open={showDuplicateWarning} onOpenChange={setShowDuplicateWarning}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Similar Courses Found</AlertDialogTitle>
+            <AlertDialogDescription>
+              Warning: Similar golf courses already exist in {selectedSubCountry}, {selectedCountry}:
+              <ul className="mt-2 list-disc list-inside">
+                {duplicateCourses.map((course, index) => (
+                  <li key={index} className="text-sm">{course.name}</li>
+                ))}
+              </ul>
+              Are you sure this is not a duplicate? Consider variations like "East Course" vs "West Course" if this is the same golf club.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleCancelDuplicate}>
               Cancel
-            </Button>
-          </div>
-        </form>
-
-        {!isCreating && course && (
-          <CourseReviewsSection
-            ratings={ratings}
-            ratingsLoading={ratingsLoading}
-            onDeleteReview={handleDeleteReview}
-          />
-        )}
-      </DialogContent>
-    </Dialog>
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleOverrideDuplicate} className="bg-[#b66b41] hover:bg-[#a55a3a]">
+              Add Anyway
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 };
 
