@@ -15,12 +15,12 @@ const UserCoursesHeader: React.FC<UserCoursesHeaderProps> = ({
 
   // Dynamic intro text based on profile ownership
   const introText = isOwnProfile 
-    ? "Here's how you rate the world's top courses."
-    : `Here's how ${firstName} rates the world's top courses.`;
+    ? "Here's how you rate the world's top courses"
+    : `Here's how ${firstName} rates the world's top courses`;
 
   return (
-    <div className="mb-6">
-      <p className="text-muted-foreground text-sm">
+    <div className="text-center mb-6">
+      <p className="text-lg text-foreground font-normal">
         {introText}
       </p>
     </div>
