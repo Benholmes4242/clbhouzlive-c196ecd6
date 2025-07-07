@@ -2,6 +2,7 @@
 import React from 'react';
 import { useNavigate } from "react-router-dom";
 import HeaderNavigation from './header/HeaderNavigation';
+import HeaderSearch from './header/HeaderSearch';
 import { useAppLogo } from '@/hooks/useAppLogo';
 
 const Header = () => {
@@ -29,6 +30,11 @@ const Header = () => {
               className="h-8 md:h-12 w-auto cursor-pointer object-contain hover:opacity-80 transition-opacity flex-shrink-0"
               onClick={handleLogoClick}
             />
+          </div>
+
+          {/* Search Bar - Desktop */}
+          <div className="flex-1 max-w-md mx-2 md:mx-4 min-w-0">
+            <HeaderSearch />
           </div>
 
           {/* Navigation Icons */}
