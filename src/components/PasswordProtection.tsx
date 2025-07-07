@@ -47,7 +47,7 @@ const PasswordProtection: React.FC<PasswordProtectionProps> = ({ children }) => 
     // This is a temporary client-side check - replace with proper authentication
     const validPasswords = [
       'admin123!', // Change this to your secure password
-      'dev-access-2024' // Temporary development access
+      'dev-access-2025!*' // Updated development access password
     ];
     
     if (validPasswords.includes(password)) {
