@@ -151,6 +151,25 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
       console.log('Regional rank:', regionalRank);
       console.log('Global rank:', globalRank);
       
+      // Check for duplicates when creating a new course
+      if (isCreating) {
+        const { data: existingCourses, error: duplicateCheckError } = await supabase
+          .from('golf_courses')
+          .select('id, name, country, sub_country')
+          .eq('name', data.name)
+          .eq('country', selectedCountry)
+          .eq('sub_country', selectedSubCountry);
+        
+        if (duplicateCheckError) {
+          console.error('Error checking for duplicates:', duplicateCheckError);
+          throw new Error('Failed to check for duplicate courses');
+        }
+        
+        if (existingCourses && existingCourses.length > 0) {
+          throw new Error(`A golf course named "${data.name}" already exists in ${selectedSubCountry}, ${selectedCountry}. Please choose a different name or verify this is not a duplicate.`);
+        }
+      }
+      
       // Auto-determine continent based on country
       let continent: "North America" | "South America" | "Europe" | "Asia" | "Africa" | "Oceania" | null = null;
       if (selectedCountry === 'USA') {
