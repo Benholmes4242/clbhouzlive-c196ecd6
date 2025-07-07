@@ -2,7 +2,6 @@
 import React from 'react';
 import { useNavigate } from "react-router-dom";
 import HeaderNavigation from './header/HeaderNavigation';
-import HeaderSearch from './header/HeaderSearch';
 import { useAppLogo } from '@/hooks/useAppLogo';
 
 const Header = () => {
@@ -32,17 +31,8 @@ const Header = () => {
             />
           </div>
 
-          {/* Search Bar - Responsive with proper constraints */}
-          <div className="flex-1 max-w-md mx-2 md:mx-4 min-w-0 hidden sm:block relative z-[60]">
-            <HeaderSearch />
-          </div>
-
-          {/* Navigation Icons - Fixed positioning with mobile optimization */}
+          {/* Navigation Icons */}
           <div className="flex items-center space-x-1 md:space-x-4 flex-shrink-0 min-w-0">
-            {/* Mobile Search Icon - Always visible on mobile */}
-            <div className="sm:hidden">
-              <HeaderSearch />
-            </div>
             <HeaderNavigation />
           </div>
         </div>
