@@ -46,23 +46,23 @@ export const useStoryData = () => {
         ];
 
         // Get users that the current user follows
-        const { data: followedUsers } = await supabase
+        const { data: followedUsers, error: followError } = await supabase
           .from('user_follows')
-          .select(`
-            following_id,
-            user_profiles!user_follows_following_id_fkey (
-              id,
-              username,
-              display_name,
-              profile_photo_url
-            )
-          `)
+          .select('following_id')
           .eq('follower_id', user.id);
 
+        console.log('Followed users:', followedUsers, 'Error:', followError);
+
         if (followedUsers && followedUsers.length > 0) {
-          followedUsers.forEach((follow: any) => {
-            const profile = follow.user_profiles;
-            if (profile) {
+          // Get profile data for followed users
+          const followedIds = followedUsers.map(f => f.following_id);
+          const { data: profiles } = await supabase
+            .from('user_profiles')
+            .select('id, username, display_name, profile_photo_url')
+            .in('id', followedIds);
+
+          if (profiles && profiles.length > 0) {
+            profiles.forEach((profile: any) => {
               newStories.push({
                 id: profile.id,
                 type: 'friend' as const,
@@ -71,8 +71,8 @@ export const useStoryData = () => {
                 avatar: profile.profile_photo_url || '',
                 hasStory: false,
               });
-            }
-          });
+            });
+          }
         }
 
         setStories(newStories);
