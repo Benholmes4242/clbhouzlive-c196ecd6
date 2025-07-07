@@ -166,25 +166,25 @@ const CourseDetailPage = () => {
           {/* Rankings underneath location text - Mobile Only */}
           <div className="md:hidden flex items-center gap-2 mb-4">
             {course.global_rank && (
-              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-xl shadow-sm">
-                <Earth className="h-4 w-4 text-white" />
+              <div className="flex items-center gap-1.5 px-4 py-3 bg-white/20 backdrop-blur-sm rounded-xl shadow-sm min-h-[44px]">
+                <Earth className="h-5 w-5 text-white" />
                 <span className="text-sm font-bold text-white">#{course.global_rank}</span>
               </div>
             )}
             {((course.country === 'Britain & Ireland' || course.country === 'United Kingdom') && course.regional_rank) && (
-              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-xl shadow-sm">
+              <div className="flex items-center gap-1.5 px-4 py-3 bg-white/20 backdrop-blur-sm rounded-xl shadow-sm min-h-[44px]">
                 <CountryFlag country="Britain & Ireland" size="sm" />
                 <span className="text-sm font-bold text-white">#{course.regional_rank}</span>
               </div>
             )}
             {(course.country === 'USA' && course.usa_rank) && (
-              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-xl shadow-sm">
+              <div className="flex items-center gap-1.5 px-4 py-3 bg-white/20 backdrop-blur-sm rounded-xl shadow-sm min-h-[44px]">
                 <CountryFlag country="USA" size="sm" />
                 <span className="text-sm font-bold text-white">#{course.usa_rank}</span>
               </div>
             )}
             {(course.country === 'Continental Europe' && course.regional_rank) && (
-              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-xl shadow-sm">
+              <div className="flex items-center gap-1.5 px-4 py-3 bg-white/20 backdrop-blur-sm rounded-xl shadow-sm min-h-[44px]">
                 <CountryFlag country="Continental Europe" size="sm" />
                 <span className="text-sm font-bold text-white">#{course.regional_rank}</span>
               </div>
