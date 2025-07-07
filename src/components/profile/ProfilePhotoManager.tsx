@@ -28,23 +28,51 @@ const ProfilePhotoManager: React.FC<ProfilePhotoManagerProps> = ({
     setPhotoPreview(tempPreviewUrl);
 
     setUploading(true);
-    const fileExt = file.name.split('.').pop();
-    const timestamp = Date.now();
-    const filePath = `${user.id}/avatar-${timestamp}.${fileExt}`;
+    try {
+      const fileExt = file.name.split('.').pop();
+      const timestamp = Date.now();
+      const filePath = `${user.id}/avatar-${timestamp}.${fileExt}`;
 
-    let { error } = await supabase.storage.from('avatars').upload(filePath, file, { upsert: false });
-    if (error) {
+      const { error } = await supabase.storage.from('avatars').upload(filePath, file, { upsert: true });
+      if (error) {
+        console.error('Upload error:', error);
+        alert('Upload failed!');
+        setUploading(false);
+        return;
+      }
+
+      const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
+      const avatarUrl = urlData?.publicUrl ?? '';
+      
+      // Update database
+      const { error: updateError } = await supabase
+        .from('user_profiles')
+        .update({ 
+          profile_photo_url: avatarUrl, 
+          updated_at: new Date().toISOString() 
+        })
+        .eq('id', user.id);
+
+      if (updateError) {
+        console.error('Database update error:', updateError);
+        alert('Failed to save profile photo!');
+        setUploading(false);
+        return;
+      }
+
+      // Update local state and parent component
+      setPhotoPreview(avatarUrl);
+      onProfileUpdate({ ...profile, profile_photo_url: avatarUrl });
+      
+      // Show success feedback
+      console.log('Profile photo updated successfully');
+      
+    } catch (error) {
+      console.error('Upload error:', error);
       alert('Upload failed!');
+    } finally {
       setUploading(false);
-      return;
     }
-
-    const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
-    let avatarUrl = urlData?.publicUrl ?? '';
-    setPhotoPreview(avatarUrl);
-    await supabase.from('user_profiles').update({ profile_photo_url: avatarUrl, updated_at: new Date().toISOString() }).eq('id', user.id);
-    onProfileUpdate({ ...profile, profile_photo_url: avatarUrl });
-    setUploading(false);
   };
 
   return (

@@ -32,7 +32,10 @@ const InstagramStyleProfileHeader: React.FC<InstagramStyleProfileHeaderProps> = 
           <ProfilePhotoManager
             user={isOwnProfile ? user : null}
             profile={profile}
-            onProfileUpdate={() => {}}
+            onProfileUpdate={(updatedProfile) => {
+              // Force a page refresh to reflect the updated photo
+              window.location.reload();
+            }}
           />
         </div>
 
