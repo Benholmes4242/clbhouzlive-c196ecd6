@@ -33,6 +33,7 @@ const Top100CoursesModal: React.FC<Top100CoursesModalProps> = ({
   const {
     courses,
     playedCourses,
+    getUserRating,
     isLoading,
     toggleCourse
   } = useTop100CoursesList(region, userId, isOwnProfile);
@@ -63,6 +64,7 @@ const Top100CoursesModal: React.FC<Top100CoursesModalProps> = ({
           isOwnProfile={isOwnProfile}
           isLoading={isLoading}
           toggleCourse={toggleCourse}
+          getUserRating={getUserRating}
         />
       </DialogContent>
     </Dialog>

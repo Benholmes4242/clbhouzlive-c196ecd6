@@ -3,6 +3,7 @@ import { Badge } from '@/components/ui/badge';
 import { Check, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import PostPlayRatingModal from '../courses/PostPlayRatingModal';
+import CourseRankBadges from '../courses/CourseRankBadges';
 
 interface Top100CourseCardProps {
   course: any;
@@ -10,6 +11,7 @@ interface Top100CourseCardProps {
   region: string;
   isOwnProfile?: boolean;
   onToggle?: () => void;
+  userRating?: number | null;
 }
 
 // Helper function to format description text with line breaks
@@ -49,7 +51,8 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
   isPlayed,
   region,
   isOwnProfile = false,
-  onToggle
+  onToggle,
+  userRating
 }) => {
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [wasAlreadyPlayed, setWasAlreadyPlayed] = useState(false);
@@ -95,6 +98,18 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
             src={course.thumbnail_image || 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=400&h=300&fit=crop'}
             alt={course.name}
             className="w-full h-full object-cover"
+          />
+
+          {/* Course ranking badges and user rating */}
+          <CourseRankBadges
+            globalRank={course.global_rank}
+            regionalRank={course.regional_rank}
+            usaRank={course.usa_rank}
+            country={course.country}
+            viewContext={region === 'britain-ireland' ? 'regional' : region === 'usa' ? 'usa' : region === 'europe' ? 'europe' : 'global'}
+            userRating={userRating}
+            showUserRating={!!userRating}
+            positioning="top-left"
           />
 
           {/* Played Indicator */}

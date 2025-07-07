@@ -11,6 +11,7 @@ interface Top100CoursesContentProps {
   isOwnProfile: boolean;
   isLoading: boolean;
   toggleCourse: (courseId: string) => void;
+  getUserRating: (courseId: string) => number | null;
 }
 
 const Top100CoursesContent: React.FC<Top100CoursesContentProps> = ({
@@ -20,7 +21,8 @@ const Top100CoursesContent: React.FC<Top100CoursesContentProps> = ({
   region,
   isOwnProfile,
   isLoading,
-  toggleCourse
+  toggleCourse,
+  getUserRating
 }) => {
   // Filter courses based on search term
   const filteredCourses = useMemo(() => {
@@ -48,6 +50,7 @@ const Top100CoursesContent: React.FC<Top100CoursesContentProps> = ({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {filteredCourses.map((course) => {
           const isPlayed = playedCourses.has(course.id);
+          const userRating = getUserRating(course.id);
           
           return (
             <Top100CourseCard
@@ -57,6 +60,7 @@ const Top100CoursesContent: React.FC<Top100CoursesContentProps> = ({
               region={region}
               isOwnProfile={isOwnProfile}
               onToggle={isOwnProfile ? () => toggleCourse(course.id) : undefined}
+              userRating={userRating}
             />
           );
         })}

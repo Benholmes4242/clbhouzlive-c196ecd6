@@ -52,7 +52,7 @@ export const useTop100CoursesList = (region: string, userId: string, isOwnProfil
     enabled: !!region,
   });
 
-  // Query to get user's played courses
+  // Query to get user's played courses and ratings
   const { data: userPlayedCourses = [], isLoading: isLoadingPlayed } = useQuery({
     queryKey: ['userTop100CoursesInRegion', userId, region],
     queryFn: async () => {
@@ -61,6 +61,23 @@ export const useTop100CoursesList = (region: string, userId: string, isOwnProfil
         .select('course_id')
         .eq('user_id', userId)
         .eq('played', true);
+
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: !!userId,
+  });
+
+  // Query to get user's course ratings
+  const { data: userRatings = [], isLoading: isLoadingRatings } = useQuery({
+    queryKey: ['userCourseRatings', userId],
+    queryFn: async () => {
+      if (!userId) return [];
+      
+      const { data, error } = await supabase
+        .from('course_ratings')
+        .select('course_id, rating')
+        .eq('user_id', userId);
 
       if (error) throw error;
       return data || [];
@@ -119,10 +136,18 @@ export const useTop100CoursesList = (region: string, userId: string, isOwnProfil
     }
   };
 
+  // Helper function to get user rating for a specific course
+  const getUserRating = (courseId: string): number | null => {
+    const rating = userRatings.find(r => r.course_id === courseId);
+    return rating ? rating.rating : null;
+  };
+
   return {
     courses,
     playedCourses,
-    isLoading: isLoadingCourses || isLoadingPlayed,
+    userRatings,
+    getUserRating,
+    isLoading: isLoadingCourses || isLoadingPlayed || isLoadingRatings,
     toggleCourse
   };
 };
