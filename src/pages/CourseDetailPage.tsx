@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { ArrowLeft, ExternalLink, Target, Check } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Target, Check, Earth } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -201,17 +201,43 @@ const CourseDetailPage = () => {
       {/* Course Info Strip */}
       <div className="bg-card border-b p-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-6">
-            <div className="flex items-center gap-2">
-              <CountryFlag country={course.country} className="w-8 h-6" />
-            </div>
+          <div className="flex items-center gap-4">
+            {/* Rankings */}
+            {course.global_rank && (
+              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 rounded-xl shadow-sm">
+                <Earth className="h-5 w-5 text-gray-600" />
+                <span className="text-sm font-bold text-gray-800">#{course.global_rank}</span>
+              </div>
+            )}
+            {((course.country === 'Britain & Ireland' || course.country === 'United Kingdom') && course.regional_rank) && (
+              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 rounded-xl shadow-sm">
+                <CountryFlag country="Britain & Ireland" size="md" />
+                <span className="text-sm font-bold text-gray-800">#{course.regional_rank}</span>
+              </div>
+            )}
+            {(course.country === 'USA' && course.usa_rank) && (
+              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 rounded-xl shadow-sm">
+                <CountryFlag country="USA" size="md" />
+                <span className="text-sm font-bold text-gray-800">#{course.usa_rank}</span>
+              </div>
+            )}
+            {(course.country === 'Continental Europe' && course.regional_rank) && (
+              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 rounded-xl shadow-sm">
+                <CountryFlag country="Continental Europe" size="md" />
+                <span className="text-sm font-bold text-gray-800">#{course.regional_rank}</span>
+              </div>
+            )}
+          </div>
+          
+          {/* Community Rating */}
+          <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <span className="text-2xl">⭐</span>
               <span className="text-xl font-semibold">
                 {ratingStats?.average_rating || 0}/10
               </span>
               <span className="text-muted-foreground">
-                (from {ratingStats?.total_ratings || 0} votes)
+                ({ratingStats?.total_ratings || 0} votes)
               </span>
             </div>
             <Badge variant="secondary" className="text-lg px-4 py-2">

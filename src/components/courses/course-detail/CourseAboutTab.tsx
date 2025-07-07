@@ -37,34 +37,6 @@ const formatDescription = (description: string) => {
 const CourseAboutTab = ({ course }: CourseAboutTabProps) => {
   return (
     <div className="space-y-8">
-      {/* Rankings */}
-      {(course.global_rank || course.regional_rank || course.usa_rank || course.country_rank) && (
-        <div>
-          <h2 className="text-2xl font-semibold mb-4">Rankings</h2>
-          <div className="flex flex-wrap gap-3">
-            {course.global_rank && (
-              <Badge variant="secondary" className="text-lg px-4 py-2">
-                #{course.global_rank} Global
-              </Badge>
-            )}
-            {course.regional_rank && (
-              <Badge variant="secondary" className="text-lg px-4 py-2">
-                #{course.regional_rank} Regional
-              </Badge>
-            )}
-            {course.usa_rank && (
-              <Badge variant="secondary" className="text-lg px-4 py-2">
-                #{course.usa_rank} USA
-              </Badge>
-            )}
-            {course.country_rank && (
-              <Badge variant="secondary" className="text-lg px-4 py-2">
-                #{course.country_rank} {course.country}
-              </Badge>
-            )}
-          </div>
-        </div>
-      )}
 
       {/* Description */}
       {course.description && (
@@ -95,12 +67,6 @@ const CourseAboutTab = ({ course }: CourseAboutTabProps) => {
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Area:</span>
                 <span className="font-medium">{course.sub_country}</span>
-              </div>
-            )}
-            {course.continent && (
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Continent:</span>
-                <span className="font-medium">{course.continent}</span>
               </div>
             )}
           </div>
