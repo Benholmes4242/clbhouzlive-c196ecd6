@@ -44,11 +44,11 @@ export const useStoryData = () => {
       ];
 
       // Get users that the current user follows
-      const { data: followedUsers } = await supabase
+      const { data: followedUsers, error: followError } = await supabase
         .from('user_follows')
         .select(`
           following_id,
-          user_profiles!user_follows_following_id_fkey (
+          user_profiles!inner (
             id,
             username,
             display_name,
@@ -56,6 +56,8 @@ export const useStoryData = () => {
           )
         `)
         .eq('follower_id', user.id);
+
+      console.log('Followed users query result:', followedUsers, 'Error:', followError);
 
       if (followedUsers && followedUsers.length > 0) {
         followedUsers.forEach((follow: any) => {
@@ -93,7 +95,9 @@ export const useStoryData = () => {
   useEffect(() => {
     fetchStoriesData();
 
-    // Set up real-time subscription for follow changes
+    // Set up real-time subscription for follow changes only if user exists
+    if (!user?.id) return;
+
     const channel = supabase
       .channel('follow-changes')
       .on(
@@ -102,7 +106,7 @@ export const useStoryData = () => {
           event: '*',
           schema: 'public',
           table: 'user_follows',
-          filter: `follower_id=eq.${user?.id}`,
+          filter: `follower_id=eq.${user.id}`,
         },
         () => {
           // Refetch stories when follow relationships change
