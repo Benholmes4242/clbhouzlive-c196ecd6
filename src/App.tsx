@@ -16,6 +16,7 @@ const UserProfilePage = lazy(() => import("./pages/UserProfilePage"));
 const Settings = lazy(() => import("./pages/Settings"));
 const Explore = lazy(() => import("./pages/Explore"));
 const Courses = lazy(() => import("./pages/Courses"));
+const CourseDetailPage = lazy(() => import("./pages/CourseDetailPage"));
 const UserCoursesPage = lazy(() => import("./pages/UserCoursesPage"));
 const MyRatings = lazy(() => import("./pages/MyRatings"));
 const News = lazy(() => import("./pages/News"));
