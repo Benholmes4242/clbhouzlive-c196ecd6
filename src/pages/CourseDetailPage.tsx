@@ -194,9 +194,9 @@ const CourseDetailPage = () => {
 
       {/* White Section Below Image */}
       <div className="bg-background p-4">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          {/* Community Vote Score - Left */}
-          <div className="flex items-center gap-2">
+        <div className="max-w-6xl mx-auto relative">
+          {/* Community Vote Score - Left aligned with course title */}
+          <div className="flex items-center gap-2 ml-6">
             <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
             <span className="text-xl font-semibold text-foreground">
               {ratingStats?.average_rating || 0}/10
@@ -206,12 +206,12 @@ const CourseDetailPage = () => {
             </span>
           </div>
           
-          {/* Visit Website Button - Right (Below Add to Played) */}
+          {/* Visit Website Button - Right */}
           {course.website_url && (
             <Button
               variant="outline"
               onClick={handleWebsiteClick}
-              className="flex items-center gap-2 bg-white border border-border rounded-full px-4 py-2"
+              className="absolute right-6 top-0 flex items-center gap-2 bg-white border border-border rounded-full px-4 py-2"
             >
               <ExternalLink className="h-4 w-4" />
               Visit Website
