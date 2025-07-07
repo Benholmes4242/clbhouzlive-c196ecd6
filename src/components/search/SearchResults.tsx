@@ -40,7 +40,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
 
   if (loading) {
     return (
-      <div className="absolute top-full left-0 right-0 bg-background border border-border rounded-md mt-1 shadow-lg z-[200]">
+      <div className="absolute top-full left-0 right-0 bg-background border border-border rounded-md mt-1 shadow-lg z-[9999] pointer-events-auto">
         <div className="p-4 text-center text-muted-foreground">
           Searching...
         </div>
@@ -54,7 +54,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
 
   if (results.length === 0) {
     return (
-      <div className="absolute top-full left-0 right-0 bg-background border border-border rounded-md mt-1 shadow-lg z-[200]">
+      <div className="absolute top-full left-0 right-0 bg-background border border-border rounded-md mt-1 shadow-lg z-[9999] pointer-events-auto">
         <div className="p-4 text-center text-muted-foreground">
           No results found for "{query}"
         </div>
@@ -63,7 +63,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
   }
 
   return (
-    <div className="absolute top-full left-0 right-0 bg-background border border-border rounded-md mt-1 shadow-lg z-[200] max-h-96 overflow-y-auto">
+    <div className="absolute top-full left-0 right-0 bg-background border border-border rounded-md mt-1 shadow-lg z-[9999] max-h-96 overflow-y-auto pointer-events-auto">
       {results.map((result) => (
         <div
           key={`${result.type}-${result.id}`}
