@@ -181,39 +181,43 @@ const CourseDetailPage = () => {
               </div>
             )}
           </div>
-
-          {/* Community Rating - below ranking badges */}
-          <div className="flex items-center gap-2 mt-3">
-            <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
-            <span className="text-xl font-semibold text-white">
-              {ratingStats?.average_rating || 0}/10
-            </span>
-            <span className="text-white opacity-80">
-              ({ratingStats?.total_ratings || 0} votes)
-            </span>
-          </div>
         </div>
 
         {/* Add to Played Button - Bottom Right (Fixed Position) */}
         {user && (
-          <div className="absolute bottom-4 right-4 z-20 flex flex-col gap-2 items-end">
-            <CoursePlayedButton 
-              isPlayed={isPlayed}
-              onAddToPlayed={handleAddToPlayed}
-            />
-            {/* Visit Website Button - Stacked under Add to Played */}
-            {course.website_url && (
-              <Button
-                variant="outline"
-                onClick={handleWebsiteClick}
-                className="flex items-center gap-2 bg-white border border-border rounded-full px-4 py-2"
-              >
-                <ExternalLink className="h-4 w-4" />
-                Visit Website
-              </Button>
-            )}
-          </div>
+          <CoursePlayedButton 
+            isPlayed={isPlayed}
+            onAddToPlayed={handleAddToPlayed}
+          />
         )}
+      </div>
+
+      {/* White Section Below Image */}
+      <div className="bg-background p-4">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
+          {/* Community Vote Score - Left */}
+          <div className="flex items-center gap-2">
+            <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
+            <span className="text-xl font-semibold text-foreground">
+              {ratingStats?.average_rating || 0}/10
+            </span>
+            <span className="text-muted-foreground">
+              ({ratingStats?.total_ratings || 0} votes)
+            </span>
+          </div>
+          
+          {/* Visit Website Button - Right (Below Add to Played) */}
+          {course.website_url && (
+            <Button
+              variant="outline"
+              onClick={handleWebsiteClick}
+              className="flex items-center gap-2 bg-white border border-border rounded-full px-4 py-2"
+            >
+              <ExternalLink className="h-4 w-4" />
+              Visit Website
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Sticky Tab Navigation */}
