@@ -20,8 +20,8 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Badge } from '@/components/ui/badge';
-import { Star, Check, Trophy, Trash2 } from 'lucide-react';
+import { Slider } from '@/components/ui/slider';
+import { Star, Check, Trophy, Trash2, Upload } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import ReviewMediaUpload from './ReviewMediaUpload';
 
@@ -50,12 +50,12 @@ const PostPlayRatingModal = ({
   const queryClient = useQueryClient();
   const [selectedRating, setSelectedRating] = useState<number | null>(null);
   const [review, setReview] = useState('');
-  const [hoveredRating, setHoveredRating] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showRemoveDialog, setShowRemoveDialog] = useState(false);
   const [hasMarkedAsPlayed, setHasMarkedAsPlayed] = useState(false);
   const [selectedMedia, setSelectedMedia] = useState<File[]>([]);
+  const [buttonText, setButtonText] = useState('Add to Played');
 
   const { data: existingRating } = useQuery({
     queryKey: ['user-course-rating', course?.id],
@@ -251,8 +251,13 @@ const PostPlayRatingModal = ({
       queryClient.invalidateQueries({ queryKey: ['user-course-rating', course?.id] });
       queryClient.invalidateQueries({ queryKey: ['course-reviews', course?.id] });
       
-      setShowConfirmation(true);
-      setIsSubmitting(false);
+      // Show "Added!" text for 1.5 seconds
+      setButtonText('Added!');
+      setTimeout(() => {
+        setShowConfirmation(true);
+        setIsSubmitting(false);
+        setButtonText('Add to Played');
+      }, 1500);
       
       toast({
         title: isEditMode ? "Rating Updated! ✨" : "Rating Submitted! ✨",
@@ -364,7 +369,6 @@ const PostPlayRatingModal = ({
       setSelectedRating(null);
       setReview('');
     }
-    setHoveredRating(null);
     setShowConfirmation(false);
     setIsSubmitting(false);
   };
@@ -386,6 +390,8 @@ const PostPlayRatingModal = ({
     }
 
     setIsSubmitting(true);
+    setButtonText('Adding...');
+    
     submitRatingMutation.mutate({ 
       rating: selectedRating, 
       reviewText: review.trim(),
@@ -401,8 +407,11 @@ const PostPlayRatingModal = ({
     setSelectedMedia(prev => prev.filter((_, i) => i !== index));
   };
 
-  // Generate rating options from 0.5 to 10 in 0.5 increments
-  const ratingOptions = Array.from({ length: 20 }, (_, i) => (i + 1) * 0.5);
+  // Handle slider value change (convert from 0-20 to 0.5-10)
+  const handleSliderChange = (value: number[]) => {
+    const rating = value[0] * 0.5;
+    setSelectedRating(rating);
+  };
 
   if (!course) return null;
 
@@ -413,16 +422,9 @@ const PostPlayRatingModal = ({
           {!showConfirmation ? (
             <>
               <DialogHeader>
-                <DialogTitle className="flex items-center gap-2 text-lg">
-                  <Trophy className="h-5 w-5 text-yellow-600" />
-                  {isEditMode ? 'Edit Your Rating' : 'Congratulations!'}
+                <DialogTitle className="text-xl font-semibold">
+                  Add {course.name} to Played
                 </DialogTitle>
-                <p className="text-sm text-muted-foreground">
-                  {isEditMode 
-                    ? `Update your rating and review for ${course.name}`
-                    : `You've played ${course.name}! How would you rate your experience?`
-                  }
-                </p>
               </DialogHeader>
 
               <div className="space-y-6 mt-4">
@@ -456,60 +458,43 @@ const PostPlayRatingModal = ({
                   </div>
                 </div>
 
-                {/* Rating Section */}
-                <div className="space-y-3">
-                  <div className="text-center">
-                    <p className="text-sm font-medium mb-2">
-                      {isEditMode ? 'Update your rating' : 'Rate your experience'}
-                    </p>
-                    <div className="flex items-center justify-center gap-1 mb-2">
-                      <Star className="h-4 w-4 text-yellow-500" />
-                      <span className="text-sm text-muted-foreground">Rate from 0.5 to 10</span>
+                {/* Rating Slider Section */}
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Rating</label>
+                    <div className="px-3">
+                      <Slider
+                        value={[selectedRating ? selectedRating * 2 : 1]}
+                        onValueChange={handleSliderChange}
+                        max={20}
+                        min={1}
+                        step={1}
+                        className="w-full review-rating-slider"
+                      />
+                      <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                        <span>0.5</span>
+                        <span>10.0</span>
+                      </div>
                     </div>
+                    
+                    {selectedRating && (
+                      <div className="text-center mt-3">
+                        <span className="text-lg font-bold" style={{ color: '#F5A623' }}>
+                          {selectedRating.toFixed(1)}/10
+                        </span>
+                      </div>
+                    )}
                   </div>
-
-                  {/* Rating Buttons */}
-                  <div className="flex flex-wrap gap-1 justify-center">
-                    {ratingOptions.map((rating) => (
-                      <Button
-                        key={rating}
-                        variant={
-                          (hoveredRating !== null && rating <= hoveredRating) ||
-                          (hoveredRating === null && selectedRating !== null && rating <= selectedRating)
-                            ? "default"
-                            : "outline"
-                        }
-                        size="sm"
-                        className="h-8 px-2 text-xs"
-                        onClick={() => setSelectedRating(rating)}
-                        onMouseEnter={() => setHoveredRating(rating)}
-                        onMouseLeave={() => setHoveredRating(null)}
-                        disabled={isSubmitting}
-                      >
-                        {rating}
-                      </Button>
-                    ))}
-                  </div>
-
-                  {selectedRating && (
-                    <div className="text-center">
-                      <Badge variant="secondary" className="text-sm">
-                        Selected: {selectedRating}/10
-                      </Badge>
-                    </div>
-                  )}
                 </div>
 
                 {/* Review Section */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    {isEditMode ? 'Update your thoughts (optional)' : 'Share your thoughts (optional)'}
-                  </label>
+                  <label className="text-sm font-medium">Review (optional)</label>
                   <Textarea
                     value={review}
                     onChange={(e) => setReview(e.target.value)}
-                    placeholder="What made this course stand out for you?"
-                    className="min-h-[80px] resize-none"
+                    placeholder="Write your review..."
+                    className="min-h-[100px] resize-none rounded-lg border-gray-200"
                     disabled={isSubmitting}
                     maxLength={500}
                   />
@@ -520,9 +505,7 @@ const PostPlayRatingModal = ({
 
                 {/* Media Upload Section */}
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">
-                    Add photos or videos (optional)
-                  </label>
+                  <label className="text-sm font-medium">Media Upload (optional)</label>
                   <ReviewMediaUpload
                     onMediaSelected={handleMediaSelected}
                     selectedMedia={selectedMedia}
@@ -530,45 +513,34 @@ const PostPlayRatingModal = ({
                   />
                 </div>
 
-                {/* Action Buttons */}
-                <div className="flex gap-3 pt-2">
-                  {isEditMode ? (
-                    <>
-                      <Button
-                        variant="destructive"
-                        onClick={() => setShowRemoveDialog(true)}
-                        disabled={isSubmitting}
-                        className="flex items-center gap-2"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                        Remove from Played
-                      </Button>
-                      <Button 
-                        onClick={handleSubmit}
-                        disabled={isSubmitting || !selectedRating}
-                        className="flex-1"
-                      >
-                        {isSubmitting ? "Updating..." : "Update Rating"}
-                      </Button>
-                    </>
-                  ) : (
-                    <>
-                      <Button
-                        variant="outline"
-                        onClick={handleSkip}
-                        disabled={isSubmitting}
-                        className="flex-1"
-                      >
-                        Skip for now
-                      </Button>
-                      <Button 
-                        onClick={handleSubmit}
-                        disabled={isSubmitting || !selectedRating}
-                        className="flex-1"
-                      >
-                        {isSubmitting ? "Submitting..." : "Rate this Course"}
-                      </Button>
-                    </>
+                {/* Submit Button */}
+                <div className="pt-4">
+                  <Button 
+                    onClick={isEditMode ? handleSubmit : handleSubmit}
+                    disabled={isSubmitting || !selectedRating}
+                    className="w-full bg-[#EAEAEA] text-[#333333] hover:bg-[#D4D4D4] shadow-sm rounded-lg font-medium"
+                    style={{
+                      backgroundColor: isSubmitting ? '#D4D4D4' : '#EAEAEA',
+                      color: '#333333'
+                    }}
+                  >
+                    {isEditMode ? (
+                      isSubmitting ? "Updating..." : "Update Rating"
+                    ) : (
+                      buttonText
+                    )}
+                  </Button>
+                  
+                  {isEditMode && (
+                    <Button
+                      variant="destructive"
+                      onClick={() => setShowRemoveDialog(true)}
+                      disabled={isSubmitting}
+                      className="w-full mt-3 flex items-center gap-2"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      Remove from Played
+                    </Button>
                   )}
                 </div>
               </div>
