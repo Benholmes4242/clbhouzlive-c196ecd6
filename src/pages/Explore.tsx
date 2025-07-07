@@ -87,6 +87,13 @@ const Explore = () => {
             onLoadMore={loadMore}
             activeFilter={activeFilter}
           />
+          
+          {/* Debug info */}
+          {activeFilter === 'Shank Tank' && (
+            <div className="fixed bottom-20 left-4 bg-red-500 text-white p-2 rounded z-50">
+              Debug: Showing {filteredContent.length} items in Shank Tank
+            </div>
+          )}
         </main>
         
         <BottomNavigation />
