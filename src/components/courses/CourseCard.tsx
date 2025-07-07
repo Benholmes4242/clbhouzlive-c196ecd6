@@ -130,39 +130,36 @@ const CourseCard: React.FC<CourseCardProps> = ({
               </div>
             )}
             
-            {/* Overlay Container - positioned relative to image */}
-            <div className="absolute inset-0">
-              {/* Ranking badges - positioned at bottom-left */}
-              <CourseRankBadges
-                globalRank={course.global_rank}
-                regionalRank={course.regional_rank}
-                usaRank={course.usa_rank}
-                country={course.country}
-                viewContext={viewContext}
-                userRating={userRating}
-                showUserRating={showUserRating}
-                positioning="bottom-left"
+            {/* Ranking badges - positioned independently at bottom-left */}
+            <CourseRankBadges
+              globalRank={course.global_rank}
+              regionalRank={course.regional_rank}
+              usaRank={course.usa_rank}
+              country={course.country}
+              viewContext={viewContext}
+              userRating={userRating}
+              showUserRating={showUserRating}
+              positioning="bottom-left"
+            />
+            
+            {/* Played button - positioned independently at bottom-right */}
+            {showPlayedButton && (
+              <CoursePlayedButton
+                courseId={course.id}
+                courseName={course.name}
+                userCourse={userCourse}
+                canModifyCourseStatus={!isViewingOtherUser && !!user}
+                currentUserId={user?.id}
+                viewingUserId={viewingUserId}
+                course={{
+                  id: course.id,
+                  name: course.name,
+                  thumbnail_image: course.thumbnail_image
+                }}
+                variant="overlay"
+                positioning="bottom-right"
               />
-              
-              {/* Played button - positioned at bottom-right */}
-              {showPlayedButton && (
-                <CoursePlayedButton
-                  courseId={course.id}
-                  courseName={course.name}
-                  userCourse={userCourse}
-                  canModifyCourseStatus={!isViewingOtherUser && !!user}
-                  currentUserId={user?.id}
-                  viewingUserId={viewingUserId}
-                  course={{
-                    id: course.id,
-                    name: course.name,
-                    thumbnail_image: course.thumbnail_image
-                  }}
-                  variant="overlay"
-                  positioning="bottom-right"
-                />
-              )}
-            </div>
+            )}
           </div>
         </div>
         
