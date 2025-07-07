@@ -141,7 +141,7 @@ const CourseDetailPage = () => {
           className="absolute top-4 left-4 bg-black/20 backdrop-blur-sm text-white hover:bg-black/40 z-50"
           onClick={() => {
             console.log('Back button clicked');
-            navigate('/courses');
+            navigate(-1);
           }}
         >
           <ArrowLeft className="h-5 w-5" />
