@@ -51,10 +51,19 @@ const Explore = () => {
     if (activeFilter === 'Clubs') return item.label === 'From Clubhouse';
     if (activeFilter === 'Shank Tank') {
       console.log('Filtering for Shank Tank:', item.title, 'contains #shanktank:', item.title?.toLowerCase().includes('#shanktank'));
-      return item.type === 'video' && item.title?.toLowerCase().includes('#shanktank');
+      const hasShankTag = item.type === 'video' && item.title?.toLowerCase().includes('#shanktank');
+      console.log('Final result for', item.title, ':', hasShankTag);
+      return hasShankTag;
     }
     return true;
   });
+
+  console.log('Active filter:', activeFilter);
+  console.log('Total content items:', content.length);
+  console.log('Filtered content items:', filteredContent.length);
+  if (activeFilter === 'Shank Tank') {
+    console.log('Shank Tank filtered items:', filteredContent.map(item => item.title));
+  }
 
   return (
       <div className="min-h-screen bg-background">
