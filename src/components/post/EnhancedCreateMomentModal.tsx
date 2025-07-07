@@ -165,42 +165,39 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
   // Action button handlers
   const handleCaptureClick = () => {
     addDebugInfo('Mobile capture clicked');
-    // Use camera API if available, otherwise fallback to file input
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-      // For now, trigger file input with camera preference
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = 'image/*,video/*';
-      input.capture = 'environment'; // Use rear camera
-      input.onchange = (event) => {
-        addDebugInfo('Camera input changed');
-        const selectedFiles = Array.from((event.target as HTMLInputElement).files || []);
-        addDebugInfo(`Selected files from camera: ${selectedFiles.length}`);
-        if (selectedFiles.length > 0) {
-          addDebugInfo('Setting files and switching to upload mode');
-          setFiles(selectedFiles);
-          setModalMode('upload');
-        }
-      };
-      input.click();
-    } else {
-      // Fallback for devices without camera API
-      addDebugInfo('Using fallback camera input');
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = 'image/*,video/*';
-      input.onchange = (event) => {
-        addDebugInfo('Fallback camera input changed');
-        const selectedFiles = Array.from((event.target as HTMLInputElement).files || []);
-        addDebugInfo(`Selected files from fallback camera: ${selectedFiles.length}`);
-        if (selectedFiles.length > 0) {
-          addDebugInfo('Setting files and switching to upload mode');
-          setFiles(selectedFiles);
-          setModalMode('upload');
-        }
-      };
-      input.click();
-    }
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*,video/*';
+    input.setAttribute('capture', 'environment'); // Use rear camera
+    input.style.position = 'absolute';
+    input.style.opacity = '0';
+    input.style.pointerEvents = 'none';
+    
+    // Add to DOM temporarily for iOS compatibility
+    document.body.appendChild(input);
+    
+    input.onchange = (event) => {
+      addDebugInfo('Camera input changed');
+      const selectedFiles = Array.from((event.target as HTMLInputElement).files || []);
+      addDebugInfo(`Selected files from camera: ${selectedFiles.length}`);
+      
+      // Clean up
+      document.body.removeChild(input);
+      
+      if (selectedFiles.length > 0) {
+        addDebugInfo('Setting files and switching to upload mode');
+        setFiles(selectedFiles);
+        setModalMode('upload');
+      }
+    };
+    
+    // Add error handling
+    input.onerror = () => {
+      addDebugInfo('Camera input error occurred');
+      document.body.removeChild(input);
+    };
+    
+    input.click();
   };
 
   const handleSelectPhotos = () => {
@@ -209,10 +206,23 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
     input.type = 'file';
     input.accept = 'image/*';
     input.multiple = true;
+    // Add specific iOS attributes
+    input.setAttribute('capture', 'camera');
+    input.style.position = 'absolute';
+    input.style.opacity = '0';
+    input.style.pointerEvents = 'none';
+    
+    // Add to DOM temporarily for iOS compatibility
+    document.body.appendChild(input);
+    
     input.onchange = (event) => {
       addDebugInfo('Photo input changed');
       const selectedFiles = Array.from((event.target as HTMLInputElement).files || []);
       addDebugInfo(`Selected photo files: ${selectedFiles.length}`);
+      
+      // Clean up
+      document.body.removeChild(input);
+      
       if (selectedFiles.length > 0) {
         addDebugInfo('Setting photo files and switching to upload mode');
         setFiles(selectedFiles);
@@ -221,6 +231,13 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
         addDebugInfo('No photo files selected');
       }
     };
+    
+    // Add error handling
+    input.onerror = () => {
+      addDebugInfo('Photo input error occurred');
+      document.body.removeChild(input);
+    };
+    
     input.click();
   };
 
@@ -230,10 +247,23 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
     input.type = 'file';
     input.accept = 'video/*';
     input.multiple = true;
+    // Add specific iOS attributes
+    input.setAttribute('capture', 'camcorder');
+    input.style.position = 'absolute';
+    input.style.opacity = '0';
+    input.style.pointerEvents = 'none';
+    
+    // Add to DOM temporarily for iOS compatibility
+    document.body.appendChild(input);
+    
     input.onchange = (event) => {
       addDebugInfo('Video input changed');
       const selectedFiles = Array.from((event.target as HTMLInputElement).files || []);
       addDebugInfo(`Selected video files: ${selectedFiles.length}`);
+      
+      // Clean up
+      document.body.removeChild(input);
+      
       if (selectedFiles.length > 0) {
         addDebugInfo('Setting video files and switching to upload mode');
         setFiles(selectedFiles);
@@ -242,6 +272,13 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
         addDebugInfo('No video files selected');
       }
     };
+    
+    // Add error handling
+    input.onerror = () => {
+      addDebugInfo('Video input error occurred');
+      document.body.removeChild(input);
+    };
+    
     input.click();
   };
 
