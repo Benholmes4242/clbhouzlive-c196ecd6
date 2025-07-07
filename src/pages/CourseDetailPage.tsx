@@ -147,8 +147,11 @@ const CourseDetailPage = () => {
         <Button
           variant="ghost"
           size="icon"
-          className="absolute top-4 left-4 bg-black/20 backdrop-blur-sm text-white hover:bg-black/40"
-          onClick={() => navigate(-1)}
+          className="absolute top-4 left-4 bg-black/20 backdrop-blur-sm text-white hover:bg-black/40 z-50"
+          onClick={() => {
+            console.log('Back button clicked');
+            navigate('/courses');
+          }}
         >
           <ArrowLeft className="h-5 w-5" />
         </Button>
