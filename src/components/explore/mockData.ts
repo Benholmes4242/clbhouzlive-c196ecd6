@@ -169,5 +169,63 @@ export const mockExploreContent: ExploreContentItem[] = [
     shares: 234,
     label: 'Trending',
     isFollowing: false
+  },
+  // Mulligan Moments - Comedy Golf Videos
+  {
+    id: '10',
+    type: 'video',
+    src: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=550&fit=crop',
+    title: 'Epic Sand Trap Fail #mulliganmoments',
+    duration: '0:30',
+    user: { 
+      id: 'user10',
+      name: 'Weekend Warrior', 
+      username: 'weekendgolfer', 
+      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=40&h=40&fit=crop&crop=face', 
+      verified: false 
+    },
+    likes: 345,
+    comments: 67,
+    shares: 89,
+    label: 'Mulligan Moment',
+    isFollowing: false
+  },
+  {
+    id: '11',
+    type: 'video',
+    src: 'https://images.unsplash.com/photo-1593111774240-d529f12cf4bb?w=400&h=600&fit=crop',
+    title: 'When your ball finds the water #mulliganmoments',
+    duration: '0:15',
+    user: { 
+      id: 'user11',
+      name: 'Golf Comedy Central', 
+      username: 'golfcomedy', 
+      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face', 
+      verified: false 
+    },
+    likes: 567,
+    comments: 123,
+    shares: 234,
+    label: 'Mulligan Moment',
+    isFollowing: false
+  },
+  {
+    id: '12',
+    type: 'video',
+    src: 'https://images.unsplash.com/photo-1566041510394-cf7c8fe21800?w=400&h=600&fit=crop',
+    title: 'Air shot compilation #mulliganmoments #golfhumor',
+    duration: '1:45',
+    user: { 
+      id: 'user12',
+      name: 'Bad Golf Shots', 
+      username: 'badgolfshots', 
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face', 
+      verified: false 
+    },
+    likes: 1234,
+    comments: 189,
+    shares: 345,
+    label: 'Mulligan Moment',
+    isFollowing: false
   }
 ];
