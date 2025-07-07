@@ -227,5 +227,63 @@ export const mockExploreContent: ExploreContentItem[] = [
     shares: 345,
     label: 'Mulligan Moment',
     isFollowing: false
+  },
+  // Shank Tank - Comedy Golf Mishits
+  {
+    id: '13',
+    type: 'video',
+    src: 'https://images.unsplash.com/photo-1593111774240-d529f12cf4bb?w=400&h=550&fit=crop',
+    title: 'Epic shank into the woods #shanktank',
+    duration: '0:20',
+    user: { 
+      id: 'user13',
+      name: 'Golf Disasters', 
+      username: 'golfdisasters', 
+      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=40&h=40&fit=crop&crop=face', 
+      verified: false 
+    },
+    likes: 789,
+    comments: 145,
+    shares: 267,
+    label: 'Comedy Gold',
+    isFollowing: false
+  },
+  {
+    id: '14',
+    type: 'video',
+    src: 'https://images.unsplash.com/photo-1566041510394-cf7c8fe21800?w=400&h=600&fit=crop',
+    title: 'When you hit the ball sideways #SHANKTANK #golfing',
+    duration: '0:35',
+    user: { 
+      id: 'user14',
+      name: 'Weekend Hacker', 
+      username: 'weekendhacker', 
+      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=40&h=40&fit=crop&crop=face', 
+      verified: false 
+    },
+    likes: 456,
+    comments: 89,
+    shares: 123,
+    label: 'Epic Fail',
+    isFollowing: false
+  },
+  {
+    id: '15',
+    type: 'video',
+    src: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=650&fit=crop',
+    title: 'My club flew further than the ball #shanktank #golfhumor',
+    duration: '0:25',
+    user: { 
+      id: 'user15',
+      name: 'Shank Master', 
+      username: 'shankmaster', 
+      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=40&h=40&fit=crop&crop=face', 
+      verified: false 
+    },
+    likes: 1123,
+    comments: 203,
+    shares: 445,
+    label: 'Shank Tank',
+    isFollowing: false
   }
 ];

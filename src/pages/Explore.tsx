@@ -49,6 +49,7 @@ const Explore = () => {
     if (activeFilter === 'Tips') return item.label === 'Pro Tip';
     if (activeFilter === 'Trending') return item.label === 'Trending';
     if (activeFilter === 'Clubs') return item.label === 'From Clubhouse';
+    if (activeFilter === 'Shank Tank') return item.type === 'video' && item.title?.toLowerCase().includes('#shanktank');
     return true;
   });
 
@@ -72,6 +73,7 @@ const Explore = () => {
             isLoading={loading}
             hasMore={hasMore}
             onLoadMore={loadMore}
+            activeFilter={activeFilter}
           />
         </main>
         

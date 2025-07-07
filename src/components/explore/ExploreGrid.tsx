@@ -11,6 +11,7 @@ interface ExploreGridProps {
   isLoading: boolean;
   hasMore: boolean;
   onLoadMore: () => void;
+  activeFilter?: string;
 }
 
 const ExploreGrid: React.FC<ExploreGridProps> = ({ 
@@ -20,7 +21,8 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
   onMediaClick,
   isLoading, 
   hasMore, 
-  onLoadMore 
+  onLoadMore,
+  activeFilter
 }) => {
   // Intersection observer for infinite scroll
   React.useEffect(() => {
@@ -60,10 +62,14 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
 
   if (content.length === 0 && !isLoading) {
     return (
-      <div className="text-center py-12">
-        <div className="text-6xl mb-4">📸</div>
-        <h3 className="text-lg font-semibold mb-2">No content yet</h3>
-        <p className="text-muted-foreground">Be the first to share something amazing!</p>
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        <div className="text-4xl mb-4">🏌️‍♂️</div>
+        <h3 className="text-lg font-semibold text-foreground mb-2">No content found</h3>
+        <p className="text-muted-foreground max-w-md">
+          {activeFilter === 'Shank Tank' 
+            ? "No shanks yet! Be the first to upload a hilarious golf mishit using #shanktank in your post."
+            : "Try adjusting your filters or check back later for new content."}
+        </p>
       </div>
     );
   }
