@@ -24,6 +24,7 @@ const ProfilePhotoManager: React.FC<ProfilePhotoManagerProps> = ({
     const file = event.target.files?.[0];
     if (!file) return;
 
+    console.log('Starting photo upload for user:', user.id);
     const tempPreviewUrl = URL.createObjectURL(file);
     setPhotoPreview(tempPreviewUrl);
 
@@ -33,16 +34,18 @@ const ProfilePhotoManager: React.FC<ProfilePhotoManagerProps> = ({
       const timestamp = Date.now();
       const filePath = `${user.id}/avatar-${timestamp}.${fileExt}`;
 
+      console.log('Uploading to path:', filePath);
       const { error } = await supabase.storage.from('avatars').upload(filePath, file, { upsert: true });
       if (error) {
         console.error('Upload error:', error);
-        alert('Upload failed!');
+        alert('Upload failed: ' + error.message);
         setUploading(false);
         return;
       }
 
       const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
       const avatarUrl = urlData?.publicUrl ?? '';
+      console.log('Generated avatar URL:', avatarUrl);
       
       // Update database
       const { error: updateError } = await supabase
@@ -55,21 +58,22 @@ const ProfilePhotoManager: React.FC<ProfilePhotoManagerProps> = ({
 
       if (updateError) {
         console.error('Database update error:', updateError);
-        alert('Failed to save profile photo!');
+        alert('Failed to save profile photo: ' + updateError.message);
         setUploading(false);
         return;
       }
 
+      console.log('Profile photo updated successfully in database');
+      
       // Update local state and parent component
       setPhotoPreview(avatarUrl);
       onProfileUpdate({ ...profile, profile_photo_url: avatarUrl });
       
-      // Show success feedback
-      console.log('Profile photo updated successfully');
+      console.log('Profile photo update complete');
       
     } catch (error) {
       console.error('Upload error:', error);
-      alert('Upload failed!');
+      alert('Upload failed: ' + (error as Error).message);
     } finally {
       setUploading(false);
     }

@@ -81,6 +81,7 @@ const ProfilePage = () => {
           profile={profile}
           currentUser={user}
           relationshipStatus={null}
+          onProfileUpdate={refreshProfile}
         />
         
         <UniversalProfileTabs

@@ -11,12 +11,14 @@ interface InstagramStyleProfileHeaderProps {
   relationshipStatus: {
     isFollowing: boolean;
   } | null;
+  onProfileUpdate?: () => void;
 }
 
 const InstagramStyleProfileHeader: React.FC<InstagramStyleProfileHeaderProps> = ({
   profile,
   currentUser,
-  relationshipStatus
+  relationshipStatus,
+  onProfileUpdate
 }) => {
   const { user } = useSupabaseSession();
   const isOwnProfile = user?.id === profile?.id;
@@ -33,8 +35,9 @@ const InstagramStyleProfileHeader: React.FC<InstagramStyleProfileHeaderProps> = 
             user={isOwnProfile ? user : null}
             profile={profile}
             onProfileUpdate={(updatedProfile) => {
-              // Force a page refresh to reflect the updated photo
-              window.location.reload();
+              if (onProfileUpdate) {
+                onProfileUpdate();
+              }
             }}
           />
         </div>
