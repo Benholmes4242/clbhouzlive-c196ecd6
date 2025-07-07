@@ -206,8 +206,6 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
     input.type = 'file';
     input.accept = 'image/*';
     input.multiple = true;
-    // Add specific iOS attributes
-    input.setAttribute('capture', 'camera');
     input.style.position = 'absolute';
     input.style.opacity = '0';
     input.style.pointerEvents = 'none';
@@ -247,8 +245,6 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
     input.type = 'file';
     input.accept = 'video/*';
     input.multiple = true;
-    // Add specific iOS attributes
-    input.setAttribute('capture', 'camcorder');
     input.style.position = 'absolute';
     input.style.opacity = '0';
     input.style.pointerEvents = 'none';
