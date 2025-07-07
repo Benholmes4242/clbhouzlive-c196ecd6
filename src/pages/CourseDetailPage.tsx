@@ -162,6 +162,35 @@ const CourseDetailPage = () => {
           <p className="text-lg mb-4 opacity-90">
             {[course.country, course.region, course.sub_country].filter(Boolean).join(', ')}
           </p>
+          
+          {/* Rankings underneath location text - Mobile Only */}
+          <div className="md:hidden flex items-center gap-2 mb-4">
+            {course.global_rank && (
+              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-xl shadow-sm">
+                <Earth className="h-4 w-4 text-white" />
+                <span className="text-sm font-bold text-white">#{course.global_rank}</span>
+              </div>
+            )}
+            {((course.country === 'Britain & Ireland' || course.country === 'United Kingdom') && course.regional_rank) && (
+              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-xl shadow-sm">
+                <CountryFlag country="Britain & Ireland" size="sm" />
+                <span className="text-sm font-bold text-white">#{course.regional_rank}</span>
+              </div>
+            )}
+            {(course.country === 'USA' && course.usa_rank) && (
+              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-xl shadow-sm">
+                <CountryFlag country="USA" size="sm" />
+                <span className="text-sm font-bold text-white">#{course.usa_rank}</span>
+              </div>
+            )}
+            {(course.country === 'Continental Europe' && course.regional_rank) && (
+              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-xl shadow-sm">
+                <CountryFlag country="Continental Europe" size="sm" />
+                <span className="text-sm font-bold text-white">#{course.regional_rank}</span>
+              </div>
+            )}
+          </div>
+
           {/* Visit Website button - hidden on mobile, shown on desktop */}
           {course.website_url && (
             <Button
@@ -175,80 +204,37 @@ const CourseDetailPage = () => {
           )}
         </div>
 
-        {/* Bottom Right Overlay */}
+        {/* Bottom Right Overlay - Played Button */}
         {user && (
-          <div className="absolute bottom-6 right-6 flex flex-col items-end gap-3">
-            {/* Rankings - mobile only */}
-            <div className="md:hidden flex items-center gap-2">
-              {course.global_rank && (
-                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-xl shadow-sm">
-                  <Earth className="h-4 w-4 text-white" />
-                  <span className="text-sm font-bold text-white">#{course.global_rank}</span>
-                </div>
-              )}
-              {((course.country === 'Britain & Ireland' || course.country === 'United Kingdom') && course.regional_rank) && (
-                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-xl shadow-sm">
-                  <CountryFlag country="Britain & Ireland" size="sm" />
-                  <span className="text-sm font-bold text-white">#{course.regional_rank}</span>
-                </div>
-              )}
-              {(course.country === 'USA' && course.usa_rank) && (
-                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-xl shadow-sm">
-                  <CountryFlag country="USA" size="sm" />
-                  <span className="text-sm font-bold text-white">#{course.usa_rank}</span>
-                </div>
-              )}
-              {(course.country === 'Continental Europe' && course.regional_rank) && (
-                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white/20 backdrop-blur-sm rounded-xl shadow-sm">
-                  <CountryFlag country="Continental Europe" size="sm" />
-                  <span className="text-sm font-bold text-white">#{course.regional_rank}</span>
-                </div>
-              )}
-            </div>
-
-            {/* Action buttons */}
-            <div className="flex flex-col items-end gap-3">
-              {!isAlreadyPlayed ? (
-                <Button
-                  onClick={handleAddToPlayed}
-                  className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 text-lg font-medium min-h-[44px]"
-                >
-                  <Target className="h-5 w-5 mr-2" />
-                  Add to My Played
-                </Button>
-              ) : (
-                <Button
-                  onClick={() => setShowRatingModal(true)}
-                  className="bg-green-600/80 hover:bg-green-700 text-white px-6 py-3 text-lg font-medium min-h-[44px]"
-                >
-                  <Check className="h-5 w-5 mr-2" />
-                  Played
-                </Button>
-              )}
-
-              {/* Visit Website button - mobile only, under the Played button */}
-              {course.website_url && (
-                <Button
-                  variant="outline"
-                  className="md:hidden bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30 w-[90%] min-h-[44px]"
-                  onClick={handleWebsiteClick}
-                >
-                  <ExternalLink className="h-4 w-4 mr-2" />
-                  Visit Website
-                </Button>
-              )}
-            </div>
+          <div className="absolute bottom-6 right-6">
+            {!isAlreadyPlayed ? (
+              <Button
+                onClick={handleAddToPlayed}
+                className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 text-lg font-medium min-h-[44px]"
+              >
+                <Target className="h-5 w-5 mr-2" />
+                Add to My Played
+              </Button>
+            ) : (
+              <Button
+                onClick={() => setShowRatingModal(true)}
+                className="bg-green-600/80 hover:bg-green-700 text-white px-6 py-3 text-lg font-medium min-h-[44px]"
+              >
+                <Check className="h-5 w-5 mr-2" />
+                Played
+              </Button>
+            )}
           </div>
         )}
       </div>
 
       {/* Course Info Strip */}
       <div className="bg-card border-b p-4">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          {/* Left side - Rankings on desktop, Community rating on mobile */}
-          <div className="flex items-center gap-4">
-            {/* Rankings - desktop only */}
-            <div className="hidden md:flex items-center gap-4">
+        <div className="max-w-6xl mx-auto">
+          {/* Desktop Layout - Rankings left, Community Rating right */}
+          <div className="hidden md:flex items-center justify-between">
+            {/* Left side - Rankings on desktop */}
+            <div className="flex items-center gap-4">
               {course.global_rank && (
                 <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 rounded-xl shadow-sm">
                   <Earth className="h-5 w-5 text-gray-600" />
@@ -274,9 +260,23 @@ const CourseDetailPage = () => {
                 </div>
               )}
             </div>
+            
+            {/* Right side - Community Rating on desktop */}
+            <div className="flex items-center gap-2">
+              <span className="text-2xl">⭐</span>
+              <span className="text-xl font-semibold">
+                {ratingStats?.average_rating || 0}/10
+              </span>
+              <span className="text-muted-foreground">
+                ({ratingStats?.total_ratings || 0} votes)
+              </span>
+            </div>
+          </div>
 
-            {/* Community Rating - mobile only */}
-            <div className="md:hidden flex items-center gap-2">
+          {/* Mobile Layout - Community Rating left, Visit Website button right */}
+          <div className="md:hidden flex items-center justify-between">
+            {/* Left side - Community Rating on mobile */}
+            <div className="flex items-center gap-2">
               <span className="text-2xl">⭐</span>
               <span className="text-xl font-semibold">
                 {ratingStats?.average_rating || 0}/10
@@ -285,17 +285,19 @@ const CourseDetailPage = () => {
                 ({ratingStats?.total_ratings || 0} votes)
               </span>
             </div>
-          </div>
-          
-          {/* Right side - Community Rating on desktop only */}
-          <div className="hidden md:flex items-center gap-2">
-            <span className="text-2xl">⭐</span>
-            <span className="text-xl font-semibold">
-              {ratingStats?.average_rating || 0}/10
-            </span>
-            <span className="text-muted-foreground">
-              ({ratingStats?.total_ratings || 0} votes)
-            </span>
+            
+            {/* Right side - Visit Website button on mobile */}
+            {course.website_url && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="min-h-[44px] px-4"
+                onClick={handleWebsiteClick}
+              >
+                <ExternalLink className="h-4 w-4 mr-2" />
+                Visit Website
+              </Button>
+            )}
           </div>
         </div>
       </div>
