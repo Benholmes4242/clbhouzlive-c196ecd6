@@ -148,7 +148,6 @@ const Top100Courses = () => {
                     key={course.id} 
                     course={course} 
                     viewContext="global" 
-                    showPlayedButton={false}
                   />
                 ))}
               </div>
@@ -219,7 +218,6 @@ const Top100Courses = () => {
                       key={course.id} 
                       course={course} 
                       viewContext="regional" 
-                      showPlayedButton={false}
                     />
                   ))}
                 </div>

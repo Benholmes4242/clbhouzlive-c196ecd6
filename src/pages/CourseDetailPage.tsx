@@ -2,24 +2,21 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { ArrowLeft, ExternalLink, Target, Check, Earth } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Earth } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import CountryFlag from '@/components/ui/country-flag';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import PostPlayRatingModal from '@/components/courses/PostPlayRatingModal';
 import CourseAboutTab from '@/components/courses/course-detail/CourseAboutTab';
 import CourseReviewsTab from '@/components/courses/course-detail/CourseReviewsTab';
 import CourseMediaTab from '@/components/courses/course-detail/CourseMediaTab';
 import CourseLeaderboardTab from '@/components/courses/course-detail/CourseLeaderboardTab';
-import FloatingCTA from '@/components/courses/course-detail/FloatingCTA';
 
 const CourseDetailPage = () => {
   const { courseId } = useParams();
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
-  const [showRatingModal, setShowRatingModal] = useState(false);
   const [activeTab, setActiveTab] = useState('about');
 
   const { data: course, isLoading: courseLoading } = useQuery({
@@ -39,41 +36,6 @@ const CourseDetailPage = () => {
     enabled: !!courseId,
   });
 
-  const { data: userCourse } = useQuery({
-    queryKey: ['user-course', courseId, user?.id],
-    queryFn: async () => {
-      if (!user?.id || !courseId) return null;
-
-      const { data, error } = await supabase
-        .from('user_courses')
-        .select('*')
-        .eq('course_id', courseId)
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      if (error && error.code !== 'PGRST116') throw error;
-      return data;
-    },
-    enabled: !!(user?.id && courseId),
-  });
-
-  const { data: userTop100Course } = useQuery({
-    queryKey: ['user-top100-course', courseId, user?.id],
-    queryFn: async () => {
-      if (!user?.id || !courseId) return null;
-
-      const { data, error } = await supabase
-        .from('user_top100_courses')
-        .select('*')
-        .eq('course_id', courseId)
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      if (error && error.code !== 'PGRST116') throw error;
-      return data;
-    },
-    enabled: !!(user?.id && courseId),
-  });
 
   const { data: ratingStats } = useQuery({
     queryKey: ['course-rating-stats', courseId],
@@ -104,17 +66,11 @@ const CourseDetailPage = () => {
     enabled: !!courseId,
   });
 
-  const handleAddToPlayed = () => {
-    setShowRatingModal(true);
-  };
-
   const handleWebsiteClick = () => {
     if (course?.website_url) {
       window.open(course.website_url, '_blank');
     }
   };
-
-  const isAlreadyPlayed = userCourse?.played || userTop100Course?.played;
 
   if (courseLoading || !course) {
     return (
@@ -163,55 +119,30 @@ const CourseDetailPage = () => {
             {[course.country, course.region, course.sub_country].filter(Boolean).join(', ')}
           </p>
           
-          {/* Rankings and Played Button - Mobile Only */}
-          <div className="md:hidden flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              {course.global_rank && (
-                <div className="flex items-center gap-1.5 px-4 py-3 bg-white/20 backdrop-blur-sm rounded-xl shadow-sm min-h-[44px]">
-                  <Earth className="h-5 w-5 text-white" />
-                  <span className="text-sm font-bold text-white">#{course.global_rank}</span>
-                </div>
-              )}
-              {((course.country === 'Britain & Ireland' || course.country === 'United Kingdom') && course.regional_rank) && (
-                <div className="flex items-center gap-1.5 px-4 py-3 bg-white/20 backdrop-blur-sm rounded-xl shadow-sm min-h-[44px]">
-                  <CountryFlag country="Britain & Ireland" size="sm" />
-                  <span className="text-sm font-bold text-white">#{course.regional_rank}</span>
-                </div>
-              )}
-              {(course.country === 'USA' && course.usa_rank) && (
-                <div className="flex items-center gap-1.5 px-4 py-3 bg-white/20 backdrop-blur-sm rounded-xl shadow-sm min-h-[44px]">
-                  <CountryFlag country="USA" size="sm" />
-                  <span className="text-sm font-bold text-white">#{course.usa_rank}</span>
-                </div>
-              )}
-              {(course.country === 'Continental Europe' && course.regional_rank) && (
-                <div className="flex items-center gap-1.5 px-4 py-3 bg-white/20 backdrop-blur-sm rounded-xl shadow-sm min-h-[44px]">
-                  <CountryFlag country="Continental Europe" size="sm" />
-                  <span className="text-sm font-bold text-white">#{course.regional_rank}</span>
-                </div>
-              )}
-            </div>
-            
-            {/* Played Button - Mobile Only */}
-            {user && (
-              <div className="mr-2">
-                {!isAlreadyPlayed ? (
-                  <Button
-                    onClick={handleAddToPlayed}
-                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 text-base font-medium min-h-[44px]"
-                  >
-                    <Target className="h-4 w-4 mr-1" />
-                    Add to Played
-                  </Button>
-                ) : (
-                  <Button
-                    onClick={() => setShowRatingModal(true)}
-                    className="bg-green-600/80 hover:bg-green-700 text-white px-4 py-2 text-base font-medium min-h-[44px]"
-                  >
-                    <Check className="h-4 w-4 mr-1" />
-                    Played
-                  </Button>
-                )}
+          {/* Rankings - Mobile Only */}
+          <div className="md:hidden flex items-center gap-2 mb-4">
+            {course.global_rank && (
+              <div className="flex items-center gap-1.5 px-4 py-3 bg-white/20 backdrop-blur-sm rounded-xl shadow-sm min-h-[44px]">
+                <Earth className="h-5 w-5 text-white" />
+                <span className="text-sm font-bold text-white">#{course.global_rank}</span>
+              </div>
+            )}
+            {((course.country === 'Britain & Ireland' || course.country === 'United Kingdom') && course.regional_rank) && (
+              <div className="flex items-center gap-1.5 px-4 py-3 bg-white/20 backdrop-blur-sm rounded-xl shadow-sm min-h-[44px]">
+                <CountryFlag country="Britain & Ireland" size="sm" />
+                <span className="text-sm font-bold text-white">#{course.regional_rank}</span>
+              </div>
+            )}
+            {(course.country === 'USA' && course.usa_rank) && (
+              <div className="flex items-center gap-1.5 px-4 py-3 bg-white/20 backdrop-blur-sm rounded-xl shadow-sm min-h-[44px]">
+                <CountryFlag country="USA" size="sm" />
+                <span className="text-sm font-bold text-white">#{course.usa_rank}</span>
+              </div>
+            )}
+            {(course.country === 'Continental Europe' && course.regional_rank) && (
+              <div className="flex items-center gap-1.5 px-4 py-3 bg-white/20 backdrop-blur-sm rounded-xl shadow-sm min-h-[44px]">
+                <CountryFlag country="Continental Europe" size="sm" />
+                <span className="text-sm font-bold text-white">#{course.regional_rank}</span>
               </div>
             )}
           </div>
@@ -229,28 +160,6 @@ const CourseDetailPage = () => {
           )}
         </div>
 
-        {/* Bottom Right Overlay - Played Button - Desktop Only */}
-        {user && (
-          <div className="absolute bottom-6 right-6 hidden md:block">
-            {!isAlreadyPlayed ? (
-              <Button
-                onClick={handleAddToPlayed}
-                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 text-base font-medium min-h-[44px]"
-              >
-                <Target className="h-4 w-4 mr-1" />
-                Add to Played
-              </Button>
-            ) : (
-              <Button
-                onClick={() => setShowRatingModal(true)}
-                className="bg-green-600/80 hover:bg-green-700 text-white px-4 py-2 text-base font-medium min-h-[44px]"
-              >
-                <Check className="h-4 w-4 mr-1" />
-                Played
-              </Button>
-            )}
-          </div>
-        )}
       </div>
 
       {/* Course Info Strip */}
@@ -362,19 +271,6 @@ const CourseDetailPage = () => {
         </Tabs>
       </div>
 
-      {/* Floating CTA on Mobile */}
-      <FloatingCTA 
-        isVisible={!isAlreadyPlayed && !!user}
-        onAddToPlayed={handleAddToPlayed}
-      />
-
-      {/* Rating Modal */}
-      <PostPlayRatingModal
-        course={course}
-        isOpen={showRatingModal}
-        onClose={() => setShowRatingModal(false)}
-        isEditMode={isAlreadyPlayed}
-      />
     </div>
   );
 };

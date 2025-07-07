@@ -4,10 +4,6 @@ import { Badge } from '@/components/ui/badge';
 import { MapPin, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import CourseRankBadges from './CourseRankBadges';
-import CoursePlayedButton from './CoursePlayedButton';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 interface Course {
   id: string;
@@ -30,7 +26,6 @@ interface CourseCardProps {
   course: Course;
   viewContext?: 'global' | 'regional' | 'usa' | 'europe';
   viewingUserId?: string;
-  showPlayedButton?: boolean;
   userRating?: number | null;
   isReadOnly?: boolean;
   showUserRating?: boolean;
@@ -72,36 +67,12 @@ const CourseCard: React.FC<CourseCardProps> = ({
   course, 
   viewContext = 'global', 
   viewingUserId,
-  showPlayedButton = true,
   userRating,
   isReadOnly = false,
   showUserRating = false,
   isFromUserCoursesPage = false
 }) => {
   const navigate = useNavigate();
-  const { user } = useSupabaseSession();
-
-  // Fetch user's course status
-  const { data: userCourse } = useQuery({
-    queryKey: ['user-course', course.id, viewingUserId || user?.id],
-    queryFn: async () => {
-      const userId = viewingUserId || user?.id;
-      if (!userId) return null;
-
-      const { data, error } = await supabase
-        .from('user_courses')
-        .select('*')
-        .eq('course_id', course.id)
-        .eq('user_id', userId)
-        .maybeSingle();
-
-      if (error && error.code !== 'PGRST116') throw error;
-      return data;
-    },
-    enabled: !!(viewingUserId || user?.id),
-  });
-
-  const isViewingOtherUser = viewingUserId && viewingUserId !== user?.id;
 
   const handleCardClick = () => {
     navigate(`/courses/${course.id}`);
@@ -142,25 +113,6 @@ const CourseCard: React.FC<CourseCardProps> = ({
             showUserRating={showUserRating}
             positioning="bottom-left"
           />
-          
-          {/* Played button - positioned relative to the outer container */}
-          {showPlayedButton && (
-            <CoursePlayedButton
-              courseId={course.id}
-              courseName={course.name}
-              userCourse={userCourse}
-              canModifyCourseStatus={!isViewingOtherUser && !!user}
-              currentUserId={user?.id}
-              viewingUserId={viewingUserId}
-              course={{
-                id: course.id,
-                name: course.name,
-                thumbnail_image: course.thumbnail_image
-              }}
-              variant="overlay"
-              positioning="bottom-right"
-            />
-          )}
         </div>
         
         <CardHeader className="pb-2">

@@ -142,7 +142,6 @@ const CourseExplorer = () => {
               key={course.id} 
               course={course} 
               viewContext={getViewContext()}
-              showPlayedButton={false}
             />
           ))}
         </div>

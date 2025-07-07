@@ -86,7 +86,6 @@ const MyCoursesTabs = ({
                   key={`${userCourse.id}-${userCourse.source}`} 
                   course={userCourse.golf_courses}
                   viewingUserId={userId}
-                  showPlayedButton={false}
                   userRating={userCourse.rating || null}
                   showUserRating={true}
                 />
@@ -118,7 +117,6 @@ const MyCoursesTabs = ({
                   key={userCourse.id} 
                   course={userCourse.golf_courses}
                   viewingUserId={userId}
-                  showPlayedButton={false}
                   userRating={userCourse.rating || null}
                   showUserRating={true}
                 />
@@ -148,7 +146,6 @@ const MyCoursesTabs = ({
                   key={`${userCourse.id}-recent-${userCourse.source}`} 
                   course={userCourse.golf_courses}
                   viewingUserId={userId}
-                  showPlayedButton={false}
                   userRating={userCourse.rating || null}
                   showUserRating={true}
                 />

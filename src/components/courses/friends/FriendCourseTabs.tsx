@@ -67,7 +67,6 @@ const FriendCourseTabs: React.FC<FriendCourseTabsProps> = ({
                   key={userCourse.id} 
                   course={userCourse.golf_courses}
                   viewingUserId={selectedFriendId}
-                  showPlayedButton={false}
                 />
               ))}
             </div>
@@ -97,7 +96,6 @@ const FriendCourseTabs: React.FC<FriendCourseTabsProps> = ({
                   key={`${userCourse.id}-recent`} 
                   course={userCourse.golf_courses}
                   viewingUserId={selectedFriendId}
-                  showPlayedButton={false}
                 />
               ))}
             </div>

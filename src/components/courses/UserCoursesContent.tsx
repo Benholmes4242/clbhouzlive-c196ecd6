@@ -234,7 +234,6 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({ username }) => 
                 key={userCourse.id} 
                 course={userCourse.golf_courses}
                 viewingUserId={targetUserId}
-                showPlayedButton={isOwnProfile}
                 viewContext="global"
                 userRating={userCourse.rating}
                 isReadOnly={!isOwnProfile}
