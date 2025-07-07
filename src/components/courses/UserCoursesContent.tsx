@@ -22,32 +22,54 @@ const getCourseRanking = (course: any) => {
   return 9999;
 };
 
-// Custom sorting function for user courses - prioritize user ratings first
-const getSortedUserCourses = (userCourses: any[]) => {
+// Custom sorting function for user courses with different sort options
+const getSortedUserCourses = (userCourses: any[], sortBy: string) => {
   console.log('Sorting user courses in UserCoursesContent:', userCourses.map(c => ({ 
     name: c.golf_courses?.name, 
     rating: c.rating 
   })));
   
-  // Sort all courses by rating in descending order (10 first, then 9, 8, etc., null/undefined last)
   const sortedCourses = userCourses.sort((a, b) => {
-    const aRating = a.rating;
-    const bRating = b.rating;
-    
-    // If both have ratings, sort by rating descending (10, 9, 8, ...)
-    if (aRating !== null && aRating !== undefined && bRating !== null && bRating !== undefined) {
-      console.log(`Comparing ratings: ${a.golf_courses?.name} (${aRating}) vs ${b.golf_courses?.name} (${bRating})`);
-      return bRating - aRating;
+    switch (sortBy) {
+      case 'rating-high-low':
+        // Sort by rating descending (10, 9, 8, ...)
+        const aRating = a.rating;
+        const bRating = b.rating;
+        
+        if (aRating !== null && aRating !== undefined && bRating !== null && bRating !== undefined) {
+          return bRating - aRating;
+        }
+        if (aRating !== null && aRating !== undefined) return -1;
+        if (bRating !== null && bRating !== undefined) return 1;
+        
+        // If neither has a rating, sort by official ranking
+        const aRank = getCourseRanking(a.golf_courses);
+        const bRank = getCourseRanking(b.golf_courses);
+        return aRank - bRank;
+        
+      case 'rating-low-high':
+        // Sort by rating ascending (0.5, 1, 2, ...)
+        const aRatingLow = a.rating;
+        const bRatingLow = b.rating;
+        
+        if (aRatingLow !== null && aRatingLow !== undefined && bRatingLow !== null && bRatingLow !== undefined) {
+          return aRatingLow - bRatingLow;
+        }
+        if (aRatingLow !== null && aRatingLow !== undefined) return -1;
+        if (bRatingLow !== null && bRatingLow !== undefined) return 1;
+        
+        // If neither has a rating, sort by official ranking
+        const aRankLow = getCourseRanking(a.golf_courses);
+        const bRankLow = getCourseRanking(b.golf_courses);
+        return aRankLow - bRankLow;
+        
+      case 'recently-played':
+      default:
+        // Sort by most recent date (played_date or created_at for ratings)
+        const aDate = new Date(a.played_date || a.created_at || 0);
+        const bDate = new Date(b.played_date || b.created_at || 0);
+        return bDate.getTime() - aDate.getTime();
     }
-    
-    // If only one has a rating, put the rated one first
-    if (aRating !== null && aRating !== undefined) return -1;
-    if (bRating !== null && bRating !== undefined) return 1;
-    
-    // If neither has a rating, sort by official ranking
-    const aRank = getCourseRanking(a.golf_courses);
-    const bRank = getCourseRanking(b.golf_courses);
-    return aRank - bRank;
   });
   
   console.log('Final sorted order in UserCoursesContent:', sortedCourses.map(c => ({ 
@@ -64,6 +86,7 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
   displayName
 }) => {
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<string>('recently-played');
   
   const {
     targetUserId,
@@ -175,50 +198,47 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
       })));
       
       // Apply sorting here to ensure proper order
-      return getSortedUserCourses(rawCourses);
+      return getSortedUserCourses(rawCourses, 'recently-played');
     },
     enabled: !!targetUserId,
   });
 
-  // Filter courses based on active filter
+  // Filter and sort courses based on active filter and sort option
   const filteredCourses = useMemo(() => {
     let coursesToFilter = allPlayedCourses;
     
-    if (!activeFilter) {
-      // When no filter is active, use all played courses
-      console.log('No filter active, showing all courses in sorted order:', coursesToFilter.map(c => ({ 
-        name: c.golf_courses?.name, 
-        rating: c.rating 
-      })));
-      return coursesToFilter;
+    // First apply regional filtering if active
+    if (activeFilter) {
+      coursesToFilter = coursesToFilter.filter((userCourse) => {
+        const course = userCourse.golf_courses;
+        if (!course) return false;
+
+        switch (activeFilter) {
+          case 'britain-ireland':
+            return course.country === 'Britain & Ireland' && course.regional_rank && course.regional_rank <= 100;
+          case 'europe':
+            return course.country === 'Continental Europe' && course.regional_rank && course.regional_rank <= 100;
+          case 'usa':
+            return course.country === 'USA' && course.regional_rank && course.regional_rank <= 100;
+          case 'global':
+            return course.global_rank && course.global_rank <= 100;
+          default:
+            return true;
+        }
+      });
     }
-
-    // Filter based on region
-    const filtered = coursesToFilter.filter((userCourse) => {
-      const course = userCourse.golf_courses;
-      if (!course) return false;
-
-      switch (activeFilter) {
-        case 'britain-ireland':
-          return course.country === 'Britain & Ireland' && course.regional_rank && course.regional_rank <= 100;
-        case 'europe':
-          return course.country === 'Continental Europe' && course.regional_rank && course.regional_rank <= 100;
-        case 'usa':
-          return course.country === 'USA' && course.regional_rank && course.regional_rank <= 100;
-        case 'global':
-          return course.global_rank && course.global_rank <= 100;
-        default:
-          return true;
-      }
-    });
     
-    console.log('Filtered courses:', filtered.map(c => ({ 
+    // Then apply sorting
+    const sortedCourses = getSortedUserCourses(coursesToFilter, sortBy);
+    
+    console.log('Final filtered and sorted courses:', sortedCourses.map(c => ({ 
       name: c.golf_courses?.name, 
-      rating: c.rating 
+      rating: c.rating,
+      sortBy 
     })));
     
-    return filtered;
-  }, [allPlayedCourses, activeFilter]);
+    return sortedCourses;
+  }, [allPlayedCourses, activeFilter, sortBy]);
 
   return (
     <div className="space-y-8">
@@ -232,6 +252,8 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
         activeFilter={activeFilter}
         onFilterChange={setActiveFilter}
         isLoading={isLoadingProgress}
+        sortBy={sortBy}
+        onSortChange={setSortBy}
       />
 
       <div className="space-y-4">

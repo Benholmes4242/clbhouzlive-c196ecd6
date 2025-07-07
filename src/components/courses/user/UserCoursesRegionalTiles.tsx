@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { X, Earth } from 'lucide-react';
+import { X, Earth, Trophy, TrendingUp, Clock } from 'lucide-react';
 import CountryFlag from '@/components/ui/country-flag';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -16,13 +16,17 @@ interface UserCoursesRegionalTilesProps {
   activeFilter: string | null;
   onFilterChange: (filter: string | null) => void;
   isLoading: boolean;
+  sortBy: string;
+  onSortChange: (sort: string) => void;
 }
 
 const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
   regionProgress,
   activeFilter,
   onFilterChange,
-  isLoading
+  isLoading,
+  sortBy,
+  onSortChange
 }) => {
   const isMobile = useIsMobile();
 
@@ -72,21 +76,72 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
     );
   }
 
+  const sortOptions = [
+    {
+      key: 'rating-high-low',
+      label: 'Rank: High to Low',
+      icon: Trophy
+    },
+    {
+      key: 'rating-low-high', 
+      label: 'Rank: Low to High',
+      icon: TrendingUp
+    },
+    {
+      key: 'recently-played',
+      label: 'Recently Played',
+      icon: Clock
+    }
+  ];
+
   return (
     <div className="mb-8">
       <div className="flex flex-col gap-4 mb-4">
-        {/* All Courses Button */}
+        {/* Sorting Controls */}
         <div className="flex justify-center">
-          <button
-            onClick={() => onFilterChange(null)}
-            className={`text-sm font-semibold whitespace-nowrap px-4 py-2 rounded-full transition-all duration-200 hover:scale-105 hover:text-[#b66b41] ${
-              activeFilter === null 
-                ? "bg-green-100 text-green-800" 
-                : "text-foreground bg-gray-100"
-            }`}
-          >
-            All Courses
-          </button>
+          {!isMobile ? (
+            <div className="flex gap-2">
+              {sortOptions.map((option) => {
+                const IconComponent = option.icon;
+                return (
+                  <button
+                    key={option.key}
+                    onClick={() => onSortChange(option.key)}
+                    className={`flex items-center gap-2 text-sm font-semibold whitespace-nowrap px-4 py-2 rounded-full transition-all duration-200 hover:shadow-sm ${
+                      sortBy === option.key 
+                        ? "bg-[#E0E0E0] text-foreground border border-gray-300 font-bold" 
+                        : "bg-[#F4F4F4] text-muted-foreground hover:bg-gray-200"
+                    }`}
+                  >
+                    <IconComponent className="w-4 h-4" />
+                    {option.label}
+                  </button>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="overflow-x-auto scrollbar-hide w-full">
+              <div className="flex gap-2 pb-2 px-4" style={{ minWidth: 'max-content' }}>
+                {sortOptions.map((option) => {
+                  const IconComponent = option.icon;
+                  return (
+                    <button
+                      key={option.key}
+                      onClick={() => onSortChange(option.key)}
+                      className={`flex items-center gap-2 text-sm font-semibold whitespace-nowrap px-4 py-2 rounded-full transition-all duration-200 flex-shrink-0 ${
+                        sortBy === option.key 
+                          ? "bg-[#E0E0E0] text-foreground border border-gray-300 font-bold" 
+                          : "bg-[#F4F4F4] text-muted-foreground"
+                      }`}
+                    >
+                      <IconComponent className="w-4 h-4" />
+                      {option.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Regional Filter Tiles */}
