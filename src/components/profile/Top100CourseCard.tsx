@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Check, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -58,6 +58,17 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
   const [wasAlreadyPlayed, setWasAlreadyPlayed] = useState(false);
   const navigate = useNavigate();
 
+  // Debug logging
+  useEffect(() => {
+    if (course.name === "Trump Turnberry Resort - Ailsa") {
+      console.log('CourseRankBadges props for Trump Turnberry:', {
+        userRating,
+        showUserRating: !!userRating,
+        positioning: "top-left"
+      });
+    }
+  }, [userRating, course.name]);
+
   const handleCardClick = () => {
     if (!isOwnProfile) {
       // If viewing someone else's profile, navigate to course detail page
@@ -111,6 +122,7 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
             showUserRating={!!userRating}
             positioning="top-left"
           />
+
 
           {/* Played Indicator */}
           {isPlayed && (
