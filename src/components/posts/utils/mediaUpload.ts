@@ -58,7 +58,6 @@ export const uploadMediaWithRetry = async (
       const uploadPromise = supabase.storage
         .from('post-media')
         .upload(fileName, file, {
-          cacheControl: '3600',
           upsert: false
         });
 
