@@ -123,8 +123,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     setIsMuted(isGloballyMuted);
   }, [isGloballyMuted, isInFeed]);
 
-  const togglePlayPause = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const togglePlayPause = (e?: React.MouseEvent | Event) => {
+    if (e && typeof e.stopPropagation === 'function') {
+      e.stopPropagation();
+    }
     const video = videoRef.current;
     if (!video) return;
 
