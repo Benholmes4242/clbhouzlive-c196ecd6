@@ -16,10 +16,19 @@ export const useAppLogo = () => {
   const { theme } = useTheme();
   const [logos, setLogos] = useState<Logo[]>([]);
   const [loading, setLoading] = useState(true);
+  const [currentLogo, setCurrentLogo] = useState<Logo | null>(null);
 
   useEffect(() => {
     fetchAppLogos();
   }, []);
+
+  // Re-evaluate current logo when theme changes
+  useEffect(() => {
+    if (logos.length > 0) {
+      const newCurrentLogo = getCurrentAppLogo();
+      setCurrentLogo(newCurrentLogo);
+    }
+  }, [theme, logos]);
 
   const fetchAppLogos = async () => {
     try {
@@ -58,7 +67,7 @@ export const useAppLogo = () => {
   };
 
   return {
-    currentLogo: getCurrentAppLogo(),
+    currentLogo,
     lightLogo: getLogosByCategory('app_logo_light')[0] || null,
     darkLogo: getLogosByCategory('app_logo_dark')[0] || null,
     loading,
