@@ -231,16 +231,32 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
 
   const handleSelectVideos = () => {
     addDebugInfo('Select videos clicked');
+    
+    // Try iOS-compatible approach
     const input = document.createElement('input');
     input.type = 'file';
-    input.accept = 'video/mp4,video/mov,video/avi,video/quicktime';
+    input.accept = 'video/*';
     input.multiple = true;
-    // Remove capture attribute completely and don't set any iOS-specific attributes
+    
+    // iOS compatibility: add to DOM temporarily
+    input.style.position = 'fixed';
+    input.style.top = '-1000px';
+    input.style.opacity = '0';
+    input.style.pointerEvents = 'none';
+    document.body.appendChild(input);
+    
+    addDebugInfo('File input created and added to DOM');
     
     input.onchange = (event) => {
-      addDebugInfo('Video input changed');
+      addDebugInfo('Video input changed - SUCCESS!');
       const selectedFiles = Array.from((event.target as HTMLInputElement).files || []);
       addDebugInfo(`Selected video files: ${selectedFiles.length}`);
+      
+      // Clean up DOM
+      if (document.body.contains(input)) {
+        document.body.removeChild(input);
+        addDebugInfo('Input removed from DOM');
+      }
       
       if (selectedFiles.length > 0) {
         addDebugInfo('Setting video files and switching to upload mode');
@@ -251,11 +267,36 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
       }
     };
     
-    input.onerror = () => {
-      addDebugInfo('Video input error occurred');
+    input.onerror = (e) => {
+      addDebugInfo(`Video input error: ${e}`);
+      if (document.body.contains(input)) {
+        document.body.removeChild(input);
+      }
     };
     
-    input.click();
+    input.oncancel = () => {
+      addDebugInfo('File selection was cancelled');
+      if (document.body.contains(input)) {
+        document.body.removeChild(input);
+      }
+    };
+    
+    // Add timeout cleanup as fallback
+    setTimeout(() => {
+      if (document.body.contains(input)) {
+        document.body.removeChild(input);
+        addDebugInfo('Input cleaned up via timeout');
+      }
+    }, 30000);
+    
+    addDebugInfo('About to trigger file picker');
+    
+    // Try click with a small delay for iOS
+    setTimeout(() => {
+      addDebugInfo('Triggering input.click()');
+      input.click();
+      addDebugInfo('input.click() called');
+    }, 50);
   };
 
   const handleBackToSelection = () => {
