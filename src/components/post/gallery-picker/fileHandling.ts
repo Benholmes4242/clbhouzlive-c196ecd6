@@ -4,16 +4,25 @@ export const createFileInput = (accept: string, multiple: boolean = true, captur
   input.accept = accept;
   input.multiple = multiple;
   
-  // Add mobile-specific attributes for better compatibility
+  // CRITICAL: On mobile, file input must be attached to DOM temporarily
   if (isMobile) {
     if (capture) {
       input.setAttribute('capture', capture);
     }
-    // Add mobile-specific styling to ensure visibility
-    input.style.position = 'absolute';
-    input.style.visibility = 'hidden';
-    input.style.width = '0';
-    input.style.height = '0';
+    // Temporarily attach to DOM for mobile compatibility
+    input.style.position = 'fixed';
+    input.style.top = '-1000px';
+    input.style.left = '-1000px';
+    input.style.opacity = '0';
+    input.style.pointerEvents = 'none';
+    document.body.appendChild(input);
+    
+    // Remove from DOM after a short delay
+    setTimeout(() => {
+      if (document.body.contains(input)) {
+        document.body.removeChild(input);
+      }
+    }, 1000);
   }
   
   console.log('Created file input with:', { accept, multiple, capture, isMobile });
