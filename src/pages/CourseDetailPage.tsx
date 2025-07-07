@@ -147,58 +147,70 @@ const CourseDetailPage = () => {
           <ArrowLeft className="h-5 w-5" />
         </Button>
 
-        {/* Course Title & Location - Bottom Left */}
-        <div className="absolute bottom-6 left-6 text-white z-10">
+        {/* Bottom Left Overlay */}
+        <div className="absolute bottom-6 left-6 text-white">
           <h1 className="text-3xl font-bold mb-2">{course.name}</h1>
-          <p className="text-lg opacity-90">
+          <p className="text-lg mb-4 opacity-90">
             {[course.country, course.region, course.sub_country].filter(Boolean).join(', ')}
           </p>
         </div>
 
-        {/* Add to Played Button - Bottom Right (Fixed Position) */}
+        {/* Ranking badges - bottom left */}
+        <div className="absolute bottom-4 left-4 flex gap-2 z-10">
+          {course.global_rank && (
+            <div className="flex items-center gap-1.5 px-3 py-2 bg-white/20 backdrop-blur-sm rounded-full">
+              <Earth className="h-4 w-4 text-white" />
+              <span className="text-sm font-bold text-white">#{course.global_rank}</span>
+            </div>
+          )}
+          {((course.country === 'Britain & Ireland' || course.country === 'United Kingdom') && course.regional_rank) && (
+            <div className="flex items-center gap-1.5 px-3 py-2 bg-white/20 backdrop-blur-sm rounded-full">
+              <CountryFlag country="Britain & Ireland" size="sm" />
+              <span className="text-sm font-bold text-white">#{course.regional_rank}</span>
+            </div>
+          )}
+          {(course.country === 'USA' && course.usa_rank) && (
+            <div className="flex items-center gap-1.5 px-3 py-2 bg-white/20 backdrop-blur-sm rounded-full">
+              <CountryFlag country="USA" size="sm" />
+              <span className="text-sm font-bold text-white">#{course.usa_rank}</span>
+            </div>
+          )}
+          {(course.country === 'Continental Europe' && course.regional_rank) && (
+            <div className="flex items-center gap-1.5 px-3 py-2 bg-white/20 backdrop-blur-sm rounded-full">
+              <CountryFlag country="Continental Europe" size="sm" />
+              <span className="text-sm font-bold text-white">#{course.regional_rank}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Add to Played Button - bottom right */}
         {user && (
           <CoursePlayedButton 
             isPlayed={isPlayed}
             onAddToPlayed={handleAddToPlayed}
           />
         )}
+
+        {/* Visit Website button - hidden on mobile, shown on desktop */}
+        {course.website_url && (
+          <Button
+            variant="outline"
+            className="hidden md:flex absolute bottom-6 right-6 bg-white/20 backdrop-blur-sm border-white/30 text-white hover:bg-white/30"
+            onClick={handleWebsiteClick}
+          >
+            <ExternalLink className="h-4 w-4 mr-2" />
+            Visit Website
+          </Button>
+        )}
       </div>
 
-      {/* White Section Below Image */}
-      <div className="bg-background p-4">
-        <div className="max-w-6xl mx-auto">
-          {/* Course Ranking Badges - Centered */}
-          <div className="flex justify-center gap-2 mb-4">
-            {course.global_rank && (
-              <div className="flex items-center gap-1.5 px-3 py-2 bg-white/20 backdrop-blur-sm rounded-full">
-                <Earth className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-bold text-muted-foreground">#{course.global_rank}</span>
-              </div>
-            )}
-            {((course.country === 'Britain & Ireland' || course.country === 'United Kingdom') && course.regional_rank) && (
-              <div className="flex items-center gap-1.5 px-3 py-2 bg-white/20 backdrop-blur-sm rounded-full">
-                <CountryFlag country="Britain & Ireland" size="sm" />
-                <span className="text-sm font-bold text-muted-foreground">#{course.regional_rank}</span>
-              </div>
-            )}
-            {(course.country === 'USA' && course.usa_rank) && (
-              <div className="flex items-center gap-1.5 px-3 py-2 bg-white/20 backdrop-blur-sm rounded-full">
-                <CountryFlag country="USA" size="sm" />
-                <span className="text-sm font-bold text-muted-foreground">#{course.usa_rank}</span>
-              </div>
-            )}
-            {(course.country === 'Continental Europe' && course.regional_rank) && (
-              <div className="flex items-center gap-1.5 px-3 py-2 bg-white/20 backdrop-blur-sm rounded-full">
-                <CountryFlag country="Continental Europe" size="sm" />
-                <span className="text-sm font-bold text-muted-foreground">#{course.regional_rank}</span>
-              </div>
-            )}
-          </div>
-
-          {/* Community Vote Score - Centered below rankings */}
-          <div className="flex justify-center items-center gap-2 mb-4">
+      {/* Community Vote Score and Visit Website */}
+      <div className="bg-background border-b p-4">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
+          {/* Community Vote Score - Left */}
+          <div className="flex items-center gap-2">
             <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
-            <span className="text-xl font-semibold text-foreground">
+            <span className="text-xl font-semibold">
               {ratingStats?.average_rating || 0}/10
             </span>
             <span className="text-muted-foreground">
@@ -206,18 +218,16 @@ const CourseDetailPage = () => {
             </span>
           </div>
           
-          {/* Visit Website Button - Centered below community score */}
-          {course.website_url && user && (
-            <div className="flex justify-center">
-              <Button
-                variant="outline"
-                onClick={handleWebsiteClick}
-                className="flex items-center gap-2 bg-white border border-border rounded-full px-4 py-2"
-              >
-                <ExternalLink className="h-4 w-4" />
-                Visit Website
-              </Button>
-            </div>
+          {/* Visit Website Button - Right */}
+          {course.website_url && (
+            <Button
+              variant="outline"
+              onClick={handleWebsiteClick}
+              className="flex items-center gap-2"
+            >
+              <ExternalLink className="h-4 w-4" />
+              Visit Website
+            </Button>
           )}
         </div>
       </div>
