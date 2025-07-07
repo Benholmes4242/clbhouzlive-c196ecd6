@@ -129,38 +129,38 @@ const CourseCard: React.FC<CourseCardProps> = ({
                 <Star className="h-12 w-12 text-white opacity-50" />
               </div>
             )}
-            
-            {/* Ranking badges - positioned independently at bottom-left */}
-            <CourseRankBadges
-              globalRank={course.global_rank}
-              regionalRank={course.regional_rank}
-              usaRank={course.usa_rank}
-              country={course.country}
-              viewContext={viewContext}
-              userRating={userRating}
-              showUserRating={showUserRating}
-              positioning="bottom-left"
-            />
-            
-            {/* Played button - positioned independently at bottom-right */}
-            {showPlayedButton && (
-              <CoursePlayedButton
-                courseId={course.id}
-                courseName={course.name}
-                userCourse={userCourse}
-                canModifyCourseStatus={!isViewingOtherUser && !!user}
-                currentUserId={user?.id}
-                viewingUserId={viewingUserId}
-                course={{
-                  id: course.id,
-                  name: course.name,
-                  thumbnail_image: course.thumbnail_image
-                }}
-                variant="overlay"
-                positioning="bottom-right"
-              />
-            )}
           </div>
+          
+          {/* Ranking badges - positioned relative to the outer container */}
+          <CourseRankBadges
+            globalRank={course.global_rank}
+            regionalRank={course.regional_rank}
+            usaRank={course.usa_rank}
+            country={course.country}
+            viewContext={viewContext}
+            userRating={userRating}
+            showUserRating={showUserRating}
+            positioning="bottom-left"
+          />
+          
+          {/* Played button - positioned relative to the outer container */}
+          {showPlayedButton && (
+            <CoursePlayedButton
+              courseId={course.id}
+              courseName={course.name}
+              userCourse={userCourse}
+              canModifyCourseStatus={!isViewingOtherUser && !!user}
+              currentUserId={user?.id}
+              viewingUserId={viewingUserId}
+              course={{
+                id: course.id,
+                name: course.name,
+                thumbnail_image: course.thumbnail_image
+              }}
+              variant="overlay"
+              positioning="bottom-right"
+            />
+          )}
         </div>
         
         <CardHeader className="pb-2">
