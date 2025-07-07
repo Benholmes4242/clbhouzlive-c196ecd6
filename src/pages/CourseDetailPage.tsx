@@ -194,7 +194,7 @@ const CourseDetailPage = () => {
             
             {/* Played Button - Mobile Only */}
             {user && (
-              <div>
+              <div className="mr-2">
                 {!isAlreadyPlayed ? (
                   <Button
                     onClick={handleAddToPlayed}
