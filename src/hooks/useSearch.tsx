@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useDebounce } from '@/hooks/useDebounce';
 
@@ -25,12 +25,6 @@ export const useSearch = () => {
   const [popularClubs, setPopularClubs] = useState<SearchResult[]>([]);
   
   const debouncedQuery = useDebounce(query, 200);
-
-  // Load recent searches and popular clubs on mount
-  useMemo(() => {
-    loadRecentSearches();
-    loadPopularClubs();
-  }, []);
 
   const loadRecentSearches = () => {
     const stored = localStorage.getItem('recent_searches');
@@ -162,8 +156,14 @@ export const useSearch = () => {
     }
   }, []);
 
+  // Load initial data on mount
+  useEffect(() => {
+    loadRecentSearches();
+    loadPopularClubs();
+  }, []);
+
   // Effect to trigger search when debounced query changes
-  useMemo(() => {
+  useEffect(() => {
     performSearch(debouncedQuery);
   }, [debouncedQuery, performSearch]);
 
