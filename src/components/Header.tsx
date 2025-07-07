@@ -39,6 +39,10 @@ const Header = () => {
 
           {/* Navigation Icons - Fixed positioning with mobile optimization */}
           <div className="flex items-center space-x-1 md:space-x-4 flex-shrink-0 min-w-0">
+            {/* Mobile Search Icon - Always visible on mobile */}
+            <div className="sm:hidden">
+              <HeaderSearch />
+            </div>
             <HeaderNavigation />
           </div>
         </div>
