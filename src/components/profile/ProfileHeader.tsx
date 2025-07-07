@@ -36,21 +36,23 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showEnlargedPhoto, setShowEnlargedPhoto] = useState(false);
 
-  // Trick: allow selecting the same file again by resetting file input after use
-  const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    handlePhotoUpload(event);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ""; // reset file input so re-uploading same file triggers change
-    }
-  };
-
   // When editable, clicking the avatar triggers the file picker
   // When not editable but has photo, clicking shows enlarged view
   const handleAvatarClick = () => {
     if (canEdit && !uploading) {
+      console.log('Avatar clicked, triggering file input');
       fileInputRef.current?.click();
     } else if (hasPhoto) {
       setShowEnlargedPhoto(true);
+    }
+  };
+
+  // Trick: allow selecting the same file again by resetting file input after use
+  const onFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('File input changed, files:', event.target.files);
+    handlePhotoUpload(event);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ""; // reset file input so re-uploading same file triggers change
     }
   };
 
@@ -101,11 +103,22 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               <UserPlaceholderIcon />
             )}
             {/* When editable: show a dim overlay + "Change" label on hover */}
-            {canEdit && (
+            {canEdit && !uploading && (
               <div className="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                 <span className="bg-white/80 text-green-900 text-xs px-3 py-1 rounded-full font-medium shadow">
                   Change photo
                 </span>
+              </div>
+            )}
+            {/* Show uploading state */}
+            {canEdit && uploading && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+                <div className="flex flex-col items-center gap-2">
+                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+                  <span className="bg-white/80 text-green-900 text-xs px-3 py-1 rounded-full font-medium shadow">
+                    Uploading...
+                  </span>
+                </div>
               </div>
             )}
             {/* When not editable but has photo: show view overlay */}
@@ -117,16 +130,15 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               </div>
             )}
           </div>
-          {/* Hidden input covers avatar when editing */}
+          {/* Hidden file input - positioned separately for better mobile compatibility */}
           {canEdit && (
             <input
               ref={fileInputRef}
               type="file"
               accept="image/*"
               onChange={onFileChange}
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+              className="sr-only"
               disabled={uploading}
-              tabIndex={-1}
               aria-label="Upload profile photo"
             />
           )}
