@@ -163,30 +163,55 @@ const CourseDetailPage = () => {
             {[course.country, course.region, course.sub_country].filter(Boolean).join(', ')}
           </p>
           
-          {/* Rankings underneath location text - Mobile Only */}
-          <div className="md:hidden flex items-center gap-2 mb-4">
-            {course.global_rank && (
-              <div className="flex items-center gap-1.5 px-4 py-3 bg-white/20 backdrop-blur-sm rounded-xl shadow-sm min-h-[44px]">
-                <Earth className="h-5 w-5 text-white" />
-                <span className="text-sm font-bold text-white">#{course.global_rank}</span>
-              </div>
-            )}
-            {((course.country === 'Britain & Ireland' || course.country === 'United Kingdom') && course.regional_rank) && (
-              <div className="flex items-center gap-1.5 px-4 py-3 bg-white/20 backdrop-blur-sm rounded-xl shadow-sm min-h-[44px]">
-                <CountryFlag country="Britain & Ireland" size="sm" />
-                <span className="text-sm font-bold text-white">#{course.regional_rank}</span>
-              </div>
-            )}
-            {(course.country === 'USA' && course.usa_rank) && (
-              <div className="flex items-center gap-1.5 px-4 py-3 bg-white/20 backdrop-blur-sm rounded-xl shadow-sm min-h-[44px]">
-                <CountryFlag country="USA" size="sm" />
-                <span className="text-sm font-bold text-white">#{course.usa_rank}</span>
-              </div>
-            )}
-            {(course.country === 'Continental Europe' && course.regional_rank) && (
-              <div className="flex items-center gap-1.5 px-4 py-3 bg-white/20 backdrop-blur-sm rounded-xl shadow-sm min-h-[44px]">
-                <CountryFlag country="Continental Europe" size="sm" />
-                <span className="text-sm font-bold text-white">#{course.regional_rank}</span>
+          {/* Rankings and Played Button - Mobile Only */}
+          <div className="md:hidden flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              {course.global_rank && (
+                <div className="flex items-center gap-1.5 px-4 py-3 bg-white/20 backdrop-blur-sm rounded-xl shadow-sm min-h-[44px]">
+                  <Earth className="h-5 w-5 text-white" />
+                  <span className="text-sm font-bold text-white">#{course.global_rank}</span>
+                </div>
+              )}
+              {((course.country === 'Britain & Ireland' || course.country === 'United Kingdom') && course.regional_rank) && (
+                <div className="flex items-center gap-1.5 px-4 py-3 bg-white/20 backdrop-blur-sm rounded-xl shadow-sm min-h-[44px]">
+                  <CountryFlag country="Britain & Ireland" size="sm" />
+                  <span className="text-sm font-bold text-white">#{course.regional_rank}</span>
+                </div>
+              )}
+              {(course.country === 'USA' && course.usa_rank) && (
+                <div className="flex items-center gap-1.5 px-4 py-3 bg-white/20 backdrop-blur-sm rounded-xl shadow-sm min-h-[44px]">
+                  <CountryFlag country="USA" size="sm" />
+                  <span className="text-sm font-bold text-white">#{course.usa_rank}</span>
+                </div>
+              )}
+              {(course.country === 'Continental Europe' && course.regional_rank) && (
+                <div className="flex items-center gap-1.5 px-4 py-3 bg-white/20 backdrop-blur-sm rounded-xl shadow-sm min-h-[44px]">
+                  <CountryFlag country="Continental Europe" size="sm" />
+                  <span className="text-sm font-bold text-white">#{course.regional_rank}</span>
+                </div>
+              )}
+            </div>
+            
+            {/* Played Button - Mobile Only */}
+            {user && (
+              <div>
+                {!isAlreadyPlayed ? (
+                  <Button
+                    onClick={handleAddToPlayed}
+                    className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 text-lg font-medium min-h-[44px]"
+                  >
+                    <Target className="h-5 w-5 mr-2" />
+                    Add to My Played
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => setShowRatingModal(true)}
+                    className="bg-green-600/80 hover:bg-green-700 text-white px-6 py-3 text-lg font-medium min-h-[44px]"
+                  >
+                    <Check className="h-5 w-5 mr-2" />
+                    Played
+                  </Button>
+                )}
               </div>
             )}
           </div>
@@ -204,9 +229,9 @@ const CourseDetailPage = () => {
           )}
         </div>
 
-        {/* Bottom Right Overlay - Played Button */}
+        {/* Bottom Right Overlay - Played Button - Desktop Only */}
         {user && (
-          <div className="absolute bottom-6 right-6">
+          <div className="absolute bottom-6 right-6 hidden md:block">
             {!isAlreadyPlayed ? (
               <Button
                 onClick={handleAddToPlayed}
