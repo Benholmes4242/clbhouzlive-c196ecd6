@@ -67,38 +67,26 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
   const [isInitialized, setIsInitialized] = useState(false);
   const [modalMode, setModalMode] = useState<'selection' | 'upload'>('selection');
   const isMobile = useIsMobile();
-  
-  // Mobile debugging state
-  const [debugInfo, setDebugInfo] = useState<string[]>([]);
-  
-  const addDebugInfo = (info: string) => {
-    setDebugInfo(prev => [...prev.slice(-4), `${new Date().toLocaleTimeString()}: ${info}`]);
-  };
 
   // Reset state when modal opens/closes
   useEffect(() => {
     if (isOpen && !isInitialized) {
       if (editMode) {
-        addDebugInfo('Initializing in edit mode');
         setCaption(initialCaption);
         setSelectedTags(initialTags);
         setFiles(initialFiles);
         setModalMode('upload'); // Skip selection for edit mode
       } else {
-        addDebugInfo('Initializing in create mode');
         setCaption('');
         setSelectedTags([]);
         setFiles(initialFiles);
         const mode = initialFiles.length > 0 ? 'upload' : 'selection';
-        addDebugInfo(`Setting modal mode to: ${mode}`);
         setModalMode(mode);
       }
       setIsInitialized(true);
     } else if (!isOpen) {
-      addDebugInfo('Modal closed, resetting state');
       setIsInitialized(false);
       setModalMode('selection');
-      setDebugInfo([]); // Clear debug info when modal closes
     }
   }, [isOpen, editMode, initialCaption, initialTags, initialFiles, isInitialized]);
 
@@ -164,7 +152,6 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
 
   // Action button handlers
   const handleCaptureClick = () => {
-    addDebugInfo('Mobile capture clicked');
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*,video/*';
@@ -177,15 +164,12 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
     document.body.appendChild(input);
     
     input.onchange = (event) => {
-      addDebugInfo('Camera input changed');
       const selectedFiles = Array.from((event.target as HTMLInputElement).files || []);
-      addDebugInfo(`Selected files from camera: ${selectedFiles.length}`);
       
       // Clean up
       document.body.removeChild(input);
       
       if (selectedFiles.length > 0) {
-        addDebugInfo('Setting files and switching to upload mode');
         setFiles(selectedFiles);
         setModalMode('upload');
       }
@@ -193,7 +177,6 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
     
     // Add error handling
     input.onerror = () => {
-      addDebugInfo('Camera input error occurred');
       document.body.removeChild(input);
     };
     
@@ -201,38 +184,24 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
   };
 
   const handleSelectPhotos = () => {
-    addDebugInfo('Select photos clicked');
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/jpeg,image/jpg,image/png,image/gif,image/webp,image/heic';
     input.multiple = true;
-    // Remove capture attribute completely and don't set any iOS-specific attributes
     
     input.onchange = (event) => {
-      addDebugInfo('Photo input changed');
       const selectedFiles = Array.from((event.target as HTMLInputElement).files || []);
-      addDebugInfo(`Selected photo files: ${selectedFiles.length}`);
       
       if (selectedFiles.length > 0) {
-        addDebugInfo('Setting photo files and switching to upload mode');
         setFiles(selectedFiles);
         setModalMode('upload');
-      } else {
-        addDebugInfo('No photo files selected');
       }
-    };
-    
-    input.onerror = () => {
-      addDebugInfo('Photo input error occurred');
     };
     
     input.click();
   };
 
   const handleSelectVideos = () => {
-    addDebugInfo('Select videos clicked');
-    
-    // Try iOS-compatible approach
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'video/*';
@@ -245,37 +214,27 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
     input.style.pointerEvents = 'none';
     document.body.appendChild(input);
     
-    addDebugInfo('File input created and added to DOM');
-    
     input.onchange = (event) => {
-      addDebugInfo('Video input changed - SUCCESS!');
       const selectedFiles = Array.from((event.target as HTMLInputElement).files || []);
-      addDebugInfo(`Selected video files: ${selectedFiles.length}`);
       
       // Clean up DOM
       if (document.body.contains(input)) {
         document.body.removeChild(input);
-        addDebugInfo('Input removed from DOM');
       }
       
       if (selectedFiles.length > 0) {
-        addDebugInfo('Setting video files and switching to upload mode');
         setFiles(selectedFiles);
         setModalMode('upload');
-      } else {
-        addDebugInfo('No video files selected');
       }
     };
     
-    input.onerror = (e) => {
-      addDebugInfo(`Video input error: ${e}`);
+    input.onerror = () => {
       if (document.body.contains(input)) {
         document.body.removeChild(input);
       }
     };
     
     input.oncancel = () => {
-      addDebugInfo('File selection was cancelled');
       if (document.body.contains(input)) {
         document.body.removeChild(input);
       }
@@ -285,17 +244,12 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
     setTimeout(() => {
       if (document.body.contains(input)) {
         document.body.removeChild(input);
-        addDebugInfo('Input cleaned up via timeout');
       }
     }, 30000);
     
-    addDebugInfo('About to trigger file picker');
-    
     // Try click with a small delay for iOS
     setTimeout(() => {
-      addDebugInfo('Triggering input.click()');
       input.click();
-      addDebugInfo('input.click() called');
     }, 50);
   };
 
@@ -328,22 +282,6 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                 {editMode ? 'Edit Moment' : 'Create a Moment'}
               </h2>
               
-              {/* Debug Info Panel - Only show on mobile */}
-              {isMobile && debugInfo.length > 0 && (
-                <div className="mt-4 p-2 bg-blue-50 border border-blue-200 rounded text-xs text-left">
-                  <div className="font-medium text-blue-800 mb-1">Debug Info:</div>
-                  {debugInfo.map((info, index) => (
-                    <div key={index} className="text-blue-600">{info}</div>
-                  ))}
-                </div>
-              )}
-              
-              {/* Mobile Info Display */}
-              {isMobile && (
-                <div className="mt-2 text-xs text-gray-500">
-                  Mode: {modalMode} | Mobile: {isMobile ? 'Yes' : 'No'} | Files: {files.length}
-                </div>
-              )}
             </div>
 
             {(() => {
@@ -363,10 +301,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                 {/* Capture Photo or Video - Mobile Only */}
                 {isMobile && (
                   <button
-                    onClick={() => {
-                      addDebugInfo('Capture button clicked on mobile');
-                      handleCaptureClick();
-                    }}
+                    onClick={handleCaptureClick}
                     className="w-full flex items-center gap-4 p-3 bg-gray-50 hover:bg-orange-50 rounded-xl transition-colors"
                     disabled={isSubmitting}
                   >
@@ -379,10 +314,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
 
                 {/* Select Photos */}
                 <button
-                  onClick={() => {
-                    addDebugInfo('Select photos button clicked');
-                    handleSelectPhotos();
-                  }}
+                  onClick={handleSelectPhotos}
                   className="w-full flex items-center gap-4 p-3 bg-gray-50 hover:bg-orange-50 rounded-xl transition-colors"
                   disabled={isSubmitting}
                 >
@@ -394,10 +326,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
 
                 {/* Select Videos */}
                 <button
-                  onClick={() => {
-                    addDebugInfo('Select videos button clicked');
-                    handleSelectVideos();
-                  }}
+                  onClick={handleSelectVideos}
                   className="w-full flex items-center gap-4 p-3 bg-gray-50 hover:bg-orange-50 rounded-xl transition-colors"
                   disabled={isSubmitting}
                 >
