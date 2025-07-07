@@ -25,7 +25,10 @@ const FullscreenMediaModal = ({
   alt = "Media content",
   golfCourse
 }: FullscreenMediaModalProps) => {
-  console.log('FullscreenMediaModal - golfCourse:', golfCourse);
+  // Only log when golfCourse is actually provided for debugging
+  if (golfCourse) {
+    console.log('FullscreenMediaModal - golf course data:', golfCourse);
+  }
   const [isMuted, setIsMuted] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
   const isMobile = useIsMobile();
