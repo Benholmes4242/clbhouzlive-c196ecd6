@@ -49,6 +49,7 @@ const Explore = () => {
     if (activeFilter === 'Tips') return item.label === 'Pro Tip';
     if (activeFilter === 'Trending') return item.label === 'Trending';
     if (activeFilter === 'Clubs') return item.label === 'From Clubhouse';
+    if (activeFilter === 'Mulligan Moments') return item.label === 'Mulligan Moment';
     return true;
   });
 
