@@ -43,6 +43,5 @@ export const filterOptions = [
   'Pros',
   'Tips',
   'Trending',
-  'Clubs',
-  'Mulligan Moments'
+  'Clubs'
 ];
