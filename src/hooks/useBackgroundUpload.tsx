@@ -142,20 +142,9 @@ export const useBackgroundUpload = () => {
       return prev;
     });
 
-    // Show completion notification
-    if (failedUploads.length === 0) {
-      toast({
-        title: "Upload Complete!",
-        description: `All ${mediaFiles.length} files uploaded successfully.`,
-        variant: "default"
-      });
-    } else if (failedUploads.length < mediaFiles.length) {
-      toast({
-        title: "Partial Upload",
-        description: `${mediaFiles.length - failedUploads.length}/${mediaFiles.length} files uploaded successfully.`,
-        variant: "default"
-      });
-    } else {
+    // Completion notifications removed - black center confirmation is sufficient
+    // Only show error notifications if uploads fail completely
+    if (failedUploads.length === mediaFiles.length) {
       toast({
         title: "Upload Failed",
         description: "Some files couldn't be uploaded. Your post is still live without media.",
