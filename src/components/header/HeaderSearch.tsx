@@ -74,6 +74,12 @@ const HeaderSearch = () => {
   // Click outside handler
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent | TouchEvent) => {
+      // Don't close if clicking on search results
+      const target = event.target as Element;
+      if (target.closest('[data-search-result]')) {
+        return;
+      }
+      
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
         setShowResults(false);
       }

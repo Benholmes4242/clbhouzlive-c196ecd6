@@ -83,16 +83,17 @@ const SearchResults: React.FC<SearchResultsProps> = ({
             {recentSearches.map((search) => (
               <div
                 key={search.id}
-            className="flex items-center p-2 hover:bg-muted cursor-pointer rounded-md"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              onRecentSearchClick(search.query);
-            }}
-            onTouchStart={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-            }}
+                data-search-result
+                className="flex items-center p-2 hover:bg-muted cursor-pointer rounded-md"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onRecentSearchClick(search.query);
+                }}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
               >
                 <Clock className="h-4 w-4 text-muted-foreground mr-3" />
                 <span className="text-sm text-foreground">{search.query}</span>
@@ -108,16 +109,17 @@ const SearchResults: React.FC<SearchResultsProps> = ({
             {popularClubs.map((club) => (
               <div
                 key={club.id}
-              className="flex items-center p-2 hover:bg-muted cursor-pointer rounded-md"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                handleResultClick(club);
-              }}
-              onTouchStart={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-              }}
+                data-search-result
+                className="flex items-center p-2 hover:bg-muted cursor-pointer rounded-md"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleResultClick(club);
+                }}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
               >
                 <div className="mr-3">
                   <div className="w-8 h-8 rounded bg-muted flex items-center justify-center overflow-hidden">
@@ -170,6 +172,7 @@ const SearchResults: React.FC<SearchResultsProps> = ({
       {results.map((result) => (
         <div
           key={`${result.type}-${result.id}`}
+          data-search-result
           className="flex items-center p-3 hover:bg-muted cursor-pointer border-b border-border last:border-b-0"
           onClick={(e) => {
             e.preventDefault();
