@@ -11,9 +11,9 @@ const ClubhouzMomentsCarousel: React.FC = () => {
   const { user } = useSupabaseSession();
   const { posts, loading } = useClubhouseContent();
 
-  // Filter posts with video content and valid users, then deduplicate by user
+  // Filter posts with video content only and valid users, then deduplicate by user
   const filteredPosts = posts.filter(post => 
-    post.post_media.some(media => media.media_type === 'video' || media.media_type === 'image') &&
+    post.post_media.some(media => media.media_type === 'video') &&
     post.user.id !== user?.id // Don't show current user's posts
   );
 
