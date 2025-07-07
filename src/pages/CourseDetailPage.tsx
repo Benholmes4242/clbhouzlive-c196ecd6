@@ -198,17 +198,17 @@ const CourseDetailPage = () => {
                 {!isAlreadyPlayed ? (
                   <Button
                     onClick={handleAddToPlayed}
-                    className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 text-lg font-medium min-h-[44px]"
+                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 text-base font-medium min-h-[44px]"
                   >
-                    <Target className="h-5 w-5 mr-2" />
-                    Add to My Played
+                    <Target className="h-4 w-4 mr-1" />
+                    Add to Played
                   </Button>
                 ) : (
                   <Button
                     onClick={() => setShowRatingModal(true)}
-                    className="bg-green-600/80 hover:bg-green-700 text-white px-6 py-3 text-lg font-medium min-h-[44px]"
+                    className="bg-green-600/80 hover:bg-green-700 text-white px-4 py-2 text-base font-medium min-h-[44px]"
                   >
-                    <Check className="h-5 w-5 mr-2" />
+                    <Check className="h-4 w-4 mr-1" />
                     Played
                   </Button>
                 )}
@@ -235,17 +235,17 @@ const CourseDetailPage = () => {
             {!isAlreadyPlayed ? (
               <Button
                 onClick={handleAddToPlayed}
-                className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 text-lg font-medium min-h-[44px]"
+                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 text-base font-medium min-h-[44px]"
               >
-                <Target className="h-5 w-5 mr-2" />
-                Add to My Played
+                <Target className="h-4 w-4 mr-1" />
+                Add to Played
               </Button>
             ) : (
               <Button
                 onClick={() => setShowRatingModal(true)}
-                className="bg-green-600/80 hover:bg-green-700 text-white px-6 py-3 text-lg font-medium min-h-[44px]"
+                className="bg-green-600/80 hover:bg-green-700 text-white px-4 py-2 text-base font-medium min-h-[44px]"
               >
-                <Check className="h-5 w-5 mr-2" />
+                <Check className="h-4 w-4 mr-1" />
                 Played
               </Button>
             )}
