@@ -140,10 +140,11 @@ const CourseDetailPage = () => {
           size="icon"
           className="absolute top-4 left-4 bg-black/20 backdrop-blur-sm text-white hover:bg-black/40 z-50"
           onClick={() => {
-            console.log('Back button clicked');
-            if (window.history.length > 1) {
-              window.history.back();
-            } else {
+            console.log('Back button clicked - attempting navigation');
+            try {
+              navigate(-1);
+            } catch (error) {
+              console.log('Navigate(-1) failed, fallback to courses');
               navigate('/courses');
             }
           }}
