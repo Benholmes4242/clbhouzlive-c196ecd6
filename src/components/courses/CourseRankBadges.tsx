@@ -102,8 +102,8 @@ const CourseRankBadges = ({
         </div>
       )}
 
-      {/* Player rating badge - only show on top-right for backward compatibility */}
-      {playerRatingBadge && positioning === 'top-left' && (
+      {/* Player rating badge - show on top-right when user rating exists */}
+      {playerRatingBadge && (
         <div className="absolute top-2 right-2">
           <Tooltip>
             <TooltipTrigger asChild>
