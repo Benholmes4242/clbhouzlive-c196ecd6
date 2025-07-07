@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Check, MapPin } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import PostPlayRatingModal from '../courses/PostPlayRatingModal';
 
 interface Top100CourseCardProps {
@@ -52,9 +53,16 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
 }) => {
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [wasAlreadyPlayed, setWasAlreadyPlayed] = useState(false);
+  const navigate = useNavigate();
 
   const handleCardClick = () => {
-    if (!isOwnProfile || !onToggle) return;
+    if (!isOwnProfile) {
+      // If viewing someone else's profile, navigate to course detail page
+      navigate(`/courses/${course.id}`);
+      return;
+    }
+    
+    if (!onToggle) return;
     
     if (!isPlayed) {
       // If course is not currently played, mark as played and show rating modal for first time
@@ -78,7 +86,7 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
           isPlayed 
             ? 'bg-green-50 border-green-200 shadow-md transform scale-[1.02]' 
             : 'bg-card hover:shadow-lg'
-        } ${isOwnProfile ? 'cursor-pointer' : ''}`}
+        } cursor-pointer`}
         onClick={handleCardClick}
       >
         {/* Course Image */}

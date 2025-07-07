@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -20,6 +21,7 @@ interface CoursesFeedProps {
 }
 
 const CoursesFeed: React.FC<CoursesFeedProps> = ({ filters }) => {
+  const navigate = useNavigate();
   const { data: courses = [], isLoading } = useQuery({
     queryKey: ['explorerCourses', filters],
     queryFn: async () => {
@@ -131,7 +133,12 @@ const CoursesFeed: React.FC<CoursesFeedProps> = ({ filters }) => {
                 </div>
               )}
 
-              <Button variant="outline" size="sm" className="w-full">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full"
+                onClick={() => navigate(`/courses/${course.id}`)}
+              >
                 View Course Page
               </Button>
             </CardContent>
