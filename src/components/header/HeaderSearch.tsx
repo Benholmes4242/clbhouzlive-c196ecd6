@@ -120,10 +120,11 @@ const HeaderSearch = () => {
       {/* Mobile Search Bar */}
       {showMobileSearch && (
         <div 
-          className="md:hidden pb-4 absolute top-full left-0 right-0 bg-background border-t border-border px-4 z-40" 
+          className="md:hidden pb-4 absolute top-full left-0 right-0 bg-background border-t border-border px-4 z-[9998]" 
           ref={mobileSearchRef}
+          style={{ pointerEvents: 'auto' }}
         >
-          <div className="relative w-full">
+          <div className="relative w-full" style={{ pointerEvents: 'auto' }}>
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <input
               type="text"
