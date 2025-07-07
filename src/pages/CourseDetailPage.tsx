@@ -139,15 +139,7 @@ const CourseDetailPage = () => {
           variant="ghost"
           size="icon"
           className="absolute top-4 left-4 bg-black/20 backdrop-blur-sm text-white hover:bg-black/40 z-50"
-          onClick={() => {
-            console.log('Back button clicked - attempting navigation');
-            try {
-              navigate(-1);
-            } catch (error) {
-              console.log('Navigate(-1) failed, fallback to courses');
-              navigate('/courses');
-            }
-          }}
+          onClick={() => navigate(-1)}
         >
           <ArrowLeft className="h-5 w-5" />
         </Button>
