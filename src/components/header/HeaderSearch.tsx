@@ -55,11 +55,11 @@ const HeaderSearch = () => {
   };
 
   const handleInputBlur = () => {
-    // Delay hiding to allow clicks on results
+    // Delay hiding to allow clicks on results - increased delay for mobile
     setTimeout(() => {
       setIsFocused(false);
       setShowResults(false);
-    }, 150);
+    }, 300);
   };
 
   const handleClearInput = () => {
@@ -166,6 +166,14 @@ const HeaderSearch = () => {
       >
         {showMobileSearch ? <X className="h-5 w-5" /> : <Search className="h-5 w-5" />}
       </Button>
+
+      {/* Mobile Search Overlay */}
+      {showMobileSearch && (
+        <div 
+          className="md:hidden fixed inset-0 bg-black/20 z-[9997]"
+          onClick={handleMobileSearchToggle}
+        />
+      )}
 
       {/* Mobile Search Bar */}
       {showMobileSearch && (
