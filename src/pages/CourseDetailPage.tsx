@@ -150,9 +150,37 @@ const CourseDetailPage = () => {
         {/* Course Title & Location - Bottom Left */}
         <div className="absolute bottom-6 left-6 text-white z-10">
           <h1 className="text-3xl font-bold mb-2">{course.name}</h1>
-          <p className="text-lg opacity-90">
+          <p className="text-lg opacity-90 mb-3">
             {[course.country, course.region, course.sub_country].filter(Boolean).join(', ')}
           </p>
+          
+          {/* Ranking badges - with spacing gap above */}
+          <div className="flex gap-2 mt-3">
+            {course.global_rank && (
+              <div className="flex items-center gap-1.5 px-3 py-2 bg-white/20 backdrop-blur-sm rounded-full">
+                <Earth className="h-4 w-4 text-white" />
+                <span className="text-sm font-bold text-white">#{course.global_rank}</span>
+              </div>
+            )}
+            {((course.country === 'Britain & Ireland' || course.country === 'United Kingdom') && course.regional_rank) && (
+              <div className="flex items-center gap-1.5 px-3 py-2 bg-white/20 backdrop-blur-sm rounded-full">
+                <CountryFlag country="Britain & Ireland" size="sm" />
+                <span className="text-sm font-bold text-white">#{course.regional_rank}</span>
+              </div>
+            )}
+            {(course.country === 'USA' && course.usa_rank) && (
+              <div className="flex items-center gap-1.5 px-3 py-2 bg-white/20 backdrop-blur-sm rounded-full">
+                <CountryFlag country="USA" size="sm" />
+                <span className="text-sm font-bold text-white">#{course.usa_rank}</span>
+              </div>
+            )}
+            {(course.country === 'Continental Europe' && course.regional_rank) && (
+              <div className="flex items-center gap-1.5 px-3 py-2 bg-white/20 backdrop-blur-sm rounded-full">
+                <CountryFlag country="Continental Europe" size="sm" />
+                <span className="text-sm font-bold text-white">#{course.regional_rank}</span>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Add to Played Button - Bottom Right (Fixed Position) */}
@@ -166,37 +194,9 @@ const CourseDetailPage = () => {
 
       {/* White Section Below Image */}
       <div className="bg-background p-4">
-        <div className="max-w-6xl mx-auto">
-          {/* Course Ranking Badges - Centered */}
-          <div className="flex justify-center gap-2 mb-4">
-            {course.global_rank && (
-              <div className="flex items-center gap-1.5 px-3 py-2 bg-white/20 backdrop-blur-sm rounded-full">
-                <Earth className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-bold text-muted-foreground">#{course.global_rank}</span>
-              </div>
-            )}
-            {((course.country === 'Britain & Ireland' || course.country === 'United Kingdom') && course.regional_rank) && (
-              <div className="flex items-center gap-1.5 px-3 py-2 bg-white/20 backdrop-blur-sm rounded-full">
-                <CountryFlag country="Britain & Ireland" size="sm" />
-                <span className="text-sm font-bold text-muted-foreground">#{course.regional_rank}</span>
-              </div>
-            )}
-            {(course.country === 'USA' && course.usa_rank) && (
-              <div className="flex items-center gap-1.5 px-3 py-2 bg-white/20 backdrop-blur-sm rounded-full">
-                <CountryFlag country="USA" size="sm" />
-                <span className="text-sm font-bold text-muted-foreground">#{course.usa_rank}</span>
-              </div>
-            )}
-            {(course.country === 'Continental Europe' && course.regional_rank) && (
-              <div className="flex items-center gap-1.5 px-3 py-2 bg-white/20 backdrop-blur-sm rounded-full">
-                <CountryFlag country="Continental Europe" size="sm" />
-                <span className="text-sm font-bold text-muted-foreground">#{course.regional_rank}</span>
-              </div>
-            )}
-          </div>
-
-          {/* Community Vote Score - Centered below rankings */}
-          <div className="flex justify-center items-center gap-2 mb-4">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
+          {/* Community Vote Score - Left */}
+          <div className="flex items-center gap-2">
             <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
             <span className="text-xl font-semibold text-foreground">
               {ratingStats?.average_rating || 0}/10
@@ -206,18 +206,16 @@ const CourseDetailPage = () => {
             </span>
           </div>
           
-          {/* Visit Website Button - Centered below community score */}
-          {course.website_url && user && (
-            <div className="flex justify-center">
-              <Button
-                variant="outline"
-                onClick={handleWebsiteClick}
-                className="flex items-center gap-2 bg-white border border-border rounded-full px-4 py-2"
-              >
-                <ExternalLink className="h-4 w-4" />
-                Visit Website
-              </Button>
-            </div>
+          {/* Visit Website Button - Right (Below Add to Played) */}
+          {course.website_url && (
+            <Button
+              variant="outline"
+              onClick={handleWebsiteClick}
+              className="flex items-center gap-2 bg-white border border-border rounded-full px-4 py-2"
+            >
+              <ExternalLink className="h-4 w-4" />
+              Visit Website
+            </Button>
           )}
         </div>
       </div>
