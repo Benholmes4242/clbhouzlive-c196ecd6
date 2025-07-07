@@ -13,12 +13,14 @@ interface Top100CoursesProps {
   userId: string;
   isOwnProfile?: boolean;
   top100Visible?: boolean;
+  userDisplayName?: string;
 }
 
 const Top100Courses: React.FC<Top100CoursesProps> = ({
   userId,
   isOwnProfile = false,
-  top100Visible = true
+  top100Visible = true,
+  userDisplayName
 }) => {
   const navigate = useNavigate();
   const { user: currentUser } = useSupabaseSession();
@@ -34,6 +36,10 @@ const Top100Courses: React.FC<Top100CoursesProps> = ({
   if (!shouldShowSection) {
     return null;
   }
+
+  // Generate dynamic heading text
+  const displayName = isOwnProfile ? 'you' : (userDisplayName || 'this user');
+  const headlineText = `Here's how ${displayName} rate${isOwnProfile ? '' : 's'} the world's top courses`;
 
   const regions = [
     { key: 'britain-ireland', name: 'Britain & Ireland' },
@@ -112,6 +118,11 @@ const Top100Courses: React.FC<Top100CoursesProps> = ({
             </label>
           </div>
         )}
+      </div>
+
+      {/* Dynamic heading text */}
+      <div className="text-center mb-6">
+        <p className="text-lg text-foreground font-normal">{headlineText}</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

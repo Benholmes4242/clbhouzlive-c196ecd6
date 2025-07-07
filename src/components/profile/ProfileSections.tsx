@@ -41,6 +41,7 @@ const ProfileSections: React.FC<ProfileSectionsProps> = ({
             userId={profile?.id || user?.id || ''}
             isOwnProfile={isOwnProfile}
             top100Visible={profile?.top100_visible}
+            userDisplayName={profile?.display_name?.split(' ')[0] || profile?.username || 'this user'}
           />
         </>
       )}
