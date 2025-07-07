@@ -69,7 +69,7 @@ const InstagramStyleProfileHeader: React.FC<InstagramStyleProfileHeaderProps> = 
           )}
           
           {bio && (
-            <p className="text-sm text-gray-800 mt-3 line-clamp-2">{bio}</p>
+            <p className={`text-sm text-gray-800 mt-3 ${profile?.user_type === 'individual' ? 'line-clamp-2' : ''}`}>{bio}</p>
           )}
         </div>
       </div>

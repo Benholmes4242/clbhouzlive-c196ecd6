@@ -60,11 +60,13 @@ const ProfilePageLayout: React.FC<ProfilePageLayoutProps> = ({
               onEGConnect={onEGConnect}
             />
           ),
-          badges: (
-            <div className="p-4">
-              <BadgeCarousel userId={profile?.id} />
-            </div>
-          )
+          ...(profile?.user_type === 'individual' && {
+            badges: (
+              <div className="p-4">
+                <BadgeCarousel userId={profile?.id} />
+              </div>
+            )
+          })
         }}
         />
       </div>

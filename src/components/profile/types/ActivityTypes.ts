@@ -43,4 +43,5 @@ export interface SocialActivityProps {
   activityVisible?: boolean;
   onVisibilityToggle?: (checked: boolean) => void;
   profileDisplayName?: string;
+  userType?: string;  // Add userType to check if it's a business account
 }

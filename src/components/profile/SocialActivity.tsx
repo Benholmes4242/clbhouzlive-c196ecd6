@@ -13,7 +13,8 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
   isOwnProfile = false,
   activityVisible = true,
   onVisibilityToggle,
-  profileDisplayName
+  profileDisplayName,
+  userType = 'individual'
 }) => {
   const { posts, loading, fetchUserPosts } = useActivityPosts(userId);
   const { isOpen, currentPost, allUserPosts: viewerPosts, openPostViewer, closePostViewer } = usePostViewer({ source: 'profile' });
@@ -87,10 +88,12 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
         onPostCreated={fetchUserPosts}
       />
 
-      {/* Badges Section */}
-      <div className="mb-6">
-        <BadgeCarousel userId={userId} />
-      </div>
+      {/* Badges Section - Only for individual users */}
+      {userType === 'individual' && (
+        <div className="mb-6">
+          <BadgeCarousel userId={userId} />
+        </div>
+      )}
 
       {/* Grid layout for square posts - increased rounded corners */}
       <div className="grid grid-cols-3 gap-2 mt-4">
