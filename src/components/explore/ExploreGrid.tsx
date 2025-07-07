@@ -24,12 +24,6 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
   onLoadMore,
   activeFilter
 }) => {
-  
-  console.log('ExploreGrid received content:', content.length, 'items');
-  console.log('ExploreGrid activeFilter:', activeFilter);
-  if (activeFilter === 'Shank Tank') {
-    console.log('ExploreGrid Shank Tank content:', content.map(item => item.title));
-  }
   // Intersection observer for infinite scroll
   React.useEffect(() => {
     const observer = new IntersectionObserver(

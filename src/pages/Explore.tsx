@@ -50,20 +50,10 @@ const Explore = () => {
     if (activeFilter === 'Trending') return item.label === 'Trending';
     if (activeFilter === 'Clubs') return item.label === 'From Clubhouse';
     if (activeFilter === 'Shank Tank') {
-      console.log('Filtering for Shank Tank:', item.title, 'contains #shanktank:', item.title?.toLowerCase().includes('#shanktank'));
-      const hasShankTag = item.type === 'video' && item.title?.toLowerCase().includes('#shanktank');
-      console.log('Final result for', item.title, ':', hasShankTag);
-      return hasShankTag;
+      return item.type === 'video' && item.title?.toLowerCase().includes('#shanktank');
     }
     return true;
   });
-
-  console.log('Active filter:', activeFilter);
-  console.log('Total content items:', content.length);
-  console.log('Filtered content items:', filteredContent.length);
-  if (activeFilter === 'Shank Tank') {
-    console.log('Shank Tank filtered items:', filteredContent.map(item => item.title));
-  }
 
   return (
       <div className="min-h-screen bg-background">
@@ -87,13 +77,6 @@ const Explore = () => {
             onLoadMore={loadMore}
             activeFilter={activeFilter}
           />
-          
-          {/* Debug info */}
-          {activeFilter === 'Shank Tank' && (
-            <div className="fixed bottom-20 left-4 bg-red-500 text-white p-2 rounded z-50">
-              Debug: Showing {filteredContent.length} items in Shank Tank
-            </div>
-          )}
         </main>
         
         <BottomNavigation />
