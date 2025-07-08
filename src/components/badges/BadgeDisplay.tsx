@@ -68,66 +68,49 @@ const BadgeDisplay: React.FC<BadgeDisplayProps> = ({
     return 'bg-gradient-to-r from-orange-400 to-yellow-400 text-white shadow-lg shadow-orange-200';
   };
 
-  const progressPercentage = Math.min((progress / badge.criteria_value) * 100, 100);
-  const IconComponent = getBadgeIcon(badge.name);
-  const circumference = 2 * Math.PI * 16; // radius of 16
-  const strokeDashoffset = circumference - (progressPercentage / 100) * circumference;
-
   return (
-    <div className={cn("relative group", className)}>
-      {/* Main Badge Container */}
+    <div className="relative group">
+      {/* Main Badge Container - Updated to match Top100AchievementCard */}
       <div
         className={cn(
-          "flex items-center gap-3 px-4 py-3 rounded-full border-2 transition-all duration-300 cursor-pointer min-w-[180px]",
-          getBadgeGradient(badge.tier, badge.category, isEarned),
-          !isEarned && "opacity-60",
-          "hover:scale-105 hover:shadow-xl"
+          "flex items-center gap-3 p-3 rounded-xl border transition-all duration-300",
+          isEarned
+            ? "bg-gradient-to-r from-orange-50 to-yellow-50 border-orange-200 shadow-md shadow-orange-100"
+            : "bg-card border-border hover:border-border/80"
         )}
       >
-        {/* Icon with Circular Progress Ring */}
-        <div className="relative flex-shrink-0">
-          {showProgress && !isEarned && (
-            <svg className="absolute -inset-1 w-8 h-8 transform -rotate-90" viewBox="0 0 36 36">
-              <circle
-                cx="18"
-                cy="18"
-                r="16"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                opacity="0.2"
-              />
-              <circle
-                cx="18"
-                cy="18"
-                r="16"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeDasharray={circumference}
-                strokeDashoffset={strokeDashoffset}
-                className="transition-all duration-500"
-              />
-            </svg>
+        {/* Badge Icon */}
+        <div
+          className={cn(
+            "flex items-center justify-center w-8 h-8 rounded-full text-lg transition-all duration-300",
+            isEarned
+              ? "bg-gradient-to-r from-orange-400 to-yellow-400 shadow-md shadow-orange-200"
+              : "bg-muted text-muted-foreground"
           )}
-          <div className={cn(
-            "w-6 h-6 flex items-center justify-center rounded-full",
-            isEarned ? "bg-white/20" : "bg-gray-300"
-          )}>
-            <IconComponent className={cn(
-              "w-4 h-4",
-              isEarned ? "text-white" : "text-gray-500"
-            )} />
-          </div>
+        >
+          {badge.emoji}
         </div>
 
-        {/* Badge Text */}
+        {/* Badge Content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <div className="font-semibold text-sm truncate">
+              <h3
+                className={cn(
+                  "font-semibold text-base leading-tight",
+                  isEarned ? "text-orange-900" : "text-foreground"
+                )}
+              >
                 {badge.display_name}
-              </div>
+              </h3>
+              <p
+                className={cn(
+                  "text-xs",
+                  isEarned ? "text-orange-700" : "text-muted-foreground"
+                )}
+              >
+                {badge.description}
+              </p>
             </div>
             {isEarned && (
               <div className="flex items-center justify-center ml-2">
@@ -137,15 +120,21 @@ const BadgeDisplay: React.FC<BadgeDisplayProps> = ({
               </div>
             )}
           </div>
-          <p className="text-xs text-muted-foreground">
-            {badge.description}
-          </p>
         </div>
 
-        {/* Progress Display */}
+        {/* Progress Indicator */}
         {showProgress && (
-          <div className="text-right text-xs font-medium">
-            <div>{isEarned ? badge.criteria_value : progress}/{badge.criteria_value}</div>
+          <div className="flex items-center">
+            <div
+              className={cn(
+                "px-2.5 py-1.5 rounded-full text-xs font-semibold border",
+                isEarned
+                  ? "bg-gradient-to-r from-orange-400 to-yellow-400 text-white border-orange-300"
+                  : "bg-muted text-muted-foreground border-border"
+              )}
+            >
+              {Math.min(progress, badge.criteria_value)}/{badge.criteria_value}
+            </div>
           </div>
         )}
       </div>
@@ -175,11 +164,6 @@ const BadgeDisplay: React.FC<BadgeDisplayProps> = ({
         </div>
         <div className="w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-black/90 absolute top-full left-1/2 transform -translate-x-1/2" />
       </div>
-
-      {/* Pulse Animation for Earned Badges */}
-      {isEarned && (
-        <div className="absolute inset-0 rounded-full animate-pulse bg-white/10 pointer-events-none" />
-      )}
     </div>
   );
 };
