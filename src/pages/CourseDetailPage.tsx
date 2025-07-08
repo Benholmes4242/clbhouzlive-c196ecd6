@@ -213,7 +213,7 @@ const CourseDetailPage = () => {
 
       {/* Rating and Website Section */}
       <div className="bg-background py-4">
-        <div className="course-hero-wrapper flex items-center justify-between">
+        <div className="max-w-[1140px] mx-auto px-4 flex items-center justify-between">
           {/* Community Vote Score - Left */}
           <div className="flex items-center gap-2">
             <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
