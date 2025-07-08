@@ -123,10 +123,9 @@ const CourseDetailPage = () => {
 
   return (
     <div className="min-h-screen bg-background pb-20 w-full">
-      <div className="w-full mx-auto">{/* Ensure full width and centering */}
-      {/* Hero Banner */}
+      {/* Hero Banner with Shared Wrapper */}
       <div className="course-hero-container relative overflow-hidden">
-        <div className="course-hero-wrapper">
+        <div className="course-hero-wrapper relative">
           <img
             src={course.thumbnail_image || 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&h=600&fit=crop'}
             srcSet={course.thumbnail_image ? `
@@ -154,65 +153,72 @@ const CourseDetailPage = () => {
               `;
             }}
           />
-        </div>
-        
-        {/* Back Button */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute top-4 left-4 bg-black/20 backdrop-blur-sm text-white hover:bg-black/40 z-50"
-          onClick={() => navigate('/courses')}
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-
-        {/* Course Title & Location - Bottom Left */}
-        <div className="absolute bottom-6 left-6 text-white z-10">
-          <h1 className="text-3xl font-bold mb-2">{course.name}</h1>
-          <p className="text-lg opacity-90 mb-3">
-            {[course.country, course.region, course.sub_country].filter(Boolean).join(', ')}
-          </p>
           
-          {/* Ranking badges - with spacing gap above */}
-          <div className="flex gap-2 mt-3">
-            {course.global_rank && (
-              <div className="flex items-center gap-1.5 px-3 py-2 bg-white/20 backdrop-blur-sm rounded-full">
-                <Earth className="h-4 w-4 text-white" />
-                <span className="text-sm font-bold text-white">#{course.global_rank}</span>
-              </div>
-            )}
-            {((course.country === 'Britain & Ireland' || course.country === 'United Kingdom') && course.regional_rank) && (
-              <div className="flex items-center gap-1.5 px-3 py-2 bg-white/20 backdrop-blur-sm rounded-full">
-                <CountryFlag country="Britain & Ireland" size="sm" />
-                <span className="text-sm font-bold text-white">#{course.regional_rank}</span>
-              </div>
-            )}
-            {(course.country === 'USA' && course.usa_rank) && (
-              <div className="flex items-center gap-1.5 px-3 py-2 bg-white/20 backdrop-blur-sm rounded-full">
-                <CountryFlag country="USA" size="sm" />
-                <span className="text-sm font-bold text-white">#{course.usa_rank}</span>
-              </div>
-            )}
-            {(course.country === 'Continental Europe' && course.regional_rank) && (
-              <div className="flex items-center gap-1.5 px-3 py-2 bg-white/20 backdrop-blur-sm rounded-full">
-                <CountryFlag country="Continental Europe" size="sm" />
-                <span className="text-sm font-bold text-white">#{course.regional_rank}</span>
-              </div>
-            )}
-          </div>
-        </div>
+          {/* Back Button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="absolute top-4 left-4 bg-black/20 backdrop-blur-sm text-white hover:bg-black/40 z-50"
+            onClick={() => navigate('/courses')}
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
 
-        {/* Add to Played Button - Bottom Right (Fixed Position) */}
-        {user && (
-          <CoursePlayedButton 
-            isPlayed={isPlayed}
-            onAddToPlayed={handleAddToPlayed}
-          />
-        )}
+          {/* Course Title & Location - Bottom Left */}
+          <div className="absolute bottom-6 left-6 text-white z-10">
+            <h1 className="text-3xl font-bold mb-2">{course.name}</h1>
+            <p className="text-lg opacity-90 mb-3">
+              {[course.country, course.region, course.sub_country].filter(Boolean).join(', ')}
+            </p>
+            
+            {/* Ranking badges */}
+            <div className="flex gap-2 flex-wrap">
+              {course.global_rank && (
+                <div className="flex items-center gap-1.5 px-3 py-2 bg-white/20 backdrop-blur-sm rounded-full">
+                  <Earth className="h-4 w-4 text-white" />
+                  <span className="text-sm font-bold text-white">#{course.global_rank}</span>
+                </div>
+              )}
+              {((course.country === 'Britain & Ireland' || course.country === 'United Kingdom') && course.regional_rank) && (
+                <div className="flex items-center gap-1.5 px-3 py-2 bg-white/20 backdrop-blur-sm rounded-full">
+                  <CountryFlag country="Britain & Ireland" size="sm" />
+                  <span className="text-sm font-bold text-white">#{course.regional_rank}</span>
+                </div>
+              )}
+              {(course.country === 'USA' && course.usa_rank) && (
+                <div className="flex items-center gap-1.5 px-3 py-2 bg-white/20 backdrop-blur-sm rounded-full">
+                  <CountryFlag country="USA" size="sm" />
+                  <span className="text-sm font-bold text-white">#{course.usa_rank}</span>
+                </div>
+              )}
+              {(course.country === 'Continental Europe' && course.regional_rank) && (
+                <div className="flex items-center gap-1.5 px-3 py-2 bg-white/20 backdrop-blur-sm rounded-full">
+                  <CountryFlag country="Continental Europe" size="sm" />
+                  <span className="text-sm font-bold text-white">#{course.regional_rank}</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Add to Played Button - Bottom Right */}
+          {user && (
+            <div className="absolute bottom-6 right-6 z-20">
+              <Button
+                onClick={handleAddToPlayed}
+                className="bg-white/20 hover:bg-white/30 backdrop-blur-sm border-0 text-white font-medium px-4 py-2 rounded-full transition-all duration-200 flex items-center gap-2"
+              >
+                <div className="w-4 h-4 rounded-full border-2 border-white flex items-center justify-center">
+                  {isPlayed && <div className="w-2 h-2 bg-white rounded-full" />}
+                </div>
+                {isPlayed ? 'Played' : 'Add to Played'}
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* White Section Below Image */}
-      <div className="bg-background p-4">
+      {/* Rating and Website Section */}
+      <div className="bg-background py-4">
         <div className="course-hero-wrapper flex items-center justify-between">
           {/* Community Vote Score - Left */}
           <div className="flex items-center gap-2">
@@ -225,7 +231,7 @@ const CourseDetailPage = () => {
             </span>
           </div>
           
-          {/* Visit Website Button - Right (Below Add to Played) */}
+          {/* Visit Website Button - Right */}
           {course.website_url && (
             <Button
               variant="outline"
@@ -281,7 +287,6 @@ const CourseDetailPage = () => {
         onClose={() => setShowAddToPlayedModal(false)}
         onSuccess={handlePlayedSuccess}
       />
-      </div> {/* Close the full width wrapper */}
     </div>
   );
 };

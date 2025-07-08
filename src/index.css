@@ -172,7 +172,7 @@
 
 /* Shared Course Hero Wrapper for Perfect Alignment */
 .course-hero-wrapper {
-  max-width: 1200px;
+  max-width: 1140px;
   margin-left: auto;
   margin-right: auto;
   padding-left: 1rem;
@@ -251,6 +251,6 @@
 /* Large desktop optimization */
 @media (min-width: 1440px) {
   .course-hero-wrapper {
-    max-width: 1200px; /* Keep consistent with content width */
+    max-width: 1140px; /* Keep consistent with content width */
   }
 }
