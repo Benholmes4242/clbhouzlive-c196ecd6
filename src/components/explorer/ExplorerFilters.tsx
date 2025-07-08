@@ -25,25 +25,29 @@ const ExplorerFilters: React.FC<ExplorerFiltersProps> = ({ filters, onFilterChan
       {/* Top Row - Audience & Region & Sort */}
       <div className="flex flex-wrap gap-4 items-center">
         {/* Audience Toggle */}
-        <div className="flex bg-muted rounded-lg p-1">
-          <Button
-            variant={filters.audience === 'friends' ? 'secondary' : 'ghost'}
-            size="sm"
+        <div className="flex space-x-2">
+          <button
             onClick={() => onFilterChange('audience', 'friends')}
-            className="flex items-center gap-2"
+            className={`whitespace-nowrap flex-shrink-0 px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
+              filters.audience === 'friends' 
+                ? "bg-gray-100 text-gray-800 hover:bg-gray-200" 
+                : "text-gray-600 hover:bg-gray-100 hover:text-gray-800"
+            }`}
           >
             <Users className="h-4 w-4" />
             My Friends
-          </Button>
-          <Button
-            variant={filters.audience === 'all' ? 'secondary' : 'ghost'}
-            size="sm"
+          </button>
+          <button
             onClick={() => onFilterChange('audience', 'all')}
-            className="flex items-center gap-2"
+            className={`whitespace-nowrap flex-shrink-0 px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2 ${
+              filters.audience === 'all' 
+                ? "bg-gray-100 text-gray-800 hover:bg-gray-200" 
+                : "text-gray-600 hover:bg-gray-100 hover:text-gray-800"
+            }`}
           >
             <Globe className="h-4 w-4" />
             All Users
-          </Button>
+          </button>
         </div>
 
         {/* Region Dropdown */}
