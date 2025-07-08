@@ -75,7 +75,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           role={shouldShowClickCursor ? "button" : undefined}
           style={{ background: "transparent", boxShadow: "none" }}
         >
-          {/* Avatar circle with subtle orange corner accents, absolutely NO background, shadow, or padding */}
+          {/* Avatar circle, absolutely NO background, shadow, or padding */}
           <div
             className={
               "w-40 h-40 md:w-52 md:h-52 rounded-[18px] overflow-hidden flex items-center justify-center object-cover transition-all relative duration-200" +
@@ -88,9 +88,6 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               margin: 0,
             }}
           >
-            {/* Orange corner accents */}
-            <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-orange-400 rounded-tl-[18px]"></div>
-            <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-orange-400 rounded-br-[18px]"></div>
             {hasPhoto ? (
               <HighQualityImage
                 src={photoPreview || profilePhotoUrl!}

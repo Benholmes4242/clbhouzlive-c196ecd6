@@ -32,8 +32,8 @@ const StoryItem: React.FC<StoryItemProps> = ({
             className="focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 rounded-[18px]"
           >
             {hasProfile && story.avatar ? (
-              // User has a profile photo - show with subtle orange ring
-              <div className="w-20 h-20 rounded-[18px] p-0.5 bg-gradient-to-tr from-orange-200 to-orange-300 hover:opacity-80 transition-opacity">
+              // User has a profile photo - show with subtle ring
+              <div className="w-20 h-20 rounded-[18px] p-0.5 bg-gradient-to-tr from-gray-200 to-gray-300 hover:opacity-80 transition-opacity">
                 <HighQualityImage
                   src={story.avatar}
                   alt={story.user}
@@ -43,8 +43,8 @@ const StoryItem: React.FC<StoryItemProps> = ({
                 />
               </div>
             ) : (
-              // User doesn't have a profile photo - show plus icon with subtle orange ring
-              <div className="w-20 h-20 rounded-[18px] p-0.5 bg-gradient-to-tr from-orange-200 to-orange-300 hover:opacity-80 transition-opacity flex items-center justify-center">
+              // User doesn't have a profile photo - show plus icon with subtle ring
+              <div className="w-20 h-20 rounded-[18px] p-0.5 bg-gradient-to-tr from-gray-200 to-gray-300 hover:opacity-80 transition-opacity flex items-center justify-center">
                 <div className="w-full h-full bg-muted border border-dashed border-gray-300 rounded-[15px] flex items-center justify-center hover:bg-muted/80 transition-colors">
                   <Plus className="h-6 w-6 text-muted-foreground" />
                 </div>
