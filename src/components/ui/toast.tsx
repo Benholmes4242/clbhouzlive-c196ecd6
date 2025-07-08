@@ -12,7 +12,8 @@ const Toast = React.forwardRef<
     <ToastPrimitives.Root
       ref={ref}
       className={cn(
-        "group relative flex w-full max-w-[368px] translate-y-2 items-center space-x-4 overflow-hidden rounded-md border p-4 shadow-lg transition-all data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-value)] data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[calc(100%+32px)] data-[state=closed]:fade-out-80 data-[state=closed]:zoom-out-95 data-[swipe=end]:fade-out-80 data-[swipe=end]:zoom-out-95",
+        "group relative flex w-full max-w-[368px] translate-y-2 items-center space-x-4 overflow-hidden rounded-md border p-4 shadow-lg transition-all data-[state=open]:animate-in data-[state=closed]:animate-out data-[swipe=move]:translate-x-[var(--radix-toast-swipe-move-value)] data-[swipe=cancel]:translate-x-0 data-[swipe=end]:translate-x-[calc(100%+32px)] data-[state=closed]:fade-out-80 data-[state=closed]:zoom-out-95 data-[swipe=end]:fade-out-80 data-[swipe=end]:zoom-out-95 bg-background text-foreground border-border",
+        "data-[type=destructive]:bg-destructive data-[type=destructive]:text-destructive-foreground data-[type=destructive]:border-destructive/50",
         className
       )}
       {...props}
@@ -96,7 +97,7 @@ const ToastViewport = React.forwardRef<
   <ToastPrimitives.Viewport
     ref={ref}
     className={cn(
-      "fixed left-[50%] bottom-0 z-[100] flex max-h-screen w-full translate-x-[-50%] flex-col space-y-2 p-4 sm:max-w-[420px]",
+      "fixed left-[50%] bottom-0 z-[200] flex max-h-screen w-full translate-x-[-50%] flex-col space-y-2 p-4 sm:max-w-[420px]",
       className
     )}
     {...props}
