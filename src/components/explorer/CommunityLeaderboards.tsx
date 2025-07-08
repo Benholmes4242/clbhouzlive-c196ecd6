@@ -80,7 +80,7 @@ const CommunityLeaderboards = () => {
     },
     {
       region: 'britain-ireland',
-      title: 'GB & Ireland',
+      title: 'Britain & Ireland',
       emoji: '',
       topUser: getTopUserForRegion('britain-ireland')
     },
