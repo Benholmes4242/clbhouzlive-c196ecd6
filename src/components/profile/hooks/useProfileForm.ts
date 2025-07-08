@@ -8,6 +8,14 @@ interface Profile {
   home_club?: string | null;
   eg_handicap_index?: number | null;
   is_public?: boolean | null;
+  user_type?: string | null;
+  business_name?: string | null;
+  business_type?: string | null;
+  contact_person_name?: string | null;
+  phone?: string | null;
+  website_url?: string | null;
+  location?: string | null;
+  bio?: string | null;
 }
 
 interface ProfileFormData {
@@ -16,6 +24,13 @@ interface ProfileFormData {
   homeClub: string;
   handicap: string;
   isPublic: boolean;
+  businessName: string;
+  businessType: string;
+  contactPersonName: string;
+  phone: string;
+  websiteUrl: string;
+  location: string;
+  bio: string;
 }
 
 export const useProfileForm = (
@@ -30,6 +45,13 @@ export const useProfileForm = (
     homeClub: profile?.home_club || "",
     handicap: profile?.eg_handicap_index?.toString() || "",
     isPublic: profile?.is_public ?? true,
+    businessName: profile?.business_name || "",
+    businessType: profile?.business_type || "",
+    contactPersonName: profile?.contact_person_name || "",
+    phone: profile?.phone || "",
+    websiteUrl: profile?.website_url || "",
+    location: profile?.location || "",
+    bio: profile?.bio || "",
   });
   const [saving, setSaving] = useState(false);
 
@@ -67,6 +89,21 @@ export const useProfileForm = (
     }));
   };
 
+  const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSelectChange = (name: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
   const handleSave = async () => {
     setSaving(true);
     try {
@@ -75,6 +112,13 @@ export const useProfileForm = (
         home_club: formData.homeClub || null,
         eg_handicap_index: formData.handicap ? parseFloat(formData.handicap) : null,
         is_public: formData.isPublic,
+        business_name: formData.businessName || null,
+        business_type: formData.businessType || null,
+        contact_person_name: formData.contactPersonName || null,
+        phone: formData.phone || null,
+        website_url: formData.websiteUrl || null,
+        location: formData.location || null,
+        bio: formData.bio || null,
         updated_at: new Date().toISOString(),
       };
 
@@ -104,6 +148,8 @@ export const useProfileForm = (
     handleInputChange,
     handleHandicapChange,
     handlePublicToggle,
+    handleTextareaChange,
+    handleSelectChange,
     handleSave,
   };
 };

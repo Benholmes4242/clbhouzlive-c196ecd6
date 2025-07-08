@@ -3,6 +3,7 @@ import React from 'react';
 import ProfilePhotoManager from './ProfilePhotoManager';
 import FollowerStats from './FollowerStats';
 import UserProfileActions from './UserProfileActions';
+import ProfileEditDialog from './ProfileEditDialog';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 interface InstagramStyleProfileHeaderProps {
@@ -60,7 +61,7 @@ const InstagramStyleProfileHeader: React.FC<InstagramStyleProfileHeaderProps> = 
             />
           </div>
           
-          {/* Action Buttons Row - now after stats */}
+          {/* Action Buttons Row */}
           {!isOwnProfile && currentUser && (
             <div className="mt-3">
               <UserProfileActions
@@ -70,6 +71,21 @@ const InstagramStyleProfileHeader: React.FC<InstagramStyleProfileHeaderProps> = 
                 username={profile.username || profile.display_name || 'User'}
                 targetUserType={profile.user_type || 'individual'}
                 currentUserType={currentUser.user_type || 'individual'}
+              />
+            </div>
+          )}
+          
+          {/* Edit Profile Button for Own Profile */}
+          {isOwnProfile && user && (
+            <div className="mt-3">
+              <ProfileEditDialog
+                profile={profile}
+                userId={user.id}
+                onProfileUpdate={() => {
+                  if (onProfileUpdate) {
+                    onProfileUpdate();
+                  }
+                }}
               />
             </div>
           )}

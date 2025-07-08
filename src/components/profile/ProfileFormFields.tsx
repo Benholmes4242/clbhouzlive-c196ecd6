@@ -10,6 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import HandicapEditModal from "./HandicapEditModal";
 
 interface ProfileFormData {
@@ -18,13 +19,23 @@ interface ProfileFormData {
   homeClub: string;
   handicap: string;
   isPublic: boolean;
+  businessName: string;
+  businessType: string;
+  contactPersonName: string;
+  phone: string;
+  websiteUrl: string;
+  location: string;
+  bio: string;
 }
 
 interface ProfileFormFieldsProps {
   formData: ProfileFormData;
   isUsernameSet: boolean;
   userId: string;
+  userType?: string;
   onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onTextareaChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  onSelectChange: (name: string, value: string) => void;
   onHandicapChange: (value: string) => void;
   onPublicToggle: (checked: boolean) => void;
   onProfileUpdate: () => void;
@@ -34,11 +45,16 @@ const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
   formData,
   isUsernameSet,
   userId,
+  userType = 'individual',
   onInputChange,
+  onTextareaChange,
+  onSelectChange,
   onHandicapChange,
   onPublicToggle,
   onProfileUpdate,
 }) => {
+  const isBusinessProfile = userType === 'business';
+
   const handleHandicapUpdate = (newHandicap: number | null) => {
     // Only update the local form state - no need to trigger full profile refetch
     onHandicapChange(newHandicap?.toString() || "");
@@ -47,15 +63,19 @@ const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
   return (
     <div className="space-y-4 py-4">
       <div className="space-y-2">
-        <Label htmlFor="displayName">Display Name</Label>
+        <Label htmlFor="displayName">
+          {isBusinessProfile ? 'Business Name' : 'Display Name'}
+        </Label>
         <Input
           id="displayName"
           name="displayName"
           value={formData.displayName}
           onChange={onInputChange}
-          placeholder="Your display name"
+          placeholder={isBusinessProfile ? 'Your business name' : 'Your display name'}
         />
       </div>
+
+      {/* Username - common for both types */}
       <div className="space-y-2">
         <Label htmlFor="username">Username</Label>
         <Input
@@ -71,29 +91,113 @@ const ProfileFormFields: React.FC<ProfileFormFieldsProps> = ({
           <p className="text-xs text-gray-500">Username cannot be changed once set</p>
         )}
       </div>
+
+      {/* Individual-specific fields */}
+      {!isBusinessProfile && (
+        <>
+          <div className="space-y-2">
+            <Label htmlFor="homeClub">Home Club</Label>
+            <Input
+              id="homeClub"
+              name="homeClub"
+              value={formData.homeClub}
+              onChange={onInputChange}
+              placeholder="Your home golf club"
+            />
+          </div>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="handicap">Handicap</Label>
+              <HandicapEditModal
+                userId={userId}
+                currentHandicap={formData.handicap ? parseFloat(formData.handicap) : null}
+                onHandicapUpdate={handleHandicapUpdate}
+              />
+            </div>
+            <div className="text-sm text-muted-foreground">
+              {formData.handicap ? `Current handicap: ${formData.handicap}` : 'No handicap set'}
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Business-specific fields */}
+      {isBusinessProfile && (
+        <>
+          <div className="space-y-2">
+            <Label htmlFor="businessType">Business Type</Label>
+            <Select value={formData.businessType} onValueChange={(value) => onSelectChange('businessType', value)}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select business type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="golf_course">Golf Course</SelectItem>
+                <SelectItem value="pro_shop">Pro Shop</SelectItem>
+                <SelectItem value="golf_academy">Golf Academy</SelectItem>
+                <SelectItem value="golf_brand">Golf Brand</SelectItem>
+                <SelectItem value="golf_media">Golf Media</SelectItem>
+                <SelectItem value="golf_tournament">Golf Tournament</SelectItem>
+                <SelectItem value="other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="contactPersonName">Contact Person Name</Label>
+            <Input
+              id="contactPersonName"
+              name="contactPersonName"
+              value={formData.contactPersonName}
+              onChange={onInputChange}
+              placeholder="Name of main contact person"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="phone">Phone</Label>
+            <Input
+              id="phone"
+              name="phone"
+              value={formData.phone}
+              onChange={onInputChange}
+              placeholder="Business phone number"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="websiteUrl">Website URL</Label>
+            <Input
+              id="websiteUrl"
+              name="websiteUrl"
+              value={formData.websiteUrl}
+              onChange={onInputChange}
+              placeholder="https://yourwebsite.com"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="location">Location</Label>
+            <Input
+              id="location"
+              name="location"
+              value={formData.location}
+              onChange={onInputChange}
+              placeholder="City, State/Country"
+            />
+          </div>
+        </>
+      )}
+
+      {/* Bio - common for both types */}
       <div className="space-y-2">
-        <Label htmlFor="homeClub">Home Club</Label>
-        <Input
-          id="homeClub"
-          name="homeClub"
-          value={formData.homeClub}
-          onChange={onInputChange}
-          placeholder="Your home golf club"
+        <Label htmlFor="bio">Bio</Label>
+        <Textarea
+          id="bio"
+          name="bio"
+          value={formData.bio}
+          onChange={onTextareaChange}
+          placeholder={isBusinessProfile ? 'Tell us about your business...' : 'Tell us about yourself...'}
+          className="min-h-[80px]"
         />
       </div>
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <Label htmlFor="handicap">Handicap</Label>
-          <HandicapEditModal
-            userId={userId}
-            currentHandicap={formData.handicap ? parseFloat(formData.handicap) : null}
-            onHandicapUpdate={handleHandicapUpdate}
-          />
-        </div>
-        <div className="text-sm text-muted-foreground">
-          {formData.handicap ? `Current handicap: ${formData.handicap}` : 'No handicap set'}
-        </div>
-      </div>
+
+      {/* Public Profile toggle - common for both types */}
       <div className="flex items-center justify-between space-x-2">
         <div className="space-y-1">
           <Label htmlFor="public-profile">Public Profile</Label>

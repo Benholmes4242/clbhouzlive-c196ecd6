@@ -19,6 +19,14 @@ interface ProfileEditDialogProps {
     home_club?: string | null;
     eg_handicap_index?: number | null;
     is_public?: boolean | null;
+    user_type?: string | null;
+    business_name?: string | null;
+    business_type?: string | null;
+    contact_person_name?: string | null;
+    phone?: string | null;
+    website_url?: string | null;
+    location?: string | null;
+    bio?: string | null;
   } | null;
   userId: string;
   onProfileUpdate: () => void;
@@ -38,6 +46,8 @@ const ProfileEditDialog: React.FC<ProfileEditDialogProps> = ({
     handleInputChange,
     handleHandicapChange,
     handlePublicToggle,
+    handleTextareaChange,
+    handleSelectChange,
     handleSave,
   } = useProfileForm(profile, userId, onProfileUpdate, () => setOpen(false));
 
@@ -57,7 +67,10 @@ const ProfileEditDialog: React.FC<ProfileEditDialogProps> = ({
           formData={formData}
           isUsernameSet={isUsernameSet}
           userId={userId}
+          userType={profile?.user_type}
           onInputChange={handleInputChange}
+          onTextareaChange={handleTextareaChange}
+          onSelectChange={handleSelectChange}
           onHandicapChange={handleHandicapChange}
           onPublicToggle={handlePublicToggle}
           onProfileUpdate={onProfileUpdate}
