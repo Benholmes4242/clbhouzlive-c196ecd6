@@ -50,7 +50,7 @@ const Explore = () => {
     if (activeFilter === 'Trending') return item.label === 'Trending';
     if (activeFilter === 'Clubs') return item.label === 'From Clubhouse';
     if (activeFilter === 'Hack Shack') {
-      return item.type === 'video' && item.title?.toLowerCase().includes('#hackshack');
+      return false; // Always show empty state
     }
     return true;
   });
