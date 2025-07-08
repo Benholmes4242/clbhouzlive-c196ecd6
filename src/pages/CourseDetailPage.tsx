@@ -166,15 +166,15 @@ const CourseDetailPage = () => {
           <ArrowLeft className="h-5 w-5" />
         </Button>
 
-        {/* Course Title & Location - Bottom Left */}
+        {/* Course Title & Location - Bottom Left (Inside Image) */}
         <div className="absolute bottom-6 left-6 text-white z-10">
           <h1 className="text-3xl font-bold mb-2">{course.name}</h1>
           <p className="text-lg opacity-90 mb-3">
             {[course.country, course.region, course.sub_country].filter(Boolean).join(', ')}
           </p>
           
-          {/* Ranking badges - with spacing gap above */}
-          <div className="flex gap-2 mt-3">
+          {/* Ranking badges */}
+          <div className="flex gap-2">
             {course.global_rank && (
               <div className="flex items-center gap-1.5 px-3 py-2 bg-white/20 backdrop-blur-sm rounded-full">
                 <Earth className="h-4 w-4 text-white" />
@@ -202,7 +202,7 @@ const CourseDetailPage = () => {
           </div>
         </div>
 
-        {/* Add to Played Button - Bottom Right (Fixed Position) */}
+        {/* Add to Played Button - Bottom Right (Inside Image) */}
         {user && (
           <CoursePlayedButton 
             isPlayed={isPlayed}
