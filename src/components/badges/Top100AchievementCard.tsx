@@ -50,20 +50,16 @@ const Top100AchievementCard: React.FC<Top100AchievementCardProps> = ({ achieveme
         >
           {title}
         </h3>
-        <p
-          className={cn(
-            "text-xs",
-            isEarned ? "text-orange-700" : "text-muted-foreground"
-          )}
-        >
-          {requirement}
-        </p>
-        {isEarned && (
-          <div className="flex items-center gap-1 mt-1">
+        {isEarned ? (
+          <div className="flex items-center justify-center mt-1">
             <span className="text-xs font-medium text-orange-800 bg-orange-100 px-2 py-0.5 rounded-full">
               ✓ Earned!
             </span>
           </div>
+        ) : (
+          <p className="text-xs text-muted-foreground">
+            {requirement}
+          </p>
         )}
       </div>
 
