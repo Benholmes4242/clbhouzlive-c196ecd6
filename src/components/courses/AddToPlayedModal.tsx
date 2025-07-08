@@ -270,7 +270,7 @@ const AddToPlayedModal = ({ course, isOpen, onClose, onSuccess }: AddToPlayedMod
           {/* Submit Button */}
           <Button 
             onClick={handleSubmit} 
-            className="w-full add-to-played-btn"
+            className="w-full bg-muted hover:bg-muted/80 active:bg-muted/60 text-muted-foreground hover:text-foreground transition-all duration-200"
             disabled={isSubmitting}
           >
             {isSubmitting ? 'Adding Course...' : 'Add to Played'}
