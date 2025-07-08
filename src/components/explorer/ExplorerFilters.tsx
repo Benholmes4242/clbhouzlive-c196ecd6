@@ -86,53 +86,6 @@ const ExplorerFilters: React.FC<ExplorerFiltersProps> = ({ filters, onFilterChan
           </SelectContent>
         </Select>
       </div>
-
-      {/* Bottom Row - Search & View Options */}
-      <div className="flex flex-wrap gap-4 items-center">
-        {/* Search Bar */}
-        <div className="relative flex-1 min-w-64">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search Top 100 course names..."
-            value={filters.search}
-            onChange={(e) => onFilterChange('search', e.target.value)}
-            className="pl-10"
-          />
-        </div>
-
-        {/* View Toggle */}
-        <div className="flex bg-muted rounded-lg p-1">
-          <Button
-            variant={filters.viewMode === 'media' ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => onFilterChange('viewMode', 'media')}
-            className="flex items-center gap-2"
-          >
-            <Grid3X3 className="h-4 w-4" />
-            Media View
-          </Button>
-          <Button
-            variant={filters.viewMode === 'course' ? 'default' : 'ghost'}
-            size="sm"
-            onClick={() => onFilterChange('viewMode', 'course')}
-            className="flex items-center gap-2"
-          >
-            <List className="h-4 w-4" />
-            Course View
-          </Button>
-        </div>
-
-        {/* Map Toggle */}
-        <Button
-          variant={filters.showMap ? 'default' : 'outline'}
-          size="sm"
-          onClick={() => onFilterChange('showMap', !filters.showMap)}
-          className="flex items-center gap-2"
-        >
-          <Map className="h-4 w-4" />
-          Map View
-        </Button>
-      </div>
     </div>
   );
 };
