@@ -75,25 +75,25 @@ const CommunityLeaderboards = () => {
     {
       region: 'global',
       title: 'Global',
-      emoji: '',  // Will use Earth icon component
+      emoji: '',
       topUser: getTopUserForRegion('global')
     },
     {
       region: 'britain-ireland',
       title: 'GB & Ireland',
-      emoji: '🇬🇧',
+      emoji: '',
       topUser: getTopUserForRegion('britain-ireland')
     },
     {
       region: 'usa',
       title: 'USA',
-      emoji: '🇺🇸',
+      emoji: '',
       topUser: getTopUserForRegion('usa')
     },
     {
       region: 'europe',
       title: 'Continental Europe',
-      emoji: '🇪🇺',
+      emoji: '',
       topUser: getTopUserForRegion('europe')
     }
   ];
@@ -128,7 +128,7 @@ const CommunityLeaderboards = () => {
                 <CarouselItem key={leaderboard.region} className="pl-4 basis-1/2">
                   <LeaderboardCard
                     title={leaderboard.title}
-                    emoji={leaderboard.emoji}
+                    region={leaderboard.region}
                     subtitle="Most Played"
                     users={getMockData(leaderboard.region)}
                     onViewFullLeaderboard={() => handleViewFullLeaderboard(leaderboard.region)}
@@ -149,7 +149,7 @@ const CommunityLeaderboards = () => {
               <LeaderboardCard
                 key={leaderboard.region}
                 title={leaderboard.title}
-                emoji={leaderboard.emoji}
+                region={leaderboard.region}
                 subtitle="Most Played"
                 users={getMockData(leaderboard.region)}
                 onViewFullLeaderboard={() => handleViewFullLeaderboard(leaderboard.region)}
