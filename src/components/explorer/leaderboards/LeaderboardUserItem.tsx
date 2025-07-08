@@ -24,10 +24,13 @@ interface LeaderboardUserItemProps {
 
 const LeaderboardUserItem: React.FC<LeaderboardUserItemProps> = ({ user, rank }) => {
   const getBadgeForProgress = (coursesPlayed: number) => {
-    if (coursesPlayed >= 100) return { emoji: '💯', text: '100 Club', color: 'bg-yellow-500' };
-    if (coursesPlayed >= 75) return { emoji: '🥇', text: '75 Club', color: 'bg-yellow-400' };
-    if (coursesPlayed >= 50) return { emoji: '🥈', text: '50 Club', color: 'bg-gray-400' };
-    if (coursesPlayed >= 25) return { emoji: '🏅', text: '25 Club', color: 'bg-amber-600' };
+    if (coursesPlayed >= 400) return { emoji: '🏆', text: 'Clbhouz Global Finisher', color: 'bg-purple-600' };
+    if (coursesPlayed >= 300) return { emoji: '💎', text: '300 Club', color: 'bg-blue-600' };
+    if (coursesPlayed >= 200) return { emoji: '🥉', text: '200 Club', color: 'bg-orange-500' };
+    if (coursesPlayed >= 100) return { emoji: '🥇', text: 'Top 100 Finisher', color: 'bg-yellow-500' };
+    if (coursesPlayed >= 75) return { emoji: '🥈', text: '75 Club', color: 'bg-gray-400' };
+    if (coursesPlayed >= 50) return { emoji: '🏅', text: '50 Club', color: 'bg-yellow-400' };
+    if (coursesPlayed >= 20) return { emoji: '🎖️', text: '20 Club', color: 'bg-amber-600' };
     return null;
   };
 
