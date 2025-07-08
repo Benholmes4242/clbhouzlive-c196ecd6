@@ -139,7 +139,7 @@ const CommunityLeaderboards = () => {
                 if (isPlayed) regionProgress.global++;
               }
 
-              // Regional categories - based on primary country assignment
+              // Regional categories - based on primary country assignment (exact match to useTop100CoursesData)
               if (course.country === 'USA' && course.regional_rank && course.regional_rank <= 100) {
                 isAnyTop100 = true;
                 if (isPlayed) regionProgress.usa++;
@@ -151,11 +151,17 @@ const CommunityLeaderboards = () => {
                 if (isPlayed) regionProgress.europe++;
               }
 
-              // Count total unique Top 100 courses played (any list)
-              if (isAnyTop100 && isPlayed) {
-                totalTop100Played++;
-              }
             });
+
+            // Use the deduplicated unique courses count for total
+            totalTop100Played = uniqueCourses.filter(course => {
+              const gc = course.golf_courses;
+              return gc && (
+                (gc.regional_rank && gc.regional_rank <= 100) ||
+                (gc.usa_rank && gc.usa_rank <= 100) ||
+                (gc.global_rank && gc.global_rank <= 100)
+              );
+            }).length;
           }
 
           // Calculate average rating
