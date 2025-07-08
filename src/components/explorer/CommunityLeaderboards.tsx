@@ -3,6 +3,8 @@ import { Button } from '@/components/ui/button';
 import { SwipeCarousel } from '@/components/ui/swipe-carousel';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import { Earth } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 import LeaderboardCard from './leaderboards/LeaderboardCard';
 
 interface LeaderboardUser {
@@ -29,46 +31,166 @@ interface RegionalLeaderboard {
 const CommunityLeaderboards = () => {
   const [sortBy, setSortBy] = useState<'courses' | 'rating' | 'posts'>('courses');
 
-  // Mock data for all regions
-  const getMockData = (region: string): LeaderboardUser[] => {
-    const allUsers = [
-      { id: '1', name: 'James MacLeod', username: 'jamesmac_golf', avatar: null, country: 'Scotland', countryFlag: '🏴󠁧󠁢󠁳󠁣󠁴󠁿', coursesPlayed: 67, totalCourses: 100, avgRating: 9.2, mediaUploaded: 84, globalRank: 1 },
-      { id: '2', name: 'Sarah Williams', username: 'sarahgolf', avatar: null, country: 'England', countryFlag: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', coursesPlayed: 52, totalCourses: 100, avgRating: 8.9, mediaUploaded: 71, globalRank: 2 },
-      { id: '3', name: 'Michael Johnson', username: 'mikej_golf', avatar: null, country: 'United States', countryFlag: '🇺🇸', coursesPlayed: 48, totalCourses: 100, avgRating: 9.1, mediaUploaded: 65, globalRank: 3 },
-      { id: '4', name: 'Emma Thompson', username: 'emmagolf', avatar: null, country: 'Ireland', countryFlag: '🇮🇪', coursesPlayed: 41, totalCourses: 100, avgRating: 8.7, mediaUploaded: 58, globalRank: 4 },
-      { id: '5', name: 'David Chen', username: 'davidgolf', avatar: null, country: 'United States', countryFlag: '🇺🇸', coursesPlayed: 39, totalCourses: 100, avgRating: 9.0, mediaUploaded: 52, globalRank: 5 },
-      { id: '6', name: 'Sophie Martin', username: 'sophiegolf', avatar: null, country: 'France', countryFlag: '🇫🇷', coursesPlayed: 35, totalCourses: 100, avgRating: 8.8, mediaUploaded: 47, globalRank: 6 },
-      { id: '7', name: 'Thomas Anderson', username: 'tomgolf', avatar: null, country: 'Sweden', countryFlag: '🇸🇪', coursesPlayed: 33, totalCourses: 100, avgRating: 9.3, mediaUploaded: 44, globalRank: 7 },
-      { id: '8', name: 'Isabella Rodriguez', username: 'isagolf', avatar: null, country: 'Spain', countryFlag: '🇪🇸', coursesPlayed: 31, totalCourses: 100, avgRating: 8.6, mediaUploaded: 41, globalRank: 8 },
-      { id: '9', name: 'Robert Murphy', username: 'robgolf', avatar: null, country: 'Ireland', countryFlag: '🇮🇪', coursesPlayed: 29, totalCourses: 100, avgRating: 8.9, mediaUploaded: 38, globalRank: 9 },
-      { id: '10', name: 'Lisa Kim', username: 'lisakim', avatar: null, country: 'United States', countryFlag: '🇺🇸', coursesPlayed: 27, totalCourses: 100, avgRating: 9.2, mediaUploaded: 35, globalRank: 10 }
-    ];
+  // Get real leaderboard data from database
+  const { data: leaderboardData, isLoading } = useQuery({
+    queryKey: ['communityLeaderboards'],
+    queryFn: async () => {
+      // Get all users with their top 100 course progress
+      const { data: profiles, error: profilesError } = await supabase
+        .from('user_profiles')
+        .select(`
+          id,
+          display_name,
+          username,
+          profile_photo_url,
+          location
+        `)
+        .eq('is_public', true)
+        .not('username', 'is', null);
+
+      if (profilesError) throw profilesError;
+
+      // For each user, calculate their Top 100 course progress
+      const usersWithProgress = await Promise.all(
+        (profiles || []).map(async (profile) => {
+          // Get courses from user_top100_courses table
+          const { data: top100Data } = await supabase
+            .from('user_top100_courses')
+            .select(`
+              course_id,
+              golf_courses (
+                regional_rank,
+                usa_rank,
+                global_rank,
+                country
+              )
+            `)
+            .eq('user_id', profile.id)
+            .eq('played', true);
+
+          // Get courses from course_ratings table
+          const { data: ratingsData } = await supabase
+            .from('course_ratings')
+            .select(`
+              course_id,
+              rating,
+              golf_courses (
+                regional_rank,
+                usa_rank,
+                global_rank,
+                country
+              )
+            `)
+            .eq('user_id', profile.id);
+
+          // Get post count
+          const { count: postCount } = await supabase
+            .from('posts')
+            .select('*', { count: 'exact', head: true })
+            .eq('user_id', profile.id);
+
+          // Combine and deduplicate courses
+          const allCourses = [
+            ...(top100Data || []),
+            ...(ratingsData || [])
+          ];
+
+          const uniqueCourseIds = new Set();
+          const uniqueTop100Courses = allCourses.filter(course => {
+            const gc = course.golf_courses;
+            const isTop100 = gc && (
+              (gc.regional_rank && gc.regional_rank <= 100) ||
+              (gc.usa_rank && gc.usa_rank <= 100) ||
+              (gc.global_rank && gc.global_rank <= 100)
+            );
+            
+            if (isTop100 && !uniqueCourseIds.has(course.course_id)) {
+              uniqueCourseIds.add(course.course_id);
+              return true;
+            }
+            return false;
+          });
+
+          // Calculate average rating
+          const coursesWithRatings = ratingsData?.filter(c => c.rating) || [];
+          const avgRating = coursesWithRatings.length > 0 
+            ? coursesWithRatings.reduce((sum, c) => sum + c.rating, 0) / coursesWithRatings.length
+            : 0;
+
+          // Determine country/region from location or default
+          const getCountryFromLocation = (location: string | null) => {
+            if (!location) return 'Unknown';
+            const lower = location.toLowerCase();
+            if (lower.includes('scotland')) return 'Scotland';
+            if (lower.includes('england')) return 'England';
+            if (lower.includes('wales')) return 'Wales';
+            if (lower.includes('ireland')) return 'Ireland';
+            if (lower.includes('usa') || lower.includes('united states') || lower.includes('america')) return 'United States';
+            if (lower.includes('france')) return 'France';
+            if (lower.includes('spain')) return 'Spain';
+            if (lower.includes('germany')) return 'Germany';
+            if (lower.includes('italy')) return 'Italy';
+            if (lower.includes('sweden')) return 'Sweden';
+            if (lower.includes('norway')) return 'Norway';
+            if (lower.includes('denmark')) return 'Denmark';
+            if (lower.includes('netherlands')) return 'Netherlands';
+            return 'Unknown';
+          };
+
+          const country = getCountryFromLocation(profile.location);
+          const getCountryFlag = (country: string) => {
+            const flags: Record<string, string> = {
+              'Scotland': '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
+              'England': '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+              'Wales': '🏴󠁧󠁢󠁷󠁬󠁳󠁿',
+              'Ireland': '🇮🇪',
+              'United States': '🇺🇸',
+              'France': '🇫🇷',
+              'Spain': '🇪🇸',
+              'Germany': '🇩🇪',
+              'Italy': '🇮🇹',
+              'Sweden': '🇸🇪',
+              'Norway': '🇳🇴',
+              'Denmark': '🇩🇰',
+              'Netherlands': '🇳🇱'
+            };
+            return flags[country] || '🌍';
+          };
+
+          return {
+            id: profile.id,
+            name: profile.display_name || profile.username || 'Anonymous',
+            username: profile.username || '',
+            avatar: profile.profile_photo_url,
+            country,
+            countryFlag: getCountryFlag(country),
+            coursesPlayed: uniqueTop100Courses.length,
+            totalCourses: 100,
+            avgRating: Number(avgRating.toFixed(1)),
+            mediaUploaded: postCount || 0
+          };
+        })
+      );
+
+      // Filter out users with no Top 100 progress and sort by courses played
+      return usersWithProgress
+        .filter(user => user.coursesPlayed > 0)
+        .sort((a, b) => b.coursesPlayed - a.coursesPlayed)
+        .map((user, index) => ({ ...user, globalRank: index + 1 }));
+    },
+  });
+
+  const getRealDataForRegion = (region: string): LeaderboardUser[] => {
+    if (!leaderboardData) return [];
 
     const regionFilters = {
-      'global': allUsers,
-      'britain-ireland': allUsers.filter(u => ['Scotland', 'England', 'Wales', 'Ireland', 'Northern Ireland'].includes(u.country)),
-      'usa': allUsers.filter(u => u.country === 'United States'),
-      'europe': allUsers.filter(u => ['France', 'Spain', 'Germany', 'Italy', 'Netherlands', 'Sweden', 'Norway', 'Denmark'].includes(u.country))
+      'global': leaderboardData,
+      'britain-ireland': leaderboardData.filter(u => ['Scotland', 'England', 'Wales', 'Ireland', 'Northern Ireland'].includes(u.country)),
+      'usa': leaderboardData.filter(u => u.country === 'United States'),
+      'europe': leaderboardData.filter(u => ['France', 'Spain', 'Germany', 'Italy', 'Netherlands', 'Sweden', 'Norway', 'Denmark'].includes(u.country))
     };
 
     return regionFilters[region as keyof typeof regionFilters] || [];
-  };
-
-  const getTopUserForRegion = (region: RegionalLeaderboard['region']): LeaderboardUser => {
-    const users = getMockData(region);
-    return users[0] || {
-      id: 'default',
-      name: 'No Data',
-      username: 'nodata',
-      avatar: null,
-      country: 'Unknown',
-      countryFlag: '🌍',
-      coursesPlayed: 0,
-      totalCourses: 100,
-      avgRating: 0,
-      mediaUploaded: 0,
-      globalRank: 999
-    };
   };
 
   const regionalLeaderboards: RegionalLeaderboard[] = [
@@ -76,25 +198,73 @@ const CommunityLeaderboards = () => {
       region: 'global',
       title: 'Global',
       emoji: '',
-      topUser: getTopUserForRegion('global')
+      topUser: getRealDataForRegion('global')[0] || {
+        id: 'default',
+        name: 'No Data',
+        username: 'nodata',
+        avatar: null,
+        country: 'Unknown',
+        countryFlag: '🌍',
+        coursesPlayed: 0,
+        totalCourses: 100,
+        avgRating: 0,
+        mediaUploaded: 0,
+        globalRank: 999
+      }
     },
     {
       region: 'britain-ireland',
       title: 'Britain & Ireland',
       emoji: '',
-      topUser: getTopUserForRegion('britain-ireland')
+      topUser: getRealDataForRegion('britain-ireland')[0] || {
+        id: 'default',
+        name: 'No Data',
+        username: 'nodata',
+        avatar: null,
+        country: 'Unknown',
+        countryFlag: '🌍',
+        coursesPlayed: 0,
+        totalCourses: 100,
+        avgRating: 0,
+        mediaUploaded: 0,
+        globalRank: 999
+      }
     },
     {
       region: 'usa',
       title: 'USA',
       emoji: '',
-      topUser: getTopUserForRegion('usa')
+      topUser: getRealDataForRegion('usa')[0] || {
+        id: 'default',
+        name: 'No Data',
+        username: 'nodata',
+        avatar: null,
+        country: 'Unknown',
+        countryFlag: '🌍',
+        coursesPlayed: 0,
+        totalCourses: 100,
+        avgRating: 0,
+        mediaUploaded: 0,
+        globalRank: 999
+      }
     },
     {
       region: 'europe',
       title: 'Continental Europe',
       emoji: '',
-      topUser: getTopUserForRegion('europe')
+      topUser: getRealDataForRegion('europe')[0] || {
+        id: 'default',
+        name: 'No Data',
+        username: 'nodata',
+        avatar: null,
+        country: 'Unknown',
+        countryFlag: '🌍',
+        coursesPlayed: 0,
+        totalCourses: 100,
+        avgRating: 0,
+        mediaUploaded: 0,
+        globalRank: 999
+      }
     }
   ];
 
@@ -126,7 +296,7 @@ const CommunityLeaderboards = () => {
                     title={leaderboard.title}
                     region={leaderboard.region}
                     subtitle="Most Played"
-                    users={getMockData(leaderboard.region)}
+                    users={getRealDataForRegion(leaderboard.region)}
                     onViewFullLeaderboard={() => handleViewFullLeaderboard(leaderboard.region)}
                     isGlobal={leaderboard.region === 'global'}
                   />
@@ -147,7 +317,7 @@ const CommunityLeaderboards = () => {
                 title={leaderboard.title}
                 region={leaderboard.region}
                 subtitle="Most Played"
-                users={getMockData(leaderboard.region)}
+                users={getRealDataForRegion(leaderboard.region)}
                 onViewFullLeaderboard={() => handleViewFullLeaderboard(leaderboard.region)}
                 isGlobal={leaderboard.region === 'global'}
               />
