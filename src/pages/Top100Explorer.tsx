@@ -13,7 +13,7 @@ const Top100Explorer = () => {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-6">
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Top 100 Explorer</h1>
-            <p className="text-gray-600">Discover Top 100 Courses Played by the Clbhouz Community</p>
+            <p className="text-gray-600">Follow the Clbhouz Community Through the World's Top 100 Courses</p>
           </div>
           
           <Top100ExplorerContent />
