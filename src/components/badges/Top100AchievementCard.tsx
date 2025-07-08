@@ -42,29 +42,33 @@ const Top100AchievementCard: React.FC<Top100AchievementCardProps> = ({ achieveme
 
       {/* Badge Content */}
       <div className="flex-1 min-w-0">
-        <h3
-          className={cn(
-            "font-semibold text-base leading-tight",
-            isEarned ? "text-orange-900" : "text-foreground"
-          )}
-        >
-          {title}
-        </h3>
-        <p
-          className={cn(
-            "text-xs",
-            isEarned ? "text-orange-700" : "text-muted-foreground"
-          )}
-        >
-          {requirement}
-        </p>
-        {isEarned && (
-          <div className="flex items-center justify-center mt-1">
-            <span className="text-xs font-medium text-orange-800 bg-orange-100 px-2 py-0.5 rounded-full">
-              ✓ Earned!
-            </span>
+        <div className="flex items-center justify-between">
+          <div className="flex-1">
+            <h3
+              className={cn(
+                "font-semibold text-base leading-tight",
+                isEarned ? "text-orange-900" : "text-foreground"
+              )}
+            >
+              {title}
+            </h3>
+            <p
+              className={cn(
+                "text-xs",
+                isEarned ? "text-orange-700" : "text-muted-foreground"
+              )}
+            >
+              {requirement}
+            </p>
           </div>
-        )}
+          {isEarned && (
+            <div className="flex items-center justify-center ml-2">
+              <span className="text-xs font-medium text-orange-800 bg-orange-100 px-2 py-0.5 rounded-full">
+                ✓ Earned!
+              </span>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Progress Indicator */}
