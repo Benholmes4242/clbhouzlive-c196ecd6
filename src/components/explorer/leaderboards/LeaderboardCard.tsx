@@ -46,8 +46,8 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
     
     const flagMappings: Record<string, string> = {
       'britain-ireland': 'United Kingdom',
-      'usa': 'United States',
-      'europe': 'European Union'
+      'usa': 'USA',
+      'europe': 'Continental Europe'
     };
     
     const country = flagMappings[region] || region;
