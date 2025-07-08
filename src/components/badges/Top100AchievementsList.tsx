@@ -28,7 +28,7 @@ const Top100AchievementsList: React.FC<Top100AchievementsListProps> = ({
   const [showAll, setShowAll] = useState(showAllInitially);
   const { badgeProgress, isLoading } = useBadges(userId);
 
-  // Get real user's Top 100 course progress
+  // Get real user's Top 100 course progress across all regional lists
   const { data: userProgress = 0 } = useQuery({
     queryKey: ['userTop100Progress', userId],
     queryFn: async () => {
@@ -36,7 +36,14 @@ const Top100AchievementsList: React.FC<Top100AchievementsListProps> = ({
       
       const { data, error } = await supabase
         .from('user_top100_courses')
-        .select('course_id', { count: 'exact' })
+        .select(`
+          course_id,
+          golf_courses (
+            regional_rank,
+            usa_rank,
+            global_rank
+          )
+        `)
         .eq('user_id', userId)
         .eq('played', true);
       
@@ -45,7 +52,18 @@ const Top100AchievementsList: React.FC<Top100AchievementsListProps> = ({
         return 0;
       }
       
-      return data?.length || 0;
+      // Count courses that have any ranking in the Top 100 lists
+      const uniqueTop100Courses = data?.filter(course => {
+        const gc = course.golf_courses;
+        return gc && (
+          (gc.regional_rank && gc.regional_rank <= 100) ||
+          (gc.usa_rank && gc.usa_rank <= 100) ||
+          (gc.global_rank && gc.global_rank <= 100)
+        );
+      }) || [];
+      
+      console.log('User Top 100 courses found:', uniqueTop100Courses.length);
+      return uniqueTop100Courses.length;
     },
     enabled: !!userId,
   });
