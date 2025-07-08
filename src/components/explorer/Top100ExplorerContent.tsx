@@ -42,9 +42,6 @@ const Top100ExplorerContent = () => {
         />
       </div>
 
-      {/* Featured Media Section */}
-      <FeaturedMoment />
-
       {/* Community Top 100 Leaderboards */}
       <CommunityLeaderboards />
 
