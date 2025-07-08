@@ -122,7 +122,8 @@ const CourseDetailPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-20">
+    <div className="min-h-screen bg-background pb-20 w-full">
+      <div className="w-full mx-auto">{/* Ensure full width and centering */}
       {/* Hero Banner */}
       <div className="course-hero-container relative overflow-hidden">
         <div className="course-hero-wrapper">
@@ -280,6 +281,7 @@ const CourseDetailPage = () => {
         onClose={() => setShowAddToPlayedModal(false)}
         onSuccess={handlePlayedSuccess}
       />
+      </div> {/* Close the full width wrapper */}
     </div>
   );
 };
