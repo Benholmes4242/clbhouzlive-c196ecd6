@@ -123,15 +123,23 @@ const BadgeDisplay: React.FC<BadgeDisplayProps> = ({
 
         {/* Badge Text */}
         <div className="flex-1 min-w-0">
-          <div className="font-semibold text-sm truncate">
-            {badge.display_name}
-          </div>
-          {isEarned && (
-            <div className="flex items-center gap-1 text-xs opacity-90">
-              <Check className="w-3 h-3" />
-              Earned!
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <div className="font-semibold text-sm truncate">
+                {badge.display_name}
+              </div>
             </div>
-          )}
+            {isEarned && (
+              <div className="flex items-center justify-center ml-2">
+                <span className="text-xs font-medium text-orange-800 bg-orange-100 px-2 py-0.5 rounded-full">
+                  ✓ Earned!
+                </span>
+              </div>
+            )}
+          </div>
+          <p className="text-xs text-muted-foreground">
+            {badge.description}
+          </p>
         </div>
 
         {/* Progress Display */}

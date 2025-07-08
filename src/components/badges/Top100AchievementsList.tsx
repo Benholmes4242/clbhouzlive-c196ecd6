@@ -2,6 +2,8 @@ import React, { useState, useMemo } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import Top100AchievementCard from './Top100AchievementCard';
 import { useBadges } from '@/hooks/useBadges';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Top100Achievement {
   id: string;
@@ -26,13 +28,27 @@ const Top100AchievementsList: React.FC<Top100AchievementsListProps> = ({
   const [showAll, setShowAll] = useState(showAllInitially);
   const { badgeProgress, isLoading } = useBadges(userId);
 
-  // Mock function to get user's Top 100 course progress - replace with actual data
-  const getUserTop100Progress = () => {
-    // This should be replaced with actual user data
-    return 35; // Example: user has played 35 Top 100 courses
-  };
-
-  const userProgress = getUserTop100Progress();
+  // Get real user's Top 100 course progress
+  const { data: userProgress = 0 } = useQuery({
+    queryKey: ['userTop100Progress', userId],
+    queryFn: async () => {
+      if (!userId) return 0;
+      
+      const { data, error } = await supabase
+        .from('user_top100_courses')
+        .select('course_id', { count: 'exact' })
+        .eq('user_id', userId)
+        .eq('played', true);
+      
+      if (error) {
+        console.error('Error fetching user Top 100 progress:', error);
+        return 0;
+      }
+      
+      return data?.length || 0;
+    },
+    enabled: !!userId,
+  });
 
   const achievements: Top100Achievement[] = useMemo(() => [
     {
