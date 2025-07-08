@@ -19,6 +19,12 @@ interface LeaderboardUser {
   avgRating: number;
   mediaUploaded: number;
   globalRank?: number;
+  regionProgress?: {
+    'britain-ireland': number;
+    'usa': number;
+    'europe': number;
+    'global': number;
+  };
 }
 
 interface RegionalLeaderboard {
@@ -50,7 +56,7 @@ const CommunityLeaderboards = () => {
 
       if (profilesError) throw profilesError;
 
-      // For each user, calculate their Top 100 course progress
+      // For each user, calculate their Top 100 course progress using the same logic as profile pages
       const usersWithProgress = await Promise.all(
         (profiles || []).map(async (profile) => {
           // Get courses from user_top100_courses table
@@ -59,10 +65,14 @@ const CommunityLeaderboards = () => {
             .select(`
               course_id,
               golf_courses (
-                regional_rank,
-                usa_rank,
+                id,
+                name,
+                country,
+                region,
+                continent,
                 global_rank,
-                country
+                regional_rank,
+                usa_rank
               )
             `)
             .eq('user_id', profile.id)
@@ -75,10 +85,14 @@ const CommunityLeaderboards = () => {
               course_id,
               rating,
               golf_courses (
-                regional_rank,
-                usa_rank,
+                id,
+                name,
+                country,
+                region,
+                continent,
                 global_rank,
-                country
+                regional_rank,
+                usa_rank
               )
             `)
             .eq('user_id', profile.id);
@@ -89,27 +103,60 @@ const CommunityLeaderboards = () => {
             .select('*', { count: 'exact', head: true })
             .eq('user_id', profile.id);
 
-          // Combine and deduplicate courses
-          const allCourses = [
-            ...(top100Data || []),
-            ...(ratingsData || [])
-          ];
+          // Combine both datasets and remove duplicates (same logic as useTop100CoursesData)
+          const allPlayedCourses = [...(top100Data || []), ...(ratingsData || [])];
+          const uniqueCourses = allPlayedCourses.filter((course, index, self) => 
+            index === self.findIndex(c => c.course_id === course.course_id)
+          );
 
-          const uniqueCourseIds = new Set();
-          const uniqueTop100Courses = allCourses.filter(course => {
-            const gc = course.golf_courses;
-            const isTop100 = gc && (
-              (gc.regional_rank && gc.regional_rank <= 100) ||
-              (gc.usa_rank && gc.usa_rank <= 100) ||
-              (gc.global_rank && gc.global_rank <= 100)
-            );
-            
-            if (isTop100 && !uniqueCourseIds.has(course.course_id)) {
-              uniqueCourseIds.add(course.course_id);
-              return true;
-            }
-            return false;
-          });
+          // Calculate regional progress using the same logic as the profile page
+          const playedCourseIds = new Set(uniqueCourses.map(pc => pc.course_id));
+          
+          let totalTop100Played = 0;
+          const regionProgress = {
+            'britain-ireland': 0,
+            'usa': 0,
+            'europe': 0,
+            'global': 0
+          };
+
+          // Get all Top 100 courses to properly calculate regional progress
+          const { data: allCoursesData } = await supabase
+            .from('golf_courses')
+            .select('id, continent, country, region, global_rank, regional_rank, usa_rank')
+            .or('global_rank.not.is.null,regional_rank.not.is.null');
+
+          if (allCoursesData) {
+            allCoursesData.forEach(course => {
+              const isPlayed = playedCourseIds.has(course.id);
+              
+              // Track if this is any kind of Top 100 course
+              let isAnyTop100 = false;
+              
+              // Global category includes all courses with global ranks (1-100)
+              if (course.global_rank && course.global_rank <= 100) {
+                isAnyTop100 = true;
+                if (isPlayed) regionProgress.global++;
+              }
+
+              // Regional categories - based on primary country assignment
+              if (course.country === 'USA' && course.regional_rank && course.regional_rank <= 100) {
+                isAnyTop100 = true;
+                if (isPlayed) regionProgress.usa++;
+              } else if (course.country === 'Britain & Ireland' && course.regional_rank && course.regional_rank <= 100) {
+                isAnyTop100 = true;
+                if (isPlayed) regionProgress['britain-ireland']++;
+              } else if (course.country === 'Continental Europe' && course.regional_rank && course.regional_rank <= 100) {
+                isAnyTop100 = true;
+                if (isPlayed) regionProgress.europe++;
+              }
+
+              // Count total unique Top 100 courses played (any list)
+              if (isAnyTop100 && isPlayed) {
+                totalTop100Played++;
+              }
+            });
+          }
 
           // Calculate average rating
           const coursesWithRatings = ratingsData?.filter(c => c.rating) || [];
@@ -164,10 +211,11 @@ const CommunityLeaderboards = () => {
             avatar: profile.profile_photo_url,
             country,
             countryFlag: getCountryFlag(country),
-            coursesPlayed: uniqueTop100Courses.length,
+            coursesPlayed: totalTop100Played, // Use deduplicated total across all lists
             totalCourses: 100,
             avgRating: Number(avgRating.toFixed(1)),
-            mediaUploaded: postCount || 0
+            mediaUploaded: postCount || 0,
+            regionProgress // Store regional breakdown for filtering
           };
         })
       );
@@ -183,14 +231,26 @@ const CommunityLeaderboards = () => {
   const getRealDataForRegion = (region: string): LeaderboardUser[] => {
     if (!leaderboardData) return [];
 
-    const regionFilters = {
-      'global': leaderboardData,
-      'britain-ireland': leaderboardData.filter(u => ['Scotland', 'England', 'Wales', 'Ireland', 'Northern Ireland'].includes(u.country)),
-      'usa': leaderboardData.filter(u => u.country === 'United States'),
-      'europe': leaderboardData.filter(u => ['France', 'Spain', 'Germany', 'Italy', 'Netherlands', 'Sweden', 'Norway', 'Denmark'].includes(u.country))
-    };
-
-    return regionFilters[region as keyof typeof regionFilters] || [];
+    // For regional leaderboards, sort by that region's specific progress
+    if (region === 'global') {
+      return leaderboardData.sort((a, b) => b.coursesPlayed - a.coursesPlayed);
+    }
+    
+    // Filter users who have played courses in the specific region and sort by regional progress
+    return leaderboardData
+      .filter(user => {
+        if (!user.regionProgress) return false;
+        const regionKey = region === 'britain-ireland' ? 'britain-ireland' : region;
+        return user.regionProgress[regionKey] > 0;
+      })
+      .sort((a, b) => {
+        const regionKey = region === 'britain-ireland' ? 'britain-ireland' : region;
+        return (b.regionProgress?.[regionKey] || 0) - (a.regionProgress?.[regionKey] || 0);
+      })
+      .map((user, index) => ({
+        ...user,
+        coursesPlayed: user.regionProgress?.[region === 'britain-ireland' ? 'britain-ireland' : region] || 0
+      }));
   };
 
   const regionalLeaderboards: RegionalLeaderboard[] = [
