@@ -41,7 +41,7 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
 
   const getFlagComponent = () => {
     if (isGlobal) {
-      return <Earth className="h-6 w-6 text-primary" />;
+      return <Earth className="h-6 w-6 text-gray-600" />;
     }
     
     const flagMappings: Record<string, string> = {
