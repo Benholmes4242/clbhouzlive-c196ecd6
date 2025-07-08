@@ -4,6 +4,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Trophy, Target, Users, Star } from 'lucide-react';
 import BadgeDisplay from './BadgeDisplay';
+import Top100AchievementsList from './Top100AchievementsList';
 import { useBadges } from '@/hooks/useBadges';
 import { Badge as BadgeType } from '@/types/badges';
 
@@ -124,19 +125,10 @@ const BadgeCarousel: React.FC<BadgeCarouselProps> = ({
           </TabsContent>
 
           <TabsContent value="top100" className="mt-6">
-            <div className="space-y-3">
-              {top100Badges.map((badgeProgress) => (
-                <div key={badgeProgress.badge.id} className="w-full">
-                  <BadgeDisplay
-                    badge={badgeProgress.badge}
-                    isEarned={badgeProgress.is_earned}
-                    progress={badgeProgress.current_progress}
-                    showProgress={!showOnlyEarned}
-                    size="md"
-                  />
-                </div>
-              ))}
-            </div>
+            <Top100AchievementsList 
+              userId={userId}
+              showAllInitially={showOnlyEarned}
+            />
           </TabsContent>
 
         </Tabs>
