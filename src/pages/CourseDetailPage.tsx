@@ -124,8 +124,8 @@ const CourseDetailPage = () => {
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* Hero Banner */}
-      <div className="hero-container relative overflow-hidden">
-        <div className="max-w-6xl mx-auto">
+      <div className="course-hero-container relative overflow-hidden">
+        <div className="course-hero-wrapper">
           <img
             src={course.thumbnail_image || 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&h=600&fit=crop'}
             srcSet={course.thumbnail_image ? `
@@ -137,10 +137,13 @@ const CourseDetailPage = () => {
               https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&h=600&fit=crop 1200w,
               https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1920&h=960&fit=crop 1920w
             `}
-            sizes="(max-width: 768px) 100vw, (min-width: 769px) 1200px"
+            sizes="(max-width: 768px) 100vw, 1200px"
             alt={course.name}
             loading="eager"
-            className="course-hero-image w-full h-96 object-cover rounded-b-lg"
+            className="course-hero-image w-full h-full object-cover"
+            onLoad={(e) => {
+              e.currentTarget.classList.add('loaded');
+            }}
             onError={(e) => {
               e.currentTarget.src = 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&h=600&fit=crop';
               e.currentTarget.srcset = `
@@ -209,7 +212,7 @@ const CourseDetailPage = () => {
 
       {/* White Section Below Image */}
       <div className="bg-background p-4">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
+        <div className="course-hero-wrapper flex items-center justify-between">
           {/* Community Vote Score - Left */}
           <div className="flex items-center gap-2">
             <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
@@ -237,7 +240,7 @@ const CourseDetailPage = () => {
 
       {/* Sticky Tab Navigation */}
       <div className="sticky top-0 z-40 bg-background border-b">
-        <div className="max-w-6xl mx-auto">
+        <div className="course-hero-wrapper">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid w-full grid-cols-4 h-12">
               <TabsTrigger value="about" className="text-base">About</TabsTrigger>
@@ -250,7 +253,7 @@ const CourseDetailPage = () => {
       </div>
 
       {/* Tab Content */}
-      <div className="max-w-6xl mx-auto p-6">
+      <div className="course-hero-wrapper p-6">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsContent value="about" className="mt-0">
             <CourseAboutTab course={course} />

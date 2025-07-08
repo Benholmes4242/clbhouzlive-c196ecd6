@@ -170,31 +170,49 @@
   transform: translateY(1px);
 }
 
-/* Hero Image Container and Responsive Image Styles */
-.hero-container {
-  aspect-ratio: 16 / 9;
-  min-height: 24rem; /* 384px - matches h-96 */
-  max-height: 28rem; /* 448px - slightly larger for desktop */
-  position: relative;
-}
-
-.course-hero-image {
-  width: 100%;
+/* Shared Course Hero Wrapper for Perfect Alignment */
+.course-hero-wrapper {
   max-width: 1200px;
   margin: 0 auto;
+  padding: 0 16px;
+}
+
+/* Hero Image Container with Responsive Aspect Ratios */
+.course-hero-container {
+  aspect-ratio: 16 / 9;
+  min-height: 24rem; /* 384px */
+  max-height: 32rem; /* 512px */
+  position: relative;
+  overflow: hidden;
+}
+
+/* Course Hero Image with Fade-in Animation */
+.course-hero-image {
+  width: 100%;
+  height: 100%;
   display: block;
-  border-radius: 0 0 6px 6px;
+  border-radius: 8px;
+  opacity: 0;
+  transition: opacity 0.3s ease-in;
   image-rendering: -webkit-optimize-contrast;
   image-rendering: crisp-edges;
   image-rendering: optimize-contrast;
   backface-visibility: hidden;
   transform: translateZ(0);
-  will-change: transform;
+  will-change: transform, opacity;
+}
+
+.course-hero-image.loaded {
+  opacity: 1;
 }
 
 /* Mobile optimization for hero images */
 @media (max-width: 768px) {
-  .hero-container {
+  .course-hero-wrapper {
+    padding: 0 8px;
+  }
+  
+  .course-hero-container {
     aspect-ratio: 4 / 3;
     min-height: 20rem;
     max-height: 24rem;
@@ -205,10 +223,25 @@
   }
 }
 
+/* Tablet optimization */
+@media (min-width: 769px) and (max-width: 1023px) {
+  .course-hero-container {
+    aspect-ratio: 16 / 9;
+    max-height: 28rem;
+  }
+}
+
 /* Desktop optimization for hero images */
-@media (min-width: 1200px) {
-  .hero-container {
-    aspect-ratio: 21 / 9; /* Wider aspect ratio for desktop */
+@media (min-width: 1024px) {
+  .course-hero-container {
+    aspect-ratio: 21 / 9; /* Wider cinematic ratio for desktop */
     max-height: 32rem; /* 512px */
+  }
+}
+
+/* Large desktop optimization */
+@media (min-width: 1440px) {
+  .course-hero-wrapper {
+    max-width: 1200px; /* Keep consistent with content width */
   }
 }
