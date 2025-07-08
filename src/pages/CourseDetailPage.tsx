@@ -202,17 +202,10 @@ const CourseDetailPage = () => {
 
           {/* Add to Played Button - Bottom Right */}
           {user && (
-            <div className="absolute bottom-6 right-6 z-20">
-              <Button
-                onClick={handleAddToPlayed}
-                className="bg-white/20 hover:bg-white/30 backdrop-blur-sm border-0 text-white font-medium px-4 py-2 rounded-full transition-all duration-200 flex items-center gap-2"
-              >
-                <div className="w-4 h-4 rounded-full border-2 border-white flex items-center justify-center">
-                  {isPlayed && <div className="w-2 h-2 bg-white rounded-full" />}
-                </div>
-                {isPlayed ? 'Played' : 'Add to Played'}
-              </Button>
-            </div>
+            <CoursePlayedButton 
+              isPlayed={isPlayed}
+              onAddToPlayed={handleAddToPlayed}
+            />
           )}
         </div>
       </div>
