@@ -154,3 +154,18 @@
   outline: none !important;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 0 2px rgba(245, 166, 35, 0.3) !important;
 }
+
+/* Add to Played Button Styles */
+.add-to-played-btn {
+  transition: all 0.2s ease-in-out;
+}
+
+.add-to-played-btn:hover {
+  background-color: hsl(220 14.3% 95.9%) !important;
+  color: hsl(220.9 39.3% 11%) !important;
+}
+
+.add-to-played-btn:active {
+  background-color: hsl(220 14.3% 91%) !important;
+  transform: translateY(1px);
+}

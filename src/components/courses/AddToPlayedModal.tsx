@@ -186,9 +186,9 @@ const AddToPlayedModal = ({ course, isOpen, onClose, onSuccess }: AddToPlayedMod
                 max={10}
                 min={0}
                 step={0.5}
-                className="w-full"
+                className="w-full review-rating-slider"
               />
-              <div className="text-center text-2xl font-bold text-primary">
+              <div className="text-center text-2xl font-bold" style={{ color: '#F5A623' }}>
                 {rating[0]}/10
               </div>
             </div>
@@ -251,7 +251,7 @@ const AddToPlayedModal = ({ course, isOpen, onClose, onSuccess }: AddToPlayedMod
           {/* Submit Button */}
           <Button 
             onClick={handleSubmit} 
-            className="w-full"
+            className="w-full add-to-played-btn"
             disabled={isSubmitting}
           >
             {isSubmitting ? 'Adding Course...' : 'Add to Played'}
