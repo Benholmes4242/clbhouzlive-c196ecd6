@@ -28,13 +28,14 @@ const Top100AchievementsList: React.FC<Top100AchievementsListProps> = ({
   const [showAll, setShowAll] = useState(showAllInitially);
   const { badgeProgress, isLoading } = useBadges(userId);
 
-  // Get real user's Top 100 course progress across all regional lists
+  // Get real user's Top 100 course progress across all regional lists from both tables
   const { data: userProgress = 0 } = useQuery({
     queryKey: ['userTop100Progress', userId],
     queryFn: async () => {
       if (!userId) return 0;
       
-      const { data, error } = await supabase
+      // Get courses from user_top100_courses table
+      const { data: top100Data, error: top100Error } = await supabase
         .from('user_top100_courses')
         .select(`
           course_id,
@@ -47,20 +48,49 @@ const Top100AchievementsList: React.FC<Top100AchievementsListProps> = ({
         .eq('user_id', userId)
         .eq('played', true);
       
-      if (error) {
-        console.error('Error fetching user Top 100 progress:', error);
-        return 0;
+      if (top100Error) {
+        console.error('Error fetching user_top100_courses:', top100Error);
       }
       
-      // Count courses that have any ranking in the Top 100 lists
-      const uniqueTop100Courses = data?.filter(course => {
+      // Get courses from course_ratings table
+      const { data: ratingsData, error: ratingsError } = await supabase
+        .from('course_ratings')
+        .select(`
+          course_id,
+          golf_courses (
+            regional_rank,
+            usa_rank,
+            global_rank
+          )
+        `)
+        .eq('user_id', userId);
+      
+      if (ratingsError) {
+        console.error('Error fetching course_ratings:', ratingsError);
+      }
+      
+      // Combine all courses and filter for Top 100
+      const allCourses = [
+        ...(top100Data || []),
+        ...(ratingsData || [])
+      ];
+      
+      // Get unique course IDs and filter for Top 100 ranked courses
+      const uniqueCourseIds = new Set();
+      const uniqueTop100Courses = allCourses.filter(course => {
         const gc = course.golf_courses;
-        return gc && (
+        const isTop100 = gc && (
           (gc.regional_rank && gc.regional_rank <= 100) ||
           (gc.usa_rank && gc.usa_rank <= 100) ||
           (gc.global_rank && gc.global_rank <= 100)
         );
-      }) || [];
+        
+        if (isTop100 && !uniqueCourseIds.has(course.course_id)) {
+          uniqueCourseIds.add(course.course_id);
+          return true;
+        }
+        return false;
+      });
       
       console.log('User Top 100 courses found:', uniqueTop100Courses.length);
       return uniqueTop100Courses.length;
