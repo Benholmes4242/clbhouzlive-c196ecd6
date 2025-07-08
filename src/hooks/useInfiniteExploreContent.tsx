@@ -4,7 +4,7 @@ import { ExploreContentItem } from '@/components/explore/types';
 import { useRealPostsFetcher } from './explore/useRealPostsFetcher';
 import { useMockPostsHandler } from './explore/useMockPostsHandler';
 
-const POSTS_PER_PAGE = 9;
+const POSTS_PER_PAGE = 6; // Reduced for faster loading on mobile
 
 export const useInfiniteExploreContent = () => {
   const [content, setContent] = useState<ExploreContentItem[]>([]);
@@ -18,17 +18,13 @@ export const useInfiniteExploreContent = () => {
 
   const loadMore = useCallback(async () => {
     if (loading || !hasMore) {
-      console.log('Skipping load more - loading:', loading, 'hasMore:', hasMore);
       return;
     }
-
-    console.log('Loading more content...');
     setLoading(true);
 
     try {
       // Try to fetch real posts first
       const realPosts = await fetchRealPosts(currentOffset, POSTS_PER_PAGE);
-      console.log('Real posts fetched:', realPosts.length);
       
       if (realPosts.length > 0) {
         setContent(prev => [...prev, ...realPosts]);
@@ -36,19 +32,16 @@ export const useInfiniteExploreContent = () => {
         
         // If we got fewer posts than requested, we might be at the end
         if (realPosts.length < POSTS_PER_PAGE) {
-          console.log('Reached end of real posts, switching to mock data');
           setHasMore(true); // Keep loading mock data
         }
       } else {
         // Fallback to mock data
-        console.log('No real posts, falling back to mock data');
         const mockPosts = getMockPosts(currentMockOffset, POSTS_PER_PAGE);
         
         if (mockPosts.length > 0) {
           setContent(prev => [...prev, ...mockPosts]);
           setCurrentMockOffset(prev => prev + POSTS_PER_PAGE);
         } else {
-          console.log('No more mock posts available');
           setHasMore(false);
         }
       }
@@ -71,7 +64,6 @@ export const useInfiniteExploreContent = () => {
   // Initial load
   useEffect(() => {
     if (content.length === 0 && !loading) {
-      console.log('Initial content load');
       loadMore();
     }
   }, []);

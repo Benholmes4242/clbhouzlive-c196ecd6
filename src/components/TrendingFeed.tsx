@@ -31,7 +31,7 @@ const TrendingFeed = () => {
         .from('user_follows')
         .select('following_id')
         .eq('follower_id', user.id)
-        .limit(20);
+        .limit(10); // Reduced for performance
 
       // Get users that are friends (accepted status, limit for performance)
       const { data: friends } = await supabase
@@ -39,7 +39,7 @@ const TrendingFeed = () => {
         .select('user_id, friend_id')
         .or(`user_id.eq.${user.id},friend_id.eq.${user.id}`)
         .eq('status', 'accepted')
-        .limit(20);
+        .limit(10); // Reduced for performance
 
       // Combine followed users and friends
       const followedUserIds = follows?.map(f => f.following_id) || [];
@@ -62,7 +62,7 @@ const TrendingFeed = () => {
         `)
         .in('user_id', allConnectedUserIds)
         .order('created_at', { ascending: false })
-        .limit(10);
+        .limit(5); // Reduced for faster mobile loading
 
       if (postsError) {
         console.error('Error fetching followed posts:', postsError);
@@ -101,7 +101,7 @@ const TrendingFeed = () => {
           )
         `)
         .in('post_id', posts.map(p => p.id))
-        .limit(50); // Limit to improve performance
+        .limit(20); // Reduced for better performance
 
       postTags = tags || [];
 
@@ -139,8 +139,9 @@ const TrendingFeed = () => {
       return formattedPosts;
     },
     enabled: !!user?.id,
-    staleTime: 300000, // Consider data fresh for 5 minutes
+    staleTime: 600000, // Consider data fresh for 10 minutes
     refetchInterval: false, // Disable auto-refetch for performance
+    gcTime: 300000, // Cache for 5 minutes after component unmount
   });
 
   // Listen for feed refresh events

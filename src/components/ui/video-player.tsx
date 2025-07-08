@@ -64,7 +64,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     video.loop = loop;
     video.playsInline = true; // Critical for mobile autoplay
     video.setAttribute('playsinline', 'true'); // iOS compatibility
-    video.preload = 'metadata'; // Preload metadata for faster start
+    video.preload = 'none'; // Don't preload for mobile performance
 
     const handlePlay = () => {
       setIsPlaying(true);
@@ -185,7 +185,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         playsInline
         muted={muted}
         loop={loop}
-        preload="metadata"
+        preload="none"
         webkit-playsinline="true"
         x5-playsinline="true"
         onClick={handleVideoClick}

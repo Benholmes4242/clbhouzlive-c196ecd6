@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { memo } from 'react';
 import { ExploreContentItem } from './types';
 import ExploreContentCard from './ExploreContentCard';
 
@@ -52,7 +52,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     return (
       <div className="space-y-4">
         <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 md:gap-4">
-          {[...Array(15)].map((_, i) => (
+          {[...Array(6)].map((_, i) => (
             <div key={i} className="aspect-square bg-muted rounded-lg animate-pulse" />
           ))}
         </div>
@@ -102,4 +102,4 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
   );
 };
 
-export default ExploreGrid;
+export default memo(ExploreGrid);

@@ -6,8 +6,7 @@ import { isValidImageUrl } from './urlValidation';
 export const useRealPostsFetcher = () => {
   const fetchRealPosts = async (currentOffset: number, postsPerPage: number): Promise<ExploreContentItem[]> => {
     try {
-      console.log('=== EXPLORE FETCH DEBUG ===');
-      console.log('Fetching real posts from offset:', currentOffset);
+      // Removed debug logs for performance
       
       const { data: postsData, error } = await supabase
         .from('posts')
@@ -33,7 +32,8 @@ export const useRealPostsFetcher = () => {
           )
         `)
         .order('created_at', { ascending: false })
-        .range(currentOffset, currentOffset + postsPerPage - 1);
+        .range(currentOffset, currentOffset + postsPerPage - 1)
+        .limit(postsPerPage); // Add explicit limit for performance
 
       if (error) {
         console.error('Error fetching posts:', error);
@@ -41,11 +41,8 @@ export const useRealPostsFetcher = () => {
       }
 
       if (!postsData || postsData.length === 0) {
-        console.log('No posts data returned');
         return [];
       }
-
-      console.log('Raw posts data:', postsData);
 
       // Get unique user IDs
       const userIds = [...new Set(postsData.map(post => post.user_id))];
@@ -61,7 +58,7 @@ export const useRealPostsFetcher = () => {
         return [];
       }
 
-      console.log('User profiles:', profiles);
+      // Performance: removed logging
 
       // Get golf course data for tagged courses
       const golfCourseIds = postsData
@@ -70,8 +67,7 @@ export const useRealPostsFetcher = () => {
         .map(tag => tag.taggable_entities?.entity_id)
         .filter(Boolean);
 
-      console.log('Golf course IDs found:', golfCourseIds);
-      console.log('Post tags data:', postsData.map(p => ({ id: p.id, tags: p.post_tags })));
+      // Performance: removed logging
 
       let golfCourses: any[] = [];
       if (golfCourseIds.length > 0) {
@@ -81,7 +77,6 @@ export const useRealPostsFetcher = () => {
           .in('id', golfCourseIds);
         
         golfCourses = coursesData || [];
-        console.log('Golf courses data:', golfCourses);
       }
 
       // Format posts for explore grid
@@ -89,15 +84,7 @@ export const useRealPostsFetcher = () => {
         const userProfile = profiles?.find(profile => profile.id === post.user_id);
         const media = (post.post_media || [])[0]; // Take first media item
         
-        console.log('Processing post:', {
-          postId: post.id,
-          mediaUrl: media?.media_url,
-          mediaType: media?.media_type,
-          hasValidUrl: media ? isValidImageUrl(media.media_url) : false
-        });
-        
         if (!media || !isValidImageUrl(media.media_url)) {
-          console.log('Skipping post due to invalid media:', post.id);
           return null;
         }
 
@@ -115,7 +102,6 @@ export const useRealPostsFetcher = () => {
               name: course.name,
               country: course.country
             };
-            console.log('Found golf course for post:', post.id, golfCourse);
           }
         }
 
@@ -140,11 +126,9 @@ export const useRealPostsFetcher = () => {
           isFollowing: Math.random() > 0.5
         };
 
-        console.log('Formatted post:', formattedPost);
         return formattedPost;
       }).filter(Boolean) as ExploreContentItem[];
 
-      console.log('Final formatted posts:', formattedPosts);
       return formattedPosts;
     } catch (error) {
       console.error('Error fetching real posts:', error);
