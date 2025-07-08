@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { SwipeCarousel } from '@/components/ui/swipe-carousel';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
-import { Trophy } from 'lucide-react';
+import { Trophy, Earth } from 'lucide-react';
 import LeaderboardCard from './leaderboards/LeaderboardCard';
 
 interface LeaderboardUser {
@@ -75,7 +75,7 @@ const CommunityLeaderboards = () => {
     {
       region: 'global',
       title: 'Global',
-      emoji: '🌍',
+      emoji: '',  // Will use Earth icon component
       topUser: getTopUserForRegion('global')
     },
     {
@@ -92,7 +92,7 @@ const CommunityLeaderboards = () => {
     },
     {
       region: 'europe',
-      title: 'Europe',
+      title: 'Continental Europe',
       emoji: '🇪🇺',
       topUser: getTopUserForRegion('europe')
     }
@@ -132,6 +132,7 @@ const CommunityLeaderboards = () => {
                     subtitle="Most Played"
                     users={getMockData(leaderboard.region)}
                     onViewFullLeaderboard={() => handleViewFullLeaderboard(leaderboard.region)}
+                    isGlobal={leaderboard.region === 'global'}
                   />
                 </CarouselItem>
               ))}
@@ -152,6 +153,7 @@ const CommunityLeaderboards = () => {
                 subtitle="Most Played"
                 users={getMockData(leaderboard.region)}
                 onViewFullLeaderboard={() => handleViewFullLeaderboard(leaderboard.region)}
+                isGlobal={leaderboard.region === 'global'}
               />
             ))}
             className="w-full"

@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Earth } from 'lucide-react';
 import LeaderboardUserItem from './LeaderboardUserItem';
 
 interface LeaderboardUser {
@@ -24,6 +25,7 @@ interface LeaderboardCardProps {
   subtitle: string;
   users: LeaderboardUser[];
   onViewFullLeaderboard: () => void;
+  isGlobal?: boolean;
 }
 
 const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
@@ -31,7 +33,8 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
   emoji,
   subtitle,
   users,
-  onViewFullLeaderboard
+  onViewFullLeaderboard,
+  isGlobal = false
 }) => {
   const topUsers = users.slice(0, 5);
 
@@ -40,7 +43,11 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
       <CardHeader className="pb-4 border-b border-border/50">
         <div className="flex items-center justify-between mb-2">
           <CardTitle className="flex items-center gap-2 text-xl">
-            <span className="text-2xl">{emoji}</span>
+            {isGlobal ? (
+              <Earth className="h-6 w-6 text-primary" />
+            ) : (
+              <span className="text-2xl">{emoji}</span>
+            )}
             {title}
           </CardTitle>
         </div>
