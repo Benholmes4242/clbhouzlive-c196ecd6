@@ -50,11 +50,19 @@ const Explore = () => {
     if (activeFilter === 'Trending') return item.label === 'Trending';
     if (activeFilter === 'Clubs') return item.label === 'From Clubhouse';
     if (activeFilter === 'Hack Shack') {
-      return item.title?.toLowerCase().includes('#hackshack') || 
-             item.title?.toLowerCase().includes('hackshack');
+      // Only videos with #hackshack hashtag
+      return item.type === 'video' && (
+        item.title?.toLowerCase().includes('#hackshack') || 
+        item.title?.toLowerCase().includes('hackshack')
+      );
     }
     return true;
   });
+
+  // Remove duplicates based on src URL
+  const uniqueContent = filteredContent.filter((item, index, self) => 
+    index === self.findIndex(t => t.src === item.src)
+  );
 
   return (
       <div className="min-h-screen bg-background">
@@ -69,7 +77,7 @@ const Explore = () => {
 
           {/* Masonry Grid with Infinite Scroll */}
           <ExploreGrid 
-            content={filteredContent}
+            content={uniqueContent}
             onLike={handleLike}
             onFollow={handleFollow}
             onMediaClick={handleMediaClick}
