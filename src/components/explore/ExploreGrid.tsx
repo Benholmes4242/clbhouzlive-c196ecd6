@@ -66,8 +66,8 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
         <div className="text-4xl mb-4">🏌️‍♂️</div>
         <h3 className="text-lg font-semibold text-foreground mb-2">No content found</h3>
         <p className="text-muted-foreground max-w-md">
-          {activeFilter === 'Shank Tank' 
-            ? "No shanks yet! Be the first to upload a hilarious golf mishit using #shanktank in your post."
+          {activeFilter === 'Hack Shack' 
+            ? "No hacks yet! Be the first to upload a hilarious golf mishit using #hackshack in your post."
             : "Try adjusting your filters or check back later for new content."}
         </p>
       </div>

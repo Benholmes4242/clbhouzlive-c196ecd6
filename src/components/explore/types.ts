@@ -44,5 +44,5 @@ export const filterOptions = [
   'Tips',
   'Trending',
   'Clubs',
-  'Shank Tank'
+  'Hack Shack'
 ];
