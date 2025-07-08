@@ -3,7 +3,8 @@ import React from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Users, Globe, Search, Grid3X3, List, Map, TrendingUp, Clock, Star } from 'lucide-react';
+import { Users, Globe, Search, Grid3X3, List, Map, TrendingUp, Clock, Star, Earth } from 'lucide-react';
+import CountryFlag from '@/components/ui/country-flag';
 
 interface FilterState {
   audience: 'friends' | 'all';
@@ -56,10 +57,30 @@ const ExplorerFilters: React.FC<ExplorerFiltersProps> = ({ filters, onFilterChan
             <SelectValue placeholder="Select region" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="global">🌍 Worldwide</SelectItem>
-            <SelectItem value="britain-ireland">🇬🇧 Britain & Ireland</SelectItem>
-            <SelectItem value="usa">🇺🇸 United States</SelectItem>
-            <SelectItem value="europe">🇪🇺 Continental Europe</SelectItem>
+            <SelectItem value="global">
+              <div className="flex items-center gap-2">
+                <Earth className="h-4 w-4 text-gray-600" />
+                Worldwide
+              </div>
+            </SelectItem>
+            <SelectItem value="britain-ireland">
+              <div className="flex items-center gap-2">
+                <CountryFlag country="United Kingdom" size="sm" />
+                Britain & Ireland
+              </div>
+            </SelectItem>
+            <SelectItem value="usa">
+              <div className="flex items-center gap-2">
+                <CountryFlag country="USA" size="sm" />
+                United States
+              </div>
+            </SelectItem>
+            <SelectItem value="europe">
+              <div className="flex items-center gap-2">
+                <CountryFlag country="Continental Europe" size="sm" />
+                Continental Europe
+              </div>
+            </SelectItem>
           </SelectContent>
         </Select>
 
