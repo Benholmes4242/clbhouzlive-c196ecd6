@@ -180,14 +180,33 @@ const AddToPlayedModal = ({ course, isOpen, onClose, onSuccess }: AddToPlayedMod
           <div className="space-y-3">
             <Label className="text-base font-medium">Rating</Label>
             <div className="space-y-2">
-              <Slider
-                value={rating}
-                onValueChange={setRating}
-                max={10}
-                min={0}
-                step={0.5}
-                className="w-full review-rating-slider"
-              />
+              <div className="relative flex w-full touch-none select-none items-center">
+                <div className="relative h-2 w-full grow overflow-hidden rounded-full" style={{ backgroundColor: '#FFE8D1' }}>
+                  <div 
+                    className="absolute h-full rounded-full transition-all" 
+                    style={{ 
+                      backgroundColor: '#F5A623',
+                      width: `${(rating[0] / 10) * 100}%`
+                    }}
+                  />
+                </div>
+                <input
+                  type="range"
+                  min={0}
+                  max={10}
+                  step={0.5}
+                  value={rating[0]}
+                  onChange={(e) => setRating([parseFloat(e.target.value)])}
+                  className="absolute w-full h-2 opacity-0 cursor-pointer"
+                />
+                <div 
+                  className="absolute block h-5 w-5 rounded-full border-2 bg-background transition-colors"
+                  style={{ 
+                    borderColor: '#F5A623',
+                    left: `calc(${(rating[0] / 10) * 100}% - 10px)`
+                  }}
+                />
+              </div>
               <div className="text-center text-2xl font-bold" style={{ color: '#F5A623' }}>
                 {rating[0]}/10
               </div>
