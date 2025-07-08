@@ -124,15 +124,33 @@ const CourseDetailPage = () => {
   return (
     <div className="min-h-screen bg-background pb-20">
       {/* Hero Banner */}
-      <div className="relative h-96 overflow-hidden">
-        <img
-          src={course.thumbnail_image || 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&h=600&fit=crop'}
-          alt={course.name}
-          className="w-full h-full object-cover"
-          onError={(e) => {
-            e.currentTarget.src = 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&h=600&fit=crop';
-          }}
-        />
+      <div className="hero-container relative overflow-hidden">
+        <div className="max-w-6xl mx-auto">
+          <img
+            src={course.thumbnail_image || 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&h=600&fit=crop'}
+            srcSet={course.thumbnail_image ? `
+              ${course.thumbnail_image}?w=768&h=384&fit=crop 768w,
+              ${course.thumbnail_image}?w=1200&h=600&fit=crop 1200w,
+              ${course.thumbnail_image}?w=1920&h=960&fit=crop 1920w
+            ` : `
+              https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=768&h=384&fit=crop 768w,
+              https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&h=600&fit=crop 1200w,
+              https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1920&h=960&fit=crop 1920w
+            `}
+            sizes="(max-width: 768px) 100vw, (min-width: 769px) 1200px"
+            alt={course.name}
+            loading="eager"
+            className="course-hero-image w-full h-96 object-cover rounded-b-lg"
+            onError={(e) => {
+              e.currentTarget.src = 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&h=600&fit=crop';
+              e.currentTarget.srcset = `
+                https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=768&h=384&fit=crop 768w,
+                https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&h=600&fit=crop 1200w,
+                https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1920&h=960&fit=crop 1920w
+              `;
+            }}
+          />
+        </div>
         
         {/* Back Button */}
         <Button

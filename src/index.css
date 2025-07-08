@@ -169,3 +169,46 @@
   background-color: hsl(220 14.3% 91%) !important;
   transform: translateY(1px);
 }
+
+/* Hero Image Container and Responsive Image Styles */
+.hero-container {
+  aspect-ratio: 16 / 9;
+  min-height: 24rem; /* 384px - matches h-96 */
+  max-height: 28rem; /* 448px - slightly larger for desktop */
+  position: relative;
+}
+
+.course-hero-image {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: block;
+  border-radius: 0 0 6px 6px;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  image-rendering: optimize-contrast;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Mobile optimization for hero images */
+@media (max-width: 768px) {
+  .hero-container {
+    aspect-ratio: 4 / 3;
+    min-height: 20rem;
+    max-height: 24rem;
+  }
+  
+  .course-hero-image {
+    border-radius: 0;
+  }
+}
+
+/* Desktop optimization for hero images */
+@media (min-width: 1200px) {
+  .hero-container {
+    aspect-ratio: 21 / 9; /* Wider aspect ratio for desktop */
+    max-height: 32rem; /* 512px */
+  }
+}
