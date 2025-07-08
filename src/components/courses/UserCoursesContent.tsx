@@ -86,7 +86,7 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
   displayName
 }) => {
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
-  const [sortBy, setSortBy] = useState<string>('recently-played');
+  const [sortBy, setSortBy] = useState<string>('rating-high-low');
   
   const {
     targetUserId,
@@ -198,7 +198,7 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
       })));
       
       // Apply sorting here to ensure proper order
-      return getSortedUserCourses(rawCourses, 'recently-played');
+      return getSortedUserCourses(rawCourses, 'rating-high-low');
     },
     enabled: !!targetUserId,
   });
