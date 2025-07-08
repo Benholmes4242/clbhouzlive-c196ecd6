@@ -27,7 +27,7 @@ const ExplorerFilters: React.FC<ExplorerFiltersProps> = ({ filters, onFilterChan
         {/* Audience Toggle */}
         <div className="flex bg-muted rounded-lg p-1">
           <Button
-            variant={filters.audience === 'friends' ? 'default' : 'ghost'}
+            variant={filters.audience === 'friends' ? 'secondary' : 'ghost'}
             size="sm"
             onClick={() => onFilterChange('audience', 'friends')}
             className="flex items-center gap-2"
@@ -36,7 +36,7 @@ const ExplorerFilters: React.FC<ExplorerFiltersProps> = ({ filters, onFilterChan
             My Friends
           </Button>
           <Button
-            variant={filters.audience === 'all' ? 'default' : 'ghost'}
+            variant={filters.audience === 'all' ? 'secondary' : 'ghost'}
             size="sm"
             onClick={() => onFilterChange('audience', 'all')}
             className="flex items-center gap-2"

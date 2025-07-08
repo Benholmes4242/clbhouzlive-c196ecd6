@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { SwipeCarousel } from '@/components/ui/swipe-carousel';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
-import { Trophy, Earth } from 'lucide-react';
+import { Earth } from 'lucide-react';
 import LeaderboardCard from './leaderboards/LeaderboardCard';
 
 interface LeaderboardUser {
@@ -108,14 +108,10 @@ const CommunityLeaderboards = () => {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <Trophy className="h-7 w-7 text-primary" />
-          <div>
-            <h2 className="text-2xl font-bold">Community Top 100 Leaderboards</h2>
-            <p className="text-sm text-muted-foreground">Follow the Clbhouz Community Through the World's Top 100 Courses</p>
-          </div>
+        <div>
+          <h2 className="text-2xl font-bold">Community Top 100 Leaderboards</h2>
+          <p className="text-sm text-muted-foreground">Follow the clbhouz community through the world's top 100 courses</p>
         </div>
-        
       </div>
 
       {/* Responsive Carousel */}
