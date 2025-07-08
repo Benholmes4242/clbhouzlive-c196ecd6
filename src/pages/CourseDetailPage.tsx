@@ -230,7 +230,7 @@ const CourseDetailPage = () => {
             <Button
               variant="outline"
               onClick={handleWebsiteClick}
-              className="flex items-center gap-2 bg-white border border-border rounded-full px-4 py-2"
+              className="flex items-center gap-2 border border-border rounded-full px-4 py-2 h-10"
             >
               <ExternalLink className="h-4 w-4" />
               Visit Website
