@@ -90,9 +90,9 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
         ))}
       </div>
       
-      {/* Infinite scroll sentinel - minimal loading indicator */}
+      {/* Infinite scroll sentinel - only show loading when there's actually more content */}
       <div id="scroll-sentinel" className="h-4">
-        {isLoading && content.length > 0 && (
+        {isLoading && content.length > 0 && hasMore && (
           <div className="flex justify-center py-4">
             <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
           </div>
