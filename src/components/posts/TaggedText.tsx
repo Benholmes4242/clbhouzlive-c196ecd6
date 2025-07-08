@@ -59,7 +59,7 @@ const TaggedText = React.memo(({ text, tags = [] }: TaggedTextProps) => {
     });
 
     // Use regex to find all @mentions and replace them
-    const mentionRegex = /@[\w\s]+/g;
+    const mentionRegex = /@\w+/g;
     const parts = [];
     let lastIndex = 0;
     let match;
