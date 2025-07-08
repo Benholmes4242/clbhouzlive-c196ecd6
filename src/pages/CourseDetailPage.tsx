@@ -123,40 +123,38 @@ const CourseDetailPage = () => {
 
   return (
     <div className="min-h-screen bg-background pb-20 w-full">
-      {/* Hero Banner with Shared Wrapper */}
+      {/* Hero Banner */}
       <div className="course-hero-container relative overflow-hidden">
-        <div className="course-hero-wrapper">
-          <img
-            src={course.thumbnail_image || 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&h=600&fit=crop'}
-            srcSet={course.thumbnail_image ? `
-              ${course.thumbnail_image}?w=768&h=384&fit=crop 768w,
-              ${course.thumbnail_image}?w=1200&h=600&fit=crop 1200w,
-              ${course.thumbnail_image}?w=1920&h=960&fit=crop 1920w
-            ` : `
+        <img
+          src={course.thumbnail_image || 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&h=600&fit=crop'}
+          srcSet={course.thumbnail_image ? `
+            ${course.thumbnail_image}?w=768&h=384&fit=crop 768w,
+            ${course.thumbnail_image}?w=1200&h=600&fit=crop 1200w,
+            ${course.thumbnail_image}?w=1920&h=960&fit=crop 1920w
+          ` : `
+            https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=768&h=384&fit=crop 768w,
+            https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&h=600&fit=crop 1200w,
+            https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1920&h=960&fit=crop 1920w
+          `}
+          sizes="(max-width: 768px) 100vw, 1200px"
+          alt={course.name}
+          loading="eager"
+          className="course-hero-image w-full h-full object-cover"
+          onLoad={(e) => {
+            e.currentTarget.classList.add('loaded');
+          }}
+          onError={(e) => {
+            e.currentTarget.src = 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&h=600&fit=crop';
+            e.currentTarget.srcset = `
               https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=768&h=384&fit=crop 768w,
               https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&h=600&fit=crop 1200w,
               https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1920&h=960&fit=crop 1920w
-            `}
-            sizes="(max-width: 768px) 100vw, 1200px"
-            alt={course.name}
-            loading="eager"
-            className="course-hero-image w-full h-full object-cover"
-            onLoad={(e) => {
-              e.currentTarget.classList.add('loaded');
-            }}
-            onError={(e) => {
-              e.currentTarget.src = 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&h=600&fit=crop';
-              e.currentTarget.srcset = `
-                https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=768&h=384&fit=crop 768w,
-                https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1200&h=600&fit=crop 1200w,
-                https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=1920&h=960&fit=crop 1920w
-              `;
-            }}
-          />
-          
-          {/* Gradient overlay for better text visibility */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-        </div>
+            `;
+          }}
+        />
+        
+        {/* Gradient overlay for better text visibility */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
         
         {/* Back Button */}
         <Button
