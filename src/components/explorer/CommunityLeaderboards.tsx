@@ -210,7 +210,7 @@ const CommunityLeaderboards = () => {
           <Trophy className="h-7 w-7 text-primary" />
           <div>
             <h2 className="text-2xl font-bold">Community Top 100 Leaderboards</h2>
-            <p className="text-sm text-muted-foreground">Leading players in the Top 100 challenge</p>
+            <p className="text-sm text-muted-foreground">Follow the Clbhouz Community Through the World's Top 100 Courses</p>
           </div>
         </div>
         
