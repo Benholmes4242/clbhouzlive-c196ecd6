@@ -9,6 +9,13 @@ export const useRealPostsFetcher = () => {
       console.log('=== EXPLORE FETCH DEBUG ===');
       console.log('Fetching real posts from offset:', currentOffset);
       
+      // Add randomness by using a random offset within reasonable bounds
+      const totalPostsEstimate = 1000; // Reasonable estimate for random offset calculation
+      const maxRandomOffset = Math.max(0, totalPostsEstimate - (postsPerPage * 10));
+      const randomOffset = Math.floor(Math.random() * maxRandomOffset);
+      
+      console.log('Using random offset:', randomOffset);
+      
       const { data: postsData, error } = await supabase
         .from('posts')
         .select(`
@@ -33,7 +40,7 @@ export const useRealPostsFetcher = () => {
           )
         `)
         .order('created_at', { ascending: false })
-        .range(currentOffset, currentOffset + postsPerPage - 1);
+        .range(randomOffset, randomOffset + postsPerPage - 1);
 
       if (error) {
         console.error('Error fetching posts:', error);
@@ -137,7 +144,7 @@ export const useRealPostsFetcher = () => {
           },
           golfCourse,
           label: Math.random() > 0.6 ? ['Pro Tip', 'Trending', 'From Clubhouse'][Math.floor(Math.random() * 3)] : undefined,
-          isFollowing: Math.random() > 0.5
+          isFollowing: false // Show content from all users, not following-based
         };
 
         console.log('Formatted post:', formattedPost);
