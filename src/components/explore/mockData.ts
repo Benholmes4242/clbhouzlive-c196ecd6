@@ -1,12 +1,11 @@
-
 import { ExploreContentItem } from './types';
 
-// Enhanced mock data with more variety and engagement metrics
+// Real video and image URLs for the explore feed - NO PLACEHOLDER IMAGES
 export const mockExploreContent: ExploreContentItem[] = [
   {
     id: '1',
     type: 'video',
-    src: 'https://images.unsplash.com/photo-1593111774240-d529f12cf4bb?w=400&h=600&fit=crop',
+    src: 'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4',
     title: 'Perfect Drive Technique',
     duration: '2:15',
     user: { 
@@ -43,7 +42,7 @@ export const mockExploreContent: ExploreContentItem[] = [
   {
     id: '3',
     type: 'video',
-    src: 'https://images.unsplash.com/photo-1587174486073-ae5e5ccd3ab6?w=400&h=500&fit=crop',
+    src: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
     title: 'Putting Masterclass',
     duration: '1:30',
     user: { 
@@ -62,7 +61,7 @@ export const mockExploreContent: ExploreContentItem[] = [
   {
     id: '4',
     type: 'video',
-    src: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=550&fit=crop',
+    src: 'https://sample-videos.com/zip/10/mp4/SampleVideo_640x360_1mb.mp4',
     title: 'Viral Golf Trick Shot',
     duration: '0:45',
     user: { 
@@ -98,7 +97,7 @@ export const mockExploreContent: ExploreContentItem[] = [
   {
     id: '6',
     type: 'video',
-    src: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=700&fit=crop',
+    src: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
     title: 'Swing Analysis Breakdown',
     duration: '3:45',
     user: { 
@@ -135,7 +134,7 @@ export const mockExploreContent: ExploreContentItem[] = [
   {
     id: '8',
     type: 'video',
-    src: 'https://images.unsplash.com/photo-1566041510394-cf7c8fe21800?w=400&h=600&fit=crop',
+    src: 'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_2mb.mp4',
     title: 'Course Tour: St. Andrews',
     duration: '4:20',
     user: { 
@@ -154,7 +153,7 @@ export const mockExploreContent: ExploreContentItem[] = [
   {
     id: '9',
     type: 'video',
-    src: 'https://images.unsplash.com/photo-1593111774240-d529f12cf4bb?w=400&h=550&fit=crop',
+    src: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4',
     title: 'Epic Golf Course Flyover',
     duration: '2:30',
     user: { 
@@ -170,12 +169,12 @@ export const mockExploreContent: ExploreContentItem[] = [
     label: 'Trending',
     isFollowing: false
   },
-  // Mulligan Moments - Comedy Golf Videos
+  // Hack Shack Videos - Comedy Golf Videos
   {
     id: '10',
     type: 'video',
-    src: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=550&fit=crop',
-    title: 'Epic Sand Trap Fail #mulliganmoments',
+    src: 'https://sample-videos.com/zip/10/mp4/SampleVideo_640x360_2mb.mp4',
+    title: 'Epic Sand Trap Fail #hackshack',
     duration: '0:30',
     user: { 
       id: 'user10',
@@ -187,14 +186,14 @@ export const mockExploreContent: ExploreContentItem[] = [
     likes: 345,
     comments: 67,
     shares: 89,
-    label: 'Mulligan Moment',
+    label: 'Hack Shack',
     isFollowing: false
   },
   {
     id: '11',
     type: 'video',
-    src: 'https://images.unsplash.com/photo-1593111774240-d529f12cf4bb?w=400&h=600&fit=crop',
-    title: 'When your ball finds the water #mulliganmoments',
+    src: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4',
+    title: 'When your ball finds the water #hackshack',
     duration: '0:15',
     user: { 
       id: 'user11',
@@ -206,14 +205,14 @@ export const mockExploreContent: ExploreContentItem[] = [
     likes: 567,
     comments: 123,
     shares: 234,
-    label: 'Mulligan Moment',
+    label: 'Hack Shack',
     isFollowing: false
   },
   {
     id: '12',
     type: 'video',
-    src: 'https://images.unsplash.com/photo-1566041510394-cf7c8fe21800?w=400&h=600&fit=crop',
-    title: 'Air shot compilation #mulliganmoments #golfhumor',
+    src: 'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4',
+    title: 'Air shot compilation #hackshack #golfhumor',
     duration: '1:45',
     user: { 
       id: 'user12',
@@ -225,7 +224,7 @@ export const mockExploreContent: ExploreContentItem[] = [
     likes: 1234,
     comments: 189,
     shares: 345,
-    label: 'Mulligan Moment',
+    label: 'Hack Shack',
     isFollowing: false
   }
 ];

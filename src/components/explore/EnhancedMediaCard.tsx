@@ -57,7 +57,6 @@ const EnhancedMediaCard: React.FC<EnhancedMediaCardProps> = ({ item, onMediaClic
               muted
               loop
               playsInline
-              poster={fallbackImage}
               onError={() => setImageError(true)}
             />
             {/* Video Play Icon - Bottom Right */}

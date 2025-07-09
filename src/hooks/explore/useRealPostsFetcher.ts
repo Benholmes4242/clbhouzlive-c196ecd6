@@ -6,7 +6,6 @@ import { isValidImageUrl } from './urlValidation';
 export const useRealPostsFetcher = () => {
   const fetchRealPosts = async (currentOffset: number, postsPerPage: number): Promise<ExploreContentItem[]> => {
     try {
-      // Removed debug logs for performance
       
       const { data: postsData, error } = await supabase
         .from('posts')
@@ -23,7 +22,7 @@ export const useRealPostsFetcher = () => {
         `)
         .order('created_at', { ascending: false })
         .range(currentOffset, currentOffset + postsPerPage - 1)
-        .limit(postsPerPage); // Add explicit limit for performance
+        .limit(postsPerPage);
 
       if (error) {
         console.error('Error fetching posts:', error);
@@ -58,7 +57,7 @@ export const useRealPostsFetcher = () => {
         const userProfile = profiles?.find(profile => profile.id === post.user_id);
         const media = (post.post_media || [])[0]; // Take first media item
         
-        if (!media || !isValidImageUrl(media.media_url)) {
+        if (!media || !media.media_url || !isValidImageUrl(media.media_url)) {
           return null;
         }
 
