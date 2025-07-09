@@ -95,11 +95,11 @@ const Index = () => {
       <StoryBar />
       
       <main className="container mx-auto px-4 py-6 pb-20">
-        <div className="max-w-2xl mx-auto space-y-6">
-          {/* Clubhouz Moments Carousel */}
+        <div className="max-w-4xl mx-auto space-y-6">
+          {/* Moments you may like section */}
           <ClubhouzMomentsCarousel />
           
-          {/* Trending Feed */}
+          {/* Main social feed */}
           <TrendingFeed />
         </div>
       </main>
