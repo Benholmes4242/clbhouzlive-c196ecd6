@@ -74,74 +74,7 @@ export const useOptimisticPostSubmission = () => {
 
       console.log('Post created successfully:', postData);
 
-      // Create tags immediately (they're small and fast)
-      await Promise.all([
-        // Create user tags
-        ...selectedTags.map(async (tag) => {
-          const { error: tagError } = await supabase
-            .from('post_tags')
-            .insert({
-              post_id: postData.id,
-              tagged_by_user_id: user.id,
-              tagged_entity_id: tag.entity_id
-            });
-
-          if (tagError) {
-            console.error('Error creating tag:', tagError);
-          }
-        }),
-
-        // Create golf course tag if needed
-        ...(courseInfo ? [(async () => {
-          try {
-            let golfCourseEntityId = null;
-            
-            // Check if golf course entity exists
-            const { data: existingEntity } = await supabase
-              .from('taggable_entities')
-              .select('id')
-              .eq('entity_type', 'golf_club')
-              .eq('entity_id', courseInfo.id)
-              .single();
-
-            if (existingEntity) {
-              golfCourseEntityId = existingEntity.id;
-            } else {
-              // Create the taggable entity
-              const { data: newEntity, error: entityError } = await supabase
-                .from('taggable_entities')
-                .insert({
-                  entity_type: 'golf_club',
-                  entity_id: courseInfo.id,
-                  name: courseInfo.name,
-                  username: null
-                })
-                .select('id')
-                .single();
-
-              if (entityError) throw entityError;
-              golfCourseEntityId = newEntity.id;
-            }
-
-            // Create the post tag
-            if (golfCourseEntityId) {
-              const { error: courseTagError } = await supabase
-                .from('post_tags')
-                .insert({
-                  post_id: postData.id,
-                  tagged_by_user_id: user.id,
-                  tagged_entity_id: golfCourseEntityId
-                });
-
-              if (courseTagError) {
-                console.error('Error creating golf course tag:', courseTagError);
-              }
-            }
-          } catch (error) {
-            console.error('Error handling golf course tag:', error);
-          }
-        })()] : [])
-      ]);
+      // Tags creation temporarily disabled due to missing database tables
 
       // Start background upload for media files (don't wait for it)
       if (mediaFiles.length > 0) {

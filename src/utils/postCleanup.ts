@@ -47,11 +47,7 @@ export const removeDuplicatePosts = async (userId: string) => {
         .delete()
         .in('post_id', postsToDelete);
 
-      // Delete associated tags
-      await supabase
-        .from('post_tags')
-        .delete()
-        .in('post_id', postsToDelete);
+      // Delete associated tags - temporarily disabled
 
       // Delete the duplicate posts
       await supabase

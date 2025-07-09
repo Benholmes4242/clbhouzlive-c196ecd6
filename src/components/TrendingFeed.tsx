@@ -86,24 +86,8 @@ const TrendingFeed = () => {
       const profiles = profilesResponse.data;
       const postMedia = mediaResponse.data;
 
-      // Simplified tags fetch for performance
+      // Tags feature temporarily disabled due to missing database tables
       let postTags = [];
-      const { data: tags } = await supabase
-        .from('post_tags')
-        .select(`
-          post_id,
-          tagged_entity_id,
-          taggable_entities!inner (
-            id,
-            entity_type,
-            entity_id,
-            name
-          )
-        `)
-        .in('post_id', posts.map(p => p.id))
-        .limit(20); // Reduced for better performance
-
-      postTags = tags || [];
 
       // Format posts with related data
       const formattedPosts = posts.map(post => {

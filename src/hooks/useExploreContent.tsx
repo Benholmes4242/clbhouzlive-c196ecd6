@@ -105,10 +105,8 @@ export const useExploreContent = () => {
         
         if (!media) return null;
 
-        // Find golf course tag
-        const golfCourseTag = post.post_tags?.find(tag => 
-          tag.taggable_entities?.entity_type === 'golf_club'
-        );
+        // Golf course tags temporarily disabled
+        const golfCourseTag = null;
         
         let golfCourse = null;
         if (golfCourseTag?.taggable_entities?.entity_id) {

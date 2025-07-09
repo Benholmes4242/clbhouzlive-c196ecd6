@@ -92,21 +92,8 @@ export const useUserPosts = () => {
       const profiles = profilesResponse.data;
       const postMedia = mediaResponse.data;
 
-      // Get tags in a simplified way for better performance
-      const { data: postTags } = await supabase
-        .from('post_tags')
-        .select(`
-          post_id,
-          tagged_entity_id,
-          taggable_entities!inner (
-            id,
-            entity_type,
-            entity_id,
-            name
-          )
-        `)
-        .in('post_id', postIds)
-        .limit(30); // Limit tags for performance
+      // Tags temporarily disabled due to missing database tables
+      const postTags = [];
 
       const formattedPosts = postsData.map(post => {
         const userProfile = profiles?.find(profile => profile.id === post.user_id);

@@ -66,10 +66,6 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, ...props 
                       item.src === '[object Object]' ||
                       typeof item.src !== 'string';
 
-  // Use fallback for invalid src or image errors
-  const displaySrc = (isInvalidSrc || imageError) ? fallbackImage : item.src;
-  const shouldUseFallback = isInvalidSrc || imageError;
-
   return (
     <>
       <div 
@@ -81,7 +77,7 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, ...props 
       >
         {/* Square Media Container */}
         <div className="relative w-full h-full overflow-hidden">
-          {item.type === 'video' && !shouldUseFallback ? (
+          {item.type === 'video' && !isInvalidSrc ? (
             <VideoPlayer
               src={item.src}
               autoplay={shouldAutoplay}
@@ -94,7 +90,7 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, ...props 
             />
           ) : (
             <OptimizedImage
-              src={displaySrc}
+              src={isInvalidSrc ? fallbackImage : item.src}
               alt={item.title || 'Content'}
               className="w-full h-full transition-transform duration-300 group-hover:scale-105"
               width={300}

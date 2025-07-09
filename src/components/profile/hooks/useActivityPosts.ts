@@ -50,45 +50,8 @@ export const useActivityPosts = (userId?: string) => {
         return;
       }
 
-      // Get post tags
-      const postIds = postsData.map(p => p.id);
-      console.log('ActivityPosts - Fetching tags for posts:', postIds);
-      
-      const { data: postTagsRaw, error: tagsError } = await supabase
-        .from('post_tags')
-        .select(`
-          post_id,
-          tagged_entity_id
-        `)
-        .in('post_id', postIds);
-
+      // Post tags temporarily disabled due to missing database tables
       let postTags = [];
-      if (postTagsRaw && postTagsRaw.length > 0) {
-        const entityIds = postTagsRaw.map(tag => tag.tagged_entity_id);
-        console.log('ActivityPosts - Fetching entities for IDs:', entityIds);
-        
-        const { data: entities, error: entitiesError } = await supabase
-          .from('taggable_entities')
-          .select('*')
-          .in('id', entityIds);
-
-        if (!entitiesError && entities) {
-          postTags = postTagsRaw.map(tag => {
-            const entity = entities.find(e => e.id === tag.tagged_entity_id);
-            if (entity) {
-              return {
-                post_id: tag.post_id,
-                id: entity.id,
-                entity_type: entity.entity_type,
-                entity_id: entity.entity_id,
-                name: entity.name,
-                username: entity.username
-              };
-            }
-            return null;
-          }).filter(Boolean);
-        }
-      }
 
       console.log('ActivityPosts - Mapped post tags:', postTags);
 
