@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Edit3, RotateCw, Trash2 } from 'lucide-react';
+import { X, Edit3, RotateCw, Trash2, Image as ImageIcon, Video as VideoIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import PhotoEditor from './PhotoEditor';
@@ -26,6 +26,8 @@ const MediaPreviewGrid: React.FC<MediaPreviewGridProps> = ({
   className
 }) => {
   const [editingFileId, setEditingFileId] = useState<string | null>(null);
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
+  const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
 
   const handleEditClick = (fileId: string) => {
     setEditingFileId(fileId);
@@ -36,6 +38,20 @@ const MediaPreviewGrid: React.FC<MediaPreviewGridProps> = ({
       onEditFile(editingFileId, editedFile);
     }
     setEditingFileId(null);
+  };
+
+  const handleImageLoad = (mediaId: string) => {
+    setLoadingStates(prev => ({ ...prev, [mediaId]: false }));
+  };
+
+  const handleImageError = (mediaId: string) => {
+    setImageErrors(prev => ({ ...prev, [mediaId]: true }));
+    setLoadingStates(prev => ({ ...prev, [mediaId]: false }));
+  };
+
+  const handleImageLoadStart = (mediaId: string) => {
+    setLoadingStates(prev => ({ ...prev, [mediaId]: true }));
+    setImageErrors(prev => ({ ...prev, [mediaId]: false }));
   };
 
   const editingFile = editingFileId 
@@ -59,22 +75,59 @@ const MediaPreviewGrid: React.FC<MediaPreviewGridProps> = ({
           {mediaFiles.map((media) => {
             const isImage = media.file.type.startsWith('image/');
             const isVideo = media.file.type.startsWith('video/');
+            const hasError = imageErrors[media.id];
+            const isLoading = loadingStates[media.id];
 
             return (
               <Card key={media.id} className="relative group overflow-hidden">
-                <div className="aspect-square relative">
+                <div className="aspect-square relative bg-gray-100">
+                  {/* Loading State */}
+                  {isLoading && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                    </div>
+                  )}
+
+                  {/* Error State - Fallback Icon */}
+                  {hasError && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+                      <div className="text-center">
+                        {isImage ? (
+                          <ImageIcon className="h-8 w-8 text-gray-400 mx-auto mb-1" />
+                        ) : (
+                          <VideoIcon className="h-8 w-8 text-gray-400 mx-auto mb-1" />
+                        )}
+                        <p className="text-xs text-gray-500">Preview unavailable</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Image Preview */}
                   {isImage && (
                     <img
                       src={media.url}
                       alt="Preview"
-                      className="w-full h-full object-cover"
+                      className={`w-full h-full object-cover transition-opacity ${
+                        hasError || isLoading ? 'opacity-0' : 'opacity-100'
+                      }`}
+                      onLoad={() => handleImageLoad(media.id)}
+                      onError={() => handleImageError(media.id)}
+                      onLoadStart={() => handleImageLoadStart(media.id)}
                     />
                   )}
+
+                  {/* Video Preview */}
                   {isVideo && (
                     <video
                       src={media.url}
-                      className="w-full h-full object-cover"
+                      className={`w-full h-full object-cover transition-opacity ${
+                        hasError || isLoading ? 'opacity-0' : 'opacity-100'
+                      }`}
                       muted
+                      preload="metadata"
+                      onLoadedData={() => handleImageLoad(media.id)}
+                      onError={() => handleImageError(media.id)}
+                      onLoadStart={() => handleImageLoadStart(media.id)}
                     />
                   )}
 
