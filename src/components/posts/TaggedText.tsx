@@ -30,11 +30,7 @@ const TaggedText = React.memo(({ text, tags = [] }: TaggedTextProps) => {
   };
 
   const renderedContent = useMemo(() => {
-    console.log('TaggedText - Input text:', text);
-    console.log('TaggedText - Input tags:', tags);
-    
     if (!text || tags.length === 0) {
-      console.log('TaggedText - Early return: no text or no tags');
       return text;
     }
 
