@@ -100,23 +100,43 @@ export const useFeedPosts = () => {
         throw profilesError;
       }
 
+      // Fetch golf courses to match against post content
+      const { data: golfCourses, error: coursesError } = await supabase
+        .from('golf_courses')
+        .select('id, name');
+
+      if (coursesError) {
+        console.warn('Error fetching golf courses:', coursesError);
+      }
+
       // TODO: In future, also fetch posts that were engaged with by followed users
       // This would require implementing like/share/comment tables first
+
+      // Helper function to find golf course mentioned in post content
+      const findMentionedCourse = (content: string) => {
+        if (!content || !golfCourses) return null;
+        
+        // Look for exact or partial matches of golf course names in post content
+        const contentLower = content.toLowerCase();
+        
+        for (const course of golfCourses) {
+          const courseName = course.name.toLowerCase();
+          
+          // Check for exact match or if course name is mentioned
+          if (contentLower.includes(courseName) || 
+              // Also check for partial matches (course name words)
+              courseName.split(' ').some(word => word.length > 3 && contentLower.includes(word))) {
+            return { id: course.id, name: course.name };
+          }
+        }
+        
+        return null;
+      };
 
       // Format the posts
       const formattedPosts: FeedPost[] = (directPosts || []).map(post => {
         const author = profiles?.find(p => p.id === post.user_id);
-        
-        // Temporary golf courses for demo until real tagging system is implemented
-        const sampleCourses = [
-          { id: '1', name: 'Walton Heath Golf Club' },
-          { id: '2', name: 'Royal St George\'s' },
-          { id: '3', name: 'Carnoustie Golf Links' },
-          { id: '4', name: 'St Andrews Old Course' },
-          { id: '5', name: 'Turnberry (Ailsa)' },
-          { id: '6', name: 'Muirfield' },
-          { id: '7', name: 'Royal Birkdale' }
-        ];
+        const mentionedCourse = findMentionedCourse(post.content);
         
         return {
           id: post.id,
@@ -131,7 +151,7 @@ export const useFeedPosts = () => {
             verified: Math.random() > 0.8 // Random verification for demo
           },
           media: post.post_media || [],
-          golf_course: Math.random() > 0.4 ? sampleCourses[Math.floor(Math.random() * sampleCourses.length)] : undefined, // Show golf course tags ~60% of the time
+          golf_course: mentionedCourse, // Only show real golf courses mentioned in post content
           engagement_stats: {
             likes: Math.floor(Math.random() * 100) + 1,
             comments: Math.floor(Math.random() * 25) + 1,
