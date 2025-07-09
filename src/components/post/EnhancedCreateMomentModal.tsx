@@ -272,7 +272,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
           />
           
           {/* Bottom Sheet Modal */}
-          <div className="relative w-full max-w-lg bg-white rounded-t-2xl p-4 animate-slide-in-up max-h-[90vh] overflow-y-auto">
+          <div className="relative w-full max-w-2xl bg-white rounded-2xl p-6 animate-slide-in-up max-h-[85vh] overflow-y-auto">
             {/* Drag indicator */}
             <div className="w-9 h-1 bg-gray-300 rounded-full mx-auto mb-4" />
             
