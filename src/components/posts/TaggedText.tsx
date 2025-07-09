@@ -93,8 +93,13 @@ const TaggedText = React.memo(({ text, tags = [] }: TaggedTextProps) => {
         parts.push(
           <button
             key={`tag-${match.index}-${matchingTag.id}`}
-            onClick={(e) => handleTagClick(matchingTag, e)}
-            className="text-blue-400 hover:text-blue-300 hover:underline font-medium cursor-pointer bg-transparent border-none p-0 inline"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              handleTagClick(matchingTag, e);
+            }}
+            className="text-blue-400 hover:text-blue-300 hover:underline font-medium cursor-pointer bg-transparent border-none p-0 inline-block"
+            style={{ pointerEvents: 'auto' }}
           >
             @{displayName}
           </button>
