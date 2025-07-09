@@ -76,18 +76,10 @@ const MediaPreviewGrid: React.FC<MediaPreviewGridProps> = ({
             const isImage = media.file.type.startsWith('image/');
             const isVideo = media.file.type.startsWith('video/');
             const hasError = imageErrors[media.id];
-            const isLoading = loadingStates[media.id];
 
             return (
               <Card key={media.id} className="relative group overflow-hidden">
                 <div className="aspect-square relative bg-gray-100">
-                  {/* Loading State */}
-                  {isLoading && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                    </div>
-                  )}
-
                   {/* Error State - Fallback Icon */}
                   {hasError && (
                     <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
@@ -103,31 +95,23 @@ const MediaPreviewGrid: React.FC<MediaPreviewGridProps> = ({
                   )}
 
                   {/* Image Preview */}
-                  {isImage && (
+                  {isImage && !hasError && (
                     <img
                       src={media.url}
                       alt="Preview"
-                      className={`w-full h-full object-cover transition-opacity ${
-                        hasError || isLoading ? 'opacity-0' : 'opacity-100'
-                      }`}
-                      onLoad={() => handleImageLoad(media.id)}
+                      className="w-full h-full object-cover"
                       onError={() => handleImageError(media.id)}
-                      onLoadStart={() => handleImageLoadStart(media.id)}
                     />
                   )}
 
                   {/* Video Preview */}
-                  {isVideo && (
+                  {isVideo && !hasError && (
                     <video
                       src={media.url}
-                      className={`w-full h-full object-cover transition-opacity ${
-                        hasError || isLoading ? 'opacity-0' : 'opacity-100'
-                      }`}
+                      className="w-full h-full object-cover"
                       muted
                       preload="metadata"
-                      onLoadedData={() => handleImageLoad(media.id)}
                       onError={() => handleImageError(media.id)}
-                      onLoadStart={() => handleImageLoadStart(media.id)}
                     />
                   )}
 
