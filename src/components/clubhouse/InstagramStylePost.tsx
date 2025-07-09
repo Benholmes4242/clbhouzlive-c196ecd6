@@ -17,6 +17,7 @@ import { usePostViewer } from '@/hooks/usePostViewer';
 import { useVideoVisibility } from '@/hooks/useVideoVisibility';
 import { useVideoPlaybackManager } from '@/contexts/VideoPlaybackManager';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
+import { extractGolfCourseFromContent, removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 
 interface PostMedia {
   id: string;
@@ -124,8 +125,19 @@ const InstagramStylePost: React.FC<InstagramStylePostProps> = ({ post, allUserPo
     touchEventOptions: { passive: false }
   });
 
-  // Fetch golf course details
+  // Extract golf course from content or tags
   useEffect(() => {
+    // First try to extract from post content
+    const extractedCourse = extractGolfCourseFromContent(post.content);
+    if (extractedCourse) {
+      setGolfCourse({
+        ...extractedCourse,
+        region: extractedCourse.region || ''
+      });
+      return;
+    }
+
+    // Fallback to tags if available
     const fetchGolfCourse = async () => {
       if (golfClubTags.length > 0 && !golfCourse) {
         try {
@@ -145,7 +157,7 @@ const InstagramStylePost: React.FC<InstagramStylePostProps> = ({ post, allUserPo
     };
 
     fetchGolfCourse();
-  }, [golfClubTags.length > 0 ? golfClubTags[0]?.entity_id : null, golfCourse]);
+  }, [post.content, golfClubTags.length > 0 ? golfClubTags[0]?.entity_id : null]);
 
   const handleProfileClick = () => {
     navigate(`/profile/${post.user.username}`);
@@ -387,7 +399,7 @@ const InstagramStylePost: React.FC<InstagramStylePostProps> = ({ post, allUserPo
         </div>
 
         {/* Caption & Comments Area - Below Media */}
-        {post.content && (
+        {post.content && removeGolfCourseFromContent(post.content) && (
           <div className="bg-background p-4 border-b">
             <div className="text-sm">
               <div className="mb-1">
@@ -398,7 +410,7 @@ const InstagramStylePost: React.FC<InstagramStylePostProps> = ({ post, allUserPo
                   · {timeAgo}
                 </span>
               </div>
-              <div>{post.content}</div>
+              <div>{removeGolfCourseFromContent(post.content)}</div>
             </div>
             
             {/* Mock comments - in a real app this would come from a comments API */}

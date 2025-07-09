@@ -8,6 +8,7 @@ import LazyImage from '@/components/ui/lazy-image';
 import CoursePostBadge from '../CoursePostBadge';
 import { UserPostData, GolfCourse } from './types';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 
 interface MobileUserPostProps {
   post: UserPostData;
@@ -92,7 +93,7 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
             <span className="font-semibold cursor-pointer" onClick={onProfileClick}>
               {displayName}
             </span>
-            <span className="ml-2">{post.content}</span>
+            <span className="ml-2">{removeGolfCourseFromContent(post.content)}</span>
           </div>
         </div>
       </div>
@@ -221,7 +222,7 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
       </div>
 
       {/* Caption & Comments Area */}
-      {post.content && (
+      {post.content && removeGolfCourseFromContent(post.content) && (
         <div className="bg-background p-4 border-b">
           <div className="text-sm">
             <div className="mb-1">
@@ -232,7 +233,7 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
                 · {timeAgo}
               </span>
             </div>
-            <div>{post.content}</div>
+            <div>{removeGolfCourseFromContent(post.content)}</div>
           </div>
           
           <div className="mt-3 space-y-2 text-sm text-muted-foreground">

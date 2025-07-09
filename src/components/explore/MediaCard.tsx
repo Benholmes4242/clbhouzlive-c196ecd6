@@ -8,6 +8,7 @@ import { useFullscreenMedia } from '@/hooks/useFullscreenMedia';
 import VideoPlayer from '@/components/ui/video-player';
 import { useVideoAutoplay } from '@/hooks/useVideoAutoplay';
 import OptimizedImage from '@/components/ui/optimized-image';
+import CoursePostBadge from '@/components/posts/CoursePostBadge';
 
 interface MediaCardProps {
   item: ExploreContentItem;
@@ -109,6 +110,19 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, ...props 
               <span className="font-medium">{item.likes}</span>
             </button>
           </div>
+
+          {/* Golf Course Badge - Top Right */}
+          {item.golfCourse && (
+            <div className="absolute top-2 right-2 z-10">
+              <CoursePostBadge 
+                course={{
+                  id: item.golfCourse.id,
+                  name: item.golfCourse.name,
+                  country: item.golfCourse.country
+                }}
+              />
+            </div>
+          )}
 
           {/* User info overlay - hidden on mobile */}
           {item.user && (

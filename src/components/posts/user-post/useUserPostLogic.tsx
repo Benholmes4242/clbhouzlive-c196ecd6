@@ -7,6 +7,7 @@ import { usePostDeletion } from '@/hooks/usePostDeletion';
 import { usePostViewer } from '@/hooks/usePostViewer';
 import { useFullscreenMedia } from '@/hooks/useFullscreenMedia';
 import { UserPostData, GolfCourse } from './types';
+import { extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 
 interface UseUserPostLogicProps {
   post: UserPostData;
@@ -35,8 +36,19 @@ export const useUserPostLogic = ({
   const isOwnPost = user?.id === post.user.id;
   const golfClubTags = post.post_tags?.filter(tag => tag.entity_type === 'golf_club') || [];
 
-  // Fetch golf course details
+  // Extract golf course from content or tags
   useEffect(() => {
+    // First try to extract from post content
+    const extractedCourse = extractGolfCourseFromContent(post.content);
+    if (extractedCourse) {
+      setGolfCourse({
+        ...extractedCourse,
+        region: extractedCourse.region || ''
+      });
+      return;
+    }
+
+    // Fallback to tags if available
     const fetchGolfCourse = async () => {
       if (golfClubTags.length > 0 && !golfCourse) {
         try {
@@ -56,7 +68,7 @@ export const useUserPostLogic = ({
     };
 
     fetchGolfCourse();
-  }, [golfClubTags.length > 0 ? golfClubTags[0]?.entity_id : null, golfCourse]);
+  }, [post.content, golfClubTags.length > 0 ? golfClubTags[0]?.entity_id : null]);
 
   const handleDeletePost = async () => {
     if (!isOwnPost) return;
