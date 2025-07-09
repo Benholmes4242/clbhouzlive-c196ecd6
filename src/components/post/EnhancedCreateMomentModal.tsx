@@ -277,11 +277,20 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
             <div className="w-9 h-1 bg-gray-300 rounded-full mx-auto mb-4" />
             
             {/* Header */}
-            <div className="text-center mb-6">
-              <h2 className="text-lg font-semibold text-gray-900">
+            <div className="flex items-center justify-between mb-4">
+              {modalMode === 'upload' && (
+                <button
+                  onClick={handleBackToSelection}
+                  className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-100 transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-600" />
+                </button>
+              )}
+              {modalMode === 'selection' && <div className="w-8 h-8" />}
+              <h2 className="text-lg font-semibold text-gray-900 flex-1 text-center">
                 {editMode ? 'Edit Moment' : 'Create a Moment'}
               </h2>
-              
+              <div className="w-8 h-8" />
             </div>
 
             {(() => {
@@ -344,14 +353,6 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
             ) : (
               /* Upload View */
               <div className="space-y-6">
-                {/* Back Button */}
-                <button
-                  onClick={handleBackToSelection}
-                  className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors mb-4"
-                >
-                  <X className="w-4 h-4" />
-                  <span className="text-sm">Back to options</span>
-                </button>
 
                 {/* Enhanced Media Upload Section */}
                 <div>
@@ -370,7 +371,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                   <RichTextInput
                     value={caption}
                     onChange={handleCaptionChange}
-                    placeholder="Write about your moment... Use @ to tag people or businesses"
+                    placeholder="Write about your moment..."
                     selectedTags={selectedTags}
                     disabled={isSubmitting}
                   />
@@ -442,9 +443,10 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                     Cancel
                   </Button>
                   <Button
+                    variant="outline"
                     onClick={handleSubmit}
                     disabled={isSubmitting || (files.length === 0 && existingMediaUrls.length === 0)}
-                    className="bg-primary text-primary-foreground hover:bg-primary/90"
+                    className="bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200"
                   >
                     {isSubmitting 
                       ? (editMode ? 'Updating...' : 'Posting...') 
