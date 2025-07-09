@@ -254,3 +254,43 @@
     max-width: 1140px; /* Keep consistent with content width */
   }
 }
+
+/* Media thumbnail styles */
+.media-thumb {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  border-radius: 6px !important;
+  display: block !important;
+  opacity: 1 !important;
+  transition: opacity 0.2s ease;
+}
+
+.media-thumb:before {
+  content: none !important;
+}
+
+.media-thumb:after {
+  content: none !important;
+}
+
+/* Ensure video thumbnails work */
+video.media-thumb {
+  background: #000;
+}
+
+/* Animation for slide up */
+@keyframes slide-in-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in-up {
+  animation: slide-in-up 0.3s ease-out;
+}

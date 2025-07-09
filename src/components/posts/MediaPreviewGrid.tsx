@@ -106,8 +106,17 @@ const MediaPreviewGrid: React.FC<MediaPreviewGridProps> = ({
                   {isImage && (
                     <img
                       src={media.url}
-                      alt="Media preview"
+                      alt={`Preview of ${media.file.name}`}
                       className="w-full h-full object-cover media-thumb"
+                      onLoad={(e) => {
+                        const img = e.target as HTMLImageElement;
+                        img.style.opacity = '1';
+                      }}
+                      onError={(e) => {
+                        console.error('Failed to load image:', media.url);
+                        const img = e.target as HTMLImageElement;
+                        img.style.display = 'none';
+                      }}
                     />
                   )}
                   {isVideo && (
@@ -115,7 +124,7 @@ const MediaPreviewGrid: React.FC<MediaPreviewGridProps> = ({
                       {videoThumbnail ? (
                         <img
                           src={videoThumbnail}
-                          alt="Video thumbnail"
+                          alt={`Video thumbnail of ${media.file.name}`}
                           className="w-full h-full object-cover media-thumb"
                         />
                       ) : (
@@ -123,6 +132,7 @@ const MediaPreviewGrid: React.FC<MediaPreviewGridProps> = ({
                           src={media.url}
                           className="w-full h-full object-cover media-thumb"
                           muted
+                          playsInline
                         />
                       )}
                       
