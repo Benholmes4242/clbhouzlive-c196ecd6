@@ -337,7 +337,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                 </button>
 
                 {/* Helper Text */}
-                <p className="text-xs text-gray-500 mt-2 px-1">
+                <p className="text-xs text-gray-500 mt-2 px-1 text-center">
                   Select multiple files to create a carousel post with swipeable media.
                 </p>
               </div>
