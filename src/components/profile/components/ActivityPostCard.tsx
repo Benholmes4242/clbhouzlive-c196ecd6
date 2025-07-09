@@ -7,6 +7,7 @@ import { Camera, Play } from 'lucide-react';
 import HighQualityImage from '@/components/ui/high-quality-image';
 import VideoPlayer from '@/components/ui/video-player';
 import { useVideoAutoplay } from '@/hooks/useVideoAutoplay';
+import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 
 interface ActivityPostCardProps {
   post: ActivityPost;
@@ -112,7 +113,7 @@ const ActivityPostCard = ({ post, attributionText, onClick }: ActivityPostCardPr
           <p className="text-white text-xs font-medium">{attributionText}</p>
           {post.content && (
             <p className="text-white text-xs opacity-90 mt-1 line-clamp-2">
-              {post.content}
+              {removeGolfCourseFromContent(post.content)}
             </p>
           )}
           {courseTags.length > 0 && (
