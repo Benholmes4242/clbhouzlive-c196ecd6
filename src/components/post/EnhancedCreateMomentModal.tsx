@@ -5,7 +5,7 @@ import { X, Camera, Image, Video } from 'lucide-react';
 import CourseTagInput from '../posts/CourseTagInput';
 import GolfCoursePin from '../posts/GolfCoursePin';
 import EnhancedMediaUpload from '../posts/EnhancedMediaUpload';
-import RichTextInput from '../posts/RichTextInput';
+import EnhancedRichTextInput from '../posts/EnhancedRichTextInput';
 import { useTaggableEntities } from '@/hooks/useTaggableEntities';
 import { useToast } from '@/hooks/use-toast';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -93,24 +93,6 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
   // Handle caption input with mention detection
   const handleCaptionChange = async (text: string) => {
     setCaption(text);
-
-    // Check for mentions - look for @ followed by at least 1 character
-    // Use regex to find the last @ mention in the text
-    const mentionRegex = /@(\w+)$/;
-    const match = text.match(mentionRegex);
-    
-    if (match && match[1].length >= 1) {
-      const query = match[1];
-      setShowSuggestions(true);
-      
-      try {
-        await searchEntities(query);
-      } catch (error) {
-        console.error('Error searching entities:', error);
-      }
-    } else {
-      setShowSuggestions(false);
-    }
   };
 
   // Handle mention selection
@@ -365,35 +347,14 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
 
                 {/* Caption Input */}
                 <div className="relative">
-                  <RichTextInput
+                  <EnhancedRichTextInput
                     value={caption}
                     onChange={handleCaptionChange}
+                    onTagsChange={setSelectedTags}
                     placeholder="Write about your moment..."
                     selectedTags={selectedTags}
                     disabled={isSubmitting}
                   />
-
-                  {/* Mention Suggestions */}
-                  {showSuggestions && entities.length > 0 && (
-                    <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-md shadow-lg max-h-40 overflow-y-auto z-50 mt-1">
-                      {entities.map((entity) => (
-                        <div
-                          key={`${entity.entity_type}-${entity.entity_id}-${entity.id}`}
-                          className="px-3 py-2 hover:bg-gray-100 cursor-pointer flex items-center gap-2 transition-colors"
-                          onClick={() => handleSelectMention(entity)}
-                        >
-                          <div className="flex flex-col">
-                            <span className="font-medium text-blue-600">
-                              @{entity.username || entity.name}
-                            </span>
-                            <span className="text-xs text-gray-500 capitalize">
-                              {entity.entity_type.replace('_', ' ')} • {entity.name}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
                 </div>
 
                 {/* Selected Tags */}

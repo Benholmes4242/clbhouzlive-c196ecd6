@@ -18,8 +18,30 @@ export const createPostTags = async (
 
   console.log('Creating post tags for post:', postId, 'with tags:', selectedTags);
 
-  // Tags feature temporarily disabled due to missing database tables
-  console.log('Post tags creation skipped - feature disabled');
+  try {
+    // Calculate tag positions based on caption content
+    // For now, we'll create tags without specific positions since we don't have the actual caption here
+    const postTagsData = selectedTags.map(tag => ({
+      post_id: postId,
+      tagged_entity_id: tag.id,
+      start_index: 0, // These would need to be calculated based on actual caption content
+      end_index: tag.name.length + 1 // @name length
+    }));
+
+    const { error } = await supabase
+      .from('post_tags')
+      .insert(postTagsData);
+
+    if (error) {
+      console.error('Error creating post tags:', error);
+      throw error;
+    }
+
+    console.log('Post tags created successfully');
+  } catch (error) {
+    console.error('Error in createPostTags:', error);
+    throw error;
+  }
 };
 
 export const createTagNotifications = async (
@@ -34,8 +56,39 @@ export const createTagNotifications = async (
 
   console.log('Creating tag notifications for:', userTags);
 
-  // Tag notifications temporarily disabled due to missing database tables
-  console.log('Tag notifications skipped - feature disabled');
+  try {
+    // Get user's profile for notification content
+    const { data: userProfile } = await supabase
+      .from('user_profiles')
+      .select('display_name, username')
+      .eq('id', userId)
+      .single();
+
+    const userName = userProfile?.display_name || userProfile?.username || 'Someone';
+
+    // Create notifications for tagged users
+    for (const tag of userTags) {
+      // Don't notify the user if they tagged themselves
+      if (tag.entity_id === userId) continue;
+
+      await supabase.rpc('send_push_notification', {
+        target_user_id: tag.entity_id,
+        notification_type: 'tag',
+        title: 'Tagged in Post',
+        message: `${userName} tagged you in their post`,
+        data: {
+          post_id: postId,
+          tagger_id: userId,
+          tagger_name: userName
+        }
+      });
+    }
+
+    console.log('Tag notifications created successfully');
+  } catch (error) {
+    console.error('Error creating tag notifications:', error);
+    // Don't throw - notifications are not critical
+  }
 };
 
 export const rollbackPost = async (postId: string): Promise<void> => {
@@ -48,7 +101,11 @@ export const rollbackPost = async (postId: string): Promise<void> => {
       .delete()
       .eq('post_id', postId);
 
-    // Post tags deletion skipped - table doesn't exist
+    // Delete post tags
+    await supabase
+      .from('post_tags')
+      .delete()
+      .eq('post_id', postId);
 
     // Delete the post
     await supabase
