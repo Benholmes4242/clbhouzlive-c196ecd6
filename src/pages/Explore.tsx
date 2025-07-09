@@ -1,69 +1,123 @@
+
 import React, { useState } from 'react';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
-import ExploreGrid from '@/components/explore/ExploreGrid';
 import ExploreFilters from '@/components/explore/ExploreFilters';
-import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { mockExploreContent } from '@/components/explore/mockData';
+import ExploreGrid from '@/components/explore/ExploreGrid';
+import MobileDebugConsole from '@/components/explore/MobileDebugConsole';
+import VerticalMediaFeed from '@/components/explore/VerticalMediaFeed';
+import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
+
+import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
 
 const Explore = () => {
-  const { user } = useSupabaseSession();
   const [activeFilter, setActiveFilter] = useState('All');
+  const [debugVisible, setDebugVisible] = useState(false);
+  const { 
+    content, 
+    loading, 
+    hasMore, 
+    loadMore 
+  } = useInfiniteExploreContent();
+  
+  const { 
+    isOpen: isFeedOpen, 
+    initialItem, 
+    openFeed, 
+    closeFeed 
+  } = useVerticalMediaFeed();
 
   const handleLike = (contentId: string) => {
-    console.log('Liked content:', contentId);
+    // Update likes optimistically - could be enhanced with actual API call
+    // For now, this is just visual feedback
   };
 
   const handleFollow = (contentId: string) => {
-    console.log('Followed user:', contentId);
+    // Update follow status optimistically - could be enhanced with actual API call
+    // For now, this is just visual feedback
   };
 
-  const handleLoadMore = () => {
-    console.log('Load more content');
+  const handleMediaClick = (item: any) => {
+    openFeed(item);
   };
 
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <main className="pt-16 pb-20">
-          <div className="max-w-md mx-auto px-4 py-8 text-center">
-            <h1 className="text-2xl font-bold mb-4">Explore</h1>
-            <p className="text-muted-foreground">
-              Sign in to explore golf content and connect with the community.
-            </p>
-          </div>
-        </main>
-        <BottomNavigation />
-      </div>
-    );
-  }
+  const filteredContent = content.filter(item => {
+    if (activeFilter === 'All') return true;
+    if (activeFilter === 'Videos') return item.type === 'video';
+    if (activeFilter === 'Photos') return item.type === 'image';
+    if (activeFilter === 'Pros') return item.user?.verified;
+    if (activeFilter === 'Tips') return item.label === 'Pro Tip';
+    if (activeFilter === 'Trending') return item.label === 'Trending';
+    if (activeFilter === 'Clubs') return item.label === 'From Clubhouse';
+    if (activeFilter === 'Hack Shack') {
+      // Only videos with #hackshack hashtag
+      return item.type === 'video' && (
+        item.title?.toLowerCase().includes('#hackshack') || 
+        item.title?.toLowerCase().includes('hackshack')
+      );
+    }
+    return true;
+  });
+
+  // Remove duplicates based on src URL
+  const uniqueContent = filteredContent.filter((item, index, self) => 
+    index === self.findIndex(t => t.src === item.src)
+  );
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <main className="pt-16 pb-20">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold mb-4">Explore</h1>
-            <ExploreFilters 
-              activeFilter={activeFilter}
-              onFilterChange={setActiveFilter}
-            />
-          </div>
+      <div className="min-h-screen bg-background">
+        <Header />
+        
+        <main className="container mx-auto px-4 py-6 pb-20">
+          {/* Sticky Filter Bar */}
+          <ExploreFilters 
+            activeFilter={activeFilter} 
+            onFilterChange={setActiveFilter} 
+          />
+
+          {/* Masonry Grid with Infinite Scroll */}
           <ExploreGrid 
-            content={mockExploreContent}
+            content={uniqueContent}
             onLike={handleLike}
             onFollow={handleFollow}
-            isLoading={false}
-            hasMore={false}
-            onLoadMore={handleLoadMore}
+            onMediaClick={handleMediaClick}
+            isLoading={loading}
+            hasMore={hasMore}
+            onLoadMore={loadMore}
             activeFilter={activeFilter}
           />
-        </div>
-      </main>
-      <BottomNavigation />
-    </div>
+        </main>
+        
+        <BottomNavigation />
+
+        {/* Mobile Debug Console */}
+        <MobileDebugConsole 
+          isVisible={debugVisible}
+          onToggle={() => setDebugVisible(!debugVisible)}
+        />
+
+        {/* Vertical Media Feed */}
+        {initialItem && (
+          <VerticalMediaFeed
+            isOpen={isFeedOpen}
+            onClose={closeFeed}
+            initialItem={initialItem}
+            allContent={content}
+            onLike={handleLike}
+            onFollow={handleFollow}
+          />
+        )}
+
+        <style>{`
+          .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+          }
+          .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+          }
+        `}</style>
+      </div>
   );
 };
 

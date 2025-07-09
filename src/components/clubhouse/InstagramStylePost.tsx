@@ -10,10 +10,10 @@ import VideoPlayer from '@/components/ui/video-player';
 import { useVideoAutoplay } from '@/hooks/useVideoAutoplay';
 import { useSwipeable } from 'react-swipeable';
 import { useIsMobile } from '@/hooks/use-mobile';
-
+import TaggedText from '@/components/posts/TaggedText';
 
 import LazyImage from '@/components/ui/lazy-image';
-
+import PostViewerModal from '@/components/posts/PostViewerModal';
 import { usePostViewer } from '@/hooks/usePostViewer';
 import { useVideoVisibility } from '@/hooks/useVideoVisibility';
 import { useVideoPlaybackManager } from '@/contexts/VideoPlaybackManager';
@@ -25,6 +25,13 @@ interface PostMedia {
   media_url: string;
 }
 
+interface PostTag {
+  id: string;
+  entity_type: 'user' | 'golf_club' | 'business';
+  entity_id: string;
+  name: string;
+  username: string | null;
+}
 
 interface UserPostData {
   id: string;
@@ -37,6 +44,7 @@ interface UserPostData {
     profile_photo_url: string | null;
   };
   post_media: PostMedia[];
+  post_tags: PostTag[];
 }
 
 interface InstagramStylePostProps {
@@ -65,6 +73,7 @@ const InstagramStylePost: React.FC<InstagramStylePostProps> = ({ post, allUserPo
 
   const displayName = post.user.display_name || post.user.username || 'User';
   const timeAgo = formatDistanceToNow(new Date(post.created_at), { addSuffix: true });
+  const golfClubTags = post.post_tags?.filter(tag => tag.entity_type === 'golf_club') || [];
 
   // Use video visibility hook for intersection observer
   const { containerRef, isVisible } = useVideoVisibility({
@@ -116,6 +125,28 @@ const InstagramStylePost: React.FC<InstagramStylePostProps> = ({ post, allUserPo
     touchEventOptions: { passive: false }
   });
 
+  // Fetch golf course details
+  useEffect(() => {
+    const fetchGolfCourse = async () => {
+      if (golfClubTags.length > 0 && !golfCourse) {
+        try {
+          const { data: courseData, error } = await supabase
+            .from('golf_courses')
+            .select('id, name, country, region')
+            .eq('id', golfClubTags[0].entity_id)
+            .single();
+
+          if (!error && courseData) {
+            setGolfCourse(courseData);
+          }
+        } catch (error) {
+          console.error('Error fetching golf course:', error);
+        }
+      }
+    };
+
+    fetchGolfCourse();
+  }, [golfClubTags.length > 0 ? golfClubTags[0]?.entity_id : null, golfCourse]);
 
   const handleProfileClick = () => {
     navigate(`/profile/${post.user.username}`);
@@ -244,6 +275,20 @@ const InstagramStylePost: React.FC<InstagramStylePostProps> = ({ post, allUserPo
             </div>
           </div>
 
+          {/* Location Tag - Top Right */}
+          {golfCourse && (
+            <div className="absolute top-3 right-3 z-20">
+              <CoursePostBadge 
+                course={{
+                  id: golfCourse.id,
+                  name: golfCourse.name,
+                  country: golfCourse.country,
+                  region: golfCourse.region
+                }}
+                className="bg-black/40 backdrop-blur-sm border border-white/20 text-xs"
+              />
+            </div>
+          )}
 
           {/* Video Controls */}
           {currentMedia.media_type === 'video' && (
@@ -354,7 +399,7 @@ const InstagramStylePost: React.FC<InstagramStylePostProps> = ({ post, allUserPo
                   · {timeAgo}
                 </span>
               </div>
-              {post.content}
+              <TaggedText text={post.content} tags={post.post_tags || []} />
             </div>
             
             {/* Mock comments - in a real app this would come from a comments API */}
@@ -365,7 +410,15 @@ const InstagramStylePost: React.FC<InstagramStylePostProps> = ({ post, allUserPo
         )}
       </div>
 
-      {/* Post Viewer Modal - functionality removed */}
+      {/* Post Viewer Modal */}
+      {currentPost && (
+        <PostViewerModal
+          isOpen={isOpen}
+          onClose={closePostViewer}
+          initialPost={currentPost}
+          allUserPosts={viewerPosts}
+        />
+      )}
     </>
   );
 };

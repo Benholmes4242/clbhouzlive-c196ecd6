@@ -133,7 +133,80 @@ export const usePostSubmission = () => {
         console.log('All media files uploaded successfully');
       }
 
-      // Tagging functionality has been removed
+      // Create user tags
+      for (const tag of selectedTags) {
+        console.log('Creating tag:', tag);
+        
+        const { error: tagError } = await supabase
+          .from('post_tags')
+          .insert({
+            post_id: postData.id,
+            tagged_by_user_id: user.id,
+            tagged_entity_id: tag.entity_id
+          });
+
+        if (tagError) {
+          console.error('Error creating tag:', tagError);
+        }
+      }
+
+      // Create golf course tag if course is selected
+      if (courseInfo) {
+        console.log('Creating golf course tag for:', courseInfo);
+        
+        // First, ensure the golf course exists as a taggable entity
+        let golfCourseEntityId = null;
+        
+        // Check if the golf course already exists in taggable_entities
+        const { data: existingEntity } = await supabase
+          .from('taggable_entities')
+          .select('id')
+          .eq('entity_type', 'golf_club')
+          .eq('entity_id', courseInfo.id)
+          .single();
+
+        if (existingEntity) {
+          golfCourseEntityId = existingEntity.id;
+          console.log('Found existing golf course entity:', golfCourseEntityId);
+        } else {
+          // Create the taggable entity for this golf course
+          const { data: newEntity, error: entityError } = await supabase
+            .from('taggable_entities')
+            .insert({
+              entity_type: 'golf_club',
+              entity_id: courseInfo.id,
+              name: courseInfo.name,
+              username: null
+            })
+            .select('id')
+            .single();
+
+          if (entityError) {
+            console.error('Error creating golf course entity:', entityError);
+            throw entityError;
+          }
+
+          golfCourseEntityId = newEntity.id;
+          console.log('Created new golf course entity:', golfCourseEntityId);
+        }
+
+        // Now create the post tag using the taggable entity ID
+        if (golfCourseEntityId) {
+          const { error: courseTagError } = await supabase
+            .from('post_tags')
+            .insert({
+              post_id: postData.id,
+              tagged_by_user_id: user.id,
+              tagged_entity_id: golfCourseEntityId
+            });
+
+          if (courseTagError) {
+            console.error('Error creating golf course tag:', courseTagError);
+          } else {
+            console.log('Golf course tag created successfully');
+          }
+        }
+      }
 
       // Dispatch success event
       window.dispatchEvent(new CustomEvent('postCompleted', {

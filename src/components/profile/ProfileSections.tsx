@@ -2,7 +2,7 @@
 import React from 'react';
 import EGAppIntegration from '@/components/profile/EGAppIntegration';
 import Top100Courses from '@/components/profile/Top100Courses';
-
+import SocialActivity from '@/components/profile/SocialActivity';
 
 interface ProfileSectionsProps {
   profile: any;
@@ -46,7 +46,13 @@ const ProfileSections: React.FC<ProfileSectionsProps> = ({
         </>
       )}
 
-      {/* Social Activity - functionality removed */}
+      {/* Social Activity - User's Posts - Show for all user types */}
+      <SocialActivity
+        userId={profile?.id || user?.id || ''}
+        isOwnProfile={isOwnProfile}
+        activityVisible={profile?.activity_visible !== false}
+        profileDisplayName={profile?.display_name}
+      />
     </div>
   );
 };

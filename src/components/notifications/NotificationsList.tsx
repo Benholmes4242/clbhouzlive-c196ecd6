@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Bell, UserPlus, Tag, MessageSquare, Heart, MessageCircle, Share, MapPin, Trophy } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import FollowNotification from './FollowNotification';
-
+import TagNotification from './TagNotification';
 
 interface NotificationsListProps {
   notifications: any[];
@@ -70,7 +70,14 @@ const NotificationsList: React.FC<NotificationsListProps> = ({
             );
           }
           
-          // Tag notifications have been removed
+          if (notification.type === 'tag') {
+            return (
+              <TagNotification
+                key={notification.id}
+                notification={notification}
+              />
+            );
+          }
 
           if (notification.type === 'message') {
             return (
