@@ -1,8 +1,7 @@
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import { Heart, Play } from 'lucide-react';
 import { ExploreContentItem } from './types';
-import OptimizedImage from '@/components/ui/optimized-image';
-import VideoPlayer from '@/components/ui/video-player';
+import { useVideoAutoplay } from '@/hooks/useVideoAutoplay';
 
 interface EnhancedMediaCardProps {
   item: ExploreContentItem;
@@ -10,8 +9,18 @@ interface EnhancedMediaCardProps {
 }
 
 const EnhancedMediaCard: React.FC<EnhancedMediaCardProps> = ({ item, onMediaClick }) => {
+  const [imageError, setImageError] = useState(false);
+  const { ref: autoplayRef, shouldAutoplay, handleMouseEnter, handleMouseLeave } = useVideoAutoplay({
+    enabled: true,
+    threshold: 0.3
+  });
+
   const handleMediaClick = () => {
     onMediaClick(item);
+  };
+
+  const handleImageError = () => {
+    setImageError(true);
   };
 
   if (item.type === 'cta') return null;
@@ -31,37 +40,52 @@ const EnhancedMediaCard: React.FC<EnhancedMediaCardProps> = ({ item, onMediaClic
 
   return (
     <div 
+      ref={autoplayRef}
       className="relative group bg-background rounded-lg overflow-hidden h-full cursor-pointer transition-transform duration-200 hover:scale-105"
       onClick={handleMediaClick}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       {/* Media Container */}
       <div className="relative w-full h-full overflow-hidden">
         {item.type === 'video' ? (
-          <>
-            <div className="relative w-full h-full">
-              <OptimizedImage
-                src={displaySrc}
-                alt={item.title || 'Video thumbnail'}
-                className="w-full h-full object-cover"
-                width={300}
-                height={300}
-              />
-              {/* Video Play Icon - Bottom Right */}
-              <div className="absolute bottom-2 right-2">
-                <div className="flex items-center justify-center w-8 h-8 bg-black/60 text-white rounded-full">
-                  <Play className="h-4 w-4 ml-0.5" fill="currentColor" />
-                </div>
+          <div className="relative w-full h-full">
+            <video
+              src={displaySrc}
+              className="w-full h-full object-cover"
+              autoPlay={shouldAutoplay}
+              muted
+              loop
+              playsInline
+              poster={fallbackImage}
+              onError={() => setImageError(true)}
+            />
+            {/* Video Play Icon - Bottom Right */}
+            <div className="absolute bottom-2 right-2">
+              <div className="flex items-center justify-center w-8 h-8 bg-black/60 text-white rounded-full">
+                <Play className="h-4 w-4 ml-0.5" fill="currentColor" />
               </div>
             </div>
-          </>
+            {imageError && (
+              <div className="absolute inset-0 bg-muted rounded-lg flex items-center justify-center">
+                <div className="text-xs text-muted-foreground">Video unavailable</div>
+              </div>
+            )}
+          </div>
         ) : (
-          <OptimizedImage
-            src={displaySrc}
-            alt={item.title || 'Image'}
-            className="w-full h-full object-cover"
-            width={300}
-            height={300}
-          />
+          <div className="relative w-full h-full">
+            <img
+              src={imageError ? fallbackImage : displaySrc}
+              alt={item.title || 'Image'}
+              className="w-full h-full object-cover"
+              onError={handleImageError}
+            />
+            {imageError && (
+              <div className="absolute inset-0 bg-muted rounded-lg flex items-center justify-center">
+                <div className="text-xs text-muted-foreground">Image unavailable</div>
+              </div>
+            )}
+          </div>
         )}
 
         {/* User Info - Top Left */}
