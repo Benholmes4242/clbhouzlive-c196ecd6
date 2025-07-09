@@ -119,7 +119,7 @@ const ClubhouzMomentsCarousel = () => {
     if (!user) return;
 
     try {
-      // Fetch video posts with user data and tags
+      // Fetch video posts with user data only (post_tags relationship doesn't exist yet)
       const { data: videoPosts, error } = await supabase
         .from('posts')
         .select(`
@@ -129,11 +129,6 @@ const ClubhouzMomentsCarousel = () => {
           post_media!inner (
             media_url,
             media_type
-          ),
-          post_tags (
-            id,
-            entity_type,
-            name
           )
         `)
         .eq('post_media.media_type', 'video')
@@ -187,8 +182,6 @@ const ClubhouzMomentsCarousel = () => {
           const userProfile = profiles?.find(profile => profile.id === post.user_id);
           if (!userProfile) return null;
 
-          const golfClubTag = post.post_tags?.find((tag: any) => tag.entity_type === 'golf_club')?.name;
-
           return {
             id: post.id,
             user: {
@@ -198,8 +191,7 @@ const ClubhouzMomentsCarousel = () => {
               avatar: userProfile.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'
             },
             videoUrl: post.post_media[0]?.media_url || '',
-            isFollowing: followingIds.has(post.user_id),
-            golfClubTag
+            isFollowing: followingIds.has(post.user_id)
           };
         })
         .filter(moment => moment !== null && moment.videoUrl !== '')
