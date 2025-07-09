@@ -269,7 +269,6 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                 <CoursePostBadge 
                   course={golfCourse}
                   className="m-0"
-                  showFullName={true}
                 />
               </div>
             )}
@@ -444,7 +443,6 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                         <CoursePostBadge 
                           course={golfCourse}
                           className="m-0"
-                          showFullName={true}
                         />
                       </div>
                     )}
