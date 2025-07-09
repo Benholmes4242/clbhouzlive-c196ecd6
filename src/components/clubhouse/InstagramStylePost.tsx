@@ -10,6 +10,7 @@ import VideoPlayer from '@/components/ui/video-player';
 import { useVideoAutoplay } from '@/hooks/useVideoAutoplay';
 import { useSwipeable } from 'react-swipeable';
 import { useIsMobile } from '@/hooks/use-mobile';
+import TaggedText from '@/components/posts/TaggedText';
 
 import LazyImage from '@/components/ui/lazy-image';
 import PostViewerModal from '@/components/posts/PostViewerModal';
@@ -398,7 +399,7 @@ const InstagramStylePost: React.FC<InstagramStylePostProps> = ({ post, allUserPo
                   · {timeAgo}
                 </span>
               </div>
-              <div>{post.content}</div>
+              <TaggedText text={post.content} tags={post.post_tags || []} />
             </div>
             
             {/* Mock comments - in a real app this would come from a comments API */}
