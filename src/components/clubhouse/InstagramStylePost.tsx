@@ -399,14 +399,7 @@ const InstagramStylePost: React.FC<InstagramStylePostProps> = ({ post, allUserPo
                   · {timeAgo}
                 </span>
               </div>
-              <TaggedText 
-                text={post.content} 
-                tags={(() => {
-                  console.log('InstagramStylePost - post.post_tags:', post.post_tags);
-                  console.log('InstagramStylePost - post.content:', post.content);
-                  return post.post_tags || [];
-                })()} 
-              />
+              <TaggedText text={post.content} tags={post.post_tags || []} />
             </div>
             
             {/* Mock comments - in a real app this would come from a comments API */}
