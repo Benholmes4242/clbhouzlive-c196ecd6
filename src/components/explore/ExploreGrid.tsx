@@ -59,12 +59,16 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
   if (content.length === 0 && !isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
-        <div className="text-4xl mb-4">🏌️‍♂️</div>
-        <h3 className="text-lg font-semibold text-foreground mb-2">No content found</h3>
+        <div className="text-4xl mb-4">⛳</div>
+        <h3 className="text-lg font-semibold text-foreground mb-2">No content yet</h3>
         <p className="text-muted-foreground max-w-md">
           {activeFilter === 'Hack Shack' 
-            ? "No hacks yet! Be the first to upload a hilarious golf mishit using #hackshack in your post."
-            : "Try adjusting your filters or check back later for new content."}
+            ? "No hack videos yet! Be the first to share a hilarious golf moment using #hackshack."
+            : activeFilter === 'Videos'
+            ? "No videos posted yet. Share your first golf video!"
+            : activeFilter === 'Photos' 
+            ? "No photos posted yet. Share your first golf photo!"
+            : "No posts yet. Be the first to share your golf content!"}
         </p>
       </div>
     );
@@ -84,9 +88,9 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
         ))}
       </div>
       
-      {/* Infinite scroll sentinel - hide loading for small content sets */}
+      {/* Infinite scroll sentinel */}
       <div id="scroll-sentinel" className="h-4">
-        {isLoading && content.length > 10 && hasMore && activeFilter !== 'Hack Shack' && (
+        {isLoading && hasMore && (
           <div className="flex justify-center py-4">
             <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
           </div>

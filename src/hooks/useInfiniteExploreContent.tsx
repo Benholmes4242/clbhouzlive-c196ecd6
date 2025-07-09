@@ -2,19 +2,16 @@
 import { useState, useCallback, useEffect } from 'react';
 import { ExploreContentItem } from '@/components/explore/types';
 import { useRealPostsFetcher } from './explore/useRealPostsFetcher';
-import { useMockPostsHandler } from './explore/useMockPostsHandler';
 
-const POSTS_PER_PAGE = 6; // Reduced for faster loading on mobile
+const POSTS_PER_PAGE = 12; // Increased for better loading experience
 
 export const useInfiniteExploreContent = () => {
   const [content, setContent] = useState<ExploreContentItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [currentOffset, setCurrentOffset] = useState(0);
-  const [currentMockOffset, setCurrentMockOffset] = useState(0);
   
   const { fetchRealPosts } = useRealPostsFetcher();
-  const { getMockPosts } = useMockPostsHandler();
 
   const loadMore = useCallback(async () => {
     if (loading || !hasMore) {
@@ -23,48 +20,30 @@ export const useInfiniteExploreContent = () => {
     setLoading(true);
 
     try {
-      // Try to fetch real posts first
+      // Only fetch real posts from clbhouz users - no mock data
       const realPosts = await fetchRealPosts(currentOffset, POSTS_PER_PAGE);
       
       if (realPosts.length > 0) {
-        // Randomize the fetched posts for variety
+        // Shuffle the fetched posts for variety
         const shuffledPosts = [...realPosts].sort(() => Math.random() - 0.5);
         setContent(prev => [...prev, ...shuffledPosts]);
         setCurrentOffset(prev => prev + POSTS_PER_PAGE);
         
-        // If we got fewer posts than requested, we might be at the end
+        // If we got fewer posts than requested, we've reached the end
         if (realPosts.length < POSTS_PER_PAGE) {
-          setHasMore(true); // Keep loading mock data
-        }
-      } else {
-        // Fallback to mock data
-        const mockPosts = getMockPosts(currentMockOffset, POSTS_PER_PAGE);
-        
-        if (mockPosts.length > 0) {
-          // Randomize mock posts as well
-          const shuffledMockPosts = [...mockPosts].sort(() => Math.random() - 0.5);
-          setContent(prev => [...prev, ...shuffledMockPosts]);
-          setCurrentMockOffset(prev => prev + POSTS_PER_PAGE);
-        } else {
           setHasMore(false);
         }
+      } else {
+        // No more real content available
+        setHasMore(false);
       }
     } catch (error) {
       console.error('Error loading content:', error);
-      
-      // Fallback to mock data on error
-      const mockPosts = getMockPosts(currentMockOffset, POSTS_PER_PAGE);
-      if (mockPosts.length > 0) {
-        const shuffledMockPosts = [...mockPosts].sort(() => Math.random() - 0.5);
-        setContent(prev => [...prev, ...shuffledMockPosts]);
-        setCurrentMockOffset(prev => prev + POSTS_PER_PAGE);
-      } else {
-        setHasMore(false);
-      }
+      setHasMore(false);
     } finally {
       setLoading(false);
     }
-  }, [loading, hasMore, currentOffset, currentMockOffset, fetchRealPosts, getMockPosts]);
+  }, [loading, hasMore, currentOffset, fetchRealPosts]);
 
   // Initial load with randomization
   useEffect(() => {
@@ -73,7 +52,7 @@ export const useInfiniteExploreContent = () => {
     }
   }, []);
 
-  // Shuffle content on each page load
+  // Shuffle content once on initial load for variety
   useEffect(() => {
     if (content.length > 0) {
       setContent(prev => [...prev].sort(() => Math.random() - 0.5));
