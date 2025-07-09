@@ -48,7 +48,6 @@ const MomentCard: React.FC<{
           muted
           loop
           playsInline
-          poster="https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop"
         />
         
         {/* Gradient Overlay */}
