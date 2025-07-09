@@ -16,6 +16,7 @@ import CommentsDrawer from './CommentsDrawer';
 import EnhancedCreateMomentModal from '../post/EnhancedCreateMomentModal';
 import TaggedText from './TaggedText';
 import { formatDistanceToNow } from 'date-fns';
+import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 
 interface PostMedia {
   id: string;
@@ -307,10 +308,10 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                 </div>
               </div>
               
-              {currentPost.content && (
+              {currentPost.content && removeGolfCourseFromContent(currentPost.content) && (
                 <div className="text-white text-sm leading-relaxed bg-black/30 p-2 rounded max-w-full">
                   <TaggedText 
-                    text={currentPost.content} 
+                    text={removeGolfCourseFromContent(currentPost.content)} 
                     tags={currentPost.post_tags?.map(tag => tag.tagged_entity || tag) || []} 
                   />
                 </div>
@@ -516,10 +517,10 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                     </div>
                   </div>
                   
-                  {currentPost.content && (
+                  {currentPost.content && removeGolfCourseFromContent(currentPost.content) && (
                     <div className="text-sm mt-3">
                       <TaggedText 
-                        text={currentPost.content} 
+                        text={removeGolfCourseFromContent(currentPost.content)} 
                         tags={currentPost.post_tags?.map(tag => tag.tagged_entity || tag) || []} 
                       />
                     </div>
