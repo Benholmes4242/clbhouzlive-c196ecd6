@@ -6,7 +6,7 @@ import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import VideoPlayer from '@/components/ui/video-player';
 import LazyImage from '@/components/ui/lazy-image';
 import CoursePostBadge from '../CoursePostBadge';
-import TaggedText from '../TaggedText';
+
 import { UserPostData, GolfCourse } from './types';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
@@ -94,7 +94,7 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
               {displayName}
             </span>
             <span className="ml-2">
-              <TaggedText text={post.content || ""} tags={post.post_tags || []} />
+              {post.content || ""}
             </span>
           </div>
         </div>
@@ -235,7 +235,7 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
                 · {timeAgo}
               </span>
             </div>
-            <TaggedText text={post.content} tags={post.post_tags || []} />
+            {post.content}
           </div>
           
           <div className="mt-3 space-y-2 text-sm text-muted-foreground">

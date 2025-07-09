@@ -60,7 +60,6 @@ export const DesktopUserPost: React.FC<DesktopUserPostProps> = ({
 
           <UserPostContent
             content={post.content}
-            tags={post.post_tags}
           />
 
           <UserPostMedia
