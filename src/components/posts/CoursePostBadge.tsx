@@ -31,7 +31,7 @@ const CoursePostBadge = ({ course, className = "" }: CoursePostBadgeProps) => {
         className="bg-black/40 text-white hover:bg-black/60 cursor-pointer transition-all duration-200 hover:shadow-sm px-3 py-1.5 rounded-full text-xs font-medium border-0 backdrop-blur-sm"
         onClick={handleCourseClick}
       >
-        <MapPin className="h-3 w-3 mr-1 text-white" />
+        <MapPin className="h-4 w-4 mr-1 text-white" />
         <span className="hover:underline">{course.name}</span>
       </Badge>
     </div>
