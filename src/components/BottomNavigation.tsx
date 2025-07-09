@@ -2,9 +2,9 @@
 import React from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePostFlow } from '@/hooks/usePostFlow';
-// Post submission functionality removed
+import { useOptimisticPostSubmission } from '@/hooks/useOptimisticPostSubmission';
 import GalleryPicker from '@/components/post/GalleryPicker';
-import PostCreationModal from '@/components/posts/PostCreationModal';
+import EnhancedCreateMomentModal from '@/components/post/EnhancedCreateMomentModal';
 import SnapToast from '@/components/snap/SnapToast';
 import NavigationBar from './bottom-navigation/NavigationBar';
 import { useNavigationHandlers } from '@/hooks/useNavigationHandlers';
@@ -31,8 +31,7 @@ const useIsDesktop = () => {
 const BottomNavigation = () => {
   const { user } = useSupabaseSession();
   const { activeTab, handleTabClick } = useNavigationHandlers();
-  // Post submission disabled for now
-  const submitPost = () => Promise.resolve();
+  const { submitPost } = useOptimisticPostSubmission();
   const { handleCaptionInput, selectMention } = usePostHandlers();
   const isDesktop = useIsDesktop();
   
@@ -109,11 +108,23 @@ const BottomNavigation = () => {
     console.log('Course info to submit:', courseInfo);
 
     try {
-        await submitPost();
-        console.log('Post submission successful');
-        closeComposer();
-        setLocalSelectedTags([]);
-        showConfirmationToast('Post shared successfully!');
+      await submitPost({
+        user,
+        content: caption,
+        mediaFiles,
+        selectedTags: finalTags,
+        courseInfo: courseInfo, // Pass course info separately
+        onSuccess: () => {
+          console.log('Post submission successful');
+          closeComposer();
+          setLocalSelectedTags([]);
+          showConfirmationToast('Post shared successfully!');
+        },
+        onError: () => {
+          console.error('Post submission failed');
+          showConfirmationToast('Failed to share post. Please try again.');
+        }
+      });
     } catch (error) {
       console.error('Error in handleSubmitPost:', error);
       showConfirmationToast('Failed to share post. Please try again.');
@@ -212,18 +223,43 @@ const BottomNavigation = () => {
         onMultipleFilesSelected={handleMultipleFilesSelected}
       />
 
-      <PostCreationModal
+      <EnhancedCreateMomentModal
         isOpen={isComposerOpen}
-        onClose={closeComposer}
-        selectedFile={selectedFile}
-        previewUrl={previewUrl}
-        captionInputRef={captionInputRef}
-        onCaptionInput={onCaptionInput}
-        showSuggestions={showSuggestions}
-        mentionSuggestions={mentionSuggestions}
-        onSelectMention={onSelectMention}
-        onSubmit={handleSubmitPost}
+        onClose={() => {
+          closeComposer();
+          setLocalSelectedTags([]);
+        }}
+        onSubmit={async (data) => {
+          setIsSubmitting(true);
+          try {
+            await submitPost({
+              user,
+              content: data.caption,
+              mediaFiles: data.files,
+              selectedTags: data.tags,
+              courseInfo: data.course,
+              onSuccess: () => {
+                console.log('Post submission successful');
+                closeComposer();
+                setLocalSelectedTags([]);
+                showConfirmationToast('Post shared successfully!');
+              },
+              onError: () => {
+                console.error('Post submission failed');
+                showConfirmationToast('Failed to share post. Please try again.');
+              }
+            });
+          } catch (error) {
+            console.error('Error in enhanced post submission:', error);
+            showConfirmationToast('Failed to share post. Please try again.');
+          } finally {
+            setIsSubmitting(false);
+          }
+        }}
         isSubmitting={isSubmitting}
+        initialFiles={selectedFiles.length > 0 ? selectedFiles : (selectedFile ? [selectedFile] : [])}
+        selectedCourse={selectedCourse}
+        onCourseSelect={setSelectedCourse}
       />
 
       <SnapToast

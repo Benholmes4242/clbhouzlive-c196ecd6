@@ -1,13 +1,36 @@
 
+import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { ExploreContentItem } from '@/components/explore/types';
-import { isValidImageUrl } from './urlValidation';
 
-export const useRealPostsFetcher = () => {
-  const fetchRealPosts = async (currentOffset: number, postsPerPage: number): Promise<ExploreContentItem[]> => {
+interface ExplorePost {
+  id: string;
+  type: 'video' | 'image';
+  src: string;
+  title: string;
+  likes: number;
+  user?: {
+    id: string;
+    name: string;
+    avatar: string;
+    verified?: boolean;
+  };
+  label?: string;
+  isFollowing?: boolean;
+  golfCourse?: {
+    id: string;
+    name: string;
+    country: string;
+  };
+}
+
+export const useExploreContent = () => {
+  const [content, setContent] = useState<ExplorePost[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchExploreContent = async () => {
+    setLoading(true);
     try {
-      // Removed debug logs for performance
-      
+      // Fetch posts with media and tags from all users
       const { data: postsData, error } = await supabase
         .from('posts')
         .select(`
@@ -23,7 +46,7 @@ export const useRealPostsFetcher = () => {
           post_tags (
             id,
             tagged_entity_id,
-            taggable_entities (
+            taggable_entities!inner (
               id,
               entity_type,
               entity_id,
@@ -32,16 +55,16 @@ export const useRealPostsFetcher = () => {
           )
         `)
         .order('created_at', { ascending: false })
-        .range(currentOffset, currentOffset + postsPerPage - 1)
-        .limit(postsPerPage); // Add explicit limit for performance
+        .limit(20);
 
       if (error) {
         console.error('Error fetching posts:', error);
-        return [];
+        return;
       }
 
       if (!postsData || postsData.length === 0) {
-        return [];
+        setContent([]);
+        return;
       }
 
       // Get unique user IDs
@@ -55,10 +78,8 @@ export const useRealPostsFetcher = () => {
 
       if (profilesError) {
         console.error('Error fetching profiles:', profilesError);
-        return [];
+        return;
       }
-
-      // Performance: removed logging
 
       // Get golf course data for tagged courses
       const golfCourseIds = postsData
@@ -66,8 +87,6 @@ export const useRealPostsFetcher = () => {
         .filter(tag => tag.taggable_entities?.entity_type === 'golf_club')
         .map(tag => tag.taggable_entities?.entity_id)
         .filter(Boolean);
-
-      // Performance: removed logging
 
       let golfCourses: any[] = [];
       if (golfCourseIds.length > 0) {
@@ -84,9 +103,7 @@ export const useRealPostsFetcher = () => {
         const userProfile = profiles?.find(profile => profile.id === post.user_id);
         const media = (post.post_media || [])[0]; // Take first media item
         
-        if (!media || !isValidImageUrl(media.media_url)) {
-          return null;
-        }
+        if (!media) return null;
 
         // Find golf course tag
         const golfCourseTag = post.post_tags?.find(tag => 
@@ -105,36 +122,39 @@ export const useRealPostsFetcher = () => {
           }
         }
 
-        const formattedPost = {
+        return {
           id: post.id,
           type: media.media_type as 'video' | 'image',
           src: media.media_url,
           title: post.content || 'Post',
-          likes: Math.floor(Math.random() * 500) + 50,
-          comments: Math.floor(Math.random() * 100) + 5,
-          shares: Math.floor(Math.random() * 50) + 1,
-          duration: media.media_type === 'video' ? `${Math.floor(Math.random() * 180) + 30}s` : undefined,
+          likes: Math.floor(Math.random() * 100), // Placeholder until we have actual likes
           user: {
             id: post.user_id,
             name: userProfile?.display_name || userProfile?.username || 'User',
-            username: userProfile?.username,
             avatar: userProfile?.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
-            verified: Math.random() > 0.7 // Random verification for demo
+            verified: false // Placeholder
           },
           golfCourse,
-          label: Math.random() > 0.6 ? ['Pro Tip', 'Trending', 'From Clubhouse'][Math.floor(Math.random() * 3)] : undefined,
-          isFollowing: Math.random() > 0.5
+          isFollowing: false // Placeholder
         };
+      }).filter(Boolean) as ExplorePost[];
 
-        return formattedPost;
-      }).filter(Boolean) as ExploreContentItem[];
+      setContent(formattedPosts);
 
-      return formattedPosts;
     } catch (error) {
-      console.error('Error fetching real posts:', error);
-      return [];
+      console.error('Error fetching explore content:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  return { fetchRealPosts };
+  useEffect(() => {
+    fetchExploreContent();
+  }, []);
+
+  return {
+    content,
+    loading,
+    refetch: fetchExploreContent
+  };
 };

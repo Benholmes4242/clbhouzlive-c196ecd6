@@ -5,7 +5,9 @@ import ExploreContentCard from './ExploreContentCard';
 
 interface ExploreGridProps {
   content: ExploreContentItem[];
-  onMediaClick: (item: ExploreContentItem) => void;
+  onLike: (contentId: string) => void;
+  onFollow: (contentId: string) => void;
+  onMediaClick?: (item: ExploreContentItem) => void;
   isLoading: boolean;
   hasMore: boolean;
   onLoadMore: () => void;
@@ -14,6 +16,8 @@ interface ExploreGridProps {
 
 const ExploreGrid: React.FC<ExploreGridProps> = ({ 
   content, 
+  onLike, 
+  onFollow, 
   onMediaClick,
   isLoading, 
   hasMore, 
@@ -59,16 +63,12 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
   if (content.length === 0 && !isLoading) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-center">
-        <div className="text-4xl mb-4">⛳</div>
-        <h3 className="text-lg font-semibold text-foreground mb-2">No content yet</h3>
+        <div className="text-4xl mb-4">🏌️‍♂️</div>
+        <h3 className="text-lg font-semibold text-foreground mb-2">No content found</h3>
         <p className="text-muted-foreground max-w-md">
           {activeFilter === 'Hack Shack' 
-            ? "No hack videos yet! Be the first to share a hilarious golf moment using #hackshack."
-            : activeFilter === 'Videos'
-            ? "No videos posted yet. Share your first golf video!"
-            : activeFilter === 'Photos' 
-            ? "No photos posted yet. Share your first golf photo!"
-            : "No posts yet. Be the first to share your golf content!"}
+            ? "No hacks yet! Be the first to upload a hilarious golf mishit using #hackshack in your post."
+            : "Try adjusting your filters or check back later for new content."}
         </p>
       </div>
     );
@@ -82,15 +82,17 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
           <div key={item.id} className="aspect-square">
             <ExploreContentCard 
               item={item} 
+              onLike={onLike} 
+              onFollow={onFollow} 
               onMediaClick={onMediaClick}
             />
           </div>
         ))}
       </div>
       
-      {/* Infinite scroll sentinel */}
+      {/* Infinite scroll sentinel - hide loading for small content sets */}
       <div id="scroll-sentinel" className="h-4">
-        {isLoading && hasMore && (
+        {isLoading && content.length > 10 && hasMore && activeFilter !== 'Hack Shack' && (
           <div className="flex justify-center py-4">
             <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
           </div>

@@ -40,5 +40,9 @@ export const filterOptions = [
   'All',
   'Videos', 
   'Photos',
+  'Pros',
+  'Tips',
+  'Trending',
+  'Clubs',
   'Hack Shack'
 ];

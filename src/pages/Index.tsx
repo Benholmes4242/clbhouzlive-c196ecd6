@@ -9,7 +9,7 @@ import ClubhouzMomentsCarousel from '@/components/clubhouse/ClubhouzMomentsCarou
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-// Post cleanup utility removed
+import { removeDuplicatePosts } from '@/utils/postCleanup';
 import { useAppLogo } from '@/hooks/useAppLogo';
 
 const Index = () => {
@@ -17,7 +17,12 @@ const Index = () => {
   const navigate = useNavigate();
   const { currentLogo } = useAppLogo();
 
-  // Post cleanup removed
+  // Clean up duplicate posts when user is loaded
+  useEffect(() => {
+    if (user?.id) {
+      removeDuplicatePosts(user.id);
+    }
+  }, [user?.id]);
 
   // Show loading state while checking authentication
   if (loading) {
@@ -93,13 +98,10 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <StoryBar />
+      <ClubhouzMomentsCarousel />
       
-      <main className="container mx-auto px-4 py-6 pb-20">
-        <div className="max-w-4xl mx-auto space-y-6">
-          {/* Moments you may like section */}
-          <ClubhouzMomentsCarousel />
-          
-          {/* Main social feed */}
+      <main className="container mx-auto px-4 py-6">
+        <div className="max-w-2xl mx-auto space-y-6">
           <TrendingFeed />
         </div>
       </main>

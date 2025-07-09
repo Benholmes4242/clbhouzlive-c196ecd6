@@ -2,15 +2,17 @@
 import React from 'react';
 import { ExploreContentItem } from './types';
 import CTACard from './CTACard';
-import EnhancedMediaCard from './EnhancedMediaCard';
+import MediaCard from './MediaCard';
 
 interface ExploreContentCardProps {
   item: ExploreContentItem;
-  onMediaClick: (item: ExploreContentItem) => void;
+  onLike: (contentId: string) => void;
+  onFollow: (contentId: string) => void;
+  onMediaClick?: (item: ExploreContentItem) => void;
 }
 
 
-const ExploreContentCard: React.FC<ExploreContentCardProps> = ({ item, onMediaClick }) => {
+const ExploreContentCard: React.FC<ExploreContentCardProps> = ({ item, onLike, onFollow, onMediaClick }) => {
   if (item.type === 'cta') {
     return (
       <div className="h-full">
@@ -21,7 +23,7 @@ const ExploreContentCard: React.FC<ExploreContentCardProps> = ({ item, onMediaCl
 
   return (
     <div className="h-full">
-      <EnhancedMediaCard item={item} onMediaClick={onMediaClick} />
+      <MediaCard item={item} onLike={onLike} onFollow={onFollow} onMediaClick={onMediaClick} />
     </div>
   );
 };

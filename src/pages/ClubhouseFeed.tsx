@@ -9,13 +9,13 @@ import ClubSpotlightCarousel from '@/components/clubhouse/ClubSpotlightCarousel'
 import FeaturedMomentsCarousel from '@/components/clubhouse/FeaturedMomentsCarousel';
 import TopPlayerContentCarousel from '@/components/clubhouse/TopPlayerContentCarousel';
 
-// Instagram style feed and clubhouse content disabled
+import InstagramStyleFeed from '@/components/clubhouse/InstagramStyleFeed';
+import { useClubhouseContent } from '@/hooks/useClubhouseContent';
 
 const ClubhouseFeed = () => {
   const [activeTab, setActiveTab] = useState('feed');
   const [searchQuery, setSearchQuery] = useState('');
-  const posts: any[] = [];
-  const loading = false;
+  const { posts, loading } = useClubhouseContent();
 
   return (
     <div className="min-h-screen bg-background">
@@ -78,9 +78,7 @@ const ClubhouseFeed = () => {
               <h2 className="text-xl font-semibold">Latest Posts</h2>
               <p className="text-muted-foreground text-sm">Discover the latest golf moments from the community</p>
             </div>
-            <div className="text-center py-12">
-              <p className="text-muted-foreground">Posts can be viewed on the Explore page</p>
-            </div>
+            <InstagramStyleFeed userPosts={posts} loading={loading} />
           </div>
         )}
       </div>
