@@ -4,7 +4,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePostFlow } from '@/hooks/usePostFlow';
 // Post submission functionality removed
 import GalleryPicker from '@/components/post/GalleryPicker';
-// Enhanced create moment modal removed
+import PostCreationModal from '@/components/posts/PostCreationModal';
 import SnapToast from '@/components/snap/SnapToast';
 import NavigationBar from './bottom-navigation/NavigationBar';
 import { useNavigationHandlers } from '@/hooks/useNavigationHandlers';
@@ -212,7 +212,19 @@ const BottomNavigation = () => {
         onMultipleFilesSelected={handleMultipleFilesSelected}
       />
 
-      {/* Create moment modal temporarily disabled */}
+      <PostCreationModal
+        isOpen={isComposerOpen}
+        onClose={closeComposer}
+        selectedFile={selectedFile}
+        previewUrl={previewUrl}
+        captionInputRef={captionInputRef}
+        onCaptionInput={onCaptionInput}
+        showSuggestions={showSuggestions}
+        mentionSuggestions={mentionSuggestions}
+        onSelectMention={onSelectMention}
+        onSubmit={handleSubmitPost}
+        isSubmitting={isSubmitting}
+      />
 
       <SnapToast
         message={toastMessage}
