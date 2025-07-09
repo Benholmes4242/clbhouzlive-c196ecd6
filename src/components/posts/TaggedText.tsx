@@ -23,11 +23,9 @@ const TaggedText = React.memo(({ text, tags = [] }: TaggedTextProps) => {
     if (tag.entity_type === 'user') {
       navigate(`/profile/${tag.entity_id}`);
     } else if (tag.entity_type === 'golf_club') {
-      // Navigate to golf club page when implemented
-      console.log('Navigate to golf club:', tag);
+      navigate(`/courses/${tag.entity_id}`);
     } else if (tag.entity_type === 'business') {
-      // Navigate to business page when implemented
-      console.log('Navigate to business:', tag);
+      navigate(`/profile/${tag.entity_id}`);
     }
   };
 
