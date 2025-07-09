@@ -264,7 +264,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
     <>
       {/* Bottom Sheet Overlay */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-end justify-center">
           {/* Semi-transparent background */}
           <div 
             className="absolute inset-0 bg-black/50 transition-opacity"
