@@ -20,6 +20,7 @@ interface Moment {
   user: MomentUser;
   videoUrl: string;
   isFollowing: boolean;
+  golfClubTag?: string;
 }
 
 const MomentCard: React.FC<{ 
@@ -69,8 +70,15 @@ const MomentCard: React.FC<{
           </div>
         </div>
         
-        {/* Follow Button */}
-        <div className="absolute bottom-3 left-3 right-3">
+        {/* Golf Club Tag and Follow Button */}
+        <div className="absolute bottom-3 left-3 right-3 space-y-2">
+          {moment.golfClubTag && (
+            <div className="flex justify-center">
+              <span className="bg-black/60 text-white rounded-full px-3 py-1 text-xs font-medium truncate max-w-full">
+                {moment.golfClubTag}
+              </span>
+            </div>
+          )}
           <Button 
             variant={moment.isFollowing ? "secondary" : "default"}
             size="sm"
@@ -111,7 +119,7 @@ const ClubhouzMomentsCarousel = () => {
     if (!user) return;
 
     try {
-      // Fetch video posts with user data - separate queries for better type safety
+      // Fetch video posts with user data and tags
       const { data: videoPosts, error } = await supabase
         .from('posts')
         .select(`
@@ -121,6 +129,11 @@ const ClubhouzMomentsCarousel = () => {
           post_media!inner (
             media_url,
             media_type
+          ),
+          post_tags (
+            id,
+            entity_type,
+            name
           )
         `)
         .eq('post_media.media_type', 'video')
@@ -174,6 +187,8 @@ const ClubhouzMomentsCarousel = () => {
           const userProfile = profiles?.find(profile => profile.id === post.user_id);
           if (!userProfile) return null;
 
+          const golfClubTag = post.post_tags?.find((tag: any) => tag.entity_type === 'golf_club')?.name;
+
           return {
             id: post.id,
             user: {
@@ -183,10 +198,11 @@ const ClubhouzMomentsCarousel = () => {
               avatar: userProfile.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'
             },
             videoUrl: post.post_media[0]?.media_url || '',
-            isFollowing: followingIds.has(post.user_id)
+            isFollowing: followingIds.has(post.user_id),
+            golfClubTag
           };
         })
-        .filter((moment): moment is Moment => moment !== null && moment.videoUrl !== '') // Type guard and filter valid videos
+        .filter(moment => moment !== null && moment.videoUrl !== '')
         .slice(0, 10); // Limit to 10 unique users
 
       setMoments(formattedMoments);
