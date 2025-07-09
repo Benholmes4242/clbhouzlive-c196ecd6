@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import SocialActivity from './SocialActivity';
+// Social activity component removed
 import HandicapSection from './HandicapSection';
 import UserCoursesContent from '@/components/courses/UserCoursesContent';
 
@@ -46,13 +46,12 @@ const UniversalProfileTabs: React.FC<UniversalProfileTabsProps> = ({
         </TabsList>
 
         <TabsContent value="activity" className="mt-0">
-          <SocialActivity
-            userId={userId}
-            isOwnProfile={isOwnProfile}
-            activityVisible={true}
-            profileDisplayName={profile?.display_name}
-            userType={profile?.user_type || 'individual'}
-          />
+            <div className="bg-card rounded-lg p-6 shadow-sm border">
+              <h2 className="text-xl font-semibold mb-4">Activity</h2>
+              <p className="text-muted-foreground">
+                User posts and activity will be displayed here.
+              </p>
+            </div>
         </TabsContent>
 
         {showIndividualTabs && (

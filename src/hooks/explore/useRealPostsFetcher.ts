@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { ExploreContentItem } from '@/components/explore/types';
 import { isValidImageUrl } from './urlValidation';
@@ -6,8 +5,6 @@ import { isValidImageUrl } from './urlValidation';
 export const useRealPostsFetcher = () => {
   const fetchRealPosts = async (currentOffset: number, postsPerPage: number): Promise<ExploreContentItem[]> => {
     try {
-      // Removed debug logs for performance
-      
       const { data: postsData, error } = await supabase
         .from('posts')
         .select(`
@@ -19,21 +16,11 @@ export const useRealPostsFetcher = () => {
             id,
             media_type,
             media_url
-          ),
-          post_tags (
-            id,
-            tagged_entity_id,
-            taggable_entities (
-              id,
-              entity_type,
-              entity_id,
-              name
-            )
           )
         `)
         .order('created_at', { ascending: false })
         .range(currentOffset, currentOffset + postsPerPage - 1)
-        .limit(postsPerPage); // Add explicit limit for performance
+        .limit(postsPerPage);
 
       if (error) {
         console.error('Error fetching posts:', error);
@@ -58,27 +45,6 @@ export const useRealPostsFetcher = () => {
         return [];
       }
 
-      // Performance: removed logging
-
-      // Get golf course data for tagged courses
-      const golfCourseIds = postsData
-        .flatMap(post => post.post_tags || [])
-        .filter(tag => tag.taggable_entities?.entity_type === 'golf_club')
-        .map(tag => tag.taggable_entities?.entity_id)
-        .filter(Boolean);
-
-      // Performance: removed logging
-
-      let golfCourses: any[] = [];
-      if (golfCourseIds.length > 0) {
-        const { data: coursesData } = await supabase
-          .from('golf_courses')
-          .select('id, name, country')
-          .in('id', golfCourseIds);
-        
-        golfCourses = coursesData || [];
-      }
-
       // Format posts for explore grid
       const formattedPosts = postsData.map(post => {
         const userProfile = profiles?.find(profile => profile.id === post.user_id);
@@ -86,23 +52,6 @@ export const useRealPostsFetcher = () => {
         
         if (!media || !isValidImageUrl(media.media_url)) {
           return null;
-        }
-
-        // Find golf course tag
-        const golfCourseTag = post.post_tags?.find(tag => 
-          tag.taggable_entities?.entity_type === 'golf_club'
-        );
-        
-        let golfCourse = null;
-        if (golfCourseTag?.taggable_entities?.entity_id) {
-          const course = golfCourses.find(c => c.id === golfCourseTag.taggable_entities.entity_id);
-          if (course) {
-            golfCourse = {
-              id: course.id,
-              name: course.name,
-              country: course.country
-            };
-          }
         }
 
         const formattedPost = {
@@ -121,7 +70,7 @@ export const useRealPostsFetcher = () => {
             avatar: userProfile?.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
             verified: Math.random() > 0.7 // Random verification for demo
           },
-          golfCourse,
+          golfCourse: null,
           label: Math.random() > 0.6 ? ['Pro Tip', 'Trending', 'From Clubhouse'][Math.floor(Math.random() * 3)] : undefined,
           isFollowing: Math.random() > 0.5
         };

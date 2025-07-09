@@ -1,14 +1,10 @@
-
 import React, { useState } from 'react';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
 import ExploreFilters from '@/components/explore/ExploreFilters';
 import ExploreGrid from '@/components/explore/ExploreGrid';
 import MobileDebugConsole from '@/components/explore/MobileDebugConsole';
-import VerticalMediaFeed from '@/components/explore/VerticalMediaFeed';
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
-
-import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
 
 const Explore = () => {
   const [activeFilter, setActiveFilter] = useState('All');
@@ -19,26 +15,20 @@ const Explore = () => {
     hasMore, 
     loadMore 
   } = useInfiniteExploreContent();
-  
-  const { 
-    isOpen: isFeedOpen, 
-    initialItem, 
-    openFeed, 
-    closeFeed 
-  } = useVerticalMediaFeed();
 
   const handleLike = (contentId: string) => {
     // Update likes optimistically - could be enhanced with actual API call
-    // For now, this is just visual feedback
+    console.log('Liked content:', contentId);
   };
 
   const handleFollow = (contentId: string) => {
     // Update follow status optimistically - could be enhanced with actual API call
-    // For now, this is just visual feedback
+    console.log('Followed user from content:', contentId);
   };
 
   const handleMediaClick = (item: any) => {
-    openFeed(item);
+    // Media click handler - could open full screen viewer
+    console.log('Media clicked:', item);
   };
 
   const filteredContent = content.filter(item => {
@@ -65,59 +55,47 @@ const Explore = () => {
   );
 
   return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        
-        <main className="container mx-auto px-4 py-6 pb-20">
-          {/* Sticky Filter Bar */}
-          <ExploreFilters 
-            activeFilter={activeFilter} 
-            onFilterChange={setActiveFilter} 
-          />
-
-          {/* Masonry Grid with Infinite Scroll */}
-          <ExploreGrid 
-            content={uniqueContent}
-            onLike={handleLike}
-            onFollow={handleFollow}
-            onMediaClick={handleMediaClick}
-            isLoading={loading}
-            hasMore={hasMore}
-            onLoadMore={loadMore}
-            activeFilter={activeFilter}
-          />
-        </main>
-        
-        <BottomNavigation />
-
-        {/* Mobile Debug Console */}
-        <MobileDebugConsole 
-          isVisible={debugVisible}
-          onToggle={() => setDebugVisible(!debugVisible)}
+    <div className="min-h-screen bg-background">
+      <Header />
+      
+      <main className="container mx-auto px-4 py-6 pb-20">
+        {/* Sticky Filter Bar */}
+        <ExploreFilters 
+          activeFilter={activeFilter} 
+          onFilterChange={setActiveFilter} 
         />
 
-        {/* Vertical Media Feed */}
-        {initialItem && (
-          <VerticalMediaFeed
-            isOpen={isFeedOpen}
-            onClose={closeFeed}
-            initialItem={initialItem}
-            allContent={content}
-            onLike={handleLike}
-            onFollow={handleFollow}
-          />
-        )}
+        {/* Masonry Grid with Infinite Scroll */}
+        <ExploreGrid 
+          content={uniqueContent}
+          onLike={handleLike}
+          onFollow={handleFollow}
+          onMediaClick={handleMediaClick}
+          isLoading={loading}
+          hasMore={hasMore}
+          onLoadMore={loadMore}
+          activeFilter={activeFilter}
+        />
+      </main>
+      
+      <BottomNavigation />
 
-        <style>{`
-          .scrollbar-hide {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-          }
-          .scrollbar-hide::-webkit-scrollbar {
-            display: none;
-          }
-        `}</style>
-      </div>
+      {/* Mobile Debug Console */}
+      <MobileDebugConsole 
+        isVisible={debugVisible}
+        onToggle={() => setDebugVisible(!debugVisible)}
+      />
+
+      <style>{`
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+      `}</style>
+    </div>
   );
 };
 
