@@ -19,16 +19,6 @@ export const useRealPostsFetcher = () => {
             id,
             media_type,
             media_url
-          ),
-          post_tags (
-            id,
-            tagged_entity_id,
-            taggable_entities (
-              id,
-              entity_type,
-              entity_id,
-              name
-            )
           )
         `)
         .order('created_at', { ascending: false })
@@ -60,24 +50,8 @@ export const useRealPostsFetcher = () => {
 
       // Performance: removed logging
 
-      // Get golf course data for tagged courses
-      const golfCourseIds = postsData
-        .flatMap(post => post.post_tags || [])
-        .filter(tag => tag.taggable_entities?.entity_type === 'golf_club')
-        .map(tag => tag.taggable_entities?.entity_id)
-        .filter(Boolean);
-
-      // Performance: removed logging
-
+      // Golf courses not available without tagging system
       let golfCourses: any[] = [];
-      if (golfCourseIds.length > 0) {
-        const { data: coursesData } = await supabase
-          .from('golf_courses')
-          .select('id, name, country')
-          .in('id', golfCourseIds);
-        
-        golfCourses = coursesData || [];
-      }
 
       // Format posts for explore grid
       const formattedPosts = postsData.map(post => {
@@ -88,22 +62,8 @@ export const useRealPostsFetcher = () => {
           return null;
         }
 
-        // Find golf course tag
-        const golfCourseTag = post.post_tags?.find(tag => 
-          tag.taggable_entities?.entity_type === 'golf_club'
-        );
-        
+        // Golf course tagging not available without tagging system
         let golfCourse = null;
-        if (golfCourseTag?.taggable_entities?.entity_id) {
-          const course = golfCourses.find(c => c.id === golfCourseTag.taggable_entities.entity_id);
-          if (course) {
-            golfCourse = {
-              id: course.id,
-              name: course.name,
-              country: course.country
-            };
-          }
-        }
 
         const formattedPost = {
           id: post.id,

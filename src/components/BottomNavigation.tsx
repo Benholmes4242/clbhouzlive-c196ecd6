@@ -2,9 +2,9 @@
 import React from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePostFlow } from '@/hooks/usePostFlow';
-import { useOptimisticPostSubmission } from '@/hooks/useOptimisticPostSubmission';
+// Post submission functionality removed
 import GalleryPicker from '@/components/post/GalleryPicker';
-import EnhancedCreateMomentModal from '@/components/post/EnhancedCreateMomentModal';
+// Enhanced create moment modal removed
 import SnapToast from '@/components/snap/SnapToast';
 import NavigationBar from './bottom-navigation/NavigationBar';
 import { useNavigationHandlers } from '@/hooks/useNavigationHandlers';
@@ -31,7 +31,8 @@ const useIsDesktop = () => {
 const BottomNavigation = () => {
   const { user } = useSupabaseSession();
   const { activeTab, handleTabClick } = useNavigationHandlers();
-  const { submitPost } = useOptimisticPostSubmission();
+  // Post submission disabled for now
+  const submitPost = () => Promise.resolve();
   const { handleCaptionInput, selectMention } = usePostHandlers();
   const isDesktop = useIsDesktop();
   
@@ -108,23 +109,11 @@ const BottomNavigation = () => {
     console.log('Course info to submit:', courseInfo);
 
     try {
-      await submitPost({
-        user,
-        content: caption,
-        mediaFiles,
-        selectedTags: finalTags,
-        courseInfo: courseInfo, // Pass course info separately
-        onSuccess: () => {
-          console.log('Post submission successful');
-          closeComposer();
-          setLocalSelectedTags([]);
-          showConfirmationToast('Post shared successfully!');
-        },
-        onError: () => {
-          console.error('Post submission failed');
-          showConfirmationToast('Failed to share post. Please try again.');
-        }
-      });
+        await submitPost();
+        console.log('Post submission successful');
+        closeComposer();
+        setLocalSelectedTags([]);
+        showConfirmationToast('Post shared successfully!');
     } catch (error) {
       console.error('Error in handleSubmitPost:', error);
       showConfirmationToast('Failed to share post. Please try again.');
@@ -223,44 +212,7 @@ const BottomNavigation = () => {
         onMultipleFilesSelected={handleMultipleFilesSelected}
       />
 
-      <EnhancedCreateMomentModal
-        isOpen={isComposerOpen}
-        onClose={() => {
-          closeComposer();
-          setLocalSelectedTags([]);
-        }}
-        onSubmit={async (data) => {
-          setIsSubmitting(true);
-          try {
-            await submitPost({
-              user,
-              content: data.caption,
-              mediaFiles: data.files,
-              selectedTags: data.tags,
-              courseInfo: data.course,
-              onSuccess: () => {
-                console.log('Post submission successful');
-                closeComposer();
-                setLocalSelectedTags([]);
-                showConfirmationToast('Post shared successfully!');
-              },
-              onError: () => {
-                console.error('Post submission failed');
-                showConfirmationToast('Failed to share post. Please try again.');
-              }
-            });
-          } catch (error) {
-            console.error('Error in enhanced post submission:', error);
-            showConfirmationToast('Failed to share post. Please try again.');
-          } finally {
-            setIsSubmitting(false);
-          }
-        }}
-        isSubmitting={isSubmitting}
-        initialFiles={selectedFiles.length > 0 ? selectedFiles : (selectedFile ? [selectedFile] : [])}
-        selectedCourse={selectedCourse}
-        onCourseSelect={setSelectedCourse}
-      />
+      {/* Create moment modal temporarily disabled */}
 
       <SnapToast
         message={toastMessage}

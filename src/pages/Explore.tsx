@@ -5,9 +5,8 @@ import BottomNavigation from '@/components/BottomNavigation';
 import ExploreFilters from '@/components/explore/ExploreFilters';
 import ExploreGrid from '@/components/explore/ExploreGrid';
 import MobileDebugConsole from '@/components/explore/MobileDebugConsole';
-import VerticalMediaFeed from '@/components/explore/VerticalMediaFeed';
+import FullScreenModal from '@/components/explore/FullScreenModal';
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
-
 import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
 
 const Explore = () => {
@@ -30,11 +29,7 @@ const Explore = () => {
   const handleLike = (contentId: string) => {
     // Update likes optimistically - could be enhanced with actual API call
     // For now, this is just visual feedback
-  };
-
-  const handleFollow = (contentId: string) => {
-    // Update follow status optimistically - could be enhanced with actual API call
-    // For now, this is just visual feedback
+    console.log('Liked:', contentId);
   };
 
   const handleMediaClick = (item: any) => {
@@ -45,12 +40,8 @@ const Explore = () => {
     if (activeFilter === 'All') return true;
     if (activeFilter === 'Videos') return item.type === 'video';
     if (activeFilter === 'Photos') return item.type === 'image';
-    if (activeFilter === 'Pros') return item.user?.verified;
-    if (activeFilter === 'Tips') return item.label === 'Pro Tip';
-    if (activeFilter === 'Trending') return item.label === 'Trending';
-    if (activeFilter === 'Clubs') return item.label === 'From Clubhouse';
     if (activeFilter === 'Hack Shack') {
-      // Only videos with #hackshack hashtag
+      // Only videos with #hackshack hashtag (case-insensitive)
       return item.type === 'video' && (
         item.title?.toLowerCase().includes('#hackshack') || 
         item.title?.toLowerCase().includes('hackshack')
@@ -75,11 +66,9 @@ const Explore = () => {
             onFilterChange={setActiveFilter} 
           />
 
-          {/* Masonry Grid with Infinite Scroll */}
+          {/* Enhanced Grid with Infinite Scroll */}
           <ExploreGrid 
             content={uniqueContent}
-            onLike={handleLike}
-            onFollow={handleFollow}
             onMediaClick={handleMediaClick}
             isLoading={loading}
             hasMore={hasMore}
@@ -96,15 +85,14 @@ const Explore = () => {
           onToggle={() => setDebugVisible(!debugVisible)}
         />
 
-        {/* Vertical Media Feed */}
+        {/* Enhanced Full Screen Modal */}
         {initialItem && (
-          <VerticalMediaFeed
+          <FullScreenModal
             isOpen={isFeedOpen}
             onClose={closeFeed}
             initialItem={initialItem}
-            allContent={content}
+            allContent={uniqueContent}
             onLike={handleLike}
-            onFollow={handleFollow}
           />
         )}
 

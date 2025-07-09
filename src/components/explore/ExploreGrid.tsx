@@ -5,9 +5,7 @@ import ExploreContentCard from './ExploreContentCard';
 
 interface ExploreGridProps {
   content: ExploreContentItem[];
-  onLike: (contentId: string) => void;
-  onFollow: (contentId: string) => void;
-  onMediaClick?: (item: ExploreContentItem) => void;
+  onMediaClick: (item: ExploreContentItem) => void;
   isLoading: boolean;
   hasMore: boolean;
   onLoadMore: () => void;
@@ -16,8 +14,6 @@ interface ExploreGridProps {
 
 const ExploreGrid: React.FC<ExploreGridProps> = ({ 
   content, 
-  onLike, 
-  onFollow, 
   onMediaClick,
   isLoading, 
   hasMore, 
@@ -82,8 +78,6 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
           <div key={item.id} className="aspect-square">
             <ExploreContentCard 
               item={item} 
-              onLike={onLike} 
-              onFollow={onFollow} 
               onMediaClick={onMediaClick}
             />
           </div>

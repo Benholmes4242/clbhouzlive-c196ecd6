@@ -3,13 +3,12 @@ import React, { useEffect } from 'react';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
 import StoryBar from '@/components/StoryBar';
-import TrendingFeed from '@/components/TrendingFeed';
-import ClubhouzMomentsCarousel from '@/components/clubhouse/ClubhouzMomentsCarousel';
+// Trending and clubhouse components removed
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { removeDuplicatePosts } from '@/utils/postCleanup';
+// Post cleanup utility removed
 import { useAppLogo } from '@/hooks/useAppLogo';
 
 const Index = () => {
@@ -17,12 +16,7 @@ const Index = () => {
   const navigate = useNavigate();
   const { currentLogo } = useAppLogo();
 
-  // Clean up duplicate posts when user is loaded
-  useEffect(() => {
-    if (user?.id) {
-      removeDuplicatePosts(user.id);
-    }
-  }, [user?.id]);
+  // Post cleanup removed
 
   // Show loading state while checking authentication
   if (loading) {
@@ -98,11 +92,12 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <StoryBar />
-      <ClubhouzMomentsCarousel />
       
       <main className="container mx-auto px-4 py-6">
         <div className="max-w-2xl mx-auto space-y-6">
-          <TrendingFeed />
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">Welcome! Explore posts and content on the Explore page</p>
+          </div>
         </div>
       </main>
       

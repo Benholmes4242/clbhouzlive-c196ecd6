@@ -27,7 +27,9 @@ export const useInfiniteExploreContent = () => {
       const realPosts = await fetchRealPosts(currentOffset, POSTS_PER_PAGE);
       
       if (realPosts.length > 0) {
-        setContent(prev => [...prev, ...realPosts]);
+        // Randomize the fetched posts for variety
+        const shuffledPosts = [...realPosts].sort(() => Math.random() - 0.5);
+        setContent(prev => [...prev, ...shuffledPosts]);
         setCurrentOffset(prev => prev + POSTS_PER_PAGE);
         
         // If we got fewer posts than requested, we might be at the end
@@ -39,7 +41,9 @@ export const useInfiniteExploreContent = () => {
         const mockPosts = getMockPosts(currentMockOffset, POSTS_PER_PAGE);
         
         if (mockPosts.length > 0) {
-          setContent(prev => [...prev, ...mockPosts]);
+          // Randomize mock posts as well
+          const shuffledMockPosts = [...mockPosts].sort(() => Math.random() - 0.5);
+          setContent(prev => [...prev, ...shuffledMockPosts]);
           setCurrentMockOffset(prev => prev + POSTS_PER_PAGE);
         } else {
           setHasMore(false);
@@ -51,7 +55,8 @@ export const useInfiniteExploreContent = () => {
       // Fallback to mock data on error
       const mockPosts = getMockPosts(currentMockOffset, POSTS_PER_PAGE);
       if (mockPosts.length > 0) {
-        setContent(prev => [...prev, ...mockPosts]);
+        const shuffledMockPosts = [...mockPosts].sort(() => Math.random() - 0.5);
+        setContent(prev => [...prev, ...shuffledMockPosts]);
         setCurrentMockOffset(prev => prev + POSTS_PER_PAGE);
       } else {
         setHasMore(false);
@@ -61,10 +66,17 @@ export const useInfiniteExploreContent = () => {
     }
   }, [loading, hasMore, currentOffset, currentMockOffset, fetchRealPosts, getMockPosts]);
 
-  // Initial load
+  // Initial load with randomization
   useEffect(() => {
     if (content.length === 0 && !loading) {
       loadMore();
+    }
+  }, []);
+
+  // Shuffle content on each page load
+  useEffect(() => {
+    if (content.length > 0) {
+      setContent(prev => [...prev].sort(() => Math.random() - 0.5));
     }
   }, []);
 
