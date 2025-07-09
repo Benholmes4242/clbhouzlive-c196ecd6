@@ -1,11 +1,24 @@
 import React from 'react';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useNavigationHandlers } from './bottom-navigation/useNavigationHandlers';
+import NavigationBar from './bottom-navigation/NavigationBar';
 
-// Simple placeholder component since tagging functionality was removed
 const BottomNavigation: React.FC = () => {
+  const { user } = useSupabaseSession();
+  const { activeTab, handleTabClick } = useNavigationHandlers();
+
+  const handleTabAction = (tab: { id: string; path: string | null; isAction?: boolean }) => {
+    handleTabClick(tab, user, () => {
+      // Handle post action - for now just console log since posting is simplified
+      console.log('Post action triggered');
+    });
+  };
+
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-border h-16 flex items-center justify-center text-muted-foreground">
-      Navigation temporarily disabled
-    </div>
+    <NavigationBar
+      activeTab={activeTab}
+      onTabClick={handleTabAction}
+    />
   );
 };
 
