@@ -156,9 +156,20 @@ const ClubhouzMomentsCarousel = () => {
 
       const followingIds = new Set(followingData?.map(f => f.following_id) || []);
 
-      // Format moments data
-      const formattedMoments: Moment[] = videoPosts
+      // Group posts by user to prevent duplicates
+      const userPostsMap = new Map<string, any>();
+      
+      videoPosts
         .filter(post => post.user_id !== user.id) // Exclude own posts
+        .forEach(post => {
+          // Only keep the first post for each user (most recent due to ordering)
+          if (!userPostsMap.has(post.user_id)) {
+            userPostsMap.set(post.user_id, post);
+          }
+        });
+
+      // Format moments data from unique users
+      const formattedMoments: Moment[] = Array.from(userPostsMap.values())
         .map(post => {
           const userProfile = profiles?.find(profile => profile.id === post.user_id);
           if (!userProfile) return null;
@@ -176,7 +187,7 @@ const ClubhouzMomentsCarousel = () => {
           };
         })
         .filter((moment): moment is Moment => moment !== null && moment.videoUrl !== '') // Type guard and filter valid videos
-        .slice(0, 10); // Limit to 10 moments
+        .slice(0, 10); // Limit to 10 unique users
 
       setMoments(formattedMoments);
     } catch (error) {
