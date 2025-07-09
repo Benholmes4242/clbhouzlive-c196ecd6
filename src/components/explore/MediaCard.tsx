@@ -35,13 +35,13 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, ...props 
 
   const handleMediaClick = () => {
     // Only open media for image and video types, not CTA
-    if (!isInvalidSrc && (item.type === 'image' || item.type === 'video')) {
+    if (item.type === 'image' || item.type === 'video') {
       console.log('MediaCard handleMediaClick - item.golfCourse:', item.golfCourse);
       // Call the onMediaClick prop instead of opening the fullscreen modal
       if (props.onMediaClick) {
         props.onMediaClick(item);
       } else {
-        openMedia(imageError ? fallbackImage : item.src, item.type, item.title, item.golfCourse);
+        openMedia(item.src, item.type, item.title, item.golfCourse);
       }
     }
   };
@@ -66,44 +66,9 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, ...props 
                       item.src === '[object Object]' ||
                       typeof item.src !== 'string';
 
-  if (isInvalidSrc) {
-    console.log('Invalid src detected, using fallback:', {
-      id: item.id,
-      originalSrc: item.src,
-      reason: 'INVALID_SRC_VALUE',
-      fallbackUsed: fallbackImage
-    });
-    
-    return (
-      <>
-        <div 
-          ref={autoplayRef}
-          className="relative group bg-white rounded-lg shadow-sm border overflow-hidden h-full cursor-pointer"
-          onClick={handleMediaClick}
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
-        >
-          <div className="relative w-full h-full overflow-hidden">
-            <OptimizedImage
-              src={fallbackImage}
-              alt={item.title || 'Content'}
-              className="w-full h-full transition-transform duration-300 group-hover:scale-105"
-              width={300}
-              height={300}
-            />
-          </div>
-        </div>
-
-        <FullscreenMediaModal
-          isOpen={isOpen}
-          onClose={closeMedia}
-          mediaUrl={currentMedia?.url || ''}
-          mediaType={currentMedia?.type || 'image'}
-          alt={currentMedia?.alt}
-        />
-      </>
-    );
-  }
+  // Use fallback for invalid src or image errors
+  const displaySrc = (isInvalidSrc || imageError) ? fallbackImage : item.src;
+  const shouldUseFallback = isInvalidSrc || imageError;
 
   return (
     <>
@@ -116,7 +81,7 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, ...props 
       >
         {/* Square Media Container */}
         <div className="relative w-full h-full overflow-hidden">
-          {item.type === 'video' ? (
+          {item.type === 'video' && !shouldUseFallback ? (
             <VideoPlayer
               src={item.src}
               autoplay={shouldAutoplay}
@@ -129,7 +94,7 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, ...props 
             />
           ) : (
             <OptimizedImage
-              src={imageError ? fallbackImage : item.src}
+              src={displaySrc}
               alt={item.title || 'Content'}
               className="w-full h-full transition-transform duration-300 group-hover:scale-105"
               width={300}
