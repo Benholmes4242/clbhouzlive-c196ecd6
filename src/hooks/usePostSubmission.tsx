@@ -142,7 +142,7 @@ export const usePostSubmission = () => {
           .insert({
             post_id: postData.id,
             tagged_by_user_id: user.id,
-            tagged_entity_id: tag.entity_id
+            tagged_entity_id: tag.id  // Use the taggable entity record ID, not entity_id
           });
 
         if (tagError) {
