@@ -82,7 +82,7 @@ const MomentCard: React.FC<{
           <Button 
             variant={moment.isFollowing ? "secondary" : "default"}
             size="sm"
-            className={`w-full ${
+            className={`w-full px-2 py-1 h-auto ${
               moment.isFollowing 
                 ? 'bg-white/20 text-white border border-white/30 hover:bg-white/30' 
                 : 'bg-white text-black hover:bg-white/90'
