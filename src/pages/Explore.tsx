@@ -11,7 +11,7 @@ import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
 
 const Explore = () => {
-  const [activeFilter, setActiveFilter] = useState('All');
+  const [activeFilter, setActiveFilter] = useState('Videos');
   const [debugVisible, setDebugVisible] = useState(false);
   const { 
     content, 
@@ -43,12 +43,8 @@ const Explore = () => {
 
   // Apply client-side filtering for non-database filters
   const filteredContent = content.filter(item => {
-    if (activeFilter === 'All' || activeFilter === 'Videos') return true; // Videos filtering is handled in the database
+    if (activeFilter === 'Videos') return true; // Videos filtering is handled in the database
     if (activeFilter === 'Photos') return item.type === 'image';
-    if (activeFilter === 'Pros') return item.user?.verified;
-    if (activeFilter === 'Tips') return item.label === 'Pro Tip';
-    if (activeFilter === 'Trending') return item.label === 'Trending';
-    if (activeFilter === 'Clubs') return item.label === 'From Clubhouse';
     if (activeFilter === 'Hack Shack') {
       // Only videos with #hackshack hashtag
       return item.type === 'video' && (
