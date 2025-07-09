@@ -21,6 +21,33 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
   const [selectedPost, setSelectedPost] = useState<ActivityPost | null>(null);
 
   const handlePostClick = (post: ActivityPost) => {
+    // Helper function to extract golf course from post tags
+    const extractGolfCourse = (postTags: any[]) => {
+      const golfCourseTag = postTags?.find(tag => 
+        tag.tagged_entity?.entity_type === 'golf_club' || tag.entity_type === 'golf_club'
+      );
+      
+      if (golfCourseTag) {
+        // Handle both tag formats
+        if (golfCourseTag.entity_type === 'golf_club') {
+          return {
+            id: golfCourseTag.entity_id,
+            name: golfCourseTag.name,
+            country: '',
+            region: ''
+          };
+        } else if (golfCourseTag.tagged_entity) {
+          return {
+            id: golfCourseTag.tagged_entity.entity_id,
+            name: golfCourseTag.tagged_entity.name,
+            country: '',
+            region: ''
+          };
+        }
+      }
+      return undefined;
+    };
+
     // Transform ActivityPost to PostData format
     const transformedPost = {
       id: post.id,
@@ -29,7 +56,7 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
       user: post.user,
       post_media: post.post_media || [],
       post_tags: post.post_tags || [],
-      golfCourse: undefined // Golf course data would need to be fetched if needed
+      golfCourse: extractGolfCourse(post.post_tags || [])
     };
     
     // Transform all posts
@@ -40,7 +67,7 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
       user: p.user,
       post_media: p.post_media || [],
       post_tags: p.post_tags || [],
-      golfCourse: undefined
+      golfCourse: extractGolfCourse(p.post_tags || [])
     }));
     
     openPostViewer(transformedPost, transformedPosts);
