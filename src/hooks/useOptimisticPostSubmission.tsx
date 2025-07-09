@@ -60,6 +60,18 @@ export const useOptimisticPostSubmission = () => {
         }))
       });
 
+      // Validate media files
+      if (mediaFiles.length === 0) {
+        console.error('No media files provided for post submission');
+        toast({
+          title: "Upload Error",
+          description: "Please select at least one photo or video",
+          variant: "destructive"
+        });
+        onError?.();
+        return;
+      }
+
       // Create the post immediately
       const { data: postData, error: postError } = await supabase
         .from('posts')
@@ -74,15 +86,36 @@ export const useOptimisticPostSubmission = () => {
 
       console.log('Post created successfully:', postData);
 
-      // Tags creation temporarily disabled due to missing database tables
+      // Store course info temporarily in post content until we have proper tables
+      if (courseInfo) {
+        console.log('Adding course info to post content:', courseInfo);
+        const updatedContent = `${content || ''}\n\n📍 Played at ${courseInfo.name}, ${courseInfo.country}`.trim();
+        
+        const { error: updateError } = await supabase
+          .from('posts')
+          .update({ content: updatedContent })
+          .eq('id', postData.id);
+          
+        if (updateError) {
+          console.error('Error updating post with course info:', updateError);
+        }
+      }
 
       // Start background upload for media files (don't wait for it)
       if (mediaFiles.length > 0) {
-        startBackgroundUpload({
-          postId: postData.id,
-          mediaFiles,
-          userId: user.id
-        });
+        console.log('Starting background upload for', mediaFiles.length, 'files');
+        try {
+          await startBackgroundUpload({
+            postId: postData.id,
+            mediaFiles,
+            userId: user.id
+          });
+        } catch (uploadError) {
+          console.error('Background upload failed:', uploadError);
+          // Don't fail the whole post submission for upload errors
+        }
+      } else {
+        console.warn('No media files to upload');
       }
 
       // Dispatch success event immediately

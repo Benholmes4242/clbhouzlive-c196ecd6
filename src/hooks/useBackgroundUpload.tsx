@@ -27,6 +27,21 @@ export const useBackgroundUpload = () => {
   }: BackgroundUploadData) => {
     console.log(`Starting background upload for post ${postId} with ${mediaFiles.length} files`);
     
+    // Validate inputs
+    if (!postId || !userId || !mediaFiles || mediaFiles.length === 0) {
+      console.error('Invalid parameters for background upload:', { postId, userId, mediaFilesCount: mediaFiles?.length });
+      throw new Error('Invalid upload parameters');
+    }
+
+    // Log file details
+    mediaFiles.forEach((file, index) => {
+      console.log(`File ${index + 1}:`, {
+        name: file.name,
+        type: file.type,
+        size: `${(file.size / 1024 / 1024).toFixed(2)}MB`
+      });
+    });
+    
     // Initialize upload progress
     setUploads(prev => new Map(prev.set(postId, {
       postId,
@@ -36,93 +51,115 @@ export const useBackgroundUpload = () => {
       failedFiles: []
     })));
 
-    // Removed redundant toast - center confirmation box is sufficient
-    // toast({
-    //   title: "Post Created!",
-    //   description: `Your moment is now live! ${mediaFiles.length > 0 ? 'Media files are uploading in the background.' : ''}`,
-    //   variant: "default"
-    // });
+    if (mediaFiles.length === 0) {
+      console.warn('No media files to upload');
+      return;
+    }
 
-    if (mediaFiles.length === 0) return;
-
-    // Process uploads in background
-    const uploadResults = await Promise.allSettled(
-      mediaFiles.map(async (file, index) => {
-        try {
-          const fileName = `${Date.now()}-${index}-${Math.random().toString(36).substring(2, 15)}`;
-          const fileExtension = file.name.split('.').pop();
-          const fullFileName = `${fileName}.${fileExtension}`;
+    // Process uploads sequentially to avoid overwhelming mobile connections
+    const uploadResults = [];
+    
+    for (let index = 0; index < mediaFiles.length; index++) {
+      const file = mediaFiles[index];
+      
+      try {
+        const fileName = `${Date.now()}-${index}-${Math.random().toString(36).substring(2, 15)}`;
+        const fileExtension = file.name.split('.').pop() || 'unknown';
+        const fullFileName = `${fileName}.${fileExtension}`;
+        
+        console.log(`Background uploading ${index + 1}/${mediaFiles.length}: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)}MB)`);
+        
+        // Upload with retry logic for mobile
+        let uploadAttempts = 0;
+        const maxAttempts = 3;
+        let uploadSuccess = false;
+        let publicUrl = '';
+        
+        while (uploadAttempts < maxAttempts && !uploadSuccess) {
+          uploadAttempts++;
+          console.log(`Upload attempt ${uploadAttempts}/${maxAttempts} for ${file.name}`);
           
-          console.log(`Background uploading: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)}MB)`);
-          
-          // No timeout - let large files take as long as needed
-          const { data, error: uploadError } = await supabase.storage
-            .from('post-media')
-            .upload(`${userId}/${fullFileName}`, file, {
-              upsert: false,
-              duplex: 'half'
-            });
+          try {
+            const { data, error: uploadError } = await supabase.storage
+              .from('post-media')
+              .upload(`${userId}/${fullFileName}`, file, {
+                upsert: false
+              });
 
-          if (uploadError) {
-            console.error(`Background upload error for ${file.name}:`, uploadError);
-            throw uploadError;
-          }
-
-          // Get public URL
-          const { data: { publicUrl } } = supabase.storage
-            .from('post-media')
-            .getPublicUrl(`${userId}/${fullFileName}`);
-
-          // Create media record
-          const { error: mediaError } = await supabase
-            .from('post_media')
-            .insert({
-              post_id: postId,
-              media_type: file.type.startsWith('image/') ? 'image' : 'video',
-              media_url: publicUrl
-            });
-
-          if (mediaError) {
-            console.error(`Media record error for ${file.name}:`, mediaError);
-            throw mediaError;
-          }
-
-          // Update progress
-          setUploads(prev => {
-            const current = prev.get(postId);
-            if (current) {
-              const updated = {
-                ...current,
-                uploadedFiles: current.uploadedFiles + 1
-              };
-              return new Map(prev.set(postId, updated));
+            if (uploadError) {
+              console.error(`Upload attempt ${uploadAttempts} failed for ${file.name}:`, uploadError);
+              if (uploadAttempts === maxAttempts) throw uploadError;
+              
+              // Wait before retry (exponential backoff)
+              await new Promise(resolve => setTimeout(resolve, uploadAttempts * 1000));
+              continue;
             }
-            return prev;
-          });
 
-          console.log(`Successfully uploaded ${file.name} in background`);
-          return { success: true, fileName: file.name };
-          
-        } catch (error) {
-          console.error(`Background upload failed for ${file.name}:`, error);
-          
-          // Update failed files
-          setUploads(prev => {
-            const current = prev.get(postId);
-            if (current) {
-              const updated = {
-                ...current,
-                failedFiles: [...current.failedFiles, file.name]
-              };
-              return new Map(prev.set(postId, updated));
-            }
-            return prev;
-          });
-          
-          return { success: false, fileName: file.name, error };
+            // Get public URL
+            const { data: { publicUrl: url } } = supabase.storage
+              .from('post-media')
+              .getPublicUrl(`${userId}/${fullFileName}`);
+              
+            publicUrl = url;
+            uploadSuccess = true;
+            console.log(`Successfully uploaded ${file.name} to:`, publicUrl);
+
+          } catch (error) {
+            console.error(`Upload attempt ${uploadAttempts} exception for ${file.name}:`, error);
+            if (uploadAttempts === maxAttempts) throw error;
+            await new Promise(resolve => setTimeout(resolve, uploadAttempts * 1000));
+          }
         }
-      })
-    );
+
+        // Create media record
+        const { error: mediaError } = await supabase
+          .from('post_media')
+          .insert({
+            post_id: postId,
+            media_type: file.type.startsWith('image/') ? 'image' : 'video',
+            media_url: publicUrl
+          });
+
+        if (mediaError) {
+          console.error(`Media record error for ${file.name}:`, mediaError);
+          throw mediaError;
+        }
+
+        // Update progress
+        setUploads(prev => {
+          const current = prev.get(postId);
+          if (current) {
+            const updated = {
+              ...current,
+              uploadedFiles: current.uploadedFiles + 1
+            };
+            return new Map(prev.set(postId, updated));
+          }
+          return prev;
+        });
+
+        console.log(`Successfully uploaded ${file.name} in background (${index + 1}/${mediaFiles.length})`);
+        uploadResults.push({ status: 'fulfilled', value: { success: true, fileName: file.name } });
+        
+      } catch (error) {
+        console.error(`Background upload failed for ${file.name}:`, error);
+        
+        // Update failed files
+        setUploads(prev => {
+          const current = prev.get(postId);
+          if (current) {
+            const updated = {
+              ...current,
+              failedFiles: [...current.failedFiles, file.name]
+            };
+            return new Map(prev.set(postId, updated));
+          }
+          return prev;
+        });
+        
+        uploadResults.push({ status: 'rejected', reason: error });
+      }
+    }
 
     // Final status update
     const failedUploads = uploadResults.filter(result => 
