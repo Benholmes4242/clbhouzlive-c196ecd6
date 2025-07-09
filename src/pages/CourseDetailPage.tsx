@@ -213,29 +213,31 @@ const CourseDetailPage = () => {
 
       {/* Rating and Website Section */}
       <div className="bg-background py-4">
-        <div className="course-hero-wrapper flex items-center justify-between">
-          {/* Community Vote Score - Left */}
-          <div className="flex items-center gap-2">
-            <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
-            <span className="text-xl font-semibold text-foreground">
-              {ratingStats?.average_rating || 0}/10
-            </span>
-            <span className="text-muted-foreground">
-              ({ratingStats?.total_ratings || 0} votes)
-            </span>
+        <div className="course-hero-wrapper">
+          <div className="flex items-center justify-between w-full">
+            {/* Community Vote Score - Left */}
+            <div className="flex items-center gap-2">
+              <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
+              <span className="text-xl font-semibold text-foreground">
+                {ratingStats?.average_rating || 0}/10
+              </span>
+              <span className="text-muted-foreground">
+                ({ratingStats?.total_ratings || 0} votes)
+              </span>
+            </div>
+            
+            {/* Visit Website Button - Right */}
+            {course.website_url && (
+              <Button
+                variant="outline"
+                onClick={handleWebsiteClick}
+                className="flex items-center gap-2 rounded-full px-4 py-2 ml-auto"
+              >
+                <ExternalLink className="h-4 w-4" />
+                Visit Website
+              </Button>
+            )}
           </div>
-          
-          {/* Visit Website Button - Right */}
-          {course.website_url && (
-            <Button
-              variant="outline"
-              onClick={handleWebsiteClick}
-              className="flex items-center gap-2 bg-white border border-border rounded-full px-4 py-2"
-            >
-              <ExternalLink className="h-4 w-4" />
-              Visit Website
-            </Button>
-          )}
         </div>
       </div>
 
