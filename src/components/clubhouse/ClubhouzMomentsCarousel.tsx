@@ -63,7 +63,7 @@ const MomentCard: React.FC<{
         </div>
         
         {/* Golf Club Tag and Follow Button */}
-        <div className="absolute bottom-3 left-3 right-3 space-y-2">
+        <div className="absolute bottom-3 left-3 right-3 space-y-2 flex flex-col items-center">
           {moment.golfClubTag && (
             <div className="flex justify-center">
               <span className="bg-black/60 text-white rounded-full px-3 py-1 text-xs font-medium truncate max-w-full">
