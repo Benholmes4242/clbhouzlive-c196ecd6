@@ -23,6 +23,10 @@ interface FeedPost {
     comments: number;
     shares: number;
   };
+  golf_course?: {
+    id: string;
+    name: string;
+  };
   engagement_reason?: 'direct_follow' | 'liked_by_follow' | 'shared_by_follow' | 'commented_by_follow';
   engaged_by_users?: string[];
 }
@@ -103,6 +107,15 @@ export const useFeedPosts = () => {
       const formattedPosts: FeedPost[] = (directPosts || []).map(post => {
         const author = profiles?.find(p => p.id === post.user_id);
         
+        // Sample golf courses for demo (in real implementation, this would come from database joins)
+        const sampleCourses = [
+          { id: '1', name: 'Walton Heath Golf Club (New)' },
+          { id: '2', name: 'Royal St George\'s' },
+          { id: '3', name: 'Carnoustie Golf Links' },
+          { id: '4', name: 'St Andrews Old Course' },
+          { id: '5', name: 'Turnberry (Ailsa)' }
+        ];
+        
         return {
           id: post.id,
           content: post.content || '',
@@ -116,6 +129,7 @@ export const useFeedPosts = () => {
             verified: Math.random() > 0.8 // Random verification for demo
           },
           media: post.post_media || [],
+          golf_course: Math.random() > 0.5 ? sampleCourses[Math.floor(Math.random() * sampleCourses.length)] : undefined,
           engagement_stats: {
             likes: Math.floor(Math.random() * 100) + 1,
             comments: Math.floor(Math.random() * 25) + 1,

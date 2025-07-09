@@ -2,6 +2,7 @@ import React from 'react';
 import { Heart, MessageCircle, Share2, RefreshCw } from 'lucide-react';
 import { useFeedPosts } from '@/hooks/useFeedPosts';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import VideoPlayer from '@/components/feed/VideoPlayer';
 
 const TrendingFeed = () => {
   const { user } = useSupabaseSession();
@@ -169,23 +170,28 @@ const TrendingFeed = () => {
           {/* Media */}
           {post.media && post.media.length > 0 && (
             <div className="mb-3 relative">
-              <div className="rounded-lg overflow-hidden">
+              <div className="feed-media-container w-full aspect-[4/3] rounded-lg overflow-hidden relative">
                 {post.media[0].media_type === 'video' ? (
-                  <video
+                  <VideoPlayer
                     src={post.media[0].media_url}
-                    className="w-full h-64 md:h-80 object-cover"
-                    controls
-                    playsInline
+                    courseName={post.golf_course?.name}
                   />
                 ) : (
-                  <img
-                    src={post.media[0].media_url}
-                    alt="Post content"
-                    className="w-full h-64 md:h-80 object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=600&h=400&fit=crop';
-                    }}
-                  />
+                  <>
+                    <img
+                      src={post.media[0].media_url}
+                      alt="Post content"
+                      className="w-full h-full object-cover object-center"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=600&h=400&fit=crop';
+                      }}
+                    />
+                    {post.golf_course && (
+                      <div className="course-tag absolute top-2 right-2 bg-black/50 text-white text-xs font-medium px-3 py-1 rounded-full backdrop-blur-sm">
+                        {post.golf_course.name}
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             </div>
