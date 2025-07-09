@@ -5,7 +5,7 @@ import { UserPlus, UserCheck, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useVideoAutoplay } from '@/hooks/useVideoAutoplay';
+
 import { toast } from 'sonner';
 
 interface MomentUser {
@@ -27,19 +27,12 @@ const MomentCard: React.FC<{
   moment: Moment; 
   onFollowToggle: (userId: string, isCurrentlyFollowing: boolean) => void;
 }> = ({ moment, onFollowToggle }) => {
-  const { ref: autoplayRef, shouldAutoplay, handleMouseEnter, handleMouseLeave } = useVideoAutoplay({
-    enabled: true,
-    threshold: 0.3
-  });
+  // Force autoplay for carousel videos
+  const [shouldAutoplay, setShouldAutoplay] = React.useState(true);
 
   return (
     <Card className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow duration-200 h-[280px]">
-      <div 
-        ref={autoplayRef}
-        className="relative h-full"
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-      >
+      <div className="relative h-full">
         {/* Video Background */}
         <video
           src={moment.videoUrl}
