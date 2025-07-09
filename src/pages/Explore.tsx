@@ -18,7 +18,7 @@ const Explore = () => {
     loading, 
     hasMore, 
     loadMore 
-  } = useInfiniteExploreContent();
+  } = useInfiniteExploreContent(activeFilter);
   
   const { 
     isOpen: isFeedOpen, 
@@ -41,9 +41,9 @@ const Explore = () => {
     openFeed(item);
   };
 
+  // Apply client-side filtering for non-database filters
   const filteredContent = content.filter(item => {
-    if (activeFilter === 'All') return true;
-    if (activeFilter === 'Videos') return item.type === 'video';
+    if (activeFilter === 'All' || activeFilter === 'Videos') return true; // Videos filtering is handled in the database
     if (activeFilter === 'Photos') return item.type === 'image';
     if (activeFilter === 'Pros') return item.user?.verified;
     if (activeFilter === 'Tips') return item.label === 'Pro Tip';

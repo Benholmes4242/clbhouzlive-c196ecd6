@@ -2,11 +2,12 @@
 import { useState, useCallback, useEffect } from 'react';
 import { ExploreContentItem } from '@/components/explore/types';
 import { useRealPostsFetcher } from './explore/useRealPostsFetcher';
+
 import { useMockPostsHandler } from './explore/useMockPostsHandler';
 
 const POSTS_PER_PAGE = 6; // Reduced for faster loading on mobile
 
-export const useInfiniteExploreContent = () => {
+export const useInfiniteExploreContent = (activeFilter?: string) => {
   const [content, setContent] = useState<ExploreContentItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
@@ -14,6 +15,7 @@ export const useInfiniteExploreContent = () => {
   const [currentMockOffset, setCurrentMockOffset] = useState(0);
   
   const { fetchRealPosts } = useRealPostsFetcher();
+  
   const { getMockPosts } = useMockPostsHandler();
 
   const loadMore = useCallback(async () => {
@@ -23,8 +25,8 @@ export const useInfiniteExploreContent = () => {
     setLoading(true);
 
     try {
-      // Try to fetch real posts first
-      const realPosts = await fetchRealPosts(currentOffset, POSTS_PER_PAGE);
+      // Try to fetch real posts with filter
+      const realPosts = await fetchRealPosts(currentOffset, POSTS_PER_PAGE, activeFilter);
       
       if (realPosts.length > 0) {
         setContent(prev => [...prev, ...realPosts]);
@@ -59,14 +61,22 @@ export const useInfiniteExploreContent = () => {
     } finally {
       setLoading(false);
     }
-  }, [loading, hasMore, currentOffset, currentMockOffset, fetchRealPosts, getMockPosts]);
+  }, [loading, hasMore, currentOffset, currentMockOffset, fetchRealPosts, getMockPosts, activeFilter]);
+
+  // Reset content when filter changes
+  useEffect(() => {
+    setContent([]);
+    setCurrentOffset(0);
+    setCurrentMockOffset(0);
+    setHasMore(true);
+  }, [activeFilter]);
 
   // Initial load
   useEffect(() => {
     if (content.length === 0 && !loading) {
       loadMore();
     }
-  }, []);
+  }, [loadMore]);
 
   return {
     content,
