@@ -27,6 +27,20 @@ export const extractGolfCourseFromContent = (content: string | null): ExtractedG
     };
   }
   
+  // Pattern to match "at [Course Name]" (more general pattern)
+  const generalPattern = /\bat\s+([^,\n]+(?:GC|Golf Club|Golf Course|Country Club|CC))/i;
+  const generalMatch = content.match(generalPattern);
+  
+  if (generalMatch) {
+    const courseName = generalMatch[1].trim();
+    
+    return {
+      id: `extracted-${courseName.toLowerCase().replace(/\s+/g, '-')}`,
+      name: courseName,
+      country: ''
+    };
+  }
+  
   return null;
 };
 
@@ -38,5 +52,11 @@ export const removeGolfCourseFromContent = (content: string | null): string => {
   
   // Remove the golf course pattern from content
   const golfCoursePattern = /\n*📍\s*Played\s+at\s+[^,]+,\s*[^,\n]+\n*/gi;
-  return content.replace(golfCoursePattern, '').trim();
+  let cleanedContent = content.replace(golfCoursePattern, '').trim();
+  
+  // Also remove the general pattern if found
+  const generalPattern = /\bat\s+([^,\n]+(?:GC|Golf Club|Golf Course|Country Club|CC))/i;
+  cleanedContent = cleanedContent.replace(generalPattern, '').trim();
+  
+  return cleanedContent;
 };
