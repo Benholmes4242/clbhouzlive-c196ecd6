@@ -1,16 +1,28 @@
+
 import React, { useEffect } from 'react';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
 import StoryBar from '@/components/StoryBar';
+import TrendingFeed from '@/components/TrendingFeed';
+import ClubhouzMomentsCarousel from '@/components/clubhouse/ClubhouzMomentsCarousel';
+
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { removeDuplicatePosts } from '@/utils/postCleanup';
 import { useAppLogo } from '@/hooks/useAppLogo';
 
 const Index = () => {
   const { user, loading } = useSupabaseSession();
   const navigate = useNavigate();
   const { currentLogo } = useAppLogo();
+
+  // Clean up duplicate posts when user is loaded
+  useEffect(() => {
+    if (user?.id) {
+      removeDuplicatePosts(user.id);
+    }
+  }, [user?.id]);
 
   // Show loading state while checking authentication
   if (loading) {
@@ -86,32 +98,11 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <StoryBar />
+      <ClubhouzMomentsCarousel />
       
       <main className="container mx-auto px-4 py-6">
         <div className="max-w-2xl mx-auto space-y-6">
-          {/* Main Feed Content */}
-          <div className="bg-card rounded-lg p-6 shadow-sm border">
-            <h2 className="text-xl font-semibold mb-4">Welcome to ClbHouz</h2>
-            <p className="text-muted-foreground mb-4">
-              Your golf community is growing! Explore content, connect with golfers, and discover amazing courses.
-            </p>
-            <div className="space-y-3">
-              <Button 
-                onClick={() => navigate('/explore')}
-                className="w-full"
-                variant="default"
-              >
-                Explore Golf Content
-              </Button>
-              <Button 
-                onClick={() => navigate('/courses')}
-                className="w-full"
-                variant="outline"
-              >
-                Browse Golf Courses
-              </Button>
-            </div>
-          </div>
+          <TrendingFeed />
         </div>
       </main>
       

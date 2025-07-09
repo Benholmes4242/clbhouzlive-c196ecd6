@@ -23,9 +23,11 @@ const TaggedText = React.memo(({ text, tags = [] }: TaggedTextProps) => {
     if (tag.entity_type === 'user') {
       navigate(`/profile/${tag.entity_id}`);
     } else if (tag.entity_type === 'golf_club') {
-      navigate(`/courses/${tag.entity_id}`);
+      // Navigate to golf club page when implemented
+      console.log('Navigate to golf club:', tag);
     } else if (tag.entity_type === 'business') {
-      navigate(`/profile/${tag.entity_id}`);
+      // Navigate to business page when implemented
+      console.log('Navigate to business:', tag);
     }
   };
 
@@ -56,84 +58,60 @@ const TaggedText = React.memo(({ text, tags = [] }: TaggedTextProps) => {
       }
     });
 
-    // Sort tags by name length (longest first) to match longer names first
-    const sortedTags = [...tags].sort((a, b) => (b.name?.length || 0) - (a.name?.length || 0));
-    
-    // Create patterns for each tag
-    const tagPatterns = sortedTags.map(tag => {
-      const patterns = [];
-      if (tag.username) {
-        patterns.push(`@${tag.username}`);
-      }
-      if (tag.name) {
-        patterns.push(`@${tag.name}`);
-        // Also handle names with spaces replaced by nothing or underscores
-        const nameNoSpaces = tag.name.replace(/\s+/g, '');
-        const nameWithUnderscores = tag.name.replace(/\s+/g, '_');
-        if (nameNoSpaces !== tag.name) patterns.push(`@${nameNoSpaces}`);
-        if (nameWithUnderscores !== tag.name) patterns.push(`@${nameWithUnderscores}`);
-      }
-      return { tag, patterns };
-    });
-
-    // Find all mentions and their positions
-    const mentions = [];
-    tagPatterns.forEach(({ tag, patterns }) => {
-      patterns.forEach(pattern => {
-        const regex = new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
-        let match;
-        while ((match = regex.exec(text)) !== null) {
-          mentions.push({
-            start: match.index,
-            end: match.index + match[0].length,
-            text: match[0],
-            tag: tag
-          });
-        }
-      });
-    });
-
-    // Sort mentions by position and remove overlaps (keep longest matches)
-    mentions.sort((a, b) => a.start - b.start || (b.end - b.start) - (a.end - a.start));
-    const filteredMentions = [];
-    for (const mention of mentions) {
-      if (!filteredMentions.some(existing => 
-        (mention.start >= existing.start && mention.start < existing.end) ||
-        (mention.end > existing.start && mention.end <= existing.end)
-      )) {
-        filteredMentions.push(mention);
-      }
-    }
-
-    // Build the final result
+    // Use regex to find all @mentions and replace them
+    const mentionRegex = /@[\w\s]+/g;
     const parts = [];
     let lastIndex = 0;
+    let match;
 
-    filteredMentions.forEach((mention, index) => {
+    while ((match = mentionRegex.exec(text)) !== null) {
       // Add text before the mention
-      if (mention.start > lastIndex) {
-        parts.push(text.slice(lastIndex, mention.start));
+      if (match.index > lastIndex) {
+        parts.push(text.slice(lastIndex, match.index));
       }
 
-      // Add the mention as a clickable link
-      const displayName = mention.tag.name || mention.tag.username;
-      parts.push(
-        <button
-          key={`tag-${mention.start}-${mention.tag.id}`}
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            handleTagClick(mention.tag, e);
-          }}
-          className="text-blue-400 hover:text-blue-300 hover:underline font-medium cursor-pointer bg-transparent border-none p-0 inline-block relative z-10"
-          style={{ pointerEvents: 'auto' }}
-        >
-          @{displayName}
-        </button>
-      );
+      const mention = match[0].trim();
+      // Try to find matching tag
+      let matchingTag = tagMap.get(mention) || tagMap.get(mention.toLowerCase());
+      
+      // If no direct match, try partial matching
+      if (!matchingTag) {
+        const mentionWithoutAt = mention.slice(1).toLowerCase();
+        for (const tag of tags) {
+          if (tag.name && tag.name.toLowerCase().includes(mentionWithoutAt)) {
+            matchingTag = tag;
+            break;
+          }
+          if (tag.username && tag.username.toLowerCase().includes(mentionWithoutAt)) {
+            matchingTag = tag;
+            break;
+          }
+        }
+      }
 
-      lastIndex = mention.end;
-    });
+      if (matchingTag) {
+        // Use the person's display name (name) instead of username for better UX
+        const displayName = matchingTag.name || matchingTag.username;
+        parts.push(
+          <button
+            key={`tag-${match.index}-${matchingTag.id}`}
+            onClick={(e) => handleTagClick(matchingTag, e)}
+            className="text-blue-400 hover:text-blue-300 hover:underline font-medium cursor-pointer bg-transparent border-none p-0 inline"
+          >
+            @{displayName}
+          </button>
+        );
+      } else {
+        // Render as blue text but not clickable
+        parts.push(
+          <span key={`mention-${match.index}`} className="text-blue-400 font-medium">
+            {mention}
+          </span>
+        );
+      }
+
+      lastIndex = match.index + match[0].length;
+    }
 
     // Add remaining text after last mention
     if (lastIndex < text.length) {
