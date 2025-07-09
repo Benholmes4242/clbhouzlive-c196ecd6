@@ -7,6 +7,7 @@ import ActivityPostCard from './components/ActivityPostCard';
 import PostViewerModal from '../posts/PostViewerModal';
 import { usePostViewer } from '@/hooks/usePostViewer';
 import BadgeCarousel from '../badges/BadgeCarousel';
+import { extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 
 const SocialActivity: React.FC<SocialActivityProps> = ({
   userId,
@@ -21,8 +22,9 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
   const [selectedPost, setSelectedPost] = useState<ActivityPost | null>(null);
 
   const handlePostClick = (post: ActivityPost) => {
-    // Helper function to extract golf course from post tags
-    const extractGolfCourse = (postTags: any[]) => {
+    // Helper function to extract golf course from post tags or content
+    const extractGolfCourse = (postTags: any[], content: string | null) => {
+      // First try to extract from post tags
       const golfCourseTag = postTags?.find(tag => 
         tag.tagged_entity?.entity_type === 'golf_club' || tag.entity_type === 'golf_club'
       );
@@ -45,6 +47,13 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
           };
         }
       }
+      
+      // If not found in tags, try to extract from content
+      const courseFromContent = extractGolfCourseFromContent(content);
+      if (courseFromContent) {
+        return courseFromContent;
+      }
+      
       return undefined;
     };
 
@@ -56,7 +65,7 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
       user: post.user,
       post_media: post.post_media || [],
       post_tags: post.post_tags || [],
-      golfCourse: extractGolfCourse(post.post_tags || [])
+      golfCourse: extractGolfCourse(post.post_tags || [], post.content)
     };
     
     // Transform all posts
@@ -67,7 +76,7 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
       user: p.user,
       post_media: p.post_media || [],
       post_tags: p.post_tags || [],
-      golfCourse: extractGolfCourse(p.post_tags || [])
+      golfCourse: extractGolfCourse(p.post_tags || [], p.content)
     }));
     
     openPostViewer(transformedPost, transformedPosts);
