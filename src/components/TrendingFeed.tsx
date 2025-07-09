@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart, MessageCircle, Share2, RefreshCw } from 'lucide-react';
+import { Heart, MessageCircle, Share2, RefreshCw, MapPin } from 'lucide-react';
 import { useFeedPosts } from '@/hooks/useFeedPosts';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import VideoPlayer from '@/components/feed/VideoPlayer';
@@ -187,7 +187,8 @@ const TrendingFeed = () => {
                       }}
                     />
                     {post.golf_course && (
-                      <div className="course-tag absolute top-2 right-2 bg-black/50 text-white text-xs font-medium px-3 py-1 rounded-full backdrop-blur-sm">
+                      <div className="course-tag absolute top-2 right-2 bg-black/60 text-white text-xs font-medium px-2 py-1 rounded-md backdrop-blur-sm flex items-center gap-1">
+                        <MapPin className="h-3 w-3" />
                         {post.golf_course.name}
                       </div>
                     )}

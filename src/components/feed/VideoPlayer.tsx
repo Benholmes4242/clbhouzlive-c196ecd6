@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState } from 'react';
-import { VolumeX, Volume2, Maximize } from 'lucide-react';
+import { VolumeX, Volume2, Maximize, MapPin } from 'lucide-react';
 
 interface VideoPlayerProps {
   src: string;
@@ -76,7 +76,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ src, courseName }) => {
       
       {/* Course Tag */}
       {courseName && (
-        <div className="course-tag absolute top-2 right-2 bg-black/50 text-white text-xs font-medium px-3 py-1 rounded-full backdrop-blur-sm">
+        <div className="course-tag absolute top-2 right-2 bg-black/60 text-white text-xs font-medium px-2 py-1 rounded-md backdrop-blur-sm flex items-center gap-1">
+          <MapPin className="h-3 w-3" />
           {courseName}
         </div>
       )}
