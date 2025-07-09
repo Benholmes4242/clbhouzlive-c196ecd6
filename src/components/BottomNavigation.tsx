@@ -4,7 +4,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePostFlow } from '@/hooks/usePostFlow';
 // Import removed - optimistic post submission disabled
 import GalleryPicker from '@/components/post/GalleryPicker';
-import EnhancedCreateMomentModal from '@/components/post/EnhancedCreateMomentModal';
+// Enhanced create moment modal removed
 import SnapToast from '@/components/snap/SnapToast';
 import NavigationBar from './bottom-navigation/NavigationBar';
 import { useNavigationHandlers } from '@/hooks/useNavigationHandlers';
@@ -171,15 +171,8 @@ const BottomNavigation = () => {
   };
 
   const onCaptionInput = (e: React.FormEvent<HTMLDivElement>) => {
-    handleCaptionInput(
-      e,
-      caption,
-      setCaption,
-      cursorPosition,
-      setCursorPosition,
-      setShowSuggestions,
-      setMentionSuggestions
-    );
+    // Caption input handling temporarily disabled
+    handleCaptionInput();
   };
 
   const onSelectMention = (entity: any) => {
@@ -188,17 +181,8 @@ const BottomNavigation = () => {
       setLocalSelectedTags(prev => [...prev, entity]);
     }
 
-    selectMention(
-      entity,
-      caption,
-      setCaption,
-      cursorPosition,
-      selectedTags,
-      setSelectedTags,
-      captionInputRef,
-      setShowSuggestions,
-      setMentionSuggestions
-    );
+    // Mention selection temporarily disabled
+    selectMention();
   };
 
   return (
@@ -215,33 +199,26 @@ const BottomNavigation = () => {
         onMultipleFilesSelected={handleMultipleFilesSelected}
       />
 
-      <EnhancedCreateMomentModal
-        isOpen={isComposerOpen}
-        onClose={() => {
-          closeComposer();
-          setLocalSelectedTags([]);
-        }}
-        onSubmit={async (data) => {
-          setIsSubmitting(true);
-          try {
-            await submitPost();
-            // Post submission logic temporarily disabled
-            console.log('Post submission successful');
-            closeComposer();
-            setLocalSelectedTags([]);
-            showConfirmationToast('Post shared successfully!');
-          } catch (error) {
-            console.error('Error in enhanced post submission:', error);
-            showConfirmationToast('Failed to share post. Please try again.');
-          } finally {
-            setIsSubmitting(false);
-          }
-        }}
-        isSubmitting={isSubmitting}
-        initialFiles={selectedFiles.length > 0 ? selectedFiles : (selectedFile ? [selectedFile] : [])}
-        selectedCourse={selectedCourse}
-        onCourseSelect={setSelectedCourse}
-      />
+      {/* Enhanced create moment modal temporarily disabled */}
+      {isComposerOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+            <h2 className="text-lg font-semibold mb-4">Create Post</h2>
+            <p className="text-muted-foreground mb-4">
+              Post creation features are being updated.
+            </p>
+            <button 
+              onClick={() => {
+                closeComposer();
+                setLocalSelectedTags([]);
+              }}
+              className="w-full bg-primary text-white rounded-md py-2"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
 
       <SnapToast
         message={toastMessage}

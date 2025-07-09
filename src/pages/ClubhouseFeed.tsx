@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Header from '@/components/Header';
@@ -9,13 +8,9 @@ import ClubSpotlightCarousel from '@/components/clubhouse/ClubSpotlightCarousel'
 import FeaturedMomentsCarousel from '@/components/clubhouse/FeaturedMomentsCarousel';
 import TopPlayerContentCarousel from '@/components/clubhouse/TopPlayerContentCarousel';
 
-import InstagramStyleFeed from '@/components/clubhouse/InstagramStyleFeed';
-import { useClubhouseContent } from '@/hooks/useClubhouseContent';
-
 const ClubhouseFeed = () => {
   const [activeTab, setActiveTab] = useState('feed');
   const [searchQuery, setSearchQuery] = useState('');
-  const { posts, loading } = useClubhouseContent();
 
   return (
     <div className="min-h-screen bg-background">
@@ -44,8 +39,8 @@ const ClubhouseFeed = () => {
               />
               
               <div className="space-y-6">
-                <FeaturedMomentsCarousel userPosts={posts} loading={loading} />
-                <TopPlayerContentCarousel userPosts={posts} loading={loading} />
+                <FeaturedMomentsCarousel userPosts={[]} loading={false} />
+                <TopPlayerContentCarousel userPosts={[]} loading={false} />
                 <CourseHighlightsCarousel />
                 <ClubSpotlightCarousel />
               </div>
@@ -71,14 +66,18 @@ const ClubhouseFeed = () => {
           </Tabs>
         </div>
         
-        {/* Instagram-style full-width feed - breaks out of container */}
+        {/* Placeholder for future posts feed */}
         {activeTab === 'feed' && (
           <div className="mt-8">
             <div className="container mx-auto px-4 mb-4">
               <h2 className="text-xl font-semibold">Latest Posts</h2>
-              <p className="text-muted-foreground text-sm">Discover the latest golf moments from the community</p>
+              <p className="text-muted-foreground text-sm">Community posts will be displayed here</p>
             </div>
-            <InstagramStyleFeed userPosts={posts} loading={loading} />
+            <div className="bg-card rounded-lg p-6 shadow-sm border mx-4">
+              <p className="text-muted-foreground text-center">
+                Golf moments and community posts coming soon
+              </p>
+            </div>
           </div>
         )}
       </div>
