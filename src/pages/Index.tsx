@@ -3,7 +3,8 @@ import React, { useEffect } from 'react';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
 import StoryBar from '@/components/StoryBar';
-// Trending and clubhouse components removed
+import TrendingFeed from '@/components/TrendingFeed';
+import ClubhouzMomentsCarousel from '@/components/clubhouse/ClubhouzMomentsCarousel';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Button } from '@/components/ui/button';
@@ -93,11 +94,13 @@ const Index = () => {
       <Header />
       <StoryBar />
       
-      <main className="container mx-auto px-4 py-6">
+      <main className="container mx-auto px-4 py-6 pb-20">
         <div className="max-w-2xl mx-auto space-y-6">
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">Welcome! Explore posts and content on the Explore page</p>
-          </div>
+          {/* Clubhouz Moments Carousel */}
+          <ClubhouzMomentsCarousel />
+          
+          {/* Trending Feed */}
+          <TrendingFeed />
         </div>
       </main>
       
