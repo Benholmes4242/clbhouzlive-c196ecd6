@@ -10,6 +10,8 @@ export interface PostTag {
   entity_id: string;
   name: string;
   username: string | null;
+  start_index?: number;
+  end_index?: number;
 }
 
 export interface UserPostData {

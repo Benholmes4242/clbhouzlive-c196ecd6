@@ -515,6 +515,48 @@ export type Database = {
           },
         ]
       }
+      post_tags: {
+        Row: {
+          created_at: string
+          end_index: number
+          id: string
+          post_id: string
+          start_index: number
+          tagged_entity_id: string
+        }
+        Insert: {
+          created_at?: string
+          end_index: number
+          id?: string
+          post_id: string
+          start_index: number
+          tagged_entity_id: string
+        }
+        Update: {
+          created_at?: string
+          end_index?: number
+          id?: string
+          post_id?: string
+          start_index?: number
+          tagged_entity_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "post_tags_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "post_tags_tagged_entity_id_fkey"
+            columns: ["tagged_entity_id"]
+            isOneToOne: false
+            referencedRelation: "taggable_entities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       posts: {
         Row: {
           content: string | null
@@ -569,6 +611,39 @@ export type Database = {
           token?: string
           updated_at?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      taggable_entities: {
+        Row: {
+          created_at: string
+          entity_id: string
+          entity_type: string
+          id: string
+          name: string
+          profile_image_url: string | null
+          updated_at: string
+          username: string | null
+        }
+        Insert: {
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          id?: string
+          name: string
+          profile_image_url?: string | null
+          updated_at?: string
+          username?: string | null
+        }
+        Update: {
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          name?: string
+          profile_image_url?: string | null
+          updated_at?: string
+          username?: string | null
         }
         Relationships: []
       }
@@ -1022,6 +1097,10 @@ export type Database = {
       is_admin: {
         Args: Record<PropertyKey, never>
         Returns: boolean
+      }
+      populate_taggable_entities: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
       send_push_notification: {
         Args: {

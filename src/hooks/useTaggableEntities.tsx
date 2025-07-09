@@ -8,6 +8,7 @@ interface TaggableEntity {
   entity_id: string;
   name: string;
   username: string | null;
+  profile_image_url?: string | null;
 }
 
 export const useTaggableEntities = () => {
@@ -15,15 +16,29 @@ export const useTaggableEntities = () => {
   const [loading, setLoading] = useState(false);
 
   const searchEntities = useCallback(async (query: string) => {
-    if (query.length < 2) {
+    if (query.length < 1) {
       setEntities([]);
       return;
     }
 
     setLoading(true);
     try {
-      // Taggable entities temporarily disabled due to missing database tables
-      setEntities([]);
+      const { data, error } = await supabase
+        .from('taggable_entities')
+        .select('*')
+        .or(`name.ilike.%${query}%,username.ilike.%${query}%`)
+        .order('name')
+        .limit(8);
+
+      if (error) {
+        console.error('Error searching entities:', error);
+        setEntities([]);
+        return;
+      }
+
+      // Type assertion to ensure proper typing
+      const typedData = (data || []) as TaggableEntity[];
+      setEntities(typedData);
     } catch (error) {
       console.error('Error searching entities:', error);
       setEntities([]);
@@ -34,8 +49,24 @@ export const useTaggableEntities = () => {
 
   const createGolfClubEntity = async (name: string) => {
     try {
-      // Entity creation temporarily disabled due to missing database tables
-      return null;
+      // For golf clubs, we would need to create a new golf_course entry first
+      // This is a simplified version - in practice you'd want more validation
+      const { data: courseData, error: courseError } = await supabase
+        .from('golf_courses')
+        .insert({
+          name,
+          country: 'Unknown',
+          continent: 'North America'
+        })
+        .select()
+        .single();
+
+      if (courseError) {
+        console.error('Error creating golf course:', courseError);
+        return null;
+      }
+
+      return courseData;
     } catch (error) {
       console.error('Error creating golf club entity:', error);
       return null;
@@ -44,7 +75,8 @@ export const useTaggableEntities = () => {
 
   const createBusinessEntity = async (name: string, username?: string) => {
     try {
-      // Entity creation temporarily disabled due to missing database tables
+      // This would create a business user profile
+      // In practice, this should be handled through proper user registration
       return null;
     } catch (error) {
       console.error('Error creating business entity:', error);
