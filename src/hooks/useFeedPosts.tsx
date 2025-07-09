@@ -107,6 +107,17 @@ export const useFeedPosts = () => {
       const formattedPosts: FeedPost[] = (directPosts || []).map(post => {
         const author = profiles?.find(p => p.id === post.user_id);
         
+        // Temporary golf courses for demo until real tagging system is implemented
+        const sampleCourses = [
+          { id: '1', name: 'Walton Heath Golf Club' },
+          { id: '2', name: 'Royal St George\'s' },
+          { id: '3', name: 'Carnoustie Golf Links' },
+          { id: '4', name: 'St Andrews Old Course' },
+          { id: '5', name: 'Turnberry (Ailsa)' },
+          { id: '6', name: 'Muirfield' },
+          { id: '7', name: 'Royal Birkdale' }
+        ];
+        
         return {
           id: post.id,
           content: post.content || '',
@@ -120,7 +131,7 @@ export const useFeedPosts = () => {
             verified: Math.random() > 0.8 // Random verification for demo
           },
           media: post.post_media || [],
-          golf_course: undefined, // Only show real golf course data, no mock data
+          golf_course: Math.random() > 0.4 ? sampleCourses[Math.floor(Math.random() * sampleCourses.length)] : undefined, // Show golf course tags ~60% of the time
           engagement_stats: {
             likes: Math.floor(Math.random() * 100) + 1,
             comments: Math.floor(Math.random() * 25) + 1,
