@@ -193,6 +193,17 @@ div[data-radix-dialog-content] .photo-editor-slider [data-radix-slider-thumb]:fo
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 0 2px rgba(245, 166, 35, 0.3) !important;
 }
 
+.photo-editor-slider [data-radix-slider-thumb]:active,
+[data-radix-dialog-content] .photo-editor-slider [data-radix-slider-thumb]:active,
+div[data-radix-dialog-content] .photo-editor-slider [data-radix-slider-thumb]:active,
+.photo-editor-slider [data-radix-slider-thumb][data-state="active"],
+[data-radix-dialog-content] .photo-editor-slider [data-radix-slider-thumb][data-state="active"],
+div[data-radix-dialog-content] .photo-editor-slider [data-radix-slider-thumb][data-state="active"] {
+  background-color: #F5A623 !important;
+  border-color: #F5A623 !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 0 2px rgba(245, 166, 35, 0.3) !important;
+}
+
 /* Add to Played Button Styles */
 .add-to-played-btn {
   transition: all 0.2s ease-in-out;
