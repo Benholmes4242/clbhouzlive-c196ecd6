@@ -162,12 +162,12 @@
 }
 
 [data-radix-dialog-content] .photo-editor-slider [data-radix-slider-range] {
-  background-color: #FF0000 !important;
+  background-color: #F5A623 !important;
 }
 
 [data-radix-dialog-content] .photo-editor-slider [data-radix-slider-thumb] {
-  background-color: #FF0000 !important;
-  border: 2px solid #FF0000 !important;
+  background-color: #F5A623 !important;
+  border: 2px solid #F5A623 !important;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
   width: 16px !important;
   height: 16px !important;
