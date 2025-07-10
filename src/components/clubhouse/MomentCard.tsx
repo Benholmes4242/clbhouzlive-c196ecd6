@@ -91,7 +91,7 @@ const MomentCard: React.FC<MomentCardProps> = ({ moment, currentUserId }) => {
   if (!mediaToShow) return null;
 
   return (
-    <div className="relative bg-card rounded-full overflow-hidden shadow-sm border group">
+    <div className="relative bg-card rounded-xl overflow-hidden shadow-sm border group">
       {/* Media Container */}
       <div className="relative aspect-[3/4] bg-muted">
         {videoMedia ? (
@@ -150,7 +150,7 @@ const MomentCard: React.FC<MomentCardProps> = ({ moment, currentUserId }) => {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <span className="bg-black/60 text-white rounded-full px-4 py-1.5 text-sm font-medium cursor-default max-w-[160px] truncate">
+                      <span className="bg-black/60 text-white rounded-full px-3 py-1.5 text-sm font-medium cursor-default max-w-[160px] truncate">
                         {golfCourseTag.name}
                       </span>
                     </TooltipTrigger>
