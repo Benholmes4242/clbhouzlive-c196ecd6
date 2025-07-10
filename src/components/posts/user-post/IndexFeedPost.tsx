@@ -153,20 +153,24 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
 
         {/* BOTTOM-LEFT: Caption Overlay Pill */}
         {cleanContent && (
-          <div className="absolute bottom-3 left-3 z-20 max-w-[70%]">
-            <div className="bg-black bg-opacity-50 text-white text-sm font-normal px-3.5 py-2.5 rounded-full backdrop-blur-sm leading-relaxed">
-              <div className="break-words whitespace-normal">
+          <div className="absolute bottom-3 left-3 z-20 max-w-[70%] group">
+            <div 
+              className="bg-black bg-opacity-50 text-white text-sm font-normal px-3 py-1.5 rounded-full backdrop-blur-sm cursor-default group-hover:bg-opacity-75 transition-all duration-200"
+              title={`${cleanContent}${post.post_tags && post.post_tags.length > 0 ? ' ' + post.post_tags.map(tag => `@${tag.name}`).join(' ') : ''}`}
+            >
+              <div className="truncate group-hover:whitespace-normal group-hover:break-words group-hover:max-w-xs">
                 {cleanContent}
+                {post.post_tags && post.post_tags.length > 0 && (
+                  <span>
+                    {' '}
+                    {post.post_tags.map((tag) => (
+                      <span key={tag.id} className="text-blue-400 font-medium">
+                        @{tag.name}{' '}
+                      </span>
+                    ))}
+                  </span>
+                )}
               </div>
-              {post.post_tags && post.post_tags.length > 0 && (
-                <div className="mt-1">
-                  {post.post_tags.map((tag) => (
-                    <span key={tag.id} className="text-blue-400 font-medium mr-1">
-                      @{tag.name}
-                    </span>
-                  ))}
-                </div>
-              )}
             </div>
           </div>
         )}
