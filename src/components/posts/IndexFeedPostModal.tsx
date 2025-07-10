@@ -221,8 +221,8 @@ const IndexFeedPostModal: React.FC<IndexFeedPostModalProps> = ({
           />
         )}
 
-        {/* Top Left - Profile Info (Same sizing as index page) */}
-        <div className="absolute top-3 left-3 z-10 flex items-center bg-black/60 text-white px-3 py-1.5 rounded-full">
+        {/* Top Left - Profile Info (Same styling as index page) */}
+        <div className="absolute top-3 left-3 z-10 flex items-center">
           <HighQualityImage
             src={currentPost.user.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
             alt={displayName}
@@ -230,7 +230,12 @@ const IndexFeedPostModal: React.FC<IndexFeedPostModalProps> = ({
             width={64}
             height={64}
           />
-          <span className="text-base font-bold">{displayName}</span>
+          <span 
+            className="text-white text-base font-bold"
+            style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
+          >
+            {displayName}
+          </span>
         </div>
 
         {/* Top Right - Golf Course Tag (Same styling as index page) */}
@@ -248,10 +253,13 @@ const IndexFeedPostModal: React.FC<IndexFeedPostModalProps> = ({
           </div>
         )}
 
-        {/* Bottom Left - Caption Text */}
+        {/* Bottom Left - Caption Text (Same styling as index page) */}
         {cleanContent && (
-          <div className="absolute bottom-3 left-3 z-10 max-w-[70%] group">
-            <div className="text-white bg-black/50 px-2 py-1 rounded text-sm leading-relaxed group-hover:whitespace-normal whitespace-nowrap overflow-hidden text-ellipsis">
+          <div className="absolute bottom-3 left-3 right-20 z-10 max-w-[70%] group">
+            <div 
+              className="text-white text-base font-bold leading-[1.4] whitespace-nowrap overflow-hidden text-ellipsis group-hover:whitespace-normal group-hover:overflow-visible transition-all duration-200"
+              style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
+            >
               {cleanContent}
             </div>
           </div>
