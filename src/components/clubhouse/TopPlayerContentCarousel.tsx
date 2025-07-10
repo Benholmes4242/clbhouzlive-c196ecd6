@@ -170,7 +170,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, currentUserId }) => {
           <HighQualityImage 
             src={player.avatar} 
             alt={player.name} 
-            className="w-16 h-16 rounded-[14px] border-2 border-white cursor-pointer hover:border-white/80 transition-colors" 
+            className="w-16 h-16 rounded-full border-2 border-white cursor-pointer hover:border-white/80 transition-colors" 
             width={64}
             height={64}
             onClick={handleProfileClick}
