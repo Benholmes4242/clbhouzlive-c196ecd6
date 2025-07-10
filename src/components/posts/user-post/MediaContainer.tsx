@@ -162,9 +162,10 @@ export const MediaContainer: React.FC<MediaContainerProps> = ({
         style={{ 
           scrollSnapType: 'x mandatory',
           WebkitOverflowScrolling: 'touch',
-          width: '100%',
+          // KEY FIX: Make the container wide enough to hold all items side by side
+          width: `${media.length * 100}%`,
           height: '100%',
-          scrollBehavior: 'auto' // Disable smooth scrolling for manual control
+          scrollBehavior: 'auto'
         }}
         onMouseDown={handleMouseDown}
       >
@@ -174,7 +175,8 @@ export const MediaContainer: React.FC<MediaContainerProps> = ({
             className="flex-shrink-0 relative"
             style={{ 
               scrollSnapAlign: 'start',
-              width: '100%', // Each item takes full viewport width
+              // Each item takes exactly 1/nth of the expanded container
+              width: `${100 / media.length}%`,
               height: '100%'
             }}
             onClick={() => handleMediaItemClick(mediaItem)}
