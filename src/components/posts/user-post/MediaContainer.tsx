@@ -92,13 +92,18 @@ export const MediaContainer: React.FC<MediaContainerProps> = ({
 
       const diff = dragStart - e.clientX;
       const beforeScroll = container.scrollLeft;
-      container.scrollLeft += diff;
+      
+      // Try using scrollTo instead of setting scrollLeft directly
+      const newScrollLeft = Math.max(0, Math.min(container.scrollWidth - container.clientWidth, beforeScroll + diff));
+      container.scrollTo({ left: newScrollLeft, behavior: 'auto' });
+      
       const afterScroll = container.scrollLeft;
       
       console.log('🔄 Dragging:', { 
         diff, 
         beforeScroll, 
         afterScroll, 
+        newScrollLeft,
         scrollWidth: container.scrollWidth, 
         clientWidth: container.clientWidth,
         isScrollable: container.scrollWidth > container.clientWidth
@@ -158,7 +163,8 @@ export const MediaContainer: React.FC<MediaContainerProps> = ({
           scrollSnapType: 'x mandatory',
           WebkitOverflowScrolling: 'touch',
           width: '100%',
-          height: '100%'
+          height: '100%',
+          scrollBehavior: 'auto' // Disable smooth scrolling for manual control
         }}
         onMouseDown={handleMouseDown}
       >
