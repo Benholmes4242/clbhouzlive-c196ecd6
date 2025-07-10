@@ -116,7 +116,7 @@ const MomentCard: React.FC<MomentCardProps> = ({ moment, currentUserId }) => {
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex flex-col justify-between p-3">
           {/* Top Section - User Info */}
           <div className="flex items-center gap-2">
-            <div className="w-12 h-12 rounded-lg overflow-hidden bg-muted border-2 border-white/20">
+            <div className="w-8 h-8 rounded-lg overflow-hidden bg-muted border-2 border-white/20">
               {moment.user.profile_photo_url ? (
                 <img
                   src={moment.user.profile_photo_url}
@@ -132,11 +132,11 @@ const MomentCard: React.FC<MomentCardProps> = ({ moment, currentUserId }) => {
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-white text-base font-medium truncate">
+              <p className="text-white text-sm font-medium truncate">
                 {moment.user.display_name || moment.user.username || 'User'}
               </p>
               {moment.user.username && (
-                <p className="text-white/80 text-sm truncate">
+                <p className="text-white/80 text-xs truncate">
                   @{moment.user.username}
                 </p>
               )}
