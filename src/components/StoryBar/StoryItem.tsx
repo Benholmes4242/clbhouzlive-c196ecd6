@@ -2,7 +2,7 @@
 import React from 'react';
 import { Plus, User } from 'lucide-react';
 import { StoryUser } from './types';
-import HighQualityImage from '@/components/ui/high-quality-image';
+
 
 interface StoryItemProps {
   story: StoryUser;
