@@ -132,11 +132,11 @@ const MomentCard: React.FC<MomentCardProps> = ({ moment, currentUserId }) => {
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-white text-sm font-medium truncate">
+              <p className="text-white text-base font-medium truncate">
                 {moment.user.display_name || moment.user.username || 'User'}
               </p>
               {moment.user.username && (
-                <p className="text-white/80 text-xs truncate">
+                <p className="text-white/80 text-sm truncate">
                   @{moment.user.username}
                 </p>
               )}
@@ -150,7 +150,7 @@ const MomentCard: React.FC<MomentCardProps> = ({ moment, currentUserId }) => {
                 <TooltipProvider>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <span className="bg-black/60 text-white rounded-full px-3 py-1.5 text-xs font-medium cursor-default max-w-[160px] truncate">
+                      <span className="bg-black/60 text-white rounded-full px-3 py-1.5 text-sm font-medium cursor-default max-w-[160px] truncate">
                         {golfCourseTag.name}
                       </span>
                     </TooltipTrigger>
