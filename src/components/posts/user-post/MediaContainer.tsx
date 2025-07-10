@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import VideoPlayer from '@/components/ui/video-player';
 import LazyImage from '@/components/ui/lazy-image';
@@ -26,112 +26,7 @@ export const MediaContainer: React.FC<MediaContainerProps> = ({
   onIndexChange,
   children
 }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
   const [isHovering, setIsHovering] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStart, setDragStart] = useState(0);
-
-  // Scroll to current index when it changes externally
-  useEffect(() => {
-    if (containerRef.current) {
-      const container = containerRef.current;
-      const itemWidth = container.offsetWidth;
-      container.scrollTo({
-        left: currentIndex * itemWidth,
-        behavior: 'smooth'
-      });
-    }
-  }, [currentIndex]);
-
-  // Handle scroll events to update current index
-  const handleScroll = useCallback(() => {
-    if (containerRef.current && !isDragging) {
-      const container = containerRef.current;
-      const scrollLeft = container.scrollLeft;
-      const itemWidth = container.offsetWidth;
-      const newIndex = Math.round(scrollLeft / itemWidth);
-      
-      console.log('📊 Scroll event:', { scrollLeft, itemWidth, newIndex, currentIndex });
-      
-      if (newIndex !== currentIndex && newIndex >= 0 && newIndex < media.length) {
-        console.log('🔄 Updating index to:', newIndex);
-        onIndexChange(newIndex);
-      }
-    }
-  }, [isDragging, currentIndex, media.length, onIndexChange]);
-
-  // Attach scroll listener - now stable with useCallback
-  useEffect(() => {
-    const container = containerRef.current;
-    if (container) {
-      console.log('🎯 Attaching scroll listener to container');
-      container.addEventListener('scroll', handleScroll);
-      return () => {
-        console.log('🗑️ Removing scroll listener');
-        container.removeEventListener('scroll', handleScroll);
-      };
-    }
-  }, [handleScroll]);
-
-  // Desktop drag functionality
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (media.length <= 1) return;
-    console.log('🖱️ Mouse down - starting drag at:', e.clientX);
-    setIsDragging(true);
-    setDragStart(e.clientX);
-    e.preventDefault();
-  };
-
-  // Global mouse events for dragging
-  useEffect(() => {
-    const handleGlobalMouseMove = (e: MouseEvent) => {
-      if (!isDragging || media.length <= 1) return;
-      
-      const container = containerRef.current;
-      if (!container) return;
-
-      const diff = dragStart - e.clientX;
-      const beforeScroll = container.scrollLeft;
-      
-      // Try using scrollTo instead of setting scrollLeft directly
-      const newScrollLeft = Math.max(0, Math.min(container.scrollWidth - container.clientWidth, beforeScroll + diff));
-      container.scrollTo({ left: newScrollLeft, behavior: 'auto' });
-      
-      const afterScroll = container.scrollLeft;
-      
-      console.log('🔄 Dragging:', { 
-        diff, 
-        beforeScroll, 
-        afterScroll, 
-        newScrollLeft,
-        scrollWidth: container.scrollWidth, 
-        clientWidth: container.clientWidth,
-        isScrollable: container.scrollWidth > container.clientWidth
-      });
-      setDragStart(e.clientX);
-    };
-
-    const handleGlobalMouseUp = () => {
-      if (isDragging) {
-        setIsDragging(false);
-        console.log('🔚 Mouse up - ending drag');
-      }
-    };
-
-    if (isDragging) {
-      document.addEventListener('mousemove', handleGlobalMouseMove);
-      document.addEventListener('mouseup', handleGlobalMouseUp);
-    }
-
-    return () => {
-      document.removeEventListener('mousemove', handleGlobalMouseMove);
-      document.removeEventListener('mouseup', handleGlobalMouseUp);
-    };
-  }, [isDragging, dragStart, media.length]);
-
-  const handleMouseLeave = () => {
-    setIsHovering(false);
-  };
 
   // Arrow navigation
   const navigateToIndex = (index: number) => {
@@ -142,69 +37,47 @@ export const MediaContainer: React.FC<MediaContainerProps> = ({
   };
 
   const handleMediaItemClick = (mediaItem: MediaItem) => {
-    if (!isDragging) {
-      onMediaClick(mediaItem.media_url, mediaItem.media_type);
-    }
+    onMediaClick(mediaItem.media_url, mediaItem.media_type);
   };
 
   if (!media || media.length === 0) return null;
+
+  const currentMedia = media[currentIndex];
+  if (!currentMedia) return null;
 
   return (
     <div 
       className="relative w-full aspect-square group"
       onMouseEnter={() => setIsHovering(true)}
-      onMouseLeave={handleMouseLeave}
+      onMouseLeave={() => setIsHovering(false)}
     >
-      {/* Carousel Container */}
+      {/* Single Media Display */}
       <div
-        ref={containerRef}
-        className="flex overflow-x-auto overflow-y-hidden scrollbar-hide cursor-grab active:cursor-grabbing"
-        style={{ 
-          scrollSnapType: 'x mandatory',
-          WebkitOverflowScrolling: 'touch',
-          // NEW APPROACH: Use viewport width to force overflow
-          width: `${media.length * 100}vw`,
-          height: '100%',
-          scrollBehavior: 'auto'
-        }}
-        onMouseDown={handleMouseDown}
+        className="w-full h-full cursor-pointer"
+        onClick={() => handleMediaItemClick(currentMedia)}
       >
-        {media.map((mediaItem, index) => (
-          <div
-            key={mediaItem.id}
-            className="flex-shrink-0 relative"
-            style={{ 
-              scrollSnapAlign: 'start',
-              // Each item takes full viewport width
-              width: '100vw',
-              height: '100%'
-            }}
-            onClick={() => handleMediaItemClick(mediaItem)}
-          >
-            {mediaItem.media_type === 'video' ? (
-              <VideoPlayer
-                src={mediaItem.media_url}
-                autoplay={isHovered && index === currentIndex}
-                loop={true}
-                className="w-full h-full object-cover"
-                showVideoIcon={false}
-                showOverlayControls={false}
-                videoId={`carousel-${mediaItem.id}`}
-                isInFeed={true}
-              />
-            ) : (
-              <LazyImage
-                src={mediaItem.media_url}
-                alt="Post content"
-                className="w-full h-full object-cover object-center"
-              />
-            )}
-          </div>
-        ))}
+        {currentMedia.media_type === 'video' ? (
+          <VideoPlayer
+            src={currentMedia.media_url}
+            autoplay={isHovered}
+            loop={true}
+            className="w-full h-full object-cover"
+            showVideoIcon={false}
+            showOverlayControls={false}
+            videoId={`carousel-${currentMedia.id}`}
+            isInFeed={true}
+          />
+        ) : (
+          <LazyImage
+            src={currentMedia.media_url}
+            alt="Post content"
+            className="w-full h-full object-cover object-center"
+          />
+        )}
       </div>
 
       {/* Navigation Arrows (Desktop Only) */}
-      {media.length > 1 && isHovering && !isDragging && (
+      {media.length > 1 && isHovering && (
         <>
           {currentIndex > 0 && (
             <button
