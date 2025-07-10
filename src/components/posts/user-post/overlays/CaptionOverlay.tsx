@@ -23,7 +23,7 @@ export const CaptionOverlay: React.FC<CaptionOverlayProps> = ({
 
   return (
     <div 
-      className="absolute bottom-3 left-3 right-20 z-20 text-white text-base font-bold leading-[1.4] pointer-events-none md:pointer-events-auto md:group"
+      className="absolute bottom-8 left-3 right-20 z-20 text-white text-base font-bold leading-[1.4] pointer-events-none md:pointer-events-auto md:group"
       style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
       title={`${cleanContent}${postTags && postTags.length > 0 ? ' ' + postTags.map(tag => `@${tag.name}`).join(' ') : ''}`}
     >
