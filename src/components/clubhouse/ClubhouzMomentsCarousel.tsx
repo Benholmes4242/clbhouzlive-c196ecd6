@@ -91,7 +91,7 @@ const ClubhouzMomentsCarousel: React.FC = () => {
         <div className="relative">
           <div
             ref={carouselRef}
-            className="flex gap-3 overflow-x-auto scrollbar-hide pb-2"
+            className="flex gap-3 overflow-x-auto scrollbar-hide pb-2 select-none"
             style={{
               scrollSnapType: 'x mandatory',
               WebkitOverflowScrolling: 'touch'

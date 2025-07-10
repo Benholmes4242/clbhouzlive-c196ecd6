@@ -30,15 +30,18 @@ export const useDragScroll = (options: UseDragScrollOptions = {}) => {
       
       element.style.cursor = 'grabbing';
       element.style.userSelect = 'none';
+      document.body.style.userSelect = 'none'; // Prevent selection on body too
       
-      // Prevent default to avoid text selection
+      // Prevent default behaviors
       e.preventDefault();
+      e.stopPropagation();
     };
 
     const handleMouseMove = (e: MouseEvent) => {
       if (!isDragging.current) return;
       
       e.preventDefault();
+      e.stopPropagation();
       
       const x = e.pageX - element.offsetLeft;
       const y = e.pageY - element.offsetTop;
@@ -58,12 +61,14 @@ export const useDragScroll = (options: UseDragScrollOptions = {}) => {
       isDragging.current = false;
       element.style.cursor = 'grab';
       element.style.userSelect = '';
+      document.body.style.userSelect = ''; // Restore body selection
     };
 
     const handleMouseLeave = () => {
       isDragging.current = false;
       element.style.cursor = 'grab';
       element.style.userSelect = '';
+      document.body.style.userSelect = ''; // Restore body selection
     };
 
     // Set initial cursor
