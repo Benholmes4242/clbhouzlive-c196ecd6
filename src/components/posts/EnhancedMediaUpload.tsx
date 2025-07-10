@@ -59,7 +59,7 @@ const EnhancedMediaUpload: React.FC<EnhancedMediaUploadProps> = ({
   // Validate file size and type
   const validateFiles = (files: File[]): File[] => {
     const validFiles: File[] = [];
-    const maxSizeInMB = 100; // 100MB max per file
+    const maxSizeInMB = 500; // 500MB max per file
     const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
 
     files.forEach(file => {
