@@ -151,26 +151,25 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
           </div>
         )}
 
-        {/* BOTTOM-LEFT: Caption Overlay Pill */}
+        {/* BOTTOM-LEFT: Caption Text Overlay */}
         {cleanContent && (
-          <div className="absolute bottom-3 left-3 z-20 max-w-[70%] group">
-            <div 
-              className="bg-white/20 text-white text-sm font-normal px-3 py-1.5 rounded-md backdrop-blur-sm border border-white/20 cursor-default group-hover:bg-white/30 transition-all duration-200"
-              title={`${cleanContent}${post.post_tags && post.post_tags.length > 0 ? ' ' + post.post_tags.map(tag => `@${tag.name}`).join(' ') : ''}`}
-            >
-              <div className="truncate group-hover:whitespace-normal group-hover:break-words group-hover:max-w-xs text-center">
-                {cleanContent}
-                {post.post_tags && post.post_tags.length > 0 && (
-                  <span>
-                    {' '}
-                    {post.post_tags.map((tag) => (
-                      <span key={tag.id} className="text-blue-400 font-medium">
-                        @{tag.name}{' '}
-                      </span>
-                    ))}
-                  </span>
-                )}
-              </div>
+          <div 
+            className="absolute bottom-3 left-3 right-20 z-20 text-white text-[13px] font-normal leading-[1.4] whitespace-nowrap overflow-hidden text-ellipsis pointer-events-none group"
+            style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
+            title={`${cleanContent}${post.post_tags && post.post_tags.length > 0 ? ' ' + post.post_tags.map(tag => `@${tag.name}`).join(' ') : ''}`}
+          >
+            <div className="group-hover:whitespace-normal group-hover:overflow-visible group-hover:bg-black/60 group-hover:px-2 group-hover:py-1.5 group-hover:rounded-md group-hover:pointer-events-auto transition-all duration-200">
+              {cleanContent}
+              {post.post_tags && post.post_tags.length > 0 && (
+                <span>
+                  {' '}
+                  {post.post_tags.map((tag) => (
+                    <span key={tag.id} className="text-blue-400 font-medium">
+                      @{tag.name}{' '}
+                    </span>
+                  ))}
+                </span>
+              )}
             </div>
           </div>
         )}
