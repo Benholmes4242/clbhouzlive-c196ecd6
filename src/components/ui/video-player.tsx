@@ -64,7 +64,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     video.loop = loop;
     video.playsInline = true; // Critical for mobile autoplay
     video.setAttribute('playsinline', 'true'); // iOS compatibility
-    video.preload = 'none'; // Don't preload for mobile performance
+    video.preload = 'metadata'; // Load metadata for poster frame
 
     const handlePlay = () => {
       setIsPlaying(true);
@@ -90,10 +90,25 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       }
     };
 
+    // Prevent touch events from interfering with autoplay on mobile
+    const handleTouchStart = (e: TouchEvent) => {
+      if (isInFeed && autoplay) {
+        e.stopPropagation();
+      }
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      if (isInFeed && autoplay) {
+        e.stopPropagation();
+      }
+    };
+
     video.addEventListener('play', handlePlay);
     video.addEventListener('pause', handlePause);
     video.addEventListener('volumechange', handleVolumeChange);
     video.addEventListener('loadedmetadata', handleLoadedMetadata);
+    video.addEventListener('touchstart', handleTouchStart);
+    video.addEventListener('touchend', handleTouchEnd);
 
     // Immediate autoplay attempt with optimization
     if (autoplay) {
@@ -111,6 +126,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       video.removeEventListener('pause', handlePause);
       video.removeEventListener('volumechange', handleVolumeChange);
       video.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      video.removeEventListener('touchstart', handleTouchStart);
+      video.removeEventListener('touchend', handleTouchEnd);
     };
   }, [autoplay, muted, loop, onPlay, onPause, isGloballyMuted, isInFeed]);
 
@@ -172,12 +189,19 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     }
   };
 
-  const handleVideoClick = () => {
+  const handleVideoClick = (e: React.MouseEvent) => {
+    // Prevent click from interfering with autoplay on feed videos
+    if (isInFeed && autoplay) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+    
     if (onClick) {
       onClick();
     } else {
-      // Always allow video click to toggle play/pause for feed videos
-      togglePlayPause({} as React.MouseEvent);
+      // Allow video click to toggle play/pause for non-feed videos
+      togglePlayPause(e);
     }
   };
 
@@ -191,11 +215,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         ref={videoRef}
         src={src}
         poster={effectivePoster}
-        className="w-full h-full object-cover cursor-pointer"
+        className={`w-full h-full object-cover ${isInFeed && autoplay ? 'pointer-events-none' : 'cursor-pointer'}`}
         playsInline
         muted={muted}
         loop={loop}
-        preload="none"
+        preload="metadata"
         webkit-playsinline="true"
         x5-playsinline="true"
         onClick={handleVideoClick}
