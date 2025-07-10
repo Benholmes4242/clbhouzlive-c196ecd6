@@ -19,8 +19,8 @@ export const useDragScroll = (options: UseDragScrollOptions = {}) => {
     if (!element || !enabled) return;
 
     const handleMouseDown = (e: MouseEvent) => {
-      // Only enable drag on desktop (not mobile)
-      if ('ontouchstart' in window) return;
+      // Only enable drag on desktop (not on mobile devices)
+      if (window.innerWidth < 768) return;
       
       isDragging.current = true;
       startX.current = e.pageX - element.offsetLeft;
