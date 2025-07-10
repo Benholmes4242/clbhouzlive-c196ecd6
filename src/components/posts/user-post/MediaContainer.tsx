@@ -162,8 +162,8 @@ export const MediaContainer: React.FC<MediaContainerProps> = ({
         style={{ 
           scrollSnapType: 'x mandatory',
           WebkitOverflowScrolling: 'touch',
-          // KEY FIX: Make the container wide enough to hold all items side by side
-          width: `${media.length * 100}%`,
+          // NEW APPROACH: Use viewport width to force overflow
+          width: `${media.length * 100}vw`,
           height: '100%',
           scrollBehavior: 'auto'
         }}
@@ -175,8 +175,8 @@ export const MediaContainer: React.FC<MediaContainerProps> = ({
             className="flex-shrink-0 relative"
             style={{ 
               scrollSnapAlign: 'start',
-              // Each item takes exactly 1/nth of the expanded container
-              width: `${100 / media.length}%`,
+              // Each item takes full viewport width
+              width: '100vw',
               height: '100%'
             }}
             onClick={() => handleMediaItemClick(mediaItem)}
