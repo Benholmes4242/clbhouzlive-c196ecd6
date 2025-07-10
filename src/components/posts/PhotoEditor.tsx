@@ -130,7 +130,7 @@ const PhotoEditor: React.FC<PhotoEditorProps> = ({
                 min={1}
                 max={3}
                 step={0.1}
-                className="w-full"
+                className="w-full photo-editor-slider"
               />
             </div>
 
@@ -146,7 +146,7 @@ const PhotoEditor: React.FC<PhotoEditorProps> = ({
                 min={0.5}
                 max={2}
                 step={0.1}
-                className="w-full"
+                className="w-full photo-editor-slider"
               />
             </div>
           </div>
@@ -157,7 +157,7 @@ const PhotoEditor: React.FC<PhotoEditorProps> = ({
             <X className="h-4 w-4 mr-2" />
             Cancel
           </Button>
-          <Button onClick={handleSave}>
+          <Button variant="outline" onClick={handleSave}>
             <Save className="h-4 w-4 mr-2" />
             Save Changes
           </Button>
