@@ -91,8 +91,18 @@ export const MediaContainer: React.FC<MediaContainerProps> = ({
       if (!container) return;
 
       const diff = dragStart - e.clientX;
-      console.log('🔄 Dragging:', { diff, currentScrollLeft: container.scrollLeft, newScrollLeft: container.scrollLeft + diff });
+      const beforeScroll = container.scrollLeft;
       container.scrollLeft += diff;
+      const afterScroll = container.scrollLeft;
+      
+      console.log('🔄 Dragging:', { 
+        diff, 
+        beforeScroll, 
+        afterScroll, 
+        scrollWidth: container.scrollWidth, 
+        clientWidth: container.clientWidth,
+        isScrollable: container.scrollWidth > container.clientWidth
+      });
       setDragStart(e.clientX);
     };
 
@@ -143,20 +153,23 @@ export const MediaContainer: React.FC<MediaContainerProps> = ({
       {/* Carousel Container */}
       <div
         ref={containerRef}
-        className="flex w-full h-full overflow-x-auto overflow-y-hidden scrollbar-hide cursor-grab active:cursor-grabbing"
+        className="flex overflow-x-auto overflow-y-hidden scrollbar-hide cursor-grab active:cursor-grabbing"
         style={{ 
           scrollSnapType: 'x mandatory',
-          WebkitOverflowScrolling: 'touch'
+          WebkitOverflowScrolling: 'touch',
+          width: '100%',
+          height: '100%'
         }}
         onMouseDown={handleMouseDown}
       >
         {media.map((mediaItem, index) => (
           <div
             key={mediaItem.id}
-            className="flex-shrink-0 w-full h-full relative"
+            className="flex-shrink-0 relative"
             style={{ 
               scrollSnapAlign: 'start',
-              minWidth: '100%' // This ensures each item takes full width
+              width: '100%', // Each item takes full viewport width
+              height: '100%'
             }}
             onClick={() => handleMediaItemClick(mediaItem)}
           >
