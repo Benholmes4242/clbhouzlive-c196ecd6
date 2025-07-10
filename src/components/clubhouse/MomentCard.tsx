@@ -116,7 +116,7 @@ const MomentCard: React.FC<MomentCardProps> = ({ moment, currentUserId }) => {
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex flex-col justify-between p-3">
           {/* Top Section - User Info */}
           <div className="flex items-center gap-2">
-            <div className="w-14 h-14 rounded-lg overflow-hidden bg-muted border-2 border-white/20">
+            <div className="w-14 h-14 rounded-full overflow-hidden bg-muted border-2 border-white/20">
               {moment.user.profile_photo_url ? (
                 <img
                   src={moment.user.profile_photo_url}
