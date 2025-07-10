@@ -168,7 +168,7 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
             style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
             title={`${cleanContent}${post.post_tags && post.post_tags.length > 0 ? ' ' + post.post_tags.map(tag => `@${tag.name}`).join(' ') : ''}`}
           >
-            <div className="whitespace-nowrap overflow-hidden text-ellipsis group-hover:whitespace-normal group-hover:overflow-visible group-hover:bg-black/60 group-hover:px-2 group-hover:py-1.5 group-hover:rounded-md transition-all duration-200">
+            <div className="whitespace-nowrap overflow-hidden text-ellipsis group-hover:whitespace-normal group-hover:overflow-visible transition-all duration-200">
               <span className="group-hover:hidden">
                 {truncatedContent}
               </span>
