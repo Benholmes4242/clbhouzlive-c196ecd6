@@ -19,9 +19,15 @@ export const useDragScroll = (options: UseDragScrollOptions = {}) => {
     if (!element || !enabled) return;
 
     const handleMouseDown = (e: MouseEvent) => {
-      // Only enable drag on desktop (not on mobile devices)
-      if (window.innerWidth < 768) return;
+      console.log('🖱️ Mouse down detected, window width:', window.innerWidth);
       
+      // Only enable drag on desktop (not on mobile devices)
+      if (window.innerWidth < 768) {
+        console.log('❌ Skipping drag - mobile device');
+        return;
+      }
+      
+      console.log('✅ Starting drag operation');
       isDragging.current = true;
       startX.current = e.pageX - element.offsetLeft;
       startY.current = e.pageY - element.offsetTop;
@@ -40,6 +46,7 @@ export const useDragScroll = (options: UseDragScrollOptions = {}) => {
     const handleMouseMove = (e: MouseEvent) => {
       if (!isDragging.current) return;
       
+      console.log('🔄 Mouse move while dragging');
       e.preventDefault();
       e.stopPropagation();
       
@@ -48,7 +55,9 @@ export const useDragScroll = (options: UseDragScrollOptions = {}) => {
       
       if (direction === 'horizontal' || direction === 'both') {
         const walkX = (x - startX.current) * 2; // Multiply by 2 for faster scrolling
-        element.scrollLeft = scrollLeft.current - walkX;
+        const newScrollLeft = scrollLeft.current - walkX;
+        console.log('📐 Horizontal scroll:', { walkX, newScrollLeft, currentScroll: element.scrollLeft });
+        element.scrollLeft = newScrollLeft;
       }
       
       if (direction === 'vertical' || direction === 'both') {
@@ -58,6 +67,7 @@ export const useDragScroll = (options: UseDragScrollOptions = {}) => {
     };
 
     const handleMouseUp = () => {
+      console.log('🔚 Mouse up - ending drag');
       isDragging.current = false;
       element.style.cursor = 'grab';
       element.style.userSelect = '';
@@ -65,6 +75,7 @@ export const useDragScroll = (options: UseDragScrollOptions = {}) => {
     };
 
     const handleMouseLeave = () => {
+      console.log('👋 Mouse leave - ending drag');
       isDragging.current = false;
       element.style.cursor = 'grab';
       element.style.userSelect = '';
@@ -73,12 +84,15 @@ export const useDragScroll = (options: UseDragScrollOptions = {}) => {
 
     // Set initial cursor
     element.style.cursor = 'grab';
+    console.log('🎯 Drag scroll initialized for element:', element);
 
     // Add event listeners
     element.addEventListener('mousedown', handleMouseDown);
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
     element.addEventListener('mouseleave', handleMouseLeave);
+
+    console.log('📎 Event listeners attached');
 
     // Cleanup
     return () => {
