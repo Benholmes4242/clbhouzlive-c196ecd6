@@ -42,7 +42,7 @@ const ClubhouzMomentsCarousel: React.FC = () => {
           </div>
           <div className="flex gap-3 overflow-hidden">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="flex-shrink-0 w-48 md:w-56">
+              <div key={i} className="flex-shrink-0 w-52 md:w-60">
                 <div className="bg-muted rounded-xl aspect-[3/4] animate-pulse" />
               </div>
             ))}
@@ -100,7 +100,7 @@ const ClubhouzMomentsCarousel: React.FC = () => {
             {moments.map((moment) => (
               <div
                 key={moment.id}
-                className="flex-shrink-0 w-48 md:w-56"
+                className="flex-shrink-0 w-52 md:w-60"
                 style={{ scrollSnapAlign: 'start' }}
               >
                 <MomentCard moment={moment} currentUserId={user.id} />
