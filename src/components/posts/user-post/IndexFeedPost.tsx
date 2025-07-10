@@ -153,7 +153,7 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
 
         {/* TOP-RIGHT: Golf Club Tag */}
         {golfCourse && (
-          <div className="absolute top-3 right-3 z-20">
+          <div className="absolute top-6 right-3 z-20">
             <CoursePostBadge 
               course={{
                 id: golfCourse.id,
