@@ -253,9 +253,9 @@ const IndexFeedPostModal: React.FC<IndexFeedPostModalProps> = ({
           </div>
         )}
 
-        {/* Bottom Left - Caption Text (Moved up to avoid overlapping dots) */}
+        {/* Bottom Left - Caption Text (Moved up more to avoid overlapping dots) */}
         {cleanContent && (
-          <div className="absolute bottom-6 left-3 right-20 z-10 max-w-[70%] group">
+          <div className="absolute bottom-10 left-3 right-20 z-10 max-w-[70%] group">
             <div 
               className="text-white text-base font-bold leading-[1.4] whitespace-nowrap overflow-hidden text-ellipsis group-hover:whitespace-normal group-hover:overflow-visible transition-all duration-200"
               style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
