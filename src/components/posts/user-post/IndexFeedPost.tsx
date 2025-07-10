@@ -143,7 +143,7 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
               height={32}
             />
             <span 
-              className="text-white text-sm font-medium"
+              className="text-white text-base font-bold"
               style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
             >
               {displayName}
