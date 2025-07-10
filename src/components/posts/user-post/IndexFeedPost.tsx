@@ -161,7 +161,7 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
                 country: golfCourse.country,
                 region: golfCourse.region
               }}
-              className="bg-white/20 text-white text-sm font-medium px-3 py-1.5 rounded-full backdrop-blur-sm border border-white/20"
+              className="bg-white/20 text-white text-sm font-medium px-3 py-1.5 rounded-full backdrop-blur-sm"
             />
           </div>
         )}
