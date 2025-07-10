@@ -22,21 +22,21 @@ const Top100AchievementCard: React.FC<Top100AchievementCardProps> = ({ achieveme
   return (
     <div
       className={cn(
-        "flex items-center gap-3 p-3 rounded-xl border transition-all duration-300",
+        "flex items-center gap-3 p-3 rounded-full border transition-all duration-300",
         isEarned
-          ? "bg-gradient-to-r from-orange-50 to-yellow-50 border-orange-200 shadow-md shadow-orange-100"
+          ? "bg-gradient-to-r from-orange-50 to-yellow-50 border-orange-200"
           : "bg-card border-border hover:border-border/80"
       )}
     >
       {/* Badge Icon */}
-      <div
-        className={cn(
-          "flex items-center justify-center w-8 h-8 rounded-full text-lg transition-all duration-300",
-          isEarned
-            ? "bg-gradient-to-r from-orange-400 to-yellow-400 shadow-md shadow-orange-200"
-            : "bg-muted text-muted-foreground"
-        )}
-      >
+        <div
+          className={cn(
+            "flex items-center justify-center w-8 h-8 rounded-full text-lg transition-all duration-300",
+            isEarned
+              ? "bg-gradient-to-r from-orange-400 to-yellow-400"
+              : "bg-muted text-muted-foreground"
+          )}
+        >
         {emoji}
       </div>
 
