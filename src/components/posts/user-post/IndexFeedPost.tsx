@@ -84,6 +84,16 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
   const currentMedia = post.post_media[currentMediaIndex];
   const cleanContent = removeGolfCourseFromContent(post.content);
   
+  // Truncate content to around 7 words
+  const truncateToWords = (text: string, wordLimit: number = 7) => {
+    if (!text) return '';
+    const words = text.split(' ');
+    if (words.length <= wordLimit) return text;
+    return words.slice(0, wordLimit).join(' ') + '...';
+  };
+  
+  const truncatedContent = truncateToWords(cleanContent);
+  
   return (
     <div 
       ref={containerRef}
@@ -152,14 +162,14 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
         )}
 
         {/* BOTTOM-LEFT: Caption Text Overlay */}
-        {cleanContent && (
+        {truncatedContent && (
           <div 
-            className="absolute bottom-3 left-3 right-20 z-20 text-white text-[13px] font-normal leading-[1.4] whitespace-nowrap overflow-hidden text-ellipsis pointer-events-none group"
+            className="absolute bottom-3 left-3 right-20 z-20 text-white text-sm font-medium leading-[1.4] whitespace-nowrap overflow-hidden text-ellipsis pointer-events-none group"
             style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
             title={`${cleanContent}${post.post_tags && post.post_tags.length > 0 ? ' ' + post.post_tags.map(tag => `@${tag.name}`).join(' ') : ''}`}
           >
             <div className="group-hover:whitespace-normal group-hover:overflow-visible group-hover:bg-black/60 group-hover:px-2 group-hover:py-1.5 group-hover:rounded-md group-hover:pointer-events-auto transition-all duration-200">
-              {cleanContent}
+              {truncatedContent}
               {post.post_tags && post.post_tags.length > 0 && (
                 <span>
                   {' '}
