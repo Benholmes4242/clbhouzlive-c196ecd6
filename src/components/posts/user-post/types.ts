@@ -31,7 +31,7 @@ export interface UserPostData {
 export interface UserPostProps {
   post: UserPostData;
   allUserPosts?: UserPostData[];
-  source?: 'clubhouse' | 'profile';
+  source?: 'clubhouse' | 'profile' | 'index';
   onPostUpdated?: () => void;
   onPostDeleted?: () => void;
 }

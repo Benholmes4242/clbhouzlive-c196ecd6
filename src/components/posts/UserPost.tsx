@@ -5,6 +5,7 @@ import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { 
   DesktopUserPost, 
   MobileUserPost, 
+  IndexFeedPost,
   useUserPostLogic,
   UserPostData
 } from './user-post';
@@ -12,7 +13,7 @@ import {
 interface UserPostProps {
   post: UserPostData;
   allUserPosts?: UserPostData[];
-  source?: 'clubhouse' | 'profile';
+  source?: 'clubhouse' | 'profile' | 'index';
   onPostUpdated?: () => void;
   onPostDeleted?: () => void;
 }
@@ -56,7 +57,17 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
 
   return (
     <>
-      {isMobile ? (
+      {source === 'index' ? (
+        <IndexFeedPost
+          post={post}
+          displayName={displayName}
+          timeAgo={timeAgo}
+          golfCourse={golfCourse}
+          onProfileClick={handleProfileClick}
+          onMediaClick={handleMediaClick}
+          onDeletePost={handleDeletePost}
+        />
+      ) : isMobile ? (
         <MobileUserPost
           post={post}
           displayName={displayName}
@@ -80,8 +91,8 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
         />
       )}
 
-      {/* Post Viewer Modal for clubhouse and profile sources */}
-      {(source === 'clubhouse' || source === 'profile') && currentPost && (
+      {/* Post Viewer Modal for clubhouse, profile, and index sources */}
+      {(source === 'clubhouse' || source === 'profile' || source === 'index') && currentPost && (
         <PostViewerModal
           isOpen={isPostViewerOpen}
           onClose={closePostViewer}

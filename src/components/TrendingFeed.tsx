@@ -231,7 +231,8 @@ const TrendingFeed = () => {
             <UserPost 
               key={item.id} 
               post={item} 
-            onPostUpdated={() => {
+              source="index"
+              onPostUpdated={() => {
                 refetchUserPosts();
                 refetchFollowedPosts();
               }}
