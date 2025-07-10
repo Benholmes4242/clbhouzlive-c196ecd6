@@ -169,10 +169,10 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
             title={`${cleanContent}${post.post_tags && post.post_tags.length > 0 ? ' ' + post.post_tags.map(tag => `@${tag.name}`).join(' ') : ''}`}
           >
             <div className="whitespace-nowrap overflow-hidden text-ellipsis group-hover:whitespace-normal group-hover:overflow-visible transition-all duration-200">
-              <span className="group-hover:hidden">
+              <span className="group-hover:hidden text-sm font-medium">
                 {truncatedContent}
               </span>
-              <span className="hidden group-hover:inline">
+              <span className="hidden group-hover:inline text-sm font-medium">
                 {cleanContent}
               </span>
               {post.post_tags && post.post_tags.length > 0 && (
