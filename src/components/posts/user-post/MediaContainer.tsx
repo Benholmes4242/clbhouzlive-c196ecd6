@@ -51,42 +51,76 @@ export const MediaContainer: React.FC<MediaContainerProps> = ({
       const itemWidth = container.offsetWidth;
       const newIndex = Math.round(scrollLeft / itemWidth);
       
+      console.log('📊 Scroll event:', { scrollLeft, itemWidth, newIndex, currentIndex });
+      
       if (newIndex !== currentIndex && newIndex >= 0 && newIndex < media.length) {
+        console.log('🔄 Updating index to:', newIndex);
         onIndexChange(newIndex);
       }
     }
   };
 
+  // Attach scroll listener
+  useEffect(() => {
+    const container = containerRef.current;
+    if (container) {
+      console.log('🎯 Attaching scroll listener to container');
+      container.addEventListener('scroll', handleScroll);
+      return () => {
+        console.log('🗑️ Removing scroll listener');
+        container.removeEventListener('scroll', handleScroll);
+      };
+    }
+  }, [handleScroll]); // Fixed dependency array
+
   // Desktop drag functionality
   const handleMouseDown = (e: React.MouseEvent) => {
     if (media.length <= 1) return;
+    console.log('🖱️ Mouse down - starting drag at:', e.clientX);
     setIsDragging(true);
     setDragStart(e.clientX);
     e.preventDefault();
   };
 
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging || media.length <= 1) return;
-    
-    const container = containerRef.current;
-    if (!container) return;
+  // Global mouse events for dragging
+  useEffect(() => {
+    const handleGlobalMouseMove = (e: MouseEvent) => {
+      if (!isDragging || media.length <= 1) return;
+      
+      const container = containerRef.current;
+      if (!container) return;
 
-    const diff = dragStart - e.clientX;
-    container.scrollLeft += diff;
-    setDragStart(e.clientX);
-  };
+      const diff = dragStart - e.clientX;
+      console.log('🔄 Dragging:', { diff, currentScrollLeft: container.scrollLeft, newScrollLeft: container.scrollLeft + diff });
+      container.scrollLeft += diff;
+      setDragStart(e.clientX);
+    };
 
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
+    const handleGlobalMouseUp = () => {
+      if (isDragging) {
+        setIsDragging(false);
+        console.log('🔚 Mouse up - ending drag');
+      }
+    };
+
+    if (isDragging) {
+      document.addEventListener('mousemove', handleGlobalMouseMove);
+      document.addEventListener('mouseup', handleGlobalMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleGlobalMouseMove);
+      document.removeEventListener('mouseup', handleGlobalMouseUp);
+    };
+  }, [isDragging, dragStart, media.length]);
 
   const handleMouseLeave = () => {
-    setIsDragging(false);
     setIsHovering(false);
   };
 
   // Arrow navigation
   const navigateToIndex = (index: number) => {
+    console.log('🏹 Arrow navigation to index:', index, 'current:', currentIndex);
     if (index >= 0 && index < media.length) {
       onIndexChange(index);
     }
@@ -114,10 +148,7 @@ export const MediaContainer: React.FC<MediaContainerProps> = ({
           scrollSnapType: 'x mandatory',
           WebkitOverflowScrolling: 'touch'
         }}
-        onScroll={handleScroll}
         onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
       >
         {media.map((mediaItem, index) => (
           <div
