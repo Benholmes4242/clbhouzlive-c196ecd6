@@ -1,5 +1,4 @@
-import React, { useState, useMemo } from 'react';
-import { ScrollArea } from '@/components/ui/scroll-area';
+import React, { useMemo } from 'react';
 import Top100AchievementCard from './Top100AchievementCard';
 import { useBadges } from '@/hooks/useBadges';
 import { useQuery } from '@tanstack/react-query';
@@ -25,7 +24,6 @@ const Top100AchievementsList: React.FC<Top100AchievementsListProps> = ({
   userId, 
   showAllInitially = false 
 }) => {
-  const [showAll, setShowAll] = useState(showAllInitially);
   const { badgeProgress, isLoading } = useBadges(userId);
 
   // Get real user's Top 100 course progress across all regional lists from both tables
@@ -184,31 +182,16 @@ const Top100AchievementsList: React.FC<Top100AchievementsListProps> = ({
     );
   }
 
-  const displayedAchievements = showAll ? achievements : achievements.slice(0, 4);
-
   return (
-    <div className="space-y-4">
-      {/* Achievements List */}
+    <div className="max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
       <div className="space-y-3">
-        {displayedAchievements.map((achievement) => (
+        {achievements.map((achievement) => (
           <Top100AchievementCard
             key={achievement.id}
             achievement={achievement}
           />
         ))}
       </div>
-
-      {/* Show More/Less Toggle */}
-      {achievements.length > 4 && (
-        <div className="text-center pt-2">
-          <button
-            onClick={() => setShowAll(!showAll)}
-            className="text-sm text-muted-foreground hover:text-foreground transition-colors px-4 py-2 rounded-lg hover:bg-muted/50"
-          >
-            {showAll ? 'Show Less' : `See All Achievements (${achievements.length - 4} more)`}
-          </button>
-        </div>
-      )}
     </div>
   );
 };
