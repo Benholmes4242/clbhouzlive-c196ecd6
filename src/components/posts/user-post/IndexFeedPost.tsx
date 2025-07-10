@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Heart, MessageCircle, Share } from 'lucide-react';
+import { Heart, MessageCircle, Share, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSwipeable } from 'react-swipeable';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
+import { useIsMobile } from '@/hooks/use-mobile';
 import VideoPlayer from '@/components/ui/video-player';
 import LazyImage from '@/components/ui/lazy-image';
 import CoursePostBadge from '../CoursePostBadge';
@@ -31,7 +32,9 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
 }) => {
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
+  const [showFullCourseTag, setShowFullCourseTag] = useState(false);
   const { user } = useSupabaseSession();
+  const isMobile = useIsMobile();
   
   const { ref: containerRef, isInView } = useIntersectionObserver({
     threshold: 0.5,
@@ -76,6 +79,20 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
       setIsHovered(false);
     }
   }, [isInView, currentMediaIndex, post.post_media]);
+
+  // Hide full course tag when scrolling off the post
+  useEffect(() => {
+    if (!isInView && showFullCourseTag) {
+      setShowFullCourseTag(false);
+    }
+  }, [isInView, showFullCourseTag]);
+
+  const handleCourseTagClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (isMobile) {
+      setShowFullCourseTag(!showFullCourseTag);
+    }
+  };
 
   if (!post.post_media || post.post_media.length === 0) {
     return null; // No media posts don't get special treatment in index feed
@@ -154,15 +171,43 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
         {/* TOP-RIGHT: Golf Club Tag */}
         {golfCourse && (
           <div className="absolute top-6 right-3 z-20">
-            <CoursePostBadge 
-              course={{
-                id: golfCourse.id,
-                name: golfCourse.name,
-                country: golfCourse.country,
-                region: golfCourse.region
-              }}
-              className="bg-white/20 text-white text-sm font-medium px-3 py-1.5 rounded-full backdrop-blur-sm"
-            />
+            {/* Mobile: Show map pin icon only, expand on click */}
+            {isMobile ? (
+              <div className="relative">
+                <button
+                  onClick={handleCourseTagClick}
+                  className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center transition-all duration-200"
+                >
+                  <MapPin className="w-4 h-4 text-white" />
+                </button>
+                
+                {/* Full course tag that appears on click */}
+                {showFullCourseTag && (
+                  <div className="absolute top-0 right-0 animate-scale-in">
+                    <CoursePostBadge 
+                      course={{
+                        id: golfCourse.id,
+                        name: golfCourse.name,
+                        country: golfCourse.country,
+                        region: golfCourse.region
+                      }}
+                      className="bg-white/20 text-white text-sm font-medium px-3 py-1.5 rounded-full backdrop-blur-sm whitespace-nowrap"
+                    />
+                  </div>
+                )}
+              </div>
+            ) : (
+              /* Desktop: Show full tag as before */
+              <CoursePostBadge 
+                course={{
+                  id: golfCourse.id,
+                  name: golfCourse.name,
+                  country: golfCourse.country,
+                  region: golfCourse.region
+                }}
+                className="bg-white/20 text-white text-sm font-medium px-3 py-1.5 rounded-full backdrop-blur-sm"
+              />
+            )}
           </div>
         )}
 
