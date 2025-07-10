@@ -150,7 +150,7 @@ const FeaturedMomentsCarousel = ({ userPosts = [], loading = false }: FeaturedMo
                         <Tooltip>
                           <TooltipTrigger asChild>
                             <h4 
-                              className="text-sm font-medium cursor-pointer hover:text-gray-400 transition-colors truncate max-w-full"
+                              className="text-base font-bold cursor-pointer hover:text-gray-400 transition-colors truncate max-w-full"
                               onClick={() => navigate(`/profile/${moment.userProfile.username}`)}
                             >
                               {moment.displayName}

@@ -132,7 +132,7 @@ const MomentCard: React.FC<MomentCardProps> = ({ moment, currentUserId }) => {
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-white text-base font-medium truncate">
+              <p className="text-white text-base font-bold truncate">
                 {moment.user.display_name || moment.user.username || 'User'}
               </p>
               {moment.user.username && (

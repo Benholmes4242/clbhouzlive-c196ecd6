@@ -177,7 +177,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({ player, currentUserId }) => {
           />
           <div className="flex-1 min-w-0">
             <h3 
-              className="text-white font-semibold text-sm mb-1 cursor-pointer hover:text-white/80 transition-colors" 
+              className="text-white font-bold text-base mb-1 cursor-pointer hover:text-white/80 transition-colors" 
               onClick={handleProfileClick}
             >
               {player.name}
