@@ -303,3 +303,12 @@ div[data-radix-dialog-content] .photo-editor-slider [data-radix-slider-thumb][da
     max-width: 1140px; /* Keep consistent with content width */
   }
 }
+
+/* Hide scrollbars for carousel */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* Internet Explorer 10+ */
+  scrollbar-width: none;  /* Firefox */
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Safari and Chrome */
+}

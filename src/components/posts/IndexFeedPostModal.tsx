@@ -9,6 +9,7 @@ import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import HighQualityImage from '@/components/ui/high-quality-image';
 import VideoPlayer from '@/components/ui/video-player';
 import CoursePostBadge from './CoursePostBadge';
+import { MediaContainer } from './user-post/MediaContainer';
 
 interface PostMedia {
   id: string;
@@ -121,6 +122,11 @@ const IndexFeedPostModal: React.FC<IndexFeedPostModalProps> = ({
     setCurrentMediaIndex(0);
   }, [currentPostIndex, allUserPosts.length]);
 
+  const handleMediaIndexChange = useCallback((newIndex: number) => {
+    setCurrentMediaIndex(newIndex);
+  }, []);
+
+  // Media navigation handlers
   const navigateMedia = useCallback((direction: 'prev' | 'next') => {
     const mediaCount = currentPost.post_media?.length || 0;
     if (mediaCount <= 1) return;
@@ -202,125 +208,117 @@ const IndexFeedPostModal: React.FC<IndexFeedPostModalProps> = ({
 
       {/* Media Container - Square Layout */}
       <div className="relative w-full max-w-[1000px] aspect-square">
-        {currentMedia.media_type === 'video' ? (
-          <VideoPlayer
-            src={currentMedia.media_url}
-            autoplay={true}
-            loop={true}
-            className="w-full h-full object-cover"
-            showOverlayControls={false}
-            showMuteButton={false}
-            isInFeed={true}
-            videoId={`modal-${currentMedia.id}`}
-          />
-        ) : (
-          <HighQualityImage
-            src={currentMedia.media_url}
-            alt="Post content"
-            className="w-full h-full object-cover"
-          />
-        )}
-
-        {/* Top Left - Profile Info (Same styling as index page) */}
-        <div className="absolute top-3 left-3 z-10 flex items-center">
-          <HighQualityImage
-            src={currentPost.user.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
-            alt={displayName}
-            className="w-16 h-16 rounded-full mr-2"
-            width={64}
-            height={64}
-          />
-          <span 
-            className="text-white text-base font-bold"
-            style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
-          >
-            {displayName}
-          </span>
-        </div>
-
-        {/* Top Right - Golf Course Tag (Same styling as index page) */}
-        {golfCourse && (
-          <div className="absolute top-3 right-3 z-10">
-            <CoursePostBadge 
-              course={{
-                id: golfCourse.id,
-                name: golfCourse.name,
-                country: golfCourse.country,
-                region: golfCourse.region
-              }}
-              className="bg-white/20 text-white text-sm font-medium px-3 py-1.5 rounded-full backdrop-blur-sm"
+        <MediaContainer
+          media={currentPost.post_media}
+          currentIndex={currentMediaIndex}
+          isHovered={true}
+          onMediaClick={() => {}}
+          onIndexChange={handleMediaIndexChange}
+        >
+          {/* Top Left - Profile Info (Same styling as index page) */}
+          <div className="absolute top-3 left-3 z-10 flex items-center">
+            <HighQualityImage
+              src={currentPost.user.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
+              alt={displayName}
+              className="w-16 h-16 rounded-full mr-2"
+              width={64}
+              height={64}
             />
-          </div>
-        )}
-
-        {/* Bottom Left - Caption Text (Moved up more to avoid overlapping dots) */}
-        {cleanContent && (
-          <div className="absolute bottom-10 left-3 right-20 z-10 max-w-[70%] group">
-            <div 
-              className="text-white text-base font-bold leading-[1.4] whitespace-nowrap overflow-hidden text-ellipsis group-hover:whitespace-normal group-hover:overflow-visible transition-all duration-200"
+            <span 
+              className="text-white text-base font-bold"
               style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
             >
-              {cleanContent}
-            </div>
+              {displayName}
+            </span>
           </div>
-        )}
 
-        {/* Bottom Right - Action Icons */}
-        <div className="absolute bottom-3 right-3 z-10 flex flex-col gap-3">
-          {/* Mute/Unmute Button */}
-          {currentMedia.media_type === 'video' && (
+          {/* Top Right - Golf Course Tag (Same styling as index page) */}
+          {golfCourse && (
+            <div className="absolute top-3 right-3 z-10">
+              <CoursePostBadge 
+                course={{
+                  id: golfCourse.id,
+                  name: golfCourse.name,
+                  country: golfCourse.country,
+                  region: golfCourse.region
+                }}
+                className="bg-white/20 text-white text-sm font-medium px-3 py-1.5 rounded-full backdrop-blur-sm"
+              />
+            </div>
+          )}
+
+          {/* Bottom Left - Caption Text (Moved up more to avoid overlapping dots) */}
+          {cleanContent && (
+            <div className="absolute bottom-10 left-3 right-20 z-10 max-w-[70%] group">
+              <div 
+                className="text-white text-base font-bold leading-[1.4] whitespace-nowrap overflow-hidden text-ellipsis group-hover:whitespace-normal group-hover:overflow-visible transition-all duration-200"
+                style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
+              >
+                {cleanContent}
+              </div>
+            </div>
+          )}
+
+          {/* Bottom Right - Action Icons */}
+          <div className="absolute bottom-3 right-3 z-10 flex flex-col gap-3">
+            {/* Mute/Unmute Button */}
+            {currentMedia.media_type === 'video' && (
+              <button 
+                className="text-white hover:scale-110 transition-transform"
+                onClick={handleMuteToggle}
+                title={isGloballyMuted ? "Unmute" : "Mute"}
+              >
+                {isGloballyMuted ? (
+                  <VolumeX className="w-6 h-6" />
+                ) : (
+                  <Volume2 className="w-6 h-6" />
+                )}
+              </button>
+            )}
+            
+            {/* Like Button */}
             <button 
               className="text-white hover:scale-110 transition-transform"
-              onClick={handleMuteToggle}
-              title={isGloballyMuted ? "Unmute" : "Mute"}
+              onClick={(e) => handleInteractionClick(e, 'like')}
             >
-              {isGloballyMuted ? (
-                <VolumeX className="w-6 h-6" />
-              ) : (
-                <Volume2 className="w-6 h-6" />
-              )}
+              <Heart className="w-6 h-6" />
             </button>
-          )}
-          
-          {/* Like Button */}
-          <button 
-            className="text-white hover:scale-110 transition-transform"
-            onClick={(e) => handleInteractionClick(e, 'like')}
-          >
-            <Heart className="w-6 h-6" />
-          </button>
-          
-          {/* Comment Button */}
-          <button 
-            className="text-white hover:scale-110 transition-transform"
-            onClick={(e) => handleInteractionClick(e, 'comment')}
-          >
-            <MessageCircle className="w-6 h-6" />
-          </button>
-          
-          {/* Share Button */}
-          <button 
-            className="text-white hover:scale-110 transition-transform"
-            onClick={(e) => handleInteractionClick(e, 'share')}
-          >
-            <Share className="w-6 h-6" />
-          </button>
-        </div>
-
-        {/* Media Navigation Dots - Bottom of square, under post text */}
-        {(currentPost.post_media?.length || 0) > 1 && (
-          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-2 z-10">
-            {currentPost.post_media.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentMediaIndex(index)}
-                className={`w-2 h-2 rounded-full transition-colors ${
-                  index === currentMediaIndex ? 'bg-white' : 'bg-white/50'
-                }`}
-              />
-            ))}
+            
+            {/* Comment Button */}
+            <button 
+              className="text-white hover:scale-110 transition-transform"
+              onClick={(e) => handleInteractionClick(e, 'comment')}
+            >
+              <MessageCircle className="w-6 h-6" />
+            </button>
+            
+            {/* Share Button */}
+            <button 
+              className="text-white hover:scale-110 transition-transform"
+              onClick={(e) => handleInteractionClick(e, 'share')}
+            >
+              <Share className="w-6 h-6" />
+            </button>
           </div>
-        )}
+
+          {/* Media Navigation Dots - Bottom of square, under post text */}
+          {(currentPost.post_media?.length || 0) > 1 && (
+            <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-2 z-10">
+              {currentPost.post_media.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleMediaIndexChange(index);
+                  }}
+                  className={`w-2 h-2 rounded-full transition-colors ${
+                    index === currentMediaIndex ? 'bg-white' : 'bg-white/50'
+                  }`}
+                />
+              ))}
+            </div>
+          )}
+        </MediaContainer>
       </div>
 
       {/* End of posts indicator */}
