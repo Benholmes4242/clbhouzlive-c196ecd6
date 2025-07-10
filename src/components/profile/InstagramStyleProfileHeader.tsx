@@ -4,6 +4,7 @@ import ProfilePhotoManager from './ProfilePhotoManager';
 import FollowerStats from './FollowerStats';
 import UserProfileActions from './UserProfileActions';
 import ProfileEditDialog from './ProfileEditDialog';
+import StoryBar from '@/components/StoryBar';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 interface InstagramStyleProfileHeaderProps {
@@ -94,6 +95,11 @@ const InstagramStyleProfileHeader: React.FC<InstagramStyleProfileHeaderProps> = 
             <p className={`text-sm text-gray-800 mt-3 ${profile?.user_type === 'individual' ? 'line-clamp-2' : ''}`}>{bio}</p>
           )}
         </div>
+      </div>
+
+      {/* Stories Section */}
+      <div className="mt-4">
+        <StoryBar />
       </div>
 
     </div>
