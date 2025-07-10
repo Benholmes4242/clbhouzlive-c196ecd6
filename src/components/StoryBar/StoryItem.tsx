@@ -34,12 +34,17 @@ const StoryItem: React.FC<StoryItemProps> = ({
             {hasProfile && story.avatar ? (
               // User has a profile photo - show with subtle ring
               <div className="w-20 h-20 rounded-[18px] p-0.5 bg-gradient-to-tr from-gray-200 to-gray-300 hover:opacity-80 transition-opacity">
-                <HighQualityImage
+                <img
                   src={story.avatar}
                   alt={story.user}
-                  className="w-full h-full rounded-[15px] border border-background"
-                  width={80}
-                  height={80}
+                  className="w-full h-full rounded-[15px] border border-background object-cover"
+                  style={{
+                    imageRendering: 'auto',
+                    backfaceVisibility: 'hidden',
+                    transform: 'translateZ(0)',
+                  }}
+                  loading="lazy"
+                  decoding="async"
                 />
               </div>
             ) : (
@@ -64,12 +69,17 @@ const StoryItem: React.FC<StoryItemProps> = ({
               style={{ background: 'linear-gradient(to top right, #9ca3af, #d1d5db)' }}
             >
               {story.avatar ? (
-                <HighQualityImage
+                <img
                   src={story.avatar}
                   alt={story.user}
-                  className="w-full h-full rounded-[15px] border border-background"
-                  width={80}
-                  height={80}
+                  className="w-full h-full rounded-[15px] border border-background object-cover"
+                  style={{
+                    imageRendering: 'auto',
+                    backfaceVisibility: 'hidden',
+                    transform: 'translateZ(0)',
+                  }}
+                  loading="lazy"
+                  decoding="async"
                   onError={(e) => {
                     console.log('Image failed to load:', story.avatar);
                     e.currentTarget.style.display = 'none';
