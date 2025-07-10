@@ -27,23 +27,8 @@ export const useStoryData = () => {
       }
 
       try {
-        // Get current user's profile
-        const { data: currentUserProfile } = await supabase
-          .from('user_profiles')
-          .select('profile_photo_url, display_name, username')
-          .eq('id', user.id)
-          .maybeSingle();
-
-        // Start with "Your Profile" story
-        const newStories: StoryUser[] = [
-          {
-            id: 'add',
-            type: 'add',
-            user: currentUserProfile?.display_name || 'Your Profile',
-            username: currentUserProfile?.username || 'your-profile',
-            avatar: currentUserProfile?.profile_photo_url || '',
-          }
-        ];
+        // Start with empty stories array - no longer showing "Your Profile"
+        const newStories: StoryUser[] = [];
 
         // Get users that the current user follows
         const { data: followedUsers, error: followError } = await supabase
@@ -78,16 +63,8 @@ export const useStoryData = () => {
         setStories(newStories);
       } catch (error) {
         console.error('Error fetching stories data:', error);
-        // Fallback to just "Your Profile" on error
-        setStories([
-          {
-            id: 'add',
-            type: 'add',
-            user: 'Your Profile',
-            username: 'your-profile',
-            avatar: '',
-          }
-        ]);
+        // Fallback to empty array on error since we're not showing "Your Profile"
+        setStories([]);
       } finally {
         setLoading(false);
       }
