@@ -123,6 +123,16 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     setIsMuted(isGloballyMuted);
   }, [isGloballyMuted, isInFeed]);
 
+  // Pause video when autoplay becomes false (when video goes out of view)
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !isInFeed) return;
+
+    if (!autoplay && !video.paused) {
+      video.pause();
+    }
+  }, [autoplay, isInFeed]);
+
   const togglePlayPause = (e?: React.MouseEvent | Event) => {
     if (e && typeof e.stopPropagation === 'function') {
       e.stopPropagation();
