@@ -69,12 +69,12 @@ export const MediaContainer: React.FC<MediaContainerProps> = ({
         <VideoPlayer
           src={currentMedia.media_url}
           autoplay={isHovered}
-          muted={true}
           loop={true}
           className="w-full h-full object-cover"
           showVideoIcon={false}
           showOverlayControls={false}
           videoId={`index-${currentMedia.id}`}
+          isInFeed={true}
         />
       ) : (
         <LazyImage
