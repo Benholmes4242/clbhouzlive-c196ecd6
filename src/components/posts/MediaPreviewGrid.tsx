@@ -28,6 +28,7 @@ const MediaPreviewGrid: React.FC<MediaPreviewGridProps> = ({
   const [editingFileId, setEditingFileId] = useState<string | null>(null);
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
   const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
+  const [imageRotations, setImageRotations] = useState<Record<string, number>>({});
 
   const handleEditClick = (fileId: string) => {
     setEditingFileId(fileId);
@@ -52,6 +53,59 @@ const MediaPreviewGrid: React.FC<MediaPreviewGridProps> = ({
   const handleImageLoadStart = (mediaId: string) => {
     setLoadingStates(prev => ({ ...prev, [mediaId]: true }));
     setImageErrors(prev => ({ ...prev, [mediaId]: false }));
+  };
+
+  const handleRotateImage = async (mediaId: string) => {
+    const media = mediaFiles.find(m => m.id === mediaId);
+    if (!media || !media.file.type.startsWith('image/')) return;
+
+    const currentRotation = imageRotations[mediaId] || 0;
+    const newRotation = (currentRotation + 90) % 360;
+    
+    setImageRotations(prev => ({ ...prev, [mediaId]: newRotation }));
+
+    // Apply rotation to the actual file if onEditFile is provided
+    if (onEditFile && newRotation !== 0) {
+      try {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        
+        img.onload = () => {
+          // Determine canvas dimensions based on rotation
+          const isRotated90or270 = newRotation === 90 || newRotation === 270;
+          canvas.width = isRotated90or270 ? img.height : img.width;
+          canvas.height = isRotated90or270 ? img.width : img.height;
+          
+          // Clear canvas and apply rotation
+          ctx?.clearRect(0, 0, canvas.width, canvas.height);
+          ctx?.save();
+          
+          // Move to center and rotate
+          ctx?.translate(canvas.width / 2, canvas.height / 2);
+          ctx?.rotate((newRotation * Math.PI) / 180);
+          
+          // Draw image from center
+          ctx?.drawImage(img, -img.width / 2, -img.height / 2);
+          ctx?.restore();
+          
+          // Convert canvas to blob and create new file
+          canvas.toBlob((blob) => {
+            if (blob) {
+              const rotatedFile = new File([blob], media.file.name, {
+                type: media.file.type,
+                lastModified: Date.now(),
+              });
+              onEditFile(mediaId, rotatedFile);
+            }
+          }, media.file.type);
+        };
+        
+        img.src = media.url;
+      } catch (error) {
+        console.error('Error rotating image:', error);
+      }
+    }
   };
 
   const editingFile = editingFileId 
@@ -99,7 +153,10 @@ const MediaPreviewGrid: React.FC<MediaPreviewGridProps> = ({
                     <img
                       src={media.url}
                       alt="Preview"
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover transition-transform duration-200"
+                      style={{ 
+                        transform: `rotate(${imageRotations[media.id] || 0}deg)` 
+                      }}
                       onError={() => handleImageError(media.id)}
                     />
                   )}
@@ -117,6 +174,17 @@ const MediaPreviewGrid: React.FC<MediaPreviewGridProps> = ({
 
                   {/* Overlay Controls */}
                   <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                    {isImage && (
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => handleRotateImage(media.id)}
+                        className="h-8 w-8 p-0"
+                        title="Rotate image"
+                      >
+                        <RotateCw className="h-4 w-4" />
+                      </Button>
+                    )}
                     {isImage && onEditFile && (
                       <Button
                         size="sm"
