@@ -85,7 +85,7 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
   const cleanContent = removeGolfCourseFromContent(post.content);
   
   // Truncate content to around 7 words
-  const truncateToWords = (text: string, wordLimit: number = 7) => {
+  const truncateToWords = (text: string, wordLimit: number = 9) => {
     if (!text) return '';
     const words = text.split(' ');
     if (words.length <= wordLimit) return text;
