@@ -121,8 +121,7 @@ const MomentCard: React.FC<MomentCardProps> = ({ moment, currentUserId }) => {
                 <img
                   src={moment.user.profile_photo_url}
                   alt={moment.user.display_name || moment.user.username || 'User'}
-                  className="w-full h-full object-cover"
-                  style={{ imageRendering: 'auto' }}
+                  className="w-full h-full object-cover hq-image"
                 />
               ) : (
                 <div className="w-full h-full bg-primary/20 flex items-center justify-center">
