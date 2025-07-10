@@ -119,7 +119,7 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
         {/* TOP-LEFT: User Info Pill */}
         <div className="absolute top-3 left-3 z-20">
           <div 
-            className="flex items-center bg-black bg-opacity-50 text-white text-sm font-medium px-2.5 py-1 rounded-full backdrop-blur-sm cursor-pointer hover:bg-opacity-60 transition-all"
+            className="flex items-center bg-white/20 text-white text-sm font-medium px-3 py-1.5 rounded-md backdrop-blur-sm border border-white/20 cursor-pointer hover:bg-white/30 transition-all"
             onClick={(e) => {
               e.stopPropagation();
               onProfileClick();
@@ -146,7 +146,7 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
                 country: golfCourse.country,
                 region: golfCourse.region
               }}
-              className="bg-black bg-opacity-50 text-white text-sm font-medium px-3 py-1 rounded-full backdrop-blur-sm"
+              className="bg-white/20 text-white text-sm font-medium px-3 py-1.5 rounded-md backdrop-blur-sm border border-white/20"
             />
           </div>
         )}
@@ -155,7 +155,7 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
         {cleanContent && (
           <div className="absolute bottom-3 left-3 z-20 max-w-[70%] group">
             <div 
-              className="bg-black bg-opacity-50 text-white text-sm font-normal px-3 py-1.5 rounded-full backdrop-blur-sm cursor-default group-hover:bg-opacity-75 transition-all duration-200"
+              className="bg-white/20 text-white text-sm font-normal px-3 py-1.5 rounded-md backdrop-blur-sm border border-white/20 cursor-default group-hover:bg-white/30 transition-all duration-200"
               title={`${cleanContent}${post.post_tags && post.post_tags.length > 0 ? ' ' + post.post_tags.map(tag => `@${tag.name}`).join(' ') : ''}`}
             >
               <div className="truncate group-hover:whitespace-normal group-hover:break-words group-hover:max-w-xs text-center">
