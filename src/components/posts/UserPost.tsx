@@ -2,6 +2,7 @@ import React from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import PostViewerModal from './PostViewerModal';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
+import IndexFeedPostModal from './IndexFeedPostModal';
 import { 
   DesktopUserPost, 
   MobileUserPost, 
@@ -50,6 +51,9 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
       handlePostClick();
     } else if (source === 'clubhouse' || source === 'profile') {
       handlePostClick();
+    } else if (source === 'index') {
+      // For index feed, use the new full-screen modal with only posts from same user
+      handlePostClick();
     } else {
       openMedia(mediaUrl, mediaType, undefined, golfCourse ? { id: golfCourse.id, name: golfCourse.name, country: golfCourse.country } : undefined);
     }
@@ -91,8 +95,18 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
         />
       )}
 
-      {/* Post Viewer Modal for clubhouse, profile, and index sources */}
-      {(source === 'clubhouse' || source === 'profile' || source === 'index') && currentPost && (
+      {/* Index Feed Post Modal */}
+      {source === 'index' && currentPost && (
+        <IndexFeedPostModal
+          isOpen={isPostViewerOpen}
+          onClose={closePostViewer}
+          initialPost={currentPost}
+          allUserPosts={viewerPosts.filter(p => p.user.id === currentPost.user.id)}
+        />
+      )}
+
+      {/* Post Viewer Modal for clubhouse and profile sources */}
+      {(source === 'clubhouse' || source === 'profile') && currentPost && (
         <PostViewerModal
           isOpen={isPostViewerOpen}
           onClose={closePostViewer}
