@@ -126,10 +126,10 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
           />
         )}
 
-        {/* TOP-LEFT: User Info Pill */}
+        {/* TOP-LEFT: User Info Overlay */}
         <div className="absolute top-3 left-3 z-20">
           <div 
-            className="flex items-center bg-white/20 text-white text-sm font-medium px-3 py-1.5 rounded-full backdrop-blur-sm border border-white/20 cursor-pointer hover:bg-white/30 transition-all"
+            className="flex items-center cursor-pointer"
             onClick={(e) => {
               e.stopPropagation();
               onProfileClick();
@@ -138,11 +138,16 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
             <LazyImage
               src={post.user.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
               alt={displayName}
-              className="w-8 h-8 rounded-full mr-1 border border-white border-opacity-20"
+              className="w-8 h-8 rounded-full mr-2 border-2 border-white"
               width={32}
               height={32}
             />
-            <span className="text-sm font-medium">{displayName}</span>
+            <span 
+              className="text-white text-sm font-medium"
+              style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
+            >
+              {displayName}
+            </span>
           </div>
         </div>
 
