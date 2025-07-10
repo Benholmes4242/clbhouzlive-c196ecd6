@@ -173,35 +173,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   };
 
   const handleVideoClick = () => {
-    // For feed videos with autoplay, don't allow click to interfere with autoplay behavior
-    if (isInFeed && autoplay) {
-      if (onClick) {
-        onClick();
-      }
-      return; // Don't toggle play/pause for autoplay feed videos
-    }
-    
     if (onClick) {
       onClick();
     } else {
+      // Always allow video click to toggle play/pause for feed videos
       togglePlayPause({} as React.MouseEvent);
-    }
-  };
-
-  // Prevent touch events from interfering with autoplay on mobile
-  const handleTouchStart = (e: React.TouchEvent) => {
-    if (isInFeed && autoplay) {
-      // For autoplay feed videos, prevent touch from interfering
-      e.preventDefault();
-      e.stopPropagation();
-    }
-  };
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (isInFeed && autoplay) {
-      // For autoplay feed videos, prevent touch from interfering
-      e.preventDefault();
-      e.stopPropagation();
     }
   };
 
@@ -215,16 +191,14 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         ref={videoRef}
         src={src}
         poster={effectivePoster}
-        className={`w-full h-full object-cover ${isInFeed && autoplay ? 'pointer-events-none' : 'cursor-pointer'}`}
+        className="w-full h-full object-cover cursor-pointer"
         playsInline
         muted={muted}
         loop={loop}
-        preload="metadata"
+        preload="none"
         webkit-playsinline="true"
         x5-playsinline="true"
         onClick={handleVideoClick}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
       />
 
       {/* Video Icon Overlay */}
