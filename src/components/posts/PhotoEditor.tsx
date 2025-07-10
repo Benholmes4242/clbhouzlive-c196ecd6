@@ -20,7 +20,7 @@ const PhotoEditor: React.FC<PhotoEditorProps> = ({
   onSave
 }) => {
   const editorRef = useRef<AvatarEditor>(null);
-  const [scale, setScale] = useState([1.2]);
+  const [scale, setScale] = useState([1.0]);
   const [rotate, setRotate] = useState(0);
   const [brightness, setBrightness] = useState([1]);
   const [position, setPosition] = useState({ x: 0.5, y: 0.5 });
@@ -77,7 +77,7 @@ const PhotoEditor: React.FC<PhotoEditorProps> = ({
 
   const handleCancel = () => {
     // Reset all values
-    setScale([1.2]);
+    setScale([1.0]);
     setRotate(0);
     setBrightness([1]);
     setPosition({ x: 0.5, y: 0.5 });
@@ -149,7 +149,7 @@ const PhotoEditor: React.FC<PhotoEditorProps> = ({
               <Slider
                 value={scale}
                 onValueChange={setScale}
-                min={1}
+                min={0.5}
                 max={3}
                 step={0.1}
                 className="w-full photo-editor-slider"
