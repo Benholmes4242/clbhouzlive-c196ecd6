@@ -119,7 +119,7 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
         {/* TOP-LEFT: User Info Pill */}
         <div className="absolute top-3 left-3 z-20">
           <div 
-            className="flex items-center bg-white/20 text-white text-sm font-medium px-3 py-1.5 rounded-md backdrop-blur-sm border border-white/20 cursor-pointer hover:bg-white/30 transition-all"
+            className="flex items-center bg-white/20 text-white text-sm font-medium px-3 py-1.5 rounded-full backdrop-blur-sm border border-white/20 cursor-pointer hover:bg-white/30 transition-all"
             onClick={(e) => {
               e.stopPropagation();
               onProfileClick();
@@ -146,7 +146,7 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
                 country: golfCourse.country,
                 region: golfCourse.region
               }}
-              className="bg-white/20 text-white text-sm font-medium px-3 py-1.5 rounded-md backdrop-blur-sm border border-white/20"
+              className="bg-white/20 text-white text-sm font-medium px-3 py-1.5 rounded-full backdrop-blur-sm border border-white/20"
             />
           </div>
         )}
