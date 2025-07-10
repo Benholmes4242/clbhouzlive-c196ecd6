@@ -1,15 +1,22 @@
-import { useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useDragScroll } from '@/hooks/useDragScroll';
 
 export const useCarouselNavigation = (itemCount: number) => {
-  const dragRef = useDragScroll({ enabled: true, direction: 'horizontal' });
+  const dragRefCallback = useDragScroll({ enabled: true, direction: 'horizontal' });
+  const carouselRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
   const isMobile = useIsMobile();
 
+  // Combined ref callback that handles both drag and carousel functionality
+  const combinedRefCallback = useCallback((node: HTMLDivElement | null) => {
+    carouselRef.current = node;
+    dragRefCallback(node);
+  }, [dragRefCallback]);
+
   const updateScrollButtons = () => {
-    const container = dragRef.current;
+    const container = carouselRef.current;
     if (container) {
       setCanScrollLeft(container.scrollLeft > 0);
       setCanScrollRight(
@@ -20,7 +27,7 @@ export const useCarouselNavigation = (itemCount: number) => {
 
   useEffect(() => {
     updateScrollButtons();
-    const container = dragRef.current;
+    const container = carouselRef.current;
     if (container) {
       container.addEventListener('scroll', updateScrollButtons);
       return () => container.removeEventListener('scroll', updateScrollButtons);
@@ -28,7 +35,7 @@ export const useCarouselNavigation = (itemCount: number) => {
   }, [itemCount]);
 
   const scroll = (direction: 'left' | 'right') => {
-    const container = dragRef.current;
+    const container = carouselRef.current;
     if (container) {
       const cardWidth = isMobile ? 212 : 252; // Approximate card width
       const scrollDistance = direction === 'left' ? -cardWidth * 2 : cardWidth * 2;
@@ -37,7 +44,7 @@ export const useCarouselNavigation = (itemCount: number) => {
   };
 
   return {
-    carouselRef: dragRef,
+    carouselRef: combinedRefCallback,
     canScrollLeft,
     canScrollRight,
     scroll,

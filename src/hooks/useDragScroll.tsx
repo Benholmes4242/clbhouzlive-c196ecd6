@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useCallback } from 'react';
 
 interface UseDragScrollOptions {
   enabled?: boolean;
@@ -14,9 +14,7 @@ export const useDragScroll = (options: UseDragScrollOptions = {}) => {
   const scrollLeft = useRef(0);
   const scrollTop = useRef(0);
 
-  useEffect(() => {
-    const element = elementRef.current;
-    if (!element || !enabled) return;
+  const attachEvents = useCallback((element: HTMLDivElement) => {
 
     const handleMouseDown = (e: MouseEvent) => {
       console.log('🖱️ Mouse down detected, window width:', window.innerWidth);
@@ -36,9 +34,8 @@ export const useDragScroll = (options: UseDragScrollOptions = {}) => {
       
       element.style.cursor = 'grabbing';
       element.style.userSelect = 'none';
-      document.body.style.userSelect = 'none'; // Prevent selection on body too
+      document.body.style.userSelect = 'none';
       
-      // Prevent default behaviors
       e.preventDefault();
       e.stopPropagation();
     };
@@ -54,7 +51,7 @@ export const useDragScroll = (options: UseDragScrollOptions = {}) => {
       const y = e.pageY - element.offsetTop;
       
       if (direction === 'horizontal' || direction === 'both') {
-        const walkX = (x - startX.current) * 2; // Multiply by 2 for faster scrolling
+        const walkX = (x - startX.current) * 2;
         const newScrollLeft = scrollLeft.current - walkX;
         console.log('📐 Horizontal scroll:', { walkX, newScrollLeft, currentScroll: element.scrollLeft });
         element.scrollLeft = newScrollLeft;
@@ -71,7 +68,7 @@ export const useDragScroll = (options: UseDragScrollOptions = {}) => {
       isDragging.current = false;
       element.style.cursor = 'grab';
       element.style.userSelect = '';
-      document.body.style.userSelect = ''; // Restore body selection
+      document.body.style.userSelect = '';
     };
 
     const handleMouseLeave = () => {
@@ -79,7 +76,7 @@ export const useDragScroll = (options: UseDragScrollOptions = {}) => {
       isDragging.current = false;
       element.style.cursor = 'grab';
       element.style.userSelect = '';
-      document.body.style.userSelect = ''; // Restore body selection
+      document.body.style.userSelect = '';
     };
 
     // Set initial cursor
@@ -94,7 +91,7 @@ export const useDragScroll = (options: UseDragScrollOptions = {}) => {
 
     console.log('📎 Event listeners attached');
 
-    // Cleanup
+    // Cleanup function
     return () => {
       element.removeEventListener('mousedown', handleMouseDown);
       document.removeEventListener('mousemove', handleMouseMove);
@@ -103,5 +100,20 @@ export const useDragScroll = (options: UseDragScrollOptions = {}) => {
     };
   }, [enabled, direction]);
 
-  return elementRef;
+  // Ref callback that attaches events when element is mounted
+  const refCallback = useCallback((node: HTMLDivElement | null) => {
+    if (elementRef.current) {
+      // Cleanup previous element if any
+      console.log('🧹 Cleaning up previous element');
+    }
+    
+    elementRef.current = node;
+    
+    if (node && enabled) {
+      console.log('🔌 Attaching drag events to new element');
+      attachEvents(node);
+    }
+  }, [attachEvents, enabled]);
+
+  return refCallback;
 };
