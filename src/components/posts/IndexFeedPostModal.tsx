@@ -221,16 +221,16 @@ const IndexFeedPostModal: React.FC<IndexFeedPostModalProps> = ({
           />
         )}
 
-        {/* Top Left - Profile Info (Black Pill) */}
+        {/* Top Left - Profile Info (Same sizing as index page) */}
         <div className="absolute top-3 left-3 z-10 flex items-center bg-black/60 text-white px-3 py-1.5 rounded-full">
           <HighQualityImage
             src={currentPost.user.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
             alt={displayName}
-            className="w-6 h-6 rounded-full mr-2"
-            width={24}
-            height={24}
+            className="w-16 h-16 rounded-full mr-2"
+            width={64}
+            height={64}
           />
-          <span className="text-sm font-semibold">{displayName}</span>
+          <span className="text-base font-bold">{displayName}</span>
         </div>
 
         {/* Top Right - Golf Course Tag (Same styling as index page) */}
