@@ -164,12 +164,17 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
         {/* BOTTOM-LEFT: Caption Text Overlay */}
         {truncatedContent && (
           <div 
-            className="absolute bottom-3 left-3 right-20 z-20 text-white text-sm font-medium leading-[1.4] whitespace-nowrap overflow-hidden text-ellipsis pointer-events-none group"
+            className="absolute bottom-3 left-3 right-20 z-20 text-white text-sm font-medium leading-[1.4] pointer-events-auto group"
             style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
             title={`${cleanContent}${post.post_tags && post.post_tags.length > 0 ? ' ' + post.post_tags.map(tag => `@${tag.name}`).join(' ') : ''}`}
           >
-            <div className="group-hover:whitespace-normal group-hover:overflow-visible group-hover:bg-black/60 group-hover:px-2 group-hover:py-1.5 group-hover:rounded-md group-hover:pointer-events-auto transition-all duration-200">
-              {truncatedContent}
+            <div className="whitespace-nowrap overflow-hidden text-ellipsis group-hover:whitespace-normal group-hover:overflow-visible group-hover:bg-black/60 group-hover:px-2 group-hover:py-1.5 group-hover:rounded-md transition-all duration-200">
+              <span className="group-hover:hidden">
+                {truncatedContent}
+              </span>
+              <span className="hidden group-hover:inline">
+                {cleanContent}
+              </span>
               {post.post_tags && post.post_tags.length > 0 && (
                 <span>
                   {' '}
