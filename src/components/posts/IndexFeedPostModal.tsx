@@ -8,6 +8,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import HighQualityImage from '@/components/ui/high-quality-image';
 import VideoPlayer from '@/components/ui/video-player';
+import CoursePostBadge from './CoursePostBadge';
 
 interface PostMedia {
   id: string;
@@ -232,11 +233,18 @@ const IndexFeedPostModal: React.FC<IndexFeedPostModalProps> = ({
           <span className="text-sm font-semibold">{displayName}</span>
         </div>
 
-        {/* Top Right - Golf Course Tag (Grey-Green Pill) */}
+        {/* Top Right - Golf Course Tag (Same styling as index page) */}
         {golfCourse && (
-          <div className="absolute top-3 right-3 z-10 bg-gray-700/80 text-white px-3 py-1.5 rounded-full text-sm font-medium">
-            {golfCourse.name}
-            {golfCourse.country && ` • ${golfCourse.country}`}
+          <div className="absolute top-3 right-3 z-10">
+            <CoursePostBadge 
+              course={{
+                id: golfCourse.id,
+                name: golfCourse.name,
+                country: golfCourse.country,
+                region: golfCourse.region
+              }}
+              className="bg-white/20 text-white text-sm font-medium px-3 py-1.5 rounded-full backdrop-blur-sm"
+            />
           </div>
         )}
 
