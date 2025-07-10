@@ -307,9 +307,9 @@ const IndexFeedPostModal: React.FC<IndexFeedPostModalProps> = ({
           </button>
         </div>
 
-        {/* Media Navigation Dots */}
+        {/* Media Navigation Dots - Bottom of square, under post text */}
         {(currentPost.post_media?.length || 0) > 1 && (
-          <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 flex space-x-2 z-10">
+          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-2 z-10">
             {currentPost.post_media.map((_, index) => (
               <button
                 key={index}
