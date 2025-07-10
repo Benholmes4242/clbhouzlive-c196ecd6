@@ -158,7 +158,7 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
               className="bg-black bg-opacity-50 text-white text-sm font-normal px-3 py-1.5 rounded-full backdrop-blur-sm cursor-default group-hover:bg-opacity-75 transition-all duration-200"
               title={`${cleanContent}${post.post_tags && post.post_tags.length > 0 ? ' ' + post.post_tags.map(tag => `@${tag.name}`).join(' ') : ''}`}
             >
-              <div className="truncate group-hover:whitespace-normal group-hover:break-words group-hover:max-w-xs">
+              <div className="truncate group-hover:whitespace-normal group-hover:break-words group-hover:max-w-xs text-center">
                 {cleanContent}
                 {post.post_tags && post.post_tags.length > 0 && (
                   <span>
