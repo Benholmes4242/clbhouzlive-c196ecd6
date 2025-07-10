@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import VideoPlayer from '@/components/ui/video-player';
 import LazyImage from '@/components/ui/lazy-image';
@@ -44,7 +44,7 @@ export const MediaContainer: React.FC<MediaContainerProps> = ({
   }, [currentIndex]);
 
   // Handle scroll events to update current index
-  const handleScroll = () => {
+  const handleScroll = useCallback(() => {
     if (containerRef.current && !isDragging) {
       const container = containerRef.current;
       const scrollLeft = container.scrollLeft;
@@ -58,9 +58,9 @@ export const MediaContainer: React.FC<MediaContainerProps> = ({
         onIndexChange(newIndex);
       }
     }
-  };
+  }, [isDragging, currentIndex, media.length, onIndexChange]);
 
-  // Attach scroll listener
+  // Attach scroll listener - now stable with useCallback
   useEffect(() => {
     const container = containerRef.current;
     if (container) {
@@ -71,7 +71,7 @@ export const MediaContainer: React.FC<MediaContainerProps> = ({
         container.removeEventListener('scroll', handleScroll);
       };
     }
-  }, [handleScroll]); // Fixed dependency array
+  }, [handleScroll]);
 
   // Desktop drag functionality
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -143,7 +143,7 @@ export const MediaContainer: React.FC<MediaContainerProps> = ({
       {/* Carousel Container */}
       <div
         ref={containerRef}
-        className="flex w-full h-full overflow-x-auto scrollbar-hide cursor-grab active:cursor-grabbing"
+        className="flex w-full h-full overflow-x-auto overflow-y-hidden scrollbar-hide cursor-grab active:cursor-grabbing"
         style={{ 
           scrollSnapType: 'x mandatory',
           WebkitOverflowScrolling: 'touch'
@@ -153,8 +153,11 @@ export const MediaContainer: React.FC<MediaContainerProps> = ({
         {media.map((mediaItem, index) => (
           <div
             key={mediaItem.id}
-            className="flex-shrink-0 w-full h-full"
-            style={{ scrollSnapAlign: 'start' }}
+            className="flex-shrink-0 w-full h-full relative"
+            style={{ 
+              scrollSnapAlign: 'start',
+              minWidth: '100%' // This ensures each item takes full width
+            }}
             onClick={() => handleMediaItemClick(mediaItem)}
           >
             {mediaItem.media_type === 'video' ? (
