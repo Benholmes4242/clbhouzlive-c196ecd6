@@ -408,7 +408,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                   >
                     {isSubmitting 
                       ? (editMode ? 'Updating...' : 'Posting...') 
-                      : (editMode ? 'Update' : `Post ${files.length > 0 ? `(${files.length} file${files.length > 1 ? 's' : ''})` : ''}`)
+                      : (editMode ? 'Update' : 'Post')
                     }
                   </Button>
                 </div>
