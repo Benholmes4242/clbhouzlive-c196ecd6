@@ -142,7 +142,7 @@ const FeaturedMomentsCarousel = ({ userPosts = [], loading = false }: FeaturedMo
                     <img 
                       src={moment.userProfile.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'} 
                       alt={moment.displayName} 
-                      className="w-16 h-16 rounded-full object-cover object-center cursor-pointer hover:opacity-80 transition-opacity border-2 border-gray-200"
+                      className="w-16 h-16 rounded-full object-cover object-center cursor-pointer hover:opacity-80 transition-opacity"
                       onClick={() => navigate(`/profile/${moment.userProfile.username}`)}
                     />
                     <div className="flex-1 min-w-0">

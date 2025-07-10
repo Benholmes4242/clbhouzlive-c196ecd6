@@ -138,7 +138,7 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
             <LazyImage
               src={post.user.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
               alt={displayName}
-              className="w-16 h-16 rounded-full mr-2 border-2 border-white"
+              className="w-16 h-16 rounded-full mr-2"
               width={64}
               height={64}
             />
