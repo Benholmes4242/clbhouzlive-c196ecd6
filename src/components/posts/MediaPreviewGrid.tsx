@@ -172,7 +172,7 @@ const MediaPreviewGrid: React.FC<MediaPreviewGridProps> = ({
                     />
                   )}
 
-                  {/* Overlay Controls */}
+                  {/* Overlay Controls - show for all images, even with errors */}
                   <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                     {isImage && (
                       <Button
