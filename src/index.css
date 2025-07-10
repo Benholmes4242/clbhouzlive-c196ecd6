@@ -155,17 +155,23 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 0 2px rgba(245, 166, 35, 0.3) !important;
 }
 
-/* Photo Editor Slider Styles - Maximum specificity */
-[data-radix-dialog-content] .photo-editor-slider [data-radix-slider-track] {
+/* Photo Editor Slider Styles - Override all specificity */
+.photo-editor-slider [data-radix-slider-track],
+[data-radix-dialog-content] .photo-editor-slider [data-radix-slider-track],
+div[data-radix-dialog-content] .photo-editor-slider [data-radix-slider-track] {
   background-color: #FFE8D1 !important;
   height: 6px !important;
 }
 
-[data-radix-dialog-content] .photo-editor-slider [data-radix-slider-range] {
+.photo-editor-slider [data-radix-slider-range],
+[data-radix-dialog-content] .photo-editor-slider [data-radix-slider-range],
+div[data-radix-dialog-content] .photo-editor-slider [data-radix-slider-range] {
   background-color: #F5A623 !important;
 }
 
-[data-radix-dialog-content] .photo-editor-slider [data-radix-slider-thumb] {
+.photo-editor-slider [data-radix-slider-thumb],
+[data-radix-dialog-content] .photo-editor-slider [data-radix-slider-thumb],
+div[data-radix-dialog-content] .photo-editor-slider [data-radix-slider-thumb] {
   background-color: #F5A623 !important;
   border: 2px solid #F5A623 !important;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
@@ -173,12 +179,16 @@
   height: 16px !important;
 }
 
-[data-radix-dialog-content] .photo-editor-slider [data-radix-slider-thumb]:hover {
+.photo-editor-slider [data-radix-slider-thumb]:hover,
+[data-radix-dialog-content] .photo-editor-slider [data-radix-slider-thumb]:hover,
+div[data-radix-dialog-content] .photo-editor-slider [data-radix-slider-thumb]:hover {
   background-color: #E6941F !important;
   border-color: #E6941F !important;
 }
 
-[data-radix-dialog-content] .photo-editor-slider [data-radix-slider-thumb]:focus {
+.photo-editor-slider [data-radix-slider-thumb]:focus,
+[data-radix-dialog-content] .photo-editor-slider [data-radix-slider-thumb]:focus,
+div[data-radix-dialog-content] .photo-editor-slider [data-radix-slider-thumb]:focus {
   outline: none !important;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), 0 0 0 2px rgba(245, 166, 35, 0.3) !important;
 }
