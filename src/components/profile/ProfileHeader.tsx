@@ -78,7 +78,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
           {/* Avatar circle, absolutely NO background, shadow, or padding */}
           <div
             className={
-              "w-40 h-40 md:w-52 md:h-52 rounded-[18px] overflow-hidden flex items-center justify-center object-cover transition-all relative duration-200" +
+              "w-40 h-40 md:w-52 md:h-52 rounded-full overflow-hidden flex items-center justify-center object-cover transition-all relative duration-200" +
               (shouldShowClickCursor ? " group-hover:opacity-80" : "")
             }
             style={{
@@ -150,7 +150,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               <HighQualityImage
                 src={photoPreview || profilePhotoUrl!}
                 alt="Profile photo"
-                className="w-full h-full rounded-[18px] shadow-2xl"
+                className="w-full h-full rounded-full shadow-2xl"
                 width={320}
                 height={320}
               />
