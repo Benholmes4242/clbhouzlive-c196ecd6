@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useSwipeable } from 'react-swipeable';
+import { useIsMobile } from '@/hooks/use-mobile';
 import VideoPlayer from '@/components/ui/video-player';
 import LazyImage from '@/components/ui/lazy-image';
 
@@ -27,10 +29,34 @@ export const MediaContainer: React.FC<MediaContainerProps> = ({
   children
 }) => {
   const [isHovering, setIsHovering] = useState(false);
+  const isMobile = useIsMobile();
 
-  // Arrow navigation
+  // Mobile swipe navigation
+  const handleSwipeLeft = () => {
+    if (media.length > 1 && currentIndex < media.length - 1) {
+      onIndexChange(currentIndex + 1);
+    }
+  };
+
+  const handleSwipeRight = () => {
+    if (media.length > 1 && currentIndex > 0) {
+      onIndexChange(currentIndex - 1);
+    }
+  };
+
+  // Swipe handlers for mobile only
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: handleSwipeLeft,
+    onSwipedRight: handleSwipeRight,
+    preventScrollOnSwipe: true,
+    trackMouse: false, // Only track touch, not mouse
+    trackTouch: true,
+    delta: 50,
+    touchEventOptions: { passive: false }
+  });
+
+  // Arrow navigation for desktop
   const navigateToIndex = (index: number) => {
-    console.log('🏹 Arrow navigation to index:', index, 'current:', currentIndex);
     if (index >= 0 && index < media.length) {
       onIndexChange(index);
     }
@@ -51,8 +77,9 @@ export const MediaContainer: React.FC<MediaContainerProps> = ({
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
-      {/* Single Media Display */}
+      {/* Single Media Display with Mobile Swipe Support */}
       <div
+        {...(isMobile && media.length > 1 ? swipeHandlers : {})}
         className="w-full h-full cursor-pointer"
         onClick={() => handleMediaItemClick(currentMedia)}
       >
@@ -77,7 +104,7 @@ export const MediaContainer: React.FC<MediaContainerProps> = ({
       </div>
 
       {/* Navigation Arrows (Desktop Only) */}
-      {media.length > 1 && isHovering && (
+      {!isMobile && media.length > 1 && isHovering && (
         <>
           {currentIndex > 0 && (
             <button
