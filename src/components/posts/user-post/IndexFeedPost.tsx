@@ -128,6 +128,9 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
           content={post.content}
           postTags={post.post_tags || []}
           truncatedContent={truncatedContent}
+          golfCourse={golfCourse}
+          showFullCourseTag={showFullCourseTag}
+          onCourseTagClick={handleCourseTagClick}
         />
 
         <InteractionIconsOverlay

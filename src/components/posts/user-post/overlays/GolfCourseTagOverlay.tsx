@@ -19,48 +19,21 @@ export const GolfCourseTagOverlay: React.FC<GolfCourseTagOverlayProps> = ({
   if (!golfCourse) return null;
 
   return (
-    <div className="absolute top-6 right-3 z-20">
-      {/* Mobile: Show map pin icon only, expand on click */}
-      {isMobile ? (
-        <div className="relative">
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              onTagClick(e);
+    <>
+      {/* Desktop: Show full tag in top-right */}
+      {!isMobile ? (
+        <div className="absolute top-6 right-3 z-20">
+          <CoursePostBadge 
+            course={{
+              id: golfCourse.id,
+              name: golfCourse.name,
+              country: golfCourse.country,
+              region: golfCourse.region
             }}
-            className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center transition-all duration-200"
-          >
-            <MapPin className="w-4 h-4 text-white" />
-          </button>
-          
-          {/* Full course tag that appears on click */}
-          {showFullTag && (
-            <div className="absolute top-0 right-0 animate-scale-in">
-              <CoursePostBadge 
-                course={{
-                  id: golfCourse.id,
-                  name: golfCourse.name,
-                  country: golfCourse.country,
-                  region: golfCourse.region
-                }}
-                className="bg-white/20 text-white text-sm font-medium px-3 py-1.5 rounded-full backdrop-blur-sm whitespace-nowrap"
-              />
-            </div>
-          )}
+            className="bg-white/20 text-white text-sm font-medium px-3 py-1.5 rounded-full backdrop-blur-sm"
+          />
         </div>
-      ) : (
-        /* Desktop: Show full tag as before */
-        <CoursePostBadge 
-          course={{
-            id: golfCourse.id,
-            name: golfCourse.name,
-            country: golfCourse.country,
-            region: golfCourse.region
-          }}
-          className="bg-white/20 text-white text-sm font-medium px-3 py-1.5 rounded-full backdrop-blur-sm"
-        />
-      )}
-    </div>
+      ) : null}
+    </>
   );
 };
