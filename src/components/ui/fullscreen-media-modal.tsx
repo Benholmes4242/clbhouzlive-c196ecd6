@@ -125,16 +125,21 @@ const FullscreenMediaModal = ({
 
   return (
     <div 
-      className="fixed inset-0 w-full h-full z-[999999] bg-black flex items-center justify-center"
+      className="fixed w-full h-full z-[999999] bg-black flex items-center justify-center"
       style={{ 
         position: 'fixed',
         top: 0,
         left: 0,
+        right: 0,
+        bottom: 0,
         width: '100vw',
         height: '100vh',
+        minHeight: '100vh',
         maxHeight: '100vh',
         zIndex: 999999,
-        touchAction: 'none'
+        touchAction: 'none',
+        margin: 0,
+        padding: 0
       }}
       onClick={handleBackdropClick}
     >
