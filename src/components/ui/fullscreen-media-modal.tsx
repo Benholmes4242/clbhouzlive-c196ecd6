@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, Volume2, VolumeX, MapPin } from 'lucide-react';
+import { ArrowLeft, Volume2, VolumeX, MapPin, Heart, MessageCircle, Share } from 'lucide-react';
 import CoursePostBadge from '../posts/CoursePostBadge';
 import { UserInfoOverlay } from '../posts/user-post/overlays/UserInfoOverlay';
 import TaggedText from '../posts/TaggedText';
@@ -116,6 +116,27 @@ const FullscreenMediaModal = ({
     if (videoRef.current) {
       videoRef.current.muted = !isMuted;
       setIsMuted(!isMuted);
+    }
+  };
+
+  const handleInteractionClick = (e: React.MouseEvent, type: string) => {
+    e.stopPropagation();
+    // Handle different interaction types
+    switch (type) {
+      case 'like':
+        // Handle like action
+        console.log('Like clicked');
+        break;
+      case 'comment':
+        // Handle comment action
+        console.log('Comment clicked');
+        break;
+      case 'share':
+        // Handle share action
+        console.log('Share clicked');
+        break;
+      default:
+        break;
     }
   };
 
@@ -260,6 +281,30 @@ const FullscreenMediaModal = ({
             </div>
           </div>
         )}
+      </div>
+
+      {/* Interaction Icons - Bottom Right (matching index feed exactly) */}
+      <div className="absolute bottom-3 right-3 z-20">
+        <div className="flex flex-col items-center gap-2.5 text-white text-lg opacity-90">
+          <button 
+            className="cursor-pointer hover:opacity-100 transition-opacity"
+            onClick={(e) => handleInteractionClick(e, 'like')}
+          >
+            <Heart className="w-5 h-5" />
+          </button>
+          <button 
+            className="cursor-pointer hover:opacity-100 transition-opacity"
+            onClick={(e) => handleInteractionClick(e, 'comment')}
+          >
+            <MessageCircle className="w-5 h-5" />
+          </button>
+          <button 
+            className="cursor-pointer hover:opacity-100 transition-opacity"
+            onClick={(e) => handleInteractionClick(e, 'share')}
+          >
+            <Share className="w-5 h-5" />
+          </button>
+        </div>
       </div>
     </div>
   );
