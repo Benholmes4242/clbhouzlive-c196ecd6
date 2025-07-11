@@ -31,29 +31,19 @@ export const MediaContainer: React.FC<MediaContainerProps> = ({
   const swipeHandlers = useSwipeable({
     onSwipedLeft: (eventData) => {
       if (media.length > 1) {
-        eventData.event.preventDefault();
-        eventData.event.stopPropagation();
         onSwipeLeft();
       }
     },
     onSwipedRight: (eventData) => {
       if (media.length > 1) {
-        eventData.event.preventDefault();
-        eventData.event.stopPropagation();
         onSwipeRight();
       }
     },
-    onSwiping: (eventData) => {
-      if (media.length > 1) {
-        eventData.event.preventDefault();
-        eventData.event.stopPropagation();
-      }
-    },
-    preventScrollOnSwipe: true,
+    preventScrollOnSwipe: false, // Allow vertical scrolling
     trackMouse: false,
     trackTouch: true,
     delta: 50,
-    touchEventOptions: { passive: false }
+    touchEventOptions: { passive: true } // Don't interfere with native scroll
   });
 
   const currentMedia = media[currentIndex];
