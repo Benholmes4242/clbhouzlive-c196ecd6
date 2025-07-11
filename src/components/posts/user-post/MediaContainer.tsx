@@ -70,6 +70,7 @@ export const MediaContainer: React.FC<MediaContainerProps> = ({
           showOverlayControls={false}
           videoId={`index-${currentMedia.id}`}
           isInFeed={true}
+          shouldPause={!isHovered} // Pause video when not hovered (out of view)
         />
       ) : (
         <LazyImage

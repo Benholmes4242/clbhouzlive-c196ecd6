@@ -12,6 +12,7 @@ interface UseVideoPlayerProps {
   isInFeed: boolean;
   isGloballyMuted: boolean;
   setGlobalMute: (muted: boolean) => void;
+  shouldPause?: boolean;
 }
 
 export const useVideoPlayer = ({
@@ -23,7 +24,8 @@ export const useVideoPlayer = ({
   onPause,
   isInFeed,
   isGloballyMuted,
-  setGlobalMute
+  setGlobalMute,
+  shouldPause = false
 }: UseVideoPlayerProps) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -124,6 +126,18 @@ export const useVideoPlayer = ({
       setActiveAudioVideo(null);
     }
   }, [isGloballyMuted, isInFeed, setActiveAudioVideo]);
+
+  // Handle shouldPause prop for feed videos
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !isInFeed) return;
+    
+    if (shouldPause && !video.paused) {
+      console.log('🎬 Pausing video due to shouldPause flag');
+      video.pause();
+      setActiveAudioVideo(null);
+    }
+  }, [shouldPause, isInFeed, setActiveAudioVideo]);
 
   const togglePlayPause = (e?: React.MouseEvent | Event) => {
     console.log('🎯 togglePlayPause called:', { isInFeed, paused: videoRef.current?.paused });

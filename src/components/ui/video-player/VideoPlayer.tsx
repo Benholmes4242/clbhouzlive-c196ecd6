@@ -23,6 +23,7 @@ interface VideoPlayerProps {
   showMuteButton?: boolean; // Control whether to show mute button in top-left
   isInFeed?: boolean; // Indicates if this video is in the main feed
   videoRef?: React.RefObject<HTMLVideoElement>; // Allow external ref
+  shouldPause?: boolean; // Control whether video should be paused (for feed videos)
 }
 
 const VideoPlayer: React.FC<VideoPlayerProps> = ({
@@ -41,7 +42,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   videoId,
   showMuteButton = true,
   isInFeed = false,
-  videoRef: externalVideoRef
+  videoRef: externalVideoRef,
+  shouldPause = false
 }) => {
   const { isGloballyMuted, setGlobalMute } = useGlobalAudio();
   
@@ -71,7 +73,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     onPause,
     isInFeed,
     isGloballyMuted,
-    setGlobalMute
+    setGlobalMute,
+    shouldPause
   });
 
   const videoRef = externalVideoRef || internalVideoRef;
