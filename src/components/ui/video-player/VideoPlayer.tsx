@@ -100,7 +100,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         ref={videoRef}
         src={src}
         poster={effectivePoster}
-        className={`w-full h-full object-cover ${isInFeed ? 'pointer-events-none' : 'cursor-pointer'}`}
+        className={`w-full h-full object-cover ${isInFeed ? 'pointer-events-none touch-none' : 'cursor-pointer'}`}
         playsInline
         muted={muted}
         loop={loop}
@@ -108,10 +108,15 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         preload="metadata"
         webkit-playsinline="true"
         x5-playsinline="true"
+        controls={false}
+        disablePictureInPicture={isInFeed}
         onClick={isInFeed ? undefined : handleVideoClick}
-        onTouchStart={isInFeed ? (e) => e.preventDefault() : undefined}
-        onTouchEnd={isInFeed ? (e) => e.preventDefault() : undefined}
-        onTouchMove={isInFeed ? (e) => e.preventDefault() : undefined}
+        onTouchStart={isInFeed ? (e) => { e.preventDefault(); e.stopPropagation(); } : undefined}
+        onTouchEnd={isInFeed ? (e) => { e.preventDefault(); e.stopPropagation(); } : undefined}
+        onTouchMove={isInFeed ? (e) => { e.preventDefault(); e.stopPropagation(); } : undefined}
+        onTouchCancel={isInFeed ? (e) => { e.preventDefault(); e.stopPropagation(); } : undefined}
+        onContextMenu={isInFeed ? (e) => { e.preventDefault(); e.stopPropagation(); } : undefined}
+        style={isInFeed ? { touchAction: 'none', userSelect: 'none' } : undefined}
       />
 
       <VideoIcon show={showVideoIcon} />
