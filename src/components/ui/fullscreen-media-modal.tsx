@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { MoreHorizontal, Volume2, VolumeX, MapPin, Heart, MessageCircle, Share } from 'lucide-react';
+import { Maximize2, Volume2, VolumeX, MapPin, Heart, MessageCircle, Share } from 'lucide-react';
 import CoursePostBadge from '../posts/CoursePostBadge';
 import { UserInfoOverlay } from '../posts/user-post/overlays/UserInfoOverlay';
 import TaggedText from '../posts/TaggedText';
@@ -172,13 +172,13 @@ const FullscreenMediaModal = ({
     >
       {/* Top Controls */}
       <div className="absolute top-4 right-4 z-10 flex items-start gap-2 pointer-events-none">
-        {/* More Options - Top Right */}
+        {/* Maximize - Top Right */}
         <button
           onClick={onClose}
           className="flex items-center justify-center w-10 h-10 text-white hover:bg-white/10 rounded-full transition-colors pointer-events-auto"
           aria-label="Close"
         >
-          <MoreHorizontal className="h-6 w-6" />
+          <Maximize2 className="h-6 w-6" />
         </button>
       </div>
 
