@@ -26,6 +26,7 @@ interface FullscreenMediaModalProps {
   displayName?: string;
   content?: string | null;
   postTags?: any[];
+  initialIndex?: number;
 }
 
 const FullscreenMediaModal = ({ 
@@ -38,14 +39,15 @@ const FullscreenMediaModal = ({
   user,
   displayName,
   content,
-  postTags
+  postTags,
+  initialIndex = 0
 }: FullscreenMediaModalProps) => {
   // Convert single media to array format for consistent handling
   const mediaUrls = Array.isArray(mediaUrl) ? mediaUrl : [mediaUrl];
   const mediaTypes = Array.isArray(mediaType) ? mediaType : [mediaType];
   const hasMultipleMedia = mediaUrls.length > 1;
   
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [isMuted, setIsMuted] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -95,6 +97,13 @@ const FullscreenMediaModal = ({
     preventScrollOnSwipe: true,
     delta: 50,
   });
+
+  // Reset current index when modal opens with new initial index
+  useEffect(() => {
+    if (isOpen) {
+      setCurrentIndex(initialIndex);
+    }
+  }, [isOpen, initialIndex]);
 
   // Auto-play video when modal opens or index changes
   useEffect(() => {

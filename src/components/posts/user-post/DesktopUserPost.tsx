@@ -17,7 +17,7 @@ interface DesktopUserPostProps {
   onProfileClick: () => void;
   onDeletePost: () => void;
   onPostUpdated?: () => void;
-  onMediaClick: (mediaUrl: string, mediaType: 'image' | 'video') => void;
+  onMediaClick: (mediaUrl: string, mediaType: 'image' | 'video', currentIndex?: number) => void;
 }
 
 export const DesktopUserPost: React.FC<DesktopUserPostProps> = ({

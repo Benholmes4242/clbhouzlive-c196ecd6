@@ -16,7 +16,7 @@ interface MobileUserPostProps {
   timeAgo: string;
   golfCourse: GolfCourse | null;
   onProfileClick: () => void;
-  onMediaClick: (mediaUrl: string, mediaType: 'image' | 'video') => void;
+  onMediaClick: (mediaUrl: string, mediaType: 'image' | 'video', currentIndex?: number) => void;
   onDeletePost: () => void;
 }
 

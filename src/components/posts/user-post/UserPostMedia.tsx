@@ -8,7 +8,7 @@ interface UserPostMediaProps {
   media: PostMedia[];
   golfCourse: GolfCourse | null;
   shouldAutoplay: boolean;
-  onMediaClick: (mediaUrl: string, mediaType: 'image' | 'video') => void;
+  onMediaClick: (mediaUrl: string, mediaType: 'image' | 'video', currentIndex?: number) => void;
 }
 
 export const UserPostMedia: React.FC<UserPostMediaProps> = ({

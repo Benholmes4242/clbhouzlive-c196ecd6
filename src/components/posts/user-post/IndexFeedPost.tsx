@@ -20,7 +20,7 @@ interface IndexFeedPostProps {
   timeAgo: string;
   golfCourse: GolfCourse | null;
   onProfileClick: () => void;
-  onMediaClick: (mediaUrl: string, mediaType: 'image' | 'video') => void;
+  onMediaClick: (mediaUrl: string, mediaType: 'image' | 'video', currentIndex?: number) => void;
   onDeletePost: () => void;
 }
 
@@ -111,7 +111,7 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
   const handleMaximizeClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     const currentMedia = post.post_media[currentMediaIndex];
-    onMediaClick(currentMedia.media_url, currentMedia.media_type);
+    onMediaClick(currentMedia.media_url, currentMedia.media_type, currentMediaIndex);
   }, [currentMediaIndex, post.post_media, onMediaClick]);
 
   // Memoized values

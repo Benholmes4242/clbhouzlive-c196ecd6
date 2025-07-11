@@ -17,6 +17,9 @@ interface MediaItem {
   displayName?: string;
   content?: string | null;
   postTags?: any[];
+  mediaUrls?: string[];
+  mediaTypes?: ('image' | 'video')[];
+  initialIndex?: number;
 }
 
 export const useFullscreenMedia = () => {
@@ -24,16 +27,33 @@ export const useFullscreenMedia = () => {
   const [currentMedia, setCurrentMedia] = useState<MediaItem | null>(null);
 
   const openMedia = (
-    url: string, 
-    type: 'image' | 'video', 
+    url: string | string[], 
+    type: 'image' | 'video' | ('image' | 'video')[], 
     alt?: string, 
     golfCourse?: { id: string; name: string; country: string; },
     user?: { id: string; profile_photo_url: string | null; },
     displayName?: string,
     content?: string | null,
-    postTags?: any[]
+    postTags?: any[],
+    initialIndex: number = 0
   ) => {
-    setCurrentMedia({ url, type, alt, golfCourse, user, displayName, content, postTags });
+    // Handle both single and multiple media
+    const mediaUrls = Array.isArray(url) ? url : [url];
+    const mediaTypes = Array.isArray(type) ? type : [type];
+    
+    setCurrentMedia({ 
+      url: mediaUrls[initialIndex], 
+      type: mediaTypes[initialIndex], 
+      alt, 
+      golfCourse, 
+      user, 
+      displayName, 
+      content, 
+      postTags,
+      mediaUrls,
+      mediaTypes,
+      initialIndex
+    });
     setIsOpen(true);
   };
 

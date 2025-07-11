@@ -15,7 +15,7 @@ interface MediaContainerProps {
   media: MediaItem[];
   currentIndex: number;
   isHovered: boolean;
-  onMediaClick: (mediaUrl: string, mediaType: 'image' | 'video') => void;
+  onMediaClick: (mediaUrl: string, mediaType: 'image' | 'video', currentIndex?: number) => void;
   onSwipeLeft: () => void;
   onSwipeRight: () => void;
   children?: React.ReactNode;

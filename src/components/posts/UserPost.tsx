@@ -44,22 +44,27 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
     onPostDeleted
   });
 
-  const handleMediaClick = (mediaUrl: string, mediaType: 'image' | 'video') => {
+  const handleMediaClick = (mediaUrl: string, mediaType: 'image' | 'video', currentIndex: number = 0) => {
     // On mobile, always use post viewer for tap-to-expand functionality
     if (isMobile) {
       handlePostClick();
     } else if (source === 'clubhouse' || source === 'profile') {
       handlePostClick();
     } else {
+      // For index feed posts, pass all media items to fullscreen modal
+      const mediaUrls = post.post_media.map(media => media.media_url);
+      const mediaTypes = post.post_media.map(media => media.media_type as 'image' | 'video');
+      
       openMedia(
-        mediaUrl, 
-        mediaType, 
+        mediaUrls, 
+        mediaTypes, 
         undefined, 
         golfCourse ? { id: golfCourse.id, name: golfCourse.name, country: golfCourse.country } : undefined,
         post.user,
         displayName,
         post.content,
-        post.post_tags
+        post.post_tags,
+        currentIndex
       );
     }
   };
@@ -114,14 +119,15 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
       <FullscreenMediaModal
         isOpen={isFullscreenOpen}
         onClose={closeMedia}
-        mediaUrl={currentMedia?.url || ''}
-        mediaType={currentMedia?.type || 'image'}
+        mediaUrl={currentMedia?.mediaUrls || currentMedia?.url || ''}
+        mediaType={currentMedia?.mediaTypes || currentMedia?.type || 'image'}
         alt={currentMedia?.alt}
         golfCourse={currentMedia?.golfCourse}
         user={currentMedia?.user}
         displayName={currentMedia?.displayName}
         content={currentMedia?.content}
         postTags={currentMedia?.postTags}
+        initialIndex={currentMedia?.initialIndex || 0}
       />
     </>
   );
