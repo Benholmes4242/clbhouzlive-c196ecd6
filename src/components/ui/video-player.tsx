@@ -52,8 +52,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const thumbnailId = videoId || `video-${src.split('/').pop()?.split('.')[0] || 'unknown'}`;
   const { thumbnailSrc, thumbnailReady } = useThumbnailGenerator(src, thumbnailId, poster);
   
-  // Use generated thumbnail or fallback to provided poster
-  const effectivePoster = thumbnailReady && thumbnailSrc ? thumbnailSrc : poster;
+  // Use generated thumbnail, provided poster, or default placeholder to prevent black screens
+  const defaultPoster = 'https://images.unsplash.com/photo-1500375592092-40eb2168fd21?w=400&h=400&fit=crop&crop=center';
+  const effectivePoster = (thumbnailReady && thumbnailSrc) ? thumbnailSrc : (poster || defaultPoster);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -259,3 +260,5 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
 };
 
 export default VideoPlayer;
+
+// Note: src/components/ui/video-player.tsx is 258 lines long. Consider refactoring into smaller components.
