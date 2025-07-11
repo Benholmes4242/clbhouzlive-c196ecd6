@@ -39,8 +39,8 @@ export const CaptionOverlay: React.FC<CaptionOverlayProps> = ({
 
   return (
     <div className="absolute bottom-3 left-3 right-20 z-20">
-      {/* Mobile Golf Course Badge - Above Caption */}
-      {isMobile && golfCourse && (
+      {/* Golf Course Badge - Above Caption for both mobile and desktop */}
+      {golfCourse && (
         <div className="mb-2">
           <div className="flex items-center">
             <button
@@ -54,8 +54,8 @@ export const CaptionOverlay: React.FC<CaptionOverlayProps> = ({
               <MapPin className="w-3 h-3 text-white" />
             </button>
             
-            {/* Full course tag that appears on click */}
-            {showFullCourseTag && (
+            {/* Full course tag that appears on click or shows always on desktop */}
+            {(showFullCourseTag || !isMobile) && (
               <div className="bg-white/20 text-white text-xs font-medium px-2 py-1 rounded-full backdrop-blur-sm whitespace-nowrap animate-scale-in">
                 {golfCourse.name}
               </div>

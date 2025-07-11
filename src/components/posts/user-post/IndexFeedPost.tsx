@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { formatDistanceToNow } from 'date-fns';
+import { Maximize2 } from 'lucide-react';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -38,7 +39,7 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
   const isMobile = useIsMobile();
   
   const { ref: containerRef, isInView } = useIntersectionObserver({
-    threshold: 0.3, // Autoplay when 30% of video is visible (within 20-40% range)
+    threshold: 0.45, // Autoplay when 45% of video is visible (within 40-50% range)
     rootMargin: '0px'
   });
 
@@ -65,6 +66,7 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
     if (isMobile) {
       setShowFullCourseTag(!showFullCourseTag);
     }
+    // On desktop, the full tag is always shown, so clicking navigates to course
   };
 
   const handleSwipeLeft = () => {
@@ -78,6 +80,12 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
   const handleInteractionClick = (e: React.MouseEvent, type: string) => {
     e.stopPropagation();
     // Handle interaction logic here (like, comment, share)
+  };
+
+  const handleMaximizeClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const currentMedia = post.post_media[currentMediaIndex];
+    onMediaClick(currentMedia.media_url, currentMedia.media_type);
   };
 
   if (!post.post_media || post.post_media.length === 0) {
@@ -107,7 +115,7 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
         media={post.post_media}
         currentIndex={currentMediaIndex}
         isHovered={isHovered}
-        onMediaClick={onMediaClick}
+        onMediaClick={() => {}} // Disable media click actions
         onSwipeLeft={handleSwipeLeft}
         onSwipeRight={handleSwipeRight}
       >
@@ -117,12 +125,27 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
           onProfileClick={onProfileClick}
         />
 
-        <GolfCourseTagOverlay
-          golfCourse={golfCourse}
-          isMobile={isMobile}
-          showFullTag={showFullCourseTag}
-          onTagClick={handleCourseTagClick}
-        />
+        {/* Desktop Maximize Button */}
+        {!isMobile && (
+          <div className="absolute top-3 right-3 z-20">
+            <button 
+              onClick={handleMaximizeClick}
+              className="w-8 h-8 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/60 transition-all"
+            >
+              <Maximize2 className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+
+        {/* Only show overlay golf course tag on mobile, desktop shows in caption */}
+        {isMobile && (
+          <GolfCourseTagOverlay
+            golfCourse={golfCourse}
+            isMobile={isMobile}
+            showFullTag={showFullCourseTag}
+            onTagClick={handleCourseTagClick}
+          />
+        )}
 
         <CaptionOverlay
           content={post.content}
