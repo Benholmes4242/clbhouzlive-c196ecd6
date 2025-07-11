@@ -238,10 +238,10 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                  bottom: 0
                }}
                {...swipeHandlers}>
-            {/* Close Button - Top Left */}
+            {/* Close Button - Top Right */}
             <button
               onClick={onClose}
-              className="absolute top-4 left-4 z-20 flex items-center justify-center w-10 h-10 text-white hover:bg-white/10 rounded-full transition-colors"
+              className="absolute top-4 right-4 z-30 flex items-center justify-center w-10 h-10 text-white hover:bg-white/10 rounded-full transition-colors"
               aria-label="Close"
             >
               <X className="h-6 w-6" />
