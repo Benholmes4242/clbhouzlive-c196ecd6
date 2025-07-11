@@ -1,6 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Maximize2, Volume2, VolumeX, MapPin, Heart, MessageCircle, Share } from 'lucide-react';
+import { Maximize2, Volume2, VolumeX, MapPin, Heart, MessageCircle, Share, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useSwipeable } from 'react-swipeable';
 import CoursePostBadge from '../posts/CoursePostBadge';
 import { UserInfoOverlay } from '../posts/user-post/overlays/UserInfoOverlay';
 import TaggedText from '../posts/TaggedText';
@@ -10,8 +11,8 @@ import { useIsMobile } from '@/hooks/use-mobile';
 interface FullscreenMediaModalProps {
   isOpen: boolean;
   onClose: () => void;
-  mediaUrl: string;
-  mediaType: 'image' | 'video';
+  mediaUrl: string | string[];
+  mediaType: 'image' | 'video' | ('image' | 'video')[];
   alt?: string;
   golfCourse?: {
     id: string;
@@ -39,20 +40,68 @@ const FullscreenMediaModal = ({
   content,
   postTags
 }: FullscreenMediaModalProps) => {
+  // Convert single media to array format for consistent handling
+  const mediaUrls = Array.isArray(mediaUrl) ? mediaUrl : [mediaUrl];
+  const mediaTypes = Array.isArray(mediaType) ? mediaType : [mediaType];
+  const hasMultipleMedia = mediaUrls.length > 1;
+  
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isMuted, setIsMuted] = useState(true);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const isMobile = useIsMobile();
+
   // Only log when golfCourse is actually provided for debugging
   if (golfCourse) {
     console.log('FullscreenMediaModal - golf course data:', golfCourse);
   }
-  const [isMuted, setIsMuted] = useState(true);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const isMobile = useIsMobile();
 
-  // Auto-play video when modal opens
+  // Navigation functions
+  const goToPrevious = () => {
+    if (isTransitioning || currentIndex <= 0) return;
+    setIsTransitioning(true);
+    setCurrentIndex(prev => prev - 1);
+    setTimeout(() => setIsTransitioning(false), 300);
+  };
+
+  const goToNext = () => {
+    if (isTransitioning || currentIndex >= mediaUrls.length - 1) return;
+    setIsTransitioning(true);
+    setCurrentIndex(prev => prev + 1);
+    setTimeout(() => setIsTransitioning(false), 300);
+  };
+
+  const goToSlide = (index: number) => {
+    if (isTransitioning || index === currentIndex) return;
+    setIsTransitioning(true);
+    setCurrentIndex(index);
+    setTimeout(() => setIsTransitioning(false), 300);
+  };
+
+  // Swipe handlers for mobile
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: () => {
+      if (isMobile && hasMultipleMedia && currentIndex < mediaUrls.length - 1) {
+        goToNext();
+      }
+    },
+    onSwipedRight: () => {
+      if (isMobile && hasMultipleMedia && currentIndex > 0) {
+        goToPrevious();
+      }
+    },
+    trackMouse: false,
+    trackTouch: true,
+    preventScrollOnSwipe: true,
+    delta: 50,
+  });
+
+  // Auto-play video when modal opens or index changes
   useEffect(() => {
-    if (isOpen && mediaType === 'video' && videoRef.current) {
+    if (isOpen && mediaTypes[currentIndex] === 'video' && videoRef.current) {
       videoRef.current.play().catch(console.error);
     }
-  }, [isOpen, mediaType]);
+  }, [isOpen, currentIndex, mediaTypes]);
 
   // Prevent background scrolling when modal is open
   useEffect(() => {
@@ -191,32 +240,72 @@ const FullscreenMediaModal = ({
         />
       )}
 
-      {/* Media Content - Fully centered and sized to fill viewport */}
-      {mediaType === 'image' ? (
+      {/* Media Content with Navigation - Fully centered and sized to fill viewport */}
+      <div className="relative w-full h-full flex items-center justify-center" {...swipeHandlers}>
+        {/* Current Media Item */}
         <div className="relative w-full h-full flex items-center justify-center">
-          <img
-            src={mediaUrl}
-            alt={alt}
-            className="w-full h-full object-cover"
-            draggable={false}
-            style={{ maxWidth: '100vw', maxHeight: '100vh' }}
-          />
+          {mediaTypes[currentIndex] === 'image' ? (
+            <img
+              src={mediaUrls[currentIndex]}
+              alt={alt}
+              className="w-full h-full object-cover"
+              draggable={false}
+              style={{ maxWidth: '100vw', maxHeight: '100vh' }}
+            />
+          ) : (
+            <video
+              ref={videoRef}
+              src={mediaUrls[currentIndex]}
+              className="w-full h-full object-cover"
+              muted={isMuted}
+              controls={false}
+              loop
+              playsInline
+              autoPlay
+              style={{ maxWidth: '100vw', maxHeight: '100vh' }}
+            />
+          )}
         </div>
-      ) : (
-        <div className="relative w-full h-full flex items-center justify-center">
-          <video
-            ref={videoRef}
-            src={mediaUrl}
-            className="w-full h-full object-cover"
-            muted={isMuted}
-            controls={false}
-            loop
-            playsInline
-            autoPlay
-            style={{ maxWidth: '100vw', maxHeight: '100vh' }}
-          />
-        </div>
-      )}
+
+        {/* Desktop Navigation Arrows - Only show if multiple media and not mobile */}
+        {hasMultipleMedia && !isMobile && (
+          <>
+            <button
+              onClick={goToPrevious}
+              disabled={currentIndex === 0 || isTransitioning}
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center w-12 h-12 text-white bg-black/50 hover:bg-black/70 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+            <button
+              onClick={goToNext}
+              disabled={currentIndex === mediaUrls.length - 1 || isTransitioning}
+              className="absolute right-4 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center w-12 h-12 text-white bg-black/50 hover:bg-black/70 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
+          </>
+        )}
+
+        {/* Dots Indicator - Show if multiple media */}
+        {hasMultipleMedia && (
+          <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-30 flex space-x-2">
+            {mediaUrls.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => goToSlide(index)}
+                disabled={isTransitioning}
+                className={`w-2 h-2 rounded-full transition-colors duration-200 ${
+                  index === currentIndex 
+                    ? "bg-white" 
+                    : "bg-white/50 hover:bg-white/70"
+                }`}
+                aria-label={`Go to media ${index + 1}`}
+              />
+            ))}
+          </div>
+        )}
+      </div>
 
       {/* Caption and Golf Course Tag - Bottom Left (matching index feed exactly) */}
       <div className="absolute bottom-5 left-3 right-20 z-20">
@@ -272,7 +361,7 @@ const FullscreenMediaModal = ({
       <div className="absolute bottom-3 right-3 z-20">
         <div className="flex flex-col items-center gap-2.5 text-white text-lg opacity-90">
           {/* Mute toggle button - only show for video posts */}
-          {mediaType === 'video' && (
+          {mediaTypes[currentIndex] === 'video' && (
             <button 
               className="cursor-pointer hover:opacity-100 transition-opacity"
               onClick={handleMuteToggle}
