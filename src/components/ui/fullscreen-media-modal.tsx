@@ -174,20 +174,6 @@ const FullscreenMediaModal = ({
             )}
           </button>
         )}
-
-        {/* Golf Course Badge - Top Right */}
-        {golfCourse && (
-          <div className="pointer-events-auto">
-            <CoursePostBadge 
-              course={{
-                id: golfCourse.id,
-                name: golfCourse.name,
-                country: golfCourse.country
-              }}
-              className="relative top-0 right-0 mr-2"
-            />
-          </div>
-        )}
       </div>
 
       {/* User Info Overlay - Top Left (exact same position as index feed) */}
