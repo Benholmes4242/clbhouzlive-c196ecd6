@@ -229,17 +229,23 @@ const FullscreenMediaModal = ({
         {/* Golf Course Badge - Above Caption (matching CaptionOverlay exactly) */}
         {golfCourse && (
           <div className="mb-2">
-            <div className="flex items-center">
-              <button
-                className="w-6 h-6 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center mr-2 transition-all duration-200"
-              >
-                <MapPin className="w-4 h-4 text-white" />
-              </button>
-              
-              <div className="bg-white/20 text-white text-xs font-medium px-2 py-1 rounded-full backdrop-blur-sm whitespace-nowrap">
+            {isMobile ? (
+              // Mobile: Map pin that expands to show golf club name (for future mobile modal implementation)
+              <div className="flex items-center">
+                <button className="w-6 h-6 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center mr-2 transition-all duration-200">
+                  <MapPin className="w-4 h-4 text-white" />
+                </button>
+                <div className="bg-white/20 text-white text-xs font-medium px-2 py-1 rounded-full backdrop-blur-sm whitespace-nowrap">
+                  {golfCourse.name}
+                </div>
+              </div>
+            ) : (
+              // Desktop: Single pill with map pin and golf club name together
+              <div className="inline-flex items-center bg-white/20 text-white text-xs font-medium px-2 py-1 rounded-full backdrop-blur-sm whitespace-nowrap">
+                <MapPin className="w-4 h-4 text-white mr-1.5" />
                 {golfCourse.name}
               </div>
-            </div>
+            )}
           </div>
         )}
 
