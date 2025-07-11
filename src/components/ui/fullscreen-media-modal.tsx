@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Volume2, VolumeX } from 'lucide-react';
 import CoursePostBadge from '../posts/CoursePostBadge';
+import { UserInfoOverlay } from '../posts/user-post/overlays/UserInfoOverlay';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface FullscreenMediaModalProps {
@@ -15,6 +16,11 @@ interface FullscreenMediaModalProps {
     name: string;
     country: string;
   };
+  user?: {
+    id: string;
+    profile_photo_url: string | null;
+  };
+  displayName?: string;
 }
 
 const FullscreenMediaModal = ({ 
@@ -23,7 +29,9 @@ const FullscreenMediaModal = ({
   mediaUrl, 
   mediaType, 
   alt = "Media content",
-  golfCourse
+  golfCourse,
+  user,
+  displayName
 }: FullscreenMediaModalProps) => {
   // Only log when golfCourse is actually provided for debugging
   if (golfCourse) {
@@ -114,6 +122,17 @@ const FullscreenMediaModal = ({
           )}
         </div>
       </div>
+
+      {/* User Info Overlay - Top Left */}
+      {user && displayName && (
+        <div className="absolute top-16 left-4 z-20">
+          <UserInfoOverlay
+            user={user}
+            displayName={displayName}
+            onProfileClick={() => {}} // Add profile click handler if needed
+          />
+        </div>
+      )}
 
       {/* Media Content - Centered and properly sized */}
       {mediaType === 'image' ? (

@@ -51,7 +51,14 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
     } else if (source === 'clubhouse' || source === 'profile') {
       handlePostClick();
     } else {
-      openMedia(mediaUrl, mediaType, undefined, golfCourse ? { id: golfCourse.id, name: golfCourse.name, country: golfCourse.country } : undefined);
+      openMedia(
+        mediaUrl, 
+        mediaType, 
+        undefined, 
+        golfCourse ? { id: golfCourse.id, name: golfCourse.name, country: golfCourse.country } : undefined,
+        post.user,
+        displayName
+      );
     }
   };
 
@@ -109,6 +116,8 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
         mediaType={currentMedia?.type || 'image'}
         alt={currentMedia?.alt}
         golfCourse={currentMedia?.golfCourse}
+        user={currentMedia?.user}
+        displayName={currentMedia?.displayName}
       />
     </>
   );
