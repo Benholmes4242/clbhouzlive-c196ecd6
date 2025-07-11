@@ -77,27 +77,30 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const videoRef = externalVideoRef || internalVideoRef;
 
   const handleVideoClick = () => {
-    // Only handle clicks if not in feed (let MediaContainer handle feed interactions)
-    if (!isInFeed) {
-      if (onClick) {
-        onClick();
-      } else {
-        togglePlayPause({} as React.MouseEvent);
-      }
+    // Completely disable all video clicks when in feed
+    if (isInFeed) {
+      return; // Do nothing for feed videos
+    }
+    
+    // Only handle clicks if not in feed
+    if (onClick) {
+      onClick();
+    } else {
+      togglePlayPause({} as React.MouseEvent);
     }
   };
 
   return (
     <div 
       className={`relative group ${className}`}
-      onMouseEnter={() => setShowControls(true)}
-      onMouseLeave={() => setShowControls(false)}
+      onMouseEnter={() => !isInFeed && setShowControls(true)}
+      onMouseLeave={() => !isInFeed && setShowControls(false)}
     >
       <video
         ref={videoRef}
         src={src}
         poster={effectivePoster}
-        className="w-full h-full object-cover cursor-pointer"
+        className={`w-full h-full object-cover ${isInFeed ? 'pointer-events-none' : 'cursor-pointer'}`}
         playsInline
         muted={muted}
         loop={loop}
@@ -105,7 +108,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         preload="metadata"
         webkit-playsinline="true"
         x5-playsinline="true"
-        onClick={handleVideoClick}
+        onClick={isInFeed ? undefined : handleVideoClick}
+        onTouchStart={isInFeed ? (e) => e.preventDefault() : undefined}
+        onTouchEnd={isInFeed ? (e) => e.preventDefault() : undefined}
+        onTouchMove={isInFeed ? (e) => e.preventDefault() : undefined}
       />
 
       <VideoIcon show={showVideoIcon} />
