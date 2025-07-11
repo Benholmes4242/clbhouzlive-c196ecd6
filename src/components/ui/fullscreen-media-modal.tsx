@@ -51,26 +51,59 @@ const FullscreenMediaModal = ({
   // Prevent background scrolling when modal is open
   useEffect(() => {
     if (isOpen) {
-      // Disable scrolling on body
+      // Store the current scroll position
+      const scrollY = window.scrollY;
+      
+      // Disable scrolling on body and html
       document.body.style.overflow = 'hidden';
       document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
       document.body.style.width = '100%';
       document.body.style.height = '100%';
-    } else {
-      // Re-enable scrolling
-      document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
-      document.body.style.height = '';
+      document.documentElement.style.overflow = 'hidden';
+      
+      // Prevent scroll events on window
+      const preventScroll = (e: Event) => {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      };
+      
+      const preventTouchMove = (e: TouchEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      };
+      
+      // Add event listeners to prevent scrolling
+      window.addEventListener('scroll', preventScroll, { passive: false });
+      window.addEventListener('wheel', preventScroll, { passive: false });
+      window.addEventListener('touchmove', preventTouchMove, { passive: false });
+      document.addEventListener('scroll', preventScroll, { passive: false });
+      document.addEventListener('wheel', preventScroll, { passive: false });
+      document.addEventListener('touchmove', preventTouchMove, { passive: false });
+      
+      return () => {
+        // Re-enable scrolling and restore position
+        document.body.style.overflow = '';
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        document.body.style.height = '';
+        document.documentElement.style.overflow = '';
+        
+        // Remove event listeners
+        window.removeEventListener('scroll', preventScroll);
+        window.removeEventListener('wheel', preventScroll);
+        window.removeEventListener('touchmove', preventTouchMove);
+        document.removeEventListener('scroll', preventScroll);
+        document.removeEventListener('wheel', preventScroll);
+        document.removeEventListener('touchmove', preventTouchMove);
+        
+        // Restore scroll position
+        window.scrollTo(0, scrollY);
+      };
     }
-
-    // Cleanup function to restore scrolling if component unmounts
-    return () => {
-      document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
-      document.body.style.height = '';
-    };
   }, [isOpen]);
 
   const handleMuteToggle = () => {
@@ -87,11 +120,6 @@ const FullscreenMediaModal = ({
     }
   };
 
-  // Prevent scroll events from propagating to background
-  const handleModalScroll = (e: React.WheelEvent | React.TouchEvent) => {
-    e.stopPropagation();
-  };
-
   // Don't render if not open
   if (!isOpen) return null;
 
@@ -105,11 +133,10 @@ const FullscreenMediaModal = ({
         width: '100vw',
         height: '100vh',
         maxHeight: '100vh',
-        zIndex: 999999
+        zIndex: 999999,
+        touchAction: 'none'
       }}
       onClick={handleBackdropClick}
-      onWheel={handleModalScroll}
-      onTouchMove={handleModalScroll}
     >
       {/* Top Controls */}
       <div className="absolute top-4 right-4 z-10 flex items-start gap-2 pointer-events-none">
