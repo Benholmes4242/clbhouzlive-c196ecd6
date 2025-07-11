@@ -298,13 +298,6 @@ const FullscreenMediaModal = ({
     >
       {/* Top Controls */}
       <div className="absolute top-4 right-4 z-10 flex items-start gap-2 pointer-events-none">
-        {/* Post Navigation Indicator */}
-        {canNavigatePosts && totalPosts > 1 && (
-          <div className="bg-black/40 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full pointer-events-auto">
-            {currentPostIndex + 1} / {totalPosts}
-          </div>
-        )}
-        
         {/* Maximize - Top Right */}
         <button
           onClick={onClose}
@@ -485,14 +478,6 @@ const FullscreenMediaModal = ({
         </div>
       </div>
 
-      {/* Navigation Instructions - Show briefly when multiple posts available */}
-      {canNavigatePosts && totalPosts > 1 && (
-        <div className="absolute bottom-3 left-3 z-20">
-          <div className="bg-black/40 backdrop-blur-sm text-white text-xs px-3 py-2 rounded-lg opacity-70">
-            {isMobile ? 'Swipe up/down for more posts' : 'Scroll up/down for more posts'}
-          </div>
-        </div>
-      )}
     </div>
   );
 };
