@@ -9,6 +9,7 @@ import CoursePostBadge from '../CoursePostBadge';
 import { UserPostData, GolfCourse } from './types';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
+import { GolfCourseTagOverlay } from './overlays/GolfCourseTagOverlay';
 
 interface MobileUserPostProps {
   post: UserPostData;
@@ -31,6 +32,7 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
 }) => {
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
+  const [isLocationExpanded, setIsLocationExpanded] = useState(false);
   const { user } = useSupabaseSession();
   
   const { ref: containerRef, isInView } = useIntersectionObserver({
@@ -163,18 +165,6 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
             </div>
           </div>
 
-          {/* Location Tag */}
-          {golfCourse && (
-            <CoursePostBadge 
-              course={{
-                id: golfCourse.id,
-                name: golfCourse.name,
-                country: golfCourse.country,
-                region: golfCourse.region
-              }}
-              className="text-xs"
-            />
-          )}
         </div>
 
 
@@ -224,6 +214,16 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
       {/* Caption & Comments Area */}
       {post.content && removeGolfCourseFromContent(post.content) && (
         <div className="bg-background p-4 border-b">
+          {/* Golf Course Map Pin */}
+          {golfCourse && (
+            <GolfCourseTagOverlay
+              golfCourse={golfCourse}
+              isMobile={true}
+              showFullTag={isLocationExpanded}
+              onTagClick={() => setIsLocationExpanded(!isLocationExpanded)}
+            />
+          )}
+          
           <div className="text-sm">
             <div className="mb-1">
               <span className="font-semibold cursor-pointer hover:opacity-80" onClick={onProfileClick}>
