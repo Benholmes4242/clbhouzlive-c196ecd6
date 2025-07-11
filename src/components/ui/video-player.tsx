@@ -187,12 +187,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     }
   };
 
-  const handleVideoTouch = (e: React.TouchEvent) => {
-    // For autoplay feed videos, prevent touch from affecting video playback
-    // but don't stop propagation so parent can handle taps for fullscreen
+  const handleVideoTouchStart = (e: React.TouchEvent) => {
+    // For autoplay feed videos, prevent touch from triggering video controls
     if (isInFeed && autoplay) {
+      // Only prevent default to stop video controls, don't stop propagation
+      // This allows parent to handle swipes/scrolls while protecting video playback
       e.preventDefault();
-      // Don't call stopPropagation() here to allow parent MediaContainer to handle taps
     }
   };
 
@@ -214,9 +214,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         webkit-playsinline="true"
         x5-playsinline="true"
         onClick={handleVideoClick}
-        onTouchStart={handleVideoTouch}
-        onTouchEnd={handleVideoTouch}
-        onTouchMove={handleVideoTouch}
+        onTouchStart={handleVideoTouchStart}
       />
 
       {/* Video Icon Overlay */}

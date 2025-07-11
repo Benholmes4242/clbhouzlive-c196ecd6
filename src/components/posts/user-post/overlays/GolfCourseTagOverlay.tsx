@@ -26,6 +26,7 @@ export const GolfCourseTagOverlay: React.FC<GolfCourseTagOverlayProps> = ({
           <button
             onClick={onTagClick}
             className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center transition-all duration-200"
+            style={{ zIndex: 30 }}
           >
             <MapPin className="w-4 h-4 text-white" />
           </button>

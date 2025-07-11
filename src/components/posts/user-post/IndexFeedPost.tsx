@@ -61,6 +61,7 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
   }, [isInView, showFullCourseTag]);
 
   const handleCourseTagClick = (e: React.MouseEvent) => {
+    e.preventDefault();
     e.stopPropagation();
     if (isMobile) {
       setShowFullCourseTag(!showFullCourseTag);
