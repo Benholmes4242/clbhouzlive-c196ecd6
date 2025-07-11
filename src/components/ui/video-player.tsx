@@ -81,8 +81,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     };
 
     const handleLoadedMetadata = () => {
-      // Optimize for immediate autoplay when ready
-      if (autoplay && video.paused) {
+      // Disable autoplay for index feed videos
+      if (autoplay && video.paused && !isInFeed) {
         video.currentTime = 0;
         video.play().catch(error => {
           console.log('Autoplay prevented:', error);
@@ -95,8 +95,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     video.addEventListener('volumechange', handleVolumeChange);
     video.addEventListener('loadedmetadata', handleLoadedMetadata);
 
-    // Immediate autoplay attempt with optimization
-    if (autoplay) {
+    // Disable immediate autoplay for index feed videos
+    if (autoplay && !isInFeed) {
       video.currentTime = 0;
       // Use requestAnimationFrame for smoother autoplay timing
       requestAnimationFrame(() => {
