@@ -27,6 +27,14 @@ interface FullscreenMediaModalProps {
   content?: string | null;
   postTags?: any[];
   initialIndex?: number;
+  // New props for post navigation
+  canNavigatePosts?: boolean;
+  canGoNext?: boolean;
+  canGoPrevious?: boolean;
+  onNextPost?: () => void;
+  onPreviousPost?: () => void;
+  currentPostIndex?: number;
+  totalPosts?: number;
 }
 
 const FullscreenMediaModal = ({ 
@@ -40,7 +48,14 @@ const FullscreenMediaModal = ({
   displayName,
   content,
   postTags,
-  initialIndex = 0
+  initialIndex = 0,
+  canNavigatePosts = false,
+  canGoNext = false,
+  canGoPrevious = false,
+  onNextPost,
+  onPreviousPost,
+  currentPostIndex = 0,
+  totalPosts = 0
 }: FullscreenMediaModalProps) => {
   // Convert single media to array format for consistent handling
   const mediaUrls = Array.isArray(mediaUrl) ? mediaUrl : [mediaUrl];
@@ -80,7 +95,7 @@ const FullscreenMediaModal = ({
     setTimeout(() => setIsTransitioning(false), 300);
   };
 
-  // Swipe handlers for mobile
+  // Swipe handlers for mobile - horizontal for media, vertical for posts
   const swipeHandlers = useSwipeable({
     onSwipedLeft: (eventData) => {
       eventData.event.preventDefault();
@@ -94,6 +109,20 @@ const FullscreenMediaModal = ({
       eventData.event.stopPropagation();
       if (isMobile && hasMultipleMedia && currentIndex > 0) {
         goToPrevious();
+      }
+    },
+    onSwipedDown: (eventData) => {
+      eventData.event.preventDefault();
+      eventData.event.stopPropagation();
+      if (isMobile && canNavigatePosts && canGoNext && onNextPost) {
+        onNextPost();
+      }
+    },
+    onSwipedUp: (eventData) => {
+      eventData.event.preventDefault();
+      eventData.event.stopPropagation();
+      if (isMobile && canNavigatePosts && canGoPrevious && onPreviousPost) {
+        onPreviousPost();
       }
     },
     trackMouse: false,
@@ -237,8 +266,26 @@ const FullscreenMediaModal = ({
         e.stopPropagation();
       }}
       onWheel={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
+        // Handle vertical scroll for post navigation on desktop
+        if (!isMobile && canNavigatePosts) {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          if (e.deltaY > 0) {
+            // Scrolling down - go to next post
+            if (canGoNext && onNextPost) {
+              onNextPost();
+            }
+          } else if (e.deltaY < 0) {
+            // Scrolling up - go to previous post
+            if (canGoPrevious && onPreviousPost) {
+              onPreviousPost();
+            }
+          }
+        } else {
+          e.preventDefault();
+          e.stopPropagation();
+        }
       }}
       onScroll={(e) => {
         e.preventDefault();
@@ -251,6 +298,13 @@ const FullscreenMediaModal = ({
     >
       {/* Top Controls */}
       <div className="absolute top-4 right-4 z-10 flex items-start gap-2 pointer-events-none">
+        {/* Post Navigation Indicator */}
+        {canNavigatePosts && totalPosts > 1 && (
+          <div className="bg-black/40 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full pointer-events-auto">
+            {currentPostIndex + 1} / {totalPosts}
+          </div>
+        )}
+        
         {/* Maximize - Top Right */}
         <button
           onClick={onClose}
@@ -430,6 +484,15 @@ const FullscreenMediaModal = ({
           </button>
         </div>
       </div>
+
+      {/* Navigation Instructions - Show briefly when multiple posts available */}
+      {canNavigatePosts && totalPosts > 1 && (
+        <div className="absolute bottom-3 left-3 z-20">
+          <div className="bg-black/40 backdrop-blur-sm text-white text-xs px-3 py-2 rounded-lg opacity-70">
+            {isMobile ? 'Swipe up/down for more posts' : 'Scroll up/down for more posts'}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

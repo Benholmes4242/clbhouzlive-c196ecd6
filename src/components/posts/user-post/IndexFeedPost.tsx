@@ -13,6 +13,8 @@ import { CaptionOverlay } from './overlays/CaptionOverlay';
 import { InteractionIconsOverlay } from './overlays/InteractionIconsOverlay';
 import { MediaNavigationDots } from './overlays/MediaNavigationDots';
 import { MediaContainer } from './MediaContainer';
+import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
+import { useFullscreenPostNavigation } from '@/hooks/useFullscreenPostNavigation';
 
 interface IndexFeedPostProps {
   post: UserPostData;
@@ -40,6 +42,21 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
   const { pauseVideo, pauseAllAndSetActive } = useVideoPlaybackManager();
   const { isGloballyMuted } = useGlobalAudio();
   const isMobile = useIsMobile();
+  
+  // Use the new fullscreen post navigation hook
+  const {
+    isOpen: isFullscreenOpen,
+    currentMedia,
+    userPosts,
+    currentPostIndex,
+    loading: postsLoading,
+    openMedia: openFullscreenMedia,
+    closeMedia: closeFullscreenMedia,
+    goToNextPost,
+    goToPreviousPost,
+    canGoNext,
+    canGoPrevious
+  } = useFullscreenPostNavigation();
   
   const { ref: containerRef, isInView } = useIntersectionObserver({
     threshold: 0.5, // Optimized threshold
@@ -108,11 +125,27 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
     // Handle interaction logic here (like, comment, share)
   }, []);
 
-  const handleMaximizeClick = useCallback((e: React.MouseEvent) => {
+  const handleMaximizeClick = useCallback(async (e: React.MouseEvent) => {
     e.stopPropagation();
     const currentMedia = post.post_media[currentMediaIndex];
-    onMediaClick(currentMedia.media_url, currentMedia.media_type, currentMediaIndex);
-  }, [currentMediaIndex, post.post_media, onMediaClick]);
+    const mediaUrls = post.post_media.map(m => m.media_url);
+    const mediaTypes = post.post_media.map(m => m.media_type as 'image' | 'video');
+    
+    // Open with post navigation enabled
+    await openFullscreenMedia(
+      mediaUrls,
+      mediaTypes,
+      'Post content',
+      golfCourse || undefined,
+      post.user,
+      displayName,
+      post.content,
+      post.post_tags,
+      currentMediaIndex,
+      post.id, // Pass post ID
+      post.user.id // Pass user ID for fetching other posts
+    );
+  }, [currentMediaIndex, post, golfCourse, displayName, openFullscreenMedia]);
 
   // Memoized values
   const cleanContent = useMemo(() => removeGolfCourseFromContent(post.content), [post.content]);
@@ -187,6 +220,28 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
           currentIndex={currentMediaIndex}
         />
       </MediaContainer>
+
+      {/* Enhanced Fullscreen Modal with Post Navigation */}
+      <FullscreenMediaModal
+        isOpen={isFullscreenOpen}
+        onClose={closeFullscreenMedia}
+        mediaUrl={currentMedia?.mediaUrls || []}
+        mediaType={currentMedia?.mediaTypes || []}
+        alt={currentMedia?.alt}
+        golfCourse={golfCourse || undefined}
+        user={currentMedia?.user}
+        displayName={currentMedia?.displayName}
+        content={currentMedia?.content}
+        postTags={currentMedia?.postTags}
+        initialIndex={currentMedia?.initialIndex || 0}
+        canNavigatePosts={userPosts.length > 1}
+        canGoNext={canGoNext}
+        canGoPrevious={canGoPrevious}
+        onNextPost={goToNextPost}
+        onPreviousPost={goToPreviousPost}
+        currentPostIndex={currentPostIndex}
+        totalPosts={userPosts.length}
+      />
     </div>
   );
 };
