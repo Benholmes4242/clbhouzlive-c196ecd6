@@ -209,11 +209,40 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
             <Share className="h-5 w-5" />
           </Button>
         </div>
+
+        {/* Golf Course Map Pin - positioned above where caption "W" will be */}
+        {golfCourse && (
+          <div className="absolute bottom-16 left-4 z-20">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsLocationExpanded(!isLocationExpanded);
+              }}
+              className="w-8 h-8 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center transition-all duration-200 border border-white/20"
+            >
+              <MapPin className="w-4 h-4 text-white" />
+            </button>
+            {/* Full course tag that appears on click */}
+            {isLocationExpanded && (
+              <div className="absolute bottom-10 left-0 animate-scale-in">
+                <CoursePostBadge 
+                  course={{
+                    id: golfCourse.id,
+                    name: golfCourse.name,
+                    country: golfCourse.country,
+                    region: golfCourse.region
+                  }}
+                  className="bg-black/80 text-white text-sm font-medium px-3 py-1.5 rounded-full whitespace-nowrap backdrop-blur-sm border border-white/20"
+                />
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Caption & Comments Area */}
       {post.content && removeGolfCourseFromContent(post.content) && (
-        <div className="bg-background p-4 border-b">
+        <div className="bg-background p-4">{/* removed border-b to eliminate black line */}
           <div className="text-sm">
             <div className="mb-1">
               <span className="font-semibold cursor-pointer hover:opacity-80" onClick={onProfileClick}>
@@ -223,32 +252,7 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
                 · {timeAgo}
               </span>
             </div>
-            <div className="relative pb-4">
-              {/* Golf Course Map Pin - positioned above first letter */}
-              {golfCourse && (
-                <div className="absolute -top-6 left-0 z-10">
-                  <button
-                    onClick={() => setIsLocationExpanded(!isLocationExpanded)}
-                    className="w-6 h-6 rounded-full bg-primary/80 flex items-center justify-center transition-all duration-200 border border-primary"
-                  >
-                    <MapPin className="w-3 h-3 text-primary-foreground" />
-                  </button>
-                  {/* Full course tag that appears on click */}
-                  {isLocationExpanded && (
-                    <div className="absolute top-7 left-0 animate-scale-in">
-                      <CoursePostBadge 
-                        course={{
-                          id: golfCourse.id,
-                          name: golfCourse.name,
-                          country: golfCourse.country,
-                          region: golfCourse.region
-                        }}
-                        className="bg-secondary text-secondary-foreground text-sm font-medium px-3 py-1.5 rounded-full whitespace-nowrap border"
-                      />
-                    </div>
-                  )}
-                </div>
-              )}
+            <div>
               {removeGolfCourseFromContent(post.content)}
             </div>
           </div>
