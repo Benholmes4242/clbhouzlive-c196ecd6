@@ -125,17 +125,15 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
           onProfileClick={onProfileClick}
         />
 
-        {/* Desktop Maximize Button */}
-        {!isMobile && (
-          <div className="absolute top-3 right-3 z-20">
-            <button 
-              onClick={handleMaximizeClick}
-              className="w-8 h-8 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/60 transition-all"
-            >
-              <Maximize2 className="w-4 h-4" />
-            </button>
-          </div>
-        )}
+        {/* Maximize Button for both Desktop and Mobile */}
+        <div className="absolute top-3 right-3 z-20">
+          <button 
+            onClick={handleMaximizeClick}
+            className="w-8 h-8 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/60 transition-all"
+          >
+            <Maximize2 className="w-4 h-4" />
+          </button>
+        </div>
 
         {/* Only show overlay golf course tag on mobile, desktop shows in caption */}
         {isMobile && (
