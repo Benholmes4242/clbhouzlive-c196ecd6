@@ -8,6 +8,7 @@ interface VideoPlaybackManagerContextType {
   muteAllVideos: () => void;
   setActiveAudioVideo: (videoId: string | null) => void;
   muteAllOtherVideos: (activeVideoId: string) => void;
+  pauseVideo: (videoId: string) => void;
 }
 
 const VideoPlaybackManagerContext = createContext<VideoPlaybackManagerContextType | undefined>(undefined);
@@ -85,6 +86,20 @@ export const VideoPlaybackManagerProvider: React.FC<{ children: React.ReactNode 
     currentAudioVideo.current = videoId;
   }, []);
 
+  const pauseVideo = useCallback((videoId: string) => {
+    const video = videoRegistry.current.get(videoId);
+    if (video && !video.paused) {
+      console.log('⏸️ Pausing video:', videoId);
+      video.pause();
+      video.muted = true;
+      
+      // Clear as active if it was the active audio video
+      if (currentAudioVideo.current === videoId) {
+        currentAudioVideo.current = null;
+      }
+    }
+  }, []);
+
   const muteAllOtherVideos = useCallback((activeVideoId: string) => {
     console.log('🔇 Muting all other videos except:', activeVideoId);
     videoRegistry.current.forEach((video, videoId) => {
@@ -103,7 +118,8 @@ export const VideoPlaybackManagerProvider: React.FC<{ children: React.ReactNode 
       pauseAllOtherVideos,
       muteAllVideos,
       setActiveAudioVideo,
-      muteAllOtherVideos
+      muteAllOtherVideos,
+      pauseVideo
     }}>
       {children}
     </VideoPlaybackManagerContext.Provider>
