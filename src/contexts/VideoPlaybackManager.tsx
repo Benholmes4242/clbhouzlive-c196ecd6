@@ -73,6 +73,15 @@ export const VideoPlaybackManagerProvider: React.FC<{ children: React.ReactNode 
       }
     }
     
+    // If clearing active video (videoId is null), mute the current active video
+    if (videoId === null && currentAudioVideo.current) {
+      const currentActiveVideo = videoRegistry.current.get(currentAudioVideo.current);
+      if (currentActiveVideo) {
+        console.log('🔇 Clearing active audio, muting current video:', currentAudioVideo.current);
+        currentActiveVideo.muted = true;
+      }
+    }
+    
     currentAudioVideo.current = videoId;
   }, []);
 

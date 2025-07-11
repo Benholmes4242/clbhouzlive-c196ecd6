@@ -38,7 +38,7 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
   const [isHovered, setIsHovered] = useState(false);
   const [showFullCourseTag, setShowFullCourseTag] = useState(false);
   const { user } = useSupabaseSession();
-  const { muteAllOtherVideos, muteAllVideos } = useVideoPlaybackManager();
+  const { muteAllOtherVideos, muteAllVideos, setActiveAudioVideo } = useVideoPlaybackManager();
   const { isGloballyMuted } = useGlobalAudio();
   const isMobile = useIsMobile();
   
@@ -63,13 +63,14 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
       console.log('🎬 Setting isHovered to false');
       setIsHovered(false);
       
-      // When video goes out of view, mute all videos to stop audio
+      // When video goes out of view, clear it as active audio video if it was active
+      // This allows new videos to take over audio when they come into view
       if (currentMedia.media_type === 'video') {
-        console.log('🎬 Video out of view, muting all videos');
-        muteAllVideos();
+        console.log('🎬 Video out of view, clearing as active audio video');
+        setActiveAudioVideo(null);
       }
     }
-  }, [isInView, currentMediaIndex, post.post_media, muteAllVideos]);
+  }, [isInView, currentMediaIndex, post.post_media, setActiveAudioVideo]);
 
   // Hide full course tag when scrolling off the post
   useEffect(() => {
