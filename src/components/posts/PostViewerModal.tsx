@@ -228,7 +228,7 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
         // Mobile Layout - Optimized for mobile viewport
         isOpen && (
           <div className="fixed inset-0 w-full bg-black z-50 overflow-hidden" 
-               style={{ height: '100vh', maxHeight: '90vh' }}
+               style={{ height: '100vh' }}
                {...swipeHandlers}>
             {/* Close Button - Top Left */}
             <button
