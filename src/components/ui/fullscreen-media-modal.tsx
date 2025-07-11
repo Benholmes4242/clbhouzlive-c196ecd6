@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, Volume2, VolumeX } from 'lucide-react';
+import { ArrowLeft, Volume2, VolumeX, MapPin } from 'lucide-react';
 import CoursePostBadge from '../posts/CoursePostBadge';
 import { UserInfoOverlay } from '../posts/user-post/overlays/UserInfoOverlay';
 import TaggedText from '../posts/TaggedText';
@@ -224,26 +224,46 @@ const FullscreenMediaModal = ({
         </div>
       )}
 
-      {/* Caption and Golf Course Tag - Bottom Left */}
-      <div className="absolute bottom-4 left-4 z-20 max-w-[70%]">
-        {/* Golf Course Tag Pill */}
+      {/* Caption and Golf Course Tag - Bottom Left (matching index feed exactly) */}
+      <div className="absolute bottom-5 left-3 right-20 z-20">
+        {/* Golf Course Badge - Above Caption (matching CaptionOverlay exactly) */}
         {golfCourse && (
           <div className="mb-2">
-            <div className="inline-flex items-center px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm border border-white/30">
-              <span className="text-white text-sm font-medium">
-                📍 {golfCourse.name}
-              </span>
+            <div className="flex items-center">
+              <button
+                className="w-6 h-6 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center mr-2 transition-all duration-200"
+              >
+                <MapPin className="w-3 h-3 text-white" />
+              </button>
+              
+              <div className="bg-white/20 text-white text-xs font-medium px-2 py-1 rounded-full backdrop-blur-sm whitespace-nowrap">
+                {golfCourse.name}
+              </div>
             </div>
           </div>
         )}
-        
-        {/* Post Caption */}
+
+        {/* Caption Text (matching CaptionOverlay exactly) */}
         {content && removeGolfCourseFromContent(content) && (
-          <div className="text-white text-sm leading-relaxed">
-            <TaggedText 
-              text={removeGolfCourseFromContent(content)} 
-              tags={postTags || []} 
-            />
+          <div 
+            className="text-white text-base font-bold leading-[1.4]"
+            style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
+          >
+            <div className="whitespace-nowrap overflow-hidden text-ellipsis">
+              <span className="text-base font-bold">
+                {removeGolfCourseFromContent(content)}
+              </span>
+              {postTags && postTags.length > 0 && (
+                <span>
+                  {' '}
+                  {postTags.map((tag) => (
+                    <span key={tag.id} className="text-blue-400 font-medium">
+                      @{tag.name}{' '}
+                    </span>
+                  ))}
+                </span>
+              )}
+            </div>
           </div>
         )}
       </div>
