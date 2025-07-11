@@ -15,6 +15,7 @@ import CoursePostBadge from './CoursePostBadge';
 import CommentsDrawer from './CommentsDrawer';
 import EnhancedCreateMomentModal from '../post/EnhancedCreateMomentModal';
 import TaggedText from './TaggedText';
+import { UserInfoOverlay } from './user-post/overlays/UserInfoOverlay';
 import { formatDistanceToNow } from 'date-fns';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 
@@ -247,7 +248,7 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
             </button>
 
             {/* Media Content - Centered Full Screen */}
-            <div className="w-full h-full flex items-center justify-center">
+            <div className="w-full h-full flex items-center justify-center relative">
               {currentMedia && (
                 <>
                   {currentMedia.media_type === 'video' ? (
@@ -268,6 +269,13 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                   )}
                 </>
               )}
+              
+              {/* User Info Overlay - Top Left */}
+              <UserInfoOverlay
+                user={currentPost.user}
+                displayName={displayName}
+                onProfileClick={() => {}} // Add profile click handler if needed
+              />
             </div>
 
             {/* Golf Course Badge - Top Right */}
@@ -295,35 +303,17 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
               </div>
             )}
 
-            {/* User Info & Caption - Bottom Left */}
-            <div className="absolute bottom-4 left-4 z-10 max-w-[60%]">
-              <div className="flex items-center space-x-3 mb-2">
-                <HighQualityImage
-                  src={currentPost.user.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
-                  alt={displayName}
-                  className="w-8 h-8 rounded-full border border-white/50"
-                  width={32}
-                  height={32}
-                />
-                <div>
-                  <div className="text-white font-semibold text-sm">
-                    {displayName}
-                  </div>
-                  <div className="text-white/70 text-xs">
-                    {timeAgo}
-                  </div>
-                </div>
-              </div>
-              
-              {currentPost.content && removeGolfCourseFromContent(currentPost.content) && (
+            {/* Caption - Bottom Left */}
+            {currentPost.content && removeGolfCourseFromContent(currentPost.content) && (
+              <div className="absolute bottom-4 left-4 z-10 max-w-[60%]">
                 <div className="text-white text-sm leading-relaxed bg-black/30 p-2 rounded max-w-full">
                   <TaggedText 
                     text={removeGolfCourseFromContent(currentPost.content)} 
                     tags={currentPost.post_tags?.map(tag => tag.tagged_entity || tag) || []} 
                   />
                 </div>
-              )}
-            </div>
+              </div>
+            )}
 
             {/* Action Buttons - Right Side */}
             <div className="absolute right-4 bottom-20 z-10 flex flex-col space-y-4">
@@ -443,6 +433,13 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                         className="w-full h-full object-contain"
                       />
                     )}
+
+                    {/* User Info Overlay - Top Left */}
+                    <UserInfoOverlay
+                      user={currentPost.user}
+                      displayName={displayName}
+                      onProfileClick={() => {}} // Add profile click handler if needed
+                    />
 
                     {/* Golf Course Badge */}
                     {golfCourse && (
