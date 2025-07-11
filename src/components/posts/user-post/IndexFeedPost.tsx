@@ -157,6 +157,7 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
 
         <InteractionIconsOverlay
           onInteractionClick={handleInteractionClick}
+          currentMediaType={post.post_media[currentMediaIndex]?.media_type}
         />
 
         <MediaNavigationDots

@@ -1,16 +1,41 @@
 import React from 'react';
-import { Heart, MessageCircle, Share } from 'lucide-react';
+import { Heart, MessageCircle, Share, VolumeX, Volume2 } from 'lucide-react';
+import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 
 interface InteractionIconsOverlayProps {
   onInteractionClick: (e: React.MouseEvent, type: string) => void;
+  currentMediaType?: 'image' | 'video';
 }
 
 export const InteractionIconsOverlay: React.FC<InteractionIconsOverlayProps> = ({
-  onInteractionClick
+  onInteractionClick,
+  currentMediaType = 'image'
 }) => {
+  const { isGloballyMuted, toggleGlobalMute } = useGlobalAudio();
+
+  const handleMuteToggle = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    toggleGlobalMute();
+  };
+
   return (
     <div className="absolute bottom-3 right-3 z-20">
       <div className="flex flex-col items-center gap-2.5 text-white text-lg opacity-90">
+        {/* Mute toggle button - only show for video posts */}
+        {currentMediaType === 'video' && (
+          <button 
+            className="cursor-pointer hover:opacity-100 transition-opacity"
+            onClick={handleMuteToggle}
+            title={isGloballyMuted ? "Unmute all videos" : "Mute all videos"}
+          >
+            {isGloballyMuted ? (
+              <VolumeX className="w-5 h-5" />
+            ) : (
+              <Volume2 className="w-5 h-5" />
+            )}
+          </button>
+        )}
+        
         <button 
           className="cursor-pointer hover:opacity-100 transition-opacity"
           onClick={(e) => onInteractionClick(e, 'like')}
