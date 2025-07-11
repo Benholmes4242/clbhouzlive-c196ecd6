@@ -38,7 +38,7 @@ export const CaptionOverlay: React.FC<CaptionOverlayProps> = ({
   if (!truncatedContent) return null;
 
   return (
-    <div className="absolute bottom-10 left-3 right-20 z-20">
+    <div className="absolute bottom-3 left-3 right-20 z-20">
       {/* Golf Course Badge - Above Caption for both mobile and desktop */}
       {golfCourse && (
         <div className="mb-2">
