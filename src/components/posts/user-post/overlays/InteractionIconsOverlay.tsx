@@ -1,6 +1,7 @@
 import React from 'react';
 import { Heart, MessageCircle, Share, VolumeX, Volume2 } from 'lucide-react';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
+import { useVideoPlaybackManager } from '@/contexts/VideoPlaybackManager';
 
 interface InteractionIconsOverlayProps {
   onInteractionClick: (e: React.MouseEvent, type: string) => void;
@@ -12,10 +13,15 @@ export const InteractionIconsOverlay: React.FC<InteractionIconsOverlayProps> = (
   currentMediaType = 'image'
 }) => {
   const { isGloballyMuted, toggleGlobalMute } = useGlobalAudio();
+  const { muteAllVideos } = useVideoPlaybackManager();
 
   const handleMuteToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
     toggleGlobalMute();
+    // When globally muting, ensure all videos are immediately muted
+    if (!isGloballyMuted) {
+      muteAllVideos();
+    }
   };
 
   return (

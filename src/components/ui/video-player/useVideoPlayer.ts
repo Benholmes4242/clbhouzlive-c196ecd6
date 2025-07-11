@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
+import { useVideoPlaybackManager } from '@/contexts/VideoPlaybackManager';
 
 interface UseVideoPlayerProps {
   src: string;
@@ -28,10 +29,17 @@ export const useVideoPlayer = ({
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(muted);
   const [showControls, setShowControls] = useState(false);
+  const { registerVideo, unregisterVideo, setActiveAudioVideo, muteAllOtherVideos } = useVideoPlaybackManager();
+  
+  // Generate unique video ID for this player instance
+  const videoId = useRef(`video-${src.split('/').pop()?.split('.')[0] || 'unknown'}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`);
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
+
+    // Register this video with the playback manager
+    registerVideo(videoId.current, video);
 
     // Set initial properties for optimized loading
     video.muted = isInFeed ? isGloballyMuted : muted;
@@ -43,11 +51,23 @@ export const useVideoPlayer = ({
     const handlePlay = () => {
       setIsPlaying(true);
       onPlay?.();
+      
+      // For feed videos, ensure this becomes the only video with audio
+      if (isInFeed && !isGloballyMuted) {
+        console.log('🎬 Video started playing in feed, ensuring audio exclusivity');
+        muteAllOtherVideos(videoId.current);
+        setActiveAudioVideo(videoId.current);
+      }
     };
 
     const handlePause = () => {
       setIsPlaying(false);
       onPause?.();
+      
+      // When video pauses, clear it as the active audio video
+      if (isInFeed) {
+        setActiveAudioVideo(null);
+      }
     };
 
     const handleVolumeChange = () => {
@@ -85,8 +105,11 @@ export const useVideoPlayer = ({
       video.removeEventListener('pause', handlePause);
       video.removeEventListener('volumechange', handleVolumeChange);
       video.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      
+      // Unregister this video when component unmounts
+      unregisterVideo(videoId.current);
     };
-  }, [autoplay, muted, loop, onPlay, onPause, isGloballyMuted, isInFeed]);
+  }, [autoplay, muted, loop, onPlay, onPause, isGloballyMuted, isInFeed, registerVideo, unregisterVideo, muteAllOtherVideos, setActiveAudioVideo]);
 
   // Update video mute state when global mute state changes (for feed videos)
   useEffect(() => {
@@ -95,7 +118,12 @@ export const useVideoPlayer = ({
     
     video.muted = isGloballyMuted;
     setIsMuted(isGloballyMuted);
-  }, [isGloballyMuted, isInFeed]);
+    
+    // If globally muted, clear this as active audio video
+    if (isGloballyMuted) {
+      setActiveAudioVideo(null);
+    }
+  }, [isGloballyMuted, isInFeed, setActiveAudioVideo]);
 
   const togglePlayPause = (e?: React.MouseEvent | Event) => {
     console.log('🎯 togglePlayPause called:', { isInFeed, paused: videoRef.current?.paused });
@@ -132,6 +160,14 @@ export const useVideoPlayer = ({
     // Update global mute state if this is a feed video
     if (isInFeed) {
       setGlobalMute(newMutedState);
+      
+      // If unmuting this video in feed, make it the active audio video
+      if (!newMutedState) {
+        muteAllOtherVideos(videoId.current);
+        setActiveAudioVideo(videoId.current);
+      } else {
+        setActiveAudioVideo(null);
+      }
     }
   };
 

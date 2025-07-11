@@ -6,12 +6,15 @@ interface VideoPlaybackManagerContextType {
   playVideo: (videoId: string, shouldUnmute?: boolean) => void;
   pauseAllOtherVideos: (activeVideoId: string) => void;
   muteAllVideos: () => void;
+  setActiveAudioVideo: (videoId: string | null) => void;
+  muteAllOtherVideos: (activeVideoId: string) => void;
 }
 
 const VideoPlaybackManagerContext = createContext<VideoPlaybackManagerContextType | undefined>(undefined);
 
 export const VideoPlaybackManagerProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const videoRegistry = useRef<Map<string, HTMLVideoElement>>(new Map());
+  const currentAudioVideo = useRef<string | null>(null);
 
   const registerVideo = useCallback((videoId: string, videoElement: HTMLVideoElement) => {
     videoRegistry.current.set(videoId, videoElement);
@@ -55,6 +58,32 @@ export const VideoPlaybackManagerProvider: React.FC<{ children: React.ReactNode 
     videoRegistry.current.forEach((video) => {
       video.muted = true;
     });
+    currentAudioVideo.current = null;
+  }, []);
+
+  const setActiveAudioVideo = useCallback((videoId: string | null) => {
+    console.log('🔊 Setting active audio video:', videoId, 'previous:', currentAudioVideo.current);
+    
+    // If there was a previous active audio video, mute it
+    if (currentAudioVideo.current && currentAudioVideo.current !== videoId) {
+      const previousVideo = videoRegistry.current.get(currentAudioVideo.current);
+      if (previousVideo) {
+        console.log('🔇 Muting previous video:', currentAudioVideo.current);
+        previousVideo.muted = true;
+      }
+    }
+    
+    currentAudioVideo.current = videoId;
+  }, []);
+
+  const muteAllOtherVideos = useCallback((activeVideoId: string) => {
+    console.log('🔇 Muting all other videos except:', activeVideoId);
+    videoRegistry.current.forEach((video, videoId) => {
+      if (videoId !== activeVideoId) {
+        video.muted = true;
+      }
+    });
+    currentAudioVideo.current = activeVideoId;
   }, []);
 
   return (
@@ -63,7 +92,9 @@ export const VideoPlaybackManagerProvider: React.FC<{ children: React.ReactNode 
       unregisterVideo,
       playVideo,
       pauseAllOtherVideos,
-      muteAllVideos
+      muteAllVideos,
+      setActiveAudioVideo,
+      muteAllOtherVideos
     }}>
       {children}
     </VideoPlaybackManagerContext.Provider>

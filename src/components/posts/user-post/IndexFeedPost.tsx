@@ -4,6 +4,7 @@ import { Maximize2 } from 'lucide-react';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useVideoPlaybackManager } from '@/contexts/VideoPlaybackManager';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { UserPostData, GolfCourse } from './types';
 import { UserInfoOverlay } from './overlays/UserInfoOverlay';
@@ -36,6 +37,7 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
   const [isHovered, setIsHovered] = useState(false);
   const [showFullCourseTag, setShowFullCourseTag] = useState(false);
   const { user } = useSupabaseSession();
+  const { muteAllOtherVideos } = useVideoPlaybackManager();
   const isMobile = useIsMobile();
   
   const { ref: containerRef, isInView } = useIntersectionObserver({
@@ -51,6 +53,9 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
     if (isInView && post.post_media?.[currentMediaIndex]?.media_type === 'video') {
       console.log('🎬 Setting isHovered to true for video autoplay');
       setIsHovered(true);
+      
+      // When this video starts playing, ensure audio exclusivity
+      // The VideoPlayer will handle the audio management through useVideoPlayer hook
     } else {
       console.log('🎬 Setting isHovered to false');
       setIsHovered(false);
