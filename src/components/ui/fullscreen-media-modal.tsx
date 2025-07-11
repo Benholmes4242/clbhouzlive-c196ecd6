@@ -288,14 +288,28 @@ const FullscreenMediaModal = ({
         overscrollBehavior: 'none'
       }}
       onClick={handleBackdropClick}
-      onTouchStart={(e) => e.stopPropagation()}
-      onTouchMove={(e) => {
-        // Only allow swipe gestures, prevent all other touch movement
+      onTouchStart={(e) => {
+        e.preventDefault();
         e.stopPropagation();
       }}
-      onTouchEnd={(e) => e.stopPropagation()}
+      onTouchMove={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }}
+      onTouchEnd={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }}
       onWheel={(e) => {
         e.preventDefault();
+        e.stopPropagation();
+      }}
+      onScroll={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }}
+      onMouseMove={(e) => {
+        // Capture all mouse events to prevent background interactions
         e.stopPropagation();
       }}
     >
