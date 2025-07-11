@@ -82,12 +82,16 @@ const FullscreenMediaModal = ({
 
   // Swipe handlers for mobile
   const swipeHandlers = useSwipeable({
-    onSwipedLeft: () => {
+    onSwipedLeft: (eventData) => {
+      eventData.event.preventDefault();
+      eventData.event.stopPropagation();
       if (isMobile && hasMultipleMedia && currentIndex < mediaUrls.length - 1) {
         goToNext();
       }
     },
-    onSwipedRight: () => {
+    onSwipedRight: (eventData) => {
+      eventData.event.preventDefault();
+      eventData.event.stopPropagation();
       if (isMobile && hasMultipleMedia && currentIndex > 0) {
         goToPrevious();
       }
@@ -96,6 +100,7 @@ const FullscreenMediaModal = ({
     trackTouch: true,
     preventScrollOnSwipe: true,
     delta: 50,
+    touchEventOptions: { passive: false }
   });
 
   // Reset current index when modal opens with new initial index
@@ -273,9 +278,20 @@ const FullscreenMediaModal = ({
         zIndex: 999999,
         touchAction: 'none',
         margin: 0,
-        padding: 0
+        padding: 0,
+        overscrollBehavior: 'none'
       }}
       onClick={handleBackdropClick}
+      onTouchStart={(e) => e.stopPropagation()}
+      onTouchMove={(e) => {
+        // Only allow swipe gestures, prevent all other touch movement
+        e.stopPropagation();
+      }}
+      onTouchEnd={(e) => e.stopPropagation()}
+      onWheel={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }}
     >
       {/* Top Controls */}
       <div className="absolute top-4 right-4 z-10 flex items-start gap-2 pointer-events-none">
@@ -299,7 +315,13 @@ const FullscreenMediaModal = ({
       )}
 
       {/* Media Content with Navigation - Fully centered and sized to fill viewport */}
-      <div className="relative w-full h-full flex items-center justify-center" {...swipeHandlers}>
+      <div 
+        className="relative w-full h-full flex items-center justify-center" 
+        {...swipeHandlers}
+        style={{ touchAction: 'pan-x' }}
+        onTouchStart={(e) => e.stopPropagation()}
+        onTouchEnd={(e) => e.stopPropagation()}
+      >
         {/* Current Media Item */}
         <div className="relative w-full h-full flex items-center justify-center">
           {mediaTypes[currentIndex] === 'image' ? (
