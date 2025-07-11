@@ -24,7 +24,11 @@ export const GolfCourseTagOverlay: React.FC<GolfCourseTagOverlayProps> = ({
       {isMobile ? (
         <div className="relative">
           <button
-            onClick={onTagClick}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onTagClick(e);
+            }}
             className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center transition-all duration-200"
           >
             <MapPin className="w-4 h-4 text-white" />
