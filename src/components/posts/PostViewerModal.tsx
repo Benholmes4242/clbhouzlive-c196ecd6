@@ -238,13 +238,13 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                  bottom: 0
                }}
                {...swipeHandlers}>
-            {/* Close Button - Top Right */}
+            {/* Close Button - Top Left */}
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 z-30 flex items-center justify-center w-10 h-10 text-white hover:bg-white/10 rounded-full transition-colors"
+              className="absolute top-4 left-4 z-30 flex items-center justify-center w-10 h-10 text-white hover:bg-white/10 rounded-full transition-colors"
               aria-label="Close"
             >
-              <X className="h-6 w-6" />
+              <ArrowLeft className="h-6 w-6" />
             </button>
 
             {/* Media Content - Centered Full Screen */}
@@ -271,11 +271,13 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
               )}
               
               {/* User Info Overlay - Top Left */}
-              <UserInfoOverlay
-                user={currentPost.user}
-                displayName={displayName}
-                onProfileClick={() => {}} // Add profile click handler if needed
-              />
+              <div className="absolute top-12 left-4 z-25">
+                <UserInfoOverlay
+                  user={currentPost.user}
+                  displayName={displayName}
+                  onProfileClick={() => {}} // Add profile click handler if needed
+                />
+              </div>
             </div>
 
             {/* Golf Course Badge - Top Right */}
