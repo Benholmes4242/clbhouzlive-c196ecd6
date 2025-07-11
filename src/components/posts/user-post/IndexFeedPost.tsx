@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { formatDistanceToNow } from 'date-fns';
+import React, { useState, useEffect, memo, useMemo, useCallback } from 'react';
 import { Maximize2 } from 'lucide-react';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -25,7 +24,7 @@ interface IndexFeedPostProps {
   onDeletePost: () => void;
 }
 
-export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
+const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
   post,
   displayName,
   timeAgo,
@@ -43,8 +42,8 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
   const isMobile = useIsMobile();
   
   const { ref: containerRef, isInView } = useIntersectionObserver({
-    threshold: 0.6, // Only trigger when 60% of video is visible - more restrictive
-    rootMargin: '-10px' // Add some margin to be more selective
+    threshold: 0.5, // Optimized threshold
+    rootMargin: '0px 0px -20% 0px' // Only trigger when entering from bottom, more selective
   });
 
   // Check if this is the user's own post
@@ -88,48 +87,47 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
     }
   }, [isInView, showFullCourseTag]);
 
-  const handleCourseTagClick = (e: React.MouseEvent) => {
+  // Memoized handlers for better performance
+  const handleCourseTagClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     if (isMobile) {
       setShowFullCourseTag(!showFullCourseTag);
     }
-    // On desktop, the full tag is always shown, so clicking navigates to course
-  };
+  }, [isMobile, showFullCourseTag]);
 
-  const handleSwipeLeft = () => {
+  const handleSwipeLeft = useCallback(() => {
     setCurrentMediaIndex(prev => prev < post.post_media.length - 1 ? prev + 1 : 0);
-  };
+  }, [post.post_media.length]);
 
-  const handleSwipeRight = () => {
+  const handleSwipeRight = useCallback(() => {
     setCurrentMediaIndex(prev => prev > 0 ? prev - 1 : post.post_media.length - 1);
-  };
+  }, [post.post_media.length]);
 
-  const handleInteractionClick = (e: React.MouseEvent, type: string) => {
+  const handleInteractionClick = useCallback((e: React.MouseEvent, type: string) => {
     e.stopPropagation();
     // Handle interaction logic here (like, comment, share)
-  };
+  }, []);
 
-  const handleMaximizeClick = (e: React.MouseEvent) => {
+  const handleMaximizeClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     const currentMedia = post.post_media[currentMediaIndex];
     onMediaClick(currentMedia.media_url, currentMedia.media_type);
-  };
+  }, [currentMediaIndex, post.post_media, onMediaClick]);
 
+  // Memoized values
+  const cleanContent = useMemo(() => removeGolfCourseFromContent(post.content), [post.content]);
+  
+  const truncatedContent = useMemo(() => {
+    if (!cleanContent) return '';
+    const words = cleanContent.split(' ');
+    if (words.length <= 9) return cleanContent;
+    return words.slice(0, 9).join(' ') + '...';
+  }, [cleanContent]);
+
+  // Early return for performance
   if (!post.post_media || post.post_media.length === 0) {
-    return null; // No media posts don't get special treatment in index feed
+    return null;
   }
-
-  const cleanContent = removeGolfCourseFromContent(post.content);
-  
-  // Truncate content to around 9 words
-  const truncateToWords = (text: string, wordLimit: number = 9) => {
-    if (!text) return '';
-    const words = text.split(' ');
-    if (words.length <= wordLimit) return text;
-    return words.slice(0, wordLimit).join(' ') + '...';
-  };
-  
-  const truncatedContent = truncateToWords(cleanContent);
   
   return (
     <div 
@@ -192,3 +190,6 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
     </div>
   );
 };
+
+// Memoized export for performance
+export const IndexFeedPost = memo(IndexFeedPostComponent);

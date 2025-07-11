@@ -20,30 +20,29 @@ const TrendingFeed = () => {
   const { optimisticPosts } = useOptimisticPosts();
   const { videos: externalVideos, loading: externalVideosLoading } = useExternalVideos();
 
-  // Get posts from followed users and friends with reduced data
+  // Get posts from followed users and friends with optimized query
   const { data: followedUsersPosts = [], isLoading: followedPostsLoading, refetch: refetchFollowedPosts } = useQuery({
     queryKey: ['followedUsersPosts', user?.id],
     queryFn: async () => {
       if (!user?.id) return [];
 
-      // Get users that current user follows (limit to reduce query complexity)
-      const { data: follows } = await supabase
-        .from('user_follows')
-        .select('following_id')
-        .eq('follower_id', user.id)
-        .limit(10); // Reduced for performance
+      // Get connected user IDs efficiently
+      const [followsResponse, friendsResponse] = await Promise.all([
+        supabase
+          .from('user_follows')
+          .select('following_id')
+          .eq('follower_id', user.id)
+          .limit(5), // Reduced for performance
+        supabase
+          .from('user_friends')
+          .select('user_id, friend_id')
+          .or(`user_id.eq.${user.id},friend_id.eq.${user.id}`)
+          .eq('status', 'accepted')
+          .limit(5) // Reduced for performance
+      ]);
 
-      // Get users that are friends (accepted status, limit for performance)
-      const { data: friends } = await supabase
-        .from('user_friends')
-        .select('user_id, friend_id')
-        .or(`user_id.eq.${user.id},friend_id.eq.${user.id}`)
-        .eq('status', 'accepted')
-        .limit(10); // Reduced for performance
-
-      // Combine followed users and friends
-      const followedUserIds = follows?.map(f => f.following_id) || [];
-      const friendUserIds = friends?.map(f => 
+      const followedUserIds = followsResponse.data?.map(f => f.following_id) || [];
+      const friendUserIds = friendsResponse.data?.map(f => 
         f.user_id === user.id ? f.friend_id : f.user_id
       ) || [];
       
@@ -51,7 +50,7 @@ const TrendingFeed = () => {
 
       if (allConnectedUserIds.length === 0) return [];
 
-      // Get posts from these users (reduced limit for faster loading)
+      // Single optimized query with all required data
       const { data: posts, error: postsError } = await supabase
         .from('posts')
         .select(`
@@ -62,16 +61,16 @@ const TrendingFeed = () => {
         `)
         .in('user_id', allConnectedUserIds)
         .order('created_at', { ascending: false })
-        .limit(5); // Reduced for faster mobile loading
+        .limit(3); // Reduced limit for performance
 
       if (postsError) {
         console.error('Error fetching followed posts:', postsError);
         return [];
       }
 
-      if (!posts) return [];
+      if (!posts || posts.length === 0) return [];
 
-      // Get user profiles and media in parallel for faster loading
+      // Get profiles and media in parallel
       const [profilesResponse, mediaResponse] = await Promise.all([
         supabase
           .from('user_profiles')
@@ -83,23 +82,13 @@ const TrendingFeed = () => {
           .in('post_id', posts.map(p => p.id))
       ]);
 
-      const profiles = profilesResponse.data;
-      const postMedia = mediaResponse.data;
+      const profiles = profilesResponse.data || [];
+      const postMedia = mediaResponse.data || [];
 
-      // Tags feature temporarily disabled due to missing database tables
-      let postTags = [];
-
-      // Format posts with related data
-      const formattedPosts = posts.map(post => {
-        const userProfile = profiles?.find(profile => profile.id === post.user_id);
-        const media = postMedia?.filter(m => m.post_id === post.id) || [];
-        const tags = postTags?.filter(t => t.post_id === post.id).map((tag: any) => ({
-          id: tag.taggable_entities?.id || tag.tagged_entity_id,
-          entity_type: tag.taggable_entities?.entity_type || 'user',
-          entity_id: tag.taggable_entities?.entity_id || tag.tagged_entity_id,
-          name: tag.taggable_entities?.name || 'Unknown',
-          username: tag.taggable_entities?.username || null
-        })) || [];
+      // Format posts efficiently
+      return posts.map(post => {
+        const userProfile = profiles.find(profile => profile.id === post.user_id);
+        const media = postMedia.filter(m => m.post_id === post.id);
 
         return {
           id: post.id,
@@ -116,16 +105,14 @@ const TrendingFeed = () => {
             media_type: m.media_type as 'image' | 'video',
             media_url: m.media_url
           })),
-          post_tags: tags
+          post_tags: [] // Disabled for performance
         };
       });
-
-      return formattedPosts;
     },
     enabled: !!user?.id,
-    staleTime: 600000, // Consider data fresh for 10 minutes
-    refetchInterval: false, // Disable auto-refetch for performance
-    gcTime: 300000, // Cache for 5 minutes after component unmount
+    staleTime: 300000, // 5 minutes cache
+    refetchInterval: false,
+    gcTime: 300000,
   });
 
   // Listen for feed refresh events
@@ -160,20 +147,19 @@ const TrendingFeed = () => {
     };
   }, [refetchUserPosts, refetchFollowedPosts]);
 
-  if (userPostsLoading || externalVideosLoading || followedPostsLoading) {
+  // Show skeleton loading only for initial load
+  if ((userPostsLoading || followedPostsLoading) && userPosts.length === 0 && followedUsersPosts.length === 0) {
     return <LoadingSkeleton />;
   }
 
-  // Filter out example friend videos
-  const realFriendVideos = externalVideos.filter(video => 
+  // Filter out example friend videos with early return for performance
+  const realFriendVideos = externalVideos.length > 0 ? externalVideos.filter(video => 
     video.type === 'friend' &&
-    video.user.username !== '@mikej_golf' && 
-    video.user.username !== '@sarahgolf' &&
-    !video.user.name.includes('Mike Johnson') &&
-    !video.user.name.includes('Sarah Chen') &&
-    !video.content.description.includes('Hole in one at my local course') &&
-    !video.content.description.includes('Working on my swing at the driving range')
-  );
+    !video.user.username?.includes('mikej_golf') && 
+    !video.user.username?.includes('sarahgolf') &&
+    !video.user.name?.includes('Mike Johnson') &&
+    !video.user.name?.includes('Sarah Chen')
+  ) : [];
 
   // Convert posts to the correct type and include ALL user posts (including current user's)
   const allUserPosts: UserPostWithType[] = [

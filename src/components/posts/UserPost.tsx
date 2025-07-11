@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import PostViewerModal from './PostViewerModal';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
@@ -114,4 +114,4 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
   );
 };
 
-export default UserPost;
+export default memo(UserPost);
