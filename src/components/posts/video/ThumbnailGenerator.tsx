@@ -4,9 +4,8 @@ import { thumbnailCache, thumbnailPromises, generateVideoThumbnail } from './thu
 import { ThumbnailState } from './types';
 
 export const useThumbnailGenerator = (src: string, videoId: string, poster?: string): ThumbnailState => {
-  // Start with poster or default placeholder for immediate display
-  const defaultPoster = 'https://images.unsplash.com/photo-1500375592092-40eb2168fd21?w=400&h=400&fit=crop&crop=center';
-  const [thumbnailSrc, setThumbnailSrc] = useState<string>(poster || defaultPoster);
+  // Start with poster if available, or no placeholder (will generate thumbnail immediately)
+  const [thumbnailSrc, setThumbnailSrc] = useState<string>(poster || '');
   const [thumbnailReady, setThumbnailReady] = useState(!!poster); // Ready if we have a poster
   const [thumbnailError, setThumbnailError] = useState(false);
 
