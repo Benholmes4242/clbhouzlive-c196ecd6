@@ -233,7 +233,7 @@ const FullscreenMediaModal = ({
               <button
                 className="w-6 h-6 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center mr-2 transition-all duration-200"
               >
-                <MapPin className="w-3 h-3 text-white" />
+                <MapPin className="w-4 h-4 text-white" />
               </button>
               
               <div className="bg-white/20 text-white text-xs font-medium px-2 py-1 rounded-full backdrop-blur-sm whitespace-nowrap">

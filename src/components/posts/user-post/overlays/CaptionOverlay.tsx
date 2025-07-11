@@ -51,7 +51,7 @@ export const CaptionOverlay: React.FC<CaptionOverlayProps> = ({
               }}
               className="w-6 h-6 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center mr-2 transition-all duration-200"
             >
-              <MapPin className="w-3 h-3 text-white" />
+              <MapPin className="w-4 h-4 text-white" />
             </button>
             
             {/* Full course tag that appears on click or shows always on desktop */}
