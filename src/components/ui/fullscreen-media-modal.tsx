@@ -180,21 +180,6 @@ const FullscreenMediaModal = ({
         >
           <ArrowLeft className="h-6 w-6" />
         </button>
-
-        {/* Mute/Unmute - Top Right (Only for videos) */}
-        {mediaType === 'video' && (
-          <button
-            onClick={handleMuteToggle}
-            className="flex items-center justify-center w-10 h-10 text-white hover:bg-white/10 rounded-full transition-colors pointer-events-auto"
-            aria-label={isMuted ? "Unmute" : "Mute"}
-          >
-            {isMuted ? (
-              <VolumeX className="h-6 w-6" />
-            ) : (
-              <Volume2 className="h-6 w-6" />
-            )}
-          </button>
-        )}
       </div>
 
       {/* User Info Overlay - Top Left (exact same position as index feed) */}
@@ -286,6 +271,20 @@ const FullscreenMediaModal = ({
       {/* Interaction Icons - Bottom Right (matching index feed exactly) */}
       <div className="absolute bottom-3 right-3 z-20">
         <div className="flex flex-col items-center gap-2.5 text-white text-lg opacity-90">
+          {/* Mute toggle button - only show for video posts */}
+          {mediaType === 'video' && (
+            <button 
+              className="cursor-pointer hover:opacity-100 transition-opacity"
+              onClick={handleMuteToggle}
+            >
+              {isMuted ? (
+                <VolumeX className="w-5 h-5" />
+              ) : (
+                <Volume2 className="w-5 h-5" />
+              )}
+            </button>
+          )}
+          
           <button 
             className="cursor-pointer hover:opacity-100 transition-opacity"
             onClick={(e) => handleInteractionClick(e, 'like')}
