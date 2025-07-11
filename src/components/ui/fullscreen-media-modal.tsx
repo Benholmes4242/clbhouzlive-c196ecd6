@@ -199,27 +199,29 @@ const FullscreenMediaModal = ({
         />
       )}
 
-      {/* Media Content - Centered and properly sized */}
+      {/* Media Content - Fully centered and sized to fill viewport */}
       {mediaType === 'image' ? (
-        <div className="relative">
+        <div className="relative w-full h-full flex items-center justify-center">
           <img
             src={mediaUrl}
             alt={alt}
-            className="max-w-[100vw] max-h-[100vh] w-auto h-auto object-contain"
+            className="w-full h-full object-cover"
             draggable={false}
+            style={{ maxWidth: '100vw', maxHeight: '100vh' }}
           />
         </div>
       ) : (
-        <div className="relative">
+        <div className="relative w-full h-full flex items-center justify-center">
           <video
             ref={videoRef}
             src={mediaUrl}
-            className="max-w-[100vw] max-h-[100vh] w-auto h-auto object-contain"
+            className="w-full h-full object-cover"
             muted={isMuted}
             controls={false}
             loop
             playsInline
             autoPlay
+            style={{ maxWidth: '100vw', maxHeight: '100vh' }}
           />
         </div>
       )}
