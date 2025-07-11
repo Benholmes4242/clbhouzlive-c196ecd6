@@ -6,3 +6,6 @@ verify_jwt = false
 
 [functions.scrape-golf-courses]
 verify_jwt = false
+
+[functions.chunked-upload]
+verify_jwt = true

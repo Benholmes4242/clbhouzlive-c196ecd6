@@ -1,14 +1,20 @@
 import React, { useState } from 'react';
-import { X, Edit3, RotateCw, Trash2, Image as ImageIcon, Video as VideoIcon } from 'lucide-react';
+import { X, Edit3, RotateCw, Trash2, Image as ImageIcon, Video as VideoIcon, Upload, CheckCircle, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
 import PhotoEditor from './PhotoEditor';
 
 interface MediaFile {
   file: File;
   url: string;
   id: string;
-  rotation?: number; // Add rotation property
+  rotation?: number;
+  isLargeFile?: boolean;
+  uploadProgress?: number;
+  isUploading?: boolean;
+  uploadUrl?: string;
+  error?: string;
 }
 
 interface MediaPreviewGridProps {
@@ -16,8 +22,10 @@ interface MediaPreviewGridProps {
   onRemoveFile: (id: string) => void;
   onEditFile?: (id: string, editedFile: File) => void;
   onRotateFile?: (id: string, rotation: number) => void;
+  onUploadFile?: (mediaFile: MediaFile) => void;
   maxFiles?: number;
   className?: string;
+  showUploadControls?: boolean;
 }
 
 const MediaPreviewGrid: React.FC<MediaPreviewGridProps> = ({
@@ -25,8 +33,10 @@ const MediaPreviewGrid: React.FC<MediaPreviewGridProps> = ({
   onRemoveFile,
   onEditFile,
   onRotateFile,
+  onUploadFile,
   maxFiles = 10,
-  className
+  className,
+  showUploadControls = true
 }) => {
   const [editingFileId, setEditingFileId] = useState<string | null>(null);
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
@@ -143,51 +153,116 @@ const MediaPreviewGrid: React.FC<MediaPreviewGridProps> = ({
                     />
                   )}
 
+                  {/* Upload Progress Overlay */}
+                  {media.isUploading && (
+                    <div className="absolute inset-0 bg-black/70 flex flex-col items-center justify-center text-white">
+                      <div className="w-3/4 space-y-2">
+                        <Progress value={media.uploadProgress} className="h-2" />
+                        <div className="text-center space-y-1">
+                          <p className="text-sm font-medium">
+                            {media.isLargeFile ? 'Uploading in chunks...' : 'Uploading...'}
+                          </p>
+                          <p className="text-xs text-white/80">
+                            {media.uploadProgress?.toFixed(0)}%
+                          </p>
+                          {media.isLargeFile && (
+                            <p className="text-xs text-white/60">
+                              Large file - this may take a while
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Success indicator */}
+                  {media.uploadUrl && !media.isUploading && (
+                    <div className="absolute top-2 right-2 bg-green-500 rounded-full p-1">
+                      <CheckCircle className="h-4 w-4 text-white" />
+                    </div>
+                  )}
+
+                  {/* Error indicator */}
+                  {media.error && (
+                    <div className="absolute inset-0 bg-red-500/20 flex items-center justify-center">
+                      <div className="text-center space-y-2">
+                        <AlertCircle className="h-8 w-8 text-red-500 mx-auto" />
+                        <p className="text-sm text-red-700 font-medium px-2">
+                          {media.error}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Overlay Controls */}
-                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                    {isImage && onEditFile && (
+                  {!media.isUploading && !media.error && (
+                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                      {isImage && onEditFile && (
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => handleEditClick(media.id)}
+                          className="h-8 w-8 p-0"
+                          title="Edit image"
+                        >
+                          <Edit3 className="h-4 w-4" />
+                        </Button>
+                      )}
+                      
+                      {/* Rotate Button for both images and videos */}
+                      {onRotateFile && (
+                        <Button
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => handleRotateClick(media.id)}
+                          className="h-8 w-8 p-0"
+                          title="Rotate media"
+                        >
+                          <RotateCw className="h-4 w-4" />
+                        </Button>
+                      )}
+                      
                       <Button
                         size="sm"
-                        variant="secondary"
-                        onClick={() => handleEditClick(media.id)}
+                        variant="destructive"
+                        onClick={() => onRemoveFile(media.id)}
                         className="h-8 w-8 p-0"
-                        title="Edit image"
+                        title="Remove media"
                       >
-                        <Edit3 className="h-4 w-4" />
+                        <Trash2 className="h-4 w-4" />
                       </Button>
-                    )}
-                    
-                    {/* Rotate Button for both images and videos */}
-                    {onRotateFile && (
+                    </div>
+                  )}
+
+                  {/* Upload button for unuploaded files */}
+                  {!media.uploadUrl && !media.isUploading && !media.error && showUploadControls && onUploadFile && (
+                    <div className="absolute bottom-2 left-2">
                       <Button
                         size="sm"
-                        variant="secondary"
-                        onClick={() => handleRotateClick(media.id)}
-                        className="h-8 w-8 p-0"
-                        title="Rotate media"
+                        onClick={() => onUploadFile(media)}
+                        className="h-8 px-3"
                       >
-                        <RotateCw className="h-4 w-4" />
+                        <Upload className="h-3 w-3 mr-1" />
+                        Upload
                       </Button>
-                    )}
-                    
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      onClick={() => onRemoveFile(media.id)}
-                      className="h-8 w-8 p-0"
-                      title="Remove media"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
+                    </div>
+                  )}
 
                   {/* File Type Badge */}
                   <div className="absolute top-2 left-2">
-                    <span className={`text-xs px-2 py-1 rounded-full text-white font-medium ${
-                      isImage ? 'bg-blue-500' : 'bg-purple-500'
-                    }`}>
-                      {isImage ? 'IMG' : 'VID'}
-                    </span>
+                    <div className="flex gap-1">
+                      <span className={`text-xs px-2 py-1 rounded-full text-white font-medium ${
+                        isImage ? 'bg-blue-500' : 'bg-purple-500'
+                      }`}>
+                        {isImage ? 'IMG' : 'VID'}
+                      </span>
+                      {/* Large file indicator */}
+                      {media.isLargeFile && (
+                        <span className="text-xs px-2 py-1 rounded-full bg-orange-500 text-white font-medium">
+                          LARGE
+                        </span>
+                      )}
+                    </div>
                   </div>
 
                   {/* File Size */}

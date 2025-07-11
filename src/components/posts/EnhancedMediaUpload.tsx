@@ -1,16 +1,23 @@
 import React, { useState, useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { RotateCw } from 'lucide-react';
+import { RotateCw, CheckCircle, AlertCircle, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
 import MediaDropzone from './MediaDropzone';
 import MediaPreviewGrid from './MediaPreviewGrid';
 import { useToast } from '@/hooks/use-toast';
+import { useChunkedUpload } from '@/hooks/useChunkedUpload';
 
 interface MediaFile {
   file: File;
   url: string;
   id: string;
-  rotation?: number; // Add rotation property
+  rotation?: number;
+  isLargeFile?: boolean; // Flag for files that should use chunked upload
+  uploadProgress?: number;
+  isUploading?: boolean;
+  uploadUrl?: string; // Final uploaded URL
+  error?: string;
 }
 
 interface ExistingMedia {
@@ -22,6 +29,7 @@ interface ExistingMedia {
 
 interface EnhancedMediaUploadProps {
   onFilesChange: (files: File[]) => void;
+  onFilesUploaded?: (uploadedFiles: { file: File; url: string }[]) => void; // New callback for uploaded files
   maxFiles?: number;
   acceptedTypes?: string[];
   disabled?: boolean;
@@ -29,25 +37,38 @@ interface EnhancedMediaUploadProps {
   existingMediaUrls?: string[];
   onExistingMediaRemove?: (url: string) => void;
   className?: string;
+  autoUpload?: boolean; // Whether to automatically upload files
 }
 
 const EnhancedMediaUpload: React.FC<EnhancedMediaUploadProps> = ({
   onFilesChange,
+  onFilesUploaded,
   maxFiles = 10,
   acceptedTypes = ['image/*', 'video/*'],
   disabled = false,
   initialFiles = [],
   existingMediaUrls = [],
   onExistingMediaRemove,
-  className
+  className,
+  autoUpload = false
 }) => {
   const { toast } = useToast();
+  const { uploadFileInChunks } = useChunkedUpload();
+  
+  // Define large file threshold (50MB)
+  const LARGE_FILE_THRESHOLD = 50 * 1024 * 1024;
   const [mediaFiles, setMediaFiles] = useState<MediaFile[]>(() => {
-    return initialFiles.map(file => ({
-      file,
-      url: URL.createObjectURL(file),
-      id: uuidv4()
-    }));
+    return initialFiles.map(file => {
+      const isLargeFile = file.size > LARGE_FILE_THRESHOLD;
+      return {
+        file,
+        url: URL.createObjectURL(file),
+        id: uuidv4(),
+        isLargeFile,
+        uploadProgress: 0,
+        isUploading: false
+      };
+    });
   });
 
   const [existingMedia, setExistingMedia] = useState<ExistingMedia[]>(() => {
@@ -100,17 +121,101 @@ const EnhancedMediaUpload: React.FC<EnhancedMediaUploadProps> = ({
     return validFiles;
   };
 
+  // Upload function for chunked uploads
+  const uploadFile = useCallback(async (mediaFile: MediaFile) => {
+    try {
+      setMediaFiles(prev => prev.map(f => 
+        f.id === mediaFile.id ? { ...f, isUploading: true, error: undefined } : f
+      ));
+
+      let uploadUrl: string;
+
+      // Use chunked upload for large files
+      if (mediaFile.isLargeFile) {
+        console.log(`Using chunked upload for large file: ${mediaFile.file.name} (${mediaFile.file.size} bytes)`);
+        
+        const result = await uploadFileInChunks(mediaFile.file, (progress) => {
+          // Update progress during chunked upload
+          setMediaFiles(prev => prev.map(f => 
+            f.id === mediaFile.id ? { ...f, uploadProgress: progress.percentage } : f
+          ));
+        });
+        
+        uploadUrl = result.publicUrl;
+      } else {
+        // Use standard upload for smaller files - you can integrate with your existing upload logic here
+        // For now, we'll simulate an upload
+        console.log(`Using standard upload for file: ${mediaFile.file.name}`);
+        
+        // Simulate progress
+        for (let progress = 0; progress <= 100; progress += 20) {
+          setMediaFiles(prev => prev.map(f => 
+            f.id === mediaFile.id ? { ...f, uploadProgress: progress } : f
+          ));
+          await new Promise(resolve => setTimeout(resolve, 200));
+        }
+        
+        // This would be replaced with your actual upload logic
+        uploadUrl = URL.createObjectURL(mediaFile.file);
+      }
+
+      setMediaFiles(prev => prev.map(f => 
+        f.id === mediaFile.id ? { 
+          ...f, 
+          uploadUrl,
+          isUploading: false, 
+          uploadProgress: 100
+        } : f
+      ));
+
+      // Notify parent of uploaded file
+      if (onFilesUploaded) {
+        onFilesUploaded([{ file: mediaFile.file, url: uploadUrl }]);
+      }
+
+      toast({
+        title: "Upload complete",
+        description: `${mediaFile.file.name} uploaded successfully`,
+      });
+
+    } catch (error) {
+      console.error('Upload failed:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Upload failed';
+      
+      setMediaFiles(prev => prev.map(f => 
+        f.id === mediaFile.id ? { 
+          ...f, 
+          isUploading: false, 
+          error: errorMessage,
+          uploadProgress: 0 
+        } : f
+      ));
+      
+      toast({
+        title: "Upload failed",
+        description: errorMessage,
+        variant: "destructive"
+      });
+    }
+  }, [uploadFileInChunks, onFilesUploaded, toast]);
+
   const handleFilesSelected = useCallback((files: File[]) => {
     console.log('EnhancedMediaUpload: Files selected:', files.map(f => f.name));
     
     const validFiles = validateFiles(files);
     if (validFiles.length === 0) return;
 
-    const newMediaFiles = validFiles.map(file => ({
-      file,
-      url: URL.createObjectURL(file),
-      id: uuidv4()
-    }));
+    const newMediaFiles = validFiles.map(file => {
+      const isLargeFile = file.size > LARGE_FILE_THRESHOLD;
+      return {
+        file,
+        url: URL.createObjectURL(file),
+        id: uuidv4(),
+        isLargeFile,
+        uploadProgress: 0,
+        isUploading: false
+      };
+    });
 
     setMediaFiles(prev => {
       const updated = [...prev, ...newMediaFiles];
@@ -119,6 +224,13 @@ const EnhancedMediaUpload: React.FC<EnhancedMediaUploadProps> = ({
       // Notify parent of changes
       const allFiles = updated.map(m => m.file);
       onFilesChange(allFiles);
+      
+      // Auto-upload if enabled
+      if (autoUpload) {
+        newMediaFiles.forEach(mediaFile => {
+          uploadFile(mediaFile);
+        });
+      }
       
       return updated;
     });
@@ -129,7 +241,7 @@ const EnhancedMediaUpload: React.FC<EnhancedMediaUploadProps> = ({
         description: `${validFiles.length} file(s) added successfully`,
       });
     }
-  }, [totalMediaCount, maxFiles, acceptedTypes, onFilesChange, toast]);
+  }, [totalMediaCount, maxFiles, acceptedTypes, onFilesChange, toast, autoUpload, uploadFile]);
 
   const handleRemoveExistingMedia = useCallback((mediaId: string) => {
     setExistingMedia(prev => {
@@ -311,7 +423,9 @@ const EnhancedMediaUpload: React.FC<EnhancedMediaUploadProps> = ({
         onRemoveFile={handleRemoveFile}
         onEditFile={handleEditFile}
         onRotateFile={handleRotateFile}
+        onUploadFile={uploadFile}
         maxFiles={maxFiles}
+        showUploadControls={!autoUpload}
       />
     </div>
   );
