@@ -135,7 +135,7 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
         )}
 
         {/* User Info Overlay */}
-        <div className="absolute top-3 left-2.5 flex items-center justify-between w-[calc(100%-20px)] z-20">
+        <div className="absolute top-3 left-2.5 z-20">
           <div className="bg-black/40 backdrop-blur-sm rounded-full p-1.5 flex items-center space-x-2 max-w-[140px]">
             <LazyImage
               src={post.user.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
@@ -162,19 +162,6 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
               </div>
             </div>
           </div>
-
-          {/* Location Tag */}
-          {golfCourse && (
-            <CoursePostBadge 
-              course={{
-                id: golfCourse.id,
-                name: golfCourse.name,
-                country: golfCourse.country,
-                region: golfCourse.region
-              }}
-              className="text-xs"
-            />
-          )}
         </div>
 
 
@@ -223,7 +210,22 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
 
       {/* Caption & Comments Area */}
       {post.content && removeGolfCourseFromContent(post.content) && (
-        <div className="bg-background p-4 border-b">
+        <div className="bg-background p-4">
+          {/* Golf Course Location - Above Caption */}
+          {golfCourse && (
+            <div className="mb-2">
+              <CoursePostBadge 
+                course={{
+                  id: golfCourse.id,
+                  name: golfCourse.name,
+                  country: golfCourse.country,
+                  region: golfCourse.region
+                }}
+                className="text-xs"
+              />
+            </div>
+          )}
+          
           <div className="text-sm">
             <div className="mb-1">
               <span className="font-semibold cursor-pointer hover:opacity-80" onClick={onProfileClick}>
