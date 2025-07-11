@@ -38,39 +38,41 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
   const [isHovered, setIsHovered] = useState(false);
   const [showFullCourseTag, setShowFullCourseTag] = useState(false);
   const { user } = useSupabaseSession();
-  const { muteAllOtherVideos, setActiveAudioVideo, pauseVideo } = useVideoPlaybackManager();
+  const { pauseVideo, pauseAllAndSetActive } = useVideoPlaybackManager();
   const { isGloballyMuted } = useGlobalAudio();
   const isMobile = useIsMobile();
   
   const { ref: containerRef, isInView } = useIntersectionObserver({
-    threshold: 0.45, // Autoplay when 45% of video is visible (within 40-50% range)
-    rootMargin: '0px'
+    threshold: 0.6, // Only trigger when 60% of video is visible - more restrictive
+    rootMargin: '-10px' // Add some margin to be more selective
   });
 
   // Check if this is the user's own post
   const isOwnPost = user?.id === post.user.id;
 
   useEffect(() => {
-    console.log('🎬 IndexFeedPost: isInView changed:', isInView, 'currentMediaIndex:', currentMediaIndex, 'mediaType:', post.post_media?.[currentMediaIndex]?.media_type);
-    
     const currentMedia = post.post_media?.[currentMediaIndex];
     if (!currentMedia) return;
     
-    if (isInView && currentMedia.media_type === 'video') {
-      console.log('🎬 Setting isHovered to true for video autoplay');
-      setIsHovered(true);
-    } else {
-      console.log('🎬 Setting isHovered to false');
-      setIsHovered(false);
+    console.log('🎬 IndexFeedPost: isInView changed:', isInView, 'for video:', `index-${currentMedia.id}`, 'mediaType:', currentMedia.media_type);
+    
+    if (currentMedia.media_type === 'video') {
+      const videoId = `index-${currentMedia.id}`;
       
-      // When video goes out of view, pause it directly and clear audio
-      if (currentMedia.media_type === 'video') {
-        const videoId = `index-${currentMedia.id}`;
-        console.log('🎬 Video out of view, pausing video:', videoId);
+      if (isInView) {
+        console.log('🎬 Video entering view, setting as active and pausing all others:', videoId);
+        setIsHovered(true);
+        pauseAllAndSetActive(videoId);
+      } else {
+        console.log('🎬 Video exiting view, pausing:', videoId);
+        setIsHovered(false);
         pauseVideo(videoId);
       }
+    } else {
+      // For images, just update hover state
+      setIsHovered(isInView);
     }
-  }, [isInView, currentMediaIndex, post.post_media, pauseVideo]);
+  }, [isInView, currentMediaIndex, post.post_media, pauseVideo, pauseAllAndSetActive]);
 
   // Hide full course tag when scrolling off the post
   useEffect(() => {
