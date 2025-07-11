@@ -64,7 +64,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     video.loop = loop;
     video.playsInline = true; // Critical for mobile autoplay
     video.setAttribute('playsinline', 'true'); // iOS compatibility
-    video.preload = 'none'; // Don't preload for mobile performance
+    video.preload = 'metadata'; // Load metadata to show poster and prepare for autoplay
 
     const handlePlay = () => {
       setIsPlaying(true);
@@ -81,8 +81,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     };
 
     const handleLoadedMetadata = () => {
-      // Disable autoplay for index feed videos
-      if (autoplay && video.paused && !isInFeed) {
+      // Enable autoplay when ready (for both feed and non-feed videos)
+      if (autoplay && video.paused) {
         video.currentTime = 0;
         video.play().catch(error => {
           console.log('Autoplay prevented:', error);
@@ -95,8 +95,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     video.addEventListener('volumechange', handleVolumeChange);
     video.addEventListener('loadedmetadata', handleLoadedMetadata);
 
-    // Disable immediate autoplay for index feed videos
-    if (autoplay && !isInFeed) {
+    // Immediate autoplay attempt for all videos when autoplay is enabled
+    if (autoplay) {
       video.currentTime = 0;
       // Use requestAnimationFrame for smoother autoplay timing
       requestAnimationFrame(() => {
@@ -187,7 +187,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         playsInline
         muted={muted}
         loop={loop}
-        preload="none"
+        autoPlay={autoplay}
+        preload="metadata"
         webkit-playsinline="true"
         x5-playsinline="true"
         onClick={handleVideoClick}

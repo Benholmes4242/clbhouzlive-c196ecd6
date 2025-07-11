@@ -38,7 +38,7 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
   const isMobile = useIsMobile();
   
   const { ref: containerRef, isInView } = useIntersectionObserver({
-    threshold: 0.5,
+    threshold: 0.3, // Autoplay when 30% of video is visible (within 20-40% range)
     rootMargin: '0px'
   });
 
