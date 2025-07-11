@@ -117,55 +117,104 @@ const FullscreenMediaModal = ({
     if (isOpen) {
       // Store the current scroll position
       const scrollY = window.scrollY;
+      const scrollX = window.scrollX;
       
-      // Disable scrolling on body and html
-      document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.top = `-${scrollY}px`;
-      document.body.style.width = '100%';
-      document.body.style.height = '100%';
-      document.documentElement.style.overflow = 'hidden';
+      // Get the body element
+      const body = document.body;
+      const html = document.documentElement;
       
-      // Prevent scroll events on window
-      const preventScroll = (e: Event) => {
+      // Store original styles
+      const originalBodyStyle = body.style.cssText;
+      const originalHtmlStyle = html.style.cssText;
+      
+      // Disable scrolling completely
+      body.style.position = 'fixed';
+      body.style.top = `-${scrollY}px`;
+      body.style.left = `-${scrollX}px`;
+      body.style.width = '100vw';
+      body.style.height = '100vh';
+      body.style.overflow = 'hidden';
+      body.style.touchAction = 'none';
+      body.style.userSelect = 'none';
+      body.style.webkitUserSelect = 'none';
+      
+      html.style.overflow = 'hidden';
+      html.style.height = '100vh';
+      html.style.touchAction = 'none';
+      html.style.userSelect = 'none';
+      html.style.webkitUserSelect = 'none';
+      
+      // Prevent all scroll-related events
+      const preventDefault = (e: Event) => {
         e.preventDefault();
         e.stopPropagation();
         return false;
       };
       
       const preventTouchMove = (e: TouchEvent) => {
+        // Allow touches within the modal content but prevent scrolling
         e.preventDefault();
         e.stopPropagation();
         return false;
       };
       
-      // Add event listeners to prevent scrolling
-      window.addEventListener('scroll', preventScroll, { passive: false });
-      window.addEventListener('wheel', preventScroll, { passive: false });
-      window.addEventListener('touchmove', preventTouchMove, { passive: false });
-      document.addEventListener('scroll', preventScroll, { passive: false });
-      document.addEventListener('wheel', preventScroll, { passive: false });
-      document.addEventListener('touchmove', preventTouchMove, { passive: false });
+      const preventWheel = (e: WheelEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      };
+      
+      const preventKeyboardScroll = (e: KeyboardEvent) => {
+        // Prevent arrow keys, space, page up/down from scrolling
+        if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space', 'PageUp', 'PageDown', 'Home', 'End'].includes(e.code)) {
+          e.preventDefault();
+          e.stopPropagation();
+          return false;
+        }
+      };
+      
+      // Add event listeners with passive: false to ensure preventDefault works
+      const eventOptions = { passive: false, capture: true };
+      
+      // Window events
+      window.addEventListener('scroll', preventDefault, eventOptions);
+      window.addEventListener('wheel', preventWheel, eventOptions);
+      window.addEventListener('touchmove', preventTouchMove, eventOptions);
+      window.addEventListener('keydown', preventKeyboardScroll, eventOptions);
+      
+      // Document events
+      document.addEventListener('scroll', preventDefault, eventOptions);
+      document.addEventListener('wheel', preventWheel, eventOptions);
+      document.addEventListener('touchmove', preventTouchMove, eventOptions);
+      document.addEventListener('keydown', preventKeyboardScroll, eventOptions);
+      
+      // Body events
+      body.addEventListener('scroll', preventDefault, eventOptions);
+      body.addEventListener('wheel', preventWheel, eventOptions);
+      body.addEventListener('touchmove', preventTouchMove, eventOptions);
       
       return () => {
-        // Re-enable scrolling and restore position
-        document.body.style.overflow = '';
-        document.body.style.position = '';
-        document.body.style.top = '';
-        document.body.style.width = '';
-        document.body.style.height = '';
-        document.documentElement.style.overflow = '';
+        // Restore original styles
+        body.style.cssText = originalBodyStyle;
+        html.style.cssText = originalHtmlStyle;
         
-        // Remove event listeners
-        window.removeEventListener('scroll', preventScroll);
-        window.removeEventListener('wheel', preventScroll);
-        window.removeEventListener('touchmove', preventTouchMove);
-        document.removeEventListener('scroll', preventScroll);
-        document.removeEventListener('wheel', preventScroll);
-        document.removeEventListener('touchmove', preventTouchMove);
+        // Remove all event listeners
+        window.removeEventListener('scroll', preventDefault, true);
+        window.removeEventListener('wheel', preventWheel, true);
+        window.removeEventListener('touchmove', preventTouchMove, true);
+        window.removeEventListener('keydown', preventKeyboardScroll, true);
+        
+        document.removeEventListener('scroll', preventDefault, true);
+        document.removeEventListener('wheel', preventWheel, true);
+        document.removeEventListener('touchmove', preventTouchMove, true);
+        document.removeEventListener('keydown', preventKeyboardScroll, true);
+        
+        body.removeEventListener('scroll', preventDefault, true);
+        body.removeEventListener('wheel', preventWheel, true);
+        body.removeEventListener('touchmove', preventTouchMove, true);
         
         // Restore scroll position
-        window.scrollTo(0, scrollY);
+        window.scrollTo(scrollX, scrollY);
       };
     }
   }, [isOpen]);
