@@ -1,5 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import { RotateCw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import MediaDropzone from './MediaDropzone';
 import MediaPreviewGrid from './MediaPreviewGrid';
 import { useToast } from '@/hooks/use-toast';
@@ -8,12 +10,14 @@ interface MediaFile {
   file: File;
   url: string;
   id: string;
+  rotation?: number; // Add rotation property
 }
 
 interface ExistingMedia {
   url: string;
   id: string;
   type: 'image' | 'video';
+  rotation?: number; // Add rotation support for existing media
 }
 
 interface EnhancedMediaUploadProps {
@@ -196,6 +200,48 @@ const EnhancedMediaUpload: React.FC<EnhancedMediaUploadProps> = ({
     });
   }, [onFilesChange, toast]);
 
+  const handleRotateFile = useCallback((fileId: string, rotation: number) => {
+    setMediaFiles(prev => {
+      const updated = prev.map(media => {
+        if (media.id === fileId) {
+          return {
+            ...media,
+            rotation
+          };
+        }
+        return media;
+      });
+      
+      return updated;
+    });
+
+    toast({
+      title: "Media rotated",
+      description: `Rotated ${rotation}°`,
+    });
+  }, [toast]);
+
+  const handleRotateExistingMedia = useCallback((mediaId: string) => {
+    setExistingMedia(prev => {
+      return prev.map(media => {
+        if (media.id === mediaId) {
+          const currentRotation = media.rotation || 0;
+          const newRotation = (currentRotation + 90) % 360;
+          return {
+            ...media,
+            rotation: newRotation
+          };
+        }
+        return media;
+      });
+    });
+
+    toast({
+      title: "Media rotated",
+      description: "Existing media rotated 90°",
+    });
+  }, [toast]);
+
   // Cleanup URLs when component unmounts
   React.useEffect(() => {
     return () => {
@@ -228,17 +274,34 @@ const EnhancedMediaUpload: React.FC<EnhancedMediaUploadProps> = ({
                   {media.type === 'video' ? (
                     <video 
                       src={media.url} 
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover transition-transform duration-200"
+                      style={{ transform: `rotate(${media.rotation || 0}deg)` }}
                       muted
                     />
                   ) : (
                     <img 
                       src={media.url} 
                       alt="Existing media"
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover transition-transform duration-200"
+                      style={{ transform: `rotate(${media.rotation || 0}deg)` }}
                     />
                   )}
+
+                  {/* Overlay Controls for Existing Media */}
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => handleRotateExistingMedia(media.id)}
+                      className="h-8 w-8 p-0"
+                      title="Rotate media"
+                      disabled={disabled}
+                    >
+                      <RotateCw className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
+                
                 <button
                   onClick={() => handleRemoveExistingMedia(media.id)}
                   className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
@@ -257,6 +320,7 @@ const EnhancedMediaUpload: React.FC<EnhancedMediaUploadProps> = ({
         mediaFiles={mediaFiles}
         onRemoveFile={handleRemoveFile}
         onEditFile={handleEditFile}
+        onRotateFile={handleRotateFile}
         maxFiles={maxFiles}
       />
     </div>

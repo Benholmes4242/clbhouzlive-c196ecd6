@@ -8,12 +8,14 @@ interface MediaFile {
   file: File;
   url: string;
   id: string;
+  rotation?: number; // Add rotation property
 }
 
 interface MediaPreviewGridProps {
   mediaFiles: MediaFile[];
   onRemoveFile: (id: string) => void;
   onEditFile?: (id: string, editedFile: File) => void;
+  onRotateFile?: (id: string, rotation: number) => void;
   maxFiles?: number;
   className?: string;
 }
@@ -22,6 +24,7 @@ const MediaPreviewGrid: React.FC<MediaPreviewGridProps> = ({
   mediaFiles,
   onRemoveFile,
   onEditFile,
+  onRotateFile,
   maxFiles = 10,
   className
 }) => {
@@ -38,6 +41,15 @@ const MediaPreviewGrid: React.FC<MediaPreviewGridProps> = ({
       onEditFile(editingFileId, editedFile);
     }
     setEditingFileId(null);
+  };
+
+  const handleRotateClick = (fileId: string) => {
+    const media = mediaFiles.find(m => m.id === fileId);
+    if (!media || !onRotateFile) return;
+
+    const currentRotation = media.rotation || 0;
+    const newRotation = (currentRotation + 90) % 360;
+    onRotateFile(fileId, newRotation);
   };
 
   const handleImageLoad = (mediaId: string) => {
@@ -99,7 +111,8 @@ const MediaPreviewGrid: React.FC<MediaPreviewGridProps> = ({
                     <img
                       src={media.url}
                       alt="Preview"
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover transition-transform duration-200"
+                      style={{ transform: `rotate(${media.rotation || 0}deg)` }}
                       onError={() => handleImageError(media.id)}
                     />
                   )}
@@ -108,7 +121,8 @@ const MediaPreviewGrid: React.FC<MediaPreviewGridProps> = ({
                   {isVideo && !hasError && (
                     <video
                       src={media.url}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover transition-transform duration-200"
+                      style={{ transform: `rotate(${media.rotation || 0}deg)` }}
                       muted
                       preload="metadata"
                       onError={() => handleImageError(media.id)}
@@ -123,15 +137,31 @@ const MediaPreviewGrid: React.FC<MediaPreviewGridProps> = ({
                         variant="secondary"
                         onClick={() => handleEditClick(media.id)}
                         className="h-8 w-8 p-0"
+                        title="Edit image"
                       >
                         <Edit3 className="h-4 w-4" />
                       </Button>
                     )}
+                    
+                    {/* Rotate Button for both images and videos */}
+                    {onRotateFile && (
+                      <Button
+                        size="sm"
+                        variant="secondary"
+                        onClick={() => handleRotateClick(media.id)}
+                        className="h-8 w-8 p-0"
+                        title="Rotate media"
+                      >
+                        <RotateCw className="h-4 w-4" />
+                      </Button>
+                    )}
+                    
                     <Button
                       size="sm"
                       variant="destructive"
                       onClick={() => onRemoveFile(media.id)}
                       className="h-8 w-8 p-0"
+                      title="Remove media"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
