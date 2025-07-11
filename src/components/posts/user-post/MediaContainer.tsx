@@ -91,7 +91,7 @@ export const MediaContainer: React.FC<MediaContainerProps> = ({
               e.stopPropagation();
               onSwipeRight(); // Swipe right shows previous media
             }}
-            className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/60 transition-all opacity-0 group-hover:opacity-100"
+            className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full flex items-center justify-center text-white hover:bg-white/10 transition-all opacity-0 group-hover:opacity-100"
             disabled={currentIndex === 0}
           >
             <ChevronLeft className="w-5 h-5" />
@@ -103,7 +103,7 @@ export const MediaContainer: React.FC<MediaContainerProps> = ({
               e.stopPropagation();
               onSwipeLeft(); // Swipe left shows next media
             }}
-            className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/60 transition-all opacity-0 group-hover:opacity-100"
+            className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 rounded-full flex items-center justify-center text-white hover:bg-white/10 transition-all opacity-0 group-hover:opacity-100"
             disabled={currentIndex === media.length - 1}
           >
             <ChevronRight className="w-5 h-5" />
