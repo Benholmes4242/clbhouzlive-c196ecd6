@@ -163,11 +163,13 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   };
 
   const handleVideoClick = () => {
-    if (onClick) {
-      onClick();
-    } else {
-      // Always allow video click to toggle play/pause for feed videos
-      togglePlayPause({} as React.MouseEvent);
+    // Only handle clicks if not in feed (let MediaContainer handle feed interactions)
+    if (!isInFeed) {
+      if (onClick) {
+        onClick();
+      } else {
+        togglePlayPause({} as React.MouseEvent);
+      }
     }
   };
 

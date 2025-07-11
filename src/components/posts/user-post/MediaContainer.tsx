@@ -126,6 +126,7 @@ export const MediaContainer: React.FC<MediaContainerProps> = ({
           showVideoIcon={false}
           showOverlayControls={false}
           videoId={`index-${currentMedia.id}`}
+          isInFeed={true}
         />
       ) : (
         <LazyImage
