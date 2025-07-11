@@ -227,16 +227,14 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
       {isMobile ? (
         // Mobile Layout - Optimized for mobile viewport
         isOpen && (
-          <div className="fixed bg-black overflow-hidden" 
+          <div className="fixed inset-0 w-full bg-black z-[9999] overflow-hidden" 
                style={{ 
+                 height: '100vh', 
                  position: 'fixed',
                  top: 0,
                  left: 0,
                  right: 0,
-                 bottom: 0,
-                 width: '100vw',
-                 height: '100dvh', // Use dynamic viewport height for mobile to handle mobile browser UI
-                 zIndex: 999999 // Very high z-index to ensure it's on top
+                 bottom: 0
                }}
                {...swipeHandlers}>
             {/* Close Button - Top Left */}
@@ -422,7 +420,7 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
       ) : (
         // Desktop Layout - Instagram Style
         <Dialog open={isOpen} onOpenChange={onClose}>
-          <DialogContent className="max-w-6xl w-full h-[100vh] p-0 bg-background border-0 shadow-2xl" style={{ zIndex: 999999 }}>
+          <DialogContent className="max-w-6xl w-full h-[90vh] p-0 bg-background border-0 shadow-2xl">
             <DialogTitle className="sr-only">Post Viewer</DialogTitle>
             <div className="flex h-full rounded-lg overflow-hidden">
               {/* Left Side - Media */}
