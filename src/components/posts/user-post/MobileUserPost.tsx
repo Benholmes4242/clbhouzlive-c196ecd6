@@ -9,7 +9,7 @@ import CoursePostBadge from '../CoursePostBadge';
 import { UserPostData, GolfCourse } from './types';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
-import { GolfCourseTagOverlay } from './overlays/GolfCourseTagOverlay';
+import { MapPin } from 'lucide-react';
 
 interface MobileUserPostProps {
   post: UserPostData;
@@ -223,16 +223,30 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
                 · {timeAgo}
               </span>
             </div>
-            <div className="relative">
+            <div className="relative pb-4">
               {/* Golf Course Map Pin - positioned above first letter */}
               {golfCourse && (
-                <div className="absolute -top-10 left-0">
-                  <GolfCourseTagOverlay
-                    golfCourse={golfCourse}
-                    isMobile={true}
-                    showFullTag={isLocationExpanded}
-                    onTagClick={() => setIsLocationExpanded(!isLocationExpanded)}
-                  />
+                <div className="absolute -top-6 left-0 z-10">
+                  <button
+                    onClick={() => setIsLocationExpanded(!isLocationExpanded)}
+                    className="w-6 h-6 rounded-full bg-primary/80 flex items-center justify-center transition-all duration-200 border border-primary"
+                  >
+                    <MapPin className="w-3 h-3 text-primary-foreground" />
+                  </button>
+                  {/* Full course tag that appears on click */}
+                  {isLocationExpanded && (
+                    <div className="absolute top-7 left-0 animate-scale-in">
+                      <CoursePostBadge 
+                        course={{
+                          id: golfCourse.id,
+                          name: golfCourse.name,
+                          country: golfCourse.country,
+                          region: golfCourse.region
+                        }}
+                        className="bg-secondary text-secondary-foreground text-sm font-medium px-3 py-1.5 rounded-full whitespace-nowrap border"
+                      />
+                    </div>
+                  )}
                 </div>
               )}
               {removeGolfCourseFromContent(post.content)}
