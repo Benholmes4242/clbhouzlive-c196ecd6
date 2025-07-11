@@ -214,16 +214,6 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
       {/* Caption & Comments Area */}
       {post.content && removeGolfCourseFromContent(post.content) && (
         <div className="bg-background p-4 border-b">
-          {/* Golf Course Map Pin */}
-          {golfCourse && (
-            <GolfCourseTagOverlay
-              golfCourse={golfCourse}
-              isMobile={true}
-              showFullTag={isLocationExpanded}
-              onTagClick={() => setIsLocationExpanded(!isLocationExpanded)}
-            />
-          )}
-          
           <div className="text-sm">
             <div className="mb-1">
               <span className="font-semibold cursor-pointer hover:opacity-80" onClick={onProfileClick}>
@@ -233,7 +223,20 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
                 · {timeAgo}
               </span>
             </div>
-            <div>{removeGolfCourseFromContent(post.content)}</div>
+            <div className="relative">
+              {/* Golf Course Map Pin - positioned above first letter */}
+              {golfCourse && (
+                <div className="absolute -top-10 left-0">
+                  <GolfCourseTagOverlay
+                    golfCourse={golfCourse}
+                    isMobile={true}
+                    showFullTag={isLocationExpanded}
+                    onTagClick={() => setIsLocationExpanded(!isLocationExpanded)}
+                  />
+                </div>
+              )}
+              {removeGolfCourseFromContent(post.content)}
+            </div>
           </div>
           
           <div className="mt-3 space-y-2 text-sm text-muted-foreground">
