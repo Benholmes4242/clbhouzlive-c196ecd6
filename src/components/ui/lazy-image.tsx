@@ -19,7 +19,6 @@ const LazyImage: React.FC<LazyImageProps> = ({
   height,
   onError,
   onClick,
-  placeholder = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHZpZXdCb3g9IjAgMCA0MCA0MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjQwIiBoZWlnaHQ9IjQwIiBmaWxsPSIjRjNGNEY2Ii8+CjxwYXRoIGQ9Ik0xNiAxNkwyNCAxNkwyNCAxOEwyOCAyMkwyOCAyNEwxNiAyNFYxNloiIGZpbGw9IiNEMUQ1REIiLz4KPC9zdmc+'
 }) => {
   const [imageSrc, setImageSrc] = useState<string>(src); // Show the actual image immediately
   const [isLoading, setIsLoading] = useState(false); // Start without loading state
