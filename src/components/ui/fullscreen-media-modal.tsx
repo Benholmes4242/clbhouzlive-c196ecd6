@@ -117,115 +117,51 @@ const FullscreenMediaModal = ({
     }
   }, [isOpen, currentIndex, mediaTypes]);
 
-  // Prevent background scrolling when modal is open
+  // Prevent background scrolling when modal is open - Simple but effective approach
   useEffect(() => {
     if (isOpen) {
       // Store the current scroll position
       const scrollY = window.scrollY;
-      const scrollX = window.scrollX;
       
-      // Get all elements that might have scroll
-      const body = document.body;
-      const html = document.documentElement;
-      const allElements = document.querySelectorAll('*');
+      // Add a CSS class to body that locks scrolling
+      document.body.classList.add('modal-open');
       
-      // Store original styles
-      const originalBodyStyle = body.style.cssText;
-      const originalHtmlStyle = html.style.cssText;
-      
-      // Create a more aggressive prevention function
-      const preventAllScroll = (e: Event) => {
-        e.preventDefault();
-        e.stopImmediatePropagation();
-        e.stopPropagation();
-        return false;
-      };
-      
-      // Disable scrolling completely on body and html
-      body.style.cssText = `
-        position: fixed !important;
-        top: -${scrollY}px !important;
-        left: -${scrollX}px !important;
-        width: 100vw !important;
-        height: 100vh !important;
-        overflow: hidden !important;
-        touch-action: none !important;
-        user-select: none !important;
-        -webkit-user-select: none !important;
-        overscroll-behavior: none !important;
-        -webkit-overflow-scrolling: auto !important;
-      `;
-      
-      html.style.cssText = `
-        overflow: hidden !important;
-        height: 100vh !important;
-        touch-action: none !important;
-        user-select: none !important;
-        -webkit-user-select: none !important;
-        overscroll-behavior: none !important;
-        -webkit-overflow-scrolling: auto !important;
-      `;
-      
-      // Prevent scrolling on all potentially scrollable elements
-      allElements.forEach(element => {
-        const computedStyle = window.getComputedStyle(element);
-        if (computedStyle.overflow === 'auto' || computedStyle.overflow === 'scroll' || 
-            computedStyle.overflowY === 'auto' || computedStyle.overflowY === 'scroll') {
-          (element as HTMLElement).style.overflow = 'hidden';
-          (element as HTMLElement).style.touchAction = 'none';
+      // Add CSS directly to ensure it works
+      const style = document.createElement('style');
+      style.id = 'modal-scroll-lock';
+      style.textContent = `
+        .modal-open {
+          position: fixed !important;
+          top: -${scrollY}px !important;
+          left: 0 !important;
+          width: 100% !important;
+          height: 100% !important;
+          overflow: hidden !important;
+          touch-action: none !important;
+          -webkit-overflow-scrolling: touch !important;
         }
-      });
-      
-      // Add comprehensive event listeners
-      const eventOptions = { passive: false, capture: true };
-      const events = [
-        'scroll', 'wheel', 'touchmove', 'touchstart', 'touchend',
-        'mousewheel', 'DOMMouseScroll', 'gesturestart', 'gesturechange', 'gestureend'
-      ];
-      
-      // Add to multiple targets
-      const targets = [window, document, document.body, document.documentElement];
-      
-      targets.forEach(target => {
-        events.forEach(eventType => {
-          target.addEventListener(eventType, preventAllScroll, eventOptions);
-        });
-      });
-      
-      // Prevent keyboard scrolling
-      const preventKeyboardScroll = (e: KeyboardEvent) => {
-        const scrollKeys = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space', 'PageUp', 'PageDown', 'Home', 'End'];
-        if (scrollKeys.includes(e.code)) {
-          e.preventDefault();
-          e.stopImmediatePropagation();
-          return false;
+        .modal-open * {
+          touch-action: none !important;
         }
-      };
-      
-      document.addEventListener('keydown', preventKeyboardScroll, eventOptions);
+        html.modal-open {
+          overflow: hidden !important;
+          height: 100% !important;
+        }
+      `;
+      document.head.appendChild(style);
+      document.documentElement.classList.add('modal-open');
       
       return () => {
-        // Restore original styles
-        body.style.cssText = originalBodyStyle;
-        html.style.cssText = originalHtmlStyle;
-        
-        // Restore scrollable elements
-        allElements.forEach(element => {
-          (element as HTMLElement).style.overflow = '';
-          (element as HTMLElement).style.touchAction = '';
-        });
-        
-        // Remove all event listeners
-        targets.forEach(target => {
-          events.forEach(eventType => {
-            target.removeEventListener(eventType, preventAllScroll, true);
-          });
-        });
-        
-        document.removeEventListener('keydown', preventKeyboardScroll, true);
+        // Remove the CSS class and styles
+        document.body.classList.remove('modal-open');
+        document.documentElement.classList.remove('modal-open');
+        const styleElement = document.getElementById('modal-scroll-lock');
+        if (styleElement) {
+          styleElement.remove();
+        }
         
         // Restore scroll position
-        window.scrollTo(scrollX, scrollY);
+        window.scrollTo(0, scrollY);
       };
     }
   }, [isOpen]);
