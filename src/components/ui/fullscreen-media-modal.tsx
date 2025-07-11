@@ -48,6 +48,31 @@ const FullscreenMediaModal = ({
     }
   }, [isOpen, mediaType]);
 
+  // Prevent background scrolling when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      // Disable scrolling on body
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+      document.body.style.height = '100%';
+    } else {
+      // Re-enable scrolling
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.body.style.height = '';
+    }
+
+    // Cleanup function to restore scrolling if component unmounts
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.body.style.height = '';
+    };
+  }, [isOpen]);
+
   const handleMuteToggle = () => {
     if (videoRef.current) {
       videoRef.current.muted = !isMuted;
@@ -62,12 +87,17 @@ const FullscreenMediaModal = ({
     }
   };
 
+  // Prevent scroll events from propagating to background
+  const handleModalScroll = (e: React.WheelEvent | React.TouchEvent) => {
+    e.stopPropagation();
+  };
+
   // Don't render if not open
   if (!isOpen) return null;
 
   return (
     <div 
-      className="fixed inset-0 w-full h-full z-[999999] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4"
+      className="fixed inset-0 w-full h-full z-[999999] bg-black flex items-center justify-center"
       style={{ 
         position: 'fixed',
         top: 0,
@@ -78,6 +108,8 @@ const FullscreenMediaModal = ({
         zIndex: 999999
       }}
       onClick={handleBackdropClick}
+      onWheel={handleModalScroll}
+      onTouchMove={handleModalScroll}
     >
       {/* Top Controls */}
       <div className="absolute top-4 right-4 z-10 flex items-start gap-2 pointer-events-none">
@@ -135,9 +167,7 @@ const FullscreenMediaModal = ({
           <img
             src={mediaUrl}
             alt={alt}
-            className={`max-w-[90vw] w-auto h-auto object-contain ${
-              isMobile ? 'max-h-[75vh]' : 'max-h-[90vh]'
-            }`}
+            className="max-w-[100vw] max-h-[100vh] w-auto h-auto object-contain"
             draggable={false}
           />
         </div>
@@ -146,9 +176,7 @@ const FullscreenMediaModal = ({
           <video
             ref={videoRef}
             src={mediaUrl}
-            className={`max-w-[90vw] w-auto h-auto object-contain ${
-              isMobile ? 'max-h-[75vh]' : 'max-h-[90vh]'
-            }`}
+            className="max-w-[100vw] max-h-[100vh] w-auto h-auto object-contain"
             muted={isMuted}
             controls={false}
             loop
