@@ -9,14 +9,7 @@ export const validateFiles = (mediaFiles: File[]): ValidationResult => {
   const supportedImageTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
   
   for (const file of mediaFiles) {
-    // Add file size limits for security
-    const maxFileSize = 50 * 1024 * 1024; // 50MB limit
-    if (file.size > maxFileSize) {
-      return {
-        isValid: false,
-        error: `File "${file.name}" is too large. Maximum file size is 50MB.`
-      };
-    }
+    // No file size limits - users can upload files of any size
     
     const isVideo = file.type.startsWith('video/');
     const isImage = file.type.startsWith('image/');

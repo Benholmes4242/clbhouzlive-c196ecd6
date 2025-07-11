@@ -60,22 +60,12 @@ const EnhancedMediaUpload: React.FC<EnhancedMediaUploadProps> = ({
 
   const totalMediaCount = mediaFiles.length + existingMedia.length;
 
-  // Validate file size and type
+  // Validate file type only - no size restrictions
   const validateFiles = (files: File[]): File[] => {
     const validFiles: File[] = [];
-    const maxSizeInMB = 100; // 100MB max per file
-    const maxSizeInBytes = maxSizeInMB * 1024 * 1024;
 
     files.forEach(file => {
-      // Check file size
-      if (file.size > maxSizeInBytes) {
-        toast({
-          title: "File too large",
-          description: `${file.name} is larger than ${maxSizeInMB}MB`,
-          variant: "destructive",
-        });
-        return;
-      }
+      // No file size limits - users can upload files of any size
 
       // Check if we've reached max files
       if (totalMediaCount + validFiles.length >= maxFiles) {

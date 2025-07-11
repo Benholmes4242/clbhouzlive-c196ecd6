@@ -157,8 +157,8 @@ const AddToPlayedModal = ({ course, isOpen, onClose, onSuccess }: AddToPlayedMod
     const validFiles = files.filter(file => {
       const isImage = file.type.startsWith('image/');
       const isVideo = file.type.startsWith('video/');
-      const isValidSize = file.size <= 10 * 1024 * 1024; // 10MB limit
-      return (isImage || isVideo) && isValidSize;
+      // No size limit - users can upload files of any size
+      return (isImage || isVideo);
     });
     
     setUploadedFiles(prev => [...prev, ...validFiles].slice(0, 5)); // Max 5 files

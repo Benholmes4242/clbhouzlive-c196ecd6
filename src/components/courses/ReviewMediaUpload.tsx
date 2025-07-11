@@ -25,16 +25,7 @@ const ReviewMediaUpload = ({ onMediaSelected, selectedMedia, onRemoveMedia }: Re
       return false;
     }
     
-    // Check file sizes (max 100MB each)
-    const oversizedFiles = files.filter(file => file.size > 104857600); // 100MB
-    if (oversizedFiles.length > 0) {
-      toast({
-        title: "File too large",
-        description: "Each file must be smaller than 100MB.",
-        variant: "destructive",
-      });
-      return false;
-    }
+    // No file size limits - users can upload files of any size
 
     // Check file types
     const validTypes = ['image/jpeg', 'image/png', 'image/heic', 'image/webp', 'video/mp4', 'video/quicktime', 'video/mov'];
@@ -136,7 +127,7 @@ const ReviewMediaUpload = ({ onMediaSelected, selectedMedia, onRemoveMedia }: Re
           Click or drag to upload photos or videos
         </p>
         <p className="text-xs text-gray-500">
-          JPG, PNG, MP4, MOV • Max 5 items • Max 100MB per item
+          JPG, PNG, MP4, MOV • Max 5 items • No size limits
         </p>
       </div>
 

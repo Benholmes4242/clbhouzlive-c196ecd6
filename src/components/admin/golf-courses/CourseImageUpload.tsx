@@ -37,15 +37,7 @@ const CourseImageUpload: React.FC<CourseImageUploadProps> = ({
       return;
     }
 
-    // Validate file size (5MB limit)
-    if (file.size > 5 * 1024 * 1024) {
-      toast({
-        title: "File too large",
-        description: "Please upload an image smaller than 5MB",
-        variant: "destructive",
-      });
-      return;
-    }
+    // No file size limit - users can upload images of any size
 
     setUploading(true);
 
@@ -152,7 +144,7 @@ const CourseImageUpload: React.FC<CourseImageUploadProps> = ({
         <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
           <ImageIcon className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
           <p className="text-sm text-muted-foreground mb-4">
-            Upload a course image (JPG, PNG, or WebP, max 5MB)
+            Upload a course image (JPG, PNG, or WebP, no size limit)
           </p>
         </div>
       )}
