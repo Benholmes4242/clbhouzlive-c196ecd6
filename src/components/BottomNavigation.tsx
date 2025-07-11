@@ -1,38 +1,16 @@
 
 import React from 'react';
-import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePostFlow } from '@/hooks/usePostFlow';
-import { useOptimisticPostSubmission } from '@/hooks/useOptimisticPostSubmission';
+import { useIsDesktop } from '@/hooks/useIsDesktop';
 import GalleryPicker from '@/components/post/GalleryPicker';
-import EnhancedCreateMomentModal from '@/components/post/EnhancedCreateMomentModal';
 import SnapToast from '@/components/snap/SnapToast';
 import NavigationBar from './bottom-navigation/NavigationBar';
+import PostSubmissionHandler from './bottom-navigation/PostSubmissionHandler';
 import { useNavigationHandlers } from '@/hooks/useNavigationHandlers';
-import { usePostHandlers } from '@/hooks/usePostHandlers';
-
-// Hook to detect desktop (≥1024px)
-const useIsDesktop = () => {
-  const [isDesktop, setIsDesktop] = React.useState<boolean>(false);
-
-  React.useEffect(() => {
-    const checkIsDesktop = () => {
-      setIsDesktop(window.innerWidth >= 1024);
-    };
-
-    checkIsDesktop();
-    window.addEventListener('resize', checkIsDesktop);
-    
-    return () => window.removeEventListener('resize', checkIsDesktop);
-  }, []);
-
-  return isDesktop;
-};
+import { usePostSubmissionHandlers } from './bottom-navigation/usePostSubmissionHandlers';
 
 const BottomNavigation = () => {
-  const { user } = useSupabaseSession();
   const { activeTab, handleTabClick } = useNavigationHandlers();
-  const { submitPost } = useOptimisticPostSubmission();
-  const { handleCaptionInput, selectMention } = usePostHandlers();
   const isDesktop = useIsDesktop();
   
   const {
@@ -41,7 +19,6 @@ const BottomNavigation = () => {
     isComposerOpen,
     selectedFile,
     selectedFiles,
-    previewUrl,
     caption,
     setCaption,
     isSubmitting,
@@ -70,150 +47,39 @@ const BottomNavigation = () => {
   // State for tags handled in CreateMomentModal
   const [localSelectedTags, setLocalSelectedTags] = React.useState<any[]>([]);
 
-  const handleSubmitPost = async () => {
-    if (!user) {
-      console.error('No user found for post submission');
-      showConfirmationToast('You must be logged in to post.');
-      return;
-    }
+  const {
+    onTabClick,
+    handleFileSelected,
+    handleMultipleFilesSelected,
+    onCaptionInput,
+    onSelectMention
+  } = usePostSubmissionHandlers(
+    captionInputRef,
+    caption,
+    setCaption,
+    cursorPosition,
+    setCursorPosition,
+    setShowSuggestions,
+    setMentionSuggestions,
+    selectedTags,
+    setSelectedTags,
+    localSelectedTags,
+    setLocalSelectedTags,
+    openComposer,
+    closeGallery,
+    showConfirmationToast
+  );
 
-    setIsSubmitting(true);
-    
-    console.log('Starting post submission with:', {
-      hasFile: !!selectedFile,
-      hasMultipleFiles: selectedFiles.length > 0,
-      caption,
-      tagCount: localSelectedTags.length,
-      course: selectedCourse ? {
-        id: selectedCourse.id,
-        name: selectedCourse.name,
-        country: selectedCourse.country
-      } : null
-    });
-
-    // Use multiple files if available, otherwise use single file
-    const mediaFiles = selectedFiles.length > 0 ? selectedFiles : (selectedFile ? [selectedFile] : []);
-
-    // Create tags array - this will be handled by the post submission hook
-    let finalTags = [...localSelectedTags];
-
-    // Add golf course information to be handled by post submission
-    const courseInfo = selectedCourse ? {
-      id: selectedCourse.id,
-      name: selectedCourse.name,
-      country: selectedCourse.country
-    } : null;
-
-    console.log('Final tags to submit:', finalTags);
-    console.log('Course info to submit:', courseInfo);
-
-    try {
-      await submitPost({
-        user,
-        content: caption,
-        mediaFiles,
-        selectedTags: finalTags,
-        courseInfo: courseInfo, // Pass course info separately
-        onSuccess: () => {
-          console.log('Post submission successful');
-          closeComposer();
-          setLocalSelectedTags([]);
-          showConfirmationToast('Post shared successfully!');
-        },
-        onError: () => {
-          console.error('Post submission failed');
-          showConfirmationToast('Failed to share post. Please try again.');
-        }
-      });
-    } catch (error) {
-      console.error('Error in handleSubmitPost:', error);
-      showConfirmationToast('Failed to share post. Please try again.');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const onTabClick = (tab: { id: string; path: string | null; isAction?: boolean }) => {
-    if (tab.isAction && tab.id === 'post') {
-      if (!user) return;
-      
-      // Both mobile and desktop now use the new EnhancedCreateMomentModal
-      console.log('Post tab clicked, opening Create a Moment modal directly');
-      setLocalSelectedTags([]);
-      // Open composer directly without files - modal will handle file upload UI
-      openComposer();
-    } else {
-      handleTabClick(tab, user, () => {});
-    }
-  };
-
-  const handleFileSelected = (file: File) => {
-    console.log('BottomNavigation handleFileSelected called with:', {
-      name: file.name,
-      type: file.type,
-      size: file.size
-    });
-    console.log('Setting local selected tags to empty array');
+  const handleCloseComposer = () => {
+    closeComposer();
     setLocalSelectedTags([]);
-    console.log('Closing gallery and opening composer with file:', file.name);
-    closeGallery(); // Ensure gallery is closed before opening composer
-    openComposer(file);
-    console.log('openComposer call completed');
-  };
-
-  const handleMultipleFilesSelected = (files: File[]) => {
-    console.log('BottomNavigation handleMultipleFilesSelected called with:', {
-      count: files.length,
-      files: files.map(f => ({ name: f.name, type: f.type, size: f.size }))
-    });
-    
-    if (files.length === 0) {
-      console.error('No files received in handleMultipleFilesSelected');
-      showConfirmationToast('No files were selected. Please try again.');
-      return;
-    }
-    
-    setLocalSelectedTags([]);
-    // Pass the first file as main file and the rest as additional files
-    openComposer(files[0], files.slice(1));
-  };
-
-  const onCaptionInput = (e: React.FormEvent<HTMLDivElement>) => {
-    handleCaptionInput(
-      e,
-      caption,
-      setCaption,
-      cursorPosition,
-      setCursorPosition,
-      setShowSuggestions,
-      setMentionSuggestions
-    );
-  };
-
-  const onSelectMention = (entity: any) => {
-    // Add to local selected tags
-    if (!localSelectedTags.find(tag => tag.id === entity.id)) {
-      setLocalSelectedTags(prev => [...prev, entity]);
-    }
-
-    selectMention(
-      entity,
-      caption,
-      setCaption,
-      cursorPosition,
-      selectedTags,
-      setSelectedTags,
-      captionInputRef,
-      setShowSuggestions,
-      setMentionSuggestions
-    );
   };
 
   return (
     <>
       <NavigationBar
         activeTab={activeTab}
-        onTabClick={onTabClick}
+        onTabClick={(tab) => onTabClick(tab, handleTabClick)}
       />
 
       <GalleryPicker
@@ -223,47 +89,16 @@ const BottomNavigation = () => {
         onMultipleFilesSelected={handleMultipleFilesSelected}
       />
 
-      <EnhancedCreateMomentModal
-        isOpen={isComposerOpen}
-        onClose={() => {
-          closeComposer();
-          setLocalSelectedTags([]);
-        }}
-        onSubmit={async (data) => {
-          // Immediate UI feedback - close modal and show success toast
-          closeComposer();
-          setLocalSelectedTags([]);
-          showConfirmationToast('Your post is out there!');
-          
-          // Background upload - don't await, don't block UI
-          setIsSubmitting(true);
-          submitPost({
-            user,
-            content: data.caption,
-            mediaFiles: data.files,
-            selectedTags: data.tags,
-            courseInfo: data.course,
-            onSuccess: () => {
-              console.log('Post submission successful - background upload completed');
-              setIsSubmitting(false);
-              // Optionally show another toast when upload completes
-              // showConfirmationToast('Post is now live!');
-            },
-            onError: () => {
-              console.error('Post submission failed - background upload failed');
-              setIsSubmitting(false);
-              showConfirmationToast('Upload failed. Please try again later.');
-            }
-          }).catch((error) => {
-            console.error('Error in enhanced post submission:', error);
-            setIsSubmitting(false);
-            showConfirmationToast('Upload failed. Please try again later.');
-          });
-        }}
-        isSubmitting={isSubmitting}
-        initialFiles={selectedFiles.length > 0 ? selectedFiles : (selectedFile ? [selectedFile] : [])}
+      <PostSubmissionHandler
+        isComposerOpen={isComposerOpen}
+        selectedFiles={selectedFiles}
+        selectedFile={selectedFile}
         selectedCourse={selectedCourse}
         onCourseSelect={setSelectedCourse}
+        onClose={handleCloseComposer}
+        onShowToast={showConfirmationToast}
+        isSubmitting={isSubmitting}
+        setIsSubmitting={setIsSubmitting}
       />
 
       <SnapToast

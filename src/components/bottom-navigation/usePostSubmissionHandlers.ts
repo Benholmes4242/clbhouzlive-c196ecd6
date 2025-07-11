@@ -1,0 +1,107 @@
+import React from 'react';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { usePostHandlers } from '@/hooks/usePostHandlers';
+
+export const usePostSubmissionHandlers = (
+  captionInputRef: React.RefObject<HTMLDivElement>,
+  caption: string,
+  setCaption: (caption: string) => void,
+  cursorPosition: number,
+  setCursorPosition: (position: number) => void,
+  setShowSuggestions: (show: boolean) => void,
+  setMentionSuggestions: (suggestions: any[]) => void,
+  selectedTags: any[],
+  setSelectedTags: (tags: any[]) => void,
+  localSelectedTags: any[],
+  setLocalSelectedTags: (tags: any[]) => void,
+  openComposer: (file?: File, additionalFiles?: File[]) => void,
+  closeGallery: () => void,
+  showConfirmationToast: (message: string) => void
+) => {
+  const { user } = useSupabaseSession();
+  const { handleCaptionInput, selectMention } = usePostHandlers();
+
+  const onTabClick = (tab: { id: string; path: string | null; isAction?: boolean }, handleTabClick: Function) => {
+    if (tab.isAction && tab.id === 'post') {
+      if (!user) return;
+      
+      // Both mobile and desktop now use the new EnhancedCreateMomentModal
+      console.log('Post tab clicked, opening Create a Moment modal directly');
+      setLocalSelectedTags([]);
+      // Open composer directly without files - modal will handle file upload UI
+      openComposer();
+    } else {
+      handleTabClick(tab, user, () => {});
+    }
+  };
+
+  const handleFileSelected = (file: File) => {
+    console.log('BottomNavigation handleFileSelected called with:', {
+      name: file.name,
+      type: file.type,
+      size: file.size
+    });
+    console.log('Setting local selected tags to empty array');
+    setLocalSelectedTags([]);
+    console.log('Closing gallery and opening composer with file:', file.name);
+    closeGallery(); // Ensure gallery is closed before opening composer
+    openComposer(file);
+    console.log('openComposer call completed');
+  };
+
+  const handleMultipleFilesSelected = (files: File[]) => {
+    console.log('BottomNavigation handleMultipleFilesSelected called with:', {
+      count: files.length,
+      files: files.map(f => ({ name: f.name, type: f.type, size: f.size }))
+    });
+    
+    if (files.length === 0) {
+      console.error('No files received in handleMultipleFilesSelected');
+      showConfirmationToast('No files were selected. Please try again.');
+      return;
+    }
+    
+    setLocalSelectedTags([]);
+    // Pass the first file as main file and the rest as additional files
+    openComposer(files[0], files.slice(1));
+  };
+
+  const onCaptionInput = (e: React.FormEvent<HTMLDivElement>) => {
+    handleCaptionInput(
+      e,
+      caption,
+      setCaption,
+      cursorPosition,
+      setCursorPosition,
+      setShowSuggestions,
+      setMentionSuggestions
+    );
+  };
+
+  const onSelectMention = (entity: any) => {
+    // Add to local selected tags
+    if (!localSelectedTags.find(tag => tag.id === entity.id)) {
+      setLocalSelectedTags([...localSelectedTags, entity]);
+    }
+
+    selectMention(
+      entity,
+      caption,
+      setCaption,
+      cursorPosition,
+      selectedTags,
+      setSelectedTags,
+      captionInputRef,
+      setShowSuggestions,
+      setMentionSuggestions
+    );
+  };
+
+  return {
+    onTabClick,
+    handleFileSelected,
+    handleMultipleFilesSelected,
+    onCaptionInput,
+    onSelectMention
+  };
+};
