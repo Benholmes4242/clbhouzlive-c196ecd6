@@ -125,7 +125,21 @@ const MediaPreviewGrid: React.FC<MediaPreviewGridProps> = ({
                       style={{ transform: `rotate(${media.rotation || 0}deg)` }}
                       muted
                       preload="metadata"
+                      controls={false}
+                      playsInline
+                      onLoadedData={(e) => {
+                        // Seek to 1 second to get a better thumbnail
+                        const video = e.target as HTMLVideoElement;
+                        video.currentTime = 1;
+                      }}
                       onError={() => handleImageError(media.id)}
+                      onLoadStart={() => handleImageLoadStart(media.id)}
+                      onLoadedMetadata={(e) => {
+                        const video = e.target as HTMLVideoElement;
+                        // Ensure we show the first frame
+                        video.currentTime = Math.min(1, video.duration * 0.1);
+                        handleImageLoad(media.id);
+                      }}
                     />
                   )}
 
