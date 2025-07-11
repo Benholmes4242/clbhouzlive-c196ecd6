@@ -12,7 +12,7 @@ export const MediaNavigationDots: React.FC<MediaNavigationDotsProps> = ({
   if (mediaCount <= 1) return null;
 
   return (
-    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex space-x-2 z-10">
+    <div className="absolute bottom-1 left-1/2 -translate-x-1/2 flex space-x-2 z-10">
       {Array.from({ length: mediaCount }).map((_, index) => (
         <div
           key={index}
