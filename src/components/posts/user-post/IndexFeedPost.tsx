@@ -5,6 +5,7 @@ import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useVideoPlaybackManager } from '@/contexts/VideoPlaybackManager';
+import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { UserPostData, GolfCourse } from './types';
 import { UserInfoOverlay } from './overlays/UserInfoOverlay';
@@ -37,7 +38,8 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
   const [isHovered, setIsHovered] = useState(false);
   const [showFullCourseTag, setShowFullCourseTag] = useState(false);
   const { user } = useSupabaseSession();
-  const { muteAllOtherVideos } = useVideoPlaybackManager();
+  const { muteAllOtherVideos, muteAllVideos } = useVideoPlaybackManager();
+  const { isGloballyMuted } = useGlobalAudio();
   const isMobile = useIsMobile();
   
   const { ref: containerRef, isInView } = useIntersectionObserver({
@@ -50,17 +52,24 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
 
   useEffect(() => {
     console.log('🎬 IndexFeedPost: isInView changed:', isInView, 'currentMediaIndex:', currentMediaIndex, 'mediaType:', post.post_media?.[currentMediaIndex]?.media_type);
-    if (isInView && post.post_media?.[currentMediaIndex]?.media_type === 'video') {
+    
+    const currentMedia = post.post_media?.[currentMediaIndex];
+    if (!currentMedia) return;
+    
+    if (isInView && currentMedia.media_type === 'video') {
       console.log('🎬 Setting isHovered to true for video autoplay');
       setIsHovered(true);
-      
-      // When this video starts playing, ensure audio exclusivity
-      // The VideoPlayer will handle the audio management through useVideoPlayer hook
     } else {
       console.log('🎬 Setting isHovered to false');
       setIsHovered(false);
+      
+      // When video goes out of view, mute all videos to stop audio
+      if (currentMedia.media_type === 'video') {
+        console.log('🎬 Video out of view, muting all videos');
+        muteAllVideos();
+      }
     }
-  }, [isInView, currentMediaIndex, post.post_media]);
+  }, [isInView, currentMediaIndex, post.post_media, muteAllVideos]);
 
   // Hide full course tag when scrolling off the post
   useEffect(() => {
