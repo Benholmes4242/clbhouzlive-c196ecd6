@@ -152,9 +152,9 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
         <div className="absolute top-3 right-3 z-20">
           <button 
             onClick={handleMaximizeClick}
-            className="w-8 h-8 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/60 transition-all"
+            className="flex items-center justify-center w-10 h-10 text-white hover:bg-white/10 rounded-full transition-colors"
           >
-            <Maximize2 className="w-4 h-4" />
+            <Maximize2 className="w-6 h-6" />
           </button>
         </div>
 
