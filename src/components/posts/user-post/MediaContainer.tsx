@@ -32,11 +32,13 @@ export const MediaContainer: React.FC<MediaContainerProps> = ({
   const hasMoved = useRef(false);
   const swipeHandlers = useSwipeable({
     onSwipedLeft: (eventData) => {
+      console.log('📱 Swipe left detected in MediaContainer');
       if (media.length > 1) {
         onSwipeLeft();
       }
     },
     onSwipedRight: (eventData) => {
+      console.log('📱 Swipe right detected in MediaContainer');
       if (media.length > 1) {
         onSwipeRight();
       }

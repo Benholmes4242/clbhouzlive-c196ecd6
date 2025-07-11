@@ -47,9 +47,12 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
   const isOwnPost = user?.id === post.user.id;
 
   useEffect(() => {
+    console.log('🎬 IndexFeedPost: isInView changed:', isInView, 'currentMediaIndex:', currentMediaIndex, 'mediaType:', post.post_media?.[currentMediaIndex]?.media_type);
     if (isInView && post.post_media?.[currentMediaIndex]?.media_type === 'video') {
+      console.log('🎬 Setting isHovered to true for video autoplay');
       setIsHovered(true);
     } else {
+      console.log('🎬 Setting isHovered to false');
       setIsHovered(false);
     }
   }, [isInView, currentMediaIndex, post.post_media]);
@@ -108,8 +111,6 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
     <div 
       ref={containerRef}
       className="relative w-full bg-black rounded-xl overflow-hidden"
-      onTouchStart={() => setIsHovered(true)}
-      onTouchEnd={() => setIsHovered(false)}
     >
       <MediaContainer
         media={post.post_media}
