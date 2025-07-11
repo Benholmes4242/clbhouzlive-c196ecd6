@@ -80,8 +80,8 @@ const FullscreenMediaModal = ({
       onClick={handleBackdropClick}
     >
       {/* Top Controls */}
-      <div className="absolute top-4 left-4 right-4 z-10 flex justify-between items-start pointer-events-none">
-        {/* Back Arrow - Top Left */}
+      <div className="absolute top-4 right-4 z-10 flex items-start gap-2 pointer-events-none">
+        {/* Back Arrow - Top Right */}
         <button
           onClick={onClose}
           className="flex items-center justify-center w-10 h-10 text-white hover:bg-white/10 rounded-full transition-colors pointer-events-auto"
@@ -90,48 +90,43 @@ const FullscreenMediaModal = ({
           <ArrowLeft className="h-6 w-6" />
         </button>
 
-        {/* Right side controls */}
-        <div className="flex items-start gap-2">
-          {/* Mute/Unmute - Top Right (Only for videos) */}
-          {mediaType === 'video' && (
-            <button
-              onClick={handleMuteToggle}
-              className="flex items-center justify-center w-10 h-10 text-white hover:bg-white/10 rounded-full transition-colors pointer-events-auto"
-              aria-label={isMuted ? "Unmute" : "Mute"}
-            >
-              {isMuted ? (
-                <VolumeX className="h-6 w-6" />
-              ) : (
-                <Volume2 className="h-6 w-6" />
-              )}
-            </button>
-          )}
+        {/* Mute/Unmute - Top Right (Only for videos) */}
+        {mediaType === 'video' && (
+          <button
+            onClick={handleMuteToggle}
+            className="flex items-center justify-center w-10 h-10 text-white hover:bg-white/10 rounded-full transition-colors pointer-events-auto"
+            aria-label={isMuted ? "Unmute" : "Mute"}
+          >
+            {isMuted ? (
+              <VolumeX className="h-6 w-6" />
+            ) : (
+              <Volume2 className="h-6 w-6" />
+            )}
+          </button>
+        )}
 
-          {/* Golf Course Badge - Top Right */}
-          {golfCourse && (
-            <div className="pointer-events-auto">
-              <CoursePostBadge 
-                course={{
-                  id: golfCourse.id,
-                  name: golfCourse.name,
-                  country: golfCourse.country
-                }}
-                className="relative top-0 right-0 mr-2"
-              />
-            </div>
-          )}
-        </div>
+        {/* Golf Course Badge - Top Right */}
+        {golfCourse && (
+          <div className="pointer-events-auto">
+            <CoursePostBadge 
+              course={{
+                id: golfCourse.id,
+                name: golfCourse.name,
+                country: golfCourse.country
+              }}
+              className="relative top-0 right-0 mr-2"
+            />
+          </div>
+        )}
       </div>
 
-      {/* User Info Overlay - Top Left */}
+      {/* User Info Overlay - Top Left (exact same position as index feed) */}
       {user && displayName && (
-        <div className="absolute top-16 left-4 z-20">
-          <UserInfoOverlay
-            user={user}
-            displayName={displayName}
-            onProfileClick={() => {}} // Add profile click handler if needed
-          />
-        </div>
+        <UserInfoOverlay
+          user={user}
+          displayName={displayName}
+          onProfileClick={() => {}} // Add profile click handler if needed
+        />
       )}
 
       {/* Media Content - Centered and properly sized */}
