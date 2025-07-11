@@ -3,6 +3,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, Volume2, VolumeX } from 'lucide-react';
 import CoursePostBadge from '../posts/CoursePostBadge';
 import { UserInfoOverlay } from '../posts/user-post/overlays/UserInfoOverlay';
+import TaggedText from '../posts/TaggedText';
+import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 interface FullscreenMediaModalProps {
@@ -21,6 +23,8 @@ interface FullscreenMediaModalProps {
     profile_photo_url: string | null;
   };
   displayName?: string;
+  content?: string | null;
+  postTags?: any[];
 }
 
 const FullscreenMediaModal = ({ 
@@ -31,7 +35,9 @@ const FullscreenMediaModal = ({
   alt = "Media content",
   golfCourse,
   user,
-  displayName
+  displayName,
+  content,
+  postTags
 }: FullscreenMediaModalProps) => {
   // Only log when golfCourse is actually provided for debugging
   if (golfCourse) {
@@ -217,6 +223,30 @@ const FullscreenMediaModal = ({
           />
         </div>
       )}
+
+      {/* Caption and Golf Course Tag - Bottom Left */}
+      <div className="absolute bottom-4 left-4 z-20 max-w-[70%]">
+        {/* Golf Course Tag Pill */}
+        {golfCourse && (
+          <div className="mb-2">
+            <div className="inline-flex items-center px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm border border-white/30">
+              <span className="text-white text-sm font-medium">
+                📍 {golfCourse.name}
+              </span>
+            </div>
+          </div>
+        )}
+        
+        {/* Post Caption */}
+        {content && removeGolfCourseFromContent(content) && (
+          <div className="text-white text-sm leading-relaxed">
+            <TaggedText 
+              text={removeGolfCourseFromContent(content)} 
+              tags={postTags || []} 
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 };

@@ -15,6 +15,8 @@ interface MediaItem {
     profile_photo_url: string | null;
   };
   displayName?: string;
+  content?: string | null;
+  postTags?: any[];
 }
 
 export const useFullscreenMedia = () => {
@@ -27,9 +29,11 @@ export const useFullscreenMedia = () => {
     alt?: string, 
     golfCourse?: { id: string; name: string; country: string; },
     user?: { id: string; profile_photo_url: string | null; },
-    displayName?: string
+    displayName?: string,
+    content?: string | null,
+    postTags?: any[]
   ) => {
-    setCurrentMedia({ url, type, alt, golfCourse, user, displayName });
+    setCurrentMedia({ url, type, alt, golfCourse, user, displayName, content, postTags });
     setIsOpen(true);
   };
 

@@ -57,7 +57,9 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
         undefined, 
         golfCourse ? { id: golfCourse.id, name: golfCourse.name, country: golfCourse.country } : undefined,
         post.user,
-        displayName
+        displayName,
+        post.content,
+        post.post_tags
       );
     }
   };
@@ -118,6 +120,8 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
         golfCourse={currentMedia?.golfCourse}
         user={currentMedia?.user}
         displayName={currentMedia?.displayName}
+        content={currentMedia?.content}
+        postTags={currentMedia?.postTags}
       />
     </>
   );
