@@ -230,31 +230,35 @@ const BottomNavigation = () => {
           setLocalSelectedTags([]);
         }}
         onSubmit={async (data) => {
+          // Immediate UI feedback - close modal and show success toast
+          closeComposer();
+          setLocalSelectedTags([]);
+          showConfirmationToast('Your post is out there!');
+          
+          // Background upload - don't await, don't block UI
           setIsSubmitting(true);
-          try {
-            await submitPost({
-              user,
-              content: data.caption,
-              mediaFiles: data.files,
-              selectedTags: data.tags,
-              courseInfo: data.course,
-              onSuccess: () => {
-                console.log('Post submission successful');
-                closeComposer();
-                setLocalSelectedTags([]);
-                showConfirmationToast('Post shared successfully!');
-              },
-              onError: () => {
-                console.error('Post submission failed');
-                showConfirmationToast('Failed to share post. Please try again.');
-              }
-            });
-          } catch (error) {
+          submitPost({
+            user,
+            content: data.caption,
+            mediaFiles: data.files,
+            selectedTags: data.tags,
+            courseInfo: data.course,
+            onSuccess: () => {
+              console.log('Post submission successful - background upload completed');
+              setIsSubmitting(false);
+              // Optionally show another toast when upload completes
+              // showConfirmationToast('Post is now live!');
+            },
+            onError: () => {
+              console.error('Post submission failed - background upload failed');
+              setIsSubmitting(false);
+              showConfirmationToast('Upload failed. Please try again later.');
+            }
+          }).catch((error) => {
             console.error('Error in enhanced post submission:', error);
-            showConfirmationToast('Failed to share post. Please try again.');
-          } finally {
             setIsSubmitting(false);
-          }
+            showConfirmationToast('Upload failed. Please try again later.');
+          });
         }}
         isSubmitting={isSubmitting}
         initialFiles={selectedFiles.length > 0 ? selectedFiles : (selectedFile ? [selectedFile] : [])}
