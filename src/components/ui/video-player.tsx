@@ -172,12 +172,28 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     }
   };
 
-  const handleVideoClick = () => {
+  const handleVideoClick = (e: React.MouseEvent) => {
+    // For autoplay feed videos, don't let clicks toggle play/pause
+    if (isInFeed && autoplay) {
+      if (onClick) {
+        onClick();
+      }
+      return;
+    }
+    
     if (onClick) {
       onClick();
     } else {
-      // Always allow video click to toggle play/pause for feed videos
-      togglePlayPause({} as React.MouseEvent);
+      // Allow video click to toggle play/pause for non-autoplay videos
+      togglePlayPause(e);
+    }
+  };
+
+  const handleVideoTouch = (e: React.TouchEvent) => {
+    // For autoplay feed videos, prevent touch events from affecting playback
+    if (isInFeed && autoplay) {
+      e.preventDefault();
+      e.stopPropagation();
     }
   };
 
@@ -199,6 +215,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         webkit-playsinline="true"
         x5-playsinline="true"
         onClick={handleVideoClick}
+        onTouchStart={handleVideoTouch}
+        onTouchEnd={handleVideoTouch}
+        onTouchMove={handleVideoTouch}
       />
 
       {/* Video Icon Overlay */}
