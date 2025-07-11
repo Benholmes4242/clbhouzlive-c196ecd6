@@ -278,9 +278,9 @@ const FullscreenMediaModal = ({
               onClick={handleMuteToggle}
             >
               {isMuted ? (
-                <VolumeX className="w-5 h-5" />
+                <VolumeX className="w-6 h-6" />
               ) : (
-                <Volume2 className="w-5 h-5" />
+                <Volume2 className="w-6 h-6" />
               )}
             </button>
           )}
@@ -289,19 +289,19 @@ const FullscreenMediaModal = ({
             className="cursor-pointer hover:opacity-100 transition-opacity"
             onClick={(e) => handleInteractionClick(e, 'like')}
           >
-            <Heart className="w-5 h-5" />
+            <Heart className="w-6 h-6" />
           </button>
           <button 
             className="cursor-pointer hover:opacity-100 transition-opacity"
             onClick={(e) => handleInteractionClick(e, 'comment')}
           >
-            <MessageCircle className="w-5 h-5" />
+            <MessageCircle className="w-6 h-6" />
           </button>
           <button 
             className="cursor-pointer hover:opacity-100 transition-opacity"
             onClick={(e) => handleInteractionClick(e, 'share')}
           >
-            <Share className="w-5 h-5" />
+            <Share className="w-6 h-6" />
           </button>
         </div>
       </div>

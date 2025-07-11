@@ -35,9 +35,9 @@ export const InteractionIconsOverlay: React.FC<InteractionIconsOverlayProps> = (
             title={isGloballyMuted ? "Unmute all videos" : "Mute all videos"}
           >
             {isGloballyMuted ? (
-              <VolumeX className="w-5 h-5" />
+              <VolumeX className="w-6 h-6" />
             ) : (
-              <Volume2 className="w-5 h-5" />
+              <Volume2 className="w-6 h-6" />
             )}
           </button>
         )}
@@ -46,19 +46,19 @@ export const InteractionIconsOverlay: React.FC<InteractionIconsOverlayProps> = (
           className="cursor-pointer hover:opacity-100 transition-opacity"
           onClick={(e) => onInteractionClick(e, 'like')}
         >
-          <Heart className="w-5 h-5" />
+          <Heart className="w-6 h-6" />
         </button>
         <button 
           className="cursor-pointer hover:opacity-100 transition-opacity"
           onClick={(e) => onInteractionClick(e, 'comment')}
         >
-          <MessageCircle className="w-5 h-5" />
+          <MessageCircle className="w-6 h-6" />
         </button>
         <button 
           className="cursor-pointer hover:opacity-100 transition-opacity"
           onClick={(e) => onInteractionClick(e, 'share')}
         >
-          <Share className="w-5 h-5" />
+          <Share className="w-6 h-6" />
         </button>
       </div>
     </div>
