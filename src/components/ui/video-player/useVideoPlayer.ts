@@ -98,6 +98,13 @@ export const useVideoPlayer = ({
   }, [isGloballyMuted, isInFeed]);
 
   const togglePlayPause = (e?: React.MouseEvent | Event) => {
+    console.log('🎯 togglePlayPause called:', { isInFeed, paused: videoRef.current?.paused });
+    
+    if (isInFeed) {
+      console.log('🚫 togglePlayPause blocked - in feed mode');
+      return; // Block all play/pause interactions in feed
+    }
+    
     if (e && typeof e.stopPropagation === 'function') {
       e.stopPropagation();
     }
@@ -105,8 +112,10 @@ export const useVideoPlayer = ({
     if (!video) return;
 
     if (video.paused) {
+      console.log('▶️ Playing video');
       video.play().catch(console.error);
     } else {
+      console.log('⏸️ Pausing video');
       video.pause();
     }
   };

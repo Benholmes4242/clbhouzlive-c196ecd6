@@ -76,9 +76,14 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
 
   const videoRef = externalVideoRef || internalVideoRef;
 
-  const handleVideoClick = () => {
+  const handleVideoClick = (e: React.MouseEvent) => {
+    console.log('🎬 Video click detected:', { isInFeed, event: e.type, target: e.target });
+    
     // Completely disable all video clicks when in feed
     if (isInFeed) {
+      console.log('🚫 Video click blocked - in feed mode');
+      e.preventDefault();
+      e.stopPropagation();
       return; // Do nothing for feed videos
     }
     
@@ -86,7 +91,17 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     if (onClick) {
       onClick();
     } else {
-      togglePlayPause({} as React.MouseEvent);
+      togglePlayPause(e);
+    }
+  };
+
+  // Debug function to log all touch events
+  const logTouchEvent = (eventType: string) => (e: React.TouchEvent) => {
+    console.log(`📱 Touch event: ${eventType}`, { isInFeed, touches: e.touches.length });
+    if (isInFeed) {
+      console.log('🚫 Touch event blocked - in feed mode');
+      e.preventDefault();
+      e.stopPropagation();
     }
   };
 
@@ -110,16 +125,16 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         x5-playsinline="true"
         controls={false}
         disablePictureInPicture={isInFeed}
-        onClick={isInFeed ? (e) => { e.preventDefault(); e.stopPropagation(); } : handleVideoClick}
-        onMouseDown={isInFeed ? (e) => { e.preventDefault(); e.stopPropagation(); } : undefined}
-        onMouseUp={isInFeed ? (e) => { e.preventDefault(); e.stopPropagation(); } : undefined}
-        onTouchStart={isInFeed ? (e) => { e.preventDefault(); e.stopPropagation(); } : undefined}
-        onTouchEnd={isInFeed ? (e) => { e.preventDefault(); e.stopPropagation(); } : undefined}
-        onTouchMove={isInFeed ? (e) => { e.preventDefault(); e.stopPropagation(); } : undefined}
-        onTouchCancel={isInFeed ? (e) => { e.preventDefault(); e.stopPropagation(); } : undefined}
-        onContextMenu={isInFeed ? (e) => { e.preventDefault(); e.stopPropagation(); } : undefined}
-        onPointerDown={isInFeed ? (e) => { e.preventDefault(); e.stopPropagation(); } : undefined}
-        onPointerUp={isInFeed ? (e) => { e.preventDefault(); e.stopPropagation(); } : undefined}
+        onClick={isInFeed ? (e) => { console.log('🚫 Video onClick blocked'); e.preventDefault(); e.stopPropagation(); } : handleVideoClick}
+        onMouseDown={isInFeed ? (e) => { console.log('🚫 Video onMouseDown blocked'); e.preventDefault(); e.stopPropagation(); } : undefined}
+        onMouseUp={isInFeed ? (e) => { console.log('🚫 Video onMouseUp blocked'); e.preventDefault(); e.stopPropagation(); } : undefined}
+        onTouchStart={isInFeed ? logTouchEvent('touchstart') : undefined}
+        onTouchEnd={isInFeed ? logTouchEvent('touchend') : undefined}
+        onTouchMove={isInFeed ? logTouchEvent('touchmove') : undefined}
+        onTouchCancel={isInFeed ? logTouchEvent('touchcancel') : undefined}
+        onContextMenu={isInFeed ? (e) => { console.log('🚫 Video onContextMenu blocked'); e.preventDefault(); e.stopPropagation(); } : undefined}
+        onPointerDown={isInFeed ? (e) => { console.log('🚫 Video onPointerDown blocked'); e.preventDefault(); e.stopPropagation(); } : undefined}
+        onPointerUp={isInFeed ? (e) => { console.log('🚫 Video onPointerUp blocked'); e.preventDefault(); e.stopPropagation(); } : undefined}
         style={isInFeed ? { touchAction: 'none', userSelect: 'none', pointerEvents: 'none' } : undefined}
       />
 
