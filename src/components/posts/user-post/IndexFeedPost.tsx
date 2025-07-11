@@ -56,21 +56,28 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
     
     console.log('🎬 IndexFeedPost: isInView changed:', isInView, 'for video:', `index-${currentMedia.id}`, 'mediaType:', currentMedia.media_type);
     
-    if (currentMedia.media_type === 'video') {
-      const videoId = `index-${currentMedia.id}`;
+    if (isInView) {
+      // When ANY post comes into view, pause all videos first
+      pauseAllAndSetActive(''); // Pass empty string to just pause all videos
       
-      if (isInView) {
-        console.log('🎬 Video entering view, setting as active and pausing all others:', videoId);
+      if (currentMedia.media_type === 'video') {
+        const videoId = `index-${currentMedia.id}`;
+        console.log('🎬 Video entering view, setting as active:', videoId);
         setIsHovered(true);
+        // Allow this video to play by calling pauseAllAndSetActive with the actual videoId
         pauseAllAndSetActive(videoId);
       } else {
-        console.log('🎬 Video exiting view, pausing:', videoId);
-        setIsHovered(false);
-        pauseVideo(videoId);
+        setIsHovered(true);
       }
     } else {
-      // For images, just update hover state
-      setIsHovered(isInView);
+      setIsHovered(false);
+      
+      // When leaving view, pause this video if it's a video
+      if (currentMedia.media_type === 'video') {
+        const videoId = `index-${currentMedia.id}`;
+        console.log('🎬 Video exiting view, pausing:', videoId);
+        pauseVideo(videoId);
+      }
     }
   }, [isInView, currentMediaIndex, post.post_media, pauseVideo, pauseAllAndSetActive]);
 
