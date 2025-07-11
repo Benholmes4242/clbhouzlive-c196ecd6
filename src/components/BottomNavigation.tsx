@@ -56,7 +56,6 @@ const BottomNavigation = () => {
     setCursorPosition,
     showToast,
     toastMessage,
-    toastVariant,
     selectedCourse,
     setSelectedCourse,
     openGallery,
@@ -77,11 +76,6 @@ const BottomNavigation = () => {
       showConfirmationToast('You must be logged in to post.');
       return;
     }
-
-    // ✅ STEP 1: Immediate UI Feedback - Close modal and show optimistic toast
-    closeComposer();
-    setLocalSelectedTags([]);
-    showConfirmationToast('Your post is out there!');
 
     setIsSubmitting(true);
     
@@ -113,7 +107,6 @@ const BottomNavigation = () => {
     console.log('Final tags to submit:', finalTags);
     console.log('Course info to submit:', courseInfo);
 
-    // ✅ STEP 2: Background Upload - Don't block UI
     try {
       await submitPost({
         user,
@@ -123,16 +116,18 @@ const BottomNavigation = () => {
         courseInfo: courseInfo, // Pass course info separately
         onSuccess: () => {
           console.log('Post submission successful');
-          showConfirmationToast('Post is now live!');
+          closeComposer();
+          setLocalSelectedTags([]);
+          showConfirmationToast('Post shared successfully!');
         },
         onError: () => {
           console.error('Post submission failed');
-          showConfirmationToast('Upload failed. Please try again.');
+          showConfirmationToast('Failed to share post. Please try again.');
         }
       });
     } catch (error) {
       console.error('Error in handleSubmitPost:', error);
-      showConfirmationToast('Upload failed. Please try again.');
+      showConfirmationToast('Failed to share post. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -235,12 +230,6 @@ const BottomNavigation = () => {
           setLocalSelectedTags([]);
         }}
         onSubmit={async (data) => {
-          // ✅ STEP 1: Immediate UI Feedback - Close modal and show optimistic toast
-          closeComposer();
-          setLocalSelectedTags([]);
-          showConfirmationToast('Your post is out there!');
-
-          // ✅ STEP 2: Background Upload - Don't block UI
           setIsSubmitting(true);
           try {
             await submitPost({
@@ -251,17 +240,18 @@ const BottomNavigation = () => {
               courseInfo: data.course,
               onSuccess: () => {
                 console.log('Post submission successful');
-                // Optionally show a subtle success toast when upload completes
-                showConfirmationToast('Post is now live!', 'success');
+                closeComposer();
+                setLocalSelectedTags([]);
+                showConfirmationToast('Post shared successfully!');
               },
               onError: () => {
                 console.error('Post submission failed');
-                showConfirmationToast('Upload failed. Please try again.', 'error');
+                showConfirmationToast('Failed to share post. Please try again.');
               }
             });
           } catch (error) {
             console.error('Error in enhanced post submission:', error);
-            showConfirmationToast('Upload failed. Please try again.', 'error');
+            showConfirmationToast('Failed to share post. Please try again.');
           } finally {
             setIsSubmitting(false);
           }
@@ -276,7 +266,6 @@ const BottomNavigation = () => {
         message={toastMessage}
         isVisible={showToast}
         onHide={hideToast}
-        variant={toastVariant}
       />
     </>
   );

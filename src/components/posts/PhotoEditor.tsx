@@ -20,7 +20,7 @@ const PhotoEditor: React.FC<PhotoEditorProps> = ({
   onSave
 }) => {
   const editorRef = useRef<AvatarEditor>(null);
-  const [scale, setScale] = useState([1.0]);
+  const [scale, setScale] = useState([1.2]);
   const [rotate, setRotate] = useState(0);
   const [brightness, setBrightness] = useState([1]);
   const [position, setPosition] = useState({ x: 0.5, y: 0.5 });
@@ -38,34 +38,12 @@ const PhotoEditor: React.FC<PhotoEditorProps> = ({
   }, []);
 
   const handleSave = async () => {
-    console.log('Saving with values:', { scale: scale[0], brightness: brightness[0], rotate });
-    
     if (editorRef.current) {
       const canvas = editorRef.current.getImage();
-      console.log('Canvas dimensions:', canvas.width, 'x', canvas.height);
-      
-      // Apply brightness adjustment to the canvas
-      const ctx = canvas.getContext('2d');
-      if (ctx && brightness[0] !== 1) {
-        console.log('Applying brightness:', brightness[0]);
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        const data = imageData.data;
-        
-        // Adjust brightness by multiplying RGB values
-        for (let i = 0; i < data.length; i += 4) {
-          data[i] = Math.min(255, data[i] * brightness[0]);     // Red
-          data[i + 1] = Math.min(255, data[i + 1] * brightness[0]); // Green
-          data[i + 2] = Math.min(255, data[i + 2] * brightness[0]); // Blue
-          // Alpha channel (i + 3) remains unchanged
-        }
-        
-        ctx.putImageData(imageData, 0, 0);
-      }
       
       // Convert canvas to blob
       canvas.toBlob((blob) => {
         if (blob) {
-          console.log('Created blob with size:', blob.size);
           // Create a new file with the same name but with edited suffix
           const fileName = imageFile.name.replace(/\.[^/.]+$/, '_edited.png');
           const editedFile = new File([blob], fileName, { type: 'image/png' });
@@ -77,7 +55,7 @@ const PhotoEditor: React.FC<PhotoEditorProps> = ({
 
   const handleCancel = () => {
     // Reset all values
-    setScale([1.0]);
+    setScale([1.2]);
     setRotate(0);
     setBrightness([1]);
     setPosition({ x: 0.5, y: 0.5 });
@@ -149,10 +127,10 @@ const PhotoEditor: React.FC<PhotoEditorProps> = ({
               <Slider
                 value={scale}
                 onValueChange={setScale}
-                min={0.5}
+                min={1}
                 max={3}
                 step={0.1}
-                className="w-full photo-editor-slider"
+                className="w-full"
               />
             </div>
 
@@ -168,7 +146,7 @@ const PhotoEditor: React.FC<PhotoEditorProps> = ({
                 min={0.5}
                 max={2}
                 step={0.1}
-                className="w-full photo-editor-slider"
+                className="w-full"
               />
             </div>
           </div>
@@ -179,7 +157,7 @@ const PhotoEditor: React.FC<PhotoEditorProps> = ({
             <X className="h-4 w-4 mr-2" />
             Cancel
           </Button>
-          <Button variant="outline" onClick={handleSave}>
+          <Button onClick={handleSave}>
             <Save className="h-4 w-4 mr-2" />
             Save Changes
           </Button>

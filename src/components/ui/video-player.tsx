@@ -123,16 +123,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     setIsMuted(isGloballyMuted);
   }, [isGloballyMuted, isInFeed]);
 
-  // Pause video when autoplay becomes false (when video goes out of view)
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video || !isInFeed) return;
-
-    if (!autoplay && !video.paused) {
-      video.pause();
-    }
-  }, [autoplay, isInFeed]);
-
   const togglePlayPause = (e?: React.MouseEvent | Event) => {
     if (e && typeof e.stopPropagation === 'function') {
       e.stopPropagation();
@@ -172,27 +162,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     }
   };
 
-  const handleVideoClick = (e: React.MouseEvent) => {
-    // For autoplay feed videos, don't let clicks control play/pause but allow event bubbling
-    if (isInFeed && autoplay) {
-      // Let the click bubble up to parent MediaContainer for fullscreen functionality
-      return;
-    }
-    
+  const handleVideoClick = () => {
     if (onClick) {
       onClick();
     } else {
-      // Allow video click to toggle play/pause for non-autoplay videos
-      togglePlayPause(e);
-    }
-  };
-
-  const handleVideoTouchStart = (e: React.TouchEvent) => {
-    // For autoplay feed videos, prevent touch from triggering video controls
-    if (isInFeed && autoplay) {
-      // Only prevent default to stop video controls, don't stop propagation
-      // This allows parent to handle swipes/scrolls while protecting video playback
-      e.preventDefault();
+      // Always allow video click to toggle play/pause for feed videos
+      togglePlayPause({} as React.MouseEvent);
     }
   };
 
@@ -214,7 +189,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         webkit-playsinline="true"
         x5-playsinline="true"
         onClick={handleVideoClick}
-        onTouchStart={handleVideoTouchStart}
       />
 
       {/* Video Icon Overlay */}

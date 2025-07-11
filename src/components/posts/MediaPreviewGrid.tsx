@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Edit3, RotateCw, Trash2 } from 'lucide-react';
+import { X, Edit3, RotateCw, Trash2, Image as ImageIcon, Video as VideoIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import PhotoEditor from './PhotoEditor';
@@ -26,7 +26,8 @@ const MediaPreviewGrid: React.FC<MediaPreviewGridProps> = ({
   className
 }) => {
   const [editingFileId, setEditingFileId] = useState<string | null>(null);
-  const [imageRotations, setImageRotations] = useState<Record<string, number>>({});
+  const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
+  const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
 
   const handleEditClick = (fileId: string) => {
     setEditingFileId(fileId);
@@ -39,57 +40,18 @@ const MediaPreviewGrid: React.FC<MediaPreviewGridProps> = ({
     setEditingFileId(null);
   };
 
-  const handleRotateImage = async (mediaId: string) => {
-    const media = mediaFiles.find(m => m.id === mediaId);
-    if (!media || !media.file.type.startsWith('image/')) return;
+  const handleImageLoad = (mediaId: string) => {
+    setLoadingStates(prev => ({ ...prev, [mediaId]: false }));
+  };
 
-    const currentRotation = imageRotations[mediaId] || 0;
-    const newRotation = (currentRotation + 90) % 360;
-    
-    setImageRotations(prev => ({ ...prev, [mediaId]: newRotation }));
+  const handleImageError = (mediaId: string) => {
+    setImageErrors(prev => ({ ...prev, [mediaId]: true }));
+    setLoadingStates(prev => ({ ...prev, [mediaId]: false }));
+  };
 
-    // Apply rotation to the actual file if onEditFile is provided
-    if (onEditFile && newRotation !== 0) {
-      try {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        const img = new Image();
-        
-        img.onload = () => {
-          // Determine canvas dimensions based on rotation
-          const isRotated90or270 = newRotation === 90 || newRotation === 270;
-          canvas.width = isRotated90or270 ? img.height : img.width;
-          canvas.height = isRotated90or270 ? img.width : img.height;
-          
-          // Clear canvas and apply rotation
-          ctx?.clearRect(0, 0, canvas.width, canvas.height);
-          ctx?.save();
-          
-          // Move to center and rotate
-          ctx?.translate(canvas.width / 2, canvas.height / 2);
-          ctx?.rotate((newRotation * Math.PI) / 180);
-          
-          // Draw image from center
-          ctx?.drawImage(img, -img.width / 2, -img.height / 2);
-          ctx?.restore();
-          
-          // Convert canvas to blob and create new file
-          canvas.toBlob((blob) => {
-            if (blob) {
-              const rotatedFile = new File([blob], media.file.name, {
-                type: media.file.type,
-                lastModified: Date.now(),
-              });
-              onEditFile(mediaId, rotatedFile);
-            }
-          }, media.file.type);
-        };
-        
-        img.src = media.url;
-      } catch (error) {
-        console.error('Error rotating image:', error);
-      }
-    }
+  const handleImageLoadStart = (mediaId: string) => {
+    setLoadingStates(prev => ({ ...prev, [mediaId]: true }));
+    setImageErrors(prev => ({ ...prev, [mediaId]: false }));
   };
 
   const editingFile = editingFileId 
@@ -113,61 +75,48 @@ const MediaPreviewGrid: React.FC<MediaPreviewGridProps> = ({
           {mediaFiles.map((media) => {
             const isImage = media.file.type.startsWith('image/');
             const isVideo = media.file.type.startsWith('video/');
+            const hasError = imageErrors[media.id];
 
             return (
               <Card key={media.id} className="relative group overflow-hidden">
-                <div className="aspect-square relative bg-muted">
-                  {/* Image Preview - always show */}
-                  {isImage && (
+                <div className="aspect-square relative bg-gray-100">
+                  {/* Error State - Fallback Icon */}
+                  {hasError && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-gray-100">
+                      <div className="text-center">
+                        {isImage ? (
+                          <ImageIcon className="h-8 w-8 text-gray-400 mx-auto mb-1" />
+                        ) : (
+                          <VideoIcon className="h-8 w-8 text-gray-400 mx-auto mb-1" />
+                        )}
+                        <p className="text-xs text-gray-500">Preview unavailable</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Image Preview */}
+                  {isImage && !hasError && (
                     <img
                       src={media.url}
                       alt="Preview"
-                      className="w-full h-full object-cover transition-transform duration-200"
-                      style={{ 
-                        transform: `rotate(${imageRotations[media.id] || 0}deg)` 
-                      }}
-                      onError={(e) => {
-                        // If URL fails, try to recreate it from the file
-                        const target = e.currentTarget;
-                        if (media.file) {
-                          const newUrl = URL.createObjectURL(media.file);
-                          target.src = newUrl;
-                        }
-                      }}
+                      className="w-full h-full object-cover"
+                      onError={() => handleImageError(media.id)}
                     />
                   )}
 
-                  {/* Video Preview - always show */}
-                  {isVideo && (
+                  {/* Video Preview */}
+                  {isVideo && !hasError && (
                     <video
                       src={media.url}
                       className="w-full h-full object-cover"
                       muted
                       preload="metadata"
-                      onError={(e) => {
-                        // If URL fails, try to recreate it from the file
-                        const target = e.currentTarget;
-                        if (media.file) {
-                          const newUrl = URL.createObjectURL(media.file);
-                          target.src = newUrl;
-                        }
-                      }}
+                      onError={() => handleImageError(media.id)}
                     />
                   )}
 
-                  {/* Overlay Controls - show for all images, even with errors */}
+                  {/* Overlay Controls */}
                   <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                    {isImage && (
-                      <Button
-                        size="sm"
-                        variant="secondary"
-                        onClick={() => handleRotateImage(media.id)}
-                        className="h-8 w-8 p-0"
-                        title="Rotate image"
-                      >
-                        <RotateCw className="h-4 w-4" />
-                      </Button>
-                    )}
                     {isImage && onEditFile && (
                       <Button
                         size="sm"

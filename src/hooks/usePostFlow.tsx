@@ -32,7 +32,6 @@ export const usePostFlow = () => {
   const [cursorPosition, setCursorPosition] = useState(0);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
-  const [toastVariant, setToastVariant] = useState<'success' | 'error' | 'default'>('default');
   const [selectedCourse, setSelectedCourse] = useState<GolfCourse | null>(null);
 
   // Clean up preview URLs when component unmounts or files change
@@ -131,16 +130,14 @@ export const usePostFlow = () => {
     resetState();
   };
 
-  const showConfirmationToast = (message: string, variant: 'success' | 'error' | 'default' = 'default') => {
+  const showConfirmationToast = (message: string) => {
     setToastMessage(message);
-    setToastVariant(variant);
     setShowToast(true);
   };
 
   const hideToast = () => {
     setShowToast(false);
     setToastMessage('');
-    setToastVariant('default');
   };
 
   return {
@@ -165,7 +162,6 @@ export const usePostFlow = () => {
     setCursorPosition,
     showToast,
     toastMessage,
-    toastVariant,
     selectedCourse,
     setSelectedCourse,
     openGallery,
