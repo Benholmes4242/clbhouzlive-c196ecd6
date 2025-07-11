@@ -63,34 +63,25 @@ export const useVideoPlayer = ({
       }
     };
 
-    // Prevent touch events from interfering with autoplay on mobile
-    const handleTouchStart = (e: TouchEvent) => {
-      if (isInFeed && autoplay) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
-    };
-
-    const handleTouchEnd = (e: TouchEvent) => {
-      if (isInFeed && autoplay) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
-    };
-
-    const handleTouchMove = (e: TouchEvent) => {
-      if (isInFeed && autoplay) {
-        e.stopPropagation();
-      }
-    };
 
     video.addEventListener('play', handlePlay);
     video.addEventListener('pause', handlePause);
     video.addEventListener('volumechange', handleVolumeChange);
     video.addEventListener('loadedmetadata', handleLoadedMetadata);
-    video.addEventListener('touchstart', handleTouchStart, { passive: false });
-    video.addEventListener('touchend', handleTouchEnd, { passive: false });
-    video.addEventListener('touchmove', handleTouchMove);
+
+    // Only add touch event listeners for non-autoplay feed videos
+    if (!(isInFeed && autoplay)) {
+      const handleTouchStart = (e: TouchEvent) => {
+        e.stopPropagation();
+      };
+
+      const handleTouchEnd = (e: TouchEvent) => {
+        e.stopPropagation();
+      };
+
+      video.addEventListener('touchstart', handleTouchStart);
+      video.addEventListener('touchend', handleTouchEnd);
+    }
 
     // Immediate autoplay attempt with optimization
     if (autoplay) {
@@ -108,9 +99,6 @@ export const useVideoPlayer = ({
       video.removeEventListener('pause', handlePause);
       video.removeEventListener('volumechange', handleVolumeChange);
       video.removeEventListener('loadedmetadata', handleLoadedMetadata);
-      video.removeEventListener('touchstart', handleTouchStart);
-      video.removeEventListener('touchend', handleTouchEnd);
-      video.removeEventListener('touchmove', handleTouchMove);
     };
   }, [autoplay, muted, loop, onPlay, onPause, isGloballyMuted, isInFeed]);
 

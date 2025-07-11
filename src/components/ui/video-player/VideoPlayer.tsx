@@ -102,7 +102,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         preload="metadata"
         webkit-playsinline="true"
         x5-playsinline="true"
-        onClick={handleVideoClick}
+        onClick={isInFeed && autoplay ? undefined : handleVideoClick}
+        onTouchStart={isInFeed && autoplay ? (e) => e.preventDefault() : undefined}
+        onTouchEnd={isInFeed && autoplay ? (e) => e.preventDefault() : undefined}
+        onTouchMove={isInFeed && autoplay ? (e) => e.preventDefault() : undefined}
       />
 
       {/* Video Icon Overlay */}
