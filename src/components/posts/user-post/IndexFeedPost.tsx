@@ -67,8 +67,12 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
     }
   };
 
-  const handleIndexChange = (newIndex: number) => {
-    setCurrentMediaIndex(newIndex);
+  const handleSwipeLeft = () => {
+    setCurrentMediaIndex(prev => prev < post.post_media.length - 1 ? prev + 1 : 0);
+  };
+
+  const handleSwipeRight = () => {
+    setCurrentMediaIndex(prev => prev > 0 ? prev - 1 : post.post_media.length - 1);
   };
 
   const handleInteractionClick = (e: React.MouseEvent, type: string) => {
@@ -104,7 +108,8 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
         currentIndex={currentMediaIndex}
         isHovered={isHovered}
         onMediaClick={onMediaClick}
-        onIndexChange={handleIndexChange}
+        onSwipeLeft={handleSwipeLeft}
+        onSwipeRight={handleSwipeRight}
       >
         <UserInfoOverlay
           user={post.user}
@@ -132,7 +137,6 @@ export const IndexFeedPost: React.FC<IndexFeedPostProps> = ({
         <MediaNavigationDots
           mediaCount={post.post_media.length}
           currentIndex={currentMediaIndex}
-          onDotClick={handleIndexChange}
         />
       </MediaContainer>
     </div>

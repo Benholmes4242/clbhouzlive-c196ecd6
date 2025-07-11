@@ -41,13 +41,13 @@ const PostContentForm = ({ onSubmit, isSubmitting = false }: PostContentFormProp
     if (isSubmitting) return;
     
     // Validate before submitting
-    const maxSize = 500 * 1024 * 1024; // 500MB
+    const maxSize = 150 * 1024 * 1024; // 150MB
     const oversizedFiles = mediaFiles.filter(file => file.size > maxSize);
     
     if (oversizedFiles.length > 0) {
       toast({
         title: "File too large",
-        description: `${oversizedFiles[0].name} exceeds the 500MB limit. Please choose a smaller file.`,
+        description: `${oversizedFiles[0].name} exceeds the 150MB limit. Please choose a smaller file.`,
         variant: "destructive"
       });
       return;
@@ -148,7 +148,7 @@ const PostContentForm = ({ onSubmit, isSubmitting = false }: PostContentFormProp
       
       {mediaFiles.length > 0 && (
         <div className="text-xs text-muted-foreground">
-          <p>Maximum file size: 500MB per file</p>
+          <p>Maximum file size: 150MB per file</p>
           {mediaFiles.some(file => file.type.startsWith('video/')) && (
             <p>Large videos may take longer to process</p>
           )}

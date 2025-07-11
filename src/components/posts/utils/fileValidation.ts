@@ -10,11 +10,11 @@ export const validateFiles = (mediaFiles: File[]): ValidationResult => {
   
   for (const file of mediaFiles) {
     // Add file size limits for security
-    const maxFileSize = 500 * 1024 * 1024; // 500MB limit
+    const maxFileSize = 50 * 1024 * 1024; // 50MB limit
     if (file.size > maxFileSize) {
       return {
         isValid: false,
-        error: `File "${file.name}" is too large. Maximum file size is 500MB.`
+        error: `File "${file.name}" is too large. Maximum file size is 50MB.`
       };
     }
     
