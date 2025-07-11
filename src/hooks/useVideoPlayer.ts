@@ -66,11 +66,19 @@ export const useVideoPlayer = ({
     // Prevent touch events from interfering with autoplay on mobile
     const handleTouchStart = (e: TouchEvent) => {
       if (isInFeed && autoplay) {
+        e.preventDefault();
         e.stopPropagation();
       }
     };
 
     const handleTouchEnd = (e: TouchEvent) => {
+      if (isInFeed && autoplay) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
       if (isInFeed && autoplay) {
         e.stopPropagation();
       }
@@ -80,8 +88,9 @@ export const useVideoPlayer = ({
     video.addEventListener('pause', handlePause);
     video.addEventListener('volumechange', handleVolumeChange);
     video.addEventListener('loadedmetadata', handleLoadedMetadata);
-    video.addEventListener('touchstart', handleTouchStart);
-    video.addEventListener('touchend', handleTouchEnd);
+    video.addEventListener('touchstart', handleTouchStart, { passive: false });
+    video.addEventListener('touchend', handleTouchEnd, { passive: false });
+    video.addEventListener('touchmove', handleTouchMove);
 
     // Immediate autoplay attempt with optimization
     if (autoplay) {
@@ -101,6 +110,7 @@ export const useVideoPlayer = ({
       video.removeEventListener('loadedmetadata', handleLoadedMetadata);
       video.removeEventListener('touchstart', handleTouchStart);
       video.removeEventListener('touchend', handleTouchEnd);
+      video.removeEventListener('touchmove', handleTouchMove);
     };
   }, [autoplay, muted, loop, onPlay, onPause, isGloballyMuted, isInFeed]);
 

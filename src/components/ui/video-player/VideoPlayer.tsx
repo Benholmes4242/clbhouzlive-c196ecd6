@@ -69,10 +69,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   });
 
   const handleVideoClick = (e: React.MouseEvent) => {
-    // Prevent click from interfering with autoplay on feed videos
+    // For feed videos with autoplay, only allow clicks for fullscreen via onClick prop
     if (isInFeed && autoplay) {
-      e.preventDefault();
-      e.stopPropagation();
+      if (onClick) {
+        onClick(); // This should be fullscreen functionality
+      }
       return;
     }
     
