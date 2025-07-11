@@ -173,11 +173,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   };
 
   const handleVideoClick = (e: React.MouseEvent) => {
-    // For autoplay feed videos, don't let clicks toggle play/pause
+    // For autoplay feed videos, prevent any click interactions with the video element itself
     if (isInFeed && autoplay) {
-      if (onClick) {
-        onClick();
-      }
+      e.preventDefault();
+      e.stopPropagation();
       return;
     }
     
@@ -190,7 +189,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   };
 
   const handleVideoTouch = (e: React.TouchEvent) => {
-    // For autoplay feed videos, prevent touch events from affecting playback
+    // For autoplay feed videos, prevent all touch interactions with video element
     if (isInFeed && autoplay) {
       e.preventDefault();
       e.stopPropagation();
