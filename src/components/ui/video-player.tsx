@@ -173,10 +173,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   };
 
   const handleVideoClick = (e: React.MouseEvent) => {
-    // For autoplay feed videos, prevent any click interactions with the video element itself
+    // For autoplay feed videos, don't let clicks control play/pause but allow event bubbling
     if (isInFeed && autoplay) {
-      e.preventDefault();
-      e.stopPropagation();
+      // Let the click bubble up to parent MediaContainer for fullscreen functionality
       return;
     }
     
@@ -189,10 +188,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   };
 
   const handleVideoTouch = (e: React.TouchEvent) => {
-    // For autoplay feed videos, prevent all touch interactions with video element
+    // For autoplay feed videos, prevent touch from affecting video playback
+    // but don't stop propagation so parent can handle taps for fullscreen
     if (isInFeed && autoplay) {
       e.preventDefault();
-      e.stopPropagation();
+      // Don't call stopPropagation() here to allow parent MediaContainer to handle taps
     }
   };
 
