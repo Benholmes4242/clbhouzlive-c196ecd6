@@ -9,6 +9,7 @@ import { UserInfoOverlay } from '../posts/user-post/overlays/UserInfoOverlay';
 import TaggedText from '../posts/TaggedText';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useVideoPlaybackManager } from '@/contexts/VideoPlaybackManager';
 
 interface FullscreenMediaModalProps {
   isOpen: boolean;
@@ -70,6 +71,10 @@ const FullscreenMediaModal = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const isMobile = useIsMobile();
   const { isTextExpanded, handleMouseEnter, handleMouseLeave } = useTextExpansion();
+  const { pauseAllAndSetActive, registerVideo, unregisterVideo } = useVideoPlaybackManager();
+  
+  // Generate unique video ID for fullscreen video
+  const fullscreenVideoId = useRef(`fullscreen-modal-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`);
 
   // Only log when golfCourse is actually provided for debugging
   if (golfCourse) {
@@ -134,12 +139,36 @@ const FullscreenMediaModal = ({
     }
   }, [isOpen, initialIndex]);
 
-  // Auto-play video when modal opens or index changes
+  // Handle video playback management when modal opens/closes
   useEffect(() => {
-    if (isOpen && mediaTypes[currentIndex] === 'video' && videoRef.current) {
-      videoRef.current.play().catch(console.error);
+    const video = videoRef.current;
+    
+    if (isOpen && video && mediaTypes[currentIndex] === 'video') {
+      console.log('🎬 Fullscreen modal opened with video - pausing all other videos');
+      
+      // Register this fullscreen video and pause all others
+      registerVideo(fullscreenVideoId.current, video);
+      pauseAllAndSetActive(fullscreenVideoId.current);
+      
+      // Start playing this video unmuted
+      video.muted = isMuted;
+      video.play().catch(console.error);
     }
-  }, [isOpen, currentIndex, mediaTypes]);
+    
+    // Cleanup when modal closes
+    if (!isOpen && video) {
+      console.log('🎬 Fullscreen modal closed - cleaning up video');
+      video.pause();
+      video.currentTime = 0;
+      unregisterVideo(fullscreenVideoId.current);
+    }
+    
+    return () => {
+      if (video) {
+        unregisterVideo(fullscreenVideoId.current);
+      }
+    };
+  }, [isOpen, currentIndex, mediaTypes, isMuted, registerVideo, unregisterVideo, pauseAllAndSetActive]);
 
   // Prevent background scrolling when modal is open - Simple but effective approach
   useEffect(() => {
@@ -191,9 +220,13 @@ const FullscreenMediaModal = ({
   }, [isOpen]);
 
   const handleMuteToggle = () => {
-    if (videoRef.current) {
-      videoRef.current.muted = !isMuted;
-      setIsMuted(!isMuted);
+    const video = videoRef.current;
+    if (video) {
+      const newMutedState = !isMuted;
+      video.muted = newMutedState;
+      setIsMuted(newMutedState);
+      
+      console.log('🔊 Fullscreen video mute toggled:', newMutedState ? 'MUTED' : 'UNMUTED');
     }
   };
 
