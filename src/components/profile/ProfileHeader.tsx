@@ -1,7 +1,7 @@
 
 import React, { useRef, useState } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import HighQualityImage from '@/components/ui/high-quality-image';
+import LazyImage from '@/components/ui/lazy-image';
 
 interface ProfileHeaderProps {
   photoPreview: string | null;
@@ -89,12 +89,14 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
             }}
           >
             {hasPhoto ? (
-              <HighQualityImage
+              <LazyImage
                 src={photoPreview || profilePhotoUrl!}
                 alt="Profile"
                 className="w-full h-full select-none"
                 width={200}
                 height={200}
+                priority={true}
+                quality="high"
               />
             ) : (
               <UserPlaceholderIcon />
@@ -147,12 +149,14 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         <Dialog open={showEnlargedPhoto} onOpenChange={setShowEnlargedPhoto}>
           <DialogContent className="max-w-fit w-auto p-0 bg-transparent border-none shadow-none">
             <div className="w-80 h-80 mx-auto relative">
-              <HighQualityImage
+              <LazyImage
                 src={photoPreview || profilePhotoUrl!}
                 alt="Profile photo"
                 className="w-full h-full rounded-full shadow-2xl"
                 width={320}
                 height={320}
+                priority={true}
+                quality="high"
               />
               {/* Custom close button positioned outside the circle */}
               <button
