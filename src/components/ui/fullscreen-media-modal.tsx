@@ -181,13 +181,19 @@ const FullscreenMediaModal = ({
         // This will allow feed videos to resume autoplay based on their visibility
         // and restore the original global mute state
         setTimeout(() => {
-          // Pause all videos first, then let the intersection observer logic 
-          // in the feed posts re-activate the appropriate video with the original mute state
+          // Clear the active video without pausing all videos
           pauseAllAndSetActive('');
           
           console.log('🔊 Fullscreen modal closed, feed videos will resume with original mute state:', originalGlobalMuteState.current);
-          // Note: The global mute state is preserved automatically since we don't change it
-          // when entering fullscreen mode, so it remains the same when exiting
+          
+          // Force re-trigger autoplay for videos in view by dispatching intersection events
+          // This ensures videos that are in view will restart autoplaying
+          setTimeout(() => {
+            // Trigger scroll and resize events to force intersection observer re-evaluation
+            window.dispatchEvent(new Event('scroll'));
+            window.dispatchEvent(new Event('resize'));
+            console.log('🔄 Triggered scroll and resize events to re-evaluate video autoplay');
+          }, 50);
         }, 100); // Small delay to ensure modal cleanup is complete
       }
     };
