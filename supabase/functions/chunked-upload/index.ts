@@ -146,54 +146,74 @@ Deno.serve(async (req) => {
         }
         
         try {
-          // Process chunks in smaller batches to avoid memory issues
-          const BATCH_SIZE = 5; // Reduced batch size for better memory management
-          const allChunkData: Uint8Array[] = []
-          
-          for (let batchStart = 0; batchStart < body.totalChunks; batchStart += BATCH_SIZE) {
-            const batchEnd = Math.min(batchStart + BATCH_SIZE, body.totalChunks)
-            console.log(`Processing chunk batch ${batchStart}-${batchEnd-1}`)
+          // First verify all chunks exist before starting
+          console.log('Verifying all chunks exist...')
+          for (let i = 0; i < body.totalChunks; i++) {
+            const chunkFileName = `${user.id}/chunks/${body.uploadId}/chunk_${i.toString().padStart(4, '0')}`
+            const { data: exists, error: listError } = await supabaseClient.storage
+              .from('post-media')
+              .list(`${user.id}/chunks/${body.uploadId}`, {
+                search: `chunk_${i.toString().padStart(4, '0')}`
+              })
             
-            for (let i = batchStart; i < batchEnd; i++) {
-              const chunkFileName = `${user.id}/chunks/${body.uploadId}/chunk_${i.toString().padStart(4, '0')}`
-              console.log(`Downloading chunk ${i}: ${chunkFileName}`)
-              
-              const { data: chunkData, error } = await supabaseClient.storage
-                .from('post-media')
-                .download(chunkFileName)
-              
-              if (error) {
-                console.error(`Failed to download chunk ${i}:`, error)
-                throw new Error(`Failed to download chunk ${i}: ${error.message}`)
-              }
-              
-              const arrayBuffer = await chunkData.arrayBuffer()
-              allChunkData.push(new Uint8Array(arrayBuffer))
-              console.log(`Chunk ${i} downloaded, size: ${arrayBuffer.byteLength} bytes`)
+            if (listError || !exists || exists.length === 0) {
+              throw new Error(`Chunk ${i} not found or verification failed`)
             }
-            
-            console.log(`Batch ${batchStart}-${batchEnd-1} completed`)
           }
+          console.log('All chunks verified to exist')
 
-          console.log('All chunks downloaded, combining...')
+          // Stream chunks directly to final file to avoid memory issues
+          console.log('Starting streaming combination...')
           
-          // Combine all chunks into final file
-          const totalSize = allChunkData.reduce((size, chunk) => size + chunk.length, 0)
-          console.log(`Combining ${allChunkData.length} chunks, total size: ${totalSize} bytes`)
+          // Calculate total size first
+          let totalSize = 0
+          for (let i = 0; i < body.totalChunks; i++) {
+            const chunkFileName = `${user.id}/chunks/${body.uploadId}/chunk_${i.toString().padStart(4, '0')}`
+            const { data: chunkInfo } = await supabaseClient.storage
+              .from('post-media')
+              .list(`${user.id}/chunks/${body.uploadId}`, {
+                search: `chunk_${i.toString().padStart(4, '0')}`
+              })
+            
+            if (chunkInfo && chunkInfo[0]) {
+              totalSize += chunkInfo[0].metadata?.size || 0
+            }
+          }
           
-          const combinedFile = new Uint8Array(totalSize)
+          console.log(`Total expected size: ${totalSize} bytes`)
+          
+          // Create final file buffer
+          const combinedFile = new Uint8Array(totalSize || body.fileSize)
           let offset = 0
           
-          for (let i = 0; i < allChunkData.length; i++) {
-            const chunk = allChunkData[i]
-            combinedFile.set(chunk, offset)
-            offset += chunk.length
-            if (i % 10 === 0) {
-              console.log(`Combined ${i + 1}/${allChunkData.length} chunks`)
+          // Stream each chunk individually to avoid memory overflow
+          for (let i = 0; i < body.totalChunks; i++) {
+            const chunkFileName = `${user.id}/chunks/${body.uploadId}/chunk_${i.toString().padStart(4, '0')}`
+            console.log(`Processing chunk ${i}/${body.totalChunks - 1}`)
+            
+            const { data: chunkData, error } = await supabaseClient.storage
+              .from('post-media')
+              .download(chunkFileName)
+            
+            if (error) {
+              console.error(`Failed to download chunk ${i}:`, error)
+              throw new Error(`Failed to download chunk ${i}: ${error.message}`)
             }
+            
+            const arrayBuffer = await chunkData.arrayBuffer()
+            const chunkArray = new Uint8Array(arrayBuffer)
+            
+            // Set chunk data in final file
+            combinedFile.set(chunkArray, offset)
+            offset += chunkArray.length
+            
+            console.log(`Chunk ${i} processed, size: ${arrayBuffer.byteLength} bytes, offset: ${offset}`)
+            
+            // Clear chunk data immediately to free memory
+            chunkData = null
           }
           
-          console.log('File combination completed, size:', combinedFile.length)
+          console.log(`File combination completed, final size: ${combinedFile.length} bytes`)
         } catch (combineError) {
           console.error('Error during chunk processing:', combineError)
           throw new Error(`Chunk processing failed: ${combineError.message}`)
