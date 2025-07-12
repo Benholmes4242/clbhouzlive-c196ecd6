@@ -18,7 +18,7 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
             variant={activeFilter === filter ? "secondary" : "outline"}
             size="sm"
             onClick={() => onFilterChange(filter)}
-            className={`whitespace-nowrap flex-shrink-0 ${
+            className={`whitespace-nowrap flex-shrink-0 focus-visible:ring-0 focus-visible:ring-offset-0 ${
               activeFilter === filter 
                 ? "bg-gray-100 text-gray-800 hover:bg-gray-200" 
                 : ""

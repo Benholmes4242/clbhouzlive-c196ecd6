@@ -92,7 +92,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
       
       {/* Infinite scroll sentinel */}
       <div id="scroll-sentinel" className="h-4">
-        {isLoading && hasMore && (
+        {isLoading && hasMore && activeFilter !== 'Hack Shack' && (
           <div className="flex justify-center py-4">
             <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
           </div>
