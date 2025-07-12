@@ -136,12 +136,15 @@ Deno.serve(async (req) => {
         }
 
         console.log('Completing chunked upload:', body.uploadId)
+        console.log('Total chunks expected:', body.totalChunks)
+        console.log('User ID:', user.id)
         
         // Download and combine all chunks
         const chunks: Uint8Array[] = []
         
         for (let i = 0; i < body.totalChunks; i++) {
           const chunkFileName = `${user.id}/chunks/${body.uploadId}/chunk_${i.toString().padStart(4, '0')}`
+          console.log(`Attempting to download chunk ${i}: ${chunkFileName}`)
           
           const { data: chunkData, error } = await supabaseClient.storage
             .from('post-media')
@@ -149,6 +152,7 @@ Deno.serve(async (req) => {
           
           if (error) {
             console.error(`Failed to download chunk ${i}:`, error)
+            console.error(`Chunk file name that failed: ${chunkFileName}`)
             throw new Error(`Failed to download chunk ${i}: ${error.message}`)
           }
           
