@@ -17,6 +17,16 @@ export const useRealPostsFetcher = () => {
             id,
             media_type,
             media_url
+          ),
+          post_tags (
+            id,
+            tagged_entity_id,
+            taggable_entities (
+              id,
+              entity_type,
+              entity_id,
+              name
+            )
           )
         `)
         .order('created_at', { ascending: false })
@@ -62,6 +72,17 @@ export const useRealPostsFetcher = () => {
           return null;
         }
 
+        // Find golf course from post tags
+        const golfCourseTag = (post.post_tags || []).find(
+          tag => tag.taggable_entities?.entity_type === 'golf_club'
+        );
+
+        const golfCourse = golfCourseTag?.taggable_entities ? {
+          id: golfCourseTag.taggable_entities.entity_id,
+          name: golfCourseTag.taggable_entities.name,
+          country: 'Unknown' // We don't have country in taggable_entities
+        } : null;
+
         const formattedPost = {
           id: post.id,
           type: media.media_type as 'video' | 'image',
@@ -78,7 +99,7 @@ export const useRealPostsFetcher = () => {
             avatar: userProfile?.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
             verified: Math.random() > 0.7 // Random verification for demo
           },
-          golfCourse: null, // No course tagging for now due to missing tables
+          golfCourse,
           label: Math.random() > 0.6 ? ['Pro Tip', 'Trending', 'From Clubhouse'][Math.floor(Math.random() * 3)] : undefined,
           isFollowing: Math.random() > 0.5
         };
