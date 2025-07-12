@@ -135,7 +135,7 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, ...props 
                   (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face';
                 }}
               />
-              <span className="text-white text-xs font-medium bg-black bg-opacity-60 px-2 py-1 rounded-full">
+              <span className="text-white text-base font-bold drop-shadow-lg">
                 {item.user.name}
               </span>
               {item.user.verified && (
