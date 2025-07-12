@@ -122,7 +122,7 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, ...props 
           )}
 
           {/* Like button overlay - hidden on mobile */}
-          <div className="absolute bottom-1 left-1 hidden md:block pointer-events-auto z-20">
+          <div className="absolute bottom-1 left-2 hidden md:block pointer-events-auto z-20">
             <button
               onClick={handleLike}
               className="flex items-center justify-center w-10 h-10 text-white hover:bg-white/10 rounded-full transition-colors pointer-events-auto"
@@ -135,7 +135,7 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, ...props 
           </div>
 
           {/* Maximize button overlay - hidden on mobile */}
-          <div className="absolute bottom-1 right-1 hidden md:block pointer-events-auto z-20">
+          <div className="absolute bottom-1 right-2 hidden md:block pointer-events-auto z-20">
             <button
               onClick={handleMediaClick}
               className="flex items-center justify-center w-10 h-10 text-white hover:bg-white/10 rounded-full transition-colors pointer-events-auto"
