@@ -115,7 +115,9 @@ export const useChunkedUpload = () => {
             console.warn(`Chunk ${chunkIndex} upload attempt ${retries} failed:`, error);
             
             if (retries >= MAX_RETRIES) {
-              throw new Error(`Failed to upload chunk ${chunkIndex} after ${MAX_RETRIES} retries: ${error}`);
+              const errorMessage = `Failed to upload chunk ${chunkIndex} after ${MAX_RETRIES} retries: ${error}`;
+              console.error(errorMessage);
+              throw new Error(errorMessage);
             }
             
             // Wait before retry (exponential backoff)
