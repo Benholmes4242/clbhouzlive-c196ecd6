@@ -47,17 +47,9 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     };
   }, [hasMore, isLoading, onLoadMore]);
 
-  // Only show skeleton loading on initial load for Videos, not for Hack Shack
-  if (isLoading && content.length === 0 && activeFilter !== 'Hack Shack') {
-    return (
-      <div className="space-y-4">
-        <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 md:gap-4">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} style={{ aspectRatio: '4/5' }} className="bg-muted rounded-lg animate-pulse" />
-          ))}
-        </div>
-      </div>
-    );
+  // Don't show skeleton loading on initial load for any filter
+  if (isLoading && content.length === 0) {
+    return null; // No loading state shown
   }
 
   if (content.length === 0 && !isLoading) {
@@ -92,7 +84,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
       
       {/* Infinite scroll sentinel */}
       <div id="scroll-sentinel" className="h-4">
-        {isLoading && hasMore && activeFilter !== 'Hack Shack' && (
+        {isLoading && hasMore && activeFilter !== 'Hack Shack' && activeFilter !== 'Videos' && (
           <div className="flex justify-center py-4">
             <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
           </div>
