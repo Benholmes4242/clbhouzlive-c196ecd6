@@ -317,8 +317,8 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
               </div>
             )}
 
-            {/* Action Buttons - Right Side */}
-            <div className="absolute right-4 bottom-20 z-10 flex flex-col space-y-4">
+            {/* Action Buttons - Bottom Right */}
+            <div className="absolute bottom-5 right-3 z-10 flex flex-col space-y-4">
               {/* Like Button */}
               <button className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform">
                 <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
