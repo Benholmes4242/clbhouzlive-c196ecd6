@@ -5,7 +5,7 @@ import { useRealPostsFetcher } from './explore/useRealPostsFetcher';
 
 import { useMockPostsHandler } from './explore/useMockPostsHandler';
 
-const POSTS_PER_PAGE = 6; // Reduced for faster loading on mobile
+const POSTS_PER_PAGE = 15; // Increased to fill viewport better
 
 export const useInfiniteExploreContent = (activeFilter?: string) => {
   const [content, setContent] = useState<ExploreContentItem[]>([]);
@@ -56,12 +56,27 @@ export const useInfiniteExploreContent = (activeFilter?: string) => {
     setHasMore(true);
   }, [activeFilter]);
 
-  // Initial load
+  // Initial load and auto-load more if viewport isn't filled
   useEffect(() => {
-    if (content.length === 0 && !loading) {
-      loadMore();
-    }
-  }, [loadMore]);
+    const autoLoadContent = async () => {
+      if (content.length === 0 && !loading) {
+        await loadMore();
+        
+        // After initial load, check if we need more content to fill viewport
+        setTimeout(() => {
+          const viewportHeight = window.innerHeight;
+          const contentHeight = document.body.scrollHeight;
+          
+          // If content doesn't fill viewport and we have more content, load more
+          if (contentHeight <= viewportHeight && hasMore && !loading) {
+            loadMore();
+          }
+        }, 100); // Small delay to allow DOM to update
+      }
+    };
+    
+    autoLoadContent();
+  }, [content.length, loading, hasMore, loadMore]);
 
   return {
     content,
