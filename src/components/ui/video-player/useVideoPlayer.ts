@@ -109,6 +109,24 @@ export const useVideoPlayer = ({
     };
   }, [autoplay, muted, loop, onPlay, onPause, isGloballyMuted, isInFeed, registerVideo, unregisterVideo, muteAllOtherVideos, setActiveAudioVideo]);
 
+  // Add effect to handle autoplay changes for already-loaded videos
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !isInFeed) return;
+
+    // If autoplay is enabled and video is paused but has been viewed before (currentTime > 0)
+    // This handles the case where videos were paused by pauseAllAndSetActive but should resume
+    if (autoplay && video.paused && video.readyState >= 2) {
+      console.log('🔄 Resuming autoplay for previously viewed video:', videoId.current);
+      video.play().catch(error => {
+        console.log('Autoplay resume prevented:', error);
+      });
+    } else if (!autoplay && !video.paused) {
+      // If autoplay is disabled but video is playing, pause it
+      video.pause();
+    }
+  }, [autoplay, isInFeed]);
+
   // Update video mute state when global mute state changes (for feed videos)
   useEffect(() => {
     const video = videoRef.current;
