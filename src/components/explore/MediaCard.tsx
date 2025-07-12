@@ -103,10 +103,12 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, ...props 
               autoplay={shouldAutoplay}
               muted={true}
               loop={true}
-              className="w-full h-full"
+              className="w-full h-full pointer-events-none"
               showVideoIcon={true}
               videoIconType="maximize"
               showOverlayControls={false}
+              controls={false}
+              onClick={undefined}
               videoId={`explore-${item.id}`}
             />
           ) : (
@@ -121,10 +123,10 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, ...props 
           )}
 
           {/* Like button overlay - hidden on mobile */}
-          <div className="absolute bottom-2 left-3 hidden md:block">
+          <div className="absolute bottom-2 left-3 hidden md:block pointer-events-auto z-20">
             <button
               onClick={handleLike}
-              className="flex items-center justify-center w-10 h-10 text-white hover:bg-white/10 rounded-full transition-colors"
+              className="flex items-center justify-center w-10 h-10 text-white hover:bg-white/10 rounded-full transition-colors pointer-events-auto"
             >
               <div className="flex items-center space-x-1">
                 <Heart className="h-4 w-4" />
