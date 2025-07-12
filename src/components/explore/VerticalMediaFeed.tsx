@@ -347,12 +347,12 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
               >
                 {isFollowing ? (
                   <>
-                    <UserCheck className="w-3 h-3 text-white" />
+                    <UserCheck className="w-4 h-4 text-white" />
                     <span className="text-white text-xs font-medium">Following</span>
                   </>
                 ) : (
                   <>
-                    <UserPlus className="w-3 h-3 text-white" />
+                    <UserPlus className="w-4 h-4 text-white" />
                     <span className="text-white text-xs font-medium">Follow</span>
                   </>
                 )}
