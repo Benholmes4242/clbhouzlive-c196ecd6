@@ -45,6 +45,7 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<ExploreContentItem | null>(null);
   const [editCourse, setEditCourse] = useState<any>(null);
+  const [isTextExpanded, setIsTextExpanded] = useState(false);
   const queryClient = useQueryClient();
 
   // Check if current user follows the displayed user
@@ -427,10 +428,18 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
               {/* Caption Text */}
               {item.title && removeGolfCourseFromContent(item.title) && (
                 <div 
-                  className="text-white text-base font-bold leading-[1.4]"
+                  className="text-white text-base font-bold leading-[1.4] cursor-default"
                   style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
+                  onMouseEnter={() => setIsTextExpanded(true)}
+                  onMouseLeave={() => setIsTextExpanded(false)}
                 >
-                  <div className="whitespace-nowrap overflow-hidden text-ellipsis">
+                  <div 
+                    className={`transition-all duration-300 ease-in-out ${
+                      isTextExpanded 
+                        ? 'whitespace-normal max-h-none' 
+                        : 'whitespace-nowrap overflow-hidden text-ellipsis max-h-7'
+                    }`}
+                  >
                     <span className="text-base font-bold">
                       {removeGolfCourseFromContent(item.title)}
                     </span>
