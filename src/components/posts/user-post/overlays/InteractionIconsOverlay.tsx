@@ -25,9 +25,9 @@ export const InteractionIconsOverlay: React.FC<InteractionIconsOverlayProps> = (
   };
 
   return (
-    <div className="absolute bottom-5 right-3 z-20">
-      <div className="flex flex-col items-center gap-2.5 text-white text-lg opacity-90">
-        {/* Mute toggle button - only show for video posts */}
+    <div className="absolute bottom-4 right-4 z-20">
+      <div className="flex flex-col items-center gap-6 text-white text-lg opacity-90">
+        {/* Mute/Unmute toggle button - only show for video posts */}
         {currentMediaType === 'video' && (
           <button 
             className="cursor-pointer hover:opacity-100 transition-opacity"
@@ -35,9 +35,9 @@ export const InteractionIconsOverlay: React.FC<InteractionIconsOverlayProps> = (
             title={isGloballyMuted ? "Unmute all videos" : "Mute all videos"}
           >
             {isGloballyMuted ? (
-              <VolumeX className="w-6 h-6" />
+              <VolumeX className="w-8 h-8" />
             ) : (
-              <Volume2 className="w-6 h-6" />
+              <Volume2 className="w-8 h-8" />
             )}
           </button>
         )}
@@ -46,19 +46,19 @@ export const InteractionIconsOverlay: React.FC<InteractionIconsOverlayProps> = (
           className="cursor-pointer hover:opacity-100 transition-opacity"
           onClick={(e) => onInteractionClick(e, 'like')}
         >
-          <Heart className="w-6 h-6" />
+          <Heart className="w-8 h-8" />
         </button>
         <button 
           className="cursor-pointer hover:opacity-100 transition-opacity"
           onClick={(e) => onInteractionClick(e, 'comment')}
         >
-          <MessageCircle className="w-6 h-6" />
+          <MessageCircle className="w-8 h-8" />
         </button>
         <button 
           className="cursor-pointer hover:opacity-100 transition-opacity"
           onClick={(e) => onInteractionClick(e, 'share')}
         >
-          <Share className="w-6 h-6" />
+          <Share className="w-8 h-8" />
         </button>
       </div>
     </div>
