@@ -52,6 +52,11 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
     const filtered = allContent.filter(item => item.type === mediaType);
     setFilteredContent(filtered);
 
+    // Debug logging for golf course data
+    console.log('VerticalMediaFeed - Filtered content with golf courses:', 
+      filtered.map(item => ({ id: item.id, title: item.title, golfCourse: item.golfCourse }))
+    );
+
     // Find the initial item's index in the filtered array
     const initialIndex = filtered.findIndex(item => item.id === initialItem.id);
     setCurrentIndex(initialIndex >= 0 ? initialIndex : 0);
