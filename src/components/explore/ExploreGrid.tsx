@@ -47,8 +47,8 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     };
   }, [hasMore, isLoading, onLoadMore]);
 
-  // Only show skeleton loading on initial load, not during pagination
-  if (isLoading && content.length === 0) {
+  // Only show skeleton loading on initial load for Videos, not for Hack Shack
+  if (isLoading && content.length === 0 && activeFilter !== 'Hack Shack') {
     return (
       <div className="space-y-4">
         <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 md:gap-4">
