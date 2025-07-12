@@ -1,5 +1,5 @@
 import React from 'react';
-import LazyImage from '@/components/ui/lazy-image';
+import { OptimizedAvatar } from '@/components/ui/optimized-avatar';
 
 interface UserInfoOverlayProps {
   user: {
@@ -23,13 +23,13 @@ export const UserInfoOverlay: React.FC<UserInfoOverlayProps> = ({
           e.stopPropagation();
           onProfileClick();
         }}
-      >
-        <LazyImage
-          src={user.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
+       >
+        <OptimizedAvatar
+          src={user.profile_photo_url || undefined}
           alt={displayName}
-          className="w-16 h-16 rounded-full mr-2"
-          width={64}
-          height={64}
+          size={64}
+          priority={true}
+          className="mr-2"
         />
         <span 
           className="text-white text-base font-bold"

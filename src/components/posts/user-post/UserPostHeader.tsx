@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import LazyImage from '@/components/ui/lazy-image';
+import { OptimizedAvatar } from '@/components/ui/optimized-avatar';
 
 interface UserPostHeaderProps {
   displayName: string;
@@ -33,12 +33,12 @@ export const UserPostHeader: React.FC<UserPostHeaderProps> = ({
   return (
     <div className="flex items-center justify-between mb-3">
       <div className="flex items-center space-x-3">
-        <LazyImage
-          src={profilePhotoUrl || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
+        <OptimizedAvatar
+          src={profilePhotoUrl || undefined}
           alt={displayName}
-          className="w-16 h-16 rounded-[14px] border-2 border-gray-200 cursor-pointer hover:opacity-80 transition-opacity"
-          width={64}
-          height={64}
+          size={64}
+          priority={true}
+          className="cursor-pointer hover:opacity-80 transition-opacity border-2 border-gray-200 rounded-[14px]"
           onClick={onProfileClick}
         />
         <div>

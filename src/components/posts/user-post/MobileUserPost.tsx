@@ -5,6 +5,7 @@ import { useSwipeable } from 'react-swipeable';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import VideoPlayer from '@/components/ui/video-player';
 import LazyImage from '@/components/ui/lazy-image';
+import { OptimizedAvatar } from '@/components/ui/optimized-avatar';
 import CoursePostBadge from '../CoursePostBadge';
 import { UserPostData, GolfCourse } from './types';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -81,12 +82,12 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
     return (
       <div className="bg-background p-4 border-b">
         <div className="flex items-center space-x-3 mb-3">
-          <LazyImage
-            src={post.user.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
+          <OptimizedAvatar
+            src={post.user.profile_photo_url || undefined}
             alt={displayName}
-            className="w-8 h-8 rounded-full cursor-pointer"
-            width={32}
-            height={32}
+            size={32}
+            priority={true}
+            className="cursor-pointer"
             onClick={onProfileClick}
           />
           <div className="text-sm">
@@ -137,12 +138,12 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
         {/* User Info Overlay */}
         <div className="absolute top-3 left-2.5 z-20">
           <div className="bg-black/40 backdrop-blur-sm rounded-full p-1.5 flex items-center space-x-2 max-w-[140px]">
-            <LazyImage
-              src={post.user.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
+            <OptimizedAvatar
+              src={post.user.profile_photo_url || undefined}
               alt={displayName}
-              className="w-6 h-6 rounded-full border border-white/20 cursor-pointer flex-shrink-0"
-              width={24}
-              height={24}
+              size={24}
+              priority={true}
+              className="border border-white/20 cursor-pointer flex-shrink-0"
               onClick={() => {
                 onProfileClick();
               }}
