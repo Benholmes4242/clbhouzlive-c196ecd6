@@ -9,6 +9,7 @@ import { UserInfoOverlay } from '../posts/user-post/overlays/UserInfoOverlay';
 import TaggedText from '../posts/TaggedText';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useVideoPlaybackManager } from '@/contexts/VideoPlaybackManager';
 
 interface FullscreenMediaModalProps {
   isOpen: boolean;
@@ -70,6 +71,10 @@ const FullscreenMediaModal = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const isMobile = useIsMobile();
   const { isTextExpanded, handleMouseEnter, handleMouseLeave } = useTextExpansion();
+  const { registerVideo, unregisterVideo, pauseAllAndSetActive } = useVideoPlaybackManager();
+  
+  // Generate unique video ID for fullscreen player
+  const fullscreenVideoId = useRef(`fullscreen-video-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`);
 
   // Only log when golfCourse is actually provided for debugging
   if (golfCourse) {
@@ -137,9 +142,28 @@ const FullscreenMediaModal = ({
   // Auto-play video when modal opens or index changes
   useEffect(() => {
     if (isOpen && mediaTypes[currentIndex] === 'video' && videoRef.current) {
+      // Register the fullscreen video and pause all other videos
+      registerVideo(fullscreenVideoId.current, videoRef.current);
+      pauseAllAndSetActive(fullscreenVideoId.current);
+      
+      // Set video properties
+      videoRef.current.muted = isMuted;
+      videoRef.current.loop = true;
+      videoRef.current.playsInline = true;
+      
       videoRef.current.play().catch(console.error);
     }
-  }, [isOpen, currentIndex, mediaTypes]);
+    
+    // Cleanup when modal closes
+    return () => {
+      if (!isOpen && videoRef.current) {
+        // Stop and unregister the fullscreen video
+        videoRef.current.pause();
+        videoRef.current.currentTime = 0;
+        unregisterVideo(fullscreenVideoId.current);
+      }
+    };
+  }, [isOpen, currentIndex, mediaTypes, isMuted, registerVideo, unregisterVideo, pauseAllAndSetActive]);
 
   // Prevent background scrolling when modal is open - Simple but effective approach
   useEffect(() => {
