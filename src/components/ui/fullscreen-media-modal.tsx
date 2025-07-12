@@ -409,7 +409,7 @@ const FullscreenMediaModal = ({
 
       {/* Interaction Icons - Bottom Right (matching index feed exactly) */}
       <div className="absolute bottom-4 right-4 z-20">
-        <div className="flex flex-col items-center gap-2.5 text-white text-lg opacity-90">
+        <div className="flex flex-col items-center gap-4 text-white text-lg opacity-90">
           {/* Mute toggle button - only show for video posts */}
           {mediaTypes[currentIndex] === 'video' && (
             <button 
