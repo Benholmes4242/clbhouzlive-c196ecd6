@@ -130,7 +130,7 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, ...props 
               <img
                 src={item.user.avatar}
                 alt={item.user.name}
-                className="w-8 h-8 rounded-lg border border-white/50"
+                className="w-6 h-6 rounded-full border border-white/50"
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face';
                 }}
