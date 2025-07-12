@@ -245,11 +245,6 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
                 (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face';
               }}
             />
-            {filteredContent[currentIndex]?.user?.verified && (
-              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
-                <Check className="w-2.5 h-2.5 text-white" />
-              </div>
-            )}
           </div>
           
           {/* Username */}
