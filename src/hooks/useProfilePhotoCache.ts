@@ -16,13 +16,14 @@ export const useProfilePhotoCache = ({
   preload = false 
 }: UseProfilePhotoCacheOptions) => {
   const [cachedSrc, setCachedSrc] = useState<string>('');
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Generate cache key
   const cacheKey = `${src}_${size}`;
 
   useEffect(() => {
     if (!src) {
+      setCachedSrc('');
       setIsLoading(false);
       return;
     }
@@ -34,66 +35,30 @@ export const useProfilePhotoCache = ({
       return;
     }
 
-    // Don't reload if already in preload queue, but set current state
-    if (preloadQueue.has(cacheKey)) {
-      // Set a shorter timeout for mobile optimization
-      const checkCache = () => {
-        if (profilePhotoCache.has(cacheKey)) {
-          setCachedSrc(profilePhotoCache.get(cacheKey)!);
-          setIsLoading(false);
-        } else {
-          setTimeout(checkCache, 100);
-        }
-      };
-      setTimeout(checkCache, 50);
-      return;
-    }
-
-    preloadQueue.add(cacheKey);
     setIsLoading(true);
+    setCachedSrc('');
 
-    // Mobile-optimized URL with smaller size and better compression
-    const mobileOptimizedSize = Math.min(size * 2, 160); // 2x for retina, but cap at 160px
-    const optimizedUrl = src.includes('supabase') 
-      ? `${src}?width=${mobileOptimizedSize}&height=${mobileOptimizedSize}&quality=75&format=webp&resize=cover`
-      : src;
+    // Simple optimized URL - just use the original src for reliability
+    const optimizedUrl = src;
 
-    // Preload and cache with timeout for mobile
+    // Preload and cache
     const img = new Image();
-    let timeoutId: NodeJS.Timeout;
-
-    const cleanup = () => {
-      if (timeoutId) clearTimeout(timeoutId);
-      preloadQueue.delete(cacheKey);
-    };
 
     img.onload = () => {
       profilePhotoCache.set(cacheKey, optimizedUrl);
       setCachedSrc(optimizedUrl);
       setIsLoading(false);
-      cleanup();
     };
 
     img.onerror = () => {
-      // Try fallback without WebP for compatibility
-      if (optimizedUrl.includes('format=webp')) {
-        const fallbackUrl = optimizedUrl.replace('&format=webp', '&format=jpeg');
-        img.src = fallbackUrl;
-        return;
-      }
       setIsLoading(false);
-      cleanup();
     };
-
-    // Set timeout for slow mobile connections
-    timeoutId = setTimeout(() => {
-      setIsLoading(false);
-      cleanup();
-    }, 8000); // 8 seconds timeout for mobile
 
     img.src = optimizedUrl;
 
-    return cleanup;
+    return () => {
+      // Cleanup if component unmounts during loading
+    };
   }, [src, size, cacheKey]);
 
   return { cachedSrc, isLoading };
