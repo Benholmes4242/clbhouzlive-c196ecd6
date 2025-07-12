@@ -10,6 +10,7 @@ import TaggedText from '../posts/TaggedText';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useVideoPlaybackManager } from '@/contexts/VideoPlaybackManager';
+import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 
 interface FullscreenMediaModalProps {
   isOpen: boolean;
@@ -72,6 +73,10 @@ const FullscreenMediaModal = ({
   const isMobile = useIsMobile();
   const { isTextExpanded, handleMouseEnter, handleMouseLeave } = useTextExpansion();
   const { registerVideo, unregisterVideo, pauseAllAndSetActive } = useVideoPlaybackManager();
+  const { isGloballyMuted } = useGlobalAudio();
+  
+  // Store the original global mute state when modal opens
+  const originalGlobalMuteState = useRef<boolean | null>(null);
   
   // Generate unique video ID for fullscreen player
   const fullscreenVideoId = useRef(`fullscreen-video-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`);
@@ -132,12 +137,20 @@ const FullscreenMediaModal = ({
     touchEventOptions: { passive: true }
   });
 
-  // Reset current index when modal opens with new initial index
+  // Store original mute state when modal opens
   useEffect(() => {
+    if (isOpen && originalGlobalMuteState.current === null) {
+      originalGlobalMuteState.current = isGloballyMuted;
+      console.log('🎬 Storing original global mute state:', isGloballyMuted);
+    }
+    
     if (isOpen) {
       setCurrentIndex(initialIndex);
+    } else {
+      // Reset stored state when modal closes
+      originalGlobalMuteState.current = null;
     }
-  }, [isOpen, initialIndex]);
+  }, [isOpen, initialIndex, isGloballyMuted]);
 
   // Auto-play video when modal opens or index changes
   useEffect(() => {
@@ -155,7 +168,7 @@ const FullscreenMediaModal = ({
     }
   }, [isOpen, currentIndex, mediaTypes, isMuted, registerVideo, pauseAllAndSetActive]);
 
-  // Cleanup when modal closes - restore feed video behavior
+  // Cleanup when modal closes - restore feed video behavior and original mute state
   useEffect(() => {
     return () => {
       if (videoRef.current) {
@@ -166,10 +179,15 @@ const FullscreenMediaModal = ({
         
         // When modal closes, trigger a re-evaluation of feed videos
         // This will allow feed videos to resume autoplay based on their visibility
+        // and restore the original global mute state
         setTimeout(() => {
           // Pause all videos first, then let the intersection observer logic 
-          // in the feed posts re-activate the appropriate video
+          // in the feed posts re-activate the appropriate video with the original mute state
           pauseAllAndSetActive('');
+          
+          console.log('🔊 Fullscreen modal closed, feed videos will resume with original mute state:', originalGlobalMuteState.current);
+          // Note: The global mute state is preserved automatically since we don't change it
+          // when entering fullscreen mode, so it remains the same when exiting
         }, 100); // Small delay to ensure modal cleanup is complete
       }
     };
