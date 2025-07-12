@@ -6,6 +6,7 @@ import { PerformanceMonitor } from './components/ui/performance-monitor';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ScrollToTop from '@/components/ScrollToTop';
+import { useProfilePreloader } from '@/hooks/useProfilePreloader';
 
 import { ThemeProvider } from '@/components/theme-provider';
 import PasswordProtection from "@/components/PasswordProtection";
@@ -50,6 +51,9 @@ const queryClient = new QueryClient({
 });
 
 const App: React.FC = () => {
+  // Preload common profile photos for better UX
+  useProfilePreloader();
+  
   console.log('App component loaded - v2'); // Force cache refresh
   return (
     <ThemeProvider defaultTheme="light" storageKey="clbhouz-ui-theme">
