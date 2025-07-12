@@ -254,11 +254,11 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
           
           {/* Username */}
           <div className="flex flex-col">
-            <span className="text-white font-semibold text-sm leading-tight" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
+            <span className="font-semibold text-sm text-white" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
               {filteredContent[currentIndex]?.user?.name || 'Unknown User'}
             </span>
             {filteredContent[currentIndex]?.user?.username && (
-              <span className="text-white/70 text-xs leading-tight" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
+              <span className="text-xs text-white/70" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
                 @{filteredContent[currentIndex]?.user?.username}
               </span>
             )}
