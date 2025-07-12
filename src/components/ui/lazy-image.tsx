@@ -1,5 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { cn } from '@/lib/utils';
+import { getOptimizedImageUrl } from '@/utils/imageOptimization';
 
 interface LazyImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   src: string;
@@ -98,34 +99,13 @@ export const LazyImage: React.FC<LazyImageProps> = ({
     return canvas.toDataURL('image/jpeg', 0.1);
   }, [blur]);
 
-  // Convert image to optimized format with quality settings
-  const getOptimizedImageUrl = useCallback((originalSrc: string, targetQuality: string) => {
-    // If it's already a Supabase storage URL, add transformation params
-    if (originalSrc.includes('supabase')) {
-      const url = new URL(originalSrc);
-      
-      // Add quality and format transformations
-      switch (targetQuality) {
-        case 'low':
-          url.searchParams.set('quality', '30');
-          url.searchParams.set('width', '400');
-          break;
-        case 'medium':
-          url.searchParams.set('quality', '70');
-          url.searchParams.set('width', '800');
-          break;
-        case 'high':
-          url.searchParams.set('quality', '90');
-          break;
-      }
-      
-      // Try to convert to WebP
-      url.searchParams.set('format', 'webp');
-      return url.toString();
-    }
-    
-    return originalSrc;
+  // Quality-based image optimization
+  const getQualityOptimizedUrl = useCallback((originalSrc: string, targetQuality: string) => {
+    const widthMap = { low: 400, medium: 800, high: 1200 };
+    const width = widthMap[targetQuality as keyof typeof widthMap] || 800;
+    return getOptimizedImageUrl(originalSrc, width);
   }, []);
+
 
   // Intersection Observer for lazy loading
   const setContainerRef = useCallback((node: HTMLDivElement | null) => {
@@ -167,7 +147,7 @@ export const LazyImage: React.FC<LazyImageProps> = ({
     
     // Start with low quality for progressive loading
     if (progressive && optimalQuality !== 'low') {
-      const lowQualitySrc = getOptimizedImageUrl(src, 'low');
+      const lowQualitySrc = getQualityOptimizedUrl(src, 'low');
       setCurrentSrc(lowQualitySrc);
       setIsLoading(true);
       setShowLowQuality(true);
@@ -175,7 +155,7 @@ export const LazyImage: React.FC<LazyImageProps> = ({
       
       // Preload high quality version
       const highQualityImg = new Image();
-      const highQualitySrc = getOptimizedImageUrl(src, optimalQuality);
+      const highQualitySrc = getQualityOptimizedUrl(src, optimalQuality);
       
       highQualityImg.onload = () => {
         // Smooth transition to high quality
@@ -198,12 +178,12 @@ export const LazyImage: React.FC<LazyImageProps> = ({
       highQualityImg.src = highQualitySrc;
     } else {
       // Direct loading without progressive enhancement
-      const finalSrc = getOptimizedImageUrl(src, optimalQuality);
+      const finalSrc = getQualityOptimizedUrl(src, optimalQuality);
       setCurrentSrc(finalSrc);
       setIsLoading(true);
       onLoadStart?.();
     }
-  }, [isInView, priority, src, progressive, getOptimalQuality, getOptimizedImageUrl, onLoadStart, onLoad]);
+  }, [isInView, priority, src, progressive, getOptimalQuality, getQualityOptimizedUrl, onLoadStart, onLoad]);
 
   const handleLoad = () => {
     if (!progressive) {
