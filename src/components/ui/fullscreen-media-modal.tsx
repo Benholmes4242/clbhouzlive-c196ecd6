@@ -2,6 +2,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Minimize2, Volume2, VolumeX, MapPin, Heart, MessageCircle, Share, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
+import { useTextExpansion } from '@/hooks/useTextExpansion';
+import { truncateToWords } from '@/utils/textUtils';
 import CoursePostBadge from '../posts/CoursePostBadge';
 import { UserInfoOverlay } from '../posts/user-post/overlays/UserInfoOverlay';
 import TaggedText from '../posts/TaggedText';
@@ -65,16 +67,9 @@ const FullscreenMediaModal = ({
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [isMuted, setIsMuted] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [isTextExpanded, setIsTextExpanded] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const isMobile = useIsMobile();
-
-  // Helper function to truncate text to 9 words
-  const truncateToWords = (text: string, wordLimit: number = 9) => {
-    const words = text.split(' ');
-    if (words.length <= wordLimit) return text;
-    return words.slice(0, wordLimit).join(' ') + '...';
-  };
+  const { isTextExpanded, handleMouseEnter, handleMouseLeave } = useTextExpansion();
 
   // Only log when golfCourse is actually provided for debugging
   if (golfCourse) {
@@ -299,8 +294,8 @@ const FullscreenMediaModal = ({
         className="relative w-full h-full flex items-center justify-center" 
         {...swipeHandlers}
         style={{ touchAction: 'manipulation' }}
-        onMouseEnter={() => setIsTextExpanded(true)}
-        onMouseLeave={() => setIsTextExpanded(false)}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
       >
         {/* Current Media Item */}
         <div className="relative w-full h-full flex items-center justify-center">
