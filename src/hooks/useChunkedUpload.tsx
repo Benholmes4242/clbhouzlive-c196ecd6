@@ -19,7 +19,7 @@ interface ChunkedUploadResult {
   fileType: string;
 }
 
-const CHUNK_SIZE = 5 * 1024 * 1024; // 5MB chunks
+const CHUNK_SIZE = 3 * 1024 * 1024; // 3MB chunks (becomes ~4MB base64)
 const MAX_RETRIES = 3;
 
 export const useChunkedUpload = () => {
