@@ -88,10 +88,10 @@ const OptimisticPostCard = ({ post, onRetry }: OptimisticPostCardProps) => {
               />
             )}
             
-            {/* Overlay for uploading state */}
+            {/* Overlay for uploading state with subtle background */}
             {(post.uploading || post.uploadFailed) && (
-              <div className="absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center">
-                <div className="text-center text-white">
+              <div className="absolute inset-0 bg-muted/90 rounded-lg flex items-center justify-center">
+                <div className="text-center text-foreground">
                   {post.uploadFailed ? (
                     <div className="space-y-2">
                       <AlertCircle className="h-8 w-8 mx-auto text-red-400" />
@@ -108,7 +108,7 @@ const OptimisticPostCard = ({ post, onRetry }: OptimisticPostCardProps) => {
                     </div>
                   ) : hasVideos ? (
                     <div className="space-y-3">
-                      <div className="animate-spin rounded-full h-8 w-8 border-2 border-white border-t-transparent mx-auto"></div>
+                      <div className="animate-spin rounded-full h-8 w-8 border-2 border-muted-foreground/30 border-t-foreground mx-auto"></div>
                       <div className="space-y-1">
                         <p className="text-sm font-medium">Processing video...</p>
                         <Progress value={undefined} className="w-32 mx-auto h-1" />
@@ -116,7 +116,7 @@ const OptimisticPostCard = ({ post, onRetry }: OptimisticPostCardProps) => {
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      <div className="animate-spin rounded-full h-6 w-6 border-2 border-white border-t-transparent mx-auto"></div>
+                      <div className="animate-spin rounded-full h-6 w-6 border-2 border-muted-foreground/30 border-t-foreground mx-auto"></div>
                       <p className="text-sm">Uploading...</p>
                     </div>
                   )}
