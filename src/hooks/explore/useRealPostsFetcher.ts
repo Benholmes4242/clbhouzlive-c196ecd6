@@ -96,7 +96,7 @@ export const useRealPostsFetcher = () => {
           
           if (courseMatch) {
             const courseName = courseMatch[1].trim()
-              .replace(/\([^)]*\)/g, '') // Remove parentheses content
+              .replace(/\([^)]*(?<!Course|course)\)/g, '') // Remove parentheses content EXCEPT if it contains "Course"
               .replace(/\s+/g, ' ') // Normalize spaces
               .trim();
             
