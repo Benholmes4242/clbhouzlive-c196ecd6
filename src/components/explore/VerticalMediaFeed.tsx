@@ -240,7 +240,7 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
             <img
               src={filteredContent[currentIndex]?.user?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
               alt={filteredContent[currentIndex]?.user?.name || 'User'}
-              className="w-10 h-10 rounded-full border-2 border-white/20 object-cover"
+              className="w-10 h-10 rounded-full object-cover"
               onError={(e) => {
                 (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face';
               }}
