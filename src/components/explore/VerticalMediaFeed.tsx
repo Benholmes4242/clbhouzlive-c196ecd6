@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Minimize2, Heart, MessageCircle, Share, Volume2, VolumeX, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
+import { Minimize2, Heart, MessageCircle, Share, Volume2, VolumeX, MoreHorizontal, Edit, Trash2, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { usePostUpdate } from '@/hooks/usePostUpdate';
 import { usePostData } from '@/hooks/usePostData';
 import { ExploreContentItem } from './types';
@@ -10,6 +11,7 @@ import { ExploreContentItem } from './types';
 import CoursePostBadge from '../posts/CoursePostBadge';
 import EnhancedCreateMomentModal from '../post/EnhancedCreateMomentModal';
 import TaggedText from '../posts/TaggedText';
+import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import VideoPlayer from '@/components/ui/video-player';
 
 interface VerticalMediaFeedProps {
@@ -30,6 +32,7 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
   onFollow
 }) => {
   const { user } = useSupabaseSession();
+  const isMobile = useIsMobile();
   const { updatePost, isUpdating } = usePostUpdate();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [filteredContent, setFilteredContent] = useState<ExploreContentItem[]>([]);
@@ -248,19 +251,6 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
                     videoId={`vertical-${item.id}`}
                   />
                   
-                  {/* Golf Course Badge */}
-                  {item.golfCourse && (
-                    <div className="absolute top-4 right-8 z-10">
-                      <CoursePostBadge 
-                        course={{
-                          id: item.golfCourse.id,
-                          name: item.golfCourse.name,
-                          country: item.golfCourse.country
-                        }}
-                      />
-                    </div>
-                  )}
-                  
                 </div>
               ) : (
                 <div className="relative w-full h-full">
@@ -272,49 +262,46 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
                       (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
                     }}
                   />
-                  
-                  {/* Golf Course Badge */}
-                  {item.golfCourse && (
-                    <div className="absolute top-4 right-8 z-10">
-                      <CoursePostBadge 
-                        course={{
-                          id: item.golfCourse.id,
-                          name: item.golfCourse.name,
-                          country: item.golfCourse.country
-                        }}
-                      />
-                    </div>
-                  )}
                 </div>
               )}
             </div>
 
-            {/* User Info & Caption - Bottom Left */}
-            <div className="absolute bottom-4 left-4 z-10 max-w-[60%]">
-              {item.user && (
-                <div className="flex items-center space-x-3 mb-2">
-                  <img
-                    src={item.user.avatar}
-                    alt={item.user.name}
-                    className="w-8 h-8 rounded-full border border-white/50"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face';
-                    }}
-                  />
-                  <div>
-                    <div className="text-white font-semibold text-sm flex items-center">
-                      {item.user.name}
+            {/* Caption and Golf Course Tag - Bottom Left */}
+            <div className="absolute bottom-5 left-3 right-20 z-20">
+              {/* Golf Course Badge - Above Caption */}
+              {item.golfCourse && (
+                <div className="mb-2">
+                  {isMobile ? (
+                    // Mobile: Map pin that expands to show golf club name
+                    <div className="flex items-center">
+                      <button className="w-6 h-6 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center mr-2 transition-all duration-200">
+                        <MapPin className="w-4 h-4 text-white" />
+                      </button>
+                      <div className="bg-white/20 text-white text-xs font-medium px-2 py-1 rounded-full backdrop-blur-sm whitespace-nowrap">
+                        {item.golfCourse.name}
+                      </div>
                     </div>
-                  </div>
+                  ) : (
+                    // Desktop: Single pill with map pin and golf club name together
+                    <div className="inline-flex items-center bg-white/20 text-white text-sm font-medium px-3 py-1.5 rounded-full backdrop-blur-sm whitespace-nowrap">
+                      <MapPin className="w-5 h-5 text-white mr-2" />
+                      {item.golfCourse.name}
+                    </div>
+                  )}
                 </div>
               )}
-              
-              {item.title && (
-                <div className="text-white text-sm leading-relaxed bg-black/30 p-2 rounded">
-                  <TaggedText 
-                    text={item.title} 
-                    tags={[]} 
-                  />
+
+              {/* Caption Text */}
+              {item.title && removeGolfCourseFromContent(item.title) && (
+                <div 
+                  className="text-white text-base font-bold leading-[1.4]"
+                  style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
+                >
+                  <div className="whitespace-nowrap overflow-hidden text-ellipsis">
+                    <span className="text-base font-bold">
+                      {removeGolfCourseFromContent(item.title)}
+                    </span>
+                  </div>
                 </div>
               )}
             </div>
