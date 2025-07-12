@@ -25,8 +25,7 @@ export const InteractionIconsOverlay: React.FC<InteractionIconsOverlayProps> = (
   };
 
   return (
-    <div className="absolute top-16 right-3 z-20">
-      {/* Top icons group */}
+    <div className="absolute bottom-3 right-3 z-20">
       <div className="flex flex-col items-center gap-2.5 text-white text-lg opacity-90">
         {/* Mute toggle button - only show for video posts */}
         {currentMediaType === 'video' && (
@@ -55,10 +54,6 @@ export const InteractionIconsOverlay: React.FC<InteractionIconsOverlayProps> = (
         >
           <MessageCircle className="w-6 h-6" />
         </button>
-      </div>
-      
-      {/* Share icon positioned at caption level */}
-      <div className="absolute bottom-[-180px] text-white text-lg opacity-90">
         <button 
           className="cursor-pointer hover:opacity-100 transition-opacity"
           onClick={(e) => onInteractionClick(e, 'share')}
