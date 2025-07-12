@@ -476,6 +476,35 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                         </Button>
                       </>
                     )}
+
+                    {/* Action Buttons - Bottom Right */}
+                    <div className="absolute bottom-5 right-3 z-10 flex flex-col space-y-4">
+                      {/* Like Button */}
+                      <button className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform">
+                        <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
+                          <Heart className="h-6 w-6" />
+                        </div>
+                        <span className="text-xs font-medium">0</span>
+                      </button>
+
+                      {/* Comment Button */}
+                      <button 
+                        onClick={() => setShowComments(true)}
+                        className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform"
+                      >
+                        <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
+                          <MessageCircle className="h-6 w-6" />
+                        </div>
+                        <span className="text-xs font-medium">0</span>
+                      </button>
+
+                      {/* Share Button */}
+                      <button className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform">
+                        <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
+                          <Share className="h-6 w-6" />
+                        </div>
+                      </button>
+                    </div>
                   </>
                 )}
 
