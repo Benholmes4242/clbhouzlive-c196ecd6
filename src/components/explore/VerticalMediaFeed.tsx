@@ -195,7 +195,7 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
 
   return (
     <div 
-      className="fixed inset-0 z-[9999] bg-black"
+      className="fixed inset-0 z-[9999] bg-black overflow-hidden"
       style={{ 
         position: 'fixed',
         top: 0,
@@ -208,7 +208,7 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
       {/* Scrollable Content */}
       <div
         ref={scrollViewRef}
-        className="h-full w-full overflow-y-auto snap-y snap-mandatory scrollbar-hide"
+        className="h-full w-full overflow-y-auto snap-y snap-mandatory"
         onScroll={handleScroll}
         style={{ 
           scrollbarWidth: 'none', 
@@ -382,15 +382,23 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
       />
 
       <style>{`
-        .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
+        * {
+          scrollbar-width: none !important;
+          -ms-overflow-style: none !important;
         }
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
+        *::-webkit-scrollbar {
+          display: none !important;
+          width: 0 !important;
+          height: 0 !important;
         }
-        .snap-y.snap-mandatory div::-webkit-scrollbar {
-          display: none;
+        .snap-y {
+          scrollbar-width: none !important;
+          -ms-overflow-style: none !important;
+        }
+        .snap-y::-webkit-scrollbar {
+          display: none !important;
+          width: 0 !important;
+          height: 0 !important;
         }
       `}</style>
     </div>
