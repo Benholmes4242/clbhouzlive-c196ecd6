@@ -1,6 +1,8 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useRef, useCallback } from 'react';
 import { cn } from '@/lib/utils';
-import { getOptimizedImageUrl } from '@/utils/imageOptimization';
+import { useLazyIntersectionObserver } from '@/hooks/useLazyIntersectionObserver';
+import { useImageLoader } from '@/hooks/useImageLoader';
+import { generateSrcSet, generateBlurPlaceholder, getOptimalQuality } from '@/utils/imageHelpers';
 
 interface LazyImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   src: string;
@@ -37,168 +39,47 @@ export const LazyImage: React.FC<LazyImageProps> = ({
   onError,
   ...props
 }) => {
-  const [isInView, setIsInView] = useState(priority);
-  const [isLoaded, setIsLoaded] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasError, setHasError] = useState(false);
-  const [currentSrc, setCurrentSrc] = useState<string>('');
-  const [showLowQuality, setShowLowQuality] = useState(progressive);
-  
   const imgRef = useRef<HTMLImageElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
 
-  // Get connection-aware quality
-  const getOptimalQuality = useCallback(() => {
-    if (quality !== 'auto') return quality;
-    
-    const connection = (navigator as any)?.connection;
-    if (!connection) return 'medium';
-    
-    const { effectiveType, downlink } = connection;
-    
-    if (effectiveType === '4g' && downlink > 5) return 'high';
-    if (effectiveType === '3g' || downlink > 1.5) return 'medium';
-    return 'low';
-  }, [quality]);
+  // Use intersection observer hook
+  const { isInView, setContainerRef } = useLazyIntersectionObserver({
+    priority,
+    rootMargin: '50px',
+    threshold: 0.1,
+  });
+
+  // Use image loader hook
+  const {
+    isLoaded,
+    isLoading,
+    hasError,
+    currentSrc,
+    showLowQuality,
+    handleLoad,
+    handleError,
+  } = useImageLoader({
+    src,
+    isInView,
+    priority,
+    progressive,
+    quality,
+    fallback,
+    onLoadStart,
+    onLoad,
+    onError,
+  });
 
   // Generate responsive image sources
-  const generateSrcSet = useCallback((originalSrc: string) => {
-    if (!responsive || !originalSrc.includes('supabase')) return '';
-    
-    const sizes = [400, 800, 1200, 1600];
-    const qualities = { low: 30, medium: 70, high: 90 };
-    const optimalQuality = getOptimalQuality();
-    
-    return sizes.map(size => {
-      const url = new URL(originalSrc);
-      url.searchParams.set('width', size.toString());
-      url.searchParams.set('quality', qualities[optimalQuality].toString());
-      url.searchParams.set('format', 'webp');
-      return `${url.toString()} ${size}w`;
-    }).join(', ');
-  }, [responsive, getOptimalQuality]);
+  const srcSet = useCallback(() => {
+    if (!responsive || !src.includes('supabase')) return '';
+    const optimalQuality = getOptimalQuality(quality);
+    return generateSrcSet(src, optimalQuality);
+  }, [responsive, src, quality]);
 
-  // Generate blur placeholder data URL
-  const generateBlurPlaceholder = useCallback(() => {
-    if (!blur) return '';
-    
-    // Create a tiny 10x10 blur placeholder
-    const canvas = document.createElement('canvas');
-    canvas.width = 10;
-    canvas.height = 10;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return '';
-    
-    // Create gradient placeholder
-    const gradient = ctx.createLinearGradient(0, 0, 10, 10);
-    gradient.addColorStop(0, '#f3f4f6');
-    gradient.addColorStop(1, '#e5e7eb');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, 10, 10);
-    
-    return canvas.toDataURL('image/jpeg', 0.1);
+  // Generate blur placeholder
+  const blurPlaceholder = useCallback(() => {
+    return blur ? generateBlurPlaceholder() : '';
   }, [blur]);
-
-  // Quality-based image optimization
-  const getQualityOptimizedUrl = useCallback((originalSrc: string, targetQuality: string) => {
-    const widthMap = { low: 400, medium: 800, high: 1200 };
-    const width = widthMap[targetQuality as keyof typeof widthMap] || 800;
-    return getOptimizedImageUrl(originalSrc, width);
-  }, []);
-
-
-  // Intersection Observer for lazy loading
-  const setContainerRef = useCallback((node: HTMLDivElement | null) => {
-    if (containerRef.current) {
-      containerRef.current = null;
-    }
-    
-    if (node && !priority && !isInView) {
-      containerRef.current = node;
-      
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              setIsInView(true);
-              observer.unobserve(entry.target);
-            }
-          });
-        },
-        {
-          rootMargin: '50px', // Reduced from 100px for faster loading
-          threshold: 0.1,
-        }
-      );
-      
-      observer.observe(node);
-      
-      return () => {
-        observer.unobserve(node);
-      };
-    }
-  }, [priority, isInView]);
-
-  // Progressive loading effect
-  useEffect(() => {
-    if (!isInView && !priority) return;
-
-    const optimalQuality = getOptimalQuality();
-    
-    // Start with low quality for progressive loading
-    if (progressive && optimalQuality !== 'low') {
-      const lowQualitySrc = getQualityOptimizedUrl(src, 'low');
-      setCurrentSrc(lowQualitySrc);
-      setIsLoading(true);
-      setShowLowQuality(true);
-      onLoadStart?.();
-      
-      // Preload high quality version
-      const highQualityImg = new Image();
-      const highQualitySrc = getQualityOptimizedUrl(src, optimalQuality);
-      
-      highQualityImg.onload = () => {
-        // Smooth transition to high quality
-        setTimeout(() => {
-          setCurrentSrc(highQualitySrc);
-          setShowLowQuality(false);
-          setIsLoaded(true);
-          setIsLoading(false);
-          onLoad?.();
-        }, 100);
-      };
-      
-      highQualityImg.onerror = () => {
-        // Keep low quality if high quality fails
-        setIsLoaded(true);
-        setIsLoading(false);
-        onLoad?.();
-      };
-      
-      highQualityImg.src = highQualitySrc;
-    } else {
-      // Direct loading without progressive enhancement
-      const finalSrc = getQualityOptimizedUrl(src, optimalQuality);
-      setCurrentSrc(finalSrc);
-      setIsLoading(true);
-      onLoadStart?.();
-    }
-  }, [isInView, priority, src, progressive, getOptimalQuality, getQualityOptimizedUrl, onLoadStart, onLoad]);
-
-  const handleLoad = () => {
-    if (!progressive) {
-      setIsLoaded(true);
-      setIsLoading(false);
-      onLoad?.();
-    }
-  };
-
-  const handleError = () => {
-    setHasError(true);
-    setIsLoading(false);
-    setCurrentSrc(fallback);
-    onError?.();
-  };
 
   const shouldLoad = isInView || priority;
 
@@ -215,7 +96,7 @@ export const LazyImage: React.FC<LazyImageProps> = ({
       {/* Blur placeholder */}
       {blur && !isLoaded && shouldLoad && (
         <img
-          src={generateBlurPlaceholder()}
+          src={blurPlaceholder()}
           alt=""
           className="absolute inset-0 w-full h-full object-cover filter blur-sm"
           aria-hidden="true"
@@ -227,7 +108,7 @@ export const LazyImage: React.FC<LazyImageProps> = ({
         <img
           ref={imgRef}
           src={currentSrc || fallback}
-          srcSet={responsive ? generateSrcSet(src) : undefined}
+          srcSet={responsive ? srcSet() : undefined}
           sizes={responsive ? sizes : undefined}
           alt={alt}
           onLoad={handleLoad}
