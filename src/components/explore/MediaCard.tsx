@@ -1,6 +1,6 @@
 
 import React, { useState, memo } from 'react';
-import { Heart } from 'lucide-react';
+import { Heart, Maximize2 } from 'lucide-react';
 import { ExploreContentItem } from './types';
 
 import PostViewerModal from '@/components/posts/PostViewerModal';
@@ -123,7 +123,7 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, ...props 
           )}
 
           {/* Like button overlay - hidden on mobile */}
-          <div className="absolute bottom-2 left-3 hidden md:block pointer-events-auto z-20">
+          <div className="absolute bottom-1 left-1 hidden md:block pointer-events-auto z-20">
             <button
               onClick={handleLike}
               className="flex items-center justify-center w-10 h-10 text-white hover:bg-white/10 rounded-full transition-colors pointer-events-auto"
@@ -132,6 +132,16 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, ...props 
                 <Heart className="h-4 w-4" />
                 <span className="font-medium text-sm">{item.likes}</span>
               </div>
+            </button>
+          </div>
+
+          {/* Maximize button overlay - hidden on mobile */}
+          <div className="absolute bottom-1 right-1 hidden md:block pointer-events-auto z-20">
+            <button
+              onClick={handleMediaClick}
+              className="flex items-center justify-center w-10 h-10 text-white hover:bg-white/10 rounded-full transition-colors pointer-events-auto"
+            >
+              <Maximize2 className="h-4 w-4" />
             </button>
           </div>
 
