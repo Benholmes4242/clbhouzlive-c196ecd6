@@ -153,17 +153,27 @@ const FullscreenMediaModal = ({
       
       videoRef.current.play().catch(console.error);
     }
-    
-    // Cleanup when modal closes
+  }, [isOpen, currentIndex, mediaTypes, isMuted, registerVideo, pauseAllAndSetActive]);
+
+  // Cleanup when modal closes - restore feed video behavior
+  useEffect(() => {
     return () => {
-      if (!isOpen && videoRef.current) {
+      if (videoRef.current) {
         // Stop and unregister the fullscreen video
         videoRef.current.pause();
         videoRef.current.currentTime = 0;
         unregisterVideo(fullscreenVideoId.current);
+        
+        // When modal closes, trigger a re-evaluation of feed videos
+        // This will allow feed videos to resume autoplay based on their visibility
+        setTimeout(() => {
+          // Pause all videos first, then let the intersection observer logic 
+          // in the feed posts re-activate the appropriate video
+          pauseAllAndSetActive('');
+        }, 100); // Small delay to ensure modal cleanup is complete
       }
     };
-  }, [isOpen, currentIndex, mediaTypes, isMuted, registerVideo, unregisterVideo, pauseAllAndSetActive]);
+  }, [unregisterVideo, pauseAllAndSetActive]);
 
   // Prevent background scrolling when modal is open - Simple but effective approach
   useEffect(() => {
