@@ -75,9 +75,8 @@ export const useVideoPlayer = ({
     };
 
     const handleLoadedMetadata = () => {
-      // Enable autoplay when ready (for both feed and non-feed videos)
-      if (autoplay && video.paused) {
-        video.currentTime = 0;
+      // Enable autoplay when ready (only if video is at start position)
+      if (autoplay && video.paused && video.currentTime === 0) {
         video.play().catch(error => {
           console.log('Autoplay prevented:', error);
         });
@@ -89,9 +88,8 @@ export const useVideoPlayer = ({
     video.addEventListener('volumechange', handleVolumeChange);
     video.addEventListener('loadedmetadata', handleLoadedMetadata);
 
-    // Immediate autoplay attempt for all videos when autoplay is enabled
-    if (autoplay) {
-      video.currentTime = 0;
+    // Only attempt autoplay on initial load when currentTime === 0
+    if (autoplay && video.currentTime === 0 && video.readyState >= 1) {
       // Use requestAnimationFrame for smoother autoplay timing
       requestAnimationFrame(() => {
         video.play().catch(error => {
