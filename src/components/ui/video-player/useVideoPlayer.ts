@@ -155,6 +155,11 @@ export const useVideoPlayer = ({
     if (!video) return;
 
     const newMutedState = !video.muted;
+    
+    // Store current playback position and playing state
+    const currentTime = video.currentTime;
+    const wasPlaying = !video.paused;
+    
     video.muted = newMutedState;
     setIsMuted(newMutedState);
     
@@ -169,6 +174,16 @@ export const useVideoPlayer = ({
       } else {
         setActiveAudioVideo(null);
       }
+    }
+    
+    // Ensure the video maintains its playback position and state
+    if (video.currentTime !== currentTime) {
+      video.currentTime = currentTime;
+    }
+    
+    // Maintain playing state - only resume if it was playing before
+    if (wasPlaying && video.paused) {
+      video.play().catch(console.error);
     }
   };
 

@@ -125,7 +125,8 @@ export const VideoPlaybackManagerProvider: React.FC<{ children: React.ReactNode 
   const muteAllOtherVideos = useCallback((activeVideoId: string) => {
     console.log('🔇 Muting all other videos except:', activeVideoId);
     videoRegistry.current.forEach((video, videoId) => {
-      if (videoId !== activeVideoId) {
+      if (videoId !== activeVideoId && !video.muted) {
+        // Only mute videos that aren't already muted to avoid disrupting playback
         video.muted = true;
       }
     });
