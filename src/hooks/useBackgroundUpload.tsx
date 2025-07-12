@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useVideoCompression } from './useVideoCompression';
+import { useChunkedUpload } from './useChunkedUpload';
 
 interface UploadProgress {
   postId: string;
@@ -20,6 +21,7 @@ interface BackgroundUploadData {
 export const useBackgroundUpload = () => {
   const { toast } = useToast();
   const { shouldCompress, triggerCompression } = useVideoCompression();
+  const { uploadFileInChunks } = useChunkedUpload();
   const [uploads, setUploads] = useState<Map<string, UploadProgress>>(new Map());
 
   const startBackgroundUpload = useCallback(async ({
@@ -71,45 +73,73 @@ export const useBackgroundUpload = () => {
         
         console.log(`Background uploading ${index + 1}/${mediaFiles.length}: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)}MB)`);
         
-        // Upload with retry logic for mobile
-        let uploadAttempts = 0;
-        const maxAttempts = 3;
-        let uploadSuccess = false;
         let publicUrl = '';
         
-        while (uploadAttempts < maxAttempts && !uploadSuccess) {
-          uploadAttempts++;
-          console.log(`Upload attempt ${uploadAttempts}/${maxAttempts} for ${file.name}`);
-          
+        // Use chunked upload for large files (>40MB) or if regular upload fails
+        if (file.size > 40 * 1024 * 1024) {
+          console.log(`Using chunked upload for large file: ${file.name}`);
           try {
-            const { data, error: uploadError } = await supabase.storage
-              .from('post-media')
-              .upload(`${userId}/${fullFileName}`, file, {
-                upsert: false
-              });
-
-            if (uploadError) {
-              console.error(`Upload attempt ${uploadAttempts} failed for ${file.name}:`, uploadError);
-              if (uploadAttempts === maxAttempts) throw uploadError;
-              
-              // Wait before retry (exponential backoff)
-              await new Promise(resolve => setTimeout(resolve, uploadAttempts * 1000));
-              continue;
-            }
-
-            // Get public URL
-            const { data: { publicUrl: url } } = supabase.storage
-              .from('post-media')
-              .getPublicUrl(`${userId}/${fullFileName}`);
-              
-            publicUrl = url;
-            uploadSuccess = true;
-            console.log(`Successfully uploaded ${file.name} to:`, publicUrl);
-
+            const result = await uploadFileInChunks(file);
+            publicUrl = result.publicUrl;
+            console.log(`Successfully uploaded ${file.name} via chunked upload to:`, publicUrl);
           } catch (error) {
-            console.error(`Upload attempt ${uploadAttempts} exception for ${file.name}:`, error);
-            if (uploadAttempts === maxAttempts) throw error;
-            await new Promise(resolve => setTimeout(resolve, uploadAttempts * 1000));
+            console.error(`Chunked upload failed for ${file.name}:`, error);
+            throw error;
+          }
+        } else {
+          // Use regular upload for smaller files with retry logic
+          let uploadAttempts = 0;
+          const maxAttempts = 3;
+          let uploadSuccess = false;
+          
+          while (uploadAttempts < maxAttempts && !uploadSuccess) {
+            uploadAttempts++;
+            console.log(`Upload attempt ${uploadAttempts}/${maxAttempts} for ${file.name}`);
+            
+            try {
+              const { data, error: uploadError } = await supabase.storage
+                .from('post-media')
+                .upload(`${userId}/${fullFileName}`, file, {
+                  upsert: false
+                });
+
+              if (uploadError) {
+                console.error(`Upload attempt ${uploadAttempts} failed for ${file.name}:`, uploadError);
+                if (uploadAttempts === maxAttempts) {
+                  // If regular upload fails, try chunked upload as fallback
+                  console.log(`Falling back to chunked upload for ${file.name}`);
+                  const result = await uploadFileInChunks(file);
+                  publicUrl = result.publicUrl;
+                  uploadSuccess = true;
+                  break;
+                }
+                
+                // Wait before retry (exponential backoff)
+                await new Promise(resolve => setTimeout(resolve, uploadAttempts * 1000));
+                continue;
+              }
+
+              // Get public URL
+              const { data: { publicUrl: url } } = supabase.storage
+                .from('post-media')
+                .getPublicUrl(`${userId}/${fullFileName}`);
+                
+              publicUrl = url;
+              uploadSuccess = true;
+              console.log(`Successfully uploaded ${file.name} to:`, publicUrl);
+
+            } catch (error) {
+              console.error(`Upload attempt ${uploadAttempts} exception for ${file.name}:`, error);
+              if (uploadAttempts === maxAttempts) {
+                // If regular upload fails, try chunked upload as fallback
+                console.log(`Falling back to chunked upload for ${file.name}`);
+                const result = await uploadFileInChunks(file);
+                publicUrl = result.publicUrl;
+                uploadSuccess = true;
+                break;
+              }
+              await new Promise(resolve => setTimeout(resolve, uploadAttempts * 1000));
+            }
           }
         }
 
