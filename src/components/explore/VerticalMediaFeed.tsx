@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { X, Heart, MessageCircle, Share, Volume2, VolumeX, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
+import { Minimize2, Heart, MessageCircle, Share, Volume2, VolumeX, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -205,15 +205,6 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
         zIndex: 9999
       }}
     >
-      {/* Close Button */}
-      <button
-        onClick={onClose}
-        className="absolute top-4 left-4 z-20 flex items-center justify-center w-10 h-10 text-white hover:bg-white/10 rounded-full transition-colors"
-        aria-label="Close"
-      >
-        <X className="h-6 w-6" />
-      </button>
-
       {/* Scrollable Content */}
       <div
         ref={scrollViewRef}
@@ -227,7 +218,7 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
           className="absolute top-4 right-4 z-30 cursor-pointer hover:opacity-100 transition-opacity text-white opacity-90"
           aria-label="Close"
         >
-          <X className="h-8 w-8" />
+          <Minimize2 className="h-8 w-8" />
         </button>
 
         {filteredContent.map((item, index) => (
