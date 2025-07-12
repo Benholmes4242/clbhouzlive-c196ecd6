@@ -140,9 +140,9 @@ Deno.serve(async (req) => {
         console.log('User ID:', user.id)
         console.log('File details:', { fileName: body.fileName, fileSize: body.fileSize, fileType: body.fileType })
         
-        // Check if file size is within reasonable limits (100MB max)
-        if (body.fileSize > 100 * 1024 * 1024) {
-          throw new Error(`File too large: ${body.fileSize} bytes (max 100MB)`)
+        // Check if file size is within reasonable limits (20MB max for now)
+        if (body.fileSize > 20 * 1024 * 1024) {
+          throw new Error(`File too large: ${body.fileSize} bytes (max 20MB for chunked uploads)`)
         }
         
         try {
