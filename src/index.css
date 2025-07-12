@@ -287,8 +287,3 @@
   background-color: transparent; /* Remove any black background */
 }
 
-.index-feed video:not([poster]) {
-  background-image: url('https://images.unsplash.com/photo-1500375592092-40eb2168fd21?w=400&h=400&fit=crop&crop=center');
-  background-size: cover;
-  background-position: center;
-}
