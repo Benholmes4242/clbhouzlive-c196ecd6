@@ -123,6 +123,13 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
     });
   };
 
+  // Helper function to truncate text to 9 words
+  const truncateToWords = (text: string, wordLimit: number = 9) => {
+    const words = text.split(' ');
+    if (words.length <= wordLimit) return text;
+    return words.slice(0, wordLimit).join(' ') + '...';
+  };
+
   // Filter content by type and set initial index
   useEffect(() => {
     if (!isOpen || !initialItem) return;
@@ -438,12 +445,15 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
                   <div 
                     className={`transition-all duration-300 ease-in-out ${
                       isTextExpanded 
-                        ? 'whitespace-normal max-h-none' 
-                        : 'whitespace-nowrap overflow-hidden text-ellipsis max-h-7'
+                        ? 'whitespace-normal' 
+                        : 'whitespace-normal'
                     }`}
                   >
                     <span className="text-base font-bold">
-                      {removeGolfCourseFromContent(item.title)}
+                      {isTextExpanded 
+                        ? removeGolfCourseFromContent(item.title)
+                        : truncateToWords(removeGolfCourseFromContent(item.title), 9)
+                      }
                     </span>
                   </div>
                 </div>
