@@ -1,107 +1,219 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { cn } from '@/lib/utils';
 
-interface LazyImageProps {
+interface LazyImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   src: string;
   alt: string;
   className?: string;
-  width?: number;
-  height?: number;
-  onError?: (e: React.SyntheticEvent<HTMLImageElement>) => void;
-  onClick?: () => void;
-  placeholder?: string;
+  priority?: boolean;
+  quality?: 'low' | 'medium' | 'high' | 'auto';
+  progressive?: boolean;
+  fallback?: string;
+  onLoadStart?: () => void;
+  onLoad?: () => void;
+  onError?: (e?: any) => void;
 }
 
-const LazyImage: React.FC<LazyImageProps> = ({
+/**
+ * Enhanced LazyImage with WebP conversion, progressive loading, and connection-aware quality
+ */
+export const LazyImage: React.FC<LazyImageProps> = ({
   src,
   alt,
-  className = '',
-  width,
-  height,
+  className,
+  priority = false,
+  quality = 'auto',
+  progressive = true,
+  fallback = '/placeholder.svg',
+  onLoadStart,
+  onLoad,
   onError,
-  onClick,
+  ...props
 }) => {
-  const [imageSrc, setImageSrc] = useState<string>(src); // Show the actual image immediately
-  const [isLoading, setIsLoading] = useState(false); // Start without loading state
+  const [isInView, setIsInView] = useState(priority);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
-  const [hasIntersected, setHasIntersected] = useState(false);
+  const [currentSrc, setCurrentSrc] = useState<string>('');
+  const [showLowQuality, setShowLowQuality] = useState(progressive);
+  
   const imgRef = useRef<HTMLImageElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  // Intersection Observer for lazy loading
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setHasIntersected(true);
-          observer.disconnect();
-        }
-      },
-      {
-        rootMargin: '50px', // Start loading 50px before the image enters viewport
-        threshold: 0.1
+  // Get connection-aware quality
+  const getOptimalQuality = useCallback(() => {
+    if (quality !== 'auto') return quality;
+    
+    const connection = (navigator as any)?.connection;
+    if (!connection) return 'medium';
+    
+    const { effectiveType, downlink } = connection;
+    
+    if (effectiveType === '4g' && downlink > 5) return 'high';
+    if (effectiveType === '3g' || downlink > 1.5) return 'medium';
+    return 'low';
+  }, [quality]);
+
+  // Convert image to optimized format with quality settings
+  const getOptimizedImageUrl = useCallback((originalSrc: string, targetQuality: string) => {
+    // If it's already a Supabase storage URL, add transformation params
+    if (originalSrc.includes('supabase')) {
+      const url = new URL(originalSrc);
+      
+      // Add quality and format transformations
+      switch (targetQuality) {
+        case 'low':
+          url.searchParams.set('quality', '30');
+          url.searchParams.set('width', '400');
+          break;
+        case 'medium':
+          url.searchParams.set('quality', '70');
+          url.searchParams.set('width', '800');
+          break;
+        case 'high':
+          url.searchParams.set('quality', '90');
+          break;
       }
-    );
-
-    if (imgRef.current) {
-      observer.observe(imgRef.current);
+      
+      // Try to convert to WebP
+      url.searchParams.set('format', 'webp');
+      return url.toString();
     }
-
-    return () => observer.disconnect();
+    
+    return originalSrc;
   }, []);
 
-  // Load the actual image when it intersects
-  useEffect(() => {
-    if (hasIntersected && src) {
-      setIsLoading(true);
-      const img = new Image();
-      img.onload = () => {
-        setImageSrc(src);
-        setIsLoading(false);
-      };
-      img.onerror = () => {
-        setHasError(true);
-        setIsLoading(false);
-      };
-      img.src = src;
+  // Intersection Observer for lazy loading
+  const setContainerRef = useCallback((node: HTMLDivElement | null) => {
+    if (containerRef.current) {
+      containerRef.current = null;
     }
-  }, [hasIntersected, src]);
+    
+    if (node && !priority && !isInView) {
+      containerRef.current = node;
+      
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              setIsInView(true);
+              observer.unobserve(entry.target);
+            }
+          });
+        },
+        {
+          rootMargin: '50px', // Reduced from 100px for faster loading
+          threshold: 0.1,
+        }
+      );
+      
+      observer.observe(node);
+      
+      return () => {
+        observer.unobserve(node);
+      };
+    }
+  }, [priority, isInView]);
 
-  const handleError = (e: React.SyntheticEvent<HTMLImageElement>) => {
-    setHasError(true);
-    setIsLoading(false);
-    if (onError) {
-      onError(e);
+  // Progressive loading effect
+  useEffect(() => {
+    if (!isInView && !priority) return;
+
+    const optimalQuality = getOptimalQuality();
+    
+    // Start with low quality for progressive loading
+    if (progressive && optimalQuality !== 'low') {
+      const lowQualitySrc = getOptimizedImageUrl(src, 'low');
+      setCurrentSrc(lowQualitySrc);
+      setIsLoading(true);
+      setShowLowQuality(true);
+      onLoadStart?.();
+      
+      // Preload high quality version
+      const highQualityImg = new Image();
+      const highQualitySrc = getOptimizedImageUrl(src, optimalQuality);
+      
+      highQualityImg.onload = () => {
+        // Smooth transition to high quality
+        setTimeout(() => {
+          setCurrentSrc(highQualitySrc);
+          setShowLowQuality(false);
+          setIsLoaded(true);
+          setIsLoading(false);
+          onLoad?.();
+        }, 100);
+      };
+      
+      highQualityImg.onerror = () => {
+        // Keep low quality if high quality fails
+        setIsLoaded(true);
+        setIsLoading(false);
+        onLoad?.();
+      };
+      
+      highQualityImg.src = highQualitySrc;
+    } else {
+      // Direct loading without progressive enhancement
+      const finalSrc = getOptimizedImageUrl(src, optimalQuality);
+      setCurrentSrc(finalSrc);
+      setIsLoading(true);
+      onLoadStart?.();
+    }
+  }, [isInView, priority, src, progressive, getOptimalQuality, getOptimizedImageUrl, onLoadStart, onLoad]);
+
+  const handleLoad = () => {
+    if (!progressive) {
+      setIsLoaded(true);
+      setIsLoading(false);
+      onLoad?.();
     }
   };
 
+  const handleError = () => {
+    setHasError(true);
+    setIsLoading(false);
+    setCurrentSrc(fallback);
+    onError?.();
+  };
+
+  const shouldLoad = isInView || priority;
+
   return (
-    <div className={`relative ${className}`} onClick={onClick}>
-      {isLoading && !hasError && (
-        <div className="absolute inset-0 bg-black/20 rounded-[inherit] flex items-center justify-center z-10">
-          <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-        </div>
+    <div 
+      ref={setContainerRef}
+      className={cn('relative overflow-hidden bg-muted', className)}
+    >
+      {/* Placeholder/Loading state */}
+      {!isLoaded && shouldLoad && (
+        <div className="absolute inset-0 bg-gradient-to-br from-muted to-muted/50 animate-pulse" />
       )}
-      
-      <img
-        ref={imgRef}
-        src={imageSrc}
-        alt={alt}
-        className={`w-full h-full object-cover rounded-[inherit] transition-opacity duration-200`}
-        style={{
-          imageRendering: 'auto',
-          backfaceVisibility: 'hidden',
-          transform: 'translateZ(0)',
-          maxWidth: '100%'
-        }}
-        onError={handleError}
-        width={width}
-        height={height}
-        loading="lazy"
-        decoding="async"
-      />
-      
+
+      {/* Main image */}
+      {shouldLoad && (
+        <img
+          ref={imgRef}
+          src={currentSrc || fallback}
+          alt={alt}
+          onLoad={handleLoad}
+          onError={handleError}
+          className={cn(
+            'w-full h-full object-cover transition-all duration-300',
+            isLoading && 'opacity-70',
+            showLowQuality && 'filter blur-[1px]',
+            hasError && 'opacity-50'
+          )}
+          loading={priority ? 'eager' : 'lazy'}
+          decoding="async"
+          {...props}
+        />
+      )}
+
+      {/* Error state */}
       {hasError && (
-        <div className="absolute inset-0 bg-muted rounded-[inherit] flex items-center justify-center">
-          <div className="text-xs text-muted-foreground">Failed to load</div>
+        <div className="absolute inset-0 flex items-center justify-center bg-muted">
+          <div className="text-muted-foreground text-xs">
+            Failed to load
+          </div>
         </div>
       )}
     </div>
