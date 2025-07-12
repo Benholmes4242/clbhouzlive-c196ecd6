@@ -25,8 +25,8 @@ export const InteractionIconsOverlay: React.FC<InteractionIconsOverlayProps> = (
   };
 
   return (
-    <div className="absolute bottom-3 right-3 z-20">
-      <div className="flex flex-col items-center gap-2.5 text-white text-lg opacity-90">
+    <div className="absolute bottom-5 right-3 z-20">
+      <div className="flex items-center gap-2.5 text-white text-lg opacity-90">
         {/* Mute toggle button - only show for video posts */}
         {currentMediaType === 'video' && (
           <button 
