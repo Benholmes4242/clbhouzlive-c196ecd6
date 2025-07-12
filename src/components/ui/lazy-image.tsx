@@ -9,6 +9,9 @@ interface LazyImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   quality?: 'low' | 'medium' | 'high' | 'auto';
   progressive?: boolean;
   fallback?: string;
+  responsive?: boolean;
+  sizes?: string;
+  blur?: boolean;
   onLoadStart?: () => void;
   onLoad?: () => void;
   onError?: (e?: any) => void;
@@ -24,6 +27,9 @@ export const LazyImage: React.FC<LazyImageProps> = ({
   priority = false,
   quality = 'auto',
   progressive = true,
+  responsive = true,
+  sizes = '(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw',
+  blur = true,
   fallback = '/placeholder.svg',
   onLoadStart,
   onLoad,
@@ -53,6 +59,44 @@ export const LazyImage: React.FC<LazyImageProps> = ({
     if (effectiveType === '3g' || downlink > 1.5) return 'medium';
     return 'low';
   }, [quality]);
+
+  // Generate responsive image sources
+  const generateSrcSet = useCallback((originalSrc: string) => {
+    if (!responsive || !originalSrc.includes('supabase')) return '';
+    
+    const sizes = [400, 800, 1200, 1600];
+    const qualities = { low: 30, medium: 70, high: 90 };
+    const optimalQuality = getOptimalQuality();
+    
+    return sizes.map(size => {
+      const url = new URL(originalSrc);
+      url.searchParams.set('width', size.toString());
+      url.searchParams.set('quality', qualities[optimalQuality].toString());
+      url.searchParams.set('format', 'webp');
+      return `${url.toString()} ${size}w`;
+    }).join(', ');
+  }, [responsive, getOptimalQuality]);
+
+  // Generate blur placeholder data URL
+  const generateBlurPlaceholder = useCallback(() => {
+    if (!blur) return '';
+    
+    // Create a tiny 10x10 blur placeholder
+    const canvas = document.createElement('canvas');
+    canvas.width = 10;
+    canvas.height = 10;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return '';
+    
+    // Create gradient placeholder
+    const gradient = ctx.createLinearGradient(0, 0, 10, 10);
+    gradient.addColorStop(0, '#f3f4f6');
+    gradient.addColorStop(1, '#e5e7eb');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 10, 10);
+    
+    return canvas.toDataURL('image/jpeg', 0.1);
+  }, [blur]);
 
   // Convert image to optimized format with quality settings
   const getOptimizedImageUrl = useCallback((originalSrc: string, targetQuality: string) => {
@@ -188,19 +232,32 @@ export const LazyImage: React.FC<LazyImageProps> = ({
         <div className="absolute inset-0 bg-gradient-to-br from-muted to-muted/50 animate-pulse" />
       )}
 
-      {/* Main image */}
+      {/* Blur placeholder */}
+      {blur && !isLoaded && shouldLoad && (
+        <img
+          src={generateBlurPlaceholder()}
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover filter blur-sm"
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Main image with responsive support */}
       {shouldLoad && (
         <img
           ref={imgRef}
           src={currentSrc || fallback}
+          srcSet={responsive ? generateSrcSet(src) : undefined}
+          sizes={responsive ? sizes : undefined}
           alt={alt}
           onLoad={handleLoad}
           onError={handleError}
           className={cn(
-            'w-full h-full object-cover transition-all duration-300',
+            'w-full h-full object-cover transition-all duration-500',
             isLoading && 'opacity-70',
             showLowQuality && 'filter blur-[1px]',
-            hasError && 'opacity-50'
+            hasError && 'opacity-50',
+            !isLoaded && blur && 'opacity-0'
           )}
           loading={priority ? 'eager' : 'lazy'}
           decoding="async"
