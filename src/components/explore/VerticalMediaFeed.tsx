@@ -221,6 +221,15 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
         onScroll={handleScroll}
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
+        {/* Close Button - Top Right */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 z-30 cursor-pointer hover:opacity-100 transition-opacity text-white opacity-90"
+          aria-label="Close"
+        >
+          <X className="h-8 w-8" />
+        </button>
+
         {filteredContent.map((item, index) => (
           <div
             key={item.id}
