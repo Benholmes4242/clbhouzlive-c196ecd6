@@ -208,9 +208,13 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
       {/* Scrollable Content */}
       <div
         ref={scrollViewRef}
-        className="h-full w-full overflow-y-auto snap-y snap-mandatory"
+        className="h-full w-full overflow-y-auto snap-y snap-mandatory scrollbar-hide"
         onScroll={handleScroll}
-        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        style={{ 
+          scrollbarWidth: 'none', 
+          msOverflowStyle: 'none',
+          WebkitOverflowScrolling: 'touch'
+        }}
       >
         {/* Close Button - Top Right */}
         <button
@@ -378,6 +382,13 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
       />
 
       <style>{`
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
         .snap-y.snap-mandatory div::-webkit-scrollbar {
           display: none;
         }
