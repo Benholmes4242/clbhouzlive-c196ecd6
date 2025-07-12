@@ -248,15 +248,25 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
           </div>
           
           {/* Username */}
-          <div className="flex flex-col">
-            <span className="font-semibold text-base text-white" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
-              {filteredContent[currentIndex]?.user?.name || 'Unknown User'}
-            </span>
-            {filteredContent[currentIndex]?.user?.username && (
-              <span className="text-sm text-white/70" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
-                @{filteredContent[currentIndex]?.user?.username}
+          <div className="flex items-center gap-3">
+            <div className="flex flex-col">
+              <span className="font-semibold text-base text-white" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
+                {filteredContent[currentIndex]?.user?.name || 'Unknown User'}
               </span>
-            )}
+              {filteredContent[currentIndex]?.user?.username && (
+                <span className="text-sm text-white/70" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
+                  @{filteredContent[currentIndex]?.user?.username}
+                </span>
+              )}
+            </div>
+            
+            {/* Follow pill */}
+            <div className="flex items-center gap-1 bg-black/60 backdrop-blur-sm rounded-full px-3 py-1.5">
+              <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+              </svg>
+              <span className="text-white text-xs font-medium">Following</span>
+            </div>
           </div>
         </div>
 
