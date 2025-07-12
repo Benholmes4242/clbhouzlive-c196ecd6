@@ -21,6 +21,7 @@ interface ChunkedUploadResult {
 
 const CHUNK_SIZE = 3 * 1024 * 1024; // 3MB chunks (becomes ~4MB base64)
 const MAX_RETRIES = 3;
+const COMPRESSION_THRESHOLD = 40 * 1024 * 1024; // 40MB threshold for compression
 
 export const useChunkedUpload = () => {
   const [progress, setProgress] = useState<UploadProgress | null>(null);

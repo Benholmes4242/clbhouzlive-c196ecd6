@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useVideoCompression } from './useVideoCompression';
 
 interface UploadProgress {
   postId: string;
@@ -18,6 +19,7 @@ interface BackgroundUploadData {
 
 export const useBackgroundUpload = () => {
   const { toast } = useToast();
+  const { shouldCompress, triggerCompression } = useVideoCompression();
   const [uploads, setUploads] = useState<Map<string, UploadProgress>>(new Map());
 
   const startBackgroundUpload = useCallback(async ({
@@ -112,17 +114,38 @@ export const useBackgroundUpload = () => {
         }
 
         // Create media record
-        const { error: mediaError } = await supabase
+        const { data: mediaData, error: mediaError } = await supabase
           .from('post_media')
           .insert({
             post_id: postId,
             media_type: file.type.startsWith('image/') ? 'image' : 'video',
             media_url: publicUrl
-          });
+          })
+          .select()
+          .single();
 
         if (mediaError) {
           console.error(`Media record error for ${file.name}:`, mediaError);
           throw mediaError;
+        }
+
+        // Check if video needs compression
+        if (shouldCompress(file)) {
+          console.log(`Video ${file.name} needs compression (${(file.size / 1024 / 1024).toFixed(2)}MB > 40MB)`);
+          
+          // Trigger compression in background
+          const compressionResult = await triggerCompression(
+            `${userId}/${fullFileName}`,
+            postId,
+            mediaData.id,
+            file.size
+          );
+          
+          if (compressionResult.success) {
+            console.log(`Compression triggered for ${file.name}`);
+          } else {
+            console.warn(`Failed to trigger compression for ${file.name}:`, compressionResult.error);
+          }
         }
 
         // Update progress
