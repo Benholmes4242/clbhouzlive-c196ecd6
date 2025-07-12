@@ -77,11 +77,38 @@ export const useRealPostsFetcher = () => {
           tag => tag.taggable_entities?.entity_type === 'golf_club'
         );
 
-        const golfCourse = golfCourseTag?.taggable_entities ? {
-          id: golfCourseTag.taggable_entities.entity_id,
-          name: golfCourseTag.taggable_entities.name,
-          country: 'Unknown' // We don't have country in taggable_entities
-        } : null;
+        let golfCourse = null;
+        
+        if (golfCourseTag?.taggable_entities) {
+          // Use golf course from tags if available
+          golfCourse = {
+            id: golfCourseTag.taggable_entities.entity_id,
+            name: golfCourseTag.taggable_entities.name,
+            country: 'Unknown'
+          };
+        } else if (post.content) {
+          // Extract golf course from content text as fallback
+          const contentText = post.content;
+          
+          // Look for patterns like "📍 Played at [Course Name]" or "@[Course Name]"
+          const courseMatch = contentText.match(/📍\s*(?:Played at\s+)?([^,\n]+(?:Golf Club|Golf Course|GC)[^,\n]*)/i) ||
+                            contentText.match(/at\s+([^,\n]+(?:Golf Club|Golf Course|GC)[^,\n]*)/i);
+          
+          if (courseMatch) {
+            const courseName = courseMatch[1].trim()
+              .replace(/\([^)]*\)/g, '') // Remove parentheses content
+              .replace(/\s+/g, ' ') // Normalize spaces
+              .trim();
+            
+            if (courseName.length > 3) { // Only if we have a reasonable course name
+              golfCourse = {
+                id: 'extracted-' + courseName.toLowerCase().replace(/\s+/g, '-'),
+                name: courseName,
+                country: 'Unknown'
+              };
+            }
+          }
+        }
 
         const formattedPost = {
           id: post.id,
