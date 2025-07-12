@@ -3,8 +3,7 @@ import React, { useState, memo } from 'react';
 import { Heart } from 'lucide-react';
 import { ExploreContentItem } from './types';
 
-import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
-import { useFullscreenMedia } from '@/hooks/useFullscreenMedia';
+import PostViewerModal from '@/components/posts/PostViewerModal';
 import VideoPlayer from '@/components/ui/video-player';
 import { useVideoAutoplay } from '@/hooks/useVideoAutoplay';
 import OptimizedImage from '@/components/ui/optimized-image';
@@ -19,7 +18,7 @@ interface MediaCardProps {
 
 const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, ...props }) => {
   const [imageError, setImageError] = useState(false);
-  const { isOpen, currentMedia, openMedia, closeMedia } = useFullscreenMedia();
+  const [isPostViewerOpen, setIsPostViewerOpen] = useState(false);
   const { ref: autoplayRef, shouldAutoplay, handleMouseEnter, handleMouseLeave } = useVideoAutoplay({
     enabled: true,
     threshold: 0.5
@@ -38,13 +37,33 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, ...props 
     // Only open media for image and video types, not CTA
     if (item.type === 'image' || item.type === 'video') {
       console.log('MediaCard handleMediaClick - item.golfCourse:', item.golfCourse);
-      // Call the onMediaClick prop instead of opening the fullscreen modal
+      // Call the onMediaClick prop instead of opening the post viewer modal
       if (props.onMediaClick) {
         props.onMediaClick(item);
       } else {
-        openMedia(item.src, item.type, item.title, item.golfCourse);
+        setIsPostViewerOpen(true);
       }
     }
+  };
+
+  // Transform ExploreContentItem to PostData format
+  const transformedPost = {
+    id: item.id,
+    content: item.title || null,
+    created_at: new Date().toISOString(), // ExploreContentItem doesn't have created_at
+    user: {
+      id: item.user?.id || 'unknown',
+      display_name: item.user?.name || 'Unknown User',
+      username: item.user?.name || null,
+      profile_photo_url: item.user?.avatar || null,
+    },
+    post_media: [{
+      id: `${item.id}-media`,
+      media_type: item.type as 'image' | 'video',
+      media_url: item.src,
+    }],
+    post_tags: [],
+    golfCourse: item.golfCourse,
   };
 
   const handleImageError = () => {
@@ -146,13 +165,11 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, ...props 
         </div>
       </div>
 
-      <FullscreenMediaModal
-        isOpen={isOpen}
-        onClose={closeMedia}
-        mediaUrl={currentMedia?.url || ''}
-        mediaType={currentMedia?.type || 'image'}
-        alt={currentMedia?.alt}
-        golfCourse={currentMedia?.golfCourse}
+      <PostViewerModal
+        isOpen={isPostViewerOpen}
+        onClose={() => setIsPostViewerOpen(false)}
+        initialPost={transformedPost}
+        allUserPosts={[transformedPost]}
       />
     </>
   );
