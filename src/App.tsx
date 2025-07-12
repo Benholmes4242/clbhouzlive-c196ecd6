@@ -47,6 +47,7 @@ const queryClient = new QueryClient({
 });
 
 const App: React.FC = () => {
+  console.log('App component loaded - v2'); // Force cache refresh
   return (
     <ThemeProvider defaultTheme="light" storageKey="clbhouz-ui-theme">
       <QueryClientProvider client={queryClient}>
