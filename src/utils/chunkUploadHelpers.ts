@@ -92,6 +92,8 @@ export const completeUpload = async (
   fileType: string,
   totalChunks: number
 ) => {
+  console.log('Completing upload with params:', { uploadId, fileName, fileSize, fileType, totalChunks });
+  
   const { data: completeData, error: completeError } = await supabase.functions.invoke('chunked-upload', {
     body: {
       action: 'complete',
@@ -103,8 +105,16 @@ export const completeUpload = async (
     }
   });
 
-  if (completeError || !completeData.success) {
-    throw new Error(completeData?.error || 'Failed to complete upload');
+  console.log('Complete upload response:', { completeData, completeError });
+
+  if (completeError) {
+    console.error('Complete upload Supabase error:', completeError);
+    throw new Error(`Complete upload Supabase error: ${JSON.stringify(completeError)}`);
+  }
+
+  if (!completeData || !completeData.success) {
+    console.error('Complete upload failed with response:', completeData);
+    throw new Error(`Complete upload failed: ${completeData?.error || 'Unknown error'} - Full response: ${JSON.stringify(completeData)}`);
   }
 
   return {
