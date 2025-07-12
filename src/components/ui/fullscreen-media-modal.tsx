@@ -273,7 +273,7 @@ const FullscreenMediaModal = ({
           className="flex items-center justify-center w-10 h-10 text-white hover:bg-white/10 rounded-full transition-colors"
           aria-label="Close"
         >
-          <Minimize2 className="h-6 w-6" />
+          <Minimize2 className="h-8 w-8" />
         </button>
       </div>
 
@@ -420,9 +420,9 @@ const FullscreenMediaModal = ({
               }}
             >
               {isMuted ? (
-                <VolumeX className="w-6 h-6" />
+                <VolumeX className="w-8 h-8" />
               ) : (
-                <Volume2 className="w-6 h-6" />
+                <Volume2 className="w-8 h-8" />
               )}
             </button>
           )}
@@ -431,19 +431,19 @@ const FullscreenMediaModal = ({
             className="cursor-pointer hover:opacity-100 transition-opacity"
             onClick={(e) => handleInteractionClick(e, 'like')}
           >
-            <Heart className="w-6 h-6" />
+            <Heart className="w-8 h-8" />
           </button>
           <button 
             className="cursor-pointer hover:opacity-100 transition-opacity"
             onClick={(e) => handleInteractionClick(e, 'comment')}
           >
-            <MessageCircle className="w-6 h-6" />
+            <MessageCircle className="w-8 h-8" />
           </button>
           <button 
             className="cursor-pointer hover:opacity-100 transition-opacity"
             onClick={(e) => handleInteractionClick(e, 'share')}
           >
-            <Share className="w-6 h-6" />
+            <Share className="w-8 h-8" />
           </button>
         </div>
       </div>

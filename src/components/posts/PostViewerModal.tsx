@@ -244,7 +244,7 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
               className="absolute top-4 left-4 z-30 flex items-center justify-center w-10 h-10 text-white hover:bg-white/10 rounded-full transition-colors"
               aria-label="Close"
             >
-              <ArrowLeft className="h-6 w-6" />
+              <ArrowLeft className="h-8 w-8" />
             </button>
 
             {/* Media Content - Centered Full Screen */}
@@ -322,7 +322,7 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
               {/* Like Button */}
               <button className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform">
                 <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
-                  <Heart className="h-6 w-6" />
+                  <Heart className="h-8 w-8" />
                 </div>
                 <span className="text-xs font-medium">0</span>
               </button>
@@ -333,7 +333,7 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                 className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform"
               >
                 <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
-                  <MessageCircle className="h-6 w-6" />
+                  <MessageCircle className="h-8 w-8" />
                 </div>
                 <span className="text-xs font-medium">0</span>
               </button>
@@ -341,7 +341,7 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
               {/* Share Button */}
               <button className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform">
                 <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
-                  <Share className="h-6 w-6" />
+                  <Share className="h-8 w-8" />
                 </div>
               </button>
 
@@ -351,7 +351,7 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                   <DropdownMenuTrigger asChild>
                     <button className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform">
                       <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
-                        <MoreHorizontal className="h-6 w-6" />
+                        <MoreHorizontal className="h-8 w-8" />
                       </div>
                     </button>
                   </DropdownMenuTrigger>
@@ -482,7 +482,7 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                       {/* Like Button */}
                       <button className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform">
                         <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
-                          <Heart className="h-6 w-6" />
+                          <Heart className="h-8 w-8" />
                         </div>
                         <span className="text-xs font-medium">0</span>
                       </button>
@@ -493,7 +493,7 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                         className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform"
                       >
                         <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
-                          <MessageCircle className="h-6 w-6" />
+                          <MessageCircle className="h-8 w-8" />
                         </div>
                         <span className="text-xs font-medium">0</span>
                       </button>
@@ -501,7 +501,7 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                       {/* Share Button */}
                       <button className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform">
                         <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
-                          <Share className="h-6 w-6" />
+                          <Share className="h-8 w-8" />
                         </div>
                       </button>
                     </div>
