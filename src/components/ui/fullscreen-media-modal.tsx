@@ -297,11 +297,11 @@ const FullscreenMediaModal = ({
       }}
     >
       {/* Top Controls */}
-      <div className="absolute top-4 right-4 z-10 flex items-start gap-2 pointer-events-none">
+      <div className="absolute top-4 right-4 z-10 flex items-start gap-2">
         {/* Maximize - Top Right */}
         <button
           onClick={onClose}
-          className="flex items-center justify-center w-10 h-10 text-white hover:bg-white/10 rounded-full transition-colors pointer-events-auto"
+          className="flex items-center justify-center w-10 h-10 text-white hover:bg-white/10 rounded-full transition-colors"
           aria-label="Close"
         >
           <Maximize2 className="h-6 w-6" />
@@ -447,7 +447,10 @@ const FullscreenMediaModal = ({
           {mediaTypes[currentIndex] === 'video' && (
             <button 
               className="cursor-pointer hover:opacity-100 transition-opacity"
-              onClick={handleMuteToggle}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleMuteToggle();
+              }}
             >
               {isMuted ? (
                 <VolumeX className="w-6 h-6" />
