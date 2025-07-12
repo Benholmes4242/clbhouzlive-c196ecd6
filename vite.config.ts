@@ -40,11 +40,4 @@ export default defineConfig(({ mode }) => ({
     // Optimize chunk size warnings
     chunkSizeWarningLimit: 1000,
   },
-  // Enable compression and caching
-  experimental: {
-    renderBuiltUrl(filename: string) {
-      // Add cache busting for better performance
-      return { relative: true, runtime: `"${filename}"` };
-    },
-  },
 }));
