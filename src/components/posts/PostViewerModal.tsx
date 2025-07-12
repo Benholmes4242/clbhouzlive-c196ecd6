@@ -68,8 +68,16 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   const [showComments, setShowComments] = useState(false);
   const [isAtEnd, setIsAtEnd] = useState(false);
+  const [isTextExpanded, setIsTextExpanded] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editCourse, setEditCourse] = useState<any>(null);
+
+  // Helper function to truncate text to 9 words
+  const truncateToWords = (text: string, wordLimit: number = 9) => {
+    const words = text.split(' ');
+    if (words.length <= wordLimit) return text;
+    return words.slice(0, wordLimit).join(' ') + '...';
+  };
 
   // Initialize allUserPosts state from props
   useEffect(() => {
@@ -248,7 +256,11 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
             </button>
 
             {/* Media Content - Centered Full Screen */}
-            <div className="w-full h-full flex items-center justify-center relative">
+            <div 
+              className="w-full h-full flex items-center justify-center relative"
+              onMouseEnter={() => setIsTextExpanded(true)}
+              onMouseLeave={() => setIsTextExpanded(false)}
+            >
               {currentMedia && (
                 <>
                   {currentMedia.media_type === 'video' ? (
@@ -308,11 +320,18 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
             {/* Caption - Bottom Left */}
             {currentPost.content && removeGolfCourseFromContent(currentPost.content) && (
               <div className="absolute bottom-4 left-4 z-10 max-w-[60%]">
-                <div className="text-white text-sm leading-relaxed bg-black/30 p-2 rounded max-w-full">
-                  <TaggedText 
-                    text={removeGolfCourseFromContent(currentPost.content)} 
-                    tags={currentPost.post_tags?.map(tag => tag.tagged_entity || tag) || []} 
-                  />
+                <div 
+                  className="text-white text-sm leading-relaxed bg-black/30 p-2 rounded max-w-full transition-all duration-300 ease-in-out"
+                >
+                  <div className="whitespace-normal">
+                    <TaggedText 
+                      text={isTextExpanded 
+                        ? removeGolfCourseFromContent(currentPost.content)
+                        : truncateToWords(removeGolfCourseFromContent(currentPost.content), 9)
+                      } 
+                      tags={currentPost.post_tags?.map(tag => tag.tagged_entity || tag) || []} 
+                    />
+                  </div>
                 </div>
               </div>
             )}
@@ -416,7 +435,11 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
             <DialogTitle className="sr-only">Post Viewer</DialogTitle>
             <div className="flex h-full rounded-lg overflow-hidden">
               {/* Left Side - Media */}
-              <div className="flex-1 bg-black relative">
+              <div 
+                className="flex-1 bg-black relative"
+                onMouseEnter={() => setIsTextExpanded(true)}
+                onMouseLeave={() => setIsTextExpanded(false)}
+              >
                 {currentMedia && (
                   <>
                     {currentMedia.media_type === 'video' ? (
@@ -553,9 +576,12 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                   </div>
                   
                   {currentPost.content && removeGolfCourseFromContent(currentPost.content) && (
-                    <div className="text-sm mt-3">
+                    <div className="text-sm mt-3 transition-all duration-300 ease-in-out">
                       <TaggedText 
-                        text={removeGolfCourseFromContent(currentPost.content)} 
+                        text={isTextExpanded 
+                          ? removeGolfCourseFromContent(currentPost.content)
+                          : truncateToWords(removeGolfCourseFromContent(currentPost.content), 9)
+                        } 
                         tags={currentPost.post_tags?.map(tag => tag.tagged_entity || tag) || []} 
                       />
                     </div>
