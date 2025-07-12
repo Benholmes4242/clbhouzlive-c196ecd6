@@ -65,8 +65,16 @@ const FullscreenMediaModal = ({
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [isMuted, setIsMuted] = useState(true);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isTextExpanded, setIsTextExpanded] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const isMobile = useIsMobile();
+
+  // Helper function to truncate text to 9 words
+  const truncateToWords = (text: string, wordLimit: number = 9) => {
+    const words = text.split(' ');
+    if (words.length <= wordLimit) return text;
+    return words.slice(0, wordLimit).join(' ') + '...';
+  };
 
   // Only log when golfCourse is actually provided for debugging
   if (golfCourse) {
@@ -291,6 +299,8 @@ const FullscreenMediaModal = ({
         className="relative w-full h-full flex items-center justify-center" 
         {...swipeHandlers}
         style={{ touchAction: 'manipulation' }}
+        onMouseEnter={() => setIsTextExpanded(true)}
+        onMouseLeave={() => setIsTextExpanded(false)}
       >
         {/* Current Media Item */}
         <div className="relative w-full h-full flex items-center justify-center">
@@ -385,12 +395,15 @@ const FullscreenMediaModal = ({
         {/* Caption Text (matching CaptionOverlay exactly) */}
         {content && removeGolfCourseFromContent(content) && (
           <div 
-            className="text-white text-base font-bold leading-[1.4]"
+            className="text-white text-base font-bold leading-[1.4] cursor-default transition-all duration-300 ease-in-out"
             style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
           >
-            <div className="whitespace-nowrap overflow-hidden text-ellipsis">
+            <div className="whitespace-normal">
               <span className="text-base font-bold">
-                {removeGolfCourseFromContent(content)}
+                {isTextExpanded 
+                  ? removeGolfCourseFromContent(content)
+                  : truncateToWords(removeGolfCourseFromContent(content), 9)
+                }
               </span>
               {postTags && postTags.length > 0 && (
                 <span>
