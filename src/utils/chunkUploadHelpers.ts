@@ -51,6 +51,7 @@ export const uploadChunkWithRetry = async (
 
   while (retries < MAX_RETRIES && !chunkUploaded) {
     try {
+      console.log(`Uploading chunk ${chunkIndex}, attempt ${retries + 1}/${MAX_RETRIES}`);
       const chunkBase64 = await convertChunkToBase64(chunk);
 
       const { data: chunkData, error: chunkError } = await supabase.functions.invoke('chunked-upload', {
@@ -62,8 +63,14 @@ export const uploadChunkWithRetry = async (
         }
       });
 
-      if (chunkError || !chunkData.success) {
-        throw new Error(chunkData?.error || `Failed to upload chunk ${chunkIndex}`);
+      if (chunkError) {
+        console.error(`Chunk ${chunkIndex} Supabase error:`, chunkError);
+        throw new Error(`Supabase error for chunk ${chunkIndex}: ${JSON.stringify(chunkError)}`);
+      }
+
+      if (!chunkData || !chunkData.success) {
+        console.error(`Chunk ${chunkIndex} upload failed:`, chunkData);
+        throw new Error(`Chunk ${chunkIndex} failed: ${chunkData?.error || 'Unknown error'}`);
       }
 
       chunkUploaded = true;
@@ -80,8 +87,14 @@ export const uploadChunkWithRetry = async (
       }
       
       // Wait before retry (exponential backoff)
-      await new Promise(resolve => setTimeout(resolve, Math.pow(2, retries) * 1000));
+      const delay = Math.pow(2, retries) * 1000;
+      console.log(`Waiting ${delay}ms before retry ${retries + 1}...`);
+      await new Promise(resolve => setTimeout(resolve, delay));
     }
+  }
+
+  if (!chunkUploaded) {
+    throw new Error(`Chunk ${chunkIndex} failed to upload after all retries`);
   }
 };
 
