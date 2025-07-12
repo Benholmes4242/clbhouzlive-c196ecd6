@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Minimize2, Heart, MessageCircle, Share, Volume2, VolumeX, MoreHorizontal, Edit, Trash2, MapPin } from 'lucide-react';
+import { Minimize2, Heart, MessageCircle, Share, Volume2, VolumeX, MoreHorizontal, Edit, Trash2, MapPin, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -232,6 +232,38 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
         >
           <Minimize2 className="h-8 w-8" />
         </button>
+
+        {/* User Profile - Top Left */}
+        <div className="absolute top-4 left-4 z-30 flex items-center space-x-3">
+          {/* Profile Photo */}
+          <div className="relative">
+            <img
+              src={filteredContent[currentIndex]?.user?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
+              alt={filteredContent[currentIndex]?.user?.name || 'User'}
+              className="w-10 h-10 rounded-full border-2 border-white/20 object-cover"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face';
+              }}
+            />
+            {filteredContent[currentIndex]?.user?.verified && (
+              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center">
+                <Check className="w-2.5 h-2.5 text-white" />
+              </div>
+            )}
+          </div>
+          
+          {/* Username */}
+          <div className="flex flex-col">
+            <span className="text-white font-semibold text-sm leading-tight" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
+              {filteredContent[currentIndex]?.user?.name || 'Unknown User'}
+            </span>
+            {filteredContent[currentIndex]?.user?.username && (
+              <span className="text-white/70 text-xs leading-tight" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
+                @{filteredContent[currentIndex]?.user?.username}
+              </span>
+            )}
+          </div>
+        </div>
 
         {filteredContent.map((item, index) => (
           <div
