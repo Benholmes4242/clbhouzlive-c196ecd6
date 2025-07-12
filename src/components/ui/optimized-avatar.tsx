@@ -35,27 +35,29 @@ export const OptimizedAvatar = React.forwardRef<
       style={{ width: size, height: size }}
       {...props}
     >
-      {/* Loading state with blur effect */}
-      {isLoading && (
-        <div 
-          className="absolute inset-0 bg-muted animate-pulse rounded-full"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='20' cy='20' r='20' fill='%23f1f5f9'/%3E%3Cellipse cx='20' cy='16' rx='7' ry='6' fill='%23e2e8f0'/%3E%3Cellipse cx='20' cy='28' rx='11' ry='7' fill='%23e2e8f0'/%3E%3C/svg%3E")`,
-            backgroundSize: 'cover'
-          }}
-        />
-      )}
-      
-      {/* Optimized image */}
+      {/* Optimized image - show immediately if cached */}
       {cachedSrc && (
         <AvatarPrimitive.Image
           className={cn(
-            "aspect-square h-full w-full transition-opacity duration-200",
-            isLoading ? "opacity-0" : "opacity-100"
+            "aspect-square h-full w-full transition-opacity duration-300",
+            isLoading ? "opacity-70" : "opacity-100"
           )}
           src={cachedSrc}
           alt={alt}
+          loading="lazy"
+          decoding="async"
         />
+      )}
+      
+      {/* Minimal loading state - only show for first 2 seconds */}
+      {isLoading && !cachedSrc && (
+        <div 
+          className="absolute inset-0 bg-muted/60 animate-pulse rounded-full flex items-center justify-center"
+        >
+          <div className="text-xs font-medium text-muted-foreground/60">
+            {alt?.charAt(0)?.toUpperCase() || '?'}
+          </div>
+        </div>
       )}
       
       {/* Fallback */}
