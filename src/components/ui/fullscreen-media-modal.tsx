@@ -9,6 +9,7 @@ import { UserInfoOverlay } from '../posts/user-post/overlays/UserInfoOverlay';
 import TaggedText from '../posts/TaggedText';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useVideoPlaybackManager } from '@/contexts/VideoPlaybackManager';
 
 interface FullscreenMediaModalProps {
   isOpen: boolean;
@@ -70,6 +71,10 @@ const FullscreenMediaModal = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const isMobile = useIsMobile();
   const { isTextExpanded, handleMouseEnter, handleMouseLeave } = useTextExpansion();
+  const { registerVideo, unregisterVideo, pauseAllAndSetActive } = useVideoPlaybackManager();
+  
+  // Generate unique video ID for fullscreen modal videos
+  const videoId = useRef(`fullscreen-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`);
 
   // Only log when golfCourse is actually provided for debugging
   if (golfCourse) {
@@ -137,9 +142,22 @@ const FullscreenMediaModal = ({
   // Auto-play video when modal opens or index changes
   useEffect(() => {
     if (isOpen && mediaTypes[currentIndex] === 'video' && videoRef.current) {
+      // Register video with playback manager
+      registerVideo(videoId.current, videoRef.current);
+      
+      // When fullscreen modal opens with a video, pause and mute ALL other videos
+      pauseAllAndSetActive(videoId.current);
+      
       videoRef.current.play().catch(console.error);
     }
-  }, [isOpen, currentIndex, mediaTypes]);
+    
+    return () => {
+      // Cleanup: unregister video when component unmounts or video changes
+      if (mediaTypes[currentIndex] === 'video') {
+        unregisterVideo(videoId.current);
+      }
+    };
+  }, [isOpen, currentIndex, mediaTypes, registerVideo, unregisterVideo, pauseAllAndSetActive]);
 
   // Prevent background scrolling when modal is open - Simple but effective approach
   useEffect(() => {
@@ -189,6 +207,15 @@ const FullscreenMediaModal = ({
       };
     }
   }, [isOpen]);
+
+  // Clean up video when modal closes
+  useEffect(() => {
+    if (!isOpen && videoRef.current) {
+      videoRef.current.pause();
+      videoRef.current.currentTime = 0;
+      unregisterVideo(videoId.current);
+    }
+  }, [isOpen, unregisterVideo]);
 
   const handleMuteToggle = () => {
     if (videoRef.current) {
