@@ -322,15 +322,15 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
               )}
             </div>
 
-            {/* Action Buttons - Right Side */}
-            <div className="absolute right-4 bottom-20 z-10 flex flex-col space-y-4">
+            {/* Action Buttons - Bottom Right */}
+            <div className="absolute bottom-4 right-4 z-10 flex flex-col space-y-8">
               {/* Like Button */}
               <button
                 onClick={() => handleLike(item)}
                 className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform"
               >
                 <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
-                  <Heart className="h-6 w-6" />
+                  <Heart className="h-8 w-8" />
                 </div>
                 <span className="text-xs font-medium">{item.likes}</span>
               </button>
@@ -341,7 +341,7 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
                 className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform"
               >
                 <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
-                  <MessageCircle className="h-6 w-6" />
+                  <MessageCircle className="h-8 w-8" />
                 </div>
                 <span className="text-xs font-medium">0</span>
               </button>
@@ -352,7 +352,7 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
                 className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform"
               >
                 <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
-                  <Share2 className="h-6 w-6" />
+                  <Share2 className="h-8 w-8" />
                 </div>
               </button>
 
@@ -362,7 +362,7 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
                   <DropdownMenuTrigger asChild>
                     <button className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform">
                       <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
-                        <MoreHorizontal className="h-6 w-6" />
+                        <MoreHorizontal className="h-8 w-8" />
                       </div>
                     </button>
                   </DropdownMenuTrigger>
