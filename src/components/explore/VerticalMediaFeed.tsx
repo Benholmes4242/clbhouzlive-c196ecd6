@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Minimize2, Heart, MessageCircle, Share, Volume2, VolumeX, MoreHorizontal, Edit, Trash2, MapPin, Check } from 'lucide-react';
+import { Minimize2, Heart, MessageCircle, Share, Volume2, VolumeX, MoreHorizontal, Edit, Trash2, MapPin, Check, UserPlus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -7,6 +7,8 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { usePostUpdate } from '@/hooks/usePostUpdate';
 import { usePostData } from '@/hooks/usePostData';
 import { ExploreContentItem } from './types';
+import { supabase } from '@/integrations/supabase/client';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import CoursePostBadge from '../posts/CoursePostBadge';
 import EnhancedCreateMomentModal from '../post/EnhancedCreateMomentModal';
@@ -43,6 +45,82 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<ExploreContentItem | null>(null);
   const [editCourse, setEditCourse] = useState<any>(null);
+  const queryClient = useQueryClient();
+
+  // Check if current user follows the displayed user
+  const { data: isFollowing, isLoading: isFollowingLoading } = useQuery({
+    queryKey: ['user-follows', user?.id, filteredContent[currentIndex]?.user?.id],
+    queryFn: async () => {
+      if (!user?.id || !filteredContent[currentIndex]?.user?.id || user.id === filteredContent[currentIndex]?.user?.id) {
+        return null; // Don't show follow button for own posts
+      }
+      
+      const { data, error } = await supabase
+        .from('user_follows')
+        .select('id')
+        .eq('follower_id', user.id)
+        .eq('following_id', filteredContent[currentIndex]?.user?.id)
+        .maybeSingle();
+      
+      if (error && error.code !== 'PGRST116') {
+        console.error('Error checking follow status:', error);
+        return false;
+      }
+      
+      return !!data;
+    },
+    enabled: !!user?.id && !!filteredContent[currentIndex]?.user?.id && user.id !== filteredContent[currentIndex]?.user?.id
+  });
+
+  // Follow/unfollow mutation
+  const followMutation = useMutation({
+    mutationFn: async ({ targetUserId, action }: { targetUserId: string; action: 'follow' | 'unfollow' }) => {
+      if (!user?.id) throw new Error('User not authenticated');
+      
+      if (action === 'follow') {
+        const { data, error } = await supabase
+          .from('user_follows')
+          .insert({
+            follower_id: user.id,
+            following_id: targetUserId
+          })
+          .select()
+          .single();
+        
+        if (error) throw error;
+        return data;
+      } else {
+        const { error } = await supabase
+          .from('user_follows')
+          .delete()
+          .eq('follower_id', user.id)
+          .eq('following_id', targetUserId);
+        
+        if (error) throw error;
+        return null;
+      }
+    },
+    onSuccess: (data, variables) => {
+      // Update the query cache
+      queryClient.setQueryData(
+        ['user-follows', user?.id, variables.targetUserId],
+        variables.action === 'follow'
+      );
+    },
+    onError: (error) => {
+      console.error('Follow/unfollow error:', error);
+    }
+  });
+
+  const handleFollowToggle = () => {
+    const targetUserId = filteredContent[currentIndex]?.user?.id;
+    if (!targetUserId || !user?.id || targetUserId === user.id) return;
+    
+    followMutation.mutate({
+      targetUserId,
+      action: isFollowing ? 'unfollow' : 'follow'
+    });
+  };
 
   // Filter content by type and set initial index
   useEffect(() => {
@@ -260,13 +338,28 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
               )}
             </div>
             
-            {/* Follow pill */}
-            <div className="flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1.5">
-              <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-              </svg>
-              <span className="text-white text-xs font-medium">Following</span>
-            </div>
+            {/* Follow pill - only show if not own post and user is logged in */}
+            {user?.id && filteredContent[currentIndex]?.user?.id && user.id !== filteredContent[currentIndex]?.user?.id && (
+              <button 
+                onClick={handleFollowToggle}
+                disabled={followMutation.isPending || isFollowingLoading}
+                className="flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1.5 hover:bg-white/30 transition-colors disabled:opacity-50"
+              >
+                {isFollowing ? (
+                  <>
+                    <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                    </svg>
+                    <span className="text-white text-xs font-medium">Following</span>
+                  </>
+                ) : (
+                  <>
+                    <UserPlus className="w-3 h-3 text-white" />
+                    <span className="text-white text-xs font-medium">Follow</span>
+                  </>
+                )}
+              </button>
+            )}
           </div>
         </div>
 
