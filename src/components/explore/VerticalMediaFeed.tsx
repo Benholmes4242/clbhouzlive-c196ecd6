@@ -307,9 +307,6 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
                   <div>
                     <div className="text-white font-semibold text-sm flex items-center">
                       {item.user.name}
-                      {item.user.verified && (
-                        <span className="text-blue-400 ml-1">✓</span>
-                      )}
                     </div>
                   </div>
                 </div>

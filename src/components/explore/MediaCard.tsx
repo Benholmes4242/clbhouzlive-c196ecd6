@@ -141,9 +141,6 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, ...props 
               <span className="text-white text-sm font-bold drop-shadow-lg">
                 {item.user.name}
               </span>
-              {item.user.verified && (
-                <span className="text-blue-400 text-xs">✓</span>
-              )}
             </div>
           )}
         </div>

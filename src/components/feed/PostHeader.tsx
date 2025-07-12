@@ -41,11 +41,6 @@ const PostHeader = ({ user, type, timeAgo }: PostHeaderProps) => {
             >
               {user.name}
             </span>
-            {user.verified && (
-              <div className="w-4 h-4 bg-green-600 rounded-full flex items-center justify-center">
-                <div className="w-2 h-2 bg-white rounded-full" />
-              </div>
-            )}
             {type === 'youtube' && (
               <span className="text-xs bg-red-500 text-white px-2 py-0.5 rounded">YouTube</span>
             )}
