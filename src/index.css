@@ -5,6 +5,32 @@
 @tailwind utilities;
 
 @layer base {
+  /* Mobile scroll behavior fixes */
+  html {
+    scroll-behavior: auto; /* Disable smooth scrolling for instant positioning */
+    -webkit-overflow-scrolling: touch;
+    height: -webkit-fill-available; /* iOS viewport fix */
+  }
+  
+  body {
+    scroll-behavior: auto;
+    overscroll-behavior: none; /* Prevent bounce scrolling on iOS */
+    position: relative;
+    min-height: 100vh;
+    min-height: -webkit-fill-available; /* iOS viewport fix */
+  }
+
+  #root {
+    min-height: 100vh;
+    min-height: -webkit-fill-available; /* iOS viewport fix */
+  }
+
+  /* Prevent iOS zoom on input focus */
+  @media screen and (max-width: 768px) {
+    input, textarea, select {
+      font-size: 16px;
+    }
+  }
   :root {
     --background: 0 0% 100%;
     --foreground: 224 71.4% 4.1%;
