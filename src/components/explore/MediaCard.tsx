@@ -104,10 +104,12 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, ...props 
           <div className="absolute bottom-2 left-2 hidden md:block">
             <button
               onClick={handleLike}
-              className="flex items-center space-x-1 bg-black bg-opacity-60 text-white px-2 py-1 rounded-full hover:bg-opacity-80 transition-all duration-200 text-sm"
+              className="flex items-center justify-center w-10 h-10 text-white hover:bg-white/10 rounded-full transition-colors"
             >
-              <Heart className="h-3 w-3" />
-              <span className="font-medium">{item.likes}</span>
+              <div className="flex items-center space-x-1">
+                <Heart className="h-4 w-4" />
+                <span className="font-medium text-sm">{item.likes}</span>
+              </div>
             </button>
           </div>
 
