@@ -59,7 +59,7 @@ export const MediaContainer: React.FC<MediaContainerProps> = ({
   return (
     <div 
       {...swipeHandlers}
-      className="relative w-full aspect-square group"
+      className="relative w-full h-full group"
       style={{ touchAction: 'pan-y' }} // Only allow vertical scrolling
     >
       {currentMedia.media_type === 'video' ? (
