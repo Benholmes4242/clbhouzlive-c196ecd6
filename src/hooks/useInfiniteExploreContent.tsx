@@ -34,30 +34,15 @@ export const useInfiniteExploreContent = (activeFilter?: string) => {
         
         // If we got fewer posts than requested, we might be at the end
         if (realPosts.length < POSTS_PER_PAGE) {
-          setHasMore(true); // Keep loading mock data
+          setHasMore(false); // No more real posts available
         }
       } else {
-        // Fallback to mock data
-        const mockPosts = getMockPosts(currentMockOffset, POSTS_PER_PAGE);
-        
-        if (mockPosts.length > 0) {
-          setContent(prev => [...prev, ...mockPosts]);
-          setCurrentMockOffset(prev => prev + POSTS_PER_PAGE);
-        } else {
-          setHasMore(false);
-        }
+        // No real posts available - mark as end instead of falling back to mock data
+        setHasMore(false);
       }
     } catch (error) {
       console.error('Error loading content:', error);
-      
-      // Fallback to mock data on error
-      const mockPosts = getMockPosts(currentMockOffset, POSTS_PER_PAGE);
-      if (mockPosts.length > 0) {
-        setContent(prev => [...prev, ...mockPosts]);
-        setCurrentMockOffset(prev => prev + POSTS_PER_PAGE);
-      } else {
-        setHasMore(false);
-      }
+      setHasMore(false); // Stop loading on error instead of falling back to mock data
     } finally {
       setLoading(false);
     }

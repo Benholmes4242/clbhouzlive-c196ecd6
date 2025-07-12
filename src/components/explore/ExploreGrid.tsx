@@ -90,11 +90,16 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
         ))}
       </div>
       
-      {/* Infinite scroll sentinel - hide loading for small content sets */}
+      {/* Infinite scroll sentinel */}
       <div id="scroll-sentinel" className="h-4">
-        {isLoading && content.length > 10 && hasMore && activeFilter !== 'Hack Shack' && (
+        {isLoading && hasMore && (
           <div className="flex justify-center py-4">
             <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        )}
+        {!hasMore && content.length > 0 && (
+          <div className="flex justify-center py-8">
+            <p className="text-muted-foreground">You've reached the end!</p>
           </div>
         )}
       </div>
