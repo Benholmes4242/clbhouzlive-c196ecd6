@@ -2,25 +2,25 @@ import React, { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { PerformanceMonitor } from './components/ui/performance-monitor';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ScrollToTop from '@/components/ScrollToTop';
-import { useProfilePreloader } from '@/hooks/useProfilePreloader';
 
 import { ThemeProvider } from '@/components/theme-provider';
 import PasswordProtection from "@/components/PasswordProtection";
 import Index from "./pages/Index";
 
-// Lazy load non-critical components for better performance
 const Auth = lazy(() => import("./pages/Auth"));
 const CreateProfile = lazy(() => import("./pages/CreateProfile"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const UserProfilePage = lazy(() => import("./pages/UserProfilePage"));
 const Settings = lazy(() => import("./pages/Settings"));
+const Explore = lazy(() => import("./pages/Explore"));
+const Courses = lazy(() => import("./pages/Courses"));
 const CourseDetailPage = lazy(() => import("./pages/CourseDetailPage"));
 const UserCoursesPage = lazy(() => import("./pages/UserCoursesPage"));
 const MyRatings = lazy(() => import("./pages/MyRatings"));
+const News = lazy(() => import("./pages/News"));
 const TourCentral = lazy(() => import("./pages/TourCentral"));
 const ClubhouseFeed = lazy(() => import("./pages/ClubhouseFeed"));
 const MessagesPage = lazy(() => import("./pages/MessagesPage"));
@@ -31,11 +31,6 @@ const FollowingPage = lazy(() => import("./pages/FollowingPage"));
 const Top100Explorer = lazy(() => import("./pages/Top100Explorer"));
 const AdminSetupPage = lazy(() => import("./pages/AdminSetupPage"));
 const AdminPage = lazy(() => import("./pages/AdminPage"));
-
-// Eager load critical pages for instant navigation
-const Explore = lazy(() => import("./pages/Explore"));
-const Courses = lazy(() => import("./pages/Courses"));
-const News = lazy(() => import("./pages/News"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 const queryClient = new QueryClient({
@@ -43,18 +38,11 @@ const queryClient = new QueryClient({
     queries: {
       retry: 1,
       refetchOnWindowFocus: false,
-      // Add caching optimization
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      gcTime: 10 * 60 * 1000, // 10 minutes
     },
   },
 });
 
 const App: React.FC = () => {
-  // Preload common profile photos for better UX
-  useProfilePreloader();
-  
-  console.log('App component loaded - v2'); // Force cache refresh
   return (
     <ThemeProvider defaultTheme="light" storageKey="clbhouz-ui-theme">
       <QueryClientProvider client={queryClient}>
@@ -105,7 +93,6 @@ const App: React.FC = () => {
           </PasswordProtection>
       </TooltipProvider>
     </QueryClientProvider>
-    <PerformanceMonitor />
     </ThemeProvider>
   );
 };

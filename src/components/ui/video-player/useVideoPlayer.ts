@@ -76,8 +76,8 @@ export const useVideoPlayer = ({
 
     const handleLoadedMetadata = () => {
       // Enable autoplay when ready (for both feed and non-feed videos)
-      // Only auto-play if video hasn't started and is currently paused
-      if (autoplay && video.paused && video.currentTime === 0) {
+      if (autoplay && video.paused) {
+        video.currentTime = 0;
         video.play().catch(error => {
           console.log('Autoplay prevented:', error);
         });
@@ -89,18 +89,15 @@ export const useVideoPlayer = ({
     video.addEventListener('volumechange', handleVolumeChange);
     video.addEventListener('loadedmetadata', handleLoadedMetadata);
 
-    // Immediate autoplay attempt for all videos when autoplay is enabled (only on initial load)
-    if (autoplay && video.readyState >= 1) {
-      // Only reset currentTime if video hasn't started playing yet
-      if (video.currentTime === 0 && video.paused) {
-        video.currentTime = 0;
-        // Use requestAnimationFrame for smoother autoplay timing
-        requestAnimationFrame(() => {
-          video.play().catch(error => {
-            console.log('Autoplay prevented:', error);
-          });
+    // Immediate autoplay attempt for all videos when autoplay is enabled
+    if (autoplay) {
+      video.currentTime = 0;
+      // Use requestAnimationFrame for smoother autoplay timing
+      requestAnimationFrame(() => {
+        video.play().catch(error => {
+          console.log('Autoplay prevented:', error);
         });
-      }
+      });
     }
 
     return () => {
@@ -157,21 +154,9 @@ export const useVideoPlayer = ({
     const video = videoRef.current;
     if (!video) return;
 
-    // Store current playback position before changing mute state
-    const currentTime = video.currentTime;
-    const wasPlaying = !video.paused;
-
     const newMutedState = !video.muted;
     video.muted = newMutedState;
     setIsMuted(newMutedState);
-    
-    // Restore playback position after mute change
-    video.currentTime = currentTime;
-    
-    // Resume playing if it was playing before
-    if (wasPlaying && video.paused) {
-      video.play().catch(console.error);
-    }
     
     // Update global mute state if this is a feed video
     if (isInFeed) {

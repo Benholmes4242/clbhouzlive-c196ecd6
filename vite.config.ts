@@ -19,25 +19,4 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  build: {
-    // Optimize build output
-    minify: 'esbuild',
-    cssMinify: true,
-    rollupOptions: {
-      output: {
-        // Manual chunk splitting for better caching
-        manualChunks: {
-          'react-vendor': ['react', 'react-dom'],
-          'router-vendor': ['react-router-dom'],
-          'ui-vendor': ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu'],
-          'query-vendor': ['@tanstack/react-query'],
-          'supabase-vendor': ['@supabase/supabase-js'],
-        },
-      },
-    },
-    // Enable gzip compression
-    reportCompressedSize: true,
-    // Optimize chunk size warnings
-    chunkSizeWarningLimit: 1000,
-  },
 }));

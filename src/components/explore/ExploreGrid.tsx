@@ -12,8 +12,6 @@ interface ExploreGridProps {
   hasMore: boolean;
   onLoadMore: () => void;
   activeFilter?: string;
-  isPreloaded?: (id: string) => boolean;
-  createSentinel?: (callback: () => void) => HTMLElement;
 }
 
 const ExploreGrid: React.FC<ExploreGridProps> = ({ 
@@ -24,51 +22,30 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
   isLoading, 
   hasMore, 
   onLoadMore,
-  activeFilter,
-  isPreloaded,
-  createSentinel
+  activeFilter
 }) => {
-  // Enhanced intersection observer with preloading support
+  // Intersection observer for infinite scroll
   React.useEffect(() => {
-    let observer: IntersectionObserver;
-    let sentinel: HTMLElement;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !isLoading) {
+          onLoadMore();
+        }
+      },
+      { threshold: 0.1 }
+    );
 
-    if (createSentinel) {
-      // Use the enhanced sentinel creator
-      sentinel = createSentinel(onLoadMore);
-      const existingSentinel = document.getElementById('scroll-sentinel');
-      if (existingSentinel) {
-        existingSentinel.appendChild(sentinel);
-      }
-    } else {
-      // Fallback to traditional intersection observer
-      observer = new IntersectionObserver(
-        (entries) => {
-          if (entries[0].isIntersecting && hasMore && !isLoading) {
-            onLoadMore();
-          }
-        },
-        { threshold: 0.1 }
-      );
-
-      const fallbackSentinel = document.getElementById('scroll-sentinel');
-      if (fallbackSentinel) {
-        observer.observe(fallbackSentinel);
-      }
+    const sentinel = document.getElementById('scroll-sentinel');
+    if (sentinel) {
+      observer.observe(sentinel);
     }
 
     return () => {
-      if (observer) {
-        const fallbackSentinel = document.getElementById('scroll-sentinel');
-        if (fallbackSentinel) {
-          observer.unobserve(fallbackSentinel);
-        }
-      }
       if (sentinel) {
-        sentinel.remove();
+        observer.unobserve(sentinel);
       }
     };
-  }, [hasMore, isLoading, onLoadMore, createSentinel]);
+  }, [hasMore, isLoading, onLoadMore]);
 
   // Don't show skeleton loading on initial load for any filter
   if (isLoading && content.length === 0) {
@@ -91,21 +68,16 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
 
   return (
     <>
-      {/* Responsive Grid Layout with preload indicators */}
+      {/* Responsive Grid Layout - No loading states between content */}
       <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 md:gap-4">
         {content.map((item) => (
-          <div key={item.id} style={{ aspectRatio: '4/5' }} className="relative">
+          <div key={item.id} style={{ aspectRatio: '4/5' }}>
             <ExploreContentCard 
               item={item} 
               onLike={onLike} 
               onFollow={onFollow} 
               onMediaClick={onMediaClick}
             />
-            {/* Show preload indicator in development or when explicitly enabled */}
-            {isPreloaded?.(item.id) && process.env.NODE_ENV === 'development' && (
-              <div className="absolute top-1 right-1 w-2 h-2 bg-green-500 rounded-full opacity-60" 
-                   title="Preloaded" />
-            )}
           </div>
         ))}
       </div>

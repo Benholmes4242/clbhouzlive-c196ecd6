@@ -6,7 +6,7 @@ import ExploreFilters from '@/components/explore/ExploreFilters';
 import ExploreGrid from '@/components/explore/ExploreGrid';
 import MobileDebugConsole from '@/components/explore/MobileDebugConsole';
 import VerticalMediaFeed from '@/components/explore/VerticalMediaFeed';
-import { useEnhancedInfiniteContent } from '@/hooks/useEnhancedInfiniteContent';
+import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 
 import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
 
@@ -17,10 +17,8 @@ const Explore = () => {
     content, 
     loading, 
     hasMore, 
-    loadMore,
-    isPreloaded,
-    createSentinel
-  } = useEnhancedInfiniteContent(activeFilter);
+    loadMore 
+  } = useInfiniteExploreContent(activeFilter);
   
   const { 
     isOpen: isFeedOpen, 
@@ -82,8 +80,6 @@ const Explore = () => {
             hasMore={hasMore}
             onLoadMore={loadMore}
             activeFilter={activeFilter}
-            isPreloaded={isPreloaded}
-            createSentinel={createSentinel}
           />
         </main>
         

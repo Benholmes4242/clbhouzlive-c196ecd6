@@ -112,10 +112,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
       onMouseEnter={() => !isInFeed && setShowControls(true)}
       onMouseLeave={() => !isInFeed && setShowControls(false)}
     >
-      {/* Show loading spinner with subtle grey background instead of black */}
+      {/* Show loading spinner if no thumbnail is ready and no poster */}
       {!thumbnailReady && !poster && (
-        <div className="absolute inset-0 bg-muted/40 rounded-[inherit] flex items-center justify-center z-10">
-          <div className="w-8 h-8 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin" />
+        <div className="absolute inset-0 bg-black/20 rounded-[inherit] flex items-center justify-center z-10">
+          <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
         </div>
       )}
       

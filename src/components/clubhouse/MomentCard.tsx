@@ -4,7 +4,6 @@ import FollowButton from '@/components/profile/actions/FollowButton';
 import { useProfileActions } from '@/components/profile/actions/useProfileActions';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
-import { OptimizedAvatar } from '@/components/ui/optimized-avatar';
 
 interface MomentCardProps {
   moment: {
@@ -115,20 +114,23 @@ const MomentCard: React.FC<MomentCardProps> = ({ moment, currentUserId }) => {
         
         {/* Overlay Content */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex flex-col justify-between p-3">
-          {/* Top Section - User Info with Optimized Avatar */}
+          {/* Top Section - User Info */}
           <div className="flex items-center gap-2">
-            <OptimizedAvatar
-              src={moment.user.profile_photo_url || undefined}
-              alt={moment.user.display_name || moment.user.username || 'User'}
-              size={56}
-              priority={true}
-              fallback={
-                <span className="text-sm text-white font-medium">
-                  {(moment.user.display_name || moment.user.username || 'U').charAt(0).toUpperCase()}
-                </span>
-              }
-              className="ring-2 ring-white/20"
-            />
+            <div className="w-14 h-14 rounded-full overflow-hidden bg-muted">
+              {moment.user.profile_photo_url ? (
+                <img
+                  src={moment.user.profile_photo_url}
+                  alt={moment.user.display_name || moment.user.username || 'User'}
+                  className="w-full h-full object-cover hq-image"
+                />
+              ) : (
+                <div className="w-full h-full bg-primary/20 flex items-center justify-center">
+                  <span className="text-xs text-primary font-medium">
+                    {(moment.user.display_name || moment.user.username || 'U').charAt(0).toUpperCase()}
+                  </span>
+                </div>
+              )}
+            </div>
             <div className="flex-1 min-w-0">
               <p className="text-white text-base font-bold truncate">
                 {moment.user.display_name || moment.user.username || 'User'}

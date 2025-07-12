@@ -12,6 +12,3 @@ verify_jwt = true
 
 [functions.video-compression]
 verify_jwt = true
-
-[functions.video-optimizer]
-verify_jwt = false
