@@ -166,7 +166,7 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
     <div 
       ref={containerRef}
       className="relative w-full bg-black overflow-hidden"
-      style={{ aspectRatio: '9/16' }}
+      style={{ aspectRatio: '4/5' }}
     >
       <MediaContainer
         media={post.post_media}
