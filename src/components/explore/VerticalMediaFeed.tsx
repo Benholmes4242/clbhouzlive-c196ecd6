@@ -235,7 +235,7 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
 
         {filteredContent.map((item, index) => (
           <div
-            key={item.id}
+            key={`${item.id}-${index}`}
             ref={(el) => {
               if (el) itemRefs.current[index] = el;
             }}
