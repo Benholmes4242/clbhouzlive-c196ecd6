@@ -139,35 +139,57 @@ Deno.serve(async (req) => {
         console.log('Total chunks expected:', body.totalChunks)
         console.log('User ID:', user.id)
         
-        // Download and combine all chunks
-        const chunks: Uint8Array[] = []
+        // Process chunks in batches to avoid memory issues
+        const BATCH_SIZE = 10; // Process 10 chunks at a time
+        const combinedChunks: Uint8Array[] = []
         
-        for (let i = 0; i < body.totalChunks; i++) {
-          const chunkFileName = `${user.id}/chunks/${body.uploadId}/chunk_${i.toString().padStart(4, '0')}`
-          console.log(`Attempting to download chunk ${i}: ${chunkFileName}`)
+        for (let batchStart = 0; batchStart < body.totalChunks; batchStart += BATCH_SIZE) {
+          const batchEnd = Math.min(batchStart + BATCH_SIZE, body.totalChunks)
+          console.log(`Processing chunk batch ${batchStart}-${batchEnd-1}`)
           
-          const { data: chunkData, error } = await supabaseClient.storage
-            .from('post-media')
-            .download(chunkFileName)
+          const batchChunks: Uint8Array[] = []
           
-          if (error) {
-            console.error(`Failed to download chunk ${i}:`, error)
-            console.error(`Chunk file name that failed: ${chunkFileName}`)
-            throw new Error(`Failed to download chunk ${i}: ${error.message}`)
+          for (let i = batchStart; i < batchEnd; i++) {
+            const chunkFileName = `${user.id}/chunks/${body.uploadId}/chunk_${i.toString().padStart(4, '0')}`
+            console.log(`Downloading chunk ${i}: ${chunkFileName}`)
+            
+            const { data: chunkData, error } = await supabaseClient.storage
+              .from('post-media')
+              .download(chunkFileName)
+            
+            if (error) {
+              console.error(`Failed to download chunk ${i}:`, error)
+              throw new Error(`Failed to download chunk ${i}: ${error.message}`)
+            }
+            
+            const arrayBuffer = await chunkData.arrayBuffer()
+            batchChunks.push(new Uint8Array(arrayBuffer))
           }
           
-          const arrayBuffer = await chunkData.arrayBuffer()
-          chunks.push(new Uint8Array(arrayBuffer))
+          // Combine this batch
+          const batchSize = batchChunks.reduce((size, chunk) => size + chunk.length, 0)
+          const combinedBatch = new Uint8Array(batchSize)
+          let offset = 0
+          
+          for (const chunk of batchChunks) {
+            combinedBatch.set(chunk, offset)
+            offset += chunk.length
+          }
+          
+          combinedChunks.push(combinedBatch)
+          console.log(`Batch ${batchStart}-${batchEnd-1} combined, size: ${batchSize} bytes`)
         }
 
-        // Combine chunks into final file
-        const totalSize = chunks.reduce((size, chunk) => size + chunk.length, 0)
-        const combinedFile = new Uint8Array(totalSize)
-        let offset = 0
+        // Combine all batches into final file
+        const totalSize = combinedChunks.reduce((size, batch) => size + batch.length, 0)
+        console.log(`Final file size: ${totalSize} bytes`)
         
-        for (const chunk of chunks) {
-          combinedFile.set(chunk, offset)
-          offset += chunk.length
+        const combinedFile = new Uint8Array(totalSize)
+        let finalOffset = 0
+        
+        for (const batch of combinedChunks) {
+          combinedFile.set(batch, finalOffset)
+          finalOffset += batch.length
         }
 
         // Generate unique filename with timestamp
