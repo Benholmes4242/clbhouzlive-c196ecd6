@@ -125,8 +125,14 @@ Deno.serve(async (req) => {
       }
 
       case 'complete': {
-        if (!body.uploadId || body.totalChunks === undefined) {
-          throw new Error('Missing upload ID or total chunks')
+        console.log('Complete request body:', body)
+        
+        if (!body.uploadId) {
+          throw new Error('Missing upload ID')
+        }
+        
+        if (body.totalChunks === undefined || body.totalChunks === null) {
+          throw new Error('Missing total chunks count')
         }
 
         console.log('Completing chunked upload:', body.uploadId)
@@ -214,10 +220,15 @@ Deno.serve(async (req) => {
 
   } catch (error) {
     console.error('Chunked upload error:', error)
+    console.error('Error details:', {
+      message: error.message,
+      stack: error.stack
+    })
     return new Response(
       JSON.stringify({ 
         error: error.message,
-        success: false 
+        success: false,
+        details: error.stack
       }),
       { 
         status: 400,
