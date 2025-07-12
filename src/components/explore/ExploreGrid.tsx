@@ -53,7 +53,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
       <div className="space-y-4">
         <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 md:gap-4">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="aspect-square bg-muted rounded-lg animate-pulse" />
+            <div key={i} style={{ aspectRatio: '4/5' }} className="bg-muted rounded-lg animate-pulse" />
           ))}
         </div>
       </div>
@@ -79,7 +79,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
       {/* Responsive Grid Layout - No loading states between content */}
       <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 md:gap-4">
         {content.map((item) => (
-          <div key={item.id} className="aspect-square">
+          <div key={item.id} style={{ aspectRatio: '4/5' }}>
             <ExploreContentCard 
               item={item} 
               onLike={onLike} 
