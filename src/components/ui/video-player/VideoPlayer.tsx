@@ -19,6 +19,7 @@ interface VideoPlayerProps {
   onClick?: () => void;
   showOverlayControls?: boolean;
   showVideoIcon?: boolean;
+  videoIconType?: 'play' | 'maximize';
   videoId?: string; // Add videoId for thumbnail generation
   showMuteButton?: boolean; // Control whether to show mute button in top-left
   isInFeed?: boolean; // Indicates if this video is in the main feed
@@ -38,6 +39,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   onClick,
   showOverlayControls = true,
   showVideoIcon = false,
+  videoIconType = 'play',
   videoId,
   showMuteButton = true,
   isInFeed = false,
@@ -144,7 +146,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         style={isInFeed ? { touchAction: 'none', userSelect: 'none', pointerEvents: 'none' } : undefined}
       />
 
-      <VideoIcon show={showVideoIcon} />
+      <VideoIcon show={showVideoIcon} iconType={videoIconType} />
 
       <VideoControls
         isPlaying={isPlaying}

@@ -86,6 +86,7 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, ...props 
               loop={true}
               className="w-full h-full"
               showVideoIcon={true}
+              videoIconType="maximize"
               showOverlayControls={false}
               videoId={`explore-${item.id}`}
             />
