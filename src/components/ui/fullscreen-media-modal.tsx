@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Maximize2, Volume2, VolumeX, MapPin, Heart, MessageCircle, Share, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Minimize2, Volume2, VolumeX, MapPin, Heart, MessageCircle, Share, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
 import CoursePostBadge from '../posts/CoursePostBadge';
 import { UserInfoOverlay } from '../posts/user-post/overlays/UserInfoOverlay';
@@ -273,7 +273,7 @@ const FullscreenMediaModal = ({
           className="flex items-center justify-center w-10 h-10 text-white hover:bg-white/10 rounded-full transition-colors"
           aria-label="Close"
         >
-          <Maximize2 className="h-6 w-6" />
+          <Minimize2 className="h-6 w-6" />
         </button>
       </div>
 
