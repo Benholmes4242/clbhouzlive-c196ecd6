@@ -98,38 +98,30 @@ const FullscreenMediaModal = ({
   // Swipe handlers for mobile - horizontal for media, vertical for posts
   const swipeHandlers = useSwipeable({
     onSwipedLeft: (eventData) => {
-      eventData.event.preventDefault();
-      eventData.event.stopPropagation();
       if (isMobile && hasMultipleMedia && currentIndex < mediaUrls.length - 1) {
         goToNext();
       }
     },
     onSwipedRight: (eventData) => {
-      eventData.event.preventDefault();
-      eventData.event.stopPropagation();
       if (isMobile && hasMultipleMedia && currentIndex > 0) {
         goToPrevious();
       }
     },
     onSwipedDown: (eventData) => {
-      eventData.event.preventDefault();
-      eventData.event.stopPropagation();
       if (isMobile && canNavigatePosts && canGoNext && onNextPost) {
         onNextPost();
       }
     },
     onSwipedUp: (eventData) => {
-      eventData.event.preventDefault();
-      eventData.event.stopPropagation();
       if (isMobile && canNavigatePosts && canGoPrevious && onPreviousPost) {
         onPreviousPost();
       }
     },
     trackMouse: false,
     trackTouch: true,
-    preventScrollOnSwipe: true,
+    preventScrollOnSwipe: false,
     delta: 50,
-    touchEventOptions: { passive: false }
+    touchEventOptions: { passive: true }
   });
 
   // Reset current index when modal opens with new initial index
@@ -247,26 +239,14 @@ const FullscreenMediaModal = ({
         minHeight: '100vh',
         maxHeight: '100vh',
         zIndex: 999999,
-        touchAction: 'none',
+        touchAction: 'manipulation',
         margin: 0,
         padding: 0,
         overscrollBehavior: 'none'
       }}
       onClick={handleBackdropClick}
-      onTouchStart={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-      }}
-      onTouchMove={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-      }}
-      onTouchEnd={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-      }}
       onWheel={(e) => {
-        // Handle vertical scroll for post navigation on desktop
+        // Handle vertical scroll for post navigation on desktop only
         if (!isMobile && canNavigatePosts) {
           e.preventDefault();
           e.stopPropagation();
@@ -282,18 +262,7 @@ const FullscreenMediaModal = ({
               onPreviousPost();
             }
           }
-        } else {
-          e.preventDefault();
-          e.stopPropagation();
         }
-      }}
-      onScroll={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-      }}
-      onMouseMove={(e) => {
-        // Capture all mouse events to prevent background interactions
-        e.stopPropagation();
       }}
     >
       {/* Top Controls */}
@@ -321,9 +290,7 @@ const FullscreenMediaModal = ({
       <div 
         className="relative w-full h-full flex items-center justify-center" 
         {...swipeHandlers}
-        style={{ touchAction: 'pan-x' }}
-        onTouchStart={(e) => e.stopPropagation()}
-        onTouchEnd={(e) => e.stopPropagation()}
+        style={{ touchAction: 'manipulation' }}
       >
         {/* Current Media Item */}
         <div className="relative w-full h-full flex items-center justify-center">
