@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { X, Heart, MessageCircle, Share2, Volume2, VolumeX, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
+import { X, Heart, MessageCircle, Share, Volume2, VolumeX, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -324,70 +324,43 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
 
             {/* Action Buttons - Bottom Right */}
             <div className="absolute bottom-4 right-4 z-10 flex flex-col space-y-8">
-              {/* Like Button */}
+              {/* Mute/Unmute toggle button - only show for video posts */}
+              {item.type === 'video' && (
+                <button 
+                  className="cursor-pointer hover:opacity-100 transition-opacity"
+                  onClick={() => setIsMuted(!isMuted)}
+                >
+                  {isMuted ? (
+                    <VolumeX className="w-8 h-8 text-white" />
+                  ) : (
+                    <Volume2 className="w-8 h-8 text-white" />
+                  )}
+                </button>
+              )}
+
+              {/* Heart Button */}
               <button
                 onClick={() => handleLike(item)}
-                className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform"
+                className="cursor-pointer hover:opacity-100 transition-opacity"
               >
-                <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
-                  <Heart className="h-8 w-8" />
-                </div>
-                <span className="text-xs font-medium">{item.likes}</span>
+                <Heart className="h-8 w-8 text-white" />
               </button>
 
-              {/* Comment Button */}
+              {/* Message Button */}
               <button
                 onClick={handleComment}
-                className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform"
+                className="cursor-pointer hover:opacity-100 transition-opacity"
               >
-                <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
-                  <MessageCircle className="h-8 w-8" />
-                </div>
-                <span className="text-xs font-medium">0</span>
+                <MessageCircle className="h-8 w-8 text-white" />
               </button>
 
               {/* Share Button */}
               <button
                 onClick={handleShare}
-                className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform"
+                className="cursor-pointer hover:opacity-100 transition-opacity"
               >
-                <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
-                  <Share2 className="h-8 w-8" />
-                </div>
+                <Share className="h-8 w-8 text-white" />
               </button>
-
-              {/* More Options Button - Only show for own posts */}
-              {user && item.user.id === user.id && (
-                <DropdownMenu modal={false}>
-                  <DropdownMenuTrigger asChild>
-                    <button className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform">
-                      <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
-                        <MoreHorizontal className="h-8 w-8" />
-                      </div>
-                    </button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent 
-                    align="end" 
-                    className="w-48 bg-background border shadow-lg z-[100]"
-                    sideOffset={8}
-                  >
-                    <DropdownMenuItem 
-                      onClick={() => handleEdit(item)}
-                      className="cursor-pointer"
-                    >
-                      <Edit className="mr-2 h-4 w-4" />
-                      Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem 
-                      onClick={() => handleDelete(item)}
-                      className="cursor-pointer text-destructive focus:text-destructive"
-                    >
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              )}
             </div>
           </div>
         ))}
