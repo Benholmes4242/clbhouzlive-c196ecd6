@@ -274,7 +274,10 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
             {/* Caption and Golf Course Tag - Bottom Left */}
             <div className="absolute bottom-5 left-3 right-20 z-20">
               {/* Golf Course Badge - Above Caption */}
-              {item.golfCourse && (
+              {(() => {
+                console.log('VerticalMediaFeed - Current item:', item.id, 'golfCourse:', item.golfCourse, 'hasGolfCourse:', !!item.golfCourse);
+                return item.golfCourse;
+              })() && (
                 <div className="mb-2">
                   {isMobile ? (
                     // Mobile: Map pin that expands to show golf club name
