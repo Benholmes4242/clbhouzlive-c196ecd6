@@ -576,7 +576,11 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                   </div>
                   
                   {currentPost.content && removeGolfCourseFromContent(currentPost.content) && (
-                    <div className="text-sm mt-3 transition-all duration-300 ease-in-out">
+                    <div 
+                      className="text-sm mt-3 transition-all duration-300 ease-in-out cursor-default"
+                      onMouseEnter={() => setIsTextExpanded(true)}
+                      onMouseLeave={() => setIsTextExpanded(false)}
+                    >
                       <TaggedText 
                         text={isTextExpanded 
                           ? removeGolfCourseFromContent(currentPost.content)
