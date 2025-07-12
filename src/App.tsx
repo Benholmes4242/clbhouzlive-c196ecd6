@@ -2,6 +2,7 @@ import React, { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { PerformanceMonitor } from './components/ui/performance-monitor';
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ScrollToTop from '@/components/ScrollToTop';
@@ -38,6 +39,9 @@ const queryClient = new QueryClient({
     queries: {
       retry: 1,
       refetchOnWindowFocus: false,
+      // Add caching optimization
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      gcTime: 10 * 60 * 1000, // 10 minutes
     },
   },
 });
@@ -93,6 +97,7 @@ const App: React.FC = () => {
           </PasswordProtection>
       </TooltipProvider>
     </QueryClientProvider>
+    <PerformanceMonitor />
     </ThemeProvider>
   );
 };
