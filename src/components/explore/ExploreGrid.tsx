@@ -97,11 +97,6 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
             <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
           </div>
         )}
-        {!hasMore && content.length > 0 && (
-          <div className="flex justify-center py-8">
-            <p className="text-muted-foreground">You've reached the end!</p>
-          </div>
-        )}
       </div>
     </>
   );
