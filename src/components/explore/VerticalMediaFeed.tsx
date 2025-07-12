@@ -371,7 +371,11 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
             className="relative w-full h-screen snap-start flex items-center justify-center"
           >
             {/* Media Content */}
-            <div className="relative w-full h-full flex items-center justify-center">
+            <div 
+              className="relative w-full h-full flex items-center justify-center"
+              onMouseEnter={() => setIsTextExpanded(true)}
+              onMouseLeave={() => setIsTextExpanded(false)}
+            >
               {item.type === 'video' ? (
                 <div className="relative w-full h-full">
                   <VideoPlayer
@@ -430,8 +434,6 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
                 <div 
                   className="text-white text-base font-bold leading-[1.4] cursor-default"
                   style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
-                  onMouseEnter={() => setIsTextExpanded(true)}
-                  onMouseLeave={() => setIsTextExpanded(false)}
                 >
                   <div 
                     className={`transition-all duration-300 ease-in-out ${
