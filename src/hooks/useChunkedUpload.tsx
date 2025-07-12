@@ -19,7 +19,7 @@ interface ChunkedUploadResult {
   fileType: string;
 }
 
-const CHUNK_SIZE = 3 * 1024 * 1024; // 3MB chunks (becomes ~4MB base64)
+const CHUNK_SIZE = 1 * 1024 * 1024; // 1MB chunks to avoid memory issues
 const MAX_RETRIES = 3;
 const COMPRESSION_THRESHOLD = 40 * 1024 * 1024; // 40MB threshold for compression
 
@@ -78,10 +78,18 @@ export const useChunkedUpload = () => {
 
         while (retries < MAX_RETRIES && !chunkUploaded) {
           try {
-            // Convert chunk to base64
-            const chunkBuffer = await chunk.arrayBuffer();
-            const chunkArray = new Uint8Array(chunkBuffer);
-            const chunkBase64 = btoa(String.fromCharCode(...chunkArray));
+            // Convert chunk to base64 more efficiently
+            const reader = new FileReader();
+            const chunkBase64 = await new Promise<string>((resolve, reject) => {
+              reader.onload = () => {
+                const result = reader.result as string;
+                // Remove the data URL prefix to get just the base64 string
+                const base64 = result.split(',')[1];
+                resolve(base64);
+              };
+              reader.onerror = reject;
+              reader.readAsDataURL(chunk);
+            });
 
             const { data: chunkData, error: chunkError } = await supabase.functions.invoke('chunked-upload', {
               body: {
