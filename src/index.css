@@ -57,8 +57,8 @@
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
     --chart-5: 27 87% 67%;
-    --media-loading: 220 13% 91%;
-    --media-loading-dark: 215 27.9% 25%;
+    --media-loading: 0 0% 0%;
+    --media-loading-dark: 0 0% 0%;
   }
 
   .dark {
@@ -86,7 +86,7 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
-    --media-loading: 215 27.9% 25%;
+    --media-loading: 0 0% 0%;
   }
 }
 
