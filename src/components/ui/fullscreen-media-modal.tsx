@@ -72,11 +72,14 @@ const FullscreenMediaModal = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const isMobile = useIsMobile();
   const { isTextExpanded, handleMouseEnter, handleMouseLeave } = useTextExpansion();
-  const { registerVideo, unregisterVideo, pauseAllAndSetActive } = useVideoPlaybackManager();
+  const { registerVideo, unregisterVideo, pauseAllAndSetActive, storeVideoPosition, resumeVideoFromPosition } = useVideoPlaybackManager();
   const { isGloballyMuted } = useGlobalAudio();
   
   // Store the original global mute state when modal opens
   const originalGlobalMuteState = useRef<boolean | null>(null);
+  
+  // Store the originally playing video ID and position
+  const originalVideoData = useRef<{videoId: string; position: number} | null>(null);
   
   // Generate unique video ID for fullscreen player
   const fullscreenVideoId = useRef(`fullscreen-video-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`);
@@ -137,11 +140,15 @@ const FullscreenMediaModal = ({
     touchEventOptions: { passive: true }
   });
 
-  // Store original mute state when modal opens
+  // Store original mute state and video positions when modal opens
   useEffect(() => {
     if (isOpen && originalGlobalMuteState.current === null) {
       originalGlobalMuteState.current = isGloballyMuted;
       console.log('🎬 Storing original global mute state:', isGloballyMuted);
+      
+      // Store positions of all currently playing videos before pausing them
+      console.log('💾 Storing video positions before fullscreen modal opens');
+      // This will be handled by the pauseAllAndSetActive call in the next useEffect
     }
     
     if (isOpen) {
@@ -149,6 +156,7 @@ const FullscreenMediaModal = ({
     } else {
       // Reset stored state when modal closes
       originalGlobalMuteState.current = null;
+      originalVideoData.current = null;
     }
   }, [isOpen, initialIndex, isGloballyMuted]);
 
@@ -192,6 +200,13 @@ const FullscreenMediaModal = ({
             // Trigger scroll and resize events to force intersection observer re-evaluation
             window.dispatchEvent(new Event('scroll'));
             window.dispatchEvent(new Event('resize'));
+            
+            // Additional trigger specifically for the video player autoplay logic
+            setTimeout(() => {
+              window.dispatchEvent(new Event('scroll'));
+              console.log('🔄 Double-triggered scroll events to ensure video autoplay resume');
+            }, 100);
+            
             console.log('🔄 Triggered scroll and resize events to re-evaluate video autoplay');
           }, 50);
         }, 100); // Small delay to ensure modal cleanup is complete

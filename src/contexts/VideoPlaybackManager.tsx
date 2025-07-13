@@ -10,12 +10,15 @@ interface VideoPlaybackManagerContextType {
   muteAllOtherVideos: (activeVideoId: string) => void;
   pauseVideo: (videoId: string) => void;
   pauseAllAndSetActive: (activeVideoId: string) => void;
+  storeVideoPosition: (videoId: string) => void;
+  resumeVideoFromPosition: (videoId: string) => void;
 }
 
 const VideoPlaybackManagerContext = createContext<VideoPlaybackManagerContextType | undefined>(undefined);
 
 export const VideoPlaybackManagerProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const videoRegistry = useRef<Map<string, HTMLVideoElement>>(new Map());
+  const videoPositions = useRef<Map<string, number>>(new Map());
   const currentAudioVideo = useRef<string | null>(null);
 
   const registerVideo = useCallback((videoId: string, videoElement: HTMLVideoElement) => {
@@ -133,6 +136,32 @@ export const VideoPlaybackManagerProvider: React.FC<{ children: React.ReactNode 
     currentAudioVideo.current = activeVideoId;
   }, []);
 
+  const storeVideoPosition = useCallback((videoId: string) => {
+    const video = videoRegistry.current.get(videoId);
+    if (video) {
+      videoPositions.current.set(videoId, video.currentTime);
+      console.log('💾 Stored video position for:', videoId, 'at', video.currentTime);
+    }
+  }, []);
+
+  const resumeVideoFromPosition = useCallback((videoId: string) => {
+    const video = videoRegistry.current.get(videoId);
+    const storedPosition = videoPositions.current.get(videoId);
+    
+    if (video && storedPosition !== undefined) {
+      video.currentTime = storedPosition;
+      console.log('▶️ Resuming video:', videoId, 'from position:', storedPosition);
+      
+      // Start playing the video
+      video.play().catch(error => {
+        console.log('Resume autoplay prevented:', error);
+      });
+      
+      // Clear the stored position
+      videoPositions.current.delete(videoId);
+    }
+  }, []);
+
   return (
     <VideoPlaybackManagerContext.Provider value={{
       registerVideo,
@@ -143,7 +172,9 @@ export const VideoPlaybackManagerProvider: React.FC<{ children: React.ReactNode 
       setActiveAudioVideo,
       muteAllOtherVideos,
       pauseVideo,
-      pauseAllAndSetActive
+      pauseAllAndSetActive,
+      storeVideoPosition,
+      resumeVideoFromPosition
     }}>
       {children}
     </VideoPlaybackManagerContext.Provider>

@@ -114,10 +114,13 @@ export const useVideoPlayer = ({
     const video = videoRef.current;
     if (!video || !isInFeed) return;
 
-    // If autoplay is enabled and video is paused but has been viewed before (currentTime > 0)
+    // If autoplay is enabled and video is paused but has been viewed before
     // This handles the case where videos were paused by pauseAllAndSetActive but should resume
     if (autoplay && video.paused && video.readyState >= 2) {
-      console.log('🔄 Resuming autoplay for previously viewed video:', videoId.current);
+      console.log('🔄 Resuming autoplay for previously viewed video:', videoId.current, 'from position:', video.currentTime);
+      
+      // If the video has some currentTime (was playing before), resume from that position
+      // Otherwise start from beginning
       video.play().catch(error => {
         console.log('Autoplay resume prevented:', error);
       });
