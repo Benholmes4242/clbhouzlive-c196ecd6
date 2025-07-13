@@ -48,6 +48,11 @@ const Explore = () => {
       return true;
     }
     
+    // Channels: Empty for now (no content yet)
+    if (activeFilter === FILTER_TYPES.CHANNELS) {
+      return false; // No content for channels yet
+    }
+    
     // Hack Shack: Only videos with #hackshack hashtag
     if (activeFilter === FILTER_TYPES.HACK_SHACK) {
       return item.type === MEDIA_TYPES.VIDEO && (
