@@ -12,8 +12,6 @@ interface VideoPlaybackManagerContextType {
   pauseAllAndSetActive: (activeVideoId: string) => void;
   storeVideoPosition: (videoId: string) => void;
   resumeVideoFromPosition: (videoId: string) => void;
-  storeVideoMuteState: (videoId: string) => void;
-  resumeVideoWithMuteState: (videoId: string) => void;
 }
 
 const VideoPlaybackManagerContext = createContext<VideoPlaybackManagerContextType | undefined>(undefined);
@@ -21,7 +19,6 @@ const VideoPlaybackManagerContext = createContext<VideoPlaybackManagerContextTyp
 export const VideoPlaybackManagerProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const videoRegistry = useRef<Map<string, HTMLVideoElement>>(new Map());
   const videoPositions = useRef<Map<string, number>>(new Map());
-  const videoMuteStates = useRef<Map<string, boolean>>(new Map());
   const currentAudioVideo = useRef<string | null>(null);
 
   const registerVideo = useCallback((videoId: string, videoElement: HTMLVideoElement) => {
@@ -165,47 +162,7 @@ export const VideoPlaybackManagerProvider: React.FC<{ children: React.ReactNode 
     }
   }, []);
 
-  const storeVideoMuteState = useCallback((videoId: string) => {
-    const video = videoRegistry.current.get(videoId);
-    if (video) {
-      videoMuteStates.current.set(videoId, video.muted);
-      console.log('🔇 Stored video mute state for:', videoId, 'muted:', video.muted);
-    }
-  }, []);
-
-  const resumeVideoWithMuteState = useCallback((videoId: string) => {
-    const video = videoRegistry.current.get(videoId);
-    const storedPosition = videoPositions.current.get(videoId);
-    const storedMuteState = videoMuteStates.current.get(videoId);
-    
-    if (video && storedPosition !== undefined) {
-      video.currentTime = storedPosition;
-      
-      // Restore the mute state
-      if (storedMuteState !== undefined) {
-        video.muted = storedMuteState;
-        console.log('🔊 Restoring video mute state:', videoId, 'muted:', storedMuteState);
-        
-        // If video was unmuted, set it as active audio video
-        if (!storedMuteState) {
-          currentAudioVideo.current = videoId;
-        }
-      }
-      
-      console.log('▶️ Resuming video:', videoId, 'from position:', storedPosition, 'with mute state:', storedMuteState);
-      
-      // Start playing the video
-      video.play().catch(error => {
-        console.log('Resume autoplay prevented:', error);
-      });
-      
-      // Clear the stored position and mute state
-      videoPositions.current.delete(videoId);
-      videoMuteStates.current.delete(videoId);
-    }
-  }, []);
-
-    return (
+  return (
     <VideoPlaybackManagerContext.Provider value={{
       registerVideo,
       unregisterVideo,
@@ -217,9 +174,7 @@ export const VideoPlaybackManagerProvider: React.FC<{ children: React.ReactNode 
       pauseVideo,
       pauseAllAndSetActive,
       storeVideoPosition,
-      resumeVideoFromPosition,
-      storeVideoMuteState,
-      resumeVideoWithMuteState
+      resumeVideoFromPosition
     }}>
       {children}
     </VideoPlaybackManagerContext.Provider>
