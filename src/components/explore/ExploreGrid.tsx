@@ -86,11 +86,11 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
       const random = Math.random();
       
       if (random < 0.15 && index < content.length) {
-        // 15% chance for 2x1 tiles
+        // 15% chance for 1x2 tall tiles
         gridItems.push({
-          type: 'wide',
+          type: 'tall',
           item: content[index],
-          key: `wide-${content[index].id}`
+          key: `tall-${content[index].id}`
         });
         index++;
       } else if (random < 0.25 && index < content.length - 3) {
@@ -140,9 +140,9 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                 />
               </div>
             );
-          } else if (gridItem.type === 'wide') {
+          } else if (gridItem.type === 'tall') {
             return (
-              <div key={gridItem.key} className="col-span-2 aspect-[2/1]">
+              <div key={gridItem.key} className="row-span-2 aspect-[1/2]">
                 <ExploreContentCard 
                   item={gridItem.item} 
                   onLike={onLike} 
