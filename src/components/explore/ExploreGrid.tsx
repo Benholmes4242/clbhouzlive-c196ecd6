@@ -66,12 +66,13 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     );
   }
 
-  // Create layout with mixed tile sizes for seamless fitting
+  // Create layout with spacing rules: only 1x1 squares can sit next to each other
   const createGridLayout = () => {
     if (content.length === 0) return [];
     
     const gridItems = [];
     let index = 0;
+    let lastLargeTileIndex = -1; // Track position of last large tile (2x2 or 1x2)
     
     // Always start with a big square (2x2)
     gridItems.push({
@@ -80,35 +81,56 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
       key: `first-big-${content[index].id}`
     });
     index++;
+    lastLargeTileIndex = 0;
     
     while (index < content.length) {
-      // Random distribution of tile types
-      const random = Math.random();
+      const currentPosition = gridItems.length;
+      const distanceFromLastLarge = currentPosition - lastLargeTileIndex;
       
-      if (random < 0.15 && index < content.length) {
-        // 15% chance for 1x2 tall tiles
-        gridItems.push({
-          type: 'tall',
-          item: content[index],
-          key: `tall-${content[index].id}`
-        });
-        index++;
-      } else if (random < 0.25 && index < content.length - 3) {
-        // 10% chance for 2x2 tiles (only if enough content remaining)
-        gridItems.push({
-          type: 'big-square',
-          item: content[index],
-          key: `big-square-${content[index].id}`
-        });
-        index++;
+      // Ensure minimum buffer of 3-5 regular tiles between large tiles
+      const minBuffer = 3 + Math.floor(Math.random() * 3);
+      
+      if (distanceFromLastLarge >= minBuffer) {
+        const random = Math.random();
+        
+        if (random < 0.15 && index < content.length) {
+          // 15% chance for 1x2 tall tiles (with buffer spacing)
+          gridItems.push({
+            type: 'tall',
+            item: content[index],
+            key: `tall-${content[index].id}`
+          });
+          index++;
+          lastLargeTileIndex = currentPosition;
+        } else if (random < 0.25 && index < content.length - 3) {
+          // 10% chance for 2x2 tiles (with buffer spacing)
+          gridItems.push({
+            type: 'big-square',
+            item: content[index],
+            key: `big-square-${content[index].id}`
+          });
+          index++;
+          lastLargeTileIndex = currentPosition;
+        } else {
+          // Add regular 1x1 tiles
+          const regularCount = Math.min(2 + Math.floor(Math.random() * 3), content.length - index);
+          for (let i = 0; i < regularCount && index < content.length; i++) {
+            gridItems.push({
+              type: 'regular',
+              item: content[index],
+              key: `regular-${content[index].id}`
+            });
+            index++;
+          }
+        }
       } else {
-        // 75% chance for regular 1x1 tiles
-        const regularCount = Math.min(3 + Math.floor(Math.random() * 4), content.length - index);
-        for (let i = 0; i < regularCount && index < content.length; i++) {
+        // Force regular tiles to maintain buffer spacing
+        const bufferCount = Math.min(minBuffer - distanceFromLastLarge + 1, content.length - index);
+        for (let i = 0; i < bufferCount && index < content.length; i++) {
           gridItems.push({
             type: 'regular',
             item: content[index],
-            key: `regular-${content[index].id}`
+            key: `buffer-${content[index].id}`
           });
           index++;
         }
