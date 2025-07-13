@@ -15,6 +15,7 @@ import EnhancedCreateMomentModal from '../post/EnhancedCreateMomentModal';
 import TaggedText from '../posts/TaggedText';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import VideoPlayer from '@/components/ui/video-player';
+import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 
 interface VerticalMediaFeedProps {
   isOpen: boolean;
@@ -36,9 +37,9 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
   const { user } = useSupabaseSession();
   const isMobile = useIsMobile();
   const { updatePost, isUpdating } = usePostUpdate();
+  const { isGloballyMuted, setGlobalMute } = useGlobalAudio();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [filteredContent, setFilteredContent] = useState<ExploreContentItem[]>([]);
-  const [isMuted, setIsMuted] = useState(true);
   const scrollViewRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<{ [key: number]: HTMLDivElement }>({});
   const [editModalOpen, setEditModalOpen] = useState(false);
@@ -426,7 +427,7 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
                   <VideoPlayer
                     src={item.src}
                     autoplay={index === currentIndex}
-                    muted={isMuted}
+                    muted={isGloballyMuted}
                     loop={true}
                     className="w-full h-full"
                     showVideoIcon={false}
@@ -504,9 +505,9 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
               {item.type === 'video' && (
                 <button 
                   className="cursor-pointer hover:opacity-100 transition-opacity"
-                  onClick={() => setIsMuted(!isMuted)}
+                  onClick={() => setGlobalMute(!isGloballyMuted)}
                 >
-                  {isMuted ? (
+                  {isGloballyMuted ? (
                     <VolumeX className="w-8 h-8 text-white" />
                   ) : (
                     <Volume2 className="w-8 h-8 text-white" />

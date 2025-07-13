@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect } from 'react';
 
 interface GlobalAudioContextType {
   isGloballyMuted: boolean;
@@ -8,9 +8,35 @@ interface GlobalAudioContextType {
 
 const GlobalAudioContext = createContext<GlobalAudioContextType | undefined>(undefined);
 
+const AUDIO_STATE_KEY = 'globalAudioState';
+
 export const GlobalAudioProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  // Default to muted on every session (resets on page refresh)
-  const [isGloballyMuted, setIsGloballyMuted] = useState(true);
+  // Initialize state from sessionStorage or default to muted
+  const [isGloballyMuted, setIsGloballyMuted] = useState(() => {
+    try {
+      const savedState = sessionStorage.getItem(AUDIO_STATE_KEY);
+      if (savedState !== null) {
+        const parsed = JSON.parse(savedState);
+        console.log('🔊 Restored audio state from session:', parsed ? 'MUTED' : 'UNMUTED');
+        return parsed;
+      }
+    } catch (error) {
+      console.warn('Failed to parse saved audio state:', error);
+    }
+    // Default to muted for fresh visits
+    console.log('🔊 Fresh visit - defaulting to MUTED');
+    return true;
+  });
+
+  // Save state to sessionStorage whenever it changes
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(AUDIO_STATE_KEY, JSON.stringify(isGloballyMuted));
+      console.log('💾 Saved audio state to session:', isGloballyMuted ? 'MUTED' : 'UNMUTED');
+    } catch (error) {
+      console.warn('Failed to save audio state:', error);
+    }
+  }, [isGloballyMuted]);
 
   const setGlobalMute = useCallback((muted: boolean) => {
     console.log('🔊 Global mute state changed to:', muted ? 'MUTED' : 'UNMUTED');
