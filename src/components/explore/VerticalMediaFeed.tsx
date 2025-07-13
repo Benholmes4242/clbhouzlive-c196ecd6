@@ -17,7 +17,6 @@ import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import VideoPlayer from '@/components/ui/video-player';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
-import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 
 interface VerticalMediaFeedProps {
   isOpen: boolean;
@@ -434,37 +433,11 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
             }));
           };
 
-          // Swipe gesture handling for media navigation within this post
-          const mediaSwipeRef = useSwipeGesture({
-            onSwipeLeft: () => {
-              if (hasMultipleMedia && currentMediaIndex < mediaItems.length - 1) {
-                setMediaIndices(prev => ({
-                  ...prev,
-                  [item.id]: currentMediaIndex + 1
-                }));
-              }
-            },
-            onSwipeRight: () => {
-              if (hasMultipleMedia && currentMediaIndex > 0) {
-                setMediaIndices(prev => ({
-                  ...prev,
-                  [item.id]: currentMediaIndex - 1
-                }));
-              }
-            },
-            threshold: 50
-          });
-
           return (
             <div
               key={`${item.id}-${index}`}
               ref={(el) => {
-                if (el) {
-                  itemRefs.current[index] = el;
-                  if (hasMultipleMedia && isMobile && mediaSwipeRef.current !== el) {
-                    mediaSwipeRef.current = el;
-                  }
-                }
+                if (el) itemRefs.current[index] = el;
               }}
               className="relative w-full h-screen snap-start snap-always flex items-center justify-center"
               style={{ 
