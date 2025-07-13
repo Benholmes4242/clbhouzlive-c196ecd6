@@ -76,8 +76,8 @@ const LazyImage: React.FC<LazyImageProps> = ({
   return (
     <div className={`relative ${className}`} onClick={onClick}>
       {isLoading && !hasError && (
-        <div className="absolute inset-0 bg-muted animate-pulse rounded-[inherit] flex items-center justify-center z-10">
-          <div className="w-8 h-8 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+        <div className="absolute inset-0 bg-media-loading animate-pulse rounded-[inherit] flex items-center justify-center z-10">
+          <div className="w-8 h-8 border-2 border-muted-foreground/30 border-t-muted-foreground/70 rounded-full animate-spin" />
         </div>
       )}
       
@@ -100,7 +100,7 @@ const LazyImage: React.FC<LazyImageProps> = ({
       />
       
       {hasError && (
-        <div className="absolute inset-0 bg-muted rounded-[inherit] flex items-center justify-center">
+        <div className="absolute inset-0 bg-media-loading rounded-[inherit] flex items-center justify-center">
           <div className="text-xs text-muted-foreground">Failed to load</div>
         </div>
       )}

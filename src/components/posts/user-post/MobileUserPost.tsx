@@ -105,7 +105,7 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
   return (
     <div 
       ref={containerRef}
-      className="relative w-full bg-black"
+      className="relative w-full bg-media-loading"
       onTouchStart={() => setIsHovered(true)}
       onTouchEnd={() => setIsHovered(false)}
     >
