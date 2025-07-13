@@ -148,7 +148,7 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
     setCurrentIndex(initialIndex >= 0 ? initialIndex : 0);
   }, [isOpen, initialItem, allContent]);
 
-  // Handle scroll to snap to items
+  // Handle scroll to snap to items with improved smoothness
   const handleScroll = useCallback(() => {
     if (!scrollViewRef.current) return;
 
@@ -161,7 +161,7 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
     }
   }, [currentIndex, filteredContent.length]);
 
-  // Auto-play/pause videos based on current index
+  // Auto-play/pause videos based on current index with preloading
   useEffect(() => {
     Object.keys(videoRefs.current).forEach((key) => {
       const index = parseInt(key);
@@ -171,8 +171,11 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
         if (index === currentIndex) {
           // Play current video
           video.play().catch(console.error);
+        } else if (Math.abs(index - currentIndex) <= 1) {
+          // Preload adjacent videos but keep them paused
+          video.load();
         } else {
-          // Pause other videos
+          // Pause videos that are far away
           video.pause();
         }
       }
@@ -314,7 +317,8 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
           scrollbarWidth: 'none', 
           msOverflowStyle: 'none',
           WebkitOverflowScrolling: 'touch',
-          scrollSnapType: 'y mandatory'
+          scrollSnapType: 'y mandatory',
+          scrollBehavior: 'smooth'
         }}
       >
         {/* Close Button - Top Right */}
@@ -383,7 +387,12 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
               if (el) itemRefs.current[index] = el;
             }}
             className="relative w-full h-screen snap-start snap-always flex items-center justify-center"
-            style={{ minHeight: '100vh', maxHeight: '100vh' }}
+            style={{ 
+              minHeight: '100vh', 
+              maxHeight: '100vh',
+              scrollSnapAlign: 'start',
+              scrollSnapStop: 'always'
+            }}
           >
             {/* Media Content */}
             <div 
@@ -392,7 +401,7 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
               onMouseLeave={() => setIsTextExpanded(false)}
             >
               {item.type === 'video' ? (
-                <div className="relative w-full h-full">
+                <div className="relative w-full h-full bg-black">
                   <VideoPlayer
                     src={item.src}
                     autoplay={index === currentIndex}
@@ -403,14 +412,14 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
                     showOverlayControls={false}
                     videoId={`vertical-${item.id}`}
                   />
-                  
                 </div>
               ) : (
-                <div className="relative w-full h-full">
+                <div className="relative w-full h-full bg-black">
                   <img
                     src={item.src}
                     alt={item.title}
                     className="w-full h-full object-contain"
+                    loading={Math.abs(index - currentIndex) <= 1 ? "eager" : "lazy"}
                     onError={(e) => {
                       (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
                     }}
