@@ -4,6 +4,7 @@ import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
 import TrendingFeed from '@/components/TrendingFeed';
 import ClubhouzMomentsCarousel from '@/components/clubhouse/ClubhouzMomentsCarousel';
+import TrendingCard from '@/components/trending/TrendingCard';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Button } from '@/components/ui/button';
@@ -97,6 +98,7 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <ClubhouzMomentsCarousel />
+      <TrendingCard />
       
       <main>
         <TrendingFeed />
