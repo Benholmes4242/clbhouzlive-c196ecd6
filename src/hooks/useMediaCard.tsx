@@ -1,0 +1,156 @@
+import { useState } from 'react';
+import { ExploreContentItem } from '@/components/explore/types';
+import { useVideoAutoplay } from '@/hooks/useVideoAutoplay';
+import { useSwipeGesture } from '@/hooks/useSwipeGesture';
+import { useIsMobile } from '@/hooks/use-mobile';
+
+interface UseMediaCardProps {
+  item: ExploreContentItem;
+  onLike: (contentId: string) => void;
+  onMediaClick?: (item: ExploreContentItem) => void;
+}
+
+export const useMediaCard = ({ item, onLike, onMediaClick }: UseMediaCardProps) => {
+  const [imageError, setImageError] = useState(false);
+  const [isPostViewerOpen, setIsPostViewerOpen] = useState(false);
+  const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const isMobile = useIsMobile();
+
+  const { ref: autoplayRef, shouldAutoplay, handleMouseEnter, handleMouseLeave } = useVideoAutoplay({
+    enabled: true,
+    threshold: 0.5
+  });
+
+  // Get media array - use the new media property if available, otherwise fallback to single media
+  const mediaItems = item.media && item.media.length > 0 ? item.media : [{
+    id: `${item.id}-single`,
+    media_type: item.type as 'video' | 'image',
+    media_url: item.src
+  }];
+
+  const currentMedia = mediaItems[currentMediaIndex] || mediaItems[0];
+  const hasMultipleMedia = mediaItems.length > 1;
+
+  // Navigation handlers
+  const handlePrevMedia = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentMediaIndex(prev => prev > 0 ? prev - 1 : mediaItems.length - 1);
+  };
+
+  const handleNextMedia = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentMediaIndex(prev => prev < mediaItems.length - 1 ? prev + 1 : 0);
+  };
+
+  // Swipe gesture handling for mobile
+  const swipeRef = useSwipeGesture({
+    onSwipeLeft: () => {
+      if (hasMultipleMedia && currentMediaIndex < mediaItems.length - 1) {
+        setCurrentMediaIndex(prev => prev + 1);
+      }
+    },
+    onSwipeRight: () => {
+      if (hasMultipleMedia && currentMediaIndex > 0) {
+        setCurrentMediaIndex(prev => prev - 1);
+      }
+    },
+    threshold: 50
+  });
+
+  // Mouse enter/leave handlers for hover state
+  const handleCardMouseEnter = () => {
+    setIsHovered(true);
+    handleMouseEnter();
+  };
+
+  const handleCardMouseLeave = () => {
+    setIsHovered(false);
+    handleMouseLeave();
+  };
+
+  const handleLike = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onLike(item.id);
+  };
+
+  const handleMediaClick = () => {
+    // Only open media for image and video types, not CTA
+    if (item.type === 'image' || item.type === 'video') {
+      console.log('MediaCard handleMediaClick - item.golfCourse:', item.golfCourse);
+      // Call the onMediaClick prop instead of opening the post viewer modal
+      if (onMediaClick) {
+        onMediaClick(item);
+      } else {
+        setIsPostViewerOpen(true);
+      }
+    }
+  };
+
+  // Transform ExploreContentItem to PostData format
+  const transformedPost = {
+    id: item.id,
+    content: item.title || null,
+    created_at: new Date().toISOString(), // ExploreContentItem doesn't have created_at
+    user: {
+      id: item.user?.id || 'unknown',
+      display_name: item.user?.name || 'Unknown User',
+      username: item.user?.name || null,
+      profile_photo_url: item.user?.avatar || null,
+    },
+    post_media: mediaItems.map(media => ({
+      id: media.id,
+      media_type: media.media_type,
+      media_url: media.media_url,
+    })),
+    post_tags: [],
+    golfCourse: item.golfCourse,
+  };
+
+  const handleImageError = () => {
+    console.log('Image load error for item:', {
+      id: item.id, 
+      src: item.src,
+      errorType: 'IMAGE_LOAD_FAILED'
+    });
+    setImageError(true);
+    setIsLoading(false);
+  };
+
+  const handleImageLoad = () => {
+    setIsLoading(false);
+  };
+
+  return {
+    // State
+    imageError,
+    isPostViewerOpen,
+    setIsPostViewerOpen,
+    currentMediaIndex,
+    isHovered,
+    isLoading,
+    isMobile,
+    
+    // Refs
+    autoplayRef,
+    swipeRef,
+    
+    // Media data
+    mediaItems,
+    currentMedia,
+    hasMultipleMedia,
+    shouldAutoplay,
+    transformedPost,
+    
+    // Handlers
+    handlePrevMedia,
+    handleNextMedia,
+    handleCardMouseEnter,
+    handleCardMouseLeave,
+    handleLike,
+    handleMediaClick,
+    handleImageError,
+    handleImageLoad,
+  };
+};
