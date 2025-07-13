@@ -97,7 +97,7 @@ const Explore = () => {
             isOpen={isFeedOpen}
             onClose={closeFeed}
             initialItem={initialItem}
-            allContent={content}
+            allContent={uniqueContent}
             onLike={handleLike}
             onFollow={handleFollow}
           />
