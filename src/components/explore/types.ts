@@ -38,5 +38,6 @@ export interface CTAContentItem {
 
 export const filterOptions = [
   'Videos', 
+  'Photos',
   'Hack Shack'
 ];

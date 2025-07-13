@@ -36,6 +36,8 @@ export const useRealPostsFetcher = () => {
       // Add media type filter if specified
       if (mediaFilter === 'Videos') {
         query = query.eq('post_media.media_type', 'video');
+      } else if (mediaFilter === 'Photos') {
+        query = query.eq('post_media.media_type', 'image');
       }
 
       const { data: postsData, error } = await query;
