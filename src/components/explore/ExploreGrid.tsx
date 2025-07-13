@@ -66,13 +66,13 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     );
   }
 
-  // Create layout with spacing rules: only 1x1 squares can sit next to each other
+  // Create layout with spacing rules: only 4:5 portrait cards can sit next to each other
   const createGridLayout = () => {
     if (content.length === 0) return [];
     
     const gridItems = [];
     let index = 0;
-    let lastLargeTileIndex = -1; // Track position of last large tile (2x2 or 1x2)
+    let lastLargeTileIndex = -1; // Track position of last large tile (2x2)
     
     // Always start with a big square (2x2)
     gridItems.push({
@@ -103,25 +103,25 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
           index++;
           lastLargeTileIndex = currentPosition;
         } else {
-          // 65% chance for regular 1x1 tiles
-          const regularCount = Math.min(2 + Math.floor(Math.random() * 3), content.length - index);
-          for (let i = 0; i < regularCount && index < content.length; i++) {
+          // 65% chance for 4:5 ratio cards
+          const cardCount = Math.min(2 + Math.floor(Math.random() * 3), content.length - index);
+          for (let i = 0; i < cardCount && index < content.length; i++) {
             gridItems.push({
-              type: 'regular',
+              type: 'portrait',
               item: content[index],
-              key: `regular-${content[index].id}`
+              key: `portrait-${content[index].id}`
             });
             index++;
           }
         }
       } else {
-        // Force regular tiles to maintain buffer spacing
+        // Force 4:5 portrait cards to maintain buffer spacing
         const bufferCount = Math.min(minBuffer - distanceFromLastLarge + 1, content.length - index);
         for (let i = 0; i < bufferCount && index < content.length; i++) {
           gridItems.push({
-            type: 'regular',
+            type: 'portrait',
             item: content[index],
-            key: `buffer-${content[index].id}`
+            key: `buffer-portrait-${content[index].id}`
           });
           index++;
         }
@@ -155,7 +155,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
             );
           } else {
             return (
-              <div key={gridItem.key} className="aspect-square">
+              <div key={gridItem.key} className="aspect-[4/5]">
                 <ExploreContentCard 
                   item={gridItem.item} 
                   onLike={onLike} 
