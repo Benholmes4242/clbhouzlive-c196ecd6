@@ -102,8 +102,8 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
 
   return (
     <>
-      {/* Seamless Grid - No Gaps on Any Screen Size */}
-      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1" style={{ 
+      {/* Seamless Grid - No Gaps */}
+      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5" style={{ 
         gridAutoRows: '1fr',
         gridAutoFlow: 'row dense'
       }}>
