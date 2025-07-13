@@ -67,41 +67,40 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     );
   }
 
-  // Create seamless grid layout with three card types
+  // Create seamless grid layout with controlled distribution
   const createGridLayout = () => {
     if (content.length === 0) return [];
     
     const gridItems = [];
-    let index = 0;
     
-    while (index < content.length) {
-      const random = Math.random();
-      
-      if (random < 0.50) {
-        // 50% chance for 1x1 squares
-        gridItems.push({
-          type: 'square',
-          item: content[index],
-          key: `square-${content[index].id}`
-        });
-        index++;
-      } else if (random < 0.85) {
-        // 35% chance for 4:5 portraits (50% + 35% = 85%)
-        gridItems.push({
-          type: 'portrait',
-          item: content[index],
-          key: `portrait-${content[index].id}`
-        });
-        index++;
-      } else {
-        // 15% chance for 1x2 tall rectangles
-        gridItems.push({
-          type: 'tall',
-          item: content[index],
-          key: `tall-${content[index].id}`
-        });
-        index++;
-      }
+    // Create a pattern that ensures proper distribution
+    const pattern = [];
+    const totalItems = content.length;
+    
+    // Calculate actual counts based on percentages
+    const squareCount = Math.round(totalItems * 0.50);
+    const portraitCount = Math.round(totalItems * 0.35);
+    const tallCount = totalItems - squareCount - portraitCount; // Remaining items
+    
+    // Create pattern array
+    for (let i = 0; i < squareCount; i++) pattern.push('square');
+    for (let i = 0; i < portraitCount; i++) pattern.push('portrait');
+    for (let i = 0; i < tallCount; i++) pattern.push('tall');
+    
+    // Shuffle the pattern for random distribution
+    for (let i = pattern.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [pattern[i], pattern[j]] = [pattern[j], pattern[i]];
+    }
+    
+    // Apply pattern to content
+    for (let index = 0; index < content.length; index++) {
+      const type = pattern[index] || 'square'; // Fallback to square
+      gridItems.push({
+        type,
+        item: content[index],
+        key: `${type}-${content[index].id}`
+      });
     }
     
     return gridItems;
