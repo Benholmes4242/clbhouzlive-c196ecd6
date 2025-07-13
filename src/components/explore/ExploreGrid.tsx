@@ -66,65 +66,32 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     );
   }
 
-  // Create layout with spacing rules: only 4:5 portrait cards can sit next to each other
+  // Create tetris-style layout with no spacing rules - cards fit anywhere
   const createGridLayout = () => {
     if (content.length === 0) return [];
     
     const gridItems = [];
     let index = 0;
-    let lastLargeTileIndex = -1; // Track position of last large tile (2x2)
-    
-    // Always start with a big square (2x2)
-    gridItems.push({
-      type: 'big-square',
-      item: content[index],
-      key: `first-big-${content[index].id}`
-    });
-    index++;
-    lastLargeTileIndex = 0;
     
     while (index < content.length) {
-      const currentPosition = gridItems.length;
-      const distanceFromLastLarge = currentPosition - lastLargeTileIndex;
+      const random = Math.random();
       
-      // Ensure minimum buffer of 3-5 regular tiles between large tiles
-      const minBuffer = 3 + Math.floor(Math.random() * 3);
-      
-      if (distanceFromLastLarge >= minBuffer) {
-        const random = Math.random();
-        
-        if (random < 0.35 && index < content.length - 3) {
-          // 35% chance for 2x2 tiles (with buffer spacing)
-          gridItems.push({
-            type: 'big-square',
-            item: content[index],
-            key: `big-square-${content[index].id}`
-          });
-          index++;
-          lastLargeTileIndex = currentPosition;
-        } else {
-          // 65% chance for 4:5 ratio cards
-          const cardCount = Math.min(2 + Math.floor(Math.random() * 3), content.length - index);
-          for (let i = 0; i < cardCount && index < content.length; i++) {
-            gridItems.push({
-              type: 'portrait',
-              item: content[index],
-              key: `portrait-${content[index].id}`
-            });
-            index++;
-          }
-        }
+      if (random < 0.35 && index < content.length) {
+        // 35% chance for 2x2 tiles
+        gridItems.push({
+          type: 'big-square',
+          item: content[index],
+          key: `big-square-${content[index].id}`
+        });
+        index++;
       } else {
-        // Force 4:5 portrait cards to maintain buffer spacing
-        const bufferCount = Math.min(minBuffer - distanceFromLastLarge + 1, content.length - index);
-        for (let i = 0; i < bufferCount && index < content.length; i++) {
-          gridItems.push({
-            type: 'portrait',
-            item: content[index],
-            key: `buffer-portrait-${content[index].id}`
-          });
-          index++;
-        }
+        // 65% chance for 4:5 portrait cards
+        gridItems.push({
+          type: 'portrait',
+          item: content[index],
+          key: `portrait-${content[index].id}`
+        });
+        index++;
       }
     }
     
