@@ -40,6 +40,7 @@ export interface CTAContentItem {
 export const FILTER_TYPES = {
   VIDEOS: 'Videos',
   PHOTOS: 'Photos',
+  VERIFIED_PROS: 'Verified Pros',
   CHANNELS: 'Channels',
   HACK_SHACK: 'Hack Shack',
   BRAIN_GAME: 'Brain Game'
@@ -53,6 +54,7 @@ export const MEDIA_TYPES = {
 export const filterOptions = [
   FILTER_TYPES.VIDEOS,
   FILTER_TYPES.PHOTOS,
+  FILTER_TYPES.VERIFIED_PROS,
   FILTER_TYPES.CHANNELS,
   FILTER_TYPES.HACK_SHACK,
   FILTER_TYPES.BRAIN_GAME

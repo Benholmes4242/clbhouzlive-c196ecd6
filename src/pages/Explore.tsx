@@ -48,6 +48,11 @@ const Explore = () => {
       return true;
     }
     
+    // Verified Pros: Empty for now (no content yet)
+    if (activeFilter === FILTER_TYPES.VERIFIED_PROS) {
+      return false; // No content for verified pros yet
+    }
+    
     // Channels: Empty for now (no content yet)
     if (activeFilter === FILTER_TYPES.CHANNELS) {
       return false; // No content for channels yet
