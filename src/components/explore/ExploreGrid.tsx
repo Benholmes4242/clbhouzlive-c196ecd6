@@ -78,9 +78,9 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     const totalItems = content.length;
     
     // Calculate actual counts based on percentages
-    const squareCount = Math.round(totalItems * 0.50);
-    const portraitCount = Math.round(totalItems * 0.35);
-    const tallCount = totalItems - squareCount - portraitCount; // Remaining items
+    const squareCount = Math.round(totalItems * 0.45);
+    const portraitCount = Math.round(totalItems * 0.45);
+    const tallCount = totalItems - squareCount - portraitCount; // Remaining items (~10%)
     
     // Create pattern array
     for (let i = 0; i < squareCount; i++) pattern.push('square');
