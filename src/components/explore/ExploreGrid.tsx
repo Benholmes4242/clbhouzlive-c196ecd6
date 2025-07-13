@@ -66,14 +66,14 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     );
   }
 
-  // Create dynamic mosaic layout with varied tile sizes
+  // Create layout with only squares for seamless fitting
   const createGridLayout = () => {
     if (content.length === 0) return [];
     
     const gridItems = [];
     let index = 0;
     
-    // Always start with a big square (2x2) for visual impact
+    // Always start with a big square (2x2)
     gridItems.push({
       type: 'big-square',
       item: content[index],
@@ -81,37 +81,36 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     });
     index++;
     
-    // Define tile types with their probabilities for varied layouts
-    const tileTypes = [
-      { type: 'regular', weight: 50 },        // 1x1 squares
-      { type: 'big-square', weight: 15 },     // 2x2 squares  
-      { type: 'vertical', weight: 20 },       // 1x2 vertical
-      { type: 'horizontal', weight: 15 }      // 2x1 horizontal
-    ];
-    
-    // Randomly assign tile sizes for dynamic, non-predictable layout
     while (index < content.length) {
-      // Skip special tiles if not enough content remaining
-      const availableTypes = index < content.length - 3 ? tileTypes : 
-        tileTypes.filter(t => t.type === 'regular');
+      // Add regular items in batches
+      const regularItemsCount = Math.min(9 + Math.floor(Math.random() * 4), content.length - index);
       
-      // Weighted random selection for varied appearance
-      const totalWeight = availableTypes.reduce((sum, t) => sum + t.weight, 0);
-      let random = Math.random() * totalWeight;
-      let selectedType = 'regular';
-      
-      for (const tileType of availableTypes) {
-        random -= tileType.weight;
-        if (random <= 0) {
-          selectedType = tileType.type;
-          break;
-        }
+      for (let i = 0; i < regularItemsCount && index < content.length; i++) {
+        gridItems.push({
+          type: 'regular',
+          item: content[index],
+          key: `regular-${content[index].id}`
+        });
+        index++;
       }
       
+      // Add big square only if we have sufficient content remaining
+      if (index < content.length - 3) {
+        gridItems.push({
+          type: 'big-square',
+          item: content[index],
+          key: `big-square-${content[index].id}`
+        });
+        index++;
+      }
+    }
+    
+    // Fill all remaining slots with regular cards
+    while (index < content.length) {
       gridItems.push({
-        type: selectedType,
+        type: 'regular',
         item: content[index],
-        key: `${selectedType}-${content[index].id}`
+        key: `regular-end-${content[index].id}`
       });
       index++;
     }
@@ -123,59 +122,35 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
 
   return (
     <>
-      {/* Dynamic Mosaic Grid - Seamless, Gap-Free Layout */}
-      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6" style={{ 
-        gridAutoRows: 'minmax(80px, 1fr)',
-        gridAutoFlow: 'row dense',
-        gap: 0
+      {/* Seamless Grid - No Gaps on Any Screen Size */}
+      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1" style={{ 
+        gridAutoRows: '1fr',
+        gridAutoFlow: 'row dense'
       }}>
         {gridItems.map((gridItem) => {
-          switch (gridItem.type) {
-            case 'big-square':
-              return (
-                <div key={gridItem.key} className="col-span-2 row-span-2">
-                  <ExploreContentCard 
-                    item={gridItem.item} 
-                    onLike={onLike} 
-                    onFollow={onFollow} 
-                    onMediaClick={onMediaClick}
-                    isFeatured={true}
-                  />
-                </div>
-              );
-            case 'vertical':
-              return (
-                <div key={gridItem.key} className="col-span-1 row-span-2">
-                  <ExploreContentCard 
-                    item={gridItem.item} 
-                    onLike={onLike} 
-                    onFollow={onFollow} 
-                    onMediaClick={onMediaClick}
-                  />
-                </div>
-              );
-            case 'horizontal':
-              return (
-                <div key={gridItem.key} className="col-span-2 row-span-1">
-                  <ExploreContentCard 
-                    item={gridItem.item} 
-                    onLike={onLike} 
-                    onFollow={onFollow} 
-                    onMediaClick={onMediaClick}
-                  />
-                </div>
-              );
-            default: // 'regular'
-              return (
-                <div key={gridItem.key} className="col-span-1 row-span-1">
-                  <ExploreContentCard 
-                    item={gridItem.item} 
-                    onLike={onLike} 
-                    onFollow={onFollow} 
-                    onMediaClick={onMediaClick}
-                  />
-                </div>
-              );
+          if (gridItem.type === 'big-square') {
+            return (
+              <div key={gridItem.key} className="col-span-2 row-span-2 aspect-square">
+                <ExploreContentCard 
+                  item={gridItem.item} 
+                  onLike={onLike} 
+                  onFollow={onFollow} 
+                  onMediaClick={onMediaClick}
+                  isFeatured={true}
+                />
+              </div>
+            );
+          } else {
+            return (
+              <div key={gridItem.key} className="aspect-square">
+                <ExploreContentCard 
+                  item={gridItem.item} 
+                  onLike={onLike} 
+                  onFollow={onFollow} 
+                  onMediaClick={onMediaClick}
+                />
+              </div>
+            );
           }
         })}
       </div>
