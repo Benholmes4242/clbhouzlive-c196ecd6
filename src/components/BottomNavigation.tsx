@@ -4,10 +4,11 @@ import { usePostFlow } from '@/hooks/usePostFlow';
 import { useIsDesktop } from '@/hooks/useIsDesktop';
 import GalleryPicker from '@/components/post/GalleryPicker';
 import SnapToast from '@/components/snap/SnapToast';
-import NavigationBar from './bottom-navigation/NavigationBar';
+import NeonNavigationBar from './bottom-navigation/NeonNavigationBar';
 import PostSubmissionHandler from './bottom-navigation/PostSubmissionHandler';
 import { useNavigationHandlers } from '@/hooks/useNavigationHandlers';
 import { usePostSubmissionHandlers } from './bottom-navigation/usePostSubmissionHandlers';
+import './bottom-navigation/neon-navigation.css';
 
 const BottomNavigation = () => {
   const { activeTab, handleTabClick } = useNavigationHandlers();
@@ -77,7 +78,7 @@ const BottomNavigation = () => {
 
   return (
     <>
-      <NavigationBar
+      <NeonNavigationBar
         activeTab={activeTab}
         onTabClick={(tab) => onTabClick(tab, handleTabClick)}
       />
