@@ -521,19 +521,19 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
                     {/* Previous Button */}
                     <button
                       onClick={handlePrevMedia}
-                      className="absolute left-4 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center w-12 h-12 bg-black/30 hover:bg-black/50 text-white rounded-full transition-all duration-200"
+                      className="absolute left-4 top-1/2 -translate-y-1/2 z-20 text-white hover:scale-110 transition-all duration-200"
                       aria-label="Previous media"
                     >
-                      <ChevronLeft className="w-6 h-6" />
+                      <ChevronLeft className="h-8 w-8 drop-shadow-lg" />
                     </button>
 
                     {/* Next Button */}
                     <button
                       onClick={handleNextMedia}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center w-12 h-12 bg-black/30 hover:bg-black/50 text-white rounded-full transition-all duration-200"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 z-20 text-white hover:scale-110 transition-all duration-200"
                       aria-label="Next media"
                     >
-                      <ChevronRight className="w-6 h-6" />
+                      <ChevronRight className="h-8 w-8 drop-shadow-lg" />
                     </button>
                   </>
                 )}

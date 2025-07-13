@@ -188,19 +188,19 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, ...props 
               {/* Previous Button */}
               <button
                 onClick={handlePrevMedia}
-                className="absolute left-2 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center w-8 h-8 bg-black/30 hover:bg-black/50 text-white rounded-full transition-all duration-200 opacity-0 group-hover:opacity-100"
+                className="absolute left-2 top-1/2 -translate-y-1/2 z-20 text-white hover:scale-110 transition-all duration-200 opacity-0 group-hover:opacity-100"
                 aria-label="Previous media"
               >
-                <ChevronLeft className="w-5 h-5" />
+                <ChevronLeft className="w-6 h-6 drop-shadow-lg" />
               </button>
 
               {/* Next Button */}
               <button
                 onClick={handleNextMedia}
-                className="absolute right-2 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center w-8 h-8 bg-black/30 hover:bg-black/50 text-white rounded-full transition-all duration-200 opacity-0 group-hover:opacity-100"
+                className="absolute right-2 top-1/2 -translate-y-1/2 z-20 text-white hover:scale-110 transition-all duration-200 opacity-0 group-hover:opacity-100"
                 aria-label="Next media"
               >
-                <ChevronRight className="w-5 h-5" />
+                <ChevronRight className="w-6 h-6 drop-shadow-lg" />
               </button>
             </>
           )}

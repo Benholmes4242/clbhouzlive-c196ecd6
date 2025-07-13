@@ -317,6 +317,28 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
               </div>
             )}
 
+            {/* Media Navigation Arrows - Mobile */}
+            {hasMultipleMedia && (
+              <>
+                <button
+                  onClick={() => navigateMedia('prev')}
+                  disabled={currentMediaIndex === 0}
+                  className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 text-white disabled:opacity-30 hover:scale-110 transition-all duration-200"
+                  aria-label="Previous media"
+                >
+                  <ChevronLeft className="h-8 w-8 drop-shadow-lg" />
+                </button>
+                <button
+                  onClick={() => navigateMedia('next')}
+                  disabled={currentMediaIndex === (currentPost.post_media?.length || 1) - 1}
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 text-white disabled:opacity-30 hover:scale-110 transition-all duration-200"
+                  aria-label="Next media"
+                >
+                  <ChevronRight className="h-8 w-8 drop-shadow-lg" />
+                </button>
+              </>
+            )}
+
             {/* Caption - Bottom Left */}
             {currentPost.content && removeGolfCourseFromContent(currentPost.content) && (
               <div className="absolute bottom-4 left-4 z-10 max-w-[60%]">
@@ -476,27 +498,38 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                       </div>
                     )}
 
-                    {/* Media Navigation */}
+                    {/* Media Navigation - Desktop */}
                     {hasMultipleMedia && (
                       <>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-muted text-white hover:text-foreground"
+                        <button
                           onClick={() => navigateMedia('prev')}
                           disabled={currentMediaIndex === 0}
+                          className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 text-white disabled:opacity-30 hover:scale-110 transition-all duration-200"
+                          aria-label="Previous media"
                         >
-                          <ChevronLeft className="h-5 w-5" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/50 hover:bg-muted text-white hover:text-foreground"
+                          <ChevronLeft className="h-8 w-8 drop-shadow-lg" />
+                        </button>
+                        <button
                           onClick={() => navigateMedia('next')}
-                          disabled={currentMediaIndex === currentPost.post_media.length - 1}
+                          disabled={currentMediaIndex === (currentPost.post_media?.length || 1) - 1}
+                          className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 text-white disabled:opacity-30 hover:scale-110 transition-all duration-200"
+                          aria-label="Next media"
                         >
-                          <ChevronRight className="h-5 w-5" />
-                        </Button>
+                          <ChevronRight className="h-8 w-8 drop-shadow-lg" />
+                        </button>
+
+                        {/* Media Navigation Dots - Desktop */}
+                        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-10">
+                          {currentPost.post_media.map((_, index) => (
+                            <button
+                              key={index}
+                              onClick={() => setCurrentMediaIndex(index)}
+                              className={`w-2 h-2 rounded-full transition-colors ${
+                                index === currentMediaIndex ? 'bg-white' : 'bg-white/50'
+                              }`}
+                            />
+                          ))}
+                        </div>
                       </>
                     )}
 
