@@ -160,6 +160,8 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
               </div>
             );
           }
+          // Fallback for any unmatched types
+          return null;
         })}
       </Masonry>
       
