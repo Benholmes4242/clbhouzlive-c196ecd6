@@ -52,6 +52,16 @@ export const useTrendingCard = () => {
 
   useEffect(() => {
     fetchRandomPost();
+
+    // Listen for post deletion events to refresh the trending card
+    const handlePostDeleted = () => {
+      fetchRandomPost();
+    };
+
+    window.addEventListener('postDeleted', handlePostDeleted);
+    return () => {
+      window.removeEventListener('postDeleted', handlePostDeleted);
+    };
   }, []);
 
   return {
