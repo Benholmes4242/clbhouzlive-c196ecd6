@@ -66,24 +66,24 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     );
   }
 
-  // Create layout ensuring no empty spaces and starting with 4:5 card
+  // Create layout ensuring seamless fit on all screen sizes, starting with large square
   const createGridLayout = () => {
     if (content.length === 0) return [];
     
     const gridItems = [];
     let index = 0;
     
-    // Always start with a tall portrait card (4:5)
+    // Always start with a big square (2x2)
     gridItems.push({
-      type: 'tall-portrait',
+      type: 'big-square',
       item: content[index],
-      key: `first-tall-${content[index].id}`
+      key: `first-big-${content[index].id}`
     });
     index++;
     
     while (index < content.length) {
-      // Add 7-10 regular items
-      const regularItemsCount = Math.min(7 + Math.floor(Math.random() * 4), content.length - index);
+      // Add regular items in batches that work well with grid columns
+      const regularItemsCount = Math.min(8 + Math.floor(Math.random() * 3), content.length - index);
       
       for (let i = 0; i < regularItemsCount && index < content.length; i++) {
         gridItems.push({
@@ -94,9 +94,9 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
         index++;
       }
       
-      // Only add special cards if we have enough remaining content to fill gaps
-      if (index < content.length - 2) {
-        const cardType = Math.random() > 0.7 ? 'big-square' : 'tall-portrait';
+      // Add special cards only if we have sufficient content remaining
+      if (index < content.length - 3) {
+        const cardType = Math.random() > 0.6 ? 'big-square' : 'tall-portrait';
         gridItems.push({
           type: cardType,
           item: content[index],
@@ -106,12 +106,12 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
       }
     }
     
-    // Fill remaining slots with regular cards
+    // Fill all remaining slots with regular cards to prevent gaps
     while (index < content.length) {
       gridItems.push({
         type: 'regular',
         item: content[index],
-        key: `regular-${content[index].id}`
+        key: `regular-end-${content[index].id}`
       });
       index++;
     }
@@ -123,8 +123,11 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
 
   return (
     <>
-      {/* Seamless Grid Layout - No Empty Spaces */}
-      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1" style={{ gridAutoRows: 'minmax(0, 1fr)' }}>
+      {/* Seamless Grid - No Gaps on Any Screen Size */}
+      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1" style={{ 
+        gridAutoRows: '1fr',
+        gridAutoFlow: 'row dense'
+      }}>
         {gridItems.map((gridItem) => {
           if (gridItem.type === 'big-square') {
             return (
