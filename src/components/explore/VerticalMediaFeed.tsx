@@ -194,14 +194,18 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
 
   // Auto-play/pause videos based on current index and manage audio
   useEffect(() => {
-    // Pause all videos except the current one
+    // Pause all videos except the current one, but don't reset currentTime
+    // Let the VideoPlayer component handle autoplay for the current video
     Object.entries(videoRefs.current).forEach(([indexStr, videoRef]) => {
       const index = parseInt(indexStr);
       if (index !== currentIndex && videoRef?.current) {
+        // Only pause, don't reset time to preserve user's position
         videoRef.current.pause();
-        videoRef.current.currentTime = 0; // Reset to beginning for smooth experience
       }
     });
+    
+    // The current video's autoplay will be handled by the VideoPlayer component
+    // based on the autoplay prop that's passed to it
   }, [currentIndex]);
 
   // Scroll to specific index with precise positioning
