@@ -134,7 +134,7 @@ const HeaderSearch = () => {
           <input
             type="text"
             placeholder="Search players, courses, or content..."
-            className="w-full pl-12 pr-10 py-3 bg-muted rounded-full border border-border focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all duration-200"
+            className="w-full pl-12 pr-10 py-3 bg-muted rounded-full border border-border focus:outline-none focus:ring-2 focus:ring-muted-foreground/10 focus:border-muted-foreground/30 transition-all duration-200"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onFocus={handleInputFocus}
@@ -194,7 +194,7 @@ const HeaderSearch = () => {
               ref={inputRef}
               type="text"
               placeholder="Search players, courses, or content..."
-              className="w-full pl-12 pr-10 py-3 bg-muted rounded-full border border-border focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 transition-all duration-200"
+              className="w-full pl-12 pr-10 py-3 bg-muted rounded-full border border-border focus:outline-none focus:ring-2 focus:ring-muted-foreground/10 focus:border-muted-foreground/30 transition-all duration-200"
               value={query}
               onChange={(e) => {
                 setQuery(e.target.value);
