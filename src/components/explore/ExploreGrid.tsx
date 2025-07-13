@@ -66,13 +66,23 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     );
   }
 
-  // Create layout ensuring no empty spaces
+  // Create layout ensuring no empty spaces and starting with 4:5 card
   const createGridLayout = () => {
+    if (content.length === 0) return [];
+    
     const gridItems = [];
     let index = 0;
     
+    // Always start with a tall portrait card (4:5)
+    gridItems.push({
+      type: 'tall-portrait',
+      item: content[index],
+      key: `first-tall-${content[index].id}`
+    });
+    index++;
+    
     while (index < content.length) {
-      // Add 7-10 regular items first
+      // Add 7-10 regular items
       const regularItemsCount = Math.min(7 + Math.floor(Math.random() * 4), content.length - index);
       
       for (let i = 0; i < regularItemsCount && index < content.length; i++) {
