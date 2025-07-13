@@ -144,7 +144,18 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
     );
 
     // Find the initial item's index in the filtered array
-    const initialIndex = filtered.findIndex(item => item.id === initialItem.id);
+    // Use both id and src for more precise matching to handle duplicates
+    const initialIndex = filtered.findIndex(item => 
+      item.id === initialItem.id && item.src === initialItem.src
+    );
+    
+    console.log('VerticalMediaFeed - Initial item:', {
+      id: initialItem.id,
+      src: initialItem.src,
+      foundIndex: initialIndex,
+      totalFiltered: filtered.length
+    });
+    
     setCurrentIndex(initialIndex >= 0 ? initialIndex : 0);
   }, [isOpen, initialItem, allContent]);
 
