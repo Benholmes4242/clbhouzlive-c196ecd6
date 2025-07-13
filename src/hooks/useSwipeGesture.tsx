@@ -36,6 +36,10 @@ export const useSwipeGesture = ({
       // Only trigger horizontal swipes if horizontal movement is greater than vertical
       if (Math.abs(deltaX) > Math.abs(deltaY)) {
         if (Math.abs(deltaX) > threshold) {
+          // Prevent default behavior and stop propagation when handling swipe
+          e.preventDefault();
+          e.stopPropagation();
+          
           if (deltaX > 0) {
             onSwipeLeft?.();
           } else {
@@ -73,7 +77,7 @@ export const useSwipeGesture = ({
     };
 
     element.addEventListener('touchstart', handleTouchStart, { passive: true });
-    element.addEventListener('touchend', handleTouchEnd, { passive: true });
+    element.addEventListener('touchend', handleTouchEnd, { passive: false });
     element.addEventListener('mousedown', handleMouseDown);
     element.addEventListener('mouseup', handleMouseUp);
 
