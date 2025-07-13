@@ -2,7 +2,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Video, Camera, TvMinimalPlay, Zap, Brain } from 'lucide-react';
-import { TbGolf } from 'react-icons/tb';
+import { PiGolf } from 'react-icons/pi';
 import { filterOptions, FILTER_TYPES } from './types';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -24,7 +24,7 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
       case FILTER_TYPES.PHOTOS:
         return <Camera className="w-4 h-4 mr-2" />;
       case FILTER_TYPES.VERIFIED_PROS:
-        return <TbGolf className="w-4 h-4 mr-2" />;
+        return <PiGolf className="w-4 h-4 mr-2" />;
       case FILTER_TYPES.CHANNELS:
         return <TvMinimalPlay className="w-4 h-4 mr-2" />;
       case FILTER_TYPES.HACK_SHACK:
