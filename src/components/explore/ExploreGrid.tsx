@@ -66,14 +66,14 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     );
   }
 
-  // Create layout with featured big cards every 9-12 items
+  // Create layout with featured cards every 8-12 items
   const createGridLayout = () => {
     const gridItems = [];
     let index = 0;
     
     while (index < content.length) {
-      // Add 8-10 regular items
-      const regularItemsCount = Math.min(9 + Math.floor(Math.random() * 3), content.length - index);
+      // Add 6-9 regular items
+      const regularItemsCount = Math.min(6 + Math.floor(Math.random() * 4), content.length - index);
       
       for (let i = 0; i < regularItemsCount && index < content.length; i++) {
         gridItems.push({
@@ -84,12 +84,14 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
         index++;
       }
       
-      // Add one big featured card if we have more content
+      // Add a featured card if we have more content
       if (index < content.length) {
+        // Randomly choose between big square (2x2) or tall portrait (1x2)
+        const cardType = Math.random() > 0.6 ? 'big-square' : 'tall-portrait';
         gridItems.push({
-          type: 'featured',
+          type: cardType,
           item: content[index],
-          key: `featured-${content[index].id}`
+          key: `${cardType}-${content[index].id}`
         });
         index++;
       }
@@ -104,28 +106,44 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     <>
       {/* Instagram-style Grid Layout with Featured Cards */}
       <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1 auto-rows-fr">
-        {gridItems.map((gridItem) => (
-          gridItem.type === 'featured' ? (
-            <div key={gridItem.key} className="col-span-2 row-span-2 aspect-square">
-              <ExploreContentCard 
-                item={gridItem.item} 
-                onLike={onLike} 
-                onFollow={onFollow} 
-                onMediaClick={onMediaClick}
-                isFeatured={true}
-              />
-            </div>
-          ) : (
-            <div key={gridItem.key} className="aspect-square">
-              <ExploreContentCard 
-                item={gridItem.item} 
-                onLike={onLike} 
-                onFollow={onFollow} 
-                onMediaClick={onMediaClick}
-              />
-            </div>
-          )
-        ))}
+        {gridItems.map((gridItem) => {
+          if (gridItem.type === 'big-square') {
+            return (
+              <div key={gridItem.key} className="col-span-2 row-span-2 aspect-square">
+                <ExploreContentCard 
+                  item={gridItem.item} 
+                  onLike={onLike} 
+                  onFollow={onFollow} 
+                  onMediaClick={onMediaClick}
+                  isFeatured={true}
+                />
+              </div>
+            );
+          } else if (gridItem.type === 'tall-portrait') {
+            return (
+              <div key={gridItem.key} className="row-span-2" style={{ aspectRatio: '4/5' }}>
+                <ExploreContentCard 
+                  item={gridItem.item} 
+                  onLike={onLike} 
+                  onFollow={onFollow} 
+                  onMediaClick={onMediaClick}
+                  isFeatured={true}
+                />
+              </div>
+            );
+          } else {
+            return (
+              <div key={gridItem.key} className="aspect-square">
+                <ExploreContentCard 
+                  item={gridItem.item} 
+                  onLike={onLike} 
+                  onFollow={onFollow} 
+                  onMediaClick={onMediaClick}
+                />
+              </div>
+            );
+          }
+        })}
       </div>
       
       {/* Infinite scroll sentinel */}
