@@ -10,7 +10,7 @@ export const useTrendingCard = () => {
     try {
       setLoading(true);
       
-      // Get a random post with media from any user
+      // Get a random post with VIDEO media only from any user
       const { data: posts, error } = await supabase
         .from('posts')
         .select(`
@@ -33,13 +33,17 @@ export const useTrendingCard = () => {
       if (error) throw error;
 
       if (posts && posts.length > 0) {
-        // Filter posts that have media
-        const postsWithMedia = posts.filter(post => post.post_media && post.post_media.length > 0);
+        // Filter posts that have VIDEO media only
+        const postsWithVideoMedia = posts.filter(post => 
+          post.post_media && 
+          post.post_media.length > 0 && 
+          post.post_media.some(media => media.media_type === 'video')
+        );
         
-        if (postsWithMedia.length > 0) {
+        if (postsWithVideoMedia.length > 0) {
           // Select a random post
-          const randomIndex = Math.floor(Math.random() * postsWithMedia.length);
-          setTrendingPost(postsWithMedia[randomIndex]);
+          const randomIndex = Math.floor(Math.random() * postsWithVideoMedia.length);
+          setTrendingPost(postsWithVideoMedia[randomIndex]);
         }
       }
     } catch (err) {

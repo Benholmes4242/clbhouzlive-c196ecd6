@@ -15,15 +15,22 @@ const TrendingCard = () => {
   }
 
   const media = trendingPost.post_media || [];
-  const hasMultipleMedia = media.length > 1;
+  // Only get video media
+  const videoMedia = media.filter(m => m.media_type === 'video');
+  const hasMultipleVideos = videoMedia.length > 1;
   const user = trendingPost.user_profiles;
+
+  // Don't render if no video media found
+  if (videoMedia.length === 0) {
+    return null;
+  }
 
   const handlePrevMedia = () => {
     setCurrentMediaIndex(prev => Math.max(0, prev - 1));
   };
 
   const handleNextMedia = () => {
-    setCurrentMediaIndex(prev => Math.min(media.length - 1, prev + 1));
+    setCurrentMediaIndex(prev => Math.min(videoMedia.length - 1, prev + 1));
   };
 
   return (
@@ -39,38 +46,29 @@ const TrendingCard = () => {
 
         {/* Media Container */}
         <div className="relative w-full h-full">
-          {hasMultipleMedia ? (
-            // Carousel for multiple media
+          {hasMultipleVideos ? (
+            // Carousel for multiple videos
             <div className="relative w-full h-full">
               <div 
                 className="flex transition-transform duration-300 ease-out h-full"
                 style={{ transform: `translateX(-${currentMediaIndex * 100}%)` }}
               >
-                {media.map((mediaItem, index) => (
+                {videoMedia.map((mediaItem, index) => (
                   <div key={index} className="flex-shrink-0 w-full h-full">
-                    {mediaItem.media_type === 'video' ? (
-                      <video
-                        src={mediaItem.media_url}
-                        className="w-full h-full object-cover"
-                        autoPlay
-                        muted
-                        loop
-                        playsInline
-                      />
-                    ) : (
-                      <img
-                        src={mediaItem.media_url}
-                        alt="Golf content"
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                      />
-                    )}
+                    <video
+                      src={mediaItem.media_url}
+                      className="w-full h-full object-cover"
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                    />
                   </div>
                 ))}
               </div>
               
               {/* Carousel Navigation */}
-              {media.length > 1 && (
+              {videoMedia.length > 1 && (
                 <>
                   <button
                     onClick={handlePrevMedia}
@@ -82,14 +80,14 @@ const TrendingCard = () => {
                   <button
                     onClick={handleNextMedia}
                     className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                    disabled={currentMediaIndex === media.length - 1}
+                    disabled={currentMediaIndex === videoMedia.length - 1}
                   >
                     <ChevronRight className="w-4 h-4" />
                   </button>
                   
                   {/* Dots Indicator */}
                   <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-1">
-                    {media.map((_, index) => (
+                    {videoMedia.map((_, index) => (
                       <div
                         key={index}
                         className={`w-2 h-2 rounded-full transition-colors ${
@@ -102,25 +100,16 @@ const TrendingCard = () => {
               )}
             </div>
           ) : (
-            // Single media
+            // Single video
             <div className="w-full h-full">
-              {media[0]?.media_type === 'video' ? (
-                <video
-                  src={media[0].media_url}
-                  className="w-full h-full object-cover"
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                />
-              ) : (
-                <img
-                  src={media[0]?.media_url}
-                  alt="Golf content"
-                  className="w-full h-full object-cover"
-                  loading="lazy"
-                />
-              )}
+              <video
+                src={videoMedia[0]?.media_url}
+                className="w-full h-full object-cover"
+                autoPlay
+                muted
+                loop
+                playsInline
+              />
             </div>
           )}
           
