@@ -45,19 +45,22 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
     const displayName = isUserPost ? (item as UserPostWithType).user.display_name : (item as VideoPost).user.name;
     const caption = isUserPost ? (item as UserPostWithType).content : (item as VideoPost).content.description;
 
-    // Generate varied aspect ratios like Pinterest
-    const aspectRatios = [
-      'aspect-square',      // 1:1 square
-      'aspect-[3/4]',       // 3:4 portrait
-      'aspect-[4/3]',       // 4:3 landscape
-      'aspect-[2/3]',       // 2:3 tall portrait
-      'aspect-[3/2]',       // 3:2 wide landscape
-      'aspect-[9/16]',      // 9:16 very tall (story-like)
-      'aspect-[16/9]',      // 16:9 wide video format
+    // Generate three types of cards based on Pinterest style
+    const cardTypes = [
+      'aspect-[2/3]',       // Tall portrait cards (2:3)
+      'aspect-[4/5]',       // Medium cards (4:5) - most common
+      'aspect-square',      // Short/square cards
     ];
     
-    // Use a consistent but varied approach based on index
-    const aspectRatio = aspectRatios[index % aspectRatios.length];
+    // Distribute card types with medium being most common
+    const getCardType = (index: number) => {
+      const random = (index * 7) % 10; // Pseudo-random but consistent
+      if (random < 5) return cardTypes[1]; // 50% medium cards
+      if (random < 8) return cardTypes[0]; // 30% tall cards  
+      return cardTypes[2]; // 20% square cards
+    };
+    
+    const aspectRatio = getCardType(index);
 
     return (
       <div key={item.id} className="mosaic-tile group relative overflow-hidden rounded-xl bg-card border">
@@ -181,7 +184,7 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
   };
 
   return (
-    <div className="mosaic-feed-container px-2 pb-20">
+    <div className="mosaic-feed-container pb-20">
       {/* Show optimistic posts first */}
       {optimisticPosts.length > 0 && (
         <div className="mb-6">

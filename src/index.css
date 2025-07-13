@@ -297,37 +297,27 @@
 /* Mosaic Feed Styles - Pinterest-style Masonry Layout */
 .mosaic-feed-container {
   margin-top: 1rem;
+  padding-left: 0.125rem;
+  padding-right: 0.125rem;
 }
 
 .mosaic-grid {
   columns: 2;
-  column-gap: 0.5rem;
+  column-gap: 0.25rem;
   padding: 0;
 }
 
-/* Responsive columns */
-@media (min-width: 640px) {
-  .mosaic-grid {
-    columns: 3;
-  }
-}
-
+/* Responsive columns - 2 mobile, 4 desktop */
 @media (min-width: 1024px) {
   .mosaic-grid {
     columns: 4;
   }
 }
 
-@media (min-width: 1280px) {
-  .mosaic-grid {
-    columns: 5;
-  }
-}
-
 .mosaic-tile {
   display: inline-block;
   width: 100%;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
   break-inside: avoid;
   transition: transform 0.2s ease-in-out;
   cursor: pointer;
