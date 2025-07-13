@@ -41,7 +41,6 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
   const [isMuted, setIsMuted] = useState(true);
   const scrollViewRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<{ [key: number]: HTMLDivElement }>({});
-  const videoRefs = useRef<{ [key: number]: HTMLVideoElement }>({});
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<ExploreContentItem | null>(null);
   const [editCourse, setEditCourse] = useState<any>(null);
@@ -142,23 +141,33 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
       item.id === initialItem.id && item.src === initialItem.src
     );
     
-    console.log('VerticalMediaFeed - Initial item:', {
-      id: initialItem.id,
-      src: initialItem.src,
+    console.log('VerticalMediaFeed - Exact item match:', {
+      clickedId: initialItem.id,
+      clickedSrc: initialItem.src,
       foundIndex: initialIndex,
-      totalFiltered: filtered.length
+      totalFiltered: filtered.length,
+      matchedItem: initialIndex >= 0 ? filtered[initialIndex] : null
     });
     
-    // Set both filtered content and current index together to prevent flickering
+    // Set both filtered content and current index together
     setFilteredContent(filtered);
     setCurrentIndex(initialIndex >= 0 ? initialIndex : 0);
-    
-    // Immediately set scroll position without animation to prevent flickering
-    if (scrollViewRef.current && initialIndex >= 0) {
-      const itemHeight = window.innerHeight;
-      scrollViewRef.current.scrollTop = initialIndex * itemHeight;
-    }
   }, [isOpen, initialItem, allContent]);
+
+  // Handle scroll positioning after content is set and components are mounted
+  useEffect(() => {
+    if (isOpen && filteredContent.length > 0 && scrollViewRef.current) {
+      // Small delay to ensure video components are mounted
+      const timeoutId = setTimeout(() => {
+        if (scrollViewRef.current) {
+          const itemHeight = window.innerHeight;
+          scrollViewRef.current.scrollTop = currentIndex * itemHeight;
+        }
+      }, 100);
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [isOpen, filteredContent.length, currentIndex]);
 
   // Handle scroll to snap to items with improved smoothness
   const handleScroll = useCallback(() => {
@@ -173,25 +182,10 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
     }
   }, [currentIndex, filteredContent.length]);
 
-  // Auto-play/pause videos based on current index with preloading
+  // Auto-play/pause videos based on current index - simplified approach
   useEffect(() => {
-    Object.keys(videoRefs.current).forEach((key) => {
-      const index = parseInt(key);
-      const video = videoRefs.current[index];
-      
-      if (video) {
-        if (index === currentIndex) {
-          // Play current video
-          video.play().catch(console.error);
-        } else if (Math.abs(index - currentIndex) <= 1) {
-          // Preload adjacent videos but keep them paused
-          video.load();
-        } else {
-          // Pause videos that are far away
-          video.pause();
-        }
-      }
-    });
+    // Let the VideoPlayer component handle autoplay based on the autoplay prop
+    // This removes the manual video ref management which was causing issues
   }, [currentIndex]);
 
   // Scroll to specific index with precise positioning
