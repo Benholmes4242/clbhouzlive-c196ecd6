@@ -25,6 +25,7 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, isFeature
   const [isPostViewerOpen, setIsPostViewerOpen] = useState(false);
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const isMobile = useIsMobile();
   const { ref: autoplayRef, shouldAutoplay, handleMouseEnter, handleMouseLeave } = useVideoAutoplay({
     enabled: true,
@@ -125,6 +126,11 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, isFeature
       errorType: 'IMAGE_LOAD_FAILED'
     });
     setImageError(true);
+    setIsLoading(false);
+  };
+
+  const handleImageLoad = () => {
+    setIsLoading(false);
   };
 
   // Fallback image for broken/missing images
@@ -150,8 +156,15 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, isFeature
         onMouseEnter={handleCardMouseEnter}
         onMouseLeave={handleCardMouseLeave}
       >
-        {/* Square Media Container */}
-        <div className="relative w-full h-full overflow-hidden">
+        {/* Square Media Container with Loading State */}
+        <div className="relative w-full h-full overflow-hidden bg-muted">
+          {/* Loading Skeleton */}
+          {isLoading && (
+            <div className="absolute inset-0 bg-muted animate-pulse flex items-center justify-center">
+              <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          )}
+          
           {currentMedia.media_type === 'video' && !isInvalidSrc ? (
             <VideoPlayer
               src={currentMedia.media_url}
@@ -171,7 +184,11 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, isFeature
               alt={item.title || 'Content'}
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
               onError={handleImageError}
-              loading="lazy"
+              onLoad={handleImageLoad}
+              loading="eager"
+              width="400"
+              height="400"
+              style={{ aspectRatio: '1/1' }}
             />
           )}
 
