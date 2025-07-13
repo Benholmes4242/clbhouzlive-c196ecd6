@@ -227,12 +227,6 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
     return () => document.removeEventListener('keydown', handleKeyPress);
   }, [handleKeyPress]);
 
-  // Stop all videos when navigating between posts or media to prevent audio overlap
-  useEffect(() => {
-    console.log('🎬 PostViewerModal: Navigation detected, stopping all videos');
-    pauseAllAndSetActive('');
-  }, [currentPostIndex, currentMediaIndex, pauseAllAndSetActive]);
-
   const currentMedia = currentPost.post_media?.[currentMediaIndex];
   const hasMultipleMedia = (currentPost.post_media?.length || 0) > 1;
   const hasMultiplePosts = allUserPosts.length > 1;

@@ -176,8 +176,18 @@ export const useFullscreenPostNavigation = () => {
   // Navigate to next post
   const goToNextPost = useCallback(() => {
     if (currentPostIndex < userPosts.length - 1) {
-      // Stop all videos before navigating to prevent audio overlap
-      console.log('🎬 Fullscreen navigation: Moving to next post, stopping all videos');
+      // AGGRESSIVE video cleanup before navigating to prevent audio overlap
+      console.log('🎬 Fullscreen navigation: Moving to next post, force stopping ALL videos');
+      
+      // Stop all videos in the DOM immediately
+      const allVideoElements = document.querySelectorAll('video');
+      allVideoElements.forEach((video) => {
+        video.pause();
+        video.muted = true;
+        video.currentTime = 0;
+      });
+      
+      // Use the video manager to ensure tracked videos are stopped
       pauseAllAndSetActive('');
       
       const nextIndex = currentPostIndex + 1;
@@ -193,8 +203,18 @@ export const useFullscreenPostNavigation = () => {
   // Navigate to previous post
   const goToPreviousPost = useCallback(() => {
     if (currentPostIndex > 0) {
-      // Stop all videos before navigating to prevent audio overlap
-      console.log('🎬 Fullscreen navigation: Moving to previous post, stopping all videos');
+      // AGGRESSIVE video cleanup before navigating to prevent audio overlap
+      console.log('🎬 Fullscreen navigation: Moving to previous post, force stopping ALL videos');
+      
+      // Stop all videos in the DOM immediately
+      const allVideoElements = document.querySelectorAll('video');
+      allVideoElements.forEach((video) => {
+        video.pause();
+        video.muted = true;
+        video.currentTime = 0;
+      });
+      
+      // Use the video manager to ensure tracked videos are stopped
       pauseAllAndSetActive('');
       
       const prevIndex = currentPostIndex - 1;

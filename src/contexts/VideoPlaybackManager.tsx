@@ -109,9 +109,20 @@ export const VideoPlaybackManagerProvider: React.FC<{ children: React.ReactNode 
   const pauseAllAndSetActive = useCallback((activeVideoId: string) => {
     console.log('🎬 Pausing ALL videos and setting active:', activeVideoId);
     
-    // First pause and mute ALL videos
+    // First, use the registry to pause and mute ALL tracked videos
     videoRegistry.current.forEach((video, videoId) => {
       if (!video.paused) {
+        console.log('⏸️ Pausing tracked video:', videoId);
+        video.pause();
+      }
+      video.muted = true;
+    });
+    
+    // AGGRESSIVE: Also find and stop any untracked videos in the DOM
+    const allVideoElements = document.querySelectorAll('video');
+    allVideoElements.forEach((video) => {
+      if (!video.paused) {
+        console.log('⏸️ Force pausing DOM video:', video.src);
         video.pause();
       }
       video.muted = true;
@@ -121,9 +132,12 @@ export const VideoPlaybackManagerProvider: React.FC<{ children: React.ReactNode 
     currentAudioVideo.current = null;
     
     // Now allow the active video to play (it will handle its own audio based on global mute state)
-    const activeVideo = videoRegistry.current.get(activeVideoId);
-    if (activeVideo) {
-      activeVideo.play().catch(console.error);
+    if (activeVideoId && activeVideoId !== '') {
+      const activeVideo = videoRegistry.current.get(activeVideoId);
+      if (activeVideo) {
+        console.log('▶️ Starting active video:', activeVideoId);
+        activeVideo.play().catch(console.error);
+      }
     }
   }, []);
 
