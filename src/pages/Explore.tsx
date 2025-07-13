@@ -7,11 +7,11 @@ import ExploreGrid from '@/components/explore/ExploreGrid';
 import MobileDebugConsole from '@/components/explore/MobileDebugConsole';
 import VerticalMediaFeed from '@/components/explore/VerticalMediaFeed';
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
-
 import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
+import { FILTER_TYPES, MEDIA_TYPES } from '@/components/explore/types';
 
 const Explore = () => {
-  const [activeFilter, setActiveFilter] = useState('Videos');
+  const [activeFilter, setActiveFilter] = useState<string>(FILTER_TYPES.VIDEOS);
   const [debugVisible, setDebugVisible] = useState(false);
   const { 
     content, 
@@ -43,15 +43,19 @@ const Explore = () => {
 
   // Apply client-side filtering for non-database filters
   const filteredContent = content.filter(item => {
-    if (activeFilter === 'Videos') return true; // Videos filtering is handled in the database
-    if (activeFilter === 'Photos') return true; // Photos filtering is handled in the database
-    if (activeFilter === 'Hack Shack') {
-      // Only videos with #hackshack hashtag
-      return item.type === 'video' && (
+    // Videos and Photos filtering is handled in the database
+    if (activeFilter === FILTER_TYPES.VIDEOS || activeFilter === FILTER_TYPES.PHOTOS) {
+      return true;
+    }
+    
+    // Hack Shack: Only videos with #hackshack hashtag
+    if (activeFilter === FILTER_TYPES.HACK_SHACK) {
+      return item.type === MEDIA_TYPES.VIDEO && (
         item.title?.toLowerCase().includes('#hackshack') || 
         item.title?.toLowerCase().includes('hackshack')
       );
     }
+    
     return true;
   });
 

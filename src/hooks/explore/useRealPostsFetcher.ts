@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { ExploreContentItem } from '@/components/explore/types';
+import { ExploreContentItem, FILTER_TYPES, MEDIA_TYPES } from '@/components/explore/types';
 import { isValidImageUrl } from './urlValidation';
 
 export const useRealPostsFetcher = () => {
@@ -34,10 +34,10 @@ export const useRealPostsFetcher = () => {
         .limit(postsPerPage);
 
       // Add media type filter if specified
-      if (mediaFilter === 'Videos') {
-        query = query.eq('post_media.media_type', 'video');
-      } else if (mediaFilter === 'Photos') {
-        query = query.eq('post_media.media_type', 'image');
+      if (mediaFilter === FILTER_TYPES.VIDEOS) {
+        query = query.eq('post_media.media_type', MEDIA_TYPES.VIDEO);
+      } else if (mediaFilter === FILTER_TYPES.PHOTOS) {
+        query = query.eq('post_media.media_type', MEDIA_TYPES.IMAGE);
       }
 
       const { data: postsData, error } = await query;

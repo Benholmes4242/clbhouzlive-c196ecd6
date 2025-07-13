@@ -36,8 +36,20 @@ export interface CTAContentItem {
   likes: number;
 }
 
+// Filter constants for type safety
+export const FILTER_TYPES = {
+  VIDEOS: 'Videos',
+  PHOTOS: 'Photos', 
+  HACK_SHACK: 'Hack Shack'
+} as const;
+
+export const MEDIA_TYPES = {
+  VIDEO: 'video',
+  IMAGE: 'image'
+} as const;
+
 export const filterOptions = [
-  'Videos', 
-  'Photos',
-  'Hack Shack'
+  FILTER_TYPES.VIDEOS,
+  FILTER_TYPES.PHOTOS,
+  FILTER_TYPES.HACK_SHACK
 ];

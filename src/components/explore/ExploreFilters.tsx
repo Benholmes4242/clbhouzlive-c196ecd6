@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Video, Camera, Zap } from 'lucide-react';
-import { filterOptions } from './types';
+import { filterOptions, FILTER_TYPES } from './types';
 
 interface ExploreFiltersProps {
   activeFilter: string;
@@ -12,11 +12,11 @@ interface ExploreFiltersProps {
 const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterChange }) => {
   const getFilterIcon = (filter: string) => {
     switch (filter) {
-      case 'Videos':
+      case FILTER_TYPES.VIDEOS:
         return <Video className="w-4 h-4 mr-2" />;
-      case 'Photos':
+      case FILTER_TYPES.PHOTOS:
         return <Camera className="w-4 h-4 mr-2" />;
-      case 'Hack Shack':
+      case FILTER_TYPES.HACK_SHACK:
         return <Zap className="w-4 h-4 mr-2" />;
       default:
         return null;
