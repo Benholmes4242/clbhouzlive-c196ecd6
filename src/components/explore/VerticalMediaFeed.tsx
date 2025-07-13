@@ -379,24 +379,8 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
               )}
             </div>
             
-            {/* Follow pill - show for other users' posts when logged in */}
-            {(() => {
-              const currentUser = user?.id;
-              const postUser = filteredContent[currentIndex]?.user?.id;
-              const isOwnPost = currentUser === postUser;
-              const shouldShow = currentUser && postUser && !isOwnPost;
-              
-              console.log('Follow pill debug:', {
-                currentUser: !!currentUser,
-                postUser: !!postUser,
-                isOwnPost,
-                shouldShow,
-                currentUserName: user?.email,
-                postUserName: filteredContent[currentIndex]?.user?.name
-              });
-              
-              return shouldShow;
-            })() && (
+            {/* Follow pill - only show if not own post and user is logged in */}
+            {user?.id && filteredContent[currentIndex]?.user?.id && user.id !== filteredContent[currentIndex]?.user?.id && (
               <button 
                 onClick={handleFollowToggle}
                 disabled={followMutation.isPending || isFollowingLoading}
