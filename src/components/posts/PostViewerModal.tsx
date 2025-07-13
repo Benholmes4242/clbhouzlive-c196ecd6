@@ -398,18 +398,29 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                   </DropdownMenuTrigger>
                   <DropdownMenuContent 
                     align="end" 
-                    className="w-48 bg-background border shadow-lg z-[100]"
+                    className="w-48 bg-background border shadow-lg"
+                    style={{ zIndex: 9999 }}
                     sideOffset={8}
+                    avoidCollisions={true}
+                    side="left"
                   >
                     <DropdownMenuItem 
-                      onClick={() => handleEdit(currentPost)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleEdit(currentPost);
+                      }}
                       className="cursor-pointer"
                     >
                       <Edit className="mr-2 h-4 w-4" />
                       Edit
                     </DropdownMenuItem>
                     <DropdownMenuItem 
-                      onClick={() => handleDelete(currentPost)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleDelete(currentPost);
+                      }}
                       className="cursor-pointer text-destructive focus:text-destructive"
                     >
                       <Trash2 className="mr-2 h-4 w-4" />
