@@ -401,7 +401,7 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
               onMouseLeave={() => setIsTextExpanded(false)}
             >
               {item.type === 'video' ? (
-                <div className="relative w-full h-full bg-media-loading animate-pulse">
+                <div className="relative w-full h-full bg-media-loading">
                   <VideoPlayer
                     src={item.src}
                     autoplay={index === currentIndex}
@@ -414,7 +414,7 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
                   />
                 </div>
               ) : (
-                <div className="relative w-full h-full bg-media-loading animate-pulse">
+                <div className="relative w-full h-full bg-media-loading">
                   <img
                     src={item.src}
                     alt={item.title}
