@@ -9,7 +9,6 @@ import { usePostData } from '@/hooks/usePostData';
 import { ExploreContentItem } from './types';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useExploreAudioState } from '@/hooks/useExploreAudioState';
 
 import CoursePostBadge from '../posts/CoursePostBadge';
 import EnhancedCreateMomentModal from '../post/EnhancedCreateMomentModal';
@@ -37,12 +36,11 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
   const { user } = useSupabaseSession();
   const isMobile = useIsMobile();
   const { updatePost, isUpdating } = usePostUpdate();
-  const { isMuted, toggleMute } = useExploreAudioState();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [filteredContent, setFilteredContent] = useState<ExploreContentItem[]>([]);
+  const [isMuted, setIsMuted] = useState(true);
   const scrollViewRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<{ [key: number]: HTMLDivElement }>({});
-  const videoRefs = useRef<{ [key: number]: React.RefObject<HTMLVideoElement> }>({});
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState<ExploreContentItem | null>(null);
   const [editCourse, setEditCourse] = useState<any>(null);
@@ -192,11 +190,10 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
     }
   }, [currentIndex, filteredContent.length]);
 
-  // Auto-play/pause videos based on current index
+  // Auto-play/pause videos based on current index - simplified approach
   useEffect(() => {
-    // Don't manually pause videos - let the VideoPlayer autoplay prop handle it
-    // The VideoPlayer component will handle play/pause based on the autoplay prop
-    console.log('🎬 Current index changed to:', currentIndex, 'of', filteredContent.length);
+    // Let the VideoPlayer component handle autoplay based on the autoplay prop
+    // This removes the manual video ref management which was causing issues
   }, [currentIndex]);
 
   // Scroll to specific index with precise positioning
@@ -413,18 +410,10 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
                     autoplay={index === currentIndex}
                     muted={isMuted}
                     loop={true}
-                    isInFeed={true}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full"
                     showVideoIcon={false}
                     showOverlayControls={false}
                     videoId={`vertical-${item.id}`}
-                    key={`video-${item.id}-${index}`} // Add key to force re-render when needed
-                    videoRef={(() => {
-                      if (!videoRefs.current[index]) {
-                        videoRefs.current[index] = React.createRef<HTMLVideoElement>();
-                      }
-                      return videoRefs.current[index];
-                    })()}
                   />
                 </div>
               ) : (
@@ -497,7 +486,7 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
               {item.type === 'video' && (
                 <button 
                   className="cursor-pointer hover:opacity-100 transition-opacity"
-                  onClick={toggleMute}
+                  onClick={() => setIsMuted(!isMuted)}
                 >
                   {isMuted ? (
                     <VolumeX className="w-8 h-8 text-white" />

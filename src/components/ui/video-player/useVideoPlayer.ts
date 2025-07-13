@@ -75,9 +75,8 @@ export const useVideoPlayer = ({
     };
 
     const handleLoadedMetadata = () => {
-      // Enable autoplay when ready - allow any time position for vertical feed
-      if (autoplay && video.paused) {
-        console.log('📺 Starting autoplay after metadata loaded:', videoId.current);
+      // Enable autoplay when ready (only if video is at start position)
+      if (autoplay && video.paused && video.currentTime === 0) {
         video.play().catch(error => {
           console.log('Autoplay prevented:', error);
         });
@@ -89,13 +88,12 @@ export const useVideoPlayer = ({
     video.addEventListener('volumechange', handleVolumeChange);
     video.addEventListener('loadedmetadata', handleLoadedMetadata);
 
-    // Attempt initial autoplay if video is ready
-    if (autoplay && video.paused && video.readyState >= 1) {
-      console.log('🚀 Initial autoplay attempt:', videoId.current);
+    // Only attempt autoplay on initial load when currentTime === 0
+    if (autoplay && video.currentTime === 0 && video.readyState >= 1) {
       // Use requestAnimationFrame for smoother autoplay timing
       requestAnimationFrame(() => {
         video.play().catch(error => {
-          console.log('Initial autoplay prevented:', error);
+          console.log('Autoplay prevented:', error);
         });
       });
     }
@@ -116,14 +114,6 @@ export const useVideoPlayer = ({
     const video = videoRef.current;
     if (!video || !isInFeed) return;
 
-    console.log('🎬 VideoPlayer autoplay effect:', {
-      videoId: videoId.current,
-      autoplay,
-      videoPaused: video.paused,
-      videoReadyState: video.readyState,
-      videoCurrentTime: video.currentTime
-    });
-
     // If autoplay is enabled and video is paused but has been viewed before
     // This handles the case where videos were paused by pauseAllAndSetActive but should resume
     if (autoplay && video.paused && video.readyState >= 2) {
@@ -136,7 +126,6 @@ export const useVideoPlayer = ({
       });
     } else if (!autoplay && !video.paused) {
       // If autoplay is disabled but video is playing, pause it
-      console.log('⏸️ Pausing video due to autoplay=false:', videoId.current);
       video.pause();
     }
   }, [autoplay, isInFeed]);
