@@ -67,46 +67,6 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     );
   }
 
-  // Create seamless grid layout with controlled distribution
-  const createGridLayout = () => {
-    if (content.length === 0) return [];
-    
-    const gridItems = [];
-    
-    // Create a pattern that ensures proper distribution
-    const pattern = [];
-    const totalItems = content.length;
-    
-    // Calculate actual counts based on percentages
-    const squareCount = Math.round(totalItems * 0.45);
-    const portraitCount = Math.round(totalItems * 0.45);
-    const tallCount = totalItems - squareCount - portraitCount; // Remaining items (~10%)
-    
-    // Create pattern array
-    for (let i = 0; i < squareCount; i++) pattern.push('square');
-    for (let i = 0; i < portraitCount; i++) pattern.push('portrait');
-    for (let i = 0; i < tallCount; i++) pattern.push('tall');
-    
-    // Shuffle the pattern for random distribution
-    for (let i = pattern.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [pattern[i], pattern[j]] = [pattern[j], pattern[i]];
-    }
-    
-    // Apply pattern to content
-    for (let index = 0; index < content.length; index++) {
-      const type = pattern[index] || 'square'; // Fallback to square
-      gridItems.push({
-        type,
-        item: content[index],
-        key: `${type}-${content[index].id}`
-      });
-    }
-    
-    return gridItems;
-  };
-
-  const gridItems = createGridLayout();
 
   // Masonry breakpoints for responsive columns
   const breakpointColumnsObj = {
@@ -124,44 +84,16 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
         className="flex gap-1 w-full"
         columnClassName="flex flex-col gap-1"
       >
-        {gridItems.map((gridItem) => {
-          if (gridItem.type === 'square') {
-            return (
-              <div key={gridItem.key} className="aspect-square mb-1">
-                <ExploreContentCard 
-                  item={gridItem.item} 
-                  onLike={onLike} 
-                  onFollow={onFollow} 
-                  onMediaClick={onMediaClick}
-                />
-              </div>
-            );
-          } else if (gridItem.type === 'portrait') {
-            return (
-              <div key={gridItem.key} className="aspect-[4/5] mb-1">
-                <ExploreContentCard 
-                  item={gridItem.item} 
-                  onLike={onLike} 
-                  onFollow={onFollow} 
-                  onMediaClick={onMediaClick}
-                />
-              </div>
-            );
-          } else if (gridItem.type === 'tall') {
-            return (
-              <div key={gridItem.key} className="aspect-[1/2] mb-1">
-                <ExploreContentCard 
-                  item={gridItem.item} 
-                  onLike={onLike} 
-                  onFollow={onFollow} 
-                  onMediaClick={onMediaClick}
-                />
-              </div>
-            );
-          }
-          // Fallback for any unmatched types
-          return null;
-        })}
+        {content.map((item) => (
+          <div key={item.id} className="aspect-[4/5] mb-1">
+            <ExploreContentCard 
+              item={item} 
+              onLike={onLike} 
+              onFollow={onFollow} 
+              onMediaClick={onMediaClick}
+            />
+          </div>
+        ))}
       </Masonry>
       
       {/* Infinite scroll sentinel */}
