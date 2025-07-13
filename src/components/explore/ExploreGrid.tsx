@@ -66,34 +66,19 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     );
   }
 
-  // Create dynamic mosaic layout with simplified tile sizes
+  // Create grid layout with all 1x1 squares
   const createGridLayout = () => {
     if (content.length === 0) return [];
     
     const gridItems = [];
-    let index = 0;
     
-    while (index < content.length) {
-      // Randomly assign tile types with weighted probabilities
-      const rand = Math.random();
-      
-      let tileType = 'small-square'; // 1x1
-      
-      // Simple distribution: 60% small squares, 25% horizontal, 15% vertical
-      if (rand < 0.25) {
-        tileType = 'horizontal'; // 2x1
-      } else if (rand < 0.4) {
-        tileType = 'vertical'; // 1x2
-      }
-      // else small-square (60% chance)
-      
+    content.forEach((item) => {
       gridItems.push({
-        type: tileType,
-        item: content[index],
-        key: `${tileType}-${content[index].id}`
+        type: 'small-square',
+        item: item,
+        key: `small-square-${item.id}`
       });
-      index++;
-    }
+    });
     
     return gridItems;
   };
