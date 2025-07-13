@@ -123,7 +123,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         ref={videoRef}
         src={src}
         poster={effectivePoster}
-        className={`w-full h-full object-cover bg-media-loading animate-pulse ${isInFeed ? 'pointer-events-none touch-none select-none' : 'cursor-pointer'}`}
+        className={`w-full h-full object-cover bg-media-loading ${isInFeed ? 'pointer-events-none touch-none select-none' : 'cursor-pointer'}`}
         data-video-id={videoId}
         playsInline
         muted={muted}
