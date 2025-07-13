@@ -196,6 +196,24 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
     // This removes the manual video ref management which was causing issues
   }, [currentIndex]);
 
+  // Mute/unmute videos based on current index to prevent overlapping audio
+  useEffect(() => {
+    if (filteredContent.length === 0) return;
+
+    // Pause all videos that are not the current one
+    filteredContent.forEach((item, index) => {
+      if (item.type === 'video' && index !== currentIndex) {
+        const videoElements = document.querySelectorAll(`[data-video-id="vertical-${item.id}"]`);
+        videoElements.forEach((videoEl) => {
+          const video = videoEl as HTMLVideoElement;
+          if (video && !video.paused) {
+            video.pause();
+          }
+        });
+      }
+    });
+  }, [currentIndex, filteredContent]);
+
   // Scroll to specific index with precise positioning
   const scrollToIndex = (index: number) => {
     if (!scrollViewRef.current) return;
