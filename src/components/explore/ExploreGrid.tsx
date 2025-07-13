@@ -66,7 +66,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     );
   }
 
-  // Create layout ensuring seamless fit on all screen sizes, starting with large square
+  // Create layout with only squares for seamless fitting
   const createGridLayout = () => {
     if (content.length === 0) return [];
     
@@ -82,8 +82,8 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     index++;
     
     while (index < content.length) {
-      // Add regular items in batches that work well with grid columns
-      const regularItemsCount = Math.min(8 + Math.floor(Math.random() * 3), content.length - index);
+      // Add regular items in batches
+      const regularItemsCount = Math.min(9 + Math.floor(Math.random() * 4), content.length - index);
       
       for (let i = 0; i < regularItemsCount && index < content.length; i++) {
         gridItems.push({
@@ -94,19 +94,18 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
         index++;
       }
       
-      // Add special cards only if we have sufficient content remaining
+      // Add big square only if we have sufficient content remaining
       if (index < content.length - 3) {
-        const cardType = Math.random() > 0.6 ? 'big-square' : 'tall-portrait';
         gridItems.push({
-          type: cardType,
+          type: 'big-square',
           item: content[index],
-          key: `${cardType}-${content[index].id}`
+          key: `big-square-${content[index].id}`
         });
         index++;
       }
     }
     
-    // Fill all remaining slots with regular cards to prevent gaps
+    // Fill all remaining slots with regular cards
     while (index < content.length) {
       gridItems.push({
         type: 'regular',
@@ -132,18 +131,6 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
           if (gridItem.type === 'big-square') {
             return (
               <div key={gridItem.key} className="col-span-2 row-span-2 aspect-square">
-                <ExploreContentCard 
-                  item={gridItem.item} 
-                  onLike={onLike} 
-                  onFollow={onFollow} 
-                  onMediaClick={onMediaClick}
-                  isFeatured={true}
-                />
-              </div>
-            );
-          } else if (gridItem.type === 'tall-portrait') {
-            return (
-              <div key={gridItem.key} className="row-span-2" style={{ aspectRatio: '4/5' }}>
                 <ExploreContentCard 
                   item={gridItem.item} 
                   onLike={onLike} 
