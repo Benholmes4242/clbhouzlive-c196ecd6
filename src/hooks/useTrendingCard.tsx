@@ -9,28 +9,20 @@ export const useTrendingCard = () => {
   const fetchRandomPost = async () => {
     try {
       setLoading(true);
+      console.log('Fetching trending video posts...');
       
-      // Get a random post with VIDEO media only from any user
+      // First get posts with media
       const { data: posts, error } = await supabase
         .from('posts')
         .select(`
           *,
-          post_media(*),
-          user_profiles!posts_user_id_fkey(
-            id,
-            display_name,
-            username,
-            profile_photo_url
-          ),
-          post_tags(
-            *,
-            taggable_entities(*)
-          )
+          post_media(*)
         `)
         .not('post_media', 'is', null)
-        .limit(50); // Get 50 posts to choose randomly from
+        .limit(50);
 
       if (error) throw error;
+      console.log('Raw posts fetched:', posts?.length || 0);
 
       if (posts && posts.length > 0) {
         // Filter posts that have VIDEO media only
@@ -40,10 +32,30 @@ export const useTrendingCard = () => {
           post.post_media.some(media => media.media_type === 'video')
         );
         
+        console.log('Posts with video media:', postsWithVideoMedia.length);
+        
         if (postsWithVideoMedia.length > 0) {
           // Select a random post
           const randomIndex = Math.floor(Math.random() * postsWithVideoMedia.length);
-          setTrendingPost(postsWithVideoMedia[randomIndex]);
+          const selectedPost = postsWithVideoMedia[randomIndex];
+          
+          // Get user profile separately
+          const { data: userProfile } = await supabase
+            .from('user_profiles')
+            .select('id, display_name, username, profile_photo_url')
+            .eq('id', selectedPost.user_id)
+            .single();
+            
+          // Attach user profile to post
+          const postWithProfile = {
+            ...selectedPost,
+            user_profiles: userProfile
+          };
+          
+          console.log('Selected trending post:', selectedPost.id, 'by', userProfile?.username);
+          setTrendingPost(postWithProfile);
+        } else {
+          console.log('No video posts found for trending card');
         }
       }
     } catch (err) {

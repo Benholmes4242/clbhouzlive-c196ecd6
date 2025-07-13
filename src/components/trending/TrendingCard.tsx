@@ -6,6 +6,8 @@ const TrendingCard = () => {
   const { trendingPost, loading } = useTrendingCard();
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
 
+  console.log('TrendingCard render - loading:', loading, 'trendingPost:', !!trendingPost);
+
   if (loading || !trendingPost) {
     return (
       <div className="px-1 mb-6">
@@ -20,8 +22,11 @@ const TrendingCard = () => {
   const hasMultipleVideos = videoMedia.length > 1;
   const user = trendingPost.user_profiles;
 
+  console.log('Video media found:', videoMedia.length, 'hasMultiple:', hasMultipleVideos);
+
   // Don't render if no video media found
   if (videoMedia.length === 0) {
+    console.log('No video media found, not rendering trending card');
     return null;
   }
 
@@ -109,6 +114,9 @@ const TrendingCard = () => {
                 muted
                 loop
                 playsInline
+                onLoadStart={() => console.log('Video loading started:', videoMedia[0]?.media_url)}
+                onCanPlay={() => console.log('Video can play')}
+                onError={(e) => console.error('Video error:', e)}
               />
             </div>
           )}
