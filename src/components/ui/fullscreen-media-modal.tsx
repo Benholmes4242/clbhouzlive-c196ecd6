@@ -41,6 +41,17 @@ interface FullscreenMediaModalProps {
   totalPosts?: number;
 }
 
+// Helper function to check if element is in viewport
+const isElementInViewport = (element: HTMLElement): boolean => {
+  const rect = element.getBoundingClientRect();
+  return (
+    rect.top >= 0 &&
+    rect.left >= 0 &&
+    rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+    rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+  );
+};
+
 const FullscreenMediaModal = ({ 
   isOpen, 
   onClose, 
@@ -194,20 +205,27 @@ const FullscreenMediaModal = ({
           
           console.log('🔊 Fullscreen modal closed, feed videos will resume with original mute state:', originalGlobalMuteState.current);
           
-          // Force re-trigger autoplay for videos in view by dispatching intersection events
-          // This ensures videos that are in view will restart autoplaying
+          // Direct approach: Force autoplay for all videos currently in viewport
           setTimeout(() => {
-            // Trigger scroll and resize events to force intersection observer re-evaluation
+            // Find all video elements in the feed and check if they're in viewport
+            const allVideos = document.querySelectorAll('[data-video-id^="index-"]');
+            
+            allVideos.forEach((videoElement) => {
+              const video = videoElement as HTMLVideoElement;
+              if (video && isElementInViewport(video)) {
+                console.log('🎯 Forcing autoplay for video in viewport:', video.dataset.videoId);
+                if (video.paused && video.readyState >= 2) {
+                  video.play().catch(error => {
+                    console.log('Direct autoplay prevented:', error);
+                  });
+                }
+              }
+            });
+            
+            // Also trigger scroll events as backup
             window.dispatchEvent(new Event('scroll'));
             window.dispatchEvent(new Event('resize'));
-            
-            // Additional trigger specifically for the video player autoplay logic
-            setTimeout(() => {
-              window.dispatchEvent(new Event('scroll'));
-              console.log('🔄 Double-triggered scroll events to ensure video autoplay resume');
-            }, 100);
-            
-            console.log('🔄 Triggered scroll and resize events to re-evaluate video autoplay');
+            console.log('🔄 Triggered direct autoplay and scroll events');
           }, 50);
         }, 100); // Small delay to ensure modal cleanup is complete
       }
