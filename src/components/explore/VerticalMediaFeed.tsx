@@ -130,21 +130,14 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
     return words.slice(0, wordLimit).join(' ') + '...';
   };
 
-  // Filter content by type and set initial index
+  // Filter content by type and set initial index - prevent flickering
   useEffect(() => {
     if (!isOpen || !initialItem) return;
 
     const mediaType = initialItem.type;
     const filtered = allContent.filter(item => item.type === mediaType);
-    setFilteredContent(filtered);
-
-    // Debug logging for golf course data
-    console.log('VerticalMediaFeed - Filtered content with golf courses:', 
-      filtered.map(item => ({ id: item.id, title: item.title, golfCourse: item.golfCourse }))
-    );
-
-    // Find the initial item's index in the filtered array
-    // Use both id and src for more precise matching to handle duplicates
+    
+    // Find the initial item's index BEFORE setting filtered content
     const initialIndex = filtered.findIndex(item => 
       item.id === initialItem.id && item.src === initialItem.src
     );
@@ -156,7 +149,15 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
       totalFiltered: filtered.length
     });
     
+    // Set both filtered content and current index together to prevent flickering
+    setFilteredContent(filtered);
     setCurrentIndex(initialIndex >= 0 ? initialIndex : 0);
+    
+    // Immediately set scroll position without animation to prevent flickering
+    if (scrollViewRef.current && initialIndex >= 0) {
+      const itemHeight = window.innerHeight;
+      scrollViewRef.current.scrollTop = initialIndex * itemHeight;
+    }
   }, [isOpen, initialItem, allContent]);
 
   // Handle scroll to snap to items with improved smoothness
@@ -238,18 +239,7 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
     }
   }, [isOpen, currentIndex, filteredContent.length, onClose]);
 
-  // Scroll to initial item when modal opens - ensure exact positioning
-  useEffect(() => {
-    if (isOpen && filteredContent.length > 0 && currentIndex >= 0) {
-      // Immediate scroll without animation to prevent flash of wrong content
-      if (scrollViewRef.current) {
-        const itemHeight = window.innerHeight;
-        scrollViewRef.current.scrollTop = currentIndex * itemHeight;
-      }
-      // Then smooth scroll to ensure perfect positioning
-      setTimeout(() => scrollToIndex(currentIndex), 50);
-    }
-  }, [isOpen, filteredContent.length, currentIndex]);
+  // Remove redundant scroll logic - now handled immediately in the filter effect
 
   const handleLike = (item: ExploreContentItem) => {
     onLike(item.id);
