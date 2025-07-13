@@ -14,7 +14,7 @@ import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 
 interface FullscreenMediaModalProps {
   isOpen: boolean;
-  onClose: (videoPosition?: number) => void;
+  onClose: (videoPosition?: number, videoMuted?: boolean) => void;
   mediaUrl: string | string[];
   mediaType: 'image' | 'video' | ('image' | 'video')[];
   alt?: string;
@@ -372,9 +372,13 @@ const FullscreenMediaModal = ({
         {/* Maximize - Top Right */}
         <button
           onClick={() => {
-            // Pass current video position back when closing
+            // Pass current video position and mute state back when closing
             const currentPosition = videoRef.current?.currentTime || 0;
-            onClose(mediaTypes[currentIndex] === 'video' ? currentPosition : undefined);
+            const currentMuted = videoRef.current?.muted;
+            onClose(
+              mediaTypes[currentIndex] === 'video' ? currentPosition : undefined,
+              mediaTypes[currentIndex] === 'video' ? currentMuted : undefined
+            );
           }}
           className="flex items-center justify-center w-10 h-10 text-white hover:bg-white/10 rounded-full transition-colors"
           aria-label="Close"

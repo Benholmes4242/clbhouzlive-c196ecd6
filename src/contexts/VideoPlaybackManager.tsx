@@ -12,6 +12,8 @@ interface VideoPlaybackManagerContextType {
   pauseAllAndSetActive: (activeVideoId: string) => void;
   storeVideoPosition: (videoId: string) => void;
   resumeVideoFromPosition: (videoId: string) => void;
+  storeVideoState: (videoId: string) => void;
+  resumeVideoWithState: (videoId: string) => void;
 }
 
 const VideoPlaybackManagerContext = createContext<VideoPlaybackManagerContextType | undefined>(undefined);
@@ -144,6 +146,43 @@ export const VideoPlaybackManagerProvider: React.FC<{ children: React.ReactNode 
     }
   }, []);
 
+  const storeVideoState = useCallback((videoId: string) => {
+    const video = videoRegistry.current.get(videoId);
+    if (video) {
+      videoPositions.current.set(videoId, video.currentTime);
+      // Store mute state with a special key
+      videoPositions.current.set(`${videoId}_muted`, video.muted ? 1 : 0);
+      console.log('💾 Stored video state for:', videoId, 'at', video.currentTime, 'muted:', video.muted);
+    }
+  }, []);
+
+  const resumeVideoWithState = useCallback((videoId: string) => {
+    const video = videoRegistry.current.get(videoId);
+    const storedPosition = videoPositions.current.get(videoId);
+    const storedMuteState = videoPositions.current.get(`${videoId}_muted`);
+    
+    if (video && storedPosition !== undefined) {
+      video.currentTime = storedPosition;
+      
+      // Restore mute state if it was stored
+      if (storedMuteState !== undefined) {
+        video.muted = storedMuteState === 1;
+        console.log('🔊 Restoring video mute state:', video.muted);
+      }
+      
+      console.log('▶️ Resuming video:', videoId, 'from position:', storedPosition, 'muted:', video.muted);
+      
+      // Start playing the video
+      video.play().catch(error => {
+        console.log('Resume autoplay prevented:', error);
+      });
+      
+      // Clear the stored position and mute state
+      videoPositions.current.delete(videoId);
+      videoPositions.current.delete(`${videoId}_muted`);
+    }
+  }, []);
+
   const resumeVideoFromPosition = useCallback((videoId: string) => {
     const video = videoRegistry.current.get(videoId);
     const storedPosition = videoPositions.current.get(videoId);
@@ -174,7 +213,9 @@ export const VideoPlaybackManagerProvider: React.FC<{ children: React.ReactNode 
       pauseVideo,
       pauseAllAndSetActive,
       storeVideoPosition,
-      resumeVideoFromPosition
+      resumeVideoFromPosition,
+      storeVideoState,
+      resumeVideoWithState
     }}>
       {children}
     </VideoPlaybackManagerContext.Provider>

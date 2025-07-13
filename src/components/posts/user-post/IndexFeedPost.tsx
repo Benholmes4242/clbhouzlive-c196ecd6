@@ -40,7 +40,7 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
   const [showFullCourseTag, setShowFullCourseTag] = useState(false);
   const [shouldResumeOnReturn, setShouldResumeOnReturn] = useState(false);
   const { user } = useSupabaseSession();
-  const { pauseVideo, pauseAllAndSetActive, storeVideoPosition, resumeVideoFromPosition } = useVideoPlaybackManager();
+  const { pauseVideo, pauseAllAndSetActive, storeVideoPosition, resumeVideoFromPosition, storeVideoState, resumeVideoWithState } = useVideoPlaybackManager();
   const { isGloballyMuted } = useGlobalAudio();
   const isMobile = useIsMobile();
   
@@ -130,10 +130,10 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
     e.stopPropagation();
     const currentMedia = post.post_media[currentMediaIndex];
     
-    // Only store position and set resume flag for videos
+    // Only store state and set resume flag for videos
     if (currentMedia.media_type === 'video') {
       const videoId = `index-${currentMedia.id}`;
-      storeVideoPosition(videoId);
+      storeVideoState(videoId); // Store both position and mute state
       setShouldResumeOnReturn(true);
     }
     
@@ -154,7 +154,7 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
       post.id, // Pass post ID
       post.user.id // Pass user ID for fetching other posts
     );
-  }, [currentMediaIndex, post, golfCourse, displayName, openFullscreenMedia, storeVideoPosition]);
+  }, [currentMediaIndex, post, golfCourse, displayName, openFullscreenMedia, storeVideoState]);
 
   // Memoized values
   const cleanContent = useMemo(() => removeGolfCourseFromContent(post.content), [post.content]);
@@ -234,20 +234,26 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
       {/* Enhanced Fullscreen Modal with Post Navigation */}
       <FullscreenMediaModal
         isOpen={isFullscreenOpen}
-        onClose={(videoPosition) => {
+        onClose={(videoPosition, videoMuted) => {
           // Handle video resume on modal close
-          if (shouldResumeOnReturn && videoPosition !== undefined) {
+          if (shouldResumeOnReturn) {
             const currentMedia = post.post_media[currentMediaIndex];
             if (currentMedia.media_type === 'video') {
               const videoId = `index-${currentMedia.id}`;
               const video = document.querySelector(`[data-video-id="${videoId}"]`) as HTMLVideoElement;
               
-              if (video) {
-                // Set the video to the position from the modal
+              if (video && videoPosition !== undefined) {
+                // Set the video to the position and mute state from the modal
                 video.currentTime = videoPosition;
+                if (videoMuted !== undefined) {
+                  video.muted = videoMuted;
+                }
                 // Force the video to play immediately, bypassing scroll detection
                 video.play().catch(console.error);
-                console.log('▶️ Resumed video from modal position:', videoPosition);
+                console.log('▶️ Resumed video from modal position:', videoPosition, 'muted:', videoMuted);
+              } else {
+                // Fallback to using the video manager's resume function
+                resumeVideoWithState(videoId);
               }
             }
             setShouldResumeOnReturn(false);
