@@ -161,9 +161,17 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
       const timeoutId = setTimeout(() => {
         if (scrollViewRef.current) {
           const itemHeight = window.innerHeight;
+          // Ensure perfect alignment to show only the clicked post
           scrollViewRef.current.scrollTop = currentIndex * itemHeight;
+          
+          // Force immediate scroll behavior without smooth scrolling
+          scrollViewRef.current.style.scrollBehavior = 'auto';
+          scrollViewRef.current.scrollTo({
+            top: currentIndex * itemHeight,
+            behavior: 'auto'
+          });
         }
-      }, 100);
+      }, 50); // Reduced delay for faster positioning
       
       return () => clearTimeout(timeoutId);
     }
