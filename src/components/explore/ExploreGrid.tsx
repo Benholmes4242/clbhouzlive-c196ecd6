@@ -102,8 +102,8 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
           });
           index++;
           lastLargeTileIndex = currentPosition;
-        } else if (random < 0.25 && index < content.length - 3) {
-          // 10% chance for 2x2 tiles (with buffer spacing)
+        } else if (random < 0.40 && index < content.length - 3) {
+          // 25% chance for 2x2 tiles (with buffer spacing)
           gridItems.push({
             type: 'big-square',
             item: content[index],
@@ -112,7 +112,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
           index++;
           lastLargeTileIndex = currentPosition;
         } else {
-          // Add regular 1x1 tiles
+          // 60% chance for regular 1x1 tiles
           const regularCount = Math.min(2 + Math.floor(Math.random() * 3), content.length - index);
           for (let i = 0; i < regularCount && index < content.length; i++) {
             gridItems.push({
