@@ -32,7 +32,7 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
     }));
   };
 
-  const renderMediaTile = (item: VideoPost | UserPostWithType) => {
+  const renderMediaTile = (item: VideoPost | UserPostWithType, index: number) => {
     const isUserPost = item.type === 'user_post';
     const media = isUserPost 
       ? (item as UserPostWithType).post_media.map(pm => ({ media_url: pm.media_url, media_type: pm.media_type }))
@@ -45,10 +45,24 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
     const displayName = isUserPost ? (item as UserPostWithType).user.display_name : (item as VideoPost).user.name;
     const caption = isUserPost ? (item as UserPostWithType).content : (item as VideoPost).content.description;
 
+    // Generate varied aspect ratios like Pinterest
+    const aspectRatios = [
+      'aspect-square',      // 1:1 square
+      'aspect-[3/4]',       // 3:4 portrait
+      'aspect-[4/3]',       // 4:3 landscape
+      'aspect-[2/3]',       // 2:3 tall portrait
+      'aspect-[3/2]',       // 3:2 wide landscape
+      'aspect-[9/16]',      // 9:16 very tall (story-like)
+      'aspect-[16/9]',      // 16:9 wide video format
+    ];
+    
+    // Use a consistent but varied approach based on index
+    const aspectRatio = aspectRatios[index % aspectRatios.length];
+
     return (
       <div key={item.id} className="mosaic-tile group relative overflow-hidden rounded-xl bg-card border">
         {/* Media Container */}
-        <div className="relative w-full aspect-square overflow-hidden">
+        <div className={`relative w-full overflow-hidden ${aspectRatio}`}>
           {hasMultipleMedia ? (
             // Carousel for multiple media
             <div className="relative w-full h-full">
@@ -185,7 +199,7 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
       
       {/* Mosaic Grid */}
       <div className="mosaic-grid">
-        {sortedContent.map((item) => renderMediaTile(item))}
+        {sortedContent.map((item, index) => renderMediaTile(item, index))}
       </div>
     </div>
   );

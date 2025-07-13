@@ -294,38 +294,41 @@
   background-color: hsl(var(--muted));
 }
 
-/* Mosaic Feed Styles */
+/* Mosaic Feed Styles - Pinterest-style Masonry Layout */
 .mosaic-feed-container {
   margin-top: 1rem;
 }
 
 .mosaic-grid {
-  display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  columns: 2;
+  column-gap: 1rem;
+  padding: 0;
 }
 
-/* Responsive grid columns */
-@media (max-width: 640px) {
+/* Responsive columns */
+@media (min-width: 640px) {
   .mosaic-grid {
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 0.75rem;
+    columns: 3;
   }
 }
 
-@media (min-width: 641px) and (max-width: 1024px) {
+@media (min-width: 1024px) {
   .mosaic-grid {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    columns: 4;
   }
 }
 
-@media (min-width: 1025px) {
+@media (min-width: 1280px) {
   .mosaic-grid {
-    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    columns: 5;
   }
 }
 
 .mosaic-tile {
+  display: inline-block;
+  width: 100%;
+  margin-bottom: 1rem;
+  break-inside: avoid;
   transition: transform 0.2s ease-in-out;
   cursor: pointer;
 }
