@@ -75,23 +75,23 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
               >
                 {media.map((mediaItem, index) => (
                   <div key={index} className="flex-shrink-0 w-full h-full">
-                    {mediaItem.media_type === 'video' ? (
-                      <video
-                        src={mediaItem.media_url}
-                        className="w-full h-full object-cover"
-                        autoPlay
-                        muted
-                        loop
-                        playsInline
-                      />
-                    ) : (
-                      <img
-                        src={mediaItem.media_url}
-                        alt="Golf content"
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                      />
-                    )}
+                     {mediaItem.media_type === 'video' ? (
+                       <video
+                         src={mediaItem.media_url}
+                         className="w-full h-full object-cover rounded-xl"
+                         autoPlay
+                         muted
+                         loop
+                         playsInline
+                       />
+                     ) : (
+                       <img
+                         src={mediaItem.media_url}
+                         alt="Golf content"
+                         className="w-full h-full object-cover rounded-xl"
+                         loading="lazy"
+                       />
+                     )}
                   </div>
                 ))}
               </div>
@@ -132,21 +132,21 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
             // Single media
             <div className="w-full h-full">
               {media[0]?.media_type === 'video' ? (
-                <video
-                  src={media[0].media_url}
-                  className="w-full h-full object-cover"
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                />
+                 <video
+                   src={media[0].media_url}
+                   className="w-full h-full object-cover rounded-xl"
+                   autoPlay
+                   muted
+                   loop
+                   playsInline
+                 />
               ) : (
-                <img
-                  src={media[0]?.media_url}
-                  alt="Golf content"
-                  className="w-full h-full object-cover"
-                  loading="lazy"
-                />
+                 <img
+                   src={media[0]?.media_url}
+                   alt="Golf content"
+                   className="w-full h-full object-cover rounded-xl"
+                   loading="lazy"
+                 />
               )}
             </div>
           )}
