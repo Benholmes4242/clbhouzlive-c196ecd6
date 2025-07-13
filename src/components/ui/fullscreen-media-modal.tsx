@@ -41,6 +41,7 @@ interface FullscreenMediaModalProps {
   totalPosts?: number;
   // Video resume props
   initialVideoPosition?: number;
+  initialVideoMuted?: boolean;
 }
 
 // Helper function to check if element is in viewport
@@ -73,7 +74,8 @@ const FullscreenMediaModal = ({
   onPreviousPost,
   currentPostIndex = 0,
   totalPosts = 0,
-  initialVideoPosition = 0
+  initialVideoPosition = 0,
+  initialVideoMuted = true
 }: FullscreenMediaModalProps) => {
   // Convert single media to array format for consistent handling
   const mediaUrls = Array.isArray(mediaUrl) ? mediaUrl : [mediaUrl];
@@ -81,7 +83,7 @@ const FullscreenMediaModal = ({
   const hasMultipleMedia = mediaUrls.length > 1;
   
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
-  const [isMuted, setIsMuted] = useState(true);
+  const [isMuted, setIsMuted] = useState(initialVideoMuted);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const isMobile = useIsMobile();

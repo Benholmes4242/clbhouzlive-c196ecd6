@@ -20,6 +20,8 @@ interface MediaItem {
   mediaUrls?: string[];
   mediaTypes?: ('image' | 'video')[];
   initialIndex?: number;
+  videoPosition?: number;
+  videoMuted?: boolean;
 }
 
 interface PostData {
@@ -134,7 +136,9 @@ export const useFullscreenPostNavigation = () => {
     postTags?: any[],
     initialIndex: number = 0,
     postId?: string,
-    userId?: string
+    userId?: string,
+    videoPosition?: number,
+    videoMuted?: boolean
   ) => {
     // Handle both single and multiple media
     const mediaUrls = Array.isArray(url) ? url : [url];
@@ -151,7 +155,9 @@ export const useFullscreenPostNavigation = () => {
       postTags,
       mediaUrls,
       mediaTypes,
-      initialIndex
+      initialIndex,
+      videoPosition,
+      videoMuted
     });
     
     setCurrentPostId(postId || null);

@@ -130,9 +130,19 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
     e.stopPropagation();
     const currentMedia = post.post_media[currentMediaIndex];
     
-    // Only store state and set resume flag for videos
+    let videoPosition = 0;
+    let videoMuted = true;
+    
+    // Store current state and get current position for videos
     if (currentMedia.media_type === 'video') {
       const videoId = `index-${currentMedia.id}`;
+      const video = document.querySelector(`[data-video-id="${videoId}"]`) as HTMLVideoElement;
+      
+      if (video) {
+        videoPosition = video.currentTime;
+        videoMuted = video.muted;
+      }
+      
       storeVideoState(videoId); // Store both position and mute state
       setShouldResumeOnReturn(true);
     }
@@ -140,7 +150,7 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
     const mediaUrls = post.post_media.map(m => m.media_url);
     const mediaTypes = post.post_media.map(m => m.media_type as 'image' | 'video');
     
-    // Open with post navigation enabled
+    // Open with post navigation enabled, passing current video position and mute state
     await openFullscreenMedia(
       mediaUrls,
       mediaTypes,
@@ -152,7 +162,9 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
       post.post_tags,
       currentMediaIndex,
       post.id, // Pass post ID
-      post.user.id // Pass user ID for fetching other posts
+      post.user.id, // Pass user ID for fetching other posts
+      videoPosition, // Pass current video position
+      videoMuted // Pass current mute state
     );
   }, [currentMediaIndex, post, golfCourse, displayName, openFullscreenMedia, storeVideoState]);
 
@@ -276,6 +288,8 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
         onPreviousPost={goToPreviousPost}
         currentPostIndex={currentPostIndex}
         totalPosts={userPosts.length}
+        initialVideoPosition={currentMedia?.videoPosition}
+        initialVideoMuted={currentMedia?.videoMuted}
       />
     </div>
   );
