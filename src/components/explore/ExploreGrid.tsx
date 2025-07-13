@@ -68,8 +68,8 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
 
   return (
     <>
-      {/* Instagram-style Edge-to-Edge Grid Layout */}
-      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-0">
+      {/* Instagram-style Grid Layout with Small Gaps */}
+      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1">
         {content.map((item) => (
           <div key={item.id} className="aspect-square">
             <ExploreContentCard 
