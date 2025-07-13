@@ -93,17 +93,8 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
       if (distanceFromLastLarge >= minBuffer) {
         const random = Math.random();
         
-        if (random < 0.15 && index < content.length) {
-          // 15% chance for 1x2 tall tiles (with buffer spacing)
-          gridItems.push({
-            type: 'tall',
-            item: content[index],
-            key: `tall-${content[index].id}`
-          });
-          index++;
-          lastLargeTileIndex = currentPosition;
-        } else if (random < 0.40 && index < content.length - 3) {
-          // 25% chance for 2x2 tiles (with buffer spacing)
+        if (random < 0.35 && index < content.length - 3) {
+          // 35% chance for 2x2 tiles (with buffer spacing)
           gridItems.push({
             type: 'big-square',
             item: content[index],
@@ -112,7 +103,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
           index++;
           lastLargeTileIndex = currentPosition;
         } else {
-          // 60% chance for regular 1x1 tiles
+          // 65% chance for regular 1x1 tiles
           const regularCount = Math.min(2 + Math.floor(Math.random() * 3), content.length - index);
           for (let i = 0; i < regularCount && index < content.length; i++) {
             gridItems.push({
@@ -159,17 +150,6 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                   onFollow={onFollow} 
                   onMediaClick={onMediaClick}
                   isFeatured={true}
-                />
-              </div>
-            );
-          } else if (gridItem.type === 'tall') {
-            return (
-              <div key={gridItem.key} className="row-span-2 aspect-[1/2]">
-                <ExploreContentCard 
-                  item={gridItem.item} 
-                  onLike={onLike} 
-                  onFollow={onFollow} 
-                  onMediaClick={onMediaClick}
                 />
               </div>
             );
