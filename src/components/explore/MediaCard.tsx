@@ -17,10 +17,9 @@ interface MediaCardProps {
   onLike: (contentId: string) => void;
   onFollow: (contentId: string) => void;
   onMediaClick?: (item: ExploreContentItem) => void;
-  isFeatured?: boolean;
 }
 
-const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, isFeatured, ...props }) => {
+const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, ...props }) => {
   const [imageError, setImageError] = useState(false);
   const [isPostViewerOpen, setIsPostViewerOpen] = useState(false);
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
@@ -230,27 +229,22 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, isFeature
           </div>
 
 
-          {/* User info overlay - larger for featured cards */}
+          {/* User info overlay - hidden on mobile */}
           {item.user && (
-            <div className={`absolute top-2 left-2 flex items-center space-x-2 hidden md:flex ${
-              isFeatured ? 'top-4 left-4' : ''
-            }`}>
+            <div className="absolute top-2 left-2 flex items-center space-x-2 hidden md:flex">
               <img
                 src={item.user.avatar}
                 alt={item.user.name}
-                className={`rounded-full ${isFeatured ? 'w-16 h-16' : 'w-14 h-14'}`}
+                className="w-14 h-14 rounded-full"
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face';
                 }}
               />
-              <span className={`text-white font-bold drop-shadow-lg ${
-                isFeatured ? 'text-base' : 'text-sm'
-              }`}>
+              <span className="text-white text-sm font-bold drop-shadow-lg">
                 {item.user.name}
               </span>
             </div>
           )}
-
         </div>
       </div>
 
