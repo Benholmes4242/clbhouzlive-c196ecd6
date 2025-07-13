@@ -2,7 +2,7 @@
 import React from 'react';
 import LoadingSkeleton from './feed/LoadingSkeleton';
 import EmptyFeedMessage from './feed/EmptyFeedMessage';
-import FeedContent from './feed/FeedContent';
+import GridFeedContent from './feed/GridFeedContent';
 import { useTrendingFeed } from '@/hooks/useTrendingFeed';
 import { processFeedContent } from '@/utils/feedContentProcessor';
 
@@ -40,7 +40,7 @@ const TrendingFeed = () => {
   };
 
   return (
-    <FeedContent
+    <GridFeedContent
       optimisticPosts={optimisticPosts}
       sortedContent={sortedContent}
       onPostUpdated={handlePostUpdated}
