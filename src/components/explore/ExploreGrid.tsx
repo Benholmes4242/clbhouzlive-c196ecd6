@@ -66,19 +66,65 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     );
   }
 
+  // Create layout with featured big cards every 9-12 items
+  const createGridLayout = () => {
+    const gridItems = [];
+    let index = 0;
+    
+    while (index < content.length) {
+      // Add 8-10 regular items
+      const regularItemsCount = Math.min(9 + Math.floor(Math.random() * 3), content.length - index);
+      
+      for (let i = 0; i < regularItemsCount && index < content.length; i++) {
+        gridItems.push({
+          type: 'regular',
+          item: content[index],
+          key: `regular-${content[index].id}`
+        });
+        index++;
+      }
+      
+      // Add one big featured card if we have more content
+      if (index < content.length) {
+        gridItems.push({
+          type: 'featured',
+          item: content[index],
+          key: `featured-${content[index].id}`
+        });
+        index++;
+      }
+    }
+    
+    return gridItems;
+  };
+
+  const gridItems = createGridLayout();
+
   return (
     <>
-      {/* Instagram-style Grid Layout with Small Gaps */}
-      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1">
-        {content.map((item) => (
-          <div key={item.id} className="aspect-square">
-            <ExploreContentCard 
-              item={item} 
-              onLike={onLike} 
-              onFollow={onFollow} 
-              onMediaClick={onMediaClick}
-            />
-          </div>
+      {/* Instagram-style Grid Layout with Featured Cards */}
+      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1 auto-rows-fr">
+        {gridItems.map((gridItem) => (
+          gridItem.type === 'featured' ? (
+            <div key={gridItem.key} className="col-span-2 row-span-2 aspect-square">
+              <ExploreContentCard 
+                item={gridItem.item} 
+                onLike={onLike} 
+                onFollow={onFollow} 
+                onMediaClick={onMediaClick}
+                isFeatured={true}
+              />
+            </div>
+          ) : (
+            <div key={gridItem.key} className="aspect-square">
+              <ExploreContentCard 
+                item={gridItem.item} 
+                onLike={onLike} 
+                onFollow={onFollow} 
+                onMediaClick={onMediaClick}
+              />
+            </div>
+          )
         ))}
       </div>
       

@@ -17,9 +17,10 @@ interface MediaCardProps {
   onLike: (contentId: string) => void;
   onFollow: (contentId: string) => void;
   onMediaClick?: (item: ExploreContentItem) => void;
+  isFeatured?: boolean;
 }
 
-const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, ...props }) => {
+const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, isFeatured, ...props }) => {
   const [imageError, setImageError] = useState(false);
   const [isPostViewerOpen, setIsPostViewerOpen] = useState(false);
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
@@ -229,20 +230,33 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, ...props 
           </div>
 
 
-          {/* User info overlay - hidden on mobile */}
+          {/* User info overlay - larger for featured cards */}
           {item.user && (
-            <div className="absolute top-2 left-2 flex items-center space-x-2 hidden md:flex">
+            <div className={`absolute top-2 left-2 flex items-center space-x-2 hidden md:flex ${
+              isFeatured ? 'top-4 left-4' : ''
+            }`}>
               <img
                 src={item.user.avatar}
                 alt={item.user.name}
-                className="w-14 h-14 rounded-full"
+                className={`rounded-full ${isFeatured ? 'w-16 h-16' : 'w-14 h-14'}`}
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face';
                 }}
               />
-              <span className="text-white text-sm font-bold drop-shadow-lg">
+              <span className={`text-white font-bold drop-shadow-lg ${
+                isFeatured ? 'text-base' : 'text-sm'
+              }`}>
                 {item.user.name}
               </span>
+            </div>
+          )}
+
+          {/* Featured badge for larger cards */}
+          {isFeatured && (
+            <div className="absolute top-2 right-2 hidden md:block">
+              <div className="bg-primary text-primary-foreground px-2 py-1 rounded text-xs font-medium">
+                Featured
+              </div>
             </div>
           )}
         </div>
