@@ -66,7 +66,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     );
   }
 
-  // Create layout with only squares for seamless fitting
+  // Create layout with mixed tile sizes for seamless fitting
   const createGridLayout = () => {
     if (content.length === 0) return [];
     
@@ -82,37 +82,37 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     index++;
     
     while (index < content.length) {
-      // Add regular items in batches
-      const regularItemsCount = Math.min(9 + Math.floor(Math.random() * 4), content.length - index);
+      // Random distribution of tile types
+      const random = Math.random();
       
-      for (let i = 0; i < regularItemsCount && index < content.length; i++) {
+      if (random < 0.15 && index < content.length) {
+        // 15% chance for 2x1 tiles
         gridItems.push({
-          type: 'regular',
+          type: 'wide',
           item: content[index],
-          key: `regular-${content[index].id}`
+          key: `wide-${content[index].id}`
         });
         index++;
-      }
-      
-      // Add big square only if we have sufficient content remaining
-      if (index < content.length - 3) {
+      } else if (random < 0.25 && index < content.length - 3) {
+        // 10% chance for 2x2 tiles (only if enough content remaining)
         gridItems.push({
           type: 'big-square',
           item: content[index],
           key: `big-square-${content[index].id}`
         });
         index++;
+      } else {
+        // 75% chance for regular 1x1 tiles
+        const regularCount = Math.min(3 + Math.floor(Math.random() * 4), content.length - index);
+        for (let i = 0; i < regularCount && index < content.length; i++) {
+          gridItems.push({
+            type: 'regular',
+            item: content[index],
+            key: `regular-${content[index].id}`
+          });
+          index++;
+        }
       }
-    }
-    
-    // Fill all remaining slots with regular cards
-    while (index < content.length) {
-      gridItems.push({
-        type: 'regular',
-        item: content[index],
-        key: `regular-end-${content[index].id}`
-      });
-      index++;
     }
     
     return gridItems;
@@ -137,6 +137,17 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                   onFollow={onFollow} 
                   onMediaClick={onMediaClick}
                   isFeatured={true}
+                />
+              </div>
+            );
+          } else if (gridItem.type === 'wide') {
+            return (
+              <div key={gridItem.key} className="col-span-2 aspect-[2/1]">
+                <ExploreContentCard 
+                  item={gridItem.item} 
+                  onLike={onLike} 
+                  onFollow={onFollow} 
+                  onMediaClick={onMediaClick}
                 />
               </div>
             );
