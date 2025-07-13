@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useVideoPlaybackManager } from '@/contexts/VideoPlaybackManager';
 
 interface MediaItem {
   url: string;
@@ -44,6 +45,7 @@ interface PostData {
 }
 
 export const useFullscreenPostNavigation = () => {
+  const { pauseAllAndSetActive } = useVideoPlaybackManager();
   const [isOpen, setIsOpen] = useState(false);
   const [currentMedia, setCurrentMedia] = useState<MediaItem | null>(null);
   const [currentPostId, setCurrentPostId] = useState<string | null>(null);
@@ -174,6 +176,10 @@ export const useFullscreenPostNavigation = () => {
   // Navigate to next post
   const goToNextPost = useCallback(() => {
     if (currentPostIndex < userPosts.length - 1) {
+      // Stop all videos before navigating to prevent audio overlap
+      console.log('🎬 Fullscreen navigation: Moving to next post, stopping all videos');
+      pauseAllAndSetActive('');
+      
       const nextIndex = currentPostIndex + 1;
       const nextPost = userPosts[nextIndex];
       const mediaItem = postToMediaItem(nextPost, 0);
@@ -182,11 +188,15 @@ export const useFullscreenPostNavigation = () => {
       setCurrentPostId(nextPost.id);
       setCurrentPostIndex(nextIndex);
     }
-  }, [currentPostIndex, userPosts, postToMediaItem]);
+  }, [currentPostIndex, userPosts, postToMediaItem, pauseAllAndSetActive]);
 
   // Navigate to previous post
   const goToPreviousPost = useCallback(() => {
     if (currentPostIndex > 0) {
+      // Stop all videos before navigating to prevent audio overlap
+      console.log('🎬 Fullscreen navigation: Moving to previous post, stopping all videos');
+      pauseAllAndSetActive('');
+      
       const prevIndex = currentPostIndex - 1;
       const prevPost = userPosts[prevIndex];
       const mediaItem = postToMediaItem(prevPost, 0);
@@ -195,7 +205,7 @@ export const useFullscreenPostNavigation = () => {
       setCurrentPostId(prevPost.id);
       setCurrentPostIndex(prevIndex);
     }
-  }, [currentPostIndex, userPosts, postToMediaItem]);
+  }, [currentPostIndex, userPosts, postToMediaItem, pauseAllAndSetActive]);
 
   const closeMedia = useCallback(() => {
     setIsOpen(false);

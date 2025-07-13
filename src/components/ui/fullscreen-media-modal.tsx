@@ -180,8 +180,19 @@ const FullscreenMediaModal = ({
 
   // Auto-play video when modal opens or index changes
   useEffect(() => {
+    // Always pause and cleanup the previous video when changing media
+    if (videoRef.current) {
+      videoRef.current.pause();
+      videoRef.current.currentTime = 0;
+      // Unregister the previous video
+      unregisterVideo(fullscreenVideoId.current);
+    }
+
     if (isOpen && mediaTypes[currentIndex] === 'video' && videoRef.current) {
-      // Register the fullscreen video and pause all other videos
+      // Generate a new unique ID for each video change to ensure proper tracking
+      fullscreenVideoId.current = `fullscreen-video-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      
+      // Register the new fullscreen video and pause all other videos
       registerVideo(fullscreenVideoId.current, videoRef.current);
       pauseAllAndSetActive(fullscreenVideoId.current);
       
@@ -196,8 +207,11 @@ const FullscreenMediaModal = ({
       }
       
       videoRef.current.play().catch(console.error);
+    } else if (isOpen && mediaTypes[currentIndex] === 'image') {
+      // For images, just pause all videos to stop any audio
+      pauseAllAndSetActive('');
     }
-  }, [isOpen, currentIndex, mediaTypes, isMuted, initialVideoPosition, initialVideoMuted, registerVideo, pauseAllAndSetActive]);
+  }, [isOpen, currentIndex, mediaTypes, isMuted, initialVideoPosition, initialVideoMuted, registerVideo, pauseAllAndSetActive, unregisterVideo]);
 
   // Cleanup when modal closes - restore feed video behavior and original mute state
   useEffect(() => {

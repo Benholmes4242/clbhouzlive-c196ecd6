@@ -10,6 +10,7 @@ import { usePostUpdate } from '@/hooks/usePostUpdate';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
 import HighQualityImage from '@/components/ui/high-quality-image';
 import VideoPlayer from '@/components/ui/video-player';
+import { useVideoPlaybackManager } from '@/contexts/VideoPlaybackManager';
 
 import CoursePostBadge from './CoursePostBadge';
 import CommentsDrawer from './CommentsDrawer';
@@ -63,6 +64,7 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
   const { user } = useSupabaseSession();
   const { updatePost, isUpdating } = usePostUpdate();
   const { deletePost } = usePostDeletion();
+  const { pauseAllAndSetActive } = useVideoPlaybackManager();
   const isMobile = useIsMobile();
   const [currentPostIndex, setCurrentPostIndex] = useState(0);
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
@@ -224,6 +226,12 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
     document.addEventListener('keydown', handleKeyPress);
     return () => document.removeEventListener('keydown', handleKeyPress);
   }, [handleKeyPress]);
+
+  // Stop all videos when navigating between posts or media to prevent audio overlap
+  useEffect(() => {
+    console.log('🎬 PostViewerModal: Navigation detected, stopping all videos');
+    pauseAllAndSetActive('');
+  }, [currentPostIndex, currentMediaIndex, pauseAllAndSetActive]);
 
   const currentMedia = currentPost.post_media?.[currentMediaIndex];
   const hasMultipleMedia = (currentPost.post_media?.length || 0) > 1;
