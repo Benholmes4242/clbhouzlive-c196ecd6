@@ -176,20 +176,6 @@ export const useFullscreenPostNavigation = () => {
   // Navigate to next post
   const goToNextPost = useCallback(() => {
     if (currentPostIndex < userPosts.length - 1) {
-      // AGGRESSIVE video cleanup before navigating to prevent audio overlap
-      console.log('🎬 Fullscreen navigation: Moving to next post, force stopping ALL videos');
-      
-      // Stop all videos in the DOM immediately
-      const allVideoElements = document.querySelectorAll('video');
-      allVideoElements.forEach((video) => {
-        video.pause();
-        video.muted = true;
-        video.currentTime = 0;
-      });
-      
-      // Use the video manager to ensure tracked videos are stopped
-      pauseAllAndSetActive('');
-      
       const nextIndex = currentPostIndex + 1;
       const nextPost = userPosts[nextIndex];
       const mediaItem = postToMediaItem(nextPost, 0);
@@ -198,25 +184,11 @@ export const useFullscreenPostNavigation = () => {
       setCurrentPostId(nextPost.id);
       setCurrentPostIndex(nextIndex);
     }
-  }, [currentPostIndex, userPosts, postToMediaItem, pauseAllAndSetActive]);
+  }, [currentPostIndex, userPosts, postToMediaItem]);
 
   // Navigate to previous post
   const goToPreviousPost = useCallback(() => {
     if (currentPostIndex > 0) {
-      // AGGRESSIVE video cleanup before navigating to prevent audio overlap
-      console.log('🎬 Fullscreen navigation: Moving to previous post, force stopping ALL videos');
-      
-      // Stop all videos in the DOM immediately
-      const allVideoElements = document.querySelectorAll('video');
-      allVideoElements.forEach((video) => {
-        video.pause();
-        video.muted = true;
-        video.currentTime = 0;
-      });
-      
-      // Use the video manager to ensure tracked videos are stopped
-      pauseAllAndSetActive('');
-      
       const prevIndex = currentPostIndex - 1;
       const prevPost = userPosts[prevIndex];
       const mediaItem = postToMediaItem(prevPost, 0);
@@ -225,7 +197,7 @@ export const useFullscreenPostNavigation = () => {
       setCurrentPostId(prevPost.id);
       setCurrentPostIndex(prevIndex);
     }
-  }, [currentPostIndex, userPosts, postToMediaItem, pauseAllAndSetActive]);
+  }, [currentPostIndex, userPosts, postToMediaItem]);
 
   const closeMedia = useCallback(() => {
     setIsOpen(false);

@@ -178,59 +178,26 @@ const FullscreenMediaModal = ({
     }
   }, [isOpen, initialIndex, isGloballyMuted]);
 
-  // Auto-play video when modal opens or index changes - Enhanced cleanup
+  // Auto-play video when modal opens or index changes
   useEffect(() => {
-    console.log('🎬 Fullscreen modal effect triggered - currentIndex:', currentIndex, 'mediaType:', mediaTypes[currentIndex]);
-    
-    // ALWAYS stop and cleanup the previous video first
-    if (videoRef.current) {
-      console.log('🛑 Stopping current video before switching');
-      videoRef.current.pause();
-      videoRef.current.currentTime = 0;
-      videoRef.current.muted = true;
-      unregisterVideo(fullscreenVideoId.current);
-    }
-
-    // Force stop ALL videos in the entire app to prevent audio overlap
-    console.log('🔇 Force stopping ALL videos in app');
-    pauseAllAndSetActive('');
-    
-    // Small delay to ensure all videos are stopped before starting new one
-    const timeoutId = setTimeout(() => {
-      if (isOpen && mediaTypes[currentIndex] === 'video' && videoRef.current) {
-        // Generate a new unique ID for each video change to ensure proper tracking
-        fullscreenVideoId.current = `fullscreen-video-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-        
-        console.log('▶️ Starting new video with ID:', fullscreenVideoId.current);
-        
-        // Register the new fullscreen video and ensure it's the only one playing
-        registerVideo(fullscreenVideoId.current, videoRef.current);
-        pauseAllAndSetActive(fullscreenVideoId.current);
-        
-        // Set video properties
-        videoRef.current.muted = isMuted;
-        videoRef.current.loop = true;
-        videoRef.current.playsInline = true;
-        
-        // Set initial position if provided
-        if (initialVideoPosition > 0) {
-          videoRef.current.currentTime = initialVideoPosition;
-        }
-        
-        videoRef.current.play().catch(error => {
-          console.error('Failed to play video:', error);
-        });
-      } else if (isOpen && mediaTypes[currentIndex] === 'image') {
-        console.log('📷 Showing image - ensuring all videos are stopped');
-        // For images, ensure all videos stay stopped
-        pauseAllAndSetActive('');
+    if (isOpen && mediaTypes[currentIndex] === 'video' && videoRef.current) {
+      // Register the fullscreen video and pause all other videos
+      registerVideo(fullscreenVideoId.current, videoRef.current);
+      pauseAllAndSetActive(fullscreenVideoId.current);
+      
+      // Set video properties - preserve the original mute state
+      videoRef.current.muted = isMuted;
+      videoRef.current.loop = true;
+      videoRef.current.playsInline = true;
+      
+      // Set initial position if provided
+      if (initialVideoPosition > 0) {
+        videoRef.current.currentTime = initialVideoPosition;
       }
-    }, 100); // Small delay to ensure cleanup is complete
-
-    return () => {
-      clearTimeout(timeoutId);
-    };
-  }, [isOpen, currentIndex, mediaTypes, isMuted, initialVideoPosition, initialVideoMuted, registerVideo, pauseAllAndSetActive, unregisterVideo]);
+      
+      videoRef.current.play().catch(console.error);
+    }
+  }, [isOpen, currentIndex, mediaTypes, isMuted, initialVideoPosition, initialVideoMuted, registerVideo, pauseAllAndSetActive]);
 
   // Cleanup when modal closes - restore feed video behavior and original mute state
   useEffect(() => {
