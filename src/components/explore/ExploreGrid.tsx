@@ -66,65 +66,40 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     );
   }
 
-  // Create layout with spacing rules: only 4:5 portrait cards can sit next to each other
+  // Create seamless grid layout with three card types
   const createGridLayout = () => {
     if (content.length === 0) return [];
     
     const gridItems = [];
     let index = 0;
-    let lastLargeTileIndex = -1; // Track position of last large tile (2x2)
-    
-    // Always start with a big square (2x2)
-    gridItems.push({
-      type: 'big-square',
-      item: content[index],
-      key: `first-big-${content[index].id}`
-    });
-    index++;
-    lastLargeTileIndex = 0;
     
     while (index < content.length) {
-      const currentPosition = gridItems.length;
-      const distanceFromLastLarge = currentPosition - lastLargeTileIndex;
+      const random = Math.random();
       
-      // Ensure minimum buffer of 3-5 regular tiles between large tiles
-      const minBuffer = 3 + Math.floor(Math.random() * 3);
-      
-      if (distanceFromLastLarge >= minBuffer) {
-        const random = Math.random();
-        
-        if (random < 0.35 && index < content.length - 3) {
-          // 35% chance for 2x2 tiles (with buffer spacing)
-          gridItems.push({
-            type: 'big-square',
-            item: content[index],
-            key: `big-square-${content[index].id}`
-          });
-          index++;
-          lastLargeTileIndex = currentPosition;
-        } else {
-          // 65% chance for 4:5 ratio cards
-          const cardCount = Math.min(2 + Math.floor(Math.random() * 3), content.length - index);
-          for (let i = 0; i < cardCount && index < content.length; i++) {
-            gridItems.push({
-              type: 'portrait',
-              item: content[index],
-              key: `portrait-${content[index].id}`
-            });
-            index++;
-          }
-        }
+      if (random < 0.50) {
+        // 50% chance for 1x1 squares
+        gridItems.push({
+          type: 'square',
+          item: content[index],
+          key: `square-${content[index].id}`
+        });
+        index++;
+      } else if (random < 0.85) {
+        // 35% chance for 4:5 portraits (50% + 35% = 85%)
+        gridItems.push({
+          type: 'portrait',
+          item: content[index],
+          key: `portrait-${content[index].id}`
+        });
+        index++;
       } else {
-        // Force 4:5 portrait cards to maintain buffer spacing
-        const bufferCount = Math.min(minBuffer - distanceFromLastLarge + 1, content.length - index);
-        for (let i = 0; i < bufferCount && index < content.length; i++) {
-          gridItems.push({
-            type: 'portrait',
-            item: content[index],
-            key: `buffer-portrait-${content[index].id}`
-          });
-          index++;
-        }
+        // 15% chance for 1x2 tall rectangles
+        gridItems.push({
+          type: 'tall',
+          item: content[index],
+          key: `tall-${content[index].id}`
+        });
+        index++;
       }
     }
     
@@ -141,21 +116,31 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
         gridAutoFlow: 'row dense'
       }}>
         {gridItems.map((gridItem) => {
-          if (gridItem.type === 'big-square') {
+          if (gridItem.type === 'square') {
             return (
-              <div key={gridItem.key} className="col-span-2 row-span-2 aspect-square">
+              <div key={gridItem.key} className="aspect-square">
                 <ExploreContentCard 
                   item={gridItem.item} 
                   onLike={onLike} 
                   onFollow={onFollow} 
                   onMediaClick={onMediaClick}
-                  isFeatured={true}
                 />
               </div>
             );
-          } else {
+          } else if (gridItem.type === 'portrait') {
             return (
               <div key={gridItem.key} className="aspect-[4/5]">
+                <ExploreContentCard 
+                  item={gridItem.item} 
+                  onLike={onLike} 
+                  onFollow={onFollow} 
+                  onMediaClick={onMediaClick}
+                />
+              </div>
+            );
+          } else if (gridItem.type === 'tall') {
+            return (
+              <div key={gridItem.key} className="row-span-2 aspect-[1/2]">
                 <ExploreContentCard 
                   item={gridItem.item} 
                   onLike={onLike} 
