@@ -1,6 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { useVideoPlaybackManager } from '@/contexts/VideoPlaybackManager';
 
 interface MediaItem {
   url: string;
@@ -45,7 +44,6 @@ interface PostData {
 }
 
 export const useFullscreenPostNavigation = () => {
-  const { pauseAllAndSetActive } = useVideoPlaybackManager();
   const [isOpen, setIsOpen] = useState(false);
   const [currentMedia, setCurrentMedia] = useState<MediaItem | null>(null);
   const [currentPostId, setCurrentPostId] = useState<string | null>(null);

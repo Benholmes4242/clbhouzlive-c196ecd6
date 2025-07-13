@@ -10,7 +10,6 @@ import { usePostUpdate } from '@/hooks/usePostUpdate';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
 import HighQualityImage from '@/components/ui/high-quality-image';
 import VideoPlayer from '@/components/ui/video-player';
-import { useVideoPlaybackManager } from '@/contexts/VideoPlaybackManager';
 
 import CoursePostBadge from './CoursePostBadge';
 import CommentsDrawer from './CommentsDrawer';
@@ -64,7 +63,6 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
   const { user } = useSupabaseSession();
   const { updatePost, isUpdating } = usePostUpdate();
   const { deletePost } = usePostDeletion();
-  const { pauseAllAndSetActive } = useVideoPlaybackManager();
   const isMobile = useIsMobile();
   const [currentPostIndex, setCurrentPostIndex] = useState(0);
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
