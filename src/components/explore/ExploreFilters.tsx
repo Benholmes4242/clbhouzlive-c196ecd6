@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Video, Camera, Zap } from 'lucide-react';
+import { Video, Camera, Zap, Brain } from 'lucide-react';
 import { filterOptions, FILTER_TYPES } from './types';
 
 interface ExploreFiltersProps {
@@ -18,6 +18,8 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
         return <Camera className="w-4 h-4 mr-2" />;
       case FILTER_TYPES.HACK_SHACK:
         return <Zap className="w-4 h-4 mr-2" />;
+      case FILTER_TYPES.BRAIN_GAME:
+        return <Brain className="w-4 h-4 mr-2" />;
       default:
         return null;
     }

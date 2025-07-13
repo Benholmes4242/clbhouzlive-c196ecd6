@@ -56,6 +56,14 @@ const Explore = () => {
       );
     }
     
+    // Brain Game: Videos and photos with #braingame hashtag
+    if (activeFilter === FILTER_TYPES.BRAIN_GAME) {
+      return (item.type === MEDIA_TYPES.VIDEO || item.type === MEDIA_TYPES.IMAGE) && (
+        item.title?.toLowerCase().includes('#braingame') || 
+        item.title?.toLowerCase().includes('braingame')
+      );
+    }
+    
     return true;
   });
 
