@@ -225,7 +225,7 @@ const InstagramStylePost: React.FC<InstagramStylePostProps> = ({ post, allUserPo
     <>
       <div 
         ref={containerRef}
-        className="relative w-full bg-black" 
+        className="relative w-full bg-media-loading" 
         onMouseEnter={handleMouseEnter} 
         onMouseLeave={handleMouseLeave}
       >

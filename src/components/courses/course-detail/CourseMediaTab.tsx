@@ -139,7 +139,7 @@ const CourseMediaTab = ({ courseId }: CourseMediaTabProps) => {
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               />
             ) : (
-              <div className="w-full h-full bg-black flex items-center justify-center">
+              <div className="w-full h-full bg-media-loading animate-pulse flex items-center justify-center">
                 <video
                   src={media.media_url}
                   className="w-full h-full object-cover"
