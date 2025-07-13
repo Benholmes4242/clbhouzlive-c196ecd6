@@ -251,14 +251,6 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, isFeature
             </div>
           )}
 
-          {/* Featured badge for larger cards */}
-          {isFeatured && (
-            <div className="absolute top-2 right-2 hidden md:block">
-              <div className="bg-primary text-primary-foreground px-2 py-1 rounded text-xs font-medium">
-                Featured
-              </div>
-            </div>
-          )}
         </div>
       </div>
 
