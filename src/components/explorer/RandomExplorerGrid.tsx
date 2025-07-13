@@ -327,9 +327,9 @@ const RandomExplorerGrid: React.FC<RandomExplorerGridProps> = ({ filters }) => {
         <p className="text-sm text-muted-foreground">{explorerPosts.length} posts found</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-0">
         {explorerPosts.map((post) => (
-          <Card key={post.id} className="overflow-hidden hover:shadow-lg transition-shadow group">
+          <Card key={post.id} className="overflow-hidden hover:shadow-sm transition-shadow group border-0 rounded-none aspect-square">
             {/* Media */}
             <div className="relative aspect-square overflow-hidden">
               {post.media.type === 'video' ? (
@@ -365,78 +365,66 @@ const RandomExplorerGrid: React.FC<RandomExplorerGridProps> = ({ filters }) => {
               </div>
             </div>
 
-            <CardContent className="p-4">
-              {/* User Info */}
-              <div className="flex items-center gap-3 mb-3">
-                <Avatar className="h-8 w-8">
+            {/* Overlay content for hover - minimally intrusive */}
+            <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex flex-col justify-between p-2">
+              {/* Top overlay - User info */}
+              <div className="flex items-center gap-2">
+                <Avatar className="h-6 w-6">
                   <AvatarImage src={post.user.avatar || undefined} />
                   <AvatarFallback className="text-xs">
                     {post.user.name.split(' ').map(n => n[0]).join('')}
                   </AvatarFallback>
                 </Avatar>
                 <div className="min-w-0 flex-1">
-                  <p className="font-medium text-sm truncate">{post.user.name}</p>
-                  <p className="text-xs text-muted-foreground">@{post.user.username}</p>
+                  <p className="font-medium text-xs text-white truncate">{post.user.name}</p>
                 </div>
               </div>
 
-              {/* Course Info */}
-              <div className="flex items-start gap-2 mb-3">
-                <MapPin className="h-4 w-4 text-primary mt-0.5 flex-shrink-0" />
-                <div className="min-w-0 flex-1">
-                  <p className="font-medium text-sm line-clamp-1">{post.course.name}</p>
-                  <p className="text-xs text-muted-foreground line-clamp-1">{post.course.location}</p>
-                </div>
-              </div>
-
-              {/* Content */}
-              <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
-                {post.content}
-              </p>
-
-              {/* Hashtags */}
-              <div className="flex flex-wrap gap-1 mb-4">
-                {post.hashtags.map((tag, index) => (
-                  <Badge key={index} variant="secondary" className="text-xs">
-                    {tag}
-                  </Badge>
-                ))}
-              </div>
-
-              {/* Actions */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleLike(post.id)}
-                    className={`flex items-center gap-1 h-8 px-2 ${
-                      likedPosts.has(post.id) ? 'text-red-500' : 'text-muted-foreground'
-                    }`}
-                  >
-                    <Heart 
-                      className={`h-4 w-4 ${likedPosts.has(post.id) ? 'fill-current' : ''}`} 
-                    />
-                    <span className="text-xs">{post.stats.likes}</span>
-                  </Button>
-                  
-                  <Button variant="ghost" size="sm" className="flex items-center gap-1 h-8 px-2 text-muted-foreground">
-                    <MessageCircle className="h-4 w-4" />
-                    <span className="text-xs">{post.stats.comments}</span>
-                  </Button>
-                  
-                  <Button variant="ghost" size="sm" className="flex items-center gap-1 h-8 px-2 text-muted-foreground">
-                    <Share className="h-4 w-4" />
-                    <span className="text-xs">{post.stats.shares}</span>
-                  </Button>
+              {/* Bottom overlay - Course and actions */}
+              <div className="space-y-1">
+                {/* Course info - single line */}
+                <div className="flex items-center gap-1">
+                  <MapPin className="h-3 w-3 text-white/90 flex-shrink-0" />
+                  <p className="font-medium text-xs text-white truncate">{post.course.name}</p>
                 </div>
                 
-                <Button variant="outline" size="sm" className="h-8 px-3">
-                  <Eye className="h-3 w-3 mr-1" />
-                  View
-                </Button>
+                {/* Actions - minimal */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleLike(post.id);
+                      }}
+                      className={`flex items-center gap-1 h-6 px-1 text-white hover:bg-white/20 ${
+                        likedPosts.has(post.id) ? 'text-red-400' : ''
+                      }`}
+                    >
+                      <Heart 
+                        className={`h-3 w-3 ${likedPosts.has(post.id) ? 'fill-current' : ''}`} 
+                      />
+                      <span className="text-xs">{post.stats.likes}</span>
+                    </Button>
+                    
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="flex items-center gap-1 h-6 px-1 text-white hover:bg-white/20"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <MessageCircle className="h-3 w-3" />
+                      <span className="text-xs">{post.stats.comments}</span>
+                    </Button>
+                  </div>
+                  
+                  <Badge className="bg-black/50 text-white border-0 text-xs">
+                    {post.progressBadge}
+                  </Badge>
+                </div>
               </div>
-            </CardContent>
+            </div>
           </Card>
         ))}
       </div>

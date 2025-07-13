@@ -86,14 +86,16 @@ const Explore = () => {
       <div className="min-h-screen bg-background">
         <Header />
         
-        <main className="container mx-auto px-4 py-6 pb-20">
-          {/* Sticky Filter Bar */}
-          <ExploreFilters 
-            activeFilter={activeFilter} 
-            onFilterChange={setActiveFilter} 
-          />
+        <main className="pb-20">
+          {/* Sticky Filter Bar with padding */}
+          <div className="container mx-auto px-4 py-6">
+            <ExploreFilters 
+              activeFilter={activeFilter} 
+              onFilterChange={setActiveFilter} 
+            />
+          </div>
 
-          {/* Masonry Grid with Infinite Scroll */}
+          {/* Edge-to-edge Grid - no container padding */}
           <ExploreGrid 
             content={uniqueContent}
             onLike={handleLike}

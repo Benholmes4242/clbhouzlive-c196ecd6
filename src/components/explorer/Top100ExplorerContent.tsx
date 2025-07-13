@@ -33,9 +33,9 @@ const Top100ExplorerContent = () => {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-0">
       {/* Sticky Filters */}
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b pb-4">
+      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b pb-4 px-4 sm:px-6 lg:px-8">
         <ExplorerFilters 
           filters={filters}
           onFilterChange={updateFilter}
@@ -43,31 +43,37 @@ const Top100ExplorerContent = () => {
       </div>
 
       {/* Community Top 100 Leaderboards */}
-      <CommunityLeaderboards />
+      <div className="px-4 sm:px-6 lg:px-8 py-8">
+        <CommunityLeaderboards />
+      </div>
 
       {/* Video Highlights Section */}
-      <VideoHighlights />
+      <div className="px-4 sm:px-6 lg:px-8 py-8">
+        <VideoHighlights />
+      </div>
 
       {/* Map View or Main Content */}
       {filters.showMap ? (
-        <MapView 
-          region={filters.region}
-          audience={filters.audience}
-        />
+        <div className="px-4 sm:px-6 lg:px-8">
+          <MapView 
+            region={filters.region}
+            audience={filters.audience}
+          />
+        </div>
       ) : (
         <>
-          {/* Random Explorer Grid (Core Content Feed) */}
+          {/* Random Explorer Grid (Core Content Feed) - Edge to edge */}
           <RandomExplorerGrid filters={filters} />
 
           {/* Legacy components for specific view modes */}
           {filters.viewMode === 'course' && (
-            <>
+            <div className="px-4 sm:px-6 lg:px-8 space-y-8 py-8">
               {/* Friends Played Scroll */}
               <FriendsPlayedScroll audience={filters.audience} />
               
               {/* Course Feed */}
               <CoursesFeed filters={filters} />
-            </>
+            </div>
           )}
         </>
       )}

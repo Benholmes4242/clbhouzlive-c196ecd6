@@ -68,10 +68,10 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
 
   return (
     <>
-      {/* Responsive Grid Layout - No loading states between content */}
-      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 md:gap-4">
+      {/* Instagram-style Edge-to-Edge Grid Layout */}
+      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-0">
         {content.map((item) => (
-          <div key={item.id} style={{ aspectRatio: '4/5' }}>
+          <div key={item.id} className="aspect-square">
             <ExploreContentCard 
               item={item} 
               onLike={onLike} 
