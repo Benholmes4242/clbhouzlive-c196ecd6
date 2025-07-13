@@ -55,12 +55,8 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
   const getOptimizedSrc = (url: string) => {
     if (!url) return '';
     
-    // For Supabase storage URLs, add optimization parameters
-    if (url.includes('supabase') && url.includes('storage')) {
-      const separator = url.includes('?') ? '&' : '?';
-      return `${url}${separator}quality=60&resize=contain&width=${width || 300}&format=webp`;
-    }
-    
+    // For now, return the original URL as Supabase storage doesn't support optimization parameters
+    // In the future, this could be enhanced with proper image optimization service
     return url;
   };
 
