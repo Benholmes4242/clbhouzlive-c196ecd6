@@ -1,5 +1,6 @@
 
 import React, { memo } from 'react';
+import Masonry from 'react-masonry-css';
 import { ExploreContentItem } from './types';
 import ExploreContentCard from './ExploreContentCard';
 
@@ -108,17 +109,26 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
 
   const gridItems = createGridLayout();
 
+  // Masonry breakpoints for responsive columns
+  const breakpointColumnsObj = {
+    default: 3,
+    1100: 4,
+    700: 3,
+    500: 2
+  };
+
   return (
     <>
-      {/* Seamless Grid - No Gaps on Any Screen Size */}
-      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1" style={{ 
-        gridAutoRows: '1fr',
-        gridAutoFlow: 'row dense'
-      }}>
+      {/* Seamless Masonry Grid - Instagram Style */}
+      <Masonry
+        breakpointCols={breakpointColumnsObj}
+        className="flex gap-1 w-full"
+        columnClassName="flex flex-col gap-1"
+      >
         {gridItems.map((gridItem) => {
           if (gridItem.type === 'square') {
             return (
-              <div key={gridItem.key} className="aspect-square">
+              <div key={gridItem.key} className="aspect-square mb-1">
                 <ExploreContentCard 
                   item={gridItem.item} 
                   onLike={onLike} 
@@ -129,7 +139,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
             );
           } else if (gridItem.type === 'portrait') {
             return (
-              <div key={gridItem.key} className="aspect-[4/5]">
+              <div key={gridItem.key} className="aspect-[4/5] mb-1">
                 <ExploreContentCard 
                   item={gridItem.item} 
                   onLike={onLike} 
@@ -140,7 +150,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
             );
           } else if (gridItem.type === 'tall') {
             return (
-              <div key={gridItem.key} className="row-span-2 aspect-[1/2]">
+              <div key={gridItem.key} className="aspect-[1/2] mb-1">
                 <ExploreContentCard 
                   item={gridItem.item} 
                   onLike={onLike} 
@@ -151,7 +161,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
             );
           }
         })}
-      </div>
+      </Masonry>
       
       {/* Infinite scroll sentinel */}
       <div id="scroll-sentinel" className="h-4">
