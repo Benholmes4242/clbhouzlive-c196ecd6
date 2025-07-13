@@ -4,6 +4,7 @@ import FollowButton from '@/components/profile/actions/FollowButton';
 import { useProfileActions } from '@/components/profile/actions/useProfileActions';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
 
 interface MomentCardProps {
   moment: {
@@ -31,6 +32,7 @@ interface MomentCardProps {
 const MomentCard: React.FC<MomentCardProps> = ({ moment, currentUserId }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isFollowing, setIsFollowing] = useState(false);
+  const navigate = useNavigate();
   const { loading, handleFollow } = useProfileActions({
     targetUserId: moment.user.id,
     currentUserId: currentUserId
@@ -88,6 +90,12 @@ const MomentCard: React.FC<MomentCardProps> = ({ moment, currentUserId }) => {
     setIsFollowing(!isFollowing);
   };
 
+  const handleProfileClick = () => {
+    if (moment.user.username) {
+      navigate(`/profile/${moment.user.username}`);
+    }
+  };
+
   if (!mediaToShow) return null;
 
   return (
@@ -116,7 +124,10 @@ const MomentCard: React.FC<MomentCardProps> = ({ moment, currentUserId }) => {
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex flex-col justify-between p-3">
           {/* Top Section - User Info */}
           <div className="flex items-center gap-2">
-            <div className="w-14 h-14 rounded-full overflow-hidden bg-muted">
+            <div 
+              className="w-14 h-14 rounded-full overflow-hidden bg-muted cursor-pointer hover:opacity-80 transition-opacity"
+              onClick={handleProfileClick}
+            >
               {moment.user.profile_photo_url ? (
                 <img
                   src={moment.user.profile_photo_url}
@@ -132,11 +143,17 @@ const MomentCard: React.FC<MomentCardProps> = ({ moment, currentUserId }) => {
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-white text-base font-bold truncate">
+              <p 
+                className="text-white text-base font-bold truncate cursor-pointer hover:opacity-80 transition-opacity"
+                onClick={handleProfileClick}
+              >
                 {moment.user.display_name || moment.user.username || 'User'}
               </p>
               {moment.user.username && (
-                <p className="text-white/80 text-sm truncate">
+                <p 
+                  className="text-white/80 text-sm truncate cursor-pointer hover:opacity-80 transition-opacity"
+                  onClick={handleProfileClick}
+                >
                   @{moment.user.username}
                 </p>
               )}
