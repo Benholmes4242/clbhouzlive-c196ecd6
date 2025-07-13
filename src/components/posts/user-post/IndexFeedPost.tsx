@@ -41,7 +41,7 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
   const [shouldResumeOnReturn, setShouldResumeOnReturn] = useState(false);
   const { user } = useSupabaseSession();
   const { pauseVideo, pauseAllAndSetActive, storeVideoPosition, resumeVideoFromPosition, storeVideoState, resumeVideoWithState } = useVideoPlaybackManager();
-  const { isGloballyMuted } = useGlobalAudio();
+  const { isGloballyMuted, setGlobalMute } = useGlobalAudio();
   const isMobile = useIsMobile();
   
   // Use the new fullscreen post navigation hook
@@ -259,6 +259,8 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
                 video.currentTime = videoPosition;
                 if (videoMuted !== undefined) {
                   video.muted = videoMuted;
+                  // Update global audio state to match the video's new mute state
+                  setGlobalMute(videoMuted);
                 }
                 // Force the video to play immediately, bypassing scroll detection
                 video.play().catch(console.error);
