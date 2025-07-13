@@ -66,14 +66,14 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     );
   }
 
-  // Create layout with featured cards every 8-12 items
+  // Create layout ensuring no empty spaces
   const createGridLayout = () => {
     const gridItems = [];
     let index = 0;
     
     while (index < content.length) {
-      // Add 6-9 regular items
-      const regularItemsCount = Math.min(6 + Math.floor(Math.random() * 4), content.length - index);
+      // Add 7-10 regular items first
+      const regularItemsCount = Math.min(7 + Math.floor(Math.random() * 4), content.length - index);
       
       for (let i = 0; i < regularItemsCount && index < content.length; i++) {
         gridItems.push({
@@ -84,10 +84,9 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
         index++;
       }
       
-      // Add a featured card if we have more content
-      if (index < content.length) {
-        // Randomly choose between big square (2x2) or tall portrait (1x2)
-        const cardType = Math.random() > 0.6 ? 'big-square' : 'tall-portrait';
+      // Only add special cards if we have enough remaining content to fill gaps
+      if (index < content.length - 2) {
+        const cardType = Math.random() > 0.7 ? 'big-square' : 'tall-portrait';
         gridItems.push({
           type: cardType,
           item: content[index],
@@ -97,6 +96,16 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
       }
     }
     
+    // Fill remaining slots with regular cards
+    while (index < content.length) {
+      gridItems.push({
+        type: 'regular',
+        item: content[index],
+        key: `regular-${content[index].id}`
+      });
+      index++;
+    }
+    
     return gridItems;
   };
 
@@ -104,8 +113,8 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
 
   return (
     <>
-      {/* Instagram-style Grid Layout with Featured Cards */}
-      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1 auto-rows-fr">
+      {/* Seamless Grid Layout - No Empty Spaces */}
+      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-1" style={{ gridAutoRows: 'minmax(0, 1fr)' }}>
         {gridItems.map((gridItem) => {
           if (gridItem.type === 'big-square') {
             return (
