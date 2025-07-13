@@ -181,7 +181,7 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
   };
 
   return (
-    <div className="mosaic-feed-container px-4 pb-20">
+    <div className="mosaic-feed-container px-2 pb-20">
       {/* Show optimistic posts first */}
       {optimisticPosts.length > 0 && (
         <div className="mb-6">
