@@ -179,9 +179,9 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
     });
   }, [currentIndex]);
 
-  // Scroll to specific index
+  // Scroll to specific index with precise positioning
   const scrollToIndex = (index: number) => {
-    if (!scrollViewRef.current || !itemRefs.current[index]) return;
+    if (!scrollViewRef.current) return;
 
     const itemHeight = window.innerHeight;
     scrollViewRef.current.scrollTo({
@@ -224,10 +224,16 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
     }
   }, [isOpen, currentIndex, filteredContent.length, onClose]);
 
-  // Scroll to initial item when modal opens
+  // Scroll to initial item when modal opens - ensure exact positioning
   useEffect(() => {
     if (isOpen && filteredContent.length > 0 && currentIndex >= 0) {
-      setTimeout(() => scrollToIndex(currentIndex), 100);
+      // Immediate scroll without animation to prevent flash of wrong content
+      if (scrollViewRef.current) {
+        const itemHeight = window.innerHeight;
+        scrollViewRef.current.scrollTop = currentIndex * itemHeight;
+      }
+      // Then smooth scroll to ensure perfect positioning
+      setTimeout(() => scrollToIndex(currentIndex), 50);
     }
   }, [isOpen, filteredContent.length, currentIndex]);
 
@@ -307,7 +313,8 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
         style={{ 
           scrollbarWidth: 'none', 
           msOverflowStyle: 'none',
-          WebkitOverflowScrolling: 'touch'
+          WebkitOverflowScrolling: 'touch',
+          scrollSnapType: 'y mandatory'
         }}
       >
         {/* Close Button - Top Right */}
@@ -375,7 +382,8 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
             ref={(el) => {
               if (el) itemRefs.current[index] = el;
             }}
-            className="relative w-full h-screen snap-start flex items-center justify-center"
+            className="relative w-full h-screen snap-start snap-always flex items-center justify-center"
+            style={{ minHeight: '100vh', maxHeight: '100vh' }}
           >
             {/* Media Content */}
             <div 
