@@ -94,7 +94,7 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
   return (
     <div className={`relative ${className}`} onClick={onClick}>
       {isLoading && !hasError && (
-        <div className="absolute inset-0 bg-muted animate-pulse rounded-[inherit]" />
+        <div className="absolute inset-0 bg-media-loading animate-pulse rounded-[inherit]" />
       )}
       
       <img
@@ -118,7 +118,7 @@ const OptimizedImage: React.FC<OptimizedImageProps> = ({
       />
       
       {hasError && (
-        <div className="absolute inset-0 bg-muted rounded-[inherit] flex items-center justify-center">
+        <div className="absolute inset-0 bg-media-loading rounded-[inherit] flex items-center justify-center">
           <div className="text-xs text-muted-foreground">Failed to load</div>
         </div>
       )}
