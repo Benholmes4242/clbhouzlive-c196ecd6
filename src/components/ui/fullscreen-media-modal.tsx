@@ -14,7 +14,7 @@ import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 
 interface FullscreenMediaModalProps {
   isOpen: boolean;
-  onClose: () => void;
+  onClose: (videoPosition?: number) => void;
   mediaUrl: string | string[];
   mediaType: 'image' | 'video' | ('image' | 'video')[];
   alt?: string;
@@ -39,6 +39,8 @@ interface FullscreenMediaModalProps {
   onPreviousPost?: () => void;
   currentPostIndex?: number;
   totalPosts?: number;
+  // Video resume props
+  initialVideoPosition?: number;
 }
 
 // Helper function to check if element is in viewport
@@ -70,7 +72,8 @@ const FullscreenMediaModal = ({
   onNextPost,
   onPreviousPost,
   currentPostIndex = 0,
-  totalPosts = 0
+  totalPosts = 0,
+  initialVideoPosition = 0
 }: FullscreenMediaModalProps) => {
   // Convert single media to array format for consistent handling
   const mediaUrls = Array.isArray(mediaUrl) ? mediaUrl : [mediaUrl];
@@ -183,9 +186,14 @@ const FullscreenMediaModal = ({
       videoRef.current.loop = true;
       videoRef.current.playsInline = true;
       
+      // Set initial position if provided
+      if (initialVideoPosition > 0) {
+        videoRef.current.currentTime = initialVideoPosition;
+      }
+      
       videoRef.current.play().catch(console.error);
     }
-  }, [isOpen, currentIndex, mediaTypes, isMuted, registerVideo, pauseAllAndSetActive]);
+  }, [isOpen, currentIndex, mediaTypes, isMuted, initialVideoPosition, registerVideo, pauseAllAndSetActive]);
 
   // Cleanup when modal closes - restore feed video behavior and original mute state
   useEffect(() => {
@@ -363,7 +371,11 @@ const FullscreenMediaModal = ({
       <div className="absolute top-4 right-4 z-10 flex items-start gap-2">
         {/* Maximize - Top Right */}
         <button
-          onClick={onClose}
+          onClick={() => {
+            // Pass current video position back when closing
+            const currentPosition = videoRef.current?.currentTime || 0;
+            onClose(mediaTypes[currentIndex] === 'video' ? currentPosition : undefined);
+          }}
           className="flex items-center justify-center w-10 h-10 text-white hover:bg-white/10 rounded-full transition-colors"
           aria-label="Close"
         >

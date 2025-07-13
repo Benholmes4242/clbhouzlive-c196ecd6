@@ -38,8 +38,9 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [showFullCourseTag, setShowFullCourseTag] = useState(false);
+  const [shouldResumeOnReturn, setShouldResumeOnReturn] = useState(false);
   const { user } = useSupabaseSession();
-  const { pauseVideo, pauseAllAndSetActive } = useVideoPlaybackManager();
+  const { pauseVideo, pauseAllAndSetActive, storeVideoPosition, resumeVideoFromPosition } = useVideoPlaybackManager();
   const { isGloballyMuted } = useGlobalAudio();
   const isMobile = useIsMobile();
   
@@ -128,6 +129,14 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
   const handleMaximizeClick = useCallback(async (e: React.MouseEvent) => {
     e.stopPropagation();
     const currentMedia = post.post_media[currentMediaIndex];
+    
+    // Only store position and set resume flag for videos
+    if (currentMedia.media_type === 'video') {
+      const videoId = `index-${currentMedia.id}`;
+      storeVideoPosition(videoId);
+      setShouldResumeOnReturn(true);
+    }
+    
     const mediaUrls = post.post_media.map(m => m.media_url);
     const mediaTypes = post.post_media.map(m => m.media_type as 'image' | 'video');
     
@@ -145,7 +154,7 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
       post.id, // Pass post ID
       post.user.id // Pass user ID for fetching other posts
     );
-  }, [currentMediaIndex, post, golfCourse, displayName, openFullscreenMedia]);
+  }, [currentMediaIndex, post, golfCourse, displayName, openFullscreenMedia, storeVideoPosition]);
 
   // Memoized values
   const cleanContent = useMemo(() => removeGolfCourseFromContent(post.content), [post.content]);
@@ -225,7 +234,26 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
       {/* Enhanced Fullscreen Modal with Post Navigation */}
       <FullscreenMediaModal
         isOpen={isFullscreenOpen}
-        onClose={closeFullscreenMedia}
+        onClose={(videoPosition) => {
+          // Handle video resume on modal close
+          if (shouldResumeOnReturn && videoPosition !== undefined) {
+            const currentMedia = post.post_media[currentMediaIndex];
+            if (currentMedia.media_type === 'video') {
+              const videoId = `index-${currentMedia.id}`;
+              const video = document.querySelector(`[data-video-id="${videoId}"]`) as HTMLVideoElement;
+              
+              if (video) {
+                // Set the video to the position from the modal
+                video.currentTime = videoPosition;
+                // Force the video to play immediately, bypassing scroll detection
+                video.play().catch(console.error);
+                console.log('▶️ Resumed video from modal position:', videoPosition);
+              }
+            }
+            setShouldResumeOnReturn(false);
+          }
+          closeFullscreenMedia();
+        }}
         mediaUrl={currentMedia?.mediaUrls || []}
         mediaType={currentMedia?.mediaTypes || []}
         alt={currentMedia?.alt}
