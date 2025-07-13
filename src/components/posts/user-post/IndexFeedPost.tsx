@@ -40,7 +40,7 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
   const [showFullCourseTag, setShowFullCourseTag] = useState(false);
   const [shouldResumeOnReturn, setShouldResumeOnReturn] = useState(false);
   const { user } = useSupabaseSession();
-  const { pauseVideo, pauseAllAndSetActive, storeVideoPosition, resumeVideoFromPosition } = useVideoPlaybackManager();
+  const { pauseVideo, pauseAllAndSetActive, storeVideoPosition, resumeVideoFromPosition, storeVideoMuteState, resumeVideoWithMuteState } = useVideoPlaybackManager();
   const { isGloballyMuted } = useGlobalAudio();
   const isMobile = useIsMobile();
   
@@ -130,10 +130,11 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
     e.stopPropagation();
     const currentMedia = post.post_media[currentMediaIndex];
     
-    // Only store position and set resume flag for videos
+    // Only store position and mute state, then set resume flag for videos
     if (currentMedia.media_type === 'video') {
       const videoId = `index-${currentMedia.id}`;
       storeVideoPosition(videoId);
+      storeVideoMuteState(videoId);
       setShouldResumeOnReturn(true);
     }
     
@@ -235,20 +236,15 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
       <FullscreenMediaModal
         isOpen={isFullscreenOpen}
         onClose={(videoPosition) => {
-          // Handle video resume on modal close
-          if (shouldResumeOnReturn && videoPosition !== undefined) {
+          // Handle video resume on modal close with mute state
+          if (shouldResumeOnReturn) {
             const currentMedia = post.post_media[currentMediaIndex];
             if (currentMedia.media_type === 'video') {
               const videoId = `index-${currentMedia.id}`;
-              const video = document.querySelector(`[data-video-id="${videoId}"]`) as HTMLVideoElement;
               
-              if (video) {
-                // Set the video to the position from the modal
-                video.currentTime = videoPosition;
-                // Force the video to play immediately, bypassing scroll detection
-                video.play().catch(console.error);
-                console.log('▶️ Resumed video from modal position:', videoPosition);
-              }
+              // Use the new resumeVideoWithMuteState method
+              resumeVideoWithMuteState(videoId);
+              console.log('▶️ Resumed video with mute state from modal');
             }
             setShouldResumeOnReturn(false);
           }
