@@ -169,6 +169,8 @@ const FullscreenMediaModal = ({
     
     if (isOpen) {
       setCurrentIndex(initialIndex);
+      // Reset mute state to match the original video when modal opens
+      setIsMuted(initialVideoMuted);
     } else {
       // Reset stored state when modal closes
       originalGlobalMuteState.current = null;
@@ -183,7 +185,7 @@ const FullscreenMediaModal = ({
       registerVideo(fullscreenVideoId.current, videoRef.current);
       pauseAllAndSetActive(fullscreenVideoId.current);
       
-      // Set video properties
+      // Set video properties - preserve the original mute state
       videoRef.current.muted = isMuted;
       videoRef.current.loop = true;
       videoRef.current.playsInline = true;
@@ -195,7 +197,7 @@ const FullscreenMediaModal = ({
       
       videoRef.current.play().catch(console.error);
     }
-  }, [isOpen, currentIndex, mediaTypes, isMuted, initialVideoPosition, registerVideo, pauseAllAndSetActive]);
+  }, [isOpen, currentIndex, mediaTypes, isMuted, initialVideoPosition, initialVideoMuted, registerVideo, pauseAllAndSetActive]);
 
   // Cleanup when modal closes - restore feed video behavior and original mute state
   useEffect(() => {
