@@ -322,7 +322,13 @@ const FullscreenMediaModal = ({
   const handleBackdropClick = (e: React.MouseEvent) => {
     // Only close if clicking the backdrop, not the media content
     if (e.target === e.currentTarget) {
-      onClose();
+      // Pass current video position and mute state back when closing via backdrop
+      const currentPosition = videoRef.current?.currentTime || 0;
+      const currentMuted = videoRef.current?.muted;
+      onClose(
+        mediaTypes[currentIndex] === 'video' ? currentPosition : undefined,
+        mediaTypes[currentIndex] === 'video' ? currentMuted : undefined
+      );
     }
   };
 
