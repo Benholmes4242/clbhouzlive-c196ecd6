@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Minimize2, Heart, MessageCircle, Share, Volume2, VolumeX, MoreHorizontal, Edit, Trash2, MapPin, Check, UserPlus, UserCheck } from 'lucide-react';
+import { Minimize2, Heart, MessageCircle, Share, Volume2, VolumeX, MoreHorizontal, Edit, Trash2, MapPin, Check, UserPlus, UserCheck, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -16,6 +16,8 @@ import TaggedText from '../posts/TaggedText';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import VideoPlayer from '@/components/ui/video-player';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
+import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
+import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 
 interface VerticalMediaFeedProps {
   isOpen: boolean;
@@ -46,6 +48,7 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
   const [editingItem, setEditingItem] = useState<ExploreContentItem | null>(null);
   const [editCourse, setEditCourse] = useState<any>(null);
   const [isTextExpanded, setIsTextExpanded] = useState(false);
+  const [mediaIndices, setMediaIndices] = useState<{[key: string]: number}>({});
   const queryClient = useQueryClient();
 
   // Check if current user follows the displayed user
@@ -402,53 +405,139 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
           </div>
         </div>
 
-        {filteredContent.map((item, index) => (
-          <div
-            key={`${item.id}-${index}`}
-            ref={(el) => {
-              if (el) itemRefs.current[index] = el;
-            }}
-            className="relative w-full h-screen snap-start snap-always flex items-center justify-center"
-            style={{ 
-              minHeight: '100vh', 
-              maxHeight: '100vh',
-              scrollSnapAlign: 'start',
-              scrollSnapStop: 'always'
-            }}
-          >
-            {/* Media Content */}
-            <div 
-              className="relative w-full h-full flex items-center justify-center"
-              onMouseEnter={() => setIsTextExpanded(true)}
-              onMouseLeave={() => setIsTextExpanded(false)}
+        {filteredContent.map((item, index) => {
+          // Get media array for this item
+          const mediaItems = item.media && item.media.length > 0 ? item.media : [{
+            id: `${item.id}-single`,
+            media_type: item.type as 'video' | 'image',
+            media_url: item.src
+          }];
+          
+          const currentMediaIndex = mediaIndices[item.id] || 0;
+          const currentMedia = mediaItems[currentMediaIndex] || mediaItems[0];
+          const hasMultipleMedia = mediaItems.length > 1;
+
+          // Navigation handlers for this specific item
+          const handlePrevMedia = (e: React.MouseEvent) => {
+            e.stopPropagation();
+            setMediaIndices(prev => ({
+              ...prev,
+              [item.id]: currentMediaIndex > 0 ? currentMediaIndex - 1 : mediaItems.length - 1
+            }));
+          };
+
+          const handleNextMedia = (e: React.MouseEvent) => {
+            e.stopPropagation();
+            setMediaIndices(prev => ({
+              ...prev,
+              [item.id]: currentMediaIndex < mediaItems.length - 1 ? currentMediaIndex + 1 : 0
+            }));
+          };
+
+          // Swipe gesture handling for media navigation within this post
+          const mediaSwipeRef = useSwipeGesture({
+            onSwipeLeft: () => {
+              if (hasMultipleMedia && currentMediaIndex < mediaItems.length - 1) {
+                setMediaIndices(prev => ({
+                  ...prev,
+                  [item.id]: currentMediaIndex + 1
+                }));
+              }
+            },
+            onSwipeRight: () => {
+              if (hasMultipleMedia && currentMediaIndex > 0) {
+                setMediaIndices(prev => ({
+                  ...prev,
+                  [item.id]: currentMediaIndex - 1
+                }));
+              }
+            },
+            threshold: 50
+          });
+
+          return (
+            <div
+              key={`${item.id}-${index}`}
+              ref={(el) => {
+                if (el) {
+                  itemRefs.current[index] = el;
+                  if (hasMultipleMedia && isMobile && mediaSwipeRef.current !== el) {
+                    mediaSwipeRef.current = el;
+                  }
+                }
+              }}
+              className="relative w-full h-screen snap-start snap-always flex items-center justify-center"
+              style={{ 
+                minHeight: '100vh', 
+                maxHeight: '100vh',
+                scrollSnapAlign: 'start',
+                scrollSnapStop: 'always'
+              }}
             >
-              {item.type === 'video' ? (
-                <div className="relative w-full h-full bg-media-loading">
-                  <VideoPlayer
-                    src={item.src}
-                    autoplay={index === currentIndex}
-                    muted={isGloballyMuted}
-                    loop={true}
-                    className="w-full h-full"
-                    showVideoIcon={false}
-                    showOverlayControls={false}
-                    videoId={`vertical-${item.id}`}
+              {/* Media Content */}
+              <div 
+                className="relative w-full h-full flex items-center justify-center"
+                onMouseEnter={() => setIsTextExpanded(true)}
+                onMouseLeave={() => setIsTextExpanded(false)}
+              >
+                {currentMedia.media_type === 'video' ? (
+                  <div className="relative w-full h-full bg-media-loading">
+                    <VideoPlayer
+                      src={currentMedia.media_url}
+                      autoplay={index === currentIndex}
+                      muted={isGloballyMuted}
+                      loop={true}
+                      className="w-full h-full"
+                      showVideoIcon={false}
+                      showOverlayControls={false}
+                      videoId={`vertical-${item.id}-${currentMediaIndex}`}
+                    />
+                  </div>
+                ) : (
+                  <div className="relative w-full h-full bg-media-loading">
+                    <img
+                      src={currentMedia.media_url}
+                      alt={item.title}
+                      className="w-full h-full object-contain"
+                      loading={Math.abs(index - currentIndex) <= 1 ? "eager" : "lazy"}
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
+                      }}
+                    />
+                  </div>
+                )}
+
+                {/* Navigation Dots - Bottom Center */}
+                {hasMultipleMedia && (
+                  <MediaNavigationDots
+                    mediaCount={mediaItems.length}
+                    currentIndex={currentMediaIndex}
                   />
-                </div>
-              ) : (
-                <div className="relative w-full h-full bg-media-loading">
-                  <img
-                    src={item.src}
-                    alt={item.title}
-                    className="w-full h-full object-contain"
-                    loading={Math.abs(index - currentIndex) <= 1 ? "eager" : "lazy"}
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
-                    }}
-                  />
-                </div>
-              )}
-            </div>
+                )}
+
+                {/* Desktop Navigation Arrows */}
+                {hasMultipleMedia && !isMobile && (
+                  <>
+                    {/* Previous Button */}
+                    <button
+                      onClick={handlePrevMedia}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center w-12 h-12 bg-black/30 hover:bg-black/50 text-white rounded-full transition-all duration-200"
+                      aria-label="Previous media"
+                    >
+                      <ChevronLeft className="w-6 h-6" />
+                    </button>
+
+                    {/* Next Button */}
+                    <button
+                      onClick={handleNextMedia}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center w-12 h-12 bg-black/30 hover:bg-black/50 text-white rounded-full transition-all duration-200"
+                      aria-label="Next media"
+                    >
+                      <ChevronRight className="w-6 h-6" />
+                    </button>
+                  </>
+                )}
+              </div>
 
             {/* Caption and Golf Course Tag - Bottom Left */}
             <div className="absolute bottom-5 left-3 right-20 z-20">
@@ -502,7 +591,7 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
             {/* Action Buttons - Bottom Right */}
             <div className="absolute bottom-4 right-4 z-10 flex flex-col space-y-8">
               {/* Mute/Unmute toggle button - only show for video posts */}
-              {item.type === 'video' && (
+              {currentMedia.media_type === 'video' && (
                 <button 
                   className="cursor-pointer hover:opacity-100 transition-opacity"
                   onClick={() => setGlobalMute(!isGloballyMuted)}
@@ -540,7 +629,8 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
               </button>
             </div>
           </div>
-        ))}
+        );
+      })}
       </div>
 
 

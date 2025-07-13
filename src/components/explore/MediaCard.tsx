@@ -1,6 +1,6 @@
 
 import React, { useState, memo } from 'react';
-import { Heart, Maximize2 } from 'lucide-react';
+import { Heart, Maximize2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { ExploreContentItem } from './types';
 
 import PostViewerModal from '@/components/posts/PostViewerModal';
@@ -8,6 +8,9 @@ import VideoPlayer from '@/components/ui/video-player';
 import { useVideoAutoplay } from '@/hooks/useVideoAutoplay';
 import OptimizedImage from '@/components/ui/optimized-image';
 import CoursePostBadge from '@/components/posts/CoursePostBadge';
+import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
+import { useSwipeGesture } from '@/hooks/useSwipeGesture';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface MediaCardProps {
   item: ExploreContentItem;
@@ -19,14 +22,62 @@ interface MediaCardProps {
 const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, ...props }) => {
   const [imageError, setImageError] = useState(false);
   const [isPostViewerOpen, setIsPostViewerOpen] = useState(false);
+  const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+  const isMobile = useIsMobile();
   const { ref: autoplayRef, shouldAutoplay, handleMouseEnter, handleMouseLeave } = useVideoAutoplay({
     enabled: true,
     threshold: 0.5
   });
 
+  // Get media array - use the new media property if available, otherwise fallback to single media
+  const mediaItems = item.media && item.media.length > 0 ? item.media : [{
+    id: `${item.id}-single`,
+    media_type: item.type as 'video' | 'image',
+    media_url: item.src
+  }];
+
+  const currentMedia = mediaItems[currentMediaIndex] || mediaItems[0];
+  const hasMultipleMedia = mediaItems.length > 1;
+
   if (item.type === 'cta') return null;
 
-  // Removed excessive logging for performance
+  // Navigation handlers
+  const handlePrevMedia = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentMediaIndex(prev => prev > 0 ? prev - 1 : mediaItems.length - 1);
+  };
+
+  const handleNextMedia = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setCurrentMediaIndex(prev => prev < mediaItems.length - 1 ? prev + 1 : 0);
+  };
+
+  // Swipe gesture handling for mobile
+  const swipeRef = useSwipeGesture({
+    onSwipeLeft: () => {
+      if (hasMultipleMedia && currentMediaIndex < mediaItems.length - 1) {
+        setCurrentMediaIndex(prev => prev + 1);
+      }
+    },
+    onSwipeRight: () => {
+      if (hasMultipleMedia && currentMediaIndex > 0) {
+        setCurrentMediaIndex(prev => prev - 1);
+      }
+    },
+    threshold: 50
+  });
+
+  // Mouse enter/leave handlers for hover state
+  const handleCardMouseEnter = () => {
+    setIsHovered(true);
+    handleMouseEnter();
+  };
+
+  const handleCardMouseLeave = () => {
+    setIsHovered(false);
+    handleMouseLeave();
+  };
 
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -57,11 +108,11 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, ...props 
       username: item.user?.name || null,
       profile_photo_url: item.user?.avatar || null,
     },
-    post_media: [{
-      id: `${item.id}-media`,
-      media_type: item.type as 'image' | 'video',
-      media_url: item.src,
-    }],
+    post_media: mediaItems.map(media => ({
+      id: media.id,
+      media_type: media.media_type,
+      media_url: media.media_url,
+    })),
     post_tags: [],
     golfCourse: item.golfCourse,
   };
@@ -78,28 +129,31 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, ...props 
   // Fallback image for broken/missing images
   const fallbackImage = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
 
-  // Enhanced validation for invalid src
-  const isInvalidSrc = !item.src || 
-                      item.src.trim() === '' || 
-                      item.src === 'null' || 
-                      item.src === 'undefined' ||
-                      item.src === '[object Object]' ||
-                      typeof item.src !== 'string';
+  // Enhanced validation for invalid src - use current media
+  const isInvalidSrc = !currentMedia.media_url || 
+                      currentMedia.media_url.trim() === '' || 
+                      currentMedia.media_url === 'null' || 
+                      currentMedia.media_url === 'undefined' ||
+                      currentMedia.media_url === '[object Object]' ||
+                      typeof currentMedia.media_url !== 'string';
 
   return (
     <>
       <div 
-        ref={autoplayRef}
+        ref={(el) => {
+          if (autoplayRef.current !== el) autoplayRef.current = el;
+          if (swipeRef.current !== el) swipeRef.current = el;
+        }}
         className="relative group bg-white rounded-lg shadow-sm border overflow-hidden h-full cursor-pointer"
         onClick={handleMediaClick}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
+        onMouseEnter={handleCardMouseEnter}
+        onMouseLeave={handleCardMouseLeave}
       >
         {/* Square Media Container */}
         <div className="relative w-full h-full overflow-hidden">
-          {item.type === 'video' && !isInvalidSrc ? (
+          {currentMedia.media_type === 'video' && !isInvalidSrc ? (
             <VideoPlayer
-              src={item.src}
+              src={currentMedia.media_url}
               autoplay={shouldAutoplay}
               muted={true}
               loop={true}
@@ -108,16 +162,47 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, ...props 
               showOverlayControls={false}
               controls={false}
               onClick={undefined}
-              videoId={`explore-${item.id}`}
+              videoId={`explore-${item.id}-${currentMediaIndex}`}
             />
           ) : (
             <img
-              src={isInvalidSrc || imageError ? fallbackImage : item.src}
+              src={isInvalidSrc || imageError ? fallbackImage : currentMedia.media_url}
               alt={item.title || 'Content'}
               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
               onError={handleImageError}
               loading="lazy"
             />
+          )}
+
+          {/* Navigation Dots - Bottom Center */}
+          {hasMultipleMedia && (
+            <MediaNavigationDots
+              mediaCount={mediaItems.length}
+              currentIndex={currentMediaIndex}
+            />
+          )}
+
+          {/* Desktop Navigation Arrows */}
+          {hasMultipleMedia && !isMobile && isHovered && (
+            <>
+              {/* Previous Button */}
+              <button
+                onClick={handlePrevMedia}
+                className="absolute left-2 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center w-8 h-8 bg-black/30 hover:bg-black/50 text-white rounded-full transition-all duration-200 opacity-0 group-hover:opacity-100"
+                aria-label="Previous media"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+
+              {/* Next Button */}
+              <button
+                onClick={handleNextMedia}
+                className="absolute right-2 top-1/2 -translate-y-1/2 z-20 flex items-center justify-center w-8 h-8 bg-black/30 hover:bg-black/50 text-white rounded-full transition-all duration-200 opacity-0 group-hover:opacity-100"
+                aria-label="Next media"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </>
           )}
 
           {/* Like button overlay - hidden on mobile */}

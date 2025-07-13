@@ -68,9 +68,10 @@ export const useRealPostsFetcher = () => {
       // Format posts for explore grid
       const formattedPosts = postsData.map(post => {
         const userProfile = profiles?.find(profile => profile.id === post.user_id);
-        const media = (post.post_media || [])[0]; // Take first media item
+        const allMedia = (post.post_media || []);
+        const primaryMedia = allMedia[0]; // First media for main display
         
-        if (!media || !isValidImageUrl(media.media_url)) {
+        if (!primaryMedia || !isValidImageUrl(primaryMedia.media_url)) {
           return null;
         }
 
@@ -114,13 +115,13 @@ export const useRealPostsFetcher = () => {
 
         const formattedPost = {
           id: post.id,
-          type: media.media_type as 'video' | 'image',
-          src: media.media_url,
+          type: primaryMedia.media_type as 'video' | 'image',
+          src: primaryMedia.media_url,
           title: post.content || 'Post',
           likes: Math.floor(Math.random() * 500) + 50,
           comments: Math.floor(Math.random() * 100) + 5,
           shares: Math.floor(Math.random() * 50) + 1,
-          duration: media.media_type === 'video' ? `${Math.floor(Math.random() * 180) + 30}s` : undefined,
+          duration: primaryMedia.media_type === 'video' ? `${Math.floor(Math.random() * 180) + 30}s` : undefined,
           user: {
             id: post.user_id,
             name: userProfile?.display_name || userProfile?.username || 'User',
@@ -130,7 +131,8 @@ export const useRealPostsFetcher = () => {
           },
           golfCourse,
           label: Math.random() > 0.6 ? ['Pro Tip', 'Trending', 'From Clubhouse'][Math.floor(Math.random() * 3)] : undefined,
-          isFollowing: Math.random() > 0.5
+          isFollowing: Math.random() > 0.5,
+          media: allMedia.filter(m => isValidImageUrl(m.media_url))
         };
 
         return formattedPost;
