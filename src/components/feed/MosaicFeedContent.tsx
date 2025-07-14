@@ -159,12 +159,25 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
               <div className="flex justify-between items-end">
                 <div className="flex-1 min-w-0">
                   <p className="text-white font-bold text-base truncate">
-                    @{username || displayName}
+                    {displayName || username}
                   </p>
                   {caption && (
-                    <p className="text-white/90 text-sm mt-1 line-clamp-2">
-                      {caption}
-                    </p>
+                    <div className="text-white/90 text-sm mt-1">
+                      {(() => {
+                        const hadIndex = caption.toLowerCase().indexOf(' had ');
+                        if (hadIndex !== -1) {
+                          const firstLine = caption.substring(0, hadIndex + 4); // Include " had"
+                          const secondLine = caption.substring(hadIndex + 4).trim();
+                          return (
+                            <>
+                              <div className="truncate">{firstLine}</div>
+                              {secondLine && <div className="truncate">{secondLine}</div>}
+                            </>
+                          );
+                        }
+                        return <div className="line-clamp-2">{caption}</div>;
+                      })()}
+                    </div>
                   )}
                 </div>
                 
