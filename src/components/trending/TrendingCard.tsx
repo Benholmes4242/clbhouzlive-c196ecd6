@@ -85,7 +85,7 @@ const TrendingCard = () => {
             <div className="absolute bottom-0 left-0 right-0 p-3">
               <div className="flex justify-between items-end">
                 <div className="flex-1 min-w-0 max-w-[calc(100%-80px)]">
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className="flex items-end gap-2 mb-1">
                     <img
                       src={user?.profile_photo_url || '/placeholder.svg'}
                       alt={user?.display_name || user?.username || 'User'}
