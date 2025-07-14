@@ -83,7 +83,7 @@ const MomentCard: React.FC<MomentCardProps> = ({ moment, currentUserId }) => {
   const imageMedia = moment.post_media.find(media => media.media_type === 'image');
   const mediaToShow = videoMedia || imageMedia;
   
-  const golfCourseTag = moment.post_tags.find(tag => tag.entity_type === 'golf_club');
+  
 
   const handleFollowClick = async () => {
     await handleFollow(isFollowing);
@@ -160,27 +160,8 @@ const MomentCard: React.FC<MomentCardProps> = ({ moment, currentUserId }) => {
             </div>
           </div>
 
-          {/* Bottom Section - Golf Course Tag & Follow Button */}
+          {/* Bottom Section - Follow Button */}
           <div className="space-y-2">
-            {golfCourseTag && (
-              <div className="flex justify-center">
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <span className="bg-black/60 text-white rounded-full px-3 py-1.5 text-sm font-medium cursor-default max-w-[160px] truncate">
-                        {golfCourseTag.name}
-                      </span>
-                    </TooltipTrigger>
-                    <TooltipContent 
-                      side="top"
-                      className="hidden md:block bg-gray-900 text-white border-gray-700 shadow-lg rounded-md px-2 py-1 text-xs max-w-[200px] z-[300]"
-                    >
-                      {golfCourseTag.name}
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
-            )}
             
             {currentUserId !== moment.user.id && (
               <div className="flex justify-center">

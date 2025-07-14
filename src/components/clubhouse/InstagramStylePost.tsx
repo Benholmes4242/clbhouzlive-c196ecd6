@@ -18,7 +18,7 @@ import { usePostViewer } from '@/hooks/usePostViewer';
 import { useVideoVisibility } from '@/hooks/useVideoVisibility';
 import { useVideoPlaybackManager } from '@/contexts/VideoPlaybackManager';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
-import { extractGolfCourseFromContent, removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
+import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 
 interface PostMedia {
   id: string;
@@ -60,7 +60,7 @@ const InstagramStylePostComponent: React.FC<InstagramStylePostProps> = ({ post, 
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   const [isVideoMuted, setIsVideoMuted] = useState(true);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
-  const [golfCourse, setGolfCourse] = useState<any>(null);
+  
   const [showComments, setShowComments] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const { isGloballyMuted, toggleGlobalMute } = useGlobalAudio();
@@ -74,9 +74,6 @@ const InstagramStylePostComponent: React.FC<InstagramStylePostProps> = ({ post, 
   const currentMedia = useMemo(() => post.post_media[currentMediaIndex], [post.post_media, currentMediaIndex]);
   const displayName = useMemo(() => post.user.display_name || post.user.username || 'User', [post.user.display_name, post.user.username]);
   const timeAgo = useMemo(() => formatDistanceToNow(new Date(post.created_at), { addSuffix: true }), [post.created_at]);
-  const golfClubTags = useMemo(() => post.post_tags?.filter(tag => tag.entity_type === 'golf_club') || [], [post.post_tags]);
-
-
   // Use video visibility hook for intersection observer
   const { containerRef, isVisible } = useVideoVisibility({
     threshold: 0.5,
@@ -127,67 +124,13 @@ const InstagramStylePostComponent: React.FC<InstagramStylePostProps> = ({ post, 
     touchEventOptions: { passive: false }
   });
 
-  // Extract golf course from content or tags
-  useEffect(() => {
-    // First try to extract from post content
-    const extractedCourse = extractGolfCourseFromContent(post.content);
-    if (extractedCourse) {
-      setGolfCourse({
-        ...extractedCourse,
-        region: extractedCourse.region || ''
-      });
-      return;
-    }
-
-    // Fallback to tags if available
-    const fetchGolfCourse = async () => {
-      if (golfClubTags.length > 0 && !golfCourse) {
-        try {
-          const { data: courseData, error } = await supabase
-            .from('golf_courses')
-            .select('id, name, country, region')
-            .eq('id', golfClubTags[0].entity_id)
-            .single();
-
-          if (!error && courseData) {
-            setGolfCourse(courseData);
-          }
-        } catch (error) {
-          console.error('Error fetching golf course:', error);
-        }
-      }
-    };
-
-    fetchGolfCourse();
-  }, [post.content, golfClubTags.length > 0 ? golfClubTags[0]?.entity_id : null]);
 
   const handleProfileClick = useCallback(() => {
     navigate(`/profile/${post.user.username}`);
   }, [navigate, post.user.username]);
 
   const handleMediaClick = () => {
-    // Transform post data for the post viewer
-    const transformedPost = {
-      ...post,
-      golfCourse: golfCourse ? {
-        id: golfCourse.id,
-        name: golfCourse.name,
-        country: golfCourse.country,
-        region: golfCourse.region
-      } : undefined
-    };
-    
-    const transformedPosts = allUserPosts.map(p => ({
-      ...p,
-      golfCourse: golfCourse ? {
-        id: golfCourse.id,
-        name: golfCourse.name,
-        country: golfCourse.country,
-        region: golfCourse.region
-      } : undefined
-    }));
-    
-    openPostViewer(transformedPost, transformedPosts);
+    openPostViewer(post, allUserPosts);
   };
 
   const handleVideoToggle = (e: React.MouseEvent) => {
@@ -290,20 +233,6 @@ const InstagramStylePostComponent: React.FC<InstagramStylePostProps> = ({ post, 
             </div>
           </div>
 
-          {/* Location Tag - Top Right */}
-          {golfCourse && (
-            <div className="absolute top-3 right-3 z-20">
-              <CoursePostBadge 
-                course={{
-                  id: golfCourse.id,
-                  name: golfCourse.name,
-                  country: golfCourse.country,
-                  region: golfCourse.region
-                }}
-                className="bg-black/40 backdrop-blur-sm border border-white/20 text-xs"
-              />
-            </div>
-          )}
 
           {/* Video Controls */}
           {currentMedia.media_type === 'video' && (
