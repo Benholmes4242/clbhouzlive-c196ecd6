@@ -1,6 +1,8 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Minimize2, Volume2, VolumeX, MapPin, Heart, MessageCircle, Share, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Minimize2, Volume2, VolumeX, MapPin, ChevronLeft, ChevronRight } from 'lucide-react';
+import { PiHandsClapping, PiShareFat } from 'react-icons/pi';
+import { GoCommentDiscussion } from 'react-icons/go';
 import { useSwipeable } from 'react-swipeable';
 import { useTextExpansion } from '@/hooks/useTextExpansion';
 import { truncateToWords } from '@/utils/textUtils';
@@ -562,19 +564,19 @@ const FullscreenMediaModal = ({
             className="cursor-pointer hover:opacity-100 transition-opacity"
             onClick={(e) => handleInteractionClick(e, 'like')}
           >
-            <Heart className="w-8 h-8" />
+            <PiHandsClapping className="w-8 h-8" />
           </button>
           <button 
             className="cursor-pointer hover:opacity-100 transition-opacity"
             onClick={(e) => handleInteractionClick(e, 'comment')}
           >
-            <MessageCircle className="w-8 h-8" />
+            <GoCommentDiscussion className="w-8 h-8" />
           </button>
           <button 
             className="cursor-pointer hover:opacity-100 transition-opacity"
             onClick={(e) => handleInteractionClick(e, 'share')}
           >
-            <Share className="w-8 h-8" />
+            <PiShareFat className="w-8 h-8" />
           </button>
         </div>
       </div>
