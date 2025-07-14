@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
 export const useTrendingCard = () => {
-  const [trendingPost, setTrendingPost] = useState(null);
+  const [trendingPosts, setTrendingPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -35,25 +35,28 @@ export const useTrendingCard = () => {
         console.log('Posts with video media:', postsWithVideoMedia.length);
         
         if (postsWithVideoMedia.length > 0) {
-          // Select a random post
-          const randomIndex = Math.floor(Math.random() * postsWithVideoMedia.length);
-          const selectedPost = postsWithVideoMedia[randomIndex];
+          // Select 3 random posts for desktop view
+          const shuffled = [...postsWithVideoMedia].sort(() => 0.5 - Math.random());
+          const selectedPosts = shuffled.slice(0, 3);
           
-          // Get user profile separately
-          const { data: userProfile } = await supabase
-            .from('user_profiles')
-            .select('id, display_name, username, profile_photo_url')
-            .eq('id', selectedPost.user_id)
-            .single();
-            
-          // Attach user profile to post
-          const postWithProfile = {
-            ...selectedPost,
-            user_profiles: userProfile
-          };
+          // Get user profiles for all selected posts
+          const postsWithProfiles = await Promise.all(
+            selectedPosts.map(async (post) => {
+              const { data: userProfile } = await supabase
+                .from('user_profiles')
+                .select('id, display_name, username, profile_photo_url')
+                .eq('id', post.user_id)
+                .single();
+                
+              return {
+                ...post,
+                user_profiles: userProfile
+              };
+            })
+          );
           
-          console.log('Selected trending post:', selectedPost.id, 'by', userProfile?.username);
-          setTrendingPost(postWithProfile);
+          console.log('Selected trending posts:', postsWithProfiles.length);
+          setTrendingPosts(postsWithProfiles);
         } else {
           console.log('No video posts found for trending card');
         }
@@ -81,7 +84,7 @@ export const useTrendingCard = () => {
   }, []);
 
   return {
-    trendingPost,
+    trendingPosts,
     loading,
     error,
     refetch: fetchRandomPost
