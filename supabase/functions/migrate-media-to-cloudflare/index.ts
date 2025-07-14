@@ -185,7 +185,11 @@ serve(async (req) => {
                 }
               }
               
-              const r2Response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${accountId}/r2/buckets/clbhouz-media/objects/${filePath}`, {
+              // Upload to R2 using S3-compatible API
+              const bucketName = 'clbhouz-media';
+              const r2Url = `https://${accountId}.r2.cloudflarestorage.com/${bucketName}/${filePath}`;
+              
+              const r2Response = await fetch(r2Url, {
                 method: 'PUT',
                 headers: {
                   'Authorization': `Bearer ${r2ApiToken}`,
@@ -200,7 +204,7 @@ serve(async (req) => {
                   status: r2Response.status,
                   statusText: r2Response.statusText,
                   error: errorText,
-                  url: `https://api.cloudflare.com/client/v4/accounts/${accountId}/r2/buckets/clbhouz-media/objects/${filePath}`,
+                  url: r2Url,
                   accountId,
                   hasToken: !!r2ApiToken
                 });
