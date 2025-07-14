@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useVideoCompression } from './useVideoCompression';
 import { useChunkedUpload } from './useChunkedUpload';
+import { useCloudflareStream } from './useCloudflareStream';
 
 interface UploadProgress {
   postId: string;
@@ -22,6 +23,7 @@ export const useBackgroundUpload = () => {
   const { toast } = useToast();
   const { shouldCompress, triggerCompression } = useVideoCompression();
   const { uploadFileInChunks } = useChunkedUpload();
+  const { uploadVideo, isVideoFile } = useCloudflareStream();
   const [uploads, setUploads] = useState<Map<string, UploadProgress>>(new Map());
 
   const startBackgroundUpload = useCallback(async ({
@@ -74,9 +76,31 @@ export const useBackgroundUpload = () => {
         console.log(`Background uploading ${index + 1}/${mediaFiles.length}: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)}MB)`);
         
         let publicUrl = '';
+        let mediaType = file.type.startsWith('image/') ? 'image' : 'video';
         
-        // Use chunked upload for large files (>40MB) or if regular upload fails
-        if (file.size > 40 * 1024 * 1024) {
+        // Use Cloudflare Stream for video files
+        if (isVideoFile(file)) {
+          console.log(`Uploading video to Cloudflare Stream: ${file.name}`);
+          try {
+            const streamResult = await uploadVideo(file, {
+              title: file.name,
+              description: `Video uploaded from post ${postId}`
+            });
+            
+            if (streamResult.success && streamResult.urls) {
+              // Use HLS URL for video playback
+              publicUrl = streamResult.urls.hls;
+              console.log(`Successfully uploaded ${file.name} to Cloudflare Stream:`, publicUrl);
+            } else {
+              throw new Error(streamResult.error || 'Cloudflare Stream upload failed');
+            }
+          } catch (error) {
+            console.error(`Cloudflare Stream upload failed for ${file.name}:`, error);
+            throw error;
+          }
+        }
+        // Use chunked upload for large image files (>40MB) or if regular upload fails
+        else if (file.size > 40 * 1024 * 1024) {
           console.log(`Using chunked upload for large file: ${file.name}`);
           try {
             const result = await uploadFileInChunks(file);
@@ -148,7 +172,7 @@ export const useBackgroundUpload = () => {
           .from('post_media')
           .insert({
             post_id: postId,
-            media_type: file.type.startsWith('image/') ? 'image' : 'video',
+            media_type: mediaType,
             media_url: publicUrl
           })
           .select()
@@ -159,8 +183,8 @@ export const useBackgroundUpload = () => {
           throw mediaError;
         }
 
-        // Check if video needs compression
-        if (shouldCompress(file)) {
+        // Skip compression for Cloudflare Stream videos (already optimized)
+        if (!isVideoFile(file) && shouldCompress(file)) {
           console.log(`Video ${file.name} needs compression (${(file.size / 1024 / 1024).toFixed(2)}MB > 40MB)`);
           
           // Trigger compression in background
@@ -176,6 +200,8 @@ export const useBackgroundUpload = () => {
           } else {
             console.warn(`Failed to trigger compression for ${file.name}:`, compressionResult.error);
           }
+        } else if (isVideoFile(file)) {
+          console.log(`Video ${file.name} uploaded to Cloudflare Stream - no additional compression needed`);
         }
 
         // Update progress

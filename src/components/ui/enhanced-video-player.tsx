@@ -70,7 +70,9 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
     }
 
     // Check if HLS is needed and supported
-    if (enableHLS && src.includes('.m3u8')) {
+    const isCloudflareStream = src.includes('videodelivery.net') || src.includes('iframe.videodelivery.net');
+    
+    if (enableHLS && (src.includes('.m3u8') || isCloudflareStream)) {
       if (window.Hls && window.Hls.isSupported()) {
         const hls = new window.Hls({
           enableWorker: true,
@@ -78,6 +80,16 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
           backBufferLength: 90,
           maxBufferLength: 30,
           maxMaxBufferLength: 60,
+          // Optimized settings for Cloudflare Stream
+          ...(isCloudflareStream && {
+            maxBufferLength: 60,
+            maxMaxBufferLength: 120,
+            startLevel: -1, // Auto-select quality
+            capLevelToPlayerSize: true,
+            abrEwmaDefaultEstimate: 2000000,
+            abrBandWidthFactor: 0.8,
+            abrBandWidthUpFactor: 0.6,
+          }),
           // Adaptive bitrate settings
           abrEwmaDefaultEstimate: adaptiveBitrate ? 1000000 : 5000000,
           abrBandWidthFactor: 0.95,
@@ -88,7 +100,7 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
         hls.attachMedia(video);
         
         hls.on(window.Hls.Events.MANIFEST_PARSED, () => {
-          console.log('📺 HLS manifest loaded, starting playback');
+          console.log('📺 HLS manifest loaded, starting playback' + (isCloudflareStream ? ' (Cloudflare Stream)' : ''));
           setIsLoading(false);
           if (autoplay) {
             video.play().catch(console.error);

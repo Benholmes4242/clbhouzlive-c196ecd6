@@ -12,3 +12,6 @@ verify_jwt = true
 
 [functions.video-compression]
 verify_jwt = true
+
+[functions.cloudflare-stream-upload]
+verify_jwt = true

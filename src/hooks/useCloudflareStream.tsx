@@ -1,0 +1,160 @@
+import { useState } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+
+interface CloudflareStreamUploadResult {
+  success: boolean;
+  videoId?: string;
+  thumbnail?: string;
+  urls?: {
+    hls: string;
+    dash: string;
+    thumbnail: string;
+  };
+  status?: string;
+  error?: string;
+}
+
+interface UploadOptions {
+  title?: string;
+  description?: string;
+  onProgress?: (progress: number) => void;
+}
+
+export const useCloudflareStream = () => {
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const { toast } = useToast();
+
+  const uploadVideo = async (file: File, options: UploadOptions = {}): Promise<CloudflareStreamUploadResult> => {
+    setIsUploading(true);
+    setUploadProgress(0);
+
+    try {
+      // Create FormData with video file and metadata
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      if (options.title || options.description) {
+        formData.append('metadata', JSON.stringify({
+          title: options.title || file.name,
+          description: options.description
+        }));
+      }
+
+      console.log(`Uploading video to Cloudflare Stream: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)}MB)`);
+      
+      // Simulate progress for user feedback
+      const progressInterval = setInterval(() => {
+        setUploadProgress(prev => {
+          const newProgress = Math.min(prev + Math.random() * 10, 90);
+          options.onProgress?.(newProgress);
+          return newProgress;
+        });
+      }, 500);
+
+      // Upload to Cloudflare Stream via edge function
+      const { data, error } = await supabase.functions.invoke('cloudflare-stream-upload', {
+        body: formData,
+      });
+
+      clearInterval(progressInterval);
+
+      if (error) {
+        console.error('Cloudflare Stream upload error:', error);
+        throw new Error(error.message || 'Upload failed');
+      }
+
+      if (!data.success) {
+        console.error('Cloudflare Stream upload failed:', data.error);
+        throw new Error(data.error || 'Upload failed');
+      }
+
+      setUploadProgress(100);
+      options.onProgress?.(100);
+
+      console.log('Video uploaded successfully to Cloudflare Stream:', data.videoId);
+
+      toast({
+        title: "Video uploaded!",
+        description: "Your video is now hosted on Cloudflare Stream with global CDN.",
+      });
+
+      return {
+        success: true,
+        videoId: data.videoId,
+        thumbnail: data.thumbnail,
+        urls: data.urls,
+        status: data.status
+      };
+
+    } catch (error) {
+      console.error('Video upload error:', error);
+      
+      toast({
+        title: "Upload failed",
+        description: error instanceof Error ? error.message : "Failed to upload video to Cloudflare Stream",
+        variant: "destructive"
+      });
+
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Upload failed'
+      };
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(0);
+    }
+  };
+
+  const getVideoStatus = async (videoId: string): Promise<CloudflareStreamUploadResult> => {
+    try {
+      const { data, error } = await supabase.functions.invoke('cloudflare-stream-upload', {
+        body: null,
+        method: 'GET',
+      });
+
+      if (error) throw new Error(error.message);
+
+      return data;
+    } catch (error) {
+      console.error('Error getting video status:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Failed to get video status'
+      };
+    }
+  };
+
+  // Helper to check if a file is a video
+  const isVideoFile = (file: File): boolean => {
+    return file.type.startsWith('video/');
+  };
+
+  // Helper to get Cloudflare Stream embed URL
+  const getEmbedUrl = (videoId: string): string => {
+    return `https://iframe.videodelivery.net/${videoId}`;
+  };
+
+  // Helper to get direct playback URL (HLS)
+  const getPlaybackUrl = (videoId: string): string => {
+    return `https://videodelivery.net/${videoId}/manifest/video.m3u8`;
+  };
+
+  // Helper to get thumbnail URL
+  const getThumbnailUrl = (videoId: string, options: { width?: number; height?: number; time?: number } = {}): string => {
+    const { width = 1280, height = 720, time = 1 } = options;
+    return `https://videodelivery.net/${videoId}/thumbnails/thumbnail.jpg?width=${width}&height=${height}&time=${time}s`;
+  };
+
+  return {
+    uploadVideo,
+    getVideoStatus,
+    isUploading,
+    uploadProgress,
+    isVideoFile,
+    getEmbedUrl,
+    getPlaybackUrl,
+    getThumbnailUrl
+  };
+};
