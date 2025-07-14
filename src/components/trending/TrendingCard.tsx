@@ -70,14 +70,14 @@ const TrendingCard = () => {
                 </div>
                 
                 {/* Action buttons */}
-                <div className="flex flex-col space-y-1 ml-2">
-                  <button className="bg-white/20 backdrop-blur-sm rounded-full p-1.5 text-white hover:bg-white/30 transition-colors">
+                <div className="flex flex-col space-y-2 ml-2">
+                  <button className="rounded-full p-1.5 text-white hover:bg-white/20 transition-colors">
                     <PiHandsClapping className="w-6 h-6" />
                   </button>
-                  <button className="bg-white/20 backdrop-blur-sm rounded-full p-1.5 text-white hover:bg-white/30 transition-colors">
+                  <button className="rounded-full p-1.5 text-white hover:bg-white/20 transition-colors">
                     <GoCommentDiscussion className="w-6 h-6" />
                   </button>
-                  <button className="bg-white/20 backdrop-blur-sm rounded-full p-1.5 text-white hover:bg-white/30 transition-colors">
+                  <button className="rounded-full p-1.5 text-white hover:bg-white/20 transition-colors">
                     <PiShareFat className="w-6 h-6" />
                   </button>
                 </div>
