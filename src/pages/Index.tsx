@@ -5,6 +5,7 @@ import BottomNavigation from '@/components/BottomNavigation';
 import TrendingFeed from '@/components/TrendingFeed';
 import ClubhouzMomentsCarousel from '@/components/clubhouse/ClubhouzMomentsCarousel';
 import TrendingCard from '@/components/trending/TrendingCard';
+import { MigrationTrigger } from '@/components/admin/MigrationTrigger';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Button } from '@/components/ui/button';
@@ -118,6 +119,11 @@ const Index = () => {
       <main>
         <TrendingFeed />
       </main>
+      
+      {/* Migration trigger for mobile access - temporary */}
+      <div className="p-4">
+        <MigrationTrigger />
+      </div>
       
       <BottomNavigation />
     </div>
