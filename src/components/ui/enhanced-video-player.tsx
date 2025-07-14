@@ -70,7 +70,7 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
     }
 
     // Check if HLS is needed and supported
-    const isCloudflareStream = src.includes('videodelivery.net') || src.includes('iframe.videodelivery.net');
+    const isCloudflareStream = src.includes('videodelivery.net') || src.includes('iframe.videodelivery.net') || src.includes('cloudflarestream.com');
     
     if (enableHLS && (src.includes('.m3u8') || isCloudflareStream)) {
       if (window.Hls && window.Hls.isSupported()) {
