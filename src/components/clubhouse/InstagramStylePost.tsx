@@ -181,6 +181,7 @@ const InstagramStylePostComponent: React.FC<InstagramStylePostProps> = ({ post, 
           className="relative w-full aspect-[4/5] md:aspect-[3/4]" 
         >
           {currentMedia.media_type === 'video' ? (
+            console.log('🎬 InstagramStylePost rendering video:', currentMedia.media_url),
             <EnhancedVideoPlayer
               src={currentMedia.media_url}
               autoplay={shouldAutoplay}
