@@ -223,7 +223,7 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
                     <img
                       src={isUserPost ? (item as UserPostWithType).user.profile_photo_url || '/placeholder.svg' : (item as VideoPost).user.avatar || '/placeholder.svg'}
                       alt={displayName || username || 'User'}
-                      className="w-5 h-5 rounded-full object-cover border border-white/20"
+                      className="w-10 h-10 rounded-full object-cover border border-white/20"
                     />
                     <p className="text-white font-bold text-base truncate">
                       {displayName || username}
