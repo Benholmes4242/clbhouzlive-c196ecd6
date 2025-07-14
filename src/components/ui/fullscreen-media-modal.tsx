@@ -1,5 +1,6 @@
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import { Minimize2, Volume2, VolumeX, ChevronLeft, ChevronRight } from 'lucide-react';
 import { PiHandsClapping, PiShareFat } from 'react-icons/pi';
 import { GoCommentDiscussion } from 'react-icons/go';
@@ -87,7 +88,7 @@ const FullscreenMediaModal = ({
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [isMuted, setIsMuted] = useState(initialVideoMuted);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null); // Keep for compatibility but EnhancedVideoPlayer manages its own video
   const isMobile = useIsMobile();
   const { isTextExpanded, handleMouseEnter, handleMouseLeave } = useTextExpansion();
   const { registerVideo, unregisterVideo, pauseAllAndSetActive, storeVideoPosition, resumeVideoFromPosition } = useVideoPlaybackManager();
@@ -182,69 +183,28 @@ const FullscreenMediaModal = ({
 
   // Auto-play video when modal opens or index changes
   useEffect(() => {
-    if (isOpen && mediaTypes[currentIndex] === 'video' && videoRef.current) {
-      // Register the fullscreen video and pause all other videos
-      registerVideo(fullscreenVideoId.current, videoRef.current);
+    if (isOpen && mediaTypes[currentIndex] === 'video') {
+      // The EnhancedVideoPlayer will handle video initialization automatically
+      // We just need to manage the video playback state
       pauseAllAndSetActive(fullscreenVideoId.current);
-      
-      // Set video properties - preserve the original mute state
-      videoRef.current.muted = isMuted;
-      videoRef.current.loop = true;
-      videoRef.current.playsInline = true;
-      
-      // Set initial position if provided
-      if (initialVideoPosition > 0) {
-        videoRef.current.currentTime = initialVideoPosition;
-      }
-      
-      videoRef.current.play().catch(console.error);
     }
-  }, [isOpen, currentIndex, mediaTypes, isMuted, initialVideoPosition, initialVideoMuted, registerVideo, pauseAllAndSetActive]);
+  }, [isOpen, currentIndex, mediaTypes, pauseAllAndSetActive]);
 
-  // Cleanup when modal closes - restore feed video behavior and original mute state
+  // Cleanup when modal closes - restore feed video behavior
   useEffect(() => {
     return () => {
-      if (videoRef.current) {
-        // Stop and unregister the fullscreen video
-        videoRef.current.pause();
-        videoRef.current.currentTime = 0;
+      if (isOpen && mediaTypes[currentIndex] === 'video') {
+        // Unregister the fullscreen video
         unregisterVideo(fullscreenVideoId.current);
         
-        // When modal closes, trigger a re-evaluation of feed videos
-        // This will allow feed videos to resume autoplay based on their visibility
-        // and restore the original global mute state
+        // When modal closes, allow feed videos to resume
         setTimeout(() => {
-          // Clear the active video without pausing all videos
           pauseAllAndSetActive('');
-          
-          console.log('🔊 Fullscreen modal closed, feed videos will resume with original mute state:', originalGlobalMuteState.current);
-          
-          // Direct approach: Force autoplay for all videos currently in viewport
-          setTimeout(() => {
-            // Find all video elements in the feed and check if they're in viewport
-            const allVideos = document.querySelectorAll('[data-video-id^="index-"]');
-            
-            allVideos.forEach((videoElement) => {
-              const video = videoElement as HTMLVideoElement;
-              if (video && isElementInViewport(video)) {
-                console.log('🎯 Forcing autoplay for video in viewport:', video.dataset.videoId);
-                if (video.paused && video.readyState >= 2) {
-                  video.play().catch(error => {
-                    console.log('Direct autoplay prevented:', error);
-                  });
-                }
-              }
-            });
-            
-            // Also trigger scroll events as backup
-            window.dispatchEvent(new Event('scroll'));
-            window.dispatchEvent(new Event('resize'));
-            console.log('🔄 Triggered direct autoplay and scroll events');
-          }, 50);
-        }, 100); // Small delay to ensure modal cleanup is complete
+          console.log('🔊 Fullscreen modal closed, feed videos will resume');
+        }, 100);
       }
     };
-  }, [unregisterVideo, pauseAllAndSetActive]);
+  }, [isOpen, currentIndex, mediaTypes, unregisterVideo, pauseAllAndSetActive]);
 
   // Prevent background scrolling when modal is open - Simple but effective approach
   useEffect(() => {
@@ -296,10 +256,8 @@ const FullscreenMediaModal = ({
   }, [isOpen]);
 
   const handleMuteToggle = () => {
-    if (videoRef.current) {
-      videoRef.current.muted = !isMuted;
-      setIsMuted(!isMuted);
-    }
+    // EnhancedVideoPlayer handles its own mute state
+    setIsMuted(!isMuted);
   };
 
   const handleInteractionClick = (e: React.MouseEvent, type: string) => {
@@ -326,13 +284,7 @@ const FullscreenMediaModal = ({
   const handleBackdropClick = (e: React.MouseEvent) => {
     // Only close if clicking the backdrop, not the media content
     if (e.target === e.currentTarget) {
-      // Pass current video position and mute state back when closing via backdrop
-      const currentPosition = videoRef.current?.currentTime || 0;
-      const currentMuted = videoRef.current?.muted;
-      onClose(
-        mediaTypes[currentIndex] === 'video' ? currentPosition : undefined,
-        mediaTypes[currentIndex] === 'video' ? currentMuted : undefined
-      );
+      onClose();
     }
   };
 
@@ -383,15 +335,7 @@ const FullscreenMediaModal = ({
       <div className="absolute top-4 right-4 z-10 flex items-start gap-2">
         {/* Maximize - Top Right */}
         <button
-          onClick={() => {
-            // Pass current video position and mute state back when closing
-            const currentPosition = videoRef.current?.currentTime || 0;
-            const currentMuted = videoRef.current?.muted;
-            onClose(
-              mediaTypes[currentIndex] === 'video' ? currentPosition : undefined,
-              mediaTypes[currentIndex] === 'video' ? currentMuted : undefined
-            );
-          }}
+          onClick={() => onClose()}
           className="flex items-center justify-center w-10 h-10 text-white hover:bg-white/10 rounded-full transition-colors"
           aria-label="Close"
         >
@@ -419,16 +363,13 @@ const FullscreenMediaModal = ({
               style={{ maxWidth: '100vw', maxHeight: '100vh' }}
             />
           ) : (
-            <video
-              ref={videoRef}
+            <EnhancedVideoPlayer
               src={mediaUrls[currentIndex]}
               className="w-full h-full object-cover"
               muted={isMuted}
-              controls={false}
-              loop
-              playsInline
-              autoPlay
-              style={{ maxWidth: '100vw', maxHeight: '100vh' }}
+              loop={true}
+              autoplay={true}
+              enableHLS={true}
             />
           )}
         </div>

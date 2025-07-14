@@ -38,8 +38,6 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
   preloadLevel = 'metadata',
   quality = 'auto'
 }) => {
-  console.log('🎬 EnhancedVideoPlayer rendered with:', { src, enableHLS, autoplay, muted });
-  
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<any>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -52,13 +50,9 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
   // Load HLS.js if needed
   useEffect(() => {
     if (enableHLS && !window.Hls) {
-      console.log('📦 Loading HLS.js...');
       const script = document.createElement('script');
       script.src = 'https://cdn.jsdelivr.net/npm/hls.js@latest';
-      script.onload = () => {
-        console.log('✅ HLS.js loaded successfully');
-        initializeVideo();
-      };
+      script.onload = () => initializeVideo();
       script.onerror = (error) => {
         console.error('❌ Failed to load HLS.js:', error);
         setError('Failed to load video player');
@@ -71,13 +65,7 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
 
   const initializeVideo = () => {
     const video = videoRef.current;
-    if (!video) {
-      console.log('❌ Video element not found');
-      return;
-    }
-
-    console.log('🎬 Initializing video with src:', src);
-    console.log('🎬 EnableHLS:', enableHLS);
+    if (!video) return;
 
     // Clear any existing HLS instance
     if (hlsRef.current) {
@@ -89,14 +77,8 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
     const isCloudflareStream = src.includes('videodelivery.net') || src.includes('iframe.videodelivery.net') || src.includes('cloudflarestream.com');
     const isM3U8 = src.includes('.m3u8');
     
-    console.log('🎬 isCloudflareStream:', isCloudflareStream);
-    console.log('🎬 isM3U8:', isM3U8);
-    console.log('🎬 HLS available:', !!window.Hls);
-    console.log('🎬 HLS supported:', window.Hls ? window.Hls.isSupported() : false);
-    
     if (enableHLS && (isM3U8 || isCloudflareStream)) {
       if (window.Hls && window.Hls.isSupported()) {
-        console.log('🎬 Creating HLS instance...');
         const hls = new window.Hls({
           enableWorker: true,
           lowLatencyMode: true,
@@ -119,12 +101,10 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
           abrBandWidthUpFactor: 0.7,
         });
 
-        console.log('🎬 Loading HLS source:', src);
         hls.loadSource(src);
         hls.attachMedia(video);
         
         hls.on(window.Hls.Events.MANIFEST_PARSED, () => {
-          console.log('📺 HLS manifest loaded, starting playback' + (isCloudflareStream ? ' (Cloudflare Stream)' : ''));
           setIsLoading(false);
           if (autoplay) {
             video.play().catch(console.error);
@@ -132,31 +112,23 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
         });
 
         hls.on(window.Hls.Events.ERROR, (event: any, data: any) => {
-          console.error('❌ HLS error:', data);
           if (data.fatal) {
             setError('Video playback error');
             setIsLoading(false);
           }
         });
 
-        hls.on(window.Hls.Events.LEVEL_SWITCHED, (event: any, data: any) => {
-          console.log(`📊 Quality switched to: ${data.level}`);
-        });
-
         hlsRef.current = hls;
       } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
         // Native HLS support (Safari)
-        console.log('🎬 Using native HLS support');
         video.src = src;
         setIsLoading(false);
       } else {
-        console.log('❌ HLS not supported, falling back to standard video');
         video.src = src;
         setIsLoading(false);
       }
     } else {
       // Standard video
-      console.log('🎬 Using standard video playback');
       video.src = src;
       setIsLoading(false);
     }
