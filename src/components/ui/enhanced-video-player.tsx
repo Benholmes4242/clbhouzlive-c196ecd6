@@ -38,6 +38,8 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
   preloadLevel = 'metadata',
   quality = 'auto'
 }) => {
+  console.log('🎬 EnhancedVideoPlayer rendered with:', { src, enableHLS, autoplay, muted });
+  
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<any>(null);
   const [isPlaying, setIsPlaying] = useState(false);
