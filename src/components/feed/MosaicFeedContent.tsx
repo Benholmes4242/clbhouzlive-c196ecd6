@@ -266,7 +266,7 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
                       {displayName || username}
                     </p>
                   </div>
-                  {caption && (
+                   {caption && (
                     <div className="text-white/90 text-sm mt-1">
                       {(() => {
                         const hadIndex = caption.toLowerCase().indexOf(' had ');
@@ -285,7 +285,7 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
                         return <div className="line-clamp-2">{caption}</div>;
                       })()}
                     </div>
-                  )}
+                   )}
                 </div>
                 
                 {/* Action buttons */}

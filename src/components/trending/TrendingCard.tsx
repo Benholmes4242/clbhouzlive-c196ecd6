@@ -108,18 +108,31 @@ const TrendingCard = () => {
                       {user?.display_name || user?.username}
                     </p>
                   </div>
-                  {post.content && (
-                    <>
-                      {/* Default truncated text */}
-                      <p className="text-white/90 text-sm mt-1 line-clamp-2 group-hover:hidden">
-                        {post.content}
-                      </p>
-                      {/* Full text on hover (desktop only) */}
-                      <p className="text-white/90 text-sm mt-1 hidden group-hover:block md:group-hover:block">
-                        {post.content}
-                      </p>
-                    </>
-                  )}
+                  {post.content && (() => {
+                    // Filter out golf club tags from content
+                    let filteredContent = post.content;
+                    if (post.post_tags) {
+                      post.post_tags.forEach(tag => {
+                        if (tag.taggable_entities?.entity_type === 'golf_club') {
+                          const tagText = filteredContent.substring(tag.start_index, tag.end_index);
+                          filteredContent = filteredContent.replace(tagText, '').trim();
+                        }
+                      });
+                    }
+                    
+                    return filteredContent ? (
+                      <>
+                        {/* Default truncated text */}
+                        <p className="text-white/90 text-sm mt-1 line-clamp-2 group-hover:hidden">
+                          {filteredContent}
+                        </p>
+                        {/* Full text on hover (desktop only) */}
+                        <p className="text-white/90 text-sm mt-1 hidden group-hover:block md:group-hover:block">
+                          {filteredContent}
+                        </p>
+                      </>
+                    ) : null;
+                  })()}
                 </div>
                 
                 {/* Action buttons */}
