@@ -46,6 +46,7 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
   const [showControls, setShowControls] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [buffered, setBuffered] = useState(0);
+  const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Load HLS.js if needed
   useEffect(() => {
@@ -72,6 +73,16 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
       hlsRef.current.destroy();
       hlsRef.current = null;
     }
+
+    // Clear any existing timeout
+    if (loadingTimeoutRef.current) {
+      clearTimeout(loadingTimeoutRef.current);
+    }
+
+    // Set a fallback timeout to prevent infinite loading
+    loadingTimeoutRef.current = setTimeout(() => {
+      setIsLoading(false);
+    }, 3000); // 3 second timeout
 
     // Check if HLS is needed and supported
     const isCloudflareStream = src.includes('videodelivery.net') || src.includes('iframe.videodelivery.net') || src.includes('cloudflarestream.com');
@@ -105,6 +116,9 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
         hls.attachMedia(video);
         
         hls.on(window.Hls.Events.MANIFEST_PARSED, () => {
+          if (loadingTimeoutRef.current) {
+            clearTimeout(loadingTimeoutRef.current);
+          }
           setIsLoading(false);
           if (autoplay) {
             video.play().catch(console.error);
@@ -114,6 +128,9 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
         hls.on(window.Hls.Events.ERROR, (event: any, data: any) => {
           if (data.fatal) {
             setError('Video playback error');
+            if (loadingTimeoutRef.current) {
+              clearTimeout(loadingTimeoutRef.current);
+            }
             setIsLoading(false);
           }
         });
@@ -122,14 +139,23 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
       } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
         // Native HLS support (Safari)
         video.src = src;
+        if (loadingTimeoutRef.current) {
+          clearTimeout(loadingTimeoutRef.current);
+        }
         setIsLoading(false);
       } else {
         video.src = src;
+        if (loadingTimeoutRef.current) {
+          clearTimeout(loadingTimeoutRef.current);
+        }
         setIsLoading(false);
       }
     } else {
       // Standard video
       video.src = src;
+      if (loadingTimeoutRef.current) {
+        clearTimeout(loadingTimeoutRef.current);
+      }
       setIsLoading(false);
     }
   };
@@ -149,10 +175,26 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
       onPause?.();
     };
 
-    const handleLoadStart = () => setIsLoading(true);
-    const handleCanPlay = () => setIsLoading(false);
-    const handleWaiting = () => setIsLoading(true);
-    const handlePlaying = () => setIsLoading(false);
+    const handleLoadStart = () => {
+      // Don't show loading spinner for every buffer event
+      // Only show for initial load
+    };
+    const handleCanPlay = () => {
+      if (loadingTimeoutRef.current) {
+        clearTimeout(loadingTimeoutRef.current);
+      }
+      setIsLoading(false);
+    };
+    const handleWaiting = () => {
+      // Don't show loading spinner for brief buffering
+      // Only show for longer waits
+    };
+    const handlePlaying = () => {
+      if (loadingTimeoutRef.current) {
+        clearTimeout(loadingTimeoutRef.current);
+      }
+      setIsLoading(false);
+    };
 
     const handleProgress = () => {
       if (video.buffered.length > 0) {
@@ -192,6 +234,9 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
     return () => {
       if (hlsRef.current) {
         hlsRef.current.destroy();
+      }
+      if (loadingTimeoutRef.current) {
+        clearTimeout(loadingTimeoutRef.current);
       }
     };
   }, []);
