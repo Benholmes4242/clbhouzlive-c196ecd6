@@ -347,6 +347,26 @@ serve(async (req) => {
                   throw new Error(`Database update failed: ${updateError.message}`);
                 }
 
+                // Delete old R2 file after successful migration
+                try {
+                  const r2FilePath = oldUrl.replace('https://media.clbhouz.co.uk/', '');
+                  const deleteResponse = await fetch(`https://api.cloudflare.com/client/v4/accounts/${accountId}/r2/buckets/clbhouz-media/objects/${encodeURIComponent(r2FilePath)}`, {
+                    method: 'DELETE',
+                    headers: {
+                      'Authorization': `Bearer ${r2ApiToken}`,
+                    },
+                  });
+
+                  if (deleteResponse.ok) {
+                    console.log(`🗑️ Deleted old R2 file: ${r2FilePath}`);
+                  } else {
+                    console.warn(`Failed to delete R2 file ${r2FilePath}: ${deleteResponse.status}`);
+                  }
+                } catch (deleteError) {
+                  console.warn(`Error deleting R2 file: ${deleteError.message}`);
+                  // Don't fail the migration if cleanup fails
+                }
+
                 progress.successful++;
                 console.log(`✅ Re-migrated video to Stream: ${oldUrl} → ${newUrl}`);
               } else {
