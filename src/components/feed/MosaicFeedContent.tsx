@@ -38,8 +38,11 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
   };
 
   const handleMaximizeClick = (item: VideoPost | UserPostWithType) => {
+    console.log('🔍 Maximize clicked for item:', item);
+    console.log('🔍 Setting selectedPost and opening modal');
     setSelectedPost(item);
     setModalOpen(true);
+    console.log('🔍 Modal state should now be open');
   };
 
   const handleCloseModal = () => {
@@ -296,6 +299,9 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
       {/* Fullscreen Media Modal */}
       {modalOpen && selectedPost && (() => {
         const modalData = getMediaDataForModal(selectedPost);
+        console.log('🔍 Modal rendering with data:', modalData);
+        console.log('🔍 Modal open state:', modalOpen);
+        console.log('🔍 Selected post:', selectedPost);
         return (
           <FullscreenMediaModal
             isOpen={modalOpen}
