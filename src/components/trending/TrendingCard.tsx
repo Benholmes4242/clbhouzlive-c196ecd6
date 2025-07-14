@@ -63,7 +63,7 @@ const TrendingCard = () => {
                     {user?.display_name || user?.username}
                   </p>
                   {post.content && (
-                    <p className="text-white/90 text-xs mt-1 line-clamp-2">
+                    <p className="text-white/90 text-sm mt-1 line-clamp-2">
                       {post.content}
                     </p>
                   )}
