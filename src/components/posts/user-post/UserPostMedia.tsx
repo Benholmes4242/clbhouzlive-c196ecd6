@@ -1,6 +1,6 @@
 import React from 'react';
 import { SwipeCarousel } from '@/components/ui/swipe-carousel';
-import VideoPlayer from '@/components/ui/video-player';
+import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import CoursePostBadge from '../CoursePostBadge';
 import { PostMedia, GolfCourse } from './types';
 
@@ -45,18 +45,14 @@ export const UserPostMedia: React.FC<UserPostMediaProps> = ({
           onClick={() => onMediaClick(mediaItem.media_url, 'image')}
         />
       ) : (
-        <VideoPlayer
+        <EnhancedVideoPlayer
           src={mediaItem.media_url}
           autoplay={shouldAutoplay}
           muted={true}
           loop={true}
           className="w-full h-full"
-          showVideoIcon={true}
-          showOverlayControls={true}
-          showMuteButton={true}
-          isInFeed={true}
+          enableHLS={true}
           onClick={() => onMediaClick(mediaItem.media_url, 'video')}
-          videoId={`carousel-${mediaItem.id}`}
         />
       )}
     </div>

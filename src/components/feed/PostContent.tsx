@@ -3,7 +3,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Play, Pause, Maximize2 } from 'lucide-react';
 import { SwipeCarousel } from '@/components/ui/swipe-carousel';
 import CoursePostBadge from '../posts/CoursePostBadge';
-import VideoPlayer from '@/components/ui/video-player';
+import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { useFullscreenMedia } from '@/hooks/useFullscreenMedia';
 import LazyImage from '@/components/ui/lazy-image';
@@ -209,15 +209,13 @@ const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentPr
                 )}
               </>
               ) : content.videoUrl ? (
-                <VideoPlayer
+                <EnhancedVideoPlayer
                   src={content.videoUrl}
                   autoplay={false}
                   muted={true}
                   loop={true}
                   className="w-full h-80"
-                  showOverlayControls={true}
-                  showMuteButton={true}
-                  isInFeed={true}
+                  enableHLS={true}
                 />
               ) : null}
           </div>

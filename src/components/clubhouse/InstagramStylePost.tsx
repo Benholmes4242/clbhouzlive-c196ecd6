@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { supabase } from '@/integrations/supabase/client';
 import CoursePostBadge from '@/components/posts/CoursePostBadge';
-import VideoPlayer from '@/components/ui/video-player';
+import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import { useVideoAutoplay } from '@/hooks/useVideoAutoplay';
 import { useSwipeable } from 'react-swipeable';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -181,18 +181,13 @@ const InstagramStylePostComponent: React.FC<InstagramStylePostProps> = ({ post, 
           className="relative w-full aspect-[4/5] md:aspect-[3/4]" 
         >
           {currentMedia.media_type === 'video' ? (
-            <VideoPlayer
+            <EnhancedVideoPlayer
               src={currentMedia.media_url}
               autoplay={shouldAutoplay}
               muted={true}
               loop={true}
               className="w-full h-full"
-              showVideoIcon={false}
-              showOverlayControls={true}
-              showMuteButton={true}
-              isInFeed={true}
-              videoId={`instagram-${currentMedia.id}`}
-              videoRef={videoRef}
+              enableHLS={true}
             />
           ) : (
             <SmartMediaContainer
