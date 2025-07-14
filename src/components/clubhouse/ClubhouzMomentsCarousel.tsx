@@ -37,7 +37,7 @@ const ClubhouzMomentsCarousel: React.FC = () => {
     return (
       <div className="w-full py-4">
         <div className="mx-auto" style={{ paddingLeft: '0.125rem', paddingRight: '0.125rem' }}>
-          <div className="flex items-center justify-between mb-4 px-3">
+          <div className="flex items-center justify-between mb-4 px-4">
             <h2 className="text-lg font-semibold">Discover new players</h2>
           </div>
           <div className="flex gap-1 overflow-hidden">
@@ -59,7 +59,7 @@ const ClubhouzMomentsCarousel: React.FC = () => {
   return (
     <div className="w-full py-4">
       <div className="mx-auto" style={{ paddingLeft: '0.125rem', paddingRight: '0.125rem' }}>
-        <div className="flex items-center justify-between mb-4 px-3">
+        <div className="flex items-center justify-between mb-4 px-4">
           <h2 className="text-lg font-semibold">Discover new players</h2>
           
           {/* Desktop Navigation Arrows */}
