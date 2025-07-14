@@ -1,6 +1,6 @@
 // Image optimization utilities for better performance
 
-export const getOptimizedImageUrl = (url: string, width?: number, height?: number): string => {
+export const getOptimizedImageUrl = (url: string, width?: number, height?: number, quality: number = 80, format: string = 'auto'): string => {
   if (!url) return url;
   
   // For Supabase storage URLs - Supabase doesn't support query param transformations
@@ -9,17 +9,22 @@ export const getOptimizedImageUrl = (url: string, width?: number, height?: numbe
     return url;
   }
   
-  // For external URLs (like Unsplash), add mobile-optimized parameters
+  // For external URLs (like Unsplash), add optimized parameters
   if (url.includes('unsplash.com')) {
     const urlObj = new URL(url);
-    if (width && height) {
-      urlObj.searchParams.set('w', width.toString());
-      urlObj.searchParams.set('h', height.toString());
-      urlObj.searchParams.set('fit', 'crop');
-      urlObj.searchParams.set('crop', 'face');
-      urlObj.searchParams.set('q', '80');
+    if (width) urlObj.searchParams.set('w', width.toString());
+    if (height) urlObj.searchParams.set('h', height.toString());
+    urlObj.searchParams.set('fit', 'crop');
+    urlObj.searchParams.set('crop', 'face');
+    urlObj.searchParams.set('q', quality.toString());
+    
+    // Set format based on browser support
+    if (format === 'auto' || format === 'webp') {
       urlObj.searchParams.set('fm', 'webp');
+    } else if (format === 'avif') {
+      urlObj.searchParams.set('fm', 'avif');
     }
+    
     return urlObj.toString();
   }
   
@@ -72,14 +77,50 @@ export const getResponsiveImageSizes = () => {
 };
 
 // Preload critical images for better perceived performance
-export const preloadCriticalImages = (urls: string[]) => {
+// Generate responsive image sizes for srcset
+export const generateResponsiveSizes = (baseWidth?: number, baseHeight?: number) => {
+  const sizes = [320, 640, 768, 1024, 1280, 1920];
+  const aspectRatio = baseWidth && baseHeight ? baseWidth / baseHeight : 1;
+  
+  return sizes
+    .filter(size => !baseWidth || size <= baseWidth * 1.5) // Don't generate sizes much larger than original
+    .map(width => ({
+      width,
+      height: Math.round(width / aspectRatio)
+    }));
+};
+
+// Enhanced critical image preloading with responsive sizes
+export const preloadCriticalImages = (urls: string[], options: { quality?: number, format?: string } = {}) => {
   if (typeof window === 'undefined') return;
   
+  const { quality = 80, format = 'webp' } = options;
+  
   urls.slice(0, 3).forEach(url => { // Only preload first 3 images
-    const link = document.createElement('link');
-    link.rel = 'preload';
-    link.as = 'image';
-    link.href = url;
-    document.head.appendChild(link);
+    // Preload multiple sizes for responsive images
+    const sizes = [320, 640, 1024];
+    
+    sizes.forEach(size => {
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'image';
+      link.href = getOptimizedImageUrl(url, size, undefined, quality, format);
+      link.media = `(max-width: ${size}px)`;
+      document.head.appendChild(link);
+    });
+  });
+};
+
+// Smart preloading based on connection and device
+export const smartPreload = (urls: string[]) => {
+  if (typeof window === 'undefined') return;
+  
+  const connection = (navigator as any).connection;
+  const isSlowConnection = connection && (connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g');
+  const preloadCount = isSlowConnection ? 1 : 3;
+  
+  preloadCriticalImages(urls.slice(0, preloadCount), {
+    quality: isSlowConnection ? 60 : 80,
+    format: 'webp'
   });
 };
