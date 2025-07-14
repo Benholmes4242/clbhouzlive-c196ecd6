@@ -3,7 +3,7 @@ import { Heart, MessageCircle, ChevronLeft, ChevronRight, Maximize2 } from 'luci
 import { PiHandsClapping, PiShareFat } from 'react-icons/pi';
 import { GoCommentDiscussion } from 'react-icons/go';
 import OptimisticPostCard from '../posts/OptimisticPostCard';
-import PostViewerModal from '../posts/PostViewerModal';
+import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import { VideoPost, UserPostWithType } from './types';
 
 interface MosaicFeedContentProps {
@@ -47,31 +47,31 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
     setSelectedPost(null);
   };
 
-  const transformPostForModal = (item: VideoPost | UserPostWithType) => {
+  const getMediaDataForModal = (item: VideoPost | UserPostWithType) => {
     const isUserPost = item.type === 'user_post';
+    const media = isUserPost 
+      ? (item as UserPostWithType).post_media
+      : [{
+          id: item.id,
+          media_type: (item as VideoPost).content.type,
+          media_url: (item as VideoPost).content.videoUrl || (item as VideoPost).content.image || ''
+        }];
+
     return {
-      id: item.id,
-      content: isUserPost ? (item as UserPostWithType).content : (item as VideoPost).content.description,
-      created_at: isUserPost ? (item as UserPostWithType).created_at : new Date().toISOString(),
-      user: {
-        id: isUserPost ? (item as UserPostWithType).user.id : item.id,
-        display_name: isUserPost ? (item as UserPostWithType).user.display_name : (item as VideoPost).user.name,
-        username: isUserPost ? (item as UserPostWithType).user.username : (item as VideoPost).user.username,
-        profile_photo_url: isUserPost ? (item as UserPostWithType).user.profile_photo_url : (item as VideoPost).user.avatar,
+      mediaUrl: media.map(m => m.media_url),
+      mediaType: media.map(m => m.media_type as 'image' | 'video'),
+      user: isUserPost ? {
+        id: (item as UserPostWithType).user.id,
+        profile_photo_url: (item as UserPostWithType).user.profile_photo_url
+      } : {
+        id: item.id,
+        profile_photo_url: (item as VideoPost).user.avatar
       },
-      post_media: isUserPost 
-        ? (item as UserPostWithType).post_media.map(pm => ({
-            id: pm.id,
-            media_type: pm.media_type,
-            media_url: pm.media_url
-          }))
-        : [{
-            id: item.id,
-            media_type: (item as VideoPost).content.type,
-            media_url: (item as VideoPost).content.videoUrl || (item as VideoPost).content.image || ''
-          }],
-      post_tags: isUserPost ? (item as UserPostWithType).post_tags : undefined,
-      golfCourse: undefined
+      displayName: isUserPost 
+        ? (item as UserPostWithType).user.display_name || (item as UserPostWithType).user.username
+        : (item as VideoPost).user.name,
+      content: isUserPost ? (item as UserPostWithType).content : (item as VideoPost).content.description,
+      postTags: isUserPost ? (item as UserPostWithType).post_tags : undefined
     };
   };
 
@@ -198,7 +198,7 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
           <div className="absolute top-2 right-2">
             <button 
               onClick={() => handleMaximizeClick(item)}
-              className="rounded-full p-1.5 bg-black/50 text-white hover:bg-black/70 transition-colors opacity-0 group-hover:opacity-100"
+              className="rounded-full p-1.5 text-white hover:bg-white/20 transition-colors opacity-0 group-hover:opacity-100"
             >
               <Maximize2 className="w-5 h-5" />
             </button>
@@ -276,15 +276,22 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
         {sortedContent.map((item, index) => renderMediaTile(item, index))}
       </div>
 
-      {/* Post Viewer Modal */}
-      {modalOpen && selectedPost && (
-        <PostViewerModal
-          isOpen={modalOpen}
-          onClose={handleCloseModal}
-          initialPost={transformPostForModal(selectedPost)}
-          allUserPosts={[transformPostForModal(selectedPost)]}
-        />
-      )}
+      {/* Fullscreen Media Modal */}
+      {modalOpen && selectedPost && (() => {
+        const modalData = getMediaDataForModal(selectedPost);
+        return (
+          <FullscreenMediaModal
+            isOpen={modalOpen}
+            onClose={handleCloseModal}
+            mediaUrl={modalData.mediaUrl}
+            mediaType={modalData.mediaType}
+            user={modalData.user}
+            displayName={modalData.displayName}
+            content={modalData.content}
+            postTags={modalData.postTags}
+          />
+        );
+      })()}
     </div>
   );
 };
