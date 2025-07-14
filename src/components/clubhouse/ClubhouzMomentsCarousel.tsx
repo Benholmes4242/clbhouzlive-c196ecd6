@@ -40,7 +40,7 @@ const ClubhouzMomentsCarousel: React.FC = () => {
           <div className="flex items-center justify-between mb-4 px-4">
             <h2 className="text-lg font-semibold">Discover new players</h2>
           </div>
-          <div className="flex gap-1 overflow-hidden">
+          <div className="flex gap-1 overflow-hidden md:px-4">
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="flex-shrink-0 w-52 md:w-60">
                 <div className="bg-muted rounded-xl aspect-[3/4] animate-pulse" />
@@ -91,7 +91,7 @@ const ClubhouzMomentsCarousel: React.FC = () => {
         <div className="relative">
           <div
             ref={carouselRef}
-            className="flex gap-1 overflow-x-auto scrollbar-hide pb-2 select-none"
+            className="flex gap-1 overflow-x-auto scrollbar-hide pb-2 select-none md:px-4"
             style={{
               scrollSnapType: 'x mandatory',
               WebkitOverflowScrolling: 'touch'
