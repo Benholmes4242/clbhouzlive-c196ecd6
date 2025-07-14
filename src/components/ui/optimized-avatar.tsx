@@ -20,7 +20,10 @@ const OptimizedAvatarComponent: React.FC<OptimizedAvatarProps> = ({
   fallback,
   priority = false
 }) => {
-  const optimizedSrc = src ? getOptimizedImageUrl(src, size, size) : null;
+  // Provide a default fallback image if src is null/empty
+  const fallbackImageUrl = `https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=${size}&h=${size}&fit=crop&crop=face`;
+  const imageUrl = src || fallbackImageUrl;
+  const optimizedSrc = getOptimizedImageUrl(imageUrl, size, size);
 
   return (
     <Avatar className={className} style={{ width: size, height: size }}>
