@@ -260,14 +260,6 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
         </div>
       )}
 
-      {/* Buffer progress bar */}
-      <div className="absolute top-0 left-0 w-full h-1 bg-white/20 z-10">
-        <div 
-          className="h-full bg-white/40 transition-all duration-300"
-          style={{ width: `${buffered}%` }}
-        />
-      </div>
-
       <video
         ref={videoRef}
         poster={poster}
