@@ -90,7 +90,7 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
             maxBufferLength: 60,
             maxMaxBufferLength: 120,
             startLevel: -1, // Auto-select quality
-            capLevelToPlayerSize: true,
+            capLevelToPlayerSize: false, // Always allow highest quality regardless of player size
             abrEwmaDefaultEstimate: 2000000,
             abrBandWidthFactor: 0.8,
             abrBandWidthUpFactor: 0.6,
