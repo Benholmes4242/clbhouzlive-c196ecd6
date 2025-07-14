@@ -8,7 +8,7 @@ import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { UserPostData, GolfCourse } from './types';
 import { UserInfoOverlay } from './overlays/UserInfoOverlay';
-import { GolfCourseTagOverlay } from './overlays/GolfCourseTagOverlay';
+
 import { CaptionOverlay } from './overlays/CaptionOverlay';
 import { InteractionIconsOverlay } from './overlays/InteractionIconsOverlay';
 import { MediaNavigationDots } from './overlays/MediaNavigationDots';
@@ -213,15 +213,7 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
           </button>
         </div>
 
-        {/* Only show overlay golf course tag on mobile, desktop shows in caption */}
-        {isMobile && (
-          <GolfCourseTagOverlay
-            golfCourse={golfCourse}
-            isMobile={isMobile}
-            showFullTag={showFullCourseTag}
-            onTagClick={handleCourseTagClick}
-          />
-        )}
+        {/* Golf course tag overlay removed */}
 
         <CaptionOverlay
           content={post.content}
