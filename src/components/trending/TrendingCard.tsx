@@ -74,12 +74,11 @@ const TrendingCard = () => {
           </div>
         )}
 
-        {/* Trending Pill - top right */}
+        {/* Trending Icon - top right */}
         <div className="absolute top-2 right-2 z-10">
-          <div className="bg-white/20 backdrop-blur-sm rounded-full px-2 py-1 flex items-center gap-1">
-            <TrendingUp className="w-4 h-4 text-white" />
-            <span className="text-white text-sm font-medium">Trending</span>
-          </div>
+          <button className="rounded-full p-1.5 text-white hover:bg-white/20 transition-colors">
+            <TrendingUp className="w-6 h-6" />
+          </button>
         </div>
 
         {/* Single Video - No Carousel */}
