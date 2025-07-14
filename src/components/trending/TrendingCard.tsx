@@ -58,14 +58,21 @@ const TrendingCard = () => {
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent transition-opacity duration-300">
             <div className="absolute bottom-0 left-0 right-0 p-3">
               <div className="flex justify-between items-end">
-                <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0 max-w-[calc(100%-80px)]">
                   <p className="text-white font-bold text-base truncate">
                     {user?.display_name || user?.username}
                   </p>
                   {post.content && (
-                    <p className="text-white/90 text-sm mt-1 line-clamp-2">
-                      {post.content}
-                    </p>
+                    <>
+                      {/* Default truncated text */}
+                      <p className="text-white/90 text-sm mt-1 line-clamp-2 group-hover:hidden">
+                        {post.content}
+                      </p>
+                      {/* Full text on hover (desktop only) */}
+                      <p className="text-white/90 text-sm mt-1 hidden group-hover:block md:group-hover:block">
+                        {post.content}
+                      </p>
+                    </>
                   )}
                 </div>
                 
