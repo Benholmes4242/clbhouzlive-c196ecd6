@@ -7,7 +7,7 @@ interface MigrationProgress {
   processed: number;
   successful: number;
   failed: number;
-  status: 'running' | 'completed' | 'error';
+  status: 'running' | 'completed' | 'error' | 'no_files_to_migrate';
   errors: string[];
 }
 
@@ -49,6 +49,12 @@ export const useMediaMigration = () => {
         toast({
           title: "Migration Completed!",
           description: `Successfully migrated ${data.successful}/${data.total} files to Cloudflare.`,
+          variant: "default"
+        });
+      } else if (data.status === 'no_files_to_migrate') {
+        toast({
+          title: "No Files to Migrate",
+          description: "All media files are already using Cloudflare or no media files were found.",
           variant: "default"
         });
       } else if (data.status === 'error') {

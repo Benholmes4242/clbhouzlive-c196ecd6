@@ -11,7 +11,7 @@ interface MigrationProgress {
   processed: number;
   successful: number;
   failed: number;
-  status: 'running' | 'completed' | 'error';
+  status: 'running' | 'completed' | 'error' | 'no_files_to_migrate';
   errors: string[];
 }
 
@@ -263,7 +263,16 @@ serve(async (req) => {
       }
     }
 
-    progress.status = progress.failed === 0 ? 'completed' : (progress.successful === 0 ? 'error' : 'completed');
+    // Set proper status based on results
+    if (progress.total === 0) {
+      progress.status = 'no_files_to_migrate';
+    } else if (progress.failed === 0) {
+      progress.status = 'completed';
+    } else if (progress.successful === 0) {
+      progress.status = 'error';
+    } else {
+      progress.status = 'completed';
+    }
 
     console.log('Migration completed:', progress);
 
