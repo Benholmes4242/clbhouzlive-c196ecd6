@@ -32,10 +32,24 @@ const TrendingCard = () => {
 
     // Only show the first video, no carousel functionality for trending cards
     const firstVideo = videoMedia[0];
+    
+    // Find golf course tag
+    const golfCourseTag = post.post_tags?.find(tag => tag.entity_type === 'golf_club');
 
     return (
       <div className="relative w-full aspect-[3/4] rounded-xl overflow-hidden bg-card border group">
-        {/* Trending Pill - on all cards */}
+        {/* Golf Course Tag - top left */}
+        {golfCourseTag && (
+          <div className="absolute top-2 left-2 z-10">
+            <div className="bg-white/20 backdrop-blur-sm rounded-full px-2 py-1 flex items-center gap-1">
+              <span className="text-white text-sm font-medium truncate max-w-[120px]">
+                {golfCourseTag.name}
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Trending Pill - top right */}
         <div className="absolute top-2 right-2 z-10">
           <div className="bg-white/20 backdrop-blur-sm rounded-full px-2 py-1 flex items-center gap-1">
             <TrendingUp className="w-4 h-4 text-white" />
