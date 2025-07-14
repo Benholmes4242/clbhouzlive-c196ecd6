@@ -49,30 +49,40 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
 
   const getMediaDataForModal = (item: VideoPost | UserPostWithType) => {
     const isUserPost = item.type === 'user_post';
-    const media = isUserPost 
-      ? (item as UserPostWithType).post_media
-      : [{
-          id: item.id,
-          media_type: (item as VideoPost).content.type,
-          media_url: (item as VideoPost).content.videoUrl || (item as VideoPost).content.image || ''
-        }];
-
-    return {
-      mediaUrl: media.map(m => m.media_url),
-      mediaType: media.map(m => m.media_type as 'image' | 'video'),
-      user: isUserPost ? {
-        id: (item as UserPostWithType).user.id,
-        profile_photo_url: (item as UserPostWithType).user.profile_photo_url
-      } : {
-        id: item.id,
-        profile_photo_url: (item as VideoPost).user.avatar
-      },
-      displayName: isUserPost 
-        ? (item as UserPostWithType).user.display_name || (item as UserPostWithType).user.username
-        : (item as VideoPost).user.name,
-      content: isUserPost ? (item as UserPostWithType).content : (item as VideoPost).content.description,
-      postTags: isUserPost ? (item as UserPostWithType).post_tags : undefined
-    };
+    
+    if (isUserPost) {
+      const userPost = item as UserPostWithType;
+      const media = userPost.post_media;
+      
+      return {
+        mediaUrl: media.length === 1 ? media[0].media_url : media.map(m => m.media_url),
+        mediaType: media.length === 1 ? media[0].media_type as 'image' | 'video' : media.map(m => m.media_type as 'image' | 'video'),
+        user: {
+          id: userPost.user.id,
+          profile_photo_url: userPost.user.profile_photo_url
+        },
+        displayName: userPost.user.display_name || userPost.user.username,
+        content: userPost.content,
+        postTags: userPost.post_tags,
+        initialIndex: 0
+      };
+    } else {
+      const videoPost = item as VideoPost;
+      const mediaUrl = videoPost.content.videoUrl || videoPost.content.image || '';
+      
+      return {
+        mediaUrl: mediaUrl,
+        mediaType: videoPost.content.type as 'image' | 'video',
+        user: {
+          id: videoPost.id,
+          profile_photo_url: videoPost.user.avatar
+        },
+        displayName: videoPost.user.name,
+        content: videoPost.content.description,
+        postTags: undefined,
+        initialIndex: 0
+      };
+    }
   };
 
   const renderMediaTile = (item: VideoPost | UserPostWithType, index: number) => {
