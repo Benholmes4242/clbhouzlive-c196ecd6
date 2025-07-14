@@ -59,20 +59,7 @@ const TrendingCard = () => {
 
     return (
       <div className="relative w-full aspect-[3/4] rounded-xl overflow-hidden bg-card border group">
-        {/* Golf Course Tag - top left */}
-        {golfCourseTag && (
-          <div className="absolute top-2 left-2 z-10">
-            <button 
-              onClick={handleGolfClubClick}
-              className="bg-white rounded-full px-3 py-1.5 flex items-center gap-1.5 hover:bg-white/90 transition-colors cursor-pointer"
-            >
-              <MapPin className="w-4 h-4 text-gray-700" />
-              <span className="text-gray-900 text-sm font-medium truncate max-w-[120px]">
-                {golfCourseTag.name}
-              </span>
-            </button>
-          </div>
-        )}
+        {/* Golf Course Tag - top left - REMOVED */}
 
         {/* Trending Icon - top right */}
         <div className="absolute top-2 right-2 z-10">
