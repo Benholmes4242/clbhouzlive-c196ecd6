@@ -38,7 +38,7 @@ const ClubhouzMomentsCarousel: React.FC = () => {
       <div className="w-full py-4">
         <div className="mx-auto" style={{ paddingLeft: '0.125rem', paddingRight: '0.125rem' }}>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold">Players you follow & trending</h2>
+            <h2 className="text-lg font-semibold">Discover new players</h2>
           </div>
           <div className="flex gap-1 overflow-hidden">
             {Array.from({ length: 4 }).map((_, i) => (
@@ -60,7 +60,7 @@ const ClubhouzMomentsCarousel: React.FC = () => {
     <div className="w-full py-4">
       <div className="mx-auto" style={{ paddingLeft: '0.125rem', paddingRight: '0.125rem' }}>
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-semibold">Players you follow & trending</h2>
+          <h2 className="text-lg font-semibold">Discover new players</h2>
           
           {/* Desktop Navigation Arrows */}
           {!isMobile && (
