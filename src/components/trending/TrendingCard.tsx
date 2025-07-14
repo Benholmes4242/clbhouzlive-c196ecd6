@@ -9,6 +9,7 @@ import { useTrendingCard } from '@/hooks/useTrendingCard';
 
 const TrendingCard = () => {
   const { trendingPosts, loading, nextSlide, prevSlide, currentIndex, totalPosts } = useTrendingCard();
+  const navigate = useNavigate();
 
   console.log('TrendingCard render - loading:', loading, 'trendingPosts:', trendingPosts.length);
 
@@ -35,7 +36,6 @@ const TrendingCard = () => {
 
   // Component to render a single trending card
   const TrendingCardItem = ({ post, index }) => {
-    const navigate = useNavigate();
     const media = post.post_media || [];
     const videoMedia = media.filter(m => m.media_type === 'video');
     const user = post.user_profiles;
