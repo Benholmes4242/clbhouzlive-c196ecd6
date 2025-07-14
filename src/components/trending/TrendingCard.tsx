@@ -55,7 +55,7 @@ const TrendingCard = () => {
           />
           
           {/* Overlay with content */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent transition-opacity duration-300">
             <div className="absolute bottom-0 left-0 right-0 p-3">
               <div className="flex justify-between items-end">
                 <div className="flex-1 min-w-0">
