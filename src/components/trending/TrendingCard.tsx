@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import { TrendingUp, ChevronLeft, ChevronRight } from 'lucide-react';
 import { PiHandsClapping, PiShareFat } from 'react-icons/pi';
 import { GoCommentDiscussion } from 'react-icons/go';
@@ -57,13 +58,13 @@ const TrendingCard = () => {
 
         {/* Single Video - No Carousel */}
         <div className="relative w-full h-full">
-          <video
+          <EnhancedVideoPlayer
             src={firstVideo.media_url}
             className="w-full h-full object-cover"
-            autoPlay
-            muted
-            loop
-            playsInline
+            autoplay={true}
+            muted={true}
+            loop={true}
+            enableHLS={true}
           />
           
           {/* Overlay with content */}

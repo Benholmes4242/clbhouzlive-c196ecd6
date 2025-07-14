@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
+import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import FollowButton from '@/components/profile/actions/FollowButton';
 import { useProfileActions } from '@/components/profile/actions/useProfileActions';
@@ -30,7 +31,6 @@ interface MomentCardProps {
 }
 
 const MomentCard: React.FC<MomentCardProps> = ({ moment, currentUserId }) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
   const [isFollowing, setIsFollowing] = useState(false);
   const navigate = useNavigate();
   const { loading, handleFollow } = useProfileActions({
@@ -59,25 +59,6 @@ const MomentCard: React.FC<MomentCardProps> = ({ moment, currentUserId }) => {
     }
   }, [followStatus]);
 
-  useEffect(() => {
-    const video = videoRef.current;
-    if (video) {
-      video.muted = true;
-      video.loop = true;
-      video.playsInline = true;
-      video.autoplay = true;
-      
-      const playVideo = async () => {
-        try {
-          await video.play();
-        } catch (error) {
-          console.log('Video autoplay failed:', error);
-        }
-      };
-      
-      playVideo();
-    }
-  }, []);
 
   const videoMedia = moment.post_media.find(media => media.media_type === 'video');
   const imageMedia = moment.post_media.find(media => media.media_type === 'image');
@@ -103,14 +84,13 @@ const MomentCard: React.FC<MomentCardProps> = ({ moment, currentUserId }) => {
       {/* Media Container */}
       <div className="relative aspect-[3/4] bg-muted">
         {videoMedia ? (
-          <video
-            ref={videoRef}
+          <EnhancedVideoPlayer
             src={mediaToShow.media_url}
             className="w-full h-full object-cover"
-            muted
-            loop
-            playsInline
-            autoPlay
+            muted={true}
+            loop={true}
+            autoplay={true}
+            enableHLS={true}
           />
         ) : (
           <img
