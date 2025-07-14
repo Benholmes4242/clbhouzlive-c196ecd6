@@ -108,6 +108,13 @@ const Index = () => {
       
       <TrendingCard />
       
+      {/* Your clubhouse feed section */}
+      <div className="mx-auto" style={{ paddingLeft: '0.125rem', paddingRight: '0.125rem' }}>
+        <div className="flex items-center justify-between mb-4 px-4">
+          <h2 className="text-lg font-semibold">Your clubhouse feed</h2>
+        </div>
+      </div>
+      
       <main>
         <TrendingFeed />
       </main>
