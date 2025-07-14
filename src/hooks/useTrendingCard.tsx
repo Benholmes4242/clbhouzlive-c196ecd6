@@ -11,12 +11,16 @@ export const useTrendingCard = () => {
       setLoading(true);
       console.log('Fetching trending video posts...');
       
-      // First get posts with media
+      // First get posts with media and tags
       const { data: posts, error } = await supabase
         .from('posts')
         .select(`
           *,
-          post_media(*)
+          post_media(*),
+          post_tags(
+            *,
+            taggable_entities(*)
+          )
         `)
         .not('post_media', 'is', null)
         .limit(50);

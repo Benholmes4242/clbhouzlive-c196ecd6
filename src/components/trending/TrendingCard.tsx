@@ -34,7 +34,9 @@ const TrendingCard = () => {
     const firstVideo = videoMedia[0];
     
     // Find golf course tag
-    const golfCourseTag = post.post_tags?.find(tag => tag.entity_type === 'golf_club');
+    const golfCourseTag = post.post_tags?.find(tag => 
+      tag.taggable_entities?.entity_type === 'golf_club'
+    )?.taggable_entities;
 
     return (
       <div className="relative w-full aspect-[3/4] rounded-xl overflow-hidden bg-card border group">
