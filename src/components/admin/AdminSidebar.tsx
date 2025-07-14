@@ -70,12 +70,6 @@ const menuItems = [
     requiredRole: "admin",
   },
   {
-    title: "Media Migration",
-    icon: Database,
-    value: "media-migration",
-    requiredRole: "admin",
-  },
-  {
     title: "Team Management",
     icon: UserCheck,
     value: "team",
