@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Minimize2, Volume2, VolumeX, MapPin, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Minimize2, Volume2, VolumeX, ChevronLeft, ChevronRight } from 'lucide-react';
 import { PiHandsClapping, PiShareFat } from 'react-icons/pi';
 import { GoCommentDiscussion } from 'react-icons/go';
 import { useSwipeable } from 'react-swipeable';
@@ -489,28 +489,7 @@ const FullscreenMediaModal = ({
           </div>
         )}
 
-        {/* Golf Course Badge - Above Caption (matching CaptionOverlay exactly) */}
-        {golfCourse && (
-          <div className="mb-2">
-            {isMobile ? (
-              // Mobile: Map pin that expands to show golf club name (for future mobile modal implementation)
-              <div className="flex items-center">
-                <button className="w-6 h-6 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center mr-2 transition-all duration-200">
-                  <MapPin className="w-4 h-4 text-white" />
-                </button>
-                <div className="bg-white/20 text-white text-xs font-medium px-2 py-1 rounded-full backdrop-blur-sm whitespace-nowrap">
-                  {golfCourse.name}
-                </div>
-              </div>
-            ) : (
-              // Desktop: Single pill with map pin and golf club name together
-              <div className="inline-flex items-center bg-white/20 text-white text-sm font-medium px-3 py-1.5 rounded-full backdrop-blur-sm whitespace-nowrap">
-                <MapPin className="w-5 h-5 text-white mr-2" />
-                {golfCourse.name}
-              </div>
-            )}
-          </div>
-        )}
+        {/* Golf Course Badge - REMOVED */}
 
         {/* Caption Text (matching CaptionOverlay exactly) */}
         {content && removeGolfCourseFromContent(content) && (
