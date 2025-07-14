@@ -169,7 +169,7 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
                 </div>
                 
                 {/* Action buttons */}
-                <div className="flex flex-col space-y-2 ml-3">
+                <div className="flex flex-col space-y-2 ml-3 mb-1">
                   <button className="rounded-full p-1.5 text-white hover:bg-white/20 transition-colors">
                     <PiHandsClapping className="w-6 h-6" />
                   </button>
