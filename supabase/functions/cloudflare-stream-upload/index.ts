@@ -66,27 +66,9 @@ serve(async (req) => {
       if (metadata.title) streamFormData.append('meta[name]', metadata.title);
       if (metadata.description) streamFormData.append('meta[description]', metadata.description);
       
-      // Set upload options for maximum quality
+      // Set upload options
       streamFormData.append('requireSignedURLs', 'false'); // Make videos publicly accessible
       streamFormData.append('allowedOrigins', '*'); // Allow embedding anywhere
-      
-      // Quality and encoding settings for 4K support
-      streamFormData.append('maxDurationSeconds', '3600'); // Allow longer videos
-      streamFormData.append('watermark', JSON.stringify({ uid: '' })); // No watermark
-      
-      // Add quality profile for high-resolution encoding
-      const qualityProfile = {
-        // Ensure 4K encoding is available
-        encodingProfiles: [
-          { width: 3840, height: 2160, bitrate: '15000k' }, // 4K
-          { width: 2560, height: 1440, bitrate: '8000k' },  // 1440p
-          { width: 1920, height: 1080, bitrate: '5000k' },  // 1080p
-          { width: 1280, height: 720, bitrate: '2500k' },   // 720p
-        ]
-      };
-      
-      // Note: Cloudflare Stream automatically handles quality levels,
-      // but we ensure high bitrate processing by uploading high-quality source
       
       // Upload to Cloudflare Stream
       const uploadResponse = await fetch(
