@@ -195,7 +195,16 @@ serve(async (req) => {
               });
 
               if (!r2Response.ok) {
-                throw new Error(`R2 upload failed: ${r2Response.status}`);
+                const errorText = await r2Response.text();
+                console.error(`R2 upload failed for ${filePath}:`, {
+                  status: r2Response.status,
+                  statusText: r2Response.statusText,
+                  error: errorText,
+                  url: `https://api.cloudflare.com/client/v4/accounts/${accountId}/r2/buckets/clbhouz-media/objects/${filePath}`,
+                  accountId,
+                  hasToken: !!r2ApiToken
+                });
+                throw new Error(`R2 upload failed: ${r2Response.status} - ${errorText}`);
               }
 
               newUrl = `https://media.clbhouz.co.uk/${filePath}`;
