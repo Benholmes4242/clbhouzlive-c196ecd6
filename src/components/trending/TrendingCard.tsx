@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { TrendingUp, Heart, MessageCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { TrendingUp, ChevronLeft, ChevronRight } from 'lucide-react';
+import { PiHandsClapping } from 'react-icons/pi';
 import { useTrendingCard } from '@/hooks/useTrendingCard';
 
 const TrendingCard = () => {
@@ -70,10 +71,10 @@ const TrendingCard = () => {
                 {/* Action buttons */}
                 <div className="flex space-x-1 ml-2">
                   <button className="bg-white/20 backdrop-blur-sm rounded-full p-1.5 text-white hover:bg-white/30 transition-colors">
-                    <Heart className="w-3 h-3" />
+                    <PiHandsClapping className="w-3 h-3" />
                   </button>
                   <button className="bg-white/20 backdrop-blur-sm rounded-full p-1.5 text-white hover:bg-white/30 transition-colors">
-                    <MessageCircle className="w-3 h-3" />
+                    <PiHandsClapping className="w-3 h-3" />
                   </button>
                 </div>
               </div>
