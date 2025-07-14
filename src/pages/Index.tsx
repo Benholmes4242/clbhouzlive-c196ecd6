@@ -98,6 +98,16 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <ClubhouzMomentsCarousel />
+      
+      {/* Golf's most watched section */}
+      <div className="w-full py-4">
+        <div className="mx-auto" style={{ paddingLeft: '0.125rem', paddingRight: '0.125rem' }}>
+          <div className="flex items-center justify-between mb-4 px-4">
+            <h2 className="text-lg font-semibold">Golf's most watched</h2>
+          </div>
+        </div>
+      </div>
+      
       <TrendingCard />
       
       <main>
