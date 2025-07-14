@@ -1,5 +1,7 @@
 import React from 'react';
-import VideoPlayer from '@/components/ui/video-player';
+import SmartMediaContainer from '@/components/ui/smart-media-container';
+import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
+import { useAdvancedImageOptimization } from '@/hooks/useAdvancedImageOptimization';
 
 interface MediaItem {
   id: string;
@@ -39,6 +41,9 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
                       media.media_url === '[object Object]' ||
                       typeof media.media_url !== 'string';
 
+  // Use advanced image optimization hook
+  const { optimizedImage, isLoading: imageLoading } = useAdvancedImageOptimization(media.media_url);
+
   return (
     <div className="relative w-full h-full overflow-hidden bg-muted">
       {/* Loading Skeleton */}
@@ -49,29 +54,27 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
       )}
       
       {media.media_type === 'video' && !isInvalidSrc ? (
-        <VideoPlayer
+        <EnhancedVideoPlayer
           src={media.media_url}
           autoplay={shouldAutoplay}
           muted={true}
           loop={true}
           className="w-full h-full pointer-events-none"
-          showVideoIcon={false}
-          showOverlayControls={false}
-          controls={false}
-          onClick={undefined}
-          videoId={`explore-${itemId}-${currentIndex}`}
+          preloadLevel="metadata"
+          enableHLS={true}
+          quality="auto"
         />
       ) : (
-        <img
-          src={isInvalidSrc ? fallbackImage : media.media_url}
-          alt={itemTitle || 'Content'}
-          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-          onError={onImageError}
-          onLoad={onImageLoad}
-          loading="eager"
-          width="400"
-          height="400"
-          style={{ aspectRatio: '1/1' }}
+        <SmartMediaContainer
+          media={[{
+            id: media.id,
+            type: 'image',
+            url: isInvalidSrc ? fallbackImage : (optimizedImage?.url || media.media_url),
+            alt: itemTitle || 'Content'
+          }]}
+          className="w-full h-full"
+          priority={currentIndex === 0}
+          enableCarousel={false}
         />
       )}
     </div>

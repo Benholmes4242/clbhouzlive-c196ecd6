@@ -2,7 +2,8 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { OptimizedAvatar } from '@/components/ui/optimized-avatar';
+import SmartMediaContainer from '@/components/ui/smart-media-container';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Star, MapPin, Heart, MessageCircle, Share } from 'lucide-react';
@@ -56,10 +57,15 @@ const FeaturedMoment = () => {
         <div className="grid md:grid-cols-2 gap-0">
           {/* Image */}
           <div className="aspect-video md:aspect-square relative overflow-hidden">
-            <img
-              src={featuredPost.media.url}
-              alt="Featured moment"
-              className="w-full h-full object-cover"
+            <SmartMediaContainer
+              media={[{
+                id: '1',
+                type: 'image',
+                url: featuredPost.media.url,
+                alt: 'Featured moment'
+              }]}
+              className="w-full h-full"
+              priority={true}
             />
           </div>
 
@@ -68,12 +74,13 @@ const FeaturedMoment = () => {
             <div>
               {/* User Info */}
               <div className="flex items-center gap-3 mb-4">
-                <Avatar className="h-10 w-10">
-                  <AvatarImage src={featuredPost.user.avatar} />
-                  <AvatarFallback>
-                    {featuredPost.user.name.split(' ').map(n => n[0]).join('')}
-                  </AvatarFallback>
-                </Avatar>
+                <OptimizedAvatar
+                  src={featuredPost.user.avatar}
+                  alt={featuredPost.user.name}
+                  size={40}
+                  fallback={featuredPost.user.name.split(' ').map(n => n[0]).join('')}
+                  priority={true}
+                />
                 <div>
                   <p className="font-semibold">{featuredPost.user.name}</p>
                   <p className="text-sm text-gray-600">@{featuredPost.user.username}</p>

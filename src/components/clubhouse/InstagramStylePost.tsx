@@ -18,6 +18,7 @@ import { usePostViewer } from '@/hooks/usePostViewer';
 import { useVideoVisibility } from '@/hooks/useVideoVisibility';
 import { useVideoPlaybackManager } from '@/contexts/VideoPlaybackManager';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
+import SmartMediaContainer from '@/components/ui/smart-media-container';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 
 interface PostMedia {
@@ -194,13 +195,15 @@ const InstagramStylePostComponent: React.FC<InstagramStylePostProps> = ({ post, 
               videoRef={videoRef}
             />
           ) : (
-            <img
-              src={currentMedia.media_url}
-              alt="Post content"
-              className="w-full h-full object-cover cursor-pointer"
-              onClick={handleMediaClick}
-              loading="lazy"
-              decoding="async"
+            <SmartMediaContainer
+              media={[{
+                id: currentMedia.id,
+                type: 'image',
+                url: currentMedia.media_url,
+                alt: 'Post content'
+              }]}
+              className="w-full h-full cursor-pointer"
+              priority={true}
             />
           )}
 
