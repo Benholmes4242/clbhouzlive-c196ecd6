@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, memo } from 'react';
+import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 
 interface OptimizedImageProps {
   src: string;
@@ -6,120 +7,93 @@ interface OptimizedImageProps {
   className?: string;
   width?: number;
   height?: number;
-  priority?: boolean;
-  onClick?: () => void;
   onError?: (e: React.SyntheticEvent<HTMLImageElement>) => void;
+  onClick?: () => void;
+  priority?: boolean;
+  loading?: 'lazy' | 'eager';
 }
 
-const OptimizedImage: React.FC<OptimizedImageProps> = ({
+const OptimizedImageComponent: React.FC<OptimizedImageProps> = ({
   src,
   alt,
   className = '',
   width,
   height,
-  priority = false,
+  onError,
   onClick,
-  onError
+  priority = false,
+  loading = 'lazy'
 }) => {
   const [imageSrc, setImageSrc] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
-  const [hasIntersected, setHasIntersected] = useState(priority);
   const imgRef = useRef<HTMLImageElement>(null);
+  
+  // Use intersection observer only if not priority
+  const { ref: intersectionRef, isInView } = useIntersectionObserver({
+    threshold: 0,
+    rootMargin: '50px'
+  });
 
-  // Intersection Observer for lazy loading (skip if priority)
-  useEffect(() => {
-    if (priority) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setHasIntersected(true);
-          observer.disconnect();
-        }
-      },
-      {
-        rootMargin: '50px',
-        threshold: 0.1
-      }
-    );
-
-    if (imgRef.current) {
-      observer.observe(imgRef.current);
+  // Optimize Supabase storage URLs
+  const getOptimizedSrc = (url: string): string => {
+    if (url.includes('supabase') && url.includes('/storage/')) {
+      const separator = url.includes('?') ? '&' : '?';
+      return `${url}${separator}quality=85&resize=fill&format=webp`;
     }
-
-    return () => observer.disconnect();
-  }, [priority]);
-
-  // Optimize image URL for faster loading
-  const getOptimizedSrc = (url: string) => {
-    if (!url) return '';
-    
-    // For now, return the original URL as Supabase storage doesn't support optimization parameters
-    // In the future, this could be enhanced with proper image optimization service
     return url;
   };
 
-  // Load image when it intersects or is priority
   useEffect(() => {
-    if (hasIntersected && src) {
-      const optimizedSrc = getOptimizedSrc(src);
-      
-      // Preload the image
-      const img = new Image();
-      img.onload = () => {
-        setImageSrc(optimizedSrc);
-        setIsLoading(false);
-      };
-      img.onerror = () => {
-        setHasError(true);
-        setIsLoading(false);
-      };
-      img.src = optimizedSrc;
+    if (priority) {
+      setImageSrc(getOptimizedSrc(src));
+    } else if (isInView) {
+      setImageSrc(getOptimizedSrc(src));
     }
-  }, [hasIntersected, src, width]);
+  }, [src, isInView, priority]);
+
+  const handleLoad = () => {
+    setIsLoading(false);
+  };
 
   const handleError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     setHasError(true);
     setIsLoading(false);
-    if (onError) {
-      onError(e);
-    }
+    onError?.(e);
   };
 
   return (
-    <div className={`relative ${className}`} onClick={onClick}>
-      {isLoading && !hasError && (
-        <div className="absolute inset-0 bg-media-loading animate-pulse rounded-[inherit]" />
+    <div
+      ref={intersectionRef}
+      className={`relative overflow-hidden ${className}`}
+      onClick={onClick}
+    >
+      {isLoading && (
+        <div className="absolute inset-0 bg-media-loading animate-pulse" />
       )}
       
-      <img
-        ref={imgRef}
-        src={imageSrc}
-        alt={alt}
-        className={`w-full h-full object-cover rounded-[inherit] transition-opacity duration-200 ${
-          isLoading ? 'opacity-0' : 'opacity-100'
-        }`}
-        style={{
-          imageRendering: 'auto',
-          backfaceVisibility: 'hidden',
-          transform: 'translateZ(0)',
-          maxWidth: '100%'
-        }}
-        onError={handleError}
-        width={width}
-        height={height}
-        loading={priority ? 'eager' : 'lazy'}
-        decoding="async"
-      />
-      
-      {hasError && (
-        <div className="absolute inset-0 bg-media-loading rounded-[inherit] flex items-center justify-center">
-          <div className="text-xs text-muted-foreground">Failed to load</div>
+      {hasError ? (
+        <div className="absolute inset-0 bg-media-loading flex items-center justify-center text-muted-foreground">
+          Failed to load
         </div>
+      ) : (
+        <img
+          ref={imgRef}
+          src={imageSrc}
+          alt={alt}
+          width={width}
+          height={height}
+          loading={loading}
+          decoding="async"
+          onLoad={handleLoad}
+          onError={handleError}
+          className={`transition-opacity duration-300 ${
+            isLoading ? 'opacity-0' : 'opacity-100'
+          } ${className}`}
+        />
       )}
     </div>
   );
 };
 
-export default OptimizedImage;
+export const OptimizedImage = memo(OptimizedImageComponent);

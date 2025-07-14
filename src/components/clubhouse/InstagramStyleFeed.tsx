@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import InstagramStylePost from './InstagramStylePost';
 import LoadingSkeleton from '@/components/feed/LoadingSkeleton';
 
@@ -33,8 +33,11 @@ interface InstagramStyleFeedProps {
 }
 
 const InstagramStyleFeed: React.FC<InstagramStyleFeedProps> = ({ userPosts = [], loading = false }) => {
-  // Filter posts that have media
-  const postsWithMedia = userPosts.filter(post => post.post_media && post.post_media.length > 0);
+  // Memoize filtered posts for performance
+  const postsWithMedia = useMemo(() => 
+    userPosts.filter(post => post.post_media && post.post_media.length > 0),
+    [userPosts]
+  );
 
   if (loading) {
     return <LoadingSkeleton />;

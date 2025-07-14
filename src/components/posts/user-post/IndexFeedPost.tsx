@@ -60,26 +60,23 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
   } = useFullscreenPostNavigation();
   
   const { ref: containerRef, isInView } = useIntersectionObserver({
-    threshold: 0.5, // Optimized threshold
-    rootMargin: '0px 0px -20% 0px' // Only trigger when entering from bottom, more selective
+    threshold: 0.3, // Optimized threshold for better performance
+    rootMargin: '10px 0px -10% 0px' // Reduced margin for better performance
   });
 
-  // Check if this is the user's own post
-  const isOwnPost = user?.id === post.user.id;
+  // Memoize expensive calculations
+  const isOwnPost = useMemo(() => user?.id === post.user.id, [user?.id, post.user.id]);
+  const currentMediaMemo = useMemo(() => post.post_media?.[currentMediaIndex], [post.post_media, currentMediaIndex]);
 
   useEffect(() => {
-    const currentMedia = post.post_media?.[currentMediaIndex];
-    if (!currentMedia) return;
-    
-    console.log('🎬 IndexFeedPost: isInView changed:', isInView, 'for video:', `index-${currentMedia.id}`, 'mediaType:', currentMedia.media_type);
+    if (!currentMediaMemo) return;
     
     if (isInView) {
       // When ANY post comes into view, pause all videos first
       pauseAllAndSetActive(''); // Pass empty string to just pause all videos
       
-      if (currentMedia.media_type === 'video') {
-        const videoId = `index-${currentMedia.id}`;
-        console.log('🎬 Video entering view, setting as active:', videoId);
+      if (currentMediaMemo.media_type === 'video') {
+        const videoId = `index-${currentMediaMemo.id}`;
         setIsHovered(true);
         // Allow this video to play by calling pauseAllAndSetActive with the actual videoId
         pauseAllAndSetActive(videoId);
@@ -90,13 +87,12 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
       setIsHovered(false);
       
       // When leaving view, pause this video if it's a video
-      if (currentMedia.media_type === 'video') {
-        const videoId = `index-${currentMedia.id}`;
-        console.log('🎬 Video exiting view, pausing:', videoId);
+      if (currentMediaMemo.media_type === 'video') {
+        const videoId = `index-${currentMediaMemo.id}`;
         pauseVideo(videoId);
       }
     }
-  }, [isInView, currentMediaIndex, post.post_media, pauseVideo, pauseAllAndSetActive]);
+  }, [isInView, currentMediaMemo, pauseVideo, pauseAllAndSetActive]);
 
   // Hide full course tag when scrolling off the post
   useEffect(() => {
@@ -128,14 +124,14 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
 
   const handleMaximizeClick = useCallback(async (e: React.MouseEvent) => {
     e.stopPropagation();
-    const currentMedia = post.post_media[currentMediaIndex];
+    if (!currentMediaMemo) return;
     
     let videoPosition = 0;
     let videoMuted = true;
     
     // Store current state and get current position for videos
-    if (currentMedia.media_type === 'video') {
-      const videoId = `index-${currentMedia.id}`;
+    if (currentMediaMemo.media_type === 'video') {
+      const videoId = `index-${currentMediaMemo.id}`;
       const video = document.querySelector(`[data-video-id="${videoId}"]`) as HTMLVideoElement;
       
       if (video) {
@@ -166,7 +162,7 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
       videoPosition, // Pass current video position
       videoMuted // Pass current mute state
     );
-  }, [currentMediaIndex, post, golfCourse, displayName, openFullscreenMedia, storeVideoState]);
+  }, [currentMediaIndex, currentMediaMemo, post, golfCourse, displayName, openFullscreenMedia, storeVideoState]);
 
   // Memoized values
   const cleanContent = useMemo(() => removeGolfCourseFromContent(post.content), [post.content]);
@@ -226,7 +222,7 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
 
         <InteractionIconsOverlay
           onInteractionClick={handleInteractionClick}
-          currentMediaType={post.post_media[currentMediaIndex]?.media_type}
+          currentMediaType={currentMediaMemo?.media_type}
         />
 
         <MediaNavigationDots
@@ -240,10 +236,9 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
         isOpen={isFullscreenOpen}
         onClose={(videoPosition, videoMuted) => {
           // Handle video resume on modal close
-          if (shouldResumeOnReturn) {
-            const currentMedia = post.post_media[currentMediaIndex];
-            if (currentMedia.media_type === 'video') {
-              const videoId = `index-${currentMedia.id}`;
+          if (shouldResumeOnReturn && currentMediaMemo) {
+            if (currentMediaMemo.media_type === 'video') {
+              const videoId = `index-${currentMediaMemo.id}`;
               const video = document.querySelector(`[data-video-id="${videoId}"]`) as HTMLVideoElement;
               
               if (video && videoPosition !== undefined) {

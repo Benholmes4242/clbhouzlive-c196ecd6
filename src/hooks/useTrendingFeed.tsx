@@ -18,19 +18,19 @@ export const useTrendingFeed = () => {
     queryFn: async () => {
       if (!user?.id) return [];
 
-      // Get connected user IDs efficiently
+      // Get connected user IDs efficiently with increased limits
       const [followsResponse, friendsResponse] = await Promise.all([
         supabase
           .from('user_follows')
           .select('following_id')
           .eq('follower_id', user.id)
-          .limit(5), // Reduced for performance
+          .limit(10), // Slightly increased for better content
         supabase
           .from('user_friends')
           .select('user_id, friend_id')
           .or(`user_id.eq.${user.id},friend_id.eq.${user.id}`)
           .eq('status', 'accepted')
-          .limit(5) // Reduced for performance
+          .limit(10) // Slightly increased for better content
       ]);
 
       const followedUserIds = followsResponse.data?.map(f => f.following_id) || [];
@@ -42,18 +42,19 @@ export const useTrendingFeed = () => {
 
       if (allConnectedUserIds.length === 0) return [];
 
-      // Single optimized query with all required data
+      // Single optimized query with all required data and filter for media posts only
       const { data: posts, error: postsError } = await supabase
         .from('posts')
         .select(`
           id,
           content,
           created_at,
-          user_id
+          user_id,
+          post_media!inner(id, media_type, media_url)
         `)
         .in('user_id', allConnectedUserIds)
         .order('created_at', { ascending: false })
-        .limit(3); // Reduced limit for performance
+        .limit(6); // Optimized limit for performance
 
       if (postsError) {
         console.error('Error fetching followed posts:', postsError);
@@ -62,26 +63,18 @@ export const useTrendingFeed = () => {
 
       if (!posts || posts.length === 0) return [];
 
-      // Get profiles and media in parallel
-      const [profilesResponse, mediaResponse] = await Promise.all([
-        supabase
-          .from('user_profiles')
-          .select('id, display_name, username, profile_photo_url')
-          .in('id', posts.map(p => p.user_id)),
-        supabase
-          .from('post_media')
-          .select('id, media_type, media_url, post_id')
-          .in('post_id', posts.map(p => p.id))
-      ]);
+      // Get profiles in single query
+      const { data: profiles } = await supabase
+        .from('user_profiles')
+        .select('id, display_name, username, profile_photo_url')
+        .in('id', [...new Set(posts.map(p => p.user_id))]);
 
-      const profiles = profilesResponse.data || [];
-      const postMedia = mediaResponse.data || [];
-
-      // Format posts efficiently
+      // Format posts efficiently with cached lookups
+      const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
+      
       return posts.map(post => {
-        const userProfile = profiles.find(profile => profile.id === post.user_id);
-        const media = postMedia.filter(m => m.post_id === post.id);
-
+        const userProfile = profileMap.get(post.user_id);
+        
         return {
           id: post.id,
           content: post.content,
@@ -92,19 +85,19 @@ export const useTrendingFeed = () => {
             username: userProfile?.username || null,
             profile_photo_url: userProfile?.profile_photo_url || null
           },
-          post_media: media.map(m => ({
+          post_media: post.post_media?.map((m: any) => ({
             id: m.id,
             media_type: m.media_type as 'image' | 'video',
             media_url: m.media_url
-          })),
+          })) || [],
           post_tags: [] // Disabled for performance
         };
       });
     },
     enabled: !!user?.id,
-    staleTime: 300000, // 5 minutes cache
+    staleTime: 600000, // 10 minutes cache for better performance
     refetchInterval: false,
-    gcTime: 300000,
+    gcTime: 900000, // 15 minutes cache retention
   });
 
   // Listen for feed refresh events

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, memo, useMemo, useCallback } from 'react';
 import { Heart, MessageCircle, Share, Play, Pause, Volume2, VolumeX, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatDistanceToNow } from 'date-fns';
@@ -52,7 +52,7 @@ interface InstagramStylePostProps {
   allUserPosts?: UserPostData[];
 }
 
-const InstagramStylePost: React.FC<InstagramStylePostProps> = ({ post, allUserPosts = [] }) => {
+const InstagramStylePostComponent: React.FC<InstagramStylePostProps> = ({ post, allUserPosts = [] }) => {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const isMobile = useIsMobile();
@@ -69,11 +69,12 @@ const InstagramStylePost: React.FC<InstagramStylePostProps> = ({ post, allUserPo
   // Add video autoplay functionality
   const { ref: autoplayRef, shouldAutoplay, handleMouseEnter, handleMouseLeave } = useVideoAutoplay();
   
-  const currentMedia = post.post_media[currentMediaIndex];
+  // Memoize current media and other expensive calculations
+  const currentMedia = useMemo(() => post.post_media[currentMediaIndex], [post.post_media, currentMediaIndex]);
+  const displayName = useMemo(() => post.user.display_name || post.user.username || 'User', [post.user.display_name, post.user.username]);
+  const timeAgo = useMemo(() => formatDistanceToNow(new Date(post.created_at), { addSuffix: true }), [post.created_at]);
+  const golfClubTags = useMemo(() => post.post_tags?.filter(tag => tag.entity_type === 'golf_club') || [], [post.post_tags]);
 
-  const displayName = post.user.display_name || post.user.username || 'User';
-  const timeAgo = formatDistanceToNow(new Date(post.created_at), { addSuffix: true });
-  const golfClubTags = post.post_tags?.filter(tag => tag.entity_type === 'golf_club') || [];
 
   // Use video visibility hook for intersection observer
   const { containerRef, isVisible } = useVideoVisibility({
@@ -159,9 +160,9 @@ const InstagramStylePost: React.FC<InstagramStylePostProps> = ({ post, allUserPo
     fetchGolfCourse();
   }, [post.content, golfClubTags.length > 0 ? golfClubTags[0]?.entity_id : null]);
 
-  const handleProfileClick = () => {
+  const handleProfileClick = useCallback(() => {
     navigate(`/profile/${post.user.username}`);
-  };
+  }, [navigate, post.user.username]);
 
   const handleMediaClick = () => {
     // Transform post data for the post viewer
@@ -434,4 +435,5 @@ const InstagramStylePost: React.FC<InstagramStylePostProps> = ({ post, allUserPo
   );
 };
 
+const InstagramStylePost = memo(InstagramStylePostComponent);
 export default InstagramStylePost;

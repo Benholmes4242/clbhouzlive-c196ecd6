@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { thumbnailCache, thumbnailPromises, generateVideoThumbnail } from './thumbnailCache';
 import { ThumbnailState } from './types';
 
@@ -9,11 +9,15 @@ export const useThumbnailGenerator = (src: string, videoId: string, poster?: str
   const [thumbnailReady, setThumbnailReady] = useState(!!poster); // Ready if we have a poster
   const [thumbnailError, setThumbnailError] = useState(false);
 
+  // Memoize key values to prevent unnecessary re-runs
+  const memoizedSrc = useMemo(() => src, [src]);
+  const memoizedVideoId = useMemo(() => videoId, [videoId]);
+
   useEffect(() => {
-    if (!src) return;
+    if (!memoizedSrc) return;
 
     // Check if we already have a cached thumbnail
-    const cachedThumbnail = thumbnailCache.get(videoId);
+    const cachedThumbnail = thumbnailCache.get(memoizedVideoId);
     if (cachedThumbnail) {
       setThumbnailSrc(cachedThumbnail);
       setThumbnailReady(true);
@@ -21,7 +25,7 @@ export const useThumbnailGenerator = (src: string, videoId: string, poster?: str
     }
 
     // Check if thumbnail generation is already in progress
-    const existingPromise = thumbnailPromises.get(videoId);
+    const existingPromise = thumbnailPromises.get(memoizedVideoId);
     if (existingPromise) {
       existingPromise.then(dataURL => {
         setThumbnailSrc(dataURL);
@@ -37,8 +41,8 @@ export const useThumbnailGenerator = (src: string, videoId: string, poster?: str
     }
 
     // Generate thumbnail for all contexts
-    const generateThumbnailPromise = generateVideoThumbnail(src, videoId);
-    thumbnailPromises.set(videoId, generateThumbnailPromise);
+    const generateThumbnailPromise = generateVideoThumbnail(memoizedSrc, memoizedVideoId);
+    thumbnailPromises.set(memoizedVideoId, generateThumbnailPromise);
     
     generateThumbnailPromise
       .then(dataURL => {
@@ -58,10 +62,10 @@ export const useThumbnailGenerator = (src: string, videoId: string, poster?: str
         }
       })
       .finally(() => {
-        thumbnailPromises.delete(videoId);
+        thumbnailPromises.delete(memoizedVideoId);
       });
 
-  }, [src, videoId, poster]);
+  }, [memoizedSrc, memoizedVideoId, poster]);
 
   return { thumbnailSrc, thumbnailReady, thumbnailError };
 };
