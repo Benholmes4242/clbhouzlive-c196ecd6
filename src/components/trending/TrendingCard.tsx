@@ -47,7 +47,7 @@ const TrendingCard = () => {
     const firstVideo = videoMedia[0];
     
     return (
-      <div className="relative w-full aspect-[3/4] rounded-xl overflow-hidden bg-card border group">
+      <div className="relative w-full aspect-[3/4] rounded-xl overflow-hidden bg-card group">
 
         {/* Trending Icon - top right */}
         <div className="absolute top-2 right-2 z-10">

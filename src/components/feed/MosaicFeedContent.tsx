@@ -124,7 +124,7 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
     const aspectRatio = getCardType(index);
 
     return (
-      <div key={item.id} className="mosaic-tile group relative overflow-hidden rounded-xl bg-card border">
+      <div key={item.id} className="mosaic-tile group relative overflow-hidden rounded-xl bg-card">
         {/* Media Container */}
         <div className={`relative w-full overflow-hidden ${aspectRatio}`}>
           {hasMultipleMedia ? (
