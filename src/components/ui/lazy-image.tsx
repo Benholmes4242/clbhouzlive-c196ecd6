@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { getOptimizedImageUrl } from '@/utils/imageOptimization';
 
 interface LazyImageProps {
   src: string;
@@ -9,6 +10,7 @@ interface LazyImageProps {
   onError?: (e: React.SyntheticEvent<HTMLImageElement>) => void;
   onClick?: () => void;
   placeholder?: string;
+  priority?: boolean;
 }
 
 const LazyImage: React.FC<LazyImageProps> = ({
@@ -19,8 +21,10 @@ const LazyImage: React.FC<LazyImageProps> = ({
   height,
   onError,
   onClick,
+  priority = false,
 }) => {
-  const [imageSrc, setImageSrc] = useState<string>(src); // Show the actual image immediately
+  const optimizedSrc = getOptimizedImageUrl(src, width, height);
+  const [imageSrc, setImageSrc] = useState<string>(priority ? optimizedSrc : ''); // Show optimized image for priority
   const [isLoading, setIsLoading] = useState(false); // Start without loading state
   const [hasError, setHasError] = useState(false);
   const [hasIntersected, setHasIntersected] = useState(false);
@@ -48,22 +52,22 @@ const LazyImage: React.FC<LazyImageProps> = ({
     return () => observer.disconnect();
   }, []);
 
-  // Load the actual image when it intersects
+  // Load the actual image when it intersects or is priority
   useEffect(() => {
-    if (hasIntersected && src) {
+    if ((hasIntersected || priority) && optimizedSrc && !imageSrc) {
       setIsLoading(true);
       const img = new Image();
       img.onload = () => {
-        setImageSrc(src);
+        setImageSrc(optimizedSrc);
         setIsLoading(false);
       };
       img.onerror = () => {
         setHasError(true);
         setIsLoading(false);
       };
-      img.src = src;
+      img.src = optimizedSrc;
     }
-  }, [hasIntersected, src]);
+  }, [hasIntersected, priority, optimizedSrc, imageSrc]);
 
   const handleError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     setHasError(true);

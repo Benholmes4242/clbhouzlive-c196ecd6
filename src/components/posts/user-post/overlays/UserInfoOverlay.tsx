@@ -1,5 +1,6 @@
 import React from 'react';
-import LazyImage from '@/components/ui/lazy-image';
+import { OptimizedImage } from '@/components/ui/optimized-image';
+import { getOptimizedImageUrl } from '@/utils/imageOptimization';
 
 interface UserInfoOverlayProps {
   user: {
@@ -24,12 +25,17 @@ export const UserInfoOverlay: React.FC<UserInfoOverlayProps> = ({
           onProfileClick();
         }}
       >
-        <LazyImage
-          src={user.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
+        <OptimizedImage
+          src={getOptimizedImageUrl(
+            user.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=64&h=64&fit=crop&crop=face',
+            64,
+            64
+          )}
           alt={displayName}
-          className="w-16 h-16 rounded-full mr-2"
+          className="w-16 h-16 rounded-full mr-2 object-cover"
           width={64}
           height={64}
+          priority={true}
         />
         <span 
           className="text-white text-base font-bold"

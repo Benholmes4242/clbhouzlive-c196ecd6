@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, memo } from 'react';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
+import { getOptimizedImageUrl } from '@/utils/imageOptimization';
 
 interface OptimizedImageProps {
   src: string;
@@ -29,19 +30,15 @@ const OptimizedImageComponent: React.FC<OptimizedImageProps> = ({
   const [hasError, setHasError] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
   
-  // Use intersection observer only if not priority
+  // Use intersection observer only if not priority - more aggressive for mobile
   const { ref: intersectionRef, isInView } = useIntersectionObserver({
     threshold: 0,
-    rootMargin: '50px'
+    rootMargin: priority ? '0px' : '100px' // Increased margin for mobile
   });
 
-  // Optimize Supabase storage URLs
+  // Use the centralized optimization utility
   const getOptimizedSrc = (url: string): string => {
-    if (url.includes('supabase') && url.includes('/storage/')) {
-      const separator = url.includes('?') ? '&' : '?';
-      return `${url}${separator}quality=85&resize=fill&format=webp`;
-    }
-    return url;
+    return getOptimizedImageUrl(url, width, height);
   };
 
   useEffect(() => {

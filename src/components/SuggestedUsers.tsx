@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { OptimizedAvatar } from '@/components/ui/optimized-avatar';
+import { getAvatarSize } from '@/utils/imageOptimization';
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -162,10 +164,12 @@ const SuggestedUsers = () => {
         <div className="space-y-3">
           {suggestedUsers.map((suggestedUser) => (
             <div key={suggestedUser.id} className="flex items-center space-x-3">
-              <img
+              <OptimizedAvatar
                 src={suggestedUser.profile_photo_url}
                 alt={suggestedUser.display_name}
-                className="w-6 h-6 rounded-full object-cover"
+                className="w-6 h-6"
+                size={getAvatarSize('thumbnail')}
+                fallback={suggestedUser.display_name?.charAt(0)}
               />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">

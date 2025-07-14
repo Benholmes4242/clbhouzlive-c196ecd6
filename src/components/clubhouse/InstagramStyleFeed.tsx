@@ -1,6 +1,7 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import InstagramStylePost from './InstagramStylePost';
 import LoadingSkeleton from '@/components/feed/LoadingSkeleton';
+import { useMobileOptimizations } from '@/hooks/useMobileOptimizations';
 
 
 interface UserPost {
@@ -33,6 +34,19 @@ interface InstagramStyleFeedProps {
 }
 
 const InstagramStyleFeed: React.FC<InstagramStyleFeedProps> = ({ userPosts = [], loading = false }) => {
+  const { preloadStrategy } = useMobileOptimizations();
+
+  // Preload first few profile images for better performance
+  useEffect(() => {
+    if (userPosts.length > 0) {
+      const profileImages = userPosts
+        .slice(0, 3)
+        .map(post => post.user.profile_photo_url)
+        .filter(Boolean) as string[];
+      
+      preloadStrategy(profileImages);
+    }
+  }, [userPosts, preloadStrategy]);
   // Memoize filtered posts for performance
   const postsWithMedia = useMemo(() => 
     userPosts.filter(post => post.post_media && post.post_media.length > 0),

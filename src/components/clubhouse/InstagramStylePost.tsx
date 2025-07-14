@@ -11,7 +11,8 @@ import { useVideoAutoplay } from '@/hooks/useVideoAutoplay';
 import { useSwipeable } from 'react-swipeable';
 import { useIsMobile } from '@/hooks/use-mobile';
 
-import LazyImage from '@/components/ui/lazy-image';
+import { OptimizedAvatar } from '@/components/ui/optimized-avatar';
+import { getAvatarSize } from '@/utils/imageOptimization';
 import PostViewerModal from '@/components/posts/PostViewerModal';
 import { usePostViewer } from '@/hooks/usePostViewer';
 import { useVideoVisibility } from '@/hooks/useVideoVisibility';
@@ -250,24 +251,26 @@ const InstagramStylePostComponent: React.FC<InstagramStylePostProps> = ({ post, 
               videoRef={videoRef}
             />
           ) : (
-            <LazyImage
+            <img
               src={currentMedia.media_url}
               alt="Post content"
               className="w-full h-full object-cover cursor-pointer"
               onClick={handleMediaClick}
+              loading="lazy"
+              decoding="async"
             />
           )}
 
           {/* User Info Overlay - Top Left - Streamlined */}
           <div className="absolute top-3 left-2.5 flex items-center space-x-2 z-20">
             <div className="bg-black/40 backdrop-blur-sm rounded-full p-1.5 flex items-center space-x-2 max-w-[140px]">
-              <LazyImage
-                src={post.user.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
+              <OptimizedAvatar
+                src={post.user.profile_photo_url}
                 alt={displayName}
-                className="w-6 h-6 rounded-full border border-white/20 cursor-pointer flex-shrink-0"
-                width={24}
-                height={24}
-                onClick={handleProfileClick}
+                className="w-6 h-6 border border-white/20 cursor-pointer flex-shrink-0"
+                size={24}
+                priority={true}
+                fallback={displayName?.charAt(0)}
               />
               <div className="text-white text-xs min-w-0">
                 <div 
