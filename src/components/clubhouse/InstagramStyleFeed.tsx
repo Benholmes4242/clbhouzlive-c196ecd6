@@ -70,14 +70,6 @@ const InstagramStyleFeed: React.FC<InstagramStyleFeedProps> = ({ userPosts = [],
 
   return (
       <div className="w-full">
-        <div className="text-white bg-red-500 p-4 mb-4">
-          DEBUG: Total posts: {userPosts.length}, Posts with media: {postsWithMedia.length}
-          {postsWithMedia.slice(0, 2).map(post => (
-            <div key={post.id} className="text-sm mt-2">
-              Post ID: {post.id}, Media: {post.post_media.length} items, First media type: {post.post_media[0]?.media_type}
-            </div>
-          ))}
-        </div>
         {/* Instagram-style full-width posts */}
         <div className="space-y-0">
           {postsWithMedia.map((post) => (

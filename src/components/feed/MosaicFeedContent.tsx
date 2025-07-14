@@ -4,6 +4,7 @@ import { PiHandsClapping, PiShareFat } from 'react-icons/pi';
 import { GoCommentDiscussion } from 'react-icons/go';
 import OptimisticPostCard from '../posts/OptimisticPostCard';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
+import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import { useNavigate } from 'react-router-dom';
 import { VideoPost, UserPostWithType } from './types';
 
@@ -136,13 +137,13 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
                 {media.map((mediaItem, index) => (
                   <div key={index} className="flex-shrink-0 w-full h-full">
                      {mediaItem.media_type === 'video' ? (
-                       <video
+                       <EnhancedVideoPlayer
                          src={mediaItem.media_url}
                          className="w-full h-full object-cover rounded-xl"
-                         autoPlay
-                         muted
-                         loop
-                         playsInline
+                         autoplay={true}
+                         muted={true}
+                         loop={true}
+                         enableHLS={true}
                        />
                      ) : (
                        <img
@@ -192,13 +193,13 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
             // Single media
             <div className="w-full h-full">
               {media[0]?.media_type === 'video' ? (
-                 <video
+                 <EnhancedVideoPlayer
                    src={media[0].media_url}
                    className="w-full h-full object-cover rounded-xl"
-                   autoPlay
-                   muted
-                   loop
-                   playsInline
+                   autoplay={true}
+                   muted={true}
+                   loop={true}
+                   enableHLS={true}
                  />
               ) : (
                  <img
