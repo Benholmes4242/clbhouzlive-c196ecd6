@@ -38,8 +38,8 @@ const TrendingCard = () => {
         {/* Trending Pill - on all cards */}
         <div className="absolute top-2 right-2 z-10">
           <div className="bg-black/30 backdrop-blur-sm rounded-full px-2 py-1 flex items-center gap-1">
-            <TrendingUp className="w-3 h-3 text-white" />
-            <span className="text-white text-xs font-medium">Trending</span>
+            <TrendingUp className="w-4 h-4 text-white" />
+            <span className="text-white text-sm font-medium">Trending</span>
           </div>
         </div>
 
