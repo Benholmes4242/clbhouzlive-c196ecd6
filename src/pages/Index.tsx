@@ -98,6 +98,12 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
+      
+      {/* Migration trigger for mobile access - temporary */}
+      <div className="p-4">
+        <MigrationTrigger />
+      </div>
+      
       <ClubhouzMomentsCarousel />
       
       {/* Golf's most watched section */}
@@ -119,11 +125,6 @@ const Index = () => {
       <main>
         <TrendingFeed />
       </main>
-      
-      {/* Migration trigger for mobile access - temporary */}
-      <div className="p-4">
-        <MigrationTrigger />
-      </div>
       
       <BottomNavigation />
     </div>
