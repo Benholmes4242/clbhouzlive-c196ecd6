@@ -169,10 +169,14 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
                           const firstLine = caption.substring(0, hadIndex + 4); // Include " had"
                           const secondLine = caption.substring(hadIndex + 4).trim();
                           return (
-                            <>
+                            <div className="relative">
                               <div className="truncate">{firstLine}</div>
-                              {secondLine && <div className="truncate">{secondLine}</div>}
-                            </>
+                              {secondLine && (
+                                <div className="truncate" style={{ paddingLeft: `${firstLine.length * 0.5}ch` }}>
+                                  {secondLine}
+                                </div>
+                              )}
+                            </div>
                           );
                         }
                         return <div className="line-clamp-2">{caption}</div>;
