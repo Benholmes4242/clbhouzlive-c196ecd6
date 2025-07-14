@@ -89,7 +89,7 @@ const TrendingCard = () => {
                     <img
                       src={user?.profile_photo_url || '/placeholder.svg'}
                       alt={user?.display_name || user?.username || 'User'}
-                      className="w-14 h-14 rounded-full object-cover"
+                      className="w-12 h-12 rounded-full object-cover"
                     />
                     <p className="text-white font-bold text-base truncate">
                       {user?.display_name || user?.username}

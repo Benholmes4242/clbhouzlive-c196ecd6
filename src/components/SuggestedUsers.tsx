@@ -165,7 +165,7 @@ const SuggestedUsers = () => {
               <img
                 src={suggestedUser.profile_photo_url}
                 alt={suggestedUser.display_name}
-                className="w-8 h-8 rounded-full object-cover"
+                className="w-6 h-6 rounded-full object-cover"
               />
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium truncate">
