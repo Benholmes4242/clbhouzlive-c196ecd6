@@ -219,9 +219,16 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
             <div className="absolute bottom-0 left-0 right-0 p-3">
               <div className="flex justify-between items-end">
                 <div className="flex-1 min-w-0">
-                  <p className="text-white font-bold text-base truncate">
-                    {displayName || username}
-                  </p>
+                  <div className="flex items-center gap-2 mb-1">
+                    <img
+                      src={isUserPost ? (item as UserPostWithType).user.profile_photo_url || '/placeholder.svg' : (item as VideoPost).user.avatar || '/placeholder.svg'}
+                      alt={displayName || username || 'User'}
+                      className="w-5 h-5 rounded-full object-cover border border-white/20"
+                    />
+                    <p className="text-white font-bold text-base truncate">
+                      {displayName || username}
+                    </p>
+                  </div>
                   {caption && (
                     <div className="text-white/90 text-sm mt-1">
                       {(() => {
