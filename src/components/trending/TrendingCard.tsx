@@ -2,13 +2,23 @@ import React, { useState } from 'react';
 import { TrendingUp, ChevronLeft, ChevronRight } from 'lucide-react';
 import { PiHandsClapping, PiShareFat } from 'react-icons/pi';
 import { GoCommentDiscussion } from 'react-icons/go';
+import { HiOutlineArrowSmLeft, HiOutlineArrowSmRight } from 'react-icons/hi';
+import { useSwipeable } from 'react-swipeable';
 import { useTrendingCard } from '@/hooks/useTrendingCard';
 
 const TrendingCard = () => {
-  const { trendingPosts, loading } = useTrendingCard();
-  const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
+  const { trendingPosts, loading, nextSlide, prevSlide, currentIndex, totalPosts } = useTrendingCard();
 
   console.log('TrendingCard render - loading:', loading, 'trendingPosts:', trendingPosts.length);
+
+  // Swipe handlers for mobile
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: nextSlide,
+    onSwipedRight: prevSlide,
+    trackMouse: false,
+    trackTouch: true,
+    preventScrollOnSwipe: true,
+  });
 
   if (loading || trendingPosts.length === 0) {
     return (
@@ -113,18 +123,58 @@ const TrendingCard = () => {
   };
 
   return (
-    <div className="px-1 mb-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-        {/* Mobile: Show only first card */}
-        <div className="md:hidden">
+    <div className="px-1 mb-6 relative">
+      {/* Mobile: Swipeable single card with navigation arrows */}
+      <div className="md:hidden" {...swipeHandlers}>
+        <div className="relative">
           <TrendingCardItem post={trendingPosts[0]} index={0} />
+          
+          {/* Mobile Navigation Arrows */}
+          {totalPosts > 1 && (
+            <>
+              <button
+                onClick={prevSlide}
+                className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full p-1.5 text-white hover:bg-white/20 transition-colors z-20"
+              >
+                <HiOutlineArrowSmLeft className="w-6 h-6" />
+              </button>
+              <button
+                onClick={nextSlide}
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1.5 text-white hover:bg-white/20 transition-colors z-20"
+              >
+                <HiOutlineArrowSmRight className="w-6 h-6" />
+              </button>
+            </>
+          )}
         </div>
-        
-        {/* Desktop: Show all three cards */}
-        <div className="hidden md:contents">
-          {trendingPosts.slice(0, 3).map((post, index) => (
-            <TrendingCardItem key={post.id} post={post} index={index} />
-          ))}
+      </div>
+      
+      {/* Desktop: Show three cards with navigation */}
+      <div className="hidden md:block">
+        <div className="relative">
+          <div className="grid grid-cols-3 gap-2">
+            {trendingPosts.slice(0, 3).map((post, index) => (
+              <TrendingCardItem key={`${post.id}-${currentIndex + index}`} post={post} index={index} />
+            ))}
+          </div>
+          
+          {/* Desktop Navigation Arrows */}
+          {totalPosts > 3 && (
+            <>
+              <button
+                onClick={prevSlide}
+                className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full p-1.5 text-white hover:bg-white/20 transition-colors z-20 bg-black/30 backdrop-blur-sm"
+              >
+                <HiOutlineArrowSmLeft className="w-6 h-6" />
+              </button>
+              <button
+                onClick={nextSlide}
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1.5 text-white hover:bg-white/20 transition-colors z-20 bg-black/30 backdrop-blur-sm"
+              >
+                <HiOutlineArrowSmRight className="w-6 h-6" />
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>

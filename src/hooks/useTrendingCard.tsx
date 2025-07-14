@@ -3,10 +3,11 @@ import { supabase } from '@/integrations/supabase/client';
 
 export const useTrendingCard = () => {
   const [trendingPosts, setTrendingPosts] = useState([]);
+  const [allTrendingPosts, setAllTrendingPosts] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
 
-  const fetchRandomPost = async () => {
+  const fetchTrendingPosts = async () => {
     try {
       setLoading(true);
       console.log('Fetching trending video posts...');
@@ -23,7 +24,7 @@ export const useTrendingCard = () => {
           )
         `)
         .not('post_media', 'is', null)
-        .limit(50);
+        .limit(100);
 
       if (error) throw error;
       console.log('Raw posts fetched:', posts?.length || 0);
@@ -39,13 +40,12 @@ export const useTrendingCard = () => {
         console.log('Posts with video media:', postsWithVideoMedia.length);
         
         if (postsWithVideoMedia.length > 0) {
-          // Shuffle and select 3 different posts to ensure no duplicates
+          // Shuffle all posts for carousel
           const shuffled = [...postsWithVideoMedia].sort(() => 0.5 - Math.random());
-          const selectedPosts = shuffled.slice(0, Math.min(3, postsWithVideoMedia.length));
           
-          // Get user profiles for all selected posts
+          // Get user profiles for all posts
           const postsWithProfiles = await Promise.all(
-            selectedPosts.map(async (post) => {
+            shuffled.map(async (post) => {
               const { data: userProfile } = await supabase
                 .from('user_profiles')
                 .select('id, display_name, username, profile_photo_url')
@@ -59,26 +59,57 @@ export const useTrendingCard = () => {
             })
           );
           
-          console.log('Selected trending posts:', postsWithProfiles.length, 'unique posts');
-          setTrendingPosts(postsWithProfiles);
+          console.log('All trending posts loaded:', postsWithProfiles.length);
+          setAllTrendingPosts(postsWithProfiles);
+          // Set initial visible posts (first 3 for desktop, first 1 for mobile)
+          setTrendingPosts(postsWithProfiles.slice(0, 3));
         } else {
           console.log('No video posts found for trending card');
         }
       }
     } catch (err) {
-      console.error('Error fetching trending post:', err);
-      setError(err.message);
+      console.error('Error fetching trending posts:', err);
     } finally {
       setLoading(false);
     }
   };
 
+  const nextSlide = () => {
+    if (allTrendingPosts.length === 0) return;
+    
+    const newIndex = (currentIndex + 1) % allTrendingPosts.length;
+    setCurrentIndex(newIndex);
+    
+    // Update visible posts for carousel
+    const nextPosts = [];
+    for (let i = 0; i < 3; i++) {
+      const postIndex = (newIndex + i) % allTrendingPosts.length;
+      nextPosts.push(allTrendingPosts[postIndex]);
+    }
+    setTrendingPosts(nextPosts);
+  };
+
+  const prevSlide = () => {
+    if (allTrendingPosts.length === 0) return;
+    
+    const newIndex = currentIndex === 0 ? allTrendingPosts.length - 1 : currentIndex - 1;
+    setCurrentIndex(newIndex);
+    
+    // Update visible posts for carousel
+    const prevPosts = [];
+    for (let i = 0; i < 3; i++) {
+      const postIndex = (newIndex + i) % allTrendingPosts.length;
+      prevPosts.push(allTrendingPosts[postIndex]);
+    }
+    setTrendingPosts(prevPosts);
+  };
+
   useEffect(() => {
-    fetchRandomPost();
+    fetchTrendingPosts();
 
     // Listen for post deletion events to refresh the trending card
     const handlePostDeleted = () => {
-      fetchRandomPost();
+      fetchTrendingPosts();
     };
 
     window.addEventListener('postDeleted', handlePostDeleted);
@@ -90,7 +121,10 @@ export const useTrendingCard = () => {
   return {
     trendingPosts,
     loading,
-    error,
-    refetch: fetchRandomPost
+    nextSlide,
+    prevSlide,
+    currentIndex,
+    totalPosts: allTrendingPosts.length,
+    refetch: fetchTrendingPosts
   };
 };
