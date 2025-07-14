@@ -45,21 +45,8 @@ const TrendingCard = () => {
     // Only show the first video, no carousel functionality for trending cards
     const firstVideo = videoMedia[0];
     
-    // Find golf course tag
-    const golfCourseTag = post.post_tags?.find(tag => 
-      tag.taggable_entities?.entity_type === 'golf_club'
-    )?.taggable_entities;
-
-    const handleGolfClubClick = (e: React.MouseEvent) => {
-      e.stopPropagation();
-      if (golfCourseTag) {
-        navigate(`/courses/${golfCourseTag.entity_id}`);
-      }
-    };
-
     return (
       <div className="relative w-full aspect-[3/4] rounded-xl overflow-hidden bg-card border group">
-        {/* Golf Course Tag - top left - REMOVED */}
 
         {/* Trending Icon - top right */}
         <div className="absolute top-2 right-2 z-10">
