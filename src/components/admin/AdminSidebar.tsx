@@ -22,7 +22,8 @@ import {
   Settings as SettingsIcon,
   MapPin,
   Flag,
-  Image
+  Image,
+  Database
 } from "lucide-react";
 
 const menuItems = [
@@ -66,6 +67,12 @@ const menuItems = [
     title: "Analytics",
     icon: TrendingUp,
     value: "analytics",
+    requiredRole: "admin",
+  },
+  {
+    title: "Media Migration",
+    icon: Database,
+    value: "media-migration",
     requiredRole: "admin",
   },
   {
