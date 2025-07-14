@@ -185,15 +185,16 @@ serve(async (req) => {
                 }
               }
               
-              // Upload to R2 using S3-compatible API
+              // Upload to R2 using the correct API
               const bucketName = 'clbhouz-media';
-              const r2Url = `https://${accountId}.r2.cloudflarestorage.com/${bucketName}/${filePath}`;
               
-              const r2Response = await fetch(r2Url, {
+              // Use the Cloudflare API v4 endpoint for R2 uploads with correct content headers
+              const r2Response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${accountId}/r2/buckets/${bucketName}/objects/${encodeURIComponent(filePath)}`, {
                 method: 'PUT',
                 headers: {
                   'Authorization': `Bearer ${r2ApiToken}`,
                   'Content-Type': fileData.type || 'application/octet-stream',
+                  'Content-Length': fileData.size.toString(),
                 },
                 body: fileData,
               });
@@ -204,7 +205,7 @@ serve(async (req) => {
                   status: r2Response.status,
                   statusText: r2Response.statusText,
                   error: errorText,
-                  url: r2Url,
+                  url: `https://api.cloudflare.com/client/v4/accounts/${accountId}/r2/buckets/${bucketName}/objects/${filePath}`,
                   accountId,
                   hasToken: !!r2ApiToken
                 });
