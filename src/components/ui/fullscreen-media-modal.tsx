@@ -397,14 +397,6 @@ const FullscreenMediaModal = ({
         </button>
       </div>
 
-      {/* User Info Overlay - Top Left (exact same position as index feed) */}
-      {user && displayName && (
-        <UserInfoOverlay
-          user={user}
-          displayName={displayName}
-          onProfileClick={() => {}} // Add profile click handler if needed
-        />
-      )}
 
       {/* Media Content with Navigation - Fully centered and sized to fill viewport */}
       <div 
@@ -481,6 +473,20 @@ const FullscreenMediaModal = ({
 
       {/* Caption and Golf Course Tag - Bottom Left (matching index feed exactly) */}
       <div className="absolute bottom-5 left-3 right-20 z-20">
+        {/* User Info - Profile Photo and Name */}
+        {user && displayName && (
+          <div className="flex items-end gap-2 mb-2">
+            <img
+              src={user.profile_photo_url || '/placeholder.svg'}
+              alt={displayName}
+              className="w-12 h-12 rounded-full object-cover"
+            />
+            <p className="text-white font-bold text-base">
+              {displayName}
+            </p>
+          </div>
+        )}
+
         {/* Golf Course Badge - Above Caption (matching CaptionOverlay exactly) */}
         {golfCourse && (
           <div className="mb-2">
