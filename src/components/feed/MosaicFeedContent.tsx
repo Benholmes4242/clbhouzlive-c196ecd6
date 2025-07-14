@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Heart, MessageCircle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Heart, MessageCircle, ChevronLeft, ChevronRight, Maximize2 } from 'lucide-react';
 import { PiHandsClapping, PiShareFat } from 'react-icons/pi';
 import { GoCommentDiscussion } from 'react-icons/go';
 import OptimisticPostCard from '../posts/OptimisticPostCard';
+import PostViewerModal from '../posts/PostViewerModal';
 import { VideoPost, UserPostWithType } from './types';
 
 interface MosaicFeedContentProps {
@@ -19,6 +20,8 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
   onPostDeleted
 }) => {
   const [currentMediaIndex, setCurrentMediaIndex] = useState<{[key: string]: number}>({});
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedPost, setSelectedPost] = useState<VideoPost | UserPostWithType | null>(null);
 
   const handlePrevMedia = (postId: string, mediaLength: number) => {
     setCurrentMediaIndex(prev => ({
@@ -32,6 +35,44 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
       ...prev,
       [postId]: Math.min(mediaLength - 1, (prev[postId] || 0) + 1)
     }));
+  };
+
+  const handleMaximizeClick = (item: VideoPost | UserPostWithType) => {
+    setSelectedPost(item);
+    setModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setSelectedPost(null);
+  };
+
+  const transformPostForModal = (item: VideoPost | UserPostWithType) => {
+    const isUserPost = item.type === 'user_post';
+    return {
+      id: item.id,
+      content: isUserPost ? (item as UserPostWithType).content : (item as VideoPost).content.description,
+      created_at: isUserPost ? (item as UserPostWithType).created_at : new Date().toISOString(),
+      user: {
+        id: isUserPost ? (item as UserPostWithType).user.id : item.id,
+        display_name: isUserPost ? (item as UserPostWithType).user.display_name : (item as VideoPost).user.name,
+        username: isUserPost ? (item as UserPostWithType).user.username : (item as VideoPost).user.username,
+        profile_photo_url: isUserPost ? (item as UserPostWithType).user.profile_photo_url : (item as VideoPost).user.avatar,
+      },
+      post_media: isUserPost 
+        ? (item as UserPostWithType).post_media.map(pm => ({
+            id: pm.id,
+            media_type: pm.media_type,
+            media_url: pm.media_url
+          }))
+        : [{
+            id: item.id,
+            media_type: (item as VideoPost).content.type,
+            media_url: (item as VideoPost).content.videoUrl || (item as VideoPost).content.image || ''
+          }],
+      post_tags: isUserPost ? (item as UserPostWithType).post_tags : undefined,
+      golfCourse: undefined
+    };
   };
 
   const renderMediaTile = (item: VideoPost | UserPostWithType, index: number) => {
@@ -153,6 +194,16 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
             </div>
           )}
           
+          {/* Maximize button - top right */}
+          <div className="absolute top-2 right-2">
+            <button 
+              onClick={() => handleMaximizeClick(item)}
+              className="rounded-full p-1.5 bg-black/50 text-white hover:bg-black/70 transition-colors opacity-0 group-hover:opacity-100"
+            >
+              <Maximize2 className="w-5 h-5" />
+            </button>
+          </div>
+          
           {/* Overlay with content */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
             <div className="absolute bottom-0 left-0 right-0 p-3">
@@ -224,6 +275,16 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
       <div className="mosaic-grid">
         {sortedContent.map((item, index) => renderMediaTile(item, index))}
       </div>
+
+      {/* Post Viewer Modal */}
+      {modalOpen && selectedPost && (
+        <PostViewerModal
+          isOpen={modalOpen}
+          onClose={handleCloseModal}
+          initialPost={transformPostForModal(selectedPost)}
+          allUserPosts={[transformPostForModal(selectedPost)]}
+        />
+      )}
     </div>
   );
 };
