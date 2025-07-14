@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Heart, MessageCircle, ChevronLeft, ChevronRight, Maximize2 } from 'lucide-react';
+import { Heart, MessageCircle, ChevronLeft, ChevronRight, Maximize2, MapPin } from 'lucide-react';
 import { PiHandsClapping, PiShareFat } from 'react-icons/pi';
 import { GoCommentDiscussion } from 'react-icons/go';
 import OptimisticPostCard from '../posts/OptimisticPostCard';
 import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
+import { useNavigate } from 'react-router-dom';
 import { VideoPost, UserPostWithType } from './types';
 
 interface MosaicFeedContentProps {
@@ -89,6 +90,7 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
   };
 
   const renderMediaTile = (item: VideoPost | UserPostWithType, index: number) => {
+    const navigate = useNavigate();
     const isUserPost = item.type === 'user_post';
     const media = isUserPost 
       ? (item as UserPostWithType).post_media.map(pm => ({ media_url: pm.media_url, media_type: pm.media_type }))
@@ -100,6 +102,18 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
     const username = isUserPost ? (item as UserPostWithType).user.username : (item as VideoPost).user.username;
     const displayName = isUserPost ? (item as UserPostWithType).user.display_name : (item as VideoPost).user.name;
     const caption = isUserPost ? (item as UserPostWithType).content : (item as VideoPost).content.description;
+
+    // Find golf course tag for user posts
+    const golfCourseTag = isUserPost 
+      ? (item as UserPostWithType).post_tags?.find(tag => tag.entity_type === 'golf_club')
+      : null;
+
+    const handleGolfClubClick = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (golfCourseTag) {
+        navigate(`/courses/${golfCourseTag.entity_id}`);
+      }
+    };
 
     // Generate three types of cards based on Pinterest style
     const cardTypes = [
@@ -207,6 +221,21 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
             </div>
           )}
           
+          {/* Golf Club Tag - top left */}
+          {golfCourseTag && (
+            <div className="absolute top-2 left-2 z-10">
+              <button 
+                onClick={handleGolfClubClick}
+                className="bg-white rounded-full px-3 py-1.5 flex items-center gap-1.5 hover:bg-white/90 transition-colors cursor-pointer"
+              >
+                <MapPin className="w-4 h-4 text-gray-700" />
+                <span className="text-gray-900 text-sm font-medium truncate max-w-[120px]">
+                  {golfCourseTag.name}
+                </span>
+              </button>
+            </div>
+          )}
+
           {/* Maximize button - top right */}
           <div className="absolute top-2 right-2 z-20">
             <button 

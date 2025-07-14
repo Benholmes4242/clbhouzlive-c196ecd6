@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { TrendingUp, ChevronLeft, ChevronRight } from 'lucide-react';
+import { TrendingUp, ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
 import { PiHandsClapping, PiShareFat } from 'react-icons/pi';
 import { GoCommentDiscussion } from 'react-icons/go';
 import { HiOutlineArrowSmLeft, HiOutlineArrowSmRight } from 'react-icons/hi';
 import { useSwipeable } from 'react-swipeable';
+import { useNavigate } from 'react-router-dom';
 import { useTrendingCard } from '@/hooks/useTrendingCard';
 
 const TrendingCard = () => {
@@ -34,6 +35,7 @@ const TrendingCard = () => {
 
   // Component to render a single trending card
   const TrendingCardItem = ({ post, index }) => {
+    const navigate = useNavigate();
     const media = post.post_media || [];
     const videoMedia = media.filter(m => m.media_type === 'video');
     const user = post.user_profiles;
@@ -48,16 +50,27 @@ const TrendingCard = () => {
       tag.taggable_entities?.entity_type === 'golf_club'
     )?.taggable_entities;
 
+    const handleGolfClubClick = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (golfCourseTag) {
+        navigate(`/courses/${golfCourseTag.entity_id}`);
+      }
+    };
+
     return (
       <div className="relative w-full aspect-[3/4] rounded-xl overflow-hidden bg-card border group">
         {/* Golf Course Tag - top left */}
         {golfCourseTag && (
           <div className="absolute top-2 left-2 z-10">
-            <div className="bg-white/20 backdrop-blur-sm rounded-full px-2 py-1 flex items-center gap-1">
-              <span className="text-white text-sm font-medium truncate max-w-[120px]">
+            <button 
+              onClick={handleGolfClubClick}
+              className="bg-white rounded-full px-3 py-1.5 flex items-center gap-1.5 hover:bg-white/90 transition-colors cursor-pointer"
+            >
+              <MapPin className="w-4 h-4 text-gray-700" />
+              <span className="text-gray-900 text-sm font-medium truncate max-w-[120px]">
                 {golfCourseTag.name}
               </span>
-            </div>
+            </button>
           </div>
         )}
 
