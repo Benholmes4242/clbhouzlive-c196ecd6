@@ -181,16 +181,14 @@ const InstagramStylePostComponent: React.FC<InstagramStylePostProps> = ({ post, 
           className="relative w-full aspect-[4/5] md:aspect-[3/4]" 
         >
           {currentMedia.media_type === 'video' ? (
-            <div className="w-full h-full">
-              <EnhancedVideoPlayer
-                src={currentMedia.media_url}
-                autoplay={shouldAutoplay}
-                muted={true}
-                loop={true}
-                className="w-full h-full object-cover"
-                enableHLS={true}
-              />
-            </div>
+            <EnhancedVideoPlayer
+              src={currentMedia.media_url}
+              className="w-full h-full object-cover"
+              autoplay={true}
+              muted={true}
+              loop={true}
+              enableHLS={true}
+            />
           ) : (
             <SmartMediaContainer
               media={[{
