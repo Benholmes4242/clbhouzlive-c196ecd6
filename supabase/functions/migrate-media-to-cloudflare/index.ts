@@ -58,15 +58,28 @@ serve(async (req) => {
       errors: []
     };
 
-    // Count total items
+    // Count total items - including videos that need re-migration from R2 to Stream
     for (const source of mediaSources) {
-      const { count } = await supabase
+      // Count Supabase files
+      const { count: supabaseCount } = await supabase
         .from(source.table)
         .select('*', { count: 'exact', head: true })
         .not(source.urlColumn, 'is', null)
         .like(source.urlColumn, `${supabaseUrl}/storage/v1/object/public/${source.bucket}/%`);
       
-      progress.total += count || 0;
+      // Count R2 videos that need re-migration to Stream
+      let r2VideoCount = 0;
+      if (source.typeColumn) {
+        const { count } = await supabase
+          .from(source.table)
+          .select('*', { count: 'exact', head: true })
+          .not(source.urlColumn, 'is', null)
+          .like(source.urlColumn, 'https://media.clbhouz.co.uk/%')
+          .or(`${source.typeColumn}.eq.video,${source.typeColumn}.like.video/%`);
+        r2VideoCount = count || 0;
+      }
+      
+      progress.total += (supabaseCount || 0) + r2VideoCount;
     }
 
     console.log(`Total items to migrate: ${progress.total}`);
@@ -102,7 +115,7 @@ serve(async (req) => {
         for (const record of records) {
           try {
             const oldUrl = record[source.urlColumn];
-            const isVideo = source.typeColumn && record[source.typeColumn]?.startsWith('video/');
+            const isVideo = source.typeColumn && (record[source.typeColumn] === 'video' || record[source.typeColumn]?.startsWith('video/'));
             const isImage = !isVideo;
 
             // Extract file path from URL
@@ -144,7 +157,8 @@ serve(async (req) => {
 
               const streamResult = await streamResponse.json();
               if (streamResult.success) {
-                newUrl = `https://videodelivery.net/${streamResult.result.uid}/manifest/video.m3u8`;
+                // Use the customer subdomain format like the working uploads
+                newUrl = `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${streamResult.result.uid}/manifest/video.m3u8`;
               } else {
                 throw new Error(`Stream upload failed: ${streamResult.errors?.[0]?.message}`);
               }
@@ -260,6 +274,98 @@ serve(async (req) => {
 
         offset += batchSize;
         console.log(`Progress: ${progress.processed}/${progress.total} (${Math.round(progress.processed/progress.total*100)}%)`);
+      }
+      
+      // Process R2 videos that need to move to Stream
+      if (source.typeColumn) {
+        console.log(`Processing R2 videos in ${source.table} that need to move to Stream`);
+        
+        offset = 0;
+        hasMore = true;
+        
+        while (hasMore) {
+          const { data: r2Records, error: r2Error } = await supabase
+            .from(source.table)
+            .select('*')
+            .not(source.urlColumn, 'is', null)
+            .like(source.urlColumn, 'https://media.clbhouz.co.uk/%')
+            .or(`${source.typeColumn}.eq.video,${source.typeColumn}.like.video/%`)
+            .range(offset, offset + batchSize - 1);
+
+          if (r2Error) {
+            console.error(`Error fetching R2 videos from ${source.table}:`, r2Error);
+            break;
+          }
+
+          if (!r2Records || r2Records.length === 0) {
+            hasMore = false;
+            break;
+          }
+
+          // Process each R2 video record
+          for (const record of r2Records) {
+            try {
+              const oldUrl = record[source.urlColumn];
+              console.log(`Re-migrating R2 video to Stream: ${oldUrl}`);
+
+              // Download from R2
+              const r2Response = await fetch(oldUrl);
+              if (!r2Response.ok) {
+                throw new Error(`Failed to download from R2: ${r2Response.status}`);
+              }
+              
+              const fileData = await r2Response.blob();
+              const fileName = oldUrl.split('/').pop() || 'video';
+
+              // Upload to Cloudflare Stream
+              const formData = new FormData();
+              formData.append('file', fileData, fileName);
+
+              const streamResponse = await fetch(`https://api.cloudflare.com/client/v4/accounts/${accountId}/stream`, {
+                method: 'POST',
+                headers: {
+                  'Authorization': `Bearer ${streamApiToken}`,
+                },
+                body: formData,
+              });
+
+              if (!streamResponse.ok) {
+                throw new Error(`Stream upload failed: ${streamResponse.status}`);
+              }
+
+              const streamResult = await streamResponse.json();
+              if (streamResult.success) {
+                const newUrl = `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${streamResult.result.uid}/manifest/video.m3u8`;
+                
+                // Update database with new Stream URL
+                const { error: updateError } = await supabase
+                  .from(source.table)
+                  .update({ [source.urlColumn]: newUrl })
+                  .eq('id', record.id);
+
+                if (updateError) {
+                  throw new Error(`Database update failed: ${updateError.message}`);
+                }
+
+                progress.successful++;
+                console.log(`✅ Re-migrated video to Stream: ${oldUrl} → ${newUrl}`);
+              } else {
+                throw new Error(`Stream upload failed: ${streamResult.errors?.[0]?.message}`);
+              }
+
+            } catch (error) {
+              progress.failed++;
+              const errorMsg = `Failed to re-migrate video ${record[source.urlColumn]}: ${error.message}`;
+              console.error(errorMsg);
+              progress.errors.push(errorMsg);
+            }
+
+            progress.processed++;
+          }
+
+          offset += batchSize;
+          console.log(`Progress: ${progress.processed}/${progress.total} (${Math.round(progress.processed/progress.total*100)}%)`);
+        }
       }
     }
 
