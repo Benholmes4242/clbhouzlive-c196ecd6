@@ -81,24 +81,27 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
       if (window.Hls && window.Hls.isSupported()) {
         const hls = new window.Hls({
           enableWorker: true,
-          lowLatencyMode: true,
+          lowLatencyMode: false, // Disable for better quality
           backBufferLength: 90,
-          maxBufferLength: 30,
-          maxMaxBufferLength: 60,
-          // Optimized settings for Cloudflare Stream
+          maxBufferLength: 60, // Increased for 4K
+          maxMaxBufferLength: 120, // Increased for 4K
+          // Optimized settings for high-quality Cloudflare Stream
           ...(isCloudflareStream && {
-            maxBufferLength: 60,
-            maxMaxBufferLength: 120,
-            startLevel: -1, // Auto-select quality
-            capLevelToPlayerSize: true,
-            abrEwmaDefaultEstimate: 2000000,
-            abrBandWidthFactor: 0.8,
-            abrBandWidthUpFactor: 0.6,
+            maxBufferLength: 120, // Increased buffer for 4K
+            maxMaxBufferLength: 240, // Increased buffer for 4K
+            startLevel: 0, // Start with highest quality available
+            capLevelToPlayerSize: false, // Allow 4K even in smaller players
+            abrEwmaDefaultEstimate: 8000000, // Higher bitrate estimate (8 Mbps for 4K)
+            abrBandWidthFactor: 0.9, // More aggressive quality selection
+            abrBandWidthUpFactor: 0.8, // Faster quality upgrades
+            maxStarvationDelay: 4, // Reduce starvation delay for smoother playback
+            maxLoadingDelay: 4,
           }),
-          // Adaptive bitrate settings
-          abrEwmaDefaultEstimate: adaptiveBitrate ? 1000000 : 5000000,
-          abrBandWidthFactor: 0.95,
-          abrBandWidthUpFactor: 0.7,
+          // Enhanced adaptive bitrate settings for 4K
+          abrEwmaDefaultEstimate: adaptiveBitrate ? 5000000 : 8000000, // Higher estimates
+          abrBandWidthFactor: 0.9, // More aggressive quality selection
+          abrBandWidthUpFactor: 0.8, // Faster upgrades to higher quality
+          startLevel: 0, // Always start with highest quality
         });
 
         hls.loadSource(src);
