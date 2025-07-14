@@ -4,6 +4,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useVideoCompression } from './useVideoCompression';
 import { useChunkedUpload } from './useChunkedUpload';
 import { useCloudflareStream } from './useCloudflareStream';
+import { useCloudflareR2 } from './useCloudflareR2';
 
 interface UploadProgress {
   postId: string;
@@ -24,6 +25,7 @@ export const useBackgroundUpload = () => {
   const { shouldCompress, triggerCompression } = useVideoCompression();
   const { uploadFileInChunks } = useChunkedUpload();
   const { uploadVideo, isVideoFile } = useCloudflareStream();
+  const { uploadToR2 } = useCloudflareR2();
   const [uploads, setUploads] = useState<Map<string, UploadProgress>>(new Map());
 
   const startBackgroundUpload = useCallback(async ({
@@ -99,7 +101,27 @@ export const useBackgroundUpload = () => {
             throw error;
           }
         }
-        // Use chunked upload for large image files (>40MB) or if regular upload fails
+        // Use Cloudflare R2 for image files
+        else if (mediaType === 'image') {
+          console.log(`Uploading image to Cloudflare R2: ${file.name}`);
+          try {
+            const r2Result = await uploadToR2(file, `${userId}/${postId}/${fullFileName}`);
+            
+            if (r2Result.success && r2Result.url) {
+              publicUrl = r2Result.url;
+              console.log(`Successfully uploaded ${file.name} to Cloudflare R2:`, publicUrl);
+            } else {
+              throw new Error(r2Result.error || 'Cloudflare R2 upload failed');
+            }
+          } catch (error) {
+            console.error(`Cloudflare R2 upload failed for ${file.name}:`, error);
+            // Fallback to chunked upload
+            console.log(`Falling back to chunked upload for ${file.name}`);
+            const result = await uploadFileInChunks(file);
+            publicUrl = result.publicUrl;
+          }
+        }
+        // Use chunked upload for large files (>40MB) or as fallback
         else if (file.size > 40 * 1024 * 1024) {
           console.log(`Using chunked upload for large file: ${file.name}`);
           try {

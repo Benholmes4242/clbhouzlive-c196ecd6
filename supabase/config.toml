@@ -15,3 +15,6 @@ verify_jwt = true
 
 [functions.cloudflare-stream-upload]
 verify_jwt = true
+
+[functions.cloudflare-r2-upload]
+verify_jwt = true
