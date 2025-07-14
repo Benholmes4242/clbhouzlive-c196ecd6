@@ -208,10 +208,15 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
           )}
           
           {/* Maximize button - top right */}
-          <div className="absolute top-2 right-2">
+          <div className="absolute top-2 right-2 z-20">
             <button 
-              onClick={() => handleMaximizeClick(item)}
-              className="rounded-full p-1.5 text-white hover:bg-white/20 transition-colors opacity-0 group-hover:opacity-100"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('🔴 MAXIMIZE BUTTON CLICKED!');
+                handleMaximizeClick(item);
+              }}
+              className="rounded-full p-2 text-white hover:bg-white/20 transition-colors opacity-100 hover:opacity-100 bg-black/30"
             >
               <Maximize2 className="w-5 h-5" />
             </button>
