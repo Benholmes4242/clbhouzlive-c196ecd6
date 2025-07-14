@@ -46,7 +46,43 @@ serve(async (req) => {
 
     console.log('Uploading to R2:', { fileName, bucketName, fileSize: file.size });
 
-    // Upload to Cloudflare R2
+    // First, ensure the bucket exists
+    const bucketListUrl = `https://api.cloudflare.com/client/v4/accounts/${accountId}/r2/buckets`;
+    const listResponse = await fetch(bucketListUrl, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${apiToken}`,
+      },
+    });
+
+    if (listResponse.ok) {
+      const buckets = await listResponse.json();
+      const bucketExists = buckets.result?.some((b: any) => b.name === bucketName);
+      
+      if (!bucketExists) {
+        console.log(`Creating R2 bucket: ${bucketName}`);
+        const createResponse = await fetch(bucketListUrl, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${apiToken}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ name: bucketName }),
+        });
+        
+        if (!createResponse.ok) {
+          const error = await createResponse.text();
+          console.error('Failed to create bucket:', error);
+          return new Response(
+            JSON.stringify({ error: 'Failed to create R2 bucket', details: error }),
+            { status: createResponse.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
+        console.log(`Successfully created bucket: ${bucketName}`);
+      }
+    }
+
+    // Upload to Cloudflare R2 using the correct API endpoint
     const r2Url = `https://api.cloudflare.com/client/v4/accounts/${accountId}/r2/buckets/${bucketName}/objects/${fileName}`;
     
     const uploadResponse = await fetch(r2Url, {
@@ -54,9 +90,8 @@ serve(async (req) => {
       headers: {
         'Authorization': `Bearer ${apiToken}`,
         'Content-Type': file.type,
-        'Content-Length': file.size.toString(),
       },
-      body: file.stream(),
+      body: file,
     });
 
     if (!uploadResponse.ok) {

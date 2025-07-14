@@ -149,8 +149,41 @@ serve(async (req) => {
                 throw new Error(`Stream upload failed: ${streamResult.errors?.[0]?.message}`);
               }
             } else {
-              // Upload to R2
+              // Upload to R2 - first ensure bucket exists
               console.log(`Uploading image to R2: ${filePath}`);
+              
+              // Check if bucket exists, create if not
+              const bucketListUrl = `https://api.cloudflare.com/client/v4/accounts/${accountId}/r2/buckets`;
+              const listResponse = await fetch(bucketListUrl, {
+                method: 'GET',
+                headers: {
+                  'Authorization': `Bearer ${r2ApiToken}`,
+                },
+              });
+
+              if (listResponse.ok) {
+                const buckets = await listResponse.json();
+                const bucketExists = buckets.result?.some((b: any) => b.name === 'clbhouz-media');
+                
+                if (!bucketExists) {
+                  console.log('Creating R2 bucket: clbhouz-media');
+                  const createResponse = await fetch(bucketListUrl, {
+                    method: 'POST',
+                    headers: {
+                      'Authorization': `Bearer ${r2ApiToken}`,
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ name: 'clbhouz-media' }),
+                  });
+                  
+                  if (!createResponse.ok) {
+                    const error = await createResponse.text();
+                    console.error('Failed to create R2 bucket:', error);
+                    throw new Error(`Failed to create R2 bucket: ${error}`);
+                  }
+                  console.log('Successfully created R2 bucket');
+                }
+              }
               
               const r2Response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${accountId}/r2/buckets/clbhouz-media/objects/${filePath}`, {
                 method: 'PUT',
