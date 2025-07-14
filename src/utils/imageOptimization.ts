@@ -3,22 +3,10 @@
 export const getOptimizedImageUrl = (url: string, width?: number, height?: number): string => {
   if (!url) return url;
   
-  // For Supabase storage URLs, we can add transformation parameters
+  // For Supabase storage URLs - Supabase doesn't support query param transformations
+  // Instead, return the original URL and let the browser handle caching
   if (url.includes('supabase.co/storage/v1/object/public/')) {
-    const urlObj = new URL(url);
-    const params = new URLSearchParams();
-    
-    if (width) params.set('width', width.toString());
-    if (height) params.set('height', height.toString());
-    // More aggressive compression for mobile
-    params.set('quality', '75'); 
-    params.set('format', 'webp');
-    
-    if (params.toString()) {
-      urlObj.search = params.toString();
-    }
-    
-    return urlObj.toString();
+    return url;
   }
   
   // For external URLs (like Unsplash), add mobile-optimized parameters
@@ -29,7 +17,7 @@ export const getOptimizedImageUrl = (url: string, width?: number, height?: numbe
       urlObj.searchParams.set('h', height.toString());
       urlObj.searchParams.set('fit', 'crop');
       urlObj.searchParams.set('crop', 'face');
-      urlObj.searchParams.set('q', '75');
+      urlObj.searchParams.set('q', '80');
       urlObj.searchParams.set('fm', 'webp');
     }
     return urlObj.toString();

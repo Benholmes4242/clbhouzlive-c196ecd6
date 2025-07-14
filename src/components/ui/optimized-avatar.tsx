@@ -20,10 +20,7 @@ const OptimizedAvatarComponent: React.FC<OptimizedAvatarProps> = ({
   fallback,
   priority = false
 }) => {
-  // Provide a default fallback image if src is null/empty
-  const fallbackImageUrl = `https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=${size}&h=${size}&fit=crop&crop=face`;
-  const imageUrl = src || fallbackImageUrl;
-  const optimizedSrc = getOptimizedImageUrl(imageUrl, size, size);
+  const optimizedSrc = src ? getOptimizedImageUrl(src, size, size) : null;
 
   return (
     <Avatar className={className} style={{ width: size, height: size }}>
@@ -38,6 +35,13 @@ const OptimizedAvatarComponent: React.FC<OptimizedAvatarProps> = ({
           }}
           loading={priority ? 'eager' : 'lazy'}
           decoding="async"
+          crossOrigin="anonymous"
+          onLoad={() => {
+            console.log('Avatar loaded successfully:', optimizedSrc);
+          }}
+          onError={(e) => {
+            console.error('Avatar image failed to load:', optimizedSrc, e);
+          }}
         />
       ) : null}
       <AvatarFallback className="bg-primary/10 text-primary text-xs">
