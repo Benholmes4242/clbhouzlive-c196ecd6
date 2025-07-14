@@ -65,18 +65,7 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
 
   const initializeVideo = () => {
     const video = videoRef.current;
-    if (!video) {
-      console.log('❌ Video ref not found during initialization');
-      return;
-    }
-
-    console.log('🎬 Initializing video element:', {
-      src,
-      videoElement: video,
-      dimensions: { width: video.offsetWidth, height: video.offsetHeight },
-      parentDimensions: video.parentElement ? { width: video.parentElement.offsetWidth, height: video.parentElement.offsetHeight } : null,
-      style: video.style.cssText
-    });
+    if (!video) return;
 
     // Clear any existing HLS instance
     if (hlsRef.current) {
