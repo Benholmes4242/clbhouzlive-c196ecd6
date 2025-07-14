@@ -35,9 +35,9 @@ export const useTrendingCard = () => {
         console.log('Posts with video media:', postsWithVideoMedia.length);
         
         if (postsWithVideoMedia.length > 0) {
-          // Select 3 random posts for desktop view
+          // Shuffle and select 3 different posts to ensure no duplicates
           const shuffled = [...postsWithVideoMedia].sort(() => 0.5 - Math.random());
-          const selectedPosts = shuffled.slice(0, 3);
+          const selectedPosts = shuffled.slice(0, Math.min(3, postsWithVideoMedia.length));
           
           // Get user profiles for all selected posts
           const postsWithProfiles = await Promise.all(
@@ -55,7 +55,7 @@ export const useTrendingCard = () => {
             })
           );
           
-          console.log('Selected trending posts:', postsWithProfiles.length);
+          console.log('Selected trending posts:', postsWithProfiles.length, 'unique posts');
           setTrendingPosts(postsWithProfiles);
         } else {
           console.log('No video posts found for trending card');

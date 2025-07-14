@@ -28,6 +28,9 @@ const TrendingCard = () => {
     
     if (videoMedia.length === 0) return null;
 
+    // Only show the first video, no carousel functionality for trending cards
+    const firstVideo = videoMedia[0];
+
     return (
       <div className="relative w-full aspect-[3/4] rounded-xl overflow-hidden bg-card border group">
         {/* Trending Pill - on all cards */}
@@ -38,10 +41,10 @@ const TrendingCard = () => {
           </div>
         </div>
 
-        {/* Video */}
+        {/* Single Video - No Carousel */}
         <div className="relative w-full h-full">
           <video
-            src={videoMedia[0]?.media_url}
+            src={firstVideo.media_url}
             className="w-full h-full object-cover"
             autoPlay
             muted
