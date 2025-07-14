@@ -30,15 +30,13 @@ const TrendingCard = () => {
 
     return (
       <div className="relative w-full aspect-[3/4] rounded-xl overflow-hidden bg-card border group">
-        {/* Trending Pill - only on first card */}
-        {index === 0 && (
-          <div className="absolute top-2 right-2 z-10">
-            <div className="bg-black/30 backdrop-blur-sm rounded-full px-2 py-1 flex items-center gap-1">
-              <TrendingUp className="w-3 h-3 text-white" />
-              <span className="text-white text-xs font-medium">Trending</span>
-            </div>
+        {/* Trending Pill - on all cards */}
+        <div className="absolute top-2 right-2 z-10">
+          <div className="bg-black/30 backdrop-blur-sm rounded-full px-2 py-1 flex items-center gap-1">
+            <TrendingUp className="w-3 h-3 text-white" />
+            <span className="text-white text-xs font-medium">Trending</span>
           </div>
-        )}
+        </div>
 
         {/* Video */}
         <div className="relative w-full h-full">
