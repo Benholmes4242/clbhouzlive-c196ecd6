@@ -114,11 +114,19 @@ const TrendingCard = () => {
                     if (post.post_tags) {
                       post.post_tags.forEach(tag => {
                         if (tag.taggable_entities?.entity_type === 'golf_club') {
+                          // Remove the tagged text using start and end indices
                           const tagText = filteredContent.substring(tag.start_index, tag.end_index);
-                          filteredContent = filteredContent.replace(tagText, '').trim();
+                          filteredContent = filteredContent.replace(tagText, '');
                         }
                       });
                     }
+                    
+                    // Also remove common golf course patterns
+                    filteredContent = filteredContent
+                      .replace(/\s*Played at[^.]*\.?\s*/gi, '')
+                      .replace(/\s*@\s*[^#\s]*\s*/g, '')
+                      .replace(/\s+/g, ' ')
+                      .trim();
                     
                     return filteredContent ? (
                       <>
