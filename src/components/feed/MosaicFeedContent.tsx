@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Heart, MessageCircle, ChevronLeft, ChevronRight, Maximize2, MapPin } from 'lucide-react';
+import { Heart, MessageCircle, ChevronLeft, ChevronRight, Maximize2 } from 'lucide-react';
 import { PiHandsClapping, PiShareFat } from 'react-icons/pi';
 import { GoCommentDiscussion } from 'react-icons/go';
 import OptimisticPostCard from '../posts/OptimisticPostCard';
@@ -103,17 +103,7 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
     const displayName = isUserPost ? (item as UserPostWithType).user.display_name : (item as VideoPost).user.name;
     const caption = isUserPost ? (item as UserPostWithType).content : (item as VideoPost).content.description;
 
-    // Find golf course tag for user posts
-    const golfCourseTag = isUserPost 
-      ? (item as UserPostWithType).post_tags?.find(tag => tag.entity_type === 'golf_club')
-      : null;
-
-    const handleGolfClubClick = (e: React.MouseEvent) => {
-      e.stopPropagation();
-      if (golfCourseTag) {
-        navigate(`/courses/${golfCourseTag.entity_id}`);
-      }
-    };
+    // Removed golf course tag logic
 
     // Generate three types of cards based on Pinterest style
     const cardTypes = [
