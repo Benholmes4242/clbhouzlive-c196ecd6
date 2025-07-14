@@ -59,8 +59,8 @@ const TrendingCard = () => {
             <div className="absolute bottom-0 left-0 right-0 p-3">
               <div className="flex justify-between items-end">
                 <div className="flex-1 min-w-0">
-                  <p className="text-white font-semibold text-xs truncate">
-                    @{user?.username || user?.display_name}
+                  <p className="text-white font-semibold text-sm truncate">
+                    {user?.display_name || user?.username}
                   </p>
                   {post.content && (
                     <p className="text-white/90 text-xs mt-1 line-clamp-2">
