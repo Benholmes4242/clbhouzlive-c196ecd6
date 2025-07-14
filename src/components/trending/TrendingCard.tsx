@@ -163,13 +163,13 @@ const TrendingCard = () => {
             <>
               <button
                 onClick={prevSlide}
-                className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full p-1.5 text-white hover:bg-white/20 transition-colors z-20 bg-black/30 backdrop-blur-sm"
+                className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full p-1.5 text-white hover:bg-white/20 transition-colors z-20"
               >
                 <HiOutlineArrowSmLeft className="w-6 h-6" />
               </button>
               <button
                 onClick={nextSlide}
-                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1.5 text-white hover:bg-white/20 transition-colors z-20 bg-black/30 backdrop-blur-sm"
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1.5 text-white hover:bg-white/20 transition-colors z-20"
               >
                 <HiOutlineArrowSmRight className="w-6 h-6" />
               </button>
