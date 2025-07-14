@@ -125,7 +125,7 @@ const MomentCard: React.FC<MomentCardProps> = ({ moment, currentUserId }) => {
           {/* Top Section - User Info */}
           <div className="flex items-center gap-2">
             <div 
-              className="w-14 h-14 rounded-full overflow-hidden bg-muted cursor-pointer hover:opacity-80 transition-opacity"
+              className="w-12 h-12 rounded-full overflow-hidden bg-muted cursor-pointer hover:opacity-80 transition-opacity"
               onClick={handleProfileClick}
             >
               {moment.user.profile_photo_url ? (
