@@ -23,6 +23,7 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
   const [currentMediaIndex, setCurrentMediaIndex] = useState<{[key: string]: number}>({});
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedPost, setSelectedPost] = useState<VideoPost | UserPostWithType | null>(null);
+  const navigate = useNavigate();
 
   const handlePrevMedia = (postId: string, mediaLength: number) => {
     setCurrentMediaIndex(prev => ({
@@ -90,7 +91,6 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
   };
 
   const renderMediaTile = (item: VideoPost | UserPostWithType, index: number) => {
-    const navigate = useNavigate();
     const isUserPost = item.type === 'user_post';
     const media = isUserPost 
       ? (item as UserPostWithType).post_media.map(pm => ({ media_url: pm.media_url, media_type: pm.media_type }))
