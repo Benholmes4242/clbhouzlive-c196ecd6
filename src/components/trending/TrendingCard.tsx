@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { TrendingUp, ChevronLeft, ChevronRight } from 'lucide-react';
-import { PiHandsClapping } from 'react-icons/pi';
+import { PiHandsClapping, PiShareFat } from 'react-icons/pi';
 import { GoCommentDiscussion } from 'react-icons/go';
 import { useTrendingCard } from '@/hooks/useTrendingCard';
 
@@ -76,6 +76,9 @@ const TrendingCard = () => {
                   </button>
                   <button className="bg-white/20 backdrop-blur-sm rounded-full p-1.5 text-white hover:bg-white/30 transition-colors">
                     <GoCommentDiscussion className="w-6 h-6" />
+                  </button>
+                  <button className="bg-white/20 backdrop-blur-sm rounded-full p-1.5 text-white hover:bg-white/30 transition-colors">
+                    <PiShareFat className="w-6 h-6" />
                   </button>
                 </div>
               </div>
