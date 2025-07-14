@@ -71,7 +71,7 @@ const TrendingCard = () => {
                 {/* Action buttons */}
                 <div className="flex space-x-1 ml-2">
                   <button className="bg-white/20 backdrop-blur-sm rounded-full p-1.5 text-white hover:bg-white/30 transition-colors">
-                    <PiHandsClapping className="w-16 h-16" />
+                    <PiHandsClapping className="w-4 h-4" />
                   </button>
                 </div>
               </div>
