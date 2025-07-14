@@ -9,7 +9,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePostUpdate } from '@/hooks/usePostUpdate';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
 import HighQualityImage from '@/components/ui/high-quality-image';
-import VideoPlayer from '@/components/ui/video-player';
+import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 
 import CoursePostBadge from './CoursePostBadge';
 import CommentsDrawer from './CommentsDrawer';
@@ -264,14 +264,14 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
               {currentMedia && (
                 <>
                   {currentMedia.media_type === 'video' ? (
-                    <VideoPlayer
-                      src={currentMedia.media_url}
-                      autoplay={true}
-                      muted={true}
-                      loop={true}
-                      className="w-full h-full"
-                      showOverlayControls={true}
-                    />
+                     <EnhancedVideoPlayer
+                       src={currentMedia.media_url}
+                       autoplay={true}
+                       muted={true}
+                       loop={true}
+                       className="w-full h-full"
+                       enableHLS={true}
+                     />
                   ) : (
                     <HighQualityImage
                       src={currentMedia.media_url}
@@ -476,14 +476,14 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                 {currentMedia && (
                   <>
                     {currentMedia.media_type === 'video' ? (
-                      <VideoPlayer
-                        src={currentMedia.media_url}
-                        autoplay={true}
-                        muted={true}
-                        loop={true}
-                        className="w-full h-full"
-                        showOverlayControls={true}
-                      />
+                       <EnhancedVideoPlayer
+                         src={currentMedia.media_url}
+                         autoplay={true}
+                         muted={true}
+                         loop={true}
+                         className="w-full h-full"
+                         enableHLS={true}
+                       />
                     ) : (
                       <HighQualityImage
                         src={currentMedia.media_url}

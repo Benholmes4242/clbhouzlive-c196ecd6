@@ -3,7 +3,7 @@ import { Heart, MessageCircle, Share } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSwipeable } from 'react-swipeable';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
-import VideoPlayer from '@/components/ui/video-player';
+import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import LazyImage from '@/components/ui/lazy-image';
 import CoursePostBadge from '../CoursePostBadge';
 import { UserPostData, GolfCourse } from './types';
@@ -116,16 +116,14 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
         onClick={() => onMediaClick(currentMedia.media_url, currentMedia.media_type)}
       >
         {currentMedia.media_type === 'video' ? (
-          <VideoPlayer
-            src={currentMedia.media_url}
-            autoplay={isHovered}
-            muted={true}
-            loop={true}
-            className="w-full h-full"
-            showVideoIcon={false}
-            showOverlayControls={false}
-            videoId={`mobile-${currentMedia.id}`}
-          />
+           <EnhancedVideoPlayer
+             src={currentMedia.media_url}
+             autoplay={isHovered}
+             muted={true}
+             loop={true}
+             className="w-full h-full"
+             enableHLS={true}
+           />
         ) : (
           <LazyImage
             src={currentMedia.media_url}

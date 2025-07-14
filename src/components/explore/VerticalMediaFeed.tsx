@@ -14,7 +14,7 @@ import CoursePostBadge from '../posts/CoursePostBadge';
 import EnhancedCreateMomentModal from '../post/EnhancedCreateMomentModal';
 import TaggedText from '../posts/TaggedText';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
-import VideoPlayer from '@/components/ui/video-player';
+import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
 
@@ -455,15 +455,13 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
               >
                 {currentMedia.media_type === 'video' ? (
                   <div className="relative w-full h-full bg-media-loading">
-                    <VideoPlayer
+                    <EnhancedVideoPlayer
                       src={currentMedia.media_url}
                       autoplay={index === currentIndex}
                       muted={isGloballyMuted}
                       loop={true}
                       className="w-full h-full"
-                      showVideoIcon={false}
-                      showOverlayControls={false}
-                      videoId={`vertical-${item.id}-${currentMediaIndex}`}
+                      enableHLS={true}
                     />
                   </div>
                 ) : (

@@ -5,7 +5,7 @@ import { ActivityPost } from '../types/ActivityTypes';
 import CourseTag from '@/components/posts/CourseTag';
 import { Camera, Play } from 'lucide-react';
 import HighQualityImage from '@/components/ui/high-quality-image';
-import VideoPlayer from '@/components/ui/video-player';
+import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import { useVideoAutoplay } from '@/hooks/useVideoAutoplay';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 
@@ -47,16 +47,15 @@ const ActivityPostCard = ({ post, attributionText, onClick }: ActivityPostCardPr
       {hasMedia && firstMedia ? (
         <>
           {firstMedia.media_type === 'video' ? (
-            <VideoPlayer
-              src={firstMedia.media_url}
-              autoplay={shouldAutoplay}
-              muted={true}
-              loop={true}
-              className="w-full h-full rounded-[inherit]"
-              showVideoIcon={true}
-              showOverlayControls={false}
-              onClick={handleClick}
-            />
+             <EnhancedVideoPlayer
+               src={firstMedia.media_url}
+               autoplay={shouldAutoplay}
+               muted={true}
+               loop={true}
+               className="w-full h-full rounded-[inherit]"
+               enableHLS={true}
+               onClick={handleClick}
+             />
           ) : (
             <HighQualityImage
               src={firstMedia.media_url}

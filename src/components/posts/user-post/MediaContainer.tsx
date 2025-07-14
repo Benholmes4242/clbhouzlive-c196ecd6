@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import { useSwipeable } from 'react-swipeable';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
-import VideoPlayer from '@/components/ui/video-player';
+import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import LazyImage from '@/components/ui/lazy-image';
 
 interface MediaItem {
@@ -63,16 +63,13 @@ export const MediaContainer: React.FC<MediaContainerProps> = ({
       style={{ touchAction: 'pan-y' }} // Only allow vertical scrolling
     >
       {currentMedia.media_type === 'video' ? (
-        <VideoPlayer
+        <EnhancedVideoPlayer
           src={currentMedia.media_url}
           autoplay={isHovered}
           muted={true}
           loop={true}
-          className="w-full h-full object-cover pointer-events-none" // Disable all video interactions
-          showVideoIcon={false}
-          showOverlayControls={false}
-          videoId={`index-${currentMedia.id}`}
-          isInFeed={true}
+          className="w-full h-full object-cover pointer-events-none"
+          enableHLS={true}
         />
       ) : (
         <LazyImage
