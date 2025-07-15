@@ -33,9 +33,6 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
   const [selectedSubCountry, setSelectedSubCountry] = useState('');
   const [courseImageUrl, setCourseImageUrl] = useState<string | null>(null);
   const [isFormInitialized, setIsFormInitialized] = useState(false);
-  const [showDuplicateWarning, setShowDuplicateWarning] = useState(false);
-  const [duplicateCourses, setDuplicateCourses] = useState<any[]>([]);
-  const [pendingFormData, setPendingFormData] = useState<any>(null);
   
   // New state for Top 100s section
   const [regionalRankingRegion, setRegionalRankingRegion] = useState('');
@@ -164,63 +161,6 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
       console.log('Regional rank:', regionalRank);
       console.log('Global rank:', globalRank);
       
-      // Check for duplicates when creating a new course
-      if (isCreating) {
-        // First check for exact matches
-        const { data: exactMatches, error: exactCheckError } = await supabase
-          .from('golf_courses')
-          .select('id, name, country, sub_country')
-          .eq('name', data.name)
-          .eq('country', selectedCountry)
-          .eq('sub_country', selectedSubCountry);
-        
-        if (exactCheckError) {
-          console.error('Error checking for exact duplicates:', exactCheckError);
-          throw new Error('Failed to check for duplicate courses');
-        }
-        
-        if (exactMatches && exactMatches.length > 0) {
-          throw new Error(`A golf course named "${data.name}" already exists in ${selectedSubCountry}, ${selectedCountry}. Please choose a different name or verify this is not a duplicate.`);
-        }
-
-        // Check for partial matches (same country/sub_country, similar name)
-        const { data: partialMatches, error: partialCheckError } = await supabase
-          .from('golf_courses')
-          .select('id, name, country, sub_country')
-          .eq('country', selectedCountry)
-          .eq('sub_country', selectedSubCountry);
-        
-        if (partialCheckError) {
-          console.error('Error checking for partial duplicates:', partialCheckError);
-          throw new Error('Failed to check for similar courses');
-        }
-
-        if (partialMatches && partialMatches.length > 0) {
-          // Check for courses with very similar names - be more lenient for golf courses
-          const similarCourses = partialMatches.filter(course => {
-            const courseName = course.name.toLowerCase();
-            const newName = data.name.toLowerCase();
-            
-            // Skip if exact same name
-            if (courseName === newName) return false;
-            
-            // Only flag as similar if one name is a substring of the other (more than just a word)
-            // For example: "Bovey Castle Golf Club" contains "Bovey Castle" but not "Bovey Tracey"
-            const minLength = Math.min(courseName.length, newName.length);
-            if (minLength < 10) return false; // Skip very short names
-            
-            return courseName.includes(newName.slice(0, -5)) || newName.includes(courseName.slice(0, -5));
-          });
-          
-          if (similarCourses.length > 0) {
-            // Store data and show warning
-            setDuplicateCourses(similarCourses);
-            setPendingFormData(data);
-            setShowDuplicateWarning(true);
-            return; // Don't proceed with save
-          }
-        }
-      }
       
       // Auto-determine continent based on country
       let continent: "North America" | "South America" | "Europe" | "Asia" | "Africa" | "Oceania" | null = null;
@@ -408,65 +348,6 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
     }
   };
 
-  const handleOverrideDuplicate = () => {
-    if (pendingFormData) {
-      // Auto-determine continent based on country
-      let continent: "North America" | "South America" | "Europe" | "Asia" | "Africa" | "Oceania" | null = null;
-      if (selectedCountry === 'USA') {
-        continent = 'North America';
-      } else if (selectedCountry === 'Britain & Ireland' || selectedCountry === 'Continental Europe') {
-        continent = 'Europe';
-      }
-      
-      // Proceed with save, bypassing duplicate check
-      const courseData = {
-        name: pendingFormData.name,
-        country: selectedCountry,
-        sub_country: selectedSubCountry,
-        region: pendingFormData.region || null,
-        continent: continent,
-        global_rank: globalRank ? parseInt(globalRank) : null,
-        regional_rank: regionalRank ? parseInt(regionalRank) : null,
-        country_rank: null,
-        description: pendingFormData.description || null,
-        thumbnail_image: courseImageUrl || null,
-        website_url: pendingFormData.website_url || null,
-        latitude: pendingFormData.latitude ? parseFloat(pendingFormData.latitude) : null,
-        longitude: pendingFormData.longitude ? parseFloat(pendingFormData.longitude) : null,
-      };
-
-      supabase
-        .from('golf_courses')
-        .insert(courseData)
-        .select()
-        .single()
-        .then(({ data: result, error }) => {
-          if (error) {
-            toast({
-              title: "Error",
-              description: `Failed to create golf course: ${error.message}`,
-              variant: "destructive",
-            });
-          } else {
-            toast({
-              title: "Success",
-              description: "Golf course created successfully",
-            });
-            queryClient.invalidateQueries({ queryKey: ['admin-golf-courses'] });
-            onClose();
-          }
-        });
-    }
-    setShowDuplicateWarning(false);
-    setPendingFormData(null);
-    setDuplicateCourses([]);
-  };
-
-  const handleCancelDuplicate = () => {
-    setShowDuplicateWarning(false);
-    setPendingFormData(null);
-    setDuplicateCourses([]);
-  };
 
   const handleImageChange = (imageUrl: string | null) => {
     console.log('=== EDITOR: Image changed to:', imageUrl);
@@ -545,31 +426,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
         </DialogContent>
       </Dialog>
 
-      {/* Duplicate Warning Dialog */}
-      <AlertDialog open={showDuplicateWarning} onOpenChange={setShowDuplicateWarning}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Similar Courses Found</AlertDialogTitle>
-            <AlertDialogDescription>
-              Warning: Similar golf courses already exist in {selectedSubCountry}, {selectedCountry}:
-              <ul className="mt-2 list-disc list-inside">
-                {duplicateCourses.map((course, index) => (
-                  <li key={index} className="text-sm">{course.name}</li>
-                ))}
-              </ul>
-              Are you sure this is not a duplicate? Consider variations like "East Course" vs "West Course" if this is the same golf club.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={handleCancelDuplicate}>
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction onClick={handleOverrideDuplicate} className="bg-[#b66b41] hover:bg-[#a55a3a]">
-              Add Anyway
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      
     </>
   );
 };
