@@ -188,8 +188,7 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
           .from('golf_courses')
           .select('id, name, country, sub_country')
           .eq('country', selectedCountry)
-          .eq('sub_country', selectedSubCountry)
-          .like('name', `%${data.name.split(' ')[0]}%`); // Check if first word of name exists
+          .eq('sub_country', selectedSubCountry);
         
         if (partialCheckError) {
           console.error('Error checking for partial duplicates:', partialCheckError);
@@ -197,10 +196,21 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
         }
 
         if (partialMatches && partialMatches.length > 0) {
-          const similarCourses = partialMatches.filter(course => 
-            course.name.toLowerCase() !== data.name.toLowerCase() &&
-            course.name.toLowerCase().includes(data.name.toLowerCase().split(' ')[0])
-          );
+          // Check for courses with very similar names - be more lenient for golf courses
+          const similarCourses = partialMatches.filter(course => {
+            const courseName = course.name.toLowerCase();
+            const newName = data.name.toLowerCase();
+            
+            // Skip if exact same name
+            if (courseName === newName) return false;
+            
+            // Only flag as similar if one name is a substring of the other (more than just a word)
+            // For example: "Bovey Castle Golf Club" contains "Bovey Castle" but not "Bovey Tracey"
+            const minLength = Math.min(courseName.length, newName.length);
+            if (minLength < 10) return false; // Skip very short names
+            
+            return courseName.includes(newName.slice(0, -5)) || newName.includes(courseName.slice(0, -5));
+          });
           
           if (similarCourses.length > 0) {
             // Store data and show warning
