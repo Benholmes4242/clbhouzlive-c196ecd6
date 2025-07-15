@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { ChevronLeft, ChevronRight, Maximize2, Play } from 'lucide-react';
 import { PiHandsClapping, PiShareFat } from 'react-icons/pi';
 import { GoCommentDiscussion } from 'react-icons/go';
@@ -98,11 +98,19 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
     
     // Video playback management for feed section
     const hasVideo = media.some(m => m.media_type === 'video');
+    
+    // Create stable priority value to prevent infinite re-renders
+    const stablePriority = useMemo(() => {
+      // Use a hash of the item ID combined with index to create a stable priority
+      const idHash = item.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      return idHash + index; // Earlier posts have higher priority
+    }, [item.id, index]);
+    
     const { videoRef, containerRef, isPlaying, shouldShowPlayIcon, togglePlayPause } = useVideoPlaybackManager({
       section: 'feed',
       videoId: item.id,
       autoplayAllowed: hasVideo,
-      priority: Date.now() - index // Earlier posts have higher priority
+      priority: stablePriority
     });
 
     // Get user info
