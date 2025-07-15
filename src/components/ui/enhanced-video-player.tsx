@@ -84,6 +84,9 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
     }
   }, [src, enableHLS]);
 
+  // Add video loading manager for mobile
+  const [isActuallyReady, setIsActuallyReady] = useState(false);
+  
   const initializeVideo = () => {
     console.log('🎬 EnhancedVideoPlayer: Initializing video', { src, enableHLS });
     const video = videoRef.current;
@@ -207,6 +210,12 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
         clearTimeout(loadingTimeoutRef.current);
       }
       setIsLoading(false);
+      
+      // Only start playing if autoplay is requested AND video has enough data
+      if (autoplay && video.readyState >= 3) {
+        console.log('🚀 EnhancedVideoPlayer: Starting autoplay', { src, readyState: video.readyState });
+        video.play().catch(console.error);
+      }
     };
     const handleWaiting = () => {
       console.log('⏳ EnhancedVideoPlayer: Video waiting/buffering', { src, timestamp: Date.now() });
@@ -335,9 +344,9 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
         poster={poster}
         muted={muted}
         loop={loop}
-        autoPlay={autoplay}
+        autoPlay={false}
         playsInline
-        preload={preloadLevel}
+        preload="none"
         className="w-full h-full object-cover"
         controlsList="nodownload nofullscreen noremoteplayback"
         disablePictureInPicture
