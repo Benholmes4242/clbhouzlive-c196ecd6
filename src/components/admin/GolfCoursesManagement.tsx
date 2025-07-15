@@ -49,12 +49,6 @@ const GolfCoursesManagement = () => {
   };
 
   const filteredCourses = filterCoursesByRegion(courses || [], selectedRegion, searchTerm);
-  
-  // Debug logging
-  console.log('Total courses:', courses?.length);
-  console.log('Search term:', searchTerm);
-  console.log('Selected region:', selectedRegion);
-  console.log('Filtered courses:', filteredCourses.length);
 
   if (isLoading) {
     return <GolfCoursesLoadingSkeleton />;
