@@ -24,7 +24,7 @@ const FullscreenVideoModal: React.FC<FullscreenVideoModalProps> = ({
   onClose,
   videoData
 }) => {
-  const [isMuted, setIsMuted] = useState(false); // Start unmuted in fullscreen
+  const [isMuted, setIsMuted] = useState(false);
   const [isPlaying, setIsPlaying] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);

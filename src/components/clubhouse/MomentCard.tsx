@@ -6,7 +6,7 @@ import { useProfileActions } from '@/components/profile/actions/useProfileAction
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { useOptimizedVideoPlayback, useFullscreenVideoModal } from '@/hooks/useOptimizedVideoPlayback';
+import { useVideoPlaybackManager, useFullscreenVideoModal } from '@/hooks/useVideoPlaybackManager';
 
 interface MomentCardProps {
   moment: {
@@ -42,7 +42,7 @@ const MomentCard: React.FC<MomentCardProps> = ({ moment, currentUserId, modalMan
 
   // Video playback management
   const videoMedia = moment.post_media.find(media => media.media_type === 'video');
-  const { videoRef, containerRef, isPlaying, shouldShowPlayIcon, togglePlayPause } = useOptimizedVideoPlayback({
+  const { videoRef, containerRef, isPlaying, togglePlayPause } = useVideoPlaybackManager({
     section: 'discover',
     videoId: moment.id,
     autoplayAllowed: !!videoMedia,
@@ -109,15 +109,16 @@ const MomentCard: React.FC<MomentCardProps> = ({ moment, currentUserId, modalMan
       {/* Media Container */}
       <div className="relative aspect-[3/4] bg-muted" onClick={handleVideoClick}>
         {videoMedia ? (
-          <video
-            ref={videoRef}
+          <EnhancedVideoPlayer
             src={mediaToShow.media_url}
             className="w-full h-full object-cover"
+            autoplay={true}
             muted={true}
             loop={true}
-            playsInline={true}
-            preload="metadata"
+            enableHLS={true}
             onClick={handleVideoClick}
+            onPlay={() => {}}
+            onPause={() => {}}
           />
         ) : (
           <img

@@ -16,9 +16,6 @@ const TrendingFeed = () => {
     externalVideos,
     refetchUserPosts,
     refetchFollowedPosts,
-    hasMore,
-    isLoadingMore,
-    loadMorePosts,
   } = useTrendingFeed();
 
   // Show skeleton loading only for initial load
@@ -48,9 +45,6 @@ const TrendingFeed = () => {
       sortedContent={sortedContent}
       onPostUpdated={handlePostUpdated}
       onPostDeleted={handlePostDeleted}
-      hasMore={hasMore}
-      isLoadingMore={isLoadingMore}
-      loadMorePosts={loadMorePosts}
     />
   );
 };
