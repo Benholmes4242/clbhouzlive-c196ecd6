@@ -48,111 +48,61 @@ class VideoPlaybackManager {
     this.notify();
   }
 
-  // Get videos that are in view and eligible for autoplay
-  private getEligibleFeedVideos(): VideoState[] {
-    const feedVideos = Array.from(this.videos.values()).filter(v => v.section === 'feed');
-    // We need to track which videos are in view - this will be updated by the hook
-    return feedVideos.filter(v => !v.isPlaying);
-  }
-
-  // Check if two videos are adjacent based on their priority (creation time)
-  private areVideosAdjacent(video1: VideoState, video2: VideoState): boolean {
-    const priorities = Array.from(this.videos.values())
+  // Check if a video should autoplay based on its position in feed
+  shouldAutoplayFeedVideo(videoId: string, inViewVideos: Set<string>): boolean {
+    const feedVideos = Array.from(this.videos.values())
       .filter(v => v.section === 'feed')
-      .map(v => v.priority)
-      .sort((a, b) => a - b);
+      .sort((a, b) => a.priority - b.priority); // Sort by priority (creation time)
     
-    const index1 = priorities.indexOf(video1.priority);
-    const index2 = priorities.indexOf(video2.priority);
+    const videoIndex = feedVideos.findIndex(v => v.id === videoId);
     
-    return Math.abs(index1 - index2) <= 1;
-  }
-
-  // Select up to 2 random videos ensuring they're spread out
-  private selectRandomSpreadVideos(candidates: VideoState[]): VideoState[] {
-    if (candidates.length <= 2) return candidates;
+    // Only autoplay first card (index 0) and 8th card (index 7) on desktop
+    const shouldAutoplay = videoIndex === 0 || videoIndex === 7;
     
-    // First, randomly select one video
-    const firstVideo = candidates[Math.floor(Math.random() * candidates.length)];
-    
-    // Filter out adjacent videos
-    const nonAdjacentCandidates = candidates.filter(v => 
-      v.id !== firstVideo.id && !this.areVideosAdjacent(firstVideo, v)
-    );
-    
-    if (nonAdjacentCandidates.length === 0) {
-      // If no non-adjacent videos, just return the first one
-      return [firstVideo];
-    }
-    
-    // Select second video from non-adjacent candidates
-    const secondVideo = nonAdjacentCandidates[Math.floor(Math.random() * nonAdjacentCandidates.length)];
-    
-    return [firstVideo, secondVideo];
+    return shouldAutoplay && inViewVideos.has(videoId);
   }
 
   // Update autoplay selection for feed section
   updateFeedAutoplay(inViewVideos: Set<string>) {
-    if (inViewVideos.size === 0) {
-      // Pause all autoplay videos if none are in view
-      this.feedAutoplayVideos.forEach(videoId => {
-        const video = this.videos.get(videoId);
-        if (video && video.isAutoplay) {
-          video.element?.pause();
-          this.videos.set(videoId, { ...video, isPlaying: false });
-        }
-      });
-      this.feedAutoplayVideos.clear();
-      this.notify();
-      return;
-    }
+    const feedVideos = Array.from(this.videos.values())
+      .filter(v => v.section === 'feed')
+      .sort((a, b) => a.priority - b.priority);
 
-    // Get eligible videos (in view and not playing)
-    const eligibleVideos = Array.from(this.videos.values()).filter(v => 
-      v.section === 'feed' && 
-      inViewVideos.has(v.id) && 
-      !v.isPlaying
-    );
-
-    // Get currently autoplaying videos that are still in view
-    const currentAutoplayInView = Array.from(this.feedAutoplayVideos).filter(videoId => {
-      const video = this.videos.get(videoId);
-      return video && video.isPlaying && inViewVideos.has(videoId);
-    });
-
-    // If we have less than 2 autoplaying and there are eligible videos
-    if (currentAutoplayInView.length < 2 && eligibleVideos.length > 0) {
-      const needed = 2 - currentAutoplayInView.length;
-      const selectedVideos = this.selectRandomSpreadVideos(eligibleVideos).slice(0, needed);
+    feedVideos.forEach((video, index) => {
+      const shouldAutoplay = (index === 0 || index === 7) && inViewVideos.has(video.id);
+      const isCurrentlyPlaying = video.isPlaying && video.isAutoplay;
       
-      selectedVideos.forEach(video => {
+      if (shouldAutoplay && !isCurrentlyPlaying) {
+        // Start autoplay
         if (video.element) {
           video.element.play().catch(console.error);
           this.videos.set(video.id, { ...video, isPlaying: true, isAutoplay: true });
           this.feedAutoplayVideos.add(video.id);
+          console.log(`🎬 Starting autoplay for feed video at position ${index + 1}: ${video.id}`);
         }
-      });
-      
-      this.notify();
-    }
-
-    // Pause autoplaying videos that are out of view
-    this.feedAutoplayVideos.forEach(videoId => {
-      if (!inViewVideos.has(videoId)) {
-        const video = this.videos.get(videoId);
-        if (video && video.isAutoplay) {
-          video.element?.pause();
-          this.videos.set(videoId, { ...video, isPlaying: false });
-          this.feedAutoplayVideos.delete(videoId);
+      } else if (!shouldAutoplay && isCurrentlyPlaying) {
+        // Stop autoplay
+        if (video.element) {
+          video.element.pause();
+          this.videos.set(video.id, { ...video, isPlaying: false });
+          this.feedAutoplayVideos.delete(video.id);
+          console.log(`⏸️ Stopping autoplay for feed video at position ${index + 1}: ${video.id}`);
         }
       }
     });
+    
+    this.notify();
   }
 
   canAutoplay(section: 'discover' | 'trending' | 'feed', videoId: string): boolean {
     if (section === 'feed') {
-      // For feed section, use the new random selection logic
-      return this.feedAutoplayVideos.has(videoId) || this.feedAutoplayVideos.size < 2;
+      // For feed section, use position-based logic
+      const feedVideos = Array.from(this.videos.values())
+        .filter(v => v.section === 'feed')
+        .sort((a, b) => a.priority - b.priority);
+      
+      const videoIndex = feedVideos.findIndex(v => v.id === videoId);
+      return videoIndex === 0 || videoIndex === 7;
     }
     
     const sectionVideos = Array.from(this.videos.values()).filter(v => v.section === section);
