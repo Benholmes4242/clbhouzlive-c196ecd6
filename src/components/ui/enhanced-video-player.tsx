@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState, memo } from 'react';
 import { Play, Pause, Volume2, VolumeX, Maximize, Loader2 } from 'lucide-react';
+import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 
 interface EnhancedVideoPlayerProps {
   src: string;
@@ -48,8 +49,34 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
   const [buffered, setBuffered] = useState(0);
   const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Load HLS.js if needed
+  // Mobile detection and lazy loading
+  const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  
+  // Intersection observer for mobile lazy loading
+  const { ref: videoContainerRef, isInView } = useIntersectionObserver({
+    threshold: isMobile ? 0.8 : 0.3, // Higher threshold for mobile
+    rootMargin: isMobile ? '0px' : '100px' // No margin for mobile
+  });
+
+  // Mobile lazy loading logic
   useEffect(() => {
+    if (isMobile) {
+      // On mobile, only load when actually in view
+      if (isInView && !shouldLoadVideo) {
+        console.log('📱 Mobile: Video entering view, start loading', { src: src.slice(-20) });
+        setShouldLoadVideo(true);
+      }
+    } else {
+      // On desktop, load immediately
+      setShouldLoadVideo(true);
+    }
+  }, [isInView, isMobile, shouldLoadVideo, src]);
+
+  // Load HLS.js if needed - only when shouldLoadVideo is true
+  useEffect(() => {
+    if (!shouldLoadVideo) return;
+    
     if (enableHLS && !window.Hls) {
       const script = document.createElement('script');
       script.src = 'https://cdn.jsdelivr.net/npm/hls.js@latest';
@@ -62,7 +89,7 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
     } else {
       initializeVideo();
     }
-  }, [src, enableHLS]);
+  }, [shouldLoadVideo, enableHLS]);
   
   const initializeVideo = () => {
     console.log('🎬 EnhancedVideoPlayer: Initializing video', { src, enableHLS });
@@ -304,6 +331,7 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
 
   return (
     <div 
+      ref={videoContainerRef}
       className={`relative group cursor-pointer ${className}`}
       onMouseEnter={() => setShowControls(true)}
       onMouseLeave={() => setShowControls(false)}
@@ -382,7 +410,10 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
 
       {/* Mobile Debug Overlay */}
       <div className="absolute bottom-2 left-2 bg-red-600/90 text-white text-xs p-2 rounded max-w-[200px] z-50 font-mono">
-        <div className="font-bold">VIDEO DEBUG:</div>
+        <div className="font-bold">MOBILE DEBUG:</div>
+        <div>IsMobile: {isMobile ? 'YES' : 'NO'}</div>
+        <div>InView: {isInView ? 'YES' : 'NO'}</div>
+        <div>ShouldLoad: {shouldLoadVideo ? 'YES' : 'NO'}</div>
         <div>Loading: {isLoading ? 'YES' : 'NO'}</div>
         <div>Playing: {isPlaying ? 'YES' : 'NO'}</div>
         <div>Error: {error || 'None'}</div>
