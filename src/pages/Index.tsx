@@ -4,6 +4,7 @@ import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
 import TrendingFeed from '@/components/TrendingFeed';
 import ClubhouzMomentsCarousel from '@/components/clubhouse/ClubhouzMomentsCarousel';
+import ClubhouseFeed from '@/components/clubhouse/ClubhouseFeed';
 import TrendingCard from '@/components/trending/TrendingCard';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -119,7 +120,7 @@ const Index = () => {
         </div>
         
         <main>
-          <TrendingFeed />
+          <ClubhouseFeed />
         </main>
       </div>
       
