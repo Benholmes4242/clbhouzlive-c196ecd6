@@ -160,11 +160,29 @@ export const useVideoPlaybackManager = ({
     };
   }, [videoId, section, priority]);
 
-  // Update video element reference in global manager
+  // Update video element reference in global manager and add event listeners
   useEffect(() => {
     if (videoRef.current && videoState) {
-      const updatedState = { ...videoState, element: videoRef.current };
+      const video = videoRef.current;
+      const updatedState = { ...videoState, element: video };
       globalVideoManager.registerVideo(updatedState);
+
+      // Add event listeners to keep state synchronized
+      const handlePlay = () => {
+        globalVideoManager.playVideo(videoId, videoState.isAutoplay);
+      };
+
+      const handlePause = () => {
+        globalVideoManager.pauseVideo(videoId);
+      };
+
+      video.addEventListener('play', handlePlay);
+      video.addEventListener('pause', handlePause);
+
+      return () => {
+        video.removeEventListener('play', handlePlay);
+        video.removeEventListener('pause', handlePause);
+      };
     }
   }, [videoRef.current, videoState?.id]);
 
@@ -202,14 +220,16 @@ export const useVideoPlaybackManager = ({
 
   // Check if video should show play icon
   const shouldShowPlayIcon = useCallback(() => {
-    if (!videoState) return false;
+    if (!videoState || !videoRef.current) return false;
     
-    // Show play icon for paused videos in trending and feed sections
-    if (section === 'trending' && !videoState.isPlaying) return true;
-    if (section === 'feed' && !videoState.isPlaying) return true;
+    // Show play icon only for paused videos in trending and feed sections
+    const isVideoActuallyPaused = videoRef.current.paused;
+    
+    if (section === 'trending' && isVideoActuallyPaused) return true;
+    if (section === 'feed' && isVideoActuallyPaused) return true;
     
     return false;
-  }, [section, videoState]);
+  }, [section, videoState, videoRef.current?.paused]);
 
   return {
     videoRef,
