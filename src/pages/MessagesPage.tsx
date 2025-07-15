@@ -11,7 +11,8 @@ import { useConversation } from '@/hooks/useConversation';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
 import { formatDistanceToNow } from 'date-fns';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { OptimizedAvatar } from '@/components/ui/optimized-avatar';
 
 const MessagesPage = () => {
   const navigate = useNavigate();
@@ -112,12 +113,13 @@ const MessagesPage = () => {
                           onClick={() => handleConversationSelect(conversation.friend_id)}
                         >
                           <div className="flex items-start gap-3">
-                            <Avatar className="w-10 h-10">
-                              <AvatarImage src={conversation.friend_photo_url || ''} />
-                              <AvatarFallback>
-                                {conversation.friend_name?.charAt(0) || conversation.friend_username?.charAt(0) || '?'}
-                              </AvatarFallback>
-                            </Avatar>
+                            <OptimizedAvatar
+                              src={conversation.friend_photo_url}
+                              alt={conversation.friend_name || 'User'}
+                              size={40}
+                              className="w-10 h-10"
+                              fallback={(conversation.friend_name || 'U').charAt(0)}
+                            />
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center justify-between">
                                 <h3 className="font-semibold text-sm truncate">
@@ -156,12 +158,13 @@ const MessagesPage = () => {
                     {/* Chat Header */}
                     <div className="p-4 border-b">
                       <div className="flex items-center gap-3">
-                        <Avatar className="w-10 h-10">
-                          <AvatarImage src={selectedConversation.friend_photo_url || ''} />
-                          <AvatarFallback>
-                            {selectedConversation.friend_name?.charAt(0) || selectedConversation.friend_username?.charAt(0) || '?'}
-                          </AvatarFallback>
-                        </Avatar>
+                        <OptimizedAvatar
+                          src={selectedConversation.friend_photo_url}
+                          alt={selectedConversation.friend_name || 'User'}
+                          size={40}
+                          className="w-10 h-10"
+                          fallback={(selectedConversation.friend_name || 'U').charAt(0)}
+                        />
                         <div>
                           <h3 className="font-semibold">
                             {selectedConversation.friend_name || selectedConversation.friend_username}

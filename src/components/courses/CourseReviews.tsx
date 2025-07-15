@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ChevronDown, ChevronUp, Star, Edit } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { OptimizedAvatar } from '@/components/ui/optimized-avatar';
 import EditRatingModal from './EditRatingModal';
 import ReviewMediaDisplay from './ReviewMediaDisplay';
 
@@ -153,15 +153,13 @@ const CourseReviews = ({ courseId, courseName, currentUser }: CourseReviewsProps
                   <div key={review.id} className="border-b pb-4 last:border-b-0">
                     <div className="flex items-start gap-3">
                       {/* User Avatar with Profile Photo */}
-                      <Avatar className="w-10 h-10 flex-shrink-0">
-                        <AvatarImage 
-                          src={review.profile_photo_url || undefined} 
-                          alt={getUserDisplayName(review)}
-                        />
-                        <AvatarFallback className="bg-primary/10 text-primary">
-                          {getUserInitials(review)}
-                        </AvatarFallback>
-                      </Avatar>
+                      <OptimizedAvatar
+                        src={review.profile_photo_url}
+                        alt={getUserDisplayName(review)}
+                        size={40}
+                        className="w-10 h-10 flex-shrink-0"
+                        fallback={getUserInitials(review)}
+                      />
                       
                       <div className="flex-1 space-y-2">
                         {/* User Name and Rating */}

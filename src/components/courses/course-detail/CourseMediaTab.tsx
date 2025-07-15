@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Play, Image as ImageIcon } from 'lucide-react';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { OptimizedAvatar } from '@/components/ui/optimized-avatar';
 
 interface CourseMediaTabProps {
   courseId: string;
@@ -156,15 +156,13 @@ const CourseMediaTab = ({ courseId }: CourseMediaTabProps) => {
             {/* Overlay with user info */}
             <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-3">
               <div className="flex items-center gap-2">
-                <Avatar className="w-6 h-6">
-                  <AvatarImage 
-                    src={media.profile_photo_url || undefined} 
-                    alt={getUserDisplayName(media)}
-                  />
-                  <AvatarFallback className="bg-primary/20 text-white text-xs">
-                    {getUserInitials(media)}
-                  </AvatarFallback>
-                </Avatar>
+                <OptimizedAvatar
+                  src={media.profile_photo_url}
+                  alt={getUserDisplayName(media)}
+                  size={24}
+                  className="w-6 h-6"
+                  fallback={getUserInitials(media)}
+                />
                 <span className="text-white text-sm font-medium truncate">
                   @{media.username || 'user'}
                 </span>
@@ -210,15 +208,13 @@ const CourseMediaTab = ({ courseId }: CourseMediaTabProps) => {
               {/* User info overlay */}
               <div className="absolute bottom-4 left-4 bg-black/80 rounded-lg p-3 text-white">
                 <div className="flex items-center gap-3">
-                  <Avatar className="w-8 h-8">
-                    <AvatarImage 
-                      src={selectedMedia.profile_photo_url || undefined} 
-                      alt={getUserDisplayName(selectedMedia)}
-                    />
-                    <AvatarFallback className="bg-primary/20 text-white">
-                      {getUserInitials(selectedMedia)}
-                    </AvatarFallback>
-                  </Avatar>
+                  <OptimizedAvatar
+                    src={selectedMedia.profile_photo_url}
+                    alt={getUserDisplayName(selectedMedia)}
+                    size={32}
+                    className="w-8 h-8"
+                    fallback={getUserInitials(selectedMedia)}
+                  />
                   <div>
                     <p className="font-medium">{getUserDisplayName(selectedMedia)}</p>
                     <p className="text-sm opacity-80">@{selectedMedia.username || 'user'}</p>

@@ -4,7 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Card, CardContent } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { OptimizedAvatar } from '@/components/ui/optimized-avatar';
 import { Badge } from '@/components/ui/badge';
 import { Camera } from 'lucide-react';
 
@@ -132,12 +132,13 @@ const FriendsPlayedScroll: React.FC<FriendsPlayedScrollProps> = ({ audience }) =
 
               {/* User & Course Info */}
               <div className="flex items-center gap-2 mb-2">
-                <Avatar className="h-6 w-6">
-                  <AvatarImage src={activity.user_profiles?.profile_photo_url} />
-                  <AvatarFallback className="text-xs">
-                    {activity.user_profiles?.display_name?.[0] || activity.user_profiles?.username?.[0] || 'U'}
-                  </AvatarFallback>
-                </Avatar>
+                <OptimizedAvatar
+                  src={activity.user_profiles?.profile_photo_url}
+                  alt={activity.user_profiles?.display_name || activity.user_profiles?.username || 'User'}
+                  size={24}
+                  className="h-6 w-6"
+                  fallback={(activity.user_profiles?.display_name || activity.user_profiles?.username || 'U').charAt(0).toUpperCase()}
+                />
                 <span className="text-sm font-medium">
                   {activity.user_profiles?.display_name || activity.user_profiles?.username}
                 </span>

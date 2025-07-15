@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Star, Heart, Edit, ChevronDown, ChevronUp } from 'lucide-react';
-import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { OptimizedAvatar } from '@/components/ui/optimized-avatar';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import EditRatingModal from '@/components/courses/EditRatingModal';
 import ReviewMediaDisplay from '@/components/courses/ReviewMediaDisplay';
@@ -184,15 +184,13 @@ const CourseReviewsTab = ({ courseId, courseName }: CourseReviewsTabProps) => {
             <div key={review.id} className="bg-card rounded-lg p-6 border">
               <div className="flex items-start gap-4">
                 {/* User Avatar */}
-                <Avatar className="w-12 h-12 flex-shrink-0">
-                  <AvatarImage 
-                    src={review.profile_photo_url || undefined} 
-                    alt={getUserDisplayName(review)}
-                  />
-                  <AvatarFallback className="bg-primary/10 text-primary">
-                    {getUserInitials(review)}
-                  </AvatarFallback>
-                </Avatar>
+                <OptimizedAvatar
+                  src={review.profile_photo_url}
+                  alt={getUserDisplayName(review)}
+                  size={48}
+                  className="w-12 h-12 flex-shrink-0"
+                  fallback={getUserInitials(review)}
+                />
                 
                 <div className="flex-1 space-y-3">
                   {/* User Name, Rating, and Date */}
