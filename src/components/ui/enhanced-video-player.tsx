@@ -357,6 +357,7 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
         autoPlay={false}
         playsInline
         preload="none"
+        src={shouldLoad ? src : undefined}
         className="w-full h-full object-cover"
         controlsList="nodownload nofullscreen noremoteplayback"
         disablePictureInPicture
