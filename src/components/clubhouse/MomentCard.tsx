@@ -46,7 +46,7 @@ const MomentCard: React.FC<MomentCardProps> = ({ moment, currentUserId, modalMan
     section: 'discover',
     videoId: moment.id,
     autoplayAllowed: !!videoMedia,
-    priority: -1 // Stable priority to prevent re-renders
+    priority: Date.now()
   });
 
   // Check follow status
