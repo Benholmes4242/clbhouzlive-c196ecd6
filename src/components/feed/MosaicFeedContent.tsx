@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { ChevronLeft, ChevronRight, Maximize2, Play } from 'lucide-react';
 import { PiHandsClapping, PiShareFat } from 'react-icons/pi';
 import { GoCommentDiscussion } from 'react-icons/go';
@@ -7,23 +7,97 @@ import { useNavigate } from 'react-router-dom';
 import { VideoPost, UserPostWithType } from './types';
 import { useOptimizedVideoPlayback, useFullscreenVideoModal } from '@/hooks/useOptimizedVideoPlayback';
 import FullscreenVideoModal from '@/components/ui/fullscreen-video-modal';
+import InfiniteScrollLoader from './InfiniteScrollLoader';
 
 interface MosaicFeedContentProps {
   optimisticPosts: any[];
   sortedContent: (VideoPost | UserPostWithType)[];
   onPostUpdated: () => void;
   onPostDeleted: () => void;
+  hasMore: boolean;
+  isLoadingMore: boolean;
+  loadMorePosts: () => Promise<void>;
 }
 
 const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
   optimisticPosts,
   sortedContent,
   onPostUpdated,
-  onPostDeleted
+  onPostDeleted,
+  hasMore,
+  isLoadingMore,
+  loadMorePosts
 }) => {
   const [currentMediaIndex, setCurrentMediaIndex] = useState<{[key: string]: number}>({});
   const navigate = useNavigate();
   const modalManager = useFullscreenVideoModal();
+  const loadingTriggerRef = useRef<HTMLDivElement>(null);
+
+  // Infinite scroll logic
+  const handleInfiniteScroll = useCallback(() => {
+    if (isLoadingMore || !hasMore) return;
+
+    const scrollTop = window.scrollY;
+    const windowHeight = window.innerHeight;
+    const documentHeight = document.documentElement.scrollHeight;
+
+    // Trigger loading when user reaches 85% of the page
+    const triggerPoint = documentHeight * 0.85;
+    
+    if (scrollTop + windowHeight >= triggerPoint) {
+      loadMorePosts();
+    }
+  }, [isLoadingMore, hasMore, loadMorePosts]);
+
+  // Set up infinite scroll listener
+  useEffect(() => {
+    const throttledScrollHandler = throttle(handleInfiniteScroll, 100);
+    window.addEventListener('scroll', throttledScrollHandler);
+    
+    return () => {
+      window.removeEventListener('scroll', throttledScrollHandler);
+    };
+  }, [handleInfiniteScroll]);
+
+  // Throttle function to prevent excessive scroll event calls
+  const throttle = (func: Function, delay: number) => {
+    let timeoutId: NodeJS.Timeout;
+    let lastExecTime = 0;
+    
+    return (...args: any[]) => {
+      const currentTime = Date.now();
+      
+      if (currentTime - lastExecTime > delay) {
+        func(...args);
+        lastExecTime = currentTime;
+      } else {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          func(...args);
+          lastExecTime = Date.now();
+        }, delay - (currentTime - lastExecTime));
+      }
+    };
+  };
+
+  // Determine if a card should autoplay based on the specified pattern
+  const shouldAutoplayCard = (index: number): boolean => {
+    // Pattern: 1st card, then every 7th+8th pair
+    // 1, 8, 9, 15, 16, 22, 23, 29, 30...
+    
+    if (index === 0) return true; // First card (index 0 = 1st card)
+    
+    // Calculate which "group" this index belongs to
+    // After the first card, we have pairs starting at positions 7, 14, 21, etc.
+    // In 0-based indexing: 7, 8, 14, 15, 21, 22, etc.
+    const adjustedIndex = index - 1; // Adjust for the first card
+    const groupSize = 7;
+    const groupIndex = Math.floor(adjustedIndex / groupSize);
+    const positionInGroup = adjustedIndex % groupSize;
+    
+    // Only the last two positions in each group should autoplay (positions 5 and 6 in 0-based)
+    return positionInGroup >= 5;
+  };
 
   const handlePrevMedia = (postId: string, mediaLength: number) => {
     setCurrentMediaIndex(prev => ({
@@ -95,12 +169,14 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
     const currentIndex = currentMediaIndex[item.id] || 0;
     const hasMultipleMedia = media.length > 1;
     
-    // Video playback management for feed section
+    // Video playback management for feed section with custom autoplay logic
     const hasVideo = media.some(m => m.media_type === 'video');
+    const shouldAutoplay = shouldAutoplayCard(index);
+    
     const { videoRef, containerRef, isPlaying, shouldShowPlayIcon, togglePlayPause } = useOptimizedVideoPlayback({
       section: 'feed',
       videoId: item.id,
-      autoplayAllowed: hasVideo,
+      autoplayAllowed: hasVideo && shouldAutoplay,
       priority: Date.now() - index // Earlier posts have higher priority
     });
 
@@ -348,6 +424,18 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
       <div className="mosaic-grid">
         {sortedContent.map((item, index) => renderMediaTile(item, index))}
       </div>
+
+      {/* Infinite scroll loading indicator */}
+      {isLoadingMore && (
+        <InfiniteScrollLoader />
+      )}
+
+      {/* Loading trigger div - positioned at bottom for intersection observer */}
+      <div 
+        ref={loadingTriggerRef}
+        className="h-1 w-full"
+        style={{ marginTop: '20px' }}
+      />
 
       {/* Fullscreen Video Modal */}
       <FullscreenVideoModal
