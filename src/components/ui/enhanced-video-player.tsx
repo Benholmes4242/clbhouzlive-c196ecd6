@@ -1,6 +1,5 @@
 import React, { useRef, useEffect, useState, memo } from 'react';
 import { Play, Pause, Volume2, VolumeX, Maximize, Loader2 } from 'lucide-react';
-import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 
 interface EnhancedVideoPlayerProps {
   src: string;
