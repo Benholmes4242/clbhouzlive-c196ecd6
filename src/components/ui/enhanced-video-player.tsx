@@ -400,7 +400,12 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
         <div>Playing: {isPlaying ? 'YES' : 'NO'}</div>
         <div>Error: {error || 'None'}</div>
         <div>Autoplay: {autoplay ? 'YES' : 'NO'}</div>
-        {mobileDebug.map((info, idx) => (
+        <div>SRC: {src.slice(-20)}</div>
+        <div>VideoReady: {videoRef.current ? 'YES' : 'NO'}</div>
+        <div>VideoWidth: {videoRef.current?.videoWidth || 'N/A'}</div>
+        <div>VideoHeight: {videoRef.current?.videoHeight || 'N/A'}</div>
+        <div>ReadyState: {videoRef.current?.readyState || 'N/A'}</div>
+        {mobileDebug.slice(-1).map((info, idx) => (
           <div key={idx} className="text-xs truncate">{info}</div>
         ))}
       </div>
