@@ -5,6 +5,7 @@ import BottomNavigation from '@/components/BottomNavigation';
 import TrendingFeed from '@/components/TrendingFeed';
 import ClubhouzMomentsCarousel from '@/components/clubhouse/ClubhouzMomentsCarousel';
 import TrendingCard from '@/components/trending/TrendingCard';
+import ErrorBoundary from '@/components/ErrorBoundary';
 
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Button } from '@/components/ui/button';
@@ -13,19 +14,25 @@ import { removeDuplicatePosts } from '@/utils/postCleanup';
 import { useAppLogo } from '@/hooks/useAppLogo';
 
 const Index = () => {
+  console.log('Index component rendering...');
+  
   const { user, loading } = useSupabaseSession();
   const navigate = useNavigate();
   const { currentLogo } = useAppLogo();
 
+  console.log('Index - user:', user, 'loading:', loading);
+
   // Clean up duplicate posts when user is loaded
   useEffect(() => {
     if (user?.id) {
+      console.log('Cleaning up duplicate posts for user:', user.id);
       removeDuplicatePosts(user.id);
     }
   }, [user?.id]);
 
   // Show loading state while checking authentication
   if (loading) {
+    console.log('Index - showing loading state');
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
@@ -41,6 +48,7 @@ const Index = () => {
 
   // Show login page for non-authenticated users - this is the landing page
   if (!user) {
+    console.log('Index - showing login page');
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4">
         <div className="text-center space-y-6 md:space-y-8 max-w-md w-full">
@@ -94,37 +102,46 @@ const Index = () => {
   }
 
   // Show authenticated user content - this is the main feed
+  console.log('Index - showing authenticated user content');
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      
-      {/* Desktop container with max-width and padding */}
-      <div className="lg:max-w-6xl lg:mx-auto lg:px-8">
-        <ClubhouzMomentsCarousel />
+    <ErrorBoundary>
+      <div className="min-h-screen bg-background">
+        <Header />
         
-        {/* Golf's most watched section */}
-        <div className="mx-auto" style={{ paddingLeft: '0.125rem', paddingRight: '0.125rem' }}>
-          <div className="flex items-center justify-between mb-4 px-4">
-            <h2 className="text-lg font-semibold">Golf's most watched</h2>
+        {/* Desktop container with max-width and padding */}
+        <div className="lg:max-w-6xl lg:mx-auto lg:px-8">
+          <ErrorBoundary fallback={<div className="p-4 text-center">Error loading moments</div>}>
+            <ClubhouzMomentsCarousel />
+          </ErrorBoundary>
+          
+          {/* Golf's most watched section */}
+          <div className="mx-auto" style={{ paddingLeft: '0.125rem', paddingRight: '0.125rem' }}>
+            <div className="flex items-center justify-between mb-4 px-4">
+              <h2 className="text-lg font-semibold">Golf's most watched</h2>
+            </div>
           </div>
+          
+          <ErrorBoundary fallback={<div className="p-4 text-center">Error loading trending content</div>}>
+            <TrendingCard />
+          </ErrorBoundary>
+          
+          {/* Your clubhouse feed section */}
+          <div className="mx-auto" style={{ paddingLeft: '0.125rem', paddingRight: '0.125rem' }}>
+            <div className="flex items-center justify-between mb-4 px-4">
+              <h2 className="text-lg font-semibold">Your clubhouse feed</h2>
+            </div>
+          </div>
+          
+          <ErrorBoundary fallback={<div className="p-4 text-center">Error loading feed</div>}>
+            <main>
+              <TrendingFeed />
+            </main>
+          </ErrorBoundary>
         </div>
         
-        <TrendingCard />
-        
-        {/* Your clubhouse feed section */}
-        <div className="mx-auto" style={{ paddingLeft: '0.125rem', paddingRight: '0.125rem' }}>
-          <div className="flex items-center justify-between mb-4 px-4">
-            <h2 className="text-lg font-semibold">Your clubhouse feed</h2>
-          </div>
-        </div>
-        
-        <main>
-          <TrendingFeed />
-        </main>
+        <BottomNavigation />
       </div>
-      
-      <BottomNavigation />
-    </div>
+    </ErrorBoundary>
   );
 };
 
