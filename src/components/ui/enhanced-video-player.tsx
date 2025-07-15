@@ -60,6 +60,14 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
     });
   }, [src, autoplay, isLoading, isPlaying, error]);
 
+  // Add visible debug for mobile
+  const [mobileDebug, setMobileDebug] = useState<string[]>([]);
+  
+  useEffect(() => {
+    const debugMsg = `${new Date().toLocaleTimeString()}: autoplay=${autoplay}, loading=${isLoading}, playing=${isPlaying}, error=${error}`;
+    setMobileDebug(prev => [...prev.slice(-2), debugMsg]);
+  }, [autoplay, isLoading, isPlaying, error]);
+
   // Load HLS.js if needed
   useEffect(() => {
     if (enableHLS && !window.Hls) {
@@ -384,6 +392,18 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
           {quality}
         </div>
       )}
+
+      {/* Mobile Debug Overlay */}
+      <div className="absolute bottom-2 left-2 bg-red-600/90 text-white text-xs p-2 rounded max-w-[200px] z-50 font-mono">
+        <div className="font-bold">VIDEO DEBUG:</div>
+        <div>Loading: {isLoading ? 'YES' : 'NO'}</div>
+        <div>Playing: {isPlaying ? 'YES' : 'NO'}</div>
+        <div>Error: {error || 'None'}</div>
+        <div>Autoplay: {autoplay ? 'YES' : 'NO'}</div>
+        {mobileDebug.map((info, idx) => (
+          <div key={idx} className="text-xs truncate">{info}</div>
+        ))}
+      </div>
     </div>
   );
 };
