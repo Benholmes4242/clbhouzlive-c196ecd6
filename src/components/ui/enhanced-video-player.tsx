@@ -77,12 +77,8 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
     // Clear any existing timeout
     if (loadingTimeoutRef.current) {
       clearTimeout(loadingTimeoutRef.current);
+      loadingTimeoutRef.current = null;
     }
-
-    // Set a fallback timeout to prevent infinite loading
-    loadingTimeoutRef.current = setTimeout(() => {
-      setIsLoading(false);
-    }, 3000); // 3 second timeout
 
     // Check if HLS is needed and supported
     const isCloudflareStream = src.includes('videodelivery.net') || src.includes('iframe.videodelivery.net') || src.includes('cloudflarestream.com');
