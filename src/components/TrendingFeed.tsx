@@ -18,22 +18,13 @@ const TrendingFeed = React.memo(() => {
     refetchFollowedPosts,
   } = useTrendingFeed();
 
-  // Show skeleton loading only for initial load
-  if ((userPostsLoading || followedPostsLoading) && userPosts.length === 0 && followedUsersPosts.length === 0) {
-    return <LoadingSkeleton />;
-  }
-
-  // Memoize the expensive feed content processing
+  // Memoize the expensive feed content processing - MUST be before early returns
   const sortedContent = useMemo(() => 
     processFeedContent(userPosts, followedUsersPosts, externalVideos),
     [userPosts, followedUsersPosts, externalVideos]
   );
 
-  if (sortedContent.length === 0 && optimisticPosts.length === 0) {
-    return <EmptyFeedMessage />;
-  }
-
-  // Memoize callbacks to prevent unnecessary re-renders
+  // Memoize callbacks to prevent unnecessary re-renders - MUST be before early returns  
   const handlePostUpdated = useCallback(() => {
     refetchUserPosts();
     refetchFollowedPosts();
@@ -43,6 +34,15 @@ const TrendingFeed = React.memo(() => {
     refetchUserPosts();
     refetchFollowedPosts();
   }, [refetchUserPosts, refetchFollowedPosts]);
+
+  // Show skeleton loading only for initial load - AFTER all hooks
+  if ((userPostsLoading || followedPostsLoading) && userPosts.length === 0 && followedUsersPosts.length === 0) {
+    return <LoadingSkeleton />;
+  }
+
+  if (sortedContent.length === 0 && optimisticPosts.length === 0) {
+    return <EmptyFeedMessage />;
+  }
 
   return (
     <MosaicFeedContent
