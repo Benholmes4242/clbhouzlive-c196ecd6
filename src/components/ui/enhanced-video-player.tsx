@@ -1,7 +1,6 @@
 import React, { useRef, useEffect, useState, memo } from 'react';
 import { Play, Pause, Volume2, VolumeX, Maximize, Loader2 } from 'lucide-react';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
-import { useVideoLoadingQueue } from '@/hooks/useVideoLoadingQueue';
 
 interface EnhancedVideoPlayerProps {
   src: string;
@@ -54,52 +53,25 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
   const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
   
-  // Intersection observer for lazy loading
+  // Intersection observer for mobile lazy loading
   const { ref: videoContainerRef, isInView } = useIntersectionObserver({
-    threshold: isMobile ? 0.9 : 0.5, // Higher threshold to reduce simultaneous loads
-    rootMargin: isMobile ? '0px' : '50px' // Reduced margin to be more conservative
+    threshold: isMobile ? 0.8 : 0.3, // Higher threshold for mobile
+    rootMargin: isMobile ? '0px' : '100px' // No margin for mobile
   });
 
-  // Generate unique video ID for queue
-  const videoId = `video-${src.split('/').pop()?.split('.')[0] || Math.random()}`;
-  
-  // Priority: videos earlier in the feed get higher priority
-  const priority = className?.includes('priority-high') ? 10 : 1;
-  
-  // Video loading queue
-  const { requestLoad, cancelLoad, isInQueue, queuePosition } = useVideoLoadingQueue(
-    videoId,
-    priority,
-    () => {
-      console.log('🎬 Video loading from queue', { src: src.slice(-20) });
-      setShouldLoadVideo(true);
-    },
-    () => {
-      console.log('🛑 Video load cancelled', { src: src.slice(-20) });
-      setShouldLoadVideo(false);
-    }
-  );
-
-  // Enhanced lazy loading with debouncing
+  // Mobile lazy loading logic
   useEffect(() => {
-    if (!isInView) {
-      if (shouldLoadVideo) {
-        cancelLoad();
-        setShouldLoadVideo(false);
-      }
-      return;
-    }
-
-    // Debounce loading to prevent rapid load/unload cycles
-    const loadTimer = setTimeout(() => {
+    if (isMobile) {
+      // On mobile, only load when actually in view
       if (isInView && !shouldLoadVideo) {
-        console.log('📱 Video entering view, requesting load', { src: src.slice(-20) });
-        requestLoad();
+        console.log('📱 Mobile: Video entering view, start loading', { src: src.slice(-20) });
+        setShouldLoadVideo(true);
       }
-    }, 150); // Small delay to debounce
-
-    return () => clearTimeout(loadTimer);
-  }, [isInView, shouldLoadVideo, requestLoad, cancelLoad, src]);
+    } else {
+      // On desktop, load immediately
+      setShouldLoadVideo(true);
+    }
+  }, [isInView, isMobile, shouldLoadVideo, src]);
 
   // Load HLS.js if needed - only when shouldLoadVideo is true
   useEffect(() => {
@@ -366,14 +338,9 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
       onClick={handleVideoClick}
     >
       {/* Loading indicator */}
-      {(isLoading || isInQueue) && (
+      {isLoading && (
         <div className="absolute inset-0 bg-black/20 flex items-center justify-center z-20">
           <Loader2 className="w-8 h-8 text-white animate-spin" />
-          {isInQueue && queuePosition >= 0 && (
-            <div className="absolute bottom-4 text-white text-xs">
-              Queue: {queuePosition + 1}
-            </div>
-          )}
         </div>
       )}
 
