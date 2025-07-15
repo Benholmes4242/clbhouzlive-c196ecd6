@@ -133,7 +133,7 @@ export const useVideoPlaybackManager = ({
     rootMargin: '50px'
   });
 
-  // Register video with global manager
+  // Register video with global manager and sync local state
   useEffect(() => {
     const initialState: VideoState = {
       id: videoId,
@@ -146,38 +146,46 @@ export const useVideoPlaybackManager = ({
     globalVideoManager.registerVideo(initialState);
     setVideoState(initialState);
 
+    // Subscribe to global state changes
+    const unsubscribe = globalVideoManager.subscribe((videos) => {
+      const currentVideo = videos.get(videoId);
+      if (currentVideo) {
+        setVideoState(currentVideo);
+      }
+    });
+
     return () => {
       globalVideoManager.unregisterVideo(videoId);
+      unsubscribe();
     };
   }, [videoId, section, priority]);
 
-  // Update video element reference
+  // Update video element reference in global manager
   useEffect(() => {
     if (videoRef.current && videoState) {
       const updatedState = { ...videoState, element: videoRef.current };
       globalVideoManager.registerVideo(updatedState);
-      setVideoState(updatedState);
     }
-  }, [videoState?.id]);
+  }, [videoRef.current, videoState?.id]);
 
   // Handle intersection changes for autoplay
   useEffect(() => {
     if (!videoRef.current || !videoState) return;
 
     if (isInView && autoplayAllowed) {
-      // Check if we can autoplay this video
-      if (globalVideoManager.canAutoplay(section, videoId)) {
+      // Check if we can autoplay this video and it's not already playing
+      if (!videoState.isPlaying && globalVideoManager.canAutoplay(section, videoId)) {
         console.log(`🎬 Starting autoplay for ${section} video: ${videoId}`);
         videoRef.current.play().catch(console.error);
         globalVideoManager.playVideo(videoId, true);
       }
-    } else if (!isInView && videoState.isAutoplay) {
+    } else if (!isInView && videoState.isPlaying && videoState.isAutoplay) {
       // Pause autoplay videos when out of view
       console.log(`⏸️ Pausing autoplay for ${section} video: ${videoId}`);
       videoRef.current?.pause();
       globalVideoManager.pauseVideo(videoId);
     }
-  }, [isInView, autoplayAllowed, section, videoId, videoState]);
+  }, [isInView, autoplayAllowed, section, videoId, videoState?.isPlaying]);
 
   // Manual play/pause control
   const togglePlayPause = useCallback(() => {
