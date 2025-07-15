@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, useMemo } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import FollowButton from '@/components/profile/actions/FollowButton';
@@ -42,18 +42,11 @@ const MomentCard: React.FC<MomentCardProps> = ({ moment, currentUserId, modalMan
 
   // Video playback management
   const videoMedia = moment.post_media.find(media => media.media_type === 'video');
-  
-  // Create stable priority value to prevent infinite re-renders
-  const stablePriority = useMemo(() => {
-    // Use a hash of the moment ID to create a stable priority
-    return moment.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  }, [moment.id]);
-  
   const { videoRef, containerRef, isPlaying, togglePlayPause } = useVideoPlaybackManager({
     section: 'discover',
     videoId: moment.id,
     autoplayAllowed: !!videoMedia,
-    priority: stablePriority
+    priority: Date.now()
   });
 
   // Check follow status
