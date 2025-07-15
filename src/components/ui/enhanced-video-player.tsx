@@ -53,10 +53,10 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
   const [isActuallyReady, setIsActuallyReady] = useState(false);
   const [shouldLoad, setShouldLoad] = useState(false);
   
-  // Intersection observer for lazy loading
+  // Intersection observer for lazy loading with 75% threshold
   const { ref: videoContainerRef, isInView } = useIntersectionObserver({
-    threshold: 0.1,
-    rootMargin: '200px' // Start loading when 200px away from viewport
+    threshold: 0.75, // 75% visibility for Instagram-style autoplay
+    rootMargin: '50px' // Start preparing when 50px away
   });
 
   // Debug logging for state changes

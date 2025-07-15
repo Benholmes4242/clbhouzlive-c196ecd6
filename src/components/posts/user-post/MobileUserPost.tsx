@@ -3,8 +3,10 @@ import { Heart, MessageCircle, Share } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSwipeable } from 'react-swipeable';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
+import { useVideoPreloader } from '@/hooks/useVideoPreloader';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import LazyImage from '@/components/ui/lazy-image';
+import { VideoSkeleton } from '@/components/ui/skeleton-loader';
 import CoursePostBadge from '../CoursePostBadge';
 import { UserPostData, GolfCourse } from './types';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -32,11 +34,26 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [debugInfo, setDebugInfo] = useState<string[]>([]);
+  const [isVideoLoading, setIsVideoLoading] = useState(true);
   const { user } = useSupabaseSession();
   
   const { ref: containerRef, isInView } = useIntersectionObserver({
-    threshold: 0.5,
-    rootMargin: '0px'
+    threshold: 0.75, // Instagram-style 75% visibility
+    rootMargin: '50px'
+  });
+
+  // Predictive preloading for smoother experience
+  const allVideos = post.post_media
+    .filter(media => media.media_type === 'video')
+    .map((media, index) => ({ 
+      id: `${post.id}-${index}`, 
+      url: media.media_url 
+    }));
+  
+  const { isPreloaded } = useVideoPreloader({
+    videos: allVideos,
+    currentIndex: currentMediaIndex,
+    preloadCount: 2
   });
 
   // Check if this is the user's own post
@@ -47,14 +64,28 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
       if (post.post_media.length > 1) {
         eventData.event.preventDefault();
         eventData.event.stopPropagation();
-        setCurrentMediaIndex(prev => prev < post.post_media.length - 1 ? prev + 1 : 0);
+        setCurrentMediaIndex(prev => {
+          const newIndex = prev < post.post_media.length - 1 ? prev + 1 : 0;
+          // Reset loading state for videos when switching
+          if (post.post_media[newIndex]?.media_type === 'video') {
+            setIsVideoLoading(true);
+          }
+          return newIndex;
+        });
       }
     },
     onSwipedRight: (eventData) => {
       if (post.post_media.length > 1) {
         eventData.event.preventDefault();
         eventData.event.stopPropagation();
-        setCurrentMediaIndex(prev => prev > 0 ? prev - 1 : post.post_media.length - 1);
+        setCurrentMediaIndex(prev => {
+          const newIndex = prev > 0 ? prev - 1 : post.post_media.length - 1;
+          // Reset loading state for videos when switching
+          if (post.post_media[newIndex]?.media_type === 'video') {
+            setIsVideoLoading(true);
+          }
+          return newIndex;
+        });
       }
     },
     onSwiping: (eventData) => {
@@ -69,31 +100,6 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
     delta: 50,
     touchEventOptions: { passive: false }
   });
-
-  useEffect(() => {
-    const now = new Date().toLocaleTimeString();
-    const debugMsg = `${now}: isInView=${isInView}, mediaType=${post.post_media?.[currentMediaIndex]?.media_type}, isHovered=${isHovered}`;
-    
-    console.log('🔍 MobileUserPost: useEffect triggered', {
-      isInView,
-      currentMediaIndex,
-      mediaType: post.post_media?.[currentMediaIndex]?.media_type,
-      postId: post.id,
-      isHovered
-    });
-    
-    setDebugInfo(prev => [...prev.slice(-4), debugMsg]); // Keep last 5 debug messages
-    
-    // For mobile, just use intersection observer for autoplay
-    if (isInView && post.post_media?.[currentMediaIndex]?.media_type === 'video') {
-      console.log('📱 MobileUserPost: Setting isHovered to true for video', post.id);
-      setIsHovered(true);
-    } else if (!isInView) {
-      console.log('📱 MobileUserPost: Setting isHovered to false (not in view)', post.id);
-      setIsHovered(false);
-    }
-    // Don't reset isHovered when still in view on mobile
-  }, [isInView, currentMediaIndex, post.post_media]);
 
   if (!post.post_media || post.post_media.length === 0) {
     return (
@@ -119,6 +125,38 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
   }
 
   const currentMedia = post.post_media[currentMediaIndex];
+
+  // Reset loading state when media changes
+  useEffect(() => {
+    if (currentMedia?.media_type === 'video') {
+      setIsVideoLoading(true);
+    }
+  }, [currentMedia?.media_url]);
+
+  useEffect(() => {
+    const now = new Date().toLocaleTimeString();
+    const debugMsg = `${now}: isInView=${isInView}, mediaType=${post.post_media?.[currentMediaIndex]?.media_type}, isHovered=${isHovered}`;
+    
+    console.log('🔍 MobileUserPost: useEffect triggered', {
+      isInView,
+      currentMediaIndex,
+      mediaType: post.post_media?.[currentMediaIndex]?.media_type,
+      postId: post.id,
+      isHovered
+    });
+    
+    setDebugInfo(prev => [...prev.slice(-4), debugMsg]); // Keep last 5 debug messages
+    
+    // For mobile, just use intersection observer for autoplay
+    if (isInView && post.post_media?.[currentMediaIndex]?.media_type === 'video') {
+      console.log('📱 MobileUserPost: Setting isHovered to true for video', post.id);
+      setIsHovered(true);
+    } else if (!isInView) {
+      console.log('📱 MobileUserPost: Setting isHovered to false (not in view)', post.id);
+      setIsHovered(false);
+    }
+    // Don't reset isHovered when still in view on mobile
+  }, [isInView, currentMediaIndex, post.post_media]);
   
   return (
     <div 
@@ -132,14 +170,23 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
         onClick={() => onMediaClick(currentMedia.media_url, currentMedia.media_type)}
       >
         {currentMedia.media_type === 'video' ? (
-           <EnhancedVideoPlayer
-             src={currentMedia.media_url}
-             autoplay={isHovered}
-             muted={true}
-             loop={true}
-             className="w-full h-full"
-             enableHLS={true}
-           />
+          <>
+            {/* Show skeleton while video is loading */}
+            {isVideoLoading && (
+              <VideoSkeleton className="absolute inset-0 z-10" />
+            )}
+            
+            <EnhancedVideoPlayer
+              src={currentMedia.media_url}
+              autoplay={isHovered}
+              muted={true}
+              loop={true}
+              className="w-full h-full"
+              enableHLS={true}
+              onPlay={() => setIsVideoLoading(false)}
+              onPause={() => {}}
+            />
+          </>
         ) : (
           <LazyImage
             src={currentMedia.media_url}
