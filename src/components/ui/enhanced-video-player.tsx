@@ -49,52 +49,21 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
   const [buffered, setBuffered] = useState(0);
   const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Add video loading manager for mobile
-  const [isActuallyReady, setIsActuallyReady] = useState(false);
-  const [shouldLoad, setShouldLoad] = useState(false);
-  
-  // Intersection observer for lazy loading with 75% threshold
-  const { ref: videoContainerRef, isInView } = useIntersectionObserver({
-    threshold: 0.75, // 75% visibility for Instagram-style autoplay
-    rootMargin: '50px' // Start preparing when 50px away
-  });
-
-  // Debug logging for state changes
+  // Load HLS.js if needed
   useEffect(() => {
-    console.log('🎬 EnhancedVideoPlayer: State change', {
-      src,
-      autoplay,
-      isLoading,
-      isPlaying,
-      error,
-      timestamp: Date.now()
-    });
-  }, [src, autoplay, isLoading, isPlaying, error]);
-
-  // Add visible debug for mobile
-  const [mobileDebug, setMobileDebug] = useState<string[]>([]);
-  
-  useEffect(() => {
-    const debugMsg = `${new Date().toLocaleTimeString()}: autoplay=${autoplay}, loading=${isLoading}, playing=${isPlaying}, error=${error}`;
-    setMobileDebug(prev => [...prev.slice(-2), debugMsg]);
-  }, [autoplay, isLoading, isPlaying, error]);
-
-  // Smart loading logic based on intersection observer
-  useEffect(() => {
-    if (isInView && !shouldLoad) {
-      console.log('📱 Smart Loading: Video entering viewport, start loading', { src: src.slice(-20) });
-      setShouldLoad(true);
-    }
-  }, [isInView, shouldLoad, src]);
-
-  // Only initialize video when we should load it
-  useEffect(() => {
-    if (shouldLoad) {
+    if (enableHLS && !window.Hls) {
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/hls.js@latest';
+      script.onload = () => initializeVideo();
+      script.onerror = (error) => {
+        console.error('❌ Failed to load HLS.js:', error);
+        setError('Failed to load video player');
+      };
+      document.head.appendChild(script);
+    } else {
       initializeVideo();
     }
-  }, [shouldLoad]);
-
-  // Override the default effect that initializes immediately
+  }, [src, enableHLS]);
   
   const initializeVideo = () => {
     console.log('🎬 EnhancedVideoPlayer: Initializing video', { src, enableHLS });
@@ -336,7 +305,6 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
 
   return (
     <div 
-      ref={videoContainerRef}
       className={`relative group cursor-pointer ${className}`}
       onMouseEnter={() => setShowControls(true)}
       onMouseLeave={() => setShowControls(false)}
@@ -354,10 +322,10 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
         poster={poster}
         muted={muted}
         loop={loop}
-        autoPlay={false}
+        autoPlay={autoplay}
         playsInline
-        preload="none"
-        src={shouldLoad ? src : undefined}
+        preload="metadata"
+        src={src}
         className="w-full h-full object-cover"
         controlsList="nodownload nofullscreen noremoteplayback"
         disablePictureInPicture
@@ -415,9 +383,7 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
 
       {/* Mobile Debug Overlay */}
       <div className="absolute bottom-2 left-2 bg-red-600/90 text-white text-xs p-2 rounded max-w-[200px] z-50 font-mono">
-        <div className="font-bold">LAZY LOAD DEBUG:</div>
-        <div>InView: {isInView ? 'YES' : 'NO'}</div>
-        <div>ShouldLoad: {shouldLoad ? 'YES' : 'NO'}</div>
+        <div className="font-bold">VIDEO DEBUG:</div>
         <div>Loading: {isLoading ? 'YES' : 'NO'}</div>
         <div>Playing: {isPlaying ? 'YES' : 'NO'}</div>
         <div>Error: {error || 'None'}</div>
@@ -427,9 +393,6 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
         <div>VideoWidth: {videoRef.current?.videoWidth || 'N/A'}</div>
         <div>VideoHeight: {videoRef.current?.videoHeight || 'N/A'}</div>
         <div>ReadyState: {videoRef.current?.readyState || 'N/A'}</div>
-        {mobileDebug.slice(-1).map((info, idx) => (
-          <div key={idx} className="text-xs truncate">{info}</div>
-        ))}
       </div>
     </div>
   );
