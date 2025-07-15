@@ -408,22 +408,6 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
         </div>
       )}
 
-      {/* Mobile Debug Overlay */}
-      <div className="absolute bottom-2 left-2 bg-red-600/90 text-white text-xs p-2 rounded max-w-[200px] z-50 font-mono">
-        <div className="font-bold">MOBILE DEBUG:</div>
-        <div>IsMobile: {isMobile ? 'YES' : 'NO'}</div>
-        <div>InView: {isInView ? 'YES' : 'NO'}</div>
-        <div>ShouldLoad: {shouldLoadVideo ? 'YES' : 'NO'}</div>
-        <div>Loading: {isLoading ? 'YES' : 'NO'}</div>
-        <div>Playing: {isPlaying ? 'YES' : 'NO'}</div>
-        <div>Error: {error || 'None'}</div>
-        <div>Autoplay: {autoplay ? 'YES' : 'NO'}</div>
-        <div>SRC: {src.slice(-20)}</div>
-        <div>VideoReady: {videoRef.current ? 'YES' : 'NO'}</div>
-        <div>VideoWidth: {videoRef.current?.videoWidth || 'N/A'}</div>
-        <div>VideoHeight: {videoRef.current?.videoHeight || 'N/A'}</div>
-        <div>ReadyState: {videoRef.current?.readyState || 'N/A'}</div>
-      </div>
     </div>
   );
 };
