@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useCallback, memo } from 'react';
 import { ChevronLeft, ChevronRight, Maximize2, Play } from 'lucide-react';
 import { PiHandsClapping, PiShareFat } from 'react-icons/pi';
 import { GoCommentDiscussion } from 'react-icons/go';
@@ -16,7 +16,7 @@ interface MosaicFeedContentProps {
   onPostDeleted: () => void;
 }
 
-const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
+const MosaicFeedContent: React.FC<MosaicFeedContentProps> = memo(({
   optimisticPosts,
   sortedContent,
   onPostUpdated,
@@ -26,21 +26,21 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
   const navigate = useNavigate();
   const modalManager = useFullscreenVideoModal();
 
-  const handlePrevMedia = (postId: string, mediaLength: number) => {
+  const handlePrevMedia = useCallback((postId: string, mediaLength: number) => {
     setCurrentMediaIndex(prev => ({
       ...prev,
       [postId]: Math.max(0, (prev[postId] || 0) - 1)
     }));
-  };
+  }, []);
 
-  const handleNextMedia = (postId: string, mediaLength: number) => {
+  const handleNextMedia = useCallback((postId: string, mediaLength: number) => {
     setCurrentMediaIndex(prev => ({
       ...prev,
       [postId]: Math.min(mediaLength - 1, (prev[postId] || 0) + 1)
     }));
-  };
+  }, []);
 
-  const handleMaximizeClick = (item: VideoPost | UserPostWithType) => {
+  const handleMaximizeClick = useCallback((item: VideoPost | UserPostWithType) => {
     console.log('🔍 Maximize clicked for item:', item);
     const modalData = getMediaDataForModal(item);
     modalManager.openModal({
@@ -48,7 +48,7 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
       user: modalData.user,
       content: modalData.content
     });
-  };
+  }, [modalManager]);
 
   const getMediaDataForModal = (item: VideoPost | UserPostWithType) => {
     const isUserPost = item.type === 'user_post';
@@ -360,6 +360,6 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
       />
     </div>
   );
-};
+});
 
 export default MosaicFeedContent;

@@ -24,7 +24,7 @@ class VideoPlaybackManager {
   private maxAutoplayVideos = {
     discover: 99, // All visible videos can autoplay
     trending: 1,  // Only first video autoplays
-    feed: 2       // Max 2 videos autoplay in feed
+    feed: 1       // Only 1 video autoplay in feed for better performance
   };
 
   subscribe(listener: (videos: Map<string, VideoState>) => void) {
@@ -129,8 +129,8 @@ export const useVideoPlaybackManager = ({
   const [videoState, setVideoState] = useState<VideoState | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const { ref: containerRef, isInView } = useIntersectionObserver({
-    threshold: 0.5,
-    rootMargin: '50px'
+    threshold: 0.3, // Lower threshold for better performance
+    rootMargin: '20px' // Reduced margin for better performance
   });
 
   // Register video with global manager and sync local state

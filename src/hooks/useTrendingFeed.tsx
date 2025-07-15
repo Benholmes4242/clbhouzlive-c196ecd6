@@ -18,19 +18,19 @@ export const useTrendingFeed = () => {
     queryFn: async () => {
       if (!user?.id) return [];
 
-      // Get connected user IDs efficiently with increased limits
+      // Get connected user IDs efficiently with reduced limits for better performance
       const [followsResponse, friendsResponse] = await Promise.all([
         supabase
           .from('user_follows')
           .select('following_id')
           .eq('follower_id', user.id)
-          .limit(10), // Slightly increased for better content
+          .limit(5), // Reduced for better performance
         supabase
           .from('user_friends')
           .select('user_id, friend_id')
           .or(`user_id.eq.${user.id},friend_id.eq.${user.id}`)
           .eq('status', 'accepted')
-          .limit(10) // Slightly increased for better content
+          .limit(5) // Reduced for better performance
       ]);
 
       const followedUserIds = followsResponse.data?.map(f => f.following_id) || [];
@@ -42,7 +42,7 @@ export const useTrendingFeed = () => {
 
       if (allConnectedUserIds.length === 0) return [];
 
-      // Single optimized query with all required data and filter for media posts only
+      // Single optimized query with minimal data selection
       const { data: posts, error: postsError } = await supabase
         .from('posts')
         .select(`
@@ -54,7 +54,7 @@ export const useTrendingFeed = () => {
         `)
         .in('user_id', allConnectedUserIds)
         .order('created_at', { ascending: false })
-        .limit(6); // Optimized limit for performance
+        .limit(4); // Further reduced for better performance
 
       if (postsError) {
         console.error('Error fetching followed posts:', postsError);
@@ -63,7 +63,7 @@ export const useTrendingFeed = () => {
 
       if (!posts || posts.length === 0) return [];
 
-      // Get profiles in single query
+      // Get profiles in single query - only necessary fields
       const { data: profiles } = await supabase
         .from('user_profiles')
         .select('id, display_name, username, profile_photo_url')
@@ -95,9 +95,9 @@ export const useTrendingFeed = () => {
       });
     },
     enabled: !!user?.id,
-    staleTime: 600000, // 10 minutes cache for better performance
+    staleTime: 300000, // 5 minutes cache for faster updates
     refetchInterval: false,
-    gcTime: 900000, // 15 minutes cache retention
+    gcTime: 600000, // 10 minutes cache retention
   });
 
   // Listen for feed refresh events

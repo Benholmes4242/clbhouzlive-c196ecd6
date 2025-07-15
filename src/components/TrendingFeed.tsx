@@ -1,12 +1,12 @@
 
-import React from 'react';
+import React, { useMemo, useCallback } from 'react';
 import LoadingSkeleton from './feed/LoadingSkeleton';
 import EmptyFeedMessage from './feed/EmptyFeedMessage';
 import MosaicFeedContent from './feed/MosaicFeedContent';
 import { useTrendingFeed } from '@/hooks/useTrendingFeed';
 import { processFeedContent } from '@/utils/feedContentProcessor';
 
-const TrendingFeed = () => {
+const TrendingFeed = React.memo(() => {
   const {
     userPosts,
     userPostsLoading,
@@ -23,21 +23,26 @@ const TrendingFeed = () => {
     return <LoadingSkeleton />;
   }
 
-  const sortedContent = processFeedContent(userPosts, followedUsersPosts, externalVideos);
+  // Memoize the expensive feed content processing
+  const sortedContent = useMemo(() => 
+    processFeedContent(userPosts, followedUsersPosts, externalVideos),
+    [userPosts, followedUsersPosts, externalVideos]
+  );
 
   if (sortedContent.length === 0 && optimisticPosts.length === 0) {
     return <EmptyFeedMessage />;
   }
 
-  const handlePostUpdated = () => {
+  // Memoize callbacks to prevent unnecessary re-renders
+  const handlePostUpdated = useCallback(() => {
     refetchUserPosts();
     refetchFollowedPosts();
-  };
+  }, [refetchUserPosts, refetchFollowedPosts]);
 
-  const handlePostDeleted = () => {
+  const handlePostDeleted = useCallback(() => {
     refetchUserPosts();
     refetchFollowedPosts();
-  };
+  }, [refetchUserPosts, refetchFollowedPosts]);
 
   return (
     <MosaicFeedContent
@@ -47,6 +52,6 @@ const TrendingFeed = () => {
       onPostDeleted={handlePostDeleted}
     />
   );
-};
+});
 
 export default TrendingFeed;
