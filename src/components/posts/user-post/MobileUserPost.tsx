@@ -70,11 +70,13 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
   });
 
   useEffect(() => {
+    // For mobile, just use intersection observer for autoplay
     if (isInView && post.post_media?.[currentMediaIndex]?.media_type === 'video') {
       setIsHovered(true);
-    } else {
+    } else if (!isInView) {
       setIsHovered(false);
     }
+    // Don't reset isHovered when still in view on mobile
   }, [isInView, currentMediaIndex, post.post_media]);
 
   if (!post.post_media || post.post_media.length === 0) {
@@ -106,8 +108,6 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
     <div 
       ref={containerRef}
       className="relative w-full bg-media-loading"
-      onTouchStart={() => setIsHovered(true)}
-      onTouchEnd={() => setIsHovered(false)}
     >
       {/* Media Container */}
       <div 
