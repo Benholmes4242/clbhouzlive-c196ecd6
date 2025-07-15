@@ -1,0 +1,251 @@
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useIntersectionObserver } from './useIntersectionObserver';
+
+interface VideoState {
+  id: string;
+  section: 'discover' | 'trending' | 'feed';
+  isPlaying: boolean;
+  isAutoplay: boolean;
+  element?: HTMLVideoElement;
+  priority: number;
+}
+
+interface VideoPlaybackManagerProps {
+  section: 'discover' | 'trending' | 'feed';
+  videoId: string;
+  autoplayAllowed?: boolean;
+  priority?: number;
+}
+
+// Global state management for video playback
+class VideoPlaybackManager {
+  private videos: Map<string, VideoState> = new Map();
+  private listeners: Set<(videos: Map<string, VideoState>) => void> = new Set();
+  private maxAutoplayVideos = {
+    discover: 99, // All visible videos can autoplay
+    trending: 1,  // Only first video autoplays
+    feed: 2       // Max 2 videos autoplay in feed
+  };
+
+  subscribe(listener: (videos: Map<string, VideoState>) => void) {
+    this.listeners.add(listener);
+    return () => this.listeners.delete(listener);
+  }
+
+  private notify() {
+    this.listeners.forEach(listener => listener(this.videos));
+  }
+
+  registerVideo(videoState: VideoState) {
+    this.videos.set(videoState.id, videoState);
+    this.notify();
+  }
+
+  unregisterVideo(videoId: string) {
+    this.videos.delete(videoId);
+    this.notify();
+  }
+
+  canAutoplay(section: 'discover' | 'trending' | 'feed', videoId: string): boolean {
+    const sectionVideos = Array.from(this.videos.values()).filter(v => v.section === section);
+    const autoplayingVideos = sectionVideos.filter(v => v.isPlaying && v.isAutoplay);
+    
+    // If this video is already playing, allow it
+    const currentVideo = this.videos.get(videoId);
+    if (currentVideo?.isPlaying) return true;
+    
+    // Check if we can start more autoplay videos
+    return autoplayingVideos.length < this.maxAutoplayVideos[section];
+  }
+
+  playVideo(videoId: string, isAutoplay: boolean = true) {
+    const video = this.videos.get(videoId);
+    if (!video) return;
+
+    const section = video.section;
+    
+    // For trending section, pause other videos when one is clicked
+    if (section === 'trending' && !isAutoplay) {
+      const trendingVideos = Array.from(this.videos.values()).filter(v => v.section === 'trending');
+      trendingVideos.forEach(v => {
+        if (v.id !== videoId && v.isPlaying) {
+          v.element?.pause();
+          this.videos.set(v.id, { ...v, isPlaying: false });
+        }
+      });
+    }
+
+    // For feed section, pause oldest video if we exceed limit
+    if (section === 'feed' && isAutoplay) {
+      const feedVideos = Array.from(this.videos.values()).filter(v => v.section === 'feed');
+      const autoplayingVideos = feedVideos.filter(v => v.isPlaying && v.isAutoplay);
+      
+      if (autoplayingVideos.length >= 2) {
+        // Pause the oldest autoplay video
+        const oldestVideo = autoplayingVideos.reduce((oldest, current) => 
+          current.priority < oldest.priority ? current : oldest
+        );
+        oldestVideo.element?.pause();
+        this.videos.set(oldestVideo.id, { ...oldestVideo, isPlaying: false });
+      }
+    }
+
+    this.videos.set(videoId, { ...video, isPlaying: true, isAutoplay });
+    this.notify();
+  }
+
+  pauseVideo(videoId: string) {
+    const video = this.videos.get(videoId);
+    if (!video) return;
+
+    this.videos.set(videoId, { ...video, isPlaying: false });
+    this.notify();
+  }
+
+  pauseAllVideos() {
+    this.videos.forEach((video, id) => {
+      if (video.isPlaying) {
+        video.element?.pause();
+        this.videos.set(id, { ...video, isPlaying: false });
+      }
+    });
+    this.notify();
+  }
+
+  getVideoState(videoId: string): VideoState | undefined {
+    return this.videos.get(videoId);
+  }
+}
+
+// Global manager instance
+const globalVideoManager = new VideoPlaybackManager();
+
+export const useVideoPlaybackManager = ({ 
+  section, 
+  videoId, 
+  autoplayAllowed = true, 
+  priority = Date.now() 
+}: VideoPlaybackManagerProps) => {
+  const [videoState, setVideoState] = useState<VideoState | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const { ref: containerRef, isInView } = useIntersectionObserver({
+    threshold: 0.5,
+    rootMargin: '50px'
+  });
+
+  // Register video with global manager
+  useEffect(() => {
+    const initialState: VideoState = {
+      id: videoId,
+      section,
+      isPlaying: false,
+      isAutoplay: false,
+      priority
+    };
+
+    globalVideoManager.registerVideo(initialState);
+    setVideoState(initialState);
+
+    return () => {
+      globalVideoManager.unregisterVideo(videoId);
+    };
+  }, [videoId, section, priority]);
+
+  // Update video element reference
+  useEffect(() => {
+    if (videoRef.current && videoState) {
+      const updatedState = { ...videoState, element: videoRef.current };
+      globalVideoManager.registerVideo(updatedState);
+      setVideoState(updatedState);
+    }
+  }, [videoState?.id]);
+
+  // Handle intersection changes for autoplay
+  useEffect(() => {
+    if (!videoRef.current || !videoState) return;
+
+    if (isInView && autoplayAllowed) {
+      // Check if we can autoplay this video
+      if (globalVideoManager.canAutoplay(section, videoId)) {
+        console.log(`🎬 Starting autoplay for ${section} video: ${videoId}`);
+        videoRef.current.play().catch(console.error);
+        globalVideoManager.playVideo(videoId, true);
+      }
+    } else if (!isInView && videoState.isAutoplay) {
+      // Pause autoplay videos when out of view
+      console.log(`⏸️ Pausing autoplay for ${section} video: ${videoId}`);
+      videoRef.current?.pause();
+      globalVideoManager.pauseVideo(videoId);
+    }
+  }, [isInView, autoplayAllowed, section, videoId, videoState]);
+
+  // Manual play/pause control
+  const togglePlayPause = useCallback(() => {
+    if (!videoRef.current) return;
+
+    if (videoRef.current.paused) {
+      videoRef.current.play().catch(console.error);
+      globalVideoManager.playVideo(videoId, false);
+    } else {
+      videoRef.current.pause();
+      globalVideoManager.pauseVideo(videoId);
+    }
+  }, [videoId]);
+
+  // Check if video should show play icon
+  const shouldShowPlayIcon = useCallback(() => {
+    if (!videoState) return false;
+    
+    // Show play icon for paused videos in trending and feed sections
+    if (section === 'trending' && !videoState.isPlaying) return true;
+    if (section === 'feed' && !videoState.isPlaying) return true;
+    
+    return false;
+  }, [section, videoState]);
+
+  return {
+    videoRef,
+    containerRef,
+    isInView,
+    isPlaying: videoState?.isPlaying || false,
+    canAutoplay: globalVideoManager.canAutoplay(section, videoId),
+    shouldShowPlayIcon: shouldShowPlayIcon(),
+    togglePlayPause,
+    pauseAllVideos: globalVideoManager.pauseAllVideos
+  };
+};
+
+// Hook for fullscreen video modal
+export const useFullscreenVideoModal = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [videoData, setVideoData] = useState<{
+    src: string;
+    poster?: string;
+    user: {
+      id: string;
+      profile_photo_url?: string;
+      display_name?: string;
+      username?: string;
+    };
+    content?: string;
+  } | null>(null);
+
+  const openModal = useCallback((data: typeof videoData) => {
+    // Pause all videos when opening modal
+    globalVideoManager.pauseAllVideos();
+    setVideoData(data);
+    setIsOpen(true);
+  }, []);
+
+  const closeModal = useCallback(() => {
+    setIsOpen(false);
+    setVideoData(null);
+  }, []);
+
+  return {
+    isOpen,
+    videoData,
+    openModal,
+    closeModal
+  };
+};

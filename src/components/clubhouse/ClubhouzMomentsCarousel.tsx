@@ -4,12 +4,15 @@ import { Button } from '@/components/ui/button';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useClubhouseContent } from '@/hooks/useClubhouseContent';
 import { useCarouselNavigation } from '@/hooks/useCarouselNavigation';
+import { useFullscreenVideoModal } from '@/hooks/useVideoPlaybackManager';
+import FullscreenVideoModal from '@/components/ui/fullscreen-video-modal';
 import MomentCard from './MomentCard';
 
 
 const ClubhouzMomentsCarousel: React.FC = () => {
   const { user } = useSupabaseSession();
   const { posts, loading } = useClubhouseContent();
+  const modalManager = useFullscreenVideoModal();
 
   // Filter posts with video content only and valid users, then deduplicate by user
   const filteredPosts = posts.filter(post => 
@@ -105,12 +108,19 @@ const ClubhouzMomentsCarousel: React.FC = () => {
                 className="flex-shrink-0 w-52 md:w-60"
                 style={{ scrollSnapAlign: 'start' }}
               >
-                <MomentCard moment={moment} currentUserId={user.id} />
+                <MomentCard moment={moment} currentUserId={user.id} modalManager={modalManager} />
               </div>
             ))}
           </div>
         </div>
       </div>
+
+      {/* Fullscreen Video Modal */}
+      <FullscreenVideoModal
+        isOpen={modalManager.isOpen}
+        onClose={modalManager.closeModal}
+        videoData={modalManager.videoData}
+      />
     </div>
   );
 };

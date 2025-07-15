@@ -6,6 +6,7 @@ import { useProfileActions } from '@/components/profile/actions/useProfileAction
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
+import { useVideoPlaybackManager, useFullscreenVideoModal } from '@/hooks/useVideoPlaybackManager';
 
 interface MomentCardProps {
   moment: {
@@ -28,14 +29,24 @@ interface MomentCardProps {
     }[];
   };
   currentUserId: string;
+  modalManager: ReturnType<typeof useFullscreenVideoModal>;
 }
 
-const MomentCard: React.FC<MomentCardProps> = ({ moment, currentUserId }) => {
+const MomentCard: React.FC<MomentCardProps> = ({ moment, currentUserId, modalManager }) => {
   const [isFollowing, setIsFollowing] = useState(false);
   const navigate = useNavigate();
   const { loading, handleFollow } = useProfileActions({
     targetUserId: moment.user.id,
     currentUserId: currentUserId
+  });
+
+  // Video playback management
+  const videoMedia = moment.post_media.find(media => media.media_type === 'video');
+  const { videoRef, containerRef, isPlaying, togglePlayPause } = useVideoPlaybackManager({
+    section: 'discover',
+    videoId: moment.id,
+    autoplayAllowed: !!videoMedia,
+    priority: Date.now()
   });
 
   // Check follow status
@@ -60,7 +71,6 @@ const MomentCard: React.FC<MomentCardProps> = ({ moment, currentUserId }) => {
   }, [followStatus]);
 
 
-  const videoMedia = moment.post_media.find(media => media.media_type === 'video');
   const imageMedia = moment.post_media.find(media => media.media_type === 'image');
   const mediaToShow = videoMedia || imageMedia;
   
@@ -77,20 +87,36 @@ const MomentCard: React.FC<MomentCardProps> = ({ moment, currentUserId }) => {
     }
   };
 
+  const handleVideoClick = () => {
+    if (videoMedia) {
+      modalManager.openModal({
+        src: videoMedia.media_url,
+        user: {
+          id: moment.user.id,
+          profile_photo_url: moment.user.profile_photo_url || undefined,
+          display_name: moment.user.display_name || undefined,
+          username: moment.user.username || undefined
+        },
+        content: undefined // MomentCard doesn't have content
+      });
+    }
+  };
+
   if (!mediaToShow) return null;
 
   return (
-    <div className="relative bg-card rounded-xl overflow-hidden shadow-sm border group">
+    <div ref={containerRef} className="relative bg-card rounded-xl overflow-hidden shadow-sm border group">
       {/* Media Container */}
-      <div className="relative aspect-[3/4] bg-muted">
+      <div className="relative aspect-[3/4] bg-muted" onClick={handleVideoClick}>
         {videoMedia ? (
-          <EnhancedVideoPlayer
+          <video
+            ref={videoRef}
             src={mediaToShow.media_url}
             className="w-full h-full object-cover"
             muted={true}
             loop={true}
-            autoplay={true}
-            enableHLS={true}
+            playsInline
+            preload="metadata"
           />
         ) : (
           <img

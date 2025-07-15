@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Heart, MessageCircle, ChevronLeft, ChevronRight, Maximize2 } from 'lucide-react';
+import { Heart, MessageCircle, ChevronLeft, ChevronRight, Maximize2, Play } from 'lucide-react';
 import { PiHandsClapping, PiShareFat } from 'react-icons/pi';
 import { GoCommentDiscussion } from 'react-icons/go';
 import OptimisticPostCard from '../posts/OptimisticPostCard';
@@ -7,6 +7,8 @@ import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import { useNavigate } from 'react-router-dom';
 import { VideoPost, UserPostWithType } from './types';
+import { useVideoPlaybackManager, useFullscreenVideoModal } from '@/hooks/useVideoPlaybackManager';
+import FullscreenVideoModal from '@/components/ui/fullscreen-video-modal';
 
 interface MosaicFeedContentProps {
   optimisticPosts: any[];
@@ -22,9 +24,8 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
   onPostDeleted
 }) => {
   const [currentMediaIndex, setCurrentMediaIndex] = useState<{[key: string]: number}>({});
-  const [modalOpen, setModalOpen] = useState(false);
-  const [selectedPost, setSelectedPost] = useState<VideoPost | UserPostWithType | null>(null);
   const navigate = useNavigate();
+  const modalManager = useFullscreenVideoModal();
 
   const handlePrevMedia = (postId: string, mediaLength: number) => {
     setCurrentMediaIndex(prev => ({
@@ -42,15 +43,12 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
 
   const handleMaximizeClick = (item: VideoPost | UserPostWithType) => {
     console.log('🔍 Maximize clicked for item:', item);
-    console.log('🔍 Setting selectedPost and opening modal');
-    setSelectedPost(item);
-    setModalOpen(true);
-    console.log('🔍 Modal state should now be open');
-  };
-
-  const handleCloseModal = () => {
-    setModalOpen(false);
-    setSelectedPost(null);
+    const modalData = getMediaDataForModal(item);
+    modalManager.openModal({
+      src: Array.isArray(modalData.mediaUrl) ? modalData.mediaUrl[0] : modalData.mediaUrl,
+      user: modalData.user,
+      content: modalData.content
+    });
   };
 
   const getMediaDataForModal = (item: VideoPost | UserPostWithType) => {
@@ -98,6 +96,15 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
       : [{ media_url: (item as VideoPost).content.videoUrl || (item as VideoPost).content.image || '', media_type: (item as VideoPost).content.type }];
     const currentIndex = currentMediaIndex[item.id] || 0;
     const hasMultipleMedia = media.length > 1;
+    
+    // Video playback management for feed section
+    const hasVideo = media.some(m => m.media_type === 'video');
+    const { videoRef, containerRef, isPlaying, shouldShowPlayIcon, togglePlayPause } = useVideoPlaybackManager({
+      section: 'feed',
+      videoId: item.id,
+      autoplayAllowed: hasVideo,
+      priority: Date.now() - index // Earlier posts have higher priority
+    });
 
     // Get user info
     const username = isUserPost ? (item as UserPostWithType).user.username : (item as VideoPost).user.username;
@@ -123,10 +130,20 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
     
     const aspectRatio = getCardType(index);
 
+    const handleTileClick = () => {
+      // Always open fullscreen modal when clicking on tile
+      handleMaximizeClick(item);
+    };
+
+    const handlePlayButtonClick = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      togglePlayPause();
+    };
+
     return (
-      <div key={item.id} className="mosaic-tile group relative overflow-hidden rounded-xl bg-card">
+      <div key={item.id} ref={containerRef} className="mosaic-tile group relative overflow-hidden rounded-xl bg-card">
         {/* Media Container */}
-        <div className={`relative w-full overflow-hidden ${aspectRatio}`}>
+        <div className={`relative w-full overflow-hidden ${aspectRatio}`} onClick={handleTileClick}>
           {hasMultipleMedia ? (
             // Carousel for multiple media
             <div className="relative w-full h-full">
@@ -137,13 +154,14 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
                 {media.map((mediaItem, index) => (
                   <div key={index} className="flex-shrink-0 w-full h-full">
                      {mediaItem.media_type === 'video' ? (
-                       <EnhancedVideoPlayer
+                       <video
+                         ref={index === currentIndex ? videoRef : undefined}
                          src={mediaItem.media_url}
                          className="w-full h-full object-cover rounded-xl"
-                         autoplay={true}
                          muted={true}
                          loop={true}
-                         enableHLS={true}
+                         playsInline
+                         preload="metadata"
                        />
                      ) : (
                        <img
@@ -212,6 +230,18 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
             </div>
           )}
           
+          {/* Play button - top left (shows when video is paused) */}
+          {hasVideo && shouldShowPlayIcon && (
+            <div className="absolute top-2 left-2 z-20">
+              <button 
+                onClick={handlePlayButtonClick}
+                className="rounded-full p-2 text-white bg-black/50 hover:bg-black/70 transition-colors"
+              >
+                <Play className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+
           {/* Maximize button - top right */}
           <div className="absolute top-2 right-2 z-20">
             <button 
@@ -318,25 +348,12 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
         {sortedContent.map((item, index) => renderMediaTile(item, index))}
       </div>
 
-      {/* Fullscreen Media Modal */}
-      {modalOpen && selectedPost && (() => {
-        const modalData = getMediaDataForModal(selectedPost);
-        console.log('🔍 Modal rendering with data:', modalData);
-        console.log('🔍 Modal open state:', modalOpen);
-        console.log('🔍 Selected post:', selectedPost);
-        return (
-          <FullscreenMediaModal
-            isOpen={modalOpen}
-            onClose={handleCloseModal}
-            mediaUrl={modalData.mediaUrl}
-            mediaType={modalData.mediaType}
-            user={modalData.user}
-            displayName={modalData.displayName}
-            content={modalData.content}
-            postTags={modalData.postTags}
-          />
-        );
-      })()}
+      {/* Fullscreen Video Modal */}
+      <FullscreenVideoModal
+        isOpen={modalManager.isOpen}
+        onClose={modalManager.closeModal}
+        videoData={modalManager.videoData}
+      />
     </div>
   );
 };

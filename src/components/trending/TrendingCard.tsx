@@ -1,16 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
-import { TrendingUp, ChevronLeft, ChevronRight } from 'lucide-react';
+import { TrendingUp, ChevronLeft, ChevronRight, Play } from 'lucide-react';
 import { PiHandsClapping, PiShareFat } from 'react-icons/pi';
 import { GoCommentDiscussion } from 'react-icons/go';
 import { HiOutlineArrowSmLeft, HiOutlineArrowSmRight } from 'react-icons/hi';
 import { useSwipeable } from 'react-swipeable';
 import { useNavigate } from 'react-router-dom';
 import { useTrendingCard } from '@/hooks/useTrendingCard';
+import { useVideoPlaybackManager, useFullscreenVideoModal } from '@/hooks/useVideoPlaybackManager';
+import FullscreenVideoModal from '@/components/ui/fullscreen-video-modal';
 
 const TrendingCard = () => {
   const { trendingPosts, loading, nextSlide, prevSlide, currentIndex, totalPosts } = useTrendingCard();
   const navigate = useNavigate();
+  const modalManager = useFullscreenVideoModal();
 
   console.log('TrendingCard render - loading:', loading, 'trendingPosts:', trendingPosts.length);
 
@@ -45,9 +48,46 @@ const TrendingCard = () => {
 
     // Only show the first video, no carousel functionality for trending cards
     const firstVideo = videoMedia[0];
+    const isFirstCard = index === 0;
+    const isMobile = window.innerWidth < 768;
+    
+    // Video playback management
+    const { videoRef, containerRef, isPlaying, shouldShowPlayIcon, togglePlayPause } = useVideoPlaybackManager({
+      section: 'trending',
+      videoId: post.id,
+      autoplayAllowed: isFirstCard || isMobile, // First card or mobile autoplays
+      priority: Date.now() - index // First card has higher priority
+    });
+
+    const handleVideoClick = () => {
+      if (isMobile) {
+        // Mobile: toggle play/pause
+        togglePlayPause();
+      } else {
+        // Desktop: open fullscreen modal
+        modalManager.openModal({
+          src: firstVideo.media_url,
+          user: {
+            id: user?.id || post.id,
+            profile_photo_url: user?.profile_photo_url || undefined,
+            display_name: user?.display_name || undefined,
+            username: user?.username || undefined
+          },
+          content: post.content || undefined
+        });
+      }
+    };
+
+    const handlePlayButtonClick = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (!isMobile) {
+        // Desktop: clicking play button toggles play/pause
+        togglePlayPause();
+      }
+    };
     
     return (
-      <div className="relative w-full aspect-[3/4] rounded-xl overflow-hidden bg-card group">
+      <div ref={containerRef} className="relative w-full aspect-[3/4] rounded-xl overflow-hidden bg-card group" onClick={handleVideoClick}>
 
         {/* Trending Icon - top right */}
         <div className="absolute top-2 right-2 z-10">
@@ -56,15 +96,28 @@ const TrendingCard = () => {
           </button>
         </div>
 
-        {/* Single Video - No Carousel */}
+        {/* Video Icon - top left (shows when paused) */}
+        {shouldShowPlayIcon && (
+          <div className="absolute top-2 left-2 z-10">
+            <button 
+              onClick={handlePlayButtonClick}
+              className="rounded-full p-1.5 text-white bg-black/50 hover:bg-black/70 transition-colors"
+            >
+              <Play className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+
+        {/* Single Video */}
         <div className="relative w-full h-full">
-          <EnhancedVideoPlayer
+          <video
+            ref={videoRef}
             src={firstVideo.media_url}
             className="w-full h-full object-cover"
-            autoplay={true}
             muted={true}
             loop={true}
-            enableHLS={true}
+            playsInline
+            preload="metadata"
           />
           
           {/* Overlay with content */}
@@ -192,6 +245,13 @@ const TrendingCard = () => {
           )}
         </div>
       </div>
+
+      {/* Fullscreen Video Modal */}
+      <FullscreenVideoModal
+        isOpen={modalManager.isOpen}
+        onClose={modalManager.closeModal}
+        videoData={modalManager.videoData}
+      />
     </div>
   );
 };
