@@ -271,7 +271,9 @@ const GolfCourseEditor: React.FC<GolfCourseEditorProps> = ({ course, isCreating,
         title: "Success",
         description: isCreating ? "Golf course created successfully" : "Golf course updated successfully",
       });
+      // Force refetch of golf courses data
       queryClient.invalidateQueries({ queryKey: ['admin-golf-courses'] });
+      queryClient.refetchQueries({ queryKey: ['admin-golf-courses'] });
       onClose();
     },
     onError: (error: any) => {

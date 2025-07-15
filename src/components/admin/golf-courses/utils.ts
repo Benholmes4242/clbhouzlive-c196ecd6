@@ -34,6 +34,7 @@ export const filterCoursesByRegion = (
     filtered = filtered.filter(course =>
       course.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       course.country.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (course.sub_country && course.sub_country.toLowerCase().includes(searchTerm.toLowerCase())) ||
       (course.region && course.region.toLowerCase().includes(searchTerm.toLowerCase()))
     );
   }
