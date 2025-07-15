@@ -48,8 +48,8 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
     <div className="relative w-full h-full overflow-hidden bg-muted">
       {/* Loading Skeleton */}
       {(isLoading || imageLoading) && (
-        <div className="absolute inset-0 bg-muted flex items-center justify-center z-10">
-          <div className="w-8 h-8 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin"></div>
+        <div className="absolute inset-0 bg-muted/20 flex items-center justify-center z-10">
+          <div className="w-8 h-8 border border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin"></div>
         </div>
       )}
       
