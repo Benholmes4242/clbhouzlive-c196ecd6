@@ -70,10 +70,20 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
   });
 
   useEffect(() => {
+    console.log('🔍 MobileUserPost: useEffect triggered', {
+      isInView,
+      currentMediaIndex,
+      mediaType: post.post_media?.[currentMediaIndex]?.media_type,
+      postId: post.id,
+      isHovered
+    });
+    
     // For mobile, just use intersection observer for autoplay
     if (isInView && post.post_media?.[currentMediaIndex]?.media_type === 'video') {
+      console.log('📱 MobileUserPost: Setting isHovered to true for video', post.id);
       setIsHovered(true);
     } else if (!isInView) {
+      console.log('📱 MobileUserPost: Setting isHovered to false (not in view)', post.id);
       setIsHovered(false);
     }
     // Don't reset isHovered when still in view on mobile

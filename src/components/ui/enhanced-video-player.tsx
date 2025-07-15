@@ -48,6 +48,18 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
   const [buffered, setBuffered] = useState(0);
   const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Debug logging for state changes
+  useEffect(() => {
+    console.log('🎬 EnhancedVideoPlayer: State change', {
+      src,
+      autoplay,
+      isLoading,
+      isPlaying,
+      error,
+      timestamp: Date.now()
+    });
+  }, [src, autoplay, isLoading, isPlaying, error]);
+
   // Load HLS.js if needed
   useEffect(() => {
     if (enableHLS && !window.Hls) {
@@ -65,8 +77,12 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
   }, [src, enableHLS]);
 
   const initializeVideo = () => {
+    console.log('🎬 EnhancedVideoPlayer: Initializing video', { src, enableHLS });
     const video = videoRef.current;
-    if (!video) return;
+    if (!video) {
+      console.log('❌ EnhancedVideoPlayer: No video ref found');
+      return;
+    }
 
     // Clear any existing HLS instance
     if (hlsRef.current) {
@@ -162,11 +178,13 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
     if (!video) return;
 
     const handlePlay = () => {
+      console.log('▶️ EnhancedVideoPlayer: Video play event', { src, timestamp: Date.now() });
       setIsPlaying(true);
       onPlay?.();
     };
 
     const handlePause = () => {
+      console.log('⏸️ EnhancedVideoPlayer: Video pause event', { src, timestamp: Date.now() });
       setIsPlaying(false);
       onPause?.();
     };
@@ -176,16 +194,19 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
       // Only show for initial load
     };
     const handleCanPlay = () => {
+      console.log('🟢 EnhancedVideoPlayer: Video can play', { src, timestamp: Date.now() });
       if (loadingTimeoutRef.current) {
         clearTimeout(loadingTimeoutRef.current);
       }
       setIsLoading(false);
     };
     const handleWaiting = () => {
+      console.log('⏳ EnhancedVideoPlayer: Video waiting/buffering', { src, timestamp: Date.now() });
       // Don't show loading spinner for brief buffering
       // Only show for longer waits
     };
     const handlePlaying = () => {
+      console.log('🎵 EnhancedVideoPlayer: Video playing', { src, timestamp: Date.now() });
       if (loadingTimeoutRef.current) {
         clearTimeout(loadingTimeoutRef.current);
       }
