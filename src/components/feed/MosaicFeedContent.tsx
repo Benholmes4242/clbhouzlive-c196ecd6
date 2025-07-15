@@ -32,10 +32,36 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
   const navigate = useNavigate();
   const modalManager = useFullscreenVideoModal();
   const loadingTriggerRef = useRef<HTMLDivElement>(null);
+  const isLoadingRef = useRef(false);
 
-  // Infinite scroll logic
+  // Stable throttle function outside component
+  const throttleRef = useRef<((func: () => void, delay: number) => () => void) | null>(null);
+  
+  if (!throttleRef.current) {
+    throttleRef.current = (func: () => void, delay: number) => {
+      let timeoutId: NodeJS.Timeout;
+      let lastExecTime = 0;
+      
+      return () => {
+        const currentTime = Date.now();
+        
+        if (currentTime - lastExecTime > delay) {
+          func();
+          lastExecTime = currentTime;
+        } else {
+          clearTimeout(timeoutId);
+          timeoutId = setTimeout(() => {
+            func();
+            lastExecTime = Date.now();
+          }, delay - (currentTime - lastExecTime));
+        }
+      };
+    };
+  }
+
+  // Infinite scroll logic with stable implementation
   const handleInfiniteScroll = useCallback(() => {
-    if (isLoadingMore || !hasMore) return;
+    if (isLoadingRef.current || !hasMore) return;
 
     const scrollTop = window.scrollY;
     const windowHeight = window.innerHeight;
@@ -45,40 +71,27 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
     const triggerPoint = documentHeight * 0.85;
     
     if (scrollTop + windowHeight >= triggerPoint) {
-      loadMorePosts();
+      isLoadingRef.current = true;
+      loadMorePosts().finally(() => {
+        isLoadingRef.current = false;
+      });
     }
-  }, [isLoadingMore, hasMore, loadMorePosts]);
+  }, [hasMore, loadMorePosts]);
 
-  // Set up infinite scroll listener
+  // Update loading ref when isLoadingMore changes
   useEffect(() => {
-    const throttledScrollHandler = throttle(handleInfiniteScroll, 100);
-    window.addEventListener('scroll', throttledScrollHandler);
+    isLoadingRef.current = isLoadingMore;
+  }, [isLoadingMore]);
+
+  // Set up infinite scroll listener with stable handler
+  useEffect(() => {
+    const throttledHandler = throttleRef.current!(handleInfiniteScroll, 100);
+    window.addEventListener('scroll', throttledHandler);
     
     return () => {
-      window.removeEventListener('scroll', throttledScrollHandler);
+      window.removeEventListener('scroll', throttledHandler);
     };
   }, [handleInfiniteScroll]);
-
-  // Throttle function to prevent excessive scroll event calls
-  const throttle = (func: Function, delay: number) => {
-    let timeoutId: NodeJS.Timeout;
-    let lastExecTime = 0;
-    
-    return (...args: any[]) => {
-      const currentTime = Date.now();
-      
-      if (currentTime - lastExecTime > delay) {
-        func(...args);
-        lastExecTime = currentTime;
-      } else {
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => {
-          func(...args);
-          lastExecTime = Date.now();
-        }, delay - (currentTime - lastExecTime));
-      }
-    };
-  };
 
   // Determine if a card should autoplay based on the specified pattern
   const shouldAutoplayCard = (index: number): boolean => {
