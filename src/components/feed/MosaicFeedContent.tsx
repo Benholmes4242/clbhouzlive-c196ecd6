@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
-import { Heart, MessageCircle, ChevronLeft, ChevronRight, Maximize2, Play } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Maximize2, Play } from 'lucide-react';
 import { PiHandsClapping, PiShareFat } from 'react-icons/pi';
 import { GoCommentDiscussion } from 'react-icons/go';
 import OptimisticPostCard from '../posts/OptimisticPostCard';
-import FullscreenMediaModal from '@/components/ui/fullscreen-media-modal';
-import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import { useNavigate } from 'react-router-dom';
 import { VideoPost, UserPostWithType } from './types';
 import { useVideoPlaybackManager, useFullscreenVideoModal } from '@/hooks/useVideoPlaybackManager';
@@ -155,13 +153,13 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
                   <div key={index} className="flex-shrink-0 w-full h-full">
                      {mediaItem.media_type === 'video' ? (
                        <video
-                         ref={index === currentIndex ? videoRef : undefined}
+                         ref={index === currentIndex && hasVideo ? videoRef : undefined}
                          src={mediaItem.media_url}
                          className="w-full h-full object-cover rounded-xl"
                          muted={true}
                          loop={true}
                          playsInline
-                         preload="metadata"
+                         preload={index === currentIndex ? "metadata" : "none"}
                        />
                      ) : (
                        <img
@@ -179,22 +177,22 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
               {media.length > 1 && (
                 <>
                   <button
-                    onClick={() => handlePrevMedia(item.id, media.length)}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={(e) => { e.stopPropagation(); handlePrevMedia(item.id, media.length); }}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity z-10"
                     disabled={currentIndex === 0}
                   >
                     <ChevronLeft className="w-4 h-4" />
                   </button>
                   <button
-                    onClick={() => handleNextMedia(item.id, media.length)}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={(e) => { e.stopPropagation(); handleNextMedia(item.id, media.length); }}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity z-10"
                     disabled={currentIndex === media.length - 1}
                   >
                     <ChevronRight className="w-4 h-4" />
                   </button>
                   
                   {/* Dots Indicator */}
-                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-1">
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-1 z-10">
                     {media.map((_, index) => (
                       <div
                         key={index}
@@ -211,13 +209,14 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
             // Single media
             <div className="w-full h-full">
               {media[0]?.media_type === 'video' ? (
-                 <EnhancedVideoPlayer
+                 <video
+                   ref={videoRef}
                    src={media[0].media_url}
                    className="w-full h-full object-cover rounded-xl"
-                   autoplay={true}
                    muted={true}
                    loop={true}
-                   enableHLS={true}
+                   playsInline
+                   preload="metadata"
                  />
               ) : (
                  <img
