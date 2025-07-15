@@ -3,10 +3,9 @@ import { ChevronLeft, ChevronRight, Maximize2, Play } from 'lucide-react';
 import { PiHandsClapping, PiShareFat } from 'react-icons/pi';
 import { GoCommentDiscussion } from 'react-icons/go';
 import OptimisticPostCard from '../posts/OptimisticPostCard';
-import FeedVideoPlayer from './FeedVideoPlayer';
 import { useNavigate } from 'react-router-dom';
 import { VideoPost, UserPostWithType } from './types';
-import { useVideoPlaybackManager, useFullscreenVideoModal } from '@/hooks/useVideoPlaybackManager';
+import { useOptimizedVideoPlayback, useFullscreenVideoModal } from '@/hooks/useOptimizedVideoPlayback';
 import FullscreenVideoModal from '@/components/ui/fullscreen-video-modal';
 
 interface MosaicFeedContentProps {
@@ -98,7 +97,7 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
     
     // Video playback management for feed section
     const hasVideo = media.some(m => m.media_type === 'video');
-    const { videoRef, containerRef, isPlaying, shouldShowPlayIcon, togglePlayPause } = useVideoPlaybackManager({
+    const { videoRef, containerRef, isPlaying, shouldShowPlayIcon, togglePlayPause } = useOptimizedVideoPlayback({
       section: 'feed',
       videoId: item.id,
       autoplayAllowed: hasVideo,
@@ -153,13 +152,13 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
                 {media.map((mediaItem, index) => (
                   <div key={index} className="flex-shrink-0 w-full h-full">
                      {mediaItem.media_type === 'video' ? (
-                       <FeedVideoPlayer
+                       <video
                          ref={index === currentIndex && hasVideo ? videoRef : undefined}
                          src={mediaItem.media_url}
                          className="w-full h-full object-cover rounded-xl"
                          muted={true}
                          loop={true}
-                         playsInline
+                         playsInline={true}
                          preload={index === currentIndex ? "metadata" : "none"}
                          onClick={handleTileClick}
                        />
@@ -211,13 +210,13 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
             // Single media
             <div className="w-full h-full">
                {media[0]?.media_type === 'video' ? (
-                 <FeedVideoPlayer
+                 <video
                    ref={videoRef}
                    src={media[0].media_url}
                    className="w-full h-full object-cover rounded-xl"
                    muted={true}
                    loop={true}
-                   playsInline
+                   playsInline={true}
                    preload="metadata"
                    onClick={handleTileClick}
                  />

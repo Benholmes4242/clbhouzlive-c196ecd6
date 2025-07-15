@@ -7,7 +7,7 @@ import { HiOutlineArrowSmLeft, HiOutlineArrowSmRight } from 'react-icons/hi';
 import { useSwipeable } from 'react-swipeable';
 import { useNavigate } from 'react-router-dom';
 import { useTrendingCard } from '@/hooks/useTrendingCard';
-import { useVideoPlaybackManager, useFullscreenVideoModal } from '@/hooks/useVideoPlaybackManager';
+import { useOptimizedVideoPlayback, useFullscreenVideoModal } from '@/hooks/useOptimizedVideoPlayback';
 import FullscreenVideoModal from '@/components/ui/fullscreen-video-modal';
 
 const TrendingCard = () => {
@@ -52,7 +52,7 @@ const TrendingCard = () => {
     const isMobile = window.innerWidth < 768;
     
     // Video playback management
-    const { videoRef, containerRef, isPlaying, shouldShowPlayIcon, togglePlayPause } = useVideoPlaybackManager({
+    const { videoRef, containerRef, isPlaying, shouldShowPlayIcon, togglePlayPause } = useOptimizedVideoPlayback({
       section: 'trending',
       videoId: post.id,
       autoplayAllowed: isFirstCard || isMobile, // First card or mobile autoplays
@@ -110,16 +110,15 @@ const TrendingCard = () => {
 
         {/* Single Video */}
         <div className="relative w-full h-full">
-          <EnhancedVideoPlayer
+          <video
+            ref={videoRef}
             src={firstVideo.media_url}
             className="w-full h-full object-cover"
-            autoplay={isFirstCard || isMobile}
             muted={true}
             loop={true}
-            enableHLS={true}
+            playsInline={true}
+            preload="metadata"
             onClick={handleVideoClick}
-            onPlay={() => {}}
-            onPause={() => {}}
           />
           
           {/* Overlay with content */}

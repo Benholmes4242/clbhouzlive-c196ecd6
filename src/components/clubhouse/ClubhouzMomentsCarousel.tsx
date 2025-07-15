@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useClubhouseContent } from '@/hooks/useClubhouseContent';
 import { useCarouselNavigation } from '@/hooks/useCarouselNavigation';
-import { useFullscreenVideoModal } from '@/hooks/useVideoPlaybackManager';
+import { useFullscreenVideoModal } from '@/hooks/useOptimizedVideoPlayback';
 import FullscreenVideoModal from '@/components/ui/fullscreen-video-modal';
 import MomentCard from './MomentCard';
 
