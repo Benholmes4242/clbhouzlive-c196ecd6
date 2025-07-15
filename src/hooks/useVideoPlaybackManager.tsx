@@ -26,7 +26,6 @@ class VideoPlaybackManager {
     trending: 1,  // Only first video autoplays
     feed: 2       // Max 2 videos autoplay in feed
   };
-  private feedAutoplayVideos: Set<string> = new Set(); // Track current autoplaying videos in feed
 
   subscribe(listener: (videos: Map<string, VideoState>) => void) {
     this.listeners.add(listener);
@@ -44,67 +43,10 @@ class VideoPlaybackManager {
 
   unregisterVideo(videoId: string) {
     this.videos.delete(videoId);
-    this.feedAutoplayVideos.delete(videoId);
-    this.notify();
-  }
-
-  // Check if a video should autoplay based on its position in feed
-  shouldAutoplayFeedVideo(videoId: string, inViewVideos: Set<string>): boolean {
-    const feedVideos = Array.from(this.videos.values())
-      .filter(v => v.section === 'feed')
-      .sort((a, b) => a.priority - b.priority); // Sort by priority (creation time)
-    
-    const videoIndex = feedVideos.findIndex(v => v.id === videoId);
-    
-    // Only autoplay first card (index 0) and 8th card (index 7) on desktop
-    const shouldAutoplay = videoIndex === 0 || videoIndex === 7;
-    
-    return shouldAutoplay && inViewVideos.has(videoId);
-  }
-
-  // Update autoplay selection for feed section
-  updateFeedAutoplay(inViewVideos: Set<string>) {
-    const feedVideos = Array.from(this.videos.values())
-      .filter(v => v.section === 'feed')
-      .sort((a, b) => a.priority - b.priority);
-
-    feedVideos.forEach((video, index) => {
-      const shouldAutoplay = (index === 0 || index === 7) && inViewVideos.has(video.id);
-      const isCurrentlyPlaying = video.isPlaying && video.isAutoplay;
-      
-      if (shouldAutoplay && !isCurrentlyPlaying) {
-        // Start autoplay
-        if (video.element) {
-          video.element.play().catch(console.error);
-          this.videos.set(video.id, { ...video, isPlaying: true, isAutoplay: true });
-          this.feedAutoplayVideos.add(video.id);
-          console.log(`🎬 Starting autoplay for feed video at position ${index + 1}: ${video.id}`);
-        }
-      } else if (!shouldAutoplay && isCurrentlyPlaying) {
-        // Stop autoplay
-        if (video.element) {
-          video.element.pause();
-          this.videos.set(video.id, { ...video, isPlaying: false });
-          this.feedAutoplayVideos.delete(video.id);
-          console.log(`⏸️ Stopping autoplay for feed video at position ${index + 1}: ${video.id}`);
-        }
-      }
-    });
-    
     this.notify();
   }
 
   canAutoplay(section: 'discover' | 'trending' | 'feed', videoId: string): boolean {
-    if (section === 'feed') {
-      // For feed section, use position-based logic
-      const feedVideos = Array.from(this.videos.values())
-        .filter(v => v.section === 'feed')
-        .sort((a, b) => a.priority - b.priority);
-      
-      const videoIndex = feedVideos.findIndex(v => v.id === videoId);
-      return videoIndex === 0 || videoIndex === 7;
-    }
-    
     const sectionVideos = Array.from(this.videos.values()).filter(v => v.section === section);
     const autoplayingVideos = sectionVideos.filter(v => v.isPlaying && v.isAutoplay);
     
@@ -133,28 +75,22 @@ class VideoPlaybackManager {
       });
     }
 
-    // For feed section, handle manual clicks differently
-    if (section === 'feed' && !isAutoplay) {
-      // If user manually clicks play and we already have 2 autoplaying videos, pause one
-      if (this.feedAutoplayVideos.size >= 2) {
-        const oldestAutoplayVideo = Array.from(this.feedAutoplayVideos)[0];
-        const oldestVideo = this.videos.get(oldestAutoplayVideo);
-        if (oldestVideo) {
-          oldestVideo.element?.pause();
-          this.videos.set(oldestAutoplayVideo, { ...oldestVideo, isPlaying: false });
-          this.feedAutoplayVideos.delete(oldestAutoplayVideo);
-        }
+    // For feed section, pause oldest video if we exceed limit
+    if (section === 'feed' && isAutoplay) {
+      const feedVideos = Array.from(this.videos.values()).filter(v => v.section === 'feed');
+      const autoplayingVideos = feedVideos.filter(v => v.isPlaying && v.isAutoplay);
+      
+      if (autoplayingVideos.length >= 2) {
+        // Pause the oldest autoplay video
+        const oldestVideo = autoplayingVideos.reduce((oldest, current) => 
+          current.priority < oldest.priority ? current : oldest
+        );
+        oldestVideo.element?.pause();
+        this.videos.set(oldestVideo.id, { ...oldestVideo, isPlaying: false });
       }
     }
 
-    // Update video state
     this.videos.set(videoId, { ...video, isPlaying: true, isAutoplay });
-    
-    // Track manually played feed videos
-    if (section === 'feed' && !isAutoplay) {
-      this.feedAutoplayVideos.add(videoId);
-    }
-    
     this.notify();
   }
 
@@ -163,12 +99,6 @@ class VideoPlaybackManager {
     if (!video) return;
 
     this.videos.set(videoId, { ...video, isPlaying: false });
-    
-    // Remove from feed autoplay tracking if it's a feed video
-    if (video.section === 'feed') {
-      this.feedAutoplayVideos.delete(videoId);
-    }
-    
     this.notify();
   }
 
@@ -189,9 +119,6 @@ class VideoPlaybackManager {
 
 // Global manager instance
 const globalVideoManager = new VideoPlaybackManager();
-
-// Track in-view videos for feed section
-const feedInViewVideos = new Set<string>();
 
 export const useVideoPlaybackManager = ({ 
   section, 
@@ -228,10 +155,6 @@ export const useVideoPlaybackManager = ({
     });
 
     return () => {
-      // Clean up feed view tracking
-      if (section === 'feed') {
-        feedInViewVideos.delete(videoId);
-      }
       globalVideoManager.unregisterVideo(videoId);
       unsubscribe();
     };
@@ -267,33 +190,18 @@ export const useVideoPlaybackManager = ({
   useEffect(() => {
     if (!videoRef.current || !videoState) return;
 
-    if (section === 'feed') {
-      // For feed section, use centralized autoplay management
-      if (isInView && autoplayAllowed) {
-        feedInViewVideos.add(videoId);
-        console.log(`📺 Feed video ${videoId} entered view`);
-      } else {
-        feedInViewVideos.delete(videoId);
-        console.log(`📺 Feed video ${videoId} left view`);
+    if (isInView && autoplayAllowed) {
+      // Check if we can autoplay this video and it's not already playing
+      if (!videoState.isPlaying && globalVideoManager.canAutoplay(section, videoId)) {
+        console.log(`🎬 Starting autoplay for ${section} video: ${videoId}`);
+        videoRef.current.play().catch(console.error);
+        globalVideoManager.playVideo(videoId, true);
       }
-      
-      // Update feed autoplay selection
-      globalVideoManager.updateFeedAutoplay(feedInViewVideos);
-    } else {
-      // For other sections, use original logic
-      if (isInView && autoplayAllowed) {
-        // Check if we can autoplay this video and it's not already playing
-        if (!videoState.isPlaying && globalVideoManager.canAutoplay(section, videoId)) {
-          console.log(`🎬 Starting autoplay for ${section} video: ${videoId}`);
-          videoRef.current.play().catch(console.error);
-          globalVideoManager.playVideo(videoId, true);
-        }
-      } else if (!isInView && videoState.isPlaying && videoState.isAutoplay) {
-        // Pause autoplay videos when out of view
-        console.log(`⏸️ Pausing autoplay for ${section} video: ${videoId}`);
-        videoRef.current?.pause();
-        globalVideoManager.pauseVideo(videoId);
-      }
+    } else if (!isInView && videoState.isPlaying && videoState.isAutoplay) {
+      // Pause autoplay videos when out of view
+      console.log(`⏸️ Pausing autoplay for ${section} video: ${videoId}`);
+      videoRef.current?.pause();
+      globalVideoManager.pauseVideo(videoId);
     }
   }, [isInView, autoplayAllowed, section, videoId, videoState?.isPlaying]);
 

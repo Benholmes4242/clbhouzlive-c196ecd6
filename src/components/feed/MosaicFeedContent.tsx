@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { ChevronLeft, ChevronRight, Maximize2 } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Maximize2, Play } from 'lucide-react';
 import { PiHandsClapping, PiShareFat } from 'react-icons/pi';
 import { GoCommentDiscussion } from 'react-icons/go';
 import OptimisticPostCard from '../posts/OptimisticPostCard';
+import FeedVideoPlayer from './FeedVideoPlayer';
 import { useNavigate } from 'react-router-dom';
 import { VideoPost, UserPostWithType } from './types';
-import { useFullscreenVideoModal } from '@/hooks/useVideoPlaybackManager';
+import { useVideoPlaybackManager, useFullscreenVideoModal } from '@/hooks/useVideoPlaybackManager';
 import FullscreenVideoModal from '@/components/ui/fullscreen-video-modal';
 
 interface MosaicFeedContentProps {
@@ -97,6 +98,12 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
     
     // Video playback management for feed section
     const hasVideo = media.some(m => m.media_type === 'video');
+    const { videoRef, containerRef, isPlaying, shouldShowPlayIcon, togglePlayPause } = useVideoPlaybackManager({
+      section: 'feed',
+      videoId: item.id,
+      autoplayAllowed: hasVideo,
+      priority: Date.now() - index // Earlier posts have higher priority
+    });
 
     // Get user info
     const username = isUserPost ? (item as UserPostWithType).user.username : (item as VideoPost).user.username;
@@ -127,8 +134,13 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
       handleMaximizeClick(item);
     };
 
+    const handlePlayButtonClick = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      togglePlayPause();
+    };
+
     return (
-      <div key={item.id} className="mosaic-tile group relative overflow-hidden rounded-xl bg-card">
+      <div key={item.id} ref={containerRef} className="mosaic-tile group relative overflow-hidden rounded-xl bg-card">
         {/* Media Container */}
         <div className={`relative w-full overflow-hidden ${aspectRatio}`} onClick={handleTileClick}>
           {hasMultipleMedia ? (
@@ -141,11 +153,12 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
                 {media.map((mediaItem, index) => (
                   <div key={index} className="flex-shrink-0 w-full h-full">
                      {mediaItem.media_type === 'video' ? (
-                       <video
+                       <FeedVideoPlayer
+                         ref={index === currentIndex && hasVideo ? videoRef : undefined}
                          src={mediaItem.media_url}
                          className="w-full h-full object-cover rounded-xl"
-                         muted
-                         loop
+                         muted={true}
+                         loop={true}
                          playsInline
                          preload={index === currentIndex ? "metadata" : "none"}
                          onClick={handleTileClick}
@@ -198,11 +211,12 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
             // Single media
             <div className="w-full h-full">
                {media[0]?.media_type === 'video' ? (
-                 <video
+                 <FeedVideoPlayer
+                   ref={videoRef}
                    src={media[0].media_url}
                    className="w-full h-full object-cover rounded-xl"
-                   muted
-                   loop
+                   muted={true}
+                   loop={true}
                    playsInline
                    preload="metadata"
                    onClick={handleTileClick}
@@ -218,6 +232,17 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
             </div>
           )}
           
+          {/* Play button - top left (shows when video is paused) */}
+          {hasVideo && shouldShowPlayIcon && (
+            <div className="absolute top-2 left-2 z-20">
+              <button 
+                onClick={handlePlayButtonClick}
+                className="rounded-full p-2 text-white bg-black/50 hover:bg-black/70 transition-colors"
+              >
+                <Play className="w-4 h-4" />
+              </button>
+            </div>
+          )}
 
           {/* Maximize button - top right */}
           <div className="absolute top-2 right-2 z-20">
