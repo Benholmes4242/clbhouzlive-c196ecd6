@@ -31,6 +31,7 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
 }) => {
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
+  const [debugInfo, setDebugInfo] = useState<string[]>([]);
   const { user } = useSupabaseSession();
   
   const { ref: containerRef, isInView } = useIntersectionObserver({
@@ -70,6 +71,9 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
   });
 
   useEffect(() => {
+    const now = new Date().toLocaleTimeString();
+    const debugMsg = `${now}: isInView=${isInView}, mediaType=${post.post_media?.[currentMediaIndex]?.media_type}, isHovered=${isHovered}`;
+    
     console.log('🔍 MobileUserPost: useEffect triggered', {
       isInView,
       currentMediaIndex,
@@ -77,6 +81,8 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
       postId: post.id,
       isHovered
     });
+    
+    setDebugInfo(prev => [...prev.slice(-4), debugMsg]); // Keep last 5 debug messages
     
     // For mobile, just use intersection observer for autoplay
     if (isInView && post.post_media?.[currentMediaIndex]?.media_type === 'video') {
@@ -213,8 +219,23 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
           >
             <Share className="h-5 w-5" />
           </Button>
-        </div>
-      </div>
+         </div>
+
+         {/* Debug Info Overlay - Only visible on mobile */}
+         {currentMedia.media_type === 'video' && (
+           <div className="absolute top-16 left-2 bg-black/80 text-white text-xs p-2 rounded max-w-[250px] z-30 font-mono">
+             <div className="font-bold mb-1">DEBUG INFO:</div>
+             <div>Post: {post.id.slice(-8)}</div>
+             <div>InView: {isInView ? 'YES' : 'NO'}</div>
+             <div>IsHovered: {isHovered ? 'YES' : 'NO'}</div>
+             <div>MediaType: {currentMedia.media_type}</div>
+             <div className="mt-1 text-yellow-300">Recent events:</div>
+             {debugInfo.slice(-3).map((info, idx) => (
+               <div key={idx} className="text-xs truncate">{info}</div>
+             ))}
+           </div>
+         )}
+       </div>
 
       {/* Caption & Comments Area */}
       {post.content && removeGolfCourseFromContent(post.content) && (
