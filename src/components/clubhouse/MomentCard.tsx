@@ -109,14 +109,16 @@ const MomentCard: React.FC<MomentCardProps> = ({ moment, currentUserId, modalMan
       {/* Media Container */}
       <div className="relative aspect-[3/4] bg-muted" onClick={handleVideoClick}>
         {videoMedia ? (
-          <video
-            ref={videoRef}
+          <EnhancedVideoPlayer
             src={mediaToShow.media_url}
             className="w-full h-full object-cover"
+            autoplay={true}
             muted={true}
             loop={true}
-            playsInline
-            preload="metadata"
+            enableHLS={true}
+            onClick={handleVideoClick}
+            onPlay={() => {}}
+            onPause={() => {}}
           />
         ) : (
           <img

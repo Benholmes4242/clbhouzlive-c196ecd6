@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, Maximize2, Play } from 'lucide-react';
 import { PiHandsClapping, PiShareFat } from 'react-icons/pi';
 import { GoCommentDiscussion } from 'react-icons/go';
 import OptimisticPostCard from '../posts/OptimisticPostCard';
+import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import { useNavigate } from 'react-router-dom';
 import { VideoPost, UserPostWithType } from './types';
 import { useVideoPlaybackManager, useFullscreenVideoModal } from '@/hooks/useVideoPlaybackManager';
@@ -152,14 +153,16 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
                 {media.map((mediaItem, index) => (
                   <div key={index} className="flex-shrink-0 w-full h-full">
                      {mediaItem.media_type === 'video' ? (
-                       <video
-                         ref={index === currentIndex && hasVideo ? videoRef : undefined}
+                       <EnhancedVideoPlayer
                          src={mediaItem.media_url}
                          className="w-full h-full object-cover rounded-xl"
+                         autoplay={index === currentIndex}
                          muted={true}
                          loop={true}
-                         playsInline
-                         preload={index === currentIndex ? "metadata" : "none"}
+                         enableHLS={true}
+                         onClick={handleTileClick}
+                         onPlay={() => {}}
+                         onPause={() => {}}
                        />
                      ) : (
                        <img
@@ -209,14 +212,16 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
             // Single media
             <div className="w-full h-full">
               {media[0]?.media_type === 'video' ? (
-                 <video
-                   ref={videoRef}
+                 <EnhancedVideoPlayer
                    src={media[0].media_url}
                    className="w-full h-full object-cover rounded-xl"
+                   autoplay={true}
                    muted={true}
                    loop={true}
-                   playsInline
-                   preload="metadata"
+                   enableHLS={true}
+                   onClick={handleTileClick}
+                   onPlay={() => {}}
+                   onPause={() => {}}
                  />
               ) : (
                  <img

@@ -110,14 +110,16 @@ const TrendingCard = () => {
 
         {/* Single Video */}
         <div className="relative w-full h-full">
-          <video
-            ref={videoRef}
+          <EnhancedVideoPlayer
             src={firstVideo.media_url}
             className="w-full h-full object-cover"
+            autoplay={isFirstCard || isMobile}
             muted={true}
             loop={true}
-            playsInline
-            preload="metadata"
+            enableHLS={true}
+            onClick={handleVideoClick}
+            onPlay={() => {}}
+            onPause={() => {}}
           />
           
           {/* Overlay with content */}
