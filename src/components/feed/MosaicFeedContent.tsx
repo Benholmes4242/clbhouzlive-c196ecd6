@@ -102,7 +102,7 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
       section: 'feed',
       videoId: item.id,
       autoplayAllowed: hasVideo,
-      priority: Date.now() - index // Earlier posts have higher priority
+      priority: -index // Earlier posts have higher priority (stable ordering)
     });
 
     // Get user info
