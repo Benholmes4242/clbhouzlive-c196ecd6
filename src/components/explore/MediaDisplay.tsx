@@ -47,9 +47,9 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
   return (
     <div className="relative w-full h-full overflow-hidden bg-muted">
       {/* Loading Skeleton */}
-      {isLoading && (
-        <div className="absolute inset-0 bg-muted animate-pulse flex items-center justify-center">
-          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+      {(isLoading || imageLoading) && (
+        <div className="absolute inset-0 bg-muted flex items-center justify-center z-10">
+          <div className="w-8 h-8 border-2 border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin"></div>
         </div>
       )}
       
