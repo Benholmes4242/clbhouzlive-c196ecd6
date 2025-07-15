@@ -7,7 +7,6 @@ import FeedVideoPlayer from './FeedVideoPlayer';
 import { useNavigate } from 'react-router-dom';
 import { VideoPost, UserPostWithType } from './types';
 import { useVideoPlaybackManager, useFullscreenVideoModal } from '@/hooks/useVideoPlaybackManager';
-import { useAutoplayPattern } from '@/hooks/useAutoplayPattern';
 import FullscreenVideoModal from '@/components/ui/fullscreen-video-modal';
 
 interface MosaicFeedContentProps {
@@ -26,19 +25,6 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
   const [currentMediaIndex, setCurrentMediaIndex] = useState<{[key: string]: number}>({});
   const navigate = useNavigate();
   const modalManager = useFullscreenVideoModal();
-  
-  // Check if mobile for autoplay pattern
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-  const { shouldAutoplay } = useAutoplayPattern({ isMobile });
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   const handlePrevMedia = (postId: string, mediaLength: number) => {
     setCurrentMediaIndex(prev => ({
@@ -112,7 +98,8 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
     
     // Video playback management for feed section
     const hasVideo = media.some(m => m.media_type === 'video');
-    const shouldAutoplayCard = shouldAutoplay(index);
+    // Only autoplay the first video (index 0)
+    const shouldAutoplayCard = index === 0;
     const { videoRef, containerRef, isPlaying, shouldShowPlayIcon, togglePlayPause } = useVideoPlaybackManager({
       section: 'feed',
       videoId: item.id,
