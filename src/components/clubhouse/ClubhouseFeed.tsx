@@ -105,25 +105,12 @@ const ClubhouseFeed = () => {
     const currentIndex = currentMediaIndex[post.id] || 0;
     const hasMultipleMedia = media.length > 1;
     
-    // Video playback management
-    const hasVideo = media.some((m: any) => m.media_type === 'video');
-    const { videoRef, containerRef, isPlaying, shouldShowPlayIcon, togglePlayPause } = useVideoPlaybackManager({
-      section: 'feed',
-      videoId: post.id,
-      autoplayAllowed: hasVideo,
-      priority: -index
-    });
-
     const aspectRatio = getCardType(index);
     const displayName = post.user.display_name || post.user.username;
+    const hasVideo = media.some((m: any) => m.media_type === 'video');
 
     const handleTileClick = () => {
       handleMaximizeClick(post);
-    };
-
-    const handlePlayButtonClick = (e: React.MouseEvent) => {
-      e.stopPropagation();
-      togglePlayPause();
     };
 
     const handleProfileClick = (e: React.MouseEvent) => {
@@ -134,7 +121,7 @@ const ClubhouseFeed = () => {
     };
 
     return (
-      <div key={post.id} ref={containerRef} className="mosaic-tile group relative overflow-hidden rounded-xl bg-card">
+      <div className="mosaic-tile group relative overflow-hidden rounded-xl bg-card">
         {/* Media Container */}
         <div className={`relative w-full overflow-hidden ${aspectRatio}`} onClick={handleTileClick}>
           {hasMultipleMedia ? (
@@ -147,15 +134,13 @@ const ClubhouseFeed = () => {
                 {media.map((mediaItem: any, index: number) => (
                   <div key={index} className="flex-shrink-0 w-full h-full">
                      {mediaItem.media_type === 'video' ? (
-                       <FeedVideoPlayer
-                         ref={index === currentIndex && hasVideo ? videoRef : undefined}
+                       <video
                          src={mediaItem.media_url}
                          className="w-full h-full object-cover rounded-xl"
-                         muted={true}
-                         loop={true}
+                         muted
+                         loop
                          playsInline
                          preload={index === currentIndex ? "metadata" : "none"}
-                         onClick={handleTileClick}
                        />
                      ) : (
                        <img
@@ -205,15 +190,13 @@ const ClubhouseFeed = () => {
             // Single media
             <div className="w-full h-full">
                {media[0]?.media_type === 'video' ? (
-                 <FeedVideoPlayer
-                   ref={videoRef}
+                 <video
                    src={media[0].media_url}
                    className="w-full h-full object-cover rounded-xl"
-                   muted={true}
-                   loop={true}
+                   muted
+                   loop
                    playsInline
                    preload="metadata"
-                   onClick={handleTileClick}
                  />
                ) : (
                  <img
@@ -223,18 +206,6 @@ const ClubhouseFeed = () => {
                    loading="lazy"
                  />
               )}
-            </div>
-          )}
-          
-          {/* Play button - top left (shows when video is paused) */}
-          {hasVideo && shouldShowPlayIcon && (
-            <div className="absolute top-2 left-2 z-20">
-              <button 
-                onClick={handlePlayButtonClick}
-                className="rounded-full p-2 text-white bg-black/50 hover:bg-black/70 transition-colors"
-              >
-                <Play className="w-4 h-4" />
-              </button>
             </div>
           )}
 
