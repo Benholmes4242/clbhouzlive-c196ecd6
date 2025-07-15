@@ -98,27 +98,30 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <ClubhouzMomentsCarousel />
-      
-      {/* Golf's most watched section */}
-      <div className="mx-auto" style={{ paddingLeft: '0.125rem', paddingRight: '0.125rem' }}>
-        <div className="flex items-center justify-between mb-4 px-4">
-          <h2 className="text-lg font-semibold">Golf's most watched</h2>
+      {/* Desktop container with max-width and padding */}
+      <div className="lg:max-w-6xl lg:mx-auto lg:px-8">
+        <ClubhouzMomentsCarousel />
+        
+        {/* Golf's most watched section */}
+        <div className="mx-auto" style={{ paddingLeft: '0.125rem', paddingRight: '0.125rem' }}>
+          <div className="flex items-center justify-between mb-4 px-4">
+            <h2 className="text-lg font-semibold">Golf's most watched</h2>
+          </div>
         </div>
-      </div>
-      
-      <TrendingCard />
-      
-      {/* Your clubhouse feed section */}
-      <div className="mx-auto" style={{ paddingLeft: '0.125rem', paddingRight: '0.125rem' }}>
-        <div className="flex items-center justify-between mb-4 px-4">
-          <h2 className="text-lg font-semibold">Your clubhouse feed</h2>
+        
+        <TrendingCard />
+        
+        {/* Your clubhouse feed section */}
+        <div className="mx-auto" style={{ paddingLeft: '0.125rem', paddingRight: '0.125rem' }}>
+          <div className="flex items-center justify-between mb-4 px-4">
+            <h2 className="text-lg font-semibold">Your clubhouse feed</h2>
+          </div>
         </div>
+        
+        <main>
+          <TrendingFeed />
+        </main>
       </div>
-      
-      <main>
-        <TrendingFeed />
-      </main>
       
       <BottomNavigation />
     </div>
