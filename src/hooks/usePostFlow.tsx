@@ -82,6 +82,7 @@ export const usePostFlow = () => {
 
   const openComposer = (file?: File, additionalFiles: File[] = []) => {
     console.log('usePostFlow: openComposer called with file:', file?.name, file?.type);
+    alert('OPEN COMPOSER FUNCTION CALLED!');
     if (file) {
       console.log('usePostFlow openComposer called with file:', file.name, file.type);
       console.log('Additional files count:', additionalFiles.length);
@@ -122,6 +123,7 @@ export const usePostFlow = () => {
       console.log('usePostFlow - Opening composer modal now, isComposerOpen will be set to true');
       setIsComposerOpen(true);
       console.log('usePostFlow - isComposerOpen set to true');
+      alert('MODAL STATE SET TO TRUE!');
     }, 100);
   };
 

@@ -25,17 +25,22 @@ export const usePostSubmissionHandlers = (
     console.log('usePostSubmissionHandlers: onTabClick called with:', tab);
     if (tab.isAction && tab.id === 'post') {
       console.log('usePostSubmissionHandlers: Post tab detected, user:', user);
+      alert('POST ACTION DETECTED!');
+      
       if (!user) {
         console.log('usePostSubmissionHandlers: No user found, returning');
+        alert('NO USER FOUND!');
         return;
       }
       
       // Both mobile and desktop now use the new EnhancedCreateMomentModal
       console.log('usePostSubmissionHandlers: Opening composer...');
+      alert('CALLING OPEN COMPOSER!');
       setLocalSelectedTags([]);
       // Open composer directly without files - modal will handle file upload UI
       openComposer();
       console.log('usePostSubmissionHandlers: openComposer called');
+      alert('OPEN COMPOSER CALLED!');
     } else {
       console.log('usePostSubmissionHandlers: Not a post action, calling handleTabClick');
       handleTabClick(tab);
