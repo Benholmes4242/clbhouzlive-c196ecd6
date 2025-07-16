@@ -30,9 +30,9 @@ const TrendingCard = () => {
     return (
       <div className="px-1 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-          <div className="w-full aspect-[3/4] bg-muted animate-pulse rounded-none" />
-          <div className="w-full aspect-[3/4] bg-muted animate-pulse hidden md:block rounded-none" />
-          <div className="w-full aspect-[3/4] bg-muted animate-pulse hidden md:block rounded-none" />
+          <div className="w-full aspect-[3/4] bg-muted animate-pulse" style={{borderRadius: '0px'}} />
+          <div className="w-full aspect-[3/4] bg-muted animate-pulse hidden md:block" style={{borderRadius: '0px'}} />
+          <div className="w-full aspect-[3/4] bg-muted animate-pulse hidden md:block" style={{borderRadius: '0px'}} />
         </div>
       </div>
     );
@@ -87,7 +87,7 @@ const TrendingCard = () => {
     };
     
     return (
-      <div ref={containerRef} className="relative w-full aspect-[3/4] overflow-hidden bg-card group rounded-none" onClick={handleVideoClick}>
+      <div ref={containerRef} className="relative w-full aspect-[3/4] overflow-hidden bg-card group" style={{borderRadius: '0px'}} onClick={handleVideoClick}>
 
         {/* Trending Icon - top right */}
         <div className="absolute top-2 right-2 z-10">
@@ -109,7 +109,7 @@ const TrendingCard = () => {
         )}
 
         {/* Single Video */}
-        <div className="relative w-full h-full rounded-none">
+        <div className="relative w-full h-full" style={{borderRadius: '0px'}}>
           <EnhancedVideoPlayer
             src={firstVideo.media_url}
             className="w-full h-full object-cover rounded-none"
