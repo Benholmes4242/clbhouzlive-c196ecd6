@@ -54,7 +54,7 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, isFeature
           if (autoplayRef.current !== el) autoplayRef.current = el;
           if (swipeRef.current !== el) swipeRef.current = el;
         }}
-        className="relative group bg-background overflow-hidden h-full cursor-pointer border-0 rounded-lg"
+        className="relative group bg-background overflow-hidden h-full cursor-pointer border-0"
         onClick={handleMediaClick}
         onMouseEnter={handleCardMouseEnter}
         onMouseLeave={handleCardMouseLeave}
