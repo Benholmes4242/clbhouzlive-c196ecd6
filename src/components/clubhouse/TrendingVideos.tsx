@@ -138,7 +138,7 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                 
                 {/* User info */}
-                <div className="absolute bottom-6 left-3 right-3">
+                <div className="absolute bottom-8 left-3 right-3">
                   <div className="flex items-center gap-2">
                     <img
                       src={video.user?.avatar || '/placeholder.svg'}
