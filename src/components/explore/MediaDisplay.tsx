@@ -103,9 +103,9 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
               }}
               loading={currentIndex === 0 ? 'eager' : 'lazy'}
             />
-            {/* Video indicator in bottom left corner */}
-            <div className="absolute bottom-2 left-2 bg-black/60 rounded-full p-1.5">
-              <RxVideo className="w-4 h-4 text-white" />
+            {/* Video indicator in bottom right corner */}
+            <div className="absolute bottom-2 right-2">
+              <RxVideo className="w-4 h-4 text-white drop-shadow-lg" />
             </div>
           </div>
         )
