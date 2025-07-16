@@ -22,7 +22,7 @@ export const useNavigationHandlers = () => {
     user: any,
     openSnapModal: () => void
   ) => {
-    if (tab.isAction && tab.id === 'snap') {
+    if (tab.isAction && tab.id === 'post') {
       if (!user) return;
       openSnapModal();
     } else if (tab.path) {
