@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, memo, useMemo, useCallback } from 'react';
-import { Heart, MessageCircle, Share, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Heart, MessageCircle, Share, Play, Pause, Volume2, VolumeX, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatDistanceToNow } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
@@ -7,7 +7,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { supabase } from '@/integrations/supabase/client';
 import CoursePostBadge from '@/components/posts/CoursePostBadge';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
-import { useClubhouseAutoplay } from '@/hooks/useClubhouseAutoplay';
+import { useVideoAutoplay } from '@/hooks/useVideoAutoplay';
 import { useSwipeable } from 'react-swipeable';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -15,9 +15,9 @@ import { OptimizedAvatar } from '@/components/ui/optimized-avatar';
 import { getAvatarSize } from '@/utils/imageOptimization';
 import PostViewerModal from '@/components/posts/PostViewerModal';
 import { usePostViewer } from '@/hooks/usePostViewer';
-
+import { useVideoVisibility } from '@/hooks/useVideoVisibility';
 import { useVideoPlaybackManager } from '@/contexts/VideoPlaybackManager';
-
+import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import SmartMediaContainer from '@/components/ui/smart-media-container';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 
@@ -51,54 +51,50 @@ interface UserPostData {
 
 interface InstagramStylePostProps {
   post: UserPostData;
-  index: number;
   allUserPosts?: UserPostData[];
 }
 
-const InstagramStylePostComponent: React.FC<InstagramStylePostProps> = ({ post, index, allUserPosts = [] }) => {
+const InstagramStylePostComponent: React.FC<InstagramStylePostProps> = ({ post, allUserPosts = [] }) => {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const isMobile = useIsMobile();
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
+  const [isVideoMuted, setIsVideoMuted] = useState(true);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  
   const [showComments, setShowComments] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const { isGloballyMuted, toggleGlobalMute } = useGlobalAudio();
   const { registerVideo, unregisterVideo, pauseAllOtherVideos } = useVideoPlaybackManager();
   const { isOpen, currentPost, allUserPosts: viewerPosts, openPostViewer, closePostViewer } = usePostViewer({ source: 'clubhouse' });
   
-  // Use clubhouse autoplay logic - only every 3rd video autoplays
-  const { ref: autoplayRef, shouldAutoplay, isAutoplayEligible } = useClubhouseAutoplay({
-    index,
-    threshold: 0.5
-  });
+  // Add video autoplay functionality
+  const { ref: autoplayRef, shouldAutoplay, handleMouseEnter, handleMouseLeave } = useVideoAutoplay();
   
   // Memoize current media and other expensive calculations
   const currentMedia = useMemo(() => post.post_media[currentMediaIndex], [post.post_media, currentMediaIndex]);
   const displayName = useMemo(() => post.user.display_name || post.user.username || 'User', [post.user.display_name, post.user.username]);
   const timeAgo = useMemo(() => formatDistanceToNow(new Date(post.created_at), { addSuffix: true }), [post.created_at]);
-
-  // Handle autoplay logic for clubhouse videos  
-  useEffect(() => {
-    if (currentMedia?.media_type === 'video') {
-      // Listen for clubhouse video autoplay events
-      const handleAutoplayEvent = (event: CustomEvent) => {
-        const { activeVideoIndex } = event.detail;
-        
-        if (activeVideoIndex === index && shouldAutoplay && isAutoplayEligible) {
-          // This video should start playing
-          setIsVideoPlaying(true);
-        } else if (activeVideoIndex !== index) {
-          // Another video is playing, pause this one
-          setIsVideoPlaying(false);
-        }
-      };
-
-      window.addEventListener('clubhouse-video-autoplay', handleAutoplayEvent as EventListener);
-      
-      return () => {
-        window.removeEventListener('clubhouse-video-autoplay', handleAutoplayEvent as EventListener);
-      };
+  // Use video visibility hook for intersection observer
+  const { containerRef, isVisible } = useVideoVisibility({
+    threshold: 0.5,
+    videoRef,
+    shouldAutoplay: true,
+    globallyMuted: isGloballyMuted,
+    onEnterView: () => {
+      if (videoRef.current && currentMedia?.media_type === 'video') {
+        pauseAllOtherVideos(post.id);
+      }
     }
-  }, [index, shouldAutoplay, isAutoplayEligible, currentMedia?.media_type]);
+  });
+
+  // Register/unregister video with playback manager
+  useEffect(() => {
+    if (videoRef.current && currentMedia?.media_type === 'video') {
+      registerVideo(post.id, videoRef.current);
+      return () => unregisterVideo(post.id);
+    }
+  }, [post.id, currentMedia?.media_type, registerVideo, unregisterVideo]);
 
   // Swipe handlers for media navigation
   const swipeHandlers = useSwipeable({
@@ -138,6 +134,26 @@ const InstagramStylePostComponent: React.FC<InstagramStylePostProps> = ({ post, 
     openPostViewer(post, allUserPosts);
   };
 
+  const handleVideoToggle = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (videoRef.current) {
+      if (videoRef.current.paused) {
+        videoRef.current.play().catch(console.error);
+        setIsVideoPlaying(true);
+      } else {
+        videoRef.current.pause();
+        setIsVideoPlaying(false);
+      }
+    }
+  };
+
+  const handleMuteToggle = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (videoRef.current) {
+      videoRef.current.muted = !videoRef.current.muted;
+      setIsVideoMuted(videoRef.current.muted);
+    }
+  };
 
   const handlePrevMedia = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -154,8 +170,10 @@ const InstagramStylePostComponent: React.FC<InstagramStylePostProps> = ({ post, 
   return (
     <>
       <div 
-        ref={autoplayRef}
-        className="relative w-full bg-media-loading"
+        ref={containerRef}
+        className="relative w-full bg-media-loading" 
+        onMouseEnter={handleMouseEnter} 
+        onMouseLeave={handleMouseLeave}
       >
         {/* Media Container - Full width, responsive height */}
         <div 
@@ -166,17 +184,10 @@ const InstagramStylePostComponent: React.FC<InstagramStylePostProps> = ({ post, 
             <EnhancedVideoPlayer
               src={currentMedia.media_url}
               className="w-full h-full object-cover"
-              autoplay={shouldAutoplay && isAutoplayEligible}
+              autoplay={true}
               muted={true}
               loop={true}
               enableHLS={true}
-              onPlay={() => {
-                setIsVideoPlaying(true);
-                if (isAutoplayEligible) {
-                  pauseAllOtherVideos(post.id);
-                }
-              }}
-              onPause={() => setIsVideoPlaying(false)}
             />
           ) : (
             <SmartMediaContainer
@@ -221,6 +232,32 @@ const InstagramStylePostComponent: React.FC<InstagramStylePostProps> = ({ post, 
           </div>
 
 
+          {/* Video Controls */}
+          {currentMedia.media_type === 'video' && (
+            <>
+              {/* Play/Pause Center Button */}
+              <div className="absolute inset-0 flex items-center justify-center z-10">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="w-16 h-16 rounded-full bg-black/40 backdrop-blur-sm text-white hover:bg-black/60 transition-all"
+                  onClick={handleVideoToggle}
+                >
+                  {isVideoPlaying ? <Pause className="h-8 w-8" /> : <Play className="h-8 w-8 ml-1" />}
+                </Button>
+              </div>
+
+              {/* Mute/Unmute - Top Right Corner */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/40 backdrop-blur-sm text-white hover:bg-black/60 z-20"
+                onClick={handleMuteToggle}
+              >
+                {isVideoMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+              </Button>
+            </>
+          )}
 
           {/* Multi-image navigation - only show arrows on desktop */}
           {post.post_media.length > 1 && (
