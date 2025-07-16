@@ -30,9 +30,9 @@ const TrendingCard = () => {
     return (
       <div className="px-1 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-          <div className="w-full aspect-[3/4] bg-muted rounded-xl animate-pulse" />
-          <div className="w-full aspect-[3/4] bg-muted rounded-xl animate-pulse hidden md:block" />
-          <div className="w-full aspect-[3/4] bg-muted rounded-xl animate-pulse hidden md:block" />
+          <div className="w-full aspect-[3/4] bg-muted rounded-lg animate-pulse" />
+          <div className="w-full aspect-[3/4] bg-muted rounded-lg animate-pulse hidden md:block" />
+          <div className="w-full aspect-[3/4] bg-muted rounded-lg animate-pulse hidden md:block" />
         </div>
       </div>
     );
@@ -87,7 +87,7 @@ const TrendingCard = () => {
     };
     
     return (
-      <div ref={containerRef} className="relative w-full aspect-[3/4] rounded-xl overflow-hidden bg-card group" onClick={handleVideoClick}>
+      <div ref={containerRef} className="relative w-full aspect-[3/4] rounded-lg overflow-hidden bg-card group" onClick={handleVideoClick}>
 
         {/* Trending Icon - top right */}
         <div className="absolute top-2 right-2 z-10">

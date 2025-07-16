@@ -141,7 +141,7 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
     };
 
     return (
-      <div ref={containerRef} className="mosaic-tile group relative overflow-hidden rounded-xl bg-card">
+      <div ref={containerRef} className="mosaic-tile group relative overflow-hidden rounded-lg bg-card">
         {/* Media Container */}
         <div className={`relative w-full overflow-hidden ${aspectRatio}`} onClick={handleTileClick}>
           {hasMultipleMedia ? (
@@ -154,10 +154,10 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
                 {media.map((mediaItem, index) => (
                   <div key={index} className="flex-shrink-0 w-full h-full">
                      {mediaItem.media_type === 'video' ? (
-                       <FeedVideoPlayer
-                         ref={index === currentIndex && hasVideo ? videoRef : undefined}
-                         src={mediaItem.media_url}
-                         className="w-full h-full object-cover rounded-xl"
+                        <FeedVideoPlayer
+                          ref={index === currentIndex && hasVideo ? videoRef : undefined}
+                          src={mediaItem.media_url}
+                          className="w-full h-full object-cover rounded-lg"
                          muted={true}
                          loop={true}
                          playsInline
@@ -168,7 +168,7 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
                        <img
                          src={mediaItem.media_url}
                          alt="Golf content"
-                         className="w-full h-full object-cover rounded-xl"
+                          className="w-full h-full object-cover rounded-lg"
                          loading="lazy"
                        />
                      )}
@@ -215,7 +215,7 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
                  <FeedVideoPlayer
                    ref={videoRef}
                    src={media[0].media_url}
-                   className="w-full h-full object-cover rounded-xl"
+                    className="w-full h-full object-cover rounded-lg"
                    muted={true}
                    loop={true}
                    playsInline
@@ -226,7 +226,7 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
                  <img
                    src={media[0]?.media_url}
                    alt="Golf content"
-                   className="w-full h-full object-cover rounded-xl"
+                    className="w-full h-full object-cover rounded-lg"
                    loading="lazy"
                  />
               )}

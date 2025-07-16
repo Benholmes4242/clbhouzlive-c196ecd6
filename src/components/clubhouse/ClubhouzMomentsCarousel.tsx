@@ -47,7 +47,7 @@ const ClubhouzMomentsCarousel: React.FC = () => {
             <div className="flex gap-1 overflow-hidden">
               {Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} className="flex-shrink-0 w-52 md:w-60">
-                  <div className="bg-muted rounded-xl aspect-[3/4] animate-pulse" />
+                  <div className="bg-muted rounded-lg aspect-[3/4] animate-pulse" />
                 </div>
               ))}
             </div>

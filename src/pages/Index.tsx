@@ -120,7 +120,7 @@ const Index = () => {
                 <div className="flex gap-1 overflow-hidden">
                   {Array.from({ length: 4 }).map((_, i) => (
                     <div key={i} className="flex-shrink-0 w-52 md:w-60">
-                      <div className="bg-muted rounded-xl aspect-[3/4] animate-pulse" />
+                      <div className="bg-muted rounded-lg aspect-[3/4] animate-pulse" />
                     </div>
                   ))}
                 </div>
@@ -136,9 +136,9 @@ const Index = () => {
           
           <div className="px-1 mb-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-              <div className="w-full aspect-[3/4] bg-muted rounded-xl animate-pulse" />
-              <div className="w-full aspect-[3/4] bg-muted rounded-xl animate-pulse hidden md:block" />
-              <div className="w-full aspect-[3/4] bg-muted rounded-xl animate-pulse hidden md:block" />
+              <div className="w-full aspect-[3/4] bg-muted rounded-lg animate-pulse" />
+              <div className="w-full aspect-[3/4] bg-muted rounded-lg animate-pulse hidden md:block" />
+              <div className="w-full aspect-[3/4] bg-muted rounded-lg animate-pulse hidden md:block" />
             </div>
           </div>
         </div>

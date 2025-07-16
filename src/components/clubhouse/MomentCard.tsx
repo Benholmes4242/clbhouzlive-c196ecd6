@@ -107,7 +107,7 @@ const MomentCard: React.FC<MomentCardProps> = ({ moment, currentUserId, modalMan
   if (!mediaToShow) return null;
 
   return (
-    <div ref={containerRef} className="relative bg-card rounded-xl overflow-hidden shadow-sm border group">
+    <div ref={containerRef} className="relative bg-card rounded-lg overflow-hidden shadow-sm border group">
       {/* Media Container */}
       <div className="relative aspect-[3/4] bg-muted" onClick={handleVideoClick}>
         {videoMedia ? (
