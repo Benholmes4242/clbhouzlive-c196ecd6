@@ -45,7 +45,9 @@ const TrendingFeed = React.memo(() => {
     threshold: 0.1,
     rootMargin: '200px', // Trigger when 200px before element comes into view
     onIntersect: () => {
+      console.log('🔄 Infinite scroll triggered!', { hasMore, infiniteLoading, postsCount: sortedContent.length });
       if (hasMore && !infiniteLoading) {
+        console.log('📥 Loading more posts...');
         loadMore();
       }
     }
@@ -74,7 +76,7 @@ const TrendingFeed = React.memo(() => {
       {sortedContent.length > 0 && (
         <div 
           ref={loadMoreRef} 
-          className="h-16 flex items-center justify-center my-4"
+          className="h-16 flex items-center justify-center my-4 bg-muted/10 border border-dashed border-muted-foreground/20"
         >
           <div className="text-center">
             {hasMore ? (
@@ -85,7 +87,7 @@ const TrendingFeed = React.memo(() => {
                 </div>
               ) : (
                 <div className="text-muted-foreground text-xs opacity-50">
-                  Scroll for more posts
+                  Scroll trigger - Posts: {sortedContent.length}
                 </div>
               )
             ) : (

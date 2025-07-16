@@ -61,11 +61,15 @@ export const useInfiniteTrendingFeed = () => {
   });
 
   const loadMore = useCallback(async () => {
+    console.log('🚀 loadMore called', { loading, hasMore, connectedUserIds: connectedUserIds.length, currentOffset });
+    
     if (loading || !hasMore) {
+      console.log('❌ loadMore blocked:', { loading, hasMore });
       return;
     }
 
     setLoading(true);
+    console.log('📊 Starting to load more posts...');
 
     try {
       let directPosts = null;
@@ -178,11 +182,18 @@ export const useInfiniteTrendingFeed = () => {
       setAllPosts(prev => [...prev, ...formattedPosts]);
       setCurrentOffset(prev => prev + POSTS_PER_PAGE);
 
+      console.log('✅ Posts loaded successfully:', {
+        newPosts: formattedPosts.length,
+        totalPosts: allPosts.length + formattedPosts.length,
+        hasMore: formattedPosts.length >= POSTS_PER_PAGE
+      });
+
       if (formattedPosts.length < POSTS_PER_PAGE) {
+        console.log('🛑 No more posts available');
         setHasMore(false);
       }
     } catch (error) {
-      console.error('Error loading more posts:', error);
+      console.error('❌ Error loading more posts:', error);
       setHasMore(false);
     } finally {
       setLoading(false);
