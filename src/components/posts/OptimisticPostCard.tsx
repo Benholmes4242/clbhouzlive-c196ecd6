@@ -76,7 +76,7 @@ const OptimisticPostCard = ({ post, onRetry }: OptimisticPostCardProps) => {
             {post.post_media[0].media_type === 'video' ? (
               <video
                 src={post.post_media[0].media_url}
-                className="w-full aspect-video object-cover rounded-lg"
+                className="w-full aspect-video object-cover"
                 muted
                 controls={false}
               />
@@ -84,13 +84,13 @@ const OptimisticPostCard = ({ post, onRetry }: OptimisticPostCardProps) => {
               <img
                 src={post.post_media[0].media_url}
                 alt="Post content"
-                className="w-full aspect-square object-cover rounded-lg"
+                className="w-full aspect-square object-cover"
               />
             )}
             
             {/* Overlay for uploading state */}
             {(post.uploading || post.uploadFailed) && (
-              <div className="absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center">
+              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
                 <div className="text-center text-white">
                   {post.uploadFailed ? (
                     <div className="space-y-2">

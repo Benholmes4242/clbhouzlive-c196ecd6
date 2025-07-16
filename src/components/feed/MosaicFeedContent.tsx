@@ -140,7 +140,7 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
     };
 
     return (
-      <div ref={containerRef} className="mosaic-tile group relative overflow-hidden rounded-lg bg-card">
+      <div ref={containerRef} className="mosaic-tile group relative overflow-hidden bg-card">
         {/* Media Container */}
         <div className={`relative w-full overflow-hidden ${aspectRatio}`} onClick={handleTileClick}>
           {hasMultipleMedia ? (

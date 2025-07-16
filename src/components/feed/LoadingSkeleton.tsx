@@ -5,7 +5,7 @@ const LoadingSkeleton = () => {
   return (
     <div className="space-y-6 pb-20">
       {[1, 2].map((i) => (
-        <div key={i} className="bg-card rounded-lg border border-border p-4 space-y-4">
+        <div key={i} className="bg-card border border-border p-4 space-y-4">
           {/* User header */}
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-muted rounded-full animate-pulse" />

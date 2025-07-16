@@ -136,7 +136,7 @@ const CourseLeaderboardTab = ({ courseId }: CourseLeaderboardTabProps) => {
     return (
       <div className="space-y-4">
         {[1, 2, 3, 4, 5].map((i) => (
-          <div key={i} className="flex items-center gap-4 p-4 bg-card rounded-lg animate-pulse">
+          <div key={i} className="flex items-center gap-4 p-4 bg-card animate-pulse">
             <div className="w-8 h-8 bg-muted rounded" />
             <div className="w-10 h-10 bg-muted rounded-full" />
             <div className="flex-1 space-y-2">
@@ -176,7 +176,7 @@ const CourseLeaderboardTab = ({ courseId }: CourseLeaderboardTabProps) => {
       {/* Leaderboard */}
       <div className="space-y-3">
         {leaderboard.map((user, index) => (
-          <div key={user.user_id} className="flex items-center gap-4 p-4 bg-card rounded-lg border hover:shadow-md transition-shadow">
+          <div key={user.user_id} className="flex items-center gap-4 p-4 bg-card border hover:shadow-md transition-shadow">
             {/* Rank */}
             <div className="flex items-center justify-center w-8">
               {getRankIcon(index)}

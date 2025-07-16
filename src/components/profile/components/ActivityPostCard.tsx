@@ -39,7 +39,7 @@ const ActivityPostCard = ({ post, attributionText, onClick }: ActivityPostCardPr
   return (
     <div 
       ref={autoplayRef}
-      className="relative aspect-square bg-gray-100 cursor-pointer group overflow-hidden rounded-xl"
+      className="relative aspect-square bg-gray-100 cursor-pointer group overflow-hidden"
       onClick={handleClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -52,7 +52,7 @@ const ActivityPostCard = ({ post, attributionText, onClick }: ActivityPostCardPr
                autoplay={shouldAutoplay}
                muted={true}
                loop={true}
-               className="w-full h-full rounded-[inherit]"
+                className="w-full h-full"
                enableHLS={true}
                onClick={handleClick}
              />
@@ -60,7 +60,7 @@ const ActivityPostCard = ({ post, attributionText, onClick }: ActivityPostCardPr
             <HighQualityImage
               src={firstMedia.media_url}
               alt="Post media"
-              className="w-full h-full rounded-[inherit]"
+              className="w-full h-full"
               width={300}
               height={300}
               onError={(e) => {

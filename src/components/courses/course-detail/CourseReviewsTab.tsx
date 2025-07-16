@@ -181,7 +181,7 @@ const CourseReviewsTab = ({ courseId, courseName }: CourseReviewsTabProps) => {
             : reviewText;
 
           return (
-            <div key={review.id} className="bg-card rounded-lg p-6 border">
+            <div key={review.id} className="bg-card p-6 border">
               <div className="flex items-start gap-4">
                 {/* User Avatar */}
                 <OptimizedAvatar
