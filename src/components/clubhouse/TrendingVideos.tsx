@@ -193,7 +193,7 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
                     </button>
 
                     {/* Overlay dots indicator */}
-                    <div className="absolute bottom-1 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2 z-10">
                       {trendingVideos.map((_, dotIndex) => (
                         <button
                           key={dotIndex}
