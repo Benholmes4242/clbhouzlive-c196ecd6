@@ -198,7 +198,7 @@ export const useInfiniteTrendingFeed = () => {
     } finally {
       setLoading(false);
     }
-  }, [loading, hasMore, connectedUserIds, currentOffset, seenPostIds]);
+  }, [loading, hasMore, connectedUserIds, currentOffset, seenPostIds, allPosts.length]);
 
   // Reset when connected users change
   useEffect(() => {
@@ -208,12 +208,12 @@ export const useInfiniteTrendingFeed = () => {
     setSeenPostIds(new Set());
   }, [connectedUserIds]);
 
-  // Initial load
+  // Initial load - fixed to prevent infinite loop
   useEffect(() => {
-    if (allPosts.length === 0 && !loading) {
+    if (allPosts.length === 0 && !loading && hasMore) {
       loadMore();
     }
-  }, [allPosts.length, loading, loadMore]);
+  }, [allPosts.length, loading, hasMore, connectedUserIds]); // Use connectedUserIds instead of loadMore
 
   return {
     posts: allPosts,
