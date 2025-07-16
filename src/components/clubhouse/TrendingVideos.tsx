@@ -114,6 +114,7 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
                     onImageLoad={() => {}}
                     itemId={video.id}
                     currentIndex={actualIndex}
+                    loop={true}
                   />
                 ) : (
                   // Other cards - video without autoplay (shows first frame)
