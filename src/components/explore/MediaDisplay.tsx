@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import SmartMediaContainer from '@/components/ui/smart-media-container';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
-import { useAdvancedImageOptimization } from '@/hooks/useAdvancedImageOptimization';
 
 interface MediaItem {
   id: string;
@@ -41,11 +40,8 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
                       media.media_url === '[object Object]' ||
                       typeof media.media_url !== 'string';
 
-  // Only use image optimization for image media types, not videos
-  const { optimizedImage, isLoading: imageLoading } = useAdvancedImageOptimization(
-    media.media_type === 'image' ? media.media_url : '',
-    { quality: 80 }
-  );
+  // Image loading state
+  const [imageLoading, setImageLoading] = useState(false);
 
   return (
     <div className="relative w-full h-full overflow-hidden bg-muted">
@@ -72,7 +68,7 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
           media={[{
             id: media.id,
             type: 'image',
-            url: isInvalidSrc ? fallbackImage : (optimizedImage?.url || media.media_url),
+            url: isInvalidSrc ? fallbackImage : media.media_url,
             alt: itemTitle || 'Content'
           }]}
           className="w-full h-full"
