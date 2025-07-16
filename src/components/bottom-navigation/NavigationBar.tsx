@@ -25,11 +25,19 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick }) 
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
+                  if (tab.id === 'post') {
+                    // Visual feedback for mobile debugging
+                    alert('POST BUTTON CLICKED!');
+                  }
                   console.log('NavigationBar: BUTTON CLICKED!!! Tab:', tab.id, 'isAction:', tab.isAction);
                   console.log('NavigationBar: Click event:', e);
                   onTabClick(tab);
                 }}
                 onTouchStart={(e) => {
+                  if (tab.id === 'post') {
+                    // Visual feedback for mobile debugging
+                    alert('POST BUTTON TOUCHED!');
+                  }
                   console.log('NavigationBar: TOUCH START!!! Tab:', tab.id);
                 }}
                 onTouchEnd={(e) => {
