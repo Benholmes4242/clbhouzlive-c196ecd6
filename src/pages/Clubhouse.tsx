@@ -102,17 +102,19 @@ const Clubhouse = () => {
             />
           </div>
 
-          {/* Edge-to-edge Grid - no container padding */}
-          <ExploreGrid 
-            content={uniqueContent}
-            onLike={handleLike}
-            onFollow={handleFollow}
-            onMediaClick={handleMediaClick}
-            isLoading={loading}
-            hasMore={hasMore}
-            onLoadMore={loadMore}
-            activeFilter={activeFilter}
-          />
+          {/* Main Grid with Container */}
+          <div className="container">
+            <ExploreGrid 
+              content={uniqueContent}
+              onLike={handleLike}
+              onFollow={handleFollow}
+              onMediaClick={handleMediaClick}
+              isLoading={loading}
+              hasMore={hasMore}
+              onLoadMore={loadMore}
+              activeFilter={activeFilter}
+            />
+          </div>
         </main>
         
         <BottomNavigation />
