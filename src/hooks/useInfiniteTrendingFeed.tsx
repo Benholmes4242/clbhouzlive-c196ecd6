@@ -61,34 +61,42 @@ export const useInfiniteTrendingFeed = () => {
   });
 
   const loadMore = useCallback(async () => {
-    if (loading || !hasMore || connectedUserIds.length === 0) {
+    if (loading || !hasMore) {
       return;
     }
 
     setLoading(true);
 
     try {
-      // 1. Get direct posts from followed users
-      const { data: directPosts, error: directError } = await supabase
-        .from('posts')
-        .select(`
-          id,
-          content,
-          created_at,
-          user_id,
-          post_media!inner(id, media_type, media_url)
-        `)
-        .in('user_id', connectedUserIds)
-        .order('created_at', { ascending: false })
-        .range(currentOffset, currentOffset + Math.floor(POSTS_PER_PAGE * 0.7) - 1);
+      let directPosts = null;
+      let directError = null;
+
+      // 1. Get direct posts from followed users (if any connections exist)
+      if (connectedUserIds.length > 0) {
+        const response = await supabase
+          .from('posts')
+          .select(`
+            id,
+            content,
+            created_at,
+            user_id,
+            post_media!inner(id, media_type, media_url)
+          `)
+          .in('user_id', connectedUserIds)
+          .order('created_at', { ascending: false })
+          .range(currentOffset, currentOffset + Math.floor(POSTS_PER_PAGE * 0.7) - 1);
+        
+        directPosts = response.data;
+        directError = response.error;
+      }
 
       if (directError) {
         console.error('Error fetching direct posts:', directError);
       }
 
-      // 2. Get posts that followed users have engaged with (liked/commented)
-      // This is a simplified approach - in a real app you'd have likes/comments tables
-      const { data: engagementPosts, error: engagementError } = await supabase
+      // 2. Get public posts for discovery (especially when user has no connections)
+      const postsToFetch = connectedUserIds.length > 0 ? Math.floor(POSTS_PER_PAGE * 0.3) : POSTS_PER_PAGE;
+      const engagementQuery = supabase
         .from('posts')
         .select(`
           id,
@@ -97,9 +105,15 @@ export const useInfiniteTrendingFeed = () => {
           user_id,
           post_media!inner(id, media_type, media_url)
         `)
-        .not('user_id', 'in', `(${connectedUserIds.join(',')})`) // Posts NOT from followed users
         .order('created_at', { ascending: false })
-        .range(0, Math.floor(POSTS_PER_PAGE * 0.3) - 1); // Get some engagement-based posts
+        .range(currentOffset, currentOffset + postsToFetch - 1);
+
+      // If user has connections, exclude their posts from discovery
+      if (connectedUserIds.length > 0) {
+        engagementQuery.not('user_id', 'in', `(${connectedUserIds.join(',')})`);
+      }
+
+      const { data: engagementPosts, error: engagementError } = await engagementQuery;
 
       if (engagementError) {
         console.error('Error fetching engagement posts:', engagementError);
@@ -185,10 +199,10 @@ export const useInfiniteTrendingFeed = () => {
 
   // Initial load
   useEffect(() => {
-    if (connectedUserIds.length > 0 && allPosts.length === 0 && !loading) {
+    if (allPosts.length === 0 && !loading) {
       loadMore();
     }
-  }, [connectedUserIds, allPosts.length, loading, loadMore]);
+  }, [allPosts.length, loading, loadMore]);
 
   return {
     posts: allPosts,
