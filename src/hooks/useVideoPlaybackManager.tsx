@@ -177,13 +177,17 @@ export const useVideoPlaybackManager = ({
       const updatedState = { ...videoState, element: video };
       globalVideoManager.registerVideo(updatedState);
 
-      // Add event listeners to keep state synchronized
+      // Add event listeners to keep state synchronized - prevent circular updates
       const handlePlay = () => {
-        globalVideoManager.playVideo(videoId, videoState.isAutoplay);
+        if (!videoState.isPlaying) {
+          globalVideoManager.playVideo(videoId, videoState.isAutoplay);
+        }
       };
 
       const handlePause = () => {
-        globalVideoManager.pauseVideo(videoId);
+        if (videoState.isPlaying) {
+          globalVideoManager.pauseVideo(videoId);
+        }
       };
 
       video.addEventListener('play', handlePlay);

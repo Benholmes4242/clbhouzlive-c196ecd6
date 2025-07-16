@@ -61,15 +61,11 @@ export const useInfiniteTrendingFeed = () => {
   });
 
   const loadMore = useCallback(async () => {
-    console.log('🚀 loadMore called', { loading, hasMore, connectedUserIds: connectedUserIds.length });
-    
     if (loading || !hasMore || connectedUserIds.length === 0) {
-      console.log('❌ loadMore blocked:', { loading, hasMore, connectedUserIds: connectedUserIds.length });
       return;
     }
 
     setLoading(true);
-    console.log('📊 Starting to load more posts...');
 
     try {
       // 1. Get direct posts from followed users
@@ -168,18 +164,11 @@ export const useInfiniteTrendingFeed = () => {
       setAllPosts(prev => [...prev, ...formattedPosts]);
       setCurrentOffset(prev => prev + POSTS_PER_PAGE);
 
-      console.log('✅ Posts loaded successfully:', {
-        newPosts: formattedPosts.length,
-        totalPosts: allPosts.length + formattedPosts.length,
-        hasMore: formattedPosts.length >= POSTS_PER_PAGE
-      });
-
       if (formattedPosts.length < POSTS_PER_PAGE) {
-        console.log('🛑 No more posts available');
         setHasMore(false);
       }
     } catch (error) {
-      console.error('❌ Error loading more posts:', error);
+      console.error('Error loading more posts:', error);
       setHasMore(false);
     } finally {
       setLoading(false);
@@ -188,7 +177,6 @@ export const useInfiniteTrendingFeed = () => {
 
   // Reset when connected users change
   useEffect(() => {
-    console.log('🔄 Resetting infinite feed, connectedUserIds:', connectedUserIds.length);
     setAllPosts([]);
     setCurrentOffset(0);
     setHasMore(true);
@@ -197,14 +185,7 @@ export const useInfiniteTrendingFeed = () => {
 
   // Initial load
   useEffect(() => {
-    console.log('🎯 Initial load check:', { 
-      connectedUserIds: connectedUserIds.length, 
-      postsLength: allPosts.length, 
-      loading 
-    });
-    
     if (connectedUserIds.length > 0 && allPosts.length === 0 && !loading) {
-      console.log('🚀 Triggering initial load');
       loadMore();
     }
   }, [connectedUserIds, allPosts.length, loading, loadMore]);

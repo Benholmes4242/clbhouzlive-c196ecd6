@@ -45,9 +45,7 @@ const TrendingFeed = React.memo(() => {
     threshold: 0.1,
     rootMargin: '200px', // Trigger when 200px before element comes into view
     onIntersect: () => {
-      console.log('🔄 Infinite scroll triggered!', { hasMore, infiniteLoading });
       if (hasMore && !infiniteLoading) {
-        console.log('📥 Loading more posts...');
         loadMore();
       }
     }
