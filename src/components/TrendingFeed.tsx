@@ -40,17 +40,19 @@ const TrendingFeed = React.memo(() => {
     refetchUserPosts();
   }, [refetchUserPosts]);
 
-  // Infinite scroll trigger - automatic detection at 80-90% scroll
+  // Infinite scroll trigger - memoized to prevent infinite loops
+  const handleIntersect = useCallback(() => {
+    console.log('🔄 Infinite scroll triggered!', { hasMore, infiniteLoading, postsCount: sortedContent.length });
+    if (hasMore && !infiniteLoading) {
+      console.log('📥 Loading more posts...');
+      loadMore();
+    }
+  }, [hasMore, infiniteLoading, sortedContent.length, loadMore]);
+
   const { ref: loadMoreRef } = useIntersectionObserver({
     threshold: 0.1,
     rootMargin: '200px', // Trigger when 200px before element comes into view
-    onIntersect: () => {
-      console.log('🔄 Infinite scroll triggered!', { hasMore, infiniteLoading, postsCount: sortedContent.length });
-      if (hasMore && !infiniteLoading) {
-        console.log('📥 Loading more posts...');
-        loadMore();
-      }
-    }
+    onIntersect: handleIntersect
   });
 
   // Show skeleton loading only for initial load - AFTER all hooks
