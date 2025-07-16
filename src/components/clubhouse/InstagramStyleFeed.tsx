@@ -53,15 +53,6 @@ const InstagramStyleFeed: React.FC<InstagramStyleFeedProps> = ({ userPosts = [],
     [userPosts]
   );
 
-  // Create a map of original indices for autoplay logic
-  const originalIndices = useMemo(() => {
-    const indices = new Map<string, number>();
-    userPosts.forEach((post, index) => {
-      indices.set(post.id, index);
-    });
-    return indices;
-  }, [userPosts]);
-
   if (loading) {
     return <LoadingSkeleton />;
   }
@@ -86,7 +77,6 @@ const InstagramStyleFeed: React.FC<InstagramStyleFeedProps> = ({ userPosts = [],
               key={post.id} 
               post={post} 
               allUserPosts={postsWithMedia}
-              index={originalIndices.get(post.id) ?? 0}
             />
           ))}
         </div>
