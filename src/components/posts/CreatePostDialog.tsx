@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from '@/components/ui/button';
 import { Plus, X } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useOptimisticPostSubmission } from './PostSubmissionHandler';
+import { useOptimisticPostSubmission } from '@/hooks/useOptimisticPostSubmission';
 import PostContentForm from './PostContentForm';
 
 interface TaggableEntity {
