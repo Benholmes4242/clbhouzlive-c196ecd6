@@ -139,9 +139,9 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
                 
                 {/* Golf Club Tag */}
                 {video.golfCourse && (
-                  <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1.5 flex items-center gap-2 max-w-[70%]">
-                    <MapPin className="w-3 h-3 text-gray-700 flex-shrink-0" />
-                    <span className="text-gray-700 text-xs font-medium truncate">
+                  <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-sm rounded-full px-3 py-1.5 flex items-center gap-2 max-w-[70%]">
+                    <MapPin className="w-3 h-3 text-white flex-shrink-0" />
+                    <span className="text-white text-xs font-medium truncate">
                       {video.golfCourse.name}
                     </span>
                   </div>
@@ -160,9 +160,7 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
                         {video.user?.name || video.user?.username || 'Anonymous'}
                       </p>
                       {video.title && (
-                        <p className="text-white/80 text-xs truncate">
-                          {video.title.replace(/Played at .+?(\s|$)/gi, '').trim() || video.title}
-                        </p>
+                        <p className="text-white/80 text-xs truncate">{video.title}</p>
                       )}
                     </div>
                   </div>
@@ -186,7 +184,7 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
                         e.stopPropagation();
                         prevVideo();
                       }}
-                      className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full hover:bg-white/20 transition-colors z-10"
+                      className="absolute left-2 top-1/2 -translate-y-1/2 p-2 hover:bg-black/20 transition-colors z-10"
                       aria-label="Previous video"
                     >
                       <ChevronLeft className="w-5 h-5 text-white drop-shadow-lg" />
@@ -198,7 +196,7 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
                         e.stopPropagation();
                         nextVideo();
                       }}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full hover:bg-white/20 transition-colors z-10"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 p-2 hover:bg-black/20 transition-colors z-10"
                       aria-label="Next video"
                     >
                       <ChevronRight className="w-5 h-5 text-white drop-shadow-lg" />
