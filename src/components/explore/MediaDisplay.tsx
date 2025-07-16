@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import SmartMediaContainer from '@/components/ui/smart-media-container';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
+import { RxVideo } from 'react-icons/rx';
 
 interface MediaItem {
   id: string;
@@ -102,13 +103,9 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
               }}
               loading={currentIndex === 0 ? 'eager' : 'lazy'}
             />
-            {/* Play button overlay for video thumbnails */}
-            <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-              <div className="w-12 h-12 bg-white/80 rounded-full flex items-center justify-center">
-                <svg className="w-6 h-6 text-black ml-1" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M8 5v14l11-7z"/>
-                </svg>
-              </div>
+            {/* Video indicator in bottom left corner */}
+            <div className="absolute bottom-2 left-2 bg-black/60 rounded-full p-1.5">
+              <RxVideo className="w-4 h-4 text-white" />
             </div>
           </div>
         )
