@@ -15,7 +15,7 @@ const TrendingCard = () => {
   const navigate = useNavigate();
   const modalManager = useFullscreenVideoModal();
 
-  console.log('TrendingCard render - loading:', loading, 'trendingPosts:', trendingPosts.length);
+  
 
   // Swipe handlers for mobile
   const swipeHandlers = useSwipeable({
@@ -56,7 +56,7 @@ const TrendingCard = () => {
       section: 'trending',
       videoId: post.id,
       autoplayAllowed: isFirstCard || isMobile, // First card or mobile autoplays
-      priority: Date.now() - index // First card has higher priority
+      priority: index // Use stable index for priority
     });
 
     const handleVideoClick = () => {

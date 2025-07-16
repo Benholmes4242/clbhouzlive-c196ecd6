@@ -124,7 +124,7 @@ export const useVideoPlaybackManager = ({
   section, 
   videoId, 
   autoplayAllowed = true, 
-  priority = Date.now() 
+  priority = 0
 }: VideoPlaybackManagerProps) => {
   const [videoState, setVideoState] = useState<VideoState | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -158,7 +158,7 @@ export const useVideoPlaybackManager = ({
       globalVideoManager.unregisterVideo(videoId);
       unsubscribe();
     };
-  }, [videoId, section, priority]);
+  }, [videoId, section]); // Remove priority from deps to prevent re-registration
 
   // Update video element reference in global manager and add event listeners
   useEffect(() => {
@@ -184,7 +184,7 @@ export const useVideoPlaybackManager = ({
         video.removeEventListener('pause', handlePause);
       };
     }
-  }, [videoRef.current, videoState?.id]);
+  }, [videoState?.id, videoId]); // More stable dependencies
 
   // Handle intersection changes for autoplay
   useEffect(() => {
@@ -193,13 +193,11 @@ export const useVideoPlaybackManager = ({
     if (isInView && autoplayAllowed) {
       // Check if we can autoplay this video and it's not already playing
       if (!videoState.isPlaying && globalVideoManager.canAutoplay(section, videoId)) {
-        console.log(`🎬 Starting autoplay for ${section} video: ${videoId}`);
         videoRef.current.play().catch(console.error);
         globalVideoManager.playVideo(videoId, true);
       }
     } else if (!isInView && videoState.isPlaying && videoState.isAutoplay) {
       // Pause autoplay videos when out of view
-      console.log(`⏸️ Pausing autoplay for ${section} video: ${videoId}`);
       videoRef.current?.pause();
       globalVideoManager.pauseVideo(videoId);
     }

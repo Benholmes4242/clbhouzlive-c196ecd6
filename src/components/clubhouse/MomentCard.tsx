@@ -49,7 +49,7 @@ const MomentCard: React.FC<MomentCardProps> = ({ moment, currentUserId, modalMan
     section: 'discover',
     videoId: moment.id,
     autoplayAllowed: hasVideo,
-    priority: Date.now()
+    priority: 1
   });
 
   // Check follow status

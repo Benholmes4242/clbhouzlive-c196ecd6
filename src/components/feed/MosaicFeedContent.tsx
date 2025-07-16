@@ -41,7 +41,6 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
   };
 
   const handleMaximizeClick = (item: VideoPost | UserPostWithType) => {
-    console.log('🔍 Maximize clicked for item:', item);
     const modalData = getMediaDataForModal(item);
     modalManager.openModal({
       src: Array.isArray(modalData.mediaUrl) ? modalData.mediaUrl[0] : modalData.mediaUrl,
@@ -103,7 +102,7 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
       section: 'feed',
       videoId: item.id,
       autoplayAllowed: hasVideo,
-      priority: Date.now() - index // Earlier posts have higher priority
+      priority: index // Use stable index for priority
     });
 
     // Get user info
@@ -251,7 +250,6 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('🔴 MAXIMIZE BUTTON CLICKED!');
                 handleMaximizeClick(item);
               }}
               className="rounded-full p-2 text-white hover:bg-white/20 transition-colors opacity-100 hover:opacity-100 bg-black/30"

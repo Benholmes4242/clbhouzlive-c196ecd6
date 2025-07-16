@@ -32,7 +32,7 @@ const ClubhouzMomentsCarousel: React.FC = () => {
 
   const moments = Array.from(userPostMap.values()).slice(0, 20); // Limit for performance
 
-  console.log('ClubhouzMomentsCarousel - moments:', moments.length);
+  
 
   const { carouselRef, canScrollLeft, canScrollRight, scroll, isMobile } = useCarouselNavigation(moments.length);
 
