@@ -26,6 +26,7 @@ export const usePostSubmissionHandlers = (
     if (tab.isAction && tab.id === 'post') {
       console.log('usePostSubmissionHandlers: Post tab detected, user:', user);
       alert('POST ACTION DETECTED!');
+      alert('User object: ' + JSON.stringify(user));
       
       if (!user) {
         console.log('usePostSubmissionHandlers: No user found, returning');
