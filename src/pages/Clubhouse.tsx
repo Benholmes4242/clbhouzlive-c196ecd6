@@ -5,6 +5,7 @@ import ExploreFilters from '@/components/explore/ExploreFilters';
 import ExploreGrid from '@/components/explore/ExploreGrid';
 import MobileDebugConsole from '@/components/explore/MobileDebugConsole';
 import VerticalMediaFeed from '@/components/explore/VerticalMediaFeed';
+import TrendingVideos from '@/components/clubhouse/TrendingVideos';
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
 import { FILTER_TYPES, MEDIA_TYPES } from '@/components/explore/types';
@@ -86,8 +87,15 @@ const Clubhouse = () => {
         <Header />
         
         <main className="pb-20">
-          {/* Sticky Filter Bar with padding */}
+          {/* Trending Videos Section */}
+          <TrendingVideos 
+            videos={uniqueContent}
+            onVideoClick={handleMediaClick}
+          />
+
+          {/* Your Clubhouse Section */}
           <div className="container mx-auto px-4 py-6">
+            <h2 className="text-xl font-semibold text-foreground mb-4">Your Clubhouse</h2>
             <ExploreFilters 
               activeFilter={activeFilter} 
               onFilterChange={setActiveFilter} 
