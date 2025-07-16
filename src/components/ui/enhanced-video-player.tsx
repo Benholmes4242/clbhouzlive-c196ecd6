@@ -355,7 +355,7 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
         playsInline
         preload="metadata"
         src={src}
-        className={`w-full h-full object-cover ${className?.includes('rounded-full') ? 'rounded-full' : className?.includes('rounded-none') ? 'rounded-none' : ''}`}
+        className="w-full h-full object-cover"
         controlsList="nodownload nofullscreen noremoteplayback"
         disablePictureInPicture
       />
