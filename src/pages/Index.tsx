@@ -1,5 +1,5 @@
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
 import TrendingFeed from '@/components/TrendingFeed';
@@ -16,6 +16,7 @@ const Index = () => {
   const { user, loading } = useSupabaseSession();
   const navigate = useNavigate();
   const { currentLogo } = useAppLogo();
+  const [contentLoaded, setContentLoaded] = useState(false);
 
   // Clean up duplicate posts when user is loaded
   useEffect(() => {
@@ -23,6 +24,16 @@ const Index = () => {
       removeDuplicatePosts(user.id);
     }
   }, [user?.id]);
+
+  // Add a delay to ensure smooth transition and prevent flickering
+  useEffect(() => {
+    if (user && !loading) {
+      const timer = setTimeout(() => {
+        setContentLoaded(true);
+      }, 100); // Small delay to prevent flash
+      return () => clearTimeout(timer);
+    }
+  }, [user, loading]);
 
   // Show loading state while checking authentication
   if (loading) {
@@ -93,9 +104,52 @@ const Index = () => {
     );
   }
 
+  // Show loading while waiting for content to stabilize
+  if (user && !contentLoaded) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Header />
+        <div className="lg:max-w-6xl lg:mx-auto lg:px-8">
+          {/* Loading skeletons for each section */}
+          <div className="w-full py-4">
+            <div className="mx-auto" style={{ paddingLeft: '0.125rem', paddingRight: '0.125rem' }}>
+              <div className="flex items-center justify-between mb-4 px-4">
+                <h2 className="text-lg font-semibold">Discover new players</h2>
+              </div>
+              <div className="relative md:px-4">
+                <div className="flex gap-1 overflow-hidden">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <div key={i} className="flex-shrink-0 w-52 md:w-60">
+                      <div className="bg-muted rounded-xl aspect-[3/4] animate-pulse" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="mx-auto" style={{ paddingLeft: '0.125rem', paddingRight: '0.125rem' }}>
+            <div className="flex items-center justify-between mb-4 px-4">
+              <h2 className="text-lg font-semibold">Golf's most watched</h2>
+            </div>
+          </div>
+          
+          <div className="px-1 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+              <div className="w-full aspect-[3/4] bg-muted rounded-xl animate-pulse" />
+              <div className="w-full aspect-[3/4] bg-muted rounded-xl animate-pulse hidden md:block" />
+              <div className="w-full aspect-[3/4] bg-muted rounded-xl animate-pulse hidden md:block" />
+            </div>
+          </div>
+        </div>
+        <BottomNavigation />
+      </div>
+    );
+  }
+
   // Show authenticated user content - this is the main feed
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background animate-fade-in">
       <Header />
       
       {/* Desktop container with max-width and padding */}

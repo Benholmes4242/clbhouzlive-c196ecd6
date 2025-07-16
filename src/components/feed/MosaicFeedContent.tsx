@@ -88,7 +88,8 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
     }
   };
 
-  const renderMediaTile = (item: VideoPost | UserPostWithType, index: number) => {
+  // MediaTile Component - extracted to fix hook usage
+  const MediaTile: React.FC<{ item: VideoPost | UserPostWithType; index: number }> = ({ item, index }) => {
     const isUserPost = item.type === 'user_post';
     const media = isUserPost 
       ? (item as UserPostWithType).post_media.map(pm => ({ media_url: pm.media_url, media_type: pm.media_type }))
@@ -102,7 +103,7 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
       section: 'feed',
       videoId: item.id,
       autoplayAllowed: hasVideo,
-      priority: -index // Earlier posts have higher priority (stable ordering)
+      priority: Date.now() - index // Earlier posts have higher priority
     });
 
     // Get user info
@@ -140,7 +141,7 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
     };
 
     return (
-      <div key={item.id} ref={containerRef} className="mosaic-tile group relative overflow-hidden rounded-xl bg-card">
+      <div ref={containerRef} className="mosaic-tile group relative overflow-hidden rounded-xl bg-card">
         {/* Media Container */}
         <div className={`relative w-full overflow-hidden ${aspectRatio}`} onClick={handleTileClick}>
           {hasMultipleMedia ? (
@@ -347,7 +348,9 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
       
       {/* Mosaic Grid */}
       <div className="mosaic-grid">
-        {sortedContent.map((item, index) => renderMediaTile(item, index))}
+        {sortedContent.map((item, index) => (
+          <MediaTile key={item.id} item={item} index={index} />
+        ))}
       </div>
 
       {/* Fullscreen Video Modal */}

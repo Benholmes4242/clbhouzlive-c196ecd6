@@ -40,12 +40,15 @@ const MomentCard: React.FC<MomentCardProps> = ({ moment, currentUserId, modalMan
     currentUserId: currentUserId
   });
 
-  // Video playback management
+  // Video playback management - ensure videoMedia is always defined to avoid conditional hooks
   const videoMedia = moment.post_media.find(media => media.media_type === 'video');
+  const hasVideo = !!videoMedia;
+  
+  // Always call the hook to maintain hook order consistency
   const { videoRef, containerRef, isPlaying, togglePlayPause } = useVideoPlaybackManager({
     section: 'discover',
     videoId: moment.id,
-    autoplayAllowed: !!videoMedia,
+    autoplayAllowed: hasVideo,
     priority: Date.now()
   });
 
@@ -74,8 +77,6 @@ const MomentCard: React.FC<MomentCardProps> = ({ moment, currentUserId, modalMan
   const imageMedia = moment.post_media.find(media => media.media_type === 'image');
   const mediaToShow = videoMedia || imageMedia;
   
-  
-
   const handleFollowClick = async () => {
     await handleFollow(isFollowing);
     setIsFollowing(!isFollowing);
@@ -102,6 +103,7 @@ const MomentCard: React.FC<MomentCardProps> = ({ moment, currentUserId, modalMan
     }
   };
 
+  // Early return moved after all hooks to maintain consistent hook order
   if (!mediaToShow) return null;
 
   return (
