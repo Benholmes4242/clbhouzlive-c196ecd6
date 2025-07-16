@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { filterValidVideoSources } from '@/utils/videoSourceValidator';
 
 interface ClubhousePost {
   id: string;
@@ -170,7 +171,7 @@ export const useClubhouseContent = () => {
   }, []);
 
   return {
-    posts,
+    posts: filterValidVideoSources(posts),
     loading,
     refetch: fetchRandomContent
   };

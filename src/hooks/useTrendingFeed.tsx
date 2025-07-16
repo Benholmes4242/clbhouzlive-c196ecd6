@@ -5,6 +5,7 @@ import { useUserPosts } from '@/hooks/useUserPosts';
 import { useOptimisticPosts } from '@/hooks/useOptimisticPosts';
 import { useExternalVideos } from '@/hooks/useExternalVideos';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { filterValidVideoSources } from '@/utils/videoSourceValidator';
 
 export const useTrendingFeed = () => {
   const { user } = useSupabaseSession();
@@ -133,9 +134,9 @@ export const useTrendingFeed = () => {
   }, [refetchUserPosts, refetchFollowedPosts]);
 
   return {
-    userPosts,
+    userPosts: filterValidVideoSources(userPosts),
     userPostsLoading,
-    followedUsersPosts,
+    followedUsersPosts: filterValidVideoSources(followedUsersPosts),
     followedPostsLoading,
     optimisticPosts,
     externalVideos,
