@@ -40,10 +40,10 @@ const TrendingFeed = React.memo(() => {
     refetchUserPosts();
   }, [refetchUserPosts]);
 
-  // Infinite scroll trigger
+  // Infinite scroll trigger - automatic detection at 80-90% scroll
   const { ref: loadMoreRef } = useIntersectionObserver({
     threshold: 0.1,
-    rootMargin: '100px',
+    rootMargin: '200px', // Trigger when 200px before element comes into view
     onIntersect: () => {
       if (hasMore && !infiniteLoading) {
         loadMore();
@@ -69,14 +69,22 @@ const TrendingFeed = React.memo(() => {
         onPostDeleted={handlePostDeleted}
       />
       
-      {/* Infinite scroll trigger */}
-      {hasMore && (
-        <div ref={loadMoreRef} className="h-10 flex items-center justify-center">
-          {infiniteLoading && (
-            <div className="animate-spin h-6 w-6 border-2 border-primary border-t-transparent rounded-full" />
-          )}
-        </div>
-      )}
+      {/* Automatic infinite scroll trigger - positioned at 80-90% of visible content */}
+      <div 
+        ref={loadMoreRef} 
+        className="h-20 flex items-center justify-center"
+        style={{ 
+          position: 'relative',
+          top: '-10vh' // Position trigger higher to load before user reaches bottom
+        }}
+      >
+        {hasMore && infiniteLoading && (
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <div className="animate-spin h-5 w-5 border-2 border-primary border-t-transparent rounded-full" />
+            <span className="text-sm">Loading more posts...</span>
+          </div>
+        )}
+      </div>
     </div>
   );
 });

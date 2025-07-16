@@ -21,7 +21,7 @@ interface PostItem {
   post_tags: any[];
 }
 
-const POSTS_PER_PAGE = 10;
+const POSTS_PER_PAGE = 15;
 
 export const useInfiniteTrendingFeed = () => {
   const { user } = useSupabaseSession();
@@ -29,6 +29,7 @@ export const useInfiniteTrendingFeed = () => {
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [currentOffset, setCurrentOffset] = useState(0);
+  const [seenPostIds, setSeenPostIds] = useState<Set<string>>(new Set());
 
   // Get connected user IDs
   const { data: connectedUserIds = [] } = useQuery({
@@ -67,7 +68,8 @@ export const useInfiniteTrendingFeed = () => {
     setLoading(true);
 
     try {
-      const { data: posts, error } = await supabase
+      // 1. Get direct posts from followed users
+      const { data: directPosts, error: directError } = await supabase
         .from('posts')
         .select(`
           id,
@@ -78,28 +80,57 @@ export const useInfiniteTrendingFeed = () => {
         `)
         .in('user_id', connectedUserIds)
         .order('created_at', { ascending: false })
-        .range(currentOffset, currentOffset + POSTS_PER_PAGE - 1);
+        .range(currentOffset, currentOffset + Math.floor(POSTS_PER_PAGE * 0.7) - 1);
 
-      if (error) {
-        console.error('Error fetching posts:', error);
-        setHasMore(false);
-        return;
+      if (directError) {
+        console.error('Error fetching direct posts:', directError);
       }
 
-      if (!posts || posts.length === 0) {
+      // 2. Get posts that followed users have engaged with (liked/commented)
+      // This is a simplified approach - in a real app you'd have likes/comments tables
+      const { data: engagementPosts, error: engagementError } = await supabase
+        .from('posts')
+        .select(`
+          id,
+          content,
+          created_at,
+          user_id,
+          post_media!inner(id, media_type, media_url)
+        `)
+        .not('user_id', 'in', `(${connectedUserIds.join(',')})`) // Posts NOT from followed users
+        .order('created_at', { ascending: false })
+        .range(0, Math.floor(POSTS_PER_PAGE * 0.3) - 1); // Get some engagement-based posts
+
+      if (engagementError) {
+        console.error('Error fetching engagement posts:', engagementError);
+      }
+
+      // Combine and deduplicate posts
+      const allFetchedPosts = [
+        ...(directPosts || []),
+        ...(engagementPosts || [])
+      ];
+
+      // Remove duplicates and already seen posts
+      const uniquePosts = allFetchedPosts.filter(post => 
+        !seenPostIds.has(post.id)
+      );
+
+      if (uniquePosts.length === 0) {
         setHasMore(false);
         return;
       }
 
       // Get profiles for the posts
+      const userIds = [...new Set(uniquePosts.map(p => p.user_id))];
       const { data: profiles } = await supabase
         .from('user_profiles')
         .select('id, display_name, username, profile_photo_url')
-        .in('id', [...new Set(posts.map(p => p.user_id))]);
+        .in('id', userIds);
 
       const profileMap = new Map(profiles?.map(p => [p.id, p]) || []);
       
-      const formattedPosts = posts.map(post => {
+      const formattedPosts = uniquePosts.map(post => {
         const userProfile = profileMap.get(post.user_id);
         
         return {
@@ -121,10 +152,19 @@ export const useInfiniteTrendingFeed = () => {
         };
       });
 
+      // Sort by creation date (newest first)
+      formattedPosts.sort((a, b) => 
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      );
+
+      // Update seen posts
+      const newPostIds = new Set([...seenPostIds, ...formattedPosts.map(p => p.id)]);
+      setSeenPostIds(newPostIds);
+
       setAllPosts(prev => [...prev, ...formattedPosts]);
       setCurrentOffset(prev => prev + POSTS_PER_PAGE);
 
-      if (posts.length < POSTS_PER_PAGE) {
+      if (formattedPosts.length < POSTS_PER_PAGE) {
         setHasMore(false);
       }
     } catch (error) {
@@ -133,13 +173,14 @@ export const useInfiniteTrendingFeed = () => {
     } finally {
       setLoading(false);
     }
-  }, [loading, hasMore, connectedUserIds, currentOffset]);
+  }, [loading, hasMore, connectedUserIds, currentOffset, seenPostIds]);
 
   // Reset when connected users change
   useEffect(() => {
     setAllPosts([]);
     setCurrentOffset(0);
     setHasMore(true);
+    setSeenPostIds(new Set());
   }, [connectedUserIds]);
 
   // Initial load

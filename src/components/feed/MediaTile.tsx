@@ -1,10 +1,11 @@
-import React, { memo } from 'react';
+import React, { memo, useMemo } from 'react';
 import { ChevronLeft, ChevronRight, Maximize2, Play } from 'lucide-react';
 import { PiHandsClapping, PiShareFat } from 'react-icons/pi';
 import { GoCommentDiscussion } from 'react-icons/go';
 import FeedVideoPlayer from './FeedVideoPlayer';
 import { VideoPost, UserPostWithType } from './types';
 import { useVideoPlaybackManager } from '@/hooks/useVideoPlaybackManager';
+import { useViewportSize } from '@/hooks/useViewportSize';
 
 interface MediaTileProps {
   item: VideoPost | UserPostWithType;
@@ -23,6 +24,8 @@ const MediaTile = memo<MediaTileProps>(({
   onNextMedia, 
   onMaximizeClick 
 }) => {
+  const { isMobile } = useViewportSize();
+  
   const isUserPost = item.type === 'user_post';
   const media = isUserPost 
     ? (item as UserPostWithType).post_media.map(pm => ({ media_url: pm.media_url, media_type: pm.media_type }))
@@ -30,14 +33,41 @@ const MediaTile = memo<MediaTileProps>(({
   const currentIndex = currentMediaIndex[item.id] || 0;
   const hasMultipleMedia = media.length > 1;
   
-  // Video playback management for feed section
+  // Video playback management for feed section with viewport-aware autoplay
   const hasVideo = media.some(m => m.media_type === 'video');
-  // Only autoplay the first video (index 0)
-  const shouldAutoplayCard = index === 0;
+  
+  // Calculate autoplay rules based on viewport
+  const shouldAutoplay = useMemo(() => {
+    if (!hasVideo) return false;
+    
+    if (isMobile) {
+      // Mobile: 1st card, then pairs at 4-5, 8-9, 12-13, etc.
+      if (index === 0) return true;
+      if (index >= 3) {
+        const adjustedIndex = index - 1; // Adjust since we start counting from 1 after the first
+        const groupSize = 4;
+        const groupIndex = Math.floor(adjustedIndex / groupSize);
+        const positionInGroup = adjustedIndex % groupSize;
+        return positionInGroup === 2 || positionInGroup === 3; // 3rd and 4th in each group (positions 2,3)
+      }
+    } else {
+      // Desktop: 1st card, then pairs at 8-9, 15-16, 22-23, etc.
+      if (index === 0) return true;
+      if (index >= 7) {
+        const adjustedIndex = index - 1; // Adjust since we start counting from 1 after the first
+        const groupSize = 7;
+        const groupIndex = Math.floor(adjustedIndex / groupSize);
+        const positionInGroup = adjustedIndex % groupSize;
+        return positionInGroup === 6 || (positionInGroup === 5 && index + 1 < 1000); // Pairs at end of each group
+      }
+    }
+    return false;
+  }, [index, isMobile, hasVideo]);
+  
   const { videoRef, containerRef, isPlaying, shouldShowPlayIcon, togglePlayPause } = useVideoPlaybackManager({
     section: 'feed',
     videoId: item.id,
-    autoplayAllowed: hasVideo && shouldAutoplayCard,
+    autoplayAllowed: shouldAutoplay,
     priority: Date.now() - index // Earlier posts have higher priority
   });
 

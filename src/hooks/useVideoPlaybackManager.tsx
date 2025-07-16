@@ -146,7 +146,7 @@ export const useVideoPlaybackManager = ({
     globalVideoManager.registerVideo(initialState);
     setVideoState(initialState);
 
-    // Subscribe to global state changes
+    // Subscribe to global state changes - avoid circular structure errors
     const unsubscribe = globalVideoManager.subscribe((videos) => {
       const currentVideo = videos.get(videoId);
       if (currentVideo && videoState) {
@@ -203,13 +203,13 @@ export const useVideoPlaybackManager = ({
     if (isInView && autoplayAllowed) {
       // Check if we can autoplay this video and it's not already playing
       if (!videoState.isPlaying && globalVideoManager.canAutoplay(section, videoId)) {
-        console.log(`🎬 Starting autoplay for ${section} video: ${videoId}`);
+        console.log(`🎬 Starting autoplay for ${section} video at index:`, videoId);
         videoRef.current.play().catch(console.error);
         globalVideoManager.playVideo(videoId, true);
       }
     } else if (!isInView && videoState.isPlaying && videoState.isAutoplay) {
       // Pause autoplay videos when out of view
-      console.log(`⏸️ Pausing autoplay for ${section} video: ${videoId}`);
+      console.log(`⏸️ Pausing autoplay for ${section} video:`, videoId);
       videoRef.current?.pause();
       globalVideoManager.pauseVideo(videoId);
     }
