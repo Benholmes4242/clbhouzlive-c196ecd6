@@ -228,10 +228,11 @@ export const useInfiniteTrendingFeed = () => {
 
   // Initial load - fixed to prevent infinite loop
   useEffect(() => {
-    if (allPosts.length === 0 && !loading && hasMore) {
+    if (allPosts.length === 0 && !loading && hasMore && connectedUserIds.length >= 0) {
+      console.log('🎯 Triggering initial load with connected users:', connectedUserIds.length);
       loadMore();
     }
-  }, [allPosts.length, loading, hasMore, connectedUserIds]); // Use connectedUserIds instead of loadMore
+  }, [connectedUserIds.length]); // Only depend on the length, not the array itself
 
   return {
     posts: allPosts,
