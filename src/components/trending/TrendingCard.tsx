@@ -91,7 +91,7 @@ const TrendingCard = () => {
 
         {/* Trending Icon - top right */}
         <div className="absolute top-2 right-2 z-10">
-          <button className="rounded-full p-1.5 text-white hover:bg-white/20 transition-colors">
+          <button className="p-1.5 text-white hover:bg-white/20 transition-colors">
             <TrendingUp className="w-6 h-6" />
           </button>
         </div>
@@ -101,7 +101,7 @@ const TrendingCard = () => {
           <div className="absolute top-2 left-2 z-10">
             <button 
               onClick={handlePlayButtonClick}
-              className="rounded-full p-1.5 text-white bg-black/50 hover:bg-black/70 transition-colors"
+              className="p-1.5 text-white bg-black/50 hover:bg-black/70 transition-colors"
             >
               <Play className="w-4 h-4" />
             </button>
@@ -131,7 +131,7 @@ const TrendingCard = () => {
                     <img
                       src={user?.profile_photo_url || '/placeholder.svg'}
                       alt={user?.display_name || user?.username || 'User'}
-                      className="w-12 h-12 rounded-full object-cover"
+                      className="w-12 h-12 object-cover"
                     />
                     <p className="text-white font-bold text-base truncate">
                       {user?.display_name || user?.username}
@@ -174,13 +174,13 @@ const TrendingCard = () => {
                 
                 {/* Action buttons */}
                 <div className="flex flex-col space-y-2 ml-2">
-                  <button className="rounded-full p-1.5 text-white hover:bg-white/20 transition-colors">
+                  <button className="p-1.5 text-white hover:bg-white/20 transition-colors">
                     <PiHandsClapping className="w-6 h-6" />
                   </button>
-                  <button className="rounded-full p-1.5 text-white hover:bg-white/20 transition-colors">
+                  <button className="p-1.5 text-white hover:bg-white/20 transition-colors">
                     <GoCommentDiscussion className="w-6 h-6" />
                   </button>
-                  <button className="rounded-full p-1.5 text-white hover:bg-white/20 transition-colors">
+                  <button className="p-1.5 text-white hover:bg-white/20 transition-colors">
                     <PiShareFat className="w-6 h-6" />
                   </button>
                 </div>
@@ -204,13 +204,13 @@ const TrendingCard = () => {
             <>
               <button
                 onClick={prevSlide}
-                className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full p-1.5 text-white hover:bg-white/20 transition-colors z-20"
+                className="absolute left-2 top-1/2 -translate-y-1/2 p-1.5 text-white hover:bg-white/20 transition-colors z-20"
               >
                 <HiOutlineArrowSmLeft className="w-6 h-6" />
               </button>
               <button
                 onClick={nextSlide}
-                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1.5 text-white hover:bg-white/20 transition-colors z-20"
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-white hover:bg-white/20 transition-colors z-20"
               >
                 <HiOutlineArrowSmRight className="w-6 h-6" />
               </button>
@@ -233,13 +233,13 @@ const TrendingCard = () => {
             <>
               <button
                 onClick={prevSlide}
-                className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full p-1.5 text-white hover:bg-white/20 transition-colors z-20"
+                className="absolute left-2 top-1/2 -translate-y-1/2 p-1.5 text-white hover:bg-white/20 transition-colors z-20"
               >
                 <HiOutlineArrowSmLeft className="w-6 h-6" />
               </button>
               <button
                 onClick={nextSlide}
-                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full p-1.5 text-white hover:bg-white/20 transition-colors z-20"
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-white hover:bg-white/20 transition-colors z-20"
               >
                 <HiOutlineArrowSmRight className="w-6 h-6" />
               </button>
