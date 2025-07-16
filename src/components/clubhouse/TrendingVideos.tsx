@@ -174,10 +174,10 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
                         e.stopPropagation();
                         prevVideo();
                       }}
-                      className="absolute left-2 top-1/2 -translate-y-1/2 p-2 bg-black/50 rounded-full hover:bg-black/70 transition-colors z-10"
+                      className="absolute left-2 top-1/2 -translate-y-1/2 p-2 hover:bg-black/20 transition-colors z-10"
                       aria-label="Previous video"
                     >
-                      <ChevronLeft className="w-5 h-5 text-white" />
+                      <ChevronLeft className="w-5 h-5 text-white drop-shadow-lg" />
                     </button>
                     
                     {/* Right arrow */}
@@ -186,14 +186,14 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
                         e.stopPropagation();
                         nextVideo();
                       }}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-black/50 rounded-full hover:bg-black/70 transition-colors z-10"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 p-2 hover:bg-black/20 transition-colors z-10"
                       aria-label="Next video"
                     >
-                      <ChevronRight className="w-5 h-5 text-white" />
+                      <ChevronRight className="w-5 h-5 text-white drop-shadow-lg" />
                     </button>
 
                     {/* Overlay dots indicator */}
-                    <div className="absolute bottom-16 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+                    <div className="absolute bottom-1 left-1/2 -translate-x-1/2 flex gap-2 z-10">
                       {trendingVideos.map((_, dotIndex) => (
                         <button
                           key={dotIndex}
