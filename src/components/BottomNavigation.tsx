@@ -13,6 +13,8 @@ const BottomNavigation = () => {
   const { activeTab, handleTabClick } = useNavigationHandlers();
   const isDesktop = useIsDesktop();
   
+  console.log('BottomNavigation rendered - isDesktop:', isDesktop, 'activeTab:', activeTab);
+  
   const {
     captionInputRef,
     isGalleryOpen,
