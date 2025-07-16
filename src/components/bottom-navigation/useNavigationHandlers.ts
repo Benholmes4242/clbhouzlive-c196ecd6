@@ -17,15 +17,17 @@ export const useNavigationHandlers = () => {
     }
   }, [location.pathname]);
 
-  const handleTabClick = (
-    tab: { id: string; path: string | null; isAction?: boolean },
-    user: any,
-    openSnapModal: () => void
-  ) => {
-    if (tab.isAction && tab.id === 'post') {
-      if (!user) return;
-      openSnapModal();
-    } else if (tab.path) {
+  const handleTabClick = (tab: { id: string; path: string | null; isAction?: boolean }) => {
+    console.log('useNavigationHandlers: handleTabClick called with:', tab);
+    
+    if (tab.isAction) {
+      console.log('useNavigationHandlers: Action tab detected, not handling navigation');
+      // Action tabs are handled by the parent component (BottomNavigation)
+      return;
+    }
+
+    if (tab.path) {
+      console.log('useNavigationHandlers: Navigating to:', tab.path);
       setActiveTab(tab.id);
       navigate(tab.path);
       
