@@ -22,15 +22,22 @@ export const usePostSubmissionHandlers = (
   const { handleCaptionInput, selectMention } = usePostHandlers();
 
   const onTabClick = (tab: { id: string; path: string | null; isAction?: boolean }, handleTabClick: Function) => {
+    console.log('usePostSubmissionHandlers: onTabClick called with:', tab);
     if (tab.isAction && tab.id === 'post') {
-      if (!user) return;
+      console.log('usePostSubmissionHandlers: Post tab detected, user:', user);
+      if (!user) {
+        console.log('usePostSubmissionHandlers: No user found, returning');
+        return;
+      }
       
       // Both mobile and desktop now use the new EnhancedCreateMomentModal
-      console.log('Post tab clicked, opening Create a Moment modal directly');
+      console.log('usePostSubmissionHandlers: Opening composer...');
       setLocalSelectedTags([]);
       // Open composer directly without files - modal will handle file upload UI
       openComposer();
+      console.log('usePostSubmissionHandlers: openComposer called');
     } else {
+      console.log('usePostSubmissionHandlers: Not a post action, calling handleTabClick');
       handleTabClick(tab);
     }
   };

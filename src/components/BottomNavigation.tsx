@@ -79,7 +79,10 @@ const BottomNavigation = () => {
     <>
       <NavigationBar
         activeTab={activeTab}
-        onTabClick={(tab) => onTabClick(tab, handleTabClick)}
+        onTabClick={(tab) => {
+          console.log('BottomNavigation: onTabClick called with:', tab);
+          onTabClick(tab, handleTabClick);
+        }}
       />
 
       <GalleryPicker

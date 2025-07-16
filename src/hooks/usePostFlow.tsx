@@ -81,6 +81,7 @@ export const usePostFlow = () => {
   };
 
   const openComposer = (file?: File, additionalFiles: File[] = []) => {
+    console.log('usePostFlow: openComposer called with file:', file?.name, file?.type);
     if (file) {
       console.log('usePostFlow openComposer called with file:', file.name, file.type);
       console.log('Additional files count:', additionalFiles.length);

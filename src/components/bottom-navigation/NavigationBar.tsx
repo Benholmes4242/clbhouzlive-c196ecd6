@@ -19,7 +19,10 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick }) 
             return (
               <button
                 key={tab.id}
-                onClick={() => onTabClick(tab)}
+                onClick={() => {
+                  console.log('NavigationBar: Tab clicked:', tab.id, tab.isAction);
+                  onTabClick(tab);
+                }}
                 className={`flex flex-col items-center justify-center space-y-1 transition-colors relative focus:outline-none ${
                   isActive
                     ? 'text-[#2a2626]'
