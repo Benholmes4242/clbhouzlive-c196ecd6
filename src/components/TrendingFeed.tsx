@@ -54,11 +54,12 @@ const TrendingFeed = React.memo(() => {
   });
 
   // Show skeleton loading only for initial load - AFTER all hooks
-  if ((userPostsLoading || infiniteLoading) && userPosts.length === 0 && infinitePosts.length === 0) {
+  if ((userPostsLoading || infiniteLoading) && userPosts.length === 0 && infinitePosts.length === 0 && optimisticPosts.length === 0) {
     return <LoadingSkeleton />;
   }
 
-  if (sortedContent.length === 0 && optimisticPosts.length === 0) {
+  // Only show empty message if we've finished loading and truly have no content
+  if (sortedContent.length === 0 && optimisticPosts.length === 0 && !userPostsLoading && !infiniteLoading && !hasMore) {
     return <EmptyFeedMessage />;
   }
 
@@ -71,32 +72,30 @@ const TrendingFeed = React.memo(() => {
         onPostDeleted={handlePostDeleted}
       />
       
-      {/* Automatic infinite scroll trigger - always visible for debugging */}
-      <div 
-        ref={loadMoreRef} 
-        className="h-20 flex items-center justify-center bg-muted/20 border-2 border-dashed border-muted-foreground/20"
-        style={{ 
-          position: 'relative',
-          marginTop: '20px' // Remove the negative top positioning for now
-        }}
-      >
-        <div className="text-center">
-          {hasMore ? (
-            infiniteLoading ? (
-              <div className="flex items-center gap-2 text-muted-foreground">
-                <div className="animate-spin h-5 w-5 border-2 border-primary border-t-transparent rounded-full" />
-                <span className="text-sm">Loading more posts...</span>
-              </div>
+      {/* Automatic infinite scroll trigger - positioned after content */}
+      {sortedContent.length > 0 && (
+        <div 
+          ref={loadMoreRef} 
+          className="h-16 flex items-center justify-center my-4"
+        >
+          <div className="text-center">
+            {hasMore ? (
+              infiniteLoading ? (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <div className="animate-spin h-5 w-5 border-2 border-primary border-t-transparent rounded-full" />
+                  <span className="text-sm">Loading more posts...</span>
+                </div>
+              ) : (
+                <div className="text-muted-foreground text-xs opacity-50">
+                  Scroll for more posts
+                </div>
+              )
             ) : (
-              <div className="text-muted-foreground text-sm">
-                Scroll trigger (hasMore: {hasMore.toString()}, loading: {infiniteLoading.toString()})
-              </div>
-            )
-          ) : (
-            <div className="text-muted-foreground text-sm">No more posts to load</div>
-          )}
+              <div className="text-muted-foreground text-sm">You've reached the end!</div>
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 });
