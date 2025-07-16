@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
 import { ExploreContentItem } from '@/components/explore/types';
 import { useVideoPlaybackManager } from '@/hooks/useVideoPlaybackManager';
 import MediaDisplay from '@/components/explore/MediaDisplay';
@@ -136,6 +136,16 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
                 
                 {/* Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                
+                {/* Golf Club Tag */}
+                {video.golfCourse && (
+                  <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-sm rounded-full px-3 py-1.5 flex items-center gap-2 max-w-[70%]">
+                    <MapPin className="w-3 h-3 text-white flex-shrink-0" />
+                    <span className="text-white text-xs font-medium truncate">
+                      {video.golfCourse.name}
+                    </span>
+                  </div>
+                )}
                 
                 {/* User info */}
                 <div className="absolute bottom-8 left-3 right-3">
