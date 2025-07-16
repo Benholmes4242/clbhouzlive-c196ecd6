@@ -209,16 +209,18 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
       // Only show for initial load
     };
     const handleCanPlay = () => {
-      console.log('🟢 EnhancedVideoPlayer: Video can play', { src, timestamp: Date.now() });
+      console.log('🟢 EnhancedVideoPlayer: Video can play', { src, timestamp: Date.now(), autoplay, readyState: video.readyState });
       if (loadingTimeoutRef.current) {
         clearTimeout(loadingTimeoutRef.current);
       }
       setIsLoading(false);
       
-      // Only start playing if autoplay is requested AND video has enough data
-      if (autoplay && video.readyState >= 3) {
+      // Attempt autoplay if requested - be more aggressive for better UX
+      if (autoplay) {
         console.log('🚀 EnhancedVideoPlayer: Starting autoplay', { src, readyState: video.readyState });
-        video.play().catch(console.error);
+        video.play().catch((error) => {
+          console.error('❌ EnhancedVideoPlayer: Autoplay failed', error);
+        });
       }
     };
     const handleWaiting = () => {

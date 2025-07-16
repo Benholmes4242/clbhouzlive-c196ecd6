@@ -45,8 +45,8 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
   // Image loading state
   const [imageLoading, setImageLoading] = useState(false);
   
-  // Debug log the media URL
-  console.log('MediaDisplay - URL:', media.media_url, 'Type:', media.media_type, 'Invalid:', isInvalidSrc);
+  // Debug log the media URL and autoplay
+  console.log('MediaDisplay - URL:', media.media_url, 'Type:', media.media_type, 'Invalid:', isInvalidSrc, 'ShouldAutoplay:', shouldAutoplay);
 
   return (
     <div className="relative w-full h-full overflow-hidden bg-muted">
