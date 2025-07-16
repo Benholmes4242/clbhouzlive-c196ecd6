@@ -161,7 +161,17 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
                       </p>
                       {video.title && (
                         <p className="text-white/80 text-xs truncate">
-                          {video.title.replace(/Played at .+?(\s|$)/gi, '').trim() || video.title}
+                          {(() => {
+                            let cleanTitle = video.title;
+                            // Remove golf course location patterns
+                            cleanTitle = cleanTitle.replace(/Played at .+?(\s|$)/gi, '');
+                            cleanTitle = cleanTitle.replace(/Park \(.+?\)[^.]*\.*/gi, '');
+                            cleanTitle = cleanTitle.replace(/Golf Club[^.]*\.*/gi, '');
+                            cleanTitle = cleanTitle.replace(/Course[^.]*\.*/gi, '');
+                            cleanTitle = cleanTitle.replace(/\s*,\s*Britain.*$/gi, '');
+                            cleanTitle = cleanTitle.replace(/\s*,\s*[A-Z][a-z]+.*$/gi, ''); // Remove country names
+                            return cleanTitle.trim() || null;
+                          })()}
                         </p>
                       )}
                     </div>
