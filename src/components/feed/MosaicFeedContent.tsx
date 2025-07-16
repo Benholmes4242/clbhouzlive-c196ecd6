@@ -4,6 +4,8 @@ import { PiHandsClapping, PiShareFat } from 'react-icons/pi';
 import { GoCommentDiscussion } from 'react-icons/go';
 import OptimisticPostCard from '../posts/OptimisticPostCard';
 import FeedVideoPlayer from './FeedVideoPlayer';
+import StableVideo from '@/components/ui/stable-media/StableVideo';
+import StableImage from '@/components/ui/stable-media/StableImage';
 import { useNavigate } from 'react-router-dom';
 import { VideoPost, UserPostWithType } from './types';
 import { useVideoPlaybackManager, useFullscreenVideoModal } from '@/hooks/useVideoPlaybackManager';
@@ -151,29 +153,35 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
                 className="flex transition-transform duration-300 ease-out h-full"
                 style={{ transform: `translateX(-${currentIndex * 100}%)` }}
               >
-                {media.map((mediaItem, index) => (
-                  <div key={index} className="flex-shrink-0 w-full h-full">
-                     {mediaItem.media_type === 'video' ? (
-                       <FeedVideoPlayer
-                         ref={index === currentIndex && hasVideo ? videoRef : undefined}
-                         src={mediaItem.media_url}
-                         className="w-full h-full object-cover rounded-xl"
-                         muted={true}
-                         loop={true}
-                         playsInline
-                         preload={index === currentIndex ? "metadata" : "none"}
-                         onClick={handleTileClick}
-                       />
-                     ) : (
-                       <img
-                         src={mediaItem.media_url}
-                         alt="Golf content"
-                         className="w-full h-full object-cover rounded-xl"
-                         loading="lazy"
-                       />
-                     )}
-                  </div>
-                ))}
+                 {media.map((mediaItem, mediaIndex) => (
+                   <div key={`${item.id}-${mediaIndex}`} className="flex-shrink-0 w-full h-full">
+                      {mediaItem.media_type === 'video' ? (
+                        <StableVideo
+                          ref={mediaIndex === currentIndex && hasVideo ? videoRef : undefined}
+                          src={mediaItem.media_url}
+                          className="w-full h-full object-cover rounded-xl"
+                          muted={true}
+                          loop={true}
+                          playsInline
+                          preload={mediaIndex === currentIndex ? "metadata" : "none"}
+                          onClick={handleTileClick}
+                          fallbackComponent={
+                            <div className="w-6 h-6 border-2 border-muted-foreground/30 border-t-muted-foreground/70 rounded-full animate-spin" />
+                          }
+                        />
+                      ) : (
+                        <StableImage
+                          src={mediaItem.media_url}
+                          alt="Golf content"
+                          className="w-full h-full object-cover rounded-xl"
+                          loading="lazy"
+                          fallbackComponent={
+                            <div className="w-6 h-6 border-2 border-muted-foreground/30 border-t-muted-foreground/70 rounded-full animate-spin" />
+                          }
+                        />
+                      )}
+                   </div>
+                 ))}
               </div>
               
               {/* Carousel Navigation */}
@@ -212,7 +220,7 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
             // Single media
             <div className="w-full h-full">
                {media[0]?.media_type === 'video' ? (
-                 <FeedVideoPlayer
+                 <StableVideo
                    ref={videoRef}
                    src={media[0].media_url}
                    className="w-full h-full object-cover rounded-xl"
@@ -221,13 +229,19 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
                    playsInline
                    preload="metadata"
                    onClick={handleTileClick}
+                   fallbackComponent={
+                     <div className="w-6 h-6 border-2 border-muted-foreground/30 border-t-muted-foreground/70 rounded-full animate-spin" />
+                   }
                  />
                ) : (
-                 <img
+                 <StableImage
                    src={media[0]?.media_url}
                    alt="Golf content"
                    className="w-full h-full object-cover rounded-xl"
                    loading="lazy"
+                   fallbackComponent={
+                     <div className="w-6 h-6 border-2 border-muted-foreground/30 border-t-muted-foreground/70 rounded-full animate-spin" />
+                   }
                  />
               )}
             </div>
