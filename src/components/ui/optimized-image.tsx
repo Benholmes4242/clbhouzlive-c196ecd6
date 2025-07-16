@@ -142,7 +142,7 @@ const OptimizedImageComponent: React.FC<OptimizedImageProps> = ({
           height={height}
           loading={loading}
           decoding="async"
-          fetchPriority={priority ? 'high' : 'auto'}
+          {...(priority && { fetchPriority: 'high' })}
           onLoad={handleLoad}
           onError={handleError}
           crossOrigin="anonymous"
