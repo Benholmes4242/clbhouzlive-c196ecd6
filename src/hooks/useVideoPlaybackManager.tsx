@@ -149,7 +149,17 @@ export const useVideoPlaybackManager = ({
     // Subscribe to global state changes
     const unsubscribe = globalVideoManager.subscribe((videos) => {
       const currentVideo = videos.get(videoId);
-      if (currentVideo && JSON.stringify(currentVideo) !== JSON.stringify(videoState)) {
+      if (currentVideo && videoState) {
+        // Compare only safe properties, excluding the element which has circular refs
+        const hasChanges = currentVideo.isPlaying !== videoState.isPlaying || 
+                          currentVideo.isAutoplay !== videoState.isAutoplay ||
+                          currentVideo.section !== videoState.section ||
+                          currentVideo.priority !== videoState.priority;
+        
+        if (hasChanges) {
+          setVideoState(currentVideo);
+        }
+      } else if (currentVideo && !videoState) {
         setVideoState(currentVideo);
       }
     });
