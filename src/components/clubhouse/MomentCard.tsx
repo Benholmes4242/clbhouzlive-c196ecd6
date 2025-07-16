@@ -1,11 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { Play } from 'lucide-react';
+import React, { useRef, useState, useEffect } from 'react';
+import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import FollowButton from '@/components/profile/actions/FollowButton';
 import { useProfileActions } from '@/components/profile/actions/useProfileActions';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { useFullscreenVideoModal } from '@/hooks/useVideoPlaybackManager';
+import { useVideoPlaybackManager, useFullscreenVideoModal } from '@/hooks/useVideoPlaybackManager';
 
 interface MomentCardProps {
   moment: {
@@ -39,6 +40,15 @@ const MomentCard: React.FC<MomentCardProps> = ({ moment, currentUserId, modalMan
     currentUserId: currentUserId
   });
 
+  // Video playback management
+  const videoMedia = moment.post_media.find(media => media.media_type === 'video');
+  const { videoRef, containerRef, isPlaying, togglePlayPause } = useVideoPlaybackManager({
+    section: 'discover',
+    videoId: moment.id,
+    autoplayAllowed: !!videoMedia,
+    priority: Date.now()
+  });
+
   // Check follow status
   const { data: followStatus } = useQuery({
     queryKey: ['followStatus', currentUserId, moment.user.id],
@@ -60,7 +70,7 @@ const MomentCard: React.FC<MomentCardProps> = ({ moment, currentUserId, modalMan
     }
   }, [followStatus]);
 
-  const videoMedia = moment.post_media.find(media => media.media_type === 'video');
+
   const imageMedia = moment.post_media.find(media => media.media_type === 'image');
   const mediaToShow = videoMedia || imageMedia;
   
@@ -77,7 +87,7 @@ const MomentCard: React.FC<MomentCardProps> = ({ moment, currentUserId, modalMan
     }
   };
 
-  const handleMediaClick = () => {
+  const handleVideoClick = () => {
     if (videoMedia) {
       modalManager.openModal({
         src: videoMedia.media_url,
@@ -95,23 +105,27 @@ const MomentCard: React.FC<MomentCardProps> = ({ moment, currentUserId, modalMan
   if (!mediaToShow) return null;
 
   return (
-    <div className="relative bg-card rounded-xl overflow-hidden shadow-sm border group">
+    <div ref={containerRef} className="relative bg-card rounded-xl overflow-hidden shadow-sm border group">
       {/* Media Container */}
-      <div className="relative aspect-[3/4] bg-muted cursor-pointer" onClick={handleMediaClick}>
-        {/* Static Image - Always show image/poster for performance */}
-        <img
-          src={mediaToShow.media_url}
-          alt="Moment"
-          className="w-full h-full object-cover hq-image"
-        />
-        
-        {/* Video Play Icon Overlay */}
-        {videoMedia && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="bg-black/40 rounded-full p-3 hover:bg-black/60 transition-colors">
-              <Play className="w-8 h-8 text-white fill-white" />
-            </div>
-          </div>
+      <div className="relative aspect-[3/4] bg-muted" onClick={handleVideoClick}>
+        {videoMedia ? (
+          <EnhancedVideoPlayer
+            src={mediaToShow.media_url}
+            className="w-full h-full object-cover"
+            autoplay={true}
+            muted={true}
+            loop={true}
+            enableHLS={true}
+            onClick={handleVideoClick}
+            onPlay={() => {}}
+            onPause={() => {}}
+          />
+        ) : (
+          <img
+            src={mediaToShow.media_url}
+            alt="Moment"
+            className="w-full h-full object-cover hq-image"
+          />
         )}
         
         {/* Overlay Content */}

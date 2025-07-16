@@ -24,7 +24,7 @@ class VideoPlaybackManager {
   private maxAutoplayVideos = {
     discover: 99, // All visible videos can autoplay
     trending: 1,  // Only first video autoplays
-    feed: 1       // Only 1 video autoplay in feed for better performance
+    feed: 2       // Max 2 videos autoplay in feed
   };
 
   subscribe(listener: (videos: Map<string, VideoState>) => void) {
@@ -124,13 +124,13 @@ export const useVideoPlaybackManager = ({
   section, 
   videoId, 
   autoplayAllowed = true, 
-  priority = 1
+  priority = Date.now() 
 }: VideoPlaybackManagerProps) => {
   const [videoState, setVideoState] = useState<VideoState | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const { ref: containerRef, isInView } = useIntersectionObserver({
-    threshold: 0.3, // Lower threshold for better performance
-    rootMargin: '20px' // Reduced margin for better performance
+    threshold: 0.5,
+    rootMargin: '50px'
   });
 
   // Register video with global manager and sync local state
@@ -146,20 +146,10 @@ export const useVideoPlaybackManager = ({
     globalVideoManager.registerVideo(initialState);
     setVideoState(initialState);
 
-    // Subscribe to global state changes - avoid circular structure errors
+    // Subscribe to global state changes
     const unsubscribe = globalVideoManager.subscribe((videos) => {
       const currentVideo = videos.get(videoId);
-      if (currentVideo && videoState) {
-        // Compare only safe properties, excluding the element which has circular refs
-        const hasChanges = currentVideo.isPlaying !== videoState.isPlaying || 
-                          currentVideo.isAutoplay !== videoState.isAutoplay ||
-                          currentVideo.section !== videoState.section ||
-                          currentVideo.priority !== videoState.priority;
-        
-        if (hasChanges) {
-          setVideoState(currentVideo);
-        }
-      } else if (currentVideo && !videoState) {
+      if (currentVideo) {
         setVideoState(currentVideo);
       }
     });
@@ -177,17 +167,13 @@ export const useVideoPlaybackManager = ({
       const updatedState = { ...videoState, element: video };
       globalVideoManager.registerVideo(updatedState);
 
-      // Add event listeners to keep state synchronized - prevent circular updates
+      // Add event listeners to keep state synchronized
       const handlePlay = () => {
-        if (!videoState.isPlaying) {
-          globalVideoManager.playVideo(videoId, videoState.isAutoplay);
-        }
+        globalVideoManager.playVideo(videoId, videoState.isAutoplay);
       };
 
       const handlePause = () => {
-        if (videoState.isPlaying) {
-          globalVideoManager.pauseVideo(videoId);
-        }
+        globalVideoManager.pauseVideo(videoId);
       };
 
       video.addEventListener('play', handlePlay);
@@ -207,13 +193,13 @@ export const useVideoPlaybackManager = ({
     if (isInView && autoplayAllowed) {
       // Check if we can autoplay this video and it's not already playing
       if (!videoState.isPlaying && globalVideoManager.canAutoplay(section, videoId)) {
-        console.log(`🎬 Starting autoplay for ${section} video at index:`, videoId);
+        console.log(`🎬 Starting autoplay for ${section} video: ${videoId}`);
         videoRef.current.play().catch(console.error);
         globalVideoManager.playVideo(videoId, true);
       }
     } else if (!isInView && videoState.isPlaying && videoState.isAutoplay) {
       // Pause autoplay videos when out of view
-      console.log(`⏸️ Pausing autoplay for ${section} video:`, videoId);
+      console.log(`⏸️ Pausing autoplay for ${section} video: ${videoId}`);
       videoRef.current?.pause();
       globalVideoManager.pauseVideo(videoId);
     }
