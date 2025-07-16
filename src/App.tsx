@@ -5,9 +5,9 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ScrollToTop from '@/components/ScrollToTop';
-
 import { ThemeProvider } from '@/components/theme-provider';
 import PasswordProtection from "@/components/PasswordProtection";
+import AuthWrapper from "@/components/auth/AuthWrapper";
 
 
 const Auth = lazy(() => import("./pages/Auth"));
@@ -62,32 +62,34 @@ const App: React.FC = () => {
                 </div>
               </div>
             }>
-              <Routes>
-                <Route path="/" element={<Explore />} />
-                <Route path="/auth" element={<Auth />} />
-                <Route path="/create-profile" element={<CreateProfile />} />
-                <Route path="/profile" element={<ProfilePage />} />
-                <Route path="/profile/:username" element={<UserProfilePage />} />
-                <Route path="/settings" element={<Settings />} />
-                <Route path="/explore" element={<Explore />} />
-                <Route path="/clubhouse" element={<Clubhouse />} />
-                <Route path="/courses" element={<Courses />} />
-                <Route path="/courses/:courseId" element={<CourseDetailPage />} />
-                <Route path="/user/:username/courses" element={<UserCoursesPage />} />
-                <Route path="/my-ratings" element={<MyRatings />} />
-                <Route path="/news" element={<News />} />
-                <Route path="/tour-central" element={<TourCentral />} />
-                
-                <Route path="/messages" element={<MessagesPage />} />
-                <Route path="/notifications" element={<NotificationsPage />} />
-                <Route path="/friends" element={<FriendsPage />} />
-                <Route path="/followers" element={<FollowersPage />} />
-                <Route path="/following" element={<FollowingPage />} />
-                <Route path="/top100-explorer" element={<Top100Explorer />} />
-                <Route path="/admin-setup" element={<AdminSetupPage />} />
-                <Route path="/admin" element={<AdminPage />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
+              <AuthWrapper>
+                <Routes>
+                  <Route path="/" element={<Explore />} />
+                  <Route path="/auth" element={<Auth />} />
+                  <Route path="/create-profile" element={<CreateProfile />} />
+                  <Route path="/profile" element={<ProfilePage />} />
+                  <Route path="/profile/:username" element={<UserProfilePage />} />
+                  <Route path="/settings" element={<Settings />} />
+                  <Route path="/explore" element={<Explore />} />
+                  <Route path="/clubhouse" element={<Clubhouse />} />
+                  <Route path="/courses" element={<Courses />} />
+                  <Route path="/courses/:courseId" element={<CourseDetailPage />} />
+                  <Route path="/user/:username/courses" element={<UserCoursesPage />} />
+                  <Route path="/my-ratings" element={<MyRatings />} />
+                  <Route path="/news" element={<News />} />
+                  <Route path="/tour-central" element={<TourCentral />} />
+                  
+                  <Route path="/messages" element={<MessagesPage />} />
+                  <Route path="/notifications" element={<NotificationsPage />} />
+                  <Route path="/friends" element={<FriendsPage />} />
+                  <Route path="/followers" element={<FollowersPage />} />
+                  <Route path="/following" element={<FollowingPage />} />
+                  <Route path="/top100-explorer" element={<Top100Explorer />} />
+                  <Route path="/admin-setup" element={<AdminSetupPage />} />
+                  <Route path="/admin" element={<AdminPage />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </AuthWrapper>
             </Suspense>
               <Toaster />
               <Sonner />
