@@ -42,6 +42,9 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
 
   // Image loading state
   const [imageLoading, setImageLoading] = useState(false);
+  
+  // Debug log the media URL
+  console.log('MediaDisplay - URL:', media.media_url, 'Type:', media.media_type, 'Invalid:', isInvalidSrc);
 
   return (
     <div className="relative w-full h-full overflow-hidden bg-muted">
@@ -64,18 +67,27 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
           quality="auto"
         />
       ) : (
-        <SmartMediaContainer
-          media={[{
-            id: media.id,
-            type: 'image',
-            url: isInvalidSrc ? fallbackImage : media.media_url,
-            alt: itemTitle || 'Content'
-          }]}
-          className="w-full h-full"
-          onMediaClick={onImageLoad}
-          priority={currentIndex === 0}
-          enableCarousel={false}
-        />
+        <div className="relative w-full h-full">
+          <img
+            src={isInvalidSrc ? fallbackImage : media.media_url}
+            alt={itemTitle || 'Content'}
+            className="w-full h-full object-cover"
+            onLoad={() => {
+              console.log('Image loaded successfully:', media.media_url);
+              setImageLoading(false);
+              onImageLoad();
+            }}
+            onError={(e) => {
+              console.log('Image failed to load:', media.media_url);
+              setImageLoading(false);
+              onImageError();
+            }}
+            onLoadStart={() => {
+              setImageLoading(true);
+            }}
+            loading={currentIndex === 0 ? 'eager' : 'lazy'}
+          />
+        </div>
       )}
     </div>
   );
