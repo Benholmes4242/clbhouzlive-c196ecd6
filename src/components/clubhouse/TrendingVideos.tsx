@@ -157,9 +157,9 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
                 
                 {/* Golf Club Tag */}
                 {video.golfCourse && (
-                  <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1.5 flex items-center gap-2 max-w-[70%]">
-                    <MapPin className="w-3 h-3 text-black flex-shrink-0" />
-                    <span className="text-black text-xs font-medium truncate">
+                  <div className="absolute top-3 left-3 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1.5 flex items-center gap-2 max-w-[70%]">
+                    <MapPin className="w-3 h-3 text-white flex-shrink-0" />
+                    <span className="text-white text-xs font-medium truncate">
                       {video.golfCourse.name}
                     </span>
                   </div>
