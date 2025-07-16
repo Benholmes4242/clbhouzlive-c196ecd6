@@ -72,15 +72,14 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     let index = 0;
     
     while (index < content.length) {
-      // Add 9 regular items before each featured card
-      const regularItemsCount = Math.min(9, content.length - index);
+      // Add 8-10 regular items
+      const regularItemsCount = Math.min(9 + Math.floor(Math.random() * 3), content.length - index);
       
       for (let i = 0; i < regularItemsCount && index < content.length; i++) {
         gridItems.push({
           type: 'regular',
           item: content[index],
-          key: `regular-${content[index].id}`,
-          index: index
+          key: `regular-${content[index].id}`
         });
         index++;
       }
@@ -90,8 +89,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
         gridItems.push({
           type: 'featured',
           item: content[index],
-          key: `featured-${content[index].id}`,
-          index: index
+          key: `featured-${content[index].id}`
         });
         index++;
       }
@@ -115,7 +113,6 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                 onFollow={onFollow} 
                 onMediaClick={onMediaClick}
                 isFeatured={true}
-                cardIndex={gridItem.index}
               />
             </div>
           ) : (
@@ -125,7 +122,6 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                 onLike={onLike} 
                 onFollow={onFollow} 
                 onMediaClick={onMediaClick}
-                cardIndex={gridItem.index}
               />
             </div>
           )
@@ -134,7 +130,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
       
       {/* Infinite scroll sentinel */}
       <div id="scroll-sentinel" className="h-4">
-        {isLoading && hasMore && (
+        {isLoading && hasMore && activeFilter !== 'Hack Shack' && activeFilter !== 'Videos' && (
           <div className="flex justify-center py-4">
             <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
           </div>

@@ -14,10 +14,9 @@ interface MediaCardProps {
   onFollow: (contentId: string) => void;
   onMediaClick?: (item: ExploreContentItem) => void;
   isFeatured?: boolean;
-  cardIndex?: number;
 }
 
-const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, isFeatured, cardIndex, ...props }) => {
+const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, isFeatured, ...props }) => {
   const {
     isPostViewerOpen,
     setIsPostViewerOpen,
@@ -43,8 +42,7 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, isFeature
   } = useMediaCard({ 
     item, 
     onLike, 
-    onMediaClick: props.onMediaClick,
-    cardIndex 
+    onMediaClick: props.onMediaClick 
   });
 
   if (item.type === 'cta') return null;
