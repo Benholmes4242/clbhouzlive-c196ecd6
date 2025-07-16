@@ -26,7 +26,7 @@ const CoursePostBadge = ({ course, className = "" }: CoursePostBadgeProps) => {
 
   return (
     <div 
-      className={`flex items-center cursor-pointer bg-black/20 backdrop-blur-sm rounded-full px-3 py-1.5 text-white ${className}`}
+      className={`flex items-center cursor-pointer bg-white/20 backdrop-blur-sm rounded-full px-3 py-1.5 text-white ${className}`}
       onClick={handleCourseClick}
     >
       <MapPin className="h-4 w-4 mr-1.5 text-white" />
