@@ -38,8 +38,18 @@ export const useVideoPlayer = ({
     const video = videoRef.current;
     if (!video) return;
 
-    // Register this video with the playback manager
+    // Register this video with the playback manager only once
     registerVideo(videoId.current, video);
+
+    return () => {
+      // Unregister this video when component unmounts
+      unregisterVideo(videoId.current);
+    };
+  }, []); // Empty dependency array - register only once
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
 
     // Set initial properties for optimized loading
     video.muted = isInFeed ? isGloballyMuted : muted;
@@ -103,11 +113,8 @@ export const useVideoPlayer = ({
       video.removeEventListener('pause', handlePause);
       video.removeEventListener('volumechange', handleVolumeChange);
       video.removeEventListener('loadedmetadata', handleLoadedMetadata);
-      
-      // Unregister this video when component unmounts
-      unregisterVideo(videoId.current);
     };
-  }, [autoplay, muted, loop, onPlay, onPause, isGloballyMuted, isInFeed, registerVideo, unregisterVideo, muteAllOtherVideos, setActiveAudioVideo]);
+  }, [autoplay, muted, loop, onPlay, onPause, isGloballyMuted, isInFeed]);
 
   // Add effect to handle autoplay changes for already-loaded videos
   useEffect(() => {
