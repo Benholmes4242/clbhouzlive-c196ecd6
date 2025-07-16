@@ -13,12 +13,12 @@ import {
 interface UserPostProps {
   post: UserPostData;
   allUserPosts?: UserPostData[];
-  source?: 'clubhouse' | 'profile' | 'index';
+  source?: 'profile' | 'index';
   onPostUpdated?: () => void;
   onPostDeleted?: () => void;
 }
 
-const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated, onPostDeleted }: UserPostProps) => {
+const UserPost = ({ post, allUserPosts = [], source = 'profile', onPostUpdated, onPostDeleted }: UserPostProps) => {
   const isMobile = useIsMobile();
   
   const {
@@ -48,7 +48,7 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
     // On mobile, always use post viewer for tap-to-expand functionality
     if (isMobile) {
       handlePostClick();
-    } else if (source === 'clubhouse' || source === 'profile') {
+    } else if (source === 'profile') {
       handlePostClick();
     } else {
       // For index feed posts, pass all media items to fullscreen modal
@@ -105,8 +105,8 @@ const UserPost = ({ post, allUserPosts = [], source = 'clubhouse', onPostUpdated
         />
       )}
 
-      {/* Post Viewer Modal for clubhouse, profile, and index sources */}
-      {(source === 'clubhouse' || source === 'profile' || source === 'index') && currentPost && (
+      {/* Post Viewer Modal for profile and index sources */}
+      {(source === 'profile' || source === 'index') && currentPost && (
         <PostViewerModal
           isOpen={isPostViewerOpen}
           onClose={closePostViewer}

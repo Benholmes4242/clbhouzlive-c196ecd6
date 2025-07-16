@@ -8,7 +8,7 @@ import ScrollToTop from '@/components/ScrollToTop';
 
 import { ThemeProvider } from '@/components/theme-provider';
 import PasswordProtection from "@/components/PasswordProtection";
-import Index from "./pages/Index";
+
 
 const Auth = lazy(() => import("./pages/Auth"));
 const CreateProfile = lazy(() => import("./pages/CreateProfile"));
@@ -22,7 +22,7 @@ const UserCoursesPage = lazy(() => import("./pages/UserCoursesPage"));
 const MyRatings = lazy(() => import("./pages/MyRatings"));
 const News = lazy(() => import("./pages/News"));
 const TourCentral = lazy(() => import("./pages/TourCentral"));
-const ClubhouseFeed = lazy(() => import("./pages/ClubhouseFeed"));
+
 const MessagesPage = lazy(() => import("./pages/MessagesPage"));
 const NotificationsPage = lazy(() => import("./pages/NotificationsPage"));
 const FriendsPage = lazy(() => import("./pages/FriendsPage"));
@@ -62,7 +62,7 @@ const App: React.FC = () => {
               </div>
             }>
               <Routes>
-                <Route path="/" element={<Index />} />
+                <Route path="/" element={<Explore />} />
                 <Route path="/auth" element={<Auth />} />
                 <Route path="/create-profile" element={<CreateProfile />} />
                 <Route path="/profile" element={<ProfilePage />} />
@@ -75,7 +75,7 @@ const App: React.FC = () => {
                 <Route path="/my-ratings" element={<MyRatings />} />
                 <Route path="/news" element={<News />} />
                 <Route path="/tour-central" element={<TourCentral />} />
-                <Route path="/clubhouse" element={<ClubhouseFeed />} />
+                
                 <Route path="/messages" element={<MessagesPage />} />
                 <Route path="/notifications" element={<NotificationsPage />} />
                 <Route path="/friends" element={<FriendsPage />} />

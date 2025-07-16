@@ -14,7 +14,7 @@ const SiteBrandingCard = () => {
   const { toast } = useToast();
   const [faviconFile, setFaviconFile] = useState<File | null>(null);
   const [faviconUrl, setFaviconUrl] = useState('');
-  const [tabTitle, setTabTitle] = useState('clbhouz | golf\'s digital clubhouse');
+  const [tabTitle, setTabTitle] = useState('clbhouz | golf\'s digital community');
 
   // Load saved settings on component mount
   useEffect(() => {
@@ -63,7 +63,7 @@ const SiteBrandingCard = () => {
   const handleResetBranding = () => {
     console.log('Resetting branding to defaults');
     // Reset to defaults
-    const defaultTitle = 'clbhouz | golf\'s digital clubhouse';
+    const defaultTitle = 'clbhouz | golf\'s digital community';
     const defaultFavicon = 'https://iiil.io/FRnqBFp.png';
     
     setTabTitle(defaultTitle);

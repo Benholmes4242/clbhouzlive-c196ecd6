@@ -25,17 +25,17 @@ interface PostData {
 }
 
 interface UsePostViewerProps {
-  source?: 'clubhouse' | 'profile' | 'explore' | 'index';
+  source?: 'profile' | 'explore' | 'index';
 }
 
-export const usePostViewer = ({ source = 'clubhouse' }: UsePostViewerProps = {}) => {
+export const usePostViewer = ({ source = 'profile' }: UsePostViewerProps = {}) => {
   const [isOpen, setIsOpen] = useState(false);
   const [currentPost, setCurrentPost] = useState<PostData | null>(null);
   const [allUserPosts, setAllUserPosts] = useState<PostData[]>([]);
 
   const openPostViewer = useCallback((post: PostData, userPosts: PostData[] = []) => {
-    // Only allow opening from clubhouse, profile, and index sources
-    if (source !== 'clubhouse' && source !== 'profile' && source !== 'index') {
+    // Only allow opening from profile and index sources
+    if (source !== 'profile' && source !== 'index') {
       return;
     }
 
@@ -50,7 +50,7 @@ export const usePostViewer = ({ source = 'clubhouse' }: UsePostViewerProps = {})
     setAllUserPosts([]);
   }, []);
 
-  const canOpenViewer = source === 'clubhouse' || source === 'profile' || source === 'index';
+  const canOpenViewer = source === 'profile' || source === 'index';
 
   return {
     isOpen,

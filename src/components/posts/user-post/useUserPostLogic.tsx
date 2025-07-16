@@ -12,7 +12,7 @@ import { extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 interface UseUserPostLogicProps {
   post: UserPostData;
   allUserPosts: UserPostData[];
-  source: 'clubhouse' | 'profile' | 'index';
+  source: 'profile' | 'index';
   onPostDeleted?: () => void;
 }
 

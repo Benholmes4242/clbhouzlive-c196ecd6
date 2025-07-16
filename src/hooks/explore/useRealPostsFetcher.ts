@@ -130,7 +130,7 @@ export const useRealPostsFetcher = () => {
             verified: Math.random() > 0.7 // Random verification for demo
           },
           golfCourse,
-          label: Math.random() > 0.6 ? ['Pro Tip', 'Trending', 'From Clubhouse'][Math.floor(Math.random() * 3)] : undefined,
+          label: Math.random() > 0.6 ? ['Pro Tip', 'Trending', 'Featured'][Math.floor(Math.random() * 3)] : undefined,
           isFollowing: Math.random() > 0.5,
           media: allMedia.filter(m => isValidImageUrl(m.media_url))
         };

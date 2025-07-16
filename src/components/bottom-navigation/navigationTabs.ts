@@ -1,8 +1,7 @@
 
-import { Home, Search, Camera, Trophy, MapPin } from 'lucide-react';
+import { Search, Camera, Trophy, MapPin } from 'lucide-react';
 
 export const navigationTabs = [
-  { id: 'home', label: 'Clubhouse', icon: Home, path: '/' },
   { id: 'explore', label: 'Explore', icon: Search, path: '/explore' },
   { id: 'post', label: 'Post', icon: Camera, path: null, isAction: true },
   { id: 'tour', label: 'Tour Central', icon: Trophy, path: '/tour-central' },

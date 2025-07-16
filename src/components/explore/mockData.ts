@@ -129,7 +129,7 @@ export const mockExploreContent: ExploreContentItem[] = [
     likes: 123,
     comments: 8,
     shares: 15,
-    label: 'From Clubhouse',
+    label: 'Featured',
     isFollowing: false
   },
   {
