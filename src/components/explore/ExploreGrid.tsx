@@ -79,7 +79,8 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
         gridItems.push({
           type: 'regular',
           item: content[index],
-          key: `regular-${content[index].id}`
+          key: `regular-${content[index].id}`,
+          index: index
         });
         index++;
       }
@@ -89,7 +90,8 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
         gridItems.push({
           type: 'featured',
           item: content[index],
-          key: `featured-${content[index].id}`
+          key: `featured-${content[index].id}`,
+          index: index
         });
         index++;
       }
@@ -113,6 +115,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                 onFollow={onFollow} 
                 onMediaClick={onMediaClick}
                 isFeatured={true}
+                cardIndex={gridItem.index}
               />
             </div>
           ) : (
@@ -122,6 +125,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                 onLike={onLike} 
                 onFollow={onFollow} 
                 onMediaClick={onMediaClick}
+                cardIndex={gridItem.index}
               />
             </div>
           )

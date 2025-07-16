@@ -8,20 +8,16 @@ interface UseMediaCardProps {
   item: ExploreContentItem;
   onLike: (contentId: string) => void;
   onMediaClick?: (item: ExploreContentItem) => void;
+  cardIndex?: number;
 }
 
-export const useMediaCard = ({ item, onLike, onMediaClick }: UseMediaCardProps) => {
+export const useMediaCard = ({ item, onLike, onMediaClick, cardIndex }: UseMediaCardProps) => {
   const [imageError, setImageError] = useState(false);
   const [isPostViewerOpen, setIsPostViewerOpen] = useState(false);
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const isMobile = useIsMobile();
-
-  const { ref: autoplayRef, shouldAutoplay, handleMouseEnter, handleMouseLeave } = useVideoAutoplay({
-    enabled: true,
-    threshold: 0.5
-  });
 
   // Get media array - use the new media property if available, otherwise fallback to single media
   const mediaItems = item.media && item.media.length > 0 ? item.media : [{
@@ -32,6 +28,14 @@ export const useMediaCard = ({ item, onLike, onMediaClick }: UseMediaCardProps) 
 
   const currentMedia = mediaItems[currentMediaIndex] || mediaItems[0];
   const hasMultipleMedia = mediaItems.length > 1;
+
+  // Only enable autoplay for 1st card (index 0) and 9th card (index 8)
+  const isAutoplayCard = cardIndex === 0 || cardIndex === 8;
+  
+  const { ref: autoplayRef, shouldAutoplay, handleMouseEnter, handleMouseLeave } = useVideoAutoplay({
+    enabled: isAutoplayCard && currentMedia.media_type === 'video',
+    threshold: 0.5
+  });
 
   // Navigation handlers
   const handlePrevMedia = (e: React.MouseEvent) => {
