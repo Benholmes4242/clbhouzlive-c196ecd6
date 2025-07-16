@@ -109,11 +109,13 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
                     playsInline
                   />
                 ) : (
-                  // Other cards - static poster
-                  <img
-                    src={video.src}
-                    alt={video.title || 'Video thumbnail'}
+                  // Other cards - video without autoplay (shows first frame)
+                  <video
                     className="w-full h-full object-cover"
+                    src={video.src}
+                    muted
+                    playsInline
+                    preload="metadata"
                   />
                 )}
                 
