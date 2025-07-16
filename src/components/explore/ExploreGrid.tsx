@@ -72,8 +72,8 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     let index = 0;
     
     while (index < content.length) {
-      // Add 8-10 regular items
-      const regularItemsCount = Math.min(9 + Math.floor(Math.random() * 3), content.length - index);
+      // Add 9 regular items before each featured card
+      const regularItemsCount = Math.min(9, content.length - index);
       
       for (let i = 0; i < regularItemsCount && index < content.length; i++) {
         gridItems.push({
@@ -134,7 +134,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
       
       {/* Infinite scroll sentinel */}
       <div id="scroll-sentinel" className="h-4">
-        {isLoading && hasMore && activeFilter !== 'Hack Shack' && activeFilter !== 'Videos' && (
+        {isLoading && hasMore && (
           <div className="flex justify-center py-4">
             <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
           </div>
