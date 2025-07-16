@@ -68,7 +68,7 @@ const MediaTile = memo<MediaTileProps>(({
     section: 'feed',
     videoId: item.id,
     autoplayAllowed: shouldAutoplay,
-    priority: Date.now() - index // Earlier posts have higher priority
+    priority: 100 - index // Earlier posts have higher priority with static values
   });
 
   // Get user info

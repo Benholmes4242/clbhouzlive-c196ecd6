@@ -124,7 +124,7 @@ export const useVideoPlaybackManager = ({
   section, 
   videoId, 
   autoplayAllowed = true, 
-  priority = Date.now() 
+  priority = 1
 }: VideoPlaybackManagerProps) => {
   const [videoState, setVideoState] = useState<VideoState | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);

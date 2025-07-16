@@ -56,7 +56,7 @@ const TrendingCard = () => {
       section: 'trending',
       videoId: post.id,
       autoplayAllowed: isFirstCard || isMobile, // First card or mobile autoplays
-      priority: Date.now() - index // First card has higher priority
+      priority: 10 - index // Static priority - first card has highest priority
     });
 
     const handleVideoClick = () => {
