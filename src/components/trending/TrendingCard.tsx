@@ -17,13 +17,16 @@ const TrendingCard = () => {
 
   
 
-  // Swipe handlers for mobile
+  // Enhanced swipe handlers for mobile
   const swipeHandlers = useSwipeable({
     onSwipedLeft: nextSlide,
     onSwipedRight: prevSlide,
     trackMouse: false,
     trackTouch: true,
     preventScrollOnSwipe: true,
+    swipeDuration: 500,
+    touchEventOptions: { passive: false },
+    delta: 50, // Minimum distance for swipe
   });
 
   if (loading || trendingPosts.length === 0) {
@@ -194,26 +197,40 @@ const TrendingCard = () => {
 
   return (
     <div className="px-1 mb-6 relative">
-      {/* Mobile: Swipeable single card with navigation arrows */}
-      <div className="md:hidden" {...swipeHandlers}>
-        <div className="relative">
-          <TrendingCardItem post={trendingPosts[0]} index={0} />
+      {/* Mobile: Enhanced swipeable single card with navigation arrows */}
+      <div className="md:hidden relative" {...swipeHandlers}>
+        <div className="relative touch-pan-y">
+          <TrendingCardItem post={trendingPosts[currentIndex]} index={0} />
           
           {/* Mobile Navigation Arrows */}
           {totalPosts > 1 && (
             <>
               <button
                 onClick={prevSlide}
-                className="absolute left-2 top-1/2 -translate-y-1/2 p-1.5 text-white hover:bg-white/20 transition-colors z-20"
+                className="absolute left-2 top-1/2 -translate-y-1/2 p-1.5 text-white hover:bg-white/20 transition-colors z-20 bg-black/30"
+                aria-label="Previous video"
               >
                 <HiOutlineArrowSmLeft className="w-6 h-6" />
               </button>
               <button
                 onClick={nextSlide}
-                className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-white hover:bg-white/20 transition-colors z-20"
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-white hover:bg-white/20 transition-colors z-20 bg-black/30"
+                aria-label="Next video"
               >
                 <HiOutlineArrowSmRight className="w-6 h-6" />
               </button>
+              
+              {/* Swipe indicator dots */}
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1 z-20">
+                {trendingPosts.slice(0, Math.min(totalPosts, 8)).map((_, index) => (
+                  <div
+                    key={index}
+                    className={`w-1.5 h-1.5 transition-all duration-200 ${
+                      index === currentIndex % totalPosts ? 'bg-white' : 'bg-white/50'
+                    }`}
+                  />
+                ))}
+              </div>
             </>
           )}
         </div>
