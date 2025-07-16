@@ -45,7 +45,9 @@ const TrendingFeed = React.memo(() => {
     threshold: 0.1,
     rootMargin: '200px', // Trigger when 200px before element comes into view
     onIntersect: () => {
+      console.log('🔄 Infinite scroll triggered!', { hasMore, infiniteLoading });
       if (hasMore && !infiniteLoading) {
+        console.log('📥 Loading more posts...');
         loadMore();
       }
     }
@@ -69,21 +71,31 @@ const TrendingFeed = React.memo(() => {
         onPostDeleted={handlePostDeleted}
       />
       
-      {/* Automatic infinite scroll trigger - positioned at 80-90% of visible content */}
+      {/* Automatic infinite scroll trigger - always visible for debugging */}
       <div 
         ref={loadMoreRef} 
-        className="h-20 flex items-center justify-center"
+        className="h-20 flex items-center justify-center bg-muted/20 border-2 border-dashed border-muted-foreground/20"
         style={{ 
           position: 'relative',
-          top: '-10vh' // Position trigger higher to load before user reaches bottom
+          marginTop: '20px' // Remove the negative top positioning for now
         }}
       >
-        {hasMore && infiniteLoading && (
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <div className="animate-spin h-5 w-5 border-2 border-primary border-t-transparent rounded-full" />
-            <span className="text-sm">Loading more posts...</span>
-          </div>
-        )}
+        <div className="text-center">
+          {hasMore ? (
+            infiniteLoading ? (
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <div className="animate-spin h-5 w-5 border-2 border-primary border-t-transparent rounded-full" />
+                <span className="text-sm">Loading more posts...</span>
+              </div>
+            ) : (
+              <div className="text-muted-foreground text-sm">
+                Scroll trigger (hasMore: {hasMore.toString()}, loading: {infiniteLoading.toString()})
+              </div>
+            )
+          ) : (
+            <div className="text-muted-foreground text-sm">No more posts to load</div>
+          )}
+        </div>
       </div>
     </div>
   );

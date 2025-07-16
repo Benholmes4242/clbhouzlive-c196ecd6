@@ -61,11 +61,15 @@ export const useInfiniteTrendingFeed = () => {
   });
 
   const loadMore = useCallback(async () => {
+    console.log('🚀 loadMore called', { loading, hasMore, connectedUserIds: connectedUserIds.length });
+    
     if (loading || !hasMore || connectedUserIds.length === 0) {
+      console.log('❌ loadMore blocked:', { loading, hasMore, connectedUserIds: connectedUserIds.length });
       return;
     }
 
     setLoading(true);
+    console.log('📊 Starting to load more posts...');
 
     try {
       // 1. Get direct posts from followed users
