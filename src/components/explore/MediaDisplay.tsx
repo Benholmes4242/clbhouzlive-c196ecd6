@@ -48,6 +48,21 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
   // Debug log the media URL and autoplay
   console.log('MediaDisplay - URL:', media.media_url, 'Type:', media.media_type, 'Invalid:', isInvalidSrc, 'ShouldAutoplay:', shouldAutoplay);
 
+  // Generate thumbnail URL for Cloudflare Stream videos
+  const getVideoThumbnail = (videoUrl: string) => {
+    if (videoUrl.includes('cloudflarestream.com') && videoUrl.includes('/manifest/video.m3u8')) {
+      // Extract video ID from Cloudflare Stream URL
+      const match = videoUrl.match(/\/([a-f0-9]+)\/manifest\/video\.m3u8/);
+      if (match) {
+        const videoId = match[1];
+        return `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${videoId}/thumbnails/thumbnail.jpg`;
+      }
+    }
+    return null;
+  };
+
+  const thumbnailUrl = media.media_type === 'video' ? getVideoThumbnail(media.media_url) : null;
+
   return (
     <div className="relative w-full h-full overflow-hidden bg-muted">
       {/* Loading Skeleton - only show for images */}
@@ -58,16 +73,45 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
       )}
       
       {media.media_type === 'video' && !isInvalidSrc ? (
-        <EnhancedVideoPlayer
-          src={media.media_url}
-          autoplay={shouldAutoplay}
-          muted={true}
-          loop={loop}
-          className="w-full h-full pointer-events-none"
-          preloadLevel="metadata"
-          enableHLS={true}
-          quality="auto"
-        />
+        shouldAutoplay ? (
+          <EnhancedVideoPlayer
+            src={media.media_url}
+            autoplay={shouldAutoplay}
+            muted={true}
+            loop={loop}
+            className="w-full h-full pointer-events-none"
+            preloadLevel="metadata"
+            enableHLS={true}
+            quality="auto"
+          />
+        ) : (
+          // Show thumbnail for non-autoplaying videos to improve performance
+          <div className="relative w-full h-full">
+            <img
+              src={thumbnailUrl || fallbackImage}
+              alt={itemTitle || 'Video thumbnail'}
+              className="w-full h-full object-cover"
+              onLoad={() => {
+                console.log('Video thumbnail loaded:', thumbnailUrl);
+                onImageLoad();
+              }}
+              onError={(e) => {
+                console.log('Video thumbnail failed to load, using fallback:', thumbnailUrl);
+                e.currentTarget.src = fallbackImage;
+                onImageError();
+              }}
+              loading={currentIndex === 0 ? 'eager' : 'lazy'}
+            />
+            {/* Play button overlay for video thumbnails */}
+            <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+              <div className="w-12 h-12 bg-white/80 rounded-full flex items-center justify-center">
+                <svg className="w-6 h-6 text-black ml-1" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M8 5v14l11-7z"/>
+                </svg>
+              </div>
+            </div>
+          </div>
+        )
       ) : (
         <div className="relative w-full h-full">
           <img
