@@ -24,7 +24,7 @@ class VideoPlaybackManager {
   private maxAutoplayVideos = {
     discover: 99, // All visible videos can autoplay
     trending: 1,  // Only first video autoplays
-    feed: 2       // Max 2 videos autoplay in feed
+    feed: 1       // Only first video autoplays in feed
   };
 
   subscribe(listener: (videos: Map<string, VideoState>) => void) {
@@ -75,19 +75,16 @@ class VideoPlaybackManager {
       });
     }
 
-    // For feed section, pause oldest video if we exceed limit
+    // For feed section, pause all other videos when one starts (only 1 allowed)
     if (section === 'feed' && isAutoplay) {
       const feedVideos = Array.from(this.videos.values()).filter(v => v.section === 'feed');
-      const autoplayingVideos = feedVideos.filter(v => v.isPlaying && v.isAutoplay);
+      const autoplayingVideos = feedVideos.filter(v => v.isPlaying && v.isAutoplay && v.id !== videoId);
       
-      if (autoplayingVideos.length >= 2) {
-        // Pause the oldest autoplay video
-        const oldestVideo = autoplayingVideos.reduce((oldest, current) => 
-          current.priority < oldest.priority ? current : oldest
-        );
-        oldestVideo.element?.pause();
-        this.videos.set(oldestVideo.id, { ...oldestVideo, isPlaying: false });
-      }
+      // Pause all other autoplay videos in feed
+      autoplayingVideos.forEach(v => {
+        v.element?.pause();
+        this.videos.set(v.id, { ...v, isPlaying: false });
+      });
     }
 
     this.videos.set(videoId, { ...video, isPlaying: true, isAutoplay });

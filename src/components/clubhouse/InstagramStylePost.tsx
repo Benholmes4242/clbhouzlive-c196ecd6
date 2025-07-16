@@ -7,7 +7,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { supabase } from '@/integrations/supabase/client';
 import CoursePostBadge from '@/components/posts/CoursePostBadge';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
-import { useVideoAutoplay } from '@/hooks/useVideoAutoplay';
+import { useVideoPlaybackManager } from '@/hooks/useVideoPlaybackManager';
 import { useSwipeable } from 'react-swipeable';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -15,8 +15,6 @@ import { OptimizedAvatar } from '@/components/ui/optimized-avatar';
 import { getAvatarSize } from '@/utils/imageOptimization';
 import PostViewerModal from '@/components/posts/PostViewerModal';
 import { usePostViewer } from '@/hooks/usePostViewer';
-import { useVideoVisibility } from '@/hooks/useVideoVisibility';
-import { useVideoPlaybackManager } from '@/contexts/VideoPlaybackManager';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import SmartMediaContainer from '@/components/ui/smart-media-container';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
@@ -61,41 +59,24 @@ const InstagramStylePostComponent: React.FC<InstagramStylePostProps> = ({ post, 
   const isMobile = useIsMobile();
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   const [isVideoMuted, setIsVideoMuted] = useState(true);
-  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
-  
   const [showComments, setShowComments] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  
   const { isGloballyMuted, toggleGlobalMute } = useGlobalAudio();
-  const { registerVideo, unregisterVideo, pauseAllOtherVideos } = useVideoPlaybackManager();
+  
+  // Use the global video playback manager
+  const { videoRef, containerRef, isPlaying, shouldShowPlayIcon, togglePlayPause } = useVideoPlaybackManager({
+    section: 'feed',
+    videoId: post.id,
+    autoplayAllowed: index === 0, // Only first post can autoplay
+    priority: index
+  });
+  
   const { isOpen, currentPost, allUserPosts: viewerPosts, openPostViewer, closePostViewer } = usePostViewer({ source: 'clubhouse' });
-  
-  // Add video autoplay functionality
-  const { ref: autoplayRef, shouldAutoplay, handleMouseEnter, handleMouseLeave } = useVideoAutoplay();
-  
+
   // Memoize current media and other expensive calculations
   const currentMedia = useMemo(() => post.post_media[currentMediaIndex], [post.post_media, currentMediaIndex]);
   const displayName = useMemo(() => post.user.display_name || post.user.username || 'User', [post.user.display_name, post.user.username]);
   const timeAgo = useMemo(() => formatDistanceToNow(new Date(post.created_at), { addSuffix: true }), [post.created_at]);
-  // Use video visibility hook for intersection observer - only autoplay first post
-  const { containerRef, isVisible } = useVideoVisibility({
-    threshold: 0.5,
-    videoRef,
-    shouldAutoplay: index === 0, // Only first post autoplays
-    globallyMuted: isGloballyMuted,
-    onEnterView: () => {
-      if (videoRef.current && currentMedia?.media_type === 'video' && index === 0) {
-        pauseAllOtherVideos(post.id);
-      }
-    }
-  });
-
-  // Register/unregister video with playback manager
-  useEffect(() => {
-    if (videoRef.current && currentMedia?.media_type === 'video') {
-      registerVideo(post.id, videoRef.current);
-      return () => unregisterVideo(post.id);
-    }
-  }, [post.id, currentMedia?.media_type, registerVideo, unregisterVideo]);
 
   // Swipe handlers for media navigation
   const swipeHandlers = useSwipeable({
@@ -126,7 +107,6 @@ const InstagramStylePostComponent: React.FC<InstagramStylePostProps> = ({ post, 
     touchEventOptions: { passive: false }
   });
 
-
   const handleProfileClick = useCallback(() => {
     navigate(`/profile/${post.user.username}`);
   }, [navigate, post.user.username]);
@@ -137,15 +117,7 @@ const InstagramStylePostComponent: React.FC<InstagramStylePostProps> = ({ post, 
 
   const handleVideoToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (videoRef.current) {
-      if (videoRef.current.paused) {
-        videoRef.current.play().catch(console.error);
-        setIsVideoPlaying(true);
-      } else {
-        videoRef.current.pause();
-        setIsVideoPlaying(false);
-      }
-    }
+    togglePlayPause();
   };
 
   const handleMuteToggle = (e: React.MouseEvent) => {
@@ -173,8 +145,6 @@ const InstagramStylePostComponent: React.FC<InstagramStylePostProps> = ({ post, 
       <div 
         ref={containerRef}
         className="relative w-full bg-media-loading" 
-        onMouseEnter={handleMouseEnter} 
-        onMouseLeave={handleMouseLeave}
       >
         {/* Media Container - Full width, responsive height */}
         <div 
@@ -182,14 +152,17 @@ const InstagramStylePostComponent: React.FC<InstagramStylePostProps> = ({ post, 
           className="relative w-full aspect-[4/5] md:aspect-[3/4]" 
         >
           {currentMedia.media_type === 'video' ? (
-            <EnhancedVideoPlayer
-              src={currentMedia.media_url}
-              className="w-full h-full object-cover"
-              autoplay={index === 0} // Only first post autoplays
-              muted={true}
-              loop={true}
-              enableHLS={true}
-            />
+            <div className="w-full h-full">
+              <video
+                ref={videoRef}
+                src={currentMedia.media_url}
+                className="w-full h-full object-cover"
+                autoPlay={false} // Let the video manager handle autoplay
+                muted={true}
+                loop={true}
+                playsInline
+              />
+            </div>
           ) : (
             <SmartMediaContainer
               media={[{
@@ -232,9 +205,8 @@ const InstagramStylePostComponent: React.FC<InstagramStylePostProps> = ({ post, 
             </div>
           </div>
 
-
           {/* Video Controls */}
-          {currentMedia.media_type === 'video' && (
+          {currentMedia.media_type === 'video' && shouldShowPlayIcon && (
             <>
               {/* Play/Pause Center Button */}
               <div className="absolute inset-0 flex items-center justify-center z-10">
@@ -244,7 +216,7 @@ const InstagramStylePostComponent: React.FC<InstagramStylePostProps> = ({ post, 
                   className="w-16 h-16 rounded-full bg-black/40 backdrop-blur-sm text-white hover:bg-black/60 transition-all"
                   onClick={handleVideoToggle}
                 >
-                  {isVideoPlaying ? <Pause className="h-8 w-8" /> : <Play className="h-8 w-8 ml-1" />}
+                  {isPlaying ? <Pause className="h-8 w-8" /> : <Play className="h-8 w-8 ml-1" />}
                 </Button>
               </div>
 
