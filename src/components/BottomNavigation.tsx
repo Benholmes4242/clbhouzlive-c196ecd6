@@ -13,8 +13,6 @@ const BottomNavigation = () => {
   const { activeTab, handleTabClick } = useNavigationHandlers();
   const isDesktop = useIsDesktop();
   
-  console.log('BottomNavigation rendered - isDesktop:', isDesktop, 'activeTab:', activeTab);
-  
   const {
     captionInputRef,
     isGalleryOpen,
@@ -82,7 +80,6 @@ const BottomNavigation = () => {
       <NavigationBar
         activeTab={activeTab}
         onTabClick={(tab) => {
-          console.log('BottomNavigation: onTabClick called with:', tab);
           onTabClick(tab, handleTabClick);
         }}
       />
