@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { ExploreContentItem } from '@/components/explore/types';
 import { useVideoPlaybackManager } from '@/hooks/useVideoPlaybackManager';
+import MediaDisplay from '@/components/explore/MediaDisplay';
 
 interface TrendingVideosProps {
   videos: ExploreContentItem[];
@@ -94,28 +95,41 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
               <div
                 key={`${video.id}-${actualIndex}`}
                 className={`relative bg-muted rounded-lg overflow-hidden cursor-pointer group ${
-                  isMobile ? 'h-[70vh]' : 'aspect-[9/16]'
+                  isMobile ? 'h-[35vh]' : 'aspect-[9/8]'
                 }`}
                 onClick={() => handleVideoClick(actualIndex)}
               >
                 {isFirstCard ? (
                   // First card - autoplay video
-                  <video
-                    className="w-full h-full object-cover"
-                    src={video.src}
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
+                  <MediaDisplay
+                    media={{
+                      id: video.id,
+                      media_type: 'video',
+                      media_url: video.src
+                    }}
+                    itemTitle={video.title}
+                    shouldAutoplay={true}
+                    isLoading={false}
+                    onImageError={() => {}}
+                    onImageLoad={() => {}}
+                    itemId={video.id}
+                    currentIndex={actualIndex}
                   />
                 ) : (
                   // Other cards - video without autoplay (shows first frame)
-                  <video
-                    className="w-full h-full object-cover"
-                    src={video.src}
-                    muted
-                    playsInline
-                    preload="metadata"
+                  <MediaDisplay
+                    media={{
+                      id: video.id,
+                      media_type: 'video',
+                      media_url: video.src
+                    }}
+                    itemTitle={video.title}
+                    shouldAutoplay={false}
+                    isLoading={false}
+                    onImageError={() => {}}
+                    onImageLoad={() => {}}
+                    itemId={video.id}
+                    currentIndex={actualIndex}
                   />
                 )}
                 
