@@ -72,11 +72,12 @@ const InstagramStyleFeed: React.FC<InstagramStyleFeedProps> = ({ userPosts = [],
       <div className="w-full">
         {/* Instagram-style full-width posts */}
         <div className="space-y-0">
-          {postsWithMedia.map((post) => (
+          {postsWithMedia.map((post, index) => (
             <InstagramStylePost 
               key={post.id} 
               post={post} 
               allUserPosts={postsWithMedia}
+              index={index}
             />
           ))}
         </div>

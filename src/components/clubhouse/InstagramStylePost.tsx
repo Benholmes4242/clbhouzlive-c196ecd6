@@ -52,9 +52,10 @@ interface UserPostData {
 interface InstagramStylePostProps {
   post: UserPostData;
   allUserPosts?: UserPostData[];
+  index: number;
 }
 
-const InstagramStylePostComponent: React.FC<InstagramStylePostProps> = ({ post, allUserPosts = [] }) => {
+const InstagramStylePostComponent: React.FC<InstagramStylePostProps> = ({ post, allUserPosts = [], index }) => {
   const navigate = useNavigate();
   const { user } = useSupabaseSession();
   const isMobile = useIsMobile();
@@ -75,14 +76,14 @@ const InstagramStylePostComponent: React.FC<InstagramStylePostProps> = ({ post, 
   const currentMedia = useMemo(() => post.post_media[currentMediaIndex], [post.post_media, currentMediaIndex]);
   const displayName = useMemo(() => post.user.display_name || post.user.username || 'User', [post.user.display_name, post.user.username]);
   const timeAgo = useMemo(() => formatDistanceToNow(new Date(post.created_at), { addSuffix: true }), [post.created_at]);
-  // Use video visibility hook for intersection observer
+  // Use video visibility hook for intersection observer - only autoplay first post
   const { containerRef, isVisible } = useVideoVisibility({
     threshold: 0.5,
     videoRef,
-    shouldAutoplay: true,
+    shouldAutoplay: index === 0, // Only first post autoplays
     globallyMuted: isGloballyMuted,
     onEnterView: () => {
-      if (videoRef.current && currentMedia?.media_type === 'video') {
+      if (videoRef.current && currentMedia?.media_type === 'video' && index === 0) {
         pauseAllOtherVideos(post.id);
       }
     }
@@ -184,7 +185,7 @@ const InstagramStylePostComponent: React.FC<InstagramStylePostProps> = ({ post, 
             <EnhancedVideoPlayer
               src={currentMedia.media_url}
               className="w-full h-full object-cover"
-              autoplay={true}
+              autoplay={index === 0} // Only first post autoplays
               muted={true}
               loop={true}
               enableHLS={true}
