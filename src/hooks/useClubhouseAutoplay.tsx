@@ -21,6 +21,9 @@ export const useClubhouseAutoplay = ({
 
   // Check if this is a 3rd video (index 2, 5, 8, 11, etc.)
   const shouldAutoplay = hasVideo && (index + 1) % 3 === 0;
+  
+  // Debug logging
+  console.log(`🎯 Post ${postId} - Index: ${index}, Should autoplay: ${shouldAutoplay}, Has video: ${hasVideo}`);
 
   // Intersection Observer for visibility detection
   useEffect(() => {
@@ -49,7 +52,8 @@ export const useClubhouseAutoplay = ({
 
     const video = videoRef.current;
 
-    if (isVisible && !isPlaying) {
+    if (isVisible && !isPlaying && shouldAutoplay) {
+      console.log(`▶️ Starting autoplay for post ${postId} at index ${index}`);
       // Pause all other videos first
       pauseAllOtherVideos(postId);
       
@@ -62,7 +66,8 @@ export const useClubhouseAutoplay = ({
         .catch((error) => {
           console.log('Autoplay failed:', error);
         });
-    } else if (!isVisible && isPlaying) {
+    } else if (!isVisible && isPlaying && shouldAutoplay) {
+      console.log(`⏸️ Pausing autoplay for post ${postId} at index ${index}`);
       // Pause when out of view
       video.pause();
       setIsPlaying(false);
