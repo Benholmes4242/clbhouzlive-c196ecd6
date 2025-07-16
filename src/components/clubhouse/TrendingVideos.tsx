@@ -95,7 +95,7 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
               <div
                 key={`${video.id}-${actualIndex}`}
                 className={`relative bg-muted rounded-lg overflow-hidden cursor-pointer group ${
-                  isMobile ? 'h-[35vh]' : 'aspect-[9/8]'
+                  isMobile ? 'h-[45vh]' : 'aspect-[9/8]'
                 }`}
                 onClick={() => handleVideoClick(actualIndex)}
               >
@@ -164,43 +164,55 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
                     </div>
                   </div>
                 )}
+
+                {/* Mobile overlay controls */}
+                {isMobile && (
+                  <>
+                    {/* Left arrow */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        prevVideo();
+                      }}
+                      className="absolute left-2 top-1/2 -translate-y-1/2 p-2 bg-black/50 rounded-full hover:bg-black/70 transition-colors z-10"
+                      aria-label="Previous video"
+                    >
+                      <ChevronLeft className="w-5 h-5 text-white" />
+                    </button>
+                    
+                    {/* Right arrow */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        nextVideo();
+                      }}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-black/50 rounded-full hover:bg-black/70 transition-colors z-10"
+                      aria-label="Next video"
+                    >
+                      <ChevronRight className="w-5 h-5 text-white" />
+                    </button>
+
+                    {/* Overlay dots indicator */}
+                    <div className="absolute bottom-16 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+                      {trendingVideos.map((_, dotIndex) => (
+                        <button
+                          key={dotIndex}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setCurrentIndex(dotIndex);
+                          }}
+                          className={`w-2 h-2 rounded-full transition-colors ${
+                            dotIndex === currentIndex ? 'bg-white' : 'bg-white/50'
+                          }`}
+                          aria-label={`Go to video ${dotIndex + 1}`}
+                        />
+                      ))}
+                    </div>
+                  </>
+                )}
               </div>
             );
           })}
-        </div>
-
-        {/* Mobile swipe navigation */}
-        {isMobile && (
-          <div className="flex justify-center mt-4 gap-2">
-            <button
-              onClick={prevVideo}
-              className="p-3 rounded-full bg-muted hover:bg-muted/80 transition-colors"
-              aria-label="Previous video"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-            <button
-              onClick={nextVideo}
-              className="p-3 rounded-full bg-muted hover:bg-muted/80 transition-colors"
-              aria-label="Next video"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
-          </div>
-        )}
-
-        {/* Dots indicator */}
-        <div className="flex justify-center mt-4 gap-2">
-          {trendingVideos.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentIndex(index)}
-              className={`w-2 h-2 rounded-full transition-colors ${
-                index === currentIndex ? 'bg-primary' : 'bg-muted'
-              }`}
-              aria-label={`Go to video ${index + 1}`}
-            />
-          ))}
         </div>
       </div>
     </div>
