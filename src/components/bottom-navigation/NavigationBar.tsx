@@ -11,7 +11,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick }) 
   console.log('NavigationBar: Component rendering with activeTab:', activeTab);
   
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-background border-t border-border z-50">
+    <nav className="fixed bottom-0 left-0 right-0 bg-background border-t border-border z-[9999]">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-around h-16 relative">
           {navigationTabs.map((tab) => {
@@ -44,10 +44,12 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick }) 
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
                 style={{ 
-                  background: tab.id === 'post' ? 'rgba(255,0,0,0.1)' : 'transparent',
-                  border: tab.id === 'post' ? '2px solid red' : 'none',
+                  background: tab.id === 'post' ? 'rgba(255,0,0,0.8)' : 'transparent',
+                  border: tab.id === 'post' ? '3px solid red' : 'none',
                   pointerEvents: 'auto',
-                  touchAction: 'manipulation'
+                  touchAction: 'manipulation',
+                  position: 'relative',
+                  zIndex: 10000
                 }}
               >
                 <Icon 
