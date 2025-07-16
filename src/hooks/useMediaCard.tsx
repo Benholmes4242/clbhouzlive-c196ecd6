@@ -19,7 +19,7 @@ export const useMediaCard = ({ item, onLike, onMediaClick }: UseMediaCardProps) 
   const isMobile = useIsMobile();
 
   const { ref: autoplayRef, shouldAutoplay, handleMouseEnter, handleMouseLeave } = useVideoAutoplay({
-    enabled: true,
+    enabled: false,  // Disable autoplay for explore page
     threshold: 0.5
   });
 

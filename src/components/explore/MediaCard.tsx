@@ -86,6 +86,7 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, isFeature
           isFeatured={isFeatured}
           onLike={handleLike}
           onMaximize={handleMediaClick}
+          mediaType={currentMedia.media_type}
         />
       </div>
 

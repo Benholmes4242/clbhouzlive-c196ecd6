@@ -59,9 +59,9 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
       {media.media_type === 'video' && !isInvalidSrc ? (
         <EnhancedVideoPlayer
           src={media.media_url}
-          autoplay={shouldAutoplay}
+          autoplay={false}  // Never autoplay on explore page
           muted={true}
-          loop={true}
+          loop={false}
           className="w-full h-full pointer-events-none"
           preloadLevel="metadata"
           enableHLS={true}
