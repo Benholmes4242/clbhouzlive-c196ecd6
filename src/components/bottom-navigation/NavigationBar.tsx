@@ -29,6 +29,15 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick }) 
                   console.log('NavigationBar: Click event:', e);
                   onTabClick(tab);
                 }}
+                onTouchStart={(e) => {
+                  console.log('NavigationBar: TOUCH START!!! Tab:', tab.id);
+                }}
+                onTouchEnd={(e) => {
+                  console.log('NavigationBar: TOUCH END!!! Tab:', tab.id);
+                }}
+                onPointerDown={(e) => {
+                  console.log('NavigationBar: POINTER DOWN!!! Tab:', tab.id);
+                }}
                 className={`flex flex-col items-center justify-center space-y-1 transition-colors relative focus:outline-none min-h-[60px] min-w-[60px] ${
                   isActive
                     ? 'text-[#2a2626]'
@@ -36,7 +45,9 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick }) 
                 }`}
                 style={{ 
                   background: tab.id === 'post' ? 'rgba(255,0,0,0.1)' : 'transparent',
-                  border: tab.id === 'post' ? '2px solid red' : 'none'
+                  border: tab.id === 'post' ? '2px solid red' : 'none',
+                  pointerEvents: 'auto',
+                  touchAction: 'manipulation'
                 }}
               >
                 <Icon 
