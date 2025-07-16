@@ -160,7 +160,9 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
                         {video.user?.name || video.user?.username || 'Anonymous'}
                       </p>
                       {video.title && (
-                        <p className="text-white/80 text-xs truncate">{video.title}</p>
+                        <p className="text-white/80 text-xs truncate">
+                          {video.title.replace(/Played at .+?(\s|$)/gi, '').trim() || video.title}
+                        </p>
                       )}
                     </div>
                   </div>
