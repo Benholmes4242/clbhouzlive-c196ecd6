@@ -16,6 +16,23 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
   // Get first 8 videos for trending
   const trendingVideos = videos.filter(item => item.type === 'video').slice(0, 8);
   
+  // Function to clean title text and remove golf course information
+  const cleanTitleText = (title: string) => {
+    if (!title) return '';
+    
+    // Remove golf course patterns from title
+    return title
+      .replace(/\s*Played at\s+[^.!?]*[.!?]?\s*/gi, '')
+      .replace(/\s*#golf\s*/gi, '')
+      .replace(/\s*#family\s*/gi, '')
+      .replace(/\s*#chaos\s*/gi, '')
+      .replace(/\s*⛳\s*/gi, '')
+      .replace(/\s*🏌️\s*/gi, '')
+      .replace(/\s*🏌️‍♂️\s*/gi, '')
+      .replace(/\s*🏌️‍♀️\s*/gi, '')
+      .trim();
+  };
+  
   const { togglePlayPause, shouldShowPlayIcon } = useVideoPlaybackManager({
     section: 'trending',
     videoId: `trending-${currentIndex}`,
@@ -159,8 +176,8 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
                       <p className="text-white text-sm font-medium truncate">
                         {video.user?.name || video.user?.username || 'Anonymous'}
                       </p>
-                      {video.title && (
-                        <p className="text-white/80 text-xs truncate">{video.title}</p>
+                      {cleanTitleText(video.title) && (
+                        <p className="text-white/80 text-xs truncate">{cleanTitleText(video.title)}</p>
                       )}
                     </div>
                   </div>
