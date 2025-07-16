@@ -94,7 +94,7 @@ const Clubhouse = () => {
           />
 
           {/* Your Clubhouse Section */}
-          <div className="container py-6">
+          <div className="container pt-4 pb-6">
             <h2 className="text-xl font-semibold text-foreground mb-4">Your Clubhouse</h2>
             <ExploreFilters 
               activeFilter={activeFilter} 
