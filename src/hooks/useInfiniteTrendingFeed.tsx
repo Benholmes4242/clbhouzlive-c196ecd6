@@ -35,7 +35,12 @@ export const useInfiniteTrendingFeed = () => {
   const { data: connectedUserIds = [] } = useQuery({
     queryKey: ['connectedUserIds', user?.id],
     queryFn: async () => {
-      if (!user?.id) return [];
+      if (!user?.id) {
+        console.log('❌ No user ID for connected users query');
+        return [];
+      }
+
+      console.log('🔍 Fetching connected users for:', user.id);
 
       const [followsResponse, friendsResponse] = await Promise.all([
         supabase
@@ -49,12 +54,25 @@ export const useInfiniteTrendingFeed = () => {
           .eq('status', 'accepted')
       ]);
 
+      console.log('📊 Follows response:', followsResponse);
+      console.log('📊 Friends response:', friendsResponse);
+
+      if (followsResponse.error) {
+        console.error('❌ Error fetching follows:', followsResponse.error);
+      }
+      if (friendsResponse.error) {
+        console.error('❌ Error fetching friends:', friendsResponse.error);
+      }
+
       const followedUserIds = followsResponse.data?.map(f => f.following_id) || [];
       const friendUserIds = friendsResponse.data?.map(f => 
         f.user_id === user.id ? f.friend_id : f.user_id
       ) || [];
       
-      return [...new Set([...followedUserIds, ...friendUserIds])];
+      const allConnectedIds = [...new Set([...followedUserIds, ...friendUserIds])];
+      console.log('✅ Connected user IDs:', allConnectedIds);
+      
+      return allConnectedIds;
     },
     enabled: !!user?.id,
     staleTime: 300000,
