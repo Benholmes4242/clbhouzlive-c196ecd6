@@ -41,13 +41,16 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
                       media.media_url === '[object Object]' ||
                       typeof media.media_url !== 'string';
 
-  // Use advanced image optimization hook
-  const { optimizedImage, isLoading: imageLoading } = useAdvancedImageOptimization(media.media_url);
+  // Only use image optimization for image media types, not videos
+  const { optimizedImage, isLoading: imageLoading } = useAdvancedImageOptimization(
+    media.media_type === 'image' ? media.media_url : '',
+    { quality: 80 }
+  );
 
   return (
     <div className="relative w-full h-full overflow-hidden bg-muted">
-      {/* Loading Skeleton */}
-      {(isLoading || imageLoading) && (
+      {/* Loading Skeleton - only show for images or when image is loading */}
+      {(isLoading || (media.media_type === 'image' && imageLoading)) && (
         <div className="absolute inset-0 bg-muted/20 flex items-center justify-center z-10">
           <div className="w-8 h-8 border border-muted-foreground/30 border-t-muted-foreground rounded-full animate-spin"></div>
         </div>
@@ -73,6 +76,7 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
             alt: itemTitle || 'Content'
           }]}
           className="w-full h-full"
+          onMediaClick={onImageLoad}
           priority={currentIndex === 0}
           enableCarousel={false}
         />
