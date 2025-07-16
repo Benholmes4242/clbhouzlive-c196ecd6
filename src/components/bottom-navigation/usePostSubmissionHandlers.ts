@@ -31,7 +31,7 @@ export const usePostSubmissionHandlers = (
       // Open composer directly without files - modal will handle file upload UI
       openComposer();
     } else {
-      handleTabClick(tab, user, () => {});
+      handleTabClick(tab);
     }
   };
 
