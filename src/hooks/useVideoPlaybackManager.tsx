@@ -21,7 +21,6 @@ interface VideoPlaybackManagerProps {
 class VideoPlaybackManager {
   private videos: Map<string, VideoState> = new Map();
   private listeners: Set<(videos: Map<string, VideoState>) => void> = new Set();
-  private failedVideos: Set<string> = new Set(); // Track videos that failed to load
   private maxAutoplayVideos = {
     discover: 99, // All visible videos can autoplay
     trending: 1,  // Only first video autoplays
@@ -47,25 +46,7 @@ class VideoPlaybackManager {
     this.notify();
   }
 
-  // Mark a video as failed to prevent retry loops
-  markVideoAsFailed(videoId: string) {
-    console.log(`❌ Marking video as failed: ${videoId}`);
-    this.failedVideos.add(videoId);
-    // Remove from active videos to prevent further attempts
-    this.unregisterVideo(videoId);
-  }
-
-  // Check if a video has previously failed
-  hasVideoFailed(videoId: string): boolean {
-    return this.failedVideos.has(videoId);
-  }
-
   canAutoplay(section: 'discover' | 'trending' | 'feed', videoId: string): boolean {
-    // Don't try to autoplay failed videos
-    if (this.hasVideoFailed(videoId)) {
-      return false;
-    }
-
     const sectionVideos = Array.from(this.videos.values()).filter(v => v.section === section);
     const autoplayingVideos = sectionVideos.filter(v => v.isPlaying && v.isAutoplay);
     
@@ -209,20 +190,11 @@ export const useVideoPlaybackManager = ({
   useEffect(() => {
     if (!videoRef.current || !videoState) return;
 
-    // Skip failed videos
-    if (globalVideoManager.hasVideoFailed(videoId)) {
-      return;
-    }
-
     if (isInView && autoplayAllowed) {
       // Check if we can autoplay this video and it's not already playing
       if (!videoState.isPlaying && globalVideoManager.canAutoplay(section, videoId)) {
         console.log(`🎬 Starting autoplay for ${section} video: ${videoId}`);
-        videoRef.current.play().catch(error => {
-          console.error(`❌ Video autoplay failed for ${videoId}:`, error);
-          // Mark this video as failed to prevent retry loops
-          globalVideoManager.markVideoAsFailed(videoId);
-        });
+        videoRef.current.play().catch(console.error);
         globalVideoManager.playVideo(videoId, true);
       }
     } else if (!isInView && videoState.isPlaying && videoState.isAutoplay) {

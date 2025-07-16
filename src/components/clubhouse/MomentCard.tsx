@@ -1,7 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
-import StableVideo from '@/components/ui/stable-media/StableVideo';
-import StableImage from '@/components/ui/stable-media/StableImage';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import FollowButton from '@/components/profile/actions/FollowButton';
 import { useProfileActions } from '@/components/profile/actions/useProfileActions';
@@ -113,25 +111,22 @@ const MomentCard: React.FC<MomentCardProps> = ({ moment, currentUserId, modalMan
       {/* Media Container */}
       <div className="relative aspect-[3/4] bg-muted" onClick={handleVideoClick}>
         {videoMedia ? (
-          <StableVideo
+          <EnhancedVideoPlayer
             src={mediaToShow.media_url}
             className="w-full h-full object-cover"
-            autoPlay={true}
+            autoplay={true}
             muted={true}
             loop={true}
+            enableHLS={true}
             onClick={handleVideoClick}
-            fallbackComponent={
-              <div className="w-8 h-8 border-2 border-muted-foreground/30 border-t-muted-foreground/70 rounded-full animate-spin" />
-            }
+            onPlay={() => {}}
+            onPause={() => {}}
           />
         ) : (
-          <StableImage
+          <img
             src={mediaToShow.media_url}
             alt="Moment"
             className="w-full h-full object-cover hq-image"
-            fallbackComponent={
-              <div className="w-8 h-8 border-2 border-muted-foreground/30 border-t-muted-foreground/70 rounded-full animate-spin" />
-            }
           />
         )}
         
