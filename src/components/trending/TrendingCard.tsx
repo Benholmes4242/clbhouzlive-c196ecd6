@@ -109,10 +109,10 @@ const TrendingCard = () => {
         )}
 
         {/* Single Video */}
-        <div className="relative w-full h-full">
+        <div className="relative w-full h-full rounded-none">
           <EnhancedVideoPlayer
             src={firstVideo.media_url}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover rounded-none"
             autoplay={isFirstCard || isMobile}
             muted={true}
             loop={true}
