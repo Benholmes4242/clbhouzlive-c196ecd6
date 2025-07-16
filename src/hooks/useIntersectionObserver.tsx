@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 interface UseIntersectionObserverProps {
   threshold?: number | number[];
   rootMargin?: string;
+  onIntersect?: () => void;
 }
 
 // Shared observer instance to reduce overhead
@@ -11,7 +12,8 @@ const observerCache = new Map<string, IntersectionObserver>();
 
 export const useIntersectionObserver = ({ 
   threshold = 0.5, 
-  rootMargin = '0px' 
+  rootMargin = '0px',
+  onIntersect
 }: UseIntersectionObserverProps = {}) => {
   const [isInView, setIsInView] = useState(false);
   const elementRef = useRef<HTMLDivElement>(null);
@@ -20,6 +22,9 @@ export const useIntersectionObserver = ({
   // Create stable callback reference
   callbackRef.current = (entry: IntersectionObserverEntry) => {
     setIsInView(entry.isIntersecting);
+    if (entry.isIntersecting && onIntersect) {
+      onIntersect();
+    }
   };
 
   useEffect(() => {

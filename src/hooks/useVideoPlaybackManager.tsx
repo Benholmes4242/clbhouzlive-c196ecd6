@@ -149,7 +149,7 @@ export const useVideoPlaybackManager = ({
     // Subscribe to global state changes
     const unsubscribe = globalVideoManager.subscribe((videos) => {
       const currentVideo = videos.get(videoId);
-      if (currentVideo) {
+      if (currentVideo && JSON.stringify(currentVideo) !== JSON.stringify(videoState)) {
         setVideoState(currentVideo);
       }
     });

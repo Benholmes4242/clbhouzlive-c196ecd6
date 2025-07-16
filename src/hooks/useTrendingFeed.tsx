@@ -24,13 +24,13 @@ export const useTrendingFeed = () => {
           .from('user_follows')
           .select('following_id')
           .eq('follower_id', user.id)
-          .limit(5), // Reduced for better performance
+          .limit(50), // Increased back for proper feed loading
         supabase
           .from('user_friends')
           .select('user_id, friend_id')
           .or(`user_id.eq.${user.id},friend_id.eq.${user.id}`)
           .eq('status', 'accepted')
-          .limit(5) // Reduced for better performance
+          .limit(50) // Increased back for proper feed loading
       ]);
 
       const followedUserIds = followsResponse.data?.map(f => f.following_id) || [];
@@ -54,7 +54,7 @@ export const useTrendingFeed = () => {
         `)
         .in('user_id', allConnectedUserIds)
         .order('created_at', { ascending: false })
-        .limit(4); // Further reduced for better performance
+        .limit(20); // Increased back for proper feed loading
 
       if (postsError) {
         console.error('Error fetching followed posts:', postsError);
