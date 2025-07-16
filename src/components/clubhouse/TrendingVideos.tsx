@@ -184,7 +184,7 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
                         e.stopPropagation();
                         prevVideo();
                       }}
-                      className="absolute left-2 top-1/2 -translate-y-1/2 p-2 hover:bg-white/20 transition-colors z-10"
+                      className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full hover:bg-white/20 transition-colors z-10"
                       aria-label="Previous video"
                     >
                       <ChevronLeft className="w-5 h-5 text-white drop-shadow-lg" />
@@ -196,7 +196,7 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
                         e.stopPropagation();
                         nextVideo();
                       }}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 p-2 hover:bg-white/20 transition-colors z-10"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full hover:bg-white/20 transition-colors z-10"
                       aria-label="Next video"
                     >
                       <ChevronRight className="w-5 h-5 text-white drop-shadow-lg" />
