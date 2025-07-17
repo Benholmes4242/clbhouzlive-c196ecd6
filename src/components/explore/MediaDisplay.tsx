@@ -110,21 +110,16 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
               />
             </>
           ) : (
-            // Show thumbnail for non-autoplaying videos to improve performance
-            <img
-              src={thumbnailUrl || fallbackImage}
-              alt={itemTitle || 'Video thumbnail'}
-              className="w-full h-full object-cover"
-              onLoad={() => {
-                console.log('Video thumbnail loaded:', thumbnailUrl);
-                onImageLoad();
-              }}
-              onError={(e) => {
-                console.log('Video thumbnail failed to load, using fallback:', thumbnailUrl);
-                e.currentTarget.src = fallbackImage;
-                onImageError();
-              }}
-              loading={currentIndex === 0 ? 'eager' : 'lazy'}
+            // Show paused video for non-autoplaying videos to maintain clarity
+            <EnhancedVideoPlayer
+              src={media.media_url}
+              autoplay={false}
+              muted={true}
+              loop={false}
+              className="w-full h-full pointer-events-none"
+              preloadLevel="metadata"
+              enableHLS={true}
+              quality="auto"
             />
           )}
           
