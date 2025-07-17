@@ -64,7 +64,7 @@ const App: React.FC = () => {
             }>
               <AuthWrapper>
                 <Routes>
-                  <Route path="/" element={<Explore />} />
+                  <Route path="/" element={<Clubhouse />} />
                   <Route path="/auth" element={<Auth />} />
                   <Route path="/create-profile" element={<CreateProfile />} />
                   <Route path="/profile" element={<ProfilePage />} />
