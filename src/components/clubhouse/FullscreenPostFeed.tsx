@@ -124,8 +124,9 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
   return (
     <div 
       ref={containerRef}
-      className="h-screen w-full bg-black relative overflow-hidden"
+      className="fixed inset-0 z-50 touch-none bg-black"
       {...swipeHandlers}
+      style={{ overscrollBehavior: 'none' }}
     >
       {/* Main Media Content */}
       <div className="absolute inset-0">
