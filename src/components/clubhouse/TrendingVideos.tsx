@@ -171,7 +171,7 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
                     <img
                       src={video.user?.avatar || '/placeholder.svg'}
                       alt={video.user?.name || 'User'}
-                      className="w-12 h-12 rounded-full border border-white/20"
+                      className="w-12 h-12 rounded-full"
                     />
                     <div className="min-w-0 flex-1">
                       <p className="text-white text-base font-medium truncate">
