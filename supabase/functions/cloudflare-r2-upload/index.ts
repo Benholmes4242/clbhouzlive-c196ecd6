@@ -38,22 +38,22 @@ serve(async (req) => {
     const formData = await req.formData();
     const file = formData.get('file') as File;
     const fileName = formData.get('fileName') as string;
-    const bucketType = formData.get('bucketType') as string; // 'avatars', 'post-media', 'course-media', etc.
-    const bucketName = formData.get('bucketName') as string; // actual bucket name to use
+    const bucketType = formData.get('bucketType') as string;
     
     if (!file || !fileName) {
       throw new Error('Missing required parameters: file or fileName');
     }
 
-    // Use bucketName if provided, otherwise fall back to bucketType for backward compatibility
-    const targetBucket = bucketName || bucketType || 'clbhouz-media';
+    // Map bucket types to actual Cloudflare R2 bucket name
+    // All uploads go to the main media bucket in Cloudflare R2
+    const targetBucket = 'clbhouz-media';
 
     // Generate unique file path with proper organization
     const fileExtension = fileName.split('.').pop();
     const timestamp = Date.now();
     const randomId = Math.random().toString(36).substring(2);
     const uniqueFileName = `${timestamp}-${randomId}.${fileExtension}`;
-    const fullPath = `${user.id}/${bucketType}/${uniqueFileName}`;
+    const fullPath = `${user.id}/${bucketType || 'course-media'}/${uniqueFileName}`;
 
     console.log('Uploading file to R2:', {
       fileName: uniqueFileName,
