@@ -55,9 +55,7 @@ const MediaOverlays: React.FC<MediaOverlaysProps> = ({
               (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face';
             }}
           />
-          <span className={`text-white font-bold drop-shadow-lg ${
-            isFeatured ? 'text-base' : 'text-sm'
-          }`}>
+          <span className="text-white font-bold drop-shadow-lg text-base">
             {user.name}
           </span>
         </div>
