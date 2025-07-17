@@ -36,7 +36,7 @@ const MediaOverlays: React.FC<MediaOverlaysProps> = ({
         >
           <div className="flex items-center space-x-1">
             <PiHandsClappingDuotone className="h-5 w-5" />
-            <span className="font-medium text-sm leading-none">{likes}</span>
+            <span className="font-medium text-sm leading-none mt-0.5">{likes}</span>
           </div>
         </button>
       </div>
