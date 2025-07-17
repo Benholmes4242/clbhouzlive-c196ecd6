@@ -197,7 +197,7 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
                 )}
                 
                 {/* User info */}
-                <div className={`absolute left-3 right-3 ${isMobile ? 'bottom-8' : 'bottom-3'}`}>
+                <div className="absolute bottom-3 left-3 right-3">
                   <div className="flex items-center gap-2">
                     <img
                       src={video.user?.avatar || '/placeholder.svg'}
@@ -216,25 +216,32 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
                 </div>
 
 
-                {/* Mobile overlay controls */}
+                {/* Mobile navigation arrows */}
                 {isMobile && (
                   <>
-                    {/* Overlay dots indicator */}
-                    <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2 z-10">
-                      {trendingVideos.map((_, dotIndex) => (
-                        <button
-                          key={dotIndex}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setCurrentIndex(dotIndex);
-                          }}
-                          className={`w-2 h-2 rounded-full transition-colors ${
-                            dotIndex === currentIndex ? 'bg-white' : 'bg-white/50'
-                          }`}
-                          aria-label={`Go to video ${dotIndex + 1}`}
-                        />
-                      ))}
-                    </div>
+                    {/* Left arrow */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        prevVideo();
+                      }}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 hover:bg-black/70 transition-colors z-10"
+                      aria-label="Previous video"
+                    >
+                      <ChevronLeft className="w-5 h-5 text-white" />
+                    </button>
+                    
+                    {/* Right arrow */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        nextVideo();
+                      }}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 hover:bg-black/70 transition-colors z-10"
+                      aria-label="Next video"
+                    >
+                      <ChevronRight className="w-5 h-5 text-white" />
+                    </button>
                   </>
                 )}
               </div>
