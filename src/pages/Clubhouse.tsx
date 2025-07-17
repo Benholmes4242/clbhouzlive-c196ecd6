@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
-import ExploreFilters from '@/components/explore/ExploreFilters';
 import ExploreGrid from '@/components/explore/ExploreGrid';
 import MobileDebugConsole from '@/components/explore/MobileDebugConsole';
 import VerticalMediaFeed from '@/components/explore/VerticalMediaFeed';
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
-import { FILTER_TYPES, MEDIA_TYPES } from '@/components/explore/types';
+import { FILTER_TYPES } from '@/components/explore/types';
 
 const Clubhouse = () => {
   const [debugVisible, setDebugVisible] = useState(false);
@@ -55,18 +54,6 @@ const Clubhouse = () => {
           {/* Your Clubhouse Section */}
           <div className="container pt-6 pb-6">
             <h2 className="text-xl font-semibold text-foreground mb-4">Your Clubhouse</h2>
-            <ExploreFilters 
-              activeFilter={FILTER_TYPES.FRIENDS}
-              onFilterChange={() => {}}
-              excludeFilters={[
-                FILTER_TYPES.VIDEOS,
-                FILTER_TYPES.PHOTOS,
-                FILTER_TYPES.VERIFIED_PROS,
-                FILTER_TYPES.CHANNELS,
-                FILTER_TYPES.HACK_SHACK,
-                FILTER_TYPES.BRAIN_GAME
-              ]}
-            />
           </div>
 
           {/* Main Grid with Container */}

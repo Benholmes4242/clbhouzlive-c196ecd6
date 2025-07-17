@@ -163,13 +163,11 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     return (
       <>
         {/* TrendingVideos-style Layout for Friends Tab on Clubhouse */}
-        <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-3'}`}>
+        <div className="grid grid-cols-1 gap-6 max-w-md mx-auto">
           {content.filter(item => item.type === 'video' || item.type === 'image').map((item, index) => (
             <div
               key={`friends-${item.id}-${index}`}
-              className={`relative bg-muted rounded-lg overflow-hidden cursor-pointer group ${
-                isMobile ? 'h-[60vh]' : 'aspect-[9/8]'
-              }`}
+              className="relative bg-muted rounded-lg overflow-hidden cursor-pointer group aspect-[9/16]"
               onClick={() => onMediaClick?.(item)}
             >
               {/* Media Display */}
@@ -180,7 +178,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                   media_url: item.src
                 }}
                 itemTitle={item.title}
-                shouldAutoplay={index === 0}
+                shouldAutoplay={false}
                 isLoading={false}
                 onImageError={() => {}}
                 onImageLoad={() => {}}
