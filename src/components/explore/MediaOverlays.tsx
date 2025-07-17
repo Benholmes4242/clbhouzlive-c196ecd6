@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart } from 'lucide-react';
+import { PiHandsClappingDuotone } from 'react-icons/pi';
 
 interface User {
   id: string;
@@ -35,7 +35,7 @@ const MediaOverlays: React.FC<MediaOverlaysProps> = ({
           className="flex items-center justify-center w-10 h-10 text-white hover:bg-white/10 rounded-full transition-colors pointer-events-auto"
         >
           <div className="flex items-center space-x-1">
-            <Heart className="h-4 w-4" />
+            <PiHandsClappingDuotone className="h-4 w-4" />
             <span className="font-medium text-sm">{likes}</span>
           </div>
         </button>
