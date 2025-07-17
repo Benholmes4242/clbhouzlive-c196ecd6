@@ -112,9 +112,9 @@ export const useRealPostsFetcher = () => {
           type: primaryMedia.media_type as 'video' | 'image',
           src: primaryMedia.media_url,
           title: post.content || 'Post',
-          likes: post.likes_count || Math.floor(Math.random() * 500) + 50,
-          comments: post.comments_count || Math.floor(Math.random() * 100) + 5,
-          shares: post.shares_count || Math.floor(Math.random() * 50) + 1,
+          likes: Math.floor(Math.random() * 500) + 50, // Mock likes for now
+          comments: Math.floor(Math.random() * 100) + 5, // Mock comments for now
+          shares: Math.floor(Math.random() * 50) + 1, // Mock shares for now
           duration: primaryMedia.media_type === 'video' ? `${Math.floor(Math.random() * 180) + 30}s` : undefined,
           user: {
             id: post.user_id,
@@ -124,11 +124,11 @@ export const useRealPostsFetcher = () => {
             verified: Math.random() > 0.7 // Random verification for demo
           },
           golfCourse,
-          label: post.interaction_type ? {
-            'liked': 'Liked by Friends',
-            'commented': 'Commented by Friends',
-            'shared': 'Shared by Friends'
-          }[post.interaction_type] : undefined,
+          label: post.interaction_type ? 
+            post.interaction_type === 'liked' ? 'Liked by Friends' :
+            post.interaction_type === 'commented' ? 'Commented by Friends' :
+            post.interaction_type === 'shared' ? 'Shared by Friends' : undefined
+            : undefined,
           isFollowing: true, // All posts in friends feed should be from followed users or interactions
           media: allMedia.filter(m => isValidImageUrl(m.media_url))
         };
