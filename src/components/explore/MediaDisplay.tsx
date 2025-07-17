@@ -106,8 +106,8 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
           )}
           
           {/* Play icon for all video cards */}
-          <div className="absolute bottom-2 right-2 z-20">
-            <FaPlay className="h-3 w-3 text-white drop-shadow-lg" />
+          <div className="absolute bottom-3 right-3 z-20">
+            <FaPlay className="h-4 w-4 text-white drop-shadow-lg" />
           </div>
         </div>
       ) : (
