@@ -200,7 +200,18 @@ const GolfCoursesManagement = () => {
               )}
             </div>
 
-            {migrationProgress && (
+            {/* Show indeterminate progress bar while migrating */}
+            {isMigrating && (
+              <div className="space-y-2">
+                <div className="text-sm text-muted-foreground">
+                  Processing files and uploading to R2... This may take a few minutes.
+                </div>
+                <Progress value={undefined} className="h-2" />
+              </div>
+            )}
+
+            {/* Show detailed progress after migration completes */}
+            {migrationProgress && !isMigrating && (
               <>
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm text-muted-foreground">
