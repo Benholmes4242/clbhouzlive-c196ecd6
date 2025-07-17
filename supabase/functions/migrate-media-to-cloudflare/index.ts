@@ -218,9 +218,9 @@ serve(async (req) => {
 
               // Generate the correct public URL based on target bucket  
               if (source.targetBucket === 'clbhouz-golf-courses') {
-                newUrl = `https://pub-${accountId}.r2.dev/clbhouz-golf-courses/${filePath}`;
+                newUrl = `https://courses.clbhouz.co.uk/${filePath}`;
               } else {
-                newUrl = `https://pub-${accountId}.r2.dev/clbhouz-media/${filePath}`;
+                newUrl = `https://pub-a1b264d44ddbe2b5127bb6ff5c274108.r2.dev/clbhouz-media/${filePath}`;
               }
             }
 
