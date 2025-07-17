@@ -92,29 +92,31 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
     <div className="container mx-auto px-4 pt-6 pb-2">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-semibold text-foreground">Trending Videos</h2>
-        
-        {/* Desktop Navigation */}
-        {!isMobile && (
-          <div className="flex gap-2">
-            <button
-              onClick={prevVideo}
-              className="p-2 rounded-full bg-muted hover:bg-muted/80 transition-colors"
-              aria-label="Previous videos"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-            <button
-              onClick={nextVideo}
-              className="p-2 rounded-full bg-muted hover:bg-muted/80 transition-colors"
-              aria-label="Next videos"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
-          </div>
-        )}
       </div>
 
       <div className="relative">
+        {/* Desktop Navigation Arrows - Overlaid on cards */}
+        {!isMobile && (
+          <>
+            {/* Left arrow */}
+            <button
+              onClick={prevVideo}
+              className="absolute left-2 top-1/2 -translate-y-1/2 p-3 rounded-full hover:bg-white/20 transition-colors z-30"
+              aria-label="Previous videos"
+            >
+              <ChevronLeft className="w-6 h-6 text-white drop-shadow-lg" />
+            </button>
+            
+            {/* Right arrow */}
+            <button
+              onClick={nextVideo}
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-3 rounded-full hover:bg-white/20 transition-colors z-30"
+              aria-label="Next videos"
+            >
+              <ChevronRight className="w-6 h-6 text-white drop-shadow-lg" />
+            </button>
+          </>
+        )}
         <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-3'}`}>
           {currentVideos.map((video, index) => {
             const isFirstCard = index === 0;
