@@ -13,6 +13,7 @@ interface TrendingVideosProps {
 const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
+  const [activeButton, setActiveButton] = useState<'left' | 'right' | null>(null);
   
   // Get first 8 videos for trending
   const trendingVideos = videos.filter(item => item.type === 'video').slice(0, 8);
@@ -76,6 +77,14 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
     if (video) {
       onVideoClick(video);
     }
+  };
+
+  const handleButtonClick = (direction: 'left' | 'right', action: () => void, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setActiveButton(direction);
+    action();
+    // Remove active state after animation
+    setTimeout(() => setActiveButton(null), 150);
   };
 
   // Swipe handlers for mobile
@@ -221,11 +230,10 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
                   <>
                     {/* Left arrow */}
                     <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        prevVideo();
-                      }}
-                      className="absolute left-2 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-white/20 transition-colors z-10"
+                      onClick={(e) => handleButtonClick('left', prevVideo, e)}
+                      className={`absolute left-2 top-1/2 -translate-y-1/2 p-1 rounded-full transition-colors z-10 ${
+                        activeButton === 'left' ? 'bg-white/20' : ''
+                      }`}
                       aria-label="Previous video"
                     >
                       <ChevronLeft className="w-6 h-6 text-white drop-shadow-lg" />
@@ -233,11 +241,10 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
                     
                     {/* Right arrow */}
                     <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        nextVideo();
-                      }}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-white/20 transition-colors z-10"
+                      onClick={(e) => handleButtonClick('right', nextVideo, e)}
+                      className={`absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full transition-colors z-10 ${
+                        activeButton === 'right' ? 'bg-white/20' : ''
+                      }`}
                       aria-label="Next video"
                     >
                       <ChevronRight className="w-6 h-6 text-white drop-shadow-lg" />
