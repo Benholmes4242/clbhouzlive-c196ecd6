@@ -22,10 +22,80 @@ const ProfilePhotoManager: React.FC<ProfilePhotoManagerProps> = ({
   const [uploading, setUploading] = useState(false);
   const { toast } = useToast();
 
+  // Function to process and optimize image for high quality
+  const processImageFile = (file: File): Promise<File> => {
+    return new Promise((resolve, reject) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      img.onload = () => {
+        // Set high-quality dimensions (max 2048x2048 for 4K quality but manageable file size)
+        const maxSize = 2048;
+        let { width, height } = img;
+        
+        // Calculate new dimensions while maintaining aspect ratio
+        if (width > height) {
+          if (width > maxSize) {
+            height = (height * maxSize) / width;
+            width = maxSize;
+          }
+        } else {
+          if (height > maxSize) {
+            width = (width * maxSize) / height;
+            height = maxSize;
+          }
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        // Use high-quality rendering
+        if (ctx) {
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
+          ctx.drawImage(img, 0, 0, width, height);
+          
+          // Convert to high-quality JPEG (95% quality)
+          canvas.toBlob(
+            (blob) => {
+              if (blob) {
+                const processedFile = new File([blob], file.name, {
+                  type: 'image/jpeg',
+                  lastModified: Date.now(),
+                });
+                resolve(processedFile);
+              } else {
+                reject(new Error('Failed to process image'));
+              }
+            },
+            'image/jpeg',
+            0.95 // 95% quality for crisp, high-resolution images
+          );
+        } else {
+          reject(new Error('Failed to get canvas context'));
+        }
+      };
+      
+      img.onerror = () => reject(new Error('Failed to load image'));
+      img.src = URL.createObjectURL(file);
+    });
+  };
+
   const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!user) return;
     const file = event.target.files?.[0];
     if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Invalid File",
+        description: "Please select an image file.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     console.log('Starting photo upload for user:', user.id);
     const tempPreviewUrl = URL.createObjectURL(file);
@@ -33,8 +103,13 @@ const ProfilePhotoManager: React.FC<ProfilePhotoManagerProps> = ({
 
     setUploading(true);
     try {
-      // Upload to Cloudflare R2 instead of Supabase storage
-      const uploadResult = await uploadToCloudflareR2(file, 'avatars', `avatar.${file.name.split('.').pop()}`);
+      // Process the image for high quality
+      console.log('Processing image for high quality...');
+      const processedFile = await processImageFile(file);
+      console.log('Image processed successfully, original size:', file.size, 'processed size:', processedFile.size);
+      
+      // Upload processed image to Cloudflare R2
+      const uploadResult = await uploadToCloudflareR2(processedFile, 'avatars', `avatar.${processedFile.name.split('.').pop()}`);
       
       if (!uploadResult.success || !uploadResult.publicUrl) {
         throw new Error(uploadResult.error || 'Upload failed');
