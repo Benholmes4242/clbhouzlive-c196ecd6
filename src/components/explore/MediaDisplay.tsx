@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import SmartMediaContainer from '@/components/ui/smart-media-container';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
-import { RxVideo } from 'react-icons/rx';
 
 interface MediaItem {
   id: string;
@@ -103,10 +102,6 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
               }}
               loading={currentIndex === 0 ? 'eager' : 'lazy'}
             />
-            {/* Video indicator in bottom right corner */}
-            <div className="absolute bottom-2 right-2">
-              <RxVideo className="w-4 h-4 text-white drop-shadow-lg" />
-            </div>
           </div>
         )
       ) : (
