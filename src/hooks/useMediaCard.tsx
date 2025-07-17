@@ -8,9 +8,10 @@ interface UseMediaCardProps {
   item: ExploreContentItem;
   onLike: (contentId: string) => void;
   onMediaClick?: (item: ExploreContentItem) => void;
+  shouldAutoplay?: boolean;
 }
 
-export const useMediaCard = ({ item, onLike, onMediaClick }: UseMediaCardProps) => {
+export const useMediaCard = ({ item, onLike, onMediaClick, shouldAutoplay = false }: UseMediaCardProps) => {
   const [imageError, setImageError] = useState(false);
   const [isPostViewerOpen, setIsPostViewerOpen] = useState(false);
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
@@ -18,8 +19,8 @@ export const useMediaCard = ({ item, onLike, onMediaClick }: UseMediaCardProps) 
   const [isLoading, setIsLoading] = useState(true);
   const isMobile = useIsMobile();
 
-  const { ref: autoplayRef, shouldAutoplay, handleMouseEnter, handleMouseLeave } = useVideoAutoplay({
-    enabled: false,  // Disable autoplay for explore page
+  const { ref: autoplayRef, shouldAutoplay: autoplayEnabled, handleMouseEnter, handleMouseLeave } = useVideoAutoplay({
+    enabled: shouldAutoplay,  // Enable autoplay based on Friends tab logic
     threshold: 0.5
   });
 
@@ -140,7 +141,7 @@ export const useMediaCard = ({ item, onLike, onMediaClick }: UseMediaCardProps) 
     mediaItems,
     currentMedia,
     hasMultipleMedia,
-    shouldAutoplay,
+    shouldAutoplay: autoplayEnabled,
     transformedPost,
     
     // Handlers

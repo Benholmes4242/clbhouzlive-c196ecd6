@@ -10,10 +10,11 @@ interface ExploreContentCardProps {
   onFollow: (contentId: string) => void;
   onMediaClick?: (item: ExploreContentItem) => void;
   isFeatured?: boolean;
+  shouldAutoplay?: boolean;
 }
 
 
-const ExploreContentCard: React.FC<ExploreContentCardProps> = ({ item, onLike, onFollow, onMediaClick, isFeatured }) => {
+const ExploreContentCard: React.FC<ExploreContentCardProps> = ({ item, onLike, onFollow, onMediaClick, isFeatured, shouldAutoplay }) => {
   if (item.type === 'cta') {
     return (
       <div className="h-full">
@@ -24,7 +25,7 @@ const ExploreContentCard: React.FC<ExploreContentCardProps> = ({ item, onLike, o
 
   return (
     <div className="h-full">
-      <MediaCard item={item} onLike={onLike} onFollow={onFollow} onMediaClick={onMediaClick} isFeatured={isFeatured} />
+      <MediaCard item={item} onLike={onLike} onFollow={onFollow} onMediaClick={onMediaClick} isFeatured={isFeatured} shouldAutoplay={shouldAutoplay} />
     </div>
   );
 };

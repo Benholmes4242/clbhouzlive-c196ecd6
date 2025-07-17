@@ -14,9 +14,19 @@ interface MediaCardProps {
   onFollow: (contentId: string) => void;
   onMediaClick?: (item: ExploreContentItem) => void;
   isFeatured?: boolean;
+  shouldAutoplay?: boolean;
 }
 
-const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, isFeatured, ...props }) => {
+const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, isFeatured, shouldAutoplay: shouldAutoplayProp, ...props }) => {
+  // Get media array first to check current media type
+  const mediaItems = item.media && item.media.length > 0 ? item.media : [{
+    id: `${item.id}-single`,
+    media_type: item.type as 'video' | 'image',
+    media_url: item.src
+  }];
+  
+  const currentMedia = mediaItems[0]; // Use first media for autoplay determination
+  
   const {
     isPostViewerOpen,
     setIsPostViewerOpen,
@@ -26,10 +36,10 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, isFeature
     isMobile,
     autoplayRef,
     swipeRef,
-    mediaItems,
-    currentMedia,
+    mediaItems: mediaItemsFromHook,
+    currentMedia: currentMediaFromHook,
     hasMultipleMedia,
-    shouldAutoplay,
+    shouldAutoplay: shouldAutoplayEnabled,
     transformedPost,
     handlePrevMedia,
     handleNextMedia,
@@ -42,7 +52,8 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, isFeature
   } = useMediaCard({ 
     item, 
     onLike, 
-    onMediaClick: props.onMediaClick 
+    onMediaClick: props.onMediaClick,
+    shouldAutoplay: shouldAutoplayProp && currentMedia?.media_type === 'video'
   });
 
   if (item.type === 'cta') return null;
@@ -60,9 +71,9 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, isFeature
         onMouseLeave={handleCardMouseLeave}
       >
         <MediaDisplay
-          media={currentMedia}
+          media={currentMediaFromHook}
           itemTitle={item.title}
-          shouldAutoplay={shouldAutoplay}
+          shouldAutoplay={shouldAutoplayEnabled}
           isLoading={isLoading}
           onImageError={handleImageError}
           onImageLoad={handleImageLoad}
@@ -72,7 +83,7 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, isFeature
 
         <MediaControls
           hasMultipleMedia={hasMultipleMedia}
-          mediaCount={mediaItems.length}
+          mediaCount={mediaItemsFromHook.length}
           currentIndex={currentMediaIndex}
           isHovered={isHovered}
           isMobile={isMobile}
@@ -86,7 +97,7 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, isFeature
           isFeatured={isFeatured}
           onLike={handleLike}
           onMaximize={handleMediaClick}
-          mediaType={currentMedia.media_type}
+          mediaType={currentMediaFromHook.media_type}
         />
       </div>
 
