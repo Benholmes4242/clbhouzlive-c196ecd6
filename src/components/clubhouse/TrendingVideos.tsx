@@ -207,8 +207,8 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
                 )}
                 
                 {/* Trending Icon */}
-                <div className="absolute top-3 right-3 bg-white/20 backdrop-blur-sm rounded-full p-2">
-                  <IoTrendingUpSharp className="w-4 h-4 text-white" />
+                <div className="absolute top-3 right-3">
+                  <IoTrendingUpSharp className="w-8 h-8 text-white drop-shadow-lg" />
                 </div>
                 
                 {/* User info */}
