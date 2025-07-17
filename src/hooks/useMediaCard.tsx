@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ExploreContentItem } from '@/components/explore/types';
 import { useVideoAutoplay } from '@/hooks/useVideoAutoplay';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
@@ -8,20 +8,32 @@ interface UseMediaCardProps {
   item: ExploreContentItem;
   onLike: (contentId: string) => void;
   onMediaClick?: (item: ExploreContentItem) => void;
+  autoplayManager?: {
+    registerVideo: (videoId: string, element: HTMLElement, index: number) => void;
+    unregisterVideo: (videoId: string) => void;
+    shouldVideoAutoplay: (index: number) => boolean;
+    isVideoAutoplaying: (videoId: string) => boolean;
+  };
+  videoIndex?: number;
 }
 
-export const useMediaCard = ({ item, onLike, onMediaClick }: UseMediaCardProps) => {
+export const useMediaCard = ({ item, onLike, onMediaClick, autoplayManager, videoIndex = 0 }: UseMediaCardProps) => {
   const [imageError, setImageError] = useState(false);
   const [isPostViewerOpen, setIsPostViewerOpen] = useState(false);
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [shouldAutoplayOverride, setShouldAutoplayOverride] = useState(false);
   const isMobile = useIsMobile();
+  const cardRef = useRef<HTMLElement | null>(null);
 
-  const { ref: autoplayRef, shouldAutoplay, handleMouseEnter, handleMouseLeave } = useVideoAutoplay({
-    enabled: false,  // Disable autoplay for explore page
+  const { ref: autoplayRef, shouldAutoplay: defaultShouldAutoplay, handleMouseEnter, handleMouseLeave } = useVideoAutoplay({
+    enabled: false,  // Disable default autoplay for explore page
     threshold: 0.5
   });
+
+  // Use override autoplay logic if autoplayManager is provided
+  const shouldAutoplay = autoplayManager ? shouldAutoplayOverride : defaultShouldAutoplay;
 
   // Get media array - use the new media property if available, otherwise fallback to single media
   const mediaItems = item.media && item.media.length > 0 ? item.media : [{
@@ -32,6 +44,35 @@ export const useMediaCard = ({ item, onLike, onMediaClick }: UseMediaCardProps) 
 
   const currentMedia = mediaItems[currentMediaIndex] || mediaItems[0];
   const hasMultipleMedia = mediaItems.length > 1;
+
+  // Handle autoplay manager integration
+  useEffect(() => {
+    if (!autoplayManager || !cardRef.current || currentMedia.media_type !== 'video') return;
+
+    const element = cardRef.current;
+    const videoId = `${item.id}-${currentMediaIndex}`;
+
+    // Register video with autoplay manager
+    autoplayManager.registerVideo(videoId, element, videoIndex);
+
+    // Listen for autoplay events
+    const handleStartAutoplay = () => {
+      setShouldAutoplayOverride(true);
+    };
+
+    const handleStopAutoplay = () => {
+      setShouldAutoplayOverride(false);
+    };
+
+    element.addEventListener('startAutoplay', handleStartAutoplay);
+    element.addEventListener('stopAutoplay', handleStopAutoplay);
+
+    return () => {
+      autoplayManager.unregisterVideo(videoId);
+      element.removeEventListener('startAutoplay', handleStartAutoplay);
+      element.removeEventListener('stopAutoplay', handleStopAutoplay);
+    };
+  }, [autoplayManager, item.id, currentMediaIndex, videoIndex, currentMedia.media_type]);
 
   // Navigation handlers
   const handlePrevMedia = (e: React.MouseEvent) => {
@@ -135,6 +176,7 @@ export const useMediaCard = ({ item, onLike, onMediaClick }: UseMediaCardProps) 
     // Refs
     autoplayRef,
     swipeRef,
+    cardRef,
     
     // Media data
     mediaItems,
