@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
+import { ChevronLeft, ChevronRight, MapPin, Play } from 'lucide-react';
 import { ExploreContentItem } from '@/components/explore/types';
 import { useVideoPlaybackManager } from '@/hooks/useVideoPlaybackManager';
 import MediaDisplay from '@/components/explore/MediaDisplay';
@@ -165,15 +165,15 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
                   </div>
                 )}
                 
-                {/* User info */}
-                <div className="absolute bottom-8 left-3 right-3">
+                {/* User info - moved down from bottom-8 to bottom-3 */}
+                <div className="absolute bottom-3 left-3 right-3">
                   <div className="flex items-center gap-2">
                     <img
                       src={video.user?.avatar || '/placeholder.svg'}
                       alt={video.user?.name || 'User'}
                       className="w-8 h-8 rounded-full border border-white/20"
                     />
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                       <p className="text-white text-sm font-medium truncate">
                         {video.user?.name || video.user?.username || 'Anonymous'}
                       </p>
@@ -184,12 +184,18 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
                   </div>
                 </div>
 
-                {/* Play indicator for non-playing cards */}
+                {/* Bottom-right play button for non-autoplay videos (replaces center play button) */}
                 {!isFirstCard && (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-                      <div className="w-0 h-0 border-l-[8px] border-l-white border-y-[6px] border-y-transparent ml-1" />
-                    </div>
+                  <div className="absolute bottom-3 right-3 pointer-events-auto z-20">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleVideoClick(actualIndex);
+                      }}
+                      className="flex items-center justify-center w-10 h-10 text-white hover:bg-white/20 rounded-full transition-colors bg-black/50 backdrop-blur-sm"
+                    >
+                      <Play className="h-4 w-4" />
+                    </button>
                   </div>
                 )}
 
