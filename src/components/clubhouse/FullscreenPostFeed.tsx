@@ -153,8 +153,8 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
         <button
           onClick={goToPrevious}
           disabled={currentIndex === 0}
-          className={`p-2 rounded-full bg-black/50 backdrop-blur-sm text-white ${
-            currentIndex === 0 ? 'opacity-50' : 'hover:bg-black/70'
+          className={`p-0 rounded-full bg-white/20 backdrop-blur-sm text-white ${
+            currentIndex === 0 ? 'opacity-50' : 'hover:bg-white/30'
           }`}
         >
           <ChevronUp className="w-6 h-6" />
@@ -162,8 +162,8 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
         <button
           onClick={goToNext}
           disabled={currentIndex === content.length - 1}
-          className={`p-2 rounded-full bg-black/50 backdrop-blur-sm text-white ${
-            currentIndex === content.length - 1 ? 'opacity-50' : 'hover:bg-black/70'
+          className={`p-0 rounded-full bg-white/20 backdrop-blur-sm text-white ${
+            currentIndex === content.length - 1 ? 'opacity-50' : 'hover:bg-white/30'
           }`}
         >
           <ChevronDown className="w-6 h-6" />
