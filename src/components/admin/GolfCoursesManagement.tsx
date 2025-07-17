@@ -6,17 +6,21 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import GolfCourseEditor from './GolfCourseEditor';
 import GolfCourseCard from './golf-courses/GolfCourseCard';
-import GolfCoursesFilters from './golf-courses/GolfCoursesFilters';
+import CascadingFilters from './golf-courses/CascadingFilters';
 import EmptyCoursesState from './golf-courses/EmptyCoursesState';
 import GolfCoursesLoadingSkeleton from './golf-courses/GolfCoursesLoadingSkeleton';
 
 import { useGolfCourses } from './golf-courses/useGolfCourses';
 import { filterCoursesByRegion } from './golf-courses/utils';
-import { GolfCourse, RegionKey } from './golf-courses/types';
+import { GolfCourse, RegionalFilter } from './golf-courses/types';
 
 const GolfCoursesManagement = () => {
   const { toast } = useToast();
-  const [selectedRegion, setSelectedRegion] = useState<RegionKey>('all');
+  const [regionalFilter, setRegionalFilter] = useState<RegionalFilter>({
+    region: 'all',
+    subCountry: null,
+    county: null
+  });
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCourse, setSelectedCourse] = useState<GolfCourse | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
@@ -51,7 +55,7 @@ const GolfCoursesManagement = () => {
   };
 
 
-  const filteredCourses = filterCoursesByRegion(courses || [], selectedRegion, searchTerm);
+  const filteredCourses = filterCoursesByRegion(courses || [], regionalFilter, searchTerm);
 
   if (isLoading) {
     return <GolfCoursesLoadingSkeleton />;
@@ -75,11 +79,11 @@ const GolfCoursesManagement = () => {
         </div>
 
 
-        <GolfCoursesFilters
+        <CascadingFilters
           searchTerm={searchTerm}
           onSearchChange={setSearchTerm}
-          selectedRegion={selectedRegion}
-          onRegionChange={setSelectedRegion}
+          regionalFilter={regionalFilter}
+          onRegionalFilterChange={setRegionalFilter}
         />
 
 

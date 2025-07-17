@@ -45,48 +45,75 @@ export const regionMapping: Record<RegionKey, string> = {
   worldwide: 'Worldwide'
 };
 
-// Primary country/region options
-export const countryOptions = [
-  'USA',
-  'Britain & Ireland',
-  'Continental Europe',
-  'Worldwide'
+// Filter state interface for cascading dropdowns
+export interface RegionalFilter {
+  region: RegionKey;
+  subCountry: string | null;
+  county: string | null;
+}
+
+// Country/Sub-country mapping for Britain & Ireland
+export const britainIrelandCountries = [
+  'England',
+  'Scotland', 
+  'Wales',
+  'Ireland',
+  'Northern Ireland'
 ];
 
-// Sub-country options based on primary country selection
-export const subCountryOptions: Record<string, string[]> = {
-  'USA': [
-    'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut',
-    'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa',
-    'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan',
-    'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire',
-    'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio',
-    'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota',
-    'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia',
-    'Wisconsin', 'Wyoming'
+// Sample counties for Britain & Ireland countries
+export const britainIrelandCounties: Record<string, string[]> = {
+  'England': [
+    'Bedfordshire', 'Berkshire', 'Buckinghamshire', 'Cambridgeshire', 'Cheshire',
+    'Cornwall', 'Cumbria', 'Derbyshire', 'Devon', 'Dorset', 'Durham', 'Essex',
+    'Gloucestershire', 'Greater London', 'Hampshire', 'Herefordshire', 'Hertfordshire',
+    'Kent', 'Lancashire', 'Leicestershire & Rutland', 'Lincolnshire', 'Norfolk',
+    'Northamptonshire', 'Northumberland', 'Nottinghamshire', 'Oxfordshire',
+    'Shropshire', 'Somerset', 'Staffordshire', 'Suffolk', 'Surrey', 'Sussex',
+    'Warwickshire', 'West Midlands', 'Wiltshire', 'Worcestershire', 'Yorkshire'
   ],
-  'Britain & Ireland': [
-    'England', 'Scotland', 'Wales', 'Ireland', 'Northern Ireland'
+  'Scotland': [
+    'Aberdeen', 'Angus', 'Argyll and Bute', 'Ayrshire', 'Borders',
+    'Dumfries and Galloway', 'Dundee', 'Edinburgh', 'Fife', 'Glasgow',
+    'Highland', 'Lanarkshire', 'Moray', 'Perth and Kinross', 'Stirling'
   ],
-  'Continental Europe': [
-    'Austria', 'Belgium', 'Bulgaria', 'Czech Republic', 'Denmark', 'Estonia', 'Finland', 'France',
-    'Germany', 'Greece', 'Hungary', 'Iceland', 'Italy', 'Latvia', 'Lithuania', 'Luxembourg',
-    'Netherlands', 'Norway', 'Poland', 'Portugal', 'Slovenia', 'Slovakia', 'Spain',
-    'Sweden', 'Switzerland', 'Turkey', 'Russia', 'Croatia'
+  'Wales': [
+    'Anglesey', 'Cardiff', 'Carmarthenshire', 'Ceredigion', 'Conwy',
+    'Denbighshire', 'Flintshire', 'Glamorgan', 'Gwynedd', 'Monmouthshire',
+    'Pembrokeshire', 'Powys', 'Rhondda Cynon Taf', 'Swansea', 'Wrexham'
   ],
-  'Worldwide': [
-    'Australia', 'New Zealand', 'South Africa', 'Japan', 'South Korea', 'China',
-    'Thailand', 'Singapore', 'Malaysia', 'Philippines', 'India', 'UAE', 'Canada',
-    'Mexico', 'Brazil', 'Argentina', 'Chile', 'Morocco', 'Egypt', 'Kenya'
+  'Ireland': [
+    'Dublin', 'Cork', 'Galway', 'Kerry', 'Kildare', 'Kilkenny',
+    'Limerick', 'Mayo', 'Meath', 'Tipperary', 'Waterford', 'Wexford'
+  ],
+  'Northern Ireland': [
+    'Antrim', 'Armagh', 'Down', 'Fermanagh', 'Londonderry', 'Tyrone'
   ]
 };
 
-// Continent options
-export const continentOptions = [
-  'North America',
-  'South America',
-  'Europe',
-  'Asia',
-  'Africa',
-  'Oceania'
+// US States
+export const usStates = [
+  'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut',
+  'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa',
+  'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan',
+  'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire',
+  'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio',
+  'Oklahoma', 'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota',
+  'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington', 'West Virginia',
+  'Wisconsin', 'Wyoming'
+];
+
+// Continental Europe countries
+export const continentalEuropeCountries = [
+  'Austria', 'Belgium', 'Bulgaria', 'Croatia', 'Czech Republic', 'Denmark', 'Estonia',
+  'Finland', 'France', 'Germany', 'Greece', 'Hungary', 'Iceland', 'Italy', 'Latvia',
+  'Lithuania', 'Luxembourg', 'Netherlands', 'Norway', 'Poland', 'Portugal', 'Slovenia',
+  'Slovakia', 'Spain', 'Sweden', 'Switzerland', 'Turkey', 'Russia'
+];
+
+// Worldwide countries
+export const worldwideCountries = [
+  'Australia', 'New Zealand', 'South Africa', 'Japan', 'South Korea', 'China',
+  'Thailand', 'Singapore', 'Malaysia', 'Philippines', 'India', 'UAE', 'Canada',
+  'Mexico', 'Brazil', 'Argentina', 'Chile', 'Morocco', 'Egypt', 'Kenya'
 ];

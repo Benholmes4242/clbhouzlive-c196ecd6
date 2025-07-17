@@ -1,9 +1,9 @@
 
-import { GolfCourse, RegionKey } from './types';
+import { GolfCourse, RegionKey, RegionalFilter } from './types';
 
 export const filterCoursesByRegion = (
   courses: GolfCourse[], 
-  selectedRegion: RegionKey, 
+  regionalFilter: RegionalFilter,
   searchTerm: string
 ): GolfCourse[] => {
   if (!courses) return [];
@@ -11,9 +11,9 @@ export const filterCoursesByRegion = (
   let filtered = courses;
 
   // Filter by region
-  if (selectedRegion !== 'all') {
+  if (regionalFilter.region !== 'all') {
     filtered = filtered.filter(course => {
-      switch (selectedRegion) {
+      switch (regionalFilter.region) {
         case 'britain-ireland':
           return course.country === 'Britain & Ireland';
         case 'usa':
@@ -27,6 +27,20 @@ export const filterCoursesByRegion = (
           return true;
       }
     });
+  }
+
+  // Filter by sub-country (state/country within region)
+  if (regionalFilter.subCountry) {
+    filtered = filtered.filter(course => 
+      course.sub_country === regionalFilter.subCountry
+    );
+  }
+
+  // Filter by county/region (third level)
+  if (regionalFilter.county) {
+    filtered = filtered.filter(course => 
+      course.region === regionalFilter.county
+    );
   }
 
   // Filter by search term
