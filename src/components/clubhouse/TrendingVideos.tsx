@@ -225,10 +225,10 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
                         e.stopPropagation();
                         prevVideo();
                       }}
-                      className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 hover:bg-black/70 transition-colors z-10"
+                      className="absolute left-2 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-white/20 transition-colors z-10"
                       aria-label="Previous video"
                     >
-                      <ChevronLeft className="w-5 h-5 text-white" />
+                      <ChevronLeft className="w-6 h-6 text-white drop-shadow-lg" />
                     </button>
                     
                     {/* Right arrow */}
@@ -237,10 +237,10 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
                         e.stopPropagation();
                         nextVideo();
                       }}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/50 hover:bg-black/70 transition-colors z-10"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-white/20 transition-colors z-10"
                       aria-label="Next video"
                     >
-                      <ChevronRight className="w-5 h-5 text-white" />
+                      <ChevronRight className="w-6 h-6 text-white drop-shadow-lg" />
                     </button>
                   </>
                 )}
