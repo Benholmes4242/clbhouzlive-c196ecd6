@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
-import { FaPlay } from 'react-icons/fa';
 import { ExploreContentItem } from '@/components/explore/types';
 import { useVideoPlaybackManager } from '@/hooks/useVideoPlaybackManager';
 import MediaDisplay from '@/components/explore/MediaDisplay';
@@ -185,10 +184,6 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
                   </div>
                 </div>
 
-                {/* Bottom-right play button for all videos */}
-                <div className="absolute bottom-3 right-3 z-20">
-                  <FaPlay className="h-4 w-4 text-white drop-shadow-lg" />
-                </div>
 
                 {/* Mobile overlay controls */}
                 {isMobile && (
