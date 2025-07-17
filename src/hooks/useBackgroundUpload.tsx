@@ -143,14 +143,12 @@ export const useBackgroundUpload = () => {
             console.log(`Upload attempt ${uploadAttempts}/${maxAttempts} for ${file.name}`);
             
             try {
-              const { data, error: uploadError } = await supabase.storage
-                .from('post-media')
-                .upload(`${userId}/${fullFileName}`, file, {
-                  upsert: false
-                });
+              // Upload to Cloudflare R2 instead of Supabase storage
+              const { uploadToCloudflareR2 } = await import('@/utils/cloudflareUpload');
+              const uploadResult = await uploadToCloudflareR2(file, 'post-media', fullFileName);
 
-              if (uploadError) {
-                console.error(`Upload attempt ${uploadAttempts} failed for ${file.name}:`, uploadError);
+              if (!uploadResult.success || !uploadResult.publicUrl) {
+                console.error(`Upload attempt ${uploadAttempts} failed for ${file.name}:`, uploadResult.error);
                 if (uploadAttempts === maxAttempts) {
                   // If regular upload fails, try chunked upload as fallback
                   console.log(`Falling back to chunked upload for ${file.name}`);
@@ -165,12 +163,7 @@ export const useBackgroundUpload = () => {
                 continue;
               }
 
-              // Get public URL
-              const { data: { publicUrl: url } } = supabase.storage
-                .from('post-media')
-                .getPublicUrl(`${userId}/${fullFileName}`);
-                
-              publicUrl = url;
+              publicUrl = uploadResult.publicUrl;
               uploadSuccess = true;
               console.log(`Successfully uploaded ${file.name} to:`, publicUrl);
 

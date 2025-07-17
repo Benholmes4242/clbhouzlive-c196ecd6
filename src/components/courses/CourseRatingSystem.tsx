@@ -55,13 +55,13 @@ const CourseRatingSystem = ({
       if (files.length > 0) {
         const uploadPromises = files.map(async (file) => {
           const fileExt = file.name.split('.').pop();
-          const fileName = `${userResponse.user.id}/${Date.now()}.${fileExt}`;
+          const fileName = `${Date.now()}.${fileExt}`;
           
-          const { error: uploadError } = await supabase.storage
-            .from('course-media')
-            .upload(fileName, file);
+          // Upload to Cloudflare R2 instead of Supabase storage
+          const { uploadToCloudflareR2 } = await import('@/utils/cloudflareUpload');
+          const uploadResult = await uploadToCloudflareR2(file, 'course-media', fileName);
 
-          if (uploadError) {
+          if (!uploadResult.success || !uploadResult.publicUrl) {
             console.error('Error uploading file:', uploadError);
             throw new Error(`Failed to upload ${file.name}`);
           }

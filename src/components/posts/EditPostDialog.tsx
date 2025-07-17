@@ -93,17 +93,17 @@ const EditPostDialog = ({ open, onOpenChange, post, onPostUpdated }: EditPostDia
 
   const uploadNewMedia = async (file: File) => {
     const fileExt = file.name.split('.').pop();
-    const fileName = `${user?.id}/${Date.now()}.${fileExt}`;
+    const fileName = `${Date.now()}.${fileExt}`;
     
-    const { error: uploadError } = await supabase.storage
-      .from('post-media')
-      .upload(fileName, file);
+    // Upload to Cloudflare R2 instead of Supabase storage
+    const { uploadToCloudflareR2 } = await import('@/utils/cloudflareUpload');
+    const uploadResult = await uploadToCloudflareR2(file, 'post-media', fileName);
 
-    if (uploadError) throw uploadError;
+    if (!uploadResult.success || !uploadResult.publicUrl) {
+      throw new Error(uploadResult.error || 'Upload failed');
+    }
 
-    const { data: { publicUrl } } = supabase.storage
-      .from('post-media')
-      .getPublicUrl(fileName);
+    const publicUrl = uploadResult.publicUrl;
 
     const mediaType = file.type.startsWith('image/') ? 'image' : 'video';
     

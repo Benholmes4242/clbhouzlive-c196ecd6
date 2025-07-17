@@ -97,24 +97,22 @@ const LogosManagement = () => {
       const fileName = `${Date.now()}.${fileExt}`;
       const filePath = `${selectedCategory}/${fileName}`;
 
-      // Upload to storage
-      const { error: uploadError } = await supabase.storage
-        .from('logos')
-        .upload(filePath, pendingUpload);
+      // Upload to Cloudflare R2 instead of Supabase storage
+      const { uploadToCloudflareR2 } = await import('@/utils/cloudflareUpload');
+      const uploadResult = await uploadToCloudflareR2(pendingUpload, 'logos', pendingUpload.name);
 
-      if (uploadError) throw uploadError;
+      if (!uploadResult.success || !uploadResult.publicUrl) {
+        throw new Error(uploadResult.error || 'Upload failed');
+      }
 
-      // Get public URL
-      const { data } = supabase.storage
-        .from('logos')
-        .getPublicUrl(filePath);
+      const publicUrl = uploadResult.publicUrl;
 
       // Save to database
       const { error: dbError } = await supabase
         .from('logos')
         .insert({
           file_name: pendingUpload.name,
-          file_url: data.publicUrl,
+          file_url: publicUrl,
           category: selectedCategory,
           file_size: pendingUpload.size,
           mime_type: pendingUpload.type,

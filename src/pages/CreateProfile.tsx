@@ -106,19 +106,19 @@ const CreateProfile = () => {
     let uploadedPhotoUrl: string | null = null;
     if (profilePhotoFile) {
       setUploadingPhoto(true);
-      const ext = profilePhotoFile.name.split('.').pop();
-      const filePath = `${user.id}/avatar.${ext}`;
-      const { error: uploadError } = await supabase.storage
-        .from("avatars")
-        .upload(filePath, profilePhotoFile, { upsert: true });
-      if (uploadError) {
-        alert("Failed to upload profile photo.");
+      
+      // Upload to Cloudflare R2 instead of Supabase storage
+      const { uploadToCloudflareR2 } = await import('@/utils/cloudflareUpload');
+      const uploadResult = await uploadToCloudflareR2(profilePhotoFile, 'avatars', `avatar.${profilePhotoFile.name.split('.').pop()}`);
+      
+      if (!uploadResult.success || !uploadResult.publicUrl) {
+        alert(uploadResult.error || "Failed to upload profile photo.");
         setUploadingPhoto(false);
         setSubmitting(false);
         return;
       }
-      const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
-      uploadedPhotoUrl = urlData?.publicUrl ?? null;
+      
+      uploadedPhotoUrl = uploadResult.publicUrl;
       setUploadingPhoto(false);
     }
 
