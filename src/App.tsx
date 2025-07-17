@@ -17,6 +17,7 @@ const UserProfilePage = lazy(() => import("./pages/UserProfilePage"));
 const Settings = lazy(() => import("./pages/Settings"));
 const Explore = lazy(() => import("./pages/Explore"));
 const Clubhouse = lazy(() => import("./pages/Clubhouse"));
+const Discover = lazy(() => import("./pages/Discover"));
 const Courses = lazy(() => import("./pages/Courses"));
 const CourseDetailPage = lazy(() => import("./pages/CourseDetailPage"));
 const UserCoursesPage = lazy(() => import("./pages/UserCoursesPage"));
@@ -72,6 +73,7 @@ const App: React.FC = () => {
                   <Route path="/settings" element={<Settings />} />
                   <Route path="/explore" element={<Explore />} />
                   <Route path="/clubhouse" element={<Clubhouse />} />
+                  <Route path="/discover" element={<Discover />} />
                   <Route path="/courses" element={<Courses />} />
                   <Route path="/courses/:courseId" element={<CourseDetailPage />} />
                   <Route path="/user/:username/courses" element={<UserCoursesPage />} />
