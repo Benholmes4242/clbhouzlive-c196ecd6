@@ -5,6 +5,7 @@ import GeneralSettingsCard from './settings/GeneralSettingsCard';
 import SecuritySettingsCard from './settings/SecuritySettingsCard';
 import FeatureFlagsCard from './settings/FeatureFlagsCard';
 import MaintenanceModeCard from './settings/MaintenanceModeCard';
+import MediaMigrationCard from './settings/MediaMigrationCard';
 
 const AdminSettings = () => {
   return (
@@ -15,6 +16,7 @@ const AdminSettings = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <MediaMigrationCard />
         <SiteBrandingCard />
         <GeneralSettingsCard />
         <SecuritySettingsCard />
