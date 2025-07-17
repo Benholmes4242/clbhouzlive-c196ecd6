@@ -22,22 +22,43 @@ export const useRealPostsFetcher = () => {
 
       const followedUserIds = followedUsers?.map(f => f.following_id) || [];
       
-      // If no followed users, fall back to general posts
       if (followedUserIds.length === 0) {
-        console.log('No followed users found, falling back to general posts');
-        return await fetchRealPosts(currentOffset, postsPerPage);
+        return []; // No followed users, return empty
       }
 
-      // Call the social feed RPC function
-      const { data: postsData, error } = await supabase
-        .rpc('fetch_social_feed_posts', {
-          followed_user_ids: followedUserIds,
-          current_offset: currentOffset,
-          posts_per_page: postsPerPage
-        });
+      // Build the query for friends' posts (both videos and photos)
+      let query = supabase
+        .from('posts')
+        .select(`
+          id,
+          content,
+          created_at,
+          user_id,
+          post_media!inner (
+            id,
+            media_type,
+            media_url
+          ),
+          post_tags (
+            id,
+            tagged_entity_id,
+            taggable_entities (
+              id,
+              entity_type,
+              entity_id,
+              name
+            )
+          )
+        `)
+        .in('user_id', followedUserIds)
+        .order('created_at', { ascending: false })
+        .range(currentOffset, currentOffset + postsPerPage - 1)
+        .limit(postsPerPage);
+
+      const { data: postsData, error } = await query;
 
       if (error) {
-        console.error('Error fetching social feed posts:', error);
+        console.error('Error fetching friends posts:', error);
         return [];
       }
 
@@ -46,7 +67,7 @@ export const useRealPostsFetcher = () => {
       }
 
       // Get unique user IDs
-      const userIds = [...new Set(postsData.map((post: any) => post.user_id))];
+      const userIds = [...new Set(postsData.map(post => post.user_id))];
       
       // Get user profiles
       const { data: profiles, error: profilesError } = await supabase
@@ -60,7 +81,7 @@ export const useRealPostsFetcher = () => {
       }
 
       // Format posts for explore grid
-      const formattedPosts = postsData.map((post: any) => {
+      const formattedPosts = postsData.map(post => {
         const userProfile = profiles?.find(profile => profile.id === post.user_id);
         const allMedia = (post.post_media || []);
         const primaryMedia = allMedia[0]; // First media for main display
@@ -112,9 +133,9 @@ export const useRealPostsFetcher = () => {
           type: primaryMedia.media_type as 'video' | 'image',
           src: primaryMedia.media_url,
           title: post.content || 'Post',
-          likes: Math.floor(Math.random() * 500) + 50, // Mock likes for now
-          comments: Math.floor(Math.random() * 100) + 5, // Mock comments for now
-          shares: Math.floor(Math.random() * 50) + 1, // Mock shares for now
+          likes: Math.floor(Math.random() * 500) + 50,
+          comments: Math.floor(Math.random() * 100) + 5,
+          shares: Math.floor(Math.random() * 50) + 1,
           duration: primaryMedia.media_type === 'video' ? `${Math.floor(Math.random() * 180) + 30}s` : undefined,
           user: {
             id: post.user_id,
@@ -124,12 +145,8 @@ export const useRealPostsFetcher = () => {
             verified: Math.random() > 0.7 // Random verification for demo
           },
           golfCourse,
-          label: post.interaction_type ? 
-            post.interaction_type === 'liked' ? 'Liked by Friends' :
-            post.interaction_type === 'commented' ? 'Commented by Friends' :
-            post.interaction_type === 'shared' ? 'Shared by Friends' : undefined
-            : undefined,
-          isFollowing: true, // All posts in friends feed should be from followed users or interactions
+          label: Math.random() > 0.6 ? ['Pro Tip', 'Trending', 'Featured'][Math.floor(Math.random() * 3)] : undefined,
+          isFollowing: true, // All posts in friends feed should be from followed users
           media: allMedia.filter(m => isValidImageUrl(m.media_url))
         };
 
