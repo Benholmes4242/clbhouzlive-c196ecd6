@@ -9,13 +9,17 @@ import { useIsMobile } from '@/hooks/use-mobile';
 interface ExploreFiltersProps {
   activeFilter: string;
   onFilterChange: (filter: string) => void;
+  excludeFilters?: string[];
 }
 
-const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterChange }) => {
+const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterChange, excludeFilters = [] }) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
   const [isAtStart, setIsAtStart] = useState(true);
   const [isAtEnd, setIsAtEnd] = useState(false);
+
+  // Filter out excluded filters
+  const availableFilters = filterOptions.filter(filter => !excludeFilters.includes(filter));
 
   const getFilterIcon = (filter: string) => {
     switch (filter) {
@@ -79,7 +83,7 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
           WebkitOverflowScrolling: 'touch'
         }}
       >
-        {filterOptions.map((filter) => (
+        {availableFilters.map((filter) => (
           <Button
             key={filter}
             variant={activeFilter === filter ? "secondary" : "outline"}

@@ -11,7 +11,7 @@ import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
 import { FILTER_TYPES, MEDIA_TYPES } from '@/components/explore/types';
 
 const Discover = () => {
-  const [activeFilter, setActiveFilter] = useState<string>(FILTER_TYPES.FRIENDS);
+  const [activeFilter, setActiveFilter] = useState<string>(FILTER_TYPES.VIDEOS);
   const [debugVisible, setDebugVisible] = useState(false);
   
   // Get content for the active filter (for the tabs section)
@@ -115,7 +115,8 @@ const Discover = () => {
             <h2 className="text-xl font-semibold text-foreground mb-4">Discover</h2>
             <ExploreFilters 
               activeFilter={activeFilter} 
-              onFilterChange={setActiveFilter} 
+              onFilterChange={setActiveFilter}
+              excludeFilters={[FILTER_TYPES.FRIENDS]}
             />
           </div>
 
