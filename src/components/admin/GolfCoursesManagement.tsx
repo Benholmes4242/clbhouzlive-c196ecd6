@@ -1,8 +1,9 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, Upload } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 import GolfCourseEditor from './GolfCourseEditor';
 import GolfCourseCard from './golf-courses/GolfCourseCard';
 import GolfCoursesFilters from './golf-courses/GolfCoursesFilters';
@@ -20,6 +21,7 @@ const GolfCoursesManagement = () => {
   const [selectedCourse, setSelectedCourse] = useState<GolfCourse | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
+  const [isMigrating, setIsMigrating] = useState(false);
 
   const { data: courses, isLoading, refetch } = useGolfCourses();
 
@@ -48,6 +50,37 @@ const GolfCoursesManagement = () => {
     refetch();
   };
 
+  const handleMigrateToR2 = async () => {
+    setIsMigrating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('migrate-media-to-cloudflare');
+      
+      if (error) {
+        console.error('Migration error:', error);
+        toast({
+          title: "Migration failed",
+          description: error.message || "Failed to start migration",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Migration started",
+        description: "Golf course images are being migrated to R2. Check the function logs for progress.",
+      });
+    } catch (error) {
+      console.error('Migration error:', error);
+      toast({
+        title: "Migration failed",
+        description: "Failed to start migration process",
+        variant: "destructive",
+      });
+    } finally {
+      setIsMigrating(false);
+    }
+  };
+
   const filteredCourses = filterCoursesByRegion(courses || [], selectedRegion, searchTerm);
 
   if (isLoading) {
@@ -62,13 +95,24 @@ const GolfCoursesManagement = () => {
             <h2 className="text-2xl font-bold mb-2">Golf Courses Management</h2>
             <p className="text-muted-foreground">Manage golf courses and their information</p>
           </div>
-          <Button 
-            onClick={handleCreateCourse} 
-            className="flex items-center gap-2 bg-[#b66b41] hover:bg-[#a55a3a] text-white"
-          >
-            <Plus className="h-4 w-4" />
-            Add New Golf Club
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              onClick={handleMigrateToR2}
+              disabled={isMigrating}
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              <Upload className="h-4 w-4" />
+              {isMigrating ? 'Migrating...' : 'Migrate Images to R2'}
+            </Button>
+            <Button 
+              onClick={handleCreateCourse} 
+              className="flex items-center gap-2 bg-[#b66b41] hover:bg-[#a55a3a] text-white"
+            >
+              <Plus className="h-4 w-4" />
+              Add New Golf Club
+            </Button>
+          </div>
         </div>
 
         {/* Add the bulk import component */}
