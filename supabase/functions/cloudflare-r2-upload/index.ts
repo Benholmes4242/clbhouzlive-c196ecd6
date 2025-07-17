@@ -39,10 +39,14 @@ serve(async (req) => {
     const file = formData.get('file') as File;
     const fileName = formData.get('fileName') as string;
     const bucketType = formData.get('bucketType') as string; // 'avatars', 'post-media', 'course-media', etc.
+    const bucketName = formData.get('bucketName') as string; // actual bucket name to use
     
-    if (!file || !fileName || !bucketType) {
-      throw new Error('Missing required parameters: file, fileName, or bucketType');
+    if (!file || !fileName) {
+      throw new Error('Missing required parameters: file or fileName');
     }
+
+    // Use bucketName if provided, otherwise fall back to bucketType for backward compatibility
+    const targetBucket = bucketName || bucketType || 'clbhouz-media';
 
     // Generate unique file path with proper organization
     const fileExtension = fileName.split('.').pop();
@@ -60,7 +64,7 @@ serve(async (req) => {
     });
 
     // Upload to Cloudflare R2
-    const uploadUrl = `https://api.cloudflare.com/client/v4/accounts/${cloudflareAccountId}/r2/buckets/clbhouz-media/objects/${fullPath}`;
+    const uploadUrl = `https://api.cloudflare.com/client/v4/accounts/${cloudflareAccountId}/r2/buckets/${targetBucket}/objects/${fullPath}`;
     
     const uploadResponse = await fetch(uploadUrl, {
       method: 'PUT',
