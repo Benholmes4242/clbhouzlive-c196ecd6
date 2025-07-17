@@ -76,6 +76,9 @@ export const MediaContainer: React.FC<MediaContainerProps> = ({
           src={currentMedia.media_url}
           alt="Post content"
           className="w-full h-full object-cover object-center pointer-events-none" // Disable image interactions
+          width={640}
+          height={800}
+          priority={isHovered}
         />
       )}
       
