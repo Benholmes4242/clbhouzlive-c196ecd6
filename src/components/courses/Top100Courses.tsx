@@ -112,7 +112,7 @@ const Top100Courses = () => {
     <div className="space-y-6">
       <div className="text-center">
         <h2 className="text-2xl font-bold mb-2">Top 100 Golf Courses</h2>
-        <p className="text-muted-foreground text-base">The world's most prestigious golf courses</p>
+        <p className="text-muted-foreground">The world's most prestigious golf courses</p>
       </div>
 
       <Tabs defaultValue="global" className="w-full">

@@ -14,9 +14,16 @@ interface MediaCardProps {
   onFollow: (contentId: string) => void;
   onMediaClick?: (item: ExploreContentItem) => void;
   isFeatured?: boolean;
+  autoplayManager?: {
+    registerVideo: (videoId: string, element: HTMLElement, index: number) => void;
+    unregisterVideo: (videoId: string) => void;
+    shouldVideoAutoplay: (index: number) => boolean;
+    isVideoAutoplaying: (videoId: string) => boolean;
+  };
+  videoIndex?: number;
 }
 
-const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, isFeatured, ...props }) => {
+const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, isFeatured, autoplayManager, videoIndex, ...props }) => {
   const {
     isPostViewerOpen,
     setIsPostViewerOpen,
@@ -26,6 +33,7 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, isFeature
     isMobile,
     autoplayRef,
     swipeRef,
+    cardRef,
     mediaItems,
     currentMedia,
     hasMultipleMedia,
@@ -42,7 +50,9 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, isFeature
   } = useMediaCard({ 
     item, 
     onLike, 
-    onMediaClick: props.onMediaClick 
+    onMediaClick: props.onMediaClick,
+    autoplayManager,
+    videoIndex
   });
 
   if (item.type === 'cta') return null;
@@ -53,6 +63,7 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, isFeature
         ref={(el) => {
           if (autoplayRef.current !== el) autoplayRef.current = el;
           if (swipeRef.current !== el) swipeRef.current = el;
+          if (cardRef.current !== el) cardRef.current = el;
         }}
         className="relative group bg-background overflow-hidden h-full cursor-pointer border-0"
         onClick={handleMediaClick}
@@ -68,6 +79,7 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, isFeature
           onImageLoad={handleImageLoad}
           itemId={item.id}
           currentIndex={currentMediaIndex}
+          loop={true}
         />
 
         <MediaControls

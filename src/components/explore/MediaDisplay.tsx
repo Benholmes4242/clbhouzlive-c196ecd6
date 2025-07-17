@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import SmartMediaContainer from '@/components/ui/smart-media-container';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import { FaPlay } from 'react-icons/fa';
+import { Loader2 } from 'lucide-react';
 
 interface MediaItem {
   id: string;
@@ -45,6 +46,8 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
 
   // Image loading state
   const [imageLoading, setImageLoading] = useState(false);
+  // Video autoplay transition state
+  const [videoTransitioning, setVideoTransitioning] = useState(shouldAutoplay);
   
   // Debug log the media URL and autoplay
   console.log('MediaDisplay - URL:', media.media_url, 'Type:', media.media_type, 'Invalid:', isInvalidSrc, 'ShouldAutoplay:', shouldAutoplay);
@@ -64,6 +67,18 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
 
   const thumbnailUrl = media.media_type === 'video' ? getVideoThumbnail(media.media_url) : null;
 
+  // Handle smooth transition for autoplay videos
+  React.useEffect(() => {
+    if (shouldAutoplay && media.media_type === 'video') {
+      setVideoTransitioning(true);
+      // Shorter timeout to reduce loading flicker
+      const timer = setTimeout(() => setVideoTransitioning(false), 400);
+      return () => clearTimeout(timer);
+    } else {
+      setVideoTransitioning(false);
+    }
+  }, [shouldAutoplay, media.media_type]);
+
   return (
     <div className="relative w-full h-full overflow-hidden bg-muted">
       {/* Loading Skeleton - only show for images */}
@@ -76,16 +91,24 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
       {media.media_type === 'video' && !isInvalidSrc ? (
         <div className="relative w-full h-full">
           {shouldAutoplay ? (
-            <EnhancedVideoPlayer
-              src={media.media_url}
-              autoplay={shouldAutoplay}
-              muted={true}
-              loop={loop}
-              className="w-full h-full pointer-events-none"
-              preloadLevel="metadata"
-              enableHLS={true}
-              quality="auto"
-            />
+            <>
+              {/* Smooth loading overlay for video transition */}
+              {videoTransitioning && (
+                <div className="absolute inset-0 bg-muted/60 backdrop-blur-sm flex items-center justify-center z-20 transition-opacity duration-300">
+                  <Loader2 className="w-6 h-6 text-muted-foreground animate-spin" />
+                </div>
+              )}
+              <EnhancedVideoPlayer
+                src={media.media_url}
+                autoplay={shouldAutoplay}
+                muted={true}
+                loop={loop}
+                className="w-full h-full pointer-events-none"
+                preloadLevel="metadata"
+                enableHLS={true}
+                quality="auto"
+              />
+            </>
           ) : (
             // Show thumbnail for non-autoplaying videos to improve performance
             <img
@@ -105,10 +128,12 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
             />
           )}
           
-          {/* Play icon for all video cards */}
-          <div className="absolute bottom-3 right-3 z-20">
-            <FaPlay className="h-4 w-4 text-white drop-shadow-lg" />
-          </div>
+          {/* Play icon for all video cards - hidden during autoplay transition */}
+          {!shouldAutoplay && (
+            <div className="absolute bottom-3 right-3 z-20">
+              <FaPlay className="h-4 w-4 text-white drop-shadow-lg" />
+            </div>
+          )}
         </div>
       ) : (
         <div className="relative w-full h-full">

@@ -132,7 +132,7 @@ const PostContent = ({ content, onVideoClick, golfClubTags = [] }: PostContentPr
 
   return (
     <>
-      <p className="text-base mb-3">{content.description}</p>
+      <p className="text-sm mb-3">{content.description}</p>
       
       <div className="relative rounded-lg overflow-hidden mb-3">
         {content.type === 'video' ? (
