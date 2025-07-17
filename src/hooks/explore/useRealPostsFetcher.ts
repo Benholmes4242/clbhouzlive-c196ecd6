@@ -3,6 +3,163 @@ import { ExploreContentItem, FILTER_TYPES, MEDIA_TYPES } from '@/components/expl
 import { isValidImageUrl } from './urlValidation';
 
 export const useRealPostsFetcher = () => {
+  const fetchFriendsPosts = async (currentOffset: number, postsPerPage: number): Promise<ExploreContentItem[]> => {
+    try {
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return [];
+
+      // Get users that the current user follows
+      const { data: followedUsers, error: followError } = await supabase
+        .from('user_follows')
+        .select('following_id')
+        .eq('follower_id', user.id);
+
+      if (followError) {
+        console.error('Error fetching followed users:', followError);
+        return [];
+      }
+
+      const followedUserIds = followedUsers?.map(f => f.following_id) || [];
+      
+      if (followedUserIds.length === 0) {
+        return []; // No followed users, return empty
+      }
+
+      // Build the query for friends' posts (both videos and photos)
+      let query = supabase
+        .from('posts')
+        .select(`
+          id,
+          content,
+          created_at,
+          user_id,
+          post_media!inner (
+            id,
+            media_type,
+            media_url
+          ),
+          post_tags (
+            id,
+            tagged_entity_id,
+            taggable_entities (
+              id,
+              entity_type,
+              entity_id,
+              name
+            )
+          )
+        `)
+        .in('user_id', followedUserIds)
+        .order('created_at', { ascending: false })
+        .range(currentOffset, currentOffset + postsPerPage - 1)
+        .limit(postsPerPage);
+
+      const { data: postsData, error } = await query;
+
+      if (error) {
+        console.error('Error fetching friends posts:', error);
+        return [];
+      }
+
+      if (!postsData || postsData.length === 0) {
+        return [];
+      }
+
+      // Get unique user IDs
+      const userIds = [...new Set(postsData.map(post => post.user_id))];
+      
+      // Get user profiles
+      const { data: profiles, error: profilesError } = await supabase
+        .from('user_profiles')
+        .select('id, display_name, username, profile_photo_url')
+        .in('id', userIds);
+
+      if (profilesError) {
+        console.error('Error fetching profiles:', profilesError);
+        return [];
+      }
+
+      // Format posts for explore grid
+      const formattedPosts = postsData.map(post => {
+        const userProfile = profiles?.find(profile => profile.id === post.user_id);
+        const allMedia = (post.post_media || []);
+        const primaryMedia = allMedia[0]; // First media for main display
+        
+        if (!primaryMedia || !isValidImageUrl(primaryMedia.media_url)) {
+          return null;
+        }
+
+        // Find golf course from post tags
+        const golfCourseTag = (post.post_tags || []).find(
+          tag => tag.taggable_entities?.entity_type === 'golf_club'
+        );
+
+        let golfCourse = null;
+        
+        if (golfCourseTag?.taggable_entities) {
+          // Use golf course from tags if available
+          golfCourse = {
+            id: golfCourseTag.taggable_entities.entity_id,
+            name: golfCourseTag.taggable_entities.name,
+            country: 'Unknown'
+          };
+        } else if (post.content) {
+          // Extract golf course from content text as fallback
+          const contentText = post.content;
+          
+          // Look for patterns like "📍 Played at [Course Name]" or "@[Course Name]"
+          const courseMatch = contentText.match(/📍\s*(?:Played at\s+)?([^,\n]+(?:Golf Club|Golf Course|GC)[^,\n]*)/i) ||
+                            contentText.match(/at\s+([^,\n]+(?:Golf Club|Golf Course|GC)[^,\n]*)/i);
+          
+          if (courseMatch) {
+            const courseName = courseMatch[1].trim()
+              .replace(/\([^)]*(?<!Course|course)\)/g, '') // Remove parentheses content EXCEPT if it contains "Course"
+              .replace(/\s+/g, ' ') // Normalize spaces
+              .trim();
+            
+            if (courseName.length > 3) { // Only if we have a reasonable course name
+              golfCourse = {
+                id: 'extracted-' + courseName.toLowerCase().replace(/\s+/g, '-'),
+                name: courseName,
+                country: 'Unknown'
+              };
+            }
+          }
+        }
+
+        const formattedPost = {
+          id: post.id,
+          type: primaryMedia.media_type as 'video' | 'image',
+          src: primaryMedia.media_url,
+          title: post.content || 'Post',
+          likes: Math.floor(Math.random() * 500) + 50,
+          comments: Math.floor(Math.random() * 100) + 5,
+          shares: Math.floor(Math.random() * 50) + 1,
+          duration: primaryMedia.media_type === 'video' ? `${Math.floor(Math.random() * 180) + 30}s` : undefined,
+          user: {
+            id: post.user_id,
+            name: userProfile?.display_name || userProfile?.username || 'User',
+            username: userProfile?.username,
+            avatar: userProfile?.profile_photo_url || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+            verified: Math.random() > 0.7 // Random verification for demo
+          },
+          golfCourse,
+          label: Math.random() > 0.6 ? ['Pro Tip', 'Trending', 'Featured'][Math.floor(Math.random() * 3)] : undefined,
+          isFollowing: true, // All posts in friends feed should be from followed users
+          media: allMedia.filter(m => isValidImageUrl(m.media_url))
+        };
+
+        return formattedPost;
+      }).filter(Boolean) as ExploreContentItem[];
+
+      return formattedPosts;
+    } catch (error) {
+      console.error('Error fetching friends posts:', error);
+      return [];
+    }
+  };
+
   const fetchRealPosts = async (currentOffset: number, postsPerPage: number, mediaFilter?: string): Promise<ExploreContentItem[]> => {
     try {
       // Build the query
@@ -145,5 +302,5 @@ export const useRealPostsFetcher = () => {
     }
   };
 
-  return { fetchRealPosts };
+  return { fetchRealPosts, fetchFriendsPosts };
 };

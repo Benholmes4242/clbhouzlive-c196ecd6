@@ -11,7 +11,7 @@ import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
 import { FILTER_TYPES, MEDIA_TYPES } from '@/components/explore/types';
 
 const Clubhouse = () => {
-  const [activeFilter, setActiveFilter] = useState<string>(FILTER_TYPES.VIDEOS);
+  const [activeFilter, setActiveFilter] = useState<string>(FILTER_TYPES.FRIENDS);
   const [debugVisible, setDebugVisible] = useState(false);
   const { 
     content, 
@@ -43,6 +43,11 @@ const Clubhouse = () => {
 
   // Apply client-side filtering for non-database filters
   const filteredContent = content.filter(item => {
+    // Friends filtering is handled in the database
+    if (activeFilter === FILTER_TYPES.FRIENDS) {
+      return true;
+    }
+    
     // Videos and Photos filtering is handled in the database
     if (activeFilter === FILTER_TYPES.VIDEOS || activeFilter === FILTER_TYPES.PHOTOS) {
       return true;

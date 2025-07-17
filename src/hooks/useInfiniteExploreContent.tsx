@@ -14,7 +14,7 @@ export const useInfiniteExploreContent = (activeFilter?: string) => {
   const [currentOffset, setCurrentOffset] = useState(0);
   const [currentMockOffset, setCurrentMockOffset] = useState(0);
   
-  const { fetchRealPosts } = useRealPostsFetcher();
+  const { fetchRealPosts, fetchFriendsPosts } = useRealPostsFetcher();
   
   const { getMockPosts } = useMockPostsHandler();
 
@@ -25,19 +25,26 @@ export const useInfiniteExploreContent = (activeFilter?: string) => {
     setLoading(true);
 
     try {
-      // Try to fetch real posts with filter
-      const realPosts = await fetchRealPosts(currentOffset, POSTS_PER_PAGE, activeFilter);
+      let posts = [];
       
-      if (realPosts.length > 0) {
-        setContent(prev => [...prev, ...realPosts]);
+      // Use specific fetcher for Friends filter
+      if (activeFilter === 'Friends') {
+        posts = await fetchFriendsPosts(currentOffset, POSTS_PER_PAGE);
+      } else {
+        // Try to fetch real posts with filter
+        posts = await fetchRealPosts(currentOffset, POSTS_PER_PAGE, activeFilter);
+      }
+      
+      if (posts.length > 0) {
+        setContent(prev => [...prev, ...posts]);
         setCurrentOffset(prev => prev + POSTS_PER_PAGE);
         
         // If we got fewer posts than requested, we might be at the end
-        if (realPosts.length < POSTS_PER_PAGE) {
-          setHasMore(false); // No more real posts available
+        if (posts.length < POSTS_PER_PAGE) {
+          setHasMore(false); // No more posts available
         }
       } else {
-        // No real posts available - mark as end instead of falling back to mock data
+        // No posts available - mark as end instead of falling back to mock data
         setHasMore(false);
       }
     } catch (error) {
@@ -46,7 +53,7 @@ export const useInfiniteExploreContent = (activeFilter?: string) => {
     } finally {
       setLoading(false);
     }
-  }, [loading, hasMore, currentOffset, currentMockOffset, fetchRealPosts, getMockPosts, activeFilter]);
+  }, [loading, hasMore, currentOffset, currentMockOffset, fetchRealPosts, fetchFriendsPosts, getMockPosts, activeFilter]);
 
   // Reset content when filter changes
   useEffect(() => {

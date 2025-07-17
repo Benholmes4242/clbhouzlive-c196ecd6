@@ -43,6 +43,7 @@ export interface CTAContentItem {
 
 // Filter constants for type safety
 export const FILTER_TYPES = {
+  FRIENDS: 'Friends',
   VIDEOS: 'Videos',
   PHOTOS: 'Photos',
   VERIFIED_PROS: 'Verified Pros',
@@ -57,6 +58,7 @@ export const MEDIA_TYPES = {
 } as const;
 
 export const filterOptions = [
+  FILTER_TYPES.FRIENDS,
   FILTER_TYPES.VIDEOS,
   FILTER_TYPES.PHOTOS,
   FILTER_TYPES.VERIFIED_PROS,
