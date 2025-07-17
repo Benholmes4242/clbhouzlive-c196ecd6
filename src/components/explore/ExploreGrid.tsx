@@ -2,7 +2,6 @@
 import React, { memo } from 'react';
 import { ExploreContentItem } from './types';
 import ExploreContentCard from './ExploreContentCard';
-// import { useAutoplayManager } from '@/hooks/useAutoplayManager';
 
 interface ExploreGridProps {
   content: ExploreContentItem[];
@@ -25,8 +24,6 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
   onLoadMore,
   activeFilter
 }) => {
-  // Temporarily disable autoplay manager to fix loading issues
-  // const autoplayManager = useAutoplayManager({ interval: 8, threshold: 0.5 });
   // Intersection observer for infinite scroll
   React.useEffect(() => {
     const observer = new IntersectionObserver(
@@ -73,32 +70,26 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
   const createGridLayout = () => {
     const gridItems = [];
     let index = 0;
-    // Disable video tracking for now
-    // let videoIndex = 0; // Track video position for autoplay
     
     while (index < content.length) {
       // Add 8-10 regular items
       const regularItemsCount = Math.min(9 + Math.floor(Math.random() * 3), content.length - index);
       
       for (let i = 0; i < regularItemsCount && index < content.length; i++) {
-        // const currentVideoIndex = content[index].type === 'video' ? videoIndex++ : -1;
         gridItems.push({
           type: 'regular',
           item: content[index],
-          key: `regular-${content[index].id}`,
-          // videoIndex: currentVideoIndex
+          key: `regular-${content[index].id}`
         });
         index++;
       }
       
       // Add one big featured card if we have more content
       if (index < content.length) {
-        // const currentVideoIndex = content[index].type === 'video' ? videoIndex++ : -1;
         gridItems.push({
           type: 'featured',
           item: content[index],
-          key: `featured-${content[index].id}`,
-          // videoIndex: currentVideoIndex
+          key: `featured-${content[index].id}`
         });
         index++;
       }
