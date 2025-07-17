@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
+import { useSwipeable } from 'react-swipeable';
 import { ExploreContentItem } from '@/components/explore/types';
 import { useVideoPlaybackManager } from '@/hooks/useVideoPlaybackManager';
 import MediaDisplay from '@/components/explore/MediaDisplay';
@@ -77,6 +78,23 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
     }
   };
 
+  // Swipe handlers for mobile
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: () => {
+      if (isMobile) {
+        nextVideo();
+      }
+    },
+    onSwipedRight: () => {
+      if (isMobile) {
+        prevVideo();
+      }
+    },
+    trackMouse: false,
+    trackTouch: true,
+    delta: 50,
+  });
+
   if (trendingVideos.length === 0) return null;
 
   const visibleVideos = isMobile ? 1 : 3;
@@ -117,7 +135,7 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
             </button>
           </>
         )}
-        <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-3'}`}>
+        <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-3'}`} {...(isMobile ? swipeHandlers : {})}>
           {currentVideos.map((video, index) => {
             const isFirstCard = index === 0;
             const actualIndex = (currentIndex + index) % trendingVideos.length;
@@ -201,30 +219,6 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
                 {/* Mobile overlay controls */}
                 {isMobile && (
                   <>
-                    {/* Left arrow */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        prevVideo();
-                      }}
-                      className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full hover:bg-white/20 transition-colors z-10"
-                      aria-label="Previous video"
-                    >
-                      <ChevronLeft className="w-5 h-5 text-white drop-shadow-lg" />
-                    </button>
-                    
-                    {/* Right arrow */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        nextVideo();
-                      }}
-                      className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full hover:bg-white/20 transition-colors z-10"
-                      aria-label="Next video"
-                    >
-                      <ChevronRight className="w-5 h-5 text-white drop-shadow-lg" />
-                    </button>
-
                     {/* Overlay dots indicator */}
                     <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2 z-10">
                       {trendingVideos.map((_, dotIndex) => (
