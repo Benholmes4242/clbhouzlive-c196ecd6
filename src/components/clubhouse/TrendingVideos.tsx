@@ -171,14 +171,14 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
                     <img
                       src={video.user?.avatar || '/placeholder.svg'}
                       alt={video.user?.name || 'User'}
-                      className="w-8 h-8 rounded-full border border-white/20"
+                      className="w-12 h-12 rounded-full border border-white/20"
                     />
                     <div className="min-w-0 flex-1">
-                      <p className="text-white text-sm font-medium truncate">
+                      <p className="text-white text-base font-medium truncate">
                         {video.user?.name || video.user?.username || 'Anonymous'}
                       </p>
                       {cleanTitleText(video.title) && (
-                        <p className="text-white/80 text-xs truncate">{cleanTitleText(video.title)}</p>
+                        <p className="text-white/80 text-sm truncate">{cleanTitleText(video.title)}</p>
                       )}
                     </div>
                   </div>
