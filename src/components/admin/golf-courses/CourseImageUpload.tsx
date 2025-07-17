@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Upload, X, Image as ImageIcon } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useCloudflareR2 } from '@/hooks/useCloudflareR2';
+import { uploadToCloudflareR2 } from '@/utils/cloudflareUpload';
 
 interface CourseImageUploadProps {
   currentImageUrl?: string | null;
@@ -18,9 +18,9 @@ const CourseImageUpload: React.FC<CourseImageUploadProps> = ({
   disabled = false
 }) => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(currentImageUrl || null);
+  const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
-  const { uploadToR2, isUploading } = useCloudflareR2();
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -37,24 +37,26 @@ const CourseImageUpload: React.FC<CourseImageUploadProps> = ({
       return;
     }
 
+    setIsUploading(true);
+
     try {
-      // Create a unique filename for golf course images bucket
+      // Create a unique filename for golf course images
       const fileExt = file.name.split('.').pop();
       const fileName = `courses/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
 
       console.log('Uploading file to R2 golf courses bucket:', fileName);
 
-      // Upload file to Cloudflare R2 golf courses bucket
-      const result = await uploadToR2(file, fileName, 'course-images');
+      // Upload file to Cloudflare R2 using course-media bucket
+      const result = await uploadToCloudflareR2(file, 'course-media', fileName);
 
       if (!result.success) {
         throw new Error(result.error || 'Upload failed');
       }
 
-      console.log('File uploaded successfully to R2:', result.url);
+      console.log('File uploaded successfully to R2:', result.publicUrl);
 
-      setPreviewUrl(result.url!);
-      onImageChange(result.url!);
+      setPreviewUrl(result.publicUrl!);
+      onImageChange(result.publicUrl!);
 
       toast({
         title: "Success",
@@ -68,6 +70,7 @@ const CourseImageUpload: React.FC<CourseImageUploadProps> = ({
         variant: "destructive",
       });
     } finally {
+      setIsUploading(false);
       // Clear the input so the same file can be selected again
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
