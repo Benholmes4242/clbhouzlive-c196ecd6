@@ -104,6 +104,11 @@ const Clubhouse = () => {
         <Header />
         
         <main className="pb-20">
+          {/* Trending Videos Section - Static content that doesn't change with tabs */}
+          <TrendingVideos 
+            videos={uniqueTrendingContent}
+            onVideoClick={handleMediaClick}
+          />
 
           {/* Your Clubhouse Section */}
           <div className="container pt-6 pb-6">
