@@ -26,18 +26,13 @@ export const useRealPostsFetcher = () => {
         return []; // No followed users, return empty
       }
 
-      // Build a query that fetches:
-      // 1. Posts by followed users
-      // 2. Posts liked by followed users
-      // 3. Posts commented on by followed users
-      let query = supabase
+      // Call the social feed RPC function
+      const { data: postsData, error } = await supabase
         .rpc('fetch_social_feed_posts', {
           followed_user_ids: followedUserIds,
           current_offset: currentOffset,
           posts_per_page: postsPerPage
         });
-
-      const { data: postsData, error } = await query;
 
       if (error) {
         console.error('Error fetching social feed posts:', error);
@@ -49,7 +44,7 @@ export const useRealPostsFetcher = () => {
       }
 
       // Get unique user IDs
-      const userIds = [...new Set(postsData.map(post => post.user_id))];
+      const userIds = [...new Set(postsData.map((post: any) => post.user_id))];
       
       // Get user profiles
       const { data: profiles, error: profilesError } = await supabase
@@ -63,7 +58,7 @@ export const useRealPostsFetcher = () => {
       }
 
       // Format posts for explore grid
-      const formattedPosts = postsData.map(post => {
+      const formattedPosts = postsData.map((post: any) => {
         const userProfile = profiles?.find(profile => profile.id === post.user_id);
         const allMedia = (post.post_media || []);
         const primaryMedia = allMedia[0]; // First media for main display

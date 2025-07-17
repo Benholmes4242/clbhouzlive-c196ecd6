@@ -1067,6 +1067,25 @@ export type Database = {
           newly_awarded_badges: Json
         }[]
       }
+      fetch_social_feed_posts: {
+        Args: {
+          followed_user_ids: string[]
+          current_offset: number
+          posts_per_page: number
+        }
+        Returns: {
+          id: string
+          user_id: string
+          content: string
+          created_at: string
+          likes_count: number
+          comments_count: number
+          shares_count: number
+          interaction_type: string
+          post_media: Json
+          post_tags: Json
+        }[]
+      }
       get_all_users_admin: {
         Args: Record<PropertyKey, never>
         Returns: {
