@@ -5,7 +5,7 @@ import ExploreFilters from '@/components/explore/ExploreFilters';
 import ExploreGrid from '@/components/explore/ExploreGrid';
 import MobileDebugConsole from '@/components/explore/MobileDebugConsole';
 import VerticalMediaFeed from '@/components/explore/VerticalMediaFeed';
-import TrendingVideos from '@/components/clubhouse/TrendingVideos';
+import DiscoverTrendingVideos from '@/components/discover/DiscoverTrendingVideos';
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
 import { FILTER_TYPES, MEDIA_TYPES } from '@/components/explore/types';
@@ -105,7 +105,7 @@ const Discover = () => {
         
         <main className="pb-20">
           {/* Trending Videos Section - Static content that doesn't change with tabs */}
-          <TrendingVideos 
+          <DiscoverTrendingVideos 
             videos={uniqueTrendingContent}
             onVideoClick={handleMediaClick}
           />
@@ -130,6 +130,7 @@ const Discover = () => {
               hasMore={hasMore}
               onLoadMore={loadMore}
               activeFilter={activeFilter}
+              isDiscoverPage={true}
             />
           </div>
         </main>
