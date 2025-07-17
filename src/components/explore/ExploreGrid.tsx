@@ -1,3 +1,4 @@
+
 import React, { memo } from 'react';
 import { ExploreContentItem } from './types';
 import ExploreContentCard from './ExploreContentCard';
@@ -78,8 +79,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
         gridItems.push({
           type: 'regular',
           item: content[index],
-          key: `regular-${content[index].id}`,
-          gridIndex: gridItems.length
+          key: `regular-${content[index].id}`
         });
         index++;
       }
@@ -89,52 +89,13 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
         gridItems.push({
           type: 'featured',
           item: content[index],
-          key: `featured-${content[index].id}`,
-          gridIndex: gridItems.length
+          key: `featured-${content[index].id}`
         });
         index++;
       }
     }
     
     return gridItems;
-  };
-
-  // Calculate autoplay for Friends tab on desktop
-  const shouldAutoplayItem = (gridIndex: number, gridItems: any[]) => {
-    if (activeFilter !== 'Friends') return false;
-    
-    // Check if we're on desktop (using same breakpoint as grid: md and above)
-    const isDesktop = window.innerWidth >= 768;
-    if (!isDesktop) return false;
-
-    // Grid is 4 columns on desktop, so each row has 4 items (accounting for featured cards that span 2x2)
-    // Calculate which row this item is in (0-indexed)
-    const row = Math.floor(gridIndex / 4);
-    
-    // Autoplay on rows 0, 2, 4, 6, etc. (every other row starting from first)
-    const shouldAutoplayRow = row % 2 === 0;
-    if (!shouldAutoplayRow) return false;
-
-    // Find all items in this row
-    const rowStartIndex = row * 4;
-    const rowEndIndex = Math.min(rowStartIndex + 4, gridItems.length);
-    const rowItems = gridItems.slice(rowStartIndex, rowEndIndex);
-    
-    // Find the first video in this row
-    let firstVideoIndex = -1;
-    for (let i = 0; i < rowItems.length; i++) {
-      const item = rowItems[i].item;
-      const isVideo = item.type === 'video' || 
-                     (item.media && item.media.length > 0 && item.media[0].media_type === 'video');
-      
-      if (isVideo) {
-        firstVideoIndex = rowStartIndex + i;
-        break;
-      }
-    }
-    
-    // Autoplay if this is the first video in the row
-    return firstVideoIndex === gridIndex;
   };
 
   const gridItems = createGridLayout();
@@ -152,7 +113,6 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                 onFollow={onFollow} 
                 onMediaClick={onMediaClick}
                 isFeatured={true}
-                shouldAutoplay={shouldAutoplayItem(gridItem.gridIndex, gridItems)}
               />
             </div>
           ) : (
@@ -162,7 +122,6 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                 onLike={onLike} 
                 onFollow={onFollow} 
                 onMediaClick={onMediaClick}
-                shouldAutoplay={shouldAutoplayItem(gridItem.gridIndex, gridItems)}
               />
             </div>
           )
