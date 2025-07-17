@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { uploadToCloudflareR2 } from '@/utils/cloudflareUpload';
 
 interface Course {
   id: string;
@@ -86,25 +87,19 @@ const AddToPlayedModal = ({ course, isOpen, onClose, onSuccess }: AddToPlayedMod
       // Upload media files if any
       if (uploadedFiles.length > 0) {
         for (const file of uploadedFiles) {
-          const fileExt = file.name.split('.').pop();
-          const fileName = `${user.id}/${course.id}/${Date.now()}.${fileExt}`;
+          // Upload to Cloudflare R2 instead of Supabase storage
+          const uploadResult = await uploadToCloudflareR2(file, 'course-review-media', file.name);
           
-          const { error: uploadError } = await supabase.storage
-            .from('course-review-media')
-            .upload(fileName, file);
-
-          if (uploadError) throw uploadError;
-
-          const { data: urlData } = supabase.storage
-            .from('course-review-media')
-            .getPublicUrl(fileName);
+          if (!uploadResult.success || !uploadResult.publicUrl) {
+            throw new Error(uploadResult.error || 'Upload failed');
+          }
 
           // Save media record
           await supabase
             .from('course_review_media')
             .insert({
               review_id: ratingData.id,
-              media_url: urlData.publicUrl,
+              media_url: uploadResult.publicUrl,
               media_type: file.type.startsWith('video/') ? 'video' : 'image',
               file_name: file.name,
               file_size: file.size,

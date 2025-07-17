@@ -1,6 +1,8 @@
 
 import React, { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { uploadToCloudflareR2 } from '@/utils/cloudflareUpload';
+import { useToast } from '@/hooks/use-toast';
 import ProfileHeader from './ProfileHeader';
 
 interface ProfilePhotoManagerProps {
@@ -18,6 +20,7 @@ const ProfilePhotoManager: React.FC<ProfilePhotoManagerProps> = ({
 }) => {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const { toast } = useToast();
 
   const handlePhotoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (!user) return;
@@ -30,21 +33,14 @@ const ProfilePhotoManager: React.FC<ProfilePhotoManagerProps> = ({
 
     setUploading(true);
     try {
-      const fileExt = file.name.split('.').pop();
-      const timestamp = Date.now();
-      const filePath = `${user.id}/avatar-${timestamp}.${fileExt}`;
-
-      console.log('Uploading to path:', filePath);
-      const { error } = await supabase.storage.from('avatars').upload(filePath, file, { upsert: true });
-      if (error) {
-        console.error('Upload error:', error);
-        alert('Upload failed: ' + error.message);
-        setUploading(false);
-        return;
+      // Upload to Cloudflare R2 instead of Supabase storage
+      const uploadResult = await uploadToCloudflareR2(file, 'avatars', `avatar.${file.name.split('.').pop()}`);
+      
+      if (!uploadResult.success || !uploadResult.publicUrl) {
+        throw new Error(uploadResult.error || 'Upload failed');
       }
 
-      const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(filePath);
-      const avatarUrl = urlData?.publicUrl ?? '';
+      const avatarUrl = uploadResult.publicUrl;
       console.log('Generated avatar URL:', avatarUrl);
       
       // Update database
@@ -58,7 +54,11 @@ const ProfilePhotoManager: React.FC<ProfilePhotoManagerProps> = ({
 
       if (updateError) {
         console.error('Database update error:', updateError);
-        alert('Failed to save profile photo: ' + updateError.message);
+        toast({
+          title: "Upload Failed",
+          description: "Failed to save profile photo: " + updateError.message,
+          variant: "destructive",
+        });
         setUploading(false);
         return;
       }
@@ -69,11 +69,20 @@ const ProfilePhotoManager: React.FC<ProfilePhotoManagerProps> = ({
       setPhotoPreview(avatarUrl);
       onProfileUpdate({ ...profile, profile_photo_url: avatarUrl });
       
+      toast({
+        title: "Profile Updated",
+        description: "Your profile photo has been updated successfully.",
+      });
+      
       console.log('Profile photo update complete');
       
     } catch (error) {
       console.error('Upload error:', error);
-      alert('Upload failed: ' + (error as Error).message);
+      toast({
+        title: "Upload Failed",
+        description: "Upload failed: " + (error as Error).message,
+        variant: "destructive",
+      });
     } finally {
       setUploading(false);
     }

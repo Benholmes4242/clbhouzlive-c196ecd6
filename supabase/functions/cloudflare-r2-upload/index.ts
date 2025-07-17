@@ -1,9 +1,18 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.50.0';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+};
+
+const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+const cloudflareAccountId = Deno.env.get('CLOUDFLARE_ACCOUNT_ID')!;
+const cloudflareR2Token = Deno.env.get('CLOUDFLARE_R2_API_TOKEN')!;
+
+const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -12,126 +21,90 @@ serve(async (req) => {
   }
 
   try {
-    console.log('R2 upload request started');
-
-      const formData = await req.formData();
-      const file = formData.get('file') as File;
-      const fileName = formData.get('fileName') as string;
-      const bucketName = formData.get('bucketName') as string || 'clbhouz-media'; // Default to media bucket
-
-    if (!file || !fileName || !bucketName) {
-      console.error('Missing required parameters', { file: !!file, fileName, bucketName });
-      return new Response(
-        JSON.stringify({ error: 'Missing required parameters' }),
-        { 
-          status: 400, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      );
+    // Get the authorization header
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      throw new Error('No authorization header');
     }
 
-    const apiToken = Deno.env.get('CLOUDFLARE_R2_API_TOKEN');
-    const accountId = Deno.env.get('CLOUDFLARE_ACCOUNT_ID');
+    // Verify the user is authenticated
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
     
-    if (!apiToken || !accountId) {
-      console.error('Missing Cloudflare credentials', { apiToken: !!apiToken, accountId: !!accountId });
-      return new Response(
-        JSON.stringify({ error: 'Cloudflare credentials not configured' }),
-        { 
-          status: 500, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      );
+    if (authError || !user) {
+      throw new Error('Authentication failed');
     }
 
-    console.log('Uploading to R2:', { fileName, bucketName, fileSize: file.size });
+    const formData = await req.formData();
+    const file = formData.get('file') as File;
+    const fileName = formData.get('fileName') as string;
+    const bucketType = formData.get('bucketType') as string; // 'avatars', 'post-media', 'course-media', etc.
+    
+    if (!file || !fileName || !bucketType) {
+      throw new Error('Missing required parameters: file, fileName, or bucketType');
+    }
 
-    // First, ensure the bucket exists
-    const bucketListUrl = `https://api.cloudflare.com/client/v4/accounts/${accountId}/r2/buckets`;
-    const listResponse = await fetch(bucketListUrl, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${apiToken}`,
-      },
+    // Generate unique file path with proper organization
+    const fileExtension = fileName.split('.').pop();
+    const timestamp = Date.now();
+    const randomId = Math.random().toString(36).substring(2);
+    const uniqueFileName = `${timestamp}-${randomId}.${fileExtension}`;
+    const fullPath = `${user.id}/${bucketType}/${uniqueFileName}`;
+
+    console.log('Uploading file to R2:', {
+      fileName: uniqueFileName,
+      bucketType,
+      fileSize: file.size,
+      userId: user.id,
+      fullPath
     });
 
-    if (listResponse.ok) {
-      const buckets = await listResponse.json();
-      const bucketExists = buckets.result?.some((b: any) => b.name === bucketName);
-      
-      if (!bucketExists) {
-        console.log(`Creating R2 bucket: ${bucketName}`);
-        const createResponse = await fetch(bucketListUrl, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${apiToken}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ name: bucketName }),
-        });
-        
-        if (!createResponse.ok) {
-          const error = await createResponse.text();
-          console.error('Failed to create bucket:', error);
-          return new Response(
-            JSON.stringify({ error: 'Failed to create R2 bucket', details: error }),
-            { status: createResponse.status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-          );
-        }
-        console.log(`Successfully created bucket: ${bucketName}`);
-      }
-    }
-
-    // Upload to Cloudflare R2 using the correct API endpoint
-    const r2Url = `https://api.cloudflare.com/client/v4/accounts/${accountId}/r2/buckets/${bucketName}/objects/${fileName}`;
+    // Upload to Cloudflare R2
+    const uploadUrl = `https://api.cloudflare.com/client/v4/accounts/${cloudflareAccountId}/r2/buckets/clbhouz-media/objects/${fullPath}`;
     
-    const uploadResponse = await fetch(r2Url, {
+    const uploadResponse = await fetch(uploadUrl, {
       method: 'PUT',
       headers: {
-        'Authorization': `Bearer ${apiToken}`,
+        'Authorization': `Bearer ${cloudflareR2Token}`,
         'Content-Type': file.type,
+        'Content-Length': file.size.toString(),
       },
       body: file,
     });
 
     if (!uploadResponse.ok) {
       const errorText = await uploadResponse.text();
-      console.error('R2 upload failed:', uploadResponse.status, errorText);
-      return new Response(
-        JSON.stringify({ error: 'R2 upload failed', details: errorText }),
-        { 
-          status: uploadResponse.status, 
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-        }
-      );
+      console.error('R2 upload failed:', errorText);
+      throw new Error(`Failed to upload to R2: ${uploadResponse.status} ${errorText}`);
     }
 
-    console.log('R2 upload successful');
+    // Construct the public URL
+    const publicUrl = `https://media.clbhouz.co.uk/${fullPath}`;
 
-    // Return the R2 public URL (using custom domain if provided)
-    const customDomain = 'https://media.clbhouz.co.uk';
-    const publicUrl = `${customDomain}/${fileName}`;
+    console.log('File uploaded successfully:', {
+      publicUrl,
+      fileName: uniqueFileName,
+      bucketType,
+      fullPath
+    });
 
-    return new Response(
-      JSON.stringify({ 
-        success: true, 
-        url: publicUrl,
-        fileName: fileName
-      }),
-      { 
-        status: 200, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      }
-    );
+    return new Response(JSON.stringify({
+      success: true,
+      publicUrl,
+      fileName: uniqueFileName,
+      fullPath
+    }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
 
   } catch (error) {
-    console.error('R2 upload error:', error);
-    return new Response(
-      JSON.stringify({ error: 'Internal server error', details: error.message }),
-      { 
-        status: 500, 
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
-      }
-    );
+    console.error('Error in cloudflare-r2-upload function:', error);
+    return new Response(JSON.stringify({ 
+      error: error.message,
+      success: false
+    }), {
+      status: 500,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
   }
 });

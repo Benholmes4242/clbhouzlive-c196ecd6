@@ -1,5 +1,6 @@
 
 import { supabase } from '@/integrations/supabase/client';
+import { uploadToCloudflareR2 } from '@/utils/cloudflareUpload';
 
 export const uploadMultipleMediaWithRetry = async (
   files: File[], 
@@ -45,45 +46,19 @@ export const uploadMediaWithRetry = async (
   
   for (let attempt = 1; attempt <= maxRetries; attempt++) {
     try {
+      console.log(`Upload attempt ${attempt}/${maxRetries} for ${file.name}`);
+      
+      // Upload to Cloudflare R2 instead of Supabase storage
       const fileExt = file.name.split('.').pop() || 'unknown';
-      const fileName = `${userId}/${postId}/${Date.now()}-${attempt}.${fileExt}`;
+      const fileName = `${postId}-${Date.now()}-${attempt}.${fileExt}`;
       
-      // Set longer timeout for larger files, especially videos
-      const isVideo = file.type.startsWith('video/');
-      const baseTimeout = isVideo ? 300000 : 120000; // 5 minutes for videos, 2 for images
-      const timeoutMs = Math.max(baseTimeout, file.size / 1024 / 1024 * 15000); // 15s per MB
+      const uploadResult = await uploadToCloudflareR2(file, 'post-media', fileName);
       
-      console.log(`Upload attempt ${attempt}/${maxRetries} for ${file.name}, timeout: ${timeoutMs}ms`);
-      
-      const uploadPromise = supabase.storage
-        .from('post-media')
-        .upload(fileName, file, {
-          upsert: false
-        });
-
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Upload timeout')), timeoutMs)
-      );
-
-      const { data, error: uploadError } = await Promise.race([uploadPromise, timeoutPromise]) as any;
-
-      if (uploadError) {
-        console.error(`Upload error on attempt ${attempt}:`, uploadError);
-        throw uploadError;
+      if (!uploadResult.success || !uploadResult.publicUrl) {
+        throw new Error(uploadResult.error || 'Upload failed');
       }
 
-      if (!data) {
-        throw new Error('No upload data returned');
-      }
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('post-media')
-        .getPublicUrl(fileName);
-
-      if (!publicUrl) {
-        throw new Error('Failed to get public URL for uploaded file');
-      }
-
+      const publicUrl = uploadResult.publicUrl;
       const mediaType = file.type.startsWith('image/') ? 'image' : 'video';
       
       const { error: mediaError } = await supabase
