@@ -38,14 +38,14 @@ const CourseImageUpload: React.FC<CourseImageUploadProps> = ({
     }
 
     try {
-      // Create a unique filename
+      // Create a unique filename for golf course images bucket
       const fileExt = file.name.split('.').pop();
       const fileName = `courses/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
 
-      console.log('Uploading file to R2:', fileName);
+      console.log('Uploading file to R2 golf courses bucket:', fileName);
 
-      // Upload file to Cloudflare R2
-      const result = await uploadToR2(file, fileName);
+      // Upload file to Cloudflare R2 golf courses bucket
+      const result = await uploadToR2(file, fileName, 'clbhouz-golf-courses');
 
       if (!result.success) {
         throw new Error(result.error || 'Upload failed');

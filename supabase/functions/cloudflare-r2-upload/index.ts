@@ -14,10 +14,10 @@ serve(async (req) => {
   try {
     console.log('R2 upload request started');
 
-    const formData = await req.formData();
-    const file = formData.get('file') as File;
-    const fileName = formData.get('fileName') as string;
-    const bucketName = formData.get('bucketName') as string;
+      const formData = await req.formData();
+      const file = formData.get('file') as File;
+      const fileName = formData.get('fileName') as string;
+      const bucketName = formData.get('bucketName') as string || 'clbhouz-media'; // Default to media bucket
 
     if (!file || !fileName || !bucketName) {
       console.error('Missing required parameters', { file: !!file, fileName, bucketName });

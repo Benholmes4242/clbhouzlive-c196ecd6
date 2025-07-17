@@ -13,7 +13,8 @@ export const useCloudflareR2 = () => {
 
   const uploadToR2 = useCallback(async (
     file: File,
-    fileName: string
+    fileName: string,
+    bucketName: string = 'clbhouz-media'
   ): Promise<R2UploadResult> => {
     setIsUploading(true);
     
@@ -23,7 +24,7 @@ export const useCloudflareR2 = () => {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('fileName', fileName);
-      formData.append('bucketName', 'clbhouz-media');
+      formData.append('bucketName', bucketName);
 
       const { data, error } = await supabase.functions.invoke('cloudflare-r2-upload', {
         body: formData,
