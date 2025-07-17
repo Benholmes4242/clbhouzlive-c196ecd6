@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, MapPin, Play } from 'lucide-react';
+import { ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
+import { PiPlay } from 'react-icons/pi';
 import { ExploreContentItem } from '@/components/explore/types';
 import { useVideoPlaybackManager } from '@/hooks/useVideoPlaybackManager';
 import MediaDisplay from '@/components/explore/MediaDisplay';
@@ -194,7 +195,7 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
                       }}
                       className="flex items-center justify-center w-10 h-10 text-white hover:bg-white/20 rounded-full transition-colors bg-black/50 backdrop-blur-sm"
                     >
-                      <Play className="h-4 w-4" />
+                      <PiPlay className="h-4 w-4" />
                     </button>
                   </div>
                 )}
