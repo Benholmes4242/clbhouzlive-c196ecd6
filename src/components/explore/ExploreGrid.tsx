@@ -160,9 +160,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
           {content.map((item, index) => (
             <div
               key={`friends-${item.id}-${index}`}
-              className={`relative bg-muted rounded-lg overflow-hidden cursor-pointer group ${
-                isMobile ? 'h-[60vh]' : 'aspect-[9/8]'
-              }`}
+              className="relative bg-muted rounded-lg overflow-hidden cursor-pointer group aspect-square"
               onClick={() => onMediaClick?.(item)}
             >
               {/* Only render MediaDisplay for non-CTA items */}
