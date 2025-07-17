@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -84,7 +83,6 @@ export const usePostSubmission = () => {
             const uploadResult = await uploadToCloudflareR2(file, 'post-media', fullFileName);
 
             if (!uploadResult.success || !uploadResult.publicUrl) {
-              console.error(`Upload error for file ${file.name}:`, uploadResult.error);
               throw new Error(uploadResult.error || 'Upload failed');
             }
 
