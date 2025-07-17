@@ -46,7 +46,8 @@ serve(async (req) => {
       { table: 'course_review_media', bucket: 'course-review-media', urlColumn: 'media_url', typeColumn: 'media_type' },
       { table: 'user_profiles', bucket: 'avatars', urlColumn: 'profile_photo_url', typeColumn: null },
       { table: 'user_profiles', bucket: 'avatars', urlColumn: 'cover_photo_url', typeColumn: null },
-      { table: 'logos', bucket: 'logos', urlColumn: 'file_url', typeColumn: 'mime_type' }
+      { table: 'logos', bucket: 'logos', urlColumn: 'file_url', typeColumn: 'mime_type' },
+      { table: 'golf_courses', bucket: 'course-images', urlColumn: 'thumbnail_image', typeColumn: null }
     ];
 
     const progress: MigrationProgress = {

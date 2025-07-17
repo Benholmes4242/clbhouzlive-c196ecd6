@@ -3,8 +3,8 @@ import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Upload, X, Image as ImageIcon } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useCloudflareR2 } from '@/hooks/useCloudflareR2';
 
 interface CourseImageUploadProps {
   currentImageUrl?: string | null;
@@ -17,10 +17,10 @@ const CourseImageUpload: React.FC<CourseImageUploadProps> = ({
   onImageChange,
   disabled = false
 }) => {
-  const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(currentImageUrl || null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const { uploadToR2, isUploading } = useCloudflareR2();
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -37,44 +37,24 @@ const CourseImageUpload: React.FC<CourseImageUploadProps> = ({
       return;
     }
 
-    // No file size limit - users can upload images of any size
-
-    setUploading(true);
-
     try {
       // Create a unique filename
       const fileExt = file.name.split('.').pop();
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-      const filePath = `courses/${fileName}`;
+      const fileName = `courses/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
 
-      console.log('Uploading file to path:', filePath);
+      console.log('Uploading file to R2:', fileName);
 
-      // Upload file to Supabase storage
-      const { data, error } = await supabase.storage
-        .from('course-images')
-        .upload(filePath, file);
+      // Upload file to Cloudflare R2
+      const result = await uploadToR2(file, fileName);
 
-      if (error) {
-        console.error('Storage upload error:', error);
-        throw error;
+      if (!result.success) {
+        throw new Error(result.error || 'Upload failed');
       }
 
-      console.log('File uploaded successfully:', data);
+      console.log('File uploaded successfully to R2:', result.url);
 
-      // Get public URL
-      const { data: { publicUrl } } = supabase.storage
-        .from('course-images')
-        .getPublicUrl(filePath);
-
-      console.log('Generated public URL:', publicUrl);
-
-      // Ensure the URL is valid
-      if (!publicUrl || !publicUrl.startsWith('http')) {
-        throw new Error('Invalid public URL generated');
-      }
-
-      setPreviewUrl(publicUrl);
-      onImageChange(publicUrl);
+      setPreviewUrl(result.url!);
+      onImageChange(result.url!);
 
       toast({
         title: "Success",
@@ -88,7 +68,6 @@ const CourseImageUpload: React.FC<CourseImageUploadProps> = ({
         variant: "destructive",
       });
     } finally {
-      setUploading(false);
       // Clear the input so the same file can be selected again
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
@@ -156,15 +135,15 @@ const CourseImageUpload: React.FC<CourseImageUploadProps> = ({
           accept="image/jpeg,image/jpg,image/png,image/webp"
           onChange={handleFileUpload}
           className="hidden"
-          disabled={uploading || disabled}
+          disabled={isUploading || disabled}
         />
         <Button
           type="button"
           variant="outline"
-          disabled={uploading || disabled}
+          disabled={isUploading || disabled}
           onClick={handleUploadClick}
         >
-          {uploading ? (
+          {isUploading ? (
             <>
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2"></div>
               Uploading...
