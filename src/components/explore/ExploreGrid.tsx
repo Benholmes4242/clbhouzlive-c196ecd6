@@ -156,7 +156,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
   if (activeFilter === FILTER_TYPES.FRIENDS) {
     return (
       <>
-        <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-3'}`}>
+        <div className="grid gap-4 grid-cols-3">
           {content.map((item, index) => (
             <div
               key={`friends-${item.id}-${index}`}
