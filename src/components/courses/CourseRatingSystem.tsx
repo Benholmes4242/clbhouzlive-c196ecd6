@@ -64,7 +64,6 @@ const CourseRatingSystem = ({
           if (!uploadResult.success || !uploadResult.publicUrl) {
             throw new Error(uploadResult.error || `Failed to upload ${file.name}`);
           }
-          }
 
           console.log(`Successfully uploaded ${file.name}`);
         });

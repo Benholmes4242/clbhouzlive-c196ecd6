@@ -79,23 +79,16 @@ export const usePostSubmission = () => {
             
             console.log(`Uploading file ${index + 1}/${mediaFiles.length}: ${file.name} (${file.size} bytes)`);
             
-            // Upload file to storage with progress tracking
-            const { error: uploadError } = await supabase.storage
-              .from('post-media')
-              .upload(`${user.id}/${fullFileName}`, file, {
-                upsert: false,
-                duplex: 'half'
-              });
+            // Upload to Cloudflare R2 instead of Supabase storage
+            const { uploadToCloudflareR2 } = await import('@/utils/cloudflareUpload');
+            const uploadResult = await uploadToCloudflareR2(file, 'post-media', fullFileName);
 
-            if (uploadError) {
-              console.error(`Upload error for file ${file.name}:`, uploadError);
-              throw uploadError;
+            if (!uploadResult.success || !uploadResult.publicUrl) {
+              console.error(`Upload error for file ${file.name}:`, uploadResult.error);
+              throw new Error(uploadResult.error || 'Upload failed');
             }
 
-            // Get public URL
-            const { data: { publicUrl } } = supabase.storage
-              .from('post-media')
-              .getPublicUrl(`${user.id}/${fullFileName}`);
+            const publicUrl = uploadResult.publicUrl;
 
             console.log(`Successfully uploaded ${file.name}, public URL: ${publicUrl}`);
 
