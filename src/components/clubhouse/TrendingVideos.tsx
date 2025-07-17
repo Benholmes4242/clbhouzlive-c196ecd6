@@ -208,7 +208,7 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
                 
                 {/* Trending Icon */}
                 <div className="absolute top-3 right-3">
-                  <HiTrendingUp className="w-6 h-6 drop-shadow-lg" style={{ color: '#f7931e' }} />
+                  <HiTrendingUp className="w-8 h-8 drop-shadow-lg" style={{ color: '#f7931e' }} />
                 </div>
                 
                 {/* User info */}
