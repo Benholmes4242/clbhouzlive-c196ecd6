@@ -22,8 +22,10 @@ export const useRealPostsFetcher = () => {
 
       const followedUserIds = followedUsers?.map(f => f.following_id) || [];
       
+      // If no followed users, fall back to general posts
       if (followedUserIds.length === 0) {
-        return []; // No followed users, return empty
+        console.log('No followed users found, falling back to general posts');
+        return await fetchRealPosts(currentOffset, postsPerPage);
       }
 
       // Call the social feed RPC function
