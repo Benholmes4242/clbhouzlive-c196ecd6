@@ -41,13 +41,24 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
     }
   };
 
+  // Event handler to prevent default scrolling
+  useEffect(() => {
+    const el = containerRef.current;
+    const preventDefault = (e: TouchEvent) => {
+      e.preventDefault();
+    };
+    
+    el?.addEventListener('touchmove', preventDefault, { passive: false });
+    return () => el?.removeEventListener('touchmove', preventDefault);
+  }, []);
+
   // Swipe handlers
   const swipeHandlers = useSwipeable({
     onSwipedUp: () => goToNext(),
     onSwipedDown: () => goToPrevious(),
     trackMouse: false,
     trackTouch: true,
-    delta: 50,
+    delta: 50
   });
 
   // Keyboard navigation
