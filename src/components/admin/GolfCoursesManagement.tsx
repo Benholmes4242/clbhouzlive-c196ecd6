@@ -10,7 +10,7 @@ import GolfCourseCard from './golf-courses/GolfCourseCard';
 import GolfCoursesFilters from './golf-courses/GolfCoursesFilters';
 import EmptyCoursesState from './golf-courses/EmptyCoursesState';
 import GolfCoursesLoadingSkeleton from './golf-courses/GolfCoursesLoadingSkeleton';
-import BulkCourseImport from './golf-courses/BulkCourseImport';
+
 import { useGolfCourses } from './golf-courses/useGolfCourses';
 import { filterCoursesByRegion } from './golf-courses/utils';
 import { GolfCourse, RegionKey } from './golf-courses/types';
@@ -152,8 +152,6 @@ const GolfCoursesManagement = () => {
           </div>
         </div>
 
-        {/* Add the bulk import component */}
-        <BulkCourseImport />
 
         <GolfCoursesFilters
           searchTerm={searchTerm}
