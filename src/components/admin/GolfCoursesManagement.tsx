@@ -53,7 +53,12 @@ const GolfCoursesManagement = () => {
   const handleMigrateToR2 = async () => {
     setIsMigrating(true);
     try {
-      const { data, error } = await supabase.functions.invoke('migrate-media-to-cloudflare');
+      const { data, error } = await supabase.functions.invoke('migrate-media-to-cloudflare', {
+        body: {
+          batchSize: 10,
+          resumeFrom: 0
+        }
+      });
       
       if (error) {
         console.error('Migration error:', error);
