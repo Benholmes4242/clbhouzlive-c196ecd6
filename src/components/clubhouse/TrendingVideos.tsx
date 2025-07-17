@@ -185,20 +185,6 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
                   </div>
                 </div>
 
-                {/* Bottom-right play button for non-autoplay videos (replaces center play button) */}
-                {!isFirstCard && (
-                  <div className="absolute bottom-3 right-3 pointer-events-auto z-20">
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleVideoClick(actualIndex);
-                      }}
-                      className="flex items-center justify-center w-10 h-10 text-white hover:bg-white/20 rounded-full transition-colors bg-black/50 backdrop-blur-sm"
-                    >
-                      <PiPlay className="h-4 w-4" />
-                    </button>
-                  </div>
-                )}
 
                 {/* Mobile overlay controls */}
                 {isMobile && (
