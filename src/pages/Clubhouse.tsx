@@ -5,26 +5,19 @@ import ExploreFilters from '@/components/explore/ExploreFilters';
 import ExploreGrid from '@/components/explore/ExploreGrid';
 import MobileDebugConsole from '@/components/explore/MobileDebugConsole';
 import VerticalMediaFeed from '@/components/explore/VerticalMediaFeed';
-import TrendingVideos from '@/components/clubhouse/TrendingVideos';
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
 import { FILTER_TYPES, MEDIA_TYPES } from '@/components/explore/types';
 
 const Clubhouse = () => {
-  const [activeFilter, setActiveFilter] = useState<string>(FILTER_TYPES.FRIENDS);
   const [debugVisible, setDebugVisible] = useState(false);
   
-  // Get content for the active filter (for the tabs section)
+  // Get content for Friends filter only
   const { 
     content, 
     loading, 
     hasMore, 
     loadMore 
-  } = useInfiniteExploreContent(activeFilter);
-  
-  // Get static content for Trending Videos (always use Friends filter)
-  const { 
-    content: trendingContent
   } = useInfiniteExploreContent(FILTER_TYPES.FRIENDS);
   
   const { 
@@ -48,54 +41,8 @@ const Clubhouse = () => {
     openFeed(item);
   };
 
-  // Apply client-side filtering for non-database filters
-  const filteredContent = content.filter(item => {
-    // Friends filtering is handled in the database
-    if (activeFilter === FILTER_TYPES.FRIENDS) {
-      return true;
-    }
-    
-    // Videos and Photos filtering is handled in the database
-    if (activeFilter === FILTER_TYPES.VIDEOS || activeFilter === FILTER_TYPES.PHOTOS) {
-      return true;
-    }
-    
-    // Verified Pros: Empty for now (no content yet)
-    if (activeFilter === FILTER_TYPES.VERIFIED_PROS) {
-      return false; // No content for verified pros yet
-    }
-    
-    // Channels: Empty for now (no content yet)
-    if (activeFilter === FILTER_TYPES.CHANNELS) {
-      return false; // No content for channels yet
-    }
-    
-    // Hack Shack: Only videos with #hackshack hashtag
-    if (activeFilter === FILTER_TYPES.HACK_SHACK) {
-      return item.type === MEDIA_TYPES.VIDEO && (
-        item.title?.toLowerCase().includes('#hackshack') || 
-        item.title?.toLowerCase().includes('hackshack')
-      );
-    }
-    
-    // Brain Game: Videos and photos with #braingame hashtag
-    if (activeFilter === FILTER_TYPES.BRAIN_GAME) {
-      return (item.type === MEDIA_TYPES.VIDEO || item.type === MEDIA_TYPES.IMAGE) && (
-        item.title?.toLowerCase().includes('#braingame') || 
-        item.title?.toLowerCase().includes('braingame')
-      );
-    }
-    
-    return true;
-  });
-
-  // Remove duplicates based on src URL for tab content
-  const uniqueContent = filteredContent.filter((item, index, self) => 
-    index === self.findIndex(t => t.src === item.src)
-  );
-
-  // Remove duplicates for trending videos (static content)
-  const uniqueTrendingContent = trendingContent.filter((item, index, self) => 
+  // Remove duplicates based on src URL
+  const uniqueContent = content.filter((item, index, self) => 
     index === self.findIndex(t => t.src === item.src)
   );
 
@@ -104,18 +51,21 @@ const Clubhouse = () => {
         <Header />
         
         <main className="pb-20">
-          {/* Trending Videos Section - Static content that doesn't change with tabs */}
-          <TrendingVideos 
-            videos={uniqueTrendingContent}
-            onVideoClick={handleMediaClick}
-          />
 
           {/* Your Clubhouse Section */}
           <div className="container pt-6 pb-6">
             <h2 className="text-xl font-semibold text-foreground mb-4">Your Clubhouse</h2>
             <ExploreFilters 
-              activeFilter={activeFilter} 
-              onFilterChange={setActiveFilter} 
+              activeFilter={FILTER_TYPES.FRIENDS}
+              onFilterChange={() => {}}
+              excludeFilters={[
+                FILTER_TYPES.VIDEOS,
+                FILTER_TYPES.PHOTOS,
+                FILTER_TYPES.VERIFIED_PROS,
+                FILTER_TYPES.CHANNELS,
+                FILTER_TYPES.HACK_SHACK,
+                FILTER_TYPES.BRAIN_GAME
+              ]}
             />
           </div>
 
@@ -129,7 +79,7 @@ const Clubhouse = () => {
               isLoading={loading}
               hasMore={hasMore}
               onLoadMore={loadMore}
-              activeFilter={activeFilter}
+              activeFilter={FILTER_TYPES.FRIENDS}
               isClubhousePage={true}
             />
           </div>
