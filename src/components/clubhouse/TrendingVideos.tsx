@@ -196,8 +196,8 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
                   </div>
                 )}
                 
-                {/* User info - moved down from bottom-8 to bottom-3 */}
-                <div className="absolute bottom-3 left-3 right-3">
+                {/* User info */}
+                <div className={`absolute left-3 right-3 ${isMobile ? 'bottom-12' : 'bottom-3'}`}>
                   <div className="flex items-center gap-2">
                     <img
                       src={video.user?.avatar || '/placeholder.svg'}
