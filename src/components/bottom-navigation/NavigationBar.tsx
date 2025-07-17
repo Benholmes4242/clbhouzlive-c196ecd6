@@ -26,8 +26,8 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick }) 
                 }}
                 className={`flex flex-col items-center justify-center space-y-1 transition-colors relative focus:outline-none min-h-[60px] min-w-[60px] ${
                   isActive
-                    ? 'text-[#2a2626]'
-                    : 'text-muted-foreground hover:text-foreground'
+                    ? 'text-black'
+                    : 'text-black/70 hover:text-black'
                 }`}
               >
                 <Icon
