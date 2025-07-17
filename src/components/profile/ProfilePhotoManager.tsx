@@ -30,9 +30,21 @@ const ProfilePhotoManager: React.FC<ProfilePhotoManagerProps> = ({
       const img = new Image();
       
       img.onload = () => {
-        // Set high-quality dimensions (max 2048x2048 for 4K quality but manageable file size)
-        const maxSize = 2048;
+        // Set very high-quality dimensions (4K: 3840x3840 max for true 4K quality)
+        const maxSize = 3840; // True 4K resolution
         let { width, height } = img;
+        
+        // Always upscale to at least 1024x1024 for small images
+        const minSize = 1024;
+        if (width < minSize && height < minSize) {
+          if (width > height) {
+            height = (height * minSize) / width;
+            width = minSize;
+          } else {
+            width = (width * minSize) / height;
+            height = minSize;
+          }
+        }
         
         // Calculate new dimensions while maintaining aspect ratio
         if (width > height) {
