@@ -184,11 +184,19 @@ const FullscreenMediaModal = ({
   // Auto-play video when modal opens or index changes
   useEffect(() => {
     if (isOpen && mediaTypes[currentIndex] === 'video') {
-      // The EnhancedVideoPlayer will handle video initialization automatically
-      // We just need to manage the video playback state
+      // Pause all other videos and set this one as active
       pauseAllAndSetActive(fullscreenVideoId.current);
+      
+      // Force autoplay for the new video after navigation
+      setTimeout(() => {
+        const videoElement = document.querySelector(`[data-video-id="${fullscreenVideoId.current}"]`) as HTMLVideoElement;
+        if (videoElement) {
+          videoElement.muted = isMuted;
+          videoElement.play().catch(console.warn);
+        }
+      }, 100);
     }
-  }, [isOpen, currentIndex, mediaTypes, pauseAllAndSetActive]);
+  }, [isOpen, currentIndex, mediaTypes, pauseAllAndSetActive, isMuted]);
 
   // Cleanup when modal closes - restore feed video behavior
   useEffect(() => {
