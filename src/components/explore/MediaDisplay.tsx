@@ -49,15 +49,14 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
   // Debug log the media URL and autoplay
   console.log('MediaDisplay - URL:', media.media_url, 'Type:', media.media_type, 'Invalid:', isInvalidSrc, 'ShouldAutoplay:', shouldAutoplay);
 
-  // Generate high-quality thumbnail URL for Cloudflare Stream videos
+  // Generate thumbnail URL for Cloudflare Stream videos
   const getVideoThumbnail = (videoUrl: string) => {
     if (videoUrl.includes('cloudflarestream.com') && videoUrl.includes('/manifest/video.m3u8')) {
       // Extract video ID from Cloudflare Stream URL
       const match = videoUrl.match(/\/([a-f0-9]+)\/manifest\/video\.m3u8/);
       if (match) {
         const videoId = match[1];
-        // Use high-quality thumbnail with proper dimensions and fit
-        return `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${videoId}/thumbnails/thumbnail.jpg?time=1s&width=800&height=800&fit=crop`;
+        return `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${videoId}/thumbnails/thumbnail.jpg`;
       }
     }
     return null;

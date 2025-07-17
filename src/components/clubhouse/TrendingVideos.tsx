@@ -215,7 +215,7 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
                 <div className="absolute bottom-3 left-3 right-3">
                   <div className="flex items-center gap-2">
                     <img
-                      src={video.user?.avatar || '/placeholder.svg'}
+                      src={`${video.user?.avatar || '/placeholder.svg'}?quality=85&width=100&height=100&fit=crop`}
                       alt={video.user?.name || 'User'}
                       className="w-12 h-12 rounded-full object-cover"
                     />
