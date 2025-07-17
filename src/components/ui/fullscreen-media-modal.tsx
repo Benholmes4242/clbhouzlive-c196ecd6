@@ -186,17 +186,8 @@ const FullscreenMediaModal = ({
     if (isOpen && mediaTypes[currentIndex] === 'video') {
       // Pause all other videos and set this one as active
       pauseAllAndSetActive(fullscreenVideoId.current);
-      
-      // Force autoplay for the new video after navigation
-      setTimeout(() => {
-        const videoElement = document.querySelector(`[data-video-id="${fullscreenVideoId.current}"]`) as HTMLVideoElement;
-        if (videoElement) {
-          videoElement.muted = isMuted;
-          videoElement.play().catch(console.warn);
-        }
-      }, 100);
     }
-  }, [isOpen, currentIndex, mediaTypes, pauseAllAndSetActive, isMuted]);
+  }, [isOpen, currentIndex, mediaTypes, pauseAllAndSetActive]);
 
   // Cleanup when modal closes - restore feed video behavior
   useEffect(() => {
@@ -372,6 +363,7 @@ const FullscreenMediaModal = ({
             />
           ) : (
             <EnhancedVideoPlayer
+              key={`fullscreen-video-${currentIndex}-${mediaUrls[currentIndex]}`}
               src={mediaUrls[currentIndex]}
               className="w-full h-full object-cover"
               muted={isMuted}
