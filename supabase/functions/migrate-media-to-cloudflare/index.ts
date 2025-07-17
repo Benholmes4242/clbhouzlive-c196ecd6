@@ -216,11 +216,11 @@ serve(async (req) => {
                 throw new Error(`R2 upload failed: ${r2Response.status} - ${errorText}`);
               }
 
-              // Generate the correct public URL based on target bucket
+              // Generate the correct public URL based on target bucket  
               if (source.targetBucket === 'clbhouz-golf-courses') {
-                newUrl = `https://golf-courses.clbhouz.co.uk/${filePath}`;
+                newUrl = `https://pub-${accountId}.r2.dev/clbhouz-golf-courses/${filePath}`;
               } else {
-                newUrl = `https://media.clbhouz.co.uk/${filePath}`;
+                newUrl = `https://pub-${accountId}.r2.dev/clbhouz-media/${filePath}`;
               }
             }
 
