@@ -20,6 +20,7 @@ interface MediaDisplayProps {
   itemId: string;
   currentIndex: number;
   loop?: boolean;
+  muted?: boolean;
 }
 
 const MediaDisplay: React.FC<MediaDisplayProps> = ({
@@ -31,7 +32,8 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
   onImageLoad,
   itemId,
   currentIndex,
-  loop = false
+  loop = false,
+  muted = true
 }) => {
   // Fallback image for broken/missing images
   const fallbackImage = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
@@ -101,7 +103,7 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
           <EnhancedVideoPlayer
             src={media.media_url}
             autoplay={shouldAutoplay}
-            muted={true}
+            muted={muted}
             loop={loop}
             className="w-full h-full pointer-events-none"
             preloadLevel="metadata"

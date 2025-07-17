@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
-import ExploreGrid from '@/components/explore/ExploreGrid';
 import MobileDebugConsole from '@/components/explore/MobileDebugConsole';
 import VerticalMediaFeed from '@/components/explore/VerticalMediaFeed';
+import FullscreenPostFeed from '@/components/clubhouse/FullscreenPostFeed';
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
 import { FILTER_TYPES } from '@/components/explore/types';
@@ -46,33 +46,25 @@ const Clubhouse = () => {
   );
 
   return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        
-        <main className="pb-20">
-
-          {/* Your Clubhouse Section */}
-          <div className="container pt-6 pb-6">
-            <h2 className="text-xl font-semibold text-foreground mb-4">Your Clubhouse</h2>
-          </div>
-
-          {/* Main Grid with Container */}
-          <div className="container">
-            <ExploreGrid 
+      <div className="h-screen bg-black overflow-hidden">
+        <main className="h-full">
+          {/* Fullscreen Post Feed */}
+          {uniqueContent.length > 0 ? (
+            <FullscreenPostFeed 
               content={uniqueContent}
               onLike={handleLike}
-              onFollow={handleFollow}
               onMediaClick={handleMediaClick}
-              isLoading={loading}
-              hasMore={hasMore}
-              onLoadMore={loadMore}
-              activeFilter={FILTER_TYPES.FRIENDS}
-              isClubhousePage={true}
             />
-          </div>
+          ) : (
+            <div className="flex items-center justify-center h-full">
+              <p className="text-white/70">Loading posts...</p>
+            </div>
+          )}
         </main>
         
-        <BottomNavigation />
+        <div className="absolute bottom-0 left-0 right-0 z-50">
+          <BottomNavigation />
+        </div>
 
         {/* Mobile Debug Console */}
         <MobileDebugConsole 
@@ -80,7 +72,7 @@ const Clubhouse = () => {
           onToggle={() => setDebugVisible(!debugVisible)}
         />
 
-        {/* Vertical Media Feed */}
+        {/* Vertical Media Feed - Keep the existing modal */}
         {initialItem && (
           <VerticalMediaFeed
             isOpen={isFeedOpen}
