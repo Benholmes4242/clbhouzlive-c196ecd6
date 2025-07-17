@@ -29,7 +29,7 @@ const MediaOverlays: React.FC<MediaOverlaysProps> = ({
   return (
     <>
       {/* Like button overlay - hidden on mobile */}
-      <div className="absolute bottom-3 left-3 hidden md:block pointer-events-auto z-20">
+      <div className="absolute bottom-1 left-3 hidden md:block pointer-events-auto z-20">
         <button
           onClick={onLike}
           className="flex items-center justify-center w-10 h-10 text-white hover:bg-white/10 rounded-full transition-colors pointer-events-auto"
