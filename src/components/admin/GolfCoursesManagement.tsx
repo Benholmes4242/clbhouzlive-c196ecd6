@@ -33,6 +33,56 @@ const GolfCoursesManagement = () => {
   } | null>(null);
 
   const { data: courses, isLoading, refetch } = useGolfCourses();
+  const [migrationStats, setMigrationStats] = useState<{
+    total: number;
+    migrated: number;
+    remaining: number;
+    noImage: number;
+  } | null>(null);
+
+  // Fetch migration stats
+  const fetchMigrationStats = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('golf_courses')
+        .select('thumbnail_image')
+        .not('thumbnail_image', 'is', null);
+
+      if (error) {
+        console.error('Error fetching migration stats:', error);
+        return;
+      }
+
+      const total = data.length;
+      const migrated = data.filter(course => 
+        course.thumbnail_image?.includes('golf-courses.clbhouz.co.uk')
+      ).length;
+      const remaining = data.filter(course => 
+        course.thumbnail_image?.includes('supabase')
+      ).length;
+
+      // Also count courses with no image
+      const { count: totalCount } = await supabase
+        .from('golf_courses')
+        .select('*', { count: 'exact', head: true });
+
+      const noImage = (totalCount || 0) - total;
+
+      setMigrationStats({
+        total: totalCount || 0,
+        migrated,
+        remaining,
+        noImage
+      });
+    } catch (error) {
+      console.error('Error fetching migration stats:', error);
+    }
+  };
+
+  // Fetch stats on component mount and when courses change
+  React.useEffect(() => {
+    fetchMigrationStats();
+  }, [courses]);
 
   const handleEditCourse = (course: GolfCourse) => {
     // Ensure the course has all required properties
@@ -159,6 +209,53 @@ const GolfCoursesManagement = () => {
           selectedRegion={selectedRegion}
           onRegionChange={setSelectedRegion}
         />
+
+        {/* Migration Progress Indicator */}
+        {migrationStats && (
+          <div className="bg-card border rounded-lg p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold text-sm">Migration Progress</h3>
+              <button
+                onClick={fetchMigrationStats}
+                className="text-xs text-muted-foreground hover:text-foreground"
+              >
+                Refresh
+              </button>
+            </div>
+            
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span>Images migrated to R2</span>
+                <span className="font-mono">
+                  {migrationStats.migrated} / {migrationStats.total - migrationStats.noImage}
+                </span>
+              </div>
+              
+              <Progress 
+                value={migrationStats.total > migrationStats.noImage 
+                  ? (migrationStats.migrated / (migrationStats.total - migrationStats.noImage)) * 100 
+                  : 0
+                } 
+                className="h-2"
+              />
+              
+              <div className="grid grid-cols-3 gap-4 text-xs text-muted-foreground">
+                <div className="text-center">
+                  <div className="font-semibold text-green-600">{migrationStats.migrated}</div>
+                  <div>Migrated</div>
+                </div>
+                <div className="text-center">
+                  <div className="font-semibold text-orange-600">{migrationStats.remaining}</div>
+                  <div>Remaining</div>
+                </div>
+                <div className="text-center">
+                  <div className="font-semibold text-gray-500">{migrationStats.noImage}</div>
+                  <div>No Image</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Migration Progress */}
         {(isMigrating || migrationProgress) && (
