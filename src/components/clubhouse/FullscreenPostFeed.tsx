@@ -8,12 +8,18 @@ interface FullscreenPostFeedProps {
   content: ExploreContentItem[];
   onLike: (contentId: string) => void;
   onMediaClick: (item: ExploreContentItem) => void;
+  isLoading: boolean;
+  hasMore: boolean;
+  onLoadMore: () => void;
 }
 
 const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({ 
   content, 
   onLike, 
-  onMediaClick 
+  onMediaClick,
+  isLoading,
+  hasMore,
+  onLoadMore
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isMuted, setIsMuted] = useState(true);
@@ -76,7 +82,28 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
   ];
 
   if (!currentPost) {
-    return (
+  // Setup intersection observer for infinite scroll
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !isLoading) {
+          onLoadMore();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (currentIndex === content.length - 2) { // Load more when near the end
+      const sentinel = document.getElementById('scroll-sentinel');
+      if (sentinel) {
+        observer.observe(sentinel);
+      }
+    }
+
+    return () => observer.disconnect();
+  }, [currentIndex, content.length, hasMore, isLoading, onLoadMore]);
+
+  return (
       <div className="h-screen flex items-center justify-center bg-background">
         <p className="text-muted-foreground">No posts available</p>
       </div>

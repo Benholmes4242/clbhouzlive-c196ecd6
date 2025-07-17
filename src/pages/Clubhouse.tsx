@@ -54,6 +54,9 @@ const Clubhouse = () => {
               content={uniqueContent}
               onLike={handleLike}
               onMediaClick={handleMediaClick}
+              isLoading={loading}
+              hasMore={hasMore}
+              onLoadMore={loadMore}
             />
           ) : (
             <div className="flex items-center justify-center h-full">
