@@ -2,7 +2,7 @@
 import React, { memo } from 'react';
 import { ExploreContentItem } from './types';
 import ExploreContentCard from './ExploreContentCard';
-import { useAutoplayManager } from '@/hooks/useAutoplayManager';
+// import { useAutoplayManager } from '@/hooks/useAutoplayManager';
 
 interface ExploreGridProps {
   content: ExploreContentItem[];
@@ -25,8 +25,8 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
   onLoadMore,
   activeFilter
 }) => {
-  // Initialize autoplay manager for every 8th video
-  const autoplayManager = useAutoplayManager({ interval: 8, threshold: 0.5 });
+  // Temporarily disable autoplay manager to fix loading issues
+  // const autoplayManager = useAutoplayManager({ interval: 8, threshold: 0.5 });
   // Intersection observer for infinite scroll
   React.useEffect(() => {
     const observer = new IntersectionObserver(
@@ -73,31 +73,32 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
   const createGridLayout = () => {
     const gridItems = [];
     let index = 0;
-    let videoIndex = 0; // Track video position for autoplay
+    // Disable video tracking for now
+    // let videoIndex = 0; // Track video position for autoplay
     
     while (index < content.length) {
       // Add 8-10 regular items
       const regularItemsCount = Math.min(9 + Math.floor(Math.random() * 3), content.length - index);
       
       for (let i = 0; i < regularItemsCount && index < content.length; i++) {
-        const currentVideoIndex = content[index].type === 'video' ? videoIndex++ : -1;
+        // const currentVideoIndex = content[index].type === 'video' ? videoIndex++ : -1;
         gridItems.push({
           type: 'regular',
           item: content[index],
           key: `regular-${content[index].id}`,
-          videoIndex: currentVideoIndex
+          // videoIndex: currentVideoIndex
         });
         index++;
       }
       
       // Add one big featured card if we have more content
       if (index < content.length) {
-        const currentVideoIndex = content[index].type === 'video' ? videoIndex++ : -1;
+        // const currentVideoIndex = content[index].type === 'video' ? videoIndex++ : -1;
         gridItems.push({
           type: 'featured',
           item: content[index],
           key: `featured-${content[index].id}`,
-          videoIndex: currentVideoIndex
+          // videoIndex: currentVideoIndex
         });
         index++;
       }
@@ -121,8 +122,6 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                 onFollow={onFollow} 
                 onMediaClick={onMediaClick}
                 isFeatured={true}
-                autoplayManager={autoplayManager}
-                videoIndex={gridItem.videoIndex}
               />
             </div>
           ) : (
@@ -132,8 +131,6 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                 onLike={onLike} 
                 onFollow={onFollow} 
                 onMediaClick={onMediaClick}
-                autoplayManager={autoplayManager}
-                videoIndex={gridItem.videoIndex}
               />
             </div>
           )
