@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { VideoPost, UserPostWithType } from './types';
 import { useVideoPlaybackManager, useFullscreenVideoModal } from '@/hooks/useVideoPlaybackManager';
 import FullscreenVideoModal from '@/components/ui/fullscreen-video-modal';
+import Masonry from 'react-masonry-css';
 
 interface MosaicFeedContentProps {
   optimisticPosts: any[];
@@ -327,6 +328,13 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
     );
   };
 
+  const breakpointColumnsObj = {
+    default: 4,
+    1100: 3,
+    700: 2,
+    500: 2
+  };
+
   return (
     <div className="mosaic-feed-container pb-20">
       {/* Show optimistic posts first */}
@@ -344,12 +352,16 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
         </div>
       )}
       
-      {/* Mosaic Grid */}
-      <div className="mosaic-grid">
+      {/* Masonry Grid */}
+      <Masonry
+        breakpointCols={breakpointColumnsObj}
+        className="mosaic-grid"
+        columnClassName="mosaic-column"
+      >
         {sortedContent.map((item, index) => (
           <MediaTile key={item.id} item={item} index={index} />
         ))}
-      </div>
+      </Masonry>
 
       {/* Fullscreen Video Modal */}
       <FullscreenVideoModal

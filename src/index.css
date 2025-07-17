@@ -319,23 +319,20 @@
 }
 
 .mosaic-grid {
-  columns: 2;
-  column-gap: 0.25rem;
-  padding: 0;
+  display: flex;
+  margin-left: -0.125rem; /* gutter size offset */
+  width: auto;
 }
 
-/* Responsive columns - 2 mobile, 4 desktop */
-@media (min-width: 1024px) {
-  .mosaic-grid {
-    columns: 4;
-  }
+.mosaic-column {
+  padding-left: 0.125rem; /* gutter size */
+  background-clip: padding-box;
 }
 
 .mosaic-tile {
-  display: inline-block;
+  display: block;
   width: 100%;
   margin-bottom: 0.25rem;
-  break-inside: avoid;
   transition: transform 0.2s ease-in-out;
   cursor: pointer;
 }
