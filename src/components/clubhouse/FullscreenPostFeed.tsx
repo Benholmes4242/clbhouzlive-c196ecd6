@@ -287,14 +287,6 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
         </div>
       </div>
 
-      {/* Post Counter */}
-      <div className="absolute top-4 right-4 z-20">
-        <div className="bg-black/50 backdrop-blur-sm rounded-full px-3 py-1">
-          <span className="text-white text-sm">
-            {currentIndex + 1} / {content.length}
-          </span>
-        </div>
-      </div>
     </div>
   );
 };
