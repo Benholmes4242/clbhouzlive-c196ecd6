@@ -26,39 +26,21 @@ export const useRealPostsFetcher = () => {
         return []; // No followed users, return empty
       }
 
-      // Build the query for friends' posts (both videos and photos)
+      // Build a query that fetches:
+      // 1. Posts by followed users
+      // 2. Posts liked by followed users
+      // 3. Posts commented on by followed users
       let query = supabase
-        .from('posts')
-        .select(`
-          id,
-          content,
-          created_at,
-          user_id,
-          post_media!inner (
-            id,
-            media_type,
-            media_url
-          ),
-          post_tags (
-            id,
-            tagged_entity_id,
-            taggable_entities (
-              id,
-              entity_type,
-              entity_id,
-              name
-            )
-          )
-        `)
-        .in('user_id', followedUserIds)
-        .order('created_at', { ascending: false })
-        .range(currentOffset, currentOffset + postsPerPage - 1)
-        .limit(postsPerPage);
+        .rpc('fetch_social_feed_posts', {
+          followed_user_ids: followedUserIds,
+          current_offset: currentOffset,
+          posts_per_page: postsPerPage
+        });
 
       const { data: postsData, error } = await query;
 
       if (error) {
-        console.error('Error fetching friends posts:', error);
+        console.error('Error fetching social feed posts:', error);
         return [];
       }
 
@@ -133,9 +115,9 @@ export const useRealPostsFetcher = () => {
           type: primaryMedia.media_type as 'video' | 'image',
           src: primaryMedia.media_url,
           title: post.content || 'Post',
-          likes: Math.floor(Math.random() * 500) + 50,
-          comments: Math.floor(Math.random() * 100) + 5,
-          shares: Math.floor(Math.random() * 50) + 1,
+          likes: post.likes_count || Math.floor(Math.random() * 500) + 50,
+          comments: post.comments_count || Math.floor(Math.random() * 100) + 5,
+          shares: post.shares_count || Math.floor(Math.random() * 50) + 1,
           duration: primaryMedia.media_type === 'video' ? `${Math.floor(Math.random() * 180) + 30}s` : undefined,
           user: {
             id: post.user_id,
@@ -145,8 +127,12 @@ export const useRealPostsFetcher = () => {
             verified: Math.random() > 0.7 // Random verification for demo
           },
           golfCourse,
-          label: Math.random() > 0.6 ? ['Pro Tip', 'Trending', 'Featured'][Math.floor(Math.random() * 3)] : undefined,
-          isFollowing: true, // All posts in friends feed should be from followed users
+          label: post.interaction_type ? {
+            'liked': 'Liked by Friends',
+            'commented': 'Commented by Friends',
+            'shared': 'Shared by Friends'
+          }[post.interaction_type] : undefined,
+          isFollowing: true, // All posts in friends feed should be from followed users or interactions
           media: allMedia.filter(m => isValidImageUrl(m.media_url))
         };
 
