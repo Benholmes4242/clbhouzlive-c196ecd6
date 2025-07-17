@@ -130,6 +130,7 @@ const Clubhouse = () => {
               hasMore={hasMore}
               onLoadMore={loadMore}
               activeFilter={activeFilter}
+              isClubhousePage={true}
             />
           </div>
         </main>
