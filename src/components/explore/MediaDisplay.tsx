@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import SmartMediaContainer from '@/components/ui/smart-media-container';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
+import { FaPlay } from 'react-icons/fa';
 
 interface MediaItem {
   id: string;
@@ -73,20 +74,20 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
       )}
       
       {media.media_type === 'video' && !isInvalidSrc ? (
-        shouldAutoplay ? (
-          <EnhancedVideoPlayer
-            src={media.media_url}
-            autoplay={shouldAutoplay}
-            muted={true}
-            loop={loop}
-            className="w-full h-full pointer-events-none"
-            preloadLevel="metadata"
-            enableHLS={true}
-            quality="auto"
-          />
-        ) : (
-          // Show thumbnail for non-autoplaying videos to improve performance
-          <div className="relative w-full h-full">
+        <div className="relative w-full h-full">
+          {shouldAutoplay ? (
+            <EnhancedVideoPlayer
+              src={media.media_url}
+              autoplay={shouldAutoplay}
+              muted={true}
+              loop={loop}
+              className="w-full h-full pointer-events-none"
+              preloadLevel="metadata"
+              enableHLS={true}
+              quality="auto"
+            />
+          ) : (
+            // Show thumbnail for non-autoplaying videos to improve performance
             <img
               src={thumbnailUrl || fallbackImage}
               alt={itemTitle || 'Video thumbnail'}
@@ -102,8 +103,13 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
               }}
               loading={currentIndex === 0 ? 'eager' : 'lazy'}
             />
+          )}
+          
+          {/* Play icon for all video cards */}
+          <div className="absolute bottom-2 right-2 z-20">
+            <FaPlay className="h-3 w-3 text-white drop-shadow-lg" />
           </div>
-        )
+        </div>
       ) : (
         <div className="relative w-full h-full">
           <img
