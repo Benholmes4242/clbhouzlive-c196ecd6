@@ -71,8 +71,11 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
   React.useEffect(() => {
     if (shouldAutoplay && media.media_type === 'video') {
       setVideoTransitioning(true);
-      const timer = setTimeout(() => setVideoTransitioning(false), 800);
+      // Shorter timeout to reduce loading flicker
+      const timer = setTimeout(() => setVideoTransitioning(false), 400);
       return () => clearTimeout(timer);
+    } else {
+      setVideoTransitioning(false);
     }
   }, [shouldAutoplay, media.media_type]);
 

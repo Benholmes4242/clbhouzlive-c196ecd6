@@ -9,6 +9,7 @@ export const useAutoplayManager = ({ interval = 8, threshold = 0.5 }: AutoplayMa
   const observerRef = useRef<IntersectionObserver | null>(null);
   const videoRefsRef = useRef<Map<string, HTMLElement>>(new Map());
   const autoplayingVideosRef = useRef<Set<string>>(new Set());
+  const processedVideosRef = useRef<Set<string>>(new Set()); // Track processed videos
 
   // Initialize intersection observer
   useEffect(() => {
@@ -18,11 +19,14 @@ export const useAutoplayManager = ({ interval = 8, threshold = 0.5 }: AutoplayMa
           const videoId = entry.target.getAttribute('data-video-id');
           if (!videoId) return;
 
+          const videoIndex = parseInt(entry.target.getAttribute('data-video-index') || '0');
+          const shouldAutoplay = (videoIndex + 1) % interval === 0;
+
           if (entry.isIntersecting) {
             // Video is in view, check if it should autoplay
-            const videoIndex = parseInt(entry.target.getAttribute('data-video-index') || '0');
-            if ((videoIndex + 1) % interval === 0) {
+            if (shouldAutoplay && !autoplayingVideosRef.current.has(videoId)) {
               autoplayingVideosRef.current.add(videoId);
+              processedVideosRef.current.add(videoId);
               // Trigger custom event to start autoplay
               entry.target.dispatchEvent(new CustomEvent('startAutoplay'));
             }
@@ -30,13 +34,14 @@ export const useAutoplayManager = ({ interval = 8, threshold = 0.5 }: AutoplayMa
             // Video is out of view, stop autoplay
             if (autoplayingVideosRef.current.has(videoId)) {
               autoplayingVideosRef.current.delete(videoId);
+              processedVideosRef.current.delete(videoId);
               // Trigger custom event to stop autoplay
               entry.target.dispatchEvent(new CustomEvent('stopAutoplay'));
             }
           }
         });
       },
-      { threshold }
+      { threshold, rootMargin: '50px' } // Add root margin to prevent rapid firing
     );
 
     return () => {
@@ -49,6 +54,9 @@ export const useAutoplayManager = ({ interval = 8, threshold = 0.5 }: AutoplayMa
   // Register a video element for autoplay management
   const registerVideo = useCallback((videoId: string, element: HTMLElement, index: number) => {
     if (!observerRef.current || !element) return;
+
+    // Unregister first if it exists to prevent duplicates
+    unregisterVideo(videoId);
 
     // Store the element reference
     videoRefsRef.current.set(videoId, element);
@@ -70,6 +78,7 @@ export const useAutoplayManager = ({ interval = 8, threshold = 0.5 }: AutoplayMa
       observerRef.current.unobserve(element);
       videoRefsRef.current.delete(videoId);
       autoplayingVideosRef.current.delete(videoId);
+      processedVideosRef.current.delete(videoId);
     }
   }, []);
 

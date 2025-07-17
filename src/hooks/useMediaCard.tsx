@@ -56,11 +56,13 @@ export const useMediaCard = ({ item, onLike, onMediaClick, autoplayManager, vide
     autoplayManager.registerVideo(videoId, element, videoIndex);
 
     // Listen for autoplay events
-    const handleStartAutoplay = () => {
+    const handleStartAutoplay = (event: Event) => {
+      console.log('Video autoplay start:', videoId);
       setShouldAutoplayOverride(true);
     };
 
-    const handleStopAutoplay = () => {
+    const handleStopAutoplay = (event: Event) => {
+      console.log('Video autoplay stop:', videoId);
       setShouldAutoplayOverride(false);
     };
 
@@ -72,7 +74,7 @@ export const useMediaCard = ({ item, onLike, onMediaClick, autoplayManager, vide
       element.removeEventListener('startAutoplay', handleStartAutoplay);
       element.removeEventListener('stopAutoplay', handleStopAutoplay);
     };
-  }, [autoplayManager, item.id, currentMediaIndex, videoIndex, currentMedia.media_type]);
+  }, [autoplayManager, videoIndex, item.id, currentMedia.media_type]); // Removed currentMediaIndex from deps
 
   // Navigation handlers
   const handlePrevMedia = (e: React.MouseEvent) => {
