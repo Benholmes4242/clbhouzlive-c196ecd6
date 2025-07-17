@@ -101,7 +101,7 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
             {/* Left arrow */}
             <button
               onClick={prevVideo}
-              className="absolute left-2 top-1/2 -translate-y-1/2 p-3 rounded-full hover:bg-white/20 transition-colors z-30"
+              className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full hover:bg-white/20 transition-colors z-30"
               aria-label="Previous videos"
             >
               <ChevronLeft className="w-6 h-6 text-white drop-shadow-lg" />
@@ -110,7 +110,7 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
             {/* Right arrow */}
             <button
               onClick={nextVideo}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-3 rounded-full hover:bg-white/20 transition-colors z-30"
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full hover:bg-white/20 transition-colors z-30"
               aria-label="Next videos"
             >
               <ChevronRight className="w-6 h-6 text-white drop-shadow-lg" />
