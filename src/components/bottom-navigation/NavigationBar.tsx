@@ -32,11 +32,8 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick }) 
               >
                 <Icon
                   className="h-5 w-5" 
-                  fill="none" 
-                  stroke="currentColor" 
-                  strokeWidth={2}
                 />
-                <span className="text-xs font-medium">{tab.label}</span>
+                <span className="text-sm font-medium">{tab.label}</span>
               </button>
             );
           })}
