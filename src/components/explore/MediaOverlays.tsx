@@ -1,5 +1,5 @@
 import React from 'react';
-import { Heart, Maximize2, Play } from 'lucide-react';
+import { Heart } from 'lucide-react';
 
 interface User {
   id: string;
@@ -41,19 +41,6 @@ const MediaOverlays: React.FC<MediaOverlaysProps> = ({
         </button>
       </div>
 
-      {/* Maximize/Play button overlay - hidden on mobile */}
-      <div className="absolute bottom-1 right-1 hidden md:block pointer-events-auto z-20">
-        <button
-          onClick={onMaximize}
-          className="flex items-center justify-center w-10 h-10 text-white hover:bg-white/10 rounded-full transition-colors pointer-events-auto"
-        >
-          {mediaType === 'video' ? (
-            <Play className="h-4 w-4" />
-          ) : (
-            <Maximize2 className="h-4 w-4" />
-          )}
-        </button>
-      </div>
 
       {/* User info overlay - larger for featured cards */}
       {user && (
