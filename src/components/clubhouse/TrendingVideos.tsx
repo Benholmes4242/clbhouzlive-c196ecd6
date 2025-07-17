@@ -34,6 +34,17 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
       .trim();
   };
   
+  // Function to truncate title to 5 words for preview
+  const truncateTitle = (title: string) => {
+    const cleanedTitle = cleanTitleText(title);
+    if (!cleanedTitle) return '';
+    
+    const words = cleanedTitle.split(' ');
+    if (words.length <= 5) return cleanedTitle;
+    
+    return words.slice(0, 5).join(' ') + '...';
+  };
+  
   const { togglePlayPause, shouldShowPlayIcon } = useVideoPlaybackManager({
     section: 'trending',
     videoId: `trending-${currentIndex}`,
@@ -177,8 +188,8 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
                       <p className="text-white text-base font-medium truncate">
                         {video.user?.name || video.user?.username || 'Anonymous'}
                       </p>
-                      {cleanTitleText(video.title) && (
-                        <p className="text-white/80 text-sm truncate">{cleanTitleText(video.title)}</p>
+                      {truncateTitle(video.title) && (
+                        <p className="text-white/80 text-sm truncate">{truncateTitle(video.title)}</p>
                       )}
                     </div>
                   </div>
