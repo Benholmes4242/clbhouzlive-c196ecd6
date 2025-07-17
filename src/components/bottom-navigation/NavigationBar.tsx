@@ -31,7 +31,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick }) 
                 }`}
               >
                 <Icon
-                  className="h-5 w-5" 
+                  className={tab.id === 'discover' ? 'h-6 w-6' : 'h-5 w-5'} 
                 />
                 <span className="text-sm font-medium">{tab.label}</span>
               </button>
