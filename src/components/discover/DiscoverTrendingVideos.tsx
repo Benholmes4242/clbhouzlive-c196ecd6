@@ -147,7 +147,7 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
         )}
         
         {/* Grid with 1080x1350 aspect ratio */}
-        <div className={`grid gap-4 ${isMobile ? 'grid-cols-2' : 'grid-cols-3'}`} {...(isMobile ? swipeHandlers : {})}>
+        <div className={`grid gap-1 ${isMobile ? 'grid-cols-2' : 'grid-cols-3'}`} {...(isMobile ? swipeHandlers : {})}>
           {currentVideos.map((video, index) => {
             const isFirstCard = index === 0;
             const actualIndex = (currentIndex + index) % trendingVideos.length;

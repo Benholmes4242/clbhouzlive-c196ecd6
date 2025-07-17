@@ -241,11 +241,11 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     return (
       <>
         {/* Discover Page Layout - 1080x1350 aspect ratio, 3 cards across */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 gap-0.5">
           {content.filter(item => item.type === 'video' || item.type === 'image').map((item, index) => (
             <div
               key={`discover-${item.id}-${index}`}
-              className="relative bg-muted rounded-lg overflow-hidden cursor-pointer group aspect-[1080/1350]"
+              className="relative bg-muted overflow-hidden cursor-pointer group aspect-[1080/1350]"
               onClick={() => onMediaClick?.(item)}
             >
               {/* Media Display */}
