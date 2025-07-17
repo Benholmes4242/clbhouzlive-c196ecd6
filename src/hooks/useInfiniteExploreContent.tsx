@@ -8,60 +8,90 @@ import { useMockPostsHandler } from './explore/useMockPostsHandler';
 const POSTS_PER_PAGE = 15; // Increased to fill viewport better
 
 export const useInfiniteExploreContent = (activeFilter?: string) => {
-  const [content, setContent] = useState<ExploreContentItem[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-  const [currentOffset, setCurrentOffset] = useState(0);
-  const [currentMockOffset, setCurrentMockOffset] = useState(0);
+  // Cache content by filter type to avoid reloading when switching tabs
+  const [contentCache, setContentCache] = useState<Record<string, ExploreContentItem[]>>({});
+  const [loadingStates, setLoadingStates] = useState<Record<string, boolean>>({});
+  const [hasMoreStates, setHasMoreStates] = useState<Record<string, boolean>>({});
+  const [offsetStates, setOffsetStates] = useState<Record<string, number>>({});
+  const [mockOffsetStates, setMockOffsetStates] = useState<Record<string, number>>({});
   
   const { fetchRealPosts, fetchFriendsPosts } = useRealPostsFetcher();
   
   const { getMockPosts } = useMockPostsHandler();
+  
+  const currentFilter = activeFilter || 'Friends';
+  const content = contentCache[currentFilter] || [];
+  const loading = loadingStates[currentFilter] || false;
+  const hasMore = hasMoreStates[currentFilter] ?? true;
+  const currentOffset = offsetStates[currentFilter] || 0;
+  const currentMockOffset = mockOffsetStates[currentFilter] || 0;
 
   const loadMore = useCallback(async () => {
     if (loading || !hasMore) {
       return;
     }
-    setLoading(true);
+    
+    // Set loading for current filter
+    setLoadingStates(prev => ({ ...prev, [currentFilter]: true }));
 
     try {
       let posts = [];
       
       // Use specific fetcher for Friends filter
-      if (activeFilter === 'Friends') {
+      if (currentFilter === 'Friends') {
         posts = await fetchFriendsPosts(currentOffset, POSTS_PER_PAGE);
       } else {
         // Try to fetch real posts with filter
-        posts = await fetchRealPosts(currentOffset, POSTS_PER_PAGE, activeFilter);
+        posts = await fetchRealPosts(currentOffset, POSTS_PER_PAGE, currentFilter);
       }
       
       if (posts.length > 0) {
-        setContent(prev => [...prev, ...posts]);
-        setCurrentOffset(prev => prev + POSTS_PER_PAGE);
+        // Update content cache for current filter
+        setContentCache(prev => ({
+          ...prev,
+          [currentFilter]: [...(prev[currentFilter] || []), ...posts]
+        }));
+        
+        // Update offset for current filter
+        setOffsetStates(prev => ({
+          ...prev,
+          [currentFilter]: (prev[currentFilter] || 0) + POSTS_PER_PAGE
+        }));
         
         // If we got fewer posts than requested, we might be at the end
         if (posts.length < POSTS_PER_PAGE) {
-          setHasMore(false); // No more posts available
+          setHasMoreStates(prev => ({ ...prev, [currentFilter]: false }));
         }
       } else {
         // No posts available - mark as end instead of falling back to mock data
-        setHasMore(false);
+        setHasMoreStates(prev => ({ ...prev, [currentFilter]: false }));
       }
     } catch (error) {
       console.error('Error loading content:', error);
-      setHasMore(false); // Stop loading on error instead of falling back to mock data
+      setHasMoreStates(prev => ({ ...prev, [currentFilter]: false }));
     } finally {
-      setLoading(false);
+      setLoadingStates(prev => ({ ...prev, [currentFilter]: false }));
     }
-  }, [loading, hasMore, currentOffset, currentMockOffset, fetchRealPosts, fetchFriendsPosts, getMockPosts, activeFilter]);
+  }, [loading, hasMore, currentOffset, currentMockOffset, fetchRealPosts, fetchFriendsPosts, getMockPosts, currentFilter]);
 
-  // Reset content when filter changes
+  // Initialize states for new filters (but don't reset existing ones)
   useEffect(() => {
-    setContent([]);
-    setCurrentOffset(0);
-    setCurrentMockOffset(0);
-    setHasMore(true);
-  }, [activeFilter]);
+    if (!(currentFilter in contentCache)) {
+      setContentCache(prev => ({ ...prev, [currentFilter]: [] }));
+    }
+    if (!(currentFilter in loadingStates)) {
+      setLoadingStates(prev => ({ ...prev, [currentFilter]: false }));
+    }
+    if (!(currentFilter in hasMoreStates)) {
+      setHasMoreStates(prev => ({ ...prev, [currentFilter]: true }));
+    }
+    if (!(currentFilter in offsetStates)) {
+      setOffsetStates(prev => ({ ...prev, [currentFilter]: 0 }));
+    }
+    if (!(currentFilter in mockOffsetStates)) {
+      setMockOffsetStates(prev => ({ ...prev, [currentFilter]: 0 }));
+    }
+  }, [currentFilter]);
 
   // Initial load and auto-load more if viewport isn't filled
   useEffect(() => {
