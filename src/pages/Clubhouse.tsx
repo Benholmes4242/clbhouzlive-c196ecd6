@@ -13,12 +13,19 @@ import { FILTER_TYPES, MEDIA_TYPES } from '@/components/explore/types';
 const Clubhouse = () => {
   const [activeFilter, setActiveFilter] = useState<string>(FILTER_TYPES.FRIENDS);
   const [debugVisible, setDebugVisible] = useState(false);
+  
+  // Get content for the active filter (for the tabs section)
   const { 
     content, 
     loading, 
     hasMore, 
     loadMore 
   } = useInfiniteExploreContent(activeFilter);
+  
+  // Get static content for Trending Videos (always use Friends filter)
+  const { 
+    content: trendingContent
+  } = useInfiniteExploreContent(FILTER_TYPES.FRIENDS);
   
   const { 
     isOpen: isFeedOpen, 
@@ -82,8 +89,13 @@ const Clubhouse = () => {
     return true;
   });
 
-  // Remove duplicates based on src URL
+  // Remove duplicates based on src URL for tab content
   const uniqueContent = filteredContent.filter((item, index, self) => 
+    index === self.findIndex(t => t.src === item.src)
+  );
+
+  // Remove duplicates for trending videos (static content)
+  const uniqueTrendingContent = trendingContent.filter((item, index, self) => 
     index === self.findIndex(t => t.src === item.src)
   );
 
@@ -92,9 +104,9 @@ const Clubhouse = () => {
         <Header />
         
         <main className="pb-20">
-          {/* Trending Videos Section */}
+          {/* Trending Videos Section - Static content that doesn't change with tabs */}
           <TrendingVideos 
-            videos={uniqueContent}
+            videos={uniqueTrendingContent}
             onVideoClick={handleMediaClick}
           />
 
