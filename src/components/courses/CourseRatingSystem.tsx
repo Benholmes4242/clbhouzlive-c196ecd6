@@ -62,8 +62,8 @@ const CourseRatingSystem = ({
           const uploadResult = await uploadToCloudflareR2(file, 'course-media', fileName);
 
           if (!uploadResult.success || !uploadResult.publicUrl) {
-            console.error('Error uploading file:', uploadError);
-            throw new Error(`Failed to upload ${file.name}`);
+            throw new Error(uploadResult.error || `Failed to upload ${file.name}`);
+          }
           }
 
           console.log(`Successfully uploaded ${file.name}`);
