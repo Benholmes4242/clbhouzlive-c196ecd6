@@ -28,7 +28,7 @@ const PostHeader = ({ user, type, timeAgo }: PostHeaderProps) => {
         <HighQualityImage
           src={user.avatar}
           alt={user.name}
-          className="w-16 h-16 rounded-[14px] border-2 border-gray-200 cursor-pointer hover:opacity-80 transition-opacity"
+          className="w-16 h-16 rounded-[14px] border-2 border-gray-200 cursor-pointer hover:opacity-80 transition-opacity object-cover"
           width={64}
           height={64}
           onClick={handleProfileClick}

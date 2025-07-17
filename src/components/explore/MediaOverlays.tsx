@@ -50,7 +50,7 @@ const MediaOverlays: React.FC<MediaOverlaysProps> = ({
           <img
             src={user.avatar}
             alt={user.name}
-            className={`rounded-full ${isFeatured ? 'w-16 h-16' : 'w-14 h-14'}`}
+            className={`rounded-full object-cover ${isFeatured ? 'w-16 h-16' : 'w-14 h-14'}`}
             onError={(e) => {
               (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face';
             }}
