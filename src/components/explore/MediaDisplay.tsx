@@ -90,45 +90,26 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
       
       {media.media_type === 'video' && !isInvalidSrc ? (
         <div className="relative w-full h-full">
-          {shouldAutoplay ? (
-            <>
-              {/* Smooth loading overlay for video transition */}
-              {videoTransitioning && (
-                <div className="absolute inset-0 bg-muted/60 backdrop-blur-sm flex items-center justify-center z-20 transition-opacity duration-300">
-                  <Loader2 className="w-6 h-6 text-muted-foreground animate-spin" />
-                </div>
-              )}
-              <EnhancedVideoPlayer
-                src={media.media_url}
-                autoplay={shouldAutoplay}
-                muted={true}
-                loop={loop}
-                className="w-full h-full pointer-events-none"
-                preloadLevel="metadata"
-                enableHLS={true}
-                quality="auto"
-              />
-            </>
-          ) : (
-            // Show thumbnail for non-autoplaying videos to improve performance
-            <img
-              src={thumbnailUrl || fallbackImage}
-              alt={itemTitle || 'Video thumbnail'}
-              className="w-full h-full object-cover"
-              onLoad={() => {
-                console.log('Video thumbnail loaded:', thumbnailUrl);
-                onImageLoad();
-              }}
-              onError={(e) => {
-                console.log('Video thumbnail failed to load, using fallback:', thumbnailUrl);
-                e.currentTarget.src = fallbackImage;
-                onImageError();
-              }}
-              loading={currentIndex === 0 ? 'eager' : 'lazy'}
-            />
+          {shouldAutoplay && (
+            // Smooth loading overlay for video transition
+            videoTransitioning && (
+              <div className="absolute inset-0 bg-muted/60 backdrop-blur-sm flex items-center justify-center z-20 transition-opacity duration-300">
+                <Loader2 className="w-6 h-6 text-muted-foreground animate-spin" />
+              </div>
+            )
           )}
+          <EnhancedVideoPlayer
+            src={media.media_url}
+            autoplay={shouldAutoplay}
+            muted={true}
+            loop={loop}
+            className="w-full h-full pointer-events-none"
+            preloadLevel="metadata"
+            enableHLS={true}
+            quality="auto"
+          />
           
-          {/* Play icon for all video cards - hidden during autoplay transition */}
+          {/* Play icon for non-autoplaying videos */}
           {!shouldAutoplay && (
             <div className="absolute bottom-3 right-3 z-20">
               <FaPlay className="h-4 w-4 text-white drop-shadow-lg" />
