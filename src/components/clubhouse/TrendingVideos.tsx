@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
-import { IoTrendingUpSharp } from 'react-icons/io5';
+import { HiTrendingUp } from 'react-icons/hi';
 import { useSwipeable } from 'react-swipeable';
 import { ExploreContentItem } from '@/components/explore/types';
 import { useVideoPlaybackManager } from '@/hooks/useVideoPlaybackManager';
@@ -208,7 +208,7 @@ const TrendingVideos: React.FC<TrendingVideosProps> = ({ videos, onVideoClick })
                 
                 {/* Trending Icon */}
                 <div className="absolute top-3 right-3">
-                  <IoTrendingUpSharp className="w-6 h-6 drop-shadow-lg" style={{ color: '#f7931e' }} />
+                  <HiTrendingUp className="w-6 h-6 drop-shadow-lg" style={{ color: '#f7931e' }} />
                 </div>
                 
                 {/* User info */}
