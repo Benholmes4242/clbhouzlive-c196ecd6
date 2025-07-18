@@ -121,7 +121,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     if (!scrollViewRef.current) return;
 
     const scrollTop = scrollViewRef.current.scrollTop;
-    const itemHeight = window.innerHeight - 80; // Account for nav bar (80px = 5rem)
+    const itemHeight = window.innerHeight;
     const newIndex = Math.round(scrollTop / itemHeight);
     
     if (newIndex !== currentIndex && newIndex >= 0 && newIndex < posts.length) {
@@ -138,7 +138,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   const scrollToIndex = (index: number) => {
     if (!scrollViewRef.current) return;
 
-    const itemHeight = window.innerHeight - 80; // Account for nav bar
+    const itemHeight = window.innerHeight;
     scrollViewRef.current.scrollTo({
       top: index * itemHeight,
       behavior: 'smooth'
@@ -208,14 +208,14 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
 
   if (posts.length === 0) {
     return (
-      <div className="fixed inset-0 bottom-20 z-10 bg-black flex items-center justify-center">
+      <div className="fixed inset-0 z-10 bg-black flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin" style={{ color: '#f7931e' }} />
       </div>
     );
   }
 
   return (
-    <div className="fixed inset-0 bottom-20 z-10 bg-black overflow-hidden">
+    <div className="fixed inset-0 z-10 bg-black overflow-hidden">
       {/* Scrollable Content */}
       <div
         ref={scrollViewRef}
@@ -229,6 +229,56 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
           scrollBehavior: 'smooth'
         }}
       >
+        {/* User Profile - Top Left */}
+        <div className="absolute top-4 left-4 z-30 flex items-center space-x-3">
+          {/* Profile Photo */}
+          <div className="relative">
+            <img
+              src={posts[currentIndex]?.user?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
+              alt={posts[currentIndex]?.user?.name || 'User'}
+              className="w-16 h-16 rounded-full object-cover"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face';
+              }}
+            />
+          </div>
+          
+          {/* Username */}
+          <div className="flex items-center gap-3">
+            <div className="flex flex-col">
+              <span className="font-semibold text-base text-white" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
+                {posts[currentIndex]?.user?.name || 'Unknown User'}
+              </span>
+              {posts[currentIndex]?.user?.username && (
+                <span className="text-sm text-white/70" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
+                  @{posts[currentIndex]?.user?.username}
+                </span>
+              )}
+            </div>
+            
+            {/* Follow pill - only show if not own post and user is logged in */}
+            {user?.id && posts[currentIndex]?.user?.id && user.id !== posts[currentIndex]?.user?.id && (
+              <button 
+                onClick={handleFollowToggle}
+                disabled={followMutation.isPending || isFollowingLoading}
+                className="flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1.5 hover:bg-white/30 transition-colors disabled:opacity-50"
+              >
+                {isFollowing ? (
+                  <>
+                    <UserCheck className="w-4 h-4 text-white" />
+                    <span className="text-white text-xs font-medium">Following</span>
+                  </>
+                ) : (
+                  <>
+                    <UserPlus className="w-4 h-4 text-white" />
+                    <span className="text-white text-xs font-medium">Follow</span>
+                  </>
+                )}
+              </button>
+            )}
+          </div>
+        </div>
+
         {posts.map((item, index) => {
           // Get media array for this item
           const mediaItems = item.media && item.media.length > 0 ? item.media : [{
@@ -264,64 +314,14 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
               ref={(el) => {
                 if (el) itemRefs.current[index] = el;
               }}
-              className="relative w-full snap-start snap-always flex items-center justify-center"
+              className="relative w-full h-screen snap-start snap-always flex items-center justify-center"
               style={{ 
-                minHeight: 'calc(100vh - 5rem)', 
-                maxHeight: 'calc(100vh - 5rem)',
+                minHeight: '100vh', 
+                maxHeight: '100vh',
                 scrollSnapAlign: 'start',
                 scrollSnapStop: 'always'
               }}
             >
-              {/* User Profile - Top Left */}
-              <div className="absolute top-4 left-4 z-30 flex items-center space-x-3">
-                {/* Profile Photo */}
-                <div className="relative">
-                  <img
-                    src={item.user?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
-                    alt={item.user?.name || 'User'}
-                    className="w-16 h-16 rounded-full object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face';
-                    }}
-                  />
-                </div>
-                
-                {/* Username */}
-                <div className="flex items-center gap-3">
-                  <div className="flex flex-col">
-                    <span className="font-semibold text-base text-white" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
-                      {item.user?.name || 'Unknown User'}
-                    </span>
-                    {item.user?.username && (
-                      <span className="text-sm text-white/70" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
-                        @{item.user?.username}
-                      </span>
-                    )}
-                  </div>
-                  
-                  {/* Follow pill - only show if not own post and user is logged in */}
-                  {user?.id && item.user?.id && user.id !== item.user?.id && index === currentIndex && (
-                    <button 
-                      onClick={handleFollowToggle}
-                      disabled={followMutation.isPending || isFollowingLoading}
-                      className="flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1.5 hover:bg-white/30 transition-colors disabled:opacity-50"
-                    >
-                      {isFollowing ? (
-                        <>
-                          <UserCheck className="w-4 h-4 text-white" />
-                          <span className="text-white text-xs font-medium">Following</span>
-                        </>
-                      ) : (
-                        <>
-                          <UserPlus className="w-4 h-4 text-white" />
-                          <span className="text-white text-xs font-medium">Follow</span>
-                        </>
-                      )}
-                    </button>
-                  )}
-                </div>
-              </div>
-
               {/* Media Content */}
               <div 
                 className="relative w-full h-full flex items-center justify-center"
@@ -449,7 +449,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
 
         {/* Loading indicator at the bottom */}
         {isLoadingMore && (
-          <div className="flex items-center justify-center" style={{ height: 'calc(100vh - 5rem)' }}>
+          <div className="h-screen flex items-center justify-center">
             <div className="text-white/70">Loading more posts...</div>
           </div>
         )}
