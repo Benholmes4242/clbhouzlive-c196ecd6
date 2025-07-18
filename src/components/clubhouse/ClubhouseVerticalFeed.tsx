@@ -282,17 +282,22 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     if (!scrollViewRef.current) return;
 
     const scrollTop = scrollViewRef.current.scrollTop;
-    const scrollDirection = scrollTop > prevScrollTopRef.current ? 'up' : 'down';
+    const scrollDirection = scrollTop > prevScrollTopRef.current ? 'down' : 'up';
     
-    // Call parent onScroll callback for header visibility
+    const itemHeight = window.innerHeight - 64; // Match the calc(100vh - 64px)
+    const newIndex = Math.round(scrollTop / itemHeight);
+    
+    // Call parent onScroll callback for header visibility - only show when at first post
     if (onScroll) {
-      onScroll(scrollDirection);
+      // Header should only be visible when at the first post (index 0)
+      if (newIndex === 0) {
+        onScroll('down'); // Show header
+      } else {
+        onScroll('up'); // Hide header
+      }
     }
     
     prevScrollTopRef.current = scrollTop;
-
-    const itemHeight = window.innerHeight - 64; // Match the calc(100vh - 64px)
-    const newIndex = Math.round(scrollTop / itemHeight);
     
     if (newIndex !== currentIndex && newIndex >= 0 && newIndex < posts.length) {
       setCurrentIndex(newIndex);
