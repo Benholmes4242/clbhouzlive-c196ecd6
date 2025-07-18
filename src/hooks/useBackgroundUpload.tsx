@@ -121,8 +121,8 @@ export const useBackgroundUpload = () => {
             publicUrl = result.publicUrl;
           }
         }
-        // Use chunked upload for large files (>40MB) or as fallback
-        else if (file.size > 40 * 1024 * 1024) {
+        // Use chunked upload for large files (>20MB) or as fallback
+        else if (file.size > 20 * 1024 * 1024) {
           console.log(`Using chunked upload for large file: ${file.name}`);
           try {
             const result = await uploadFileInChunks(file);
