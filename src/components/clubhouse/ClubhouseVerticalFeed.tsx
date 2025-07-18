@@ -50,6 +50,27 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
       rootMargin: '0px'
     });
     const [videoElement, setVideoElement] = useState<HTMLVideoElement | null>(null);
+    const [hasUserInteracted, setHasUserInteracted] = useState(false);
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+    // Listen for user interaction to enable autoplay on mobile
+    useEffect(() => {
+      const handleUserInteraction = () => {
+        setHasUserInteracted(true);
+        document.removeEventListener('touchstart', handleUserInteraction);
+        document.removeEventListener('click', handleUserInteraction);
+      };
+
+      if (isMobile && !hasUserInteracted) {
+        document.addEventListener('touchstart', handleUserInteraction, { passive: true });
+        document.addEventListener('click', handleUserInteraction);
+      }
+
+      return () => {
+        document.removeEventListener('touchstart', handleUserInteraction);
+        document.removeEventListener('click', handleUserInteraction);
+      };
+    }, [isMobile, hasUserInteracted]);
 
     useEffect(() => {
       if (!ref.current || !isInView) return;
@@ -65,18 +86,28 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
       if (!videoElement) return;
 
       if (isInView) {
-        videoElement.play().catch(console.error);
+        // On mobile, only autoplay after user interaction
+        if (isMobile && !hasUserInteracted) {
+          console.log('📱 Mobile autoplay blocked - waiting for user interaction');
+          return;
+        }
+        
+        // Ensure video is muted for autoplay to work
+        videoElement.muted = true;
+        videoElement.play().catch((error) => {
+          console.log('📱 Mobile autoplay failed:', error.message);
+        });
       } else {
         videoElement.pause();
       }
-    }, [isInView, videoElement]);
+    }, [isInView, videoElement, isMobile, hasUserInteracted]);
 
     return (
       <div ref={ref} className="relative w-full h-full bg-media-loading">
         <EnhancedVideoPlayer
           src={src}
-          autoplay={false} // We handle autoplay manually
-          muted={muted}
+          autoplay={isInView && (!isMobile || hasUserInteracted)} // Enable autoplay based on mobile state
+          muted={true} // Always muted for autoplay
           loop={true}
           className={className}
           enableHLS={true}
