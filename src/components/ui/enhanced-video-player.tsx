@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState, memo } from 'react';
 import { Play, Pause, Volume2, VolumeX, Maximize, Loader2 } from 'lucide-react';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
+import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 
 interface EnhancedVideoPlayerProps {
   src: string;
@@ -42,7 +43,7 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<any>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(muted);
+  const { isGloballyMuted } = useGlobalAudio();
   const [isLoading, setIsLoading] = useState(true);
   const [showControls, setShowControls] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -220,7 +221,7 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
         console.log('🚀 EnhancedVideoPlayer: Starting autoplay', { src, readyState: video.readyState });
         
         // Ensure proper mobile settings
-        video.muted = true;
+        video.muted = isGloballyMuted;
         video.playsInline = true;
         
         video.play().catch((error) => {
@@ -257,7 +258,7 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
     };
 
     const handleVolumeChange = () => {
-      setIsMuted(video.muted);
+      // Volume changes are now handled by global audio context
     };
 
     video.addEventListener('play', handlePlay);
@@ -279,7 +280,16 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
       video.removeEventListener('progress', handleProgress);
       video.removeEventListener('volumechange', handleVolumeChange);
     };
-  }, [onPlay, onPause]);
+  }, [onPlay, onPause, isGloballyMuted]);
+
+  // Update video muted state when global audio state changes
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+    
+    console.log('🔊 EnhancedVideoPlayer: Updating mute state to', isGloballyMuted ? 'MUTED' : 'UNMUTED');
+    video.muted = isGloballyMuted;
+  }, [isGloballyMuted]);
 
   // Cleanup HLS on unmount
   useEffect(() => {
@@ -311,7 +321,7 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
     if (!video) return;
 
     video.muted = !video.muted;
-    setIsMuted(video.muted);
+    // Mute state is now managed by global audio context
   };
 
   const handleFullscreen = (e: React.MouseEvent) => {
@@ -361,7 +371,7 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
       <video
         ref={videoRef}
         poster={poster}
-        muted={muted}
+        muted={isGloballyMuted}
         loop={loop}
         autoPlay={autoplay}
         playsInline
