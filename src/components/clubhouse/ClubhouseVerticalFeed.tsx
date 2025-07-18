@@ -250,7 +250,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
       {/* Scrollable Content */}
       <div
         ref={scrollViewRef}
-        className="h-full w-full overflow-y-auto snap-y snap-mandatory"
+        className="h-full w-full overflow-y-auto snap-y snap-mandatory pb-20"
         onScroll={handleScroll}
         style={{ 
           scrollbarWidth: 'none', 

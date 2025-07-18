@@ -9,7 +9,11 @@ import PostSubmissionHandler from './bottom-navigation/PostSubmissionHandler';
 import { useNavigationHandlers } from '@/hooks/useNavigationHandlers';
 import { usePostSubmissionHandlers } from './bottom-navigation/usePostSubmissionHandlers';
 
-const BottomNavigation = () => {
+interface BottomNavigationProps {
+  variant?: 'default' | 'clubhouse';
+}
+
+const BottomNavigation: React.FC<BottomNavigationProps> = ({ variant = 'default' }) => {
   const { activeTab, handleTabClick } = useNavigationHandlers();
   const isDesktop = useIsDesktop();
   
@@ -82,6 +86,7 @@ const BottomNavigation = () => {
         onTabClick={(tab) => {
           onTabClick(tab, handleTabClick);
         }}
+        variant={variant}
       />
 
       <GalleryPicker
