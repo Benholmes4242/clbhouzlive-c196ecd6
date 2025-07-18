@@ -378,30 +378,6 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
         </button>
       </div>
 
-      {/* Corner controls */}
-      <div
-        className={`absolute top-2 right-2 flex gap-2 transition-opacity duration-300 ${
-          showControls ? 'opacity-100' : 'opacity-0'
-        }`}
-      >
-        <button
-          onClick={toggleMute}
-          className="bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-all duration-200"
-        >
-          {isMuted ? (
-            <VolumeX className="w-4 h-4" />
-          ) : (
-            <Volume2 className="w-4 h-4" />
-          )}
-        </button>
-        
-        <button
-          onClick={handleFullscreen}
-          className="bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-all duration-200"
-        >
-          <Maximize className="w-4 h-4" />
-        </button>
-      </div>
 
       {/* Quality indicator */}
       {enableHLS && quality !== 'auto' && (
