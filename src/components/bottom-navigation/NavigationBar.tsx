@@ -31,7 +31,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
                   e.stopPropagation();
                   onTabClick(tab);
                 }}
-                className={`flex flex-col items-center justify-center space-y-1 transition-colors relative focus:outline-none min-h-[60px] min-w-[60px] ${
+                className={`flex items-center justify-center transition-colors relative focus:outline-none min-h-[60px] min-w-[60px] p-3 ${
                   isClubhouse
                     ? isActive
                       ? 'text-white'
@@ -40,11 +40,9 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
                       ? 'text-black'
                       : 'text-black/70 hover:text-black'
                 }`}
+                aria-label={tab.label}
               >
-                <Icon
-                  className={tab.id === 'discover' ? 'h-6 w-6' : 'h-5 w-5'} 
-                />
-                <span className="text-sm font-medium">{tab.label}</span>
+                <Icon className="h-7 w-7" />
               </button>
             );
           })}
