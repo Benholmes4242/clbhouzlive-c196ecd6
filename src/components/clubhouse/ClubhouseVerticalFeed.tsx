@@ -10,6 +10,7 @@ import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
+import PostComments from './PostComments';
 
 interface ClubhouseVerticalFeedProps {
   posts: ExploreContentItem[];
@@ -427,6 +428,12 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                     </div>
                   </div>
                 )}
+
+                {/* Comments Section */}
+                <PostComments 
+                  postId={item.id} 
+                  totalComments={Math.floor(Math.random() * 50) + 5} // Mock comment count between 5-54
+                />
               </div>
 
               {/* Action Buttons - Bottom Right */}
