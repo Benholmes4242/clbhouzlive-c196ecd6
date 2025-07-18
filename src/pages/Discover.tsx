@@ -51,24 +51,7 @@ const Discover = () => {
   };
 
   const handleTrendingVideoClick = (item: any) => {
-    const isMobile = window.innerWidth < 768;
-    
-    if (isMobile) {
-      // Mobile: open vertical feed
-      openFeed(item);
-    } else {
-      // Desktop: open fullscreen modal
-      modalManager.openModal({
-        src: item.src,
-        user: {
-          id: item.user?.id || item.id,
-          profile_photo_url: item.user?.avatar || undefined,
-          display_name: item.user?.name || undefined,
-          username: item.user?.username || undefined
-        },
-        content: item.title || undefined
-      });
-    }
+    openFeed(item);
   };
 
   // Apply client-side filtering for non-database filters
