@@ -467,7 +467,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
               </div>
 
               {/* Caption and Golf Course Tag - Bottom Left */}
-              <div className="absolute bottom-2 left-3 right-20 z-20">
+              <div className="absolute bottom-8 left-3 right-20 z-20">
                 {/* Golf Course Badge - Above Caption */}
                 {item.golfCourse && (
                   <div className="mb-2">
@@ -510,7 +510,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
               </div>
 
               {/* Action Buttons - Bottom Right */}
-              <div className="absolute bottom-4 right-4 z-10 flex flex-col space-y-6">
+              <div className="absolute bottom-10 right-4 z-10 flex flex-col space-y-6">
                 {/* Mute/Unmute toggle button - only show for video posts */}
                 {currentMedia.media_type === 'video' && (
                   <button 
