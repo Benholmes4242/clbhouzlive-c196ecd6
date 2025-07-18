@@ -9,6 +9,7 @@ import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
+import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 
 interface ClubhouseVerticalFeedProps {
   posts: ExploreContentItem[];
@@ -34,6 +35,52 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   const [isTextExpanded, setIsTextExpanded] = useState(false);
   const [mediaIndices, setMediaIndices] = useState<{[key: string]: number}>({});
   const queryClient = useQueryClient();
+
+  // VideoWithAutoplay component using intersection observer
+  const VideoWithAutoplay: React.FC<{
+    src: string;
+    muted: boolean;
+    className: string;
+  }> = ({ src, muted, className }) => {
+    const { ref, isInView } = useIntersectionObserver({
+      threshold: 0.5, // Video must be 50% visible to autoplay
+      rootMargin: '0px'
+    });
+    const [videoElement, setVideoElement] = useState<HTMLVideoElement | null>(null);
+
+    useEffect(() => {
+      if (!ref.current || !isInView) return;
+      
+      // Find the video element within the container
+      const video = ref.current.querySelector('video');
+      if (video && video !== videoElement) {
+        setVideoElement(video);
+      }
+    }, [ref.current, isInView, videoElement]);
+
+    useEffect(() => {
+      if (!videoElement) return;
+
+      if (isInView) {
+        videoElement.play().catch(console.error);
+      } else {
+        videoElement.pause();
+      }
+    }, [isInView, videoElement]);
+
+    return (
+      <div ref={ref} className="relative w-full h-full bg-media-loading">
+        <EnhancedVideoPlayer
+          src={src}
+          autoplay={false} // We handle autoplay manually
+          muted={muted}
+          loop={true}
+          className={className}
+          enableHLS={true}
+        />
+      </div>
+    );
+  };
 
   // Check if current user follows the displayed user
   const { data: isFollowing, isLoading: isFollowingLoading } = useQuery({
@@ -177,22 +224,6 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [currentIndex, posts.length, hasMore, isLoadingMore, onLoadMore]);
 
-  // Mute/unmute videos based on current index
-  useEffect(() => {
-    if (posts.length === 0) return;
-
-    posts.forEach((item, index) => {
-      if (item.type === 'video' && index !== currentIndex) {
-        const videoElements = document.querySelectorAll(`[data-video-id="clubhouse-${item.id}"]`);
-        videoElements.forEach((videoEl) => {
-          const video = videoEl as HTMLVideoElement;
-          if (video && !video.paused) {
-            video.pause();
-          }
-        });
-      }
-    });
-  }, [currentIndex, posts]);
 
   const handleLike = (item: ExploreContentItem) => {
     onLike(item.id);
@@ -329,16 +360,11 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 onMouseLeave={() => setIsTextExpanded(false)}
               >
                 {currentMedia.media_type === 'video' ? (
-                  <div className="relative w-full h-full bg-media-loading">
-                    <EnhancedVideoPlayer
-                      src={currentMedia.media_url}
-                      autoplay={index === currentIndex}
-                      muted={isGloballyMuted}
-                      loop={true}
-                      className="w-full h-full"
-                      enableHLS={true}
-                    />
-                  </div>
+                  <VideoWithAutoplay
+                    src={currentMedia.media_url}
+                    muted={isGloballyMuted}
+                    className="w-full h-full"
+                  />
                 ) : (
                   <div className="relative w-full h-full bg-media-loading">
                     <img
