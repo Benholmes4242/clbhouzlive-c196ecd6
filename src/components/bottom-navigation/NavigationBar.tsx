@@ -17,8 +17,8 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
         ? 'bg-black' 
         : 'bg-background'
     }`}>
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-around h-16 relative">
+      <div className="w-full px-2">
+        <div className="flex items-center justify-between h-16 relative">
           {navigationTabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
