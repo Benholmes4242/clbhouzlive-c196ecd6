@@ -8,6 +8,8 @@ import VerticalMediaFeed from '@/components/explore/VerticalMediaFeed';
 import DiscoverTrendingVideos from '@/components/discover/DiscoverTrendingVideos';
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
+import { useFullscreenVideoModal } from '@/hooks/useVideoPlaybackManager';
+import FullscreenVideoModal from '@/components/ui/fullscreen-video-modal';
 import { FILTER_TYPES, MEDIA_TYPES } from '@/components/explore/types';
 
 const Discover = () => {
@@ -34,6 +36,8 @@ const Discover = () => {
     closeFeed 
   } = useVerticalMediaFeed();
 
+  const modalManager = useFullscreenVideoModal();
+
   const handleLike = (contentId: string) => {
     // Update likes optimistically - could be enhanced with actual API call
     // For now, this is just visual feedback
@@ -46,6 +50,27 @@ const Discover = () => {
 
   const handleMediaClick = (item: any) => {
     openFeed(item);
+  };
+
+  const handleTrendingVideoClick = (item: any) => {
+    const isMobile = window.innerWidth < 768;
+    
+    if (isMobile) {
+      // Mobile: open vertical feed
+      openFeed(item);
+    } else {
+      // Desktop: open fullscreen modal
+      modalManager.openModal({
+        src: item.src,
+        user: {
+          id: item.user?.id || item.id,
+          profile_photo_url: item.user?.avatar || undefined,
+          display_name: item.user?.name || undefined,
+          username: item.user?.username || undefined
+        },
+        content: item.title || undefined
+      });
+    }
   };
 
   // Apply client-side filtering for non-database filters
@@ -107,7 +132,7 @@ const Discover = () => {
           {/* Trending Videos Section - Static content that doesn't change with tabs */}
           <DiscoverTrendingVideos 
             videos={uniqueTrendingContent}
-            onVideoClick={handleMediaClick}
+            onVideoClick={handleTrendingVideoClick}
           />
 
           {/* Your Discover Section */}
@@ -155,6 +180,13 @@ const Discover = () => {
             onFollow={handleFollow}
           />
         )}
+
+        {/* Fullscreen Video Modal */}
+        <FullscreenVideoModal
+          isOpen={modalManager.isOpen}
+          onClose={modalManager.closeModal}
+          videoData={modalManager.videoData}
+        />
 
         <style>{`
           .scrollbar-hide {
