@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Heart, MessageCircle, Share, Volume2, VolumeX, MapPin, UserPlus, UserCheck, Loader2 } from 'lucide-react';
+import { MessageCircle, Share, Volume2, VolumeX, MapPin, UserPlus, UserCheck, Loader2 } from 'lucide-react';
+import { FaHeart, FaRegHeart } from 'react-icons/fa';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ExploreContentItem } from '@/components/explore/types';
@@ -108,6 +109,29 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     enabled: !!user?.id && !!posts[currentIndex]?.user?.id && user.id !== posts[currentIndex]?.user?.id
   });
 
+  // Check which posts the user has liked
+  const { data: likedPosts } = useQuery({
+    queryKey: ['post-likes', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      
+      const postIds = posts.map(post => post.id);
+      const { data, error } = await supabase
+        .from('post_likes')
+        .select('post_id')
+        .eq('user_id', user.id)
+        .in('post_id', postIds);
+      
+      if (error) {
+        console.error('Error fetching liked posts:', error);
+        return [];
+      }
+      
+      return data.map(like => like.post_id);
+    },
+    enabled: !!user?.id && posts.length > 0
+  });
+
   // Follow/unfollow mutation
   const followMutation = useMutation({
     mutationFn: async ({ targetUserId, action }: { targetUserId: string; action: 'follow' | 'unfollow' }) => {
@@ -147,6 +171,51 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     }
   });
 
+  // Like/unlike mutation
+  const likeMutation = useMutation({
+    mutationFn: async ({ postId, action }: { postId: string; action: 'like' | 'unlike' }) => {
+      if (!user?.id) throw new Error('User not authenticated');
+      
+      if (action === 'like') {
+        const { data, error } = await supabase
+          .from('post_likes')
+          .insert({
+            post_id: postId,
+            user_id: user.id
+          })
+          .select()
+          .single();
+        
+        if (error) throw error;
+        return data;
+      } else {
+        const { error } = await supabase
+          .from('post_likes')
+          .delete()
+          .eq('post_id', postId)
+          .eq('user_id', user.id);
+        
+        if (error) throw error;
+        return null;
+      }
+    },
+    onSuccess: (data, variables) => {
+      // Update the liked posts cache
+      queryClient.setQueryData(['post-likes', user?.id], (oldData: string[] | undefined) => {
+        if (!oldData) return variables.action === 'like' ? [variables.postId] : [];
+        
+        if (variables.action === 'like') {
+          return [...oldData, variables.postId];
+        } else {
+          return oldData.filter(id => id !== variables.postId);
+        }
+      });
+    },
+    onError: (error) => {
+      console.error('Like/unlike error:', error);
+    }
+  });
+
   const handleFollowToggle = () => {
     const targetUserId = posts[currentIndex]?.user?.id;
     if (!targetUserId || !user?.id || targetUserId === user.id) return;
@@ -154,6 +223,16 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     followMutation.mutate({
       targetUserId,
       action: isFollowing ? 'unfollow' : 'follow'
+    });
+  };
+
+  const handleLike = (postId: string) => {
+    if (!user?.id) return;
+    
+    const isLiked = likedPosts?.includes(postId);
+    likeMutation.mutate({
+      postId,
+      action: isLiked ? 'unlike' : 'like'
     });
   };
 
@@ -226,9 +305,6 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   }, [currentIndex, posts.length, hasMore, isLoadingMore, onLoadMore]);
 
 
-  const handleLike = (item: ExploreContentItem) => {
-    onLike(item.id);
-  };
 
   const handleShare = () => {
     console.log('Share clicked');
@@ -454,10 +530,15 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
 
                 {/* Heart Button */}
                 <button
-                  onClick={() => handleLike(item)}
+                  onClick={() => handleLike(item.id)}
                   className="cursor-pointer hover:opacity-100 transition-opacity"
+                  disabled={likeMutation.isPending}
                 >
-                  <Heart className="h-8 w-8 text-white" />
+                  {likedPosts?.includes(item.id) ? (
+                    <FaHeart className="h-8 w-8 text-red-500" />
+                  ) : (
+                    <FaRegHeart className="h-8 w-8 text-white" />
+                  )}
                 </button>
 
                 {/* Message Button */}
