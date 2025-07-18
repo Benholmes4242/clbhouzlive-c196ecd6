@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Heart, MessageCircle, Share, Volume2, VolumeX, MapPin, UserPlus, UserCheck } from 'lucide-react';
+import { Heart, MessageCircle, Share, Volume2, VolumeX, MapPin, UserPlus, UserCheck, Loader2 } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ExploreContentItem } from '@/components/explore/types';
@@ -207,7 +207,11 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   };
 
   if (posts.length === 0) {
-    return null;
+    return (
+      <div className="fixed inset-0 z-10 bg-black flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin" style={{ color: '#f7931e' }} />
+      </div>
+    );
   }
 
   return (
