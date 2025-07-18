@@ -55,17 +55,10 @@ const Clubhouse = () => {
         }`}
       >
         {/* Clubhouse Logo */}
-        <div className="absolute top-4 left-4 flex items-center gap-1 md:gap-2">
-          <img
-            src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
-            alt="Logo Mark"
-            className="h-8 md:h-10 w-auto object-contain"
-          />
-          <img
-            src="/lovable-uploads/a41de6f8-b123-485a-b624-0c40ee893eec.png"
-            alt="clbhouz Logo"
-            className="h-8 md:h-10 w-auto object-contain"
-          />
+        <div className="absolute top-4 left-4">
+          <div className="text-white font-bold text-xl tracking-wide">
+            Clubhouse
+          </div>
         </div>
 
         {/* Floating Horizontal Menu */}
