@@ -444,7 +444,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                     className="w-full h-full"
                   />
                 ) : (
-                  <div className="relative w-full h-full bg-white">
+                  <div className="relative w-full h-full bg-black">
                     <img
                       src={currentMedia.media_url}
                       alt={item.title}
@@ -471,25 +471,25 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 {/* Golf Course Badge - Above Caption */}
                 {item.golfCourse && (
                   <div className="mb-2">
-                      {isMobile ? (
-                        <div className="inline-flex items-center bg-black/20 text-black text-xs font-medium px-2 py-1 rounded-full backdrop-blur-sm whitespace-nowrap">
-                          <MapPin className="w-4 h-4 text-black mr-2" />
-                          {item.golfCourse.name}
-                        </div>
-                      ) : (
-                        <div className="inline-flex items-center bg-black/20 text-black text-sm font-medium px-3 py-1.5 rounded-full backdrop-blur-sm whitespace-nowrap">
-                          <MapPin className="w-5 h-5 text-black mr-2" />
-                          {item.golfCourse.name}
-                        </div>
-                      )}
+                     {isMobile ? (
+                       <div className="inline-flex items-center bg-white/20 text-white text-xs font-medium px-2 py-1 rounded-full backdrop-blur-sm whitespace-nowrap">
+                         <MapPin className="w-4 h-4 text-white mr-2" />
+                         {item.golfCourse.name}
+                       </div>
+                     ) : (
+                       <div className="inline-flex items-center bg-white/20 text-white text-sm font-medium px-3 py-1.5 rounded-full backdrop-blur-sm whitespace-nowrap">
+                         <MapPin className="w-5 h-5 text-white mr-2" />
+                         {item.golfCourse.name}
+                       </div>
+                     )}
                   </div>
                 )}
 
                 {/* Caption Text */}
                 {item.title && removeGolfCourseFromContent(item.title) && (
                   <div 
-                    className="text-black text-base font-bold leading-[1.4] cursor-default"
-                    style={{ textShadow: '0 1px 3px rgba(255,255,255,0.7)' }}
+                    className="text-white text-base font-bold leading-[1.4] cursor-default"
+                    style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
                   >
                     <div className="transition-all duration-300 ease-in-out whitespace-normal">
                       <span className="text-base font-bold">
@@ -520,9 +520,9 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                     onClick={() => setGlobalMute(!isGloballyMuted)}
                   >
                     {isGloballyMuted ? (
-                      <VolumeX className="w-8 h-8 text-black" />
+                      <VolumeX className="w-8 h-8 text-white" />
                     ) : (
-                      <Volume2 className="w-8 h-8 text-black" />
+                      <Volume2 className="w-8 h-8 text-white" />
                     )}
                   </button>
                 )}
@@ -537,10 +537,10 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                     {likedPosts?.includes(item.id) ? (
                       <FaHeart className="h-8 w-8 text-red-500" />
                     ) : (
-                      <FaRegHeart className="h-8 w-8 text-black" />
+                      <FaRegHeart className="h-8 w-8 text-white" />
                     )}
                   </button>
-                  <span className="text-black text-sm font-medium mt-1" style={{ textShadow: '0 1px 3px rgba(255,255,255,0.7)' }}>
+                  <span className="text-white text-sm font-medium mt-1" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
                     {Math.floor(Math.random() * 1000) + 10}
                   </span>
                 </div>
@@ -551,9 +551,9 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                     onClick={handleComment}
                     className="cursor-pointer hover:opacity-100 transition-opacity"
                   >
-                    <MessageCircle className="h-8 w-8 text-black" />
+                    <MessageCircle className="h-8 w-8 text-white" />
                   </button>
-                  <span className="text-black text-sm font-medium mt-1" style={{ textShadow: '0 1px 3px rgba(255,255,255,0.7)' }}>
+                  <span className="text-white text-sm font-medium mt-1" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
                     {Math.floor(Math.random() * 50) + 5}
                   </span>
                 </div>
@@ -563,7 +563,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                   onClick={handleShare}
                   className="cursor-pointer hover:opacity-100 transition-opacity"
                 >
-                  <RiShareForward2Fill className="h-8 w-8 text-black" />
+                  <RiShareForward2Fill className="h-8 w-8 text-white" />
                 </button>
               </div>
             </div>
@@ -573,7 +573,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
         {/* Loading indicator at the bottom */}
         {isLoadingMore && (
           <div className="h-screen flex items-center justify-center">
-            <div className="text-black/70">Loading more posts...</div>
+            <div className="text-white/70">Loading more posts...</div>
           </div>
         )}
       </div>

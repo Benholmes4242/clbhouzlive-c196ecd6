@@ -14,7 +14,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
   return (
     <nav className={`fixed bottom-0 left-0 right-0 z-40 ${
       isClubhouse 
-        ? 'bg-white' 
+        ? 'bg-black' 
         : 'bg-background'
     }`}>
       <div className="w-full px-2">
@@ -34,8 +34,8 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
                 className={`flex items-center justify-center transition-colors relative focus:outline-none min-h-[60px] min-w-[60px] p-3 ${
                   isClubhouse
                     ? isActive
-                      ? 'text-black'
-                      : 'text-black/70 hover:text-black'
+                      ? 'text-white'
+                      : 'text-white/70 hover:text-white'
                     : isActive
                       ? 'text-black'
                       : 'text-black/70 hover:text-black'
