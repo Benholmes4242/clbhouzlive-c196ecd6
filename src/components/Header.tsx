@@ -22,12 +22,12 @@ const Header = () => {
             <img
               src="/lovable-uploads/29e83040-b5c5-48e4-84d7-3f99640e4a80.png"
               alt="Logo Mark"
-              className="h-8 md:h-12 w-auto object-contain flex-shrink-0"
+              className="h-10 md:h-12 w-auto object-contain flex-shrink-0"
             />
             <img
               src={currentLogo?.file_url || "/lovable-uploads/4e825850-f4fd-4fed-90ac-429e1b988009.png"}
               alt="clbhouz Logo"
-              className="h-8 md:h-12 w-auto cursor-pointer object-contain hover:opacity-80 transition-opacity flex-shrink-0"
+              className="h-10 md:h-12 w-auto cursor-pointer object-contain hover:opacity-80 transition-opacity flex-shrink-0"
               onClick={handleLogoClick}
             />
           </div>
