@@ -3,7 +3,6 @@ import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
 import ExploreFilters from '@/components/explore/ExploreFilters';
 import ExploreGrid from '@/components/explore/ExploreGrid';
-import MobileDebugConsole from '@/components/explore/MobileDebugConsole';
 import VerticalMediaFeed from '@/components/explore/VerticalMediaFeed';
 import DiscoverTrendingVideos from '@/components/discover/DiscoverTrendingVideos';
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
@@ -14,7 +13,6 @@ import { FILTER_TYPES, MEDIA_TYPES } from '@/components/explore/types';
 
 const Discover = () => {
   const [activeFilter, setActiveFilter] = useState<string>(FILTER_TYPES.VIDEOS);
-  const [debugVisible, setDebugVisible] = useState(false);
   
   // Get content for the active filter (for the tabs section)
   const { 
@@ -162,12 +160,6 @@ const Discover = () => {
         </main>
         
         <BottomNavigation />
-
-        {/* Mobile Debug Console */}
-        <MobileDebugConsole 
-          isVisible={debugVisible}
-          onToggle={() => setDebugVisible(!debugVisible)}
-        />
 
         {/* Vertical Media Feed */}
         {initialItem && (

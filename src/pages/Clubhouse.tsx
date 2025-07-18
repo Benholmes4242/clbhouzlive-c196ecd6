@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
-import MobileDebugConsole from '@/components/explore/MobileDebugConsole';
 import VerticalMediaFeed from '@/components/explore/VerticalMediaFeed';
 import FullscreenPostFeed from '@/components/clubhouse/FullscreenPostFeed';
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
@@ -9,7 +8,6 @@ import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
 import { FILTER_TYPES } from '@/components/explore/types';
 
 const Clubhouse = () => {
-  const [debugVisible, setDebugVisible] = useState(false);
   
   // Get content for Friends filter only
   const { 
@@ -68,12 +66,6 @@ const Clubhouse = () => {
         <div className="absolute bottom-0 left-0 right-0 z-50">
           <BottomNavigation />
         </div>
-
-        {/* Mobile Debug Console */}
-        <MobileDebugConsole 
-          isVisible={debugVisible}
-          onToggle={() => setDebugVisible(!debugVisible)}
-        />
 
         {/* Vertical Media Feed - Keep the existing modal */}
         {initialItem && (

@@ -4,7 +4,6 @@ import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
 import ExploreFilters from '@/components/explore/ExploreFilters';
 import ExploreGrid from '@/components/explore/ExploreGrid';
-import MobileDebugConsole from '@/components/explore/MobileDebugConsole';
 import VerticalMediaFeed from '@/components/explore/VerticalMediaFeed';
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
@@ -12,7 +11,6 @@ import { FILTER_TYPES, MEDIA_TYPES } from '@/components/explore/types';
 
 const Explore = () => {
   const [activeFilter, setActiveFilter] = useState<string>(FILTER_TYPES.VIDEOS);
-  const [debugVisible, setDebugVisible] = useState(false);
   const { 
     content, 
     loading, 
@@ -109,12 +107,6 @@ const Explore = () => {
         </main>
         
         <BottomNavigation />
-
-        {/* Mobile Debug Console */}
-        <MobileDebugConsole 
-          isVisible={debugVisible}
-          onToggle={() => setDebugVisible(!debugVisible)}
-        />
 
         {/* Vertical Media Feed */}
         {initialItem && (
