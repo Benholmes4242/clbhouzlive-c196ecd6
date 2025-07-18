@@ -69,7 +69,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     }, [isInView, videoElement]);
 
     return (
-      <div ref={ref} className="relative w-full h-full bg-media-loading">
+      <div ref={ref} className="relative w-full h-full bg-black">
         <EnhancedVideoPlayer
           src={src}
           autoplay={false} // We handle autoplay manually
