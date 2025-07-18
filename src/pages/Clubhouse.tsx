@@ -54,10 +54,19 @@ const Clubhouse = () => {
           headerVisible ? 'translate-y-0' : '-translate-y-full'
         }`}
       >
-        {/* Clubhouse Logo */}
+        {/* Logo Mark and Clubhouse Logo */}
         <div className="absolute top-4 left-4">
-          <div className="text-white font-bold text-xl tracking-wide">
-            Clubhouse
+          <div className="flex items-center gap-1 md:gap-2">
+            <img
+              src="/lovable-uploads/dc594c09-ec74-44cb-82be-f42cbdcb12cf.png"
+              alt="Logo Mark"
+              className="h-8 md:h-12 w-auto object-contain flex-shrink-0"
+            />
+            <img
+              src="/lovable-uploads/638495f6-b30e-46cb-bed7-e42b9b5ab329.png"
+              alt="clbhouz Logo"
+              className="h-8 md:h-12 w-auto object-contain flex-shrink-0"
+            />
           </div>
         </div>
 
