@@ -345,12 +345,14 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
               ref={(el) => {
                 if (el) itemRefs.current[index] = el;
               }}
-              className="relative w-full snap-start snap-always flex items-center justify-center"
+              className="relative w-full snap-start snap-always flex items-center justify-center bg-black border-0"
               style={{ 
                 height: 'calc(100vh - 64px)', // Just the nav bar height (h-16 = 64px)
                 minHeight: 'calc(100vh - 64px)',
                 scrollSnapAlign: 'start',
-                scrollSnapStop: 'always'
+                scrollSnapStop: 'always',
+                border: 'none',
+                outline: 'none'
               }}
             >
               {/* Media Content */}
