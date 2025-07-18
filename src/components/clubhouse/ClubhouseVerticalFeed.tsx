@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { MessageCircle, Share, Volume2, VolumeX, MapPin, UserPlus, UserCheck, Loader2 } from 'lucide-react';
+import { MessageCircle, Volume2, VolumeX, MapPin, UserPlus, UserCheck, Loader2 } from 'lucide-react';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
+import { RiShareForward2Fill } from 'react-icons/ri';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ExploreContentItem } from '@/components/explore/types';
@@ -550,7 +551,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                   onClick={handleShare}
                   className="cursor-pointer hover:opacity-100 transition-opacity"
                 >
-                  <Share className="h-8 w-8 text-white" />
+                  <RiShareForward2Fill className="h-8 w-8 text-white" />
                 </button>
               </div>
             </div>
