@@ -122,7 +122,6 @@ const Discover = () => {
             <ExploreFilters 
               activeFilter={activeFilter} 
               onFilterChange={setActiveFilter}
-              excludeFilters={[FILTER_TYPES.FRIENDS]}
             />
           </div>
 
