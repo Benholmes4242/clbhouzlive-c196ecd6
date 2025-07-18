@@ -81,15 +81,15 @@ const Auth: React.FC = () => {
         />
         {/* Only show confirmation notice if explicitly needed (shouldn't happen with disabled email confirmation) */}
         {showConfirmNotice && (
-          <div className="mb-3 text-center text-sm text-primary-foreground bg-primary p-3 rounded">
+          <div className="mb-3 text-center text-base text-primary-foreground bg-primary p-3 rounded">
             Please check your email to confirm your account to become a member.
           </div>
         )}
         {errorMsg && (
-          <div className="mb-3 text-destructive text-center text-sm">{errorMsg}</div>
+          <div className="mb-3 text-destructive text-center text-base">{errorMsg}</div>
         )}
         {resendMsg && (
-          <div className="mb-3 text-green-700 text-center text-sm">{resendMsg}</div>
+          <div className="mb-3 text-green-700 text-center text-base">{resendMsg}</div>
         )}
         {showConfirmNotice && (
           <ConfirmNotice

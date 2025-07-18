@@ -34,7 +34,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
       </div>
       {children}
       <button
-        className="mt-4 text-xs text-muted-foreground underline-offset-4 hover:underline"
+        className="mt-4 text-sm text-muted-foreground underline-offset-4 hover:underline"
         onClick={toggleAuthMode}
         disabled={submitting}
       >

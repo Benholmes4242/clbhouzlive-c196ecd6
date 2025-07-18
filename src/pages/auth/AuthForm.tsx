@@ -241,7 +241,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
         </Button>
         <button
           type="button"
-          className="w-full text-xs text-muted-foreground underline-offset-4 hover:underline"
+          className="w-full text-sm text-muted-foreground underline-offset-4 hover:underline"
           onClick={() => setShowForgotPassword(false)}
           disabled={resetSubmitting}
         >
@@ -292,7 +292,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
           </div>
           
           {usernameAvailable === false && suggestedUsernames.length > 0 && (
-            <div className="mt-2 p-2 bg-gray-50 rounded text-sm">
+            <div className="mt-2 p-2 bg-gray-50 rounded text-base">
               <p className="text-gray-600 mb-2">Username taken. Try these:</p>
               <div className="flex flex-wrap gap-1">
                 {suggestedUsernames.map((suggestion) => (
@@ -303,7 +303,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
                       setUsername(suggestion);
                       checkUsernameAvailability(suggestion);
                     }}
-                    className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs hover:bg-blue-200"
+                    className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-sm hover:bg-blue-200"
                   >
                     @{suggestion}
                   </button>
@@ -313,7 +313,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
           )}
           
           {username.length > 0 && username.length < 3 && (
-            <p className="text-xs text-red-500 mt-1">Username must be at least 3 characters</p>
+            <p className="text-sm text-red-500 mt-1">Username must be at least 3 characters</p>
           )}
         </div>
       )}
@@ -343,7 +343,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
           {/* Social Login Divider */}
           <div className="flex items-center my-4">
             <div className="flex-1 border-t border-gray-300"></div>
-            <span className="mx-4 text-sm text-gray-500">or</span>
+            <span className="mx-4 text-base text-gray-500">or</span>
             <div className="flex-1 border-t border-gray-300"></div>
           </div>
           
@@ -382,7 +382,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
           {!isSignUp && (
             <button
               type="button"
-              className="w-full text-xs text-muted-foreground underline-offset-4 hover:underline mt-4"
+              className="w-full text-sm text-muted-foreground underline-offset-4 hover:underline mt-4"
               onClick={() => setShowForgotPassword(true)}
               disabled={submitting}
             >
