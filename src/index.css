@@ -5,7 +5,7 @@
 @tailwind utilities;
 
 @layer base {
-  /* Mobile scroll behavior fixes */
+  /* Mobile scroll behavior fixes and safe area support */
   html {
     scroll-behavior: auto; /* Disable smooth scrolling for instant positioning */
     -webkit-overflow-scrolling: touch;
@@ -18,11 +18,22 @@
     position: relative;
     min-height: 100vh;
     min-height: -webkit-fill-available; /* iOS viewport fix */
+    /* Extend background behind status bar on mobile */
+    @media (max-width: 768px) {
+      min-height: 100vh;
+      min-height: calc(100vh + env(safe-area-inset-top));
+      padding-top: env(safe-area-inset-top);
+    }
   }
 
   #root {
     min-height: 100vh;
     min-height: -webkit-fill-available; /* iOS viewport fix */
+    /* Ensure root extends behind status bar on mobile */
+    @media (max-width: 768px) {
+      min-height: 100vh;
+      min-height: calc(100vh + env(safe-area-inset-top));
+    }
   }
 
   /* Prevent iOS zoom on input focus */
@@ -111,6 +122,22 @@
   }
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
+  }
+
+  /* Safe area utilities for mobile devices */
+  .safe-area-full {
+    @media (max-width: 768px) {
+      min-height: 100vh;
+      min-height: calc(100vh + env(safe-area-inset-top));
+      padding-top: env(safe-area-inset-top, 0);
+    }
+  }
+
+  .safe-area-bg {
+    @media (max-width: 768px) {
+      padding-top: env(safe-area-inset-top, 0);
+      margin-top: calc(-1 * env(safe-area-inset-top, 0));
+    }
   }
   
 .container {

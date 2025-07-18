@@ -47,10 +47,13 @@ const Clubhouse = () => {
   }
 
   return (
-    <div className="h-screen bg-black overflow-hidden relative">
+    <div className="h-screen bg-black overflow-hidden relative" style={{
+      minHeight: '100dvh',
+      paddingTop: 'env(safe-area-inset-top, 0)',
+    }}>
       {/* Header with Logo and Floating Menu */}
       <div 
-        className={`absolute top-0 left-0 right-0 z-40 transition-transform duration-300 ease-out ${
+        className={`absolute top-0 left-0 right-0 z-40 transition-transform duration-300 ease-out safe-area-bg ${
           headerVisible ? 'translate-y-0' : '-translate-y-full'
         }`}
       >
