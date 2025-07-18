@@ -69,7 +69,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     }, [isInView, videoElement]);
 
     return (
-      <div ref={ref} className="relative w-full h-full bg-black">
+      <div ref={ref} className="relative w-full h-full bg-media-loading">
         <EnhancedVideoPlayer
           src={src}
           autoplay={false} // We handle autoplay manually
@@ -345,14 +345,12 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
               ref={(el) => {
                 if (el) itemRefs.current[index] = el;
               }}
-              className="relative w-full snap-start snap-always flex items-center justify-center bg-black border-0"
+              className="relative w-full snap-start snap-always flex items-center justify-center"
               style={{ 
                 height: 'calc(100vh - 64px)', // Just the nav bar height (h-16 = 64px)
                 minHeight: 'calc(100vh - 64px)',
                 scrollSnapAlign: 'start',
-                scrollSnapStop: 'always',
-                border: 'none',
-                outline: 'none'
+                scrollSnapStop: 'always'
               }}
             >
               {/* Media Content */}
