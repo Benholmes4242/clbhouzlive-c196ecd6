@@ -54,7 +54,7 @@ const generateMockComments = (postId: string): Comment[] => {
 
 const PostComments: React.FC<PostCommentsProps> = ({ postId, totalComments }) => {
   const comments = generateMockComments(postId);
-  const displayedComments = comments.slice(0, 2); // Show max 2 comments
+  const displayedComments = comments.slice(0, 1); // Show max 1 comment
   const hasMoreComments = totalComments > displayedComments.length;
 
   if (totalComments === 0) {
