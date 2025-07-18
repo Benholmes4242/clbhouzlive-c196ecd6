@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Search } from 'lucide-react';
 import BottomNavigation from '@/components/BottomNavigation';
 import ClubhouseVerticalFeed from '@/components/clubhouse/ClubhouseVerticalFeed';
 import { useInfiniteFollowedPosts } from '@/hooks/useInfiniteFollowedPosts';
@@ -12,10 +13,28 @@ const Clubhouse = () => {
     isLoadingMore
   } = useInfiniteFollowedPosts();
 
+  const [headerVisible, setHeaderVisible] = useState(true);
+  const [activeTab, setActiveTab] = useState('Following');
+
   const handleLike = (contentId: string) => {
     // Handle like functionality
     console.log('Liked post:', contentId);
   };
+
+  const handleScroll = (scrollDirection: 'up' | 'down') => {
+    if (scrollDirection === 'up') {
+      setHeaderVisible(false);
+    } else if (scrollDirection === 'down') {
+      setHeaderVisible(true);
+    }
+  };
+
+  const menuItems = [
+    { label: 'Following', active: activeTab === 'Following' },
+    { label: 'Explore', active: activeTab === 'Explore' },
+    { label: 'Trending', active: activeTab === 'Trending' },
+    { label: 'Channels', active: activeTab === 'Channels' },
+  ];
 
   if (isLoading) {
     return (
@@ -29,6 +48,45 @@ const Clubhouse = () => {
 
   return (
     <div className="h-screen bg-black overflow-hidden relative">
+      {/* Header with Logo and Floating Menu */}
+      <div 
+        className={`absolute top-0 left-0 right-0 z-40 transition-transform duration-300 ease-out ${
+          headerVisible ? 'translate-y-0' : '-translate-y-full'
+        }`}
+      >
+        {/* Clubhouse Logo */}
+        <div className="absolute top-4 left-4">
+          <div className="text-white font-bold text-xl tracking-wide">
+            Clubhouse
+          </div>
+        </div>
+
+        {/* Floating Horizontal Menu */}
+        <div className="flex justify-center pt-16 pb-4">
+          <div className="flex items-center space-x-8 px-6">
+            {menuItems.map((item) => (
+              <button
+                key={item.label}
+                onClick={() => setActiveTab(item.label)}
+                className={`text-sm font-medium transition-all duration-200 ${
+                  item.active 
+                    ? 'text-white border-b-2 border-white pb-1' 
+                    : 'text-white/70 hover:text-white'
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+            <button className="text-white/70 hover:text-white transition-colors duration-200">
+              <Search size={18} />
+            </button>
+          </div>
+        </div>
+
+        {/* Gradient fade */}
+        <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-b from-transparent to-black/20 pointer-events-none" />
+      </div>
+
       {/* Main Content - Fullscreen Vertical Feed */}
       <ClubhouseVerticalFeed
         posts={posts}
@@ -36,6 +94,7 @@ const Clubhouse = () => {
         onLoadMore={loadMore}
         hasMore={hasMore}
         isLoadingMore={isLoadingMore}
+        onScroll={handleScroll}
       />
       
       {/* Bottom Navigation */}

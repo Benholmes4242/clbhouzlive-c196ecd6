@@ -20,6 +20,7 @@ interface ClubhouseVerticalFeedProps {
   onLoadMore: () => void;
   hasMore: boolean;
   isLoadingMore: boolean;
+  onScroll?: (scrollDirection: 'up' | 'down') => void;
 }
 
 const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
@@ -27,7 +28,8 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   onLike,
   onLoadMore,
   hasMore,
-  isLoadingMore
+  isLoadingMore,
+  onScroll
 }) => {
   const { user } = useSupabaseSession();
   const isMobile = useIsMobile();
@@ -272,11 +274,23 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     return words.slice(0, wordLimit).join(' ') + '...';
   };
 
+  // Track previous scroll position for direction detection
+  const prevScrollTopRef = useRef(0);
+
   // Handle scroll to snap to items
   const handleScroll = useCallback(() => {
     if (!scrollViewRef.current) return;
 
     const scrollTop = scrollViewRef.current.scrollTop;
+    const scrollDirection = scrollTop > prevScrollTopRef.current ? 'up' : 'down';
+    
+    // Call parent onScroll callback for header visibility
+    if (onScroll) {
+      onScroll(scrollDirection);
+    }
+    
+    prevScrollTopRef.current = scrollTop;
+
     const itemHeight = window.innerHeight - 64; // Match the calc(100vh - 64px)
     const newIndex = Math.round(scrollTop / itemHeight);
     
@@ -288,7 +302,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
         onLoadMore();
       }
     }
-  }, [currentIndex, posts.length, hasMore, isLoadingMore, onLoadMore]);
+  }, [currentIndex, posts.length, hasMore, isLoadingMore, onLoadMore, onScroll]);
 
   // Scroll to specific index
   const scrollToIndex = (index: number) => {
