@@ -65,7 +65,7 @@ const PostComments: React.FC<PostCommentsProps> = ({ postId, totalComments }) =>
     <div className="mt-3 space-y-2">
       {/* View all comments link */}
       {hasMoreComments && (
-        <button className="text-white/70 text-sm hover:text-white transition-colors">
+        <button className="text-black/70 text-sm hover:text-black transition-colors">
           View all {totalComments} comments
         </button>
       )}
@@ -83,14 +83,14 @@ const PostComments: React.FC<PostCommentsProps> = ({ postId, totalComments }) =>
           />
           <div className="flex-1 min-w-0">
             <div className="text-sm">
-              <span className="font-semibold text-white mr-2">
+              <span className="font-semibold text-black mr-2">
                 {comment.user.username}
               </span>
-              <span className="text-white/90">
+              <span className="text-black/90">
                 {comment.content}
               </span>
             </div>
-            <span className="text-xs text-white/60 mt-1">
+            <span className="text-xs text-black/60 mt-1">
               {comment.timestamp}
             </span>
           </div>

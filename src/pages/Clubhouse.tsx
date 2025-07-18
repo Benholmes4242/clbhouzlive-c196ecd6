@@ -28,7 +28,7 @@ const Clubhouse = () => {
   }
 
   return (
-    <div className="h-screen bg-black overflow-hidden relative">
+    <div className="h-screen bg-white overflow-hidden relative">
       {/* Main Content - Fullscreen Vertical Feed */}
       <ClubhouseVerticalFeed
         posts={posts}
