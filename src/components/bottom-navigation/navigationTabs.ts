@@ -1,5 +1,5 @@
 
-import { FiHome } from 'react-icons/fi';
+import { PiHouseBold } from 'react-icons/pi';
 import { FaRegUser } from 'react-icons/fa';
 import { FiMapPin } from 'react-icons/fi';
 import { HiCamera } from 'react-icons/hi2';
@@ -7,7 +7,7 @@ import { RiCompassDiscoverLine } from 'react-icons/ri';
 import { Trophy } from 'lucide-react';
 
 export const navigationTabs = [
-  { id: 'clubhouse', label: 'Clubhouse', icon: FiHome, path: '/clubhouse' },
+  { id: 'clubhouse', label: 'Clubhouse', icon: PiHouseBold, path: '/clubhouse' },
   { id: 'discover', label: 'Discover', icon: RiCompassDiscoverLine, path: '/discover' },
   { id: 'tour', label: 'Tour Central', icon: Trophy, path: '/tour-central' },
   { id: 'post', label: 'Post', icon: HiCamera, path: null, isAction: true },
