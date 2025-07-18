@@ -77,9 +77,9 @@ const Clubhouse = () => {
               <button
                 key={item.label}
                 onClick={() => setActiveTab(item.label)}
-                className={`text-sm font-medium transition-all duration-200 ${
+                className={`relative text-sm font-medium transition-all duration-200 ${
                   item.active 
-                    ? 'text-white border-b-2 border-white pb-1' 
+                    ? 'text-white after:content-[""] after:absolute after:bottom-0 after:left-1/2 after:transform after:-translate-x-1/2 after:w-4 after:h-0.5 after:bg-white after:rounded-full' 
                     : 'text-white/70 hover:text-white'
                 }`}
               >
