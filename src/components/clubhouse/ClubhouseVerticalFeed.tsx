@@ -375,12 +375,12 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 {isFollowing ? (
                   <>
                     <UserCheck className="w-4 h-4 text-white" />
-                    <span className="text-white text-xs font-medium">Following</span>
+                    <span className="text-white text-sm font-medium">Following</span>
                   </>
                 ) : (
                   <>
                     <UserPlus className="w-4 h-4 text-white" />
-                    <span className="text-white text-xs font-medium">Follow</span>
+                    <span className="text-white text-sm font-medium">Follow</span>
                   </>
                 )}
               </button>
