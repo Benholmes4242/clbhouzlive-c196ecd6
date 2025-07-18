@@ -145,6 +145,8 @@ Deno.serve(async (req) => {
           throw new Error(`File too large: ${body.fileSize} bytes (max 100MB for chunked uploads)`)
         }
         
+        let finalUpload: any
+        
         try {
           console.log('Starting simple chunk combination...')
           
@@ -216,7 +218,7 @@ Deno.serve(async (req) => {
           console.log('File combination completed, size:', combinedFile.length)
           
           // Upload final combined file
-          const { data: finalUpload, error: uploadError } = await supabaseClient.storage
+          const { data: uploadData, error: uploadError } = await supabaseClient.storage
             .from('post-media')
             .upload(uniqueFileName, combinedFile, {
               contentType: body.fileType,
@@ -228,6 +230,7 @@ Deno.serve(async (req) => {
             throw new Error(`Failed to upload final file: ${uploadError.message}`)
           }
           
+          finalUpload = uploadData
           console.log('File upload completed successfully:', finalUpload.path)
         } catch (combineError) {
           console.error('Error during chunk processing:', combineError)
