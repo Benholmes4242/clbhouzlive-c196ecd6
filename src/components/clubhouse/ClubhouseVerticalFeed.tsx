@@ -229,56 +229,6 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
           scrollBehavior: 'smooth'
         }}
       >
-        {/* User Profile - Top Left */}
-        <div className="absolute top-4 left-4 z-30 flex items-center space-x-3">
-          {/* Profile Photo */}
-          <div className="relative">
-            <img
-              src={posts[currentIndex]?.user?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
-              alt={posts[currentIndex]?.user?.name || 'User'}
-              className="w-16 h-16 rounded-full object-cover"
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face';
-              }}
-            />
-          </div>
-          
-          {/* Username */}
-          <div className="flex items-center gap-3">
-            <div className="flex flex-col">
-              <span className="font-semibold text-base text-white" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
-                {posts[currentIndex]?.user?.name || 'Unknown User'}
-              </span>
-              {posts[currentIndex]?.user?.username && (
-                <span className="text-sm text-white/70" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
-                  @{posts[currentIndex]?.user?.username}
-                </span>
-              )}
-            </div>
-            
-            {/* Follow pill - only show if not own post and user is logged in */}
-            {user?.id && posts[currentIndex]?.user?.id && user.id !== posts[currentIndex]?.user?.id && (
-              <button 
-                onClick={handleFollowToggle}
-                disabled={followMutation.isPending || isFollowingLoading}
-                className="flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1.5 hover:bg-white/30 transition-colors disabled:opacity-50"
-              >
-                {isFollowing ? (
-                  <>
-                    <UserCheck className="w-4 h-4 text-white" />
-                    <span className="text-white text-xs font-medium">Following</span>
-                  </>
-                ) : (
-                  <>
-                    <UserPlus className="w-4 h-4 text-white" />
-                    <span className="text-white text-xs font-medium">Follow</span>
-                  </>
-                )}
-              </button>
-            )}
-          </div>
-        </div>
-
         {posts.map((item, index) => {
           // Get media array for this item
           const mediaItems = item.media && item.media.length > 0 ? item.media : [{
@@ -322,6 +272,56 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 scrollSnapStop: 'always'
               }}
             >
+              {/* User Profile - Top Left */}
+              <div className="absolute top-4 left-4 z-30 flex items-center space-x-3">
+                {/* Profile Photo */}
+                <div className="relative">
+                  <img
+                    src={item.user?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
+                    alt={item.user?.name || 'User'}
+                    className="w-16 h-16 rounded-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face';
+                    }}
+                  />
+                </div>
+                
+                {/* Username */}
+                <div className="flex items-center gap-3">
+                  <div className="flex flex-col">
+                    <span className="font-semibold text-base text-white" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
+                      {item.user?.name || 'Unknown User'}
+                    </span>
+                    {item.user?.username && (
+                      <span className="text-sm text-white/70" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
+                        @{item.user?.username}
+                      </span>
+                    )}
+                  </div>
+                  
+                  {/* Follow pill - only show if not own post and user is logged in */}
+                  {user?.id && item.user?.id && user.id !== item.user?.id && index === currentIndex && (
+                    <button 
+                      onClick={handleFollowToggle}
+                      disabled={followMutation.isPending || isFollowingLoading}
+                      className="flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1.5 hover:bg-white/30 transition-colors disabled:opacity-50"
+                    >
+                      {isFollowing ? (
+                        <>
+                          <UserCheck className="w-4 h-4 text-white" />
+                          <span className="text-white text-xs font-medium">Following</span>
+                        </>
+                      ) : (
+                        <>
+                          <UserPlus className="w-4 h-4 text-white" />
+                          <span className="text-white text-xs font-medium">Follow</span>
+                        </>
+                      )}
+                    </button>
+                  )}
+                </div>
+              </div>
+
               {/* Media Content */}
               <div 
                 className="relative w-full h-full flex items-center justify-center"
