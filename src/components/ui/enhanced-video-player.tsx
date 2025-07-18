@@ -280,7 +280,7 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
       video.removeEventListener('progress', handleProgress);
       video.removeEventListener('volumechange', handleVolumeChange);
     };
-  }, [onPlay, onPause, isGloballyMuted]);
+  }, [onPlay, onPause]);
 
   // Update video muted state when global audio state changes
   useEffect(() => {
