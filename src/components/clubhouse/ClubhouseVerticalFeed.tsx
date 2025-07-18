@@ -466,7 +466,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
               </div>
 
               {/* Caption and Golf Course Tag - Bottom Left */}
-              <div className="absolute bottom-5 left-3 right-20 z-20">
+              <div className="absolute bottom-2 left-3 right-20 z-20">
                 {/* Golf Course Badge - Above Caption */}
                 {item.golfCourse && (
                   <div className="mb-2">
