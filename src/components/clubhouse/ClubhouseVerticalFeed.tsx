@@ -121,7 +121,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     if (!scrollViewRef.current) return;
 
     const scrollTop = scrollViewRef.current.scrollTop;
-    const itemHeight = window.innerHeight - 80; // Account for nav bar (80px = 5rem)
+    const itemHeight = window.innerHeight;
     const newIndex = Math.round(scrollTop / itemHeight);
     
     if (newIndex !== currentIndex && newIndex >= 0 && newIndex < posts.length) {
@@ -138,7 +138,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   const scrollToIndex = (index: number) => {
     if (!scrollViewRef.current) return;
 
-    const itemHeight = window.innerHeight - 80; // Account for nav bar
+    const itemHeight = window.innerHeight;
     scrollViewRef.current.scrollTo({
       top: index * itemHeight,
       behavior: 'smooth'
@@ -208,14 +208,14 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
 
   if (posts.length === 0) {
     return (
-      <div className="fixed inset-0 bottom-20 z-10 bg-black flex items-center justify-center">
+      <div className="fixed inset-0 z-10 bg-black flex items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin" style={{ color: '#f7931e' }} />
       </div>
     );
   }
 
   return (
-    <div className="fixed inset-0 bottom-20 z-10 bg-black overflow-hidden">
+    <div className="fixed inset-0 z-10 bg-black overflow-hidden">
       {/* Scrollable Content */}
       <div
         ref={scrollViewRef}
@@ -314,10 +314,10 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
               ref={(el) => {
                 if (el) itemRefs.current[index] = el;
               }}
-              className="relative w-full snap-start snap-always flex items-center justify-center"
+              className="relative w-full h-screen snap-start snap-always flex items-center justify-center"
               style={{ 
-                minHeight: 'calc(100vh - 5rem)', 
-                maxHeight: 'calc(100vh - 5rem)',
+                minHeight: '100vh', 
+                maxHeight: '100vh',
                 scrollSnapAlign: 'start',
                 scrollSnapStop: 'always'
               }}
@@ -449,7 +449,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
 
         {/* Loading indicator at the bottom */}
         {isLoadingMore && (
-          <div className="flex items-center justify-center" style={{ height: 'calc(100vh - 5rem)' }}>
+          <div className="h-screen flex items-center justify-center">
             <div className="text-white/70">Loading more posts...</div>
           </div>
         )}
