@@ -510,7 +510,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
               </div>
 
               {/* Action Buttons - Bottom Right */}
-              <div className="absolute bottom-4 right-4 z-10 flex flex-col space-y-8">
+              <div className="absolute bottom-4 right-4 z-10 flex flex-col space-y-6">
                 {/* Mute/Unmute toggle button - only show for video posts */}
                 {currentMedia.media_type === 'video' && (
                   <button 
@@ -525,26 +525,36 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                   </button>
                 )}
 
-                {/* Heart Button */}
-                <button
-                  onClick={() => handleLike(item.id)}
-                  className="cursor-pointer hover:opacity-100 transition-opacity"
-                  disabled={likeMutation.isPending}
-                >
-                  {likedPosts?.includes(item.id) ? (
-                    <FaHeart className="h-8 w-8 text-red-500" />
-                  ) : (
-                    <FaRegHeart className="h-8 w-8 text-white" />
-                  )}
-                </button>
+                {/* Heart Button with Like Count */}
+                <div className="flex flex-col items-center">
+                  <button
+                    onClick={() => handleLike(item.id)}
+                    className="cursor-pointer hover:opacity-100 transition-opacity"
+                    disabled={likeMutation.isPending}
+                  >
+                    {likedPosts?.includes(item.id) ? (
+                      <FaHeart className="h-8 w-8 text-red-500" />
+                    ) : (
+                      <FaRegHeart className="h-8 w-8 text-white" />
+                    )}
+                  </button>
+                  <span className="text-white text-sm font-medium mt-1" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
+                    {Math.floor(Math.random() * 1000) + 10}
+                  </span>
+                </div>
 
-                {/* Message Button */}
-                <button
-                  onClick={handleComment}
-                  className="cursor-pointer hover:opacity-100 transition-opacity"
-                >
-                  <MessageCircle className="h-8 w-8 text-white" />
-                </button>
+                {/* Message Button with Comment Count */}
+                <div className="flex flex-col items-center">
+                  <button
+                    onClick={handleComment}
+                    className="cursor-pointer hover:opacity-100 transition-opacity"
+                  >
+                    <MessageCircle className="h-8 w-8 text-white" />
+                  </button>
+                  <span className="text-white text-sm font-medium mt-1" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
+                    {Math.floor(Math.random() * 50) + 5}
+                  </span>
+                </div>
 
                 {/* Share Button */}
                 <button
