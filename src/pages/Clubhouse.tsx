@@ -1,94 +1,48 @@
-import React, { useState } from 'react';
-import Header from '@/components/Header';
+import React from 'react';
 import BottomNavigation from '@/components/BottomNavigation';
-import VerticalMediaFeed from '@/components/explore/VerticalMediaFeed';
-import FullscreenPostFeed from '@/components/clubhouse/FullscreenPostFeed';
-import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
-import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
-import { FILTER_TYPES } from '@/components/explore/types';
+import ClubhouseVerticalFeed from '@/components/clubhouse/ClubhouseVerticalFeed';
+import { useInfiniteFollowedPosts } from '@/hooks/useInfiniteFollowedPosts';
 
 const Clubhouse = () => {
-  
-  // Get content for Friends filter only
-  const { 
-    content, 
-    loading, 
-    hasMore, 
-    loadMore 
-  } = useInfiniteExploreContent(FILTER_TYPES.FRIENDS);
-  
-  const { 
-    isOpen: isFeedOpen, 
-    initialItem, 
-    openFeed, 
-    closeFeed 
-  } = useVerticalMediaFeed();
+  const {
+    posts,
+    isLoading,
+    hasMore,
+    loadMore,
+    isLoadingMore
+  } = useInfiniteFollowedPosts();
 
   const handleLike = (contentId: string) => {
-    // Update likes optimistically - could be enhanced with actual API call
-    // For now, this is just visual feedback
+    // Handle like functionality
+    console.log('Liked post:', contentId);
   };
 
-  const handleFollow = (contentId: string) => {
-    // Update follow status optimistically - could be enhanced with actual API call
-    // For now, this is just visual feedback
-  };
-
-  const handleMediaClick = (item: any) => {
-    openFeed(item);
-  };
-
-  // Remove duplicates based on src URL
-  const uniqueContent = content.filter((item, index, self) => 
-    index === self.findIndex(t => t.src === item.src)
-  );
+  if (isLoading) {
+    return (
+      <div className="fixed inset-0 z-10 bg-black flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-white/70 text-lg">Loading your feed...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-      <div className="h-screen bg-black overflow-hidden">
-        <main className="h-full">
-          {/* Fullscreen Post Feed */}
-          {uniqueContent.length > 0 ? (
-            <FullscreenPostFeed 
-              content={uniqueContent}
-              onLike={handleLike}
-              onMediaClick={handleMediaClick}
-              isLoading={loading}
-              hasMore={hasMore}
-              onLoadMore={loadMore}
-            />
-          ) : (
-            <div className="flex items-center justify-center h-full">
-              <p className="text-white/70">Loading posts...</p>
-            </div>
-          )}
-        </main>
-        
-        <div className="absolute bottom-0 left-0 right-0 z-50">
-          <BottomNavigation />
-        </div>
-
-        {/* Vertical Media Feed - Keep the existing modal */}
-        {initialItem && (
-          <VerticalMediaFeed
-            isOpen={isFeedOpen}
-            onClose={closeFeed}
-            initialItem={initialItem}
-            allContent={uniqueContent}
-            onLike={handleLike}
-            onFollow={handleFollow}
-          />
-        )}
-
-        <style>{`
-          .scrollbar-hide {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-          }
-          .scrollbar-hide::-webkit-scrollbar {
-            display: none;
-          }
-        `}</style>
+    <div className="h-screen bg-black overflow-hidden relative">
+      {/* Main Content - Fullscreen Vertical Feed */}
+      <ClubhouseVerticalFeed
+        posts={posts}
+        onLike={handleLike}
+        onLoadMore={loadMore}
+        hasMore={hasMore}
+        isLoadingMore={isLoadingMore}
+      />
+      
+      {/* Bottom Navigation */}
+      <div className="absolute bottom-0 left-0 right-0 z-50">
+        <BottomNavigation />
       </div>
+    </div>
   );
 };
 
