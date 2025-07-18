@@ -207,14 +207,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   };
 
   if (posts.length === 0) {
-    return (
-      <div className="fixed inset-0 z-10 bg-black flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-white/70 text-lg mb-2">No posts from followed users</p>
-          <p className="text-white/50 text-sm">Follow some users to see their posts here!</p>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   return (
