@@ -49,64 +49,61 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
       threshold: 0.5, // Video must be 50% visible to autoplay
       rootMargin: '0px'
     });
-    const [videoElement, setVideoElement] = useState<HTMLVideoElement | null>(null);
-    const [hasUserInteracted, setHasUserInteracted] = useState(false);
+    const [hasAttemptedPlay, setHasAttemptedPlay] = useState(false);
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-    // Listen for user interaction to enable autoplay on mobile
-    useEffect(() => {
-      const handleUserInteraction = () => {
-        setHasUserInteracted(true);
-        document.removeEventListener('touchstart', handleUserInteraction);
-        document.removeEventListener('click', handleUserInteraction);
-      };
-
-      if (isMobile && !hasUserInteracted) {
-        document.addEventListener('touchstart', handleUserInteraction, { passive: true });
-        document.addEventListener('click', handleUserInteraction);
-      }
-
-      return () => {
-        document.removeEventListener('touchstart', handleUserInteraction);
-        document.removeEventListener('click', handleUserInteraction);
-      };
-    }, [isMobile, hasUserInteracted]);
-
-    useEffect(() => {
-      if (!ref.current || !isInView) return;
+    const attemptVideoPlay = useCallback(async () => {
+      if (!ref.current || hasAttemptedPlay) return;
       
-      // Find the video element within the container
-      const video = ref.current.querySelector('video');
-      if (video && video !== videoElement) {
-        setVideoElement(video);
-      }
-    }, [ref.current, isInView, videoElement]);
+      const video = ref.current.querySelector('video') as HTMLVideoElement;
+      if (!video) return;
 
-    useEffect(() => {
-      if (!videoElement) return;
-
-      if (isInView) {
-        // On mobile, only autoplay after user interaction
-        if (isMobile && !hasUserInteracted) {
-          console.log('📱 Mobile autoplay blocked - waiting for user interaction');
-          return;
-        }
+      try {
+        // Ensure video is muted for autoplay compliance
+        video.muted = true;
+        video.playsInline = true;
         
-        // Ensure video is muted for autoplay to work
-        videoElement.muted = true;
-        videoElement.play().catch((error) => {
-          console.log('📱 Mobile autoplay failed:', error.message);
-        });
-      } else {
-        videoElement.pause();
+        await video.play();
+        console.log('✅ Mobile autoplay successful');
+        setHasAttemptedPlay(true);
+      } catch (error) {
+        console.log('❌ Mobile autoplay failed:', error);
+        
+        // On mobile, try again after a brief delay
+        if (isMobile) {
+          setTimeout(() => {
+            video.play().catch(() => {
+              console.log('❌ Mobile autoplay retry failed');
+            });
+          }, 100);
+        }
       }
-    }, [isInView, videoElement, isMobile, hasUserInteracted]);
+    }, [ref.current, hasAttemptedPlay, isMobile]);
+
+    // Handle initial autoplay attempt when video comes into view
+    useEffect(() => {
+      if (isInView && !hasAttemptedPlay) {
+        // Small delay to ensure video is ready
+        setTimeout(attemptVideoPlay, 100);
+      }
+    }, [isInView, attemptVideoPlay, hasAttemptedPlay]);
+
+    // Add touch handler for mobile interaction
+    const handleTouchStart = useCallback(() => {
+      if (isMobile && isInView && !hasAttemptedPlay) {
+        attemptVideoPlay();
+      }
+    }, [isMobile, isInView, hasAttemptedPlay, attemptVideoPlay]);
 
     return (
-      <div ref={ref} className="relative w-full h-full bg-media-loading">
+      <div 
+        ref={ref} 
+        className="relative w-full h-full bg-media-loading"
+        onTouchStart={handleTouchStart}
+      >
         <EnhancedVideoPlayer
           src={src}
-          autoplay={isInView && (!isMobile || hasUserInteracted)} // Enable autoplay based on mobile state
+          autoplay={true} // Let EnhancedVideoPlayer handle autoplay
           muted={true} // Always muted for autoplay
           loop={true}
           className={className}

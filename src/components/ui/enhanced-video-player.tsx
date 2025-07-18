@@ -215,11 +215,23 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
       }
       setIsLoading(false);
       
-      // Attempt autoplay if requested - be more aggressive for better UX
+      // Attempt autoplay if requested - be more aggressive for mobile
       if (autoplay) {
         console.log('🚀 EnhancedVideoPlayer: Starting autoplay', { src, readyState: video.readyState });
+        
+        // Ensure proper mobile settings
+        video.muted = true;
+        video.playsInline = true;
+        
         video.play().catch((error) => {
           console.error('❌ EnhancedVideoPlayer: Autoplay failed', error);
+          
+          // On mobile, try again with a small delay
+          if (isMobile) {
+            setTimeout(() => {
+              video.play().catch(() => console.log('❌ Mobile autoplay retry failed'));
+            }, 200);
+          }
         });
       }
     };
