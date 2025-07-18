@@ -168,25 +168,8 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     if (!scrollViewRef.current) return;
 
     const scrollTop = scrollViewRef.current.scrollTop;
-    // Calculate heights dynamically based on current post type
-    let accumulatedHeight = 0;
-    let newIndex = 0;
-    
-    for (let i = 0; i < posts.length; i++) {
-      const post = posts[i];
-      const mediaItems = post.media && post.media.length > 0 ? post.media : [{
-        media_type: post.type as 'video' | 'image'
-      }];
-      const currentMedia = mediaItems[0];
-      const itemHeight = currentMedia.media_type === 'video' ? 
-        (window.innerHeight - 64) : (window.innerHeight - 128);
-      
-      if (scrollTop < accumulatedHeight + itemHeight) {
-        newIndex = i;
-        break;
-      }
-      accumulatedHeight += itemHeight;
-    }
+    const itemHeight = window.innerHeight - 64; // Match the calc(100vh - 64px)
+    const newIndex = Math.round(scrollTop / itemHeight);
     
     if (newIndex !== currentIndex && newIndex >= 0 && newIndex < posts.length) {
       setCurrentIndex(newIndex);
@@ -198,24 +181,13 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     }
   }, [currentIndex, posts.length, hasMore, isLoadingMore, onLoadMore]);
 
-  // Scroll to specific index with dynamic heights
+  // Scroll to specific index
   const scrollToIndex = (index: number) => {
     if (!scrollViewRef.current) return;
 
-    let accumulatedHeight = 0;
-    for (let i = 0; i < index; i++) {
-      const post = posts[i];
-      const mediaItems = post.media && post.media.length > 0 ? post.media : [{
-        media_type: post.type as 'video' | 'image'
-      }];
-      const currentMedia = mediaItems[0];
-      const itemHeight = currentMedia.media_type === 'video' ? 
-        (window.innerHeight - 64) : (window.innerHeight - 128);
-      accumulatedHeight += itemHeight;
-    }
-
+    const itemHeight = window.innerHeight - 64; // Match the calc(100vh - 64px)
     scrollViewRef.current.scrollTo({
-      top: accumulatedHeight,
+      top: index * itemHeight,
       behavior: 'smooth'
     });
   };
@@ -375,8 +347,8 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
               }}
               className="relative w-full snap-start snap-always flex items-center justify-center"
               style={{ 
-                height: currentMedia.media_type === 'video' ? 'calc(100vh - 64px)' : 'calc(100vh - 128px)', // Different heights for video vs photo
-                minHeight: currentMedia.media_type === 'video' ? 'calc(100vh - 64px)' : 'calc(100vh - 128px)',
+                height: 'calc(100vh - 64px)', // Just the nav bar height (h-16 = 64px)
+                minHeight: 'calc(100vh - 64px)',
                 scrollSnapAlign: 'start',
                 scrollSnapStop: 'always'
               }}
