@@ -366,7 +366,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                     className="w-full h-full"
                   />
                 ) : (
-                  <div className="relative w-full h-full bg-media-loading">
+                  <div className="relative w-full h-full bg-black">
                     <img
                       src={currentMedia.media_url}
                       alt={item.title}
