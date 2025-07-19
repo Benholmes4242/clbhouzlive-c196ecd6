@@ -420,7 +420,6 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                   timestamp={latestVideo.post_created_at}
                   onOpenFullVideo={() => {
                     // TODO: Implement full video modal or navigate to post
-                    console.log('Open full video for post:', latestVideo.post_id);
                   }}
                 />
               )}

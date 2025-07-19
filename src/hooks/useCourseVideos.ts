@@ -26,7 +26,6 @@ export const useCourseVideos = (courseId: string | undefined, enabled: boolean =
         .single();
 
       if (entityError || !taggableEntity) {
-        console.log('No taggable entity found for course:', courseId);
         return [];
       }
 
@@ -37,7 +36,6 @@ export const useCourseVideos = (courseId: string | undefined, enabled: boolean =
         .eq('tagged_entity_id', taggableEntity.id);
 
       if (tagError || !taggedPosts || taggedPosts.length === 0) {
-        console.log('No posts tagged with this course:', courseId);
         return [];
       }
 
@@ -93,6 +91,8 @@ export const useCourseVideos = (courseId: string | undefined, enabled: boolean =
       return transformedVideos as CourseVideo[];
     },
     enabled: enabled && !!courseId,
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 10 * 60 * 1000, // 10 minutes - videos don't change frequently
+    gcTime: 30 * 60 * 1000, // 30 minutes garbage collection time
+    refetchOnWindowFocus: false, // Don't refetch when window gains focus
   });
 };
