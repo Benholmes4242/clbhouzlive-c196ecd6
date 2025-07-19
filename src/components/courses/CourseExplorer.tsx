@@ -4,13 +4,16 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
-import { Search, MapPin } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Search, MapPin, TestTube } from 'lucide-react';
 import CourseCard from './CourseCard';
 import { Skeleton } from '@/components/ui/skeleton';
+import GBITestModal from './GBITestModal';
 
 const CourseExplorer = () => {
   const [selectedRegion, setSelectedRegion] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [isGBITestModalOpen, setIsGBITestModalOpen] = useState(false);
 
   // Fetch courses based on selected region using correct filtering logic
   const { data: courses = [], isLoading } = useQuery({
@@ -112,8 +115,8 @@ const CourseExplorer = () => {
         />
       </div>
 
-      {/* Region Selection */}
-      <div className="flex justify-start">
+      {/* Region Selection and GB & I Test Button */}
+      <div className="flex items-center gap-4">
         <Select value={selectedRegion} onValueChange={setSelectedRegion}>
           <SelectTrigger className="w-[200px] focus:ring-[#b66b41] focus:border-[#b66b41]">
             <SelectValue />
@@ -130,6 +133,15 @@ const CourseExplorer = () => {
             ))}
           </SelectContent>
         </Select>
+
+        <Button
+          onClick={() => setIsGBITestModalOpen(true)}
+          variant="outline"
+          className="border-[#b66b41] text-[#b66b41] hover:bg-[#b66b41] hover:text-white"
+        >
+          <TestTube className="h-4 w-4 mr-2" />
+          GB & I Test
+        </Button>
       </div>
 
       {/* Course Grid */}
@@ -157,6 +169,12 @@ const CourseExplorer = () => {
           </p>
         </div>
       )}
+
+      {/* GB & I Test Modal */}
+      <GBITestModal
+        isOpen={isGBITestModalOpen}
+        onClose={() => setIsGBITestModalOpen(false)}
+      />
     </div>
   );
 };
