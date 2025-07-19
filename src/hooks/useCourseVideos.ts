@@ -7,6 +7,8 @@ interface CourseVideo {
   media_type: string;
   created_at: string;
   post_id: string;
+  username?: string;
+  post_created_at?: string;
 }
 
 export const useCourseVideos = (courseId: string | undefined, enabled: boolean = true) => {
@@ -41,7 +43,7 @@ export const useCourseVideos = (courseId: string | undefined, enabled: boolean =
 
       const postIds = taggedPosts.map(tag => tag.post_id);
 
-      // Then find video media for those posts
+      // Then find video media for those posts with user information
       const { data: videos, error } = await supabase
         .from('post_media')
         .select(`
@@ -49,7 +51,11 @@ export const useCourseVideos = (courseId: string | undefined, enabled: boolean =
           media_url,
           media_type,
           created_at,
-          post_id
+          post_id,
+          posts(
+            created_at,
+            user_id
+          )
         `)
         .eq('media_type', 'video')
         .in('post_id', postIds)
@@ -61,7 +67,30 @@ export const useCourseVideos = (courseId: string | undefined, enabled: boolean =
         return [];
       }
 
-      return (videos || []) as CourseVideo[];
+      // Get user profiles for the posts
+      const videoData = videos || [];
+      const userIds = videoData.map(v => v.posts?.user_id).filter(Boolean);
+      
+      const { data: userProfiles } = await supabase
+        .from('user_profiles')
+        .select('id, username')
+        .in('id', userIds);
+
+      // Transform the data to flatten the structure
+      const transformedVideos = videoData.map(video => {
+        const userProfile = userProfiles?.find(profile => profile.id === video.posts?.user_id);
+        return {
+          id: video.id,
+          media_url: video.media_url,
+          media_type: video.media_type,
+          created_at: video.created_at,
+          post_id: video.post_id,
+          username: userProfile?.username,
+          post_created_at: video.posts?.created_at,
+        };
+      });
+
+      return transformedVideos as CourseVideo[];
     },
     enabled: enabled && !!courseId,
     staleTime: 5 * 60 * 1000, // 5 minutes

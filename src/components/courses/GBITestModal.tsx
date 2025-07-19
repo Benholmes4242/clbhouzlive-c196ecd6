@@ -413,23 +413,16 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
 
               {/* Video Overlay - Only show in fullscreen mode if video exists */}
               {latestVideo && (
-                <>
-                  {/* Latest Post Label */}
-                  <div className={`fixed bottom-6 z-20 ${isMobile ? 'left-6' : 'right-52'}`}>
-                    <p className={`text-white font-bold ${isMobile ? 'text-3xl' : 'text-sm bg-black/50 px-3 py-2 rounded-lg backdrop-blur-sm'}`}>
-                      Latest post from {currentCourse.name}
-                    </p>
-                  </div>
-                  
-                  <CourseVideoOverlay
-                    videoUrl={latestVideo.media_url}
-                    courseName={currentCourse.name}
-                    onOpenFullVideo={() => {
-                      // TODO: Implement full video modal or navigate to post
-                      console.log('Open full video for post:', latestVideo.post_id);
-                    }}
-                  />
-                </>
+                <CourseVideoOverlay
+                  videoUrl={latestVideo.media_url}
+                  courseName={currentCourse.name}
+                  username={latestVideo.username}
+                  timestamp={latestVideo.post_created_at}
+                  onOpenFullVideo={() => {
+                    // TODO: Implement full video modal or navigate to post
+                    console.log('Open full video for post:', latestVideo.post_id);
+                  }}
+                />
               )}
             </div>
           ) : (
