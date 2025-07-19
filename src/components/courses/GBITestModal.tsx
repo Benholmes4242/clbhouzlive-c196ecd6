@@ -402,7 +402,7 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                   className={`relative rounded-lg overflow-hidden cursor-pointer transition-all hover:scale-[1.02] ${
                     index === currentIndex ? 'ring-2 ring-white' : ''
                   }`}
-                  style={{ minHeight: '120px' }}
+                  style={{ minHeight: '160px' }}
                 >
                   {/* Background Image */}
                   {course.thumbnail_image ? (
