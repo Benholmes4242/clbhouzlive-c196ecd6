@@ -399,53 +399,53 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                   key={course.id}
                   data-course-index={index}
                   onClick={() => handleCourseClick(index)}
-                  className={`bg-white/10 backdrop-blur-sm rounded-lg p-4 cursor-pointer transition-all hover:bg-white/20 ${
+                  className={`relative rounded-lg overflow-hidden cursor-pointer transition-all hover:scale-[1.02] ${
                     index === currentIndex ? 'ring-2 ring-white' : ''
                   }`}
+                  style={{ minHeight: '120px' }}
                 >
-                  <div className="flex items-center gap-4">
-                    {/* Course Image */}
-                    <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
-                      {course.thumbnail_image ? (
-                        <img
-                          src={course.thumbnail_image}
-                          alt={course.name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-green-900 to-green-700 flex items-center justify-center">
-                          <span className="text-2xl">⛳</span>
-                        </div>
-                      )}
+                  {/* Background Image */}
+                  {course.thumbnail_image ? (
+                    <img
+                      src={course.thumbnail_image}
+                      alt={course.name}
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="absolute inset-0 w-full h-full bg-gradient-to-br from-green-900 to-green-700 flex items-center justify-center">
+                      <span className="text-6xl">⛳</span>
                     </div>
+                  )}
 
-                    {/* Course Info */}
-                    <div className="flex-1 text-white">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-lg font-semibold">{course.name}</h3>
-                        <div className="flex gap-2">
-                          {course.global_rank && course.global_rank <= 100 && (
-                            <div className="flex items-center gap-1 px-2 py-1 bg-white/20 rounded-full">
-                              <Earth className="h-3 w-3" />
-                              <span className="text-xs font-semibold">#{course.global_rank}</span>
-                            </div>
-                          )}
-                          {course.regional_rank && course.regional_rank <= 100 && (
-                            <div className="flex items-center gap-1 px-2 py-1 bg-white/20 rounded-full">
-                              <CountryFlag country="Britain & Ireland" size="sm" />
-                              <span className="text-xs font-semibold">#{course.regional_rank}</span>
-                            </div>
-                          )}
-                        </div>
+                  {/* Overlay Gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+
+                  {/* Course Info Overlay */}
+                  <div className="absolute inset-0 p-4 flex flex-col justify-end text-white">
+                    <div className="flex items-center gap-3 mb-2">
+                      <h3 className="text-lg font-semibold">{course.name}</h3>
+                      <div className="flex gap-2">
+                        {course.global_rank && course.global_rank <= 100 && (
+                          <div className="flex items-center gap-1 px-2 py-1 bg-white/20 backdrop-blur-sm rounded-full">
+                            <Earth className="h-3 w-3" />
+                            <span className="text-xs font-semibold">#{course.global_rank}</span>
+                          </div>
+                        )}
+                        {course.regional_rank && course.regional_rank <= 100 && (
+                          <div className="flex items-center gap-1 px-2 py-1 bg-white/20 backdrop-blur-sm rounded-full">
+                            <CountryFlag country="Britain & Ireland" size="sm" />
+                            <span className="text-xs font-semibold">#{course.regional_rank}</span>
+                          </div>
+                        )}
                       </div>
-                      <p className="text-sm opacity-75">
-                        {[
-                          course.country,
-                          course.sub_country,
-                          course.region
-                        ].filter(Boolean).join(', ')}
-                      </p>
                     </div>
+                    <p className="text-sm opacity-90">
+                      {[
+                        course.country,
+                        course.sub_country,
+                        course.region
+                      ].filter(Boolean).join(', ')}
+                    </p>
                   </div>
                 </div>
               ))}
