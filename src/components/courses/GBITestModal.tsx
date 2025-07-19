@@ -183,8 +183,7 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                 <h2 className="text-3xl md:text-4xl font-bold mb-2 leading-tight">
                   {currentCourse.name}
                 </h2>
-                <div className="flex items-center gap-2 text-lg opacity-90">
-                  <MapPin className="h-5 w-5 flex-shrink-0" />
+                <div className="text-lg opacity-90">
                   <span>
                     {currentCourse.country}
                     {currentCourse.region && currentCourse.region !== currentCourse.country 
