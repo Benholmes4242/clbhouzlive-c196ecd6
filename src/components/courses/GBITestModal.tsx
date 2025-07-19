@@ -239,12 +239,22 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                   const jumpIndex = jumpPoint - 1; // Convert to 0-based index
                   const currentRanking = currentIndex + 1; // Convert to 1-based ranking
                   
-                  // Determine if this jump point should be highlighted
-                  const isInRange = (() => {
-                    if (jumpPoint === 1) return currentRanking >= 1 && currentRanking <= 9;
-                    if (jumpPoint === 100) return currentRanking >= 91 && currentRanking <= 100;
-                    return currentRanking >= jumpPoint - 4 && currentRanking <= jumpPoint + 9;
+                  // Determine which jump point should show the dot
+                  const activeJumpPoint = (() => {
+                    if (currentRanking <= 9) return 1;
+                    if (currentRanking <= 19) return 10;
+                    if (currentRanking <= 29) return 20;
+                    if (currentRanking <= 39) return 30;
+                    if (currentRanking <= 49) return 40;
+                    if (currentRanking <= 59) return 50;
+                    if (currentRanking <= 69) return 60;
+                    if (currentRanking <= 79) return 70;
+                    if (currentRanking <= 89) return 80;
+                    if (currentRanking <= 99) return 90;
+                    return 100;
                   })();
+                  
+                  const showDot = jumpPoint === activeJumpPoint;
 
                   return (
                     <div key={jumpPoint} className="flex items-center">
@@ -255,8 +265,8 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                       >
                         {jumpPoint}
                       </button>
-                      {isInRange && (
-                        <div className="w-1 h-1 bg-white rounded-full ml-1"></div>
+                      {showDot && (
+                        <div className="w-1 h-1 bg-white rounded-full ml-2"></div>
                       )}
                     </div>
                   );
