@@ -58,7 +58,7 @@ export const useCourseVideos = (courseId: string | undefined, enabled: boolean =
         .eq('media_type', 'video')
         .in('post_id', postIds)
         .order('created_at', { ascending: false })
-        .limit(1); // Get only the most recent video
+        .limit(10); // Get up to 10 recent videos for the carousel
 
       if (error) {
         console.error('Error fetching course videos:', error);
@@ -91,8 +91,8 @@ export const useCourseVideos = (courseId: string | undefined, enabled: boolean =
       return transformedVideos as CourseVideo[];
     },
     enabled: enabled && !!courseId,
-    staleTime: 10 * 60 * 1000, // 10 minutes - videos don't change frequently
-    gcTime: 30 * 60 * 1000, // 30 minutes garbage collection time
-    refetchOnWindowFocus: false, // Don't refetch when window gains focus
+    staleTime: 30 * 1000, // 30 seconds - refresh quickly to show new videos
+    gcTime: 5 * 60 * 1000, // 5 minutes garbage collection time
+    refetchOnWindowFocus: true, // Refetch when window gains focus to get latest videos
   });
 };
