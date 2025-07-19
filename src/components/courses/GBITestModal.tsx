@@ -422,8 +422,15 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
 
                   {/* Course Info Overlay */}
                   <div className="absolute inset-0 p-4 flex flex-col justify-end text-white">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-lg font-semibold">{course.name}</h3>
+                    <div className="mb-4">
+                      <h3 className="text-lg font-semibold mb-1">{course.name}</h3>
+                      <p className="text-sm opacity-90 mb-2">
+                        {[
+                          course.country,
+                          course.sub_country,
+                          course.region
+                        ].filter(Boolean).join(', ')}
+                      </p>
                       <div className="flex gap-2">
                         {course.global_rank && course.global_rank <= 100 && (
                           <div className="flex items-center gap-1 px-2 py-1 bg-white/20 backdrop-blur-sm rounded-full">
@@ -439,13 +446,6 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                         )}
                       </div>
                     </div>
-                    <p className="text-sm opacity-90">
-                      {[
-                        course.country,
-                        course.sub_country,
-                        course.region
-                      ].filter(Boolean).join(', ')}
-                    </p>
                   </div>
                 </div>
               ))}
