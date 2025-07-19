@@ -213,7 +213,7 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
       <div className="absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/80 to-transparent">
         <div className="flex items-center justify-between p-4">
           <div className="text-white">
-            <h1 className="text-lg font-semibold">Great Britain & Ireland Top 100</h1>
+            <h1 className="text-lg opacity-90">Great Britain & Ireland Top 100</h1>
           </div>
           
           {/* Single View Toggle Icon */}
