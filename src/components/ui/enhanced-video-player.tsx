@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, memo } from 'react';
+import React, { useRef, useEffect, useState, memo, useCallback, useMemo } from 'react';
 import { Play, Pause, Volume2, VolumeX, Maximize, Loader2 } from 'lucide-react';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
@@ -25,7 +25,7 @@ declare global {
   }
 }
 
-const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
+const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = memo(({
   src,
   poster,
   autoplay = false,
@@ -74,7 +74,7 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
     }
   }, [isInView, isMobile, shouldLoadVideo, src]);
 
-  // Load HLS.js if needed - only when shouldLoadVideo is true
+  // Load HLS.js if needed - only when shouldLoadVideo is true and NEVER on mute changes
   useEffect(() => {
     console.log('🔍 DEBUG: HLS initialization effect triggered:', {
       shouldLoadVideo,
@@ -83,7 +83,11 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
       hasHls: !!window.Hls
     });
     
-    if (!shouldLoadVideo) return;
+    // CRITICAL: Only initialize when actually needed, never on state changes
+    if (!shouldLoadVideo) {
+      console.log('🚫 Skipping HLS init - shouldLoadVideo is false');
+      return;
+    }
     
     if (enableHLS && !window.Hls) {
       const script = document.createElement('script');
@@ -97,7 +101,7 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
     } else {
       initializeVideo();
     }
-  }, [shouldLoadVideo, enableHLS]); // Remove src dependency to prevent reinit on mute changes
+  }, [shouldLoadVideo]); // ONLY depend on shouldLoadVideo - nothing else!
   
   const initializeVideo = () => {
     console.log('🎬 EnhancedVideoPlayer: Initializing video', { src, enableHLS });
@@ -450,6 +454,6 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
 
     </div>
   );
-};
+});
 
-export default memo(EnhancedVideoPlayer);
+export default EnhancedVideoPlayer;
