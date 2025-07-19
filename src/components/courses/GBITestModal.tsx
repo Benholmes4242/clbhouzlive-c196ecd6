@@ -337,15 +337,15 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                   {/* Ranking Badges - Inline version */}
                   <div className="flex gap-2">
                     {currentCourse.global_rank && currentCourse.global_rank <= 100 && (
-                      <div className="flex items-center justify-center gap-1.5 px-2 py-1 bg-white rounded-full">
-                        <Earth className="h-5 w-5 text-gray-600" />
-                        <span className="text-sm font-bold text-gray-800 leading-none flex items-center translate-y-[2px]">#{currentCourse.global_rank}</span>
+                      <div className="flex items-center justify-center gap-1 px-1.5 py-0.5 bg-white rounded-full">
+                        <Earth className="h-4 w-4 text-gray-600" />
+                        <span className="text-xs font-bold text-gray-800 leading-none flex items-center translate-y-[1px]">#{currentCourse.global_rank}</span>
                       </div>
                     )}
                     {currentCourse.regional_rank && currentCourse.regional_rank <= 100 && (
-                      <div className="flex items-center justify-center gap-1.5 px-2 py-1 bg-white rounded-full">
+                      <div className="flex items-center justify-center gap-1 px-1.5 py-0.5 bg-white rounded-full">
                         <CountryFlag country="Britain & Ireland" size="md" />
-                        <span className="text-sm font-bold text-gray-800 leading-none flex items-center translate-y-[2px]">#{currentCourse.regional_rank}</span>
+                        <span className="text-xs font-bold text-gray-800 leading-none flex items-center translate-y-[1px]">#{currentCourse.regional_rank}</span>
                       </div>
                     )}
                   </div>
@@ -478,15 +478,15 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                       <div className="flex items-center justify-between">
                         <div className="flex gap-2">
                           {course.regional_rank && course.regional_rank <= 100 && (
-                            <div className="flex items-center gap-1 px-2 py-1 bg-white rounded-full">
+                            <div className="flex items-center gap-1 px-1.5 py-0.5 bg-white rounded-full">
                               <CountryFlag country="Britain & Ireland" size="md" />
-                              <span className="text-sm font-bold text-gray-800 translate-y-[2px]">#{course.regional_rank}</span>
+                              <span className="text-xs font-bold text-gray-800 translate-y-[1px]">#{course.regional_rank}</span>
                             </div>
                           )}
                           {course.global_rank && course.global_rank <= 100 && (
-                            <div className="flex items-center gap-1 px-2 py-1 bg-white rounded-full">
-                              <Earth className="h-5 w-5 text-gray-600" />
-                              <span className="text-sm font-bold text-gray-800 translate-y-[2px]">#{course.global_rank}</span>
+                            <div className="flex items-center gap-1 px-1.5 py-0.5 bg-white rounded-full">
+                              <Earth className="h-4 w-4 text-gray-600" />
+                              <span className="text-xs font-bold text-gray-800 translate-y-[1px]">#{course.global_rank}</span>
                             </div>
                           )}
                         </div>
@@ -497,11 +497,13 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                             onClick={(e) => handleAddToPlayed(course, e)}
                             className={`${
                               playedCourses.has(course.id)
-                                ? 'bg-green-600 hover:bg-green-700'
-                                : 'bg-white/20 hover:bg-white/30'
-                            } backdrop-blur-sm border-0 text-white font-medium px-3 py-1.5 rounded-full transition-all duration-200 text-sm`}
+                                ? 'bg-[#9DC183] hover:bg-[#8AB372]'
+                                : 'bg-white hover:bg-gray-100'
+                            } border-0 font-bold px-1.5 py-0.5 rounded-full transition-all duration-200 text-xs ${
+                              playedCourses.has(course.id) ? 'text-white' : 'text-gray-800'
+                            }`}
                           >
-                            <Target className="h-4 w-4 mr-1.5" />
+                            <Target className="h-3 w-3 mr-1" />
                             {playedCourses.has(course.id) ? 'Played' : 'Add to Played'}
                           </Button>
                         )}
