@@ -477,14 +477,6 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
         </div>
       )}
 
-      {/* Progress Indicator */}
-      {courses.length > 0 && (
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
-          <div className="bg-black/50 rounded-full px-4 py-2 text-white text-sm">
-            {currentIndex + 1} / {courses.length}
-          </div>
-        </div>
-      )}
 
     </div>
   );
