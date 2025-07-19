@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { X, ChevronUp, ChevronDown, MapPin, Earth } from 'lucide-react';
+import { CiCircleList } from 'react-icons/ci';
+import { MdFitScreen } from 'react-icons/md';
 import { useSwipeable } from 'react-swipeable';
 import { useIsMobile } from '@/hooks/use-mobile';
 import CountryFlag from '@/components/ui/country-flag';
@@ -227,30 +229,20 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
             <h1 className="text-lg font-semibold">Great Britain & Ireland Top 100</h1>
           </div>
           
-          {/* View Toggle */}
+          {/* Single View Toggle Icon */}
           <div className="flex items-center gap-4">
-            <div className="flex bg-white/20 backdrop-blur-sm rounded-full p-0.5">
-              <button
-                onClick={() => toggleViewMode('fullscreen')}
-                className={`px-2 py-1 text-xs font-medium rounded-full transition-all ${
-                  viewMode === 'fullscreen'
-                    ? 'bg-white text-black'
-                    : 'text-white hover:bg-white/20'
-                }`}
-              >
-                Full Screen View
-              </button>
-              <button
-                onClick={() => toggleViewMode('list')}
-                className={`px-2 py-1 text-xs font-medium rounded-full transition-all ${
-                  viewMode === 'list'
-                    ? 'bg-white text-black'
-                    : 'text-white hover:bg-white/20'
-                }`}
-              >
-                List View
-              </button>
-            </div>
+            <button
+              onClick={() => toggleViewMode(viewMode === 'fullscreen' ? 'list' : 'fullscreen')}
+              className="text-white hover:text-gray-300 transition-colors p-2"
+              aria-label={viewMode === 'fullscreen' ? 'Switch to List View' : 'Switch to Full Screen View'}
+              title={viewMode === 'fullscreen' ? 'Switch to List View' : 'Switch to Full Screen View'}
+            >
+              {viewMode === 'fullscreen' ? (
+                <CiCircleList className="h-6 w-6" />
+              ) : (
+                <MdFitScreen className="h-6 w-6" />
+              )}
+            </button>
             
             <button
               onClick={onClose}
