@@ -49,6 +49,19 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     }));
   }, []);
 
+  // Create stable memoized callbacks for each video
+  const memoizedMuteCallbacks = React.useMemo(() => {
+    const callbacks: { [key: string]: (isMuted: boolean) => void } = {};
+    posts.forEach((post) => {
+      const mediaItems = post.media && post.media.length > 0 ? post.media : [{ id: `${post.id}-single` }];
+      mediaItems.forEach((_, mediaIndex) => {
+        const videoId = `${post.id}-${mediaIndex}`;
+        callbacks[videoId] = (isMuted: boolean) => handleVideoMuteChange(videoId, isMuted);
+      });
+    });
+    return callbacks;
+  }, [posts, handleVideoMuteChange]);
+
   // Handle video mute toggle
   const handleVideoMuteToggle = useCallback((videoId: string) => {
     toggleVideoMute(videoId);
@@ -430,7 +443,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                     id={`${item.id}-${currentMediaIndex}`}
                     src={currentMedia.media_url}
                     className="w-full h-full"
-                    onMuteStateChange={(isMuted) => handleVideoMuteChange(`${item.id}-${currentMediaIndex}`, isMuted)}
+                    onMuteStateChange={memoizedMuteCallbacks[`${item.id}-${currentMediaIndex}`]}
                   />
                 ) : (
                   <div className="relative w-full h-full bg-black">
