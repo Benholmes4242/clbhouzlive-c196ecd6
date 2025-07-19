@@ -293,43 +293,40 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = memo(({
     };
   }, [onPlay, onPause, src]); // Add src dependency to prevent restart loops
 
-  // Update video muted state when global audio state changes - NO RESTART
+  // Handle global mute changes via event listener instead of useEffect to prevent re-renders
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
     
-    console.log('🔍 DEBUG: Global mute state changed in video player:', {
-      isGloballyMuted,
-      videoSrc: src.slice(-20),
-      videoPaused: video.paused,
-      videoMuted: video.muted,
-      currentTime: video.currentTime,
-      readyState: video.readyState
-    });
-    
-    // ONLY change mute property - never restart or change playback
-    const wasPlaying = !video.paused;
-    const currentTime = video.currentTime;
-    
-    // CRITICAL: Only change muted property, nothing else
-    if (video.muted !== isGloballyMuted) {
-      video.muted = isGloballyMuted;
-      console.log('🔊 EnhancedVideoPlayer: Mute state updated', { 
-        muted: isGloballyMuted, 
-        currentTime,
-        playing: !video.paused,
-        src: src.slice(-20)
+    // Listen for custom mute events instead of using context in useEffect
+    const handleGlobalMuteChange = (event: CustomEvent) => {
+      console.log('🔍 DEBUG: Received global mute event:', {
+        isGloballyMuted: event.detail.muted,
+        videoSrc: src.slice(-20),
+        videoPaused: video.paused,
+        videoMuted: video.muted,
+        currentTime: video.currentTime
       });
-    }
+      
+      // ONLY change mute property - never restart or change playback
+      if (video.muted !== event.detail.muted) {
+        video.muted = event.detail.muted;
+        console.log('🔊 EnhancedVideoPlayer: Mute state updated via event', { 
+          muted: event.detail.muted, 
+          currentTime: video.currentTime,
+          playing: !video.paused,
+          src: src.slice(-20)
+        });
+      }
+    };
     
-    // DO NOT restart video or change playback state
-    console.log('🔍 DEBUG: Video state after mute change:', {
-      paused: video.paused,
-      muted: video.muted,
-      currentTime: video.currentTime,
-      wasPlaying
-    });
-  }, [isGloballyMuted, src]);
+    // Listen for global mute changes
+    window.addEventListener('globalMuteChanged', handleGlobalMuteChange as EventListener);
+    
+    return () => {
+      window.removeEventListener('globalMuteChanged', handleGlobalMuteChange as EventListener);
+    };
+  }, [src]); // Only depend on src, not global mute state
 
   // Cleanup HLS on unmount
   useEffect(() => {

@@ -41,12 +41,23 @@ export const GlobalAudioProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const setGlobalMute = useCallback((muted: boolean) => {
     console.log('🔊 Global mute state changed to:', muted ? 'MUTED' : 'UNMUTED');
     setIsGloballyMuted(muted);
+    
+    // Dispatch custom event to prevent React re-render loops
+    window.dispatchEvent(new CustomEvent('globalMuteChanged', {
+      detail: { muted }
+    }));
   }, []);
 
   const toggleGlobalMute = useCallback(() => {
     setIsGloballyMuted(prev => {
       const newState = !prev;
       console.log('🔄 Toggling global mute from', prev ? 'MUTED' : 'UNMUTED', 'to', newState ? 'MUTED' : 'UNMUTED');
+      
+      // Dispatch custom event for the new state
+      window.dispatchEvent(new CustomEvent('globalMuteChanged', {
+        detail: { muted: newState }
+      }));
+      
       return newState;
     });
   }, []);
