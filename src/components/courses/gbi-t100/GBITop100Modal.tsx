@@ -111,7 +111,7 @@ const GBITop100Modal: React.FC<GBITop100ModalProps> = ({ open, onOpenChange }) =
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-none w-full h-full p-0 bg-black">
+      <DialogContent className="max-w-none w-screen h-screen p-0 bg-black border-0 rounded-none m-0" style={{ width: '100vw', height: '100vh' }}>
         <div className="relative w-full h-full flex">
           {/* Header */}
           <div className="absolute top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-sm">
