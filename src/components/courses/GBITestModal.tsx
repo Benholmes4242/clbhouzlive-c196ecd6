@@ -180,10 +180,10 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
             {/* Course Information - matching CourseCard layout exactly */}
             <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
               <div>
-                <h2 className="text-3xl md:text-4xl font-bold mb-3 leading-tight">
+                <h2 className="text-3xl md:text-4xl font-bold mb-2 leading-tight">
                   {currentCourse.name}
                 </h2>
-                <div className="flex items-center gap-2 text-lg opacity-90 mb-4">
+                <div className="flex items-center gap-2 text-lg opacity-90">
                   <MapPin className="h-5 w-5 flex-shrink-0" />
                   <span>
                     {currentCourse.country}
