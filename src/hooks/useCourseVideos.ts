@@ -17,8 +17,6 @@ export const useCourseVideos = (courseId: string | undefined, enabled: boolean =
     queryFn: async (): Promise<CourseVideo[]> => {
       if (!courseId) return [];
 
-      console.log('🔍 useCourseVideos: Starting query for courseId:', courseId);
-
       // First, get the taggable entity ID for this course
       const { data: taggableEntity, error: entityError } = await supabase
         .from('taggable_entities')
@@ -27,10 +25,7 @@ export const useCourseVideos = (courseId: string | undefined, enabled: boolean =
         .eq('entity_id', courseId)
         .single();
 
-      console.log('🏷️ useCourseVideos: Taggable entity result:', { taggableEntity, entityError });
-
       if (entityError || !taggableEntity) {
-        console.log('❌ useCourseVideos: No taggable entity found');
         return [];
       }
 
@@ -40,15 +35,11 @@ export const useCourseVideos = (courseId: string | undefined, enabled: boolean =
         .select('post_id')
         .eq('tagged_entity_id', taggableEntity.id);
 
-      console.log('📝 useCourseVideos: Tagged posts result:', { taggedPosts, tagError, entityId: taggableEntity.id });
-
       if (tagError || !taggedPosts || taggedPosts.length === 0) {
-        console.log('❌ useCourseVideos: No tagged posts found');
         return [];
       }
 
       const postIds = taggedPosts.map(tag => tag.post_id);
-      console.log('🆔 useCourseVideos: Post IDs:', postIds);
 
       // Then find video media for those posts with user information
       const { data: videos, error } = await supabase
