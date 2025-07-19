@@ -365,6 +365,51 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                 </button>
               )}
 
+              {/* Jump Index - Vertical on Right Side for Both Desktop and Mobile */}
+              {courses.length > 0 && (
+                <div className="absolute top-1/2 right-4 transform -translate-y-1/2 flex flex-col gap-2">
+                  {[1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map((jumpPoint) => {
+                    // Only show jump points that exist in our dataset
+                    if (jumpPoint > courses.length) return null;
+                    
+                    const jumpIndex = jumpPoint - 1; // Convert to 0-based index
+                    const currentRanking = currentIndex + 1; // Convert to 1-based ranking
+                    
+                    // Determine which jump point should show the dot
+                    const activeJumpPoint = (() => {
+                      if (currentRanking <= 9) return 1;
+                      if (currentRanking <= 19) return 10;
+                      if (currentRanking <= 29) return 20;
+                      if (currentRanking <= 39) return 30;
+                      if (currentRanking <= 49) return 40;
+                      if (currentRanking <= 59) return 50;
+                      if (currentRanking <= 69) return 60;
+                      if (currentRanking <= 79) return 70;
+                      if (currentRanking <= 89) return 80;
+                      if (currentRanking <= 99) return 90;
+                      return 100;
+                    })();
+                    
+                    const showDot = jumpPoint === activeJumpPoint;
+
+                    return (
+                      <div key={jumpPoint} className="flex items-center justify-center">
+                        <button
+                          onClick={() => jumpToIndex(jumpIndex)}
+                          className={`text-sm transition-colors ${
+                            showDot 
+                              ? 'text-white font-bold' 
+                              : 'text-white/60 font-normal hover:text-white/80'
+                          }`}
+                          aria-label={`Jump to course ${jumpPoint}`}
+                        >
+                          {jumpPoint}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
 
               {/* Video Overlay - Only show in fullscreen mode if video exists */}
               {latestVideo && (
