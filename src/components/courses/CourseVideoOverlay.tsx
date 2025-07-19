@@ -88,7 +88,7 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
             autoplay={true}
             muted={isMuted}
             loop={true}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
             enableHLS={true}
             onPlay={() => setIsPlaying(true)}
             onPause={() => setIsPlaying(false)}
