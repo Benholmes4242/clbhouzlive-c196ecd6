@@ -1,5 +1,6 @@
 import React from 'react';
 import { MapPin, Star } from 'lucide-react';
+import { getOptimizedImageUrl, getResponsiveImageSizes } from '@/utils/imageOptimization';
 
 interface Course {
   id: string;
@@ -28,8 +29,12 @@ const GBICarouselSlide: React.FC<GBICarouselSlideProps> = ({ course, isActive })
 
   const communityRank = getCommunityRank(course.regional_rank);
 
+  // Get responsive image sizes based on screen size
+  const responsiveSize = getResponsiveImageSizes();
+  
   // Get the primary image or use a placeholder
-  const courseImage = course.images?.[0] || `https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=1200&h=800&fit=crop&q=80`;
+  const baseImage = course.images?.[0] || `https://images.unsplash.com/photo-1535131749006-b7f58c99034b`;
+  const courseImage = getOptimizedImageUrl(baseImage, responsiveSize.width, responsiveSize.height, 85, 'webp');
 
   return (
     <div className="relative w-full h-full">
