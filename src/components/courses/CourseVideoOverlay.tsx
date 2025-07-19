@@ -146,7 +146,7 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
                   e.stopPropagation();
                   goToPrevVideo();
                 }}
-                className="absolute left-2 top-1/2 transform -translate-y-1/2 z-30 p-2 bg-black/50 rounded-full text-white hover:bg-black/70 transition-all duration-300 opacity-0 group-hover:opacity-100"
+                className="absolute left-2 top-1/2 transform -translate-y-1/2 z-30 p-1 rounded-full text-white hover:bg-white hover:text-black transition-all duration-300 opacity-0 group-hover:opacity-100"
                 aria-label="Previous video"
               >
                 <ChevronLeft className={`${isMobile ? 'h-5 w-5' : 'h-6 w-6'}`} />
@@ -158,7 +158,7 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
                   e.stopPropagation();
                   goToNextVideo();
                 }}
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 z-30 p-2 bg-black/50 rounded-full text-white hover:bg-black/70 transition-all duration-300 opacity-0 group-hover:opacity-100"
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 z-30 p-1 rounded-full text-white hover:bg-white hover:text-black transition-all duration-300 opacity-0 group-hover:opacity-100"
                 aria-label="Next video"
               >
                 <ChevronRight className={`${isMobile ? 'h-5 w-5' : 'h-6 w-6'}`} />
