@@ -81,7 +81,7 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
         onMouseLeave={() => setIsHovered(false)}
         onClick={handleOverlayClick}
       >
-        <div className="relative w-full h-full rounded-lg overflow-hidden shadow-2xl bg-black">
+        <div className="relative w-full h-full rounded-lg bg-black shadow-2xl overflow-hidden">
           <EnhancedVideoPlayer
             ref={videoRef}
             src={videoUrl}
