@@ -93,7 +93,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
         onClick={handleCardClick}
       >
         <div className="relative">
-          <div className="aspect-video bg-muted overflow-hidden">
+          <div className="aspect-[4/5] bg-muted overflow-hidden">
             {course.thumbnail_image ? (
               <img
                 src={course.thumbnail_image}
