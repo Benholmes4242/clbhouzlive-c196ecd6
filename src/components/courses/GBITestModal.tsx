@@ -247,7 +247,7 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                   })();
 
                   return (
-                    <div key={jumpPoint} className="flex flex-col items-center">
+                    <div key={jumpPoint} className="flex items-center">
                       <button
                         onClick={() => jumpToIndex(jumpIndex)}
                         className="px-2 py-1 text-sm font-medium text-white hover:text-gray-300 transition-colors"
@@ -256,7 +256,7 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                         {jumpPoint}
                       </button>
                       {isInRange && (
-                        <div className="w-1 h-1 bg-white rounded-full mt-1"></div>
+                        <div className="w-1 h-1 bg-white rounded-full ml-1"></div>
                       )}
                     </div>
                   );
