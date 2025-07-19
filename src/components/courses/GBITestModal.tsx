@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { X, ChevronUp, ChevronDown, MapPin, Earth } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
 import { useIsMobile } from '@/hooks/use-mobile';
+import CountryFlag from '@/components/ui/country-flag';
 import CourseRankBadges from './CourseRankBadges';
 
 interface GBITestModalProps {
@@ -204,7 +205,7 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                   )}
                   {currentCourse.regional_rank && currentCourse.regional_rank <= 100 && (
                     <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white/90 backdrop-blur-sm rounded-full">
-                      <span className="text-sm font-bold text-gray-800">GB</span>
+                      <CountryFlag country="Britain & Ireland" size="sm" />
                       <span className="text-sm font-bold text-gray-800">#{currentCourse.regional_rank}</span>
                     </div>
                   )}
