@@ -367,19 +367,18 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                     const showDot = jumpPoint === activeJumpPoint;
 
                     return (
-                      <div key={jumpPoint} className="flex items-center justify-between w-8">
+                      <div key={jumpPoint} className="flex items-center justify-center">
                         <button
                           onClick={() => jumpToIndex(jumpIndex)}
-                          className="text-sm font-medium text-white hover:text-gray-300 transition-colors"
+                          className={`text-sm transition-colors ${
+                            showDot 
+                              ? 'text-white font-bold' 
+                              : 'text-white/60 font-normal hover:text-white/80'
+                          }`}
                           aria-label={`Jump to course ${jumpPoint}`}
                         >
                           {jumpPoint}
                         </button>
-                        <div className="w-1 h-1 flex items-center justify-center">
-                          {showDot && (
-                            <div className="w-1 h-1 bg-white rounded-full"></div>
-                          )}
-                        </div>
                       </div>
                     );
                   })}
