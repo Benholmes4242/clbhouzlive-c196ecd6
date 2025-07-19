@@ -217,7 +217,7 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <div 
-      className="fixed top-0 left-0 w-full h-full z-[9999] bg-black overflow-hidden"
+      className="fixed top-0 left-0 w-full h-full z-[9999] bg-white overflow-hidden"
       style={{ margin: 0, padding: 0, touchAction: 'none' }}
       onClick={(e) => {
         e.stopPropagation();
@@ -254,9 +254,9 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
       {...swipeHandlers}
     >
       {/* Header */}
-      <div className="absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/80 to-transparent">
+      <div className="absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-white/90 to-transparent">
         <div className="flex items-center justify-between p-4">
-          <div className="text-white">
+          <div className="text-black">
             <h1 className="text-lg opacity-90">Great Britain & Ireland Top 100</h1>
           </div>
           
@@ -264,7 +264,7 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
           <div className="flex items-center gap-4">
             <button
               onClick={() => toggleViewMode(viewMode === 'fullscreen' ? 'list' : 'fullscreen')}
-              className="text-white hover:text-gray-300 transition-colors p-2"
+              className="text-black hover:text-gray-600 transition-colors p-2"
               aria-label={viewMode === 'fullscreen' ? 'Switch to List View' : 'Switch to Full Screen View'}
               title={viewMode === 'fullscreen' ? 'Switch to List View' : 'Switch to Full Screen View'}
             >
@@ -277,7 +277,7 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
             
             <button
               onClick={onClose}
-              className="text-white hover:text-gray-300 transition-colors p-2"
+              className="text-black hover:text-gray-600 transition-colors p-2"
               aria-label="Close modal"
             >
               <X className="h-6 w-6" />
@@ -290,8 +290,8 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
       {viewMode === 'fullscreen' ? (
         <div className="relative w-full h-full flex items-center justify-center">
           {isLoading ? (
-            <div className="text-white text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+            <div className="text-black text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black mx-auto mb-4"></div>
               <p>Loading GB & I Top 100 courses...</p>
             </div>
           ) : currentCourse ? (
@@ -423,7 +423,7 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
               )}
             </div>
           ) : (
-            <div className="text-white text-center">
+            <div className="text-black text-center">
               <p className="text-lg">No courses found</p>
             </div>
           )}
@@ -432,8 +432,8 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
         /* List View */
         <div className="pt-20 pb-4 h-full overflow-y-auto" ref={listRef}>
           {isLoading ? (
-            <div className="text-white text-center p-8">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+            <div className="text-black text-center p-8">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black mx-auto mb-4"></div>
               <p>Loading GB & I Top 100 courses...</p>
             </div>
           ) : courses.length > 0 ? (
@@ -514,7 +514,7 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
               ))}
             </div>
           ) : (
-            <div className="text-white text-center p-8">
+            <div className="text-black text-center p-8">
               <p className="text-lg">No courses found</p>
             </div>
           )}
