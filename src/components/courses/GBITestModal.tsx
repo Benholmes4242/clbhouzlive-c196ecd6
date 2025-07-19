@@ -504,7 +504,7 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                             }`}
                           >
                             <Target className="h-5 w-5 mr-1" />
-                            {playedCourses.has(course.id) ? 'Played' : 'Add to Played'}
+                            <span className="translate-y-[3px]">{playedCourses.has(course.id) ? 'Played' : 'Add to Played'}</span>
                           </Button>
                         )}
                       </div>
