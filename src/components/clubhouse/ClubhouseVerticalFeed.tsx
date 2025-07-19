@@ -63,7 +63,7 @@ const VideoWithAutoplay: React.FC<{
   }, [addVideo, removeVideo]);
 
   const attemptVideoPlay = useCallback(async () => {
-    if (!videoRef.current || hasAttemptedPlay) return;
+    if (!videoRef.current) return;
     
     const video = videoRef.current;
     
@@ -86,6 +86,7 @@ const VideoWithAutoplay: React.FC<{
       setHasAttemptedPlay(true);
     } catch (error) {
       console.log('❌ VideoWithAutoplay: Video autoplay failed:', error);
+      setHasAttemptedPlay(true); // Mark as attempted even if failed
       
       // On mobile, try again after a brief delay
       if (isMobile) {
@@ -96,7 +97,28 @@ const VideoWithAutoplay: React.FC<{
         }, 100);
       }
     }
-  }, [videoRef.current, hasAttemptedPlay, isMobile, src, setActiveVideo, isGloballyMuted, isInView]);
+  }, [videoRef.current, isMobile, src, setActiveVideo, isGloballyMuted, isInView, hasAttemptedPlay]);
+
+  // Handle click to play for autoplay policy
+  const handleVideoClick = useCallback(async () => {
+    if (!videoRef.current) return;
+    
+    const video = videoRef.current;
+    
+    try {
+      setActiveVideo(video);
+      
+      if (video.paused) {
+        await video.play();
+        console.log('👆 VideoWithAutoplay: User clicked to play:', src.slice(-20));
+      } else {
+        video.pause();
+        console.log('👆 VideoWithAutoplay: User clicked to pause:', src.slice(-20));
+      }
+    } catch (error) {
+      console.log('❌ VideoWithAutoplay: User click play failed:', error);
+    }
+  }, [src, setActiveVideo]);
 
   // Handle autoplay when video comes into view (works for both scroll directions)
   useEffect(() => {
@@ -106,8 +128,8 @@ const VideoWithAutoplay: React.FC<{
       hasAttemptedPlay
     });
     
-    if (isInView) {
-      // Auto-play when video comes into view (regardless of previous attempts)
+    if (isInView && !hasAttemptedPlay) {
+      // Auto-play when video comes into view only if we haven't tried before
       setTimeout(attemptVideoPlay, 100);
     } else if (!isInView && videoRef.current) {
       // Pause video and reset play state when it goes out of view
@@ -140,6 +162,7 @@ const VideoWithAutoplay: React.FC<{
         loop={true}
         className="w-full h-full"
         enableHLS={true}
+        onClick={handleVideoClick}
       />
     </div>
   );
