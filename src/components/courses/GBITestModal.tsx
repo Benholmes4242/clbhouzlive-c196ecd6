@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { X, ChevronUp, ChevronDown, MapPin } from 'lucide-react';
+import { X, ChevronUp, ChevronDown, MapPin, Earth } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
 import { useIsMobile } from '@/hooks/use-mobile';
 import CourseRankBadges from './CourseRankBadges';
@@ -194,15 +194,20 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                   </span>
                 </div>
                 
-                {/* Ranking Badges */}
-                <div>
-                  <CourseRankBadges
-                    globalRank={currentCourse.global_rank}
-                    regionalRank={currentCourse.regional_rank}
-                    usaRank={null}
-                    country={currentCourse.country}
-                    viewContext="regional"
-                  />
+                {/* Ranking Badges - Inline version */}
+                <div className="flex gap-2">
+                  {currentCourse.global_rank && currentCourse.global_rank <= 100 && (
+                    <div className="flex items-center gap-1.5 px-2 py-1 bg-white/90 backdrop-blur-sm rounded-xl shadow-sm">
+                      <Earth className="h-4 w-4 text-gray-600" />
+                      <span className="text-sm font-bold text-gray-800">{currentCourse.global_rank}</span>
+                    </div>
+                  )}
+                  {currentCourse.regional_rank && currentCourse.regional_rank <= 100 && (
+                    <div className="flex items-center gap-1.5 px-2 py-1 bg-white/90 backdrop-blur-sm rounded-xl shadow-sm">
+                      <span className="text-sm font-bold text-blue-600">🏴󠁧󠁢󠁥󠁮󠁧󠁿</span>
+                      <span className="text-sm font-bold text-gray-800">{currentCourse.regional_rank}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
