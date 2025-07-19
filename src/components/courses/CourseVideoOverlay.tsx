@@ -65,18 +65,21 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
   };
 
   return (
-    <div className="fixed bottom-6 left-6 right-6 z-20">
+    <div className={isMobile ? "fixed bottom-6 left-6 right-6 z-20" : "fixed bottom-6 right-6 z-20"}>
       {/* Latest Post Label - Above Video */}
-      <div className="mb-3">
-        <p className={`text-white font-bold ${isMobile ? 'text-2xl' : 'text-base'}`}>
+      <div className={isMobile ? "mb-3" : "mb-2"}>
+        <p className={`text-white font-bold ${isMobile ? 'text-2xl' : 'text-sm'}`}>
           Latest Post from {courseName}
         </p>
       </div>
 
       {/* Video Container */}
       <div
-        className="relative w-full cursor-pointer group"
-        style={{ height: isMobile ? '200px' : '250px' }}
+        className="relative cursor-pointer group"
+        style={{ 
+          width: isMobile ? '100%' : '200px',
+          height: isMobile ? '200px' : '300px'
+        }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         onClick={handleOverlayClick}
