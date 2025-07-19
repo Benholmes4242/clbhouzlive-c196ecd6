@@ -105,11 +105,13 @@ export const useMediaCard = ({ item, onLike, onMediaClick, autoplayManager, vide
   // Mouse enter/leave handlers for hover state
   const handleCardMouseEnter = () => {
     setIsHovered(true);
+    // Don't restart video on hover - keep playing if already playing
     handleMouseEnter();
   };
 
   const handleCardMouseLeave = () => {
     setIsHovered(false);
+    // Don't stop video on mouse leave - let it continue playing
     handleMouseLeave();
   };
 

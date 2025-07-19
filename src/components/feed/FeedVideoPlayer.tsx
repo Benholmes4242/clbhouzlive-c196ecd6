@@ -1,4 +1,5 @@
 import React, { useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
+import { useSingleAudioManager } from '@/contexts/SingleAudioManager';
 
 interface FeedVideoPlayerProps {
   src: string;
@@ -27,6 +28,8 @@ const FeedVideoPlayer = forwardRef<HTMLVideoElement, FeedVideoPlayerProps>(({
 }, ref) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<any>(null);
+  const { setActiveVideo, clearActiveVideo } = useSingleAudioManager();
+  const videoId = useRef(`feed-video-${Math.random().toString(36).substr(2, 9)}`).current;
 
   // Expose the video element to parent via ref
   useImperativeHandle(ref, () => videoRef.current!, []);
@@ -94,6 +97,41 @@ const FeedVideoPlayer = forwardRef<HTMLVideoElement, FeedVideoPlayerProps>(({
       }
     };
   }, [src]);
+
+  // Handle audio management when video plays
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handlePlay = () => {
+      if (!video.muted) {
+        setActiveVideo(videoId, video);
+      }
+    };
+
+    const handlePause = () => {
+      clearActiveVideo(videoId);
+    };
+
+    const handleVolumeChange = () => {
+      if (!video.muted) {
+        setActiveVideo(videoId, video);
+      } else {
+        clearActiveVideo(videoId);
+      }
+    };
+
+    video.addEventListener('play', handlePlay);
+    video.addEventListener('pause', handlePause);
+    video.addEventListener('volumechange', handleVolumeChange);
+
+    return () => {
+      video.removeEventListener('play', handlePlay);
+      video.removeEventListener('pause', handlePause);
+      video.removeEventListener('volumechange', handleVolumeChange);
+      clearActiveVideo(videoId);
+    };
+  }, [videoId, setActiveVideo, clearActiveVideo]);
 
   return (
     <video

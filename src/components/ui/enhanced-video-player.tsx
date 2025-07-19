@@ -2,6 +2,8 @@ import React, { useRef, useEffect, useState, memo } from 'react';
 import { Play, Pause, Volume2, VolumeX, Maximize, Loader2 } from 'lucide-react';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
+import { useIsMobile } from '@/hooks/useIsMobile';
+import { useSingleAudioManager } from '@/contexts/SingleAudioManager';
 
 interface EnhancedVideoPlayerProps {
   src: string;
@@ -44,6 +46,12 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
   const hlsRef = useRef<any>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const { isGloballyMuted } = useGlobalAudio();
+  const isMobile = useIsMobile();
+  const { setActiveVideo, clearActiveVideo, isActiveVideo } = useSingleAudioManager();
+  
+  // Create unique video ID and position preservation
+  const videoId = useRef(`video-${Math.random().toString(36).substr(2, 9)}`).current;
+  const preservedTimeRef = useRef<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showControls, setShowControls] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -52,7 +60,6 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
 
   // Mobile detection and lazy loading
   const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
-  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
   
   // Intersection observer for mobile lazy loading
   const { ref: videoContainerRef, isInView } = useIntersectionObserver({
@@ -209,31 +216,43 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
       // Don't show loading spinner for every buffer event
       // Only show for initial load
     };
-    const handleCanPlay = () => {
-      console.log('🟢 EnhancedVideoPlayer: Video can play', { src, timestamp: Date.now(), autoplay, readyState: video.readyState });
-      if (loadingTimeoutRef.current) {
-        clearTimeout(loadingTimeoutRef.current);
-      }
+    const handleCanPlay = async () => {
+      console.log('🟢 EnhancedVideoPlayer: Video can play', {
+        src,
+        timestamp: Date.now(),
+        autoplay,
+        readyState: video.readyState
+      });
+
+      clearTimeout(loadingTimeoutRef.current);
       setIsLoading(false);
-      
-      // Attempt autoplay if requested - be more aggressive for mobile
+      setError(null);
+
+      // Restore preserved time if available
+      if (preservedTimeRef.current !== null && video.duration > 0) {
+        video.currentTime = Math.min(preservedTimeRef.current, video.duration);
+        preservedTimeRef.current = null;
+        console.log('🕐 Restored video time to:', video.currentTime);
+      }
+
       if (autoplay) {
-        console.log('🚀 EnhancedVideoPlayer: Starting autoplay', { src, readyState: video.readyState });
-        
-        // Ensure proper mobile settings
-        video.muted = isGloballyMuted;
-        video.playsInline = true;
-        
-        video.play().catch((error) => {
-          console.error('❌ EnhancedVideoPlayer: Autoplay failed', error);
-          
-          // On mobile, try again with a small delay
-          if (isMobile) {
-            setTimeout(() => {
-              video.play().catch(() => console.log('❌ Mobile autoplay retry failed'));
-            }, 200);
-          }
+        console.log('🚀 EnhancedVideoPlayer: Starting autoplay', {
+          src,
+          readyState: video.readyState
         });
+
+        try {
+          await video.play();
+          console.log('✅ Autoplay successful');
+          
+          // Special handling for mobile
+          if (isMobile) {
+            console.log('✅ Mobile autoplay successful');
+          }
+        } catch (error) {
+          console.log('❌ Autoplay prevented:', error);
+          setIsPlaying(false);
+        }
       }
     };
     const handleWaiting = () => {
@@ -288,20 +307,38 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
     if (!video) return;
     
     console.log('🔊 EnhancedVideoPlayer: Updating mute state to', isGloballyMuted ? 'MUTED' : 'UNMUTED');
-    video.muted = isGloballyMuted;
-  }, [isGloballyMuted]);
+    
+    // If globally muted, mute this video and clear it as active
+    if (isGloballyMuted) {
+      video.muted = true;
+      clearActiveVideo(videoId);
+    } else {
+      // If globally unmuted, only unmute if this is the active video
+      if (isActiveVideo(videoId)) {
+        video.muted = false;
+      }
+    }
+  }, [isGloballyMuted, videoId, clearActiveVideo, isActiveVideo]);
 
-  // Cleanup HLS on unmount
+  // Cleanup HLS on unmount and preserve video position
   useEffect(() => {
     return () => {
+      // Preserve current time before cleanup
+      const video = videoRef.current;
+      if (video && !video.paused && video.currentTime > 0) {
+        preservedTimeRef.current = video.currentTime;
+        console.log('💾 Preserving video time:', video.currentTime);
+      }
+      
       if (hlsRef.current) {
+        console.log('🧹 Cleaning up HLS instance');
         hlsRef.current.destroy();
+        hlsRef.current = null;
       }
-      if (loadingTimeoutRef.current) {
-        clearTimeout(loadingTimeoutRef.current);
-      }
+      
+      clearActiveVideo(videoId);
     };
-  }, []);
+  }, [videoId, clearActiveVideo]);
 
   const togglePlayPause = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -317,11 +354,35 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
 
   const toggleMute = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const video = videoRef.current;
-    if (!video) return;
-
-    video.muted = !video.muted;
-    // Mute state is now managed by global audio context
+    
+    if (videoRef.current) {
+      const video = videoRef.current;
+      const shouldUnmute = video.muted;
+      
+      if (shouldUnmute) {
+        // When unmuting, this becomes the active audio video
+        setActiveVideo(videoId, video);
+        
+        // For mobile, ensure user interaction requirements are met
+        if (isMobile) {
+          video.muted = false;
+          video.play().catch(error => {
+            console.warn('Mobile autoplay with sound failed:', error);
+            // Fallback to muted if unmuted play fails
+            video.muted = true;
+            video.play().catch(console.error);
+          });
+        } else {
+          video.muted = false;
+        }
+      } else {
+        // When muting, clear this as active video
+        clearActiveVideo(videoId);
+        video.muted = true;
+      }
+      
+      console.log('🔊 Video mute toggled to:', video.muted ? 'MUTED' : 'UNMUTED', 'mobile:', isMobile);
+    }
   };
 
   const handleFullscreen = (e: React.MouseEvent) => {
@@ -337,6 +398,9 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
   const handleVideoClick = (e: React.MouseEvent) => {
     if (onClick) {
       onClick();
+    } else if (isMobile && videoRef.current?.muted) {
+      // On mobile, clicking should unmute and play
+      toggleMute(e);
     } else {
       togglePlayPause(e);
     }
