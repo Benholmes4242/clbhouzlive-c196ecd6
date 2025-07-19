@@ -98,7 +98,7 @@ const VideoWithAutoplay: React.FC<{
     }
   }, [videoRef.current, hasAttemptedPlay, isMobile, src, setActiveVideo, isGloballyMuted, isInView]);
 
-  // Handle initial autoplay attempt when video comes into view
+  // Handle autoplay when video comes into view (works for both scroll directions)
   useEffect(() => {
     console.log('📱 VideoWithAutoplay: View state changed:', {
       src: src.slice(-20),
@@ -106,15 +106,19 @@ const VideoWithAutoplay: React.FC<{
       hasAttemptedPlay
     });
     
-    if (isInView && !hasAttemptedPlay) {
-      // Small delay to ensure video is ready
+    if (isInView) {
+      // Auto-play when video comes into view (regardless of previous attempts)
       setTimeout(attemptVideoPlay, 100);
-    } else if (!isInView && videoRef.current && !videoRef.current.paused) {
-      // Pause video when it goes out of view
-      console.log('📱 VideoWithAutoplay: Video went out of view, pausing:', src.slice(-20));
-      videoRef.current.pause();
+    } else if (!isInView && videoRef.current) {
+      // Pause video and reset play state when it goes out of view
+      if (!videoRef.current.paused) {
+        console.log('📱 VideoWithAutoplay: Video went out of view, pausing:', src.slice(-20));
+        videoRef.current.pause();
+      }
+      // Reset play attempt state so video can auto-play again when scrolling back
+      setHasAttemptedPlay(false);
     }
-  }, [isInView, attemptVideoPlay, hasAttemptedPlay, src]);
+  }, [isInView, attemptVideoPlay, src]);
 
   // Update video mute state when global mute changes
   useEffect(() => {
