@@ -25,16 +25,18 @@ export const useVideoAutoplay = (options: UseVideoAutoplayOptions = {}) => {
     rootMargin
   });
 
-  // Update autoplay state based on visibility only (removed hover requirement for desktop)
+  // Update autoplay state based on visibility only, but don't change it once set to true
   useEffect(() => {
     if (!enabled) {
       setShouldAutoplay(false);
       return;
     }
 
-    // Both mobile and desktop: autoplay when scrolled into view
-    setShouldAutoplay(isInView);
-  }, [enabled, isInView]);
+    // Only set to true when in view, don't toggle back to false to prevent restarts
+    if (isInView && !shouldAutoplay) {
+      setShouldAutoplay(true);
+    }
+  }, [enabled, isInView, shouldAutoplay]);
 
   const handleMouseEnter = () => {
     if (!isMobile) {

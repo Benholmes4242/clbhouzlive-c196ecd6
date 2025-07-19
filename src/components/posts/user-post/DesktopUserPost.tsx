@@ -46,7 +46,7 @@ export const DesktopUserPost: React.FC<DesktopUserPostProps> = ({
   return (
     <>
       <Card ref={autoplayRef} className="border-0 shadow-sm">
-        <div className="p-4" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+        <div className="p-4">
           <UserPostHeader
             displayName={displayName}
             timeAgo={timeAgo}
