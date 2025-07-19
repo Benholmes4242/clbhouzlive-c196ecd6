@@ -247,20 +247,18 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                   })();
 
                   return (
-                    <button
-                      key={jumpPoint}
-                      onClick={() => jumpToIndex(jumpIndex)}
-                      className={`
-                        px-2 py-1 text-sm font-medium rounded transition-colors
-                        ${isInRange 
-                          ? 'bg-white text-black' 
-                          : 'text-white hover:text-gray-300 hover:bg-white/20'
-                        }
-                      `}
-                      aria-label={`Jump to course ${jumpPoint}`}
-                    >
-                      {jumpPoint}
-                    </button>
+                    <div key={jumpPoint} className="flex flex-col items-center">
+                      <button
+                        onClick={() => jumpToIndex(jumpIndex)}
+                        className="px-2 py-1 text-sm font-medium text-white hover:text-gray-300 transition-colors"
+                        aria-label={`Jump to course ${jumpPoint}`}
+                      >
+                        {jumpPoint}
+                      </button>
+                      {isInRange && (
+                        <div className="w-1 h-1 bg-white rounded-full mt-1"></div>
+                      )}
+                    </div>
                   );
                 })}
               </div>
