@@ -202,7 +202,6 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                     usaRank={null}
                     country={currentCourse.country}
                     viewContext="regional"
-                    positioning="top-left"
                   />
                 </div>
               </div>
