@@ -254,7 +254,7 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
       {...swipeHandlers}
     >
       {/* Header */}
-      <div className="absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/80 to-transparent">
+      <div className="absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/50 to-transparent">
         <div className="flex items-center justify-between p-4">
           <div className="text-white">
             <h1 className="text-lg font-semibold text-white">Great Britain & Ireland Top 100</h1>
