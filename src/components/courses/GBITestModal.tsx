@@ -14,6 +14,7 @@ import CourseVideoOverlay from './CourseVideoOverlay';
 import AddToPlayedModal from './AddToPlayedModal';
 import { useCourseVideos } from '@/hooks/useCourseVideos';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface GBITestModalProps {
   isOpen: boolean;
@@ -44,13 +45,13 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
   const { user } = useSupabaseSession();
   const navigate = useNavigate();
 
-  // Fetch GB & I Top 100 courses
+  // Fetch GB & I Top 100 courses with optimized caching
   const { data: courses = [], isLoading } = useQuery({
     queryKey: ['gbi-top-100-test'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('golf_courses')
-        .select('*')
+        .select('id, name, country, region, sub_country, thumbnail_image, regional_rank, global_rank, description')
         .eq('country', 'Britain & Ireland')
         .not('regional_rank', 'is', null)
         .lte('regional_rank', 100)
@@ -60,9 +61,11 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
       return data || [];
     },
     enabled: isOpen,
+    staleTime: 5 * 60 * 1000, // 5 minutes - courses don't change frequently
+    gcTime: 30 * 60 * 1000, // 30 minutes garbage collection
   });
 
-  // Query to get user's played courses
+  // Query to get user's played courses with better caching
   const { data: userPlayedCourses = [] } = useQuery({
     queryKey: ['userTop100CoursesGBI', user?.id],
     queryFn: async () => {
@@ -78,6 +81,8 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
       return data || [];
     },
     enabled: isOpen && !!user?.id,
+    staleTime: 2 * 60 * 1000, // 2 minutes - user data changes less frequently
+    gcTime: 10 * 60 * 1000, // 10 minutes garbage collection
   });
 
   // Update played courses set when data changes
@@ -222,6 +227,9 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
 
   if (!isOpen) return null;
 
+  // Show immediate skeleton UI instead of blank loading screen
+  const showSkeletonLoading = isLoading || courses.length === 0;
+
   // Transform video data for the carousel
   const videos = courseVideos.map(video => ({
     videoUrl: video.media_url,
@@ -303,10 +311,31 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
       {/* Main Content */}
       {viewMode === 'fullscreen' ? (
         <div className="relative w-full h-full flex items-center justify-center">
-          {isLoading ? (
-            <div className="text-black text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black mx-auto mb-4"></div>
-              <p>Loading GB & I Top 100 courses...</p>
+          {showSkeletonLoading ? (
+            /* Skeleton Loading - Shows immediately */
+            <div className="relative w-full h-full">
+              <Skeleton className="absolute inset-0 w-full h-full" />
+              
+              {/* Skeleton Course Info */}
+              <div className={`absolute left-0 right-0 p-6 ${
+                isMobile ? 'top-1/2 -translate-y-1/2' : 'bottom-16'
+              }`}>
+                <Skeleton className="h-8 w-3/4 mb-3" />
+                <Skeleton className="h-5 w-1/2 mb-3" />
+                <div className="flex gap-2">
+                  <Skeleton className="h-7 w-12 rounded-full" />
+                  <Skeleton className="h-7 w-12 rounded-full" />
+                </div>
+              </div>
+              
+              {/* Skeleton Jump Points */}
+              {!isMobile && (
+                <div className="absolute top-1/2 right-4 transform -translate-y-1/2 flex flex-col gap-2">
+                  {[1,2,3,4,5,6,7,8,9,10,11].map((i) => (
+                    <Skeleton key={i} className="h-5 w-8" />
+                  ))}
+                </div>
+              )}
             </div>
           ) : currentCourse ? (
             <div className="relative w-full h-full">
