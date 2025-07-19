@@ -17,7 +17,7 @@ export const MediaNavigationDots: React.FC<MediaNavigationDotsProps> = ({
         <span
           key={index}
           className={`text-white text-sm transition-all ${
-            index === currentIndex ? 'font-bold' : 'font-normal opacity-60'
+            index === currentIndex ? 'font-bold text-white' : 'font-normal text-white/60'
           }`}
         >
           {index + 1}
