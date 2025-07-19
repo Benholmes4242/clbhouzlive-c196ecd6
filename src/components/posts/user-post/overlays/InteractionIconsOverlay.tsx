@@ -28,6 +28,18 @@ export const InteractionIconsOverlay: React.FC<InteractionIconsOverlayProps> = (
     console.log('🔊 Mute button clicked - only toggling global state');
   };
 
+  const handleInteractionClick = (e: React.MouseEvent, type: string) => {
+    e.stopPropagation();
+    e.preventDefault();
+    e.nativeEvent?.stopImmediatePropagation?.();
+    
+    // Block any video interaction - just handle the overlay action
+    console.log(`💫 ${type} button clicked - blocking video interaction`);
+    
+    // Call the original handler but ensure no video restart
+    onInteractionClick(e, type);
+  };
+
   return (
     <div className="absolute bottom-4 right-4 z-20">
       <div className="flex flex-col items-center gap-6 text-white text-lg opacity-90">
@@ -37,6 +49,8 @@ export const InteractionIconsOverlay: React.FC<InteractionIconsOverlayProps> = (
             className="cursor-pointer hover:opacity-100 transition-opacity"
             onClick={handleMuteToggle}
             title={isGloballyMuted ? "Unmute all videos" : "Mute all videos"}
+            onTouchStart={(e) => e.stopPropagation()}
+            onTouchEnd={(e) => e.stopPropagation()}
           >
             {isGloballyMuted ? (
               <VolumeX className="w-8 h-8" />
@@ -48,19 +62,25 @@ export const InteractionIconsOverlay: React.FC<InteractionIconsOverlayProps> = (
         
         <button 
           className="cursor-pointer hover:opacity-100 transition-opacity"
-          onClick={(e) => onInteractionClick(e, 'like')}
+          onClick={(e) => handleInteractionClick(e, 'like')}
+          onTouchStart={(e) => e.stopPropagation()}
+          onTouchEnd={(e) => e.stopPropagation()}
         >
           <Heart className="w-8 h-8" />
         </button>
         <button 
           className="cursor-pointer hover:opacity-100 transition-opacity"
-          onClick={(e) => onInteractionClick(e, 'comment')}
+          onClick={(e) => handleInteractionClick(e, 'comment')}
+          onTouchStart={(e) => e.stopPropagation()}
+          onTouchEnd={(e) => e.stopPropagation()}
         >
           <MessageCircle className="w-8 h-8" />
         </button>
         <button 
           className="cursor-pointer hover:opacity-100 transition-opacity"
-          onClick={(e) => onInteractionClick(e, 'share')}
+          onClick={(e) => handleInteractionClick(e, 'share')}
+          onTouchStart={(e) => e.stopPropagation()}
+          onTouchEnd={(e) => e.stopPropagation()}
         >
           <Share className="w-8 h-8" />
         </button>
