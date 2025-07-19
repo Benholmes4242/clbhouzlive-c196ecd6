@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { X, ChevronUp, ChevronDown } from 'lucide-react';
+import { X, ChevronUp, ChevronDown, MapPin } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
 import { useIsMobile } from '@/hooks/use-mobile';
+import CourseRankBadges from './CourseRankBadges';
 
 interface GBITestModalProps {
   isOpen: boolean;
@@ -17,6 +18,7 @@ interface Course {
   region?: string;
   thumbnail_image?: string;
   regional_rank?: number;
+  global_rank?: number;
   description?: string;
 }
 
@@ -175,35 +177,34 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40" />
             </div>
 
-            {/* Course Information */}
+            {/* Course Information - matching CourseCard layout exactly */}
             <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
               <div className="max-w-4xl mx-auto">
-                <h2 className="text-3xl md:text-4xl font-bold mb-2">
+                <h2 className="text-3xl md:text-4xl font-bold mb-3 leading-tight">
                   {currentCourse.name}
                 </h2>
-                <p className="text-lg opacity-90 mb-4">
-                  {currentCourse.region ? `${currentCourse.region}, ` : ''}
-                  {currentCourse.country}
-                </p>
-                
-                {/* Ranking Badges */}
-                <div className="flex gap-3">
-                  {/* World Rank - if available, we'll show it as #3 for now as placeholder */}
-                  <div className="flex items-center bg-white/20 backdrop-blur-sm rounded-full px-3 py-1">
-                    <span className="text-white text-sm font-semibold">
-                      #{currentCourse.regional_rank}
-                    </span>
-                  </div>
-                  
-                  {/* Regional Rank */}
-                  <div className="flex items-center bg-green-600 rounded-full px-3 py-1">
-                    <span className="text-white text-sm font-semibold">
-                      #{currentCourse.regional_rank}
-                    </span>
-                  </div>
+                <div className="flex items-center gap-2 text-lg opacity-90 mb-4">
+                  <MapPin className="h-5 w-5 flex-shrink-0" />
+                  <span>
+                    {currentCourse.country}
+                    {currentCourse.region && currentCourse.region !== currentCourse.country 
+                      ? `, ${currentCourse.region}` 
+                      : ''
+                    }
+                  </span>
                 </div>
               </div>
             </div>
+
+            {/* Ranking Badges - using CourseRankBadges component positioned bottom-left */}
+            <CourseRankBadges
+              globalRank={currentCourse.global_rank}
+              regionalRank={currentCourse.regional_rank}
+              usaRank={null}
+              country={currentCourse.country}
+              viewContext="regional"
+              positioning="bottom-left"
+            />
 
             {/* Navigation Arrows */}
             {!isMobile && (
