@@ -60,8 +60,15 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = memo(({
     rootMargin: isMobile ? '0px' : '100px' // No margin for mobile
   });
 
-  // Mobile lazy loading logic
+  // Mobile lazy loading logic - STABLE VERSION
   useEffect(() => {
+    console.log('🔍 DEBUG: shouldLoadVideo effect triggered:', {
+      isMobile, 
+      isInView, 
+      shouldLoadVideo,
+      src: src.slice(-20)
+    });
+    
     if (isMobile) {
       // On mobile, only load when actually in view
       if (isInView && !shouldLoadVideo) {
@@ -69,10 +76,13 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = memo(({
         setShouldLoadVideo(true);
       }
     } else {
-      // On desktop, load immediately
-      setShouldLoadVideo(true);
+      // On desktop, load immediately but only once
+      if (!shouldLoadVideo) {
+        console.log('🖥️ Desktop: Loading video immediately', { src: src.slice(-20) });
+        setShouldLoadVideo(true);
+      }
     }
-  }, [isInView, isMobile, shouldLoadVideo, src]);
+  }, [isInView, isMobile]); // REMOVED shouldLoadVideo and src from dependencies
 
   // Load HLS.js if needed - only when shouldLoadVideo is true and NEVER on mute changes
   useEffect(() => {
