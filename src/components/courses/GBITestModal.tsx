@@ -256,7 +256,7 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                         {jumpPoint}
                       </button>
                       {isInRange && (
-                        <div className="w-1 h-1 bg-white rounded-full ml-1"></div>
+                        <div className="w-1 h-1 bg-white rounded-full ml-0.5"></div>
                       )}
                     </div>
                   );
