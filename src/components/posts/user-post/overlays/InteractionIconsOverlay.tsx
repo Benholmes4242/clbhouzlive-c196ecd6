@@ -22,6 +22,8 @@ export const InteractionIconsOverlay: React.FC<InteractionIconsOverlayProps> = (
     if (!isGloballyMuted) {
       muteAllVideos();
     }
+    // When unmuting, don't automatically unmute all videos
+    // Let individual videos handle their own audio when they become active
   };
 
   return (

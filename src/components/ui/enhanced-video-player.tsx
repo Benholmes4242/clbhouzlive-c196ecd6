@@ -287,8 +287,13 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
     const video = videoRef.current;
     if (!video) return;
     
-    console.log('🔊 EnhancedVideoPlayer: Updating mute state to', isGloballyMuted ? 'MUTED' : 'UNMUTED');
-    video.muted = isGloballyMuted;
+    // When globally muted, always mute this video
+    if (isGloballyMuted) {
+      console.log('🔊 EnhancedVideoPlayer: Updating mute state to MUTED');
+      video.muted = true;
+    }
+    // When globally unmuted, stay muted unless this video is specifically playing
+    // Individual videos will handle their own unmuting when they become active
   }, [isGloballyMuted]);
 
   // Cleanup HLS on unmount

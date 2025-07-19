@@ -23,6 +23,8 @@ const FeedMuteToggle: React.FC<FeedMuteToggleProps> = ({ isVideoPost = false }) 
     if (!isGloballyMuted) {
       muteAllVideos();
     }
+    // When unmuting, don't automatically unmute all videos
+    // Let individual videos handle their own audio when they become active
   };
 
   return (
