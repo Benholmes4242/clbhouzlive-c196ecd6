@@ -1,3 +1,4 @@
+// ClubhouseVerticalFeed - Audio functionality completely removed for Clubhouse page
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { MessageCircle, MapPin, UserPlus, UserCheck, Loader2 } from 'lucide-react';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
