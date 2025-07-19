@@ -40,11 +40,17 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   const [mediaIndices, setMediaIndices] = useState<{[key: string]: number}>({});
   const queryClient = useQueryClient();
 
-  // Audio control state - always starts muted
+  // Audio control state - always starts muted, then checks session preference
   const [isGloballyMuted, setIsGloballyMuted] = useState(() => {
-    // Always start muted, but check session storage for preference
-    const savedPreference = sessionStorage.getItem('clubhouse-audio-preference');
-    return savedPreference !== 'unmuted';
+    // Always default to muted for safety
+    try {
+      const savedPreference = sessionStorage.getItem('clubhouse-audio-preference');
+      // Only unmute if explicitly saved as 'unmuted'
+      return savedPreference !== 'unmuted';
+    } catch (error) {
+      // If sessionStorage fails, default to muted
+      return true;
+    }
   });
 
   // Check if current user follows the displayed user
@@ -300,7 +306,11 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     setIsGloballyMuted(newMutedState);
     
     // Persist preference in session storage
-    sessionStorage.setItem('clubhouse-audio-preference', newMutedState ? 'muted' : 'unmuted');
+    try {
+      sessionStorage.setItem('clubhouse-audio-preference', newMutedState ? 'muted' : 'unmuted');
+    } catch (error) {
+      console.warn('Failed to save audio preference:', error);
+    }
   }, [isGloballyMuted]);
 
   if (posts.length === 0) {
