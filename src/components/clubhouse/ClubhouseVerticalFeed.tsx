@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { MessageCircle, Volume2, VolumeX, MapPin, UserPlus, UserCheck, Loader2 } from 'lucide-react';
+import { MessageCircle, MapPin, UserPlus, UserCheck, Loader2 } from 'lucide-react';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
 import { RiShareForward2Fill } from 'react-icons/ri';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -9,7 +9,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
-import { useVideoManagerContext } from '@/contexts/VideoManagerContext';
+
 import ManagedVideoPlayer from './ManagedVideoPlayer';
 import PostComments from './PostComments';
 
@@ -32,40 +32,12 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
 }) => {
   const { user } = useSupabaseSession();
   const isMobile = useIsMobile();
-  const { toggleVideoMute, getVideoMuteState } = useVideoManagerContext();
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollViewRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<{ [key: number]: HTMLDivElement }>({});
   const [isTextExpanded, setIsTextExpanded] = useState(false);
   const [mediaIndices, setMediaIndices] = useState<{[key: string]: number}>({});
-  const [videoMuteStates, setVideoMuteStates] = useState<{[key: string]: boolean}>({});
   const queryClient = useQueryClient();
-
-  // Handle video mute state changes
-  const handleVideoMuteChange = useCallback((videoId: string, isMuted: boolean) => {
-    setVideoMuteStates(prev => ({
-      ...prev,
-      [videoId]: isMuted
-    }));
-  }, []);
-
-  // Create stable memoized callbacks for each video
-  const memoizedMuteCallbacks = React.useMemo(() => {
-    const callbacks: { [key: string]: (isMuted: boolean) => void } = {};
-    posts.forEach((post) => {
-      const mediaItems = post.media && post.media.length > 0 ? post.media : [{ id: `${post.id}-single` }];
-      mediaItems.forEach((_, mediaIndex) => {
-        const videoId = `${post.id}-${mediaIndex}`;
-        callbacks[videoId] = (isMuted: boolean) => handleVideoMuteChange(videoId, isMuted);
-      });
-    });
-    return callbacks;
-  }, [posts, handleVideoMuteChange]);
-
-  // Handle video mute toggle
-  const handleVideoMuteToggle = useCallback((videoId: string) => {
-    toggleVideoMute(videoId);
-  }, [toggleVideoMute]);
 
   // Check if current user follows the displayed user
   const { data: isFollowing, isLoading: isFollowingLoading } = useQuery({
@@ -443,7 +415,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                     id={`${item.id}-${currentMediaIndex}`}
                     src={currentMedia.media_url}
                     className="w-full h-full"
-                    onMuteStateChange={memoizedMuteCallbacks[`${item.id}-${currentMediaIndex}`]}
+                    disableAudio={true}
                   />
                 ) : (
                   <div className="relative w-full h-full bg-black">
@@ -515,19 +487,6 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
 
               {/* Action Buttons - Bottom Right */}
               <div className="absolute bottom-10 right-4 z-10 flex flex-col space-y-6">
-                {/* Mute/Unmute toggle button - only show for video posts */}
-                {currentMedia.media_type === 'video' && (
-                  <button 
-                    className="cursor-pointer hover:opacity-100 transition-opacity"
-                    onClick={() => handleVideoMuteToggle(`${item.id}-${currentMediaIndex}`)}
-                  >
-                    {videoMuteStates[`${item.id}-${currentMediaIndex}`] !== false ? (
-                      <VolumeX className="w-8 h-8 text-white" />
-                    ) : (
-                      <Volume2 className="w-8 h-8 text-white" />
-                    )}
-                  </button>
-                )}
 
                 {/* Heart Button with Like Count */}
                 <div className="flex flex-col items-center">

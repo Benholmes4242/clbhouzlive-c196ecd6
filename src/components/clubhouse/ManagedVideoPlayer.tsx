@@ -7,7 +7,7 @@ interface ManagedVideoPlayerProps {
   id: string;
   src: string;
   className?: string;
-  onMuteStateChange?: (isMuted: boolean) => void;
+  disableAudio?: boolean; // New prop to disable audio functionality
 }
 
 /**
@@ -18,11 +18,12 @@ const ManagedVideoPlayer: React.FC<ManagedVideoPlayerProps> = ({
   id,
   src,
   className = '',
-  onMuteStateChange
+  disableAudio = false
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const playerRef = useRef<HTMLVideoElement>(null);
-  const { handleVideoInView, registerVideo, unregisterVideo, getVideoMuteState } = useVideoManagerContext();
+  const { handleVideoInView, registerVideo, unregisterVideo } = disableAudio ? 
+    { handleVideoInView: () => {}, registerVideo: () => {}, unregisterVideo: () => {} } : 
+    useVideoManagerContext();
   
   // Use intersection observer to detect when video is in viewport
   const { ref: containerRef, isInView } = useIntersectionObserver({
@@ -32,6 +33,8 @@ const ManagedVideoPlayer: React.FC<ManagedVideoPlayerProps> = ({
 
   // Handle video element being ready
   const handleVideoLoaded = useCallback(() => {
+    if (disableAudio) return; // Skip video manager when audio is disabled
+    
     // Find the video element within the EnhancedVideoPlayer
     const container = containerRef.current;
     if (container) {
@@ -41,51 +44,46 @@ const ManagedVideoPlayer: React.FC<ManagedVideoPlayerProps> = ({
         registerVideo(id, videoElement);
       }
     }
-  }, [id, registerVideo, containerRef]);
+  }, [id, registerVideo, containerRef, disableAudio]);
 
   // Handle viewport changes
   useEffect(() => {
-    if (videoRef.current) {
+    if (!disableAudio && videoRef.current) {
       handleVideoInView(id, isInView);
     }
-  }, [id, isInView, handleVideoInView]);
+  }, [id, isInView, handleVideoInView, disableAudio]);
 
   // Check for video element periodically until found
   useEffect(() => {
-    if (!videoRef.current) {
-      const checkForVideo = () => {
-        const container = containerRef.current;
-        if (container) {
-          const videoElement = container.querySelector('video') as HTMLVideoElement;
-          if (videoElement) {
-            videoRef.current = videoElement;
-            registerVideo(id, videoElement);
-            return;
-          }
+    if (disableAudio || videoRef.current) return; // Skip when audio disabled or video already found
+    
+    const checkForVideo = () => {
+      const container = containerRef.current;
+      if (container) {
+        const videoElement = container.querySelector('video') as HTMLVideoElement;
+        if (videoElement) {
+          videoRef.current = videoElement;
+          registerVideo(id, videoElement);
+          return;
         }
-        // Try again after a short delay
-        setTimeout(checkForVideo, 100);
-      };
-      
-      const timeout = setTimeout(checkForVideo, 100);
-      return () => clearTimeout(timeout);
-    }
-  }, [id, registerVideo, containerRef]);
+      }
+      // Try again after a short delay
+      setTimeout(checkForVideo, 100);
+    };
+    
+    const timeout = setTimeout(checkForVideo, 100);
+    return () => clearTimeout(timeout);
+  }, [id, registerVideo, containerRef, disableAudio]);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
-      unregisterVideo(id);
+      if (!disableAudio) {
+        unregisterVideo(id);
+      }
     };
-  }, [id, unregisterVideo]);
+  }, [id, unregisterVideo, disableAudio]);
 
-  // Notify parent of mute state changes
-  useEffect(() => {
-    if (onMuteStateChange) {
-      const isMuted = getVideoMuteState(id);
-      onMuteStateChange(isMuted);
-    }
-  }, [id, onMuteStateChange]);
 
   return (
     <div ref={containerRef} className={`relative w-full h-full ${className}`}>
