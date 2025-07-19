@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Search, MapPin } from 'lucide-react';
 import CourseCard from './CourseCard';
 import { Skeleton } from '@/components/ui/skeleton';
+import GBIButton from './gbi-t100/GBIButton';
 
 const CourseExplorer = () => {
   const [selectedRegion, setSelectedRegion] = useState<string>('all');
@@ -112,8 +113,8 @@ const CourseExplorer = () => {
         />
       </div>
 
-      {/* Region Selection */}
-      <div className="flex justify-start">
+      {/* Region Selection and GB&I Button */}
+      <div className="flex justify-between items-center">
         <Select value={selectedRegion} onValueChange={setSelectedRegion}>
           <SelectTrigger className="w-[200px] focus:ring-[#b66b41] focus:border-[#b66b41]">
             <SelectValue />
@@ -130,6 +131,9 @@ const CourseExplorer = () => {
             ))}
           </SelectContent>
         </Select>
+
+        {/* GB&I T100 Button */}
+        <GBIButton />
       </div>
 
       {/* Course Grid */}
