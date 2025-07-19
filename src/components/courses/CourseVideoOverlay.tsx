@@ -28,6 +28,11 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
   const currentVideo = videos[currentVideoIndex];
   const hasMultipleVideos = videos.length > 1;
 
+  // Debug logging
+  console.log('Current video index:', currentVideoIndex);
+  console.log('Current video:', currentVideo);
+  console.log('All videos:', videos);
+
   const handleOverlayClick = () => {
     if (onOpenFullVideo) {
       onOpenFullVideo(currentVideoIndex);
@@ -92,6 +97,7 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
       >
         <div className="relative w-full h-full rounded-xl bg-black shadow-2xl overflow-hidden">
           <EnhancedVideoPlayer
+            key={`video-${currentVideoIndex}-${currentVideo?.videoUrl}`}
             ref={videoRef}
             src={currentVideo?.videoUrl}
             autoplay={true}
