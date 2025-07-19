@@ -16,6 +16,7 @@ interface Course {
   name: string;
   country: string;
   region?: string;
+  sub_country?: string;
   thumbnail_image?: string;
   regional_rank?: number;
   global_rank?: number;
@@ -185,11 +186,11 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                 </h2>
                 <div className="text-lg opacity-90">
                   <span>
-                    {currentCourse.country}
-                    {currentCourse.region && currentCourse.region !== currentCourse.country 
-                      ? `, ${currentCourse.region}` 
-                      : ''
-                    }
+                    {[
+                      currentCourse.country,
+                      currentCourse.sub_country,
+                      currentCourse.region
+                    ].filter(Boolean).join(', ')}
                   </span>
                 </div>
               </div>
