@@ -497,7 +497,7 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                             onClick={(e) => handleAddToPlayed(course, e)}
                             className={`${
                               playedCourses.has(course.id)
-                                ? 'bg-[#9DC183] hover:bg-[#8AB372]'
+                                ? 'bg-[#1A2421] hover:bg-[#0F1410]'
                                 : 'bg-white hover:bg-gray-100'
                             } border-0 font-bold px-1.5 py-0.5 rounded-full transition-all duration-200 text-sm h-auto ${
                               playedCourses.has(course.id) ? 'text-white' : 'text-gray-800'
