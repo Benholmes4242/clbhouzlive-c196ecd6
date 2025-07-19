@@ -167,7 +167,16 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
     isOpen && viewMode === 'fullscreen' && !!currentCourse
   );
 
-  const latestVideo = courseVideos.length > 0 ? courseVideos[0] : null;
+  // Mock video for Royal County Down for demonstration
+  const mockVideo = currentCourse?.name?.toLowerCase().includes('royal county down') ? {
+    id: 'mock-video-1',
+    media_url: 'https://customer-4ah4gni80ytefpck.cloudflarestream.com/a767a8247b6545e5a4134a23f9b058e4/manifest/video.m3u8',
+    media_type: 'video',
+    created_at: new Date().toISOString(),
+    post_id: 'mock-post-1'
+  } : null;
+
+  const latestVideo = mockVideo || (courseVideos.length > 0 ? courseVideos[0] : null);
 
   return (
     <div 
