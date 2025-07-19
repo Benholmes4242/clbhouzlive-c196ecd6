@@ -215,26 +215,22 @@ const PostPlayRatingModal = ({
 
       // Upload media files if any
       if (mediaFiles.length > 0) {
+        const { uploadToCloudflareR2 } = await import('@/utils/cloudflareUpload');
         const uploadPromises = mediaFiles.map(async (file) => {
-          const fileExt = file.name.split('.').pop();
-          const fileName = `${userResponse.user.id}/${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+          const fileName = `${userResponse.user.id}-${Date.now()}-${Math.random().toString(36).substring(2)}-${file.name}`;
           
-          const { error: uploadError } = await supabase.storage
-            .from('course-review-media')
-            .upload(fileName, file);
-
-          if (uploadError) throw uploadError;
-
-          const { data: urlData } = supabase.storage
-            .from('course-review-media')
-            .getPublicUrl(fileName);
+          const uploadResult = await uploadToCloudflareR2(file, 'course-review-media', fileName);
+          
+          if (!uploadResult.success) {
+            throw new Error(uploadResult.error || `Failed to upload ${file.name}`);
+          }
 
           // Save media record to database
           const { error: mediaError } = await supabase
             .from('course_review_media')
             .insert({
               review_id: ratingId,
-              media_url: urlData.publicUrl,
+              media_url: uploadResult.publicUrl,
               media_type: file.type.startsWith('video/') ? 'video' : 'image',
               file_name: file.name,
               file_size: file.size
