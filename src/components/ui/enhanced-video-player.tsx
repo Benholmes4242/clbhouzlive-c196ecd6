@@ -49,6 +49,7 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
   const [error, setError] = useState<string | null>(null);
   const [buffered, setBuffered] = useState(0);
   const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [userHasInteracted, setUserHasInteracted] = useState(false);
 
   // Mobile detection and lazy loading
   const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
@@ -59,6 +60,27 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
     threshold: isMobile ? 0.8 : 0.3, // Higher threshold for mobile
     rootMargin: isMobile ? '0px' : '100px' // No margin for mobile
   });
+
+  // Track user interaction for autoplay
+  useEffect(() => {
+    const handleUserInteraction = () => {
+      setUserHasInteracted(true);
+      // Remove listeners once user has interacted
+      document.removeEventListener('touchstart', handleUserInteraction);
+      document.removeEventListener('click', handleUserInteraction);
+      document.removeEventListener('keydown', handleUserInteraction);
+    };
+
+    document.addEventListener('touchstart', handleUserInteraction, { passive: true });
+    document.addEventListener('click', handleUserInteraction);
+    document.addEventListener('keydown', handleUserInteraction);
+
+    return () => {
+      document.removeEventListener('touchstart', handleUserInteraction);
+      document.removeEventListener('click', handleUserInteraction);
+      document.removeEventListener('keydown', handleUserInteraction);
+    };
+  }, []);
 
   // Mobile lazy loading logic
   useEffect(() => {
@@ -216,9 +238,9 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
       }
       setIsLoading(false);
       
-      // Attempt autoplay if requested - be more aggressive for mobile
-      if (autoplay) {
-        console.log('🚀 EnhancedVideoPlayer: Starting autoplay', { src, readyState: video.readyState });
+      // Attempt autoplay if requested and user has interacted with page
+      if (autoplay && (userHasInteracted || !isMobile)) {
+        console.log('🚀 EnhancedVideoPlayer: Starting autoplay', { src, readyState: video.readyState, userHasInteracted });
         
         // Ensure proper mobile settings
         video.muted = isGloballyMuted;
@@ -226,14 +248,9 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
         
         video.play().catch((error) => {
           console.error('❌ EnhancedVideoPlayer: Autoplay failed', error);
-          
-          // On mobile, try again with a small delay
-          if (isMobile) {
-            setTimeout(() => {
-              video.play().catch(() => console.log('❌ Mobile autoplay retry failed'));
-            }, 200);
-          }
         });
+      } else if (autoplay && !userHasInteracted && isMobile) {
+        console.log('⏳ EnhancedVideoPlayer: Waiting for user interaction before autoplay', { src });
       }
     };
     const handleWaiting = () => {
@@ -280,7 +297,19 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
       video.removeEventListener('progress', handleProgress);
       video.removeEventListener('volumechange', handleVolumeChange);
     };
-  }, [onPlay, onPause]);
+  }, [onPlay, onPause, userHasInteracted]);
+
+  // Retry autoplay when user interacts
+  useEffect(() => {
+    if (userHasInteracted && autoplay && isMobile) {
+      const video = videoRef.current;
+      if (video && video.paused && !isPlaying) {
+        console.log('🚀 EnhancedVideoPlayer: User interacted, starting delayed autoplay');
+        video.muted = isGloballyMuted;
+        video.play().catch(console.error);
+      }
+    }
+  }, [userHasInteracted, autoplay, isMobile, isPlaying, isGloballyMuted]);
 
   // Update video muted state when global audio state changes
   useEffect(() => {
