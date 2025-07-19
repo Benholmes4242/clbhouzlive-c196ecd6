@@ -237,16 +237,6 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
     timestamp: video.post_created_at
   }));
 
-  // Debug: Log video data to help troubleshoot
-  console.log('🎥 Course Videos Data:', { 
-    courseVideosCount: courseVideos.length,
-    rawCourseVideos: courseVideos,
-    transformedVideosCount: videos.length,
-    transformedVideos: videos,
-    currentCourseId: currentCourse?.id,
-    currentCourseName: currentCourse?.name
-  });
-
   return (
     <div 
       className="fixed top-0 left-0 w-full h-full z-[9999] bg-white overflow-hidden"
