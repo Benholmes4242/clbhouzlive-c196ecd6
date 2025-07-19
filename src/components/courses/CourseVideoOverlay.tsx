@@ -76,7 +76,7 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
       {/* Video Container */}
       <div
         className="relative w-full cursor-pointer group"
-        style={{ height: isMobile ? '240px' : '300px' }}
+        style={{ height: isMobile ? '200px' : '250px' }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         onClick={handleOverlayClick}
