@@ -317,19 +317,15 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40" />
               </div>
 
-              {/* Course Information - Beautiful mobile design */}
+              {/* Course Information - matching CourseCard layout exactly */}
               <div className={`absolute left-0 right-0 p-6 text-white ${
                 isMobile ? 'bottom-4' : 'bottom-16'
               }`}>
                 <div>
-                  <h2 className={`font-bold mb-3 leading-tight ${
-                    isMobile ? 'text-2xl' : 'text-3xl md:text-4xl'
-                  }`}>
+                  <h2 className="text-3xl md:text-4xl font-bold mb-2 leading-tight">
                     {currentCourse.name}
                   </h2>
-                  <div className={`opacity-90 mb-4 ${
-                    isMobile ? 'text-base' : 'text-lg'
-                  }`}>
+                  <div className="text-lg opacity-90 mb-2">
                     <span>
                       {[
                         currentCourse.country,
@@ -339,47 +335,21 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                     </span>
                   </div>
                   
-                  {/* Ranking Badges */}
-                  <div className="flex gap-2 mb-4">
+                  {/* Ranking Badges - Inline version */}
+                  <div className="flex gap-2">
                     {currentCourse.regional_rank && currentCourse.regional_rank <= 100 && (
-                      <div className="flex items-center justify-center gap-1 px-2 py-1 bg-white rounded-full">
+                      <div className="flex items-center justify-center gap-1 px-1.5 py-0.5 bg-white rounded-full">
                         <CountryFlag country="Britain & Ireland" size="lg" />
                         <span className="text-sm font-bold text-gray-800 leading-none flex items-center translate-y-[3px]">#{currentCourse.regional_rank}</span>
                       </div>
                     )}
                     {currentCourse.global_rank && currentCourse.global_rank <= 100 && (
-                      <div className="flex items-center justify-center gap-1 px-2 py-1 bg-white rounded-full">
-                        <Earth className="h-4 w-4 text-gray-600" />
+                      <div className="flex items-center justify-center gap-1 px-1.5 py-0.5 bg-white rounded-full">
+                        <Earth className="h-5 w-5 text-gray-600" />
                         <span className="text-sm font-bold text-gray-800 leading-none flex items-center translate-y-[3px]">#{currentCourse.global_rank}</span>
                       </div>
                     )}
                   </div>
-
-                  {/* Latest Post Section - Only on mobile */}
-                  {isMobile && latestVideo && (
-                    <div className="bg-black/40 backdrop-blur-sm rounded-lg p-4 border border-white/20">
-                      <h3 className="text-lg font-semibold mb-3">
-                        Latest Post from {currentCourse.name}
-                      </h3>
-                      <div 
-                        className="relative w-24 h-16 rounded-lg overflow-hidden cursor-pointer bg-gray-800"
-                        onClick={() => {
-                          console.log('Open full video for post:', latestVideo.post_id);
-                        }}
-                      >
-                        {/* Video thumbnail placeholder - could be enhanced with actual video thumbnail in the future */}
-                        <div className="w-full h-full bg-gradient-to-br from-green-900 to-green-700 flex items-center justify-center">
-                          <span className="text-white text-xl">⛳</span>
-                        </div>
-                        {/* Play button overlay */}
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="w-6 h-6 bg-white/80 rounded-full flex items-center justify-center">
-                            <div className="w-0 h-0 border-l-[6px] border-l-black border-t-[3px] border-t-transparent border-b-[3px] border-b-transparent ml-1"></div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
 
