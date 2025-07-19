@@ -32,6 +32,14 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
   const prevVideoData = videos[(currentVideoIndex - 1 + videos.length) % videos.length];
   const hasMultipleVideos = videos.length > 1;
 
+  // Debug current state
+  console.log('🎬 CourseVideoOverlay State:', {
+    currentVideoIndex,
+    videosLength: videos.length,
+    currentVideoUrl: currentVideo?.videoUrl,
+    allVideoUrls: videos.map(v => v.videoUrl)
+  });
+
   const handleOverlayClick = () => {
     if (onOpenFullVideo) {
       onOpenFullVideo(currentVideoIndex);
