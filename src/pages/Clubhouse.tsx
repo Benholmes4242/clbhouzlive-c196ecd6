@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Search } from 'lucide-react';
 import BottomNavigation from '@/components/BottomNavigation';
 import ClubhouseVerticalFeed from '@/components/clubhouse/ClubhouseVerticalFeed';
 import { useInfiniteFollowedPosts } from '@/hooks/useInfiniteFollowedPosts';
 import { VideoManagerProvider } from '@/contexts/VideoManagerContext';
 
-const Clubhouse = () => {
+const Clubhouse = React.memo(() => {
   const {
     posts,
     isLoading,
@@ -17,18 +17,18 @@ const Clubhouse = () => {
   const [headerVisible, setHeaderVisible] = useState(true);
   const [activeTab, setActiveTab] = useState('Following');
 
-  const handleLike = (contentId: string) => {
+  const handleLike = useCallback((contentId: string) => {
     // Handle like functionality
     console.log('Liked post:', contentId);
-  };
+  }, []);
 
-  const handleScroll = (scrollDirection: 'up' | 'down') => {
+  const handleScroll = useCallback((scrollDirection: 'up' | 'down') => {
     if (scrollDirection === 'up') {
       setHeaderVisible(false);
     } else if (scrollDirection === 'down') {
       setHeaderVisible(true);
     }
-  };
+  }, []);
 
   const menuItems = [
     { label: 'Following', active: activeTab === 'Following' },
@@ -118,6 +118,6 @@ const Clubhouse = () => {
       </div>
     </VideoManagerProvider>
   );
-};
+});
 
 export default Clubhouse;

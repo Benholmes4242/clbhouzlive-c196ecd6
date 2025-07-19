@@ -40,20 +40,19 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   const [mediaIndices, setMediaIndices] = useState<{[key: string]: number}>({});
   const queryClient = useQueryClient();
 
-  // Audio control state - always starts muted, then checks session preference
+  // Audio control state - initialize once to prevent flicker
   const [isGloballyMuted, setIsGloballyMuted] = useState(() => {
-    // Always default to muted for safety
     try {
       const savedPreference = sessionStorage.getItem('clubhouse-audio-preference');
-      // Only unmute if explicitly saved as 'unmuted'
+      console.log('🔊 Restored audio state from session:', savedPreference === 'unmuted' ? 'UNMUTED' : 'MUTED');
       return savedPreference !== 'unmuted';
     } catch (error) {
-      // If sessionStorage fails, default to muted
+      console.log('🔊 Using default audio state: MUTED');
       return true;
     }
   });
 
-  // Check if current user follows the displayed user
+  // Check if current user follows the displayed user - memoized to prevent re-renders
   const { data: isFollowing, isLoading: isFollowingLoading } = useQuery({
     queryKey: ['user-follows', user?.id, posts[currentIndex]?.user?.id],
     queryFn: async () => {
@@ -75,16 +74,18 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
       
       return !!data;
     },
-    enabled: !!user?.id && !!posts[currentIndex]?.user?.id && user.id !== posts[currentIndex]?.user?.id
+    enabled: !!user?.id && !!posts[currentIndex]?.user?.id && user.id !== posts[currentIndex]?.user?.id,
+    staleTime: 5 * 60 * 1000, // Cache for 5 minutes to reduce re-fetching
+    gcTime: 10 * 60 * 1000 // Keep in cache for 10 minutes
   });
 
-  // Check which posts the user has liked
+  // Check which posts the user has liked - optimized query
   const { data: likedPosts } = useQuery({
-    queryKey: ['post-likes', user?.id],
+    queryKey: ['post-likes', user?.id, posts.map(p => p.id).slice(0, 10).join(',')], // Only track first 10 posts
     queryFn: async () => {
-      if (!user?.id) return [];
+      if (!user?.id || posts.length === 0) return [];
       
-      const postIds = posts.map(post => post.id);
+      const postIds = posts.slice(0, 10).map(post => post.id); // Limit to visible posts
       const { data, error } = await supabase
         .from('post_likes')
         .select('post_id')

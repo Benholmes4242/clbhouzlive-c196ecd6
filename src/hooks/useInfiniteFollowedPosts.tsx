@@ -29,11 +29,17 @@ export const useInfiniteFollowedPosts = () => {
     initialPageParam: 0,
   });
 
-  // Flatten all pages into a single array
+  // Flatten all pages into a single array with memoization to prevent unnecessary re-renders
   useEffect(() => {
     if (data?.pages) {
       const flattenedPosts = data.pages.flatMap(page => page.posts);
-      setAllPosts(flattenedPosts);
+      // Only update if the content actually changed
+      setAllPosts(prevPosts => {
+        if (JSON.stringify(prevPosts.map(p => p.id)) === JSON.stringify(flattenedPosts.map(p => p.id))) {
+          return prevPosts;
+        }
+        return flattenedPosts;
+      });
     }
   }, [data]);
 
