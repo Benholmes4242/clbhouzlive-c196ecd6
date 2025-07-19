@@ -222,7 +222,12 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
 
   if (!isOpen) return null;
 
-  const latestVideo = courseVideos.length > 0 ? courseVideos[0] : null;
+  // Transform video data for the carousel
+  const videos = courseVideos.map(video => ({
+    videoUrl: video.media_url,
+    username: video.username,
+    timestamp: video.post_created_at
+  }));
 
   return (
     <div 
@@ -437,15 +442,14 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                 </div>
               )}
 
-              {/* Video Overlay - Only show in fullscreen mode if video exists */}
-              {latestVideo && (
+              {/* Video Overlay - Only show in fullscreen mode if videos exist */}
+              {videos.length > 0 && (
                 <CourseVideoOverlay
-                  videoUrl={latestVideo.media_url}
+                  videos={videos}
                   courseName={currentCourse.name}
-                  username={latestVideo.username}
-                  timestamp={latestVideo.post_created_at}
-                  onOpenFullVideo={() => {
-                    // TODO: Implement full video modal or navigate to post
+                  onOpenFullVideo={(videoIndex) => {
+                    // TODO: Implement full video modal or navigate to post with specific video
+                    console.log('Opening video at index:', videoIndex);
                   }}
                 />
               )}
