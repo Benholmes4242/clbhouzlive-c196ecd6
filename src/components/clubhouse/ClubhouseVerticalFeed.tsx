@@ -13,6 +13,7 @@ import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import PostComments from './PostComments';
+import { useVideoManager } from '@/contexts/VideoManagerContext';
 
 interface ClubhouseVerticalFeedProps {
   posts: ExploreContentItem[];
@@ -34,24 +35,51 @@ const VideoWithAutoplay: React.FC<{
     rootMargin: '0px'
   });
   const [hasAttemptedPlay, setHasAttemptedPlay] = useState(false);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const { setActiveVideo, addVideo, removeVideo } = useVideoManager();
+  const { isGloballyMuted } = useGlobalAudio();
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-  const attemptVideoPlay = useCallback(async () => {
-    if (!ref.current || hasAttemptedPlay) return;
-    
-    const video = ref.current.querySelector('video') as HTMLVideoElement;
-    if (!video) return;
+  // Register video with manager when component mounts
+  useEffect(() => {
+    return () => {
+      if (videoRef.current) {
+        removeVideo(videoRef.current);
+      }
+    };
+  }, [removeVideo]);
 
+  // Handle video ref and registration
+  const handleVideoRef = useCallback((video: HTMLVideoElement | null) => {
+    if (videoRef.current) {
+      removeVideo(videoRef.current);
+    }
+    
+    videoRef.current = video;
+    
+    if (video) {
+      addVideo(video);
+    }
+  }, [addVideo, removeVideo]);
+
+  const attemptVideoPlay = useCallback(async () => {
+    if (!videoRef.current || hasAttemptedPlay) return;
+    
+    const video = videoRef.current;
+    
     try {
-      // Ensure video is muted for autoplay compliance
-      video.muted = true;
+      // Ensure video respects global mute state
+      video.muted = isGloballyMuted;
       video.playsInline = true;
       
+      // Set this video as the active one (pauses others)
+      setActiveVideo(video);
+      
       await video.play();
-      console.log('✅ Mobile autoplay successful');
+      console.log('✅ Video autoplay successful:', src.slice(-20));
       setHasAttemptedPlay(true);
     } catch (error) {
-      console.log('❌ Mobile autoplay failed:', error);
+      console.log('❌ Video autoplay failed:', error);
       
       // On mobile, try again after a brief delay
       if (isMobile) {
@@ -62,7 +90,7 @@ const VideoWithAutoplay: React.FC<{
         }, 100);
       }
     }
-  }, [ref.current, hasAttemptedPlay, isMobile]);
+  }, [videoRef.current, hasAttemptedPlay, isMobile, src, setActiveVideo, isGloballyMuted]);
 
   // Handle initial autoplay attempt when video comes into view
   useEffect(() => {
@@ -72,23 +100,23 @@ const VideoWithAutoplay: React.FC<{
     }
   }, [isInView, attemptVideoPlay, hasAttemptedPlay]);
 
-  // Add touch handler for mobile interaction
-  const handleTouchStart = useCallback(() => {
-    if (isMobile && isInView && !hasAttemptedPlay) {
-      attemptVideoPlay();
+  // Update video mute state when global mute changes
+  useEffect(() => {
+    if (videoRef.current) {
+      videoRef.current.muted = isGloballyMuted;
     }
-  }, [isMobile, isInView, hasAttemptedPlay, attemptVideoPlay]);
+  }, [isGloballyMuted]);
 
   return (
     <div 
       ref={ref}
       className={className}
-      onTouchStart={handleTouchStart}
     >
       <EnhancedVideoPlayer
+        ref={handleVideoRef}
         src={src}
         autoplay={isInView}
-        muted={muted}
+        muted={isGloballyMuted}
         loop={true}
         className="w-full h-full"
         enableHLS={true}

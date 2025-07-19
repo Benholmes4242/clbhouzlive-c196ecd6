@@ -8,6 +8,8 @@ import ScrollToTop from '@/components/ScrollToTop';
 import { ThemeProvider } from '@/components/theme-provider';
 import PasswordProtection from "@/components/PasswordProtection";
 import AuthWrapper from "@/components/auth/AuthWrapper";
+import { GlobalAudioProvider } from './contexts/GlobalAudioContext';
+import { VideoManagerProvider } from './contexts/VideoManagerContext';
 
 
 const Auth = lazy(() => import("./pages/Auth"));
@@ -63,7 +65,9 @@ const App: React.FC = () => {
                 </div>
               </div>
             }>
-              <AuthWrapper>
+              <GlobalAudioProvider>
+                <VideoManagerProvider>
+                  <AuthWrapper>
                 <Routes>
                   <Route path="/" element={<Clubhouse />} />
                   <Route path="/auth" element={<Auth />} />
@@ -91,7 +95,9 @@ const App: React.FC = () => {
                   <Route path="/admin" element={<AdminPage />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
-              </AuthWrapper>
+                  </AuthWrapper>
+                </VideoManagerProvider>
+              </GlobalAudioProvider>
             </Suspense>
               <Toaster />
               <Sonner />

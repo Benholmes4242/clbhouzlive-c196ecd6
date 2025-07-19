@@ -25,7 +25,7 @@ declare global {
   }
 }
 
-const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
+const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlayerProps>(({
   src,
   poster,
   autoplay = false,
@@ -39,7 +39,7 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
   adaptiveBitrate = true,
   preloadLevel = 'metadata',
   quality = 'auto'
-}) => {
+}, ref) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<any>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -369,7 +369,16 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
       )}
 
       <video
-        ref={videoRef}
+        ref={(el) => {
+          videoRef.current = el;
+          if (ref) {
+            if (typeof ref === 'function') {
+              ref(el);
+            } else {
+              ref.current = el;
+            }
+          }
+        }}
         poster={poster}
         muted={isGloballyMuted}
         loop={loop}
@@ -410,6 +419,6 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
 
     </div>
   );
-};
+});
 
 export default memo(EnhancedVideoPlayer);
