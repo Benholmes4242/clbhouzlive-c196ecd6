@@ -118,7 +118,7 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
       >
         <div className="relative w-full h-full rounded-xl bg-black shadow-2xl overflow-hidden">
           {/* Main Video Player */}
-          <div className={`absolute inset-0 transition-opacity duration-300 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
+          <div className={`absolute inset-0 transition-opacity duration-150 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
             <EnhancedVideoPlayer
               ref={videoRef}
               src={currentVideo?.videoUrl}
@@ -127,6 +127,7 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
               loop={true}
               className="w-full h-full object-contain"
               enableHLS={true}
+              key={`video-${currentVideoIndex}-${currentVideo?.videoUrl}`}
             />
           </div>
           
