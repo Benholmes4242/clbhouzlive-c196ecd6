@@ -1,6 +1,5 @@
-// ClubhouseVerticalFeed - Audio control system implemented
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { MessageCircle, MapPin, UserPlus, UserCheck, Loader2, Volume2, VolumeX } from 'lucide-react';
+import { MessageCircle, Volume2, VolumeX, MapPin, UserPlus, UserCheck, Loader2 } from 'lucide-react';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
 import { RiShareForward2Fill } from 'react-icons/ri';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -9,9 +8,10 @@ import { ExploreContentItem } from '@/components/explore/types';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
+import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
+import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
-
-import ManagedVideoPlayer from './ManagedVideoPlayer';
+import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import PostComments from './PostComments';
 
 interface ClubhouseVerticalFeedProps {
@@ -33,6 +33,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
 }) => {
   const { user } = useSupabaseSession();
   const isMobile = useIsMobile();
+  const { isGloballyMuted, setGlobalMute } = useGlobalAudio();
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollViewRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<{ [key: number]: HTMLDivElement }>({});
@@ -40,19 +41,81 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   const [mediaIndices, setMediaIndices] = useState<{[key: string]: number}>({});
   const queryClient = useQueryClient();
 
-  // Audio control state - initialize once to prevent flicker
-  const [isGloballyMuted, setIsGloballyMuted] = useState(() => {
-    try {
-      const savedPreference = sessionStorage.getItem('clubhouse-audio-preference');
-      console.log('🔊 Restored audio state from session:', savedPreference === 'unmuted' ? 'UNMUTED' : 'MUTED');
-      return savedPreference !== 'unmuted';
-    } catch (error) {
-      console.log('🔊 Using default audio state: MUTED');
-      return true;
-    }
-  });
+  // VideoWithAutoplay component using intersection observer
+  const VideoWithAutoplay: React.FC<{
+    src: string;
+    muted: boolean;
+    className: string;
+  }> = ({ src, muted, className }) => {
+    const { ref, isInView } = useIntersectionObserver({
+      threshold: 0.5, // Video must be 50% visible to autoplay
+      rootMargin: '0px'
+    });
+    const [hasAttemptedPlay, setHasAttemptedPlay] = useState(false);
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 
-  // Check if current user follows the displayed user - memoized to prevent re-renders
+    const attemptVideoPlay = useCallback(async () => {
+      if (!ref.current || hasAttemptedPlay) return;
+      
+      const video = ref.current.querySelector('video') as HTMLVideoElement;
+      if (!video) return;
+
+      try {
+        // Ensure video is muted for autoplay compliance
+        video.muted = true;
+        video.playsInline = true;
+        
+        await video.play();
+        console.log('✅ Mobile autoplay successful');
+        setHasAttemptedPlay(true);
+      } catch (error) {
+        console.log('❌ Mobile autoplay failed:', error);
+        
+        // On mobile, try again after a brief delay
+        if (isMobile) {
+          setTimeout(() => {
+            video.play().catch(() => {
+              console.log('❌ Mobile autoplay retry failed');
+            });
+          }, 100);
+        }
+      }
+    }, [ref.current, hasAttemptedPlay, isMobile]);
+
+    // Handle initial autoplay attempt when video comes into view
+    useEffect(() => {
+      if (isInView && !hasAttemptedPlay) {
+        // Small delay to ensure video is ready
+        setTimeout(attemptVideoPlay, 100);
+      }
+    }, [isInView, attemptVideoPlay, hasAttemptedPlay]);
+
+    // Add touch handler for mobile interaction
+    const handleTouchStart = useCallback(() => {
+      if (isMobile && isInView && !hasAttemptedPlay) {
+        attemptVideoPlay();
+      }
+    }, [isMobile, isInView, hasAttemptedPlay, attemptVideoPlay]);
+
+    return (
+      <div 
+        ref={ref} 
+        className="relative w-full h-full bg-media-loading"
+        onTouchStart={handleTouchStart}
+      >
+        <EnhancedVideoPlayer
+          src={src}
+          autoplay={true} // Let EnhancedVideoPlayer handle autoplay
+          muted={true} // Always muted for autoplay
+          loop={true}
+          className={className}
+          enableHLS={true}
+        />
+      </div>
+    );
+  };
+
+  // Check if current user follows the displayed user
   const { data: isFollowing, isLoading: isFollowingLoading } = useQuery({
     queryKey: ['user-follows', user?.id, posts[currentIndex]?.user?.id],
     queryFn: async () => {
@@ -74,18 +137,16 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
       
       return !!data;
     },
-    enabled: !!user?.id && !!posts[currentIndex]?.user?.id && user.id !== posts[currentIndex]?.user?.id,
-    staleTime: 5 * 60 * 1000, // Cache for 5 minutes to reduce re-fetching
-    gcTime: 10 * 60 * 1000 // Keep in cache for 10 minutes
+    enabled: !!user?.id && !!posts[currentIndex]?.user?.id && user.id !== posts[currentIndex]?.user?.id
   });
 
-  // Check which posts the user has liked - optimized query
+  // Check which posts the user has liked
   const { data: likedPosts } = useQuery({
-    queryKey: ['post-likes', user?.id, posts.map(p => p.id).slice(0, 10).join(',')], // Only track first 10 posts
+    queryKey: ['post-likes', user?.id],
     queryFn: async () => {
-      if (!user?.id || posts.length === 0) return [];
+      if (!user?.id) return [];
       
-      const postIds = posts.slice(0, 10).map(post => post.id); // Limit to visible posts
+      const postIds = posts.map(post => post.id);
       const { data, error } = await supabase
         .from('post_likes')
         .select('post_id')
@@ -301,19 +362,6 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     console.log('Comment clicked');
   };
 
-  // Audio toggle handler
-  const handleAudioToggle = useCallback(() => {
-    const newMutedState = !isGloballyMuted;
-    setIsGloballyMuted(newMutedState);
-    
-    // Persist preference in session storage
-    try {
-      sessionStorage.setItem('clubhouse-audio-preference', newMutedState ? 'muted' : 'unmuted');
-    } catch (error) {
-      console.warn('Failed to save audio preference:', error);
-    }
-  }, [isGloballyMuted]);
-
   if (posts.length === 0) {
     return (
       <div className="fixed inset-0 z-10 bg-black flex items-center justify-center">
@@ -439,12 +487,10 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 onMouseLeave={() => setIsTextExpanded(false)}
               >
                 {currentMedia.media_type === 'video' ? (
-                  <ManagedVideoPlayer
-                    id={`${item.id}-${currentMediaIndex}`}
+                  <VideoWithAutoplay
                     src={currentMedia.media_url}
+                    muted={isGloballyMuted}
                     className="w-full h-full"
-                    disableAudio={false} // Always enable audio management
-                    isInView={index === currentIndex && !isGloballyMuted}
                   />
                 ) : (
                   <div className="relative w-full h-full bg-black">
@@ -516,20 +562,18 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
 
               {/* Action Buttons - Bottom Right */}
               <div className="absolute bottom-10 right-4 z-10 flex flex-col space-y-6">
-                {/* Audio Toggle Button - Above Heart */}
+                {/* Mute/Unmute toggle button - only show for video posts */}
                 {currentMedia.media_type === 'video' && (
-                  <div className="flex flex-col items-center">
-                    <button
-                      onClick={handleAudioToggle}
-                      className="cursor-pointer hover:opacity-100 transition-opacity"
-                    >
-                      {isGloballyMuted ? (
-                        <VolumeX className="h-8 w-8 text-white" />
-                      ) : (
-                        <Volume2 className="h-8 w-8 text-white" />
-                      )}
-                    </button>
-                  </div>
+                  <button 
+                    className="cursor-pointer hover:opacity-100 transition-opacity"
+                    onClick={() => setGlobalMute(!isGloballyMuted)}
+                  >
+                    {isGloballyMuted ? (
+                      <VolumeX className="w-8 h-8 text-white" />
+                    ) : (
+                      <Volume2 className="w-8 h-8 text-white" />
+                    )}
+                  </button>
                 )}
 
                 {/* Heart Button with Like Count */}

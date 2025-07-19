@@ -1,11 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
 import BottomNavigation from '@/components/BottomNavigation';
 import ClubhouseVerticalFeed from '@/components/clubhouse/ClubhouseVerticalFeed';
 import { useInfiniteFollowedPosts } from '@/hooks/useInfiniteFollowedPosts';
-import { VideoManagerProvider } from '@/contexts/VideoManagerContext';
 
-const Clubhouse = React.memo(() => {
+const Clubhouse = () => {
   const {
     posts,
     isLoading,
@@ -17,18 +16,18 @@ const Clubhouse = React.memo(() => {
   const [headerVisible, setHeaderVisible] = useState(true);
   const [activeTab, setActiveTab] = useState('Following');
 
-  const handleLike = useCallback((contentId: string) => {
+  const handleLike = (contentId: string) => {
     // Handle like functionality
     console.log('Liked post:', contentId);
-  }, []);
+  };
 
-  const handleScroll = useCallback((scrollDirection: 'up' | 'down') => {
+  const handleScroll = (scrollDirection: 'up' | 'down') => {
     if (scrollDirection === 'up') {
       setHeaderVisible(false);
     } else if (scrollDirection === 'down') {
       setHeaderVisible(true);
     }
-  }, []);
+  };
 
   const menuItems = [
     { label: 'Following', active: activeTab === 'Following' },
@@ -48,76 +47,74 @@ const Clubhouse = React.memo(() => {
   }
 
   return (
-    <VideoManagerProvider>
-      <div className="h-screen bg-black overflow-hidden relative" style={{
-        minHeight: '100dvh',
-        paddingTop: 'env(safe-area-inset-top, 0)',
-      }}>
-        {/* Header with Logo and Floating Menu */}
-        <div 
-          className={`absolute top-0 left-0 right-0 z-40 transition-transform duration-300 ease-out ${
-            headerVisible ? 'translate-y-0' : '-translate-y-full'
-          }`}
-        >
-          {/* Logo Mark and Clubhouse Logo */}
-          <div className="absolute top-4 left-4">
-            <div className="flex items-center gap-1 md:gap-2">
-              <img
-                src="/lovable-uploads/dc594c09-ec74-44cb-82be-f42cbdcb12cf.png"
-                alt="Logo Mark"
-                className="h-10 md:h-12 w-auto object-contain flex-shrink-0"
-              />
-              <img
-                src="/lovable-uploads/638495f6-b30e-46cb-bed7-e42b9b5ab329.png"
-                alt="clbhouz Logo"
-                className="h-10 md:h-12 w-auto object-contain flex-shrink-0"
-              />
-            </div>
+    <div className="h-screen bg-black overflow-hidden relative" style={{
+      minHeight: '100dvh',
+      paddingTop: 'env(safe-area-inset-top, 0)',
+    }}>
+      {/* Header with Logo and Floating Menu */}
+      <div 
+        className={`absolute top-0 left-0 right-0 z-40 transition-transform duration-300 ease-out ${
+          headerVisible ? 'translate-y-0' : '-translate-y-full'
+        }`}
+      >
+        {/* Logo Mark and Clubhouse Logo */}
+        <div className="absolute top-4 left-4">
+          <div className="flex items-center gap-1 md:gap-2">
+            <img
+              src="/lovable-uploads/dc594c09-ec74-44cb-82be-f42cbdcb12cf.png"
+              alt="Logo Mark"
+              className="h-10 md:h-12 w-auto object-contain flex-shrink-0"
+            />
+            <img
+              src="/lovable-uploads/638495f6-b30e-46cb-bed7-e42b9b5ab329.png"
+              alt="clbhouz Logo"
+              className="h-10 md:h-12 w-auto object-contain flex-shrink-0"
+            />
           </div>
+        </div>
 
-          {/* Floating Horizontal Menu */}
-          <div className="flex justify-center pt-16 pb-4">
-            <div className="flex items-center space-x-8 px-6">
-              {menuItems.map((item) => (
-                <button
-                  key={item.label}
-                  onClick={() => setActiveTab(item.label)}
-                  className={`relative text-base font-medium transition-all duration-200 ${
-                    item.active 
-                      ? 'text-white after:content-[""] after:absolute after:bottom-0 after:left-1/2 after:transform after:-translate-x-1/2 after:w-4 after:h-0.5 after:bg-white after:rounded-full' 
-                      : 'text-white/70 hover:text-white'
-                  }`}
-                >
-                  {item.label}
-                </button>
-              ))}
-              <button className="text-white/70 hover:text-white transition-colors duration-200">
-                <Search size={18} />
+        {/* Floating Horizontal Menu */}
+        <div className="flex justify-center pt-16 pb-4">
+          <div className="flex items-center space-x-8 px-6">
+            {menuItems.map((item) => (
+              <button
+                key={item.label}
+                onClick={() => setActiveTab(item.label)}
+                className={`relative text-base font-medium transition-all duration-200 ${
+                  item.active 
+                    ? 'text-white after:content-[""] after:absolute after:bottom-0 after:left-1/2 after:transform after:-translate-x-1/2 after:w-4 after:h-0.5 after:bg-white after:rounded-full' 
+                    : 'text-white/70 hover:text-white'
+                }`}
+              >
+                {item.label}
               </button>
-            </div>
+            ))}
+            <button className="text-white/70 hover:text-white transition-colors duration-200">
+              <Search size={18} />
+            </button>
           </div>
-
-          {/* Gradient fade */}
-          <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-b from-transparent to-black/20 pointer-events-none" />
         </div>
 
-        {/* Main Content - Fullscreen Vertical Feed */}
-        <ClubhouseVerticalFeed
-          posts={posts}
-          onLike={handleLike}
-          onLoadMore={loadMore}
-          hasMore={hasMore}
-          isLoadingMore={isLoadingMore}
-          onScroll={handleScroll}
-        />
-        
-        {/* Bottom Navigation */}
-        <div className="absolute bottom-0 left-0 right-0 z-50">
-          <BottomNavigation variant="clubhouse" />
-        </div>
+        {/* Gradient fade */}
+        <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-b from-transparent to-black/20 pointer-events-none" />
       </div>
-    </VideoManagerProvider>
+
+      {/* Main Content - Fullscreen Vertical Feed */}
+      <ClubhouseVerticalFeed
+        posts={posts}
+        onLike={handleLike}
+        onLoadMore={loadMore}
+        hasMore={hasMore}
+        isLoadingMore={isLoadingMore}
+        onScroll={handleScroll}
+      />
+      
+      {/* Bottom Navigation */}
+      <div className="absolute bottom-0 left-0 right-0 z-50">
+        <BottomNavigation variant="clubhouse" />
+      </div>
+    </div>
   );
-});
+};
 
 export default Clubhouse;

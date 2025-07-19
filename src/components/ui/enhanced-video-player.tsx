@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, memo, useCallback, useMemo } from 'react';
+import React, { useRef, useEffect, useState, memo } from 'react';
 import { Play, Pause, Volume2, VolumeX, Maximize, Loader2 } from 'lucide-react';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
@@ -25,7 +25,7 @@ declare global {
   }
 }
 
-const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = memo(({
+const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
   src,
   poster,
   autoplay = false,
@@ -60,15 +60,8 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = memo(({
     rootMargin: isMobile ? '0px' : '100px' // No margin for mobile
   });
 
-  // Mobile lazy loading logic - STABLE VERSION
+  // Mobile lazy loading logic
   useEffect(() => {
-    console.log('🔍 DEBUG: shouldLoadVideo effect triggered:', {
-      isMobile, 
-      isInView, 
-      shouldLoadVideo,
-      src: src.slice(-20)
-    });
-    
     if (isMobile) {
       // On mobile, only load when actually in view
       if (isInView && !shouldLoadVideo) {
@@ -76,28 +69,14 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = memo(({
         setShouldLoadVideo(true);
       }
     } else {
-      // On desktop, load immediately but only once
-      if (!shouldLoadVideo) {
-        console.log('🖥️ Desktop: Loading video immediately', { src: src.slice(-20) });
-        setShouldLoadVideo(true);
-      }
+      // On desktop, load immediately
+      setShouldLoadVideo(true);
     }
-  }, [isInView, isMobile]); // REMOVED shouldLoadVideo and src from dependencies
+  }, [isInView, isMobile, shouldLoadVideo, src]);
 
-  // Load HLS.js if needed - only when shouldLoadVideo is true and NEVER on mute changes
+  // Load HLS.js if needed - only when shouldLoadVideo is true
   useEffect(() => {
-    console.log('🔍 DEBUG: HLS initialization effect triggered:', {
-      shouldLoadVideo,
-      enableHLS,
-      src: src.slice(-20),
-      hasHls: !!window.Hls
-    });
-    
-    // CRITICAL: Only initialize when actually needed, never on state changes
-    if (!shouldLoadVideo) {
-      console.log('🚫 Skipping HLS init - shouldLoadVideo is false');
-      return;
-    }
+    if (!shouldLoadVideo) return;
     
     if (enableHLS && !window.Hls) {
       const script = document.createElement('script');
@@ -111,7 +90,7 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = memo(({
     } else {
       initializeVideo();
     }
-  }, [shouldLoadVideo]); // ONLY depend on shouldLoadVideo - nothing else!
+  }, [shouldLoadVideo, enableHLS]);
   
   const initializeVideo = () => {
     console.log('🎬 EnhancedVideoPlayer: Initializing video', { src, enableHLS });
@@ -301,42 +280,16 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = memo(({
       video.removeEventListener('progress', handleProgress);
       video.removeEventListener('volumechange', handleVolumeChange);
     };
-  }, [onPlay, onPause, src]); // Add src dependency to prevent restart loops
+  }, [onPlay, onPause]);
 
-  // Handle global mute changes via event listener instead of useEffect to prevent re-renders
+  // Update video muted state when global audio state changes
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
     
-    // Listen for custom mute events instead of using context in useEffect
-    const handleGlobalMuteChange = (event: CustomEvent) => {
-      console.log('🔍 DEBUG: Received global mute event:', {
-        isGloballyMuted: event.detail.muted,
-        videoSrc: src.slice(-20),
-        videoPaused: video.paused,
-        videoMuted: video.muted,
-        currentTime: video.currentTime
-      });
-      
-      // ONLY change mute property - never restart or change playback
-      if (video.muted !== event.detail.muted) {
-        video.muted = event.detail.muted;
-        console.log('🔊 EnhancedVideoPlayer: Mute state updated via event', { 
-          muted: event.detail.muted, 
-          currentTime: video.currentTime,
-          playing: !video.paused,
-          src: src.slice(-20)
-        });
-      }
-    };
-    
-    // Listen for global mute changes
-    window.addEventListener('globalMuteChanged', handleGlobalMuteChange as EventListener);
-    
-    return () => {
-      window.removeEventListener('globalMuteChanged', handleGlobalMuteChange as EventListener);
-    };
-  }, [src]); // Only depend on src, not global mute state
+    console.log('🔊 EnhancedVideoPlayer: Updating mute state to', isGloballyMuted ? 'MUTED' : 'UNMUTED');
+    video.muted = isGloballyMuted;
+  }, [isGloballyMuted]);
 
   // Cleanup HLS on unmount
   useEffect(() => {
@@ -364,15 +317,11 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = memo(({
 
   const toggleMute = (e: React.MouseEvent) => {
     e.stopPropagation();
-    e.preventDefault(); // Prevent any default behavior
     const video = videoRef.current;
     if (!video) return;
 
-    // Only toggle mute state, don't restart video
     video.muted = !video.muted;
-    
-    // Don't trigger any play/pause or restart logic
-    console.log('🔊 Manual mute toggle', { muted: video.muted, currentTime: video.currentTime });
+    // Mute state is now managed by global audio context
   };
 
   const handleFullscreen = (e: React.MouseEvent) => {
@@ -461,6 +410,6 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = memo(({
 
     </div>
   );
-});
+};
 
-export default EnhancedVideoPlayer;
+export default memo(EnhancedVideoPlayer);

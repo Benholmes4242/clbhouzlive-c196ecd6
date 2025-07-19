@@ -16,42 +16,12 @@ export const InteractionIconsOverlay: React.FC<InteractionIconsOverlayProps> = (
   const { muteAllVideos } = useVideoPlaybackManager();
 
   const handleMuteToggle = (e: React.MouseEvent) => {
-    console.log('🔍 DEBUG: Mute button clicked - event details:', {
-      type: e.type,
-      target: e.target,
-      currentTarget: e.currentTarget,
-      bubbles: e.bubbles,
-      timeStamp: e.timeStamp
-    });
-    
     e.stopPropagation();
-    e.preventDefault();
-    e.nativeEvent?.stopImmediatePropagation?.();
-    
-    // Only toggle global mute state - no video interaction at all
-    console.log('🔊 About to toggle global mute - current state:', isGloballyMuted);
     toggleGlobalMute();
-    console.log('🔊 Mute button clicked - only toggling global state');
-  };
-
-  const handleInteractionClick = (e: React.MouseEvent, type: string) => {
-    console.log(`🔍 DEBUG: ${type} button clicked - event details:`, {
-      type: e.type,
-      target: e.target,
-      currentTarget: e.currentTarget,
-      bubbles: e.bubbles,
-      timeStamp: e.timeStamp
-    });
-    
-    e.stopPropagation();
-    e.preventDefault();
-    e.nativeEvent?.stopImmediatePropagation?.();
-    
-    // Block any video interaction - just handle the overlay action
-    console.log(`💫 ${type} button clicked - blocking video interaction`);
-    
-    // Call the original handler but ensure no video restart
-    onInteractionClick(e, type);
+    // When globally muting, ensure all videos are immediately muted
+    if (!isGloballyMuted) {
+      muteAllVideos();
+    }
   };
 
   return (
@@ -63,8 +33,6 @@ export const InteractionIconsOverlay: React.FC<InteractionIconsOverlayProps> = (
             className="cursor-pointer hover:opacity-100 transition-opacity"
             onClick={handleMuteToggle}
             title={isGloballyMuted ? "Unmute all videos" : "Mute all videos"}
-            onTouchStart={(e) => e.stopPropagation()}
-            onTouchEnd={(e) => e.stopPropagation()}
           >
             {isGloballyMuted ? (
               <VolumeX className="w-8 h-8" />
@@ -76,25 +44,19 @@ export const InteractionIconsOverlay: React.FC<InteractionIconsOverlayProps> = (
         
         <button 
           className="cursor-pointer hover:opacity-100 transition-opacity"
-          onClick={(e) => handleInteractionClick(e, 'like')}
-          onTouchStart={(e) => e.stopPropagation()}
-          onTouchEnd={(e) => e.stopPropagation()}
+          onClick={(e) => onInteractionClick(e, 'like')}
         >
           <Heart className="w-8 h-8" />
         </button>
         <button 
           className="cursor-pointer hover:opacity-100 transition-opacity"
-          onClick={(e) => handleInteractionClick(e, 'comment')}
-          onTouchStart={(e) => e.stopPropagation()}
-          onTouchEnd={(e) => e.stopPropagation()}
+          onClick={(e) => onInteractionClick(e, 'comment')}
         >
           <MessageCircle className="w-8 h-8" />
         </button>
         <button 
           className="cursor-pointer hover:opacity-100 transition-opacity"
-          onClick={(e) => handleInteractionClick(e, 'share')}
-          onTouchStart={(e) => e.stopPropagation()}
-          onTouchEnd={(e) => e.stopPropagation()}
+          onClick={(e) => onInteractionClick(e, 'share')}
         >
           <Share className="w-8 h-8" />
         </button>
