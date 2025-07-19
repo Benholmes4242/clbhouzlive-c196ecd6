@@ -97,6 +97,10 @@ const EnhancedRichTextInput: React.FC<EnhancedRichTextInputProps> = ({
   };
 
   const handleSelectEntity = (entity: TaggableEntity) => {
+    console.log('EnhancedRichTextInput: Selecting entity:', entity);
+    console.log('EnhancedRichTextInput: Current selectedTags:', selectedTags);
+    console.log('EnhancedRichTextInput: onTagsChange callback exists:', !!onTagsChange);
+    
     const newText = 
       value.slice(0, mentionPosition.start) +
       `@${entity.name} ` +
@@ -106,7 +110,11 @@ const EnhancedRichTextInput: React.FC<EnhancedRichTextInputProps> = ({
     
     // Add to selected tags if callback provided
     if (onTagsChange && !selectedTags.find(tag => tag.id === entity.id)) {
-      onTagsChange([...selectedTags, entity]);
+      const newTags = [...selectedTags, entity];
+      console.log('EnhancedRichTextInput: Adding entity to tags, new tags:', newTags);
+      onTagsChange(newTags);
+    } else {
+      console.log('EnhancedRichTextInput: Not adding tag - callback missing or tag already exists');
     }
     
     setShowSuggestions(false);
