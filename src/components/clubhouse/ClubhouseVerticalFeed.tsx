@@ -8,10 +8,9 @@ import { ExploreContentItem } from '@/components/explore/types';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
-import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
-import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
-import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
+import { useVideoManagerContext } from '@/contexts/VideoManagerContext';
+import ManagedVideoPlayer from './ManagedVideoPlayer';
 import PostComments from './PostComments';
 
 interface ClubhouseVerticalFeedProps {
@@ -33,87 +32,27 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
 }) => {
   const { user } = useSupabaseSession();
   const isMobile = useIsMobile();
-  const { isGloballyMuted, setGlobalMute } = useGlobalAudio();
+  const { toggleVideoMute, getVideoMuteState } = useVideoManagerContext();
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollViewRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<{ [key: number]: HTMLDivElement }>({});
   const [isTextExpanded, setIsTextExpanded] = useState(false);
   const [mediaIndices, setMediaIndices] = useState<{[key: string]: number}>({});
+  const [videoMuteStates, setVideoMuteStates] = useState<{[key: string]: boolean}>({});
   const queryClient = useQueryClient();
 
-  // VideoWithAutoplay component using intersection observer
-  const VideoWithAutoplay: React.FC<{
-    src: string;
-    muted: boolean;
-    className: string;
-  }> = ({ src, muted, className }) => {
-    const { ref, isInView } = useIntersectionObserver({
-      threshold: 0.5, // Video must be 50% visible to autoplay
-      rootMargin: '0px'
-    });
-    const [hasAttemptedPlay, setHasAttemptedPlay] = useState(false);
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  // Handle video mute state changes
+  const handleVideoMuteChange = useCallback((videoId: string, isMuted: boolean) => {
+    setVideoMuteStates(prev => ({
+      ...prev,
+      [videoId]: isMuted
+    }));
+  }, []);
 
-    const attemptVideoPlay = useCallback(async () => {
-      if (!ref.current || hasAttemptedPlay) return;
-      
-      const video = ref.current.querySelector('video') as HTMLVideoElement;
-      if (!video) return;
-
-      try {
-        // Ensure video is muted for autoplay compliance
-        video.muted = true;
-        video.playsInline = true;
-        
-        await video.play();
-        console.log('✅ Mobile autoplay successful');
-        setHasAttemptedPlay(true);
-      } catch (error) {
-        console.log('❌ Mobile autoplay failed:', error);
-        
-        // On mobile, try again after a brief delay
-        if (isMobile) {
-          setTimeout(() => {
-            video.play().catch(() => {
-              console.log('❌ Mobile autoplay retry failed');
-            });
-          }, 100);
-        }
-      }
-    }, [ref.current, hasAttemptedPlay, isMobile]);
-
-    // Handle initial autoplay attempt when video comes into view
-    useEffect(() => {
-      if (isInView && !hasAttemptedPlay) {
-        // Small delay to ensure video is ready
-        setTimeout(attemptVideoPlay, 100);
-      }
-    }, [isInView, attemptVideoPlay, hasAttemptedPlay]);
-
-    // Add touch handler for mobile interaction
-    const handleTouchStart = useCallback(() => {
-      if (isMobile && isInView && !hasAttemptedPlay) {
-        attemptVideoPlay();
-      }
-    }, [isMobile, isInView, hasAttemptedPlay, attemptVideoPlay]);
-
-    return (
-      <div 
-        ref={ref} 
-        className="relative w-full h-full bg-media-loading"
-        onTouchStart={handleTouchStart}
-      >
-        <EnhancedVideoPlayer
-          src={src}
-          autoplay={true} // Let EnhancedVideoPlayer handle autoplay
-          muted={true} // Always muted for autoplay
-          loop={true}
-          className={className}
-          enableHLS={true}
-        />
-      </div>
-    );
-  };
+  // Handle video mute toggle
+  const handleVideoMuteToggle = useCallback((videoId: string) => {
+    toggleVideoMute(videoId);
+  }, [toggleVideoMute]);
 
   // Check if current user follows the displayed user
   const { data: isFollowing, isLoading: isFollowingLoading } = useQuery({
@@ -487,10 +426,11 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 onMouseLeave={() => setIsTextExpanded(false)}
               >
                 {currentMedia.media_type === 'video' ? (
-                  <VideoWithAutoplay
+                  <ManagedVideoPlayer
+                    id={`${item.id}-${currentMediaIndex}`}
                     src={currentMedia.media_url}
-                    muted={isGloballyMuted}
                     className="w-full h-full"
+                    onMuteStateChange={(isMuted) => handleVideoMuteChange(`${item.id}-${currentMediaIndex}`, isMuted)}
                   />
                 ) : (
                   <div className="relative w-full h-full bg-black">
@@ -566,9 +506,9 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 {currentMedia.media_type === 'video' && (
                   <button 
                     className="cursor-pointer hover:opacity-100 transition-opacity"
-                    onClick={() => setGlobalMute(!isGloballyMuted)}
+                    onClick={() => handleVideoMuteToggle(`${item.id}-${currentMediaIndex}`)}
                   >
-                    {isGloballyMuted ? (
+                    {videoMuteStates[`${item.id}-${currentMediaIndex}`] !== false ? (
                       <VolumeX className="w-8 h-8 text-white" />
                     ) : (
                       <Volume2 className="w-8 h-8 text-white" />
