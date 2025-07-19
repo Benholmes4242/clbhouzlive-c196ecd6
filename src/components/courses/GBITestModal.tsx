@@ -34,6 +34,8 @@ interface Course {
 
 const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [displayedIndex, setDisplayedIndex] = useState(0); // Index of course being displayed (after image loads)
+  const [imageLoading, setImageLoading] = useState(false);
   const [viewMode, setViewMode] = useState<'fullscreen' | 'list'>('fullscreen');
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [showAddToPlayedModal, setShowAddToPlayedModal] = useState(false);
@@ -184,10 +186,45 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
     }
   }, [goToNext, goToPrevious]);
 
+  // Handle image loading and synchronization for mobile
+  useEffect(() => {
+    if (!courses.length || !isMobile || viewMode !== 'fullscreen') {
+      setDisplayedIndex(currentIndex);
+      return;
+    }
+
+    const targetCourse = courses[currentIndex];
+    if (!targetCourse?.thumbnail_image) {
+      // No image to load, update immediately
+      setDisplayedIndex(currentIndex);
+      return;
+    }
+
+    // Don't show loading state or delay if it's the same course
+    if (currentIndex === displayedIndex) {
+      return;
+    }
+
+    setImageLoading(true);
+    
+    // Preload the new image
+    const img = new Image();
+    img.onload = () => {
+      setImageLoading(false);
+      setDisplayedIndex(currentIndex);
+    };
+    img.onerror = () => {
+      setImageLoading(false);
+      setDisplayedIndex(currentIndex);
+    };
+    img.src = targetCourse.thumbnail_image;
+  }, [currentIndex, courses, isMobile, viewMode, displayedIndex]);
+
   // Reset index when modal opens
   useEffect(() => {
     if (isOpen) {
       setCurrentIndex(0);
+      setDisplayedIndex(0);
     }
   }, [isOpen]);
 
@@ -205,6 +242,7 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
   }, [isOpen]);
 
   const currentCourse = courses[currentIndex];
+  const displayedCourse = courses[displayedIndex];
 
   // Fetch videos for the current course (only in fullscreen mode)
   const { data: courseVideos = [] } = useCourseVideos(
@@ -299,10 +337,10 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
             <div className="relative w-full h-full">
               {/* Course Image */}
               <div className="absolute inset-0">
-                {currentCourse.thumbnail_image ? (
+                {displayedCourse.thumbnail_image ? (
                   <img
-                    src={currentCourse.thumbnail_image}
-                    alt={currentCourse.name}
+                    src={displayedCourse.thumbnail_image}
+                    alt={displayedCourse.name}
                     className="w-full h-full object-cover"
                   />
                 ) : (
@@ -323,30 +361,30 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
               }`}>
                 <div>
                   <h2 className="text-3xl md:text-4xl font-bold mb-2 leading-tight">
-                    {currentCourse.name}
+                    {displayedCourse.name}
                   </h2>
                   <div className="text-lg opacity-90 mb-2">
                     <span>
                       {[
-                        currentCourse.country,
-                        currentCourse.sub_country,
-                        currentCourse.region
+                        displayedCourse.country,
+                        displayedCourse.sub_country,
+                        displayedCourse.region
                       ].filter(Boolean).join(', ')}
                     </span>
                   </div>
                   
                   {/* Ranking Badges - Inline version */}
                   <div className="flex gap-2">
-                    {currentCourse.regional_rank && currentCourse.regional_rank <= 100 && (
+                    {displayedCourse.regional_rank && displayedCourse.regional_rank <= 100 && (
                       <div className="flex items-center justify-center gap-1 px-1.5 py-0.5 bg-white rounded-full">
                         <CountryFlag country="Britain & Ireland" size="lg" />
-                        <span className="text-sm font-bold text-gray-800 leading-none flex items-center translate-y-[3px]">#{currentCourse.regional_rank}</span>
+                        <span className="text-sm font-bold text-gray-800 leading-none flex items-center translate-y-[3px]">#{displayedCourse.regional_rank}</span>
                       </div>
                     )}
-                    {currentCourse.global_rank && currentCourse.global_rank <= 100 && (
+                    {displayedCourse.global_rank && displayedCourse.global_rank <= 100 && (
                       <div className="flex items-center justify-center gap-1 px-1.5 py-0.5 bg-white rounded-full">
                         <Earth className="h-5 w-5 text-gray-600" />
-                        <span className="text-sm font-bold text-gray-800 leading-none flex items-center translate-y-[3px]">#{currentCourse.global_rank}</span>
+                        <span className="text-sm font-bold text-gray-800 leading-none flex items-center translate-y-[3px]">#{displayedCourse.global_rank}</span>
                       </div>
                     )}
                   </div>
