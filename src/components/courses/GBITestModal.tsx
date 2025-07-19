@@ -178,7 +178,7 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40" />
             </div>
 
-            {/* Course Information - matching CourseCard layout exactly */}
+            {/* Course Information and Ranking Badges */}
             <div className="absolute bottom-20 left-0 right-0 p-6 text-white">
               <div>
                 <h2 className="text-3xl md:text-4xl font-bold mb-2 leading-tight">
@@ -194,17 +194,19 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                   </span>
                 </div>
               </div>
+              
+              {/* Ranking Badges - positioned within the same container */}
+              <div className="absolute bottom-0 left-0">
+                <CourseRankBadges
+                  globalRank={currentCourse.global_rank}
+                  regionalRank={currentCourse.regional_rank}
+                  usaRank={null}
+                  country={currentCourse.country}
+                  viewContext="regional"
+                  positioning="bottom-left"
+                />
+              </div>
             </div>
-
-            {/* Ranking Badges - using CourseRankBadges component positioned bottom-left */}
-            <CourseRankBadges
-              globalRank={currentCourse.global_rank}
-              regionalRank={currentCourse.regional_rank}
-              usaRank={null}
-              country={currentCourse.country}
-              viewContext="regional"
-              positioning="bottom-left"
-            />
 
             {/* Navigation Arrows */}
             {!isMobile && (
