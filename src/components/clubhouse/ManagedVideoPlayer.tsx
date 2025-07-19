@@ -63,14 +63,35 @@ const ManagedVideoPlayer: React.FC<ManagedVideoPlayerProps> = ({
         // Use video manager for audio control when not disabled
         handleVideoInView(id, isIntersecting);
         // Control audio based on passed isInView prop (current video in feed)
-        if (isInView && !disableAudio) {
-          videoRef.current.muted = false;
-        } else {
-          videoRef.current.muted = true;
-        }
+        videoRef.current.muted = !isInView;
       }
     }
   }, [id, isInView, isIntersecting, handleVideoInView, disableAudio]);
+
+  // Ensure mute state is maintained on video events (like loop restart)
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handleVideoEvents = () => {
+      if (disableAudio) {
+        video.muted = true;
+      } else {
+        video.muted = !isInView;
+      }
+    };
+
+    // Listen to video events that might reset mute state
+    video.addEventListener('loadstart', handleVideoEvents);
+    video.addEventListener('play', handleVideoEvents);
+    video.addEventListener('seeking', handleVideoEvents);
+
+    return () => {
+      video.removeEventListener('loadstart', handleVideoEvents);
+      video.removeEventListener('play', handleVideoEvents);
+      video.removeEventListener('seeking', handleVideoEvents);
+    };
+  }, [disableAudio, isInView]);
 
   // Check for video element periodically until found
   useEffect(() => {
