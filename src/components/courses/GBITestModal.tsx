@@ -273,7 +273,9 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
               </div>
 
               {/* Course Information - matching CourseCard layout exactly */}
-              <div className="absolute bottom-16 left-0 right-0 p-6 text-white">
+              <div className={`absolute left-0 right-0 p-6 text-white ${
+                isMobile ? 'bottom-4' : 'bottom-16'
+              }`}>
                 <div>
                   <h2 className="text-3xl md:text-4xl font-bold mb-2 leading-tight">
                     {currentCourse.name}
