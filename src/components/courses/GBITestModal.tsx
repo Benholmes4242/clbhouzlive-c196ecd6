@@ -34,8 +34,7 @@ interface Course {
 
 const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [displayedIndex, setDisplayedIndex] = useState(0); // Index of course being displayed (after image loads)
-  const [imageLoading, setImageLoading] = useState(false);
+  const [displayedIndex, setDisplayedIndex] = useState(0);
   const [viewMode, setViewMode] = useState<'fullscreen' | 'list'>('fullscreen');
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [showAddToPlayedModal, setShowAddToPlayedModal] = useState(false);
@@ -186,39 +185,10 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
     }
   }, [goToNext, goToPrevious]);
 
-  // Handle image loading and synchronization for mobile
+  // Simplified synchronization - no preloading delays
   useEffect(() => {
-    if (!courses.length || !isMobile || viewMode !== 'fullscreen') {
-      setDisplayedIndex(currentIndex);
-      return;
-    }
-
-    const targetCourse = courses[currentIndex];
-    if (!targetCourse?.thumbnail_image) {
-      // No image to load, update immediately
-      setDisplayedIndex(currentIndex);
-      return;
-    }
-
-    // Don't show loading state or delay if it's the same course
-    if (currentIndex === displayedIndex) {
-      return;
-    }
-
-    setImageLoading(true);
-    
-    // Preload the new image
-    const img = new Image();
-    img.onload = () => {
-      setImageLoading(false);
-      setDisplayedIndex(currentIndex);
-    };
-    img.onerror = () => {
-      setImageLoading(false);
-      setDisplayedIndex(currentIndex);
-    };
-    img.src = targetCourse.thumbnail_image;
-  }, [currentIndex, courses, isMobile, viewMode, displayedIndex]);
+    setDisplayedIndex(currentIndex);
+  }, [currentIndex]);
 
   // Reset index when modal opens
   useEffect(() => {
@@ -338,11 +308,29 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
               {/* Course Image */}
               <div className="absolute inset-0">
                 {displayedCourse.thumbnail_image ? (
-                  <img
-                    src={displayedCourse.thumbnail_image}
-                    alt={displayedCourse.name}
-                    className="w-full h-full object-cover"
-                  />
+                  <div className="relative w-full h-full">
+                    {/* Placeholder background */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-green-900 to-green-700 flex items-center justify-center">
+                      <div className="text-white text-center">
+                        <div className="text-6xl mb-4">⛳</div>
+                        <p className="text-lg opacity-80">{displayedCourse.name}</p>
+                      </div>
+                    </div>
+                    {/* Actual image */}
+                    <img
+                      src={displayedCourse.thumbnail_image}
+                      alt={displayedCourse.name}
+                      className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
+                      loading="eager"
+                      onLoad={(e) => {
+                        e.currentTarget.style.opacity = '1';
+                      }}
+                      onError={(e) => {
+                        e.currentTarget.style.opacity = '0';
+                      }}
+                      style={{ opacity: 0 }}
+                    />
+                  </div>
                 ) : (
                   <div className="w-full h-full bg-gradient-to-br from-green-900 to-green-700 flex items-center justify-center">
                     <div className="text-white text-center">
