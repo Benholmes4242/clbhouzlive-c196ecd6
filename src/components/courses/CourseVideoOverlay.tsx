@@ -40,6 +40,14 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
 
   const goToNextVideo = async () => {
     if (isTransitioning) return;
+    
+    console.log('🎬 CourseVideoOverlay: Going to next video', {
+      currentIndex: currentVideoIndex,
+      nextIndex: (currentVideoIndex + 1) % videos.length,
+      currentVideo: currentVideo,
+      nextVideo: videos[(currentVideoIndex + 1) % videos.length]
+    });
+    
     setIsTransitioning(true);
     
     // Add a small delay for smooth transition
