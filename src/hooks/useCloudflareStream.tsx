@@ -77,6 +77,7 @@ export const useCloudflareStream = () => {
 
       toast({
         title: "Your post is out there!",
+        duration: 2000,
       });
 
       return {
