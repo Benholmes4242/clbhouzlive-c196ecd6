@@ -416,7 +416,7 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                 <>
                   {/* Latest Post Label */}
                   <div className="fixed bottom-6 right-52 z-20">
-                    <p className="text-white text-sm font-medium bg-black/50 px-3 py-2 rounded-lg backdrop-blur-sm">
+                    <p className={`text-white font-bold ${isMobile ? 'text-3xl' : 'text-sm bg-black/50 px-3 py-2 rounded-lg backdrop-blur-sm'}`}>
                       Latest post from {currentCourse.name}
                     </p>
                   </div>
