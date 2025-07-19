@@ -132,7 +132,7 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
           {/* Bottom Left Overlay - Username and Timestamp */}
           <div className="absolute bottom-4 left-4 text-white">
             {username && (
-              <p className="text-lg font-semibold leading-tight">
+              <p className="text-lg opacity-90 font-medium leading-tight">
                 @{username}
               </p>
             )}
