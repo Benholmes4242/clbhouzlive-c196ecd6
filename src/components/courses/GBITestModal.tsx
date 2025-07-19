@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { X, ChevronUp, ChevronDown, MapPin, Earth } from 'lucide-react';
@@ -26,6 +26,8 @@ interface Course {
 
 const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [viewMode, setViewMode] = useState<'fullscreen' | 'list'>('fullscreen');
+  const listRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
 
   // Fetch GB & I Top 100 courses
@@ -65,6 +67,32 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
       setCurrentIndex(index);
     }
   }, [courses.length]);
+
+  // Toggle view mode and preserve position
+  const toggleViewMode = useCallback((newMode: 'fullscreen' | 'list') => {
+    if (newMode === 'list' && viewMode === 'fullscreen') {
+      // Switching to list view - scroll to current course
+      setViewMode(newMode);
+      setTimeout(() => {
+        if (listRef.current) {
+          const courseElements = listRef.current.querySelectorAll('[data-course-index]');
+          const targetElement = courseElements[currentIndex] as HTMLElement;
+          if (targetElement) {
+            targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }
+      }, 50);
+    } else if (newMode === 'fullscreen' && viewMode === 'list') {
+      // Switching back to fullscreen - current index is already preserved
+      setViewMode(newMode);
+    }
+  }, [viewMode, currentIndex]);
+
+  // Handle course click in list view
+  const handleCourseClick = useCallback((index: number) => {
+    setCurrentIndex(index);
+    setViewMode('fullscreen');
+  }, []);
 
   // Keyboard navigation
   useEffect(() => {
@@ -144,144 +172,245 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
           <div className="text-white">
             <h1 className="text-lg font-semibold">Great Britain & Ireland Top 100</h1>
           </div>
-          <button
-            onClick={onClose}
-            className="text-white hover:text-gray-300 transition-colors p-2"
-            aria-label="Close modal"
-          >
-            <X className="h-6 w-6" />
-          </button>
+          
+          {/* View Toggle */}
+          <div className="flex items-center gap-4">
+            <div className="flex bg-white/20 backdrop-blur-sm rounded-full p-1">
+              <button
+                onClick={() => toggleViewMode('fullscreen')}
+                className={`px-4 py-2 text-sm font-medium rounded-full transition-all ${
+                  viewMode === 'fullscreen'
+                    ? 'bg-white text-black'
+                    : 'text-white hover:bg-white/20'
+                }`}
+              >
+                Full Screen View
+              </button>
+              <button
+                onClick={() => toggleViewMode('list')}
+                className={`px-4 py-2 text-sm font-medium rounded-full transition-all ${
+                  viewMode === 'list'
+                    ? 'bg-white text-black'
+                    : 'text-white hover:bg-white/20'
+                }`}
+              >
+                List View
+              </button>
+            </div>
+            
+            <button
+              onClick={onClose}
+              className="text-white hover:text-gray-300 transition-colors p-2"
+              aria-label="Close modal"
+            >
+              <X className="h-6 w-6" />
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="relative w-full h-full flex items-center justify-center">
-        {isLoading ? (
-          <div className="text-white text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-            <p>Loading GB & I Top 100 courses...</p>
-          </div>
-        ) : currentCourse ? (
-          <div className="relative w-full h-full">
-            {/* Course Image */}
-            <div className="absolute inset-0">
-              {currentCourse.thumbnail_image ? (
-                <img
-                  src={currentCourse.thumbnail_image}
-                  alt={currentCourse.name}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <div className="w-full h-full bg-gradient-to-br from-green-900 to-green-700 flex items-center justify-center">
-                  <div className="text-white text-center">
-                    <div className="text-6xl mb-4">⛳</div>
-                    <p className="text-lg">No image available</p>
+      {viewMode === 'fullscreen' ? (
+        <div className="relative w-full h-full flex items-center justify-center">
+          {isLoading ? (
+            <div className="text-white text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+              <p>Loading GB & I Top 100 courses...</p>
+            </div>
+          ) : currentCourse ? (
+            <div className="relative w-full h-full">
+              {/* Course Image */}
+              <div className="absolute inset-0">
+                {currentCourse.thumbnail_image ? (
+                  <img
+                    src={currentCourse.thumbnail_image}
+                    alt={currentCourse.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-green-900 to-green-700 flex items-center justify-center">
+                    <div className="text-white text-center">
+                      <div className="text-6xl mb-4">⛳</div>
+                      <p className="text-lg">No image available</p>
+                    </div>
+                  </div>
+                )}
+                {/* Overlay gradient */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40" />
+              </div>
+
+              {/* Course Information - matching CourseCard layout exactly */}
+              <div className="absolute bottom-16 left-0 right-0 p-6 text-white">
+                <div>
+                  <h2 className="text-3xl md:text-4xl font-bold mb-2 leading-tight">
+                    {currentCourse.name}
+                  </h2>
+                  <div className="text-lg opacity-90 mb-2">
+                    <span>
+                      {[
+                        currentCourse.country,
+                        currentCourse.sub_country,
+                        currentCourse.region
+                      ].filter(Boolean).join(', ')}
+                    </span>
+                  </div>
+                  
+                  {/* Ranking Badges - Inline version */}
+                  <div className="flex gap-2">
+                    {currentCourse.global_rank && currentCourse.global_rank <= 100 && (
+                      <div className="flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white/90 backdrop-blur-sm rounded-full">
+                        <Earth className="h-5 w-5 text-gray-600" />
+                        <span className="text-sm font-bold text-gray-800 leading-none flex items-center translate-y-[2px]">#{currentCourse.global_rank}</span>
+                      </div>
+                    )}
+                    {currentCourse.regional_rank && currentCourse.regional_rank <= 100 && (
+                      <div className="flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white/90 backdrop-blur-sm rounded-full">
+                        <CountryFlag country="Britain & Ireland" size="md" />
+                        <span className="text-sm font-bold text-gray-800 leading-none flex items-center translate-y-[2px]">#{currentCourse.regional_rank}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
+              </div>
+
+              {/* Left Navigation Arrow - Previous */}
+              {!isMobile && (
+                <button
+                  onClick={goToPrevious}
+                  disabled={currentIndex === 0}
+                  className="absolute top-1/2 left-4 transform -translate-y-1/2 text-white hover:text-gray-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors p-2"
+                  aria-label="Previous course"
+                >
+                  <ChevronUp className="h-8 w-8" />
+                </button>
               )}
-              {/* Overlay gradient */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40" />
-            </div>
 
-            {/* Course Information - matching CourseCard layout exactly */}
-            <div className="absolute bottom-16 left-0 right-0 p-6 text-white">
-              <div>
-                <h2 className="text-3xl md:text-4xl font-bold mb-2 leading-tight">
-                  {currentCourse.name}
-                </h2>
-                <div className="text-lg opacity-90 mb-2">
-                  <span>
-                    {[
-                      currentCourse.country,
-                      currentCourse.sub_country,
-                      currentCourse.region
-                    ].filter(Boolean).join(', ')}
-                  </span>
-                </div>
-                
-                {/* Ranking Badges - Inline version */}
-                <div className="flex gap-2">
-                  {currentCourse.global_rank && currentCourse.global_rank <= 100 && (
-                    <div className="flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white/90 backdrop-blur-sm rounded-full">
-                      <Earth className="h-5 w-5 text-gray-600" />
-                      <span className="text-sm font-bold text-gray-800 leading-none flex items-center translate-y-[2px]">#{currentCourse.global_rank}</span>
-                    </div>
-                  )}
-                  {currentCourse.regional_rank && currentCourse.regional_rank <= 100 && (
-                    <div className="flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white/90 backdrop-blur-sm rounded-full">
-                      <CountryFlag country="Britain & Ireland" size="md" />
-                      <span className="text-sm font-bold text-gray-800 leading-none flex items-center translate-y-[2px]">#{currentCourse.regional_rank}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
+              {/* Vertical Jump Index */}
+              {!isMobile && courses.length > 0 && (
+                <div className="absolute top-1/2 right-4 transform -translate-y-1/2 flex flex-col gap-2">
+                  {[1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map((jumpPoint) => {
+                    // Only show jump points that exist in our dataset
+                    if (jumpPoint > courses.length) return null;
+                    
+                    const jumpIndex = jumpPoint - 1; // Convert to 0-based index
+                    const currentRanking = currentIndex + 1; // Convert to 1-based ranking
+                    
+                    // Determine which jump point should show the dot
+                    const activeJumpPoint = (() => {
+                      if (currentRanking <= 9) return 1;
+                      if (currentRanking <= 19) return 10;
+                      if (currentRanking <= 29) return 20;
+                      if (currentRanking <= 39) return 30;
+                      if (currentRanking <= 49) return 40;
+                      if (currentRanking <= 59) return 50;
+                      if (currentRanking <= 69) return 60;
+                      if (currentRanking <= 79) return 70;
+                      if (currentRanking <= 89) return 80;
+                      if (currentRanking <= 99) return 90;
+                      return 100;
+                    })();
+                    
+                    const showDot = jumpPoint === activeJumpPoint;
 
-            {/* Left Navigation Arrow - Previous */}
-            {!isMobile && (
-              <button
-                onClick={goToPrevious}
-                disabled={currentIndex === 0}
-                className="absolute top-1/2 left-4 transform -translate-y-1/2 text-white hover:text-gray-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors p-2"
-                aria-label="Previous course"
-              >
-                <ChevronUp className="h-8 w-8" />
-              </button>
-            )}
-
-            {/* Vertical Jump Index */}
-            {!isMobile && courses.length > 0 && (
-              <div className="absolute top-1/2 right-4 transform -translate-y-1/2 flex flex-col gap-2">
-                {[1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map((jumpPoint) => {
-                  // Only show jump points that exist in our dataset
-                  if (jumpPoint > courses.length) return null;
-                  
-                  const jumpIndex = jumpPoint - 1; // Convert to 0-based index
-                  const currentRanking = currentIndex + 1; // Convert to 1-based ranking
-                  
-                  // Determine which jump point should show the dot
-                  const activeJumpPoint = (() => {
-                    if (currentRanking <= 9) return 1;
-                    if (currentRanking <= 19) return 10;
-                    if (currentRanking <= 29) return 20;
-                    if (currentRanking <= 39) return 30;
-                    if (currentRanking <= 49) return 40;
-                    if (currentRanking <= 59) return 50;
-                    if (currentRanking <= 69) return 60;
-                    if (currentRanking <= 79) return 70;
-                    if (currentRanking <= 89) return 80;
-                    if (currentRanking <= 99) return 90;
-                    return 100;
-                  })();
-                  
-                  const showDot = jumpPoint === activeJumpPoint;
-
-                  return (
-                    <div key={jumpPoint} className="flex items-center justify-between w-8">
-                      <button
-                        onClick={() => jumpToIndex(jumpIndex)}
-                        className="text-sm font-medium text-white hover:text-gray-300 transition-colors"
-                        aria-label={`Jump to course ${jumpPoint}`}
-                      >
-                        {jumpPoint}
-                      </button>
-                      <div className="w-1 h-1 flex items-center justify-center">
-                        {showDot && (
-                          <div className="w-1 h-1 bg-white rounded-full"></div>
-                        )}
+                    return (
+                      <div key={jumpPoint} className="flex items-center justify-between w-8">
+                        <button
+                          onClick={() => jumpToIndex(jumpIndex)}
+                          className="text-sm font-medium text-white hover:text-gray-300 transition-colors"
+                          aria-label={`Jump to course ${jumpPoint}`}
+                        >
+                          {jumpPoint}
+                        </button>
+                        <div className="w-1 h-1 flex items-center justify-center">
+                          {showDot && (
+                            <div className="w-1 h-1 bg-white rounded-full"></div>
+                          )}
+                        </div>
                       </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="text-white text-center">
+              <p className="text-lg">No courses found</p>
+            </div>
+          )}
+        </div>
+      ) : (
+        /* List View */
+        <div className="pt-20 pb-4 h-full overflow-y-auto" ref={listRef}>
+          {isLoading ? (
+            <div className="text-white text-center p-8">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+              <p>Loading GB & I Top 100 courses...</p>
+            </div>
+          ) : courses.length > 0 ? (
+            <div className="max-w-4xl mx-auto px-4 space-y-4">
+              {courses.map((course, index) => (
+                <div
+                  key={course.id}
+                  data-course-index={index}
+                  onClick={() => handleCourseClick(index)}
+                  className={`bg-white/10 backdrop-blur-sm rounded-lg p-4 cursor-pointer transition-all hover:bg-white/20 ${
+                    index === currentIndex ? 'ring-2 ring-white' : ''
+                  }`}
+                >
+                  <div className="flex items-center gap-4">
+                    {/* Course Image */}
+                    <div className="w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
+                      {course.thumbnail_image ? (
+                        <img
+                          src={course.thumbnail_image}
+                          alt={course.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-green-900 to-green-700 flex items-center justify-center">
+                          <span className="text-2xl">⛳</span>
+                        </div>
+                      )}
                     </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="text-white text-center">
-            <p className="text-lg">No courses found</p>
-          </div>
-        )}
-      </div>
+
+                    {/* Course Info */}
+                    <div className="flex-1 text-white">
+                      <div className="flex items-center gap-3 mb-2">
+                        <h3 className="text-lg font-semibold">{course.name}</h3>
+                        <div className="flex gap-2">
+                          {course.global_rank && course.global_rank <= 100 && (
+                            <div className="flex items-center gap-1 px-2 py-1 bg-white/20 rounded-full">
+                              <Earth className="h-3 w-3" />
+                              <span className="text-xs font-semibold">#{course.global_rank}</span>
+                            </div>
+                          )}
+                          {course.regional_rank && course.regional_rank <= 100 && (
+                            <div className="flex items-center gap-1 px-2 py-1 bg-white/20 rounded-full">
+                              <CountryFlag country="Britain & Ireland" size="sm" />
+                              <span className="text-xs font-semibold">#{course.regional_rank}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <p className="text-sm opacity-75">
+                        {[
+                          course.country,
+                          course.sub_country,
+                          course.region
+                        ].filter(Boolean).join(', ')}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-white text-center p-8">
+              <p className="text-lg">No courses found</p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Progress Indicator */}
       {courses.length > 0 && (
