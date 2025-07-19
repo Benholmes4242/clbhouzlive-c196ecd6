@@ -22,16 +22,15 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
   onOpenFullVideo 
 }) => {
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const preloadVideoRef = useRef<HTMLVideoElement>(null);
   const isMobile = useIsMobile();
 
   const currentVideo = videos[currentVideoIndex];
+  const nextVideoData = videos[(currentVideoIndex + 1) % videos.length];
+  const prevVideoData = videos[(currentVideoIndex - 1 + videos.length) % videos.length];
   const hasMultipleVideos = videos.length > 1;
-
-  // Debug logging
-  console.log('Current video index:', currentVideoIndex);
-  console.log('Current video:', currentVideo);
-  console.log('All videos:', videos);
 
   const handleOverlayClick = () => {
     if (onOpenFullVideo) {
@@ -39,18 +38,32 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
     }
   };
 
-  const nextVideo = () => {
-    setCurrentVideoIndex((prev) => (prev + 1) % videos.length);
+  const goToNextVideo = async () => {
+    if (isTransitioning) return;
+    setIsTransitioning(true);
+    
+    // Add a small delay for smooth transition
+    setTimeout(() => {
+      setCurrentVideoIndex((prev) => (prev + 1) % videos.length);
+      setIsTransitioning(false);
+    }, 150);
   };
 
-  const prevVideo = () => {
-    setCurrentVideoIndex((prev) => (prev - 1 + videos.length) % videos.length);
+  const goToPrevVideo = async () => {
+    if (isTransitioning) return;
+    setIsTransitioning(true);
+    
+    // Add a small delay for smooth transition  
+    setTimeout(() => {
+      setCurrentVideoIndex((prev) => (prev - 1 + videos.length) % videos.length);
+      setIsTransitioning(false);
+    }, 150);
   };
 
   // Swipe gesture hook for mobile
   const swipeRef = useSwipeGesture({
-    onSwipeLeft: nextVideo,
-    onSwipeRight: prevVideo,
+    onSwipeLeft: goToNextVideo,
+    onSwipeRight: goToPrevVideo,
     threshold: 50
   });
 
@@ -96,16 +109,33 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
         onClick={handleOverlayClick}
       >
         <div className="relative w-full h-full rounded-xl bg-black shadow-2xl overflow-hidden">
-          <EnhancedVideoPlayer
-            key={`video-${currentVideoIndex}-${currentVideo?.videoUrl}`}
-            ref={videoRef}
-            src={currentVideo?.videoUrl}
-            autoplay={true}
-            muted={true}
-            loop={true}
-            className="w-full h-full object-contain"
-            enableHLS={true}
-          />
+          {/* Main Video Player */}
+          <div className={`absolute inset-0 transition-opacity duration-300 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
+            <EnhancedVideoPlayer
+              ref={videoRef}
+              src={currentVideo?.videoUrl}
+              autoplay={true}
+              muted={true}
+              loop={true}
+              className="w-full h-full object-contain"
+              enableHLS={true}
+            />
+          </div>
+          
+          {/* Preload next video (invisible) */}
+          {hasMultipleVideos && nextVideoData && (
+            <div className="absolute inset-0 opacity-0 pointer-events-none">
+              <EnhancedVideoPlayer
+                ref={preloadVideoRef}
+                src={nextVideoData.videoUrl}
+                autoplay={false}
+                muted={true}
+                loop={true}
+                className="w-full h-full object-contain"
+                enableHLS={true}
+              />
+            </div>
+          )}
           
           {/* Navigation Arrows Overlay */}
           {hasMultipleVideos && (
@@ -114,7 +144,7 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  prevVideo();
+                  goToPrevVideo();
                 }}
                 className="absolute left-2 top-1/2 transform -translate-y-1/2 z-30 p-2 bg-black/50 rounded-full text-white hover:bg-black/70 transition-all duration-300 opacity-0 group-hover:opacity-100"
                 aria-label="Previous video"
@@ -126,7 +156,7 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  nextVideo();
+                  goToNextVideo();
                 }}
                 className="absolute right-2 top-1/2 transform -translate-y-1/2 z-30 p-2 bg-black/50 rounded-full text-white hover:bg-black/70 transition-all duration-300 opacity-0 group-hover:opacity-100"
                 aria-label="Next video"
