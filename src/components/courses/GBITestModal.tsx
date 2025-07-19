@@ -198,15 +198,15 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                 {/* Ranking Badges - Inline version */}
                 <div className="flex gap-2">
                   {currentCourse.global_rank && currentCourse.global_rank <= 100 && (
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white/90 backdrop-blur-sm rounded-full">
+                    <div className="flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white/90 backdrop-blur-sm rounded-full">
                       <Earth className="h-5 w-5 text-gray-600" />
-                      <span className="text-sm font-bold text-gray-800 leading-none">#{currentCourse.global_rank}</span>
+                      <span className="text-sm font-bold text-gray-800 leading-none flex items-center">#{currentCourse.global_rank}</span>
                     </div>
                   )}
                   {currentCourse.regional_rank && currentCourse.regional_rank <= 100 && (
-                    <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white/90 backdrop-blur-sm rounded-full">
+                    <div className="flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white/90 backdrop-blur-sm rounded-full">
                       <CountryFlag country="Britain & Ireland" size="md" />
-                      <span className="text-sm font-bold text-gray-800 leading-none">#{currentCourse.regional_rank}</span>
+                      <span className="text-sm font-bold text-gray-800 leading-none flex items-center">#{currentCourse.regional_rank}</span>
                     </div>
                   )}
                 </div>
