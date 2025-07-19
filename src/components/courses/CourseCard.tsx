@@ -38,12 +38,16 @@ const formatDescription = (description: string) => {
     <span>
       {description
         .split('\n')
-        .map((line, index, array) => (
-          <React.Fragment key={index}>
-            {line}
-            {index < array.length - 1 && <br />}
-          </React.Fragment>
-        ))}
+        .map((line, index, array) => {
+          // Extract only valid Fragment props (key and children)
+          const fragmentProps = { key: index };
+          return (
+            <React.Fragment {...fragmentProps}>
+              {line}
+              {index < array.length - 1 && <br />}
+            </React.Fragment>
+          );
+        })}
     </span>
   );
 };
