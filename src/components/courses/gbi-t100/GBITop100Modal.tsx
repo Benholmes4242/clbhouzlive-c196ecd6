@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { X, ChevronUp, ChevronDown } from 'lucide-react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useQuery } from '@tanstack/react-query';
@@ -112,6 +112,8 @@ const GBITop100Modal: React.FC<GBITop100ModalProps> = ({ open, onOpenChange }) =
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-none w-screen h-screen p-0 bg-black border-0 rounded-none m-0" style={{ width: '100vw', height: '100vh' }}>
+        <DialogTitle className="sr-only">Great Britain & Ireland Top 100 Golf Courses</DialogTitle>
+        <DialogDescription className="sr-only">Browse and explore the top 100 golf courses in Great Britain and Ireland</DialogDescription>
         <div className="relative w-full h-full flex">
           {/* Header */}
           <div className="absolute top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-sm">
