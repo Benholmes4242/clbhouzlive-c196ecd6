@@ -14,12 +14,14 @@ export const MediaNavigationDots: React.FC<MediaNavigationDotsProps> = ({
   return (
     <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex space-x-2 z-10">
       {Array.from({ length: mediaCount }).map((_, index) => (
-        <div
+        <span
           key={index}
-          className={`w-2 h-2 rounded-full transition-all ${
-            index === currentIndex ? 'bg-white' : 'bg-white bg-opacity-40'
+          className={`text-white text-sm transition-all ${
+            index === currentIndex ? 'font-bold' : 'font-normal opacity-60'
           }`}
-        />
+        >
+          {index + 1}
+        </span>
       ))}
     </div>
   );
