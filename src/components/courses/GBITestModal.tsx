@@ -338,14 +338,14 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                   <div className="flex gap-2">
                     {currentCourse.global_rank && currentCourse.global_rank <= 100 && (
                       <div className="flex items-center justify-center gap-1 px-1.5 py-0.5 bg-white rounded-full">
-                        <Earth className="h-4 w-4 text-gray-600" />
-                        <span className="text-xs font-bold text-gray-800 leading-none flex items-center translate-y-[1px]">#{currentCourse.global_rank}</span>
+                        <Earth className="h-5 w-5 text-gray-600" />
+                        <span className="text-sm font-bold text-gray-800 leading-none flex items-center translate-y-[1px]">#{currentCourse.global_rank}</span>
                       </div>
                     )}
                     {currentCourse.regional_rank && currentCourse.regional_rank <= 100 && (
                       <div className="flex items-center justify-center gap-1 px-1.5 py-0.5 bg-white rounded-full">
-                        <CountryFlag country="Britain & Ireland" size="md" />
-                        <span className="text-xs font-bold text-gray-800 leading-none flex items-center translate-y-[1px]">#{currentCourse.regional_rank}</span>
+                        <CountryFlag country="Britain & Ireland" size="lg" />
+                        <span className="text-sm font-bold text-gray-800 leading-none flex items-center translate-y-[1px]">#{currentCourse.regional_rank}</span>
                       </div>
                     )}
                   </div>
@@ -479,14 +479,14 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                         <div className="flex gap-2">
                           {course.regional_rank && course.regional_rank <= 100 && (
                             <div className="flex items-center gap-1 px-1.5 py-0.5 bg-white rounded-full">
-                              <CountryFlag country="Britain & Ireland" size="md" />
-                              <span className="text-xs font-bold text-gray-800 translate-y-[1px]">#{course.regional_rank}</span>
+                              <CountryFlag country="Britain & Ireland" size="lg" />
+                              <span className="text-sm font-bold text-gray-800 translate-y-[1px]">#{course.regional_rank}</span>
                             </div>
                           )}
                           {course.global_rank && course.global_rank <= 100 && (
                             <div className="flex items-center gap-1 px-1.5 py-0.5 bg-white rounded-full">
-                              <Earth className="h-4 w-4 text-gray-600" />
-                              <span className="text-xs font-bold text-gray-800 translate-y-[1px]">#{course.global_rank}</span>
+                              <Earth className="h-5 w-5 text-gray-600" />
+                              <span className="text-sm font-bold text-gray-800 translate-y-[1px]">#{course.global_rank}</span>
                             </div>
                           )}
                         </div>
