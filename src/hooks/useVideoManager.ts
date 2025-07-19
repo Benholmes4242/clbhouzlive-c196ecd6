@@ -15,6 +15,7 @@ interface VideoInstance {
 export const useVideoManager = () => {
   const videosRef = useRef<Map<string, VideoInstance>>(new Map());
   const currentPlayingVideoRef = useRef<string | null>(null);
+  const globalAudioPreferenceRef = useRef<boolean>(true); // true = muted, false = unmuted
 
   // Register a video with the manager
   const registerVideo = useCallback((id: string, videoElement: HTMLVideoElement) => {
@@ -66,11 +67,12 @@ export const useVideoManager = () => {
       // Pause all other videos when this one comes into view
       pauseAllVideosExcept(id);
       
-      // Start playing this video (muted)
-      video.videoElement.muted = true;
+      // Start playing this video, respecting global audio preference
+      const shouldBeMuted = globalAudioPreferenceRef.current;
+      video.videoElement.muted = shouldBeMuted;
       video.videoElement.play().then(() => {
         video.isPlaying = true;
-        video.isMuted = true;
+        video.isMuted = shouldBeMuted;
         currentPlayingVideoRef.current = id;
         videosRef.current.set(id, video);
       }).catch(error => {
@@ -109,6 +111,9 @@ export const useVideoManager = () => {
     video.videoElement.muted = newMutedState;
     video.isMuted = newMutedState;
     videosRef.current.set(id, video);
+
+    // Update global audio preference based on user's action
+    globalAudioPreferenceRef.current = newMutedState;
 
     // If unmuting, ensure this video is playing
     if (!newMutedState && video.isInView) {
