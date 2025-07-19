@@ -78,7 +78,7 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
         className="relative cursor-pointer group flex-shrink-0"
         style={{ 
           width: isMobile ? '180px' : '270px',
-          height: isMobile ? '200px' : '300px'
+          height: isMobile ? '220px' : '330px'
         }}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
