@@ -44,8 +44,10 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
     console.log('🎬 CourseVideoOverlay: Going to next video', {
       currentIndex: currentVideoIndex,
       nextIndex: (currentVideoIndex + 1) % videos.length,
-      currentVideo: currentVideo,
-      nextVideo: videos[(currentVideoIndex + 1) % videos.length]
+      currentVideoUrl: currentVideo?.videoUrl,
+      nextVideoUrl: videos[(currentVideoIndex + 1) % videos.length]?.videoUrl,
+      allVideos: videos,
+      videosLength: videos.length
     });
     
     setIsTransitioning(true);

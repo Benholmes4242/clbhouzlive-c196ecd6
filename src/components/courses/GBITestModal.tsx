@@ -239,9 +239,12 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
 
   // Debug: Log video data to help troubleshoot
   console.log('🎥 Course Videos Data:', { 
-    courseVideos, 
+    courseVideosCount: courseVideos.length,
+    rawCourseVideos: courseVideos,
+    transformedVideosCount: videos.length,
     transformedVideos: videos,
-    courseId: currentCourse?.id 
+    currentCourseId: currentCourse?.id,
+    currentCourseName: currentCourse?.name
   });
 
   return (
