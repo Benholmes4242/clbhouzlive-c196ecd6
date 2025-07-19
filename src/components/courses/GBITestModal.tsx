@@ -157,8 +157,6 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
     };
   }, [isOpen]);
 
-  if (!isOpen) return null;
-
   const currentCourse = courses[currentIndex];
 
   // Fetch videos for the current course (only in fullscreen mode)
@@ -166,6 +164,8 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
     currentCourse?.id, 
     isOpen && viewMode === 'fullscreen' && !!currentCourse
   );
+
+  if (!isOpen) return null;
 
   const latestVideo = courseVideos.length > 0 ? courseVideos[0] : null;
 
