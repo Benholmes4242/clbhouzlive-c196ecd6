@@ -140,29 +140,33 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
           {/* Navigation Arrows Overlay */}
           {hasMultipleVideos && (
             <>
-              {/* Left Arrow - Overlay on video */}
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  goToPrevVideo();
-                }}
-                className="absolute left-2 top-1/2 transform -translate-y-1/2 z-30 p-1 rounded-full text-white hover:bg-white hover:text-black transition-all duration-300 opacity-0 group-hover:opacity-100"
-                aria-label="Previous video"
-              >
-                <ChevronLeft className={`${isMobile ? 'h-5 w-5' : 'h-6 w-6'}`} />
-              </button>
+              {/* Left Arrow - Only show when not on first video */}
+              {currentVideoIndex > 0 && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    goToPrevVideo();
+                  }}
+                  className="absolute left-2 top-1/2 transform -translate-y-1/2 z-30 p-1 rounded-full text-white hover:bg-white hover:text-black transition-all duration-300 opacity-0 group-hover:opacity-100"
+                  aria-label="Previous video"
+                >
+                  <ChevronLeft className={`${isMobile ? 'h-5 w-5' : 'h-6 w-6'}`} />
+                </button>
+              )}
 
-              {/* Right Arrow - Overlay on video */}
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  goToNextVideo();
-                }}
-                className="absolute right-2 top-1/2 transform -translate-y-1/2 z-30 p-1 rounded-full text-white hover:bg-white hover:text-black transition-all duration-300 opacity-0 group-hover:opacity-100"
-                aria-label="Next video"
-              >
-                <ChevronRight className={`${isMobile ? 'h-5 w-5' : 'h-6 w-6'}`} />
-              </button>
+              {/* Right Arrow - Only show when not on last video */}
+              {currentVideoIndex < videos.length - 1 && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    goToNextVideo();
+                  }}
+                  className="absolute right-2 top-1/2 transform -translate-y-1/2 z-30 p-1 rounded-full text-white hover:bg-white hover:text-black transition-all duration-300 opacity-0 group-hover:opacity-100"
+                  aria-label="Next video"
+                >
+                  <ChevronRight className={`${isMobile ? 'h-5 w-5' : 'h-6 w-6'}`} />
+                </button>
+              )}
             </>
           )}
           
