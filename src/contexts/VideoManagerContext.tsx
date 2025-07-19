@@ -14,17 +14,27 @@ export const VideoManagerProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const currentActiveVideo = useRef<HTMLVideoElement | null>(null);
 
   const setActiveVideo = (videoElement: HTMLVideoElement | null) => {
-    // If there's a currently active video and it's different from the new one, pause it
-    if (currentActiveVideo.current && currentActiveVideo.current !== videoElement) {
-      currentActiveVideo.current.pause();
-      currentActiveVideo.current.currentTime = 0; // Reset to beginning
-      console.log('🔇 Paused previous video:', currentActiveVideo.current.src.slice(-20));
-    }
+    console.log('🎮 VideoManager: setActiveVideo called', {
+      newVideo: videoElement?.src.slice(-20),
+      currentActive: currentActiveVideo.current?.src.slice(-20),
+      totalVideos: activeVideos.current.size
+    });
+
+    // Pause and reset ALL other videos
+    activeVideos.current.forEach(video => {
+      if (video !== videoElement && !video.paused) {
+        video.pause();
+        video.currentTime = 0;
+        console.log('🔇 VideoManager: Paused and reset video:', video.src.slice(-20));
+      }
+    });
     
     currentActiveVideo.current = videoElement;
     
     if (videoElement) {
-      console.log('🎵 Set new active video:', videoElement.src.slice(-20));
+      console.log('🎵 VideoManager: Set new active video:', videoElement.src.slice(-20));
+    } else {
+      console.log('🔇 VideoManager: Cleared active video');
     }
   };
 
@@ -39,6 +49,7 @@ export const VideoManagerProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
   const addVideo = (video: HTMLVideoElement) => {
     activeVideos.current.add(video);
+    console.log('➕ VideoManager: Added video, total count:', activeVideos.current.size, video.src.slice(-20));
   };
 
   const removeVideo = (video: HTMLVideoElement) => {
@@ -46,6 +57,7 @@ export const VideoManagerProvider: React.FC<{ children: React.ReactNode }> = ({ 
     if (currentActiveVideo.current === video) {
       currentActiveVideo.current = null;
     }
+    console.log('➖ VideoManager: Removed video, total count:', activeVideos.current.size, video.src.slice(-20));
   };
 
   const value = {

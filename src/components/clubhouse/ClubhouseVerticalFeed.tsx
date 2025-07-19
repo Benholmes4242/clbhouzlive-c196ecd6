@@ -31,8 +31,8 @@ const VideoWithAutoplay: React.FC<{
   className: string;
 }> = React.memo(({ src, muted, className }) => {
   const { ref, isInView } = useIntersectionObserver({
-    threshold: 0.5, // Video must be 50% visible to autoplay
-    rootMargin: '0px'
+    threshold: 0.8, // Video must be 80% visible to autoplay (more restrictive)
+    rootMargin: '0px' // No margin to prevent multiple videos triggering
   });
   const [hasAttemptedPlay, setHasAttemptedPlay] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -67,19 +67,25 @@ const VideoWithAutoplay: React.FC<{
     
     const video = videoRef.current;
     
+    console.log('🎬 VideoWithAutoplay: Attempting to play video:', src.slice(-20), {
+      isInView,
+      hasAttemptedPlay,
+      videoPaused: video.paused
+    });
+    
     try {
       // Ensure video respects global mute state
       video.muted = isGloballyMuted;
       video.playsInline = true;
       
-      // Set this video as the active one (pauses others)
+      // CRITICAL: Set this video as the active one BEFORE playing (pauses others)
       setActiveVideo(video);
       
       await video.play();
-      console.log('✅ Video autoplay successful:', src.slice(-20));
+      console.log('✅ VideoWithAutoplay: Video autoplay successful:', src.slice(-20));
       setHasAttemptedPlay(true);
     } catch (error) {
-      console.log('❌ Video autoplay failed:', error);
+      console.log('❌ VideoWithAutoplay: Video autoplay failed:', error);
       
       // On mobile, try again after a brief delay
       if (isMobile) {
@@ -90,15 +96,25 @@ const VideoWithAutoplay: React.FC<{
         }, 100);
       }
     }
-  }, [videoRef.current, hasAttemptedPlay, isMobile, src, setActiveVideo, isGloballyMuted]);
+  }, [videoRef.current, hasAttemptedPlay, isMobile, src, setActiveVideo, isGloballyMuted, isInView]);
 
   // Handle initial autoplay attempt when video comes into view
   useEffect(() => {
+    console.log('📱 VideoWithAutoplay: View state changed:', {
+      src: src.slice(-20),
+      isInView,
+      hasAttemptedPlay
+    });
+    
     if (isInView && !hasAttemptedPlay) {
       // Small delay to ensure video is ready
       setTimeout(attemptVideoPlay, 100);
+    } else if (!isInView && videoRef.current && !videoRef.current.paused) {
+      // Pause video when it goes out of view
+      console.log('📱 VideoWithAutoplay: Video went out of view, pausing:', src.slice(-20));
+      videoRef.current.pause();
     }
-  }, [isInView, attemptVideoPlay, hasAttemptedPlay]);
+  }, [isInView, attemptVideoPlay, hasAttemptedPlay, src]);
 
   // Update video mute state when global mute changes
   useEffect(() => {
