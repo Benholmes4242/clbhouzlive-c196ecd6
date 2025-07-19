@@ -190,11 +190,6 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                   {currentCourse.region ? `${currentCourse.region}, ` : ''}
                   {currentCourse.country}
                 </p>
-                {currentCourse.description && (
-                  <p className="text-sm opacity-80 leading-relaxed max-w-2xl">
-                    {currentCourse.description}
-                  </p>
-                )}
               </div>
             </div>
 
@@ -236,14 +231,6 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
         </div>
       )}
 
-      {/* Instructions */}
-      <div className="absolute bottom-4 right-4 text-white text-xs opacity-60">
-        {isMobile ? (
-          <p>Swipe up/down to navigate</p>
-        ) : (
-          <p>Use arrow keys or scroll to navigate</p>
-        )}
-      </div>
     </div>
   );
 };
