@@ -173,8 +173,14 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
     <div 
       className="fixed top-0 left-0 w-full h-full z-[9999] bg-black overflow-hidden"
       style={{ margin: 0, padding: 0 }}
+      onClick={(e) => e.stopPropagation()}
+      onWheel={(e) => {
+        e.stopPropagation();
+        handleWheel(e);
+      }}
+      onTouchMove={(e) => e.stopPropagation()}
+      onScroll={(e) => e.stopPropagation()}
       {...swipeHandlers}
-      onWheel={handleWheel}
     >
       {/* Header */}
       <div className="absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/80 to-transparent">
