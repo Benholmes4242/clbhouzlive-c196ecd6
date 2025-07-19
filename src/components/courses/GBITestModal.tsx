@@ -440,7 +440,7 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                         )}
                         {course.global_rank && course.global_rank <= 100 && (
                           <div className="flex items-center gap-1 px-2 py-1 bg-white rounded-full">
-                            <Earth className="h-4 w-4 text-gray-600" />
+                            <Earth className="h-5 w-5 text-gray-600" />
                             <span className="text-sm font-semibold text-gray-800 translate-y-[2px]">#{course.global_rank}</span>
                           </div>
                         )}
