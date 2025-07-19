@@ -61,9 +61,9 @@ const ManagedVideoPlayer: React.FC<ManagedVideoPlayerProps> = ({
         videoRef.current.muted = true;
       } else {
         // Use video manager for audio control when not disabled
-        handleVideoInView(id, isIntersecting);
+        handleVideoInView(id, isIntersecting && isInView);
         // Control audio based on passed isInView prop (current video in feed)
-        videoRef.current.muted = !isInView;
+        videoRef.current.muted = !(isInView && isIntersecting);
       }
     }
   }, [id, isInView, isIntersecting, handleVideoInView, disableAudio]);
@@ -77,7 +77,7 @@ const ManagedVideoPlayer: React.FC<ManagedVideoPlayerProps> = ({
       if (disableAudio) {
         video.muted = true;
       } else {
-        video.muted = !isInView;
+        video.muted = !(isInView && isIntersecting);
       }
     };
 
@@ -91,7 +91,7 @@ const ManagedVideoPlayer: React.FC<ManagedVideoPlayerProps> = ({
       video.removeEventListener('play', handleVideoEvents);
       video.removeEventListener('seeking', handleVideoEvents);
     };
-  }, [disableAudio, isInView]);
+  }, [disableAudio, isInView, isIntersecting]);
 
   // Check for video element periodically until found
   useEffect(() => {
