@@ -146,15 +146,17 @@ const LogosManagement = () => {
 
   const handleDeleteLogo = async (logo: Logo) => {
     try {
-      // Delete from storage
+      // Note: Logo files are now stored in Cloudflare R2, not Supabase storage
+      // For R2 deletion, we would need to implement deleteFromCloudflareR2 function
+      // For now, we'll only delete the database record as files in R2 are managed separately
+      
+      // Extract file path for future R2 deletion if needed
       const urlParts = logo.file_url.split('/');
       const filePath = urlParts.slice(-2).join('/');
       
-      await supabase.storage
-        .from('logos')
-        .remove([filePath]);
+      console.log('Logo file path (for future R2 deletion):', filePath);
 
-      // Delete from database
+      // Delete from database only (R2 files are kept for data integrity)
       const { error } = await supabase
         .from('logos')
         .delete()
