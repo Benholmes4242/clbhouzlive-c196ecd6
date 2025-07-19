@@ -432,8 +432,8 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                     id={`${item.id}-${currentMediaIndex}`}
                     src={currentMedia.media_url}
                     className="w-full h-full"
-                    disableAudio={isGloballyMuted}
-                    isInView={index === currentIndex}
+                    disableAudio={false} // Always enable audio management
+                    isInView={index === currentIndex && !isGloballyMuted}
                   />
                 ) : (
                   <div className="relative w-full h-full bg-black">

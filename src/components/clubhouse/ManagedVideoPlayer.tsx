@@ -23,9 +23,14 @@ const ManagedVideoPlayer: React.FC<ManagedVideoPlayerProps> = ({
   isInView = false
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  
+  // Always call hooks - fix React hooks order violation
+  const videoManagerContext = useVideoManagerContext();
+  
+  // Use context methods only if audio is enabled
   const { handleVideoInView, registerVideo, unregisterVideo } = disableAudio ? 
     { handleVideoInView: () => {}, registerVideo: () => {}, unregisterVideo: () => {} } : 
-    useVideoManagerContext();
+    videoManagerContext;
   
   // Use intersection observer to detect when video is in viewport
   const { ref: containerRef, isInView: isIntersecting } = useIntersectionObserver({
