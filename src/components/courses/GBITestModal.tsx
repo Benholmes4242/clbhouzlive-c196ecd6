@@ -135,10 +135,7 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
       <div className="absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/80 to-transparent">
         <div className="flex items-center justify-between p-4">
           <div className="text-white">
-            <h1 className="text-lg font-semibold">GB & I Top 100 Test</h1>
-            <p className="text-sm opacity-80">
-              {courses.length > 0 && `${currentIndex + 1} of ${courses.length}`}
-            </p>
+            <h1 className="text-lg font-semibold">GB&I Top 100</h1>
           </div>
           <button
             onClick={onClose}
