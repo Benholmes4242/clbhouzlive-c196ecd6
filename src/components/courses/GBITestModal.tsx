@@ -367,7 +367,7 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
 
               {/* Jump Index - Vertical on Right Side for Desktop Only */}
               {courses.length > 0 && (
-                <div className="absolute top-1/2 right-4 transform -translate-y-1/2 flex-col gap-2 hidden md:flex">
+                <div className="absolute top-1/2 right-4 transform -translate-y-1/2 hidden md:flex md:flex-col gap-2">
                   {[1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map((jumpPoint) => {
                     // Only show jump points that exist in our dataset
                     if (jumpPoint > courses.length) return null;
