@@ -280,7 +280,7 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
       video.removeEventListener('progress', handleProgress);
       video.removeEventListener('volumechange', handleVolumeChange);
     };
-  }, [onPlay, onPause]);
+  }, [onPlay, onPause, src]); // Add src dependency to prevent restart loops
 
   // Update video muted state when global audio state changes
   useEffect(() => {
@@ -322,11 +322,15 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
 
   const toggleMute = (e: React.MouseEvent) => {
     e.stopPropagation();
+    e.preventDefault(); // Prevent any default behavior
     const video = videoRef.current;
     if (!video) return;
 
+    // Only toggle mute state, don't restart video
     video.muted = !video.muted;
-    // Mute state is now managed by global audio context
+    
+    // Don't trigger any play/pause or restart logic
+    console.log('🔊 Manual mute toggle', { muted: video.muted, currentTime: video.currentTime });
   };
 
   const handleFullscreen = (e: React.MouseEvent) => {
