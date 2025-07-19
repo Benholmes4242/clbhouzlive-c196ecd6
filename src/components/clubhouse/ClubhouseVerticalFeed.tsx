@@ -110,9 +110,10 @@ const VideoWithAutoplay: React.FC<{
       // Small delay to ensure video is ready
       setTimeout(attemptVideoPlay, 100);
     } else if (!isInView && videoRef.current && !videoRef.current.paused) {
-      // Pause video when it goes out of view
+      // Pause video when it goes out of view and reset hasAttemptedPlay
       console.log('📱 VideoWithAutoplay: Video went out of view, pausing:', src.slice(-20));
       videoRef.current.pause();
+      setHasAttemptedPlay(false); // Reset to allow autoplay when coming back into view
     }
   }, [isInView, attemptVideoPlay, hasAttemptedPlay, src]);
 
