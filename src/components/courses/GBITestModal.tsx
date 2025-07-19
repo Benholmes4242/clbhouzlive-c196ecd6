@@ -7,6 +7,7 @@ import { MdFitScreen } from 'react-icons/md';
 import { useSwipeable } from 'react-swipeable';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useNavigate } from 'react-router-dom';
 import CountryFlag from '@/components/ui/country-flag';
 import CourseRankBadges from './CourseRankBadges';
 import CourseVideoOverlay from './CourseVideoOverlay';
@@ -40,6 +41,7 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
   const listRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
   const { user } = useSupabaseSession();
+  const navigate = useNavigate();
 
   // Fetch GB & I Top 100 courses
   const { data: courses = [], isLoading } = useQuery({
@@ -136,11 +138,10 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
     }
   }, [viewMode, currentIndex]);
 
-  // Handle course click in list view
-  const handleCourseClick = useCallback((index: number) => {
-    setCurrentIndex(index);
-    setViewMode('fullscreen');
-  }, []);
+  // Handle course click in list view - navigate to course detail page
+  const handleCourseClick = useCallback((courseId: string) => {
+    navigate(`/courses/${courseId}`);
+  }, [navigate]);
 
   // Keyboard navigation
   useEffect(() => {
@@ -442,7 +443,7 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                 <div
                   key={course.id}
                   data-course-index={index}
-                  onClick={() => handleCourseClick(index)}
+                  onClick={() => handleCourseClick(course.id)}
                   className={`relative rounded-lg overflow-hidden cursor-pointer transition-all hover:scale-[1.02] ${
                     index === currentIndex ? 'ring-2 ring-white' : ''
                   }`}
