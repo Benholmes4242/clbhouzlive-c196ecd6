@@ -122,7 +122,8 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <div 
-      className="fixed top-0 left-0 right-0 bottom-0 z-[9999] bg-black w-screen h-screen"
+      className="fixed top-0 left-0 w-full h-full z-[9999] bg-black overflow-hidden"
+      style={{ margin: 0, padding: 0 }}
       {...swipeHandlers}
       onWheel={handleWheel}
     >
