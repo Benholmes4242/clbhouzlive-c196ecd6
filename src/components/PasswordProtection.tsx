@@ -46,7 +46,7 @@ const PasswordProtection: React.FC<PasswordProtectionProps> = ({ children }) => 
     // For security, password should be validated on server-side
     // This is a temporary client-side check - replace with proper authentication
     const validPasswords = [
-      'dev-access-2025!*' // Development access password
+      'dev-access-2002**' // Development access password
     ];
     
     if (validPasswords.includes(password)) {
