@@ -18,13 +18,12 @@ const FeedMuteToggle: React.FC<FeedMuteToggleProps> = ({ isVideoPost = false }) 
   }
 
   const handleToggle = () => {
+    // Only toggle global mute state - no video interaction
     toggleGlobalMute();
-    // When globally muting, ensure all videos are muted
-    if (!isGloballyMuted) {
-      muteAllVideos();
-    }
-    // When unmuting, don't automatically unmute all videos
-    // Let individual videos handle their own audio when they become active
+    
+    // Don't call muteAllVideos() as that might trigger video restarts
+    // Let videos handle mute state through useEffect in enhanced-video-player
+    console.log('🔊 Feed mute toggle - only changing global state');
   };
 
   return (

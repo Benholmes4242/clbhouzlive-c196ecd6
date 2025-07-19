@@ -282,18 +282,27 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
     };
   }, [onPlay, onPause, src]); // Add src dependency to prevent restart loops
 
-  // Update video muted state when global audio state changes
+  // Update video muted state when global audio state changes - NO RESTART
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
     
-    // When globally muted, always mute this video
-    if (isGloballyMuted) {
-      console.log('🔊 EnhancedVideoPlayer: Updating mute state to MUTED');
-      video.muted = true;
+    // ONLY change mute property - never restart or change playback
+    const wasPlaying = !video.paused;
+    const currentTime = video.currentTime;
+    
+    video.muted = isGloballyMuted;
+    
+    // Ensure video stays in the same playback state
+    if (wasPlaying && video.paused) {
+      video.play().catch(console.error);
     }
-    // When globally unmuted, stay muted unless this video is specifically playing
-    // Individual videos will handle their own unmuting when they become active
+    
+    console.log('🔊 EnhancedVideoPlayer: Mute state updated', { 
+      muted: isGloballyMuted, 
+      currentTime,
+      playing: !video.paused 
+    });
   }, [isGloballyMuted]);
 
   // Cleanup HLS on unmount
