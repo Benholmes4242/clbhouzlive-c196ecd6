@@ -85,7 +85,7 @@ const ManagedVideoPlayer: React.FC<ManagedVideoPlayerProps> = ({
       const isMuted = getVideoMuteState(id);
       onMuteStateChange(isMuted);
     }
-  }, [id, getVideoMuteState, onMuteStateChange]);
+  }, [id, onMuteStateChange]);
 
   return (
     <div ref={containerRef} className={`relative w-full h-full ${className}`}>
