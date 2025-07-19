@@ -1,6 +1,6 @@
-// ClubhouseVerticalFeed - Audio functionality completely removed for Clubhouse page
+// ClubhouseVerticalFeed - Audio control system implemented
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { MessageCircle, MapPin, UserPlus, UserCheck, Loader2 } from 'lucide-react';
+import { MessageCircle, MapPin, UserPlus, UserCheck, Loader2, Volume2, VolumeX } from 'lucide-react';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
 import { RiShareForward2Fill } from 'react-icons/ri';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -39,6 +39,13 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   const [isTextExpanded, setIsTextExpanded] = useState(false);
   const [mediaIndices, setMediaIndices] = useState<{[key: string]: number}>({});
   const queryClient = useQueryClient();
+
+  // Audio control state - always starts muted
+  const [isGloballyMuted, setIsGloballyMuted] = useState(() => {
+    // Always start muted, but check session storage for preference
+    const savedPreference = sessionStorage.getItem('clubhouse-audio-preference');
+    return savedPreference !== 'unmuted';
+  });
 
   // Check if current user follows the displayed user
   const { data: isFollowing, isLoading: isFollowingLoading } = useQuery({
@@ -287,6 +294,15 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     console.log('Comment clicked');
   };
 
+  // Audio toggle handler
+  const handleAudioToggle = useCallback(() => {
+    const newMutedState = !isGloballyMuted;
+    setIsGloballyMuted(newMutedState);
+    
+    // Persist preference in session storage
+    sessionStorage.setItem('clubhouse-audio-preference', newMutedState ? 'muted' : 'unmuted');
+  }, [isGloballyMuted]);
+
   if (posts.length === 0) {
     return (
       <div className="fixed inset-0 z-10 bg-black flex items-center justify-center">
@@ -416,7 +432,8 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                     id={`${item.id}-${currentMediaIndex}`}
                     src={currentMedia.media_url}
                     className="w-full h-full"
-                    disableAudio={true}
+                    disableAudio={isGloballyMuted}
+                    isInView={index === currentIndex}
                   />
                 ) : (
                   <div className="relative w-full h-full bg-black">
@@ -488,6 +505,21 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
 
               {/* Action Buttons - Bottom Right */}
               <div className="absolute bottom-10 right-4 z-10 flex flex-col space-y-6">
+                {/* Audio Toggle Button - Above Heart */}
+                {currentMedia.media_type === 'video' && (
+                  <div className="flex flex-col items-center">
+                    <button
+                      onClick={handleAudioToggle}
+                      className="cursor-pointer hover:opacity-100 transition-opacity"
+                    >
+                      {isGloballyMuted ? (
+                        <VolumeX className="h-8 w-8 text-white" />
+                      ) : (
+                        <Volume2 className="h-8 w-8 text-white" />
+                      )}
+                    </button>
+                  </div>
+                )}
 
                 {/* Heart Button with Like Count */}
                 <div className="flex flex-col items-center">

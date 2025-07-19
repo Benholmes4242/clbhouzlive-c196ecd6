@@ -8,6 +8,7 @@ interface ManagedVideoPlayerProps {
   src: string;
   className?: string;
   disableAudio?: boolean; // New prop to disable audio functionality
+  isInView?: boolean; // Track if video should have audio (when unmuted)
 }
 
 /**
@@ -18,7 +19,8 @@ const ManagedVideoPlayer: React.FC<ManagedVideoPlayerProps> = ({
   id,
   src,
   className = '',
-  disableAudio = false
+  disableAudio = false,
+  isInView = false
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const { handleVideoInView, registerVideo, unregisterVideo } = disableAudio ? 
@@ -26,7 +28,7 @@ const ManagedVideoPlayer: React.FC<ManagedVideoPlayerProps> = ({
     useVideoManagerContext();
   
   // Use intersection observer to detect when video is in viewport
-  const { ref: containerRef, isInView } = useIntersectionObserver({
+  const { ref: containerRef, isInView: isIntersecting } = useIntersectionObserver({
     threshold: 0.5, // Video must be 50% visible
     rootMargin: '0px'
   });
@@ -46,12 +48,24 @@ const ManagedVideoPlayer: React.FC<ManagedVideoPlayerProps> = ({
     }
   }, [id, registerVideo, containerRef, disableAudio]);
 
-  // Handle viewport changes
+  // Handle viewport changes and audio control
   useEffect(() => {
-    if (!disableAudio && videoRef.current) {
-      handleVideoInView(id, isInView);
+    if (videoRef.current) {
+      if (disableAudio) {
+        // Force muted when audio is disabled
+        videoRef.current.muted = true;
+      } else {
+        // Use video manager for audio control when not disabled
+        handleVideoInView(id, isIntersecting);
+        // Control audio based on passed isInView prop (current video in feed)
+        if (isInView && !disableAudio) {
+          videoRef.current.muted = false;
+        } else {
+          videoRef.current.muted = true;
+        }
+      }
     }
-  }, [id, isInView, handleVideoInView, disableAudio]);
+  }, [id, isInView, isIntersecting, handleVideoInView, disableAudio]);
 
   // Check for video element periodically until found
   useEffect(() => {
