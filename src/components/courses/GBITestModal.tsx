@@ -6,6 +6,8 @@ import { useSwipeable } from 'react-swipeable';
 import { useIsMobile } from '@/hooks/use-mobile';
 import CountryFlag from '@/components/ui/country-flag';
 import CourseRankBadges from './CourseRankBadges';
+import CourseVideoOverlay from './CourseVideoOverlay';
+import { useCourseVideos } from '@/hooks/useCourseVideos';
 
 interface GBITestModalProps {
   isOpen: boolean;
@@ -158,6 +160,14 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   const currentCourse = courses[currentIndex];
+
+  // Fetch videos for the current course (only in fullscreen mode)
+  const { data: courseVideos = [] } = useCourseVideos(
+    currentCourse?.id, 
+    isOpen && viewMode === 'fullscreen' && !!currentCourse
+  );
+
+  const latestVideo = courseVideos.length > 0 ? courseVideos[0] : null;
 
   return (
     <div 
@@ -330,6 +340,18 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                     );
                   })}
                 </div>
+              )}
+
+              {/* Video Overlay - Only show in fullscreen mode if video exists */}
+              {latestVideo && (
+                <CourseVideoOverlay
+                  videoUrl={latestVideo.media_url}
+                  courseName={currentCourse.name}
+                  onOpenFullVideo={() => {
+                    // TODO: Implement full video modal or navigate to post
+                    console.log('Open full video for post:', latestVideo.post_id);
+                  }}
+                />
               )}
             </div>
           ) : (
