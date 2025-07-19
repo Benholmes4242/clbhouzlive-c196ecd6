@@ -51,7 +51,7 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
       onClick={handleOverlayClick}
     >
       {/* Video Container */}
-      <div className="relative w-36 h-36 md:w-40 md:h-40 rounded-lg overflow-hidden shadow-2xl bg-black">
+      <div className="relative w-36 h-48 md:w-40 md:h-40 rounded-lg overflow-hidden shadow-2xl bg-black">
         <EnhancedVideoPlayer
           ref={videoRef}
           src={videoUrl}
