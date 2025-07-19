@@ -433,15 +433,15 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                       </p>
                       <div className="flex gap-2">
                         {course.global_rank && course.global_rank <= 100 && (
-                          <div className="flex items-center gap-1 px-2 py-1 bg-white/20 backdrop-blur-sm rounded-full">
-                            <Earth className="h-5 w-5" />
-                            <span className="text-xs font-semibold">#{course.global_rank}</span>
+                          <div className="flex items-center gap-1 px-2 py-1 bg-white rounded-full">
+                            <Earth className="h-4 w-4 text-gray-600" />
+                            <span className="text-xs font-semibold text-gray-800">#{course.global_rank}</span>
                           </div>
                         )}
                         {course.regional_rank && course.regional_rank <= 100 && (
-                          <div className="flex items-center gap-1 px-2 py-1 bg-white/20 backdrop-blur-sm rounded-full">
-                            <CountryFlag country="Britain & Ireland" size="lg" />
-                            <span className="text-xs font-semibold">#{course.regional_rank}</span>
+                          <div className="flex items-center gap-1 px-2 py-1 bg-white rounded-full">
+                            <CountryFlag country="Britain & Ireland" size="md" />
+                            <span className="text-xs font-semibold text-gray-800">#{course.regional_rank}</span>
                           </div>
                         )}
                       </div>
