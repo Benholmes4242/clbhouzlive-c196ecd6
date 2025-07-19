@@ -76,8 +76,7 @@ export const useCloudflareStream = () => {
       console.log('Video uploaded successfully to Cloudflare Stream:', data.videoId);
 
       toast({
-        title: "Video uploaded!",
-        description: "Your video is now hosted on Cloudflare Stream with global CDN.",
+        title: "Your post is out there!",
       });
 
       return {
