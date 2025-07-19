@@ -178,11 +178,6 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
             {/* Course Information */}
             <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
               <div className="max-w-4xl mx-auto">
-                <div className="mb-2">
-                  <span className="inline-block bg-green-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                    #{currentCourse.regional_rank}
-                  </span>
-                </div>
                 <h2 className="text-3xl md:text-4xl font-bold mb-2">
                   {currentCourse.name}
                 </h2>
@@ -190,6 +185,23 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                   {currentCourse.region ? `${currentCourse.region}, ` : ''}
                   {currentCourse.country}
                 </p>
+                
+                {/* Ranking Badges */}
+                <div className="flex gap-3">
+                  {/* World Rank - if available, we'll show it as #3 for now as placeholder */}
+                  <div className="flex items-center bg-white/20 backdrop-blur-sm rounded-full px-3 py-1">
+                    <span className="text-white text-sm font-semibold">
+                      #{currentCourse.regional_rank}
+                    </span>
+                  </div>
+                  
+                  {/* Regional Rank */}
+                  <div className="flex items-center bg-green-600 rounded-full px-3 py-1">
+                    <span className="text-white text-sm font-semibold">
+                      #{currentCourse.regional_rank}
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
 
