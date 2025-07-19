@@ -255,16 +255,16 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
     >
       {/* Header */}
       <div className="absolute top-0 left-0 right-0 z-10">
-        <div className="flex items-center justify-between p-4">
-          <div className="text-black">
-            <h1 className="text-lg opacity-90">Great Britain & Ireland Top 100</h1>
+        <div className="flex items-center justify-between">
+          <div className="text-white p-4">
+            <h1 className="text-lg font-semibold drop-shadow-lg">Great Britain & Ireland Top 100</h1>
           </div>
           
           {/* Single View Toggle Icon */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 p-4">
             <button
               onClick={() => toggleViewMode(viewMode === 'fullscreen' ? 'list' : 'fullscreen')}
-              className="text-black hover:text-gray-600 transition-colors p-2"
+              className="text-white hover:text-gray-300 transition-colors p-2 drop-shadow-lg"
               aria-label={viewMode === 'fullscreen' ? 'Switch to List View' : 'Switch to Full Screen View'}
               title={viewMode === 'fullscreen' ? 'Switch to List View' : 'Switch to Full Screen View'}
             >
@@ -277,7 +277,7 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
             
             <button
               onClick={onClose}
-              className="text-black hover:text-gray-600 transition-colors p-2"
+              className="text-white hover:text-gray-300 transition-colors p-2 drop-shadow-lg"
               aria-label="Close modal"
             >
               <X className="h-6 w-6" />
