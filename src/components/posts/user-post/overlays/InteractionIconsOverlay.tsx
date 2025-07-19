@@ -17,6 +17,7 @@ export const InteractionIconsOverlay: React.FC<InteractionIconsOverlayProps> = (
 
   const handleMuteToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
+    e.preventDefault(); // Prevent any default behavior
     toggleGlobalMute();
     // When globally muting, ensure all videos are immediately muted
     if (!isGloballyMuted) {
