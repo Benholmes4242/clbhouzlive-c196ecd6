@@ -131,7 +131,12 @@ const CourseCard: React.FC<CourseCardProps> = ({
           
           {course.description && (
             <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
-              {formatDescription(course.description)}
+              {course.description.split('\n').map((line, index, array) => (
+                <span key={index}>
+                  {line}
+                  {index < array.length - 1 && <br />}
+                </span>
+              ))}
             </p>
           )}
         </CardContent>
