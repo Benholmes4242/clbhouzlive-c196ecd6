@@ -32,14 +32,6 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
   const prevVideoData = videos[(currentVideoIndex - 1 + videos.length) % videos.length];
   const hasMultipleVideos = videos.length > 1;
 
-  // Debug current state
-  console.log('🎬 CourseVideoOverlay State:', {
-    currentVideoIndex,
-    videosLength: videos.length,
-    currentVideoUrl: currentVideo?.videoUrl,
-    allVideoUrls: videos.map(v => v.videoUrl)
-  });
-
   const handleOverlayClick = () => {
     if (onOpenFullVideo) {
       onOpenFullVideo(currentVideoIndex);
@@ -99,11 +91,6 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
         <p className={`text-white font-bold leading-tight ${isMobile ? 'text-2xl' : 'text-lg'}`}>
           Latest Posts from {courseName}
         </p>
-        {hasMultipleVideos && (
-          <p className="text-white/80 text-sm mt-1">
-            {currentVideoIndex + 1} of {videos.length}
-          </p>
-        )}
       </div>
 
       {/* Video Container */}
