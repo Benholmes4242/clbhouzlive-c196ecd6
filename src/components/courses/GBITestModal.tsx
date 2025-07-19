@@ -59,6 +59,13 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
     }
   }, [currentIndex]);
 
+  // Jump to specific course index
+  const jumpToIndex = useCallback((index: number) => {
+    if (index >= 0 && index < courses.length) {
+      setCurrentIndex(index);
+    }
+  }, [courses.length]);
+
   // Keyboard navigation
   useEffect(() => {
     if (!isOpen) return;
@@ -210,26 +217,53 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
               </div>
             </div>
 
-            {/* Navigation Arrows */}
+            {/* Left Navigation Arrow - Previous */}
             {!isMobile && (
-              <>
-                <button
-                  onClick={goToPrevious}
-                  disabled={currentIndex === 0}
-                  className="absolute top-1/2 left-4 transform -translate-y-1/2 text-white hover:text-gray-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors p-2"
-                  aria-label="Previous course"
-                >
-                  <ChevronUp className="h-8 w-8" />
-                </button>
-                <button
-                  onClick={goToNext}
-                  disabled={currentIndex === courses.length - 1}
-                  className="absolute top-1/2 right-4 transform -translate-y-1/2 text-white hover:text-gray-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors p-2"
-                  aria-label="Next course"
-                >
-                  <ChevronDown className="h-8 w-8" />
-                </button>
-              </>
+              <button
+                onClick={goToPrevious}
+                disabled={currentIndex === 0}
+                className="absolute top-1/2 left-4 transform -translate-y-1/2 text-white hover:text-gray-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors p-2"
+                aria-label="Previous course"
+              >
+                <ChevronUp className="h-8 w-8" />
+              </button>
+            )}
+
+            {/* Vertical Jump Index */}
+            {!isMobile && courses.length > 0 && (
+              <div className="absolute top-1/2 right-4 transform -translate-y-1/2 flex flex-col gap-2 bg-black/60 backdrop-blur-sm rounded-lg p-3">
+                {[1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map((jumpPoint) => {
+                  // Only show jump points that exist in our dataset
+                  if (jumpPoint > courses.length) return null;
+                  
+                  const jumpIndex = jumpPoint - 1; // Convert to 0-based index
+                  const currentRanking = currentIndex + 1; // Convert to 1-based ranking
+                  
+                  // Determine if this jump point should be highlighted
+                  const isInRange = (() => {
+                    if (jumpPoint === 1) return currentRanking >= 1 && currentRanking <= 9;
+                    if (jumpPoint === 100) return currentRanking >= 91 && currentRanking <= 100;
+                    return currentRanking >= jumpPoint - 4 && currentRanking <= jumpPoint + 9;
+                  })();
+
+                  return (
+                    <button
+                      key={jumpPoint}
+                      onClick={() => jumpToIndex(jumpIndex)}
+                      className={`
+                        px-2 py-1 text-sm font-medium rounded transition-colors
+                        ${isInRange 
+                          ? 'bg-white text-black' 
+                          : 'text-white hover:text-gray-300 hover:bg-white/20'
+                        }
+                      `}
+                      aria-label={`Jump to course ${jumpPoint}`}
+                    >
+                      {jumpPoint}
+                    </button>
+                  );
+                })}
+              </div>
             )}
           </div>
         ) : (
