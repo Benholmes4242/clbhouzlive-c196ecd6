@@ -1,15 +1,18 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { X, ChevronUp, ChevronDown, MapPin, Earth } from 'lucide-react';
+import { X, ChevronUp, ChevronDown, MapPin, Earth, Target } from 'lucide-react';
 import { CiCircleList } from 'react-icons/ci';
 import { MdFitScreen } from 'react-icons/md';
 import { useSwipeable } from 'react-swipeable';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import CountryFlag from '@/components/ui/country-flag';
 import CourseRankBadges from './CourseRankBadges';
 import CourseVideoOverlay from './CourseVideoOverlay';
+import AddToPlayedModal from './AddToPlayedModal';
 import { useCourseVideos } from '@/hooks/useCourseVideos';
+import { Button } from '@/components/ui/button';
 
 interface GBITestModalProps {
   isOpen: boolean;
@@ -31,8 +34,12 @@ interface Course {
 const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [viewMode, setViewMode] = useState<'fullscreen' | 'list'>('fullscreen');
+  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
+  const [showAddToPlayedModal, setShowAddToPlayedModal] = useState(false);
+  const [playedCourses, setPlayedCourses] = useState<Set<string>>(new Set());
   const listRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
+  const { user } = useSupabaseSession();
 
   // Fetch GB & I Top 100 courses
   const { data: courses = [], isLoading } = useQuery({
@@ -51,6 +58,43 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
     },
     enabled: isOpen,
   });
+
+  // Query to get user's played courses
+  const { data: userPlayedCourses = [] } = useQuery({
+    queryKey: ['userTop100CoursesGBI', user?.id],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      
+      const { data, error } = await supabase
+        .from('user_top100_courses')
+        .select('course_id')
+        .eq('user_id', user.id)
+        .eq('played', true);
+
+      if (error) throw error;
+      return data || [];
+    },
+    enabled: isOpen && !!user?.id,
+  });
+
+  // Update played courses set when data changes
+  useEffect(() => {
+    const playedSet = new Set(userPlayedCourses.map(pc => pc.course_id));
+    setPlayedCourses(playedSet);
+  }, [userPlayedCourses]);
+
+  // Handle Add to Played button click
+  const handleAddToPlayed = (course: Course, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent card click
+    setSelectedCourse(course);
+    setShowAddToPlayedModal(true);
+  };
+
+  // Handle successful course addition
+  const handlePlayedSuccess = () => {
+    setShowAddToPlayedModal(false);
+    // The query will automatically refetch due to invalidation in the modal
+  };
 
   // Navigation functions
   const goToNext = useCallback(() => {
@@ -431,18 +475,35 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                           course.region
                         ].filter(Boolean).join(', ')}
                       </p>
-                      <div className="flex gap-2">
-                        {course.regional_rank && course.regional_rank <= 100 && (
-                          <div className="flex items-center gap-1 px-2 py-1 bg-white rounded-full">
-                            <CountryFlag country="Britain & Ireland" size="md" />
-                            <span className="text-sm font-bold text-gray-800 translate-y-[2px]">#{course.regional_rank}</span>
-                          </div>
-                        )}
-                        {course.global_rank && course.global_rank <= 100 && (
-                          <div className="flex items-center gap-1 px-2 py-1 bg-white rounded-full">
-                            <Earth className="h-5 w-5 text-gray-600" />
-                            <span className="text-sm font-bold text-gray-800 translate-y-[2px]">#{course.global_rank}</span>
-                          </div>
+                      <div className="flex items-center justify-between">
+                        <div className="flex gap-2">
+                          {course.regional_rank && course.regional_rank <= 100 && (
+                            <div className="flex items-center gap-1 px-2 py-1 bg-white rounded-full">
+                              <CountryFlag country="Britain & Ireland" size="md" />
+                              <span className="text-sm font-bold text-gray-800 translate-y-[2px]">#{course.regional_rank}</span>
+                            </div>
+                          )}
+                          {course.global_rank && course.global_rank <= 100 && (
+                            <div className="flex items-center gap-1 px-2 py-1 bg-white rounded-full">
+                              <Earth className="h-5 w-5 text-gray-600" />
+                              <span className="text-sm font-bold text-gray-800 translate-y-[2px]">#{course.global_rank}</span>
+                            </div>
+                          )}
+                        </div>
+                        
+                        {/* Add to Played Button */}
+                        {user && (
+                          <Button
+                            onClick={(e) => handleAddToPlayed(course, e)}
+                            className={`${
+                              playedCourses.has(course.id)
+                                ? 'bg-green-600 hover:bg-green-700'
+                                : 'bg-white/20 hover:bg-white/30'
+                            } backdrop-blur-sm border-0 text-white font-medium px-3 py-1.5 rounded-full transition-all duration-200 text-sm`}
+                          >
+                            <Target className="h-4 w-4 mr-1.5" />
+                            {playedCourses.has(course.id) ? 'Played' : 'Add to Played'}
+                          </Button>
                         )}
                       </div>
                     </div>
@@ -458,7 +519,15 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
         </div>
       )}
 
-
+      {/* Add to Played Modal */}
+      {selectedCourse && (
+        <AddToPlayedModal
+          course={selectedCourse}
+          isOpen={showAddToPlayedModal}
+          onClose={() => setShowAddToPlayedModal(false)}
+          onSuccess={handlePlayedSuccess}
+        />
+      )}
     </div>
   );
 };
