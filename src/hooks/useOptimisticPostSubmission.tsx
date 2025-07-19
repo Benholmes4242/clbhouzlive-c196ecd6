@@ -108,9 +108,41 @@ export const useOptimisticPostSubmission = () => {
         }
       }
 
-      // Store course info temporarily in post content until we have proper tables
+      // Handle course info and create corresponding tag
       if (courseInfo) {
         console.log('Adding course info to post content:', courseInfo);
+        
+        // First, find the taggable entity for this course
+        const { data: taggableEntity, error: entityError } = await supabase
+          .from('taggable_entities')
+          .select('id')
+          .eq('entity_type', 'golf_club')
+          .eq('entity_id', courseInfo.id)
+          .single();
+          
+        if (taggableEntity && !entityError) {
+          console.log('Found taggable entity for course:', taggableEntity);
+          
+          // Create a post tag for the course
+          const { error: courseTagError } = await supabase
+            .from('post_tags')
+            .insert({
+              post_id: postData.id,
+              tagged_entity_id: taggableEntity.id,
+              start_index: 0,
+              end_index: 0
+            });
+            
+          if (courseTagError) {
+            console.error('Error creating course tag:', courseTagError);
+          } else {
+            console.log('Course tag created successfully for:', courseInfo.name);
+          }
+        } else {
+          console.error('Could not find taggable entity for course:', courseInfo.id, entityError);
+        }
+        
+        // Update post content with course info
         const updatedContent = `${content || ''}\n\n📍 Played at ${courseInfo.name}, ${courseInfo.country}`.trim();
         
         const { error: updateError } = await supabase
