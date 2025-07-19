@@ -172,14 +172,52 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
   return (
     <div 
       className="fixed top-0 left-0 w-full h-full z-[9999] bg-black overflow-hidden"
-      style={{ margin: 0, padding: 0 }}
-      onClick={(e) => e.stopPropagation()}
+      style={{ margin: 0, padding: 0, touchAction: 'none' }}
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }}
       onWheel={(e) => {
+        e.preventDefault();
         e.stopPropagation();
         handleWheel(e);
       }}
-      onTouchMove={(e) => e.stopPropagation()}
-      onScroll={(e) => e.stopPropagation()}
+      onTouchStart={(e) => {
+        e.stopPropagation();
+      }}
+      onTouchMove={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }}
+      onTouchEnd={(e) => {
+        e.stopPropagation();
+      }}
+      onScroll={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }}
+      onMouseDown={(e) => {
+        e.stopPropagation();
+      }}
+      onMouseMove={(e) => {
+        e.stopPropagation();
+      }}
+      onMouseUp={(e) => {
+        e.stopPropagation();
+      }}
+      onPointerDown={(e) => {
+        e.stopPropagation();
+      }}
+      onPointerMove={(e) => {
+        e.stopPropagation();
+      }}
+      onPointerUp={(e) => {
+        e.stopPropagation();
+      }}
+      onContextMenu={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }}
       {...swipeHandlers}
     >
       {/* Header */}
