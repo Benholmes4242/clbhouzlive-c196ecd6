@@ -65,10 +65,10 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-20 max-w-[50%]">
-      {/* Latest Post Label - Above Video */}
-      <div className={isMobile ? "mb-3" : "mb-2"}>
-        <p className={`text-white font-bold ${isMobile ? 'text-2xl' : 'text-sm'}`}>
+    <div className="fixed bottom-6 right-6 z-20 flex items-end gap-4 max-w-[70%]">
+      {/* Latest Post Label - Left of Video */}
+      <div className="flex-shrink-0">
+        <p className={`text-white font-bold ${isMobile ? 'text-xl' : 'text-sm'} leading-tight`}>
           Latest Post from {courseName}
         </p>
       </div>
