@@ -184,7 +184,7 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                 <h2 className="text-3xl md:text-4xl font-bold mb-2 leading-tight">
                   {currentCourse.name}
                 </h2>
-                <div className="text-lg opacity-90">
+                <div className="text-lg opacity-90 mb-2">
                   <span>
                     {[
                       currentCourse.country,
@@ -193,18 +193,20 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                     ].filter(Boolean).join(', ')}
                   </span>
                 </div>
+                
+                {/* Ranking Badges */}
+                <div>
+                  <CourseRankBadges
+                    globalRank={currentCourse.global_rank}
+                    regionalRank={currentCourse.regional_rank}
+                    usaRank={null}
+                    country={currentCourse.country}
+                    viewContext="regional"
+                    positioning="top-left"
+                  />
+                </div>
               </div>
             </div>
-
-            {/* Ranking Badges - using CourseRankBadges component positioned bottom-left */}
-            <CourseRankBadges
-              globalRank={currentCourse.global_rank}
-              regionalRank={currentCourse.regional_rank}
-              usaRank={null}
-              country={currentCourse.country}
-              viewContext="regional"
-              positioning="bottom-left"
-            />
 
             {/* Navigation Arrows */}
             {!isMobile && (
