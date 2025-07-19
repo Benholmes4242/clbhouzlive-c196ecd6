@@ -16,19 +16,33 @@ export const InteractionIconsOverlay: React.FC<InteractionIconsOverlayProps> = (
   const { muteAllVideos } = useVideoPlaybackManager();
 
   const handleMuteToggle = (e: React.MouseEvent) => {
+    console.log('🔍 DEBUG: Mute button clicked - event details:', {
+      type: e.type,
+      target: e.target,
+      currentTarget: e.currentTarget,
+      bubbles: e.bubbles,
+      timeStamp: e.timeStamp
+    });
+    
     e.stopPropagation();
     e.preventDefault();
     e.nativeEvent?.stopImmediatePropagation?.();
     
     // Only toggle global mute state - no video interaction at all
+    console.log('🔊 About to toggle global mute - current state:', isGloballyMuted);
     toggleGlobalMute();
-    
-    // Don't call muteAllVideos() as that might trigger video restarts
-    // Let videos handle mute state through useEffect in enhanced-video-player
     console.log('🔊 Mute button clicked - only toggling global state');
   };
 
   const handleInteractionClick = (e: React.MouseEvent, type: string) => {
+    console.log(`🔍 DEBUG: ${type} button clicked - event details:`, {
+      type: e.type,
+      target: e.target,
+      currentTarget: e.currentTarget,
+      bubbles: e.bubbles,
+      timeStamp: e.timeStamp
+    });
+    
     e.stopPropagation();
     e.preventDefault();
     e.nativeEvent?.stopImmediatePropagation?.();

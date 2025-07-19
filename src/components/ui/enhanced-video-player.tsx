@@ -76,6 +76,13 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
 
   // Load HLS.js if needed - only when shouldLoadVideo is true
   useEffect(() => {
+    console.log('🔍 DEBUG: HLS initialization effect triggered:', {
+      shouldLoadVideo,
+      enableHLS,
+      src: src.slice(-20),
+      hasHls: !!window.Hls
+    });
+    
     if (!shouldLoadVideo) return;
     
     if (enableHLS && !window.Hls) {
@@ -90,7 +97,7 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
     } else {
       initializeVideo();
     }
-  }, [shouldLoadVideo, enableHLS]);
+  }, [shouldLoadVideo, enableHLS]); // Remove src dependency to prevent reinit on mute changes
   
   const initializeVideo = () => {
     console.log('🎬 EnhancedVideoPlayer: Initializing video', { src, enableHLS });
@@ -287,23 +294,38 @@ const EnhancedVideoPlayer: React.FC<EnhancedVideoPlayerProps> = ({
     const video = videoRef.current;
     if (!video) return;
     
+    console.log('🔍 DEBUG: Global mute state changed in video player:', {
+      isGloballyMuted,
+      videoSrc: src.slice(-20),
+      videoPaused: video.paused,
+      videoMuted: video.muted,
+      currentTime: video.currentTime,
+      readyState: video.readyState
+    });
+    
     // ONLY change mute property - never restart or change playback
     const wasPlaying = !video.paused;
     const currentTime = video.currentTime;
     
-    video.muted = isGloballyMuted;
-    
-    // Ensure video stays in the same playback state
-    if (wasPlaying && video.paused) {
-      video.play().catch(console.error);
+    // CRITICAL: Only change muted property, nothing else
+    if (video.muted !== isGloballyMuted) {
+      video.muted = isGloballyMuted;
+      console.log('🔊 EnhancedVideoPlayer: Mute state updated', { 
+        muted: isGloballyMuted, 
+        currentTime,
+        playing: !video.paused,
+        src: src.slice(-20)
+      });
     }
     
-    console.log('🔊 EnhancedVideoPlayer: Mute state updated', { 
-      muted: isGloballyMuted, 
-      currentTime,
-      playing: !video.paused 
+    // DO NOT restart video or change playback state
+    console.log('🔍 DEBUG: Video state after mute change:', {
+      paused: video.paused,
+      muted: video.muted,
+      currentTime: video.currentTime,
+      wasPlaying
     });
-  }, [isGloballyMuted]);
+  }, [isGloballyMuted, src]);
 
   // Cleanup HLS on unmount
   useEffect(() => {
