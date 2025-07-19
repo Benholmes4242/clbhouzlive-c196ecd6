@@ -176,26 +176,13 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
       className="fixed top-0 left-0 w-full h-full z-[9999] bg-black overflow-hidden"
       style={{ margin: 0, padding: 0, touchAction: 'none' }}
       onClick={(e) => {
-        e.preventDefault();
         e.stopPropagation();
       }}
-      onWheel={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        handleWheel(e);
-      }}
+      onWheel={handleWheel}
       onTouchStart={(e) => {
         e.stopPropagation();
       }}
-      onTouchMove={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-      }}
       onTouchEnd={(e) => {
-        e.stopPropagation();
-      }}
-      onScroll={(e) => {
-        e.preventDefault();
         e.stopPropagation();
       }}
       onMouseDown={(e) => {
