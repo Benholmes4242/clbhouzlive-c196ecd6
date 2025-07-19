@@ -8,7 +8,6 @@ import ScrollToTop from '@/components/ScrollToTop';
 import { ThemeProvider } from '@/components/theme-provider';
 import PasswordProtection from "@/components/PasswordProtection";
 import AuthWrapper from "@/components/auth/AuthWrapper";
-import { SingleAudioManagerProvider } from "@/contexts/SingleAudioManager";
 
 
 const Auth = lazy(() => import("./pages/Auth"));
@@ -50,7 +49,6 @@ const App: React.FC = () => {
     <ThemeProvider defaultTheme="light" storageKey="clbhouz-ui-theme">
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
-          <SingleAudioManagerProvider>
             <PasswordProtection>
             <BrowserRouter>
               <ScrollToTop />
@@ -98,8 +96,7 @@ const App: React.FC = () => {
               <Toaster />
               <Sonner />
             </BrowserRouter>
-           </PasswordProtection>
-          </SingleAudioManagerProvider>
+          </PasswordProtection>
       </TooltipProvider>
     </QueryClientProvider>
     </ThemeProvider>

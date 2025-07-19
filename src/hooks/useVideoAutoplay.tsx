@@ -32,12 +32,9 @@ export const useVideoAutoplay = (options: UseVideoAutoplayOptions = {}) => {
       return;
     }
 
-    // Only start autoplay when coming into view, don't restart when leaving
-    if (isInView && !shouldAutoplay) {
-      setShouldAutoplay(true);
-    }
-    // Keep playing even when out of view unless explicitly disabled
-  }, [enabled, isInView, shouldAutoplay]);
+    // Both mobile and desktop: autoplay when scrolled into view
+    setShouldAutoplay(isInView);
+  }, [enabled, isInView]);
 
   const handleMouseEnter = () => {
     if (!isMobile) {
