@@ -23,6 +23,82 @@ interface ClubhouseVerticalFeedProps {
   onScroll?: (scrollDirection: 'up' | 'down') => void;
 }
 
+// VideoWithAutoplay component moved outside to prevent recreation on re-renders
+const VideoWithAutoplay: React.FC<{
+  src: string;
+  muted: boolean;
+  className: string;
+}> = React.memo(({ src, muted, className }) => {
+  const { ref, isInView } = useIntersectionObserver({
+    threshold: 0.5, // Video must be 50% visible to autoplay
+    rootMargin: '0px'
+  });
+  const [hasAttemptedPlay, setHasAttemptedPlay] = useState(false);
+  const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+  const attemptVideoPlay = useCallback(async () => {
+    if (!ref.current || hasAttemptedPlay) return;
+    
+    const video = ref.current.querySelector('video') as HTMLVideoElement;
+    if (!video) return;
+
+    try {
+      // Ensure video is muted for autoplay compliance
+      video.muted = true;
+      video.playsInline = true;
+      
+      await video.play();
+      console.log('✅ Mobile autoplay successful');
+      setHasAttemptedPlay(true);
+    } catch (error) {
+      console.log('❌ Mobile autoplay failed:', error);
+      
+      // On mobile, try again after a brief delay
+      if (isMobile) {
+        setTimeout(() => {
+          video.play().catch(() => {
+            console.log('❌ Mobile autoplay retry failed');
+          });
+        }, 100);
+      }
+    }
+  }, [ref.current, hasAttemptedPlay, isMobile]);
+
+  // Handle initial autoplay attempt when video comes into view
+  useEffect(() => {
+    if (isInView && !hasAttemptedPlay) {
+      // Small delay to ensure video is ready
+      setTimeout(attemptVideoPlay, 100);
+    }
+  }, [isInView, attemptVideoPlay, hasAttemptedPlay]);
+
+  // Add touch handler for mobile interaction
+  const handleTouchStart = useCallback(() => {
+    if (isMobile && isInView && !hasAttemptedPlay) {
+      attemptVideoPlay();
+    }
+  }, [isMobile, isInView, hasAttemptedPlay, attemptVideoPlay]);
+
+  return (
+    <div 
+      ref={ref}
+      className={className}
+      onTouchStart={handleTouchStart}
+    >
+      <EnhancedVideoPlayer
+        src={src}
+        autoplay={isInView}
+        muted={muted}
+        loop={true}
+        className="w-full h-full"
+        enableHLS={true}
+      />
+    </div>
+  );
+});
+
+VideoWithAutoplay.displayName = 'VideoWithAutoplay';
+
 const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   posts,
   onLike,
@@ -37,83 +113,9 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const scrollViewRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<{ [key: number]: HTMLDivElement }>({});
-  const [isTextExpanded, setIsTextExpanded] = useState(false);
+  // Removed isTextExpanded state as mouse handlers were removed to prevent re-renders
   const [mediaIndices, setMediaIndices] = useState<{[key: string]: number}>({});
   const queryClient = useQueryClient();
-
-  // VideoWithAutoplay component using intersection observer
-  const VideoWithAutoplay: React.FC<{
-    src: string;
-    muted: boolean;
-    className: string;
-  }> = ({ src, muted, className }) => {
-    const { ref, isInView } = useIntersectionObserver({
-      threshold: 0.5, // Video must be 50% visible to autoplay
-      rootMargin: '0px'
-    });
-    const [hasAttemptedPlay, setHasAttemptedPlay] = useState(false);
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-    const attemptVideoPlay = useCallback(async () => {
-      if (!ref.current || hasAttemptedPlay) return;
-      
-      const video = ref.current.querySelector('video') as HTMLVideoElement;
-      if (!video) return;
-
-      try {
-        // Ensure video is muted for autoplay compliance
-        video.muted = true;
-        video.playsInline = true;
-        
-        await video.play();
-        console.log('✅ Mobile autoplay successful');
-        setHasAttemptedPlay(true);
-      } catch (error) {
-        console.log('❌ Mobile autoplay failed:', error);
-        
-        // On mobile, try again after a brief delay
-        if (isMobile) {
-          setTimeout(() => {
-            video.play().catch(() => {
-              console.log('❌ Mobile autoplay retry failed');
-            });
-          }, 100);
-        }
-      }
-    }, [ref.current, hasAttemptedPlay, isMobile]);
-
-    // Handle initial autoplay attempt when video comes into view
-    useEffect(() => {
-      if (isInView && !hasAttemptedPlay) {
-        // Small delay to ensure video is ready
-        setTimeout(attemptVideoPlay, 100);
-      }
-    }, [isInView, attemptVideoPlay, hasAttemptedPlay]);
-
-    // Add touch handler for mobile interaction
-    const handleTouchStart = useCallback(() => {
-      if (isMobile && isInView && !hasAttemptedPlay) {
-        attemptVideoPlay();
-      }
-    }, [isMobile, isInView, hasAttemptedPlay, attemptVideoPlay]);
-
-    return (
-      <div 
-        ref={ref} 
-        className="relative w-full h-full bg-media-loading"
-        onTouchStart={handleTouchStart}
-      >
-        <EnhancedVideoPlayer
-          src={src}
-          autoplay={true} // Let EnhancedVideoPlayer handle autoplay
-          muted={true} // Always muted for autoplay
-          loop={true}
-          className={className}
-          enableHLS={true}
-        />
-      </div>
-    );
-  };
 
   // Check if current user follows the displayed user
   const { data: isFollowing, isLoading: isFollowingLoading } = useQuery({
@@ -483,8 +485,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
               {/* Media Content */}
               <div 
                 className="relative w-full h-full flex items-center justify-center"
-                onMouseEnter={() => setIsTextExpanded(true)}
-                onMouseLeave={() => setIsTextExpanded(false)}
+                // Removed mouse enter/leave handlers that were causing re-renders
               >
                 {currentMedia.media_type === 'video' ? (
                   <VideoWithAutoplay
@@ -542,10 +543,8 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                   >
                     <div className="transition-all duration-300 ease-in-out whitespace-normal">
                       <span className="text-base font-bold">
-                        {isTextExpanded 
-                          ? removeGolfCourseFromContent(item.title)
-                          : truncateToWords(removeGolfCourseFromContent(item.title), 9)
-                        }
+                        {/* Always show truncated text to prevent re-renders */}
+                        {truncateToWords(removeGolfCourseFromContent(item.title), 9)}
                       </span>
                     </div>
                   </div>
