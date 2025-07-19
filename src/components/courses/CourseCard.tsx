@@ -34,14 +34,18 @@ interface CourseCardProps {
 
 // Helper function to format description text with line breaks
 const formatDescription = (description: string) => {
-  return description
-    .split('\n')
-    .map((line, index, array) => (
-      <React.Fragment key={index}>
-        {line}
-        {index < array.length - 1 && <br />}
-      </React.Fragment>
-    ));
+  return (
+    <span>
+      {description
+        .split('\n')
+        .map((line, index, array) => (
+          <React.Fragment key={index}>
+            {line}
+            {index < array.length - 1 && <br />}
+          </React.Fragment>
+        ))}
+    </span>
+  );
 };
 
 const formatLocation = (course: Course) => {
