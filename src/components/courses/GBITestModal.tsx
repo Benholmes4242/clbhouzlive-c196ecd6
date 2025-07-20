@@ -93,18 +93,13 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
 
   // Handle Add to Played button click
   const handleAddToPlayed = (course: Course, e: React.MouseEvent) => {
-    console.log('🎯 Add to Played clicked for course:', course.name);
     e.stopPropagation(); // Prevent card click
-    console.log('🎯 Setting selected course:', course);
     setSelectedCourse(course);
-    console.log('🎯 Opening Add to Played modal');
     setShowAddToPlayedModal(true);
-    console.log('🎯 Add to Played handler completed');
   };
 
   // Handle successful course addition
   const handlePlayedSuccess = () => {
-    console.log('🎯 Add to Played success - closing modal');
     setShowAddToPlayedModal(false);
     // The query will automatically refetch due to invalidation in the modal
   };
@@ -187,15 +182,13 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
 
   // Wheel handler for desktop
   const handleWheel = useCallback((e: React.WheelEvent) => {
-    // Only handle wheel events in fullscreen mode
-    if (viewMode !== 'fullscreen') return;
-    
+    e.preventDefault();
     if (e.deltaY > 0) {
       goToNext();
     } else {
       goToPrevious();
     }
-  }, [goToNext, goToPrevious, viewMode]);
+  }, [goToNext, goToPrevious]);
 
   // Simplified synchronization - no preloading delays
   useEffect(() => {
@@ -562,29 +555,19 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                           
                           {/* Add to Played Button */}
                           {user && (
-                            <div 
-                              onClick={(e) => {
-                                e.stopPropagation();
-                              }}
-                              className="relative z-10"
+                            <Button
+                              onClick={(e) => handleAddToPlayed(course, e)}
+                              className={`${
+                                playedCourses.has(course.id)
+                                  ? 'bg-[#0B6623] hover:bg-[#084C1A]'
+                                  : 'bg-white hover:bg-gray-100'
+                              } border-0 font-bold px-1 md:px-1.5 py-0.5 rounded-full transition-all duration-200 text-xs md:text-sm h-auto ${
+                                playedCourses.has(course.id) ? 'text-white' : 'text-gray-800'
+                              }`}
                             >
-                              <Button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleAddToPlayed(course, e);
-                                }}
-                                className={`${
-                                  playedCourses.has(course.id)
-                                    ? 'bg-[#0B6623] hover:bg-[#084C1A]'
-                                    : 'bg-white hover:bg-gray-100'
-                                } border-0 font-bold px-1 md:px-1.5 py-0.5 rounded-full transition-all duration-200 text-xs md:text-sm h-auto ${
-                                  playedCourses.has(course.id) ? 'text-white' : 'text-gray-800'
-                                }`}
-                              >
-                                <Target className="h-4 w-4 md:h-5 md:w-5 mr-1" />
-                                <span className="translate-y-[2px] md:translate-y-[3px]">{playedCourses.has(course.id) ? 'Played' : 'Add to Played'}</span>
-                              </Button>
-                            </div>
+                              <Target className="h-4 w-4 md:h-5 md:w-5 mr-1" />
+                              <span className="translate-y-[2px] md:translate-y-[3px]">{playedCourses.has(course.id) ? 'Played' : 'Add to Played'}</span>
+                            </Button>
                           )}
                         </div>
                       </div>
@@ -660,14 +643,11 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
       )}
 
       {/* Add to Played Modal */}
-      {selectedCourse && showAddToPlayedModal && (
+      {selectedCourse && (
         <AddToPlayedModal
           course={selectedCourse}
           isOpen={showAddToPlayedModal}
-          onClose={() => {
-            console.log('🎯 AddToPlayedModal onClose called');
-            setShowAddToPlayedModal(false);
-          }}
+          onClose={() => setShowAddToPlayedModal(false)}
           onSuccess={handlePlayedSuccess}
         />
       )}

@@ -115,9 +115,6 @@ const AddToPlayedModal = ({ course, isOpen, onClose, onSuccess }: AddToPlayedMod
       }
     },
     onSuccess: () => {
-      // Invalidate the specific queries used by GBITestModal
-      queryClient.invalidateQueries({ queryKey: ['userTop100CoursesGBI', user.id] });
-      queryClient.invalidateQueries({ queryKey: ['gbi-top-100-test'] });
       queryClient.invalidateQueries({ queryKey: ['user-course'] });
       queryClient.invalidateQueries({ queryKey: ['course-rating-stats'] });
       queryClient.invalidateQueries({ queryKey: ['user-top100-course'] });
