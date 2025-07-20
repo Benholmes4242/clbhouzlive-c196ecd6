@@ -37,7 +37,7 @@ const LeaderboardUserItem: React.FC<LeaderboardUserItemProps> = ({ user, rank })
   const badge = getBadgeForProgress(user.coursesPlayed);
 
   return (
-    <div className="flex items-center gap-3 p-3 hover:bg-muted/50 transition-colors">
+    <div className="flex items-center gap-3 p-3 transition-colors">
       {/* Rank */}
       <div className="w-8 text-center">
         <span className="text-lg font-bold text-muted-foreground">#{rank}</span>

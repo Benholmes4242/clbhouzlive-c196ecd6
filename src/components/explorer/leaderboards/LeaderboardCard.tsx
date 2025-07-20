@@ -55,7 +55,7 @@ const LeaderboardCard: React.FC<LeaderboardCardProps> = ({
   };
 
   return (
-    <Card className="min-w-0 h-[520px] bg-gradient-to-br from-card to-card/80 border-2 hover:border-primary/20 transition-all duration-300">
+    <Card className="min-w-0 h-[520px] bg-gradient-to-br from-card to-card/80 border-2 border-border transition-all duration-300">
       <CardHeader className="pb-4 border-b border-border/50">
         <div className="flex items-center justify-between mb-2">
           <CardTitle className="flex items-center gap-3 text-xl">
