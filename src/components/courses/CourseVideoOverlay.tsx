@@ -85,7 +85,7 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
   };
 
   return (
-    <div className="fixed bottom-6 left-6 right-6 z-20 flex items-end justify-between">
+    <div className="fixed bottom-6 left-6 right-6 z-20">
       {/* Latest Posts Label - Left aligned with club title */}
       <div className={`mb-6 ${isMobile ? 'max-w-[200px]' : ''}`}>
         <p className={`text-white font-bold leading-tight ${isMobile ? 'text-3xl' : 'text-xl'}`}>
@@ -93,8 +93,9 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
         </p>
       </div>
 
-      {/* Fanned Video Stack Container */}
-      <div className="relative flex-shrink-0 group">
+      {/* Fanned Video Stack Container - Centered */}
+      <div className="flex justify-center">
+        <div className="relative group">
         {/* Stack of video cards - show up to 4 videos */}
         {videos.slice(0, 4).map((video, index) => {
           const isTopCard = index === 0;
@@ -244,6 +245,7 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
             {isMobile ? 'Tap to see more' : 'Click to see more'}
           </div>
         )}
+        </div>
       </div>
     </div>
   );
