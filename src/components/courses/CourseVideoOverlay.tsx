@@ -85,15 +85,15 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-20 flex items-center justify-center">
+    <div className="fixed bottom-6 right-6 z-20">
       {/* Latest Posts Label - Positioned above cards */}
-      <div className="absolute bottom-20 left-6">
+      <div className="mb-6">
         <p className={`text-white font-bold leading-tight ${isMobile ? 'text-3xl' : 'text-xl'}`}>
           Latest Posts from {courseName}
         </p>
       </div>
 
-      {/* Fanned Video Stack Container - Centered */}
+      {/* Fanned Video Stack Container - Bottom Right */}
       <div className="relative group">
         {/* Stack of video cards - show up to 4 videos */}
         {videos.slice(0, 4).map((video, index) => {
