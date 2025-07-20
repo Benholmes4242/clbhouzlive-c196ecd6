@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Maximize2, Minimize2, Volume2, VolumeX } from 'lucide-react';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
@@ -23,6 +23,8 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
 }) => {
   const [currentVideoIndex, setCurrentVideoIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
   const preloadVideoRef = useRef<HTMLVideoElement>(null);
   const isMobile = useIsMobile();
@@ -60,6 +62,14 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
     }, 150);
   };
 
+  const handleFullscreenToggle = () => {
+    setIsFullscreen(!isFullscreen);
+  };
+
+  const handleMuteToggle = () => {
+    setIsMuted(!isMuted);
+  };
+
   // Swipe gesture hook for mobile
   const swipeRef = useSwipeGesture({
     onSwipeLeft: goToNextVideo,
@@ -87,6 +97,110 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
   // Get the videos to show in the fan (up to 4 cards)
   const fanVideos = videos.slice(0, Math.min(4, videos.length));
   const displayCount = fanVideos.length;
+
+  // Fullscreen modal
+  if (isFullscreen) {
+    return (
+      <div className="fixed inset-0 z-[9999] bg-black/80 flex items-center justify-center">
+        <div 
+          className="relative bg-black rounded-lg overflow-hidden shadow-2xl"
+          style={{
+            width: '100vw',
+            height: '75vh',
+            maxWidth: '100vw'
+          }}
+        >
+          {/* Fullscreen Video Player */}
+          <EnhancedVideoPlayer
+            src={currentVideo?.videoUrl}
+            autoplay={true}
+            muted={isMuted}
+            loop={true}
+            className="w-full h-full object-contain"
+            enableHLS={true}
+            hideControls={true}
+            key={`fullscreen-video-${currentVideoIndex}-${currentVideo?.videoUrl}`}
+          />
+
+          {/* Top Right Controls */}
+          <div className="absolute top-4 right-4 z-30 flex gap-2">
+            {/* Mute/Unmute Button */}
+            <button
+              onClick={handleMuteToggle}
+              className="p-3 rounded-full bg-black/50 text-white hover:bg-black/70 transition-all duration-300"
+              aria-label={isMuted ? "Unmute" : "Mute"}
+            >
+              {isMuted ? (
+                <VolumeX className="h-6 w-6" />
+              ) : (
+                <Volume2 className="h-6 w-6" />
+              )}
+            </button>
+
+            {/* Minimize Button */}
+            <button
+              onClick={handleFullscreenToggle}
+              className="p-3 rounded-full bg-black/50 text-white hover:bg-black/70 transition-all duration-300"
+              aria-label="Exit fullscreen"
+            >
+              <Minimize2 className="h-6 w-6" />
+            </button>
+          </div>
+
+          {/* Navigation Arrows - Desktop */}
+          {hasMultipleVideos && !isMobile && (
+            <>
+              {/* Left Arrow */}
+              <button
+                onClick={goToPrevVideo}
+                disabled={currentVideoIndex === 0}
+                className="absolute left-6 top-1/2 transform -translate-y-1/2 z-30 p-4 rounded-full bg-black/50 text-white hover:bg-black/70 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-300"
+                aria-label="Previous video"
+              >
+                <ChevronLeft className="h-8 w-8" />
+              </button>
+
+              {/* Right Arrow */}
+              <button
+                onClick={goToNextVideo}
+                disabled={currentVideoIndex >= videos.length - 1}
+                className="absolute right-6 top-1/2 transform -translate-y-1/2 z-30 p-4 rounded-full bg-black/50 text-white hover:bg-black/70 disabled:opacity-30 disabled:cursor-not-allowed transition-all duration-300"
+                aria-label="Next video"
+              >
+                <ChevronRight className="h-8 w-8" />
+              </button>
+            </>
+          )}
+
+          {/* Bottom Info */}
+          <div className="absolute bottom-6 left-6 text-white z-30">
+            {currentVideo?.username && (
+              <p className="text-2xl font-medium mb-1">
+                @{currentVideo.username}
+              </p>
+            )}
+            {currentVideo?.timestamp && (
+              <p className="text-lg opacity-80">
+                {formatTimestamp(currentVideo.timestamp)}
+              </p>
+            )}
+            <p className="text-sm opacity-60 mt-2">
+              {currentVideoIndex + 1} of {videos.length}
+            </p>
+          </div>
+
+          {/* Mobile Swipe Area */}
+          {isMobile && hasMultipleVideos && (
+            <div
+              ref={swipeRef}
+              className="absolute inset-0 z-20"
+              style={{ touchAction: 'pan-y' }}
+            />
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="fixed bottom-6 left-6 right-6 z-20 flex items-end justify-between">
@@ -178,7 +292,7 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
               ref={videoRef}
               src={currentVideo?.videoUrl}
               autoplay={true}
-              muted={true}
+              muted={isMuted}
               loop={true}
               className="w-full h-full object-contain"
               enableHLS={true}
@@ -187,21 +301,21 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
             />
           </div>
           
-          {/* Preload next video (invisible) */}
-          {hasMultipleVideos && nextVideoData && (
-             <div className="absolute inset-0 opacity-0 pointer-events-none">
-               <EnhancedVideoPlayer
-                 ref={preloadVideoRef}
-                 src={nextVideoData.videoUrl}
-                 autoplay={false}
-                 muted={true}
-                 loop={true}
-                 className="w-full h-full object-contain"
-                 enableHLS={true}
-                 hideControls={true}
-               />
-             </div>
-          )}
+           {/* Preload next video (invisible) */}
+           {hasMultipleVideos && nextVideoData && (
+              <div className="absolute inset-0 opacity-0 pointer-events-none">
+                <EnhancedVideoPlayer
+                  ref={preloadVideoRef}
+                  src={nextVideoData.videoUrl}
+                  autoplay={false}
+                  muted={true}
+                  loop={true}
+                  className="w-full h-full object-contain"
+                  enableHLS={true}
+                  hideControls={true}
+                />
+              </div>
+           )}
           
           {/* Navigation Arrows Overlay */}
           {hasMultipleVideos && (
@@ -249,6 +363,18 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
               </p>
             )}
           </div>
+
+          {/* Fullscreen Icon - Top Right of Video Card */}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleFullscreenToggle();
+            }}
+            className="absolute top-3 right-3 z-30 p-2 rounded-full bg-black/50 text-white hover:bg-black/70 transition-all duration-300 opacity-0 group-hover:opacity-100"
+            aria-label="Open fullscreen"
+          >
+            <Maximize2 className={`${isMobile ? 'h-4 w-4' : 'h-5 w-5'}`} />
+          </button>
           
           {/* Subtle Border */}
           <div className="absolute inset-0 rounded-xl ring-1 ring-white/20" />
