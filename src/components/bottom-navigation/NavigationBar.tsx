@@ -12,11 +12,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
   const isClubhouse = variant === 'clubhouse';
   
   return (
-    <nav className={`fixed bottom-0 left-0 right-0 z-40 ${
-      isClubhouse 
-        ? 'bg-black/20 backdrop-blur-sm' 
-        : 'bg-background/20 backdrop-blur-sm'
-    }`}>
+    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-transparent">
       <div className="w-full px-2">
         <div className="flex items-center justify-between h-16 relative">
           {navigationTabs.map((tab) => {
