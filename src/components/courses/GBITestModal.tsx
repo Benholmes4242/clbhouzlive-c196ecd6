@@ -338,254 +338,155 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
               )}
             </div>
           ) : currentCourse ? (
-            /* Desktop Card Layout - Only show on desktop */
-            !isMobile ? (
-              <div className="relative w-full max-w-6xl mx-auto p-8">
-                <div className="relative bg-card rounded-lg overflow-hidden shadow-lg">
-                  {/* Main Course Card */}
-                  <div className="relative flex h-[500px]">
-                    {/* Main Course Image - Left Side */}
-                    <div className="flex-1 relative">
-                      {displayedCourse.thumbnail_image ? (
-                        <div className="relative w-full h-full">
-                          {/* Placeholder background */}
-                          <div className="absolute inset-0 bg-gradient-to-br from-green-900 to-green-700 flex items-center justify-center">
-                            <div className="text-white text-center">
-                              <div className="text-6xl mb-4">⛳</div>
-                              <p className="text-lg opacity-80">{displayedCourse.name}</p>
-                            </div>
-                          </div>
-                          {/* Actual image */}
-                          <img
-                            src={displayedCourse.thumbnail_image}
-                            alt={displayedCourse.name}
-                            className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
-                            loading="eager"
-                            onLoad={(e) => {
-                              e.currentTarget.style.opacity = '1';
-                            }}
-                            onError={(e) => {
-                              e.currentTarget.style.opacity = '0';
-                            }}
-                            style={{ opacity: 0 }}
-                          />
-                        </div>
-                      ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-green-900 to-green-700 flex items-center justify-center">
-                          <div className="text-white text-center">
-                            <div className="text-6xl mb-4">⛳</div>
-                            <p className="text-lg">No image available</p>
-                          </div>
-                        </div>
-                      )}
-                      {/* Dark overlay for text readability */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                      
-                      {/* Course Information Overlay */}
-                      <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
-                        <h2 className="text-4xl font-bold mb-3 leading-tight">
-                          {displayedCourse.name}
-                        </h2>
-                        <div className="text-xl opacity-90 mb-4">
-                          {[
-                            displayedCourse.country,
-                            displayedCourse.sub_country,
-                            displayedCourse.region
-                          ].filter(Boolean).join(', ')}
-                        </div>
-                        
-                        {/* Ranking Pills */}
-                        <div className="flex gap-3 mb-4">
-                          {displayedCourse.regional_rank && displayedCourse.regional_rank <= 100 && (
-                            <div className="flex items-center gap-2 px-3 py-1.5 bg-white rounded-full">
-                              <CountryFlag country="Britain & Ireland" size="lg" />
-                              <span className="text-base font-bold text-foreground">UK {displayedCourse.regional_rank}</span>
-                            </div>
-                          )}
-                          {displayedCourse.global_rank && displayedCourse.global_rank <= 100 && (
-                            <div className="flex items-center gap-2 px-3 py-1.5 bg-white rounded-full">
-                              <Earth className="h-5 w-5 text-muted-foreground" />
-                              <span className="text-base font-bold text-foreground">World #{displayedCourse.global_rank}</span>
-                            </div>
-                          )}
-                        </div>
-                        
-                        {/* Course Description */}
-                        {displayedCourse.description && (
-                          <p className="text-lg opacity-90 leading-relaxed">
-                            Latest Posts from {displayedCourse.name}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    
-                    {/* Right Side Small Thumbnail */}
-                    <div className="w-80 relative">
-                      {displayedCourse.thumbnail_image ? (
-                        <img
-                          src={displayedCourse.thumbnail_image}
-                          alt={`${displayedCourse.name} view`}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-green-800 to-green-600 flex items-center justify-center">
-                          <span className="text-white text-4xl">⛳</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              /* Mobile Layout - Keep existing mobile layout */
-              <div className="relative w-full h-full">
-                {/* Course Image */}
-                <div className="absolute inset-0">
-                  {displayedCourse.thumbnail_image ? (
-                    <div className="relative w-full h-full">
-                      {/* Placeholder background */}
-                      <div className="absolute inset-0 bg-gradient-to-br from-green-900 to-green-700 flex items-center justify-center">
-                        <div className="text-white text-center">
-                          <div className="text-6xl mb-4">⛳</div>
-                          <p className="text-lg opacity-80">{displayedCourse.name}</p>
-                        </div>
-                      </div>
-                      {/* Actual image */}
-                      <img
-                        src={displayedCourse.thumbnail_image}
-                        alt={displayedCourse.name}
-                        className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
-                        loading="eager"
-                        onLoad={(e) => {
-                          e.currentTarget.style.opacity = '1';
-                        }}
-                        onError={(e) => {
-                          e.currentTarget.style.opacity = '0';
-                        }}
-                        style={{ opacity: 0 }}
-                      />
-                    </div>
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-green-900 to-green-700 flex items-center justify-center">
+            <div className="relative w-full h-full">
+              {/* Course Image */}
+              <div className="absolute inset-0">
+                {displayedCourse.thumbnail_image ? (
+                  <div className="relative w-full h-full">
+                    {/* Placeholder background */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-green-900 to-green-700 flex items-center justify-center">
                       <div className="text-white text-center">
                         <div className="text-6xl mb-4">⛳</div>
-                        <p className="text-lg">No image available</p>
+                        <p className="text-lg opacity-80">{displayedCourse.name}</p>
                       </div>
                     </div>
-                  )}
-                  {/* Overlay gradient */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40" />
-                </div>
+                    {/* Actual image */}
+                    <img
+                      src={displayedCourse.thumbnail_image}
+                      alt={displayedCourse.name}
+                      className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300"
+                      loading="eager"
+                      onLoad={(e) => {
+                        e.currentTarget.style.opacity = '1';
+                      }}
+                      onError={(e) => {
+                        e.currentTarget.style.opacity = '0';
+                      }}
+                      style={{ opacity: 0 }}
+                    />
+                  </div>
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-green-900 to-green-700 flex items-center justify-center">
+                    <div className="text-white text-center">
+                      <div className="text-6xl mb-4">⛳</div>
+                      <p className="text-lg">No image available</p>
+                    </div>
+                  </div>
+                )}
+                {/* Overlay gradient */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40" />
+              </div>
 
-                {/* Course Information - Mobile */}
-                <div className="absolute top-1/2 -translate-y-1/2 left-0 right-0 p-6 text-white">
-                  <div>
-                    <h2 className="text-3xl font-bold mb-2 leading-tight">
-                      {displayedCourse.name}
-                    </h2>
-                    <div className="text-lg opacity-90 mb-2">
-                      <span>
-                        {[
-                          displayedCourse.country,
-                          displayedCourse.sub_country,
-                          displayedCourse.region
-                        ].filter(Boolean).join(', ')}
-                      </span>
-                    </div>
-                    
-                    {/* Ranking Badges - Mobile */}
-                    <div className="flex gap-2">
-                      {displayedCourse.regional_rank && displayedCourse.regional_rank <= 100 && (
-                        <div className="flex items-center justify-center gap-1 px-1.5 py-0.5 bg-white rounded-full">
-                          <CountryFlag country="Britain & Ireland" size="lg" />
-                          <span className="text-sm font-bold text-gray-800 leading-none flex items-center translate-y-[3px]">#{displayedCourse.regional_rank}</span>
-                        </div>
-                      )}
-                      {displayedCourse.global_rank && displayedCourse.global_rank <= 100 && (
-                        <div className="flex items-center justify-center gap-1 px-1.5 py-0.5 bg-white rounded-full">
-                          <Earth className="h-5 w-5 text-gray-600" />
-                          <span className="text-sm font-bold text-gray-800 leading-none flex items-center translate-y-[3px]">#{displayedCourse.global_rank}</span>
-                        </div>
-                      )}
-                    </div>
+              {/* Course Information - matching CourseCard layout exactly */}
+              <div className={`absolute left-0 right-0 p-6 text-white ${
+                isMobile ? 'top-1/2 -translate-y-1/2' : 'bottom-16'
+              }`}>
+                <div>
+                  <h2 className="text-3xl md:text-4xl font-bold mb-2 leading-tight">
+                    {displayedCourse.name}
+                  </h2>
+                  <div className="text-lg opacity-90 mb-2">
+                    <span>
+                      {[
+                        displayedCourse.country,
+                        displayedCourse.sub_country,
+                        displayedCourse.region
+                      ].filter(Boolean).join(', ')}
+                    </span>
+                  </div>
+                  
+                  {/* Ranking Badges - Inline version */}
+                  <div className="flex gap-2">
+                    {displayedCourse.regional_rank && displayedCourse.regional_rank <= 100 && (
+                      <div className="flex items-center justify-center gap-1 px-1.5 py-0.5 bg-white rounded-full">
+                        <CountryFlag country="Britain & Ireland" size="lg" />
+                        <span className="text-sm font-bold text-gray-800 leading-none flex items-center translate-y-[3px]">#{displayedCourse.regional_rank}</span>
+                      </div>
+                    )}
+                    {displayedCourse.global_rank && displayedCourse.global_rank <= 100 && (
+                      <div className="flex items-center justify-center gap-1 px-1.5 py-0.5 bg-white rounded-full">
+                        <Earth className="h-5 w-5 text-gray-600" />
+                        <span className="text-sm font-bold text-gray-800 leading-none flex items-center translate-y-[3px]">#{displayedCourse.global_rank}</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
-            )
+
+              {/* Left Navigation Arrow - Previous */}
+              {!isMobile && (
+                <button
+                  onClick={goToPrevious}
+                  disabled={currentIndex === 0}
+                  className="absolute top-1/2 left-4 transform -translate-y-1/2 text-white hover:text-gray-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors p-2"
+                  aria-label="Previous course"
+                >
+                  <ChevronUp className="h-8 w-8" />
+                </button>
+              )}
+
+              {/* Jump Index - Vertical on Right Side for Desktop Only */}
+              {courses.length > 0 && !isMobile && (
+                <div className="absolute top-1/2 right-4 transform -translate-y-1/2 flex flex-col gap-2">
+                  {[1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map((jumpPoint) => {
+                    // Only show jump points that exist in our dataset
+                    if (jumpPoint > courses.length) return null;
+                    
+                    const jumpIndex = jumpPoint - 1; // Convert to 0-based index
+                    const currentRanking = currentIndex + 1; // Convert to 1-based ranking
+                    
+                    // Determine which jump point should show the dot
+                    const activeJumpPoint = (() => {
+                      if (currentRanking <= 9) return 1;
+                      if (currentRanking <= 19) return 10;
+                      if (currentRanking <= 29) return 20;
+                      if (currentRanking <= 39) return 30;
+                      if (currentRanking <= 49) return 40;
+                      if (currentRanking <= 59) return 50;
+                      if (currentRanking <= 69) return 60;
+                      if (currentRanking <= 79) return 70;
+                      if (currentRanking <= 89) return 80;
+                      if (currentRanking <= 99) return 90;
+                      return 100;
+                    })();
+                    
+                    const showDot = jumpPoint === activeJumpPoint;
+
+                    return (
+                      <div key={jumpPoint} className="flex items-center justify-center">
+                        <button
+                          onClick={() => jumpToIndex(jumpIndex)}
+                          className={`text-sm transition-colors ${
+                            showDot 
+                              ? 'text-white font-bold' 
+                              : 'text-white/60 font-normal hover:text-white/80'
+                          }`}
+                          aria-label={`Jump to course ${jumpPoint}`}
+                        >
+                          {jumpPoint}
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Video Overlay - Only show in fullscreen mode if videos exist */}
+              {videos.length > 0 && (
+                <CourseVideoOverlay
+                  videos={videos}
+                  courseName={currentCourse.name}
+                  onOpenFullVideo={(videoIndex) => {
+                    // TODO: Implement full video modal or navigate to post with specific video
+                    console.log('Opening video at index:', videoIndex);
+                  }}
+                />
+              )}
+            </div>
           ) : (
             <div className="text-black text-center">
               <p className="text-lg">No courses found</p>
             </div>
-          )}
-
-          {/* Left Navigation Arrow - Previous */}
-          {!isMobile && (
-            <button
-              onClick={goToPrevious}
-              disabled={currentIndex === 0}
-              className="absolute top-1/2 left-4 transform -translate-y-1/2 text-white hover:text-gray-300 disabled:opacity-30 disabled:cursor-not-allowed transition-colors p-2"
-              aria-label="Previous course"
-            >
-              <ChevronUp className="h-8 w-8" />
-            </button>
-          )}
-
-          {/* Jump Index - Vertical on Right Side for Desktop Only */}
-          {courses.length > 0 && !isMobile && (
-            <div className="absolute top-1/2 right-4 transform -translate-y-1/2 flex flex-col gap-2">
-              {[1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map((jumpPoint) => {
-                // Only show jump points that exist in our dataset
-                if (jumpPoint > courses.length) return null;
-                
-                const jumpIndex = jumpPoint - 1; // Convert to 0-based index
-                const currentRanking = currentIndex + 1; // Convert to 1-based ranking
-                
-                // Determine which jump point should show the dot
-                const activeJumpPoint = (() => {
-                  if (currentRanking <= 9) return 1;
-                  if (currentRanking <= 19) return 10;
-                  if (currentRanking <= 29) return 20;
-                  if (currentRanking <= 39) return 30;
-                  if (currentRanking <= 49) return 40;
-                  if (currentRanking <= 59) return 50;
-                  if (currentRanking <= 69) return 60;
-                  if (currentRanking <= 79) return 70;
-                  if (currentRanking <= 89) return 80;
-                  if (currentRanking <= 99) return 90;
-                  return 100;
-                })();
-                
-                const showDot = jumpPoint === activeJumpPoint;
-
-                return (
-                  <div key={jumpPoint} className="flex items-center justify-center">
-                    <button
-                      onClick={() => jumpToIndex(jumpIndex)}
-                      className={`text-sm transition-colors ${
-                        showDot 
-                          ? 'text-white font-bold' 
-                          : 'text-white/60 font-normal hover:text-white/80'
-                      }`}
-                      aria-label={`Jump to course ${jumpPoint}`}
-                    >
-                      {jumpPoint}
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
-          {/* Video Overlay - Only show in fullscreen mode if videos exist */}
-          {videos.length > 0 && (
-            <CourseVideoOverlay
-              videos={videos}
-              courseName={currentCourse.name}
-              onOpenFullVideo={(videoIndex) => {
-                // TODO: Implement full video modal or navigate to post with specific video
-                console.log('Opening video at index:', videoIndex);
-              }}
-            />
           )}
         </div>
       ) : (
