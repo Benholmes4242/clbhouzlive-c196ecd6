@@ -85,7 +85,7 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
   };
 
   return (
-    <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 flex items-center justify-center" style={{backgroundColor: 'rgba(255,0,0,0.5)'}}>
+    <div className="fixed bottom-6 left-6 right-6 z-20 flex items-end justify-between">
       {/* Latest Posts Label - Left aligned with club title */}
       <div className="max-w-[200px] mb-6">
         <p className={`text-white font-bold leading-tight ${isMobile ? 'text-2xl' : 'text-lg'}`}>
