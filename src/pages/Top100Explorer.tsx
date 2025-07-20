@@ -6,7 +6,7 @@ import Top100ExplorerContent from '@/components/explorer/Top100ExplorerContent';
 
 const Top100Explorer = () => {
   return (
-    <div className="min-h-screen bg-white">{/* Force white background temporarily */}
+    <div className="min-h-screen bg-white text-black">{/* Force light theme */}
       <Header />
       
       <main className="container mx-auto px-4 py-6 pb-20">
