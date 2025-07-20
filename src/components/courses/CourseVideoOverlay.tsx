@@ -84,6 +84,10 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
     return `${diffInWeeks} weeks ago`;
   };
 
+  // Get the videos to show in the fan (up to 4 cards)
+  const fanVideos = videos.slice(0, Math.min(4, videos.length));
+  const displayCount = fanVideos.length;
+
   return (
     <div className="fixed bottom-6 left-6 right-6 z-20 flex items-end justify-between">
       {/* Latest Posts Label - Left aligned with club title */}
@@ -93,17 +97,80 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
         </p>
       </div>
 
-      {/* Video Container */}
+      {/* Fanned Video Card Stack */}
       <div
         ref={swipeRef}
-        className="relative cursor-pointer group flex-shrink-0"
+        className="relative cursor-pointer group flex-shrink-0 hover:scale-105 transition-transform duration-300"
         style={{ 
           width: isMobile ? '180px' : '270px',
           height: isMobile ? '220px' : '330px'
         }}
-        onClick={handleOverlayClick}
       >
-        <div className="relative w-full h-full rounded-xl bg-black shadow-2xl overflow-hidden">
+        {/* Background Fan Cards */}
+        {fanVideos.map((video, index) => {
+          if (index === currentVideoIndex) return null; // Skip the current active card
+          
+          const isNext = index === (currentVideoIndex + 1) % videos.length;
+          const isPrev = index === (currentVideoIndex - 1 + videos.length) % videos.length;
+          const isFarBack = !isNext && !isPrev;
+          
+          // Calculate positions for fan effect
+          let transform = '';
+          let zIndex = 10;
+          let opacity = 0.7;
+          
+          if (isNext) {
+            transform = isMobile 
+              ? 'translateX(8px) translateY(4px) rotate(2deg)' 
+              : 'translateX(12px) translateY(6px) rotate(3deg)';
+            zIndex = 15;
+            opacity = 0.8;
+          } else if (isPrev) {
+            transform = isMobile 
+              ? 'translateX(-8px) translateY(4px) rotate(-2deg)' 
+              : 'translateX(-12px) translateY(6px) rotate(-3deg)';
+            zIndex = 15;
+            opacity = 0.8;
+          } else if (isFarBack) {
+            transform = isMobile 
+              ? 'translateX(4px) translateY(8px) rotate(1deg)' 
+              : 'translateX(6px) translateY(12px) rotate(1.5deg)';
+            zIndex = 5;
+            opacity = 0.6;
+          }
+
+          return (
+            <div
+              key={`fan-${index}`}
+              className="absolute inset-0 rounded-xl bg-black shadow-lg overflow-hidden transition-all duration-300 group-hover:scale-105"
+              style={{
+                transform,
+                zIndex,
+                opacity,
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                setCurrentVideoIndex(index);
+              }}
+            >
+              <EnhancedVideoPlayer
+                src={video.videoUrl}
+                autoplay={false}
+                muted={true}
+                loop={true}
+                className="w-full h-full object-contain"
+                enableHLS={true}
+              />
+              <div className="absolute inset-0 rounded-xl ring-1 ring-white/10" />
+            </div>
+          );
+        })}
+
+        {/* Main Active Video Card */}
+        <div 
+          className="relative w-full h-full rounded-xl bg-black shadow-2xl overflow-hidden z-20"
+          onClick={handleOverlayClick}
+        >
           {/* Main Video Player */}
           <div className={`absolute inset-0 transition-opacity duration-150 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
             <EnhancedVideoPlayer
@@ -167,7 +234,7 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
           )}
           
           {/* Bottom Left Overlay - Username and Timestamp */}
-          <div className="absolute bottom-4 left-4 text-white">
+          <div className="absolute bottom-4 left-4 text-white z-25">
             {currentVideo?.username && (
               <p className="text-lg opacity-90 font-medium leading-tight">
                 @{currentVideo.username}
@@ -183,6 +250,13 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
           {/* Subtle Border */}
           <div className="absolute inset-0 rounded-xl ring-1 ring-white/20" />
         </div>
+
+        {/* Swipe Indicator (subtle hint) */}
+        {hasMultipleVideos && (
+          <div className="absolute -bottom-6 right-0 text-white/60 text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            Swipe or click cards
+          </div>
+        )}
       </div>
     </div>
   );
