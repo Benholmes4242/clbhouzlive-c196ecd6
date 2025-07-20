@@ -167,7 +167,7 @@ const CourseDetailPage = () => {
         </Button>
 
         {/* Course Title & Location - Bottom Left */}
-        <div className="absolute bottom-6 md:bottom-48 left-6 text-white z-10">
+        <div className="absolute bottom-6 md:top-16 left-6 text-white z-10">
           <h1 className="text-3xl font-bold mb-2">{course.name}</h1>
           <p className="text-lg opacity-90 mb-3">
             {[course.country, course.region, course.sub_country].filter(Boolean).join(', ')}
