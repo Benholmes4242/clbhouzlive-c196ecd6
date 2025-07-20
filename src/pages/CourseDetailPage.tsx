@@ -174,7 +174,7 @@ const CourseDetailPage = () => {
           </p>
           
           {/* Ranking badges */}
-          <div className="flex gap-2 flex-wrap">
+          <div className="flex gap-2 flex-wrap mb-0 md:mb-4">
             {course.global_rank && (
               <div className="flex items-center gap-1.5 px-3 py-2 bg-white/20 backdrop-blur-sm rounded-full">
                 <Earth className="h-4 w-4 text-white" />
