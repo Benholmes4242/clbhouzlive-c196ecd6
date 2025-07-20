@@ -137,6 +137,7 @@ const VideoWithAutoplay: React.FC<{
         loop={true}
         className="w-full h-full"
         enableHLS={true}
+        hideControls={true}
       />
     </div>
   );
