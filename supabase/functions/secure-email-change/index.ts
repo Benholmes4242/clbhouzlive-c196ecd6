@@ -114,11 +114,20 @@ serve(async (req) => {
     const cooldownUntil = new Date();
     cooldownUntil.setHours(cooldownUntil.getHours() + 24);
 
+    // First get current email_change_count
+    const { data: currentProfile } = await supabase
+      .from('user_profiles')
+      .select('email_change_count')
+      .eq('id', user.id)
+      .single();
+
+    const currentCount = currentProfile?.email_change_count || 0;
+
     const { error: profileError } = await supabase
       .from('user_profiles')
       .update({
         email_change_cooldown_until: cooldownUntil.toISOString(),
-        email_change_count: supabase.sql`COALESCE(email_change_count, 0) + 1`
+        email_change_count: currentCount + 1
       })
       .eq('id', user.id);
 
