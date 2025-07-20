@@ -555,19 +555,31 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                           
                           {/* Add to Played Button */}
                           {user && (
-                            <Button
-                              onClick={(e) => handleAddToPlayed(course, e)}
-                              className={`${
-                                playedCourses.has(course.id)
-                                  ? 'bg-[#0B6623] hover:bg-[#084C1A]'
-                                  : 'bg-white hover:bg-gray-100'
-                              } border-0 font-bold px-1 md:px-1.5 py-0.5 rounded-full transition-all duration-200 text-xs md:text-sm h-auto ${
-                                playedCourses.has(course.id) ? 'text-white' : 'text-gray-800'
-                              }`}
+                            <div 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                e.preventDefault();
+                              }}
+                              className="relative z-10"
                             >
-                              <Target className="h-4 w-4 md:h-5 md:w-5 mr-1" />
-                              <span className="translate-y-[2px] md:translate-y-[3px]">{playedCourses.has(course.id) ? 'Played' : 'Add to Played'}</span>
-                            </Button>
+                              <Button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  e.preventDefault();
+                                  handleAddToPlayed(course, e);
+                                }}
+                                className={`${
+                                  playedCourses.has(course.id)
+                                    ? 'bg-[#0B6623] hover:bg-[#084C1A]'
+                                    : 'bg-white hover:bg-gray-100'
+                                } border-0 font-bold px-1 md:px-1.5 py-0.5 rounded-full transition-all duration-200 text-xs md:text-sm h-auto ${
+                                  playedCourses.has(course.id) ? 'text-white' : 'text-gray-800'
+                                }`}
+                              >
+                                <Target className="h-4 w-4 md:h-5 md:w-5 mr-1" />
+                                <span className="translate-y-[2px] md:translate-y-[3px]">{playedCourses.has(course.id) ? 'Played' : 'Add to Played'}</span>
+                              </Button>
+                            </div>
                           )}
                         </div>
                       </div>
