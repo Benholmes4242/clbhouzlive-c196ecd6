@@ -123,13 +123,20 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
             </TabsTrigger>
           </TabsList>
         ) : (
-          // Main courses page - only show Explore and Top 100 Explorer tabs
-          <TabsList className={`grid w-full ${user ? 'grid-cols-2' : 'grid-cols-1'}`}>
+          // Main courses page - show Explore, Global Top 100, and Top 100 Explorer tabs
+          <TabsList className={`grid w-full ${user ? 'grid-cols-3' : 'grid-cols-2'}`}>
             <TabsTrigger 
               value="explore"
               className="data-[state=active]:text-foreground"
             >
               Explore
+            </TabsTrigger>
+            <TabsTrigger 
+              value="global-top100"
+              className="data-[state=active]:text-foreground"
+              onClick={() => navigate('/global-top100')}
+            >
+              Global Top 100
             </TabsTrigger>
             {user && (
               <TabsTrigger 

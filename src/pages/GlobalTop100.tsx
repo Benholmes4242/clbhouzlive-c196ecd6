@@ -1,0 +1,28 @@
+import React from 'react';
+import Header from '@/components/Header';
+import BottomNavigation from '@/components/BottomNavigation';
+import GlobalTop100Content from '@/components/global-top100/GlobalTop100Content';
+
+const GlobalTop100 = () => {
+  return (
+    <div className="min-h-screen bg-background">
+      <Header />
+      
+      <main className="container mx-auto px-4 py-6 pb-20">
+        <div className="max-w-6xl mx-auto">
+          {/* Page Header */}
+          <div className="text-center mb-8">
+            <h1 className="text-4xl font-bold text-foreground mb-3">Global Top 100</h1>
+            <h2 className="text-xl text-muted-foreground">Follow the Clubhouse Community through the World's Top 100 Courses</h2>
+          </div>
+          
+          <GlobalTop100Content />
+        </div>
+      </main>
+      
+      <BottomNavigation />
+    </div>
+  );
+};
+
+export default GlobalTop100;

@@ -34,6 +34,7 @@ const FriendsPage = lazy(() => import("./pages/FriendsPage"));
 const FollowersPage = lazy(() => import("./pages/FollowersPage"));
 const FollowingPage = lazy(() => import("./pages/FollowingPage"));
 const Top100Explorer = lazy(() => import("./pages/Top100Explorer"));
+const GlobalTop100 = lazy(() => import("./pages/GlobalTop100"));
 const AdminSetupPage = lazy(() => import("./pages/AdminSetupPage"));
 const AdminPage = lazy(() => import("./pages/AdminPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -82,6 +83,7 @@ const App: React.FC = () => {
                   <Route path="/followers" element={<FollowersPage />} />
                   <Route path="/following" element={<FollowingPage />} />
                   <Route path="/top100-explorer" element={<Top100Explorer />} />
+                  <Route path="/global-top100" element={<GlobalTop100 />} />
                   <Route path="/admin-setup" element={<AdminSetupPage />} />
                   <Route path="/admin" element={<AdminPage />} />
                   <Route path="*" element={<NotFound />} />
