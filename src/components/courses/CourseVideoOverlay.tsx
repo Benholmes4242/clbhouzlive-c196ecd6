@@ -94,7 +94,7 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
       </div>
 
       {/* Fanned Video Stack Container */}
-      <div className="relative flex-shrink-0 group" style={{ marginRight: isMobile ? '20px' : '40px' }}>
+      <div className="relative flex-shrink-0 group">
         {/* Stack of video cards - show up to 4 videos */}
         {videos.slice(0, 4).map((video, index) => {
           const isTopCard = index === 0;
