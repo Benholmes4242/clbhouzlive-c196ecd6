@@ -14,8 +14,8 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
   return (
     <nav className={`fixed bottom-0 left-0 right-0 z-40 ${
       isClubhouse 
-        ? 'bg-black/80 backdrop-blur-md' 
-        : 'bg-background/80 backdrop-blur-md'
+        ? 'bg-black/20 backdrop-blur-sm' 
+        : 'bg-background/20 backdrop-blur-sm'
     }`}>
       <div className="w-full px-2">
         <div className="flex items-center justify-between h-16 relative">
