@@ -620,10 +620,10 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                               }
                             }, 50);
                           }}
-                          className={`text-sm transition-colors bg-white rounded-full px-2 py-1 shadow-md ${
+                          className={`text-sm transition-colors ${
                             showDot 
-                              ? 'text-gray-900 font-bold border-2 border-primary' 
-                              : 'text-gray-600 font-normal hover:text-gray-900 hover:bg-gray-50'
+                              ? 'text-gray-900 font-bold' 
+                              : 'text-gray-600 font-normal hover:text-gray-900'
                           }`}
                           aria-label={`Jump to course ${jumpPoint}`}
                         >
