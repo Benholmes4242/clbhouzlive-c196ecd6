@@ -95,7 +95,6 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
   const handleAddToPlayed = (course: Course, e: React.MouseEvent) => {
     console.log('🎯 Add to Played clicked for course:', course.name);
     e.stopPropagation(); // Prevent card click
-    e.preventDefault();
     console.log('🎯 Setting selected course:', course);
     setSelectedCourse(course);
     console.log('🎯 Opening Add to Played modal');
@@ -188,13 +187,15 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
 
   // Wheel handler for desktop
   const handleWheel = useCallback((e: React.WheelEvent) => {
-    e.preventDefault();
+    // Only handle wheel events in fullscreen mode
+    if (viewMode !== 'fullscreen') return;
+    
     if (e.deltaY > 0) {
       goToNext();
     } else {
       goToPrevious();
     }
-  }, [goToNext, goToPrevious]);
+  }, [goToNext, goToPrevious, viewMode]);
 
   // Simplified synchronization - no preloading delays
   useEffect(() => {
@@ -564,14 +565,12 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                             <div 
                               onClick={(e) => {
                                 e.stopPropagation();
-                                e.preventDefault();
                               }}
                               className="relative z-10"
                             >
                               <Button
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  e.preventDefault();
                                   handleAddToPlayed(course, e);
                                 }}
                                 className={`${
