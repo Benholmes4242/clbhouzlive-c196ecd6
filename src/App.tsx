@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ScrollToTop from '@/components/ScrollToTop';
 import { ThemeProvider } from '@/components/theme-provider';
 import PasswordProtection from "@/components/PasswordProtection";
+import ClubhouzLoading from "@/components/ClubhouzLoading";
 import AuthWrapper from "@/components/auth/AuthWrapper";
 import { GlobalAudioProvider } from './contexts/GlobalAudioContext';
 import { VideoManagerProvider } from './contexts/VideoManagerContext';
@@ -54,17 +55,7 @@ const App: React.FC = () => {
             <PasswordProtection>
             <BrowserRouter>
               <ScrollToTop />
-            <Suspense fallback={
-              <div className="min-h-screen bg-background flex items-center justify-center">
-                <div className="text-center">
-                  <div 
-                    className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto"
-                    style={{ borderBottomColor: '#f7931e' }}
-                  ></div>
-                  <p className="mt-2 text-muted-foreground">Loading...</p>
-                </div>
-              </div>
-            }>
+            <Suspense fallback={<ClubhouzLoading />}>
               <GlobalAudioProvider>
                 <VideoManagerProvider>
                   <AuthWrapper>
