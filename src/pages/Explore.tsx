@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
 import ExploreFilters from '@/components/explore/ExploreFilters';
@@ -7,9 +8,12 @@ import ExploreGrid from '@/components/explore/ExploreGrid';
 import VerticalMediaFeed from '@/components/explore/VerticalMediaFeed';
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { FILTER_TYPES, MEDIA_TYPES } from '@/components/explore/types';
 
 const Explore = () => {
+  const { user } = useSupabaseSession();
+  const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState<string>(FILTER_TYPES.VIDEOS);
   const { 
     content, 
@@ -26,16 +30,28 @@ const Explore = () => {
   } = useVerticalMediaFeed();
 
   const handleLike = (contentId: string) => {
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
     // Update likes optimistically - could be enhanced with actual API call
     // For now, this is just visual feedback
   };
 
   const handleFollow = (contentId: string) => {
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
     // Update follow status optimistically - could be enhanced with actual API call
     // For now, this is just visual feedback
   };
 
   const handleMediaClick = (item: any) => {
+    if (!user) {
+      navigate('/auth');
+      return;
+    }
     openFeed(item);
   };
 
