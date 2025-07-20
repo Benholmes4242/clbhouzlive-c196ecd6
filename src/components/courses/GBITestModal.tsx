@@ -93,13 +93,19 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
 
   // Handle Add to Played button click
   const handleAddToPlayed = (course: Course, e: React.MouseEvent) => {
+    console.log('🎯 Add to Played clicked for course:', course.name);
     e.stopPropagation(); // Prevent card click
+    e.preventDefault();
+    console.log('🎯 Setting selected course:', course);
     setSelectedCourse(course);
+    console.log('🎯 Opening Add to Played modal');
     setShowAddToPlayedModal(true);
+    console.log('🎯 Add to Played handler completed');
   };
 
   // Handle successful course addition
   const handlePlayedSuccess = () => {
+    console.log('🎯 Add to Played success - closing modal');
     setShowAddToPlayedModal(false);
     // The query will automatically refetch due to invalidation in the modal
   };
@@ -655,11 +661,14 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
       )}
 
       {/* Add to Played Modal */}
-      {selectedCourse && (
+      {selectedCourse && showAddToPlayedModal && (
         <AddToPlayedModal
           course={selectedCourse}
           isOpen={showAddToPlayedModal}
-          onClose={() => setShowAddToPlayedModal(false)}
+          onClose={() => {
+            console.log('🎯 AddToPlayedModal onClose called');
+            setShowAddToPlayedModal(false);
+          }}
           onSuccess={handlePlayedSuccess}
         />
       )}
