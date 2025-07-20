@@ -576,9 +576,8 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                 ))}
               </div>
 
-              {/* Number Jump List for List View - Desktop Only */}
-              {!isMobile && (
-                <div className="fixed top-1/2 right-4 transform -translate-y-1/2 flex flex-col gap-2 z-20">
+              {/* Number Jump List for List View */}
+              <div className="fixed top-1/2 right-2 md:right-4 transform -translate-y-1/2 flex flex-col gap-1 md:gap-2 z-20">
                   {[1, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map((jumpPoint) => {
                     // Only show jump points that exist in our dataset
                     if (jumpPoint > courses.length) return null;
@@ -632,8 +631,8 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                       </div>
                     );
                   })}
-                </div>
-              )}
+                 </div>
+            
             </>
           ) : (
             <div className="text-black text-center p-8">
