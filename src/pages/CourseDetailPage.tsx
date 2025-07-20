@@ -181,9 +181,11 @@ const CourseDetailPage = () => {
         <div 
           className="absolute left-6 text-white z-10" 
           style={{
-            top: isDesktop ? '64px' : 'auto',
-            bottom: isDesktop ? 'auto' : '24px'
+            top: isDesktop ? '64px !important' : 'auto',
+            bottom: isDesktop ? 'auto' : '24px !important',
+            backgroundColor: 'rgba(255, 0, 0, 0.5)'
           }}
+          onLoad={() => console.log('Desktop mode:', isDesktop)}
         >
           <h1 className="text-3xl font-bold mb-2">{course.name}</h1>
           <p className="text-lg opacity-90 mb-3">
