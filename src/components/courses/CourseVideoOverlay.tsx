@@ -160,6 +160,7 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
                 loop={true}
                 className="w-full h-full object-contain"
                 enableHLS={true}
+                hideControls={true}
               />
               <div className="absolute inset-0 rounded-xl ring-1 ring-white/10" />
             </div>
@@ -181,23 +182,25 @@ const CourseVideoOverlay: React.FC<CourseVideoOverlayProps> = ({
               loop={true}
               className="w-full h-full object-contain"
               enableHLS={true}
+              hideControls={true}
               key={`video-${currentVideoIndex}-${currentVideo?.videoUrl}`}
             />
           </div>
           
           {/* Preload next video (invisible) */}
           {hasMultipleVideos && nextVideoData && (
-            <div className="absolute inset-0 opacity-0 pointer-events-none">
-              <EnhancedVideoPlayer
-                ref={preloadVideoRef}
-                src={nextVideoData.videoUrl}
-                autoplay={false}
-                muted={true}
-                loop={true}
-                className="w-full h-full object-contain"
-                enableHLS={true}
-              />
-            </div>
+             <div className="absolute inset-0 opacity-0 pointer-events-none">
+               <EnhancedVideoPlayer
+                 ref={preloadVideoRef}
+                 src={nextVideoData.videoUrl}
+                 autoplay={false}
+                 muted={true}
+                 loop={true}
+                 className="w-full h-full object-contain"
+                 enableHLS={true}
+                 hideControls={true}
+               />
+             </div>
           )}
           
           {/* Navigation Arrows Overlay */}
