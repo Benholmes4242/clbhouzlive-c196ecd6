@@ -24,6 +24,7 @@ import { Slider } from '@/components/ui/slider';
 import { Star, Check, Trophy, Trash2, Upload } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import ReviewMediaUpload from './ReviewMediaUpload';
+import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 
 interface Course {
   id: string;
@@ -563,7 +564,7 @@ const PostPlayRatingModal = ({
               {/* Rating Preview */}
               <div className="bg-muted/30 rounded-lg p-4 space-y-2">
                 <div className="flex items-center justify-center gap-2">
-                  <Star className="h-5 w-5 text-yellow-500 fill-current" />
+                  <ClubhouseLogo size="md" showTooltip />
                   <span className="font-bold text-lg">{selectedRating}/10</span>
                 </div>
                 {review && (

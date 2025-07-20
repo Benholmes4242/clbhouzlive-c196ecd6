@@ -1,6 +1,7 @@
 
 import React from 'react';
-import { Star, Users } from 'lucide-react';
+import { Users } from 'lucide-react';
+import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import CourseRatingSystem from './CourseRatingSystem';
 
 interface RatingStats {
@@ -49,7 +50,7 @@ const CourseDetailRatingSection = ({
       {ratingStats ? (
         <div className="flex items-center gap-4 mb-4">
           <div className="flex items-center gap-2">
-            <Star className="h-5 w-5 text-yellow-500 fill-current" />
+            <ClubhouseLogo size="md" showTooltip />
             <span className="text-2xl font-bold">{ratingStats.average_rating}/10</span>
           </div>
           <div className="flex items-center gap-1 text-muted-foreground">

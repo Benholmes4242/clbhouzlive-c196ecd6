@@ -8,6 +8,7 @@ import { OptimizedAvatar } from '@/components/ui/optimized-avatar';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import EditRatingModal from '@/components/courses/EditRatingModal';
 import ReviewMediaDisplay from '@/components/courses/ReviewMediaDisplay';
+import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 
 interface CourseReviewsTabProps {
   courseId: string;
@@ -200,7 +201,7 @@ const CourseReviewsTab = ({ courseId, courseName }: CourseReviewsTabProps) => {
                         {getUserDisplayName(review)}
                       </span>
                       <div className="flex items-center gap-1">
-                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                        <ClubhouseLogo size="sm" showTooltip />
                         <span className="font-medium">{review.rating}/10</span>
                       </div>
                       {isUserReview(review) && (

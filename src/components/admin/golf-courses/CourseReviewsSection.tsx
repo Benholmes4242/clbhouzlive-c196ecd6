@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Trash2, Star, User, Calendar, AlertTriangle } from 'lucide-react';
+import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -49,10 +50,12 @@ const CourseReviewsSection: React.FC<CourseReviewsSectionProps> = ({
 
   const renderStars = (rating: number) => {
     return Array.from({ length: 5 }, (_, i) => (
-      <Star
+      <ClubhouseLogo
         key={i}
-        className={`h-4 w-4 ${
-          i < rating ? 'text-yellow-400 fill-current' : 'text-gray-300'
+        size="sm"
+        showTooltip={i === 0}
+        className={`${
+          i < rating ? 'opacity-100' : 'opacity-30'
         }`}
       />
     ));
@@ -132,7 +135,7 @@ const CourseReviewsSection: React.FC<CourseReviewsSectionProps> = ({
       ) : (
         <Card>
           <CardContent className="p-8 text-center">
-            <Star className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+            <ClubhouseLogo size="lg" className="mx-auto mb-4 opacity-50" />
             <h3 className="text-lg font-semibold mb-2">No reviews yet</h3>
             <p className="text-muted-foreground">This course hasn't received any reviews from users.</p>
           </CardContent>

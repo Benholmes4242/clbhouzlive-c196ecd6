@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { ArrowLeft, ExternalLink, Earth, Star } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Earth } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import CountryFlag from '@/components/ui/country-flag';
+import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import CourseAboutTab from '@/components/courses/course-detail/CourseAboutTab';
 import CourseReviewsTab from '@/components/courses/course-detail/CourseReviewsTab';
@@ -217,7 +218,7 @@ const CourseDetailPage = () => {
           <div className="flex items-center justify-between w-full">
             {/* Community Vote Score - Left */}
             <div className="flex items-center gap-2">
-              <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
+              <ClubhouseLogo size="md" showTooltip />
               <span className="text-xl font-semibold text-foreground">
                 {ratingStats?.average_rating || 0}/10
               </span>

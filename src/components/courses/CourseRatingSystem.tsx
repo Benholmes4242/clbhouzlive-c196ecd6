@@ -8,6 +8,7 @@ import { Star } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import MediaFileHandler from '@/components/posts/MediaFileHandler';
 import MediaPreview from '@/components/posts/MediaPreview';
+import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 
 interface CourseRatingSystemProps {
   courseId: string;
@@ -128,7 +129,7 @@ const CourseRatingSystem = ({
       <div className="text-center">
         <p className="text-sm font-medium mb-2">Rate your experience</p>
         <div className="flex items-center justify-center gap-1 mb-2">
-          <Star className="h-4 w-4 text-yellow-500" />
+          <ClubhouseLogo size="sm" showTooltip />
           <span className="text-sm text-muted-foreground">Rate from 0.5 to 10</span>
         </div>
       </div>

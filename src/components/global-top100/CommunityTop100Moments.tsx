@@ -3,7 +3,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Heart, MessageCircle, Share, MapPin, Star, Play } from 'lucide-react';
+import { Heart, MessageCircle, Share, MapPin, Play } from 'lucide-react';
+import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 
 const communityMomentsData = [
   {
@@ -222,7 +223,7 @@ const CommunityTop100Moments = () => {
                 
                 {/* Rating */}
                 <div className="absolute top-3 right-3 bg-black/70 text-white px-2 py-1 rounded-full flex items-center gap-1">
-                  <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                  <ClubhouseLogo size="xs" showTooltip />
                   <span className="text-xs font-medium">{post.rating}</span>
                 </div>
               </div>
