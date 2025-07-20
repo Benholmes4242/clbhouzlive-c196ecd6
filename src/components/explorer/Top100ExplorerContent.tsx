@@ -40,7 +40,7 @@ const Top100ExplorerContent = () => {
     >
       {/* Sticky Filters */}
       <div 
-        className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b pb-4 px-4 sm:px-6 lg:px-8"
+        className="sticky top-0 z-10 bg-background border-b pb-4 px-4 sm:px-6 lg:px-8"
         onMouseEnter={() => console.log('🏷️ Mouse ENTERED sticky filters section')}
         onMouseLeave={() => console.log('🏷️ Mouse LEFT sticky filters section')}
       >
