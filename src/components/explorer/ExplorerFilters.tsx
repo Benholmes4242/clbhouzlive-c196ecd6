@@ -21,8 +21,6 @@ interface ExplorerFiltersProps {
 }
 
 const ExplorerFilters: React.FC<ExplorerFiltersProps> = ({ filters, onFilterChange }) => {
-  console.log('🔍 ExplorerFilters: Rendering with filters:', filters);
-  
   return (
     <div className="space-y-4">
       {/* Top Row - Audience & Region & Sort */}
@@ -57,7 +55,6 @@ const ExplorerFilters: React.FC<ExplorerFiltersProps> = ({ filters, onFilterChan
         <Select 
           value={filters.region} 
           onValueChange={(value) => onFilterChange('region', value)}
-          onOpenChange={(open) => console.log('🌍 Region dropdown:', open ? 'OPENED' : 'CLOSED')}
         >
           <SelectTrigger className="w-48">
             <SelectValue placeholder="Select region" />
@@ -94,7 +91,6 @@ const ExplorerFilters: React.FC<ExplorerFiltersProps> = ({ filters, onFilterChan
         <Select 
           value={filters.sortBy} 
           onValueChange={(value) => onFilterChange('sortBy', value)}
-          onOpenChange={(open) => console.log('📊 Sort dropdown:', open ? 'OPENED' : 'CLOSED')}
         >
           <SelectTrigger className="w-44">
             <SelectValue placeholder="Sort by" />

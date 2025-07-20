@@ -33,17 +33,9 @@ const Top100ExplorerContent = () => {
   };
 
   return (
-    <div 
-      className="space-y-0"
-      onMouseEnter={() => console.log('🖱️ Mouse ENTERED Top100ExplorerContent')}
-      onMouseLeave={() => console.log('🖱️ Mouse LEFT Top100ExplorerContent')}
-    >
-      {/* Sticky Filters */}
-      <div 
-        className="sticky top-0 z-10 bg-background border-b pb-4 px-4 sm:px-6 lg:px-8"
-        onMouseEnter={() => console.log('🏷️ Mouse ENTERED sticky filters section')}
-        onMouseLeave={() => console.log('🏷️ Mouse LEFT sticky filters section')}
-      >
+    <div className="space-y-0">
+      {/* Filters */}
+      <div className="border-b pb-4 px-4 sm:px-6 lg:px-8">
         <ExplorerFilters 
           filters={filters}
           onFilterChange={updateFilter}
