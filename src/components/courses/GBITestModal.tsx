@@ -398,15 +398,15 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                   {/* Ranking Badges - Inline version */}
                   <div className="flex gap-2">
                     {displayedCourse.regional_rank && displayedCourse.regional_rank <= 100 && (
-                      <div className="flex items-center justify-center gap-1 px-1.5 py-0.5 bg-black/40 rounded-full">
+                      <div className="flex items-center justify-center gap-1 px-1.5 py-0.5 bg-white rounded-full">
                         <CountryFlag country="Britain & Ireland" size="lg" />
-                        <span className="text-sm font-bold text-white leading-none flex items-center translate-y-[3px]">#{displayedCourse.regional_rank}</span>
+                        <span className="text-sm font-bold text-gray-800 leading-none flex items-center translate-y-[3px]">#{displayedCourse.regional_rank}</span>
                       </div>
                     )}
                     {displayedCourse.global_rank && displayedCourse.global_rank <= 100 && (
-                      <div className="flex items-center justify-center gap-1 px-1.5 py-0.5 bg-black/40 rounded-full">
-                        <Earth className="h-5 w-5 text-white" />
-                        <span className="text-sm font-bold text-white leading-none flex items-center translate-y-[3px]">#{displayedCourse.global_rank}</span>
+                      <div className="flex items-center justify-center gap-1 px-1.5 py-0.5 bg-white rounded-full">
+                        <Earth className="h-5 w-5 text-gray-600" />
+                        <span className="text-sm font-bold text-gray-800 leading-none flex items-center translate-y-[3px]">#{displayedCourse.global_rank}</span>
                       </div>
                     )}
                   </div>
