@@ -179,7 +179,7 @@ const CourseDetailPage = () => {
 
         {/* Course Title & Location - Bottom Left */}
         <div 
-          className="absolute left-6 text-white z-10" 
+          className="fixed left-6 text-white z-10" 
           style={{
             top: window.innerWidth >= 768 ? '64px' : 'auto',
             bottom: window.innerWidth >= 768 ? 'auto' : '24px',
