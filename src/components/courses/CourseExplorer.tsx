@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Search, MapPin, Crown } from 'lucide-react';
+import { Search, MapPin, TestTube } from 'lucide-react';
 import CourseCard from './CourseCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import GBITestModal from './GBITestModal';
@@ -115,7 +115,7 @@ const CourseExplorer = () => {
         />
       </div>
 
-      {/* Region Selection and GB&I Top 100 Box */}
+      {/* Region Selection and GB & I Test Button */}
       <div className="flex items-center gap-4">
         <Select value={selectedRegion} onValueChange={setSelectedRegion}>
           <SelectTrigger className="w-[200px] focus:ring-[#b66b41] focus:border-[#b66b41]">
@@ -134,19 +134,14 @@ const CourseExplorer = () => {
           </SelectContent>
         </Select>
 
-        {/* GB&I Top 100 Green Box */}
-        <div
+        <Button
           onClick={() => setIsGBITestModalOpen(true)}
-          className="bg-green-600 hover:bg-green-700 text-white rounded-lg p-4 cursor-pointer transition-all duration-200 hover:scale-105 shadow-lg min-w-[200px]"
+          variant="outline"
+          className="border-[#b66b41] text-[#b66b41] hover:bg-[#b66b41] hover:text-white"
         >
-          <div className="flex items-start justify-between mb-2">
-            <Crown className="h-6 w-6 text-white" />
-            <Crown className="h-6 w-6 text-white/30" />
-          </div>
-          <h3 className="text-lg font-bold mb-1">GB&I Top 100</h3>
-          <p className="text-sm text-white/90 mb-3">Great Britain & Ireland's finest</p>
-          <p className="text-xs text-white/80">Click to explore →</p>
-        </div>
+          <TestTube className="h-4 w-4 mr-2" />
+          GB & I Test
+        </Button>
       </div>
 
       {/* Course Grid */}
