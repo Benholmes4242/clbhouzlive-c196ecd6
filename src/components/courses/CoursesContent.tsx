@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import CourseExplorer from './CourseExplorer';
@@ -96,10 +95,9 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
         </p>
       </div>
 
-      <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
-        {/* Only show My Courses tab on user profile pages, not on main courses page */}
-        {username ? (
-          // User profile courses page - show all tabs including My Courses
+      {/* User profile courses page - show all tabs including My Courses */}
+      {username ? (
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
           <TabsList className={`grid w-full ${user ? 'grid-cols-3' : 'grid-cols-2'}`}>
             <TabsTrigger 
               value="explore"
@@ -122,50 +120,63 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
               {getMyCoursesTabLabel()}
             </TabsTrigger>
           </TabsList>
-        ) : (
-          // Main courses page - show Explore, Global Top 100, and Top 100 Explorer tabs
-          <TabsList className={`grid w-full ${user ? 'grid-cols-3' : 'grid-cols-2'}`}>
-            <TabsTrigger 
-              value="explore"
-              className="data-[state=active]:text-foreground"
-            >
-              Explore
-            </TabsTrigger>
-            <TabsTrigger 
-              value="global-top100"
-              className="data-[state=active]:text-foreground"
-              onClick={() => navigate('/global-top100')}
-            >
-              Global Top 100
-            </TabsTrigger>
-            {user && (
-              <TabsTrigger 
-                value="friends-courses"
-                className="data-[state=active]:text-foreground"
-              >
-                Top 100 Explorer
-              </TabsTrigger>
-            )}
-          </TabsList>
-        )}
 
-        <TabsContent value="explore" className="mt-6">
-          <CourseExplorer />
-        </TabsContent>
-
-        {user && (
-          <TabsContent value="friends-courses" className="mt-6">
-            <FriendsCourses />
+          <TabsContent value="explore" className="mt-6">
+            <CourseExplorer />
           </TabsContent>
-        )}
 
-        {/* Only render My Courses content on user profile pages */}
-        {username && (
+          {user && (
+            <TabsContent value="friends-courses" className="mt-6">
+              <FriendsCourses />
+            </TabsContent>
+          )}
+
           <TabsContent value="my-courses" className="mt-6">
             <UserCoursesContent username={username} />
           </TabsContent>
-        )}
-      </Tabs>
+        </Tabs>
+      ) : (
+        // Main courses page - show custom navigation with Global Top 100
+        <div className="space-y-6">
+          {/* Custom Navigation Bar */}
+          <div className={`grid w-full ${user ? 'grid-cols-3' : 'grid-cols-2'} bg-muted p-1 rounded-md`}>
+            <button
+              onClick={() => setActiveTab('explore')}
+              className={`flex items-center justify-center rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${
+                activeTab === 'explore' 
+                  ? 'bg-background text-foreground shadow-sm' 
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Explore
+            </button>
+            <button
+              onClick={() => navigate('/global-top100')}
+              className="flex items-center justify-center rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 text-muted-foreground hover:text-foreground hover:bg-background/50"
+            >
+              Global Top 100
+            </button>
+            {user && (
+              <button
+                onClick={() => setActiveTab('friends-courses')}
+                className={`flex items-center justify-center rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 ${
+                  activeTab === 'friends-courses' 
+                    ? 'bg-background text-foreground shadow-sm' 
+                    : 'text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                Top 100 Explorer
+              </button>
+            )}
+          </div>
+          
+          {/* Tab Content */}
+          <div>
+            {activeTab === 'explore' && <CourseExplorer />}
+            {user && activeTab === 'friends-courses' && <FriendsCourses />}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
