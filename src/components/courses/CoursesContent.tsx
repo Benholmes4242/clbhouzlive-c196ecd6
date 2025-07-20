@@ -71,8 +71,8 @@ const CoursesContent: React.FC<CoursesContentProps> = ({ username, displayName }
       return "Here's how you rank the world's best golf courses.";
     }
     
-    // Default subtitle for explore and friends-courses tabs
-    return "Global Top 100 Courses. One Epic Checklist.";
+    // Default subtitle for explore tab
+    return "Explore the World's Courses";
   };
 
   // Dynamic tab label for "My Courses" tab
