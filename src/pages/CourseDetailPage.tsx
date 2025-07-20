@@ -21,7 +21,6 @@ const CourseDetailPage = () => {
   const [activeTab, setActiveTab] = useState('about');
   const [showAddToPlayedModal, setShowAddToPlayedModal] = useState(false);
   const [isPlayed, setIsPlayed] = useState(false);
-  const [isDesktop, setIsDesktop] = useState(window.innerWidth >= 768);
 
   const { data: course, isLoading: courseLoading } = useQuery({
     queryKey: ['course-detail', courseId],
@@ -63,16 +62,6 @@ const CourseDetailPage = () => {
   React.useEffect(() => {
     setIsPlayed(!!userCourse?.played);
   }, [userCourse]);
-
-  // Handle responsive positioning
-  React.useEffect(() => {
-    const handleResize = () => {
-      setIsDesktop(window.innerWidth >= 768);
-    };
-    
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
 
   const { data: ratingStats } = useQuery({
@@ -178,21 +167,14 @@ const CourseDetailPage = () => {
         </Button>
 
         {/* Course Title & Location - Bottom Left */}
-        <div 
-          className="fixed left-6 text-white z-10" 
-          style={{
-            top: window.innerWidth >= 768 ? '64px' : 'auto',
-            bottom: window.innerWidth >= 768 ? 'auto' : '24px',
-            backgroundColor: 'rgba(255, 0, 0, 0.3)'
-          }}
-        >
+        <div className="absolute bottom-6 left-6 text-white z-10">
           <h1 className="text-3xl font-bold mb-2">{course.name}</h1>
           <p className="text-lg opacity-90 mb-3">
             {[course.country, course.region, course.sub_country].filter(Boolean).join(', ')}
           </p>
           
           {/* Ranking badges */}
-          <div className="flex gap-2 flex-wrap mb-0 md:mb-4">
+          <div className="flex gap-2 flex-wrap">
             {course.global_rank && (
               <div className="flex items-center gap-1.5 px-3 py-2 bg-white/20 backdrop-blur-sm rounded-full">
                 <Earth className="h-4 w-4 text-white" />

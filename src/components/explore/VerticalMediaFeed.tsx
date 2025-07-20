@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Minimize2, Heart, MessageCircle, Share, Volume2, VolumeX, MoreHorizontal, Edit, Trash2, MapPin, Check, UserPlus, UserCheck, ChevronLeft, ChevronRight } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -37,7 +36,6 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
   onFollow
 }) => {
   const { user } = useSupabaseSession();
-  const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { updatePost, isUpdating } = usePostUpdate();
   const { isGloballyMuted, setGlobalMute } = useGlobalAudio();
@@ -118,12 +116,6 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
   });
 
   const handleFollowToggle = () => {
-    if (!user) {
-      onClose();
-      navigate('/auth');
-      return;
-    }
-    
     const targetUserId = filteredContent[currentIndex]?.user?.id;
     if (!targetUserId || !user?.id || targetUserId === user.id) return;
     
@@ -273,30 +265,15 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
   // Remove redundant scroll logic - now handled immediately in the filter effect
 
   const handleLike = (item: ExploreContentItem) => {
-    if (!user) {
-      onClose();
-      navigate('/auth');
-      return;
-    }
     onLike(item.id);
   };
 
   const handleShare = () => {
-    if (!user) {
-      onClose();
-      navigate('/auth');
-      return;
-    }
     // Implement share functionality
     console.log('Share clicked');
   };
 
   const handleComment = () => {
-    if (!user) {
-      onClose();
-      navigate('/auth');
-      return;
-    }
     // Implement comment functionality
     console.log('Comment clicked');
   };

@@ -334,18 +334,6 @@
   background-color: transparent; /* Remove any black background */
 }
 
-/* Course Title Container Responsive Positioning */
-.course-title-container {
-  bottom: 24px;
-}
-
-@media (min-width: 768px) {
-  .course-title-container {
-    top: 64px !important;
-    bottom: auto !important;
-  }
-}
-
 .index-feed video:not([poster]) {
   background-color: hsl(var(--muted));
 }
