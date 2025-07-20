@@ -527,8 +527,8 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
 
                     {/* Course Info Overlay */}
-                    <div className="absolute inset-0 p-4 flex flex-col justify-end text-white">
-                      <div className="mb-4">
+                    <div className="absolute inset-0 p-2 pb-3 flex flex-col justify-end text-white">
+                      <div>
                         <h3 className="text-2xl font-semibold mb-1">{course.name}</h3>
                         <p className="text-lg opacity-90 mb-2">
                           {[
