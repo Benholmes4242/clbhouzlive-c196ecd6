@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Globe, MapPin, Crown, Star } from 'lucide-react';
+import GBITestModal from '@/components/courses/GBITestModal';
 
 const courseListData = [
   {
@@ -34,13 +35,25 @@ const courseListData = [
 ];
 
 const Top100CourseLists = () => {
+  const [isGBIModalOpen, setIsGBIModalOpen] = useState(false);
+
+  const handleCardClick = (listId: string) => {
+    if (listId === 'gbi') {
+      setIsGBIModalOpen(true);
+    }
+  };
+
   return (
     <section>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {courseListData.map((list) => {
           const IconComponent = list.icon;
           return (
-            <Card key={list.id} className="group cursor-pointer hover:shadow-lg transition-all duration-300 overflow-hidden">
+            <Card 
+              key={list.id} 
+              className="group cursor-pointer hover:shadow-lg transition-all duration-300 overflow-hidden"
+              onClick={() => handleCardClick(list.id)}
+            >
               <CardContent className="p-0">
                 <div className={`${list.color} p-6 text-white relative overflow-hidden`}>
                   <div className="absolute top-2 right-2 opacity-20">
@@ -60,6 +73,11 @@ const Top100CourseLists = () => {
           );
         })}
       </div>
+      
+      <GBITestModal 
+        isOpen={isGBIModalOpen} 
+        onClose={() => setIsGBIModalOpen(false)} 
+      />
     </section>
   );
 };
