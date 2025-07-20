@@ -34,8 +34,8 @@ const Top100ExplorerContent = () => {
 
   return (
     <div className="space-y-0">
-      {/* Filters */}
-      <div className="border-b pb-4 px-4 sm:px-6 lg:px-8">
+      {/* Sticky Filters */}
+      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b pb-4 px-4 sm:px-6 lg:px-8">
         <ExplorerFilters 
           filters={filters}
           onFilterChange={updateFilter}

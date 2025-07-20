@@ -369,8 +369,8 @@ const CommunityLeaderboards = () => {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <CarouselPrevious className="hidden md:flex hover:bg-background hover:text-foreground" />
-            <CarouselNext className="hidden md:flex hover:bg-background hover:text-foreground" />
+            <CarouselPrevious className="hidden md:flex" />
+            <CarouselNext className="hidden md:flex" />
           </Carousel>
         </div>
         
