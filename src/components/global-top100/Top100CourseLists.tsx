@@ -52,7 +52,7 @@ const Top100CourseLists = () => {
           return (
             <Card 
               key={list.id} 
-              className="group cursor-pointer hover:shadow-lg transition-all duration-300 overflow-hidden"
+              className="group cursor-pointer hover:shadow-lg transition-all duration-300 overflow-hidden h-48"
               onClick={() => handleCardClick(list.id)}
             >
               <CardContent className="p-0">
