@@ -92,12 +92,12 @@ const Top100CourseLists = () => {
                           <div className="absolute inset-0 flex flex-col justify-between text-white p-6">
                             <div className="flex-1 flex flex-col justify-center">
                               <div className="relative z-10">
-                                <h3 className="text-2xl font-bold mb-1">{list.title}</h3>
-                                <p className="text-white/90 text-base">{list.description}</p>
+                                <h3 className="text-3xl font-bold mb-1">{list.title}</h3>
+                                <p className="text-white/90 text-lg">{list.description}</p>
                               </div>
                             </div>
                             <div>
-                              <p className="text-base text-white/80">Click to explore →</p>
+                              <p className="text-lg text-white/80">Click to explore →</p>
                             </div>
                           </div>
                         </div>
@@ -107,12 +107,12 @@ const Top100CourseLists = () => {
                           <div className="absolute inset-0 flex flex-col justify-between text-white p-6">
                             <div className="flex-1 flex flex-col justify-center">
                               <div className="relative z-10">
-                                <h3 className="text-2xl font-bold mb-1">{list.title}</h3>
-                                <p className="text-white/90 text-base">{list.description}</p>
+                                <h3 className="text-3xl font-bold mb-1">{list.title}</h3>
+                                <p className="text-white/90 text-lg">{list.description}</p>
                               </div>
                             </div>
                             <div>
-                              <p className="text-base text-white/80">Click to explore →</p>
+                              <p className="text-lg text-white/80">Click to explore →</p>
                             </div>
                           </div>
                         </div>
@@ -163,12 +163,12 @@ const Top100CourseLists = () => {
                     <div className="absolute inset-0 flex flex-col justify-between text-white p-6">
                       <div className="flex-1 flex flex-col justify-center">
                         <div className="relative z-10">
-                          <h3 className="text-2xl font-bold mb-1">{list.title}</h3>
-                          <p className="text-white/90 text-base">{list.description}</p>
+                          <h3 className="text-3xl font-bold mb-1">{list.title}</h3>
+                          <p className="text-white/90 text-lg">{list.description}</p>
                         </div>
                       </div>
                       <div>
-                        <p className="text-base text-white/80">Click to explore →</p>
+                        <p className="text-lg text-white/80">Click to explore →</p>
                       </div>
                     </div>
                   </div>
@@ -178,12 +178,12 @@ const Top100CourseLists = () => {
                     <div className="absolute inset-0 flex flex-col justify-between text-white p-6">
                       <div className="flex-1 flex flex-col justify-center">
                         <div className="relative z-10">
-                          <h3 className="text-2xl font-bold mb-1">{list.title}</h3>
-                          <p className="text-white/90 text-base">{list.description}</p>
+                          <h3 className="text-3xl font-bold mb-1">{list.title}</h3>
+                          <p className="text-white/90 text-lg">{list.description}</p>
                         </div>
                       </div>
                       <div>
-                        <p className="text-base text-white/80">Click to explore →</p>
+                        <p className="text-lg text-white/80">Click to explore →</p>
                       </div>
                     </div>
                   </div>
