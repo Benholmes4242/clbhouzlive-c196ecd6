@@ -68,12 +68,12 @@ const Top100CourseLists = () => {
                   >
                     <div className="flex-1 flex flex-col justify-center p-6">
                       <div className="relative z-10">
-                        <h3 className="text-xl font-bold mb-1">{list.title}</h3>
-                        <p className="text-white/90 text-sm">{list.description}</p>
+                        <h3 className="text-2xl font-bold mb-1">{list.title}</h3>
+                        <p className="text-white/90 text-base">{list.description}</p>
                       </div>
                     </div>
                     <div className="p-6 pt-0">
-                      <p className="text-sm text-white/80">Click to explore →</p>
+                      <p className="text-base text-white/80">Click to explore →</p>
                     </div>
                   </div>
                 ) : (
