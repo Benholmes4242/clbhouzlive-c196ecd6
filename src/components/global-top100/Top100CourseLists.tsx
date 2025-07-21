@@ -72,7 +72,7 @@ const Top100CourseLists = () => {
                         <p className="text-white/90 text-sm">{list.description}</p>
                       </div>
                     </div>
-                    <div className="p-4">
+                    <div className="px-6 pb-4">
                       <p className="text-sm text-white/80">Click to explore →</p>
                     </div>
                   </div>
