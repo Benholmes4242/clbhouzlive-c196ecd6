@@ -41,7 +41,7 @@ const Top100CoursesModal: React.FC<Top100CoursesModalProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[80vh]">
-        <DialogHeader>
+        <DialogHeader className="pb-2">
           <DialogTitle>{regionName} - Top 100 Courses</DialogTitle>
         </DialogHeader>
         
