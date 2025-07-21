@@ -15,7 +15,6 @@ const courseListData = [
   {
     id: 'gbi',
     title: 'GB&I Top 100',
-    icon: Crown,
     description: 'Great Britain & Ireland\'s finest',
     color: '',
     backgroundImage: gbiGolfCourse
@@ -57,30 +56,44 @@ const Top100CourseLists = () => {
               onClick={() => handleCardClick(list.id)}
             >
               <CardContent className="p-0">
-                <div 
-                  className={`p-6 text-white relative overflow-hidden ${
-                    list.backgroundImage 
-                      ? '' 
-                      : list.color
-                  }`}
-                  style={list.backgroundImage ? {
-                    backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${list.backgroundImage})`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center'
-                  } : {}}
-                >
-                  <div className="absolute top-2 right-2 opacity-20">
-                    <IconComponent className="h-12 w-12" />
+                {list.backgroundImage ? (
+                  // GB&I card with full background image
+                  <div 
+                    className="h-full text-white relative overflow-hidden"
+                    style={{
+                      backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${list.backgroundImage})`,
+                      backgroundSize: 'cover',
+                      backgroundPosition: 'center'
+                    }}
+                  >
+                    <div className="p-6">
+                      <div className="relative z-10">
+                        <h3 className="text-xl font-bold mb-2">{list.title}</h3>
+                        <p className="text-white/90 text-sm">{list.description}</p>
+                      </div>
+                    </div>
+                    <div className="p-4">
+                      <p className="text-sm text-white/80">Click to explore →</p>
+                    </div>
                   </div>
-                  <div className="relative z-10">
-                    <IconComponent className="h-8 w-8 mb-3" />
-                    <h3 className="text-xl font-bold mb-2">{list.title}</h3>
-                    <p className="text-white/90 text-sm">{list.description}</p>
-                  </div>
-                </div>
-                <div className="p-4 bg-background group-hover:bg-muted/50 transition-colors">
-                  <p className="text-sm text-muted-foreground">Click to explore →</p>
-                </div>
+                ) : (
+                  // Other cards with icon and gradient
+                  <>
+                    <div className={`${list.color} p-6 text-white relative overflow-hidden`}>
+                      <div className="absolute top-2 right-2 opacity-20">
+                        <IconComponent className="h-12 w-12" />
+                      </div>
+                      <div className="relative z-10">
+                        <IconComponent className="h-8 w-8 mb-3" />
+                        <h3 className="text-xl font-bold mb-2">{list.title}</h3>
+                        <p className="text-white/90 text-sm">{list.description}</p>
+                      </div>
+                    </div>
+                    <div className="p-4 bg-background group-hover:bg-muted/50 transition-colors">
+                      <p className="text-sm text-muted-foreground">Click to explore →</p>
+                    </div>
+                  </>
+                )}
               </CardContent>
             </Card>
           );
