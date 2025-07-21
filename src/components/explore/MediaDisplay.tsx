@@ -21,6 +21,7 @@ interface MediaDisplayProps {
   currentIndex: number;
   loop?: boolean;
   muted?: boolean;
+  hidePlayButton?: boolean;
 }
 
 const MediaDisplay: React.FC<MediaDisplayProps> = ({
@@ -33,7 +34,8 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
   itemId,
   currentIndex,
   loop = false,
-  muted = true
+  muted = true,
+  hidePlayButton = false
 }) => {
   // Fallback image for broken/missing images
   const fallbackImage = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
@@ -112,7 +114,7 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
           />
           
           {/* Play icon for non-autoplaying videos */}
-          {!shouldAutoplay && (
+          {!shouldAutoplay && !hidePlayButton && (
             <div className="absolute bottom-3 right-3 z-20">
               <FaPlay className="h-4 w-4 text-white drop-shadow-lg" />
             </div>

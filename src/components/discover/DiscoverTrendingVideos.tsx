@@ -122,26 +122,26 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
         <h2 className="text-xl font-semibold text-foreground">Trending Videos</h2>
       </div>
 
-      <div className="relative">
-        {/* Desktop Navigation Arrows - Overlaid on cards */}
+      <div className="relative flex items-center">
+        {/* Desktop Navigation Arrows - Outside the cards */}
         {!isMobile && (
           <>
-            {/* Left arrow */}
+            {/* Left arrow - positioned on the left side of the container */}
             <button
               onClick={prevVideo}
-              className="absolute left-2 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-white/20 transition-colors z-30"
+              className="absolute -left-12 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors z-30"
               aria-label="Previous videos"
             >
-              <ChevronLeft className="w-6 h-6 text-white drop-shadow-lg" />
+              <ChevronLeft className="w-6 h-6 text-white" />
             </button>
             
-            {/* Right arrow */}
+            {/* Right arrow - positioned on the right side of the container */}
             <button
               onClick={nextVideo}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-white/20 transition-colors z-30"
+              className="absolute -right-12 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors z-30"
               aria-label="Next videos"
             >
-              <ChevronRight className="w-6 h-6 text-white drop-shadow-lg" />
+              <ChevronRight className="w-6 h-6 text-white" />
             </button>
           </>
         )}
@@ -173,6 +173,7 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
                   itemId={video.id}
                   currentIndex={actualIndex}
                   loop={true}
+                  hidePlayButton={true}
                 />
                 
                 {/* Overlay */}
@@ -200,31 +201,29 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
                   </div>
                 </div>
 
-                {/* Mobile navigation arrows */}
-                {isMobile && (
-                  <>
-                    {/* Left arrow */}
-                    <button
-                      onClick={(e) => handleButtonClick('left', prevVideo, e)}
-                      className={`absolute left-2 top-1/2 -translate-y-1/2 p-1 rounded-full transition-colors z-10 ${
-                        activeButton === 'left' ? 'bg-white/20' : ''
-                      }`}
-                      aria-label="Previous video"
-                    >
-                      <ChevronLeft className="w-6 h-6 text-white drop-shadow-lg" />
-                    </button>
-                    
-                    {/* Right arrow */}
-                    <button
-                      onClick={(e) => handleButtonClick('right', nextVideo, e)}
-                      className={`absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-full transition-colors z-10 ${
-                        activeButton === 'right' ? 'bg-white/20' : ''
-                      }`}
-                      aria-label="Next video"
-                    >
-                      <ChevronRight className="w-6 h-6 text-white drop-shadow-lg" />
-                    </button>
-                  </>
+                {/* Mobile navigation arrows - Outside cards */}
+                {isMobile && index === 0 && (
+                  <button
+                    onClick={(e) => handleButtonClick('left', prevVideo, e)}
+                    className={`absolute -left-8 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/20 backdrop-blur-sm transition-colors z-10 ${
+                      activeButton === 'left' ? 'bg-black/40' : ''
+                    }`}
+                    aria-label="Previous video"
+                  >
+                    <ChevronLeft className="w-6 h-6 text-white" />
+                  </button>
+                )}
+                
+                {isMobile && index === currentVideos.length - 1 && (
+                  <button
+                    onClick={(e) => handleButtonClick('right', nextVideo, e)}
+                    className={`absolute -right-8 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/20 backdrop-blur-sm transition-colors z-10 ${
+                      activeButton === 'right' ? 'bg-black/40' : ''
+                    }`}
+                    aria-label="Next video"
+                  >
+                    <ChevronRight className="w-6 h-6 text-white" />
+                  </button>
                 )}
               </div>
             );
