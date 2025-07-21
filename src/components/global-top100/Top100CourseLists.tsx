@@ -72,7 +72,7 @@ const Top100CourseLists = () => {
             {courseListData.map((list) => {
               const IconComponent = list.icon;
               return (
-                <div key={list.id} className="w-full flex-shrink-0 px-3">
+                <div key={list.id} className="w-full flex-shrink-0">
                   <Card 
                     className="group cursor-pointer hover:shadow-lg transition-all duration-300 overflow-hidden"
                     onClick={() => handleCardClick(list.id)}
@@ -125,7 +125,7 @@ const Top100CourseLists = () => {
         </div>
         
         {/* Carousel Indicators */}
-        <div className="flex justify-center mt-4 space-x-2">
+        <div className="flex justify-center mt-6 space-x-2">
           {courseListData.map((_, index) => (
             <button
               key={index}
