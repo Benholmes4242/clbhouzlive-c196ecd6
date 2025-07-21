@@ -122,30 +122,7 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
         <h2 className="text-xl font-semibold text-foreground">Trending Videos</h2>
       </div>
 
-      <div className="relative flex items-center">
-        {/* Desktop Navigation Arrows - Outside the cards */}
-        {!isMobile && (
-          <>
-            {/* Left arrow - positioned on the left side of the container */}
-            <button
-              onClick={prevVideo}
-              className="absolute -left-12 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors z-30"
-              aria-label="Previous videos"
-            >
-              <ChevronLeft className="w-6 h-6 text-white" />
-            </button>
-            
-            {/* Right arrow - positioned on the right side of the container */}
-            <button
-              onClick={nextVideo}
-              className="absolute -right-12 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors z-30"
-              aria-label="Next videos"
-            >
-              <ChevronRight className="w-6 h-6 text-white" />
-            </button>
-          </>
-        )}
-        
+      <div className="relative">
         {/* Grid with 1080x1350 aspect ratio */}
         <div className={`grid gap-1 ${isMobile ? 'grid-cols-2' : 'grid-cols-3'}`} {...(isMobile ? swipeHandlers : {})}>
           {currentVideos.map((video, index) => {
@@ -201,11 +178,32 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
                   </div>
                 </div>
 
-                {/* Mobile navigation arrows - Outside cards */}
+                {/* Navigation arrows on cards - Desktop: first and last card only */}
+                {!isMobile && index === 0 && (
+                  <button
+                    onClick={prevVideo}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors z-30"
+                    aria-label="Previous videos"
+                  >
+                    <ChevronLeft className="w-6 h-6 text-white" />
+                  </button>
+                )}
+                
+                {!isMobile && index === currentVideos.length - 1 && (
+                  <button
+                    onClick={nextVideo}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors z-30"
+                    aria-label="Next videos"
+                  >
+                    <ChevronRight className="w-6 h-6 text-white" />
+                  </button>
+                )}
+                
+                {/* Mobile navigation arrows - first and last cards only */}
                 {isMobile && index === 0 && (
                   <button
                     onClick={(e) => handleButtonClick('left', prevVideo, e)}
-                    className={`absolute -left-8 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/20 backdrop-blur-sm transition-colors z-10 ${
+                    className={`absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/20 backdrop-blur-sm transition-colors z-10 ${
                       activeButton === 'left' ? 'bg-black/40' : ''
                     }`}
                     aria-label="Previous video"
@@ -217,7 +215,7 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
                 {isMobile && index === currentVideos.length - 1 && (
                   <button
                     onClick={(e) => handleButtonClick('right', nextVideo, e)}
-                    className={`absolute -right-8 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/20 backdrop-blur-sm transition-colors z-10 ${
+                    className={`absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/20 backdrop-blur-sm transition-colors z-10 ${
                       activeButton === 'right' ? 'bg-black/40' : ''
                     }`}
                     aria-label="Next video"
