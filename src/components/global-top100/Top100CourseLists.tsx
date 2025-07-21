@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Globe, MapPin, Crown, Star } from 'lucide-react';
 import GBITestModal from '@/components/courses/GBITestModal';
+import gbiGolfCourse from '@/assets/gbi-golf-course.jpg';
 
 const courseListData = [
   {
@@ -16,7 +17,8 @@ const courseListData = [
     title: 'GB&I Top 100',
     icon: Crown,
     description: 'Great Britain & Ireland\'s finest',
-    color: 'bg-gradient-to-br from-gray-900 to-black'
+    color: '',
+    backgroundImage: gbiGolfCourse
   },
   {
     id: 'europe',
@@ -55,7 +57,18 @@ const Top100CourseLists = () => {
               onClick={() => handleCardClick(list.id)}
             >
               <CardContent className="p-0">
-                <div className={`${list.color} p-6 text-white relative overflow-hidden`}>
+                <div 
+                  className={`p-6 text-white relative overflow-hidden ${
+                    list.backgroundImage 
+                      ? '' 
+                      : list.color
+                  }`}
+                  style={list.backgroundImage ? {
+                    backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${list.backgroundImage})`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center'
+                  } : {}}
+                >
                   <div className="absolute top-2 right-2 opacity-20">
                     <IconComponent className="h-12 w-12" />
                   </div>
