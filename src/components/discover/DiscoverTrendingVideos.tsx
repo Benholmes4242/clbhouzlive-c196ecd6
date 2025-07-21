@@ -178,15 +178,6 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
                 {/* Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                 
-                {/* Golf Club Tag */}
-                {video.golfCourse && (
-                  <div className="absolute top-3 left-3 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-2 max-w-[70%]">
-                    <MapPin className="w-4 h-4 text-white flex-shrink-0" />
-                    <span className="text-white text-sm font-medium truncate">
-                      {video.golfCourse.name}
-                    </span>
-                  </div>
-                )}
                 
                 {/* Trending Icon */}
                 <div className="absolute top-3 right-3">
@@ -205,9 +196,6 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
                       <p className="text-white text-base font-medium truncate">
                         {video.user?.name || video.user?.username || 'Anonymous'}
                       </p>
-                      {truncateTitle(video.title) && (
-                        <p className="text-white/80 text-sm truncate">{truncateTitle(video.title)}</p>
-                      )}
                     </div>
                   </div>
                 </div>
