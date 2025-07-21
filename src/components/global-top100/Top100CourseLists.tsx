@@ -16,7 +16,7 @@ const courseListData = [
     title: 'GB&I Top 100',
     icon: Crown,
     description: 'Great Britain & Ireland\'s finest',
-    color: 'bg-gradient-to-br from-green-500 to-green-600'
+    color: 'bg-gradient-to-br from-gray-900 to-black'
   },
   {
     id: 'europe',
