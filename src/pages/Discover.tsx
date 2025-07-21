@@ -117,7 +117,7 @@ const Discover = () => {
           />
 
           {/* Your Discover Section */}
-          <div className="container pt-6 pb-2">
+          <div className="container pt-6 pb-6">
             <h2 className="text-2xl font-semibold text-foreground mb-4">Explore</h2>
             <ExploreFilters 
               activeFilter={activeFilter} 
