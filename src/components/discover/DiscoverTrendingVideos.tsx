@@ -143,7 +143,7 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
                     media_url: video.src
                   }}
                   itemTitle={video.title}
-                  shouldAutoplay={isFirstCard}
+                  shouldAutoplay={false}
                   isLoading={false}
                   onImageError={() => {}}
                   onImageLoad={() => {}}
