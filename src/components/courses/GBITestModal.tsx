@@ -16,6 +16,7 @@ import { useCourseVideos } from '@/hooks/useCourseVideos';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import ClubhouseLogo from '@/components/ui/clubhouse-logo';
+import royalCountyDownImage from '@/assets/royal-county-down.jpg';
 
 interface GBITestModalProps {
   isOpen: boolean;
@@ -383,10 +384,17 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                 {displayedCourse.thumbnail_image ? (
                   <div className="relative w-full h-full">
                     {/* Placeholder background */}
-                    <div className="absolute inset-0 bg-gradient-to-br from-green-900 to-green-700 flex items-center justify-center">
-                      <div className="text-white text-center">
-                        <div className="text-6xl mb-4">⛳</div>
-                        <p className="text-lg opacity-80">{displayedCourse.name}</p>
+                    <div className="absolute inset-0">
+                      <img
+                        src={royalCountyDownImage}
+                        alt="Royal County Down Golf Course"
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                        <div className="text-white text-center">
+                          <div className="text-6xl mb-4">⛳</div>
+                          <p className="text-lg opacity-80">{displayedCourse.name}</p>
+                        </div>
                       </div>
                     </div>
                     {/* Actual image */}
@@ -405,10 +413,17 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                     />
                   </div>
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-green-900 to-green-700 flex items-center justify-center">
-                    <div className="text-white text-center">
-                      <div className="text-6xl mb-4">⛳</div>
-                      <p className="text-lg">No image available</p>
+                  <div className="relative w-full h-full">
+                    <img
+                      src={royalCountyDownImage}
+                      alt="Royal County Down Golf Course"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                      <div className="text-white text-center">
+                        <div className="text-6xl mb-4">⛳</div>
+                        <p className="text-lg">No image available</p>
+                      </div>
                     </div>
                   </div>
                 )}
