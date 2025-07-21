@@ -84,20 +84,22 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
         }}
       >
         {availableFilters.map((filter) => (
-          <Button
+          <button
             key={filter}
-            variant={activeFilter === filter ? "secondary" : "outline"}
-            size="sm"
             onClick={() => onFilterChange(filter)}
-            className={`whitespace-nowrap flex-shrink-0 focus-visible:ring-0 focus-visible:ring-offset-0 flex items-center ${
-              activeFilter === filter 
-                ? "bg-gray-100 text-gray-800 hover:bg-gray-200" 
-                : ""
-            }`}
+            className={`
+              px-4 py-2.5 rounded-full text-base font-medium whitespace-nowrap flex-shrink-0 
+              flex items-center transition-all duration-200 shadow-sm hover:shadow-md
+              focus:outline-none focus:ring-2 focus:ring-primary/20
+              ${activeFilter === filter 
+                ? "bg-primary/10 text-primary shadow-md backdrop-blur-sm" 
+                : "bg-background/60 text-muted-foreground hover:bg-background/80 hover:text-foreground backdrop-blur-sm border border-border/30"
+              }
+            `}
           >
             {getFilterIcon(filter)}
             {filter}
-          </Button>
+          </button>
         ))}
       </div>
     </div>
