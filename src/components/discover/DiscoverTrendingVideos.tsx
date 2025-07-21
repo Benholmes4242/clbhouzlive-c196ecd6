@@ -119,7 +119,7 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
   return (
     <div className="container mx-auto px-4 pt-6 pb-2">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold text-foreground">Trending</h2>
+        <h2 className="text-2xl font-semibold text-foreground">Trending</h2>
       </div>
 
       <div className="relative">
