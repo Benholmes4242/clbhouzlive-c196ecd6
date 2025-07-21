@@ -68,7 +68,7 @@ const Top100CourseLists = () => {
                   >
                     <div className="p-6">
                       <div className="relative z-10">
-                        <h3 className="text-xl font-bold mb-1">{list.title}</h3>
+                        <h3 className="text-xl font-bold mb-0.5">{list.title}</h3>
                         <p className="text-white/90 text-sm">{list.description}</p>
                       </div>
                     </div>
