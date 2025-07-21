@@ -47,7 +47,7 @@ export const CaptionOverlay: React.FC<CaptionOverlayProps> = ({
         style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
         title={`${cleanContent}${postTags && postTags.length > 0 ? ' ' + postTags.map(tag => `@${tag.name}`).join(' ') : ''}`}
       >
-      <div className="whitespace-nowrap overflow-hidden text-ellipsis md:group-hover:whitespace-normal md:group-hover:overflow-visible transition-all duration-200">
+      <div className="line-clamp-2 md:group-hover:line-clamp-none transition-all duration-200">
         <span className="md:group-hover:hidden text-base font-bold">
           {truncatedContent}
         </span>
