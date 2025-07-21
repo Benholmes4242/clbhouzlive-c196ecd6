@@ -11,7 +11,8 @@ const courseListData = [
     title: 'Global Top 100',
     icon: Globe,
     description: 'The world\'s greatest golf courses',
-    color: 'bg-gradient-to-br from-blue-500 to-blue-600'
+    color: '',
+    backgroundImage: '/lovable-uploads/bd96819b-505e-4a35-b242-d106babe5179.png'
   },
   {
     id: 'gbi',
