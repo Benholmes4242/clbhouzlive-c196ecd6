@@ -92,7 +92,7 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
               flex items-center transition-all duration-200 shadow-sm hover:shadow-md
               focus:outline-none focus:ring-2 focus:ring-primary/20
               ${activeFilter === filter 
-                ? "bg-primary/10 text-primary shadow-md backdrop-blur-sm" 
+                ? "bg-muted/80 text-foreground shadow-md backdrop-blur-sm" 
                 : "bg-background/60 text-muted-foreground hover:bg-background/80 hover:text-foreground backdrop-blur-sm border border-border/30"
               }
             `}
