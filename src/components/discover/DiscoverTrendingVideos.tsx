@@ -207,6 +207,7 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
                       activeButton === 'left' ? 'bg-white' : 'hover:bg-white'
                     }`}
                     aria-label="Previous video"
+                    onMouseLeave={() => setActiveButton(null)}
                   >
                     <ChevronLeft className="w-6 h-6 text-white" />
                   </button>
@@ -219,6 +220,7 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
                       activeButton === 'right' ? 'bg-white' : 'hover:bg-white'
                     }`}
                     aria-label="Next video"
+                    onMouseLeave={() => setActiveButton(null)}
                   >
                     <ChevronRight className="w-6 h-6 text-white" />
                   </button>
