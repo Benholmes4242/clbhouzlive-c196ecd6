@@ -316,7 +316,7 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
     >
       {/* Header */}
       <div className={`absolute top-0 left-0 right-0 z-10 ${viewMode === 'list' ? '' : 'bg-gradient-to-b from-black/50 to-transparent'}`}>
-        <div className="flex items-center justify-between p-2">
+        <div className="flex items-center justify-between p-2 pt-4">
           <div className={viewMode === 'list' ? 'text-black' : 'text-white'}>
             <h1 className={`text-lg font-semibold ${viewMode === 'list' ? 'text-black' : 'text-white'}`}>Great Britain & Ireland Top 100</h1>
           </div>
