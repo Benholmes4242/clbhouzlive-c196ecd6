@@ -84,12 +84,12 @@ const Top100CourseLists = () => {
                         <div 
                           className="relative aspect-[4/3] overflow-hidden"
                           style={{
-                            backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${list.backgroundImage})`,
+                            backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.3)), url(${list.backgroundImage})`,
                             backgroundSize: 'cover',
                             backgroundPosition: 'center'
                           }}
                         >
-                          <div className="absolute inset-0 bg-black/20 flex flex-col justify-between text-white p-6">
+                          <div className="absolute inset-0 flex flex-col justify-between text-white p-6">
                             <div className="flex-1 flex flex-col justify-center">
                               <div className="relative z-10">
                                 <h3 className="text-2xl font-bold mb-1">{list.title}</h3>
@@ -155,12 +155,12 @@ const Top100CourseLists = () => {
                   <div 
                     className="relative aspect-[4/3] overflow-hidden"
                     style={{
-                      backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${list.backgroundImage})`,
+                      backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.3)), url(${list.backgroundImage})`,
                       backgroundSize: 'cover',
                       backgroundPosition: 'center'
                     }}
                   >
-                    <div className="absolute inset-0 bg-black/20 flex flex-col justify-between text-white p-6">
+                    <div className="absolute inset-0 flex flex-col justify-between text-white p-6">
                       <div className="flex-1 flex flex-col justify-center">
                         <div className="relative z-10">
                           <h3 className="text-2xl font-bold mb-1">{list.title}</h3>
