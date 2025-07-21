@@ -55,11 +55,11 @@ const Top100CourseLists = () => {
               className="group cursor-pointer hover:shadow-lg transition-all duration-300 overflow-hidden h-48"
               onClick={() => handleCardClick(list.id)}
             >
-              <CardContent className="p-0">
+              <CardContent className="p-0 h-full">
                 {list.backgroundImage ? (
-                  // GB&I card with full background image
+                  // GB&I card with full background image covering entire card
                   <div 
-                    className="h-full text-white relative overflow-hidden"
+                    className="h-full text-white relative overflow-hidden flex flex-col justify-between"
                     style={{
                       backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${list.backgroundImage})`,
                       backgroundSize: 'cover',
