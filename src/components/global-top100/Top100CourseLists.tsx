@@ -74,41 +74,45 @@ const Top100CourseLists = () => {
               return (
                 <div key={list.id} className="w-full flex-shrink-0 px-3">
                   <Card 
-                    className="group cursor-pointer hover:shadow-lg transition-all duration-300 overflow-hidden h-56"
+                    className="group cursor-pointer hover:shadow-lg transition-all duration-300 overflow-hidden"
                     onClick={() => handleCardClick(list.id)}
                   >
-                    <CardContent className="p-0 h-full">
+                    <CardContent className="p-0">
                       {list.backgroundImage ? (
                         // GB&I card with full background image covering entire card
                         <div 
-                          className="h-full text-white relative overflow-hidden flex flex-col justify-between"
+                          className="relative aspect-[4/3] overflow-hidden"
                           style={{
                             backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${list.backgroundImage})`,
                             backgroundSize: 'cover',
                             backgroundPosition: 'center'
                           }}
                         >
-                          <div className="flex-1 flex flex-col justify-center p-6">
-                            <div className="relative z-10">
-                              <h3 className="text-2xl font-bold mb-1">{list.title}</h3>
-                              <p className="text-white/90 text-base">{list.description}</p>
+                          <div className="absolute inset-0 bg-black/20 flex flex-col justify-between text-white p-6">
+                            <div className="flex-1 flex flex-col justify-center">
+                              <div className="relative z-10">
+                                <h3 className="text-2xl font-bold mb-1">{list.title}</h3>
+                                <p className="text-white/90 text-base">{list.description}</p>
+                              </div>
                             </div>
-                          </div>
-                          <div className="p-6 pt-0">
-                            <p className="text-base text-white/80">Click to explore →</p>
+                            <div>
+                              <p className="text-base text-white/80">Click to explore →</p>
+                            </div>
                           </div>
                         </div>
                       ) : (
                         // Other cards with gradient background, same layout as GB&I
-                        <div className={`${list.color} h-full text-white relative overflow-hidden flex flex-col justify-between`}>
-                          <div className="flex-1 flex flex-col justify-center p-6">
-                            <div className="relative z-10">
-                              <h3 className="text-2xl font-bold mb-1">{list.title}</h3>
-                              <p className="text-white/90 text-base">{list.description}</p>
+                        <div className={`${list.color} relative aspect-[4/3] overflow-hidden`}>
+                          <div className="absolute inset-0 flex flex-col justify-between text-white p-6">
+                            <div className="flex-1 flex flex-col justify-center">
+                              <div className="relative z-10">
+                                <h3 className="text-2xl font-bold mb-1">{list.title}</h3>
+                                <p className="text-white/90 text-base">{list.description}</p>
+                              </div>
                             </div>
-                          </div>
-                          <div className="p-6 pt-0">
-                            <p className="text-base text-white/80">Click to explore →</p>
+                            <div>
+                              <p className="text-base text-white/80">Click to explore →</p>
+                            </div>
                           </div>
                         </div>
                       )}
@@ -141,41 +145,45 @@ const Top100CourseLists = () => {
           return (
             <Card 
               key={list.id} 
-              className="group cursor-pointer hover:shadow-lg transition-all duration-300 overflow-hidden h-56"
+              className="group cursor-pointer hover:shadow-lg transition-all duration-300 overflow-hidden"
               onClick={() => handleCardClick(list.id)}
             >
-              <CardContent className="p-0 h-full">
+              <CardContent className="p-0">
                 {list.backgroundImage ? (
                   // GB&I card with full background image covering entire card
                   <div 
-                    className="h-full text-white relative overflow-hidden flex flex-col justify-between"
+                    className="relative aspect-[4/3] overflow-hidden"
                     style={{
                       backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${list.backgroundImage})`,
                       backgroundSize: 'cover',
                       backgroundPosition: 'center'
                     }}
                   >
-                    <div className="flex-1 flex flex-col justify-center p-6">
-                      <div className="relative z-10">
-                        <h3 className="text-2xl font-bold mb-1">{list.title}</h3>
-                        <p className="text-white/90 text-base">{list.description}</p>
+                    <div className="absolute inset-0 bg-black/20 flex flex-col justify-between text-white p-6">
+                      <div className="flex-1 flex flex-col justify-center">
+                        <div className="relative z-10">
+                          <h3 className="text-2xl font-bold mb-1">{list.title}</h3>
+                          <p className="text-white/90 text-base">{list.description}</p>
+                        </div>
                       </div>
-                    </div>
-                    <div className="p-6 pt-0">
-                      <p className="text-base text-white/80">Click to explore →</p>
+                      <div>
+                        <p className="text-base text-white/80">Click to explore →</p>
+                      </div>
                     </div>
                   </div>
                 ) : (
                   // Other cards with gradient background, same layout as GB&I
-                  <div className={`${list.color} h-full text-white relative overflow-hidden flex flex-col justify-between`}>
-                    <div className="flex-1 flex flex-col justify-center p-6">
-                      <div className="relative z-10">
-                        <h3 className="text-2xl font-bold mb-1">{list.title}</h3>
-                        <p className="text-white/90 text-base">{list.description}</p>
+                  <div className={`${list.color} relative aspect-[4/3] overflow-hidden`}>
+                    <div className="absolute inset-0 flex flex-col justify-between text-white p-6">
+                      <div className="flex-1 flex flex-col justify-center">
+                        <div className="relative z-10">
+                          <h3 className="text-2xl font-bold mb-1">{list.title}</h3>
+                          <p className="text-white/90 text-base">{list.description}</p>
+                        </div>
                       </div>
-                    </div>
-                    <div className="p-6 pt-0">
-                      <p className="text-base text-white/80">Click to explore →</p>
+                      <div>
+                        <p className="text-base text-white/80">Click to explore →</p>
+                      </div>
                     </div>
                   </div>
                 )}
