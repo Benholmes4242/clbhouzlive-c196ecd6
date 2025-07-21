@@ -77,22 +77,18 @@ const Top100CourseLists = () => {
                     </div>
                   </div>
                 ) : (
-                  // Other cards with icon and gradient
-                  <>
-                    <div className={`${list.color} p-6 text-white relative overflow-hidden`}>
-                      <div className="absolute top-2 right-2 opacity-20">
-                        <IconComponent className="h-12 w-12" />
-                      </div>
+                  // Other cards with gradient background, same layout as GB&I
+                  <div className={`${list.color} h-full text-white relative overflow-hidden flex flex-col justify-between`}>
+                    <div className="flex-1 flex flex-col justify-center p-6">
                       <div className="relative z-10">
-                        <IconComponent className="h-8 w-8 mb-3" />
-                        <h3 className="text-xl font-bold mb-2">{list.title}</h3>
-                        <p className="text-white/90 text-sm">{list.description}</p>
+                        <h3 className="text-2xl font-bold mb-1">{list.title}</h3>
+                        <p className="text-white/90 text-base">{list.description}</p>
                       </div>
                     </div>
-                    <div className="p-4 bg-background group-hover:bg-muted/50 transition-colors">
-                      <p className="text-sm text-muted-foreground">Click to explore →</p>
+                    <div className="p-6 pt-0">
+                      <p className="text-base text-white/80">Click to explore →</p>
                     </div>
-                  </>
+                  </div>
                 )}
               </CardContent>
             </Card>
