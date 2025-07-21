@@ -8,7 +8,7 @@ import { Trophy } from 'lucide-react';
 
 export const navigationTabs = [
   { id: 'clubhouse', label: 'Clubhouse', icon: PiHouseBold, path: '/clubhouse' },
-  { id: 'discover', label: 'Discover', icon: RiCompassDiscoverLine, path: '/discover' },
+  { id: 'discover', label: 'Explore', icon: RiCompassDiscoverLine, path: '/discover' },
   { id: 'tour', label: 'Tour Central', icon: Trophy, path: '/tour-central' },
   { id: 'post', label: 'Post', icon: HiCamera, path: null, isAction: true },
   { id: 'courses', label: 'Courses', icon: FiMapPin, path: '/courses' },
