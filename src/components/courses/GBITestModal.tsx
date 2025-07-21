@@ -15,6 +15,7 @@ import AddToPlayedModal from './AddToPlayedModal';
 import { useCourseVideos } from '@/hooks/useCourseVideos';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 
 interface GBITestModalProps {
   isOpen: boolean;
@@ -83,6 +84,44 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
     enabled: isOpen && !!user?.id,
     staleTime: 2 * 60 * 1000, // 2 minutes - user data changes less frequently
     gcTime: 10 * 60 * 1000, // 10 minutes garbage collection
+  });
+
+  // Query to get community ratings for courses
+  const { data: communityRatings = [] } = useQuery({
+    queryKey: ['communityRatingsGBI', courses.map(c => c.id)],
+    queryFn: async () => {
+      if (courses.length === 0) return [];
+      
+      const { data, error } = await supabase
+        .from('course_ratings')
+        .select('course_id, rating')
+        .in('course_id', courses.map(c => c.id));
+
+      if (error) throw error;
+      
+      // Calculate average ratings per course
+      const ratingsByCourse: Record<string, number[]> = {};
+      data?.forEach(rating => {
+        if (!ratingsByCourse[rating.course_id]) {
+          ratingsByCourse[rating.course_id] = [];
+        }
+        ratingsByCourse[rating.course_id].push(rating.rating);
+      });
+
+      // Calculate averages
+      const averages: Record<string, number> = {};
+      Object.entries(ratingsByCourse).forEach(([courseId, ratings]) => {
+        if (ratings.length > 0) {
+          const avg = ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length;
+          averages[courseId] = Math.round(avg * 10) / 10; // Round to 1 decimal place
+        }
+      });
+
+      return averages;
+    },
+    enabled: isOpen && courses.length > 0,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 15 * 60 * 1000, // 15 minutes garbage collection
   });
 
   // Update played courses set when data changes
@@ -409,6 +448,12 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                         <span className="text-sm font-bold text-gray-800 leading-none flex items-center translate-y-[3px]">#{displayedCourse.global_rank}</span>
                       </div>
                     )}
+                    {communityRatings[displayedCourse.id] && (
+                      <div className="flex items-center justify-center gap-1 px-1.5 py-0.5 bg-white rounded-full">
+                        <ClubhouseLogo size="sm" />
+                        <span className="text-sm font-bold text-gray-800 leading-none flex items-center translate-y-[3px]">{communityRatings[displayedCourse.id]}/10</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -549,6 +594,12 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
                               <div className="flex items-center gap-1 px-1 md:px-1.5 py-0.5 bg-white rounded-full">
                                 <Earth className="h-4 w-4 md:h-5 md:w-5 text-gray-600" />
                                 <span className="text-xs md:text-sm font-bold text-gray-800 translate-y-[2px] md:translate-y-[3px]">#{course.global_rank}</span>
+                              </div>
+                            )}
+                            {communityRatings[course.id] && (
+                              <div className="flex items-center gap-1 px-1 md:px-1.5 py-0.5 bg-white rounded-full">
+                                <ClubhouseLogo size="xs" className="md:!w-5 md:!h-5" />
+                                <span className="text-xs md:text-sm font-bold text-gray-800 translate-y-[2px] md:translate-y-[3px]">{communityRatings[course.id]}/10</span>
                               </div>
                             )}
                           </div>
