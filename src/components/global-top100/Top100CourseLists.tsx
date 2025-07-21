@@ -59,7 +59,7 @@ const Top100CourseLists = () => {
                 {list.backgroundImage ? (
                   // GB&I card with full background image covering entire card
                   <div 
-                    className="h-full text-white relative overflow-hidden flex flex-col justify-between"
+                    className="h-full text-white relative overflow-hidden flex flex-col justify-end"
                     style={{
                       backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${list.backgroundImage})`,
                       backgroundSize: 'cover',
@@ -67,12 +67,10 @@ const Top100CourseLists = () => {
                     }}
                   >
                     <div className="p-6">
-                      <div className="relative z-10">
+                      <div className="relative z-10 mb-4">
                         <h3 className="text-xl font-bold mb-2">{list.title}</h3>
                         <p className="text-white/90 text-sm">{list.description}</p>
                       </div>
-                    </div>
-                    <div className="px-6 pb-4">
                       <p className="text-sm text-white/80">Click to explore →</p>
                     </div>
                   </div>
