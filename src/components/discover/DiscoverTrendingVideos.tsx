@@ -182,7 +182,7 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
                 {!isMobile && index === 0 && (
                   <button
                     onClick={prevVideo}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors z-30"
+                    className="absolute left-2 top-1/2 -translate-y-1/2 p-0 rounded-full hover:bg-white transition-colors z-30"
                     aria-label="Previous videos"
                   >
                     <ChevronLeft className="w-6 h-6 text-white" />
@@ -192,7 +192,7 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
                 {!isMobile && index === currentVideos.length - 1 && (
                   <button
                     onClick={nextVideo}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/20 backdrop-blur-sm hover:bg-black/40 transition-colors z-30"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-0 rounded-full hover:bg-white transition-colors z-30"
                     aria-label="Next videos"
                   >
                     <ChevronRight className="w-6 h-6 text-white" />
@@ -203,8 +203,8 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
                 {isMobile && index === 0 && (
                   <button
                     onClick={(e) => handleButtonClick('left', prevVideo, e)}
-                    className={`absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/20 backdrop-blur-sm transition-colors z-10 ${
-                      activeButton === 'left' ? 'bg-black/40' : ''
+                    className={`absolute left-2 top-1/2 -translate-y-1/2 p-0 rounded-full transition-colors z-10 ${
+                      activeButton === 'left' ? 'bg-white' : 'hover:bg-white'
                     }`}
                     aria-label="Previous video"
                   >
@@ -215,8 +215,8 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
                 {isMobile && index === currentVideos.length - 1 && (
                   <button
                     onClick={(e) => handleButtonClick('right', nextVideo, e)}
-                    className={`absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-black/20 backdrop-blur-sm transition-colors z-10 ${
-                      activeButton === 'right' ? 'bg-black/40' : ''
+                    className={`absolute right-2 top-1/2 -translate-y-1/2 p-0 rounded-full transition-colors z-10 ${
+                      activeButton === 'right' ? 'bg-white' : 'hover:bg-white'
                     }`}
                     aria-label="Next video"
                   >
