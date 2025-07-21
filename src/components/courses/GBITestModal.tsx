@@ -89,7 +89,7 @@ const GBITestModal: React.FC<GBITestModalProps> = ({ isOpen, onClose }) => {
 
   // Query to get community ratings for courses
   const { data: communityRatings = [] } = useQuery({
-    queryKey: ['communityRatingsGBI', courses.map(c => c.id)],
+    queryKey: ['communityRatingsGBI', isOpen ? courses.map(c => c.id).join(',') : 'closed'],
     queryFn: async () => {
       if (courses.length === 0) return [];
       
