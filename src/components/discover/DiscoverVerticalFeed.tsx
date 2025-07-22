@@ -468,7 +468,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
               </div>
 
               {/* Golf Course Badge and Caption - Bottom Left */}
-              <div className="absolute bottom-8 left-3 right-20 z-20">
+              <div className="absolute bottom-24 left-3 right-20 z-20">
                 {/* Golf Course Badge - Above Caption */}
                 {item.golfCourse && (
                   <div className="mb-2">
@@ -506,7 +506,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
               </div>
 
               {/* Action Buttons - Bottom Right */}
-              <div className="absolute bottom-10 right-4 z-10 flex flex-col space-y-6">
+              <div className="absolute bottom-24 right-4 z-10 flex flex-col space-y-6">
                 {/* Mute/Unmute Button */}
                 <button
                   onClick={toggleGlobalMute}
