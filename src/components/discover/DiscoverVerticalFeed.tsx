@@ -41,7 +41,13 @@ const VideoWithAutoplay: React.FC<{
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
-        setIsInView(entry.isIntersecting && entry.intersectionRatio >= 0.8);
+        const newIsInView = entry.isIntersecting && entry.intersectionRatio >= 0.8;
+        setIsInView(newIsInView);
+        
+        // Reset hasAttemptedPlay when video goes out of view
+        if (!newIsInView) {
+          setHasAttemptedPlay(false);
+        }
       },
       {
         threshold: 0.8,
