@@ -13,6 +13,26 @@ export function useSupabaseSession() {
     let mounted = true;
     console.log('useSupabaseSession: Initializing...');
 
+    // Initialize session immediately
+    const initSession = async () => {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
+        console.log('useSupabaseSession: Initial session fetch', { hasSession: !!session, error });
+        
+        if (mounted) {
+          setSession(session);
+          setUser(session?.user ?? null);
+          setLoading(false);
+        }
+      } catch (error) {
+        console.error('useSupabaseSession: Error fetching initial session', error);
+        if (mounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       console.log('useSupabaseSession: Auth state changed', { event: _event, hasSession: !!session });
       if (mounted) {
@@ -22,28 +42,16 @@ export function useSupabaseSession() {
       }
     });
 
-    // Fetch session on mount
-    supabase.auth.getSession().then(({ data: { session }, error }) => {
-      console.log('useSupabaseSession: Initial session fetch', { hasSession: !!session, error });
-      if (mounted) {
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
-      }
-    }).catch((error) => {
-      console.error('useSupabaseSession: Error fetching session', error);
-      if (mounted) {
-        setLoading(false); // Set loading to false even on error
-      }
-    });
+    // Initialize session
+    initSession();
 
-    // Add a fallback timeout to prevent infinite loading
+    // Shorter timeout as backup
     const timeout = setTimeout(() => {
       if (mounted && loading) {
         console.warn('useSupabaseSession: Timeout reached, forcing loading to false');
         setLoading(false);
       }
-    }, 5000);
+    }, 3000);
 
     return () => {
       mounted = false;
