@@ -598,13 +598,6 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                   </div>
                 )}
 
-                {/* Comments Section */}
-                <div className="mt-4">
-                  <PostComments 
-                    postId={item.id} 
-                    totalComments={Math.floor(Math.random() * 50) + 5} // Mock comment count between 5-54
-                  />
-                </div>
               </div>
 
               {/* Action Buttons - Bottom Right */}
