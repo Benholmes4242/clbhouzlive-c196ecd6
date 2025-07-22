@@ -10,6 +10,7 @@ import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import { useVideoManager } from '@/contexts/VideoManagerContext';
+import CommentsModal from '@/components/posts/CommentsModal';
 
 interface DiscoverVerticalFeedProps {
   isOpen: boolean;
@@ -160,6 +161,8 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
   const isMobile = useIsMobile();
   const { isGloballyMuted, setGlobalMute } = useGlobalAudio();
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [commentsModalOpen, setCommentsModalOpen] = useState(false);
+  const [selectedPostId, setSelectedPostId] = useState<string>('');
   const scrollViewRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<{ [key: number]: HTMLDivElement }>({});
   const queryClient = useQueryClient();
@@ -281,10 +284,10 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
     });
   }, [followMutation, posts, currentIndex, user?.id, isFollowing]);
 
-  const handleComment = useCallback(() => {
-    // TODO: Open comments modal
-    console.log('Comment clicked for post:', posts[currentIndex]?.id);
-  }, [posts, currentIndex]);
+  const handleComment = useCallback((postId: string) => {
+    setSelectedPostId(postId);
+    setCommentsModalOpen(true);
+  }, []);
 
   const handleShare = useCallback(() => {
     // TODO: Implement share functionality
@@ -542,7 +545,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
 
                 {/* Comment Button */}
                 <button
-                  onClick={handleComment}
+                  onClick={() => handleComment(item.id)}
                   className="cursor-pointer hover:opacity-100 transition-opacity flex flex-col items-center"
                   aria-label="Comment"
                 >
@@ -565,6 +568,13 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
           );
         })}
       </div>
+
+      {/* Comments Modal */}
+      <CommentsModal
+        isOpen={commentsModalOpen}
+        onClose={() => setCommentsModalOpen(false)}
+        postId={selectedPostId}
+      />
 
       {/* Loading More Indicator */}
       {isLoadingMore && (
