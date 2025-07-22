@@ -160,6 +160,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
   const { user } = useSupabaseSession();
   const isMobile = useIsMobile();
   const { isGloballyMuted, setGlobalMute } = useGlobalAudio();
+  const { setActiveVideo } = useVideoManager();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [commentsModalOpen, setCommentsModalOpen] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string>('');
@@ -316,6 +317,12 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
     if (newIndex !== currentIndex && newIndex >= 0 && newIndex < posts.length) {
       setCurrentIndex(newIndex);
       
+      // If scrolling to a photo post, stop all videos
+      const currentPost = posts[newIndex];
+      if (currentPost && currentPost.type !== 'video') {
+        setActiveVideo(null);
+      }
+      
       // Call onScroll callback if provided
       if (onScroll) {
         const direction = newIndex > currentIndex ? 'down' : 'up';
@@ -327,7 +334,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
     if (hasMore && !isLoadingMore && newIndex >= posts.length - 3) {
       onLoadMore();
     }
-  }, [currentIndex, posts.length, onScroll, hasMore, isLoadingMore, onLoadMore]);
+  }, [currentIndex, posts.length, onScroll, hasMore, isLoadingMore, onLoadMore, posts, setActiveVideo]);
 
   // Navigate to specific index
   const navigateToIndex = useCallback((index: number) => {

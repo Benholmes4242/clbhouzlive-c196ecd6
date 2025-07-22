@@ -155,6 +155,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   const { user } = useSupabaseSession();
   const isMobile = useIsMobile();
   const { isGloballyMuted, setGlobalMute } = useGlobalAudio();
+  const { setActiveVideo } = useVideoManager();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [commentsModalOpen, setCommentsModalOpen] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string>('');
@@ -350,6 +351,12 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     
     if (newIndex !== currentIndex && newIndex >= 0 && newIndex < posts.length) {
       setCurrentIndex(newIndex);
+      
+      // If scrolling to a photo post, stop all videos
+      const currentPost = posts[newIndex];
+      if (currentPost && currentPost.type !== 'video') {
+        setActiveVideo(null);
+      }
       
       // Load more posts when near the end
       if (newIndex >= posts.length - 3 && hasMore && !isLoadingMore) {
