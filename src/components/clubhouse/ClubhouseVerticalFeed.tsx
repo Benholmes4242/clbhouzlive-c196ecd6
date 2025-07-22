@@ -435,57 +435,6 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
           scrollBehavior: 'smooth'
         }}
       >
-        {/* User Profile - Top Left - Hidden for first post to avoid header interference */}
-        {currentIndex !== 0 && (
-          <div className="absolute top-4 left-4 z-30 flex items-center space-x-3">
-            {/* Profile Photo */}
-            <div className="relative">
-              <img
-                src={posts[currentIndex]?.user?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
-                alt={posts[currentIndex]?.user?.name || 'User'}
-                className="w-16 h-16 rounded-full object-cover"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face';
-                }}
-              />
-            </div>
-            
-            {/* Username */}
-            <div className="flex items-center gap-3">
-              <div className="flex flex-col">
-                <span className="font-semibold text-base text-white" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
-                  {posts[currentIndex]?.user?.name || 'Unknown User'}
-                </span>
-                {posts[currentIndex]?.user?.username && (
-                  <span className="text-sm text-white/70" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
-                    @{posts[currentIndex]?.user?.username}
-                  </span>
-                )}
-              </div>
-              
-              {/* Follow pill - only show if not own post and user is logged in */}
-              {user?.id && posts[currentIndex]?.user?.id && user.id !== posts[currentIndex]?.user?.id && (
-                <button 
-                  onClick={handleFollowToggle}
-                  disabled={followMutation.isPending || isFollowingLoading}
-                  className="flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1.5 hover:bg-white/30 transition-colors disabled:opacity-50"
-                >
-                  {isFollowing ? (
-                    <>
-                      <UserCheck className="w-4 h-4 text-white" />
-                      <span className="text-white text-sm font-medium">Following</span>
-                    </>
-                  ) : (
-                    <>
-                      <UserPlus className="w-4 h-4 text-white" />
-                      <span className="text-white text-sm font-medium">Follow</span>
-                    </>
-                  )}
-                </button>
-              )}
-            </div>
-          </div>
-        )}
 
         {posts.map((item, index) => {
           // Get media array for this item
@@ -564,22 +513,74 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 )}
               </div>
 
-              {/* Caption and Golf Course Tag - Bottom Left */}
+              {/* Golf Course Tag - Top Right */}
+              {item.golfCourse && (
+                <div className="absolute top-4 right-4 z-30">
+                  {isMobile ? (
+                    <div className="inline-flex items-center bg-white/20 text-white text-xs font-medium px-2 py-1 rounded-full backdrop-blur-sm whitespace-nowrap">
+                      <MapPin className="w-4 h-4 text-white mr-2" />
+                      {item.golfCourse.name}
+                    </div>
+                  ) : (
+                    <div className="inline-flex items-center bg-white/20 text-white text-sm font-medium px-3 py-1.5 rounded-full backdrop-blur-sm whitespace-nowrap">
+                      <MapPin className="w-5 h-5 text-white mr-2" />
+                      {item.golfCourse.name}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* User Profile and Caption - Bottom Left */}
               <div className="absolute bottom-8 left-3 right-20 z-20">
-                {/* Golf Course Badge - Above Caption */}
-                {item.golfCourse && (
-                  <div className="mb-2">
-                     {isMobile ? (
-                       <div className="inline-flex items-center bg-white/20 text-white text-xs font-medium px-2 py-1 rounded-full backdrop-blur-sm whitespace-nowrap">
-                         <MapPin className="w-4 h-4 text-white mr-2" />
-                         {item.golfCourse.name}
-                       </div>
-                     ) : (
-                       <div className="inline-flex items-center bg-white/20 text-white text-sm font-medium px-3 py-1.5 rounded-full backdrop-blur-sm whitespace-nowrap">
-                         <MapPin className="w-5 h-5 text-white mr-2" />
-                         {item.golfCourse.name}
-                       </div>
-                     )}
+                {/* User Profile Section */}
+                {index === currentIndex && (
+                  <div className="mb-3 flex items-center space-x-3">
+                    {/* Profile Photo */}
+                    <div className="relative">
+                      <img
+                        src={item.user?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
+                        alt={item.user?.name || 'User'}
+                        className="w-12 h-12 rounded-full object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face';
+                        }}
+                      />
+                    </div>
+                    
+                    {/* Username */}
+                    <div className="flex items-center gap-3">
+                      <div className="flex flex-col">
+                        <span className="font-semibold text-base text-white" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
+                          {item.user?.name || 'Unknown User'}
+                        </span>
+                        {item.user?.username && (
+                          <span className="text-sm text-white/70" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
+                            @{item.user?.username}
+                          </span>
+                        )}
+                      </div>
+                      
+                      {/* Follow pill - only show if not own post and user is logged in */}
+                      {user?.id && item.user?.id && user.id !== item.user?.id && (
+                        <button 
+                          onClick={handleFollowToggle}
+                          disabled={followMutation.isPending || isFollowingLoading}
+                          className="flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1.5 hover:bg-white/30 transition-colors disabled:opacity-50"
+                        >
+                          {isFollowing ? (
+                            <>
+                              <UserCheck className="w-4 h-4 text-white" />
+                              <span className="text-white text-sm font-medium">Following</span>
+                            </>
+                          ) : (
+                            <>
+                              <UserPlus className="w-4 h-4 text-white" />
+                              <span className="text-white text-sm font-medium">Follow</span>
+                            </>
+                          )}
+                        </button>
+                      )}
+                    </div>
                   </div>
                 )}
 
