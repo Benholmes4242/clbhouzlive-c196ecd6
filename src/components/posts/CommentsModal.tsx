@@ -225,25 +225,32 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId }
             ))}
           </div>
 
-          {/* Comment Input */}
-          <div className="border-t border-gray-700 p-4">
+          {/* Comment Input - Fixed to bottom above nav bar */}
+          <div className="sticky bottom-0 bg-[#1C1C1E] border-t border-gray-700 p-4 pb-6">
             <div className="flex items-center space-x-3">
+              {/* User Profile Picture - Left */}
               <img
                 src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
                 alt="Your avatar"
                 className="w-8 h-8 rounded-full object-cover flex-shrink-0"
               />
-              <div className="flex-1 flex items-center space-x-2">
-                <button className="p-2 rounded-full hover:bg-white/10 transition-colors">
-                  <Smile className="w-5 h-5 text-gray-400" />
-                </button>
+              
+              {/* Text Input - Center */}
+              <div className="flex-1">
                 <Input
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
                   onKeyPress={handleKeyPress}
-                  placeholder="Add a comment..."
-                  className="flex-1 bg-gray-800 border-gray-600 text-white placeholder:text-gray-400 rounded-full px-4 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  placeholder="Leave your thoughts here..."
+                  className="w-full bg-gray-800 border-gray-600 text-white placeholder:text-gray-400 rounded-full px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
+              </div>
+              
+              {/* Right Side Icons */}
+              <div className="flex items-center space-x-2">
+                <button className="p-2 rounded-full hover:bg-white/10 transition-colors">
+                  <span className="text-gray-400 text-lg">@</span>
+                </button>
                 <Button
                   onClick={handleSubmitComment}
                   disabled={!newComment.trim()}
