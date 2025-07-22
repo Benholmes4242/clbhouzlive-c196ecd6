@@ -11,8 +11,8 @@ import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
+import PostComments from './PostComments';
 import { useVideoManager } from '@/contexts/VideoManagerContext';
-import CommentsModal from '@/components/comments/CommentsModal';
 
 interface ClubhouseVerticalFeedProps {
   posts: ExploreContentItem[];
@@ -160,8 +160,6 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   const itemRefs = useRef<{ [key: number]: HTMLDivElement }>({});
   // Removed isTextExpanded state as mouse handlers were removed to prevent re-renders
   const [mediaIndices, setMediaIndices] = useState<{[key: string]: number}>({});
-  const [commentsModalOpen, setCommentsModalOpen] = useState(false);
-  const [selectedPostForComments, setSelectedPostForComments] = useState<ExploreContentItem | null>(null);
   const queryClient = useQueryClient();
 
   // Check if current user follows the displayed user
@@ -407,9 +405,8 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     console.log('Share clicked');
   };
 
-  const handleComment = (post: ExploreContentItem) => {
-    setSelectedPostForComments(post);
-    setCommentsModalOpen(true);
+  const handleComment = () => {
+    console.log('Comment clicked');
   };
 
   if (posts.length === 0) {
@@ -601,6 +598,13 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                   </div>
                 )}
 
+                {/* Comments Section */}
+                <div className="mt-4">
+                  <PostComments 
+                    postId={item.id} 
+                    totalComments={Math.floor(Math.random() * 50) + 5} // Mock comment count between 5-54
+                  />
+                </div>
               </div>
 
               {/* Action Buttons - Bottom Right */}
@@ -638,7 +642,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 {/* Message Button with Comment Count */}
                 <div className="flex flex-col items-center">
                   <button
-                    onClick={() => handleComment(item)}
+                    onClick={handleComment}
                     className="cursor-pointer hover:opacity-100 transition-opacity"
                   >
                     <ChatBubbleOvalLeftEllipsisIcon className="h-8 w-8 text-white" />
@@ -688,17 +692,6 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
           height: 0 !important;
         }
       `}</style>
-
-      {/* Comments Modal */}
-      <CommentsModal
-        isOpen={commentsModalOpen}
-        onClose={() => {
-          setCommentsModalOpen(false);
-          setSelectedPostForComments(null);
-        }}
-        postId={selectedPostForComments?.id || ''}
-        postAuthor={selectedPostForComments?.user}
-      />
     </div>
   );
 };
