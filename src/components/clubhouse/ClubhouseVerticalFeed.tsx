@@ -648,7 +648,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                     onClick={handleComment}
                     className="cursor-pointer hover:opacity-100 transition-opacity"
                   >
-                    <TfiComment className="h-8 w-8 text-white" />
+                    <TfiComment className="h-7 w-7 text-white" />
                   </button>
                   <span className="text-white text-sm font-medium mt-1" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
                     {Math.floor(Math.random() * 50) + 5}
