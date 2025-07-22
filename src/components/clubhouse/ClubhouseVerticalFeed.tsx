@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { MessageCircle, MapPin, UserPlus, UserCheck, Loader2 } from 'lucide-react';
+import { MapPin, UserPlus, UserCheck, Loader2 } from 'lucide-react';
 import { PiHeartLight } from 'react-icons/pi';
 import { VscMute, VscUnmute } from 'react-icons/vsc';
 import { BsSend } from 'react-icons/bs';
+import { BiMessageRounded } from 'react-icons/bi';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ExploreContentItem } from '@/components/explore/types';
@@ -647,7 +648,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                     onClick={handleComment}
                     className="cursor-pointer hover:opacity-100 transition-opacity"
                   >
-                    <MessageCircle className="h-8 w-8 text-white" />
+                    <BiMessageRounded className="h-8 w-8 text-white" />
                   </button>
                   <span className="text-white text-sm font-medium mt-1" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
                     {Math.floor(Math.random() * 50) + 5}
