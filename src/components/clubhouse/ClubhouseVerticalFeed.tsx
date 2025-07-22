@@ -515,7 +515,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
 
               {/* Golf Course Tag - Top Right */}
               {item.golfCourse && (
-                <div className="absolute top-4 right-4 z-30">
+                <div className={`absolute right-4 z-30 ${index === 0 ? 'top-20' : 'top-4'}`}>
                   {isMobile ? (
                     <div className="inline-flex items-center bg-white/20 text-white text-xs font-medium px-1.5 py-0.5 rounded-full backdrop-blur-sm whitespace-nowrap">
                       <MapPin className="w-4 h-4 text-white mr-2" />
