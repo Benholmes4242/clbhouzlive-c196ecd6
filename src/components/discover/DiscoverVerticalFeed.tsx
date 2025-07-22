@@ -407,49 +407,6 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                 <Minimize2 className="w-6 h-6" />
               </button>
 
-              {/* User Info - Top Left */}
-              <div className="absolute top-6 left-6 z-20 flex items-center space-x-3">
-                <img
-                  src={posts[currentIndex]?.user?.avatar || '/placeholder.svg'}
-                  alt={posts[currentIndex]?.user?.name || 'User'}
-                  className="w-16 h-16 rounded-full object-cover"
-                  onError={(e) => {
-                    e.currentTarget.src = '/placeholder.svg';
-                  }}
-                />
-                <div className="flex flex-col">
-                  <span className="font-semibold text-base text-white" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
-                    {posts[currentIndex]?.user?.name || 'Unknown User'}
-                  </span>
-                  {posts[currentIndex]?.user?.username && (
-                    <span className="text-sm text-white/70" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
-                      @{posts[currentIndex]?.user?.username}
-                    </span>
-                  )}
-                </div>
-                
-                {/* Follow Button - Next to user info */}
-                {user?.id && posts[currentIndex]?.user?.id && user.id !== posts[currentIndex]?.user?.id && (
-                  <button
-                    onClick={handleFollow}
-                    disabled={isFollowingLoading || followMutation.isPending}
-                    className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-white hover:bg-white/30 transition-colors disabled:opacity-50 ml-3"
-                    style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
-                  >
-                    {isFollowing ? (
-                      <>
-                        <UserCheck className="w-4 h-4 text-white" />
-                        <span className="text-white text-sm font-medium">Following</span>
-                      </>
-                    ) : (
-                      <>
-                        <UserPlus className="w-4 h-4 text-white" />
-                        <span className="text-white text-sm font-medium">Follow</span>
-                      </>
-                    )}
-                  </button>
-                )}
-              </div>
 
               {/* Media Content */}
               <div 
@@ -476,23 +433,75 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                 )}
               </div>
 
-              {/* Golf Course Badge and Caption - Bottom Left */}
+              {/* Golf Course Tag - Top Right */}
+              {item.golfCourse && (
+                <div className="absolute top-6 right-16 z-30">
+                  {isMobile ? (
+                    <div className="inline-flex items-center bg-white/20 text-white text-xs font-medium px-2 py-1 rounded-full backdrop-blur-sm whitespace-nowrap">
+                      <MapPin className="w-4 h-4 text-white mr-2" />
+                      {item.golfCourse.name}
+                    </div>
+                  ) : (
+                    <div className="inline-flex items-center bg-white/20 text-white text-sm font-medium px-3 py-1.5 rounded-full backdrop-blur-sm whitespace-nowrap">
+                      <MapPin className="w-5 h-5 text-white mr-2" />
+                      {item.golfCourse.name}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* User Profile and Caption - Bottom Left */}
               <div className="absolute bottom-24 left-3 right-20 z-20">
-                {/* Golf Course Badge - Above Caption */}
-                {item.golfCourse && (
-                  <div className="mb-2">
-                     {isMobile ? (
-                       <div className="inline-flex items-center bg-white/20 text-white text-xs font-medium px-2 py-1 rounded-full backdrop-blur-sm whitespace-nowrap">
-                         <MapPin className="w-4 h-4 text-white mr-2" />
-                         {item.golfCourse.name}
-                       </div>
-                     ) : (
-                       <div className="inline-flex items-center bg-white/20 text-white text-sm font-medium px-3 py-1.5 rounded-full backdrop-blur-sm whitespace-nowrap">
-                         <MapPin className="w-5 h-5 text-white mr-2" />
-                         {item.golfCourse.name}
-                       </div>
-                     )}
-                   </div>
+                {/* User Profile Section */}
+                {index === currentIndex && (
+                  <div className="mb-3 flex items-center space-x-3">
+                    {/* Profile Photo */}
+                    <div className="relative">
+                      <img
+                        src={item.user?.avatar || '/placeholder.svg'}
+                        alt={item.user?.name || 'User'}
+                        className="w-12 h-12 rounded-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src = '/placeholder.svg';
+                        }}
+                      />
+                    </div>
+                    
+                    {/* Username */}
+                    <div className="flex items-center gap-3">
+                      <div className="flex flex-col">
+                        <span className="font-semibold text-base text-white" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
+                          {item.user?.name || 'Unknown User'}
+                        </span>
+                        {item.user?.username && (
+                          <span className="text-sm text-white/70" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
+                            @{item.user?.username}
+                          </span>
+                        )}
+                      </div>
+                      
+                      {/* Follow pill - only show if not own post and user is logged in */}
+                      {user?.id && item.user?.id && user.id !== item.user?.id && (
+                        <button 
+                          onClick={handleFollow}
+                          disabled={isFollowingLoading || followMutation.isPending}
+                          className="flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-full px-2 py-1 hover:bg-white/30 transition-colors disabled:opacity-50"
+                        >
+                          {isFollowing ? (
+                            <>
+                              <UserCheck className="w-4 h-4 text-white" />
+                              <span className="text-white text-sm font-medium">Following</span>
+                            </>
+                          ) : (
+                            <>
+                              <UserPlus className="w-4 h-4 text-white" />
+                              <span className="text-white text-sm font-medium">Follow</span>
+                            </>
+                          )}
+                        </button>
+                      )}
+                    </div>
+                  </div>
                 )}
 
                 {/* Caption Text */}
