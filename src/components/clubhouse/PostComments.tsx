@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import CommentsModal from '@/components/posts/CommentsModal';
 
 interface Comment {
   id: string;
@@ -53,6 +54,7 @@ const generateMockComments = (postId: string): Comment[] => {
 };
 
 const PostComments: React.FC<PostCommentsProps> = ({ postId, totalComments }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const comments = generateMockComments(postId);
   const displayedComments = comments.slice(0, 1); // Show max 1 comment
   const hasMoreComments = totalComments > displayedComments.length;
@@ -62,41 +64,53 @@ const PostComments: React.FC<PostCommentsProps> = ({ postId, totalComments }) =>
   }
 
   return (
-    <div className="mt-3 space-y-2">
-      {/* Display comments */}
-      {displayedComments.map((comment) => (
-        <div key={comment.id} className="flex items-start space-x-3">
-          <img
-            src={comment.user.avatar}
-            alt={comment.user.username}
-            className="w-6 h-6 rounded-full object-cover flex-shrink-0"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face';
-            }}
-          />
-          <div className="flex-1 min-w-0">
-            <div className="text-sm">
-              <span className="font-semibold text-white mr-2">
-                {comment.user.username}
-              </span>
-              <span className="text-white/90">
-                {comment.content}
+    <>
+      <div className="mt-3 space-y-2">
+        {/* Display comments */}
+        {displayedComments.map((comment) => (
+          <div key={comment.id} className="flex items-start space-x-3">
+            <img
+              src={comment.user.avatar}
+              alt={comment.user.username}
+              className="w-6 h-6 rounded-full object-cover flex-shrink-0"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face';
+              }}
+            />
+            <div className="flex-1 min-w-0">
+              <div className="text-sm">
+                <span className="font-semibold text-white mr-2">
+                  {comment.user.username}
+                </span>
+                <span className="text-white/90">
+                  {comment.content}
+                </span>
+              </div>
+              <span className="text-xs text-white/60 mt-1">
+                {comment.timestamp}
               </span>
             </div>
-            <span className="text-xs text-white/60 mt-1">
-              {comment.timestamp}
-            </span>
           </div>
-        </div>
-      ))}
-      
-      {/* View all comments link */}
-      {hasMoreComments && (
-        <button className="text-white/70 text-sm hover:text-white transition-colors">
-          View all {totalComments} comments
-        </button>
-      )}
-    </div>
+        ))}
+        
+        {/* View all comments link */}
+        {hasMoreComments && (
+          <button 
+            onClick={() => setIsModalOpen(true)}
+            className="text-white/70 text-sm hover:text-white transition-colors"
+          >
+            View all {totalComments} comments
+          </button>
+        )}
+      </div>
+
+      {/* Comments Modal */}
+      <CommentsModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        postId={postId}
+      />
+    </>
   );
 };
 
