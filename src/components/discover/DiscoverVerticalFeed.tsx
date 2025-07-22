@@ -389,44 +389,42 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                 maxHeight: '100vh'
               }}
             >
-              {/* Close Button */}
+              {/* Close Button - Top Right */}
               <button
                 onClick={onClose}
-                className="absolute top-6 left-6 z-30 p-2 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70"
+                className="absolute top-6 right-6 z-30 p-2 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70"
                 aria-label="Close"
               >
                 ✕
               </button>
 
-              {/* User Info - Top Right */}
-              <div className="absolute top-6 right-6 left-16 z-20 flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <img
-                    src={posts[currentIndex]?.user?.avatar || '/placeholder.svg'}
-                    alt={posts[currentIndex]?.user?.name || 'User'}
-                    className="w-16 h-16 rounded-full object-cover"
-                    onError={(e) => {
-                      e.currentTarget.src = '/placeholder.svg';
-                    }}
-                  />
-                  <div className="flex flex-col">
-                    <span className="font-semibold text-base text-white" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
-                      {posts[currentIndex]?.user?.name || 'Unknown User'}
+              {/* User Info - Top Left */}
+              <div className="absolute top-6 left-6 z-20 flex items-center space-x-3">
+                <img
+                  src={posts[currentIndex]?.user?.avatar || '/placeholder.svg'}
+                  alt={posts[currentIndex]?.user?.name || 'User'}
+                  className="w-16 h-16 rounded-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = '/placeholder.svg';
+                  }}
+                />
+                <div className="flex flex-col">
+                  <span className="font-semibold text-base text-white" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
+                    {posts[currentIndex]?.user?.name || 'Unknown User'}
+                  </span>
+                  {posts[currentIndex]?.user?.username && (
+                    <span className="text-sm text-white/70" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
+                      @{posts[currentIndex]?.user?.username}
                     </span>
-                    {posts[currentIndex]?.user?.username && (
-                      <span className="text-sm text-white/70" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
-                        @{posts[currentIndex]?.user?.username}
-                      </span>
-                    )}
-                  </div>
+                  )}
                 </div>
                 
-                {/* Follow Button */}
+                {/* Follow Button - Next to user info */}
                 {user?.id && posts[currentIndex]?.user?.id && user.id !== posts[currentIndex]?.user?.id && (
                   <button
                     onClick={handleFollow}
                     disabled={isFollowingLoading || followMutation.isPending}
-                    className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-white hover:bg-white/30 transition-colors disabled:opacity-50"
+                    className="flex items-center space-x-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-white hover:bg-white/30 transition-colors disabled:opacity-50 ml-3"
                     style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
                   >
                     {isFollowing ? (
