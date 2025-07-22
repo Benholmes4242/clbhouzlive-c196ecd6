@@ -9,7 +9,6 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
-import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import { useVideoManager } from '@/contexts/VideoManagerContext';
 
 interface DiscoverVerticalFeedProps {
@@ -30,15 +29,37 @@ const VideoWithAutoplay: React.FC<{
   muted: boolean;
   className: string;
 }> = React.memo(({ src, muted, className }) => {
-  const { ref: intersectionRef, isInView } = useIntersectionObserver({
-    threshold: 0.8, // Video must be 80% visible to autoplay (more restrictive)
-    rootMargin: '0px' // No margin to prevent multiple videos triggering
-  });
   const [hasAttemptedPlay, setHasAttemptedPlay] = useState(false);
+  const [isInView, setIsInView] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const intersectionRef = useRef<HTMLVideoElement | null>(null);
   const { setActiveVideo, addVideo, removeVideo } = useVideoManager();
   const { isGloballyMuted } = useGlobalAudio();
   const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+  // Use intersection observer with proper typing
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsInView(entry.isIntersecting && entry.intersectionRatio >= 0.8);
+      },
+      {
+        threshold: 0.8,
+        rootMargin: '0px'
+      }
+    );
+
+    const currentRef = intersectionRef.current;
+    if (currentRef) {
+      observer.observe(currentRef);
+    }
+
+    return () => {
+      if (currentRef) {
+        observer.unobserve(currentRef);
+      }
+    };
+  }, []);
 
   // Register video with manager when component mounts
   useEffect(() => {
@@ -56,15 +77,12 @@ const VideoWithAutoplay: React.FC<{
     }
     
     videoRef.current = node;
-    // Handle intersection observer ref
-    if (node && intersectionRef.current) {
-      intersectionRef.current = node;
-    }
+    intersectionRef.current = node;
     
     if (node) {
       addVideo(node);
     }
-  }, [intersectionRef, addVideo, removeVideo]);
+  }, [addVideo, removeVideo]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -139,6 +157,26 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
   const scrollViewRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<{ [key: number]: HTMLDivElement }>({});
   const queryClient = useQueryClient();
+
+  // Hide header when modal opens, show when closed
+  useEffect(() => {
+    const header = document.querySelector('header');
+    if (header) {
+      if (isOpen) {
+        header.style.display = 'none';
+      } else {
+        header.style.display = '';
+      }
+    }
+
+    // Cleanup: ensure header is shown when component unmounts
+    return () => {
+      const header = document.querySelector('header');
+      if (header) {
+        header.style.display = '';
+      }
+    };
+  }, [isOpen]);
 
   // Find initial index when modal opens
   useEffect(() => {
