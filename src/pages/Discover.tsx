@@ -7,8 +7,6 @@ import DiscoverVerticalFeed from '@/components/discover/DiscoverVerticalFeed';
 import DiscoverTrendingVideos from '@/components/discover/DiscoverTrendingVideos';
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
-import { useFullscreenVideoModal } from '@/hooks/useVideoPlaybackManager';
-import FullscreenVideoModal from '@/components/ui/fullscreen-video-modal';
 import { FILTER_TYPES, MEDIA_TYPES } from '@/components/explore/types';
 
 const Discover = () => {
@@ -33,8 +31,6 @@ const Discover = () => {
     openFeed, 
     closeFeed 
   } = useVerticalMediaFeed();
-
-  const modalManager = useFullscreenVideoModal();
 
   const handleLike = (contentId: string) => {
     // Update likes optimistically - could be enhanced with actual API call
@@ -156,12 +152,6 @@ const Discover = () => {
           />
         )}
 
-        {/* Fullscreen Video Modal */}
-        <FullscreenVideoModal
-          isOpen={modalManager.isOpen}
-          onClose={modalManager.closeModal}
-          videoData={modalManager.videoData}
-        />
 
         <style>{`
           .scrollbar-hide {
