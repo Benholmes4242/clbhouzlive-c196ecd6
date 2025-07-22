@@ -15,11 +15,6 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
   console.log('AuthWrapper: loading =', loading, 'user =', !!user);
   
   if (loading) {
-    // Add a timeout to prevent infinite loading
-    setTimeout(() => {
-      console.log('AuthWrapper: Force ending loading state after timeout');
-    }, 3000);
-    
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
