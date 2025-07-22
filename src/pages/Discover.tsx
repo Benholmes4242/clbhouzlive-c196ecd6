@@ -32,6 +32,8 @@ const Discover = () => {
     closeFeed 
   } = useVerticalMediaFeed();
 
+  const [feedSource, setFeedSource] = useState<'trending' | 'tabs'>('tabs');
+
   const handleLike = (contentId: string) => {
     // Update likes optimistically - could be enhanced with actual API call
     // For now, this is just visual feedback
@@ -43,10 +45,12 @@ const Discover = () => {
   };
 
   const handleMediaClick = (item: any) => {
+    setFeedSource('tabs');
     openFeed(item);
   };
 
   const handleTrendingVideoClick = (item: any) => {
+    setFeedSource('trending');
     openFeed(item);
   };
 
@@ -143,7 +147,7 @@ const Discover = () => {
           <DiscoverVerticalFeed
             isOpen={isFeedOpen}
             onClose={closeFeed}
-            posts={uniqueContent}
+            posts={feedSource === 'trending' ? uniqueTrendingContent : uniqueContent}
             onLike={handleLike}
             onLoadMore={loadMore}
             hasMore={hasMore}
