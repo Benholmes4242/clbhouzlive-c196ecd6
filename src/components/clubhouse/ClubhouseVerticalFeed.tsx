@@ -1,9 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { MapPin, UserPlus, UserCheck, Loader2 } from 'lucide-react';
-import { PiHeartLight } from 'react-icons/pi';
-import { SpeakerXMarkIcon, SpeakerWaveIcon } from '@heroicons/react/24/outline';
-import { BsSend } from 'react-icons/bs';
-import { ChatBubbleOvalLeftEllipsisIcon } from '@heroicons/react/24/outline';
+import { PaperAirplaneIcon, HeartIcon, SpeakerXMarkIcon, SpeakerWaveIcon, ChatBubbleOvalLeftEllipsisIcon } from '@heroicons/react/24/outline';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ExploreContentItem } from '@/components/explore/types';
@@ -633,8 +630,8 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                     className="cursor-pointer hover:opacity-100 transition-opacity"
                     disabled={likeMutation.isPending}
                   >
-                    <PiHeartLight 
-                      className={`h-8 w-8 ${likedPosts?.includes(item.id) ? 'text-red-500' : 'text-white'}`} 
+                    <HeartIcon 
+                      className={`h-8 w-8 ${likedPosts?.includes(item.id) ? 'text-red-500 fill-red-500' : 'text-white'}`} 
                     />
                   </button>
                   <span className="text-white text-sm font-medium mt-1" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
@@ -660,7 +657,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                   onClick={handleShare}
                   className="cursor-pointer hover:opacity-100 transition-opacity"
                 >
-                  <BsSend className="h-7 w-7 text-white" />
+                  <PaperAirplaneIcon className="h-7 w-7 text-white" />
                 </button>
               </div>
             </div>
