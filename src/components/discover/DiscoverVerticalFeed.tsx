@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { MapPin, UserPlus, UserCheck, Loader2 } from 'lucide-react';
+import { MapPin, UserPlus, UserCheck, Loader2, Minimize2 } from 'lucide-react';
 import { PaperAirplaneIcon, HeartIcon, SpeakerXMarkIcon, SpeakerWaveIcon, ChatBubbleOvalLeftEllipsisIcon } from '@heroicons/react/24/outline';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -395,7 +395,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                 className="absolute top-6 right-6 z-30 p-2 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70"
                 aria-label="Close"
               >
-                ✕
+                <Minimize2 className="w-5 h-5" />
               </button>
 
               {/* User Info - Top Left */}
