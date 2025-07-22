@@ -401,7 +401,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                 className="absolute top-6 right-6 z-30 p-0 rounded-full text-white hover:bg-white/20 transition-colors"
                 aria-label="Close"
               >
-                <Minimize2 className="w-8 h-8" />
+                <Minimize2 className="w-6 h-6" />
               </button>
 
               {/* User Info - Top Left */}
