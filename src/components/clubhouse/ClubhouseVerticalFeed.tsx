@@ -659,7 +659,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                   onClick={handleShare}
                   className="cursor-pointer hover:opacity-100 transition-opacity"
                 >
-                  <BsSend className="h-8 w-8 text-white" />
+                  <BsSend className="h-7 w-7 text-white" />
                 </button>
               </div>
             </div>
