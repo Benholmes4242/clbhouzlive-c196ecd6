@@ -18,7 +18,7 @@ const CreateProfile = lazy(() => import("./pages/CreateProfile"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const UserProfilePage = lazy(() => import("./pages/UserProfilePage"));
 const Settings = lazy(() => import("./pages/Settings"));
-// Explore page removed - discover page will be renamed to explore
+const Explore = lazy(() => import("./pages/Explore"));
 const Clubhouse = lazy(() => import("./pages/Clubhouse"));
 const Discover = lazy(() => import("./pages/Discover"));
 const Courses = lazy(() => import("./pages/Courses"));
@@ -67,7 +67,7 @@ const App: React.FC = () => {
                   <Route path="/profile" element={<ProfilePage />} />
                   <Route path="/profile/:username" element={<UserProfilePage />} />
                   <Route path="/settings" element={<Settings />} />
-                  {/* <Route path="/explore" element={<Explore />} /> - removed old explore page */}
+                  <Route path="/explore" element={<Explore />} />
                   <Route path="/clubhouse" element={<Clubhouse />} />
                   <Route path="/discover" element={<Discover />} />
                   <Route path="/courses" element={<Courses />} />
