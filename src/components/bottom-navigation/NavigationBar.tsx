@@ -43,7 +43,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
                 aria-label={tab.label}
               >
                 <Icon 
-                  className="h-8 w-8" 
+                  className="h-9 w-9" 
                   style={tab.id === 'post' ? { color: '#f7931e' } : undefined}
                 />
               </button>
