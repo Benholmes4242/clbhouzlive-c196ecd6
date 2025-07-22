@@ -161,10 +161,10 @@ const CommentsModal: React.FC<CommentsModalProps> = ({ isOpen, onClose, postId }
       />
       
       {/* Modal */}
-      <div className="fixed inset-x-0 bottom-0 z-50 animate-slide-in-up">
+      <div className="fixed inset-x-0 bottom-0 z-[60] animate-slide-in-up">
         <div 
-          className="bg-[#1C1C1E] rounded-t-3xl shadow-2xl flex flex-col"
-          style={{ height: '75vh', maxHeight: '75vh' }}
+          className="bg-[#1C1C1E] rounded-t-3xl shadow-2xl flex flex-col relative"
+          style={{ height: '75vh', maxHeight: '75vh', marginBottom: '64px' }}
         >
           {/* Drag Handle */}
           <div className="flex justify-center pt-2 pb-1">
