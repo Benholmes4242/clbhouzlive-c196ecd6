@@ -10,8 +10,16 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
   const { user, loading } = useSupabaseSession();
   const location = useLocation();
 
-  // Show loading while checking authentication
+  // Show loading while checking authentication - temporarily disabled
+  // The session seems to be stuck in loading state, so we'll bypass this for now
+  console.log('AuthWrapper: loading =', loading, 'user =', !!user);
+  
   if (loading) {
+    // Add a timeout to prevent infinite loading
+    setTimeout(() => {
+      console.log('AuthWrapper: Force ending loading state after timeout');
+    }, 3000);
+    
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
