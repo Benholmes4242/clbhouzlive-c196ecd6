@@ -193,6 +193,12 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
       const index = posts.findIndex(post => post.id === initialItem.id);
       if (index !== -1) {
         setCurrentIndex(index);
+        // Scroll to the correct item
+        if (scrollViewRef.current) {
+          const element = scrollViewRef.current;
+          const targetScrollTop = index * element.clientHeight;
+          element.scrollTo({ top: targetScrollTop, behavior: 'instant' });
+        }
       }
     }
   }, [isOpen, initialItem, posts]);
