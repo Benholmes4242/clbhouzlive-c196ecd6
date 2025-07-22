@@ -3,7 +3,7 @@ import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
 import ExploreFilters from '@/components/explore/ExploreFilters';
 import ExploreGrid from '@/components/explore/ExploreGrid';
-import VerticalMediaFeed from '@/components/explore/VerticalMediaFeed';
+import DiscoverVerticalFeed from '@/components/discover/DiscoverVerticalFeed';
 import DiscoverTrendingVideos from '@/components/discover/DiscoverTrendingVideos';
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
@@ -142,15 +142,17 @@ const Discover = () => {
         
         <BottomNavigation />
 
-        {/* Vertical Media Feed */}
+        {/* Discover Vertical Feed */}
         {initialItem && (
-          <VerticalMediaFeed
+          <DiscoverVerticalFeed
             isOpen={isFeedOpen}
             onClose={closeFeed}
-            initialItem={initialItem}
-            allContent={uniqueContent}
+            posts={uniqueContent}
             onLike={handleLike}
-            onFollow={handleFollow}
+            onLoadMore={loadMore}
+            hasMore={hasMore}
+            isLoadingMore={loading}
+            initialItem={initialItem}
           />
         )}
 
