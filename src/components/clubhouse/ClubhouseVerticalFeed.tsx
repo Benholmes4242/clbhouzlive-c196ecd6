@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { MessageCircle, Volume2, VolumeX, MapPin, UserPlus, UserCheck, Loader2 } from 'lucide-react';
+import { MessageCircle, MapPin, UserPlus, UserCheck, Loader2 } from 'lucide-react';
 import { PiHeartLight } from 'react-icons/pi';
-import { RiShareForward2Fill } from 'react-icons/ri';
+import { VscMute, VscUnmute } from 'react-icons/vsc';
+import { BsSend } from 'react-icons/bs';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ExploreContentItem } from '@/components/explore/types';
@@ -617,9 +618,9 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                     onClick={() => setGlobalMute(!isGloballyMuted)}
                   >
                     {isGloballyMuted ? (
-                      <VolumeX className="w-8 h-8 text-white" />
+                      <VscMute className="w-8 h-8 text-white" />
                     ) : (
-                      <Volume2 className="w-8 h-8 text-white" />
+                      <VscUnmute className="w-8 h-8 text-white" />
                     )}
                   </button>
                 )}
@@ -658,7 +659,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                   onClick={handleShare}
                   className="cursor-pointer hover:opacity-100 transition-opacity"
                 >
-                  <RiShareForward2Fill className="h-8 w-8 text-white" />
+                  <BsSend className="h-8 w-8 text-white" />
                 </button>
               </div>
             </div>
