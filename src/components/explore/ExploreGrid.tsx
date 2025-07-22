@@ -261,6 +261,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                 itemId={item.id}
                 currentIndex={index}
                 loop={true}
+                hidePlayButton={true}
               />
               
               {/* Overlay */}
