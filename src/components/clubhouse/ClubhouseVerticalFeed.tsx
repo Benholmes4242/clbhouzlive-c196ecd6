@@ -645,7 +645,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                     onClick={handleComment}
                     className="cursor-pointer hover:opacity-100 transition-opacity"
                   >
-                    <ChatBubbleOvalLeftEllipsisIcon className="h-7 w-7 text-white" />
+                    <ChatBubbleOvalLeftEllipsisIcon className="h-8 w-8 text-white" />
                   </button>
                   <span className="text-white text-sm font-medium mt-1" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
                     {Math.floor(Math.random() * 50) + 5}
@@ -657,7 +657,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                   onClick={handleShare}
                   className="cursor-pointer hover:opacity-100 transition-opacity"
                 >
-                  <PaperAirplaneIcon className="h-7 w-7 text-white" />
+                  <PaperAirplaneIcon className="h-8 w-8 text-white" />
                 </button>
               </div>
             </div>
