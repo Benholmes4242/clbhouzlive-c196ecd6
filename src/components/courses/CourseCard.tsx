@@ -42,10 +42,10 @@ const formatDescription = (description: string) => {
           // Extract only valid Fragment props (key and children)
           const fragmentProps = { key: index };
           return (
-            <React.Fragment {...fragmentProps}>
+            <span key={index}>
               {line}
               {index < array.length - 1 && <br />}
-            </React.Fragment>
+            </span>
           );
         })}
     </span>
