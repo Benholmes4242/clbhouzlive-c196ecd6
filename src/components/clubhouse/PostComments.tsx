@@ -63,13 +63,6 @@ const PostComments: React.FC<PostCommentsProps> = ({ postId, totalComments }) =>
 
   return (
     <div className="mt-3 space-y-2">
-      {/* View all comments link */}
-      {hasMoreComments && (
-        <button className="text-white/70 text-sm hover:text-white transition-colors">
-          View all {totalComments} comments
-        </button>
-      )}
-      
       {/* Display comments */}
       {displayedComments.map((comment) => (
         <div key={comment.id} className="flex items-start space-x-3">
@@ -96,6 +89,13 @@ const PostComments: React.FC<PostCommentsProps> = ({ postId, totalComments }) =>
           </div>
         </div>
       ))}
+      
+      {/* View all comments link */}
+      {hasMoreComments && (
+        <button className="text-white/70 text-sm hover:text-white transition-colors">
+          View all {totalComments} comments
+        </button>
+      )}
     </div>
   );
 };
