@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { MessageCircle, Volume2, VolumeX, MapPin, UserPlus, UserCheck, Loader2 } from 'lucide-react';
-import { FaHeart, FaRegHeart } from 'react-icons/fa';
+import { PiHeartLight } from 'react-icons/pi';
 import { RiShareForward2Fill } from 'react-icons/ri';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -631,11 +631,9 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                     className="cursor-pointer hover:opacity-100 transition-opacity"
                     disabled={likeMutation.isPending}
                   >
-                    {likedPosts?.includes(item.id) ? (
-                      <FaHeart className="h-8 w-8 text-red-500" />
-                    ) : (
-                      <FaRegHeart className="h-8 w-8 text-white" />
-                    )}
+                    <PiHeartLight 
+                      className={`h-8 w-8 ${likedPosts?.includes(item.id) ? 'text-red-500' : 'text-white'}`} 
+                    />
                   </button>
                   <span className="text-white text-sm font-medium mt-1" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
                     {Math.floor(Math.random() * 1000) + 10}
