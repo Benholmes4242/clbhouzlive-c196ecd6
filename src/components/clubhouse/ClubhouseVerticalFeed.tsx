@@ -589,8 +589,11 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                   >
                     <div className="transition-all duration-300 ease-in-out whitespace-normal">
                       <span className="text-base font-bold">
-                        {/* Always show truncated text to prevent re-renders */}
-                        {truncateToWords(removeGolfCourseFromContent(item.title), 12)}
+                        {/* Show truncated text on mobile, full text on desktop */}
+                        {isMobile 
+                          ? truncateToWords(removeGolfCourseFromContent(item.title), 12)
+                          : removeGolfCourseFromContent(item.title)
+                        }
                       </span>
                     </div>
                   </div>
