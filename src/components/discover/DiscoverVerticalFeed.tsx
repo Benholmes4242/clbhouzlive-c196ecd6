@@ -398,7 +398,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
               {/* Close Button - Top Right */}
               <button
                 onClick={onClose}
-                className="absolute top-6 right-6 z-30 p-2 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70"
+                className="absolute top-6 right-6 z-30 p-0 rounded-full text-white hover:bg-white/20 transition-colors"
                 aria-label="Close"
               >
                 <Minimize2 className="w-5 h-5" />
