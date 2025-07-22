@@ -387,25 +387,6 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
         disablePictureInPicture
       />
 
-      {/* Play/Pause overlay */}
-      {!hideControls && (
-        <div
-          className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 ${
-            showControls ? 'opacity-100' : 'opacity-0'
-          }`}
-        >
-          <button
-            onClick={togglePlayPause}
-            className="bg-black/50 hover:bg-black/70 text-white rounded-full p-4 transition-all duration-200 transform hover:scale-110"
-          >
-            {isPlaying ? (
-              <Pause className="w-6 h-6" />
-            ) : (
-              <Play className="w-6 h-6 ml-1" />
-            )}
-          </button>
-        </div>
-      )}
 
 
       {/* Quality indicator */}
