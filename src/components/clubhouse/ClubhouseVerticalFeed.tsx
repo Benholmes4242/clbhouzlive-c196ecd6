@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { MapPin, UserPlus, UserCheck, Loader2 } from 'lucide-react';
 import { PiHeartLight } from 'react-icons/pi';
-import { VscMute, VscUnmute } from 'react-icons/vsc';
+import { SpeakerXMarkIcon, SpeakerWaveIcon } from '@heroicons/react/24/outline';
 import { BsSend } from 'react-icons/bs';
 import { ChatBubbleOvalLeftEllipsisIcon } from '@heroicons/react/24/outline';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -619,9 +619,9 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                     onClick={() => setGlobalMute(!isGloballyMuted)}
                   >
                     {isGloballyMuted ? (
-                      <VscMute className="w-8 h-8 text-white" />
+                      <SpeakerXMarkIcon className="w-8 h-8 text-white" />
                     ) : (
-                      <VscUnmute className="w-8 h-8 text-white" />
+                      <SpeakerWaveIcon className="w-8 h-8 text-white" />
                     )}
                   </button>
                 )}
