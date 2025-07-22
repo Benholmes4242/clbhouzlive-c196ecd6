@@ -587,7 +587,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                     style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
                   >
                     <div className="transition-all duration-300 ease-in-out whitespace-normal">
-                      <span className="text-base font-bold">
+                      <span className="text-base font-medium">
                         {/* Show truncated text on mobile, full text on desktop */}
                         {isMobile 
                           ? truncateToWords(removeGolfCourseFromContent(item.title), 12)
