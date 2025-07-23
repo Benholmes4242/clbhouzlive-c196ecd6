@@ -565,8 +565,9 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                       WebkitLineClamp: 2,
                       WebkitBoxOrient: 'vertical',
                       overflow: 'hidden',
-                      marginLeft: index === currentIndex ? '0px' : '0px',  // Consistent alignment
-                      marginTop: index === currentIndex ? '0px' : '12px'   // Add top margin when profile section is hidden
+                      marginLeft: '0px',  // Always align with profile photo position
+                      marginTop: index === currentIndex ? '0px' : '0px',  // Remove conditional margin
+                      wordBreak: 'break-word'  // Ensure proper word wrapping
                     }}
                   >
                     <span className="text-base font-medium">
