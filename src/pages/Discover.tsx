@@ -4,7 +4,6 @@ import BottomNavigation from '@/components/BottomNavigation';
 import ExploreFilters from '@/components/explore/ExploreFilters';
 import ExploreGrid from '@/components/explore/ExploreGrid';
 import DiscoverVerticalFeed from '@/components/discover/DiscoverVerticalFeed';
-import DiscoverTrendingVideos from '@/components/discover/DiscoverTrendingVideos';
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed.tsx';
 import { FILTER_TYPES, MEDIA_TYPES } from '@/components/explore/types';
@@ -20,11 +19,6 @@ const Discover = () => {
     loadMore 
   } = useInfiniteExploreContent(activeFilter);
   
-  // Get static content for Trending Videos (always use Friends filter)
-  const { 
-    content: trendingContent
-  } = useInfiniteExploreContent(FILTER_TYPES.FRIENDS);
-  
   const { 
     isOpen: isFeedOpen, 
     initialItem, 
@@ -32,7 +26,6 @@ const Discover = () => {
     closeFeed 
   } = useVerticalMediaFeed();
 
-  const [feedSource, setFeedSource] = useState<'trending' | 'tabs'>('tabs');
 
   const handleLike = (contentId: string) => {
     // Update likes optimistically - could be enhanced with actual API call
@@ -45,12 +38,6 @@ const Discover = () => {
   };
 
   const handleMediaClick = (item: any) => {
-    setFeedSource('tabs');
-    openFeed(item);
-  };
-
-  const handleTrendingVideoClick = (item: any) => {
-    setFeedSource('trending');
     openFeed(item);
   };
 
@@ -100,22 +87,12 @@ const Discover = () => {
     index === self.findIndex(t => t.src === item.src)
   );
 
-  // Remove duplicates for trending videos (static content)
-  const uniqueTrendingContent = trendingContent.filter((item, index, self) => 
-    index === self.findIndex(t => t.src === item.src)
-  );
 
   return (
       <div className="min-h-screen bg-background">
         <Header />
         
         <main className="pb-20">
-          {/* Trending Videos Section - Static content that doesn't change with tabs */}
-          <DiscoverTrendingVideos 
-            videos={uniqueTrendingContent}
-            onVideoClick={handleTrendingVideoClick}
-          />
-
           {/* Your Discover Section */}
           <div className="container pt-6 pb-2">
             <ExploreFilters 
@@ -147,7 +124,7 @@ const Discover = () => {
           <DiscoverVerticalFeed
             isOpen={isFeedOpen}
             onClose={closeFeed}
-            posts={feedSource === 'trending' ? uniqueTrendingContent : uniqueContent}
+            posts={uniqueContent}
             onLike={handleLike}
             onLoadMore={loadMore}
             hasMore={hasMore}
