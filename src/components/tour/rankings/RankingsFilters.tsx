@@ -33,14 +33,25 @@ const RankingsFilters = ({
       
       <div className="flex flex-wrap gap-2">
         {filteredRankings.map((ranking) => (
-          <Button
+          <button
             key={ranking.id}
-            variant={selectedRanking.id === ranking.id ? "default" : "outline"}
-            size="sm"
             onClick={() => setSelectedRanking(ranking)}
+            className={`
+              relative px-4 py-2 text-sm font-medium rounded-2xl transition-all duration-200
+              backdrop-blur-[20px] border border-white/30
+              shadow-[0_4px_30px_rgba(0,0,0,0.1)]
+              before:absolute before:inset-0 before:rounded-2xl
+              before:bg-gradient-radial before:from-white/10 before:via-transparent before:to-transparent
+              before:from-[circle_at_top_left] before:pointer-events-none
+              ${selectedRanking.id === ranking.id 
+                ? 'bg-white/15 text-foreground border-white/40' 
+                : 'bg-white/15 text-muted-foreground hover:bg-white/20 hover:text-foreground'
+              }
+              dark:bg-black/20 dark:border-white/20 dark:hover:bg-black/30
+            `}
           >
             {getTourButtonText(ranking.tour)}
-          </Button>
+          </button>
         ))}
       </div>
     </div>
