@@ -448,7 +448,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
 
               {/* Golf Course Tag - Top Left */}
               {item.golfCourse && (
-                <div className="absolute top-6 left-6 z-30">
+                <div className="absolute top-6 left-3 z-30">
                   {isMobile ? (
                     <div className="inline-flex items-center bg-white/20 text-white text-xs font-medium px-1.5 py-0.5 rounded-full backdrop-blur-sm whitespace-nowrap">
                       <MapPin className="w-4 h-4 text-white mr-2" />
@@ -521,17 +521,22 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                 {item.title && removeGolfCourseFromContent(item.title) && (
                   <div 
                     className="text-white text-base font-medium leading-[1.4] cursor-default"
-                    style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
+                    style={{ 
+                      textShadow: '0 1px 3px rgba(0,0,0,0.7)',
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden',
+                      marginLeft: '0px',
+                      marginTop: '0px',
+                      wordBreak: 'break-word',
+                      width: '70vw',
+                      maxWidth: '70vw'
+                    }}
                   >
-                    <div className="transition-all duration-300 ease-in-out whitespace-normal">
-                      <span className="text-base font-medium">
-                        {/* Show truncated text on mobile, full text on desktop */}
-                        {isMobile 
-                          ? truncateToWords(removeGolfCourseFromContent(item.title), 12)
-                          : removeGolfCourseFromContent(item.title)
-                        }
-                      </span>
-                    </div>
+                    <span className="text-base font-medium">
+                      {removeGolfCourseFromContent(item.title)}
+                    </span>
                   </div>
                 )}
               </div>
