@@ -557,7 +557,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 {/* Caption Text */}
                 {item.title && removeGolfCourseFromContent(item.title) && (
                   <div 
-                    className="text-white text-base font-medium cursor-default line-clamp-2"
+                    className="text-white text-base font-medium cursor-default"
                     style={{ 
                       textShadow: '0 1px 3px rgba(0,0,0,0.7)',
                       lineHeight: '1.3',
@@ -566,8 +566,10 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                       WebkitBoxOrient: 'vertical',
                       overflow: 'hidden',
                       marginLeft: '0px',  // Always align with profile photo position
-                      marginTop: index === currentIndex ? '0px' : '0px',  // Remove conditional margin
-                      wordBreak: 'break-word'  // Ensure proper word wrapping
+                      marginTop: '0px',
+                      wordBreak: 'break-word',  // Ensure proper word wrapping
+                      width: 'calc(100% - 80px)', // Account for right margin to prevent single line
+                      maxWidth: '280px' // Force text to wrap to multiple lines
                     }}
                   >
                     <span className="text-base font-medium">
