@@ -48,9 +48,10 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
     return words.slice(0, 5).join(' ') + '...';
   };
   
+  // Video playback manager for the first (main) card
   const { togglePlayPause, shouldShowPlayIcon } = useVideoPlaybackManager({
     section: 'trending',
-    videoId: `trending-${currentIndex}`,
+    videoId: `trending-first-card`,
     autoplayAllowed: true,
     priority: 1
   });
@@ -143,11 +144,11 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
                     media_url: video.src
                   }}
                   itemTitle={video.title}
-                  shouldAutoplay={false}
+                  shouldAutoplay={isFirstCard}
                   isLoading={false}
                   onImageError={() => {}}
                   onImageLoad={() => {}}
-                  itemId={video.id}
+                  itemId={isFirstCard ? 'trending-first-card' : video.id}
                   currentIndex={actualIndex}
                   loop={true}
                   hidePlayButton={true}
@@ -162,20 +163,24 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
                   <HiTrendingUp className="w-8 h-8 drop-shadow-lg" style={{ color: '#f7931e' }} />
                 </div>
                 
-                {/* User info */}
+                {/* User info and caption */}
                 <div className="absolute bottom-3 left-3 right-3">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 mb-2">
                     <img
                       src={video.user?.avatar || '/placeholder.svg'}
                       alt={video.user?.name || 'User'}
-                      className="w-12 h-12 rounded-full object-cover"
+                      className="w-10 h-10 rounded-full object-cover"
                     />
                     <div className="min-w-0 flex-1">
-                      <p className="text-white text-base font-medium truncate">
+                      <p className="text-white text-sm font-medium truncate">
                         {video.user?.name || video.user?.username || 'Anonymous'}
                       </p>
                     </div>
                   </div>
+                  {/* Caption text */}
+                  <p className="text-white text-sm line-clamp-2 opacity-90">
+                    {truncateTitle(video.title)}
+                  </p>
                 </div>
 
                 
