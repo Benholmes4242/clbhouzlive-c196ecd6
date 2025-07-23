@@ -5,6 +5,7 @@ import { HiTrendingUp } from 'react-icons/hi';
 import { ExploreContentItem } from './types';
 import ExploreContentCard from './ExploreContentCard';
 import MediaDisplay from './MediaDisplay';
+import MasonryGrid from './MasonryGrid';
 import { FILTER_TYPES } from './types';
 // import { useAutoplayManager } from '@/hooks/useAutoplayManager';
 
@@ -19,6 +20,7 @@ interface ExploreGridProps {
   activeFilter?: string;
   isClubhousePage?: boolean;
   isDiscoverPage?: boolean;
+  useMasonryLayout?: boolean;
 }
 
 const ExploreGrid: React.FC<ExploreGridProps> = ({ 
@@ -31,7 +33,8 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
   onLoadMore,
   activeFilter,
   isClubhousePage = false,
-  isDiscoverPage = false
+  isDiscoverPage = false,
+  useMasonryLayout = false
 }) => {
   const [isMobile, setIsMobile] = useState(false);
 
@@ -231,6 +234,19 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
           )}
         </div>
       </>
+    );
+  }
+
+  // Use Masonry Layout if specified
+  if (useMasonryLayout) {
+    return (
+      <MasonryGrid
+        content={content}
+        onMediaClick={onMediaClick}
+        isLoading={isLoading}
+        hasMore={hasMore}
+        onLoadMore={onLoadMore}
+      />
     );
   }
 
