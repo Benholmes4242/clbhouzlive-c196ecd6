@@ -176,7 +176,7 @@ const HeaderSearch = () => {
       {/* Mobile Search Overlay */}
       {showMobileSearch && (
         <div 
-          className="md:hidden fixed inset-0 bg-black/20 z-[9997]"
+          className="md:hidden fixed inset-0 z-[9997]"
           onClick={handleMobileSearchToggle}
         />
       )}
@@ -184,7 +184,7 @@ const HeaderSearch = () => {
       {/* Mobile Search Bar */}
       {showMobileSearch && (
         <div 
-          className="md:hidden absolute top-full left-0 right-0 bg-background border-t border-border px-4 py-4 z-[9998]" 
+          className="md:hidden absolute top-full left-0 right-0 px-4 py-4 z-[9998]" 
           ref={mobileSearchRef}
           style={{ pointerEvents: 'auto' }}
         >
