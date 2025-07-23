@@ -6,14 +6,14 @@ import { navigationTabs } from './navigationTabs';
 export const useNavigationHandlers = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [activeTab, setActiveTab] = useState('home');
+  const [activeTab, setActiveTab] = useState('clubhouse');
 
   useEffect(() => {
     const currentTab = navigationTabs.find(tab => tab.path === location.pathname);
     if (currentTab) {
       setActiveTab(currentTab.id);
     } else if (location.pathname === '/') {
-      setActiveTab('home');
+      setActiveTab('clubhouse'); // Set clubhouse as active when on home page
     }
   }, [location.pathname]);
 
