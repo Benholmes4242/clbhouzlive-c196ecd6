@@ -94,8 +94,8 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
               flex items-center transition-colors duration-100 ease-in-out
               focus:outline-none border-0 outline-0
               ${activeFilter === filter 
-                ? "bg-white/20 backdrop-blur-[1px] border border-white/40 text-foreground" 
-                : "bg-transparent backdrop-blur-[1px] border border-white/25 text-foreground hover:bg-white/10"
+                ? "bg-white/20 backdrop-blur-[1px] border border-white/40 text-white" 
+                : "bg-transparent backdrop-blur-[1px] border border-white/25 text-white hover:bg-white/10"
               }
             `}
             style={{ border: activeFilter === filter ? 'none' : undefined, outline: 'none' }}
