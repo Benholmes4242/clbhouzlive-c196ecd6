@@ -17,8 +17,8 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
         ? 'bg-transparent' 
         : 'bg-background'
     }`}>
-      <div className="w-full px-2">
-        <div className="flex items-center justify-between h-16 relative">
+      <div className={`w-full px-2 ${isClubhouse ? 'bg-transparent' : ''}`}>
+        <div className={`flex items-center justify-between h-16 relative ${isClubhouse ? 'bg-transparent' : ''}`}>
           {navigationTabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
