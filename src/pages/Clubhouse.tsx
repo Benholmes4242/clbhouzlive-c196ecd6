@@ -53,10 +53,9 @@ const Clubhouse = () => {
     }}>
       {/* Header with Logo and Floating Menu */}
       <div 
-        className="fixed top-0 left-0 right-0 z-40 backdrop-blur-[2px] bg-white/0 supports-[backdrop-filter]:bg-white/0"
-        style={{
-          paddingTop: 'env(safe-area-inset-top, 0)',
-        }}
+        className={`absolute top-0 left-0 right-0 z-40 transition-transform duration-300 ease-out backdrop-blur-[2px] bg-white/0 supports-[backdrop-filter]:bg-white/0 ${
+          headerVisible ? 'translate-y-0' : '-translate-y-full'
+        }`}
       >
         {/* Logo Mark and Clubhouse Logo */}
         <div className="absolute top-4 left-4">
