@@ -26,9 +26,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
           : 'bg-background'
       }`}
     >
-      <div className={`w-full px-2 ${
-        isClubhouse ? 'rounded-t-2xl overflow-hidden' : ''
-      }`}>
+      <div className="w-full px-2">
         <div className={`flex items-center justify-between h-16 relative`}>
           {navigationTabs.map((tab) => {
             const Icon = tab.icon;
