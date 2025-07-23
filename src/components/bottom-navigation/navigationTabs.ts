@@ -1,12 +1,14 @@
 
 import { 
-  BoltIcon,
+  BoltIcon
+} from '@heroicons/react/24/outline';
+import { 
+  HomeIcon,
   TrophyIcon, 
   CameraIcon, 
   MapPinIcon, 
   UserIcon 
-} from '@heroicons/react/24/outline';
-import { HomeIcon } from '@heroicons/react/24/solid';
+} from '@heroicons/react/24/solid';
 
 export const navigationTabs = [
   { id: 'clubhouse', label: 'Clubhouse', icon: HomeIcon, path: '/clubhouse' },
