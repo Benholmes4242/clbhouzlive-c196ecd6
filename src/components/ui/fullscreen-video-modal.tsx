@@ -81,8 +81,7 @@ const FullscreenVideoModal: React.FC<FullscreenVideoModalProps> = ({
   return (
     <div 
       ref={modalRef}
-      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/95 animate-fade-in"
-      style={{ height: '100dvh' }}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 animate-fade-in"
       onClick={handleBackdropClick}
     >
       {/* Close button */}
