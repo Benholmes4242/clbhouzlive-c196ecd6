@@ -53,7 +53,7 @@ const Clubhouse = () => {
     }}>
       {/* Header with Logo and Floating Menu */}
       <div 
-        className={`absolute top-0 left-0 right-0 z-40 transition-transform duration-300 ease-out ${
+        className={`absolute top-0 left-0 right-0 z-40 transition-transform duration-300 ease-out backdrop-blur-[2px] bg-white/0 supports-[backdrop-filter]:bg-white/0 ${
           headerVisible ? 'translate-y-0' : '-translate-y-full'
         }`}
       >
@@ -73,9 +73,9 @@ const Clubhouse = () => {
           </div>
         </div>
 
-        {/* Floating Horizontal Menu with Glassmorphism */}
-        <div className="flex justify-center pt-16 pb-4">
-          <div className="flex items-center space-x-8 px-6 py-2 rounded-full backdrop-blur-[2px] bg-white/0 supports-[backdrop-filter]:bg-white/0">
+        {/* Floating Horizontal Menu */}
+        <div className="flex justify-center pt-16 pb-2">
+          <div className="flex items-center space-x-8 px-6">
             {menuItems.map((item) => (
               <button
                 key={item.label}
