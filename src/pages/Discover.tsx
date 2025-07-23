@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Header from '@/components/Header';
 import BottomNavigation from '@/components/BottomNavigation';
 import ExploreFilters from '@/components/explore/ExploreFilters';
-import ExploreGrid from '@/components/explore/ExploreGrid';
+import StaggeredGrid from '@/components/explore/StaggeredGrid';
 import DiscoverVerticalFeed from '@/components/discover/DiscoverVerticalFeed';
 import DiscoverTrendingVideos from '@/components/discover/DiscoverTrendingVideos';
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
@@ -110,7 +110,7 @@ const Discover = () => {
         <Header />
         
         <main className="pb-20">
-          {/* Trending Videos Section - Static content that doesn't change with tabs */}
+          {/* Trending Videos Section - Static content with autoplay */}
           <DiscoverTrendingVideos 
             videos={uniqueTrendingContent}
             onVideoClick={handleTrendingVideoClick}
@@ -124,18 +124,14 @@ const Discover = () => {
             />
           </div>
 
-          {/* Main Grid with Container */}
+          {/* Main Staggered Grid */}
           <div className="container">
-            <ExploreGrid 
+            <StaggeredGrid 
               content={uniqueContent}
-              onLike={handleLike}
-              onFollow={handleFollow}
               onMediaClick={handleMediaClick}
               isLoading={loading}
               hasMore={hasMore}
               onLoadMore={loadMore}
-              activeFilter={activeFilter}
-              isDiscoverPage={true}
             />
           </div>
         </main>

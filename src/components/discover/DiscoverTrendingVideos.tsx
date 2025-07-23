@@ -135,7 +135,7 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
                 className="relative bg-muted rounded-lg overflow-hidden cursor-pointer group aspect-[1080/1350]"
                 onClick={() => handleVideoClick(actualIndex)}
               >
-                {/* Media Display */}
+                {/* Media Display with autoplay for first card */}
                 <MediaDisplay
                   media={{
                     id: video.id,
@@ -143,7 +143,7 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
                     media_url: video.src
                   }}
                   itemTitle={video.title}
-                  shouldAutoplay={false}
+                  shouldAutoplay={isFirstCard}
                   isLoading={false}
                   onImageError={() => {}}
                   onImageLoad={() => {}}
@@ -174,6 +174,9 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
                       <p className="text-white text-base font-medium truncate">
                         {video.user?.name || video.user?.username || 'Anonymous'}
                       </p>
+                      {truncateTitle(video.title) && (
+                        <p className="text-white/80 text-sm truncate">{truncateTitle(video.title)}</p>
+                      )}
                     </div>
                   </div>
                 </div>

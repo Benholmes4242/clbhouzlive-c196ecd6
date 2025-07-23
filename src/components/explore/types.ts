@@ -30,6 +30,8 @@ export interface ExploreContentItem {
     media_type: 'video' | 'image';
     media_url: string;
   }[];
+  position?: number; // For staggered grid positioning
+  isAutoplay?: boolean; // For autoplay logic
 }
 
 export interface CTAContentItem {
