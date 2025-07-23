@@ -6,7 +6,7 @@ import ExploreGrid from '@/components/explore/ExploreGrid';
 import DiscoverVerticalFeed from '@/components/discover/DiscoverVerticalFeed';
 import DiscoverTrendingVideos from '@/components/discover/DiscoverTrendingVideos';
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
-import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
+import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed.tsx';
 import { FILTER_TYPES, MEDIA_TYPES } from '@/components/explore/types';
 
 const Discover = () => {
