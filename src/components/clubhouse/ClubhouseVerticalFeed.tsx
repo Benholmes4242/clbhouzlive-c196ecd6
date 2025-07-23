@@ -488,7 +488,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
             >
               {/* Media Content */}
               <div 
-                className="relative w-full h-full flex items-center justify-center"
+                className="relative w-full h-full flex items-center justify-center z-10"
                 // Removed mouse enter/leave handlers that were causing re-renders
               >
                 {currentMedia.media_type === 'video' ? (
