@@ -94,9 +94,6 @@ const Clubhouse = () => {
             </button>
           </div>
         </div>
-
-        {/* Gradient fade */}
-        <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-b from-transparent to-black/20 pointer-events-none" />
       </div>
 
       {/* Main Content - Fullscreen Vertical Feed */}
