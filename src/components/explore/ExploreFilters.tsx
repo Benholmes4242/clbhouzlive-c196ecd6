@@ -90,7 +90,7 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
             key={filter}
             onClick={() => onFilterChange(filter)}
             className={`
-              px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap flex-shrink-0 
+              px-4 py-2 rounded-full text-lg font-medium whitespace-nowrap flex-shrink-0 
               flex items-center transition-colors duration-100 ease-in-out
               focus:outline-none border border-black/25 outline-0
               text-black bg-transparent hover:bg-black/5
