@@ -334,7 +334,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     const scrollTop = scrollViewRef.current.scrollTop;
     const scrollDirection = scrollTop > prevScrollTopRef.current ? 'down' : 'up';
     
-    const itemHeight = window.innerHeight - 64; // Match the calc(100vh - 64px)
+    const itemHeight = window.innerHeight; // Full screen height now
     const newIndex = Math.round(scrollTop / itemHeight);
     
     // Call parent onScroll callback for header visibility - only show when at first post
@@ -369,7 +369,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   const scrollToIndex = (index: number) => {
     if (!scrollViewRef.current) return;
 
-    const itemHeight = window.innerHeight - 64; // Match the calc(100vh - 64px)
+    const itemHeight = window.innerHeight; // Full screen height now
     scrollViewRef.current.scrollTo({
       top: index * itemHeight,
       behavior: 'smooth'
@@ -480,8 +480,8 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
               }}
               className="relative w-full snap-start snap-always flex items-center justify-center"
               style={{ 
-                height: 'calc(100vh - 64px)', // Just the nav bar height (h-16 = 64px)
-                minHeight: 'calc(100vh - 64px)',
+                height: '100vh', // Full screen height now that nav is transparent
+                minHeight: '100vh',
                 scrollSnapAlign: 'start',
                 scrollSnapStop: 'always'
               }}
