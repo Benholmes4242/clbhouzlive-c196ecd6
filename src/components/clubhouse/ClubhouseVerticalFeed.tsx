@@ -557,14 +557,15 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 {/* Caption Text */}
                 {item.title && removeGolfCourseFromContent(item.title) && (
                   <div 
-                    className="text-white text-xl font-medium cursor-default line-clamp-2 ml-0"
+                    className="text-white text-xl font-medium cursor-default line-clamp-2"
                     style={{ 
                       textShadow: '0 1px 3px rgba(0,0,0,0.7)',
                       lineHeight: '1.3',
                       display: '-webkit-box',
                       WebkitLineClamp: 2,
                       WebkitBoxOrient: 'vertical',
-                      overflow: 'hidden'
+                      overflow: 'hidden',
+                      marginLeft: '0px'  // Align with profile photo left edge
                     }}
                   >
                     <span className="text-xl font-medium">
