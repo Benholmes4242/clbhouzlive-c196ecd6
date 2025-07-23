@@ -234,69 +234,85 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     );
   }
 
-  // Check if we should use Discover page layout with 1080x1350 aspect ratio
+  // Function to get aspect ratio for masonry layout
+  const getAspectRatio = (index: number) => {
+    const ratios = [
+      { aspect: 'aspect-square', gridRow: 'row-span-4' }, // 1080x1080
+      { aspect: 'aspect-[4/5]', gridRow: 'row-span-5' },  // 1080x1350
+      { aspect: 'aspect-[9/16]', gridRow: 'row-span-7' }  // 1080x1920
+    ];
+    return ratios[index % ratios.length];
+  };
+
+  // Check if we should use Discover page layout with varied aspect ratios
   if (isDiscoverPage) {
+    const filteredContent = content.filter(item => item.type === 'video' || item.type === 'image');
+    
     return (
       <>
-        {/* Discover Page Layout - 1080x1350 aspect ratio, 3 cards across */}
-        <div className="grid grid-cols-3 gap-0.5">
-          {content.filter(item => item.type === 'video' || item.type === 'image').map((item, index) => (
-            <div
-              key={`discover-${item.id}-${index}`}
-              className="relative bg-muted rounded overflow-hidden cursor-pointer group aspect-[1080/1350]"
-              onClick={() => onMediaClick?.(item)}
-            >
-              {/* Media Display */}
-              <MediaDisplay
-                media={{
-                  id: item.id,
-                  media_type: item.type as 'video' | 'image',
-                  media_url: item.src
-                }}
-                itemTitle={item.title}
-                shouldAutoplay={false}
-                isLoading={false}
-                onImageError={() => {}}
-                onImageLoad={() => {}}
-                itemId={item.id}
-                currentIndex={index}
-                loop={true}
-                hidePlayButton={true}
-              />
-              
-              {/* Overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-              
-              {/* Golf Club Tag */}
-              {item.golfCourse && (
-                <div className="absolute top-3 left-3 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-2 max-w-[70%]">
-                  <MapPin className="w-4 h-4 text-white flex-shrink-0" />
-                  <span className="text-white text-sm font-medium truncate">
-                    {item.golfCourse.name}
-                  </span>
-                </div>
-              )}
-              
-              {/* User info */}
-              <div className="absolute bottom-3 left-3 right-3">
-                <div className="flex items-center gap-2">
-                  <img
-                    src={item.user?.avatar || '/placeholder.svg'}
-                    alt={item.user?.name || 'User'}
-                    className="w-12 h-12 rounded-full object-cover"
-                  />
-                  <div className="min-w-0 flex-1">
-                    <p className="text-white text-base font-medium truncate">
-                      {item.user?.name || item.user?.username || 'Anonymous'}
-                    </p>
-                    {truncateTitle(item.title) && (
-                      <p className="text-white/80 text-sm truncate">{truncateTitle(item.title)}</p>
-                    )}
+        {/* Discover Page Layout - Masonry grid with 3 different aspect ratios */}
+        <div className="grid grid-cols-3 md:grid-cols-4 gap-0.5 auto-rows-[1fr]">
+          {filteredContent.map((item, index) => {
+            const { aspect, gridRow } = getAspectRatio(index);
+            
+            return (
+              <div
+                key={`discover-${item.id}-${index}`}
+                className={`relative bg-muted rounded overflow-hidden cursor-pointer group ${aspect} ${gridRow}`}
+                onClick={() => onMediaClick?.(item)}
+              >
+                {/* Media Display */}
+                <MediaDisplay
+                  media={{
+                    id: item.id,
+                    media_type: item.type as 'video' | 'image',
+                    media_url: item.src
+                  }}
+                  itemTitle={item.title}
+                  shouldAutoplay={false}
+                  isLoading={false}
+                  onImageError={() => {}}
+                  onImageLoad={() => {}}
+                  itemId={item.id}
+                  currentIndex={index}
+                  loop={true}
+                  hidePlayButton={true}
+                />
+                
+                {/* Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                
+                {/* Golf Club Tag */}
+                {item.golfCourse && (
+                  <div className="absolute top-3 left-3 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-2 max-w-[70%]">
+                    <MapPin className="w-4 h-4 text-white flex-shrink-0" />
+                    <span className="text-white text-sm font-medium truncate">
+                      {item.golfCourse.name}
+                    </span>
+                  </div>
+                )}
+                
+                {/* User info */}
+                <div className="absolute bottom-3 left-3 right-3">
+                  <div className="flex items-center gap-2">
+                    <img
+                      src={item.user?.avatar || '/placeholder.svg'}
+                      alt={item.user?.name || 'User'}
+                      className="w-12 h-12 rounded-full object-cover"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-white text-base font-medium truncate">
+                        {item.user?.name || item.user?.username || 'Anonymous'}
+                      </p>
+                      {truncateTitle(item.title) && (
+                        <p className="text-white/80 text-sm truncate">{truncateTitle(item.title)}</p>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
         
         {/* Infinite scroll sentinel */}
