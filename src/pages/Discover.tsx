@@ -17,7 +17,12 @@ const Discover = () => {
     loading, 
     hasMore, 
     loadMore 
-  } = useInfiniteExploreContent(activeFilter);
+  } = useInfiniteExploreContent(activeFilter === FILTER_TYPES.TRENDING ? FILTER_TYPES.FRIENDS : activeFilter);
+  
+  // Get trending content specifically for the trending tab
+  const { 
+    content: trendingContent
+  } = useInfiniteExploreContent(FILTER_TYPES.FRIENDS);
   
   const { 
     isOpen: isFeedOpen, 
@@ -42,9 +47,9 @@ const Discover = () => {
   };
 
   // Apply client-side filtering for non-database filters
-  const filteredContent = content.filter(item => {
+  const filteredContent = (activeFilter === FILTER_TYPES.TRENDING ? trendingContent : content).filter(item => {
     // Friends filtering is handled in the database
-    if (activeFilter === FILTER_TYPES.FRIENDS) {
+    if (activeFilter === FILTER_TYPES.FRIENDS || activeFilter === FILTER_TYPES.TRENDING) {
       return true;
     }
     
