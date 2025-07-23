@@ -565,15 +565,15 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                       WebkitLineClamp: 2,
                       WebkitBoxOrient: 'vertical',
                       overflow: 'hidden',
-                      marginLeft: '0px',  // Always align with profile photo position
+                      marginLeft: '0px',
                       marginTop: '0px',
-                      wordBreak: 'break-word',  // Ensure proper word wrapping
-                      width: 'calc(100% - 80px)', // Account for right margin to prevent single line
-                      maxWidth: '280px' // Force text to wrap to multiple lines
+                      wordBreak: 'break-word',
+                      width: '70vw', // 70% of screen width
+                      maxWidth: '70vw'
                     }}
                   >
                     <span className="text-base font-medium">
-                      {truncateToWords(removeGolfCourseFromContent(item.title), 8)}
+                      {removeGolfCourseFromContent(item.title)}
                     </span>
                   </div>
                 )}
