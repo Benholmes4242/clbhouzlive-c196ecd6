@@ -14,9 +14,9 @@ const Header = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50">
-      <div className="container mx-auto px-4 max-w-full box-border bg-transparent">
-        <div className="flex items-center justify-between h-16 max-w-full">
+    <header className="sticky top-0 z-50" style={{border: '2px solid red', background: 'transparent'}}>
+      <div className="container mx-auto px-4 max-w-full box-border bg-transparent" style={{border: '2px solid blue', background: 'transparent'}}>
+        <div className="flex items-center justify-between h-16 max-w-full" style={{border: '2px solid green', background: 'transparent'}}>
           {/* Logo - Enlarged and optimized positioning */}
           <div className="flex items-center flex-shrink-0 gap-1 md:gap-2 py-1 min-w-0">
             <img
