@@ -9,13 +9,15 @@ interface UserPostMediaProps {
   golfCourse: GolfCourse | null;
   shouldAutoplay: boolean;
   onMediaClick: (mediaUrl: string, mediaType: 'image' | 'video', currentIndex?: number) => void;
+  isClubhouse?: boolean;
 }
 
 export const UserPostMedia: React.FC<UserPostMediaProps> = ({
   media,
   golfCourse,
   shouldAutoplay,
-  onMediaClick
+  onMediaClick,
+  isClubhouse = false
 }) => {
   if (!media || media.length === 0) return null;
 
@@ -31,7 +33,8 @@ export const UserPostMedia: React.FC<UserPostMediaProps> = ({
               country: golfCourse.country,
               region: golfCourse.region
             }}
-            className="m-0"
+            className={isClubhouse ? "m-0" : "m-0"}
+            isClubhouse={isClubhouse}
           />
         </div>
       )}
