@@ -53,7 +53,7 @@ const Clubhouse = () => {
     }}>
       {/* Header with Logo and Floating Menu */}
       <div 
-        className={`absolute top-0 left-0 right-0 z-40 transition-transform duration-300 ease-out backdrop-blur-sm bg-white/0 supports-[backdrop-filter]:bg-white/0 ${
+        className={`absolute top-0 left-0 right-0 z-40 transition-transform duration-300 ease-out bg-white/0 supports-[backdrop-filter]:bg-white/0 ${
           headerVisible ? 'translate-y-0' : '-translate-y-full'
         }`}
       >
