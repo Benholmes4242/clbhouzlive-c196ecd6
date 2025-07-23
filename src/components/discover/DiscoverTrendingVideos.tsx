@@ -192,10 +192,16 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
               >
                 {/* Video Element */}
                 <video
+                  key={`trending-video-${video.id}-${actualIndex}`}
                   ref={(el) => {
                     const videoId = `trending-${video.id}`;
                     if (el) {
                       videoRefs.current.set(videoId, el);
+                      // Auto-play first video when ref is set
+                      if (isFirstCard && el.readyState >= 1) {
+                        el.muted = true;
+                        el.play().catch(() => {});
+                      }
                     } else {
                       videoRefs.current.delete(videoId);
                     }
@@ -206,11 +212,17 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
                   muted
                   playsInline
                   preload="metadata"
-                  onLoadedData={() => {
-                    // If this is the first card and no video is currently active, play it
-                    if (isFirstCard && !activeVideoId) {
-                      playFirstVideo();
+                  onLoadedData={(e) => {
+                    const videoElement = e.currentTarget;
+                    // If this is the first card, play it
+                    if (isFirstCard) {
+                      videoElement.muted = true;
+                      videoElement.play().catch(() => {});
+                      setActiveVideoId(`trending-${video.id}`);
                     }
+                  }}
+                  onError={(e) => {
+                    console.error('Video failed to load:', video.src);
                   }}
                 />
                 
