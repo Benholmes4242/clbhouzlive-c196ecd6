@@ -1,10 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight, MapPin } from 'lucide-react';
 import { HiTrendingUp } from 'react-icons/hi';
 import { useSwipeable } from 'react-swipeable';
 import { ExploreContentItem } from '@/components/explore/types';
-import { useVideoPlaybackManager } from '@/hooks/useVideoPlaybackManager';
-import MediaDisplay from '@/components/explore/MediaDisplay';
 
 interface DiscoverTrendingVideosProps {
   videos: ExploreContentItem[];
@@ -15,6 +13,8 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const [activeButton, setActiveButton] = useState<'left' | 'right' | null>(null);
+  const videoRefs = useRef<Map<string, HTMLVideoElement>>(new Map());
+  const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
   
   // Get first 8 videos for trending
   const trendingVideos = videos.filter(item => item.type === 'video').slice(0, 8);
@@ -48,13 +48,45 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
     return words.slice(0, 5).join(' ') + '...';
   };
   
-  // Video playback manager for the first (main) card
-  const { togglePlayPause, shouldShowPlayIcon } = useVideoPlaybackManager({
-    section: 'trending',
-    videoId: `trending-first-card`,
-    autoplayAllowed: true,
-    priority: 1
-  });
+  // Function to pause all videos except the specified one
+  const pauseAllVideosExcept = (exceptId?: string) => {
+    videoRefs.current.forEach((video, videoId) => {
+      if (videoId !== exceptId && !video.paused) {
+        video.pause();
+      }
+    });
+  };
+
+  // Function to play the first visible video
+  const playFirstVideo = () => {
+    if (trendingVideos.length === 0) return;
+    
+    const firstVideo = trendingVideos[currentIndex];
+    const firstVideoId = `trending-${firstVideo.id}`;
+    const videoElement = videoRefs.current.get(firstVideoId);
+    
+    if (videoElement) {
+      // Pause all other videos first
+      pauseAllVideosExcept(firstVideoId);
+      
+      // Play the first video
+      videoElement.muted = true; // Ensure muted for autoplay
+      videoElement.play().catch(() => {
+        // Autoplay failed, which is normal on some browsers
+      });
+      
+      setActiveVideoId(firstVideoId);
+    }
+  };
+
+  // Effect to handle video playback when currentIndex changes
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      playFirstVideo();
+    }, 100); // Small delay to ensure DOM is updated
+    
+    return () => clearTimeout(timer);
+  }, [currentIndex, trendingVideos.length]);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -124,6 +156,28 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
       </div>
 
       <div className="relative">
+        {/* Navigation arrows for desktop */}
+        {!isMobile && trendingVideos.length > visibleVideos && (
+          <>
+            <button
+              onClick={(e) => handleButtonClick('left', prevVideo, e)}
+              className={`absolute left-2 top-1/2 transform -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-all duration-200 ${
+                activeButton === 'left' ? 'scale-95' : 'hover:scale-105'
+              }`}
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button
+              onClick={(e) => handleButtonClick('right', nextVideo, e)}
+              className={`absolute right-2 top-1/2 transform -translate-y-1/2 z-10 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-all duration-200 ${
+                activeButton === 'right' ? 'scale-95' : 'hover:scale-105'
+              }`}
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </>
+        )}
+
         {/* Grid with 1080x1350 aspect ratio */}
         <div className={`grid gap-1 ${isMobile ? 'grid-cols-2' : 'grid-cols-3'}`} {...(isMobile ? swipeHandlers : {})}>
           {currentVideos.map((video, index) => {
@@ -136,22 +190,28 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
                 className="relative bg-muted rounded-lg overflow-hidden cursor-pointer group aspect-[1080/1350]"
                 onClick={() => handleVideoClick(actualIndex)}
               >
-                {/* Media Display */}
-                <MediaDisplay
-                  media={{
-                    id: video.id,
-                    media_type: 'video',
-                    media_url: video.src
+                {/* Video Element */}
+                <video
+                  ref={(el) => {
+                    const videoId = `trending-${video.id}`;
+                    if (el) {
+                      videoRefs.current.set(videoId, el);
+                    } else {
+                      videoRefs.current.delete(videoId);
+                    }
                   }}
-                  itemTitle={video.title}
-                  shouldAutoplay={isFirstCard}
-                  isLoading={false}
-                  onImageError={() => {}}
-                  onImageLoad={() => {}}
-                  itemId={isFirstCard ? 'trending-first-card' : video.id}
-                  currentIndex={actualIndex}
-                  loop={true}
-                  hidePlayButton={true}
+                  src={video.src}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  loop
+                  muted
+                  playsInline
+                  preload="metadata"
+                  onLoadedData={() => {
+                    // If this is the first card and no video is currently active, play it
+                    if (isFirstCard && !activeVideoId) {
+                      playFirstVideo();
+                    }
+                  }}
                 />
                 
                 {/* Overlay */}
