@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, memo } from 'react';
 import Masonry from 'react-masonry-css';
 import { MapPin } from 'lucide-react';
-import MediaDisplay from './MediaDisplay';
+import MasonryMediaDisplay from './MasonryMediaDisplay';
 import { ExploreContentItem } from './types';
 
 interface MasonryGridProps {
@@ -57,16 +57,19 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
     return words.slice(0, 5).join(' ') + '...';
   };
 
-  // Generate random height for varied card sizes
+  // Generate random height for varied card sizes with more variation
   const getCardHeight = (item: ExploreContentItem, index: number) => {
     // Use item ID for consistent heights
     const seed = item.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
     const random = (seed + index) % 100;
     
-    // Create 3 different height categories
-    if (random < 30) return 'h-48'; // Short cards
-    if (random < 70) return 'h-64'; // Medium cards
-    return 'h-80'; // Tall cards
+    // Create more varied height categories
+    if (random < 20) return 'h-40'; // Extra short
+    if (random < 35) return 'h-52'; // Short
+    if (random < 55) return 'h-64'; // Medium
+    if (random < 75) return 'h-80'; // Tall
+    if (random < 90) return 'h-96'; // Extra tall
+    return 'h-[28rem]'; // Super tall
   };
 
   // Intersection observer for infinite scroll
@@ -121,7 +124,7 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({
               onClick={() => onMediaClick?.(item)}
             >
               {/* Media Display */}
-              <MediaDisplay
+              <MasonryMediaDisplay
                 media={{
                   id: item.id,
                   media_type: item.type as 'video' | 'image',
