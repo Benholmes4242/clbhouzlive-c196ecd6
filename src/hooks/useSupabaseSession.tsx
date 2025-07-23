@@ -13,6 +13,7 @@ export function useSupabaseSession() {
     let mounted = true;
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log('Auth state change:', _event, session?.user?.id);
       if (mounted) {
         setSession(session);
         setUser(session?.user ?? null);
@@ -21,10 +22,16 @@ export function useSupabaseSession() {
     });
 
     // Fetch session on mount
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      console.log('Initial session fetch:', session?.user?.id, error);
       if (mounted) {
         setSession(session);
         setUser(session?.user ?? null);
+        setLoading(false);
+      }
+    }).catch((error) => {
+      console.error('Session fetch error:', error);
+      if (mounted) {
         setLoading(false);
       }
     });
