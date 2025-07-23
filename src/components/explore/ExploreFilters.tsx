@@ -95,10 +95,10 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
               focus:outline-none border-0 outline-0
               ${activeFilter === filter 
                 ? "bg-foreground text-background" 
-                : "bg-secondary/80 text-foreground hover:bg-secondary"
+                : "bg-transparent backdrop-blur-[1px] border border-white/25 text-foreground hover:bg-white/10"
               }
             `}
-            style={{ border: 'none', outline: 'none' }}
+            style={{ border: activeFilter === filter ? 'none' : undefined, outline: 'none' }}
           >
             {getFilterIcon(filter)}
             {filter}
