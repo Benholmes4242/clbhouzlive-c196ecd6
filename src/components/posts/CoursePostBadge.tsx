@@ -27,7 +27,17 @@ const CoursePostBadge = ({ course, className = "", isClubhouse = false }: Course
 
   return (
     <div 
-      className={`flex items-center cursor-pointer bg-transparent backdrop-blur-none border border-white/10 rounded-full px-3 py-1.5 text-white shadow-lg shadow-black/10 ${className}`}
+      className={`
+        relative flex items-center cursor-pointer rounded-2xl px-3 py-1.5 text-white 
+        backdrop-blur-[20px] border border-white/30
+        shadow-[0_4px_30px_rgba(0,0,0,0.1)]
+        bg-white/15 hover:bg-white/20 transition-all duration-200
+        before:absolute before:inset-0 before:rounded-2xl
+        before:bg-gradient-radial before:from-white/10 before:via-transparent before:to-transparent
+        before:from-[circle_at_top_left] before:pointer-events-none
+        dark:bg-black/20 dark:border-white/20 dark:hover:bg-black/30
+        ${className}
+      `}
       onClick={handleCourseClick}
     >
       <MapPin className={`${isClubhouse ? 'h-5 w-5' : 'h-4 w-4'} mr-1.5 text-white`} />
