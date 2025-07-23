@@ -90,12 +90,12 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
             key={filter}
             onClick={() => onFilterChange(filter)}
             className={`
-              px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap flex-shrink-0 
-              flex items-center transition-all duration-200 ease-in-out
+              px-4 py-2.5 rounded-full text-sm font-medium whitespace-nowrap flex-shrink-0 
+              flex items-center transition-all duration-300 ease-out
               focus:outline-none border-0 outline-0
               ${activeFilter === filter 
-                ? "bg-white/40 backdrop-blur-md border border-white/30 text-black shadow-lg" 
-                : "bg-white/20 backdrop-blur-sm border border-white/20 text-black/80 hover:bg-white/30 hover:border-white/40"
+                ? "bg-white/60 backdrop-blur-xl text-black shadow-lg shadow-black/10" 
+                : "bg-white/30 backdrop-blur-md text-black/70 hover:bg-white/50 hover:text-black/90 shadow-sm shadow-black/5"
               }
             `}
             style={{ border: 'none', outline: 'none' }}
