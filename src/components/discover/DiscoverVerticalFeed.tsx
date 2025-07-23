@@ -450,12 +450,12 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
               {item.golfCourse && (
                 <div className="absolute top-6 left-3 z-30">
                   {isMobile ? (
-                    <div className="inline-flex items-center bg-transparent backdrop-blur-md border border-white/10 text-white text-base font-medium px-2 py-1 rounded-full shadow-lg shadow-black/10 whitespace-nowrap">
+                    <div className="inline-flex items-center bg-transparent backdrop-blur-md text-white text-base font-medium px-2 py-1 rounded-full shadow-lg shadow-black/10 whitespace-nowrap">
                       <MapPin className="w-6 h-6 text-white mr-2" />
                       {item.golfCourse.name}
                     </div>
                   ) : (
-                    <div className="inline-flex items-center bg-transparent backdrop-blur-md border border-white/10 text-white text-base font-medium px-1.5 py-0.5 rounded-full shadow-lg shadow-black/10 whitespace-nowrap">
+                    <div className="inline-flex items-center bg-transparent backdrop-blur-md text-white text-base font-medium px-1.5 py-0.5 rounded-full shadow-lg shadow-black/10 whitespace-nowrap">
                       <MapPin className="w-6 h-6 text-white mr-2" />
                       {item.golfCourse.name}
                     </div>
