@@ -47,7 +47,7 @@ const Clubhouse = () => {
   }
 
   return (
-    <div className="h-screen bg-black overflow-hidden relative" style={{
+    <div className="h-screen bg-transparent overflow-hidden relative" style={{
       minHeight: '100dvh',
       paddingTop: 'env(safe-area-inset-top, 0)',
     }}>
