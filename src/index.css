@@ -70,6 +70,7 @@
     --chart-5: 27 87% 67%;
     --media-loading: 0 0% 0%;
     --media-loading-dark: 0 0% 0%;
+    --pill-bg-blue: 220 100% 50%;
   }
 
   .dark {
@@ -98,6 +99,7 @@
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
     --media-loading: 0 0% 0%;
+    --pill-bg-blue: 220 100% 35%;
   }
 }
 
