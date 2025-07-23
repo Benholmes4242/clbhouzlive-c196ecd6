@@ -547,7 +547,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                     {/* Username */}
                     <div className="flex items-center gap-3">
                       <div className="flex flex-col">
-                        <span className="font-semibold text-lg text-white" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
+                        <span className="font-semibold text-xl text-white" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
                           {item.user?.name || 'Unknown User'}
                         </span>
                         {item.user?.username && (
@@ -584,11 +584,11 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 {/* Caption Text */}
                 {item.title && removeGolfCourseFromContent(item.title) && (
                   <div 
-                    className="text-white text-lg font-medium leading-[1.4] cursor-default"
+                    className="text-white text-xl font-medium leading-[1.4] cursor-default"
                     style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
                   >
                     <div className="transition-all duration-300 ease-in-out whitespace-normal">
-                      <span className="text-lg font-medium">
+                      <span className="text-xl font-medium">
                         {/* Show truncated text on mobile, full text on desktop */}
                         {isMobile 
                           ? truncateToWords(removeGolfCourseFromContent(item.title), 12)
