@@ -167,7 +167,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
           {content.filter(item => item.type === 'video' || item.type === 'image').map((item, index) => (
             <div
               key={`friends-${item.id}-${index}`}
-              className="relative bg-muted rounded-3xl overflow-hidden cursor-pointer group aspect-[9/16]"
+              className="relative bg-muted rounded-lg overflow-hidden cursor-pointer group aspect-[9/16]"
               onClick={() => onMediaClick?.(item)}
             >
               {/* Media Display */}
@@ -243,7 +243,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
           {content.filter(item => item.type === 'video' || item.type === 'image').map((item, index) => (
             <div
               key={`discover-${item.id}-${index}`}
-              className="relative bg-muted rounded-3xl overflow-hidden cursor-pointer group aspect-[1080/1350]"
+              className="relative bg-muted overflow-hidden cursor-pointer group aspect-[1080/1350]"
               onClick={() => onMediaClick?.(item)}
             >
               {/* Media Display */}
