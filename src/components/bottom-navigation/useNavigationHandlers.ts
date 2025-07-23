@@ -14,9 +14,6 @@ export const useNavigationHandlers = () => {
       setActiveTab(currentTab.id);
     } else if (location.pathname === '/') {
       setActiveTab('clubhouse'); // Set clubhouse as active when on home page
-    } else {
-      // For any unknown paths, default to clubhouse
-      setActiveTab('clubhouse');
     }
   }, [location.pathname]);
 
