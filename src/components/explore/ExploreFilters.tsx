@@ -74,7 +74,7 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
   };
 
   return (
-    <div className="sticky top-20 z-10 bg-background/95 backdrop-blur-sm pb-4 mb-6">
+    <div className="sticky top-16 z-10 bg-background/95 backdrop-blur-sm pb-2 mb-3">
       <div 
         ref={scrollContainerRef}
         className="flex space-x-2 overflow-x-auto scrollbar-hide transition-transform duration-150 ease-out"
