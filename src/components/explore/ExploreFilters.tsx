@@ -92,13 +92,10 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
             className={`
               px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap flex-shrink-0 
               flex items-center transition-colors duration-100 ease-in-out
-              focus:outline-none border-0 outline-0
-              ${activeFilter === filter 
-                ? "bg-foreground text-background" 
-                : "bg-secondary/80 text-foreground hover:bg-secondary"
-              }
+              focus:outline-none border border-black/25 outline-0
+              text-black bg-transparent hover:bg-black/5
             `}
-            style={{ border: 'none', outline: 'none' }}
+            style={{ outline: 'none' }}
           >
             {getFilterIcon(filter)}
             {filter}
