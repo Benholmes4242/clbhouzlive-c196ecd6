@@ -537,7 +537,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                       <img
                         src={item.user?.avatar || 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face'}
                         alt={item.user?.name || 'User'}
-                        className="w-12 h-12 rounded-full object-cover"
+                        className="w-14 h-14 rounded-full object-cover"
                         onError={(e) => {
                           (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face';
                         }}
