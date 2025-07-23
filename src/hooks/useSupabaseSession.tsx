@@ -11,21 +11,33 @@ export function useSupabaseSession() {
 
   useEffect(() => {
     let mounted = true;
+    console.log('🔒 useSupabaseSession: initializing');
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('🔒 Auth state change:', event, session?.user?.id ? 'user exists' : 'no user');
       if (mounted) {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
+        console.log('🔒 Updated state - loading:', false, 'user:', session?.user?.id || 'none');
       }
     });
 
     // Fetch session on mount
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    console.log('🔒 Fetching initial session...');
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      console.log('🔒 Initial session fetch result:', session?.user?.id ? 'user exists' : 'no user', error ? 'ERROR: ' + error.message : 'no error');
       if (mounted) {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
+        console.log('🔒 Set initial state - loading:', false, 'user:', session?.user?.id || 'none');
+      }
+    }).catch((error) => {
+      console.error('🔒 Session fetch failed:', error);
+      if (mounted) {
+        setLoading(false);
+        console.log('🔒 Set loading false due to error');
       }
     });
 
