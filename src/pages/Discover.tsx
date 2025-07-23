@@ -124,7 +124,7 @@ const Discover = () => {
             />
           </div>
 
-          {/* Main Grid with Container - Using Masonry Layout */}
+          {/* Main Grid with Container */}
           <div className="container">
             <ExploreGrid 
               content={uniqueContent}
@@ -135,7 +135,7 @@ const Discover = () => {
               hasMore={hasMore}
               onLoadMore={loadMore}
               activeFilter={activeFilter}
-              useMasonryLayout={true}
+              isDiscoverPage={true}
             />
           </div>
         </main>
