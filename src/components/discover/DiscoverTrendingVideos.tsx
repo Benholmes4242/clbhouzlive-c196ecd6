@@ -132,7 +132,7 @@ const DiscoverTrendingVideos: React.FC<DiscoverTrendingVideosProps> = ({ videos,
             return (
               <div
                 key={`${video.id}-${actualIndex}`}
-                className="relative bg-muted rounded-lg overflow-hidden cursor-pointer group aspect-[1080/1350]"
+                className="relative bg-muted rounded-3xl overflow-hidden cursor-pointer group aspect-[1080/1350]"
                 onClick={() => handleVideoClick(actualIndex)}
               >
                 {/* Media Display */}
