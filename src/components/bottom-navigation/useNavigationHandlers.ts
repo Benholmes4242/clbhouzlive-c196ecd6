@@ -12,8 +12,8 @@ export const useNavigationHandlers = () => {
     const currentTab = navigationTabs.find(tab => tab.path === location.pathname);
     if (currentTab) {
       setActiveTab(currentTab.id);
-    } else if (location.pathname === '/') {
-      setActiveTab('clubhouse'); // Set clubhouse as active when on home page
+    } else if (location.pathname === '/' || location.pathname === '/clubhouse') {
+      setActiveTab('clubhouse'); // Set clubhouse as active when on home page or clubhouse page
     }
   }, [location.pathname]);
 
