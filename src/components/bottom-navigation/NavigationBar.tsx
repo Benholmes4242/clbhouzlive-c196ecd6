@@ -22,7 +22,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
     <nav 
       className={`fixed bottom-0 left-0 right-0 z-40 ${
         isClubhouse 
-          ? 'bg-white/5 supports-[backdrop-filter]:bg-white/3 border-t border-white/5' 
+          ? 'backdrop-blur-[2px] bg-white/0 supports-[backdrop-filter]:bg-white/0' 
           : 'bg-background'
       }`}
     >
