@@ -545,19 +545,12 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                     </div>
                     
                     {/* Username */}
-                    <div className="flex items-center gap-3">
-                      <div className="flex flex-col">
-                        <span className="font-semibold text-xl text-white" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
-                          {item.user?.name || 'Unknown User'}
-                        </span>
-                        {item.user?.username && (
-                          <span className="text-sm text-white/70" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
-                            @{item.user?.username}
-                          </span>
-                        )}
-                      </div>
-                      {/* Follow button removed - clubhouse only shows posts from followed users */}
-                    </div>
+                     <div className="flex items-center gap-3">
+                       <span className="font-semibold text-xl text-white" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
+                         {item.user?.name || 'Unknown User'}
+                       </span>
+                       {/* Follow button removed - clubhouse only shows posts from followed users */}
+                     </div>
                   </div>
                 )}
 
