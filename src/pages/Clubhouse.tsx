@@ -13,20 +13,11 @@ const Clubhouse = () => {
     isLoadingMore
   } = useInfiniteFollowedPosts();
 
-  const [headerVisible, setHeaderVisible] = useState(true);
   const [activeTab, setActiveTab] = useState('Following');
 
   const handleLike = (contentId: string) => {
     // Handle like functionality
     console.log('Liked post:', contentId);
-  };
-
-  const handleScroll = (scrollDirection: 'up' | 'down') => {
-    if (scrollDirection === 'up') {
-      setHeaderVisible(false);
-    } else if (scrollDirection === 'down') {
-      setHeaderVisible(true);
-    }
   };
 
   const menuItems = [
@@ -53,9 +44,7 @@ const Clubhouse = () => {
     }}>
       {/* Header with Logo and Floating Menu */}
       <div 
-        className={`absolute top-0 left-0 right-0 z-40 transition-transform duration-300 ease-out backdrop-blur-[2px] bg-white/0 supports-[backdrop-filter]:bg-white/0 ${
-          headerVisible ? 'translate-y-0' : '-translate-y-full'
-        }`}
+        className="absolute top-0 left-0 right-0 z-40 backdrop-blur-[2px] bg-white/0 supports-[backdrop-filter]:bg-white/0"
       >
         {/* Logo Mark and Clubhouse Logo */}
         <div className="absolute top-4 left-4">
@@ -103,7 +92,6 @@ const Clubhouse = () => {
         onLoadMore={loadMore}
         hasMore={hasMore}
         isLoadingMore={isLoadingMore}
-        onScroll={handleScroll}
       />
       
       {/* Bottom Navigation */}

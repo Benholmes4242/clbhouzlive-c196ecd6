@@ -20,7 +20,7 @@ interface ClubhouseVerticalFeedProps {
   onLoadMore: () => void;
   hasMore: boolean;
   isLoadingMore: boolean;
-  onScroll?: (scrollDirection: 'up' | 'down') => void;
+  
 }
 
 // VideoWithAutoplay component moved outside to prevent recreation on re-renders
@@ -149,8 +149,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   onLike,
   onLoadMore,
   hasMore,
-  isLoadingMore,
-  onScroll
+  isLoadingMore
 }) => {
   const { user } = useSupabaseSession();
   const isMobile = useIsMobile();
@@ -337,15 +336,6 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     const itemHeight = window.innerHeight; // Full screen height now
     const newIndex = Math.round(scrollTop / itemHeight);
     
-    // Call parent onScroll callback for header visibility - only show when at first post
-    if (onScroll) {
-      // Header should only be visible when at the first post (index 0)
-      if (newIndex === 0) {
-        onScroll('down'); // Show header
-      } else {
-        onScroll('up'); // Hide header
-      }
-    }
     
     prevScrollTopRef.current = scrollTop;
     
@@ -363,7 +353,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
         onLoadMore();
       }
     }
-  }, [currentIndex, posts.length, hasMore, isLoadingMore, onLoadMore, onScroll]);
+  }, [currentIndex, posts.length, hasMore, isLoadingMore, onLoadMore]);
 
   // Scroll to specific index
   const scrollToIndex = (index: number) => {
@@ -522,7 +512,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
 
               {/* Golf Course Tag - Top Left */}
               {item.golfCourse && (
-                <div className={`absolute left-4 z-30 ${index === 0 ? 'top-28' : 'top-4'}`}>
+                <div className="absolute left-4 top-28 z-30">
                   {isMobile ? (
                     <div className="inline-flex items-center bg-white/20 text-white text-xs font-medium px-1.5 py-0.5 rounded-full backdrop-blur-sm whitespace-nowrap">
                       <MapPin className="w-4 h-4 text-white mr-2" />
