@@ -22,12 +22,16 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
     <nav 
       className={`fixed bottom-0 left-0 right-0 z-40 ${
         isClubhouse 
-          ? 'bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-t border-border' 
+          ? '!bg-transparent' 
           : 'bg-background'
       }`}
+      style={isClubhouse ? { 
+        backgroundColor: 'transparent !important',
+        background: 'none !important'
+      } : {}}
     >
-      <div className="w-full px-2">
-        <div className={`flex items-center justify-between h-16 relative`}>
+      <div className={`w-full px-2 ${isClubhouse ? 'bg-transparent' : ''}`}>
+        <div className={`flex items-center justify-between h-16 relative ${isClubhouse ? 'bg-transparent' : ''}`}>
           {navigationTabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
