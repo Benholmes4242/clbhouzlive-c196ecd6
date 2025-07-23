@@ -557,7 +557,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 {/* Caption Text */}
                 {item.title && removeGolfCourseFromContent(item.title) && (
                   <div 
-                    className="text-white text-xl font-medium cursor-default line-clamp-2"
+                    className="text-white text-xl font-medium cursor-default line-clamp-2 ml-0"
                     style={{ 
                       textShadow: '0 1px 3px rgba(0,0,0,0.7)',
                       lineHeight: '1.3',
