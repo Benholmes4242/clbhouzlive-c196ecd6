@@ -556,27 +556,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                           </span>
                         )}
                       </div>
-                      
-                      {/* Follow pill - only show if not own post and user is logged in */}
-                      {user?.id && item.user?.id && user.id !== item.user?.id && (
-                        <button 
-                          onClick={handleFollowToggle}
-                          disabled={followMutation.isPending || isFollowingLoading}
-                          className="flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-full px-2 py-1 hover:bg-white/30 transition-colors disabled:opacity-50"
-                        >
-                          {isFollowing ? (
-                            <>
-                              <UserCheck className="w-4 h-4 text-white" />
-                              <span className="text-white text-sm font-medium">Following</span>
-                            </>
-                          ) : (
-                            <>
-                              <UserPlus className="w-4 h-4 text-white" />
-                              <span className="text-white text-sm font-medium">Follow</span>
-                            </>
-                          )}
-                        </button>
-                      )}
+                      {/* Follow button removed - clubhouse only shows posts from followed users */}
                     </div>
                   </div>
                 )}
