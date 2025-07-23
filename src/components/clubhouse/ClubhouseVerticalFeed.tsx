@@ -514,12 +514,12 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
               {item.golfCourse && (
                 <div className="absolute left-4 top-28 z-30">
                   {isMobile ? (
-                    <div className="inline-flex items-center bg-white/20 text-white text-base font-medium px-3 py-1.5 rounded-full backdrop-blur-sm whitespace-nowrap">
+                    <div className="inline-flex items-center bg-white/20 text-white text-base font-medium px-2 py-1 rounded-full backdrop-blur-sm whitespace-nowrap">
                       <MapPin className="w-6 h-6 text-white mr-2" />
                       {item.golfCourse.name}
                     </div>
                   ) : (
-                    <div className="inline-flex items-center bg-white/20 text-white text-base font-medium px-2 py-1 rounded-full backdrop-blur-sm whitespace-nowrap">
+                    <div className="inline-flex items-center bg-white/20 text-white text-base font-medium px-1.5 py-0.5 rounded-full backdrop-blur-sm whitespace-nowrap">
                       <MapPin className="w-6 h-6 text-white mr-2" />
                       {item.golfCourse.name}
                     </div>
