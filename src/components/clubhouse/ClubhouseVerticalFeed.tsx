@@ -538,7 +538,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
               )}
 
               {/* User Profile and Caption - Bottom Left */}
-              <div className="absolute bottom-8 left-3 right-20 z-20">
+              <div className="absolute bottom-24 left-3 right-20 z-20">
                 {/* User Profile Section */}
                 {index === currentIndex && (
                   <div className="mb-3 flex items-center space-x-3">
