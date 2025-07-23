@@ -109,19 +109,6 @@ const Clubhouse = () => {
         onScroll={handleScroll}
       />
       
-      {/* Footer with Glass Effect - matches header styling */}
-      <footer className="fixed bottom-16 left-0 right-0 z-40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-t border-border">
-        <div className="flex items-center justify-center h-12 px-4">
-          <div className="flex items-center space-x-6 text-sm text-white/70">
-            <span>© 2024 clbhouz</span>
-            <span>•</span>
-            <span>Privacy</span>
-            <span>•</span>
-            <span>Terms</span>
-          </div>
-        </div>
-      </footer>
-      
       {/* Bottom Navigation */}
       <div className="absolute bottom-0 left-0 right-0 z-50 bg-transparent">
         <BottomNavigation variant="clubhouse" />
