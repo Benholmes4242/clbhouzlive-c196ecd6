@@ -557,18 +557,19 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 {/* Caption Text */}
                 {item.title && removeGolfCourseFromContent(item.title) && (
                   <div 
-                    className="text-white text-xl font-medium leading-[1.4] cursor-default"
-                    style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
+                    className="text-white text-xl font-medium cursor-default line-clamp-2"
+                    style={{ 
+                      textShadow: '0 1px 3px rgba(0,0,0,0.7)',
+                      lineHeight: '1.3',
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical',
+                      overflow: 'hidden'
+                    }}
                   >
-                    <div className="transition-all duration-300 ease-in-out whitespace-normal">
-                      <span className="text-xl font-medium">
-                        {/* Show truncated text on mobile, full text on desktop */}
-                        {isMobile 
-                          ? truncateToWords(removeGolfCourseFromContent(item.title), 12)
-                          : removeGolfCourseFromContent(item.title)
-                        }
-                      </span>
-                    </div>
+                    <span className="text-xl font-medium">
+                      {truncateToWords(removeGolfCourseFromContent(item.title), 12)}
+                    </span>
                   </div>
                 )}
 
