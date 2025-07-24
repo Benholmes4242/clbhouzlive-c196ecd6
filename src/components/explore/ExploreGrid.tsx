@@ -444,7 +444,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                         {layoutItem.item.user?.name || layoutItem.item.user?.username || 'Anonymous'}
                       </p>
                       {truncateTitle(layoutItem.item.title) && (
-                        <p className="text-white/80 text-sm max-w-[60%] md:max-w-none line-clamp-2 md:line-clamp-none">
+                        <p className="text-white/80 text-sm max-w-[75%] md:max-w-none line-clamp-2 md:line-clamp-none">
                           {cleanTitleText(layoutItem.item.title)}
                         </p>
                       )}
