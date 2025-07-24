@@ -6,7 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ScrollToTop from '@/components/ScrollToTop';
 import { ThemeProvider } from '@/components/theme-provider';
-import PasswordProtection from "@/components/PasswordProtection";
+import SiteAccessControl from "@/components/SiteAccessControl";
 import ClubhouzLoading from "@/components/ClubhouzLoading";
 import AuthWrapper from "@/components/auth/AuthWrapper";
 import { GlobalAudioProvider } from './contexts/GlobalAudioContext';
@@ -53,7 +53,7 @@ const App: React.FC = () => {
     <ThemeProvider defaultTheme="light" storageKey="clbhouz-ui-theme">
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
-            <PasswordProtection>
+            <SiteAccessControl>
             <BrowserRouter>
               <ScrollToTop />
             <Suspense fallback={<ClubhouzLoading />}>
@@ -95,7 +95,7 @@ const App: React.FC = () => {
               <Toaster />
               <Sonner />
             </BrowserRouter>
-          </PasswordProtection>
+          </SiteAccessControl>
       </TooltipProvider>
     </QueryClientProvider>
     </ThemeProvider>

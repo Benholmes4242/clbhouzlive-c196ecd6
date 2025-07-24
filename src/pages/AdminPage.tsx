@@ -1,35 +1,16 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import Header from "@/components/Header";
 import { useAdmin } from '@/hooks/useAdmin';
-import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import AdminDashboard from '@/components/admin/AdminDashboard';
-import AccessDenied from '@/components/admin/AccessDenied';
-import AdminLoading from '@/components/admin/AdminLoading';
+import AdminRouteProtection from '@/components/admin/AdminRouteProtection';
 
 const AdminPage = () => {
-  const navigate = useNavigate();
-  const { user, loading: sessionLoading } = useSupabaseSession();
   const { 
     users, 
-    loading: adminLoading, 
-    isAdmin, 
-    isLimitedAdmin, 
     userRole,
-    hasAdminAccess,
     assignRole, 
     removeRole 
   } = useAdmin();
-
-  console.log('AdminPage render - user:', !!user, 'sessionLoading:', sessionLoading, 'isAdmin:', isAdmin, 'isLimitedAdmin:', isLimitedAdmin, 'adminLoading:', adminLoading);
-
-  // Don't redirect immediately, wait for session to load
-  React.useEffect(() => {
-    if (!sessionLoading && !user) {
-      console.log('No user found after session loaded, redirecting to auth');
-      navigate('/auth');
-    }
-  }, [user, sessionLoading, navigate]);
 
   const handleRoleChange = async (userId: string, newRole: string) => {
     if (newRole === 'none') {
@@ -43,44 +24,17 @@ const AdminPage = () => {
     }
   };
 
-  // Show loading state while session or admin status is loading
-  if (sessionLoading || adminLoading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <div className="container mx-auto px-4 py-8">
-          <div className="flex items-center justify-center">
-            <div 
-              className="animate-spin rounded-full h-8 w-8 border-b-2"
-              style={{ borderBottomColor: '#6e9277' }}
-            ></div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Show access denied if user has no admin access (neither admin nor limited_admin)
-  if (!hasAdminAccess) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <div className="container mx-auto px-4 py-8">
-          <AccessDenied />
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
-      <AdminDashboard 
-        users={users} 
-        onRoleChange={handleRoleChange}
-        userRole={userRole || 'admin'}
-      />
-    </div>
+    <AdminRouteProtection requiredRole="limited_admin">
+      <div className="min-h-screen bg-background">
+        <Header />
+        <AdminDashboard 
+          users={users} 
+          onRoleChange={handleRoleChange}
+          userRole={userRole || 'admin'}
+        />
+      </div>
+    </AdminRouteProtection>
   );
 };
 
