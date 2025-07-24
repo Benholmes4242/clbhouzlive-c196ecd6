@@ -244,44 +244,143 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     return ratios[index % ratios.length];
   };
 
-  // Check if we should use Discover page layout with square aspect ratios
+  // Check if we should use Discover page layout with large video cards
   if (isDiscoverPage) {
     const filteredContent = content.filter(item => item.type === 'video' || item.type === 'image');
     
+    // Create layout with large video cards every 3rd/4th row
+    const createDiscoverLayout = () => {
+      const layoutItems = [];
+      let contentIndex = 0;
+      let rowCount = 0;
+      
+      while (contentIndex < filteredContent.length) {
+        rowCount++;
+        
+        // Every 3rd row, add a large video card
+        if (rowCount % 3 === 0) {
+          // Find next video for large card
+          let largeCardVideo = null;
+          let largeCardIndex = -1;
+          
+          for (let i = contentIndex; i < filteredContent.length; i++) {
+            if (filteredContent[i].type === 'video') {
+              largeCardVideo = filteredContent[i];
+              largeCardIndex = i;
+              break;
+            }
+          }
+          
+          if (largeCardVideo) {
+            // Add 2 regular cards + 1 large video card for mobile (3 cols)
+            // Add 2 regular cards + 1 large video card for desktop (4 cols)
+            const regularCardsCount = window.innerWidth >= 768 ? 2 : 2; // 2 regular cards on both mobile and desktop
+            
+            // Add regular cards
+            for (let i = 0; i < regularCardsCount && contentIndex < filteredContent.length; i++) {
+              if (contentIndex === largeCardIndex) {
+                contentIndex++; // Skip the video we'll use for large card
+                if (contentIndex < filteredContent.length) {
+                  layoutItems.push({
+                    type: 'regular',
+                    item: filteredContent[contentIndex],
+                    index: contentIndex,
+                    shouldAutoplay: false
+                  });
+                  contentIndex++;
+                }
+              } else {
+                layoutItems.push({
+                  type: 'regular',
+                  item: filteredContent[contentIndex],
+                  index: contentIndex,
+                  shouldAutoplay: false
+                });
+                contentIndex++;
+              }
+            }
+            
+            // Add large video card
+            layoutItems.push({
+              type: 'large',
+              item: largeCardVideo,
+              index: largeCardIndex,
+              shouldAutoplay: true
+            });
+            
+            // Remove the video from remaining content since we used it
+            if (largeCardIndex >= contentIndex) {
+              contentIndex = largeCardIndex + 1;
+            }
+          } else {
+            // No video available, add regular cards
+            const cardsInRow = window.innerWidth >= 768 ? 4 : 3;
+            for (let i = 0; i < cardsInRow && contentIndex < filteredContent.length; i++) {
+              const videoCount = filteredContent.slice(0, contentIndex + 1).filter(item => item.type === 'video').length;
+              const shouldAutoplay = filteredContent[contentIndex].type === 'video' && videoCount % 5 === 1;
+              
+              layoutItems.push({
+                type: 'regular',
+                item: filteredContent[contentIndex],
+                index: contentIndex,
+                shouldAutoplay
+              });
+              contentIndex++;
+            }
+          }
+        } else {
+          // Regular row - add normal cards
+          const cardsInRow = window.innerWidth >= 768 ? 4 : 3;
+          for (let i = 0; i < cardsInRow && contentIndex < filteredContent.length; i++) {
+            const videoCount = filteredContent.slice(0, contentIndex + 1).filter(item => item.type === 'video').length;
+            const shouldAutoplay = filteredContent[contentIndex].type === 'video' && videoCount % 5 === 1;
+            
+            layoutItems.push({
+              type: 'regular',
+              item: filteredContent[contentIndex],
+              index: contentIndex,
+              shouldAutoplay
+            });
+            contentIndex++;
+          }
+        }
+      }
+      
+      return layoutItems;
+    };
+    
+    const layoutItems = createDiscoverLayout();
+    
     return (
       <>
-        {/* Discover Page Layout - Square grid */}
-        <div className="grid grid-cols-3 md:grid-cols-4 gap-0.5">
-          {filteredContent.map((item, index) => {
-            // Calculate video index for autoplay (every 5th video)
-            const videoCount = filteredContent.slice(0, index + 1).filter(i => i.type === 'video').length;
-            const shouldAutoplay = item.type === 'video' && videoCount % 5 === 1;
-            
-            return (
+        {/* Discover Page Layout - Grid with large video cards */}
+        <div className="grid grid-cols-3 md:grid-cols-4 gap-0.5 auto-rows-fr">
+          {layoutItems.map((layoutItem, index) => (
+            layoutItem.type === 'large' ? (
               <div
-                key={`discover-${item.id}-${index}`}
-                className="relative bg-muted rounded overflow-hidden cursor-pointer group aspect-square"
-                onClick={() => onMediaClick?.(item)}
+                key={`discover-large-${layoutItem.item.id}-${index}`}
+                className="col-span-2 row-span-2 relative bg-muted rounded overflow-hidden cursor-pointer group"
+                onClick={() => onMediaClick?.(layoutItem.item)}
               >
                 {/* Shimmer loading placeholder */}
                 <div className="absolute inset-0 bg-gradient-to-r from-muted via-muted/50 to-muted animate-pulse z-0">
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer"></div>
                 </div>
                 
-                {/* Media Display */}
+                {/* Large Video Card - Always Autoplay */}
                 <MediaDisplay
                   media={{
-                    id: item.id,
-                    media_type: item.type as 'video' | 'image',
-                    media_url: item.src
+                    id: layoutItem.item.id,
+                    media_type: layoutItem.item.type as 'video' | 'image',
+                    media_url: layoutItem.item.src
                   }}
-                  itemTitle={item.title}
-                  shouldAutoplay={shouldAutoplay}
+                  itemTitle={layoutItem.item.title}
+                  shouldAutoplay={true}
                   isLoading={false}
                   onImageError={() => {}}
                   onImageLoad={() => {}}
-                  itemId={item.id}
-                  currentIndex={index}
+                  itemId={layoutItem.item.id}
+                  currentIndex={layoutItem.index}
                   loop={true}
                   hidePlayButton={true}
                 />
@@ -290,11 +389,11 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                 
                 {/* Golf Club Tag */}
-                {item.golfCourse && (
+                {layoutItem.item.golfCourse && (
                   <div className="absolute top-3 left-3 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-2 max-w-[70%]">
                     <MapPin className="w-4 h-4 text-white flex-shrink-0" />
                     <span className="text-white text-sm font-medium truncate">
-                      {item.golfCourse.name}
+                      {layoutItem.item.golfCourse.name}
                     </span>
                   </div>
                 )}
@@ -303,23 +402,84 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                 <div className="absolute bottom-3 left-3 right-3">
                   <div className="flex items-center gap-2">
                     <img
-                      src={item.user?.avatar || '/placeholder.svg'}
-                      alt={item.user?.name || 'User'}
+                      src={layoutItem.item.user?.avatar || '/placeholder.svg'}
+                      alt={layoutItem.item.user?.name || 'User'}
                       className="w-12 h-12 rounded-full object-cover"
                     />
                     <div className="min-w-0 flex-1">
                       <p className="text-white text-base font-medium truncate">
-                        {item.user?.name || item.user?.username || 'Anonymous'}
+                        {layoutItem.item.user?.name || layoutItem.item.user?.username || 'Anonymous'}
                       </p>
-                      {truncateTitle(item.title) && (
-                        <p className="text-white/80 text-sm truncate">{truncateTitle(item.title)}</p>
+                      {truncateTitle(layoutItem.item.title) && (
+                        <p className="text-white/80 text-sm truncate">{truncateTitle(layoutItem.item.title)}</p>
                       )}
                     </div>
                   </div>
                 </div>
               </div>
-            );
-          })}
+            ) : (
+              <div
+                key={`discover-regular-${layoutItem.item.id}-${index}`}
+                className="relative bg-muted rounded overflow-hidden cursor-pointer group aspect-square"
+                onClick={() => onMediaClick?.(layoutItem.item)}
+              >
+                {/* Shimmer loading placeholder */}
+                <div className="absolute inset-0 bg-gradient-to-r from-muted via-muted/50 to-muted animate-pulse z-0">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer"></div>
+                </div>
+                
+                {/* Regular Card */}
+                <MediaDisplay
+                  media={{
+                    id: layoutItem.item.id,
+                    media_type: layoutItem.item.type as 'video' | 'image',
+                    media_url: layoutItem.item.src
+                  }}
+                  itemTitle={layoutItem.item.title}
+                  shouldAutoplay={layoutItem.shouldAutoplay}
+                  isLoading={false}
+                  onImageError={() => {}}
+                  onImageLoad={() => {}}
+                  itemId={layoutItem.item.id}
+                  currentIndex={layoutItem.index}
+                  loop={true}
+                  hidePlayButton={true}
+                />
+                
+                {/* Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                
+                {/* Golf Club Tag */}
+                {layoutItem.item.golfCourse && (
+                  <div className="absolute top-3 left-3 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-2 max-w-[70%]">
+                    <MapPin className="w-4 h-4 text-white flex-shrink-0" />
+                    <span className="text-white text-sm font-medium truncate">
+                      {layoutItem.item.golfCourse.name}
+                    </span>
+                  </div>
+                )}
+                
+                {/* User info */}
+                <div className="absolute bottom-3 left-3 right-3">
+                  <div className="flex items-center gap-2">
+                    <img
+                      src={layoutItem.item.user?.avatar || '/placeholder.svg'}
+                      alt={layoutItem.item.user?.name || 'User'}
+                      className="w-12 h-12 rounded-full object-cover"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-white text-base font-medium truncate">
+                        {layoutItem.item.user?.name || layoutItem.item.user?.username || 'Anonymous'}
+                      </p>
+                      {truncateTitle(layoutItem.item.title) && (
+                        <p className="text-white/80 text-sm truncate">{truncateTitle(layoutItem.item.title)}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )
+          ))}
         </div>
         
         {/* Infinite scroll sentinel */}
