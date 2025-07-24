@@ -248,34 +248,39 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
   if (isDiscoverPage) {
     const filteredContent = content.filter(item => item.type === 'video' || item.type === 'image');
     
-    // Create layout with large video cards every 3rd/4th row - no gaps
+    // Create layout with large video cards at specified intervals - no gaps
     const createDiscoverLayout = () => {
       const layoutItems = [];
       let contentIndex = 0;
+      let regularCardCount = 0;
       const isMobileView = window.innerWidth < 768;
       const colsPerRow = isMobileView ? 3 : 4;
+      const largeCardInterval = isMobileView ? 8 : 10; // Mobile: every 8 cards, Desktop: every 10 cards
       
       while (contentIndex < filteredContent.length) {
         const remainingItems = filteredContent.length - contentIndex;
         
-        // Decide if we should place a large card in this row
-        // Only place large card if we have enough content and can find a video
+        // Check if we should place a large card based on regular card count
         let shouldPlaceLargeCard = false;
         let largeCardVideo = null;
         let largeCardIndex = -1;
         
-        // Look for a video in the next few items
-        for (let i = contentIndex; i < Math.min(contentIndex + colsPerRow * 2, filteredContent.length); i++) {
-          if (filteredContent[i].type === 'video') {
-            largeCardVideo = filteredContent[i];
-            largeCardIndex = i;
-            shouldPlaceLargeCard = true;
-            break;
+        // Look for a video in the next few items if we've reached the interval
+        if (regularCardCount >= largeCardInterval && remainingItems >= 3) {
+          for (let i = contentIndex; i < Math.min(contentIndex + colsPerRow * 2, filteredContent.length); i++) {
+            if (filteredContent[i].type === 'video') {
+              largeCardVideo = filteredContent[i];
+              largeCardIndex = i;
+              shouldPlaceLargeCard = true;
+              break;
+            }
           }
         }
         
-        // Only place large card if we have enough remaining items to fill the row properly
-        if (shouldPlaceLargeCard && remainingItems >= colsPerRow) {
+        if (shouldPlaceLargeCard && largeCardVideo) {
+          // Reset counter since we're placing a large card
+          regularCardCount = 0;
+          
           // Place 2 regular cards + 1 large card (takes 2x2 space)
           let regularCardsAdded = 0;
           const targetRegularCards = colsPerRow - 2; // Leave space for 2x2 large card
@@ -299,6 +304,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
               });
               contentIndex++;
               regularCardsAdded++;
+              regularCardCount++; // This will be reset to 0 after large card
             }
           }
           
@@ -309,6 +315,9 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
             index: largeCardIndex,
             shouldAutoplay: true
           });
+          
+          // Reset regular card counter after placing large card
+          regularCardCount = 0;
           
           // Skip the video we used for large card if we haven't passed it yet
           if (largeCardIndex >= contentIndex) {
@@ -329,6 +338,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                 shouldAutoplay
               });
               contentIndex++;
+              regularCardCount++;
             }
           }
         } else {
@@ -345,6 +355,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
               shouldAutoplay
             });
             contentIndex++;
+            regularCardCount++;
           }
         }
       }
