@@ -76,14 +76,6 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     return words.slice(0, 5).join(' ') + '...';
   };
 
-  // Function to truncate title for mobile (4 words max for 2 rows x 2 words)
-  const truncateForMobile = (title: string) => {
-    const cleanedTitle = cleanTitleText(title);
-    if (!cleanedTitle) return '';
-    
-    const words = cleanedTitle.split(' ');
-    return words.slice(0, 4).join(' ');
-  };
   // Temporarily disable autoplay manager to fix loading issues
   // const autoplayManager = useAutoplayManager({ interval: 8, threshold: 0.5 });
   // Intersection observer for infinite scroll
@@ -452,8 +444,8 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                         {layoutItem.item.user?.name || layoutItem.item.user?.username || 'Anonymous'}
                       </p>
                       {truncateTitle(layoutItem.item.title) && (
-                        <p className="text-white/80 text-sm">
-                          {isMobile ? truncateForMobile(layoutItem.item.title) : cleanTitleText(layoutItem.item.title)}
+                        <p className="text-white/80 text-sm max-w-[60%] md:max-w-none line-clamp-2 md:line-clamp-none">
+                          {cleanTitleText(layoutItem.item.title)}
                         </p>
                       )}
                     </div>
