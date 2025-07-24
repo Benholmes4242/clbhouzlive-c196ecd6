@@ -93,7 +93,7 @@ const SiteAccessControl: React.FC<SiteAccessControlProps> = ({ children }) => {
         setHasAccess(true);
         toast({
           title: 'Access Granted',
-          description: 'Welcome to ClbHouz!',
+          description: 'Welcome to clubhouz!',
         });
         
         // Log successful access for security monitoring
@@ -147,7 +147,7 @@ const SiteAccessControl: React.FC<SiteAccessControlProps> = ({ children }) => {
             <div>
               <h2 className="text-xl font-semibold mb-2">Secure Access Required</h2>
               <p className="text-muted-foreground text-center leading-relaxed">
-                Enter your access code to continue to ClbHouz
+                Enter your access code to continue to clubhouz
               </p>
             </div>
             
@@ -170,7 +170,7 @@ const SiteAccessControl: React.FC<SiteAccessControlProps> = ({ children }) => {
               
               <Button 
                 type="submit" 
-                variant="default"
+                variant="outline"
                 className="w-full"
                 disabled={!accessCode.trim() || submitting}
               >
