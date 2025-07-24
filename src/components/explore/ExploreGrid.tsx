@@ -244,16 +244,15 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     return ratios[index % ratios.length];
   };
 
-  // Check if we should use Discover page layout with varied aspect ratios
+  // Check if we should use Discover page layout with square aspect ratios
   if (isDiscoverPage) {
     const filteredContent = content.filter(item => item.type === 'video' || item.type === 'image');
     
     return (
       <>
-        {/* Discover Page Layout - Masonry grid with 3 different aspect ratios */}
-        <div className="grid grid-cols-3 md:grid-cols-4 gap-0.5 auto-rows-[1fr]">
+        {/* Discover Page Layout - Square grid */}
+        <div className="grid grid-cols-3 md:grid-cols-4 gap-0.5">
           {filteredContent.map((item, index) => {
-            const { aspect, gridRow } = getAspectRatio(index);
             // Calculate video index for autoplay (every 5th video)
             const videoCount = filteredContent.slice(0, index + 1).filter(i => i.type === 'video').length;
             const shouldAutoplay = item.type === 'video' && videoCount % 5 === 1;
@@ -261,7 +260,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
             return (
               <div
                 key={`discover-${item.id}-${index}`}
-                className={`relative bg-muted rounded overflow-hidden cursor-pointer group ${aspect} ${gridRow}`}
+                className="relative bg-muted rounded overflow-hidden cursor-pointer group aspect-square"
                 onClick={() => onMediaClick?.(item)}
               >
                 {/* Shimmer loading placeholder */}
