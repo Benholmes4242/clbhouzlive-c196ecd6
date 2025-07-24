@@ -314,22 +314,8 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
               contentIndex = largeCardIndex + 1;
             }
             
-            // Fill the next row with regular cards
-            const nextRowItems = Math.min(colsPerRow, filteredContent.length - contentIndex);
-            for (let i = 0; i < nextRowItems; i++) {
-              if (contentIndex < filteredContent.length) {
-                const videoCount = filteredContent.slice(0, contentIndex + 1).filter(item => item.type === 'video').length;
-                const shouldAutoplay = filteredContent[contentIndex].type === 'video' && videoCount % 5 === 1;
-                
-                layoutItems.push({
-                  type: 'regular',
-                  item: filteredContent[contentIndex],
-                  index: contentIndex,
-                  shouldAutoplay
-                });
-                contentIndex++;
-              }
-            }
+            // The large card spans 2 rows, so increment row count by 1 to account for this
+            rowCount++;
           } else {
             // No video available or not enough content, fill row with regular cards
             const itemsInThisRow = Math.min(colsPerRow, remainingItems);
