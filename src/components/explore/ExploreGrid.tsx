@@ -1,12 +1,13 @@
 
-import React, { memo, useState, useEffect } from 'react';
+import React, { memo, useState, useEffect, useRef, useCallback } from 'react';
 import { MapPin } from 'lucide-react';
 import { HiTrendingUp } from 'react-icons/hi';
 import { ExploreContentItem } from './types';
 import ExploreContentCard from './ExploreContentCard';
 import MediaDisplay from './MediaDisplay';
 import { FILTER_TYPES } from './types';
-// import { useAutoplayManager } from '@/hooks/useAutoplayManager';
+import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
+import { useImagePreloader } from '@/hooks/usePerformanceOptimizations';
 
 interface ExploreGridProps {
   content: ExploreContentItem[];
@@ -234,34 +235,107 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     );
   }
 
-  // Function to get aspect ratio for masonry layout
-  const getAspectRatio = (index: number) => {
-    const ratios = [
-      { aspect: 'aspect-square', gridRow: 'row-span-4' }, // 1080x1080
-      { aspect: 'aspect-[4/5]', gridRow: 'row-span-5' },  // 1080x1350
-      { aspect: 'aspect-[9/16]', gridRow: 'row-span-7' }  // 1080x1920
-    ];
-    return ratios[index % ratios.length];
+  // Smart media preloading for upcoming content
+  const preloadRef = useRef<HTMLDivElement>(null);
+  const [visibleItems, setVisibleItems] = useState<Set<number>>(new Set());
+  
+  // Media preloading URLs for performance
+  const preloadUrls = content
+    .slice(0, Math.min(content.length, 20)) // Preload first 20 items
+    .map(item => item.src)
+    .filter(Boolean);
+  
+  useImagePreloader(preloadUrls);
+
+  // Detect media aspect ratio dynamically
+  const detectAspectRatio = (item: ExploreContentItem, index: number) => {
+    // Every 5th video gets vertical aspect ratio (4:5 or 3:4)
+    if (item.type === 'video' && (index + 1) % 5 === 0) {
+      return { 
+        aspect: 'aspect-[4/5]', 
+        autoplay: true // Every 5th video autoplays
+      };
+    }
+    
+    // First trending video autoplays
+    if (item.type === 'video' && activeFilter === FILTER_TYPES.TRENDING && index === 0) {
+      return { 
+        aspect: 'aspect-square', 
+        autoplay: true 
+      };
+    }
+    
+    // Use horizontal for specific content types (scenic landscapes)
+    if (item.title?.toLowerCase().includes('landscape') || 
+        item.title?.toLowerCase().includes('scenic') ||
+        item.title?.toLowerCase().includes('course')) {
+      return { 
+        aspect: 'aspect-[16/9]', 
+        autoplay: false 
+      };
+    }
+    
+    // Default to square
+    return { 
+      aspect: 'aspect-square', 
+      autoplay: false 
+    };
   };
 
-  // Check if we should use Discover page layout with varied aspect ratios
+  // Intersection observer for smart preloading
+  const { ref: preloadObserverRef, isInView: preloadInView } = useIntersectionObserver({
+    threshold: 0.1,
+    rootMargin: '400px' // Start preloading 400px before viewport
+  });
+
+  // Preload next batch when approaching end
+  useEffect(() => {
+    if (preloadInView && hasMore && !isLoading) {
+      onLoadMore();
+    }
+  }, [preloadInView, hasMore, isLoading, onLoadMore]);
+
+  // Check if we should use Discover page layout with smart responsive grid
   if (isDiscoverPage) {
     const filteredContent = content.filter(item => item.type === 'video' || item.type === 'image');
     
     return (
       <>
-        {/* Discover Page Layout - Masonry grid with 3 different aspect ratios */}
-        <div className="grid grid-cols-3 md:grid-cols-4 gap-0.5 auto-rows-[1fr]">
+        {/* Discover Page Layout - Smart responsive grid */}
+        <div 
+          className={`
+            grid gap-2 
+            ${isMobile 
+              ? 'grid-cols-3' // Mobile: 3 columns (~180-200px each)
+              : 'grid-cols-4' // Desktop: 4 columns (~220-250px each)
+            }
+            auto-rows-max
+          `}
+          style={{
+            gridTemplateColumns: isMobile 
+              ? 'repeat(3, minmax(180px, 1fr))' 
+              : 'repeat(4, minmax(220px, 1fr))'
+          }}
+        >
           {filteredContent.map((item, index) => {
-            const { aspect, gridRow } = getAspectRatio(index);
+            const { aspect, autoplay } = detectAspectRatio(item, index);
             
             return (
               <div
                 key={`discover-${item.id}-${index}`}
-                className={`relative bg-muted rounded overflow-hidden cursor-pointer group ${aspect} ${gridRow}`}
+                className={`
+                  relative bg-muted overflow-hidden cursor-pointer group
+                  ${aspect}
+                  hover:scale-[1.02] transition-transform duration-200
+                `}
                 onClick={() => onMediaClick?.(item)}
+                style={{
+                  // Ensure no gaps/padding/whitespace
+                  padding: 0,
+                  margin: 0,
+                }}
               >
-                {/* Media Display */}
+                {/* Media Display with object-fit: cover */}
                 <MediaDisplay
                   media={{
                     id: item.id,
@@ -269,43 +343,44 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                     media_url: item.src
                   }}
                   itemTitle={item.title}
-                  shouldAutoplay={false}
+                  shouldAutoplay={autoplay}
                   isLoading={false}
                   onImageError={() => {}}
                   onImageLoad={() => {}}
                   itemId={item.id}
                   currentIndex={index}
                   loop={true}
-                  hidePlayButton={true}
+                  muted={true} // Always muted until fullscreen
+                  hidePlayButton={autoplay} // Hide play button on autoplaying videos
                 />
                 
-                {/* Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                {/* Subtle overlay for better text readability */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
                 
-                {/* Golf Club Tag */}
+                {/* Golf Course Tag - Minimal design */}
                 {item.golfCourse && (
-                  <div className="absolute top-3 left-3 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-2 max-w-[70%]">
-                    <MapPin className="w-4 h-4 text-white flex-shrink-0" />
-                    <span className="text-white text-sm font-medium truncate">
+                  <div className="absolute top-2 left-2 bg-black/30 backdrop-blur-sm rounded-full px-2 py-1 flex items-center gap-1">
+                    <MapPin className="w-3 h-3 text-white" />
+                    <span className="text-white text-xs font-medium truncate max-w-[100px]">
                       {item.golfCourse.name}
                     </span>
                   </div>
                 )}
                 
-                {/* User info */}
-                <div className="absolute bottom-3 left-3 right-3">
+                {/* User info - Bottom overlay */}
+                <div className="absolute bottom-2 left-2 right-2">
                   <div className="flex items-center gap-2">
                     <img
                       src={item.user?.avatar || '/placeholder.svg'}
                       alt={item.user?.name || 'User'}
-                      className="w-12 h-12 rounded-full object-cover"
+                      className="w-8 h-8 rounded-full object-cover border border-white/20"
                     />
                     <div className="min-w-0 flex-1">
-                      <p className="text-white text-base font-medium truncate">
+                      <p className="text-white text-sm font-medium truncate">
                         {item.user?.name || item.user?.username || 'Anonymous'}
                       </p>
                       {truncateTitle(item.title) && (
-                        <p className="text-white/80 text-sm truncate">{truncateTitle(item.title)}</p>
+                        <p className="text-white/70 text-xs truncate">{truncateTitle(item.title)}</p>
                       )}
                     </div>
                   </div>
@@ -314,6 +389,12 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
             );
           })}
         </div>
+        
+        {/* Smart preloading trigger */}
+        <div 
+          ref={preloadObserverRef}
+          className="h-1 w-full"
+        />
         
         {/* Infinite scroll sentinel */}
         <div id="scroll-sentinel" className="h-4">
