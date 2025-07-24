@@ -7,6 +7,7 @@ import { ExploreContentItem } from '@/components/explore/types';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
+import CoursePostBadge from '@/components/posts/CoursePostBadge';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
@@ -510,22 +511,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 )}
               </div>
 
-              {/* Golf Course Tag - Top Left */}
-              {item.golfCourse && (
-                <div className="absolute left-3 top-28 z-30">
-                  {isMobile ? (
-                    <div className="inline-flex items-center bg-transparent backdrop-blur-[1px] border border-white/25 text-white text-base font-medium px-2 py-1 rounded-full shadow-lg shadow-black/10 whitespace-nowrap">
-                      <MapPin className="w-6 h-6 text-white mr-2" />
-                      {item.golfCourse.name}
-                    </div>
-                  ) : (
-                    <div className="inline-flex items-center bg-transparent backdrop-blur-[1px] border border-white/25 text-white text-base font-medium px-1.5 py-0.5 rounded-full shadow-lg shadow-black/10 whitespace-nowrap">
-                      <MapPin className="w-6 h-6 text-white mr-2" />
-                      {item.golfCourse.name}
-                    </div>
-                  )}
-                </div>
-              )}
+              {/* Golf Course Tag - REMOVED - Now shown in UserInfoOverlay for clubhouse */}
 
               {/* User Profile and Caption - Bottom Left */}
               <div className="absolute bottom-24 left-3 right-20 z-20">
@@ -544,12 +530,25 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                       />
                     </div>
                     
-                    {/* Username */}
-                     <div className="flex items-center gap-3">
+                     {/* Username and Golf Course */}
+                     <div className="flex flex-col">
                        <span className="font-semibold text-xl text-white" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
                          {item.user?.name || 'Unknown User'}
                        </span>
-                       {/* Follow button removed - clubhouse only shows posts from followed users */}
+                       
+                        {/* Golf Course Badge below username */}
+                        {item.golfCourse && (
+                          <div className="mt-1">
+                            <CoursePostBadge 
+                              course={{
+                                id: item.golfCourse.id,
+                                name: item.golfCourse.name,
+                                country: item.golfCourse.country
+                              }}
+                              isClubhouse={true}
+                            />
+                          </div>
+                        )}
                      </div>
                   </div>
                 )}
