@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -21,11 +21,7 @@ interface CoursePostBadgeProps {
 const CoursePostBadge = ({ course, className = "", isClubhouse = false }: CoursePostBadgeProps) => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-
-  const handleCourseClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    navigate(`/courses/${course.id}`);
-  };
+  const [showFullName, setShowFullName] = useState(false);
 
   // Truncate to 4 words on mobile clubhouse only
   const truncateToFourWords = (text: string) => {
@@ -34,7 +30,24 @@ const CoursePostBadge = ({ course, className = "", isClubhouse = false }: Course
     return words.slice(0, 4).join(' ') + '...';
   };
 
-  const displayName = (isMobile && isClubhouse) ? truncateToFourWords(course.name) : course.name;
+  const shouldTruncate = isMobile && isClubhouse;
+  const isTruncated = shouldTruncate && course.name.split(' ').length > 4;
+  const displayName = (shouldTruncate && !showFullName) ? truncateToFourWords(course.name) : course.name;
+
+  const handleCourseClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    
+    // Mobile behavior: first click shows full name, second click navigates
+    if (isMobile && isClubhouse && isTruncated) {
+      if (!showFullName) {
+        setShowFullName(true);
+        return;
+      }
+    }
+    
+    // Navigate to course page
+    navigate(`/courses/${course.id}`);
+  };
 
   return (
     <div 
