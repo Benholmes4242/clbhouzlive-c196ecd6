@@ -282,17 +282,49 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
           }
           
           if (largeCardVideo && remainingItems >= 3) {
-            // Place 2 regular cards + 1 large card (takes 2x2 space)
+            // Calculate how many regular cards we can fit alongside the large card
+            const regularCardsInRow = colsPerRow - 2; // Large card takes 2 columns
             let regularCardsAdded = 0;
-            const targetRegularCards = colsPerRow - 2; // Leave space for 2x2 large card
             
-            // Add regular cards, skipping the video we'll use for large card
-            while (regularCardsAdded < targetRegularCards && contentIndex < filteredContent.length) {
+            // Add regular cards first, skipping the item we'll use for large card
+            while (regularCardsAdded < regularCardsInRow && contentIndex < filteredContent.length) {
               if (contentIndex === largeCardIndex) {
-                contentIndex++; // Skip the video we'll use for large card
-                continue;
+                contentIndex++; // Skip the item we'll use for large card
+                if (contentIndex >= filteredContent.length) break;
               }
               
+              const videoCount = filteredContent.slice(0, contentIndex + 1).filter(item => item.type === 'video').length;
+              const shouldAutoplay = filteredContent[contentIndex].type === 'video' && videoCount % 5 === 1;
+              
+              layoutItems.push({
+                type: 'regular',
+                item: filteredContent[contentIndex],
+                index: contentIndex,
+                shouldAutoplay
+              });
+              contentIndex++;
+              regularCardsAdded++;
+            }
+            
+            // Add the large card
+            layoutItems.push({
+              type: 'large',
+              item: largeCardVideo,
+              index: largeCardIndex,
+              shouldAutoplay: largeCardVideo.type === 'video' // Only autoplay if it's a video
+            });
+            
+            // Skip the item we used for large card if we haven't passed it yet
+            if (largeCardIndex >= contentIndex) {
+              contentIndex = largeCardIndex + 1;
+            }
+            
+            // The large card spans 2 rows, so increment row count by 1
+            rowCount++;
+            
+            // Add one more row to completely fill the space around the large card
+            const nextRowItems = Math.min(colsPerRow, filteredContent.length - contentIndex);
+            for (let i = 0; i < nextRowItems; i++) {
               if (contentIndex < filteredContent.length) {
                 const videoCount = filteredContent.slice(0, contentIndex + 1).filter(item => item.type === 'video').length;
                 const shouldAutoplay = filteredContent[contentIndex].type === 'video' && videoCount % 5 === 1;
@@ -304,25 +336,8 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                   shouldAutoplay
                 });
                 contentIndex++;
-                regularCardsAdded++;
               }
             }
-            
-            // Add the large video card
-            layoutItems.push({
-              type: 'large',
-              item: largeCardVideo,
-              index: largeCardIndex,
-              shouldAutoplay: true
-            });
-            
-            // Skip the video we used for large card if we haven't passed it yet
-            if (largeCardIndex >= contentIndex) {
-              contentIndex = largeCardIndex + 1;
-            }
-            
-            // The large card spans 2 rows, so increment row count by 1 to account for this
-            rowCount++;
           } else {
             // No video available or not enough content, fill row with regular cards
             const itemsInThisRow = Math.min(colsPerRow, remainingItems);
