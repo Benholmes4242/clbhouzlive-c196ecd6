@@ -15,8 +15,9 @@ export const SecurityHeaders = () => {
       meta.content = content;
     };
 
-    // Content Security Policy recommendations
-    setMetaTag('security-policy', 'Content Security Policy should be configured at server level');
+    // Apply Content Security Policy
+    setMetaTag('http-equiv', 'Content-Security-Policy');
+    setMetaTag('content', RECOMMENDED_CSP);
     
     // Referrer Policy
     setMetaTag('referrer', 'strict-origin-when-cross-origin');
@@ -29,6 +30,12 @@ export const SecurityHeaders = () => {
     
     // X-Frame-Options
     setMetaTag('x-frame-options', 'DENY');
+    
+    // Strict Transport Security (HSTS) - note in meta for reference
+    setMetaTag('security-note', 'HSTS should be configured at server level');
+    
+    // X-XSS-Protection (legacy but still useful)
+    setMetaTag('x-xss-protection', '1; mode=block');
   }, []);
 
   return null;

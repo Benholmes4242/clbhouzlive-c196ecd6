@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import ScrollToTop from '@/components/ScrollToTop';
 import { ThemeProvider } from '@/components/theme-provider';
 import SiteAccessControl from "@/components/SiteAccessControl";
+import { SecurityHeaders } from "@/components/security/SecurityHeaders";
 import ClubhouzLoading from "@/components/ClubhouzLoading";
 import AuthWrapper from "@/components/auth/AuthWrapper";
 import { GlobalAudioProvider } from './contexts/GlobalAudioContext';
@@ -53,7 +54,8 @@ const App: React.FC = () => {
     <ThemeProvider defaultTheme="light" storageKey="clbhouz-ui-theme">
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
-            <SiteAccessControl>
+          <SecurityHeaders />
+          <SiteAccessControl>
             <BrowserRouter>
               <ScrollToTop />
             <Suspense fallback={<ClubhouzLoading />}>
