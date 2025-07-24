@@ -51,16 +51,16 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
                   e.stopPropagation();
                   onTabClick(tab);
                 }}
-                className={`flex items-center justify-center transition-colors relative focus:outline-none min-h-[60px] min-w-[60px] p-3 ${
+                className={`flex items-center justify-center relative focus:outline-none min-h-[60px] min-w-[60px] p-3 ${
                   isClubhouse
                     ? tab.id === 'post'
                       ? '' // Camera icon gets its own styling
                       : tab.id === 'clubhouse'
                         ? 'text-white' // Home icon stays white always on clubhouse
                         : 'text-white hover:text-white/80'
-                    : isActive
-                      ? 'text-black'
-                      : 'text-black/70 hover:text-black'
+                    : tab.id === 'post'
+                      ? '' // Camera icon gets its own styling
+                      : 'text-black'
                 }`}
                 aria-label={tab.label}
               >
