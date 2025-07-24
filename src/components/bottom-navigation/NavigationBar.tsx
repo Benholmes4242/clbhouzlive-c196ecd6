@@ -58,9 +58,9 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
                       : tab.id === 'clubhouse'
                         ? 'text-white' // Home icon stays white always on clubhouse
                         : 'text-white hover:text-white/80'
-                    : isActive
-                      ? 'text-black'
-                      : 'text-black/70 hover:text-black'
+                    : tab.id === 'post'
+                      ? '' // Camera icon gets its own styling
+                      : 'text-black' // All other icons are black with no hover state
                 }`}
                 aria-label={tab.label}
               >
