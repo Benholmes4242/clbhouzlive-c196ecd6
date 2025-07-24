@@ -234,31 +234,63 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     );
   }
 
-  // Function to get aspect ratio for masonry layout
-  const getAspectRatio = (index: number) => {
-    const ratios = [
-      { aspect: 'aspect-square', gridRow: 'row-span-4' }, // 1080x1080
-      { aspect: 'aspect-[4/5]', gridRow: 'row-span-5' },  // 1080x1350
-      { aspect: 'aspect-[9/16]', gridRow: 'row-span-7' }  // 1080x1920
-    ];
-    return ratios[index % ratios.length];
+  // Function to determine card type - only square and vertical (4:5)
+  const getCardType = (index: number) => {
+    // Every 5th video gets vertical format
+    if (index % 5 === 4) {
+      return { aspect: 'aspect-[4/5]', isVertical: true };
+    }
+    // Default to square for all other content
+    return { aspect: 'aspect-square', isVertical: false };
   };
 
-  // Check if we should use Discover page layout with varied aspect ratios
+  // Preload content that's about to come into view
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const img = entry.target as HTMLImageElement | HTMLVideoElement;
+            if (img.tagName === 'IMG') {
+              // Image preloading handled by browser
+            } else if (img.tagName === 'VIDEO') {
+              (img as HTMLVideoElement).preload = 'metadata';
+            }
+          }
+        });
+      },
+      { rootMargin: '200px' } // Preload 200px before entering viewport
+    );
+
+    // Observe all media elements that are about to come into view
+    const mediaElements = document.querySelectorAll('.discover-media');
+    mediaElements.forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, [content]);
+
+  // Check if we should use Discover page layout - clean mosaic grid
   if (isDiscoverPage) {
     const filteredContent = content.filter(item => item.type === 'video' || item.type === 'image');
     
     return (
       <>
-        {/* Discover Page Layout - Masonry grid with 3 different aspect ratios */}
-        <div className="grid grid-cols-3 md:grid-cols-4 gap-0.5 auto-rows-[1fr]">
+        {/* Discover Page Layout - Clean mosaic grid with only square and vertical cards */}
+        <div className="grid grid-cols-3 md:grid-cols-4 gap-2 p-2">
           {filteredContent.map((item, index) => {
-            const { aspect, gridRow } = getAspectRatio(index);
+            const { aspect, isVertical } = getCardType(index);
+            const shouldAutoplay = (index === 0 && activeFilter === 'Trending') || 
+                                 (index % 5 === 4 && item.type === 'video');
             
             return (
               <div
                 key={`discover-${item.id}-${index}`}
-                className={`relative bg-muted rounded overflow-hidden cursor-pointer group ${aspect} ${gridRow}`}
+                className={`relative bg-muted rounded cursor-pointer group overflow-hidden ${aspect}`}
+                style={{ 
+                  width: '100%',
+                  minHeight: isVertical ? '250px' : '200px',
+                  maxHeight: isVertical ? '250px' : '200px'
+                }}
                 onClick={() => onMediaClick?.(item)}
               >
                 {/* Media Display */}
@@ -269,43 +301,46 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                     media_url: item.src
                   }}
                   itemTitle={item.title}
-                  shouldAutoplay={false}
+                  shouldAutoplay={shouldAutoplay}
                   isLoading={false}
                   onImageError={() => {}}
                   onImageLoad={() => {}}
                   itemId={item.id}
                   currentIndex={index}
                   loop={true}
+                  muted={true}
                   hidePlayButton={true}
                 />
                 
                 {/* Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
                 
                 {/* Golf Club Tag */}
                 {item.golfCourse && (
-                  <div className="absolute top-3 left-3 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-2 max-w-[70%]">
-                    <MapPin className="w-4 h-4 text-white flex-shrink-0" />
-                    <span className="text-white text-sm font-medium truncate">
+                  <div className="absolute top-2 left-2 bg-black/50 backdrop-blur-sm rounded-full px-2 py-1 flex items-center gap-1 max-w-[70%]">
+                    <MapPin className="w-3 h-3 text-white flex-shrink-0" />
+                    <span className="text-white text-xs font-medium truncate">
                       {item.golfCourse.name}
                     </span>
                   </div>
                 )}
                 
-                {/* User info */}
-                <div className="absolute bottom-3 left-3 right-3">
+                {/* User info - positioned at bottom */}
+                <div className="absolute bottom-2 left-2 right-2">
                   <div className="flex items-center gap-2">
                     <img
                       src={item.user?.avatar || '/placeholder.svg'}
                       alt={item.user?.name || 'User'}
-                      className="w-12 h-12 rounded-full object-cover"
+                      className="w-8 h-8 rounded-full object-cover border border-white/20"
                     />
                     <div className="min-w-0 flex-1">
-                      <p className="text-white text-base font-medium truncate">
+                      <p className="text-white text-sm font-medium truncate drop-shadow-sm">
                         {item.user?.name || item.user?.username || 'Anonymous'}
                       </p>
                       {truncateTitle(item.title) && (
-                        <p className="text-white/80 text-sm truncate">{truncateTitle(item.title)}</p>
+                        <p className="text-white/80 text-xs truncate drop-shadow-sm">
+                          {truncateTitle(item.title)}
+                        </p>
                       )}
                     </div>
                   </div>
