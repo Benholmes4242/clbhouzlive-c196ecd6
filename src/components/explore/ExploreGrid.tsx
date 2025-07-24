@@ -443,7 +443,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                         {layoutItem.item.user?.name || layoutItem.item.user?.username || 'Anonymous'}
                       </p>
                       {truncateTitle(layoutItem.item.title) && (
-                        <p className="text-white/80 text-sm truncate">{truncateTitle(layoutItem.item.title)}</p>
+                        <p className="text-white/80 text-sm">{cleanTitleText(layoutItem.item.title)}</p>
                       )}
                     </div>
                   </div>
@@ -481,7 +481,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                 {/* Film icon for videos in regular cards */}
                 {layoutItem.item.type === 'video' && (
                   <div className="absolute bottom-2 right-2 z-20">
-                    <FilmIcon className="w-4 h-4 text-white drop-shadow-lg" />
+                    <FilmIcon className="w-5 h-5 text-white drop-shadow-lg" />
                   </div>
                 )}
               </div>
