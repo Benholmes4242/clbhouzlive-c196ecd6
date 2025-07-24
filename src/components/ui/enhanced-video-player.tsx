@@ -18,6 +18,7 @@ interface EnhancedVideoPlayerProps {
   preloadLevel?: 'none' | 'metadata' | 'auto';
   quality?: 'auto' | '240p' | '360p' | '480p' | '720p' | '1080p';
   hideControls?: boolean; // Hide play/pause controls
+  objectFit?: 'cover' | 'contain'; // Add object fit option
 }
 
 declare global {
@@ -40,7 +41,8 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
   adaptiveBitrate = true,
   preloadLevel = 'metadata',
   quality = 'auto',
-  hideControls = false
+  hideControls = false,
+  objectFit = 'cover'
 }, ref) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<any>(null);
@@ -382,7 +384,7 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
         playsInline
         preload="metadata"
         src={src}
-        className="w-full h-full object-cover"
+        className={`w-full h-full ${objectFit === 'contain' ? 'object-contain' : 'object-cover'}`}
         controlsList="nodownload nofullscreen noremoteplayback"
         disablePictureInPicture
       />

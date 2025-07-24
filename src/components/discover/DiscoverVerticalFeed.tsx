@@ -30,7 +30,8 @@ const VideoWithAutoplay: React.FC<{
   src: string;
   muted: boolean;
   className: string;
-}> = React.memo(({ src, muted, className }) => {
+  objectFit?: 'cover' | 'contain';
+}> = React.memo(({ src, muted, className, objectFit = 'cover' }) => {
   const [hasAttemptedPlay, setHasAttemptedPlay] = useState(false);
   const [isInView, setIsInView] = useState(false);
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -140,6 +141,7 @@ const VideoWithAutoplay: React.FC<{
         enableHLS={true}
         preloadLevel="metadata"
         poster=""
+        objectFit={objectFit}
       />
     </div>
   );
@@ -476,6 +478,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                     src={item.src}
                     muted={isGloballyMuted}
                     className="w-full h-full"
+                    objectFit="contain"
                   />
                 ) : (
                   <div className="relative w-full h-full bg-black">
