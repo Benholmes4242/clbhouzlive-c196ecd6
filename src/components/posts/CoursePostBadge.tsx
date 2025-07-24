@@ -55,7 +55,7 @@ const CoursePostBadge = ({ course, className = "", isClubhouse = false }: Course
       onClick={handleCourseClick}
     >
       <MapPin className={`${isClubhouse ? 'h-5 w-5' : 'h-4 w-4'} mr-0.5 text-white`} />
-      <span className="hover:underline text-base font-medium">{displayName}</span>
+      <span className="text-base font-medium">{displayName}</span>
     </div>
   );
 };
