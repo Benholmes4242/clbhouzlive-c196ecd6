@@ -580,7 +580,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
               </div>
 
               {/* Action Buttons - Bottom Right */}
-              <div className="absolute bottom-28 right-4 z-10 flex flex-col space-y-6">
+              <div className="absolute bottom-16 right-4 z-10 flex flex-col space-y-6">
                 {/* Mute/Unmute toggle button - only show for video posts */}
                 {currentMedia.media_type === 'video' && (
                   <button 
