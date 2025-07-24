@@ -24,6 +24,9 @@ interface MediaCardProps {
 }
 
 const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, isFeatured, autoplayManager, videoIndex, ...props }) => {
+  // Early return for CTA cards to avoid hook calls
+  if (item.type === 'cta') return null;
+
   const {
     isPostViewerOpen,
     setIsPostViewerOpen,
@@ -54,8 +57,6 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, isFeature
     autoplayManager,
     videoIndex
   });
-
-  if (item.type === 'cta') return null;
 
   return (
     <>
