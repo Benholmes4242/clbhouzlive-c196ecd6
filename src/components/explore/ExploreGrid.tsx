@@ -415,13 +415,11 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                 {/* Overlay for large cards */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                 
-                {/* Golf Club Tag for large cards - matching clubhouse design */}
+                {/* Golf Club Tag for large cards - matching clubhouse CoursePostBadge design */}
                 {layoutItem.item.golfCourse && (
-                  <div className="absolute top-3 left-3 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-2 max-w-[70%]">
-                    <MapPin className="w-4 h-4 text-white flex-shrink-0" />
-                    <span className="text-white text-sm font-medium truncate">
-                      {layoutItem.item.golfCourse.name}
-                    </span>
+                  <div className="absolute top-3 left-3 flex items-center cursor-pointer bg-transparent backdrop-blur-[1px] border border-white/25 rounded-full px-0.5 py-0 text-white shadow-lg shadow-black/10">
+                    <MapPin className="h-5 w-5 mr-0.5 text-white" />
+                    <span className="text-base font-medium">{layoutItem.item.golfCourse.name}</span>
                   </div>
                 )}
                 
