@@ -7,6 +7,7 @@ import { ExploreContentItem } from '@/components/explore/types';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
+import CoursePostBadge from '@/components/posts/CoursePostBadge';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import { useVideoManager } from '@/contexts/VideoManagerContext';
@@ -446,22 +447,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                 )}
               </div>
 
-              {/* Golf Course Tag - Top Left */}
-              {item.golfCourse && (
-                <div className="absolute top-6 left-3 z-30">
-                  {isMobile ? (
-                    <div className="inline-flex items-center bg-transparent backdrop-blur-[1px] border border-white/25 text-white text-base font-medium px-2 py-1 rounded-full shadow-lg shadow-black/10 whitespace-nowrap">
-                      <MapPin className="w-6 h-6 text-white mr-2" />
-                      {item.golfCourse.name}
-                    </div>
-                  ) : (
-                    <div className="inline-flex items-center bg-transparent backdrop-blur-[1px] border border-white/25 text-white text-base font-medium px-1.5 py-0.5 rounded-full shadow-lg shadow-black/10 whitespace-nowrap">
-                      <MapPin className="w-6 h-6 text-white mr-2" />
-                      {item.golfCourse.name}
-                    </div>
-                  )}
-                </div>
-              )}
+              {/* Golf Course Tag - REMOVED - Now shown below username like clubhouse */}
 
               {/* User Profile and Caption - Bottom Left */}
               <div className="absolute bottom-24 left-3 right-20 z-20">
@@ -480,38 +466,24 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                       />
                     </div>
                     
-                    {/* Username */}
-                    <div className="flex items-center gap-3">
-                      <div className="flex flex-col">
-                        <span className="font-semibold text-base text-white" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
-                          {item.user?.name || 'Unknown User'}
-                        </span>
-                        {item.user?.username && (
-                          <span className="text-sm text-white/70" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
-                            @{item.user?.username}
-                          </span>
-                        )}
-                      </div>
+                    {/* Username and Golf Course */}
+                    <div className="flex flex-col">
+                      <span className="font-semibold text-xl text-white" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
+                        {item.user?.name || 'Unknown User'}
+                      </span>
                       
-                      {/* Follow pill - only show if not own post and user is logged in */}
-                      {user?.id && item.user?.id && user.id !== item.user?.id && (
-                        <button 
-                          onClick={handleFollow}
-                          disabled={isFollowingLoading || followMutation.isPending}
-                          className="flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-full px-2 py-1 hover:bg-white/30 transition-colors disabled:opacity-50"
-                        >
-                          {isFollowing ? (
-                            <>
-                              <UserCheck className="w-4 h-4 text-white" />
-                              <span className="text-white text-sm font-medium">Following</span>
-                            </>
-                          ) : (
-                            <>
-                              <UserPlus className="w-4 h-4 text-white" />
-                              <span className="text-white text-sm font-medium">Follow</span>
-                            </>
-                          )}
-                        </button>
+                      {/* Golf Course Badge below username */}
+                      {item.golfCourse && (
+                        <div className="mt-1">
+                          <CoursePostBadge 
+                            course={{
+                              id: item.golfCourse.id,
+                              name: item.golfCourse.name,
+                              country: item.golfCourse.country
+                            }}
+                            isClubhouse={true}
+                          />
+                        </div>
                       )}
                     </div>
                   </div>
@@ -520,9 +492,10 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                 {/* Caption Text */}
                 {item.title && removeGolfCourseFromContent(item.title) && (
                   <div 
-                    className="text-white text-base font-medium leading-[1.4] cursor-default"
+                    className="text-white text-base font-medium cursor-default"
                     style={{ 
                       textShadow: '0 1px 3px rgba(0,0,0,0.7)',
+                      lineHeight: '1.3',
                       display: '-webkit-box',
                       WebkitLineClamp: 2,
                       WebkitBoxOrient: 'vertical',
@@ -530,7 +503,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                       marginLeft: '0px',
                       marginTop: '0px',
                       wordBreak: 'break-word',
-                      width: '70vw',
+                      width: '70vw', // 70% of screen width
                       maxWidth: '70vw'
                     }}
                   >
@@ -539,6 +512,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                     </span>
                   </div>
                 )}
+
               </div>
 
               {/* Action Buttons - Bottom Right */}
