@@ -359,7 +359,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
             layoutItem.type === 'large' ? (
               <div
                 key={`discover-large-${layoutItem.item.id}-${index}`}
-                className="col-span-2 row-span-2 relative bg-muted rounded overflow-hidden cursor-pointer group"
+                className="col-span-2 row-span-2 relative bg-muted rounded overflow-hidden cursor-pointer group aspect-square"
                 onClick={() => onMediaClick?.(layoutItem.item)}
               >
                 {/* Shimmer loading placeholder */}
