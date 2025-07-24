@@ -410,38 +410,6 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                   loop={true}
                   hidePlayButton={true}
                 />
-                
-                {/* Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                
-                {/* Golf Club Tag */}
-                {layoutItem.item.golfCourse && (
-                  <div className="absolute top-3 left-3 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-2 max-w-[70%]">
-                    <MapPin className="w-4 h-4 text-white flex-shrink-0" />
-                    <span className="text-white text-sm font-medium truncate">
-                      {layoutItem.item.golfCourse.name}
-                    </span>
-                  </div>
-                )}
-                
-                {/* User info */}
-                <div className="absolute bottom-3 left-3 right-3">
-                  <div className="flex items-center gap-2">
-                    <img
-                      src={layoutItem.item.user?.avatar || '/placeholder.svg'}
-                      alt={layoutItem.item.user?.name || 'User'}
-                      className="w-12 h-12 rounded-full object-cover"
-                    />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-white text-base font-medium truncate">
-                        {layoutItem.item.user?.name || layoutItem.item.user?.username || 'Anonymous'}
-                      </p>
-                      {truncateTitle(layoutItem.item.title) && (
-                        <p className="text-white/80 text-sm truncate">{truncateTitle(layoutItem.item.title)}</p>
-                      )}
-                    </div>
-                  </div>
-                </div>
               </div>
             ) : (
               <div
@@ -471,38 +439,6 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                   loop={true}
                   hidePlayButton={true}
                 />
-                
-                {/* Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                
-                {/* Golf Club Tag */}
-                {layoutItem.item.golfCourse && (
-                  <div className="absolute top-3 left-3 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-2 max-w-[70%]">
-                    <MapPin className="w-4 h-4 text-white flex-shrink-0" />
-                    <span className="text-white text-sm font-medium truncate">
-                      {layoutItem.item.golfCourse.name}
-                    </span>
-                  </div>
-                )}
-                
-                {/* User info */}
-                <div className="absolute bottom-3 left-3 right-3">
-                  <div className="flex items-center gap-2">
-                    <img
-                      src={layoutItem.item.user?.avatar || '/placeholder.svg'}
-                      alt={layoutItem.item.user?.name || 'User'}
-                      className="w-12 h-12 rounded-full object-cover"
-                    />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-white text-base font-medium truncate">
-                        {layoutItem.item.user?.name || layoutItem.item.user?.username || 'Anonymous'}
-                      </p>
-                      {truncateTitle(layoutItem.item.title) && (
-                        <p className="text-white/80 text-sm truncate">{truncateTitle(layoutItem.item.title)}</p>
-                      )}
-                    </div>
-                  </div>
-                </div>
               </div>
             )
           ))}
