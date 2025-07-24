@@ -244,23 +244,21 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     return ratios[index % ratios.length];
   };
 
-  // Check if we should use Discover page layout - clean mosaic grid with square cards only
+  // Check if we should use Discover page layout with varied aspect ratios
   if (isDiscoverPage) {
     const filteredContent = content.filter(item => item.type === 'video' || item.type === 'image');
     
     return (
       <>
-        {/* Discover Page Layout - Clean mosaic grid with square cards only */}
-        <div className="grid grid-cols-3 md:grid-cols-4 gap-1 auto-rows-fr">
+        {/* Discover Page Layout - Masonry grid with 3 different aspect ratios */}
+        <div className="grid grid-cols-3 md:grid-cols-4 gap-0.5 auto-rows-[1fr]">
           {filteredContent.map((item, index) => {
-            // Autoplay first card and every 5th video (1, 5, 10, 15, etc.)
-            const shouldAutoplay = item.type === 'video' && (index === 0 || (index + 1) % 5 === 0);
+            const { aspect, gridRow } = getAspectRatio(index);
             
             return (
               <div
                 key={`discover-${item.id}-${index}`}
-                className="relative bg-muted rounded cursor-pointer group aspect-square overflow-hidden"
-                style={{ borderRadius: '4px' }}
+                className={`relative bg-muted rounded overflow-hidden cursor-pointer group ${aspect} ${gridRow}`}
                 onClick={() => onMediaClick?.(item)}
               >
                 {/* Media Display */}
@@ -271,44 +269,43 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                     media_url: item.src
                   }}
                   itemTitle={item.title}
-                  shouldAutoplay={shouldAutoplay}
+                  shouldAutoplay={false}
                   isLoading={false}
                   onImageError={() => {}}
                   onImageLoad={() => {}}
                   itemId={item.id}
                   currentIndex={index}
                   loop={true}
-                  muted={true}
-                  hidePlayButton={!shouldAutoplay}
+                  hidePlayButton={true}
                 />
                 
-                {/* Gradient overlay for better text readability */}
+                {/* Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                 
                 {/* Golf Club Tag */}
                 {item.golfCourse && (
-                  <div className="absolute top-2 left-2 bg-white/20 backdrop-blur-sm rounded-full px-2 py-1 flex items-center gap-1 max-w-[70%]">
-                    <MapPin className="w-3 h-3 text-white flex-shrink-0" />
-                    <span className="text-white text-xs font-medium truncate">
+                  <div className="absolute top-3 left-3 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-2 max-w-[70%]">
+                    <MapPin className="w-4 h-4 text-white flex-shrink-0" />
+                    <span className="text-white text-sm font-medium truncate">
                       {item.golfCourse.name}
                     </span>
                   </div>
                 )}
                 
-                {/* User info - compact for square format */}
-                <div className="absolute bottom-2 left-2 right-2">
+                {/* User info */}
+                <div className="absolute bottom-3 left-3 right-3">
                   <div className="flex items-center gap-2">
                     <img
                       src={item.user?.avatar || '/placeholder.svg'}
                       alt={item.user?.name || 'User'}
-                      className="w-8 h-8 rounded-full object-cover"
+                      className="w-12 h-12 rounded-full object-cover"
                     />
                     <div className="min-w-0 flex-1">
-                      <p className="text-white text-sm font-medium truncate">
+                      <p className="text-white text-base font-medium truncate">
                         {item.user?.name || item.user?.username || 'Anonymous'}
                       </p>
                       {truncateTitle(item.title) && (
-                        <p className="text-white/80 text-xs truncate">{truncateTitle(item.title)}</p>
+                        <p className="text-white/80 text-sm truncate">{truncateTitle(item.title)}</p>
                       )}
                     </div>
                   </div>

@@ -382,7 +382,7 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
         playsInline
         preload="metadata"
         src={src}
-        className="w-full h-full object-contain"
+        className="w-full h-full object-cover"
         controlsList="nodownload nofullscreen noremoteplayback"
         disablePictureInPicture
       />
