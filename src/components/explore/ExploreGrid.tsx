@@ -248,86 +248,92 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
   if (isDiscoverPage) {
     const filteredContent = content.filter(item => item.type === 'video' || item.type === 'image');
     
-    // Create layout with large video cards at specified intervals - no gaps
+    // Create layout with large video cards every third row - no gaps
     const createDiscoverLayout = () => {
       const layoutItems = [];
       let contentIndex = 0;
-      let regularCardCount = 0;
+      let rowCount = 0;
       const isMobileView = window.innerWidth < 768;
       const colsPerRow = isMobileView ? 3 : 4;
-      const largeCardInterval = isMobileView ? 8 : 10; // Mobile: every 8 cards, Desktop: every 10 cards
       
       while (contentIndex < filteredContent.length) {
+        rowCount++;
         const remainingItems = filteredContent.length - contentIndex;
         
-        // Check if we should place a large card based on regular card count
-        let shouldPlaceLargeCard = false;
-        let largeCardVideo = null;
-        let largeCardIndex = -1;
-        
-        // Look for a video in the next few items if we've reached the interval
-        if (regularCardCount >= largeCardInterval && remainingItems >= 3) {
+        // Every third row, try to place a large video card
+        if (rowCount % 3 === 0) {
+          // Look for a video in the upcoming content
+          let largeCardVideo = null;
+          let largeCardIndex = -1;
+          
           for (let i = contentIndex; i < Math.min(contentIndex + colsPerRow * 2, filteredContent.length); i++) {
             if (filteredContent[i].type === 'video') {
               largeCardVideo = filteredContent[i];
               largeCardIndex = i;
-              shouldPlaceLargeCard = true;
               break;
             }
           }
-        }
-        
-        if (shouldPlaceLargeCard && largeCardVideo) {
-          // Reset counter since we're placing a large card
-          regularCardCount = 0;
           
-          // Place 2 regular cards + 1 large card (takes 2x2 space)
-          let regularCardsAdded = 0;
-          const targetRegularCards = colsPerRow - 2; // Leave space for 2x2 large card
-          
-          // Add regular cards, skipping the video we'll use for large card
-          while (regularCardsAdded < targetRegularCards && contentIndex < filteredContent.length) {
-            if (contentIndex === largeCardIndex) {
-              contentIndex++; // Skip the video we'll use for large card
-              continue;
+          if (largeCardVideo && remainingItems >= 3) {
+            // Place 2 regular cards + 1 large card (takes 2x2 space)
+            let regularCardsAdded = 0;
+            const targetRegularCards = colsPerRow - 2; // Leave space for 2x2 large card
+            
+            // Add regular cards, skipping the video we'll use for large card
+            while (regularCardsAdded < targetRegularCards && contentIndex < filteredContent.length) {
+              if (contentIndex === largeCardIndex) {
+                contentIndex++; // Skip the video we'll use for large card
+                continue;
+              }
+              
+              if (contentIndex < filteredContent.length) {
+                const videoCount = filteredContent.slice(0, contentIndex + 1).filter(item => item.type === 'video').length;
+                const shouldAutoplay = filteredContent[contentIndex].type === 'video' && videoCount % 5 === 1;
+                
+                layoutItems.push({
+                  type: 'regular',
+                  item: filteredContent[contentIndex],
+                  index: contentIndex,
+                  shouldAutoplay
+                });
+                contentIndex++;
+                regularCardsAdded++;
+              }
             }
             
-            if (contentIndex < filteredContent.length) {
-              const videoCount = filteredContent.slice(0, contentIndex + 1).filter(item => item.type === 'video').length;
-              const shouldAutoplay = filteredContent[contentIndex].type === 'video' && videoCount % 5 === 1;
-              
-              layoutItems.push({
-                type: 'regular',
-                item: filteredContent[contentIndex],
-                index: contentIndex,
-                shouldAutoplay
-              });
-              contentIndex++;
-              regularCardsAdded++;
-              regularCardCount++; // This will be reset to 0 after large card
+            // Add the large video card
+            layoutItems.push({
+              type: 'large',
+              item: largeCardVideo,
+              index: largeCardIndex,
+              shouldAutoplay: true
+            });
+            
+            // Skip the video we used for large card if we haven't passed it yet
+            if (largeCardIndex >= contentIndex) {
+              contentIndex = largeCardIndex + 1;
             }
-          }
-          
-          // Add the large video card
-          layoutItems.push({
-            type: 'large',
-            item: largeCardVideo,
-            index: largeCardIndex,
-            shouldAutoplay: true
-          });
-          
-          // Reset regular card counter after placing large card
-          regularCardCount = 0;
-          
-          // Skip the video we used for large card if we haven't passed it yet
-          if (largeCardIndex >= contentIndex) {
-            contentIndex = largeCardIndex + 1;
-          }
-          
-          // Fill any remaining space in this "row section" with regular cards
-          const nextRowItems = Math.min(colsPerRow, filteredContent.length - contentIndex);
-          for (let i = 0; i < nextRowItems; i++) {
-            if (contentIndex < filteredContent.length) {
+            
+            // Fill the next row with regular cards
+            const nextRowItems = Math.min(colsPerRow, filteredContent.length - contentIndex);
+            for (let i = 0; i < nextRowItems; i++) {
+              if (contentIndex < filteredContent.length) {
+                const videoCount = filteredContent.slice(0, contentIndex + 1).filter(item => item.type === 'video').length;
+                const shouldAutoplay = filteredContent[contentIndex].type === 'video' && videoCount % 5 === 1;
+                
+                layoutItems.push({
+                  type: 'regular',
+                  item: filteredContent[contentIndex],
+                  index: contentIndex,
+                  shouldAutoplay
+                });
+                contentIndex++;
+              }
+            }
+          } else {
+            // No video available or not enough content, fill row with regular cards
+            const itemsInThisRow = Math.min(colsPerRow, remainingItems);
+            for (let i = 0; i < itemsInThisRow; i++) {
               const videoCount = filteredContent.slice(0, contentIndex + 1).filter(item => item.type === 'video').length;
               const shouldAutoplay = filteredContent[contentIndex].type === 'video' && videoCount % 5 === 1;
               
@@ -338,11 +344,10 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                 shouldAutoplay
               });
               contentIndex++;
-              regularCardCount++;
             }
           }
         } else {
-          // Fill a complete row with regular cards only
+          // Regular row - fill with normal cards
           const itemsInThisRow = Math.min(colsPerRow, remainingItems);
           for (let i = 0; i < itemsInThisRow; i++) {
             const videoCount = filteredContent.slice(0, contentIndex + 1).filter(item => item.type === 'video').length;
@@ -355,7 +360,6 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
               shouldAutoplay
             });
             contentIndex++;
-            regularCardCount++;
           }
         }
       }
