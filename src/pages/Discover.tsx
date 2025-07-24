@@ -147,6 +147,13 @@ const Discover = () => {
           .scrollbar-hide::-webkit-scrollbar {
             display: none;
           }
+          @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+          }
+          .animate-shimmer {
+            animation: shimmer 2s infinite;
+          }
         `}</style>
       </div>
   );

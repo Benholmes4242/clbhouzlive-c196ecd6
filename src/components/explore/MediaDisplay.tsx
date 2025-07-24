@@ -49,7 +49,8 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
                       typeof media.media_url !== 'string';
 
   // Image loading state
-  const [imageLoading, setImageLoading] = useState(false);
+  const [imageLoading, setImageLoading] = useState(true);
+  const [mediaLoaded, setMediaLoaded] = useState(false);
   // Video autoplay transition state
   const [videoTransitioning, setVideoTransitioning] = useState(shouldAutoplay);
   
@@ -129,17 +130,19 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
             onLoad={() => {
               console.log('Image loaded successfully:', media.media_url);
               setImageLoading(false);
+              setMediaLoaded(true);
               onImageLoad();
             }}
             onError={(e) => {
               console.log('Image failed to load:', media.media_url);
               setImageLoading(false);
+              setMediaLoaded(true);
               onImageError();
             }}
             onLoadStart={() => {
               setImageLoading(true);
             }}
-            loading={currentIndex === 0 ? 'eager' : 'lazy'}
+            loading={currentIndex <= 5 ? 'eager' : 'lazy'}
           />
         </div>
       )}

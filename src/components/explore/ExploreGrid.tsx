@@ -254,6 +254,9 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
         <div className="grid grid-cols-3 md:grid-cols-4 gap-0.5 auto-rows-[1fr]">
           {filteredContent.map((item, index) => {
             const { aspect, gridRow } = getAspectRatio(index);
+            // Calculate video index for autoplay (every 5th video)
+            const videoCount = filteredContent.slice(0, index + 1).filter(i => i.type === 'video').length;
+            const shouldAutoplay = item.type === 'video' && videoCount % 5 === 1;
             
             return (
               <div
@@ -261,6 +264,11 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                 className={`relative bg-muted rounded overflow-hidden cursor-pointer group ${aspect} ${gridRow}`}
                 onClick={() => onMediaClick?.(item)}
               >
+                {/* Shimmer loading placeholder */}
+                <div className="absolute inset-0 bg-gradient-to-r from-muted via-muted/50 to-muted animate-pulse z-0">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer"></div>
+                </div>
+                
                 {/* Media Display */}
                 <MediaDisplay
                   media={{
@@ -269,7 +277,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                     media_url: item.src
                   }}
                   itemTitle={item.title}
-                  shouldAutoplay={false}
+                  shouldAutoplay={shouldAutoplay}
                   isLoading={false}
                   onImageError={() => {}}
                   onImageLoad={() => {}}
