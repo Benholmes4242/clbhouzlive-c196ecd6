@@ -33,7 +33,7 @@ export const UserInfoOverlay: React.FC<UserInfoOverlayProps> = ({
   return (
     <div className="absolute top-3 left-3 z-20">
       <div 
-        className="flex flex-col cursor-pointer"
+        className="cursor-pointer"
         onClick={(e) => {
           e.stopPropagation();
           onProfileClick();
@@ -52,28 +52,30 @@ export const UserInfoOverlay: React.FC<UserInfoOverlayProps> = ({
             height={64}
             priority={true}
           />
-          <span 
-            className="text-white text-base font-bold"
-            style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
-          >
-            {displayName}
-          </span>
-        </div>
-        
-        {/* Golf Course Badge - Only show on clubhouse page */}
-        {isClubhouse && golfCourse && (
-          <div className="mt-2 ml-18">
-            <CoursePostBadge 
-              course={{
-                id: golfCourse.id,
-                name: golfCourse.name,
-                country: golfCourse.country,
-                region: golfCourse.region
-              }}
-              isClubhouse={true}
-            />
+          <div className="flex flex-col">
+            <span 
+              className="text-white text-base font-bold"
+              style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
+            >
+              {displayName}
+            </span>
+            
+            {/* Golf Course Badge - Only show on clubhouse page */}
+            {isClubhouse && golfCourse && (
+              <div className="mt-1">
+                <CoursePostBadge 
+                  course={{
+                    id: golfCourse.id,
+                    name: golfCourse.name,
+                    country: golfCourse.country,
+                    region: golfCourse.region
+                  }}
+                  isClubhouse={true}
+                />
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </div>
   );
