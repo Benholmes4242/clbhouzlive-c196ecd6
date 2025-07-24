@@ -262,16 +262,23 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
         
         // Every third row, try to place a large video card
         if (rowCount % 3 === 0) {
-          // Look for a video in the upcoming content
+          // Look for a video in the upcoming content for large card
           let largeCardVideo = null;
           let largeCardIndex = -1;
           
-          for (let i = contentIndex; i < Math.min(contentIndex + colsPerRow * 2, filteredContent.length); i++) {
+          // First try to find a video for the large card
+          for (let i = contentIndex; i < Math.min(contentIndex + colsPerRow * 3, filteredContent.length); i++) {
             if (filteredContent[i].type === 'video') {
               largeCardVideo = filteredContent[i];
               largeCardIndex = i;
               break;
             }
+          }
+          
+          // If no video found, use any content item for large card (image can work too)
+          if (!largeCardVideo && contentIndex < filteredContent.length) {
+            largeCardVideo = filteredContent[contentIndex + Math.min(2, filteredContent.length - contentIndex - 1)];
+            largeCardIndex = contentIndex + Math.min(2, filteredContent.length - contentIndex - 1);
           }
           
           if (largeCardVideo && remainingItems >= 3) {
