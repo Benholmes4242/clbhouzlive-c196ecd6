@@ -197,6 +197,8 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
           user={post.user}
           displayName={displayName}
           onProfileClick={onProfileClick}
+          golfCourse={golfCourse}
+          source="index"
         />
 
         {/* Maximize Button for both Desktop and Mobile */}
