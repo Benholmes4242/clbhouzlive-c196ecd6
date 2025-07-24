@@ -247,6 +247,51 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
     enabled: !!user?.id
   });
 
+  // Like/unlike mutation
+  const likeMutation = useMutation({
+    mutationFn: async ({ postId, action }: { postId: string; action: 'like' | 'unlike' }) => {
+      if (!user?.id) throw new Error('User not authenticated');
+      
+      if (action === 'like') {
+        const { data, error } = await supabase
+          .from('post_likes')
+          .insert({
+            post_id: postId,
+            user_id: user.id
+          })
+          .select()
+          .single();
+        
+        if (error) throw error;
+        return data;
+      } else {
+        const { error } = await supabase
+          .from('post_likes')
+          .delete()
+          .eq('post_id', postId)
+          .eq('user_id', user.id);
+        
+        if (error) throw error;
+        return null;
+      }
+    },
+    onSuccess: (data, variables) => {
+      // Update the liked posts cache
+      queryClient.setQueryData(['user-post-likes', user?.id], (oldData: string[] | undefined) => {
+        if (!oldData) return variables.action === 'like' ? [variables.postId] : [];
+        
+        if (variables.action === 'like') {
+          return [...oldData, variables.postId];
+        } else {
+          return oldData.filter(id => id !== variables.postId);
+        }
+      });
+    },
+    onError: (error) => {
+      console.error('Like/unlike error:', error);
+    }
+  });
+
   // Follow/unfollow mutation
   const followMutation = useMutation({
     mutationFn: async ({ targetUserId, shouldFollow }: { targetUserId: string; shouldFollow: boolean }) => {
@@ -517,50 +562,53 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
 
               {/* Action Buttons - Bottom Right */}
               <div className="absolute bottom-24 right-4 z-10 flex flex-col space-y-6">
-                {/* Mute/Unmute Button */}
-                <button
-                  onClick={toggleGlobalMute}
-                  className="cursor-pointer hover:opacity-100 transition-opacity"
-                  aria-label={isGloballyMuted ? "Unmute" : "Mute"}
-                >
-                  {isGloballyMuted ? (
-                    <SpeakerXMarkIcon className="w-8 h-8 text-white" />
-                  ) : (
-                    <SpeakerWaveIcon className="w-8 h-8 text-white" />
-                  )}
-                </button>
+                {/* Mute/Unmute toggle button - only show for video posts */}
+                {item.type === 'video' && (
+                  <button 
+                    className="cursor-pointer hover:opacity-100 transition-opacity"
+                    onClick={toggleGlobalMute}
+                  >
+                    {isGloballyMuted ? (
+                      <SpeakerXMarkIcon className="w-8 h-8 text-white" />
+                    ) : (
+                      <SpeakerWaveIcon className="w-8 h-8 text-white" />
+                    )}
+                  </button>
+                )}
 
-                {/* Like Button */}
-                <button
-                  onClick={() => handleLike(item.id)}
-                  className="cursor-pointer hover:opacity-100 transition-opacity flex flex-col items-center"
-                  aria-label="Like"
-                >
-                  <HeartIcon 
-                    className={`h-8 w-8 ${likedPosts?.includes(item.id) ? 'text-red-500 fill-red-500' : 'text-white'}`} 
-                  />
+                {/* Heart Button with Like Count */}
+                <div className="flex flex-col items-center">
+                  <button
+                    onClick={() => handleLike(item.id)}
+                    className="cursor-pointer hover:opacity-100 transition-opacity"
+                    disabled={likeMutation.isPending}
+                  >
+                    <HeartIcon 
+                      className={`h-8 w-8 ${likedPosts?.includes(item.id) ? 'text-red-500 fill-red-500' : 'text-white'}`} 
+                    />
+                  </button>
                   <span className="text-white text-sm font-medium mt-1" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
                     {Math.floor(Math.random() * 1000) + 10}
                   </span>
-                </button>
+                </div>
 
-                {/* Comment Button */}
-                <button
-                  onClick={() => handleComment(item.id)}
-                  className="cursor-pointer hover:opacity-100 transition-opacity flex flex-col items-center"
-                  aria-label="Comment"
-                >
-                  <ChatBubbleOvalLeftEllipsisIcon className="h-8 w-8 text-white" />
+                {/* Message Button with Comment Count */}
+                <div className="flex flex-col items-center">
+                  <button
+                    onClick={() => handleComment(item.id)}
+                    className="cursor-pointer hover:opacity-100 transition-opacity"
+                  >
+                    <ChatBubbleOvalLeftEllipsisIcon className="h-8 w-8 text-white" />
+                  </button>
                   <span className="text-white text-sm font-medium mt-1" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
                     {Math.floor(Math.random() * 50) + 5}
                   </span>
-                </button>
+                </div>
 
                 {/* Share Button */}
                 <button
                   onClick={handleShare}
                   className="cursor-pointer hover:opacity-100 transition-opacity"
-                  aria-label="Share"
                 >
                   <PaperAirplaneIcon className="h-8 w-8 text-white" />
                 </button>
