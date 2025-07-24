@@ -84,7 +84,7 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
   }, [shouldAutoplay, media.media_type, media.id]);
 
   return (
-    <div className="relative w-full h-full overflow-hidden bg-muted">
+    <div className="absolute inset-0 overflow-hidden bg-muted">
       {/* Loading Skeleton - only show for images */}
       {(media.media_type === 'image' && (isLoading || imageLoading)) && (
         <div className="absolute inset-0 bg-muted/20 flex items-center justify-center z-10">
@@ -93,7 +93,7 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
       )}
       
       {media.media_type === 'video' && !isInvalidSrc ? (
-        <div className="relative w-full h-full">
+        <div className="absolute inset-0">
           {shouldAutoplay && (
             // Smooth loading overlay for video transition
             videoTransitioning && (
@@ -107,7 +107,7 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
             autoplay={shouldAutoplay}
             muted={muted}
             loop={loop}
-            className="w-full h-full pointer-events-none"
+            className="absolute inset-0 w-full h-full object-cover pointer-events-none"
             preloadLevel="metadata"
             enableHLS={true}
             quality="auto"
@@ -121,11 +121,11 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
           )}
         </div>
       ) : (
-        <div className="relative w-full h-full">
+        <div className="absolute inset-0">
           <img
             src={isInvalidSrc ? fallbackImage : media.media_url}
             alt={itemTitle || 'Content'}
-            className="w-full h-full object-cover"
+            className="absolute inset-0 w-full h-full object-cover"
             onLoad={() => {
               console.log('Image loaded successfully:', media.media_url);
               setImageLoading(false);
