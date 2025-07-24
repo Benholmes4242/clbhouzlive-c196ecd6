@@ -19,18 +19,12 @@ interface CaptionOverlayProps {
   content: string | null;
   postTags: PostTag[];
   truncatedContent: string;
-  golfCourse?: GolfCourse | null;
-  showFullCourseTag?: boolean;
-  onCourseTagClick?: (e: React.MouseEvent) => void;
 }
 
 export const CaptionOverlay: React.FC<CaptionOverlayProps> = ({
   content,
   postTags,
-  truncatedContent,
-  golfCourse,
-  showFullCourseTag = false,
-  onCourseTagClick
+  truncatedContent
 }) => {
   const cleanContent = removeGolfCourseFromContent(content);
   const isMobile = useIsMobile();
