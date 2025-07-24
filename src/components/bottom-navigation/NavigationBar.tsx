@@ -53,9 +53,9 @@ const NavigationBar: React.FC<NavigationBarProps> = ({ activeTab, onTabClick, va
                 }}
                 className={`flex items-center justify-center transition-colors relative focus:outline-none min-h-[60px] min-w-[60px] p-3 ${
                   isClubhouse
-                    ? isActive
-                      ? 'text-white'
-                      : 'text-white/70 hover:text-white'
+                    ? tab.id === 'post'
+                      ? '' // Camera icon gets its own styling
+                      : 'text-white hover:text-white/80'
                     : isActive
                       ? 'text-black'
                       : 'text-black/70 hover:text-black'
