@@ -1,13 +1,12 @@
 
-import React, { memo, useState, useEffect, useRef, useCallback } from 'react';
+import React, { memo, useState, useEffect } from 'react';
 import { MapPin } from 'lucide-react';
 import { HiTrendingUp } from 'react-icons/hi';
 import { ExploreContentItem } from './types';
 import ExploreContentCard from './ExploreContentCard';
 import MediaDisplay from './MediaDisplay';
 import { FILTER_TYPES } from './types';
-import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
-import { useImagePreloader } from '@/hooks/usePerformanceOptimizations';
+// import { useAutoplayManager } from '@/hooks/useAutoplayManager';
 
 interface ExploreGridProps {
   content: ExploreContentItem[];
@@ -235,116 +234,34 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     );
   }
 
-  // Smart media preloading for upcoming content
-  const preloadRef = useRef<HTMLDivElement>(null);
-  const [visibleItems, setVisibleItems] = useState<Set<number>>(new Set());
-  
-  // Media preloading URLs for performance
-  const preloadUrls = content
-    .slice(0, Math.min(content.length, 20)) // Preload first 20 items
-    .map(item => item.src)
-    .filter(Boolean);
-  
-  useImagePreloader(preloadUrls);
-
-  // Intersection observer for smart preloading
-  const { ref: preloadObserverRef, isInView: preloadInView } = useIntersectionObserver({
-    threshold: 0.1,
-    rootMargin: '400px' // Start preloading 400px before viewport
-  });
-
-  // Preload next batch when approaching end
-  useEffect(() => {
-    if (preloadInView && hasMore && !isLoading) {
-      onLoadMore();
-    }
-  }, [preloadInView, hasMore, isLoading, onLoadMore]);
-
-  // Detect media aspect ratio with standardized card sizes
-  const getCardLayout = (item: ExploreContentItem, index: number) => {
-    // Every 5th video gets vertical aspect ratio (4:5) - 200px × 250px
-    if (item.type === 'video' && (index + 1) % 5 === 0) {
-      return { 
-        containerClass: 'aspect-[4/5]', // 200px × 250px vertical
-        autoplay: true,
-        cardType: 'vertical'
-      };
-    }
-    
-    // First trending video autoplays (square)
-    if (item.type === 'video' && activeFilter === FILTER_TYPES.TRENDING && index === 0) {
-      return { 
-        containerClass: 'aspect-square', // 200px × 200px square
-        autoplay: true,
-        cardType: 'square'
-      };
-    }
-    
-    // Horizontal for specific landscape content (16:9 or 4:3) - 200px × 150px max
-    if (item.title?.toLowerCase().includes('landscape') || 
-        item.title?.toLowerCase().includes('scenic') ||
-        item.title?.toLowerCase().includes('course view') ||
-        item.title?.toLowerCase().includes('golf course')) {
-      return { 
-        containerClass: 'aspect-[4/3]', // 200px × 150px horizontal 
-        autoplay: false,
-        cardType: 'horizontal'
-      };
-    }
-    
-    // Default to square - 200px × 200px
-    return { 
-      containerClass: 'aspect-square',
-      autoplay: false,
-      cardType: 'square'
-    };
+  // Function to get aspect ratio for masonry layout
+  const getAspectRatio = (index: number) => {
+    const ratios = [
+      { aspect: 'aspect-square', gridRow: 'row-span-4' }, // 1080x1080
+      { aspect: 'aspect-[4/5]', gridRow: 'row-span-5' },  // 1080x1350
+      { aspect: 'aspect-[9/16]', gridRow: 'row-span-7' }  // 1080x1920
+    ];
+    return ratios[index % ratios.length];
   };
 
-  // Check if we should use Discover page layout with standardized card sizes
+  // Check if we should use Discover page layout with varied aspect ratios
   if (isDiscoverPage) {
     const filteredContent = content.filter(item => item.type === 'video' || item.type === 'image');
     
     return (
       <>
-        {/* Discover Page Layout - Standardized 3-card system */}
-        <div 
-          className={`
-            grid gap-2
-            ${isMobile 
-              ? 'grid-cols-3' // Mobile: 3 columns
-              : 'grid-cols-4' // Desktop: 4 columns  
-            }
-          `}
-          style={{
-            // Ensure consistent card sizing across breakpoints
-            gridTemplateColumns: isMobile 
-              ? 'repeat(3, 1fr)' // Equal width columns on mobile
-              : 'repeat(4, 1fr)' // Equal width columns on desktop
-          }}
-        >
+        {/* Discover Page Layout - Masonry grid with 3 different aspect ratios */}
+        <div className="grid grid-cols-3 md:grid-cols-4 gap-0.5 auto-rows-[1fr]">
           {filteredContent.map((item, index) => {
-            const { containerClass, autoplay, cardType } = getCardLayout(item, index);
+            const { aspect, gridRow } = getAspectRatio(index);
             
             return (
               <div
                 key={`discover-${item.id}-${index}`}
-                className={`
-                  relative bg-muted overflow-hidden cursor-pointer group
-                  ${containerClass}
-                  rounded
-                  hover:scale-[1.02] transition-transform duration-200
-                  w-full
-                `}
+                className={`relative bg-muted rounded overflow-hidden cursor-pointer group ${aspect} ${gridRow}`}
                 onClick={() => onMediaClick?.(item)}
-                style={{
-                  // Fixed container dimensions to prevent layout shift
-                  minHeight: cardType === 'vertical' ? '250px' : 
-                            cardType === 'horizontal' ? '150px' : '200px',
-                  maxHeight: cardType === 'vertical' ? '250px' : 
-                            cardType === 'horizontal' ? '150px' : '200px'
-                }}
               >
-                {/* Media Display with object-fit: cover to fill container */}
+                {/* Media Display */}
                 <MediaDisplay
                   media={{
                     id: item.id,
@@ -352,44 +269,43 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                     media_url: item.src
                   }}
                   itemTitle={item.title}
-                  shouldAutoplay={autoplay}
+                  shouldAutoplay={false}
                   isLoading={false}
                   onImageError={() => {}}
                   onImageLoad={() => {}}
                   itemId={item.id}
                   currentIndex={index}
                   loop={true}
-                  muted={true} // Always muted until fullscreen
-                  hidePlayButton={autoplay} // Hide play button on autoplaying videos
+                  hidePlayButton={true}
                 />
                 
-                {/* Subtle overlay for better text readability */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+                {/* Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                 
-                {/* Golf Course Tag - Minimal design */}
+                {/* Golf Club Tag */}
                 {item.golfCourse && (
-                  <div className="absolute top-2 left-2 bg-black/40 backdrop-blur-sm rounded px-2 py-1 flex items-center gap-1">
-                    <MapPin className="w-3 h-3 text-white" />
-                    <span className="text-white text-xs font-medium truncate max-w-[80px]">
+                  <div className="absolute top-3 left-3 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-2 max-w-[70%]">
+                    <MapPin className="w-4 h-4 text-white flex-shrink-0" />
+                    <span className="text-white text-sm font-medium truncate">
                       {item.golfCourse.name}
                     </span>
                   </div>
                 )}
                 
-                {/* User info - Bottom overlay with consistent positioning */}
-                <div className="absolute bottom-2 left-2 right-2">
+                {/* User info */}
+                <div className="absolute bottom-3 left-3 right-3">
                   <div className="flex items-center gap-2">
                     <img
                       src={item.user?.avatar || '/placeholder.svg'}
                       alt={item.user?.name || 'User'}
-                      className="w-7 h-7 rounded-full object-cover border border-white/20 flex-shrink-0"
+                      className="w-12 h-12 rounded-full object-cover"
                     />
                     <div className="min-w-0 flex-1">
-                      <p className="text-white text-xs font-medium truncate leading-tight">
+                      <p className="text-white text-base font-medium truncate">
                         {item.user?.name || item.user?.username || 'Anonymous'}
                       </p>
                       {truncateTitle(item.title) && (
-                        <p className="text-white/70 text-xs truncate leading-tight">{truncateTitle(item.title)}</p>
+                        <p className="text-white/80 text-sm truncate">{truncateTitle(item.title)}</p>
                       )}
                     </div>
                   </div>
@@ -398,12 +314,6 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
             );
           })}
         </div>
-        
-        {/* Smart preloading trigger */}
-        <div 
-          ref={preloadObserverRef}
-          className="h-1 w-full"
-        />
         
         {/* Infinite scroll sentinel */}
         <div id="scroll-sentinel" className="h-4">
