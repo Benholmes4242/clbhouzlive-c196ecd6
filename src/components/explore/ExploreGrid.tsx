@@ -76,6 +76,32 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
   };
   // Temporarily disable autoplay manager to fix loading issues
   // const autoplayManager = useAutoplayManager({ interval: 8, threshold: 0.5 });
+  
+  // Preload content that's about to come into view
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const img = entry.target as HTMLImageElement | HTMLVideoElement;
+            if (img.tagName === 'IMG') {
+              // Image preloading handled by browser
+            } else if (img.tagName === 'VIDEO') {
+              (img as HTMLVideoElement).preload = 'metadata';
+            }
+          }
+        });
+      },
+      { rootMargin: '200px' } // Preload 200px before entering viewport
+    );
+
+    // Observe all media elements that are about to come into view
+    const mediaElements = document.querySelectorAll('.discover-media');
+    mediaElements.forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, [content]);
+  
   // Intersection observer for infinite scroll
   React.useEffect(() => {
     const observer = new IntersectionObserver(
@@ -244,30 +270,6 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     return { aspect: 'aspect-square', isVertical: false };
   };
 
-  // Preload content that's about to come into view
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const img = entry.target as HTMLImageElement | HTMLVideoElement;
-            if (img.tagName === 'IMG') {
-              // Image preloading handled by browser
-            } else if (img.tagName === 'VIDEO') {
-              (img as HTMLVideoElement).preload = 'metadata';
-            }
-          }
-        });
-      },
-      { rootMargin: '200px' } // Preload 200px before entering viewport
-    );
-
-    // Observe all media elements that are about to come into view
-    const mediaElements = document.querySelectorAll('.discover-media');
-    mediaElements.forEach((el) => observer.observe(el));
-
-    return () => observer.disconnect();
-  }, [content]);
 
   // Check if we should use Discover page layout - clean mosaic grid
   if (isDiscoverPage) {
