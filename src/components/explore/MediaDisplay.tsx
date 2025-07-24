@@ -53,9 +53,6 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
   const [mediaLoaded, setMediaLoaded] = useState(false);
   // Video autoplay transition state
   const [videoTransitioning, setVideoTransitioning] = useState(shouldAutoplay);
-  
-  // Debug log the media URL and autoplay
-  console.log('MediaDisplay - URL:', media.media_url, 'Type:', media.media_type, 'Invalid:', isInvalidSrc, 'ShouldAutoplay:', shouldAutoplay);
 
   // Generate thumbnail URL for Cloudflare Stream videos
   const getVideoThumbnail = (videoUrl: string) => {
@@ -76,8 +73,8 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
   React.useEffect(() => {
     if (shouldAutoplay && media.media_type === 'video') {
       setVideoTransitioning(true);
-      // Shorter timeout to reduce loading flicker
-      const timer = setTimeout(() => setVideoTransitioning(false), 400);
+      // Reduced timeout for faster loading
+      const timer = setTimeout(() => setVideoTransitioning(false), 200);
       return () => clearTimeout(timer);
     } else {
       setVideoTransitioning(false);
@@ -128,13 +125,11 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
             alt={itemTitle || 'Content'}
             className="w-full h-full object-cover"
             onLoad={() => {
-              console.log('Image loaded successfully:', media.media_url);
               setImageLoading(false);
               setMediaLoaded(true);
               onImageLoad();
             }}
             onError={(e) => {
-              console.log('Image failed to load:', media.media_url);
               setImageLoading(false);
               setMediaLoaded(true);
               onImageError();

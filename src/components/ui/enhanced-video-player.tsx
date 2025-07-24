@@ -69,7 +69,6 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
     if (isMobile) {
       // On mobile, only load when actually in view
       if (isInView && !shouldLoadVideo) {
-        console.log('📱 Mobile: Video entering view, start loading', { src: src.slice(-20) });
         setShouldLoadVideo(true);
       }
     } else {
@@ -97,10 +96,8 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
   }, [shouldLoadVideo, enableHLS]);
   
   const initializeVideo = () => {
-    console.log('🎬 EnhancedVideoPlayer: Initializing video', { src, enableHLS });
     const video = videoRef.current;
     if (!video) {
-      console.log('❌ EnhancedVideoPlayer: No video ref found');
       return;
     }
 
@@ -198,13 +195,11 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
     if (!video) return;
 
     const handlePlay = () => {
-      console.log('▶️ EnhancedVideoPlayer: Video play event', { src, timestamp: Date.now() });
       setIsPlaying(true);
       onPlay?.();
     };
 
     const handlePause = () => {
-      console.log('⏸️ EnhancedVideoPlayer: Video pause event', { src, timestamp: Date.now() });
       setIsPlaying(false);
       onPause?.();
     };
@@ -214,7 +209,6 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
       // Only show for initial load
     };
     const handleCanPlay = () => {
-      console.log('🟢 EnhancedVideoPlayer: Video can play', { src, timestamp: Date.now(), autoplay, readyState: video.readyState });
       if (loadingTimeoutRef.current) {
         clearTimeout(loadingTimeoutRef.current);
       }
@@ -222,24 +216,20 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
       
       // Attempt muted autoplay if requested
       if (autoplay) {
-        console.log('🚀 EnhancedVideoPlayer: Starting muted autoplay', { src, readyState: video.readyState });
-        
         // Ensure video is muted for autoplay compliance
         video.muted = true;
         video.playsInline = true;
         
-        video.play().catch((error) => {
-          console.error('❌ EnhancedVideoPlayer: Autoplay failed', error);
+        video.play().catch(() => {
+          // Autoplay failed silently
         });
       }
     };
     const handleWaiting = () => {
-      console.log('⏳ EnhancedVideoPlayer: Video waiting/buffering', { src, timestamp: Date.now() });
       // Don't show loading spinner for brief buffering
       // Only show for longer waits
     };
     const handlePlaying = () => {
-      console.log('🎵 EnhancedVideoPlayer: Video playing', { src, timestamp: Date.now() });
       if (loadingTimeoutRef.current) {
         clearTimeout(loadingTimeoutRef.current);
       }
@@ -284,7 +274,6 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
     const video = videoRef.current;
     if (!video) return;
     
-    console.log('🔊 EnhancedVideoPlayer: Updating mute state to', isGloballyMuted ? 'MUTED' : 'UNMUTED');
     // For autoplay compliance, force muted if autoplay is enabled
     video.muted = autoplay ? true : isGloballyMuted;
   }, [isGloballyMuted, autoplay]);
