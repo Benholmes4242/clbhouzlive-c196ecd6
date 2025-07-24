@@ -54,7 +54,7 @@ export const UserInfoOverlay: React.FC<UserInfoOverlayProps> = ({
           />
           <div className="flex flex-col">
             <span 
-              className="text-white text-base"
+              className="text-white text-base font-medium"
               style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}
             >
               {displayName}
