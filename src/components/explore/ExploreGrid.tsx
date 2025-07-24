@@ -1,7 +1,7 @@
 
 import React, { memo, useState, useEffect } from 'react';
 import { MapPin } from 'lucide-react';
-import { FilmIcon } from '@heroicons/react/24/solid';
+import { FilmIcon } from '@heroicons/react/24/outline';
 import { HiTrendingUp } from 'react-icons/hi';
 import { ExploreContentItem } from './types';
 import ExploreContentCard from './ExploreContentCard';
