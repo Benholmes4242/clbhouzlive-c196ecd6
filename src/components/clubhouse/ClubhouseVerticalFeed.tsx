@@ -516,7 +516,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                     {/* Left Arrow */}
                     <button
                       onClick={handlePrevMedia}
-                      className="absolute left-4 top-1/2 -translate-y-1/2 z-30 p-0 rounded-full bg-white/20 hover:bg-white/40 transition-all duration-200 w-10 h-10 flex items-center justify-center"
+                      className="absolute left-4 top-1/2 -translate-y-1/2 z-30 p-0 transition-all duration-200 w-10 h-10 flex items-center justify-center"
                       aria-label="Previous media"
                     >
                       <ChevronLeft className="w-6 h-6 text-white" />
@@ -525,7 +525,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                     {/* Right Arrow */}
                     <button
                       onClick={handleNextMedia}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 z-30 p-0 rounded-full bg-white/20 hover:bg-white/40 transition-all duration-200 w-10 h-10 flex items-center justify-center"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 z-30 p-0 transition-all duration-200 w-10 h-10 flex items-center justify-center"
                       aria-label="Next media"
                     >
                       <ChevronRight className="w-6 h-6 text-white" />
