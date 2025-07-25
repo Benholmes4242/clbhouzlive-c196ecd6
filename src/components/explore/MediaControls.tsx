@@ -37,7 +37,7 @@ const MediaControls: React.FC<MediaControlsProps> = ({
           {/* Previous Button */}
           <button
             onClick={onPrevMedia}
-            className="absolute left-2 top-1/2 -translate-y-1/2 z-20 text-white hover:scale-110 transition-all duration-200 opacity-0 group-hover:opacity-100"
+            className="absolute left-1 top-1/2 -translate-y-1/2 z-20 text-white hover:scale-110 transition-all duration-200 opacity-0 group-hover:opacity-100"
             aria-label="Previous media"
           >
             <ChevronLeft className="w-6 h-6 drop-shadow-lg" />
@@ -46,7 +46,7 @@ const MediaControls: React.FC<MediaControlsProps> = ({
           {/* Next Button */}
           <button
             onClick={onNextMedia}
-            className="absolute right-2 top-1/2 -translate-y-1/2 z-20 text-white hover:scale-110 transition-all duration-200 opacity-0 group-hover:opacity-100"
+            className="absolute right-1 top-1/2 -translate-y-1/2 z-20 text-white hover:scale-110 transition-all duration-200 opacity-0 group-hover:opacity-100"
             aria-label="Next media"
           >
             <ChevronRight className="w-6 h-6 drop-shadow-lg" />
