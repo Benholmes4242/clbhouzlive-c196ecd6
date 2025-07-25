@@ -60,7 +60,7 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
         flex items-center transition-colors duration-100 ease-in-out
         focus:outline-none border border-black/25 outline-0
         text-black bg-transparent hover:bg-black/5
-        ${activeFilter === filter ? 'bg-orange-100 border-orange-300 text-orange-700' : ''}
+        ${activeFilter === filter ? 'bg-orange-50 border-orange-200 shadow-sm shadow-orange-200/50' : ''}
       `}
       style={{ outline: 'none' }}
     >
