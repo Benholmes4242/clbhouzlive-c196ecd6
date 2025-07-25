@@ -64,11 +64,16 @@ export const UserPostMedia: React.FC<UserPostMediaProps> = ({
   return (
     <div className="mb-3">
       <div className="rounded-lg overflow-hidden">
-        <SwipeCarousel
-          items={carouselItems}
-          showDots={carouselItems.length > 1}
-          showArrows={false}
-        />
+        {isClubhouse ? (
+          // For clubhouse, render single media directly without carousel
+          carouselItems[0]
+        ) : (
+          <SwipeCarousel
+            items={carouselItems}
+            showDots={carouselItems.length > 1}
+            showArrows={false}
+          />
+        )}
       </div>
     </div>
   );
