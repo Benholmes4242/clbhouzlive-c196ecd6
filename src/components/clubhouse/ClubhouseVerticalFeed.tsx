@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { MapPin, UserPlus, UserCheck, Loader2 } from 'lucide-react';
+import { MapPin, UserPlus, UserCheck, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { HeartIcon, ChatBubbleOvalLeftEllipsisIcon, PaperAirplaneIcon, SpeakerXMarkIcon, SpeakerWaveIcon } from '@heroicons/react/24/solid';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -508,6 +508,29 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                     mediaCount={mediaItems.length}
                     currentIndex={currentMediaIndex}
                   />
+                )}
+
+                {/* Navigation Arrows - Left and Right */}
+                {hasMultipleMedia && (
+                  <>
+                    {/* Left Arrow */}
+                    <button
+                      onClick={handlePrevMedia}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 z-30 p-0 rounded-full bg-white/20 hover:bg-white/40 transition-all duration-200 w-10 h-10 flex items-center justify-center"
+                      aria-label="Previous media"
+                    >
+                      <ChevronLeft className="w-6 h-6 text-white" />
+                    </button>
+
+                    {/* Right Arrow */}
+                    <button
+                      onClick={handleNextMedia}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 z-30 p-0 rounded-full bg-white/20 hover:bg-white/40 transition-all duration-200 w-10 h-10 flex items-center justify-center"
+                      aria-label="Next media"
+                    >
+                      <ChevronRight className="w-6 h-6 text-white" />
+                    </button>
+                  </>
                 )}
               </div>
 
