@@ -5,6 +5,7 @@ import { Video, Camera, TvMinimalPlay, Zap, Brain, Users, TrendingUp } from 'luc
 import { PiGolf } from 'react-icons/pi';
 import { filterOptions, FILTER_TYPES } from './types';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useCarouselNavigation } from '@/hooks/useCarouselNavigation';
 
 interface ExploreFiltersProps {
   activeFilter: string;
@@ -13,13 +14,19 @@ interface ExploreFiltersProps {
 }
 
 const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterChange, excludeFilters = [] }) => {
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
-  const [isAtStart, setIsAtStart] = useState(true);
-  const [isAtEnd, setIsAtEnd] = useState(false);
 
   // Filter out excluded filters
   const availableFilters = filterOptions.filter(filter => !excludeFilters.includes(filter));
+
+  // Split filters into two rows as evenly as possible
+  const midpoint = Math.ceil(availableFilters.length / 2);
+  const topRowFilters = availableFilters.slice(0, midpoint);
+  const bottomRowFilters = availableFilters.slice(midpoint);
+
+  // Carousel navigation hooks for each row
+  const topRowCarousel = useCarouselNavigation(topRowFilters.length);
+  const bottomRowCarousel = useCarouselNavigation(bottomRowFilters.length);
 
   const getFilterIcon = (filter: string) => {
     switch (filter) {
@@ -44,63 +51,46 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
     }
   };
 
-  const checkScrollPosition = () => {
-    if (scrollContainerRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
-      setIsAtStart(scrollLeft <= 0);
-      setIsAtEnd(scrollLeft >= scrollWidth - clientWidth - 1);
-    }
-  };
+  const renderFilterButton = (filter: string) => (
+    <button
+      key={filter}
+      onClick={() => onFilterChange(filter)}
+      className={`
+        px-3 py-1 rounded-full text-lg font-medium whitespace-nowrap flex-shrink-0 
+        flex items-center transition-colors duration-100 ease-in-out
+        focus:outline-none border border-black/25 outline-0
+        text-black bg-transparent hover:bg-black/5
+        ${activeFilter === filter ? 'bg-primary/10 border-primary/30 text-primary' : ''}
+      `}
+      style={{ outline: 'none' }}
+    >
+      {getFilterIcon(filter)}
+      {filter}
+    </button>
+  );
 
-  useEffect(() => {
-    checkScrollPosition();
-  }, []);
-
-  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    checkScrollPosition();
-    
-    // Add bounce effect when reaching ends on mobile
-    if (isMobile) {
-      const container = e.currentTarget;
-      const { scrollLeft, scrollWidth, clientWidth } = container;
-      
-      if (scrollLeft <= 0 || scrollLeft >= scrollWidth - clientWidth) {
-        container.style.transform = scrollLeft <= 0 ? 'translateX(8px)' : 'translateX(-8px)';
-        setTimeout(() => {
-          container.style.transform = 'translateX(0)';
-        }, 150);
-      }
-    }
-  };
+  const renderCarouselRow = (filters: string[], carouselRef: (node: HTMLDivElement | null) => void) => (
+    <div 
+      ref={carouselRef}
+      className="flex space-x-2 overflow-x-auto scrollbar-hide transition-transform duration-150 ease-out"
+      style={{
+        scrollbarWidth: 'none',
+        msOverflowStyle: 'none',
+        WebkitOverflowScrolling: 'touch'
+      }}
+    >
+      {filters.map(renderFilterButton)}
+    </div>
+  );
 
   return (
     <div className="sticky top-16 z-10 bg-background/95 backdrop-blur-sm pb-2 mb-3">
-      <div 
-        ref={scrollContainerRef}
-        className="flex space-x-2 overflow-x-auto scrollbar-hide transition-transform duration-150 ease-out"
-        onScroll={handleScroll}
-        style={{
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
-          WebkitOverflowScrolling: 'touch'
-        }}
-      >
-        {availableFilters.map((filter) => (
-          <button
-            key={filter}
-            onClick={() => onFilterChange(filter)}
-            className={`
-              px-3 py-1 rounded-full text-lg font-medium whitespace-nowrap flex-shrink-0 
-              flex items-center transition-colors duration-100 ease-in-out
-              focus:outline-none border border-black/25 outline-0
-              text-black bg-transparent hover:bg-black/5
-            `}
-            style={{ outline: 'none' }}
-          >
-            {getFilterIcon(filter)}
-            {filter}
-          </button>
-        ))}
+      <div className="space-y-2">
+        {/* Top Row */}
+        {renderCarouselRow(topRowFilters, topRowCarousel.carouselRef)}
+        
+        {/* Bottom Row */}
+        {renderCarouselRow(bottomRowFilters, bottomRowCarousel.carouselRef)}
       </div>
     </div>
   );
