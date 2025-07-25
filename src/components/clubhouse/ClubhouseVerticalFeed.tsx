@@ -138,6 +138,7 @@ const VideoWithAutoplay: React.FC<{
         className="w-full h-full"
         enableHLS={true}
         hideControls={true}
+        objectFit="smart"
       />
     </div>
   );

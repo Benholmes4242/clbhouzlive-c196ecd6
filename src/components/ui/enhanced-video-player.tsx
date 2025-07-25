@@ -18,7 +18,7 @@ interface EnhancedVideoPlayerProps {
   preloadLevel?: 'none' | 'metadata' | 'auto';
   quality?: 'auto' | '240p' | '360p' | '480p' | '720p' | '1080p';
   hideControls?: boolean; // Hide play/pause controls
-  objectFit?: 'cover' | 'contain'; // Add object fit option
+  objectFit?: 'cover' | 'contain' | 'smart'; // Add smart object fit option for TikTok-style behavior
 }
 
 declare global {
@@ -53,6 +53,8 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
   const [error, setError] = useState<string | null>(null);
   const [buffered, setBuffered] = useState(0);
   const loadingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [videoAspectRatio, setVideoAspectRatio] = useState<number | null>(null);
+  const [smartObjectFit, setSmartObjectFit] = useState<'cover' | 'contain'>('cover');
 
   // Mobile detection and lazy loading
   const [shouldLoadVideo, setShouldLoadVideo] = useState(false);
@@ -214,6 +216,37 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
       }
       setIsLoading(false);
       
+      // Calculate smart object fit for TikTok-style behavior
+      if (objectFit === 'smart') {
+        const videoWidth = video.videoWidth;
+        const videoHeight = video.videoHeight;
+        
+        if (videoWidth && videoHeight) {
+          const aspectRatio = videoWidth / videoHeight;
+          setVideoAspectRatio(aspectRatio);
+          
+          // Get screen dimensions
+          const screenAspectRatio = window.innerWidth / window.innerHeight;
+          
+          // Portrait videos (9:16 or similar) should fill screen when they're close to screen aspect ratio
+          const isPortrait = aspectRatio < 1;
+          const isCloseToScreenRatio = Math.abs(aspectRatio - screenAspectRatio) < 0.3;
+          
+          // Use cover for portrait videos that are close to 9:16 on mobile screens
+          // Use contain for everything else to prevent cropping
+          if (isPortrait && (aspectRatio > 0.5 && aspectRatio < 0.8)) {
+            // Standard portrait video (9:16 to 4:5) - fill screen
+            setSmartObjectFit('cover');
+          } else if (isCloseToScreenRatio) {
+            // Video aspect ratio matches screen - safe to use cover
+            setSmartObjectFit('cover');
+          } else {
+            // Wide, square, or extreme aspect ratios - use contain to prevent cropping
+            setSmartObjectFit('contain');
+          }
+        }
+      }
+      
       // Attempt muted autoplay if requested
       if (autoplay) {
         // Ensure video is muted for autoplay compliance
@@ -373,7 +406,13 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
         playsInline
         preload="metadata"
         src={src}
-        className={`w-full h-full ${objectFit === 'contain' ? 'object-contain' : 'object-cover'}`}
+        className={`w-full h-full ${
+          objectFit === 'smart' 
+            ? (smartObjectFit === 'contain' ? 'object-contain' : 'object-cover')
+            : objectFit === 'contain' 
+              ? 'object-contain' 
+              : 'object-cover'
+        }`}
         controlsList="nodownload nofullscreen noremoteplayback"
         disablePictureInPicture
       />
