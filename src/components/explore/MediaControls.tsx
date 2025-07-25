@@ -1,5 +1,6 @@
 import React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useSwipeable } from 'react-swipeable';
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
 
 interface MediaControlsProps {
@@ -8,8 +9,8 @@ interface MediaControlsProps {
   currentIndex: number;
   isHovered: boolean;
   isMobile: boolean;
-  onPrevMedia: (e: React.MouseEvent) => void;
-  onNextMedia: (e: React.MouseEvent) => void;
+  onPrevMedia: (e?: React.MouseEvent) => void;
+  onNextMedia: (e?: React.MouseEvent) => void;
 }
 
 const MediaControls: React.FC<MediaControlsProps> = ({
