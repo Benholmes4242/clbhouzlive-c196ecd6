@@ -38,7 +38,7 @@ const Header = () => {
           </div>
 
           {/* Navigation Icons - Perfectly centered with logo */}
-          <div className="flex items-center space-x-1 md:space-x-2 flex-shrink-0 min-w-0">
+          <div className="flex items-center space-x-1 md:space-x-2 flex-shrink-0 min-w-0 translate-y-0.5">
             <HeaderNavigation />
           </div>
         </div>
