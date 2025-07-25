@@ -118,17 +118,17 @@ const HeaderNavigation = () => {
   if (!user) {
     return (
       <>
-        <Button variant="ghost" size="sm" className="h-10 md:h-12 w-10 md:w-12 p-0 flex-shrink-0 rounded-full" onClick={handleNotificationsClick}>
-          <Bell className="h-4 w-4 md:h-5 md:w-5" />
+        <Button variant="ghost" size="sm" className="p-2 md:p-3 flex-shrink-0" onClick={handleNotificationsClick}>
+          <Bell className="h-4 w-4" />
         </Button>
 
-        <Button variant="ghost" size="sm" className="h-10 md:h-12 w-10 md:w-12 p-0 flex-shrink-0 rounded-full" onClick={handleProfileClick}>
+        <Button variant="ghost" size="sm" className="p-2 md:p-3 flex-shrink-0" onClick={handleProfileClick}>
           <CircleUserRound className="h-4 w-4 md:h-5 md:w-5" />
         </Button>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" className="h-10 md:h-12 w-10 md:w-12 p-0 flex-shrink-0 rounded-full">
+            <Button variant="ghost" size="sm" className="p-2 md:p-3 flex-shrink-0">
               <Settings className="h-4 w-4 md:h-5 md:w-5" />
             </Button>
           </DropdownMenuTrigger>
@@ -148,8 +148,8 @@ const HeaderNavigation = () => {
 
   return (
     <>
-      <Button variant="ghost" size="sm" className="relative h-10 md:h-12 w-10 md:w-12 p-0 flex-shrink-0 rounded-full" onClick={handleNotificationsClick}>
-        <Bell className="h-4 w-4 md:h-5 md:w-5" />
+      <Button variant="ghost" size="sm" className="relative p-2 md:p-3 flex-shrink-0" onClick={handleNotificationsClick}>
+        <Bell className="h-4 w-4" />
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
             {unreadCount > 9 ? '9+' : unreadCount}
@@ -157,13 +157,13 @@ const HeaderNavigation = () => {
         )}
       </Button>
 
-      <Button variant="ghost" size="sm" className="h-10 md:h-12 w-10 md:w-12 p-0 flex-shrink-0 rounded-full" onClick={handleProfileClick}>
+      <Button variant="ghost" size="sm" className="p-2 md:p-3 flex-shrink-0" onClick={handleProfileClick}>
         <CircleUserRound className="h-4 w-4 md:h-5 md:w-5" />
       </Button>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="sm" className="h-10 md:h-12 w-10 md:w-12 p-0 flex-shrink-0 rounded-full">
+          <Button variant="ghost" size="sm" className="p-2 md:p-3 flex-shrink-0">
             <Settings className="h-4 w-4 md:h-5 md:w-5" />
           </Button>
         </DropdownMenuTrigger>
