@@ -226,6 +226,13 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
           </div>
         </div>
       </div>
+      
+      {/* Top 100 Courses Played Section Heading */}
+      <div className="w-full bg-background py-6 mt-8">
+        <div className="max-w-4xl mx-auto px-6">
+          <h2 className="text-2xl font-bold text-foreground">Top 100 Courses Played</h2>
+        </div>
+      </div>
     </>
   );
 };
