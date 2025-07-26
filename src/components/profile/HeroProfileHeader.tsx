@@ -63,15 +63,34 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
             {/* Profile Photo */}
             <div className="w-20 h-20 mb-4">
               {isOwnProfile ? (
-                <ProfilePhotoManager
-                  user={user}
-                  profile={profile}
-                  onProfileUpdate={() => {
-                    if (onProfileUpdate) {
-                      onProfileUpdate();
-                    }
+                <div 
+                  className="relative cursor-pointer group"
+                  onClick={() => {
+                    const input = document.createElement('input');
+                    input.type = 'file';
+                    input.accept = 'image/*';
+                    input.onchange = (e) => {
+                      const file = (e.target as HTMLInputElement).files?.[0];
+                      if (file) {
+                        // Handle photo upload logic here if needed
+                        console.log('Photo selected:', file);
+                      }
+                    };
+                    input.click();
                   }}
-                />
+                >
+                  <OptimizedAvatar
+                    src={profile?.profile_photo_url}
+                    alt={displayName}
+                    size={80}
+                    fallback={displayName.charAt(0)}
+                    className="shadow-lg group-hover:opacity-80 transition-opacity"
+                  />
+                  {/* Hover overlay */}
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
+                    <span className="text-white text-xs font-medium">Edit</span>
+                  </div>
+                </div>
               ) : (
                 <OptimizedAvatar
                   src={profile?.profile_photo_url}
