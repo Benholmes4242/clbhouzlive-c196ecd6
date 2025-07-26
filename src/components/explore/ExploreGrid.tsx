@@ -228,7 +228,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
         <div id="scroll-sentinel" className="h-4">
           {isLoading && hasMore && (
             <div className="flex justify-center py-4">
-              <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+              <div className="w-6 h-6 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
             </div>
           )}
         </div>
@@ -496,7 +496,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
         <div id="scroll-sentinel" className="h-4">
           {isLoading && hasMore && (
             <div className="flex justify-center py-4">
-              <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+              <div className="w-6 h-6 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
             </div>
           )}
         </div>
@@ -536,7 +536,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
       <div id="scroll-sentinel" className="h-4">
         {isLoading && hasMore && activeFilter !== 'Hack Shack' && activeFilter !== 'Videos' && (
           <div className="flex justify-center py-4">
-            <div className="w-6 h-6 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+            <div className="w-6 h-6 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
           </div>
         )}
       </div>
