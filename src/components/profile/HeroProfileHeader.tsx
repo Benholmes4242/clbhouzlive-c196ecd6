@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import ProfilePhotoManager from './ProfilePhotoManager';
 import ProfileEditDialog from './ProfileEditDialog';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useInViewAnimation, useStaggeredInView } from '@/hooks/useInViewAnimation';
 
 interface HeroProfileHeaderProps {
   profile: any;
@@ -21,6 +22,23 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
   const username = profile?.username;
   const homeClub = profile?.home_club || 'Golf Club';
   const backgroundImage = profile?.background_image_url;
+
+  // Animation hooks
+  const activityAnimation = useStaggeredInView(2, { staggerDelay: 100 });
+  const top100Animation = useStaggeredInView(5, { staggerDelay: 100 });
+  const badgesAnimation = useStaggeredInView(5, { staggerDelay: 100 });
+
+  // Smooth scroll function
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+        inline: 'nearest'
+      });
+    }
+  };
 
   return (
     <>
@@ -129,7 +147,10 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
           <div className="grid grid-cols-3 gap-4">
             
             {/* Activity Card */}
-            <div className="group relative aspect-square rounded-lg overflow-hidden cursor-pointer hover-scale">
+            <div 
+              onClick={() => scrollToSection('activity-section')}
+              className="group relative aspect-square rounded-lg overflow-hidden cursor-pointer hover-scale"
+            >
               <div 
                 className="absolute inset-0 bg-cover bg-center"
                 style={{
@@ -143,7 +164,10 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
             </div>
             
             {/* Handicap Card */}
-            <div className="group relative aspect-square rounded-lg overflow-hidden cursor-pointer hover-scale">
+            <div 
+              onClick={() => scrollToSection('activity-section')}
+              className="group relative aspect-square rounded-lg overflow-hidden cursor-pointer hover-scale"
+            >
               <div 
                 className="absolute inset-0 bg-cover bg-center"
                 style={{
@@ -157,7 +181,10 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
             </div>
             
             {/* Top 100 Card */}
-            <div className="group relative aspect-square rounded-lg overflow-hidden cursor-pointer hover-scale">
+            <div 
+              onClick={() => scrollToSection('top100-section')}
+              className="group relative aspect-square rounded-lg overflow-hidden cursor-pointer hover-scale"
+            >
               <div 
                 className="absolute inset-0 bg-cover bg-center"
                 style={{
@@ -175,7 +202,7 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
       </div>
       
       {/* Activity Section Heading */}
-      <div className="w-full bg-background py-6">
+      <div id="activity-section" className="w-full bg-background py-6" ref={activityAnimation.ref}>
         <div className="max-w-4xl mx-auto px-6">
           <h2 className="text-2xl font-bold text-foreground mb-6">Activity</h2>
           
@@ -183,7 +210,13 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
           <div className="grid grid-cols-2 gap-6">
             
             {/* Left Box - User Playing Golf */}
-            <div className="relative rounded-lg overflow-hidden aspect-[4/3]">
+            <div 
+              className={`relative rounded-lg overflow-hidden aspect-[4/3] transition-all duration-500 ease-out ${
+                activityAnimation.visibleItems[0] 
+                  ? 'opacity-100 translate-y-0' 
+                  : 'opacity-0 translate-y-4'
+              }`}
+            >
               <div 
                 className="absolute inset-0 bg-cover bg-center"
                 style={{
@@ -214,7 +247,13 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
             </div>
             
             {/* Right Box - Dark Overlay Card */}
-            <div className="bg-black/90 backdrop-blur-sm rounded-lg p-6 aspect-[4/3] flex flex-col justify-center">
+            <div 
+              className={`bg-black/90 backdrop-blur-sm rounded-lg p-6 aspect-[4/3] flex flex-col justify-center transition-all duration-500 ease-out ${
+                activityAnimation.visibleItems[1] 
+                  ? 'opacity-100 translate-y-0' 
+                  : 'opacity-0 translate-y-4'
+              }`}
+            >
               <h3 className="text-white text-2xl font-bold mb-6">Handicap: 4.0</h3>
               
               <div className="space-y-4">
@@ -238,14 +277,20 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
       </div>
       
       {/* Top 100 Courses Played Section Heading */}
-      <div className="w-full bg-background py-6 mt-8">
+      <div id="top100-section" className="w-full bg-background py-6 mt-8" ref={top100Animation.ref}>
         <div className="max-w-4xl mx-auto px-6">
           <h2 className="text-2xl font-bold text-foreground mb-6">Top 100 Courses Played</h2>
           
           {/* Clubhouse Index Badge Card and Course Map Grid */}
           <div className="grid grid-cols-2 gap-6">
             {/* Clubhouse Index Badge Card */}
-            <div className="bg-purple-50 dark:bg-purple-950/20 rounded-lg p-6 border border-purple-200 dark:border-purple-800/30">
+            <div 
+              className={`bg-purple-50 dark:bg-purple-950/20 rounded-lg p-6 border border-purple-200 dark:border-purple-800/30 transition-all duration-500 ease-out ${
+                top100Animation.visibleItems[0] 
+                  ? 'opacity-100 translate-y-0' 
+                  : 'opacity-0 translate-y-4'
+              }`}
+            >
               <div className="flex items-start space-x-4">
                 <div className="flex-shrink-0">
                   <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/40 rounded-full flex items-center justify-center">
@@ -272,7 +317,13 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
             </div>
             
             {/* Course Map Container */}
-            <div className="bg-muted/50 rounded-lg p-6 border border-muted-foreground/20 relative overflow-hidden">
+            <div 
+              className={`bg-muted/50 rounded-lg p-6 border border-muted-foreground/20 relative overflow-hidden transition-all duration-500 ease-out ${
+                top100Animation.visibleItems[1] 
+                  ? 'opacity-100 translate-y-0' 
+                  : 'opacity-0 translate-y-4'
+              }`}
+            >
               {/* Placeholder Map Background */}
               <div 
                 className="absolute inset-0 opacity-20 bg-cover bg-center"
@@ -315,7 +366,13 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
           <div className="mt-8 space-y-4">
             
             {/* Course Card 1 */}
-            <div className="bg-card rounded-lg overflow-hidden shadow-sm border border-border hover:shadow-md transition-shadow">
+            <div 
+              className={`bg-card rounded-lg overflow-hidden shadow-sm border border-border hover:shadow-md transition-all duration-500 ease-out ${
+                top100Animation.visibleItems[2] 
+                  ? 'opacity-100 translate-y-0' 
+                  : 'opacity-0 translate-y-4'
+              }`}
+            >
               <div className="flex">
                 {/* Course Image */}
                 <div className="w-32 h-24 flex-shrink-0">
@@ -365,7 +422,13 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
             </div>
             
             {/* Course Card 2 */}
-            <div className="bg-card rounded-lg overflow-hidden shadow-sm border border-border hover:shadow-md transition-shadow">
+            <div 
+              className={`bg-card rounded-lg overflow-hidden shadow-sm border border-border hover:shadow-md transition-all duration-500 ease-out ${
+                top100Animation.visibleItems[3] 
+                  ? 'opacity-100 translate-y-0' 
+                  : 'opacity-0 translate-y-4'
+              }`}
+            >
               <div className="flex">
                 {/* Course Image */}
                 <div className="w-32 h-24 flex-shrink-0">
@@ -415,7 +478,13 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
             </div>
             
             {/* Course Card 3 */}
-            <div className="bg-card rounded-lg overflow-hidden shadow-sm border border-border hover:shadow-md transition-shadow">
+            <div 
+              className={`bg-card rounded-lg overflow-hidden shadow-sm border border-border hover:shadow-md transition-all duration-500 ease-out ${
+                top100Animation.visibleItems[4] 
+                  ? 'opacity-100 translate-y-0' 
+                  : 'opacity-0 translate-y-4'
+              }`}
+            >
               <div className="flex">
                 {/* Course Image */}
                 <div className="w-32 h-24 flex-shrink-0">
@@ -453,7 +522,7 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
       </div>
       
       {/* Badges & Achievements Section Heading */}
-      <div className="w-full bg-background py-6">
+      <div className="w-full bg-background py-6" ref={badgesAnimation.ref}>
         <div className="max-w-4xl mx-auto px-6">
           <h2 className="text-2xl font-bold text-foreground mb-6">Badges & Achievements</h2>
           
@@ -461,7 +530,13 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
           <div className="space-y-4">
             
             {/* 20 Club Badge - Bronze */}
-            <div className="bg-card rounded-lg p-6 border border-border shadow-sm">
+            <div 
+              className={`bg-card rounded-lg p-6 border border-border shadow-sm transition-all duration-500 ease-out ${
+                badgesAnimation.visibleItems[0] 
+                  ? 'opacity-100 translate-y-0' 
+                  : 'opacity-0 translate-y-4'
+              }`}
+            >
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
                   <div className="w-12 h-12 bg-amber-600/20 rounded-full flex items-center justify-center">
@@ -490,7 +565,13 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
             </div>
             
             {/* 50 Club Badge - Silver */}
-            <div className="bg-card rounded-lg p-6 border border-border shadow-sm">
+            <div 
+              className={`bg-card rounded-lg p-6 border border-border shadow-sm transition-all duration-500 ease-out ${
+                badgesAnimation.visibleItems[1] 
+                  ? 'opacity-100 translate-y-0' 
+                  : 'opacity-0 translate-y-4'
+              }`}
+            >
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
                   <div className="w-12 h-12 bg-slate-400/20 rounded-full flex items-center justify-center">
@@ -519,7 +600,13 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
             </div>
             
             {/* 75 Club Badge - Gold */}
-            <div className="bg-card rounded-lg p-6 border border-border shadow-sm opacity-75">
+            <div 
+              className={`bg-card rounded-lg p-6 border border-border shadow-sm opacity-75 transition-all duration-500 ease-out ${
+                badgesAnimation.visibleItems[2] 
+                  ? 'opacity-75 translate-y-0' 
+                  : 'opacity-0 translate-y-4'
+              }`}
+            >
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
                   <div className="w-12 h-12 bg-yellow-500/20 rounded-full flex items-center justify-center">
@@ -548,7 +635,13 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
             </div>
             
             {/* 100 Club Badge - Platinum */}
-            <div className="bg-card rounded-lg p-6 border border-border shadow-sm opacity-50">
+            <div 
+              className={`bg-card rounded-lg p-6 border border-border shadow-sm opacity-50 transition-all duration-500 ease-out ${
+                badgesAnimation.visibleItems[3] 
+                  ? 'opacity-50 translate-y-0' 
+                  : 'opacity-0 translate-y-4'
+              }`}
+            >
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
                   <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center">
@@ -577,7 +670,13 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
             </div>
             
             {/* Clubhouse Global Finisher Badge - Diamond */}
-            <div className="bg-card rounded-lg p-6 border border-border shadow-sm opacity-30">
+            <div 
+              className={`bg-card rounded-lg p-6 border border-border shadow-sm opacity-30 transition-all duration-500 ease-out ${
+                badgesAnimation.visibleItems[4] 
+                  ? 'opacity-30 translate-y-0' 
+                  : 'opacity-0 translate-y-4'
+              }`}
+            >
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
                   <div className="w-12 h-12 bg-cyan-500/20 rounded-full flex items-center justify-center">
