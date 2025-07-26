@@ -86,6 +86,30 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
           </div>
         )}
       </div>
+      
+      {/* Floating Stats Bar */}
+      <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2">
+        <div className="bg-black/80 backdrop-blur-sm rounded-full px-8 py-4 shadow-lg">
+          <div className="flex items-center justify-center space-x-8 text-white">
+            <div className="text-center">
+              <div className="font-bold text-lg">4.0</div>
+              <div className="text-xs text-white/80">Handicap</div>
+            </div>
+            <div className="text-center">
+              <div className="font-bold text-lg">142</div>
+              <div className="text-xs text-white/80">Posts</div>
+            </div>
+            <div className="text-center">
+              <div className="font-bold text-lg">32</div>
+              <div className="text-xs text-white/80">Rated Courses</div>
+            </div>
+            <div className="text-center">
+              <div className="font-bold text-lg">8.6/10</div>
+              <div className="text-xs text-white/80">Avg. Rating</div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
