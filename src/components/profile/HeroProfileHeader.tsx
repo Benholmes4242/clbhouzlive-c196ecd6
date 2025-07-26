@@ -59,9 +59,9 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
         <div className="relative flex items-start justify-between px-6 py-8 pt-16">{/* Added pt-16 for better spacing */}
           
           {/* Left Side - Profile Info */}
-          <div className="flex flex-col space-y-4">
+          <div className="text-white">
             {/* Profile Photo */}
-            <div className="w-20 h-20 flex-shrink-0">
+            <div className="w-20 h-20 mb-4">
               {isOwnProfile ? (
                 <ProfilePhotoManager
                   user={user}
@@ -84,7 +84,7 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
             </div>
             
             {/* Text Info */}
-            <div className="text-white">
+            <div>
               <h1 className="text-4xl font-bold mb-2 drop-shadow-lg">
                 {displayName}
               </h1>
