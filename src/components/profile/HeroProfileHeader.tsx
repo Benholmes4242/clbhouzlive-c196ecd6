@@ -40,22 +40,7 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
     setUploading(true);
     
     try {
-      // Check if avatars bucket exists first
-      const { data: buckets } = await supabase.storage.listBuckets();
-      const avatarsBucket = buckets?.find(bucket => bucket.id === 'avatars');
-      
-      if (!avatarsBucket) {
-        console.log('Creating avatars bucket...');
-        const { error: bucketError } = await supabase.storage.createBucket('avatars', {
-          public: true,
-        });
-        if (bucketError) {
-          console.error('Error creating bucket:', bucketError);
-          throw bucketError;
-        }
-      }
-      
-      // Upload file to Supabase Storage
+      // Upload file directly to Supabase Storage (avatars bucket already exists)
       const fileExt = file.name.split('.').pop();
       const fileName = `${user.id}/avatar.${fileExt}`;
       
