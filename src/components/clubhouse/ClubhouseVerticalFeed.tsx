@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import ClubhouzLoading from '@/components/ClubhouzLoading';
 import { MapPin, UserPlus, UserCheck, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { HeartIcon, ChatBubbleOvalLeftEllipsisIcon, PaperAirplaneIcon, SpeakerXMarkIcon, SpeakerWaveIcon } from '@heroicons/react/24/solid';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
@@ -412,11 +413,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   };
 
   if (posts.length === 0) {
-    return (
-      <div className="fixed inset-0 z-10 bg-black flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin" style={{ color: '#f7931e' }} />
-      </div>
-    );
+    return <ClubhouzLoading />;
   }
 
   return (

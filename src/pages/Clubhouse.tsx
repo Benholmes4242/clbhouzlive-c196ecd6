@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import ClubhouzLoading from '@/components/ClubhouzLoading';
 import { Search } from 'lucide-react';
 import BottomNavigation from '@/components/BottomNavigation';
 import ClubhouseVerticalFeed from '@/components/clubhouse/ClubhouseVerticalFeed';
@@ -28,13 +29,7 @@ const Clubhouse = () => {
   ];
 
   if (isLoading) {
-    return (
-      <div className="fixed inset-0 z-10 bg-black flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-white/70 text-lg">Loading your feed...</p>
-        </div>
-      </div>
-    );
+    return <ClubhouzLoading />;
   }
 
   return (
