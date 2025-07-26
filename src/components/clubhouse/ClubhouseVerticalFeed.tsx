@@ -334,20 +334,18 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
 
   // Track previous scroll position for direction detection
   const prevScrollTopRef = useRef(0);
+  const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isScrollingRef = useRef(false);
 
-  // Handle scroll to snap to items
+  // Throttled scroll handler for better performance
   const handleScroll = useCallback(() => {
     if (!scrollViewRef.current) return;
 
     const scrollTop = scrollViewRef.current.scrollTop;
-    const scrollDirection = scrollTop > prevScrollTopRef.current ? 'down' : 'up';
-    
-    const itemHeight = window.innerHeight; // Full screen height now
+    const itemHeight = window.innerHeight;
     const newIndex = Math.round(scrollTop / itemHeight);
     
-    
-    prevScrollTopRef.current = scrollTop;
-    
+    // Immediate index update for responsiveness
     if (newIndex !== currentIndex && newIndex >= 0 && newIndex < posts.length) {
       setCurrentIndex(newIndex);
       
@@ -356,12 +354,20 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
       if (currentPost && currentPost.type !== 'video') {
         setActiveVideo(null);
       }
-      
-      // Load more posts when near the end
+    }
+
+    // Debounced loading check to prevent excessive calls
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
+    }
+    
+    scrollTimeoutRef.current = setTimeout(() => {
       if (newIndex >= posts.length - 3 && hasMore && !isLoadingMore) {
         onLoadMore();
       }
-    }
+    }, 150);
+
+    prevScrollTopRef.current = scrollTop;
   }, [currentIndex, posts.length, hasMore, isLoadingMore, onLoadMore]);
 
   // Scroll to specific index
@@ -434,7 +440,9 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
           msOverflowStyle: 'none',
           WebkitOverflowScrolling: 'touch',
           scrollSnapType: 'y mandatory',
-          scrollBehavior: 'smooth'
+          scrollBehavior: isMobile ? 'auto' : 'smooth',
+          overscrollBehavior: 'none',
+          touchAction: 'pan-y'
         }}
       >
 
@@ -725,11 +733,34 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
         .snap-y {
           scrollbar-width: none !important;
           -ms-overflow-style: none !important;
+          scroll-snap-type: y mandatory;
+          will-change: scroll-position;
+          transform: translateZ(0);
+          -webkit-transform: translateZ(0);
+          backface-visibility: hidden;
+          -webkit-backface-visibility: hidden;
+          perspective: 1000;
+          -webkit-perspective: 1000;
         }
         .snap-y::-webkit-scrollbar {
           display: none !important;
           width: 0 !important;
           height: 0 !important;
+        }
+        .snap-start {
+          scroll-snap-align: start;
+          scroll-snap-stop: always;
+          transform: translateZ(0);
+          -webkit-transform: translateZ(0);
+          will-change: transform;
+        }
+        @media (max-width: 768px) {
+          .snap-y {
+            scroll-behavior: auto !important;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior: none;
+            overscroll-behavior-y: none;
+          }
         }
       `}</style>
     </div>
