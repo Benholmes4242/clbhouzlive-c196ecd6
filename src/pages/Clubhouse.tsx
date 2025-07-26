@@ -4,6 +4,7 @@ import { Search } from 'lucide-react';
 import BottomNavigation from '@/components/BottomNavigation';
 import ClubhouseVerticalFeed from '@/components/clubhouse/ClubhouseVerticalFeed';
 import { useInfiniteFollowedPosts } from '@/hooks/useInfiniteFollowedPosts';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Clubhouse = () => {
   const {
@@ -15,6 +16,8 @@ const Clubhouse = () => {
   } = useInfiniteFollowedPosts();
 
   const [activeTab, setActiveTab] = useState('Following');
+  const [currentPostIndex, setCurrentPostIndex] = useState(0);
+  const isMobile = useIsMobile();
 
   const handleLike = (contentId: string) => {
     // Handle like functionality
@@ -39,7 +42,9 @@ const Clubhouse = () => {
     }}>
       {/* Header with Logo and Floating Menu */}
       <div 
-        className="absolute top-0 left-0 right-0 z-40 backdrop-blur-[2px] bg-white/0 supports-[backdrop-filter]:bg-white/0"
+        className={`absolute top-0 left-0 right-0 z-40 backdrop-blur-[2px] bg-white/0 supports-[backdrop-filter]:bg-white/0 transition-transform duration-300 ${
+          isMobile && currentPostIndex > 0 ? '-translate-y-full' : 'translate-y-0'
+        }`}
       >
         {/* Logo Mark and Clubhouse Logo */}
         <div className="absolute top-4 left-4">
@@ -87,6 +92,7 @@ const Clubhouse = () => {
         onLoadMore={loadMore}
         hasMore={hasMore}
         isLoadingMore={isLoadingMore}
+        onCurrentPostChange={setCurrentPostIndex}
       />
       
       {/* Bottom Navigation */}

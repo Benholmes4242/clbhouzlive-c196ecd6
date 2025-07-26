@@ -22,7 +22,7 @@ interface ClubhouseVerticalFeedProps {
   onLoadMore: () => void;
   hasMore: boolean;
   isLoadingMore: boolean;
-  
+  onCurrentPostChange?: (index: number) => void;
 }
 
 // VideoWithAutoplay component moved outside to prevent recreation on re-renders
@@ -152,7 +152,8 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   onLike,
   onLoadMore,
   hasMore,
-  isLoadingMore
+  isLoadingMore,
+  onCurrentPostChange
 }) => {
   const { user } = useSupabaseSession();
   const isMobile = useIsMobile();
@@ -191,6 +192,11 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     },
     enabled: !!user?.id && !!posts[currentIndex]?.user?.id && user.id !== posts[currentIndex]?.user?.id
   });
+
+  // Notify parent component when current post changes
+  useEffect(() => {
+    onCurrentPostChange?.(currentIndex);
+  }, [currentIndex, onCurrentPostChange]);
 
   // Check which posts the user has liked
   const { data: likedPosts } = useQuery({
