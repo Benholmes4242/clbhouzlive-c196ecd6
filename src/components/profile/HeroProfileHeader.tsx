@@ -136,10 +136,10 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
         
         {/* Content Container - Top Section */}
-        <div className="relative flex items-start justify-between px-6 py-8 pt-16">{/* Added pt-16 for better spacing */}
+        <div className="relative flex items-start justify-between px-6 py-8 pt-16">
           
           {/* Left Side - Profile Info */}
-          <div className="text-white">
+          <div className="text-white flex-1">
             {/* Profile Photo */}
             <div className="w-20 h-20 mb-4">
               {isOwnProfile ? (
@@ -184,7 +184,7 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
             </div>
             
             {/* Text Info */}
-            <div>
+            <div className="mb-4">
               <h1 className="text-4xl font-bold mb-2 drop-shadow-lg">
                 {displayName}
               </h1>
@@ -196,6 +196,28 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
               <p className="text-lg text-white/80 drop-shadow">
                 {homeClub}
               </p>
+            </div>
+
+            {/* Stats Bar - Full Width with 8px rounded corners */}
+            <div className="bg-black/80 backdrop-blur-sm rounded-lg px-6 py-4 shadow-lg">
+              <div className="flex items-center justify-center space-x-8 text-white">
+                <div className="text-center">
+                  <div className="font-bold text-lg drop-shadow">4.0</div>
+                  <div className="text-xs text-white/80 drop-shadow">Handicap</div>
+                </div>
+                <div className="text-center">
+                  <div className="font-bold text-lg drop-shadow">142</div>
+                  <div className="text-xs text-white/80 drop-shadow">Posts</div>
+                </div>
+                <div className="text-center">
+                  <div className="font-bold text-lg drop-shadow">32</div>
+                  <div className="text-xs text-white/80 drop-shadow">Rated Courses</div>
+                </div>
+                <div className="text-center">
+                  <div className="font-bold text-lg drop-shadow">8.6/10</div>
+                  <div className="text-xs text-white/80 drop-shadow">Avg. Rating</div>
+                </div>
+              </div>
             </div>
           </div>
           
@@ -213,30 +235,6 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
               />
             </div>
           )}
-        </div>
-        
-        {/* Floating Stats Bar - Centered */}
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
-          <div className="bg-black/80 backdrop-blur-sm rounded-full px-6 md:px-8 py-3 md:py-4 shadow-lg">
-            <div className="flex items-center justify-center space-x-4 md:space-x-8 text-white">
-              <div className="text-center">
-                <div className="font-bold text-sm md:text-lg drop-shadow">4.0</div>
-                <div className="text-xs text-white/80 drop-shadow">Handicap</div>
-              </div>
-              <div className="text-center">
-                <div className="font-bold text-sm md:text-lg drop-shadow">142</div>
-                <div className="text-xs text-white/80 drop-shadow">Posts</div>
-              </div>
-              <div className="text-center">
-                <div className="font-bold text-sm md:text-lg drop-shadow">32</div>
-                <div className="text-xs text-white/80 drop-shadow">Rated Courses</div>
-              </div>
-              <div className="text-center">
-                <div className="font-bold text-sm md:text-lg drop-shadow">8.6/10</div>
-                <div className="text-xs text-white/80 drop-shadow">Avg. Rating</div>
-              </div>
-            </div>
-          </div>
         </div>
         
         {/* Highlight Reel Section Container - positioned at bottom */}
@@ -756,7 +754,7 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
                   <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-purple-500">
                       <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
-                      <path d="M14 9h1.5a2.5 2.5 0 0 1 0-5H14"/>
+                      <path d="M14 9h1.5a2.5 2.5 0 0 1 0 5H14"/>
                       <path d="M6 9h8"/>
                       <path d="M18 9h1.5a2.5 2.5 0 0 1 0 5H18"/>
                       <path d="M18 9v6"/>
