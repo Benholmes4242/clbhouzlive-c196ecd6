@@ -230,7 +230,36 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
       {/* Top 100 Courses Played Section Heading */}
       <div className="w-full bg-background py-6 mt-8">
         <div className="max-w-4xl mx-auto px-6">
-          <h2 className="text-2xl font-bold text-foreground">Top 100 Courses Played</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-6">Top 100 Courses Played</h2>
+          
+          {/* Clubhouse Index Badge Card */}
+          <div className="grid grid-cols-2 gap-6">
+            <div className="bg-purple-50 dark:bg-purple-950/20 rounded-lg p-6 border border-purple-200 dark:border-purple-800/30">
+              <div className="flex items-start space-x-4">
+                <div className="flex-shrink-0">
+                  <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/40 rounded-full flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-purple-600 dark:text-purple-400">
+                      <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+                      <path d="M14 9h1.5a2.5 2.5 0 0 1 0 5H14"/>
+                      <path d="M6 9h8"/>
+                      <path d="M18 9h1.5a2.5 2.5 0 0 1 0 5H18"/>
+                      <path d="M18 9v6"/>
+                      <path d="M6 15v6"/>
+                      <path d="M18 15v6"/>
+                    </svg>
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-purple-900 dark:text-purple-100 mb-2">
+                    Clubhouse Index
+                  </h3>
+                  <p className="text-sm text-purple-700 dark:text-purple-300">
+                    You've contributed 32 ratings to the Clubhouse Index.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </>
