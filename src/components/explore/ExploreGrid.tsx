@@ -169,8 +169,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
           {content.filter(item => item.type === 'video' || item.type === 'image').map((item, index) => (
             <div
               key={`friends-${item.id}-${index}`}
-              className="relative bg-muted cursor-pointer group aspect-[9/16]"
-              style={{ borderRadius: '8px', overflow: 'hidden' }}
+              className="relative bg-muted rounded-md overflow-hidden cursor-pointer group aspect-[9/16]"
               onClick={() => onMediaClick?.(item)}
             >
               {/* Media Display */}
@@ -383,13 +382,12 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     return (
       <>
         {/* Discover Page Layout - Grid with large video cards */}
-        <div className="grid grid-cols-3 md:grid-cols-4 gap-1 auto-rows-fr">
+        <div className="grid grid-cols-3 md:grid-cols-4 gap-0.5 auto-rows-fr">
           {layoutItems.map((layoutItem, index) => (
             layoutItem.type === 'large' ? (
               <div
                 key={`discover-large-${layoutItem.item.id}-${index}`}
-                className="col-span-2 row-span-2 relative bg-muted cursor-pointer group aspect-square"
-                style={{ borderRadius: '8px', overflow: 'hidden' }}
+                className="col-span-2 row-span-2 relative bg-muted rounded-md overflow-hidden cursor-pointer group aspect-square"
                 onClick={() => onMediaClick?.(layoutItem.item)}
               >
                 {/* Shimmer loading placeholder */}
@@ -457,8 +455,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
             ) : (
               <div
                 key={`discover-regular-${layoutItem.item.id}-${index}`}
-                className="relative bg-muted cursor-pointer group aspect-square"
-                style={{ borderRadius: '8px', overflow: 'hidden' }}
+                className="relative bg-muted rounded-md overflow-hidden cursor-pointer group aspect-square"
                 onClick={() => onMediaClick?.(layoutItem.item)}
               >
                 {/* Shimmer loading placeholder */}
