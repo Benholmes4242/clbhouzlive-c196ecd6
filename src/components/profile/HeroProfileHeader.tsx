@@ -61,28 +61,26 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
           {/* Left Side - Profile Info */}
           <div className="flex flex-col space-y-4">
             {/* Profile Photo */}
-            <div className="flex items-start">
-              <div className="w-20 h-20 flex-shrink-0">
-                {isOwnProfile ? (
-                  <ProfilePhotoManager
-                    user={user}
-                    profile={profile}
-                    onProfileUpdate={() => {
-                      if (onProfileUpdate) {
-                        onProfileUpdate();
-                      }
-                    }}
-                  />
-                ) : (
-                  <OptimizedAvatar
-                    src={profile?.profile_photo_url}
-                    alt={displayName}
-                    size={80}
-                    fallback={displayName.charAt(0)}
-                    className="shadow-lg"
-                  />
-                )}
-              </div>
+            <div className="w-20 h-20 flex-shrink-0">
+              {isOwnProfile ? (
+                <ProfilePhotoManager
+                  user={user}
+                  profile={profile}
+                  onProfileUpdate={() => {
+                    if (onProfileUpdate) {
+                      onProfileUpdate();
+                    }
+                  }}
+                />
+              ) : (
+                <OptimizedAvatar
+                  src={profile?.profile_photo_url}
+                  alt={displayName}
+                  size={80}
+                  fallback={displayName.charAt(0)}
+                  className="shadow-lg"
+                />
+              )}
             </div>
             
             {/* Text Info */}
