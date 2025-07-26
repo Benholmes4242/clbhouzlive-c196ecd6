@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from "@/components/Header";
 import BottomNavigation from '@/components/BottomNavigation';
-import InstagramStyleProfileHeader from '@/components/profile/InstagramStyleProfileHeader';
+import HeroProfileHeader from '@/components/profile/HeroProfileHeader';
 import UniversalProfileTabs from '@/components/profile/UniversalProfileTabs';
 import { useProfileData } from '@/hooks/useProfileData';
 
@@ -77,10 +77,9 @@ const ProfilePage = () => {
       <Header />
       
       <div className="max-w-4xl mx-auto">
-        <InstagramStyleProfileHeader 
+        <HeroProfileHeader 
           profile={profile}
           currentUser={user}
-          relationshipStatus={null}
           onProfileUpdate={refreshProfile}
         />
         
