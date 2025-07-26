@@ -169,7 +169,8 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
           {content.filter(item => item.type === 'video' || item.type === 'image').map((item, index) => (
             <div
               key={`friends-${item.id}-${index}`}
-              className="relative bg-muted rounded-lg overflow-hidden cursor-pointer group aspect-[9/16]"
+              className="relative bg-muted cursor-pointer group aspect-[9/16]"
+              style={{ borderRadius: '8px', overflow: 'hidden' }}
               onClick={() => onMediaClick?.(item)}
             >
               {/* Media Display */}
@@ -387,7 +388,8 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
             layoutItem.type === 'large' ? (
               <div
                 key={`discover-large-${layoutItem.item.id}-${index}`}
-                className="col-span-2 row-span-2 relative bg-muted rounded-lg overflow-hidden cursor-pointer group aspect-square"
+                className="col-span-2 row-span-2 relative bg-muted cursor-pointer group aspect-square"
+                style={{ borderRadius: '8px', overflow: 'hidden' }}
                 onClick={() => onMediaClick?.(layoutItem.item)}
               >
                 {/* Shimmer loading placeholder */}
@@ -455,7 +457,8 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
             ) : (
               <div
                 key={`discover-regular-${layoutItem.item.id}-${index}`}
-                className="relative bg-muted rounded-lg overflow-hidden cursor-pointer group aspect-square"
+                className="relative bg-muted cursor-pointer group aspect-square"
+                style={{ borderRadius: '8px', overflow: 'hidden' }}
                 onClick={() => onMediaClick?.(layoutItem.item)}
               >
                 {/* Shimmer loading placeholder */}
