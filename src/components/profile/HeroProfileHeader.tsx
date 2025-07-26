@@ -167,7 +167,63 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
       {/* Activity Section Heading */}
       <div className="w-full bg-background py-6">
         <div className="max-w-4xl mx-auto px-6">
-          <h2 className="text-2xl font-bold text-foreground">Activity</h2>
+          <h2 className="text-2xl font-bold text-foreground mb-6">Activity</h2>
+          
+          {/* 2-Column Activity Grid */}
+          <div className="grid grid-cols-2 gap-6">
+            
+            {/* Left Box - User Playing Golf */}
+            <div className="relative rounded-lg overflow-hidden aspect-[4/3]">
+              <div 
+                className="absolute inset-0 bg-cover bg-center"
+                style={{
+                  backgroundImage: `url(https://images.unsplash.com/photo-1486312338219?w=600&h=400&fit=crop)`
+                }}
+              />
+              <div className="absolute inset-0 bg-black/20" />
+              
+              {/* Handicap Label */}
+              <div className="absolute top-4 left-4">
+                <span className="bg-black/80 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm font-semibold">
+                  Handicap
+                </span>
+              </div>
+              
+              {/* Mini Video Thumbnails */}
+              <div className="absolute bottom-4 left-4 flex space-x-2">
+                <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded border border-white/30 flex items-center justify-center">
+                  <div className="w-3 h-3 bg-white rounded-full opacity-80" />
+                </div>
+                <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded border border-white/30 flex items-center justify-center">
+                  <div className="w-3 h-3 bg-white rounded-full opacity-80" />
+                </div>
+                <div className="w-8 h-8 bg-white/20 backdrop-blur-sm rounded border border-white/30 flex items-center justify-center">
+                  <div className="w-3 h-3 bg-white rounded-full opacity-80" />
+                </div>
+              </div>
+            </div>
+            
+            {/* Right Box - Dark Overlay Card */}
+            <div className="bg-black/90 backdrop-blur-sm rounded-lg p-6 aspect-[4/3] flex flex-col justify-center">
+              <h3 className="text-white text-2xl font-bold mb-6">Handicap: 4.0</h3>
+              
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-white/80">Posts</span>
+                  <span className="text-white font-semibold">1142</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-white/80">Courses Played</span>
+                  <span className="text-white font-semibold">32</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-white/80">Tips Shared</span>
+                  <span className="text-white font-semibold">12</span>
+                </div>
+              </div>
+            </div>
+            
+          </div>
         </div>
       </div>
     </>
