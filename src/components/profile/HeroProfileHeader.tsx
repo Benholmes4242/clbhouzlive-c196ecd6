@@ -3,6 +3,8 @@ import { Button } from '@/components/ui/button';
 import ProfileEditDialog from './ProfileEditDialog';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useInViewAnimation, useStaggeredInView } from '@/hooks/useInViewAnimation';
+import { OptimizedAvatar } from '@/components/ui/optimized-avatar';
+import ProfilePhotoManager from './ProfilePhotoManager';
 
 interface HeroProfileHeaderProps {
   profile: any;
@@ -57,7 +59,32 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
         <div className="relative flex items-start justify-between px-6 py-8 pt-16">{/* Added pt-16 for better spacing */}
           
           {/* Left Side - Profile Info */}
-          <div className="flex items-center space-x-6">
+          <div className="flex flex-col space-y-4">
+            {/* Profile Photo */}
+            <div className="flex items-start">
+              <div className="w-20 h-20 flex-shrink-0">
+                {isOwnProfile ? (
+                  <ProfilePhotoManager
+                    user={user}
+                    profile={profile}
+                    onProfileUpdate={() => {
+                      if (onProfileUpdate) {
+                        onProfileUpdate();
+                      }
+                    }}
+                  />
+                ) : (
+                  <OptimizedAvatar
+                    src={profile?.profile_photo_url}
+                    alt={displayName}
+                    size={80}
+                    fallback={displayName.charAt(0)}
+                    className="shadow-lg"
+                  />
+                )}
+              </div>
+            </div>
+            
             {/* Text Info */}
             <div className="text-white">
               <h1 className="text-4xl font-bold mb-2 drop-shadow-lg">
