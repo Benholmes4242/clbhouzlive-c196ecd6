@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import ProfileEditDialog from './ProfileEditDialog';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useInViewAnimation, useStaggeredInView } from '@/hooks/useInViewAnimation';
 import { OptimizedAvatar } from '@/components/ui/optimized-avatar';
-import ProfilePhotoManager from './ProfilePhotoManager';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface HeroProfileHeaderProps {
   profile: any;
@@ -18,11 +19,105 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
   onProfileUpdate
 }) => {
   const { user } = useSupabaseSession();
+  const [uploading, setUploading] = useState(false);
+  const { toast } = useToast();
   const isOwnProfile = user?.id === profile?.id;
   const displayName = profile?.display_name || profile?.username || 'User';
   const username = profile?.username;
   const homeClub = profile?.home_club || 'Golf Club';
   const backgroundImage = profile?.background_image_url;
+  
+  console.log('HeroProfileHeader - profile data:', profile);
+  console.log('HeroProfileHeader - profile photo URL:', profile?.profile_photo_url);
+
+  const handlePhotoUpload = async (file: File) => {
+    if (!user) {
+      console.log('No user found for upload');
+      return;
+    }
+    
+    console.log('Starting photo upload for user:', user.id, 'file:', file);
+    setUploading(true);
+    
+    try {
+      // Check if avatars bucket exists first
+      const { data: buckets } = await supabase.storage.listBuckets();
+      const avatarsBucket = buckets?.find(bucket => bucket.id === 'avatars');
+      
+      if (!avatarsBucket) {
+        console.log('Creating avatars bucket...');
+        const { error: bucketError } = await supabase.storage.createBucket('avatars', {
+          public: true,
+        });
+        if (bucketError) {
+          console.error('Error creating bucket:', bucketError);
+          throw bucketError;
+        }
+      }
+      
+      // Upload file to Supabase Storage
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/avatar.${fileExt}`;
+      
+      console.log('Uploading file:', fileName);
+      const { data, error: uploadError } = await supabase.storage
+        .from('avatars')
+        .upload(fileName, file, {
+          cacheControl: '3600',
+          upsert: true
+        });
+
+      if (uploadError) {
+        console.error('Upload error:', uploadError);
+        throw uploadError;
+      }
+
+      console.log('Upload successful:', data);
+      
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('avatars')
+        .getPublicUrl(fileName);
+      
+      console.log('Public URL:', publicUrl);
+      
+      // Update profile in database
+      const { error: updateError } = await supabase
+        .from('user_profiles')
+        .update({ 
+          profile_photo_url: publicUrl,
+          updated_at: new Date().toISOString() 
+        })
+        .eq('id', user.id);
+
+      if (updateError) {
+        console.error('Database update error:', updateError);
+        throw updateError;
+      }
+
+      console.log('Profile updated successfully');
+      
+      toast({
+        title: "Success",
+        description: "Profile photo updated successfully!",
+      });
+      
+      // Trigger refresh
+      if (onProfileUpdate) {
+        onProfileUpdate();
+      }
+      
+    } catch (error) {
+      console.error('Photo upload error:', error);
+      toast({
+        title: "Upload Failed", 
+        description: "Failed to upload photo: " + (error as Error).message,
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
 
   // Animation hooks
   const activityAnimation = useStaggeredInView(2, { staggerDelay: 100 });
@@ -66,14 +161,15 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
                 <div 
                   className="relative cursor-pointer group"
                   onClick={() => {
+                    if (uploading) return;
                     const input = document.createElement('input');
                     input.type = 'file';
                     input.accept = 'image/*';
                     input.onchange = (e) => {
                       const file = (e.target as HTMLInputElement).files?.[0];
                       if (file) {
-                        // Handle photo upload logic here if needed
-                        console.log('Photo selected:', file);
+                        console.log('Photo selected for upload:', file);
+                        handlePhotoUpload(file);
                       }
                     };
                     input.click();
