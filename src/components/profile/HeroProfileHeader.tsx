@@ -113,6 +113,16 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
         </div>
       </div>
       
+      {/* Highlight Reel Section Container */}
+      <div className="w-full bg-background/80 backdrop-blur-sm pt-2 px-4 pb-0">
+        <div className="h-[90px] overflow-x-auto scrollbar-hide">
+          {/* Placeholder for highlight reel content */}
+          <div className="h-full flex items-center justify-center text-muted-foreground">
+            <span className="text-sm">Highlight Reel Coming Soon</span>
+          </div>
+        </div>
+      </div>
+      
       {/* 3-Section Grid with Square Cards */}
       <div className="w-full bg-background py-6">
         <div className="max-w-4xl mx-auto px-6">
