@@ -232,8 +232,9 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
         <div className="max-w-4xl mx-auto px-6">
           <h2 className="text-2xl font-bold text-foreground mb-6">Top 100 Courses Played</h2>
           
-          {/* Clubhouse Index Badge Card */}
+          {/* Clubhouse Index Badge Card and Course Map Grid */}
           <div className="grid grid-cols-2 gap-6">
+            {/* Clubhouse Index Badge Card */}
             <div className="bg-purple-50 dark:bg-purple-950/20 rounded-lg p-6 border border-purple-200 dark:border-purple-800/30">
               <div className="flex items-start space-x-4">
                 <div className="flex-shrink-0">
@@ -257,6 +258,45 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
                     You've contributed 32 ratings to the Clubhouse Index.
                   </p>
                 </div>
+              </div>
+            </div>
+            
+            {/* Course Map Container */}
+            <div className="bg-muted/50 rounded-lg p-6 border border-muted-foreground/20 relative overflow-hidden">
+              {/* Placeholder Map Background */}
+              <div 
+                className="absolute inset-0 opacity-20 bg-cover bg-center"
+                style={{
+                  backgroundImage: `url(https://images.unsplash.com/photo-1461749280684-dccba630e2f6?w=600&h=400&fit=crop)`
+                }}
+              />
+              <div className="absolute inset-0 bg-muted/80" />
+              
+              {/* Content */}
+              <div className="relative z-10 flex items-start space-x-4">
+                <div className="flex-shrink-0">
+                  <div className="w-12 h-12 bg-muted-foreground/20 rounded-full flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground">
+                      <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+                      <circle cx="12" cy="10" r="3"/>
+                    </svg>
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-muted-foreground mb-2">
+                    Interactive map coming soon
+                  </h3>
+                  <p className="text-sm text-muted-foreground/80">
+                    View courses you've rated worldwide.
+                  </p>
+                </div>
+              </div>
+              
+              {/* Coming Soon Badge */}
+              <div className="absolute top-4 right-4">
+                <span className="bg-muted-foreground/20 text-muted-foreground px-2 py-1 rounded-full text-xs font-medium">
+                  Coming Soon
+                </span>
               </div>
             </div>
           </div>
