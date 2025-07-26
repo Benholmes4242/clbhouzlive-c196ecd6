@@ -1,6 +1,5 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import ProfilePhotoManager from './ProfilePhotoManager';
 import ProfileEditDialog from './ProfileEditDialog';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useInViewAnimation, useStaggeredInView } from '@/hooks/useInViewAnimation';
@@ -59,21 +58,6 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
           
           {/* Left Side - Profile Info */}
           <div className="flex items-center space-x-6">
-            {/* Profile Photo */}
-            <div className="flex-shrink-0">
-              <div className="w-[120px] h-[120px] rounded-full overflow-hidden border-4 border-white/20 shadow-lg">
-                <ProfilePhotoManager
-                  user={isOwnProfile ? user : null}
-                  profile={profile}
-                  onProfileUpdate={(updatedProfile) => {
-                    if (onProfileUpdate) {
-                      onProfileUpdate();
-                    }
-                  }}
-                />
-              </div>
-            </div>
-            
             {/* Text Info */}
             <div className="text-white">
               <h1 className="text-4xl font-bold mb-2 drop-shadow-lg">
