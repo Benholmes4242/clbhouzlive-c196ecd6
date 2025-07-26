@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { MapPin, UserPlus, UserCheck, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
-import { useSwipeable } from 'react-swipeable';
 import { HeartIcon, ChatBubbleOvalLeftEllipsisIcon, PaperAirplaneIcon, SpeakerXMarkIcon, SpeakerWaveIcon } from '@heroicons/react/24/solid';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -465,27 +464,40 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
             }));
           };
 
-          // Swipe handlers for media navigation
-          const swipeHandlers = useSwipeable({
-            onSwipedLeft: () => {
-              if (hasMultipleMedia) {
+          // Touch event handlers for swipe navigation
+          let touchStartX = 0;
+          let touchStartY = 0;
+          
+          const handleTouchStart = (e: React.TouchEvent) => {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+          };
+          
+          const handleTouchEnd = (e: React.TouchEvent) => {
+            if (!hasMultipleMedia) return;
+            
+            const touchEndX = e.changedTouches[0].clientX;
+            const touchEndY = e.changedTouches[0].clientY;
+            const deltaX = touchEndX - touchStartX;
+            const deltaY = touchEndY - touchStartY;
+            
+            // Only trigger swipe if horizontal movement is greater than vertical
+            if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 50) {
+              if (deltaX > 0) {
+                // Swipe right - previous media
+                setMediaIndices(prev => ({
+                  ...prev,
+                  [item.id]: currentMediaIndex > 0 ? currentMediaIndex - 1 : mediaItems.length - 1
+                }));
+              } else {
+                // Swipe left - next media
                 setMediaIndices(prev => ({
                   ...prev,
                   [item.id]: currentMediaIndex < mediaItems.length - 1 ? currentMediaIndex + 1 : 0
                 }));
               }
-            },
-            onSwipedRight: () => {
-              if (hasMultipleMedia) {
-                setMediaIndices(prev => ({
-                  ...prev,
-                  [item.id]: currentMediaIndex > 0 ? currentMediaIndex - 1 : mediaItems.length - 1
-                }));
-              }
-            },
-            preventScrollOnSwipe: false,
-            trackMouse: false
-          });
+            }
+          };
 
           return (
             <div
@@ -503,7 +515,8 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
             >
               {/* Media Content */}
               <div 
-                {...swipeHandlers}
+                onTouchStart={handleTouchStart}
+                onTouchEnd={handleTouchEnd}
                 className="relative w-full h-full flex items-center justify-center z-10"
                 // Removed mouse enter/leave handlers that were causing re-renders
               >
