@@ -382,7 +382,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     return (
       <>
         {/* Discover Page Layout - Grid with large video cards */}
-        <div className="grid grid-cols-3 md:grid-cols-4 gap-0.5 auto-rows-fr">
+        <div className="grid grid-cols-3 md:grid-cols-4 gap-1 auto-rows-fr">
           {layoutItems.map((layoutItem, index) => (
             layoutItem.type === 'large' ? (
               <div
