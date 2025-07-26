@@ -300,6 +300,145 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
               </div>
             </div>
           </div>
+          
+          {/* Individual Rated Course Cards */}
+          <div className="mt-8 space-y-4">
+            
+            {/* Course Card 1 */}
+            <div className="bg-card rounded-lg overflow-hidden shadow-sm border border-border hover:shadow-md transition-shadow">
+              <div className="flex">
+                {/* Course Image */}
+                <div className="w-32 h-24 flex-shrink-0">
+                  <div 
+                    className="w-full h-full bg-cover bg-center"
+                    style={{
+                      backgroundImage: `url(https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=300&fit=crop)`
+                    }}
+                  />
+                </div>
+                
+                {/* Course Details */}
+                <div className="flex-1 p-4 relative">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h4 className="font-bold text-foreground text-lg mb-1">
+                        Pebble Beach Golf Links
+                      </h4>
+                      <p className="text-muted-foreground text-sm mb-2">
+                        Pebble Beach, California
+                      </p>
+                    </div>
+                    
+                    {/* Score Pill */}
+                    <div className="bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm font-semibold">
+                      9.5/10
+                    </div>
+                  </div>
+                  
+                  {/* Optional Tag */}
+                  <div className="flex items-center space-x-2 mt-2">
+                    <span className="bg-secondary text-secondary-foreground px-2 py-1 rounded-full text-xs font-medium flex items-center space-x-1">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+                        <path d="M14 9h1.5a2.5 2.5 0 0 1 0 5H14"/>
+                        <path d="M6 9h8"/>
+                        <path d="M18 9h1.5a2.5 2.5 0 0 1 0 5H18"/>
+                        <path d="M18 9v6"/>
+                        <path d="M6 15v6"/>
+                        <path d="M18 15v6"/>
+                      </svg>
+                      <span>Top 100 Course</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Course Card 2 */}
+            <div className="bg-card rounded-lg overflow-hidden shadow-sm border border-border hover:shadow-md transition-shadow">
+              <div className="flex">
+                {/* Course Image */}
+                <div className="w-32 h-24 flex-shrink-0">
+                  <div 
+                    className="w-full h-full bg-cover bg-center"
+                    style={{
+                      backgroundImage: `url(https://images.unsplash.com/photo-1486312338219?w=400&h=300&fit=crop)`
+                    }}
+                  />
+                </div>
+                
+                {/* Course Details */}
+                <div className="flex-1 p-4 relative">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h4 className="font-bold text-foreground text-lg mb-1">
+                        Augusta National Golf Club
+                      </h4>
+                      <p className="text-muted-foreground text-sm mb-2">
+                        Augusta, Georgia
+                      </p>
+                    </div>
+                    
+                    {/* Score Pill */}
+                    <div className="bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm font-semibold">
+                      10/10
+                    </div>
+                  </div>
+                  
+                  {/* Optional Tag */}
+                  <div className="flex items-center space-x-2 mt-2">
+                    <span className="bg-secondary text-secondary-foreground px-2 py-1 rounded-full text-xs font-medium flex items-center space-x-1">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
+                        <path d="M14 9h1.5a2.5 2.5 0 0 1 0 5H14"/>
+                        <path d="M6 9h8"/>
+                        <path d="M18 9h1.5a2.5 2.5 0 0 1 0 5H18"/>
+                        <path d="M18 9v6"/>
+                        <path d="M6 15v6"/>
+                        <path d="M18 15v6"/>
+                      </svg>
+                      <span>Top 100 Course</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Course Card 3 */}
+            <div className="bg-card rounded-lg overflow-hidden shadow-sm border border-border hover:shadow-md transition-shadow">
+              <div className="flex">
+                {/* Course Image */}
+                <div className="w-32 h-24 flex-shrink-0">
+                  <div 
+                    className="w-full h-full bg-cover bg-center"
+                    style={{
+                      backgroundImage: `url(https://images.unsplash.com/photo-1587174486073?w=400&h=300&fit=crop)`
+                    }}
+                  />
+                </div>
+                
+                {/* Course Details */}
+                <div className="flex-1 p-4 relative">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h4 className="font-bold text-foreground text-lg mb-1">
+                        Old Head Golf Links
+                      </h4>
+                      <p className="text-muted-foreground text-sm mb-2">
+                        Kinsale, Ireland
+                      </p>
+                    </div>
+                    
+                    {/* Score Pill */}
+                    <div className="bg-primary text-primary-foreground px-3 py-1 rounded-full text-sm font-semibold">
+                      8.5/10
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+          </div>
         </div>
       </div>
     </>
