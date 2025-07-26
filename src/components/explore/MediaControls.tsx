@@ -39,13 +39,13 @@ const MediaControls: React.FC<MediaControlsProps> = ({
         currentIndex={currentIndex}
       />
 
-      {/* Desktop Navigation Arrows */}
-      {!isMobile && isHovered && (
+      {/* Navigation Arrows */}
+      {((!isMobile && isHovered) || isMobile) && (
         <>
           {/* Previous Button */}
           <button
             onClick={onPrevMedia}
-            className="absolute left-0 top-1/2 -translate-y-1/2 z-20 text-white hover:scale-110 transition-all duration-200 opacity-0 group-hover:opacity-100"
+            className={`absolute ${isMobile ? '-left-2' : 'left-0'} top-1/2 -translate-y-1/2 z-20 text-white hover:scale-110 transition-all duration-200 ${!isMobile ? 'opacity-0 group-hover:opacity-100' : 'opacity-70'}`}
             aria-label="Previous media"
           >
             <ChevronLeft className="w-6 h-6 drop-shadow-lg" />
@@ -54,7 +54,7 @@ const MediaControls: React.FC<MediaControlsProps> = ({
           {/* Next Button */}
           <button
             onClick={onNextMedia}
-            className="absolute right-0 top-1/2 -translate-y-1/2 z-20 text-white hover:scale-110 transition-all duration-200 opacity-0 group-hover:opacity-100"
+            className={`absolute ${isMobile ? '-right-2' : 'right-0'} top-1/2 -translate-y-1/2 z-20 text-white hover:scale-110 transition-all duration-200 ${!isMobile ? 'opacity-0 group-hover:opacity-100' : 'opacity-70'}`}
             aria-label="Next media"
           >
             <ChevronRight className="w-6 h-6 drop-shadow-lg" />
