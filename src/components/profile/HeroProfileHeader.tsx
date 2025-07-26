@@ -43,7 +43,7 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
   return (
     <>
       <div 
-        className="relative w-full h-80 bg-gradient-to-br from-primary to-primary/80 overflow-hidden"
+        className="relative w-full min-h-screen bg-gradient-to-br from-primary to-primary/80 overflow-hidden"
         style={{
           backgroundImage: backgroundImage ? `url(${backgroundImage})` : undefined,
           backgroundSize: 'cover',
@@ -51,11 +51,11 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
           backgroundRepeat: 'no-repeat'
         }}
       >
-        {/* Dark overlay for better text readability */}
-        <div className="absolute inset-0 bg-black/30" />
+        {/* Dark gradient overlay for better text readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
         
-        {/* Content Container */}
-        <div className="relative h-full flex items-center justify-between px-6 py-8">
+        {/* Content Container - Top Section */}
+        <div className="relative flex items-start justify-between px-6 py-8 pt-16">{/* Added pt-16 for better spacing */}
           
           {/* Left Side - Profile Info */}
           <div className="flex items-center space-x-6">
@@ -106,97 +106,97 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
           )}
         </div>
         
-        {/* Floating Stats Bar */}
-        <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2">
-          <div className="bg-black/80 backdrop-blur-sm rounded-full px-8 py-4 shadow-lg">
-            <div className="flex items-center justify-center space-x-8 text-white">
+        {/* Floating Stats Bar - Centered */}
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
+          <div className="bg-black/80 backdrop-blur-sm rounded-full px-6 md:px-8 py-3 md:py-4 shadow-lg">
+            <div className="flex items-center justify-center space-x-4 md:space-x-8 text-white">
               <div className="text-center">
-                <div className="font-bold text-lg">4.0</div>
-                <div className="text-xs text-white/80">Handicap</div>
+                <div className="font-bold text-sm md:text-lg drop-shadow">4.0</div>
+                <div className="text-xs text-white/80 drop-shadow">Handicap</div>
               </div>
               <div className="text-center">
-                <div className="font-bold text-lg">142</div>
-                <div className="text-xs text-white/80">Posts</div>
+                <div className="font-bold text-sm md:text-lg drop-shadow">142</div>
+                <div className="text-xs text-white/80 drop-shadow">Posts</div>
               </div>
               <div className="text-center">
-                <div className="font-bold text-lg">32</div>
-                <div className="text-xs text-white/80">Rated Courses</div>
+                <div className="font-bold text-sm md:text-lg drop-shadow">32</div>
+                <div className="text-xs text-white/80 drop-shadow">Rated Courses</div>
               </div>
               <div className="text-center">
-                <div className="font-bold text-lg">8.6/10</div>
-                <div className="text-xs text-white/80">Avg. Rating</div>
+                <div className="font-bold text-sm md:text-lg drop-shadow">8.6/10</div>
+                <div className="text-xs text-white/80 drop-shadow">Avg. Rating</div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-      
-      {/* Highlight Reel Section Container */}
-      <div className="w-full bg-background/80 backdrop-blur-sm pt-2 px-4 pb-0">
-        <div className="h-[90px] overflow-x-auto scrollbar-hide">
-          {/* Placeholder for highlight reel content */}
-          <div className="h-full flex items-center justify-center text-muted-foreground">
-            <span className="text-sm">Highlight Reel Coming Soon</span>
+        
+        {/* Highlight Reel Section Container - positioned at bottom */}
+        <div className="absolute bottom-32 left-0 right-0 px-4">
+          <div className="h-[90px] overflow-x-auto scrollbar-hide">
+            {/* Placeholder for highlight reel content */}
+            <div className="h-full flex items-center justify-center text-white/60">
+              <span className="text-sm drop-shadow">Highlight Reel Coming Soon</span>
+            </div>
           </div>
         </div>
-      </div>
-      
-      {/* 3-Section Grid with Square Cards */}
-      <div className="w-full bg-background py-6">
-        <div className="max-w-4xl mx-auto px-6">
-          <div className="grid grid-cols-3 gap-4">
-            
-            {/* Activity Card */}
-            <div 
-              onClick={() => scrollToSection('activity-section')}
-              className="group relative aspect-square rounded-lg overflow-hidden cursor-pointer hover-scale"
-            >
+        
+        {/* 3-Section Grid with Square Cards - positioned at very bottom */}
+        <div className="absolute bottom-6 left-0 right-0 px-6">
+          <div className="max-w-4xl mx-auto">
+            <div className="grid grid-cols-3 gap-4">
+              
+              {/* Activity Card */}
               <div 
-                className="absolute inset-0 bg-cover bg-center"
-                style={{
-                  backgroundImage: `url(https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?w=400&h=400&fit=crop)`
-                }}
-              />
-              <div className="absolute inset-0 bg-black/40 group-hover:bg-black/30 transition-colors duration-300" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <h3 className="text-white text-xl font-bold drop-shadow-lg">Activity</h3>
+                onClick={() => scrollToSection('activity-section')}
+                className="group relative aspect-square rounded-lg overflow-hidden cursor-pointer hover-scale"
+              >
+                <div 
+                  className="absolute inset-0 bg-cover bg-center"
+                  style={{
+                    backgroundImage: `url(https://images.unsplash.com/photo-1581090464777-f3220bbe1b8b?w=400&h=400&fit=crop)`
+                  }}
+                />
+                <div className="absolute inset-0 bg-black/40 group-hover:bg-black/30 transition-colors duration-300" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <h3 className="text-white text-xl font-bold drop-shadow-lg">Activity</h3>
+                </div>
               </div>
-            </div>
-            
-            {/* Handicap Card */}
-            <div 
-              onClick={() => scrollToSection('activity-section')}
-              className="group relative aspect-square rounded-lg overflow-hidden cursor-pointer hover-scale"
-            >
+              
+              {/* Handicap Card */}
               <div 
-                className="absolute inset-0 bg-cover bg-center"
-                style={{
-                  backgroundImage: `url(https://images.unsplash.com/photo-1438565434616-3ef039228b15?w=400&h=400&fit=crop)`
-                }}
-              />
-              <div className="absolute inset-0 bg-black/40 group-hover:bg-black/30 transition-colors duration-300" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <h3 className="text-white text-xl font-bold drop-shadow-lg">Handicap</h3>
+                onClick={() => scrollToSection('activity-section')}
+                className="group relative aspect-square rounded-lg overflow-hidden cursor-pointer hover-scale"
+              >
+                <div 
+                  className="absolute inset-0 bg-cover bg-center"
+                  style={{
+                    backgroundImage: `url(https://images.unsplash.com/photo-1438565434616-3ef039228b15?w=400&h=400&fit=crop)`
+                  }}
+                />
+                <div className="absolute inset-0 bg-black/40 group-hover:bg-black/30 transition-colors duration-300" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <h3 className="text-white text-xl font-bold drop-shadow-lg">Handicap</h3>
+                </div>
               </div>
-            </div>
-            
-            {/* Top 100 Card */}
-            <div 
-              onClick={() => scrollToSection('top100-section')}
-              className="group relative aspect-square rounded-lg overflow-hidden cursor-pointer hover-scale"
-            >
+              
+              {/* Top 100 Card */}
               <div 
-                className="absolute inset-0 bg-cover bg-center"
-                style={{
-                  backgroundImage: `url(https://images.unsplash.com/photo-1472396961693-142e6e269027?w=400&h=400&fit=crop)`
-                }}
-              />
-              <div className="absolute inset-0 bg-black/40 group-hover:bg-black/30 transition-colors duration-300" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <h3 className="text-white text-xl font-bold drop-shadow-lg">Top 100</h3>
+                onClick={() => scrollToSection('top100-section')}
+                className="group relative aspect-square rounded-lg overflow-hidden cursor-pointer hover-scale"
+              >
+                <div 
+                  className="absolute inset-0 bg-cover bg-center"
+                  style={{
+                    backgroundImage: `url(https://images.unsplash.com/photo-1472396961693-142e6e269027?w=400&h=400&fit=crop)`
+                  }}
+                />
+                <div className="absolute inset-0 bg-black/40 group-hover:bg-black/30 transition-colors duration-300" />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <h3 className="text-white text-xl font-bold drop-shadow-lg">Top 100</h3>
+                </div>
               </div>
+              
             </div>
-            
           </div>
         </div>
       </div>
