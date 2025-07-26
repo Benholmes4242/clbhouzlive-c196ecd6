@@ -964,7 +964,6 @@ export type Database = {
       }
       user_profiles: {
         Row: {
-          background_image_url: string | null
           bag_visible: boolean | null
           bio: string | null
           business_name: string | null
@@ -999,7 +998,6 @@ export type Database = {
           website_url: string | null
         }
         Insert: {
-          background_image_url?: string | null
           bag_visible?: boolean | null
           bio?: string | null
           business_name?: string | null
@@ -1034,7 +1032,6 @@ export type Database = {
           website_url?: string | null
         }
         Update: {
-          background_image_url?: string | null
           bag_visible?: boolean | null
           bio?: string | null
           business_name?: string | null
