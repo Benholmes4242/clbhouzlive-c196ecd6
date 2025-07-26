@@ -7,6 +7,7 @@ import { OptimizedAvatar } from '@/components/ui/optimized-avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Trophy, MapPin, Star, Calendar, TrendingUp } from 'lucide-react';
+import BackgroundUpload from '@/components/profile/BackgroundUpload';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
@@ -78,6 +79,18 @@ const ProfilePage = () => {
   const username = profile?.username || 'username';
   const handicap = profile?.handicap_index || '4.0';
   const homeClub = profile?.home_club || 'Golf Club';
+  
+  // Default background image if user hasn't uploaded one
+  const defaultBackgroundUrl = "url('https://images.unsplash.com/photo-1535131749006-b7f58c99034b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')";
+  const backgroundImageUrl = profile?.background_image_url 
+    ? `url('${profile.background_image_url}')`
+    : defaultBackgroundUrl;
+
+  const handleBackgroundUpdate = (url: string | null) => {
+    if (setProfile) {
+      setProfile((prev: any) => prev ? { ...prev, background_image_url: url } : prev);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background pb-28">
@@ -89,7 +102,7 @@ const ProfilePage = () => {
         <div 
           className="absolute inset-0 bg-cover bg-center"
           style={{
-            backgroundImage: "url('https://images.unsplash.com/photo-1535131749006-b7f58c99034b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')"
+            backgroundImage: backgroundImageUrl
           }}
         />
         
@@ -125,9 +138,16 @@ const ProfilePage = () => {
               </div>
             </div>
             
-            <Button variant="outline" className="bg-white/20 border-white/30 text-white hover:bg-white/30">
-              Edit Profile
-            </Button>
+            <div className="flex flex-col gap-2">
+              <Button variant="outline" className="bg-white/20 border-white/30 text-white hover:bg-white/30">
+                Edit Profile
+              </Button>
+              <BackgroundUpload
+                userId={user.id}
+                currentBackgroundUrl={profile?.background_image_url}
+                onBackgroundUpdate={handleBackgroundUpdate}
+              />
+            </div>
           </div>
         </div>
       </div>
