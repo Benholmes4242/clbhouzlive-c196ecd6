@@ -58,42 +58,42 @@ const App: React.FC = () => {
           <SiteAccessControl>
             <BrowserRouter>
               <ScrollToTop />
-            <Suspense fallback={<ClubhouzLoading />}>
               <GlobalAudioProvider>
                 <VideoManagerProvider>
                   <AuthWrapper>
-                <Routes>
-                  <Route path="/" element={<Clubhouse />} />
-                  <Route path="/auth" element={<Auth />} />
-                  <Route path="/create-profile" element={<CreateProfile />} />
-                  <Route path="/profile" element={<ProfilePage />} />
-                  <Route path="/profile/:username" element={<UserProfilePage />} />
-                  <Route path="/settings" element={<Settings />} />
-                  <Route path="/explore" element={<Explore />} />
-                  <Route path="/clubhouse" element={<Clubhouse />} />
-                  <Route path="/discover" element={<Discover />} />
-                  <Route path="/courses" element={<Courses />} />
-                  <Route path="/courses/:courseId" element={<CourseDetailPage />} />
-                  <Route path="/user/:username/courses" element={<UserCoursesPage />} />
-                  <Route path="/my-ratings" element={<MyRatings />} />
-                  <Route path="/news" element={<News />} />
-                  <Route path="/tour-central" element={<TourCentral />} />
-                  
-                  <Route path="/messages" element={<MessagesPage />} />
-                  <Route path="/notifications" element={<NotificationsPage />} />
-                  <Route path="/friends" element={<FriendsPage />} />
-                  <Route path="/followers" element={<FollowersPage />} />
-                  <Route path="/following" element={<FollowingPage />} />
-                  
-                  <Route path="/global-top100" element={<GlobalTop100 />} />
-                  <Route path="/admin-setup" element={<AdminSetupPage />} />
-                  <Route path="/admin" element={<AdminPage />} />
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
+                    <Suspense fallback={<ClubhouzLoading />}>
+                      <Routes>
+                        <Route path="/" element={<Clubhouse />} />
+                        <Route path="/auth" element={<Auth />} />
+                        <Route path="/create-profile" element={<CreateProfile />} />
+                        <Route path="/profile" element={<ProfilePage />} />
+                        <Route path="/profile/:username" element={<UserProfilePage />} />
+                        <Route path="/settings" element={<Settings />} />
+                        <Route path="/explore" element={<Explore />} />
+                        <Route path="/clubhouse" element={<Clubhouse />} />
+                        <Route path="/discover" element={<Discover />} />
+                        <Route path="/courses" element={<Courses />} />
+                        <Route path="/courses/:courseId" element={<CourseDetailPage />} />
+                        <Route path="/user/:username/courses" element={<UserCoursesPage />} />
+                        <Route path="/my-ratings" element={<MyRatings />} />
+                        <Route path="/news" element={<News />} />
+                        <Route path="/tour-central" element={<TourCentral />} />
+                        
+                        <Route path="/messages" element={<MessagesPage />} />
+                        <Route path="/notifications" element={<NotificationsPage />} />
+                        <Route path="/friends" element={<FriendsPage />} />
+                        <Route path="/followers" element={<FollowersPage />} />
+                        <Route path="/following" element={<FollowingPage />} />
+                        
+                        <Route path="/global-top100" element={<GlobalTop100 />} />
+                        <Route path="/admin-setup" element={<AdminSetupPage />} />
+                        <Route path="/admin" element={<AdminPage />} />
+                        <Route path="*" element={<NotFound />} />
+                      </Routes>
+                    </Suspense>
                   </AuthWrapper>
                 </VideoManagerProvider>
               </GlobalAudioProvider>
-            </Suspense>
               <Toaster />
               <Sonner />
             </BrowserRouter>
