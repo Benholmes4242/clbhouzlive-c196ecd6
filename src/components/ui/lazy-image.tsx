@@ -40,8 +40,8 @@ const LazyImage: React.FC<LazyImageProps> = ({
         }
       },
       {
-        rootMargin: '50px', // Start loading 50px before the image enters viewport
-        threshold: 0.1
+        rootMargin: '100px', // Start loading 100px before the image enters viewport
+        threshold: 0.01 // 1% visibility threshold
       }
     );
 
@@ -99,7 +99,7 @@ const LazyImage: React.FC<LazyImageProps> = ({
         onError={handleError}
         width={width}
         height={height}
-        loading="lazy"
+        loading="eager" // Always eager to prevent grey placeholders
         decoding="async"
       />
       

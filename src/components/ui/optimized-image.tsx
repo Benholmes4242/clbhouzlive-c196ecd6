@@ -44,8 +44,8 @@ const OptimizedImageComponent: React.FC<OptimizedImageProps> = ({
   
   // Use intersection observer only if not priority - more aggressive for mobile
   const { ref: intersectionRef, isInView } = useIntersectionObserver({
-    threshold: 0,
-    rootMargin: priority ? '0px' : '100px' // Increased margin for mobile
+    threshold: 0.01, // 1% visibility to show media content
+    rootMargin: priority ? '0px' : '200px' // Even more aggressive margin
   });
 
   // Generate responsive image sources
@@ -140,7 +140,7 @@ const OptimizedImageComponent: React.FC<OptimizedImageProps> = ({
           alt={alt}
           width={width}
           height={height}
-          loading={loading}
+          loading={priority ? 'eager' : 'eager'} // Always eager loading to prevent grey placeholders
           decoding="async"
           {...(priority && { fetchPriority: 'high' })}
           onLoad={handleLoad}

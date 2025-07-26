@@ -478,7 +478,7 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
                       src={currentMedia.media_url}
                       alt={item.title}
                       className="w-full h-full object-contain"
-                      loading={Math.abs(index - currentIndex) <= 1 ? "eager" : "lazy"}
+                      loading="eager" // Always load media to prevent grey placeholders
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
                       }}

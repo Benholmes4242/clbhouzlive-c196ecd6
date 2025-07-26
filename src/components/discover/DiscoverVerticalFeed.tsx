@@ -483,7 +483,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                       src={item.src}
                       alt={item.title}
                       className="w-full h-full object-contain"
-                      loading={Math.abs(index - currentIndex) <= 1 ? "eager" : "lazy"}
+                      loading="eager" // Always load media to prevent grey placeholders
                       onError={(e) => {
                         e.currentTarget.src = '/placeholder.svg';
                       }}

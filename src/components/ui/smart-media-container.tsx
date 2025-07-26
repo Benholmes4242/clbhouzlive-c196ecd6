@@ -42,7 +42,7 @@ const SmartMediaContainer: React.FC<SmartMediaContainerProps> = ({
   const { isMobile, isSlowNetwork, getBatchSize } = useMobileOptimizations();
   
   const { ref: intersectionRef, isInView } = useIntersectionObserver({
-    threshold: 0.1,
+    threshold: 0.01, // 1% visibility to show content
     rootMargin: `${lazyThreshold}px`
   });
 
