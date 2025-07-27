@@ -215,7 +215,7 @@ const HeroProfileHeader = ({
             </div>
             
             {/* Text Info */}
-            <div className="mb-2">
+            <div className="mb-0">
               <h1 className="text-4xl font-bold mb-2 drop-shadow-lg">
                 {displayName}
               </h1>
