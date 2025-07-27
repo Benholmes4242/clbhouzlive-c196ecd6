@@ -24,10 +24,7 @@ const ClubhouseLogo: React.FC<ClubhouseLogoProps> = ({
       src="/lovable-uploads/2b0e2d79-6b26-4b6b-a27b-8dd5f8cc5aad.png"
       alt="Clubhouse Community Rating"
       className={`${sizeClasses[size]} ${className}`}
-      style={{ 
-        objectFit: 'contain',
-        filter: 'brightness(1.5) contrast(1.2) drop-shadow(0 1px 2px rgba(0,0,0,0.3))'
-      }}
+      style={{ objectFit: 'contain' }}
     />
   );
 
