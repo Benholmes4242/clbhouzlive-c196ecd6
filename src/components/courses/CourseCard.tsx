@@ -126,8 +126,8 @@ const CourseCard: React.FC<CourseCardProps> = ({
           </h3>
           
           {/* Location with map pin */}
-          <div className="flex items-center text-white/90 text-sm drop-shadow">
-            <MapPin className="h-4 w-4 mr-1 flex-shrink-0" />
+          <div className="flex items-center text-white/90 text-lg leading-relaxed drop-shadow-lg">
+            <MapPin className="h-5 w-5 mr-2 flex-shrink-0" />
             <span>{formatLocation(course)}</span>
           </div>
         </div>
