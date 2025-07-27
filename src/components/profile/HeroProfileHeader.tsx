@@ -231,7 +231,7 @@ const HeroProfileHeader = ({
                 {/* Edit Profile Button (only for own profile) */}
                 {isOwnProfile && (
                   <button 
-                    className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg backdrop-blur-sm transition-colors text-sm -mb-1"
+                    className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg backdrop-blur-sm transition-colors text-sm relative -top-1"
                     onClick={() => window.location.href = '/settings'}
                   >
                     Edit Profile
