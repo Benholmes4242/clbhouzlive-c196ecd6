@@ -6,7 +6,7 @@ import {
   CameraIcon, 
   MapPinIcon, 
   UserIcon 
-} from '@heroicons/react/24/solid';
+} from '@heroicons/react/24/outline';
 
 export const navigationTabs = [
   { id: 'clubhouse', label: 'Clubhouse', icon: HomeIcon, path: '/clubhouse' },
