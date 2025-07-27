@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { MapPin, X } from 'lucide-react';
+import { MapPin, X, Maximize2, VolumeX, Volume2 } from 'lucide-react';
 
 interface VideoHighlight {
   id: string;
@@ -20,6 +20,30 @@ interface Top100VideoHighlightsProps {
 
 const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId }) => {
   const [fullscreenVideo, setFullscreenVideo] = useState<string | null>(null);
+  const [isPlaying, setIsPlaying] = useState<string | null>(null);
+  const [isMuted, setIsMuted] = useState(true);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const handlePlayVideo = (videoId: string, videoUrl: string) => {
+    if (isPlaying === videoId) {
+      videoRef.current?.pause();
+      setIsPlaying(null);
+    } else {
+      videoRef.current?.play();
+      setIsPlaying(videoId);
+    }
+  };
+
+  const handleMuteToggle = () => {
+    setIsMuted(!isMuted);
+    if (videoRef.current) {
+      videoRef.current.muted = !isMuted;
+    }
+  };
+
+  const handleFullscreen = (videoUrl: string) => {
+    setFullscreenVideo(videoUrl);
+  };
   
   // Function to extract video ID from Cloudflare Stream URL and generate thumbnail
   const getVideoThumbnail = (videoUrl: string) => {
@@ -157,46 +181,68 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId })
             {videoHighlights.slice(0, 1).map((highlight) => (
               <div
                 key={highlight.id}
-                className="relative w-full aspect-video rounded-lg overflow-hidden bg-gray-800/50 border border-white/20 hover:border-white/40 transition-all cursor-pointer group"
-                onClick={() => setFullscreenVideo(highlight.media_url)}
+                className="relative w-full aspect-video rounded-lg overflow-hidden bg-gray-800/50 border border-white/20 hover:border-white/40 transition-all group"
               >
-                {/* Video Thumbnail - Full Size */}
-                {getVideoThumbnail(highlight.media_url) ? (
-                  <img 
-                    src={getVideoThumbnail(highlight.media_url)!}
-                    alt={`${highlight.course_name} video thumbnail`}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      // Fallback to video element if thumbnail fails
-                      const target = e.target as HTMLImageElement;
-                      const videoElement = document.createElement('video');
-                      videoElement.src = highlight.media_url;
-                      videoElement.className = 'w-full h-full object-cover';
-                      videoElement.muted = true;
-                      videoElement.preload = 'metadata';
-                      target.parentNode?.replaceChild(videoElement, target);
-                    }}
-                  />
-                ) : (
-                  <video 
-                    src={highlight.media_url}
-                    className="w-full h-full object-cover"
-                    muted
-                    preload="metadata"
-                  />
+                {/* Video Player */}
+                <video 
+                  ref={videoRef}
+                  src={highlight.media_url}
+                  className="w-full h-full object-cover"
+                  muted={isMuted}
+                  preload="metadata"
+                  poster={getVideoThumbnail(highlight.media_url) || undefined}
+                  onClick={() => handlePlayVideo(highlight.id, highlight.media_url)}
+                />
+                
+                {/* Gradient overlay - only show when not playing */}
+                {isPlaying !== highlight.id && (
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none"></div>
                 )}
                 
-                {/* Gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-                
-                {/* Play button overlay */}
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:bg-white/30 transition-all">
-                    <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M8 5v14l11-7z"/>
-                    </svg>
+                {/* Play button overlay - only show when not playing */}
+                {isPlaying !== highlight.id && (
+                  <div 
+                    className="absolute inset-0 flex items-center justify-center cursor-pointer"
+                    onClick={() => handlePlayVideo(highlight.id, highlight.media_url)}
+                  >
+                    <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:bg-white/30 transition-all">
+                      <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M8 5v14l11-7z"/>
+                      </svg>
+                    </div>
                   </div>
-                </div>
+                )}
+
+                {/* Control icons - only show when playing */}
+                {isPlaying === highlight.id && (
+                  <>
+                    {/* Maximize button - top right */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleFullscreen(highlight.media_url);
+                      }}
+                      className="absolute top-2 right-2 z-20 text-white hover:text-white/80 transition-colors"
+                    >
+                      <Maximize2 className="h-5 w-5" />
+                    </button>
+
+                    {/* Mute/Unmute button - bottom right */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleMuteToggle();
+                      }}
+                      className="absolute bottom-2 right-2 z-20 text-white hover:text-white/80 transition-colors"
+                    >
+                      {isMuted ? (
+                        <VolumeX className="h-5 w-5" />
+                      ) : (
+                        <Volume2 className="h-5 w-5" />
+                      )}
+                    </button>
+                  </>
+                )}
               </div>
             ))}
           </div>
