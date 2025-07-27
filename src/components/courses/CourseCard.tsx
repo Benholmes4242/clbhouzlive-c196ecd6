@@ -90,6 +90,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
     <>
       <Card 
         className="group hover:shadow-lg transition-all duration-200 cursor-pointer overflow-hidden relative"
+        style={{ borderRadius: '8px' }}
         onClick={handleCardClick}
       >
         <div className="relative">
