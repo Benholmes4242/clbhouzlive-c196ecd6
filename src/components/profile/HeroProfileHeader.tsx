@@ -245,22 +245,22 @@ const HeroProfileHeader = ({
                   @{username}
                 </p>
               )}
-              <div className="flex items-center justify-between">
+              <div className="flex items-start justify-between">
                 <p className="text-lg text-white/80 drop-shadow">
                   {homeClub}
                 </p>
                 {/* Action Buttons (only for own profile) */}
                 {isOwnProfile && (
-                  <div className="flex flex-col space-y-2">
+                  <div className="flex flex-col space-y-2 -translate-y-10">
                     <button 
-                      className="bg-transparent backdrop-blur-[1px] border border-white/25 text-white px-4 py-2 shadow-lg shadow-black/10 transition-colors text-sm font-medium hover:bg-white/10"
+                      className="bg-transparent backdrop-blur-[1px] border border-white/25 text-white px-0.5 py-0 shadow-lg shadow-black/10 transition-colors text-base font-medium"
                       style={{ borderRadius: '8px' }}
                       onClick={() => setEditDialogOpen(true)}
                     >
                       Edit Profile
                     </button>
                     <button 
-                      className="bg-transparent backdrop-blur-[1px] border border-white/25 text-white px-4 py-2 shadow-lg shadow-black/10 transition-colors text-sm font-medium hover:bg-white/10"
+                      className="bg-transparent backdrop-blur-[1px] border border-white/25 text-white px-0.5 py-0 shadow-lg shadow-black/10 transition-colors text-base font-medium"
                       style={{ borderRadius: '8px' }}
                       onClick={async () => {
                         // Handle cover photo upload
