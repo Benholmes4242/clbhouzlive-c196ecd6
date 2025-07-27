@@ -173,7 +173,7 @@ const Top100AchievementsSection: React.FC<Top100AchievementsSectionProps> = ({
   return (
     <div className="mb-6">
       {/* Achievements Stats Card with embedded achievements */}
-      <div className="bg-black/40 backdrop-blur-sm rounded-[8px] px-4 py-3 border border-black/20">
+      <div className="bg-white/20 backdrop-blur-sm rounded-[8px] px-4 py-3 border border-white/30">
         <div className="space-y-4">
           <div>
             <h3 className="font-bold text-lg text-white">Achievements</h3>
@@ -197,7 +197,7 @@ const Top100AchievementsSection: React.FC<Top100AchievementsSectionProps> = ({
                   className={`flex items-center gap-3 p-2 rounded-lg border transition-all duration-300 ${
                     achievement.isEarned
                       ? "bg-green-500/10 border-green-400/30"
-                      : "bg-black/20 border-black/40 opacity-60"
+                      : "bg-white/5 border-white/20 opacity-60"
                   }`}
                 >
                   {/* Achievement Icon */}
