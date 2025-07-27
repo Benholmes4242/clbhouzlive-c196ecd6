@@ -196,10 +196,7 @@ const Top100AchievementsSection: React.FC<Top100AchievementsSectionProps> = ({
                   {highestEarnedAchievement.title}
                 </div>
                 <div className="text-xs text-white/80">
-                  {isOwnProfile 
-                    ? `You've played ${userProgress} top 100 courses`
-                    : `${firstName} has played ${userProgress} top 100 courses`
-                  }
+                  Played {userProgress} top 100 courses
                 </div>
               </div>
             </div>
