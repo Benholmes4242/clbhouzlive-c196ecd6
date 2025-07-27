@@ -224,14 +224,14 @@ const HeroProfileHeader = ({
                   @{username}
                 </p>
               )}
-              <div className="flex items-end justify-between">
-                <p className="text-lg text-white/80 drop-shadow pb-2">
+              <div className="flex items-center justify-between">
+                <p className="text-lg text-white/80 drop-shadow">
                   {homeClub}
                 </p>
                 {/* Edit Profile Button (only for own profile) */}
                 {isOwnProfile && (
                   <button 
-                    className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg backdrop-blur-sm transition-colors text-sm relative -top-2"
+                    className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg backdrop-blur-sm transition-colors text-sm"
                     onClick={() => window.location.href = '/settings'}
                   >
                     Edit Profile
