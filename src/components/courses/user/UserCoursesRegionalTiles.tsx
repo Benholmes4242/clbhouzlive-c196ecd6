@@ -190,7 +190,7 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
                     <TooltipTrigger asChild>
                       <button
                         onClick={() => onFilterChange(activeFilter === tile.key ? null : tile.key)}
-                        className={`flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors px-1 py-1 shadow-lg shadow-black/10 text-sm font-medium hover:bg-white/30 ${
+                        className={`flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors px-1 py-0.5 shadow-lg shadow-black/10 text-sm font-medium hover:bg-white/30 ${
                           activeFilter === tile.key 
                             ? 'bg-white/40 backdrop-blur-sm border border-white/50 text-white' 
                             : 'bg-white/20 backdrop-blur-sm border border-white/30 text-white'
