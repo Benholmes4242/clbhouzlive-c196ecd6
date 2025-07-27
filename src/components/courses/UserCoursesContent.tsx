@@ -8,6 +8,7 @@ import CourseCard from './CourseCard';
 import { EmptyTop100State } from './user/UserCoursesEmptyStates';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import Top100AchievementsSection from '@/components/profile/Top100AchievementsSection';
 
 interface UserCoursesContentProps {
   username?: string;
@@ -246,6 +247,11 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
         displayName={finalDisplayName} 
         isOwnProfile={finalIsOwnProfile} 
       />
+
+      {/* Achievements Section */}
+      {targetUserId && (
+        <Top100AchievementsSection userId={targetUserId} />
+      )}
 
       <UserCoursesRegionalTiles
         regionProgress={regionProgress}
