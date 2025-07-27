@@ -64,7 +64,6 @@ const UniversalProfileTabs: React.FC<UniversalProfileTabsProps> = ({
             <TabsContent value="top100" className="mt-0">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-3xl font-bold text-white">Top 100 courses</h2>
-                <div className="text-white">DEBUG: Top 100 title rendered</div>
               </div>
               <UserCoursesContent 
                 username={profile?.username} 
