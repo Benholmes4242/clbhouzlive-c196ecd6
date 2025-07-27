@@ -33,6 +33,14 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
     }
   ];
 
+  // Auto-change content when swiping
+  React.useEffect(() => {
+    const currentCard = cards[currentIndex];
+    if (currentCard && isMobile) {
+      onSectionChange?.(currentCard.id);
+    }
+  }, [currentIndex, cards, onSectionChange, isMobile]);
+
   const goToNext = () => {
     setCurrentIndex((prev) => (prev + 1) % cards.length);
   };
