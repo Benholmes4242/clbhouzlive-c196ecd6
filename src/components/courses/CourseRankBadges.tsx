@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Earth } from 'lucide-react';
 import CountryFlag from '@/components/ui/country-flag';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import ClubhouseLogo from '@/components/ui/clubhouse-logo';
 
 interface CourseRankBadgesProps {
   globalRank: number | null;
@@ -107,8 +108,9 @@ const CourseRankBadges = ({
         <div className="absolute top-2 right-2">
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="flex items-center px-2 py-1 bg-teal-100/90 backdrop-blur-sm rounded-xl shadow-sm">
-                <span className="text-sm font-bold text-teal-800">{playerRatingBadge.content}</span>
+              <div className="flex items-center gap-1.5 px-2 py-1 bg-white/90 backdrop-blur-sm rounded-xl shadow-sm">
+                <ClubhouseLogo size="sm" />
+                <span className="text-sm font-bold text-gray-800">{playerRatingBadge.content}</span>
               </div>
             </TooltipTrigger>
             <TooltipContent>
