@@ -3,10 +3,29 @@ import { useNavigate } from 'react-router-dom';
 import Header from "@/components/Header";
 import BottomNavigation from '@/components/BottomNavigation';
 import HeroProfileHeader from '@/components/profile/HeroProfileHeader';
+import UniversalProfileTabs from '@/components/profile/UniversalProfileTabs';
 import { useProfileData } from '@/hooks/useProfileData';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
+  const [activeTab, setActiveTab] = useState('activity'); // State for tab control
+  
+  // Functions to handle card clicks and scroll to tabs
+  const scrollToHandicap = () => {
+    setActiveTab('handicap');
+    const element = document.getElementById('profile-tabs');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+  
+  const scrollToTop100 = () => {
+    setActiveTab('top100');
+    const element = document.getElementById('profile-tabs');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
   
   const {
     user,
@@ -86,7 +105,20 @@ const ProfilePage = () => {
         <HeroProfileHeader 
           profile={profile}
           onProfileUpdate={refreshProfile}
+          onHandicapClick={scrollToHandicap}
+          onTop100Click={scrollToTop100}
         />
+        
+        <div id="profile-tabs">
+          <UniversalProfileTabs
+            userId={profile?.id}
+            profile={profile}
+            isOwnProfile={true}
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+            hideActivityTab={true}
+          />
+        </div>
       </div>
       
       <BottomNavigation />
