@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import ProfileFormFields from "./ProfileFormFields";
 import { useProfileForm } from "./hooks/useProfileForm";
+import { useLatestHorizontalVideo } from '@/hooks/useLatestHorizontalVideo';
 
 interface Course {
   id: string;
@@ -46,6 +47,7 @@ const HeroProfileHeader = ({
   const [uploading, setUploading] = useState(false);
   const [avatarKey, setAvatarKey] = useState(Date.now()); // Add cache-busting key
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const { videoUrl: latestHorizontalVideo } = useLatestHorizontalVideo(profile?.id);
   
   // Derived values
   const isOwnProfile = user?.id === profile?.id;
@@ -389,43 +391,47 @@ const HeroProfileHeader = ({
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Activity Card */}
             <div 
-              className="relative overflow-hidden bg-gradient-to-br from-blue-500 to-blue-700 flex flex-col justify-end text-white h-[200px] cursor-pointer group"
+              className="relative overflow-hidden flex flex-col justify-end text-white h-[200px] cursor-pointer group"
               style={{ borderRadius: '8px' }}
               ref={null}
               onClick={() => scrollToSection('recent-activity')}
             >
-              {/* Activity Pattern Background */}
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-transparent">
-                <div className="absolute inset-0" style={{
-                  backgroundImage: `
-                    radial-gradient(circle at 20% 80%, rgba(255,255,255,0.1) 0%, transparent 50%),
-                    radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1) 0%, transparent 50%),
-                    linear-gradient(45deg, rgba(255,255,255,0.05) 25%, transparent 25%), 
-                    linear-gradient(-45deg, rgba(255,255,255,0.05) 25%, transparent 25%)
-                  `,
-                  backgroundSize: '100% 100%, 100% 100%, 40px 40px, 40px 40px'
-                }}>
+              {/* Video Background or Fallback */}
+              {latestHorizontalVideo ? (
+                <video
+                  className="absolute inset-0 w-full h-full object-cover"
+                  src={latestHorizontalVideo}
+                  muted
+                  loop
+                  autoPlay
+                  playsInline
+                />
+              ) : (
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-blue-700">
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-transparent">
+                    <div className="absolute inset-0" style={{
+                      backgroundImage: `
+                        radial-gradient(circle at 20% 80%, rgba(255,255,255,0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1) 0%, transparent 50%),
+                        linear-gradient(45deg, rgba(255,255,255,0.05) 25%, transparent 25%), 
+                        linear-gradient(-45deg, rgba(255,255,255,0.05) 25%, transparent 25%)
+                      `,
+                      backgroundSize: '100% 100%, 100% 100%, 40px 40px, 40px 40px'
+                    }}>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              )}
+              
+              {/* Dark overlay for text readability */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
               
               {/* Content */}
               <div className="relative p-8 cursor-pointer group">
                 <div className="flex items-center mb-3">
-                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mr-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
-                      <path d="M3 3v5h5"/>
-                      <path d="M6 5 3 8"/>
-                      <path d="M3 19v-5h5"/>
-                      <path d="M6 19l-3-3"/>
-                      <path d="M15 3h5v5"/>
-                      <path d="M18 3 21 6"/>
-                      <path d="M21 19v-5h-5"/>
-                      <path d="M18 19l3-3"/>
-                    </svg>
-                  </div>
                   <h3 className="text-3xl font-bold group-hover:scale-105 transition-transform">Activity</h3>
                 </div>
-                <p className="text-white/80 text-lg leading-relaxed">View your recent golf moments, rounds played, and course discoveries.</p>
+                <p className="text-white/90 text-lg leading-relaxed drop-shadow-lg">View your recent golf moments, rounds played, and course discoveries.</p>
               </div>
             </div>
 
