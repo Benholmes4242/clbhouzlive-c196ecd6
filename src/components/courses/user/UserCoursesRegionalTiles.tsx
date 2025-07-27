@@ -121,23 +121,23 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
               })}
             </div>
           ) : (
-            <div className="overflow-x-auto scrollbar-hide w-full">
-              <div className="flex gap-2 pb-2 px-4" style={{ minWidth: 'max-content' }}>
+            <div className="w-full">
+              <div className="flex gap-1 w-full">
                 {sortOptions.map((option) => {
                   const IconComponent = option.icon;
                   return (
                     <button
                       key={option.key}
                       onClick={() => onSortChange(option.key)}
-                      className={`flex items-center gap-2 text-base font-medium whitespace-nowrap px-1 py-1.5 shadow-lg shadow-black/10 transition-colors flex-shrink-0 hover:bg-white/30 ${
+                      className={`flex items-center justify-center gap-1 text-sm font-medium px-2 py-1.5 shadow-lg shadow-black/10 transition-colors flex-1 hover:bg-white/30 ${
                         sortBy === option.key 
                           ? "bg-white/40 backdrop-blur-sm border border-white/50 text-white" 
                           : "bg-white/20 backdrop-blur-sm border border-white/30 text-white"
                       }`}
                       style={{ borderRadius: '8px' }}
                     >
-                      <IconComponent className="w-4 h-4" />
-                      {option.label}
+                      <IconComponent className="w-3 h-3" />
+                      <span className="text-xs">{option.label}</span>
                     </button>
                   );
                 })}
@@ -182,51 +182,37 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
               </TooltipProvider>
             </div>
           ) : (
-            /* Mobile: Horizontally scrollable with bounce */
-            <div 
-              className="overflow-x-auto scrollbar-hide"
-              style={{
-                WebkitOverflowScrolling: 'touch',
-                overscrollBehaviorX: 'contain'
-              }}
-            >
-              <div 
-                className="flex items-center gap-3 pb-2 px-4"
-                style={{ 
-                  minWidth: 'max-content',
-                  width: 'max-content'
-                }}
-              >
-                <TooltipProvider>
-                  {tiles.map((tile) => (
-                    <Tooltip key={tile.key}>
-                      <TooltipTrigger asChild>
-                        <button
-                          onClick={() => onFilterChange(activeFilter === tile.key ? null : tile.key)}
-                          className={`flex items-center gap-1 cursor-pointer transition-colors whitespace-nowrap flex-shrink-0 px-0.5 py-1.5 shadow-lg shadow-black/10 text-base font-medium hover:bg-white/30 ${
-                            activeFilter === tile.key 
-                              ? 'bg-white/40 backdrop-blur-sm border border-white/50 text-white' 
-                              : 'bg-white/20 backdrop-blur-sm border border-white/30 text-white'
-                          }`}
-                          style={{ borderRadius: '8px' }}
-                        >
-                          {tile.flag === 'earth' ? (
-                            <Earth className="w-5 h-4 text-white flex-shrink-0" />
-                          ) : (
-                            <CountryFlag country={tile.country} size="md" className="flex-shrink-0" />
-                          )}
-                          <span className="text-sm font-semibold">
-                            {tile.progress.played} / {tile.progress.total}
-                          </span>
-                        </button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>{tile.label}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  ))}
-                </TooltipProvider>
-              </div>
+            /* Mobile: Full width grid */
+            <div className="grid grid-cols-4 gap-2">
+              <TooltipProvider>
+                {tiles.map((tile) => (
+                  <Tooltip key={tile.key}>
+                    <TooltipTrigger asChild>
+                      <button
+                        onClick={() => onFilterChange(activeFilter === tile.key ? null : tile.key)}
+                        className={`flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors px-1 py-2 shadow-lg shadow-black/10 text-sm font-medium hover:bg-white/30 ${
+                          activeFilter === tile.key 
+                            ? 'bg-white/40 backdrop-blur-sm border border-white/50 text-white' 
+                            : 'bg-white/20 backdrop-blur-sm border border-white/30 text-white'
+                        }`}
+                        style={{ borderRadius: '8px' }}
+                      >
+                        {tile.flag === 'earth' ? (
+                          <Earth className="w-4 h-4 text-white flex-shrink-0" />
+                        ) : (
+                          <CountryFlag country={tile.country} size="sm" className="flex-shrink-0" />
+                        )}
+                        <span className="text-xs font-semibold">
+                          {tile.progress.played} / {tile.progress.total}
+                        </span>
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{tile.label}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                ))}
+              </TooltipProvider>
             </div>
           )}
         </div>
