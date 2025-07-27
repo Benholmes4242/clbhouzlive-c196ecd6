@@ -3,6 +3,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { OptimizedAvatar } from '@/components/ui/optimized-avatar';
+import { useStaggeredInView } from '@/hooks/useInViewAnimation';
 
 interface Course {
   id: string;
@@ -27,28 +28,27 @@ interface UserProfile {
 
 interface HeroProfileHeaderProps {
   profile: UserProfile | null;
-  isOwnProfile: boolean;
-  displayName: string;
-  username: string | null;
-  homeClub: string;
-  backgroundImage?: string;
-  postsCount: number;
-  onRefresh: () => void;
+  onProfileUpdate: () => void;
 }
 
 const HeroProfileHeader = ({ 
   profile, 
-  isOwnProfile, 
-  displayName, 
-  username, 
-  homeClub,
-  backgroundImage,
-  postsCount,
-  onRefresh
+  onProfileUpdate
 }: HeroProfileHeaderProps) => {
   const { user } = useSupabaseSession();
   const [uploading, setUploading] = useState(false);
   const [avatarKey, setAvatarKey] = useState(Date.now()); // Add cache-busting key
+  
+  // Derived values
+  const isOwnProfile = user?.id === profile?.id;
+  const displayName = profile?.display_name || 'User';
+  const username = profile?.username;
+  const homeClub = profile?.home_club || 'No Club';
+  const backgroundImage = profile?.background_image_url;
+  const postsCount = 0; // This would be fetched from actual data
+  
+  // Animation hook for badges
+  const badgesAnimation = useStaggeredInView(5, { threshold: 0.1, staggerDelay: 100 });
   
   // Update avatar key when profile photo URL changes to force re-render
   useEffect(() => {
@@ -113,7 +113,7 @@ const HeroProfileHeader = ({
       console.log('Photo upload successful, refreshing profile data...');
       
       // Refresh the profile data
-      onRefresh();
+      onProfileUpdate();
       
       toast({
         title: "Success", 
@@ -413,7 +413,7 @@ const HeroProfileHeader = ({
 
       {/* Rest of content sections would continue here... */}
       {/* Badges & Achievements Section Heading */}
-      <div className="w-full bg-background py-6" ref={badgesRef}>
+      <div className="w-full bg-background py-6" ref={badgesAnimation.ref}>
         <div className="max-w-4xl mx-auto px-6">
           <h2 className="text-2xl font-bold text-foreground mb-6">Badges & Achievements</h2>
           

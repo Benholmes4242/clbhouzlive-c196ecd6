@@ -79,7 +79,6 @@ const ProfilePage = () => {
       <div className="max-w-4xl mx-auto">
         <HeroProfileHeader 
           profile={profile}
-          currentUser={user}
           onProfileUpdate={refreshProfile}
         />
         
