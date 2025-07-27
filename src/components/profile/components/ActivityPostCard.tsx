@@ -3,7 +3,8 @@ import React from 'react';
 import { ActivityPost } from '../types/ActivityTypes';
 
 import CourseTag from '@/components/posts/CourseTag';
-import { Camera, Play, Film } from 'lucide-react';
+import { Camera, Play } from 'lucide-react';
+import { MdOutlinePlayCircle } from 'react-icons/md';
 import HighQualityImage from '@/components/ui/high-quality-image';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import { useVideoAutoplay } from '@/hooks/useVideoAutoplay';
@@ -112,7 +113,7 @@ const ActivityPostCard = ({ post, attributionText, onClick, isFirstVideo }: Acti
                 />
                 {/* Film icon for videos */}
                 <div className="absolute bottom-2 right-2 z-10">
-                  <Film className="w-4 h-4 text-white drop-shadow-lg" />
+                  <MdOutlinePlayCircle className="w-4 h-4 text-white drop-shadow-lg" />
                 </div>
               </div>
             )
