@@ -20,6 +20,8 @@ interface Achievement {
 const Top100AchievementsSection: React.FC<Top100AchievementsSectionProps> = ({
   userId
 }) => {
+  console.log('Top100AchievementsSection rendering with userId:', userId);
+  
   // Get real user's Top 100 course progress across all regional lists
   const { data: userProgress = 0 } = useQuery({
     queryKey: ['userTop100Progress', userId],
