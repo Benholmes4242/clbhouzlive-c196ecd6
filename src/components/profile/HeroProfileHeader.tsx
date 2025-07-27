@@ -179,7 +179,9 @@ const HeroProfileHeader = ({
           backgroundImage: backgroundImage ? `url(${backgroundImage})` : undefined,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
+          backgroundRepeat: 'no-repeat',
+          // Ensure cover photo extends to the very top
+          marginTop: backgroundImage ? '0' : '0'
         }}
       >
         {/* Gradient overlay */}
