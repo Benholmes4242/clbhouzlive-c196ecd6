@@ -228,14 +228,35 @@ const HeroProfileHeader = ({
                 <p className="text-lg text-white/80 drop-shadow">
                   {homeClub}
                 </p>
-                {/* Edit Profile Button (only for own profile) */}
+                {/* Action Buttons (only for own profile) */}
                 {isOwnProfile && (
-                  <button 
-                    className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg backdrop-blur-sm transition-colors text-sm transform -translate-y-1"
-                    onClick={() => window.location.href = '/settings'}
-                  >
-                    Edit Profile
-                  </button>
+                  <div className="flex flex-col space-y-2">
+                    <button 
+                      className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg backdrop-blur-sm transition-colors text-sm"
+                      onClick={() => window.location.href = '/settings'}
+                    >
+                      Edit Profile
+                    </button>
+                    <button 
+                      className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg backdrop-blur-sm transition-colors text-sm"
+                      onClick={() => {
+                        // Handle cover photo upload
+                        const input = document.createElement('input');
+                        input.type = 'file';
+                        input.accept = 'image/*';
+                        input.onchange = (e) => {
+                          const file = (e.target as HTMLInputElement).files?.[0];
+                          if (file) {
+                            // TODO: Implement cover photo upload
+                            console.log('Cover photo selected:', file);
+                          }
+                        };
+                        input.click();
+                      }}
+                    >
+                      Change Cover
+                    </button>
+                  </div>
                 )}
               </div>
             </div>
