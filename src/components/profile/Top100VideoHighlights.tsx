@@ -177,7 +177,7 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId })
 
   if (isLoading) {
     return (
-      <div className="bg-white/20 backdrop-blur-sm rounded-[8px] px-4 py-3 border border-white/30">
+      <div className="bg-black/40 backdrop-blur-sm rounded-[8px] px-4 py-3 border border-black/20">
         <div className="space-y-4">
           <div>
             <h3 className="font-bold text-lg text-white">Latest Highlights</h3>
@@ -202,7 +202,7 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId })
   }
 
   return (
-    <div className="bg-white/20 backdrop-blur-sm rounded-[8px] px-4 py-3 border border-white/30">
+    <div className="bg-black/40 backdrop-blur-sm rounded-[8px] px-4 py-3 border border-black/20">
       <div className="space-y-4">
         <div>
           <h3 className="font-bold text-lg text-white">Latest Highlights</h3>
