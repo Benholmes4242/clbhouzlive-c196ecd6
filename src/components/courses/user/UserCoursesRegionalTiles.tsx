@@ -234,7 +234,7 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
 
       {/* Active Filter Indicator */}
       {activeFilter && (
-        <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+        <div className="flex items-center justify-center gap-2 text-sm text-white">
           <span>
             Showing {tiles.find(t => t.key === activeFilter)?.label.replace(' Played', '')} courses
           </span>
