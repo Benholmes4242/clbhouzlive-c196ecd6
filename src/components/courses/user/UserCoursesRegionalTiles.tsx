@@ -242,7 +242,7 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
             variant="ghost"
             size="sm"
             onClick={() => onFilterChange(null)}
-            className="h-auto p-1 text-muted-foreground hover:text-[#b66b41]"
+            className="h-auto p-1 text-muted-foreground"
           >
             <X className="h-3 w-3" />
           </Button>
