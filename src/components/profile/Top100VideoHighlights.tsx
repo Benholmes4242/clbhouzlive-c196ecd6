@@ -19,26 +19,8 @@ interface Top100VideoHighlightsProps {
 }
 
 const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId }) => {
-  const [isPlaying, setIsPlaying] = useState<string | null>(null);
   const [isMuted, setIsMuted] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
-
-  const handlePlayVideo = (videoId: string, videoUrl: string) => {
-    if (isPlaying === videoId) {
-      videoRef.current?.pause();
-      setIsPlaying(null);
-    } else {
-      videoRef.current?.play();
-      setIsPlaying(videoId);
-    }
-  };
-
-  const handleMuteToggle = () => {
-    setIsMuted(!isMuted);
-    if (videoRef.current) {
-      videoRef.current.muted = !isMuted;
-    }
-  };
   
   // Function to extract video ID from Cloudflare Stream URL and generate thumbnail
   const getVideoThumbnail = (videoUrl: string) => {
@@ -184,16 +166,12 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId })
                   src={highlight.media_url}
                   className="w-full h-full object-cover"
                   muted={isMuted}
+                  autoPlay
+                  loop
+                  playsInline
                   preload="metadata"
                   poster={getVideoThumbnail(highlight.media_url) || undefined}
-                  onClick={() => handlePlayVideo(highlight.id, highlight.media_url)}
                 />
-                
-                {/* Gradient overlay - only show when not playing */}
-                {isPlaying !== highlight.id && (
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none"></div>
-                )}
-                
 
               </div>
             ))}
