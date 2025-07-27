@@ -165,10 +165,10 @@ const HeroProfileHeader = ({
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
         
         {/* Content Container - Top Section */}
-        <div className="relative flex items-start justify-between px-6 py-8 pt-16">
+        <div className="relative flex items-start justify-between px-8 py-8 pt-16">
           
           {/* Left Side - Profile Info */}
-          <div className="text-white flex-1">
+          <div className="text-white flex-1 ml-4">
             {/* Profile Photo */}
             <div className="w-24 h-24 mb-4">
               {isOwnProfile ? (
