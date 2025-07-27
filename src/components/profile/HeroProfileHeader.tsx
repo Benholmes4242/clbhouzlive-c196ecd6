@@ -186,7 +186,7 @@ const HeroProfileHeader = ({
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
         
         {/* Content Container - Top Section */}
-        <div className="relative flex items-end justify-between px-8 pt-16" style={{ paddingBottom: '32px' }}>
+        <div className="relative flex items-end justify-between px-8 pt-16 pb-8" style={{ marginBottom: '24px' }}>
           
           {/* Left Side - Profile Information */}
           <div className="flex flex-col text-white">
@@ -348,7 +348,7 @@ const HeroProfileHeader = ({
         </div>
 
         {/* Stats Bar - Full Width with equal padding */}
-        <div className="relative px-8" style={{ marginTop: '-40px' }}>
+        <div className="relative px-8 mb-6">
           <div className="bg-black/40 backdrop-blur-sm px-6 py-1 shadow-lg" style={{ borderRadius: '8px' }}>
             <div className="flex items-center justify-between w-full text-white">
               <div className="text-center">
