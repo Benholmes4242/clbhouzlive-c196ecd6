@@ -28,6 +28,19 @@ const ActivityPostCard = ({ post, attributionText, onClick, isFirstVideo }: Acti
     console.log('Navigate to course feed:', courseName);
   };
 
+  // Generate thumbnail URL for Cloudflare Stream videos
+  const getVideoThumbnail = (videoUrl: string) => {
+    if (videoUrl.includes('cloudflarestream.com') && videoUrl.includes('/manifest/video.m3u8')) {
+      // Extract video ID from Cloudflare Stream URL
+      const match = videoUrl.match(/\/([a-f0-9]+)\/manifest\/video\.m3u8/);
+      if (match) {
+        const videoId = match[1];
+        return `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${videoId}/thumbnails/thumbnail.jpg`;
+      }
+    }
+    return null;
+  };
+
   // Find course tags from post tags
   const courseTags = post.post_tags?.filter(tag => 
     tag.tagged_entity?.entity_type === 'golf_club'
@@ -67,11 +80,35 @@ const ActivityPostCard = ({ post, attributionText, onClick, isFirstVideo }: Acti
               // Show thumbnail for non-autoplay videos
               <div className="relative w-full h-full">
                 <HighQualityImage
-                  src={firstMedia.media_url}
+                  src={getVideoThumbnail(firstMedia.media_url) || firstMedia.media_url}
                   alt="Video thumbnail"
                   className="w-full h-full"
                   width={300}
                   height={300}
+                  onError={(e) => {
+                    // Fallback for thumbnail generation issues
+                    const target = e.target as HTMLImageElement;
+                    target.style.display = 'none';
+                    const container = target.parentElement;
+                    if (container && !container.querySelector('.video-placeholder')) {
+                      container.classList.add('flex', 'items-center', 'justify-center', 'bg-gray-200');
+                      
+                      const placeholder = document.createElement('div');
+                      placeholder.className = 'flex flex-col items-center justify-center text-gray-500 video-placeholder';
+                      
+                      const filmIcon = document.createElement('div');
+                      filmIcon.innerHTML = '🎬';
+                      filmIcon.className = 'text-2xl mb-1';
+                      
+                      const span = document.createElement('span');
+                      span.className = 'text-xs';
+                      span.textContent = 'Video';
+                      
+                      placeholder.appendChild(filmIcon);
+                      placeholder.appendChild(span);
+                      container.appendChild(placeholder);
+                    }
+                  }}
                 />
                 {/* Film icon for videos */}
                 <div className="absolute bottom-2 right-2 z-10">
