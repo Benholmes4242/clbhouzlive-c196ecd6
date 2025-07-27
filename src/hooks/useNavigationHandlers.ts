@@ -23,6 +23,16 @@ export const useNavigationHandlers = () => {
       return;
     }
 
+    // Special case: if clicking home/clubhouse while already on clubhouse page, scroll to top
+    if (tab.id === 'clubhouse' && (location.pathname === '/clubhouse' || location.pathname === '/')) {
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: 'smooth'
+      });
+      return;
+    }
+
     setActiveTab(tab.id);
     
     if (tab.path) {
