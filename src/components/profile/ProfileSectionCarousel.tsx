@@ -20,7 +20,7 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
     },
     {
       id: 'top100',
-      title: 'Top 100',
+      title: 'Top 100 Courses',
       description: 'Discover and track the world\'s greatest golf courses.',
       backgroundImage: `url('/lovable-uploads/b5c44b64-e08d-4c79-b3d0-e15cad97b1b3.png')`,
       className: 'relative overflow-hidden bg-gradient-to-br from-amber-500 to-orange-600 flex flex-col justify-end text-white h-[200px] cursor-pointer group'
