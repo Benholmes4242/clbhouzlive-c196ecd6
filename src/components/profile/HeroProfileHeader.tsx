@@ -232,13 +232,15 @@ const HeroProfileHeader = ({
                 {isOwnProfile && (
                   <div className="flex flex-col space-y-2">
                     <button 
-                      className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg backdrop-blur-sm transition-colors text-sm"
+                      className="bg-transparent backdrop-blur-[1px] border border-white/25 text-white px-4 py-2 shadow-lg shadow-black/10 transition-colors text-sm font-medium"
+                      style={{ borderRadius: '8px' }}
                       onClick={() => window.location.href = '/settings'}
                     >
                       Edit Profile
                     </button>
                     <button 
-                      className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg backdrop-blur-sm transition-colors text-sm"
+                      className="bg-transparent backdrop-blur-[1px] border border-white/25 text-white px-4 py-2 shadow-lg shadow-black/10 transition-colors text-sm font-medium"
+                      style={{ borderRadius: '8px' }}
                       onClick={() => {
                         // Handle cover photo upload
                         const input = document.createElement('input');
