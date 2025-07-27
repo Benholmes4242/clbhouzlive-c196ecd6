@@ -104,7 +104,7 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
         onClick={handleCardClick}
       >
         {/* Course Image */}
-        <div className="relative h-32 overflow-hidden">
+        <div className="relative h-32 overflow-hidden rounded-t-lg">
           <img
             src={course.thumbnail_image || 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=400&h=300&fit=crop'}
             alt={course.name}
