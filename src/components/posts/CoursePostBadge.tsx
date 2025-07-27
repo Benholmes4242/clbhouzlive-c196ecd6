@@ -51,7 +51,7 @@ const CoursePostBadge = ({ course, className = "", isClubhouse = false }: Course
 
   return (
     <div 
-      className={`flex items-center cursor-pointer bg-transparent backdrop-blur-[1px] border border-white/25 px-0.5 py-0 text-white shadow-lg shadow-black/10 ${className}`}
+      className={`flex items-center cursor-pointer bg-black/20 backdrop-blur-sm border border-white/30 px-2 py-1 text-white shadow-lg ${className}`}
       style={{ borderRadius: '8px' }}
       onClick={handleCourseClick}
     >
