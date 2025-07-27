@@ -182,54 +182,65 @@ const Top100AchievementsSection: React.FC<Top100AchievementsSectionProps> = ({
             </p>
           </div>
           
-          {/* Achievement Cards */}
-          <div className="space-y-2">
-            {achievements.map((achievement) => (
-              <div
-                key={achievement.id}
-                className={`flex items-center gap-3 p-2 rounded-lg border transition-all duration-300 ${
-                  achievement.isEarned
-                    ? "bg-white/10 border-white/30"
-                    : "bg-white/5 border-white/20 opacity-60"
-                }`}
-              >
-                {/* Achievement Icon */}
-                <div className="flex items-center justify-center w-6 h-6 rounded-full text-sm">
-                  {achievement.id === '20-club' ? (
-                    <MedalIcon size="sm" />
-                  ) : (
-                    <span>{achievement.emoji}</span>
-                  )}
-                </div>
+          {/* Achievement Cards - Limited height with scroll */}
+          <div className="relative">
+            <div 
+              className="max-h-32 overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent space-y-2"
+              style={{
+                WebkitOverflowScrolling: 'touch',
+                scrollbarWidth: 'thin'
+              }}
+            >
+              {achievements.map((achievement) => (
+                <div
+                  key={achievement.id}
+                  className={`flex items-center gap-3 p-2 rounded-lg border transition-all duration-300 ${
+                    achievement.isEarned
+                      ? "bg-white/10 border-white/30"
+                      : "bg-white/5 border-white/20 opacity-60"
+                  }`}
+                >
+                  {/* Achievement Icon */}
+                  <div className="flex items-center justify-center w-6 h-6 rounded-full text-sm">
+                    {achievement.id === '20-club' ? (
+                      <MedalIcon size="sm" />
+                    ) : (
+                      <span>{achievement.emoji}</span>
+                    )}
+                  </div>
 
-                {/* Achievement Content */}
-                <div className="flex-1">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h4 className="font-medium text-white text-sm leading-tight">
-                        {achievement.title}
-                      </h4>
-                      <p className="text-xs text-white/70">
-                        {achievement.description}
-                      </p>
-                    </div>
-                    
-                    {/* Progress/Status */}
-                    <div className="text-right">
-                      {achievement.isEarned ? (
-                        <span className="text-xs font-medium text-green-300">
-                          ✓ Earned!
-                        </span>
-                      ) : (
-                        <span className="text-xs text-white/60">
-                          {Math.min(userProgress, achievement.threshold)}/{achievement.threshold}
-                        </span>
-                      )}
+                  {/* Achievement Content */}
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium text-white text-sm leading-tight">
+                          {achievement.title}
+                        </h4>
+                        <p className="text-xs text-white/70">
+                          {achievement.description}
+                        </p>
+                      </div>
+                      
+                      {/* Progress/Status */}
+                      <div className="text-right">
+                        {achievement.isEarned ? (
+                          <span className="text-xs font-medium text-green-300">
+                            ✓ Earned!
+                          </span>
+                        ) : (
+                          <span className="text-xs text-white/60">
+                            {Math.min(userProgress, achievement.threshold)}/{achievement.threshold}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+            
+            {/* Scroll indicator gradient */}
+            <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-white/10 to-transparent pointer-events-none rounded-b-lg"></div>
           </div>
         </div>
       </div>
