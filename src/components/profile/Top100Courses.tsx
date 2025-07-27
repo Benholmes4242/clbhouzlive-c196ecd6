@@ -8,6 +8,7 @@ import { useTop100CoursesData } from '@/hooks/useTop100CoursesData';
 import { useNavigate } from 'react-router-dom';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { supabase } from '@/integrations/supabase/client';
+import Top100AchievementsSection from './Top100AchievementsSection';
 
 interface Top100CoursesProps {
   userId: string;
@@ -119,6 +120,9 @@ const Top100Courses: React.FC<Top100CoursesProps> = ({
           </div>
         )}
       </div>
+
+      {/* Achievements Section */}
+      <Top100AchievementsSection userId={userId} />
 
       {/* Dynamic heading text */}
       <div className="text-center mb-6">
