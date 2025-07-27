@@ -511,59 +511,7 @@ const HeroProfileHeader = ({
             </div>
         </div>
         
-        {/* Top 100 Section */}
-        <div 
-          id="top100" 
-          className="bg-gradient-to-br from-amber-500 to-orange-600 text-white relative"
-          ref={top100Ref}
-          onClick={() => scrollToSection('top100-courses')}
-        >
-          {/* Top 100 Pattern Background */}
-          <div className="absolute inset-0 bg-gradient-to-br from-amber-500/20 to-transparent">
-            <div className="absolute inset-0" style={{
-              backgroundImage: `
-                repeating-linear-gradient(45deg, rgba(255,255,255,0.05) 0px, rgba(255,255,255,0.05) 1px, transparent 1px, transparent 20px),
-                repeating-linear-gradient(-45deg, rgba(255,255,255,0.05) 0px, rgba(255,255,255,0.05) 1px, transparent 1px, transparent 20px),
-                radial-gradient(circle at 25% 75%, rgba(255,255,255,0.1) 0%, transparent 50%)
-              `,
-              backgroundSize: '20px 20px, 20px 20px, 100% 100%'
-            }}>
-            </div>
-          </div>
-          
-          {/* Content */}
-          <div className="relative p-8 cursor-pointer group">
-            <div className="flex items-center mb-4">
-              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mr-4">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
-                  <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/>
-                  <path d="M14 9h1.5a2.5 2.5 0 0 1 0 5H14"/>
-                  <path d="M6 9h8"/>
-                  <path d="M18 9h1.5a2.5 2.5 0 0 1 0 5H18"/>
-                  <path d="M18 9v6"/>
-                  <path d="M6 15v-6"/>
-                </svg>
-              </div>
-              <h3 className="text-3xl font-bold group-hover:scale-105 transition-transform">Top 100</h3>
-            </div>
-            <p className="text-white/80 text-lg leading-relaxed mb-6">Discover and track the world's greatest golf courses from our curated Top 100 lists.</p>
-            
-            {/* Top 100 Preview Grid */}
-            <div className="grid grid-cols-4 gap-2">
-              {[1, 2, 3, 4].map((rank, index) => (
-                <div 
-                  key={rank}
-                  className="bg-white/10 backdrop-blur-sm rounded-lg p-3 text-center border border-white/20"
-                  ref={null}
-                >
-                  <div className="text-lg font-bold text-amber-200">#{rank}</div>
-                  <div className="text-xs text-white/70 mt-1">Course</div>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
-      </div>
 
       {/* Rest of content sections would continue here... */}
       
