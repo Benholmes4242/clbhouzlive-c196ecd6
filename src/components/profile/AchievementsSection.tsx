@@ -54,7 +54,7 @@ const AchievementsSection: React.FC<AchievementsSectionProps> = ({
   }
 
   return (
-    <Card className="bg-black/40 backdrop-blur-sm border-black/20">
+    <Card className="!bg-black/40 backdrop-blur-sm !border-black/20 rounded-lg">
       <CardContent className="p-6">
          <div className="flex items-center gap-2 mb-4">
            <Trophy className="h-5 w-5 text-yellow-400" />
