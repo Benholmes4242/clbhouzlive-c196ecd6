@@ -46,20 +46,23 @@ export const usePostSubmissionHandlers = (
       if (tab.id === 'clubhouse' && (location.pathname === '/clubhouse' || location.pathname === '/')) {
         console.log('usePostSubmissionHandlers: Scrolling to top of clubhouse page');
         
-        // Try multiple scroll methods to ensure it works
-        document.documentElement.scrollTop = 0;
-        document.body.scrollTop = 0;
+        // Find the ClubhouseVerticalFeed scroll container
+        const scrollContainer = document.querySelector('.fixed.inset-0.z-10.bg-black.overflow-hidden .h-full.w-full.overflow-y-auto');
         
-        // Also try the window scroll with immediate behavior first, then smooth
-        window.scrollTo(0, 0);
-        
-        setTimeout(() => {
-          window.scrollTo({
+        if (scrollContainer) {
+          console.log('Found clubhouse scroll container, scrolling to top');
+          scrollContainer.scrollTo({
             top: 0,
             left: 0,
             behavior: 'smooth'
           });
-        }, 10);
+        } else {
+          console.log('Clubhouse scroll container not found, trying window scroll');
+          // Fallback to multiple scroll methods
+          document.documentElement.scrollTop = 0;
+          document.body.scrollTop = 0;
+          window.scrollTo(0, 0);
+        }
         
         return;
       }
