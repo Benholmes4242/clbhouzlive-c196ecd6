@@ -19,7 +19,6 @@ interface Top100VideoHighlightsProps {
 }
 
 const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId }) => {
-  const [fullscreenVideo, setFullscreenVideo] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState<string | null>(null);
   const [isMuted, setIsMuted] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -39,10 +38,6 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId })
     if (videoRef.current) {
       videoRef.current.muted = !isMuted;
     }
-  };
-
-  const handleFullscreen = (videoUrl: string) => {
-    setFullscreenVideo(videoUrl);
   };
   
   // Function to extract video ID from Cloudflare Stream URL and generate thumbnail
@@ -215,25 +210,6 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId })
           </div>
         )}
         
-        {/* Fullscreen Video Modal */}
-        {fullscreenVideo && (
-          <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center">
-            <div className="relative w-full h-full max-w-6xl max-h-full p-4">
-              <button
-                onClick={() => setFullscreenVideo(null)}
-                className="absolute top-4 right-4 z-10 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
-              >
-                <X className="w-6 h-6" />
-              </button>
-              <video
-                src={fullscreenVideo}
-                className="w-full h-full object-contain"
-                controls
-                autoPlay
-              />
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
