@@ -1,7 +1,8 @@
 
 import React, { useRef, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Video, Camera, TvMinimalPlay, Zap, Brain, Users, TrendingUp } from 'lucide-react';
+import { Camera, TvMinimalPlay, Zap, Brain, Users, TrendingUp } from 'lucide-react';
+import { FilmIcon } from '@heroicons/react/24/outline';
 import { PiGolf } from 'react-icons/pi';
 import { filterOptions, FILTER_TYPES } from './types';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -33,7 +34,7 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
       case FILTER_TYPES.FRIENDS:
         return <Users className="w-4 h-4 mr-2" />;
       case FILTER_TYPES.VIDEOS:
-        return <Video className="w-4 h-4 mr-2" />;
+        return <FilmIcon className="w-4 h-4 mr-2" />;
       case FILTER_TYPES.PHOTOS:
         return <Camera className="w-4 h-4 mr-2" />;
       case FILTER_TYPES.TRENDING:
