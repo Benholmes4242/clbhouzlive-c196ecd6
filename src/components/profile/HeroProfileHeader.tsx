@@ -621,13 +621,11 @@ const HeroProfileHeader = ({
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-3xl font-bold text-white">Top 100 courses</h2>
                 </div>
-                <div className="bg-white rounded-lg p-6 shadow-lg border">
-                  <UserCoursesContent 
-                    username={profile?.username || ''}
-                    isOwnProfile={isOwnProfile}
-                    displayName={profile?.display_name || 'User'}
-                  />
-                </div>
+                <UserCoursesContent 
+                  username={profile?.username || ''}
+                  isOwnProfile={isOwnProfile}
+                  displayName={profile?.display_name || 'User'}
+                />
               </div>
             )}
         </div>
