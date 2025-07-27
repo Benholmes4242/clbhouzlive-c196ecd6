@@ -90,7 +90,7 @@ const ProfilePage = () => {
         <Header />
       </div>
       
-      <div className="max-w-4xl mx-auto">
+      <div className="container">
         <HeroProfileHeader 
           profile={profile}
           isOwnProfile={true} // This is always the user's own profile on this route
