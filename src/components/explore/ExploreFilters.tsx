@@ -56,13 +56,13 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
       key={filter}
       onClick={() => onFilterChange(filter)}
       className={`
-        px-3 py-1 rounded-full text-lg font-medium whitespace-nowrap flex-shrink-0 
+        px-3 py-1 text-lg font-medium whitespace-nowrap flex-shrink-0 
         flex items-center transition-colors duration-100 ease-in-out
         focus:outline-none border border-black/25 outline-0
         text-black bg-transparent hover:bg-black/5
         ${activeFilter === filter ? 'bg-orange-50 border-orange-200 shadow-sm shadow-orange-200/50' : ''}
       `}
-      style={{ outline: 'none' }}
+      style={{ outline: 'none', borderRadius: '8px' }}
     >
       {getFilterIcon(filter)}
       {filter}
