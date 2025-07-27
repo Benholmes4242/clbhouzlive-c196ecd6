@@ -273,7 +273,7 @@ const HeroProfileHeader = ({
                 Edit Profile
               </button>
               <button 
-                className="bg-transparent backdrop-blur-[1px] border border-white/25 text-white px-3 py-1.5 shadow-lg shadow-black/10 transition-colors text-base font-medium -mb-1"
+                className="bg-transparent backdrop-blur-[1px] border border-white/25 text-white px-3 py-1.5 shadow-lg shadow-black/10 transition-colors text-base font-medium"
                 style={{ borderRadius: '8px' }}
                 onClick={async () => {
                   // Handle cover photo upload
