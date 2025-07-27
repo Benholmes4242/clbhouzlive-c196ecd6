@@ -39,7 +39,7 @@ const CourseRankBadges = ({
   if (globalRank && globalRank <= 100) {
     rankingBadges.push({
       rank: globalRank,
-      icon: <Earth className="h-5 w-5 text-white" />,
+      icon: <Earth className="h-6 w-6 text-white" />,
       tooltip: "Worldwide Ranking"
     });
   }
@@ -48,19 +48,19 @@ const CourseRankBadges = ({
   if (isGBI && regionalRank && regionalRank <= 100) {
     rankingBadges.push({
       rank: regionalRank,
-      icon: <CountryFlag country="Britain & Ireland" size="md" />,
+      icon: <CountryFlag country="Britain & Ireland" size="lg" />,
       tooltip: "GB&I Ranking"
     });
   } else if (isUSA && usaRank && usaRank <= 100) {
     rankingBadges.push({
       rank: usaRank,
-      icon: <CountryFlag country="USA" size="md" />,
+      icon: <CountryFlag country="USA" size="lg" />,
       tooltip: "USA Ranking"
     });
   } else if (isEurope && regionalRank && regionalRank <= 100) {
     rankingBadges.push({
       rank: regionalRank,
-      icon: <CountryFlag country="Continental Europe" size="md" />,
+      icon: <CountryFlag country="Continental Europe" size="lg" />,
       tooltip: "Continental Europe Ranking"
     });
   }
@@ -90,9 +90,9 @@ const CourseRankBadges = ({
           {rankingBadges.map((badge, index) => (
             <Tooltip key={index}>
               <TooltipTrigger asChild>
-                <div className="flex items-center gap-1.5 px-2 py-1 bg-black/20 backdrop-blur-sm border border-white/20 rounded-xl shadow-sm" style={{ borderRadius: '8px' }}>
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-black/20 backdrop-blur-sm border border-white/20 rounded-xl shadow-sm" style={{ borderRadius: '8px' }}>
                   {badge.icon}
-                  <span className="text-sm font-bold text-white">{badge.rank}</span>
+                  <span className="text-base font-bold text-white">{badge.rank}</span>
                 </div>
               </TooltipTrigger>
               <TooltipContent>
@@ -108,9 +108,9 @@ const CourseRankBadges = ({
         <div className="absolute top-2 right-2">
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="flex items-center gap-1.5 px-2 py-1 bg-black/20 backdrop-blur-sm border border-white/20 rounded-xl shadow-sm" style={{ borderRadius: '8px' }}>
-                <ClubhouseLogo size="sm" />
-                <span className="text-sm font-bold text-white">{playerRatingBadge.content}</span>
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-black/20 backdrop-blur-sm border border-white/20 rounded-xl shadow-sm" style={{ borderRadius: '8px' }}>
+                <ClubhouseLogo size="md" />
+                <span className="text-base font-bold text-white">{playerRatingBadge.content}</span>
               </div>
             </TooltipTrigger>
             <TooltipContent>
