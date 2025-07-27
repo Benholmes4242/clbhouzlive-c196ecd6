@@ -183,8 +183,8 @@ const HeroProfileHeader = ({
           backgroundRepeat: 'no-repeat'
         }}
       >
-        {/* Gradient overlay - stronger for better text contrast */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/20" />
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
       </div>
       
       {/* Content container - positioned above the background */}
