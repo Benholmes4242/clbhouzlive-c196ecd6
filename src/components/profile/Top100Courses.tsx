@@ -32,9 +32,13 @@ const Top100Courses: React.FC<Top100CoursesProps> = ({
     handleVisibilityToggle
   } = useTop100CoursesData(userId, isOwnProfile);
 
+  console.log('Top100Courses component - userId:', userId, 'isOwnProfile:', isOwnProfile, 'top100Visible:', top100Visible);
+
   const shouldShowSection = isOwnProfile || top100Visible;
+  console.log('shouldShowSection:', shouldShowSection);
 
   if (!shouldShowSection) {
+    console.log('Top100Courses returning null due to shouldShowSection being false');
     return null;
   }
 
