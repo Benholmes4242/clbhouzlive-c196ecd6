@@ -428,9 +428,6 @@ const HeroProfileHeader = ({
                 </div>
               )}
               
-              {/* Dark overlay for text readability */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-              
               {/* Content */}
               <div className="relative p-8 cursor-pointer group">
                 <div className="flex items-center mb-3">
