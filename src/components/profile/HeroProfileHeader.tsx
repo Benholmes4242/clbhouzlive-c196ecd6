@@ -228,28 +228,6 @@ const HeroProfileHeader = ({
                 {homeClub}
               </p>
             </div>
-
-            {/* Stats Bar - Full Width with 8px rounded corners */}
-            <div className="bg-black/80 backdrop-blur-sm rounded-lg px-6 py-4 shadow-lg">
-              <div className="flex items-center justify-center space-x-8 text-white">
-                <div className="text-center">
-                  <div className="font-bold text-lg drop-shadow">4.0</div>
-                  <div className="text-xs text-white/80 drop-shadow">Handicap</div>
-                </div>
-                <div className="text-center">
-                  <div className="font-bold text-lg drop-shadow">{postsCount}</div>
-                  <div className="text-xs text-white/80 drop-shadow">Posts</div>
-                </div>
-                <div className="text-center">
-                  <div className="font-bold text-lg drop-shadow">32</div>
-                  <div className="text-xs text-white/80 drop-shadow">Rated Courses</div>
-                </div>
-                <div className="text-center">
-                  <div className="font-bold text-lg drop-shadow">8.6/10</div>
-                  <div className="text-xs text-white/80 drop-shadow">Avg. Rating</div>
-                </div>
-              </div>
-            </div>
           </div>
           
           {/* Right Side - Edit Profile Button (only for own profile) */}
@@ -263,6 +241,30 @@ const HeroProfileHeader = ({
               </button>
             </div>
           )}
+        </div>
+
+        {/* Stats Bar - Full Width with equal padding */}
+        <div className="relative px-8 pb-8">
+          <div className="bg-black/80 backdrop-blur-sm rounded-lg px-6 py-4 shadow-lg">
+            <div className="flex items-center justify-center space-x-8 text-white">
+              <div className="text-center">
+                <div className="font-bold text-lg drop-shadow">4.0</div>
+                <div className="text-xs text-white/80 drop-shadow">Handicap</div>
+              </div>
+              <div className="text-center">
+                <div className="font-bold text-lg drop-shadow">{postsCount}</div>
+                <div className="text-xs text-white/80 drop-shadow">Posts</div>
+              </div>
+              <div className="text-center">
+                <div className="font-bold text-lg drop-shadow">32</div>
+                <div className="text-xs text-white/80 drop-shadow">Rated Courses</div>
+              </div>
+              <div className="text-center">
+                <div className="font-bold text-lg drop-shadow">8.6/10</div>
+                <div className="text-xs text-white/80 drop-shadow">Avg. Rating</div>
+              </div>
+            </div>
+          </div>
         </div>
         
         {/* Highlight Reel Section Container - positioned at bottom */}
