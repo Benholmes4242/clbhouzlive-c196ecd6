@@ -10,6 +10,13 @@ import ProfileFormFields from "./ProfileFormFields";
 import { useProfileForm } from "./hooks/useProfileForm";
 import { useLatestHorizontalVideo } from '@/hooks/useLatestHorizontalVideo';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
+import { useActivityPosts } from './hooks/useActivityPosts';
+import { ActivityPost } from './types/ActivityTypes';
+import ActivityHeader from './components/ActivityHeader';
+import ActivityPostCard from './components/ActivityPostCard';
+import PostViewerModal from '../posts/PostViewerModal';
+import { usePostViewer } from '@/hooks/usePostViewer';
+import { extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 
 interface Course {
   id: string;
@@ -49,6 +56,11 @@ const HeroProfileHeader = ({
   const [avatarKey, setAvatarKey] = useState(Date.now()); // Add cache-busting key
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const { videoUrl: latestHorizontalVideo } = useLatestHorizontalVideo(profile?.id);
+  
+  // Activity posts logic
+  const { posts, loading: postsLoading, fetchUserPosts } = useActivityPosts(profile?.id);
+  const { isOpen, currentPost, allUserPosts: viewerPosts, openPostViewer, closePostViewer } = usePostViewer({ source: 'profile' });
+  const [selectedPost, setSelectedPost] = useState<ActivityPost | null>(null);
   
   // Derived values
   const isOwnProfile = user?.id === profile?.id;
@@ -509,7 +521,107 @@ const HeroProfileHeader = ({
               </div>
             </div>
             </div>
+            
+            {/* Activity Posts Section - Right under the three cards */}
+            <div className="mt-8 px-2">
+              <ActivityHeader 
+                postsCount={posts.length}
+                isOwnProfile={isOwnProfile}
+                onPostCreated={fetchUserPosts}
+              />
+
+              {/* Loading state */}
+              {postsLoading ? (
+                <div className="text-center py-8">
+                  <p className="text-muted-foreground">Loading posts...</p>
+                </div>
+              ) : (
+                <>
+                  {/* Grid layout for square posts */}
+                  <div className="grid grid-cols-3 gap-2 mt-4">
+                    {posts.map((post) => (
+                      <ActivityPostCard
+                        key={post.id}
+                        post={post}
+                        attributionText={isOwnProfile ? "You posted this" : `${profile?.display_name?.split(' ')[0] || 'User'} posted this`}
+                        onClick={(post) => {
+                          // Transform and open post viewer
+                          const extractGolfCourse = (postTags: any[], content: string | null) => {
+                            const golfCourseTag = postTags?.find(tag => 
+                              tag.tagged_entity?.entity_type === 'golf_club' || tag.entity_type === 'golf_club'
+                            );
+                            
+                            if (golfCourseTag) {
+                              if (golfCourseTag.entity_type === 'golf_club') {
+                                return {
+                                  id: golfCourseTag.entity_id,
+                                  name: golfCourseTag.name,
+                                  country: '',
+                                  region: ''
+                                };
+                              } else if (golfCourseTag.tagged_entity) {
+                                return {
+                                  id: golfCourseTag.tagged_entity.entity_id,
+                                  name: golfCourseTag.tagged_entity.name,
+                                  country: '',
+                                  region: ''
+                                };
+                              }
+                            }
+                            
+                            const courseFromContent = extractGolfCourseFromContent(content);
+                            if (courseFromContent) {
+                              return courseFromContent;
+                            }
+                            
+                            return undefined;
+                          };
+
+                          const transformedPost = {
+                            id: post.id,
+                            content: post.content,
+                            created_at: post.created_at,
+                            user: post.user,
+                            post_media: post.post_media || [],
+                            post_tags: post.post_tags || [],
+                            golfCourse: extractGolfCourse(post.post_tags || [], post.content)
+                          };
+                          
+                          const transformedPosts = posts.map(p => ({
+                            id: p.id,
+                            content: p.content,
+                            created_at: p.created_at,
+                            user: p.user,
+                            post_media: p.post_media || [],
+                            post_tags: p.post_tags || [],
+                            golfCourse: extractGolfCourse(p.post_tags || [], p.content)
+                          }));
+                          
+                          openPostViewer(transformedPost, transformedPosts);
+                        }}
+                      />
+                    ))}
+                  </div>
+
+                  {posts.length === 0 && (
+                    <div className="text-center py-8">
+                      <p className="text-muted-foreground">No posts yet.</p>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
         </div>
+        
+        {/* Post Viewer Modal */}
+        {currentPost && (
+          <PostViewerModal
+            isOpen={isOpen}
+            onClose={closePostViewer}
+            initialPost={currentPost}
+            allUserPosts={viewerPosts}
+          />
+        )}
         
         </div>
 

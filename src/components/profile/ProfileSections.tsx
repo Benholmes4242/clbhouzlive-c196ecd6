@@ -46,13 +46,6 @@ const ProfileSections: React.FC<ProfileSectionsProps> = ({
         </>
       )}
 
-      {/* Social Activity - User's Posts - Show for all user types */}
-      <SocialActivity
-        userId={profile?.id || user?.id || ''}
-        isOwnProfile={isOwnProfile}
-        activityVisible={profile?.activity_visible !== false}
-        profileDisplayName={profile?.display_name}
-      />
     </div>
   );
 };
