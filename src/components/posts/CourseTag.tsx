@@ -12,7 +12,8 @@ const CourseTag = ({ courseName, courseLocation, onClick, className = "" }: Cour
   return (
     <button
       onClick={onClick}
-      className={`inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 rounded-lg text-sm hover:bg-blue-200 transition-colors ${className}`}
+      className={`inline-flex items-center px-3 py-1 bg-blue-100 text-blue-800 text-sm hover:bg-blue-200 transition-colors ${className}`}
+      style={{ borderRadius: '8px' }}
     >
       <span className="font-medium">{courseName}</span>
       {courseLocation && (
