@@ -89,7 +89,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
   return (
     <>
       <div 
-        className="group hover:shadow-lg transition-all duration-200 cursor-pointer overflow-hidden relative h-56"
+        className="group hover:shadow-lg transition-all duration-200 cursor-pointer overflow-hidden relative h-64"
         style={{ borderRadius: '8px' }}
         onClick={handleCardClick}
       >
