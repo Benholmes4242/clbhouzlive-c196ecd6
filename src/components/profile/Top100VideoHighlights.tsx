@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { MapPin, X, Maximize2, VolumeX, Volume2 } from 'lucide-react';
+import { useSwipeable } from 'react-swipeable';
 
 interface VideoHighlight {
   id: string;
@@ -19,14 +20,19 @@ interface Top100VideoHighlightsProps {
 }
 
 const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [isMuted, setIsMuted] = useState(true);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
   const handleMuteToggle = () => {
-    setIsMuted(!isMuted);
-    if (videoRef.current) {
-      videoRef.current.muted = !isMuted;
-    }
+    const newMutedState = !isMuted;
+    setIsMuted(newMutedState);
+    // Apply mute state to all videos
+    videoRefs.current.forEach(video => {
+      if (video) {
+        video.muted = newMutedState;
+      }
+    });
   };
 
   // Function to extract video ID from Cloudflare Stream URL and generate thumbnail
@@ -71,7 +77,7 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId })
         .eq('post_media.media_type', 'video')
         .eq('post_tags.taggable_entities.entity_type', 'golf_club')
         .order('created_at', { ascending: false })
-        .limit(4);
+        .limit(5); // Changed to 5 videos
 
       if (error) {
         console.error('Error fetching video highlights:', error);
@@ -117,7 +123,7 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId })
           media_url: post.post_media[0]?.media_url || ''
         });
 
-        if (processedHighlights.length >= 3) break;
+        if (processedHighlights.length >= 5) break; // Up to 5 videos
       }
 
       return processedHighlights;
@@ -126,19 +132,20 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId })
     enabled: !!userId
   });
 
+  // Setup intersection observer for current video
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video || videoHighlights.length === 0) return;
+    const currentVideo = videoRefs.current[currentIndex];
+    if (!currentVideo || videoHighlights.length === 0) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
         const [entry] = entries;
         if (entry.isIntersecting) {
           // Video is in view, play it
-          video.play().catch(console.error);
+          currentVideo.play().catch(console.error);
         } else {
           // Video is out of view, pause it
-          video.pause();
+          currentVideo.pause();
         }
       },
       {
@@ -146,12 +153,27 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId })
       }
     );
 
-    observer.observe(video);
+    observer.observe(currentVideo);
 
     return () => {
       observer.disconnect();
     };
-  }, [videoHighlights]);
+  }, [currentIndex, videoHighlights]);
+
+  // Handle swipe navigation
+  const goToNext = () => {
+    setCurrentIndex((prev) => (prev + 1) % videoHighlights.length);
+  };
+
+  const goToPrevious = () => {
+    setCurrentIndex((prev) => (prev - 1 + videoHighlights.length) % videoHighlights.length);
+  };
+
+  const swipeHandlers = useSwipeable({
+    onSwipedLeft: goToNext,
+    onSwipedRight: goToPrevious,
+    trackMouse: true
+  });
 
   if (isLoading) {
     return (
@@ -188,43 +210,57 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId })
         </div>
         
         {videoHighlights.length > 0 ? (
-          <div className="space-y-2">
-            {/* Show only the first video highlight */}
-            {videoHighlights.slice(0, 1).map((highlight) => (
-              <div
-                key={highlight.id}
-                className="relative w-full aspect-video rounded-lg overflow-hidden bg-gray-800/50 border border-white/20 hover:border-white/40 transition-all group"
+          <div className="space-y-3">
+            {/* Swipeable video container */}
+            <div 
+              {...swipeHandlers}
+              className="relative w-full aspect-video rounded-[8px] overflow-hidden bg-gray-800/50 border border-white/20 hover:border-white/40 transition-all group"
+            >
+              {/* Video Player */}
+              <video 
+                ref={(el) => (videoRefs.current[currentIndex] = el)}
+                src={videoHighlights[currentIndex]?.media_url}
+                className="w-full h-full object-cover"
+                muted={isMuted}
+                autoPlay
+                loop
+                playsInline
+                preload="metadata"
+                poster={getVideoThumbnail(videoHighlights[currentIndex]?.media_url) || undefined}
+              />
+
+              {/* Mute/Unmute button - bottom right */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleMuteToggle();
+                }}
+                className="absolute bottom-2 right-2 z-20 text-white hover:text-white/80 transition-colors"
               >
-                {/* Video Player */}
-                <video 
-                  ref={videoRef}
-                  src={highlight.media_url}
-                  className="w-full h-full object-cover"
-                  muted={isMuted}
-                  autoPlay
-                  loop
-                  playsInline
-                  preload="metadata"
-                  poster={getVideoThumbnail(highlight.media_url) || undefined}
-                />
+                {isMuted ? (
+                  <VolumeX className="h-5 w-5" />
+                ) : (
+                  <Volume2 className="h-5 w-5" />
+                )}
+              </button>
+            </div>
 
-                {/* Mute/Unmute button - bottom right */}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleMuteToggle();
-                  }}
-                  className="absolute bottom-2 right-2 z-20 text-white hover:text-white/80 transition-colors"
-                >
-                  {isMuted ? (
-                    <VolumeX className="h-5 w-5" />
-                  ) : (
-                    <Volume2 className="h-5 w-5" />
-                  )}
-                </button>
-
+            {/* Pagination dots */}
+            {videoHighlights.length > 1 && (
+              <div className="flex justify-center space-x-2">
+                {videoHighlights.map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentIndex(index)}
+                    className={`w-2 h-2 rounded-full transition-all ${
+                      index === currentIndex 
+                        ? 'bg-white' 
+                        : 'bg-white/40 hover:bg-white/60'
+                    }`}
+                  />
+                ))}
               </div>
-            ))}
+            )}
           </div>
         ) : (
           <div className="text-center py-6">
