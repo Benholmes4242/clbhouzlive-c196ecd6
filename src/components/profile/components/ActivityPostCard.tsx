@@ -3,7 +3,7 @@ import React from 'react';
 import { ActivityPost } from '../types/ActivityTypes';
 
 import CourseTag from '@/components/posts/CourseTag';
-import { Camera, Play } from 'lucide-react';
+import { Camera, Play, Film } from 'lucide-react';
 import HighQualityImage from '@/components/ui/high-quality-image';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import { useVideoAutoplay } from '@/hooks/useVideoAutoplay';
@@ -13,9 +13,10 @@ interface ActivityPostCardProps {
   post: ActivityPost;
   attributionText: string;
   onClick: (post: ActivityPost) => void;
+  isFirstVideo: boolean;
 }
 
-const ActivityPostCard = ({ post, attributionText, onClick }: ActivityPostCardProps) => {
+const ActivityPostCard = ({ post, attributionText, onClick, isFirstVideo }: ActivityPostCardProps) => {
   const { ref: autoplayRef, shouldAutoplay, handleMouseEnter, handleMouseLeave } = useVideoAutoplay();
   
   const handleClick = () => {
@@ -35,6 +36,10 @@ const ActivityPostCard = ({ post, attributionText, onClick }: ActivityPostCardPr
   // Check if we have media
   const hasMedia = post.post_media && post.post_media.length > 0;
   const firstMedia = hasMedia ? post.post_media[0] : null;
+  const isVideo = firstMedia?.media_type === 'video';
+  
+  // Only autoplay if this is the first video and shouldAutoplay is true
+  const allowAutoplay = isVideo && isFirstVideo && shouldAutoplay;
 
   return (
     <div 
@@ -48,15 +53,32 @@ const ActivityPostCard = ({ post, attributionText, onClick }: ActivityPostCardPr
       {hasMedia && firstMedia ? (
         <>
           {firstMedia.media_type === 'video' ? (
-             <EnhancedVideoPlayer
-               src={firstMedia.media_url}
-               autoplay={shouldAutoplay}
-               muted={true}
-               loop={true}
+            allowAutoplay ? (
+              <EnhancedVideoPlayer
+                src={firstMedia.media_url}
+                autoplay={true}
+                muted={true}
+                loop={true}
                 className="w-full h-full"
-               enableHLS={true}
-               onClick={handleClick}
-             />
+                enableHLS={true}
+                onClick={handleClick}
+              />
+            ) : (
+              // Show thumbnail for non-autoplay videos
+              <div className="relative w-full h-full">
+                <HighQualityImage
+                  src={firstMedia.media_url}
+                  alt="Video thumbnail"
+                  className="w-full h-full"
+                  width={300}
+                  height={300}
+                />
+                {/* Film icon for videos */}
+                <div className="absolute bottom-2 right-2 z-10">
+                  <Film className="w-4 h-4 text-white drop-shadow-lg" />
+                </div>
+              </div>
+            )
           ) : (
             <HighQualityImage
               src={firstMedia.media_url}

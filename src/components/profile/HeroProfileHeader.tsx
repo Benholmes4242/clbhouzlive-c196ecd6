@@ -513,68 +513,74 @@ const HeroProfileHeader = ({
                 <>
                   {/* Grid layout for square posts */}
                   <div className="grid grid-cols-3 gap-2 mt-4">
-                    {posts.map((post) => (
-                      <ActivityPostCard
-                        key={post.id}
-                        post={post}
-                        attributionText={isOwnProfile ? "You posted this" : `${profile?.display_name?.split(' ')[0] || 'User'} posted this`}
-                        onClick={(post) => {
-                          // Transform and open post viewer
-                          const extractGolfCourse = (postTags: any[], content: string | null) => {
-                            const golfCourseTag = postTags?.find(tag => 
-                              tag.tagged_entity?.entity_type === 'golf_club' || tag.entity_type === 'golf_club'
-                            );
-                            
-                            if (golfCourseTag) {
-                              if (golfCourseTag.entity_type === 'golf_club') {
-                                return {
-                                  id: golfCourseTag.entity_id,
-                                  name: golfCourseTag.name,
-                                  country: '',
-                                  region: ''
-                                };
-                              } else if (golfCourseTag.tagged_entity) {
-                                return {
-                                  id: golfCourseTag.tagged_entity.entity_id,
-                                  name: golfCourseTag.tagged_entity.name,
-                                  country: '',
-                                  region: ''
-                                };
+                    {posts.map((post, index) => {
+                      // Check if this is the first video post
+                      const isFirstVideo = index === 0 && post.post_media?.[0]?.media_type === 'video';
+                       
+                       return (
+                        <ActivityPostCard
+                          key={post.id}
+                          post={post}
+                          attributionText={isOwnProfile ? "You posted this" : `${profile?.display_name?.split(' ')[0] || 'User'} posted this`}
+                          isFirstVideo={isFirstVideo}
+                          onClick={(post) => {
+                            // Transform and open post viewer
+                            const extractGolfCourse = (postTags: any[], content: string | null) => {
+                              const golfCourseTag = postTags?.find(tag => 
+                                tag.tagged_entity?.entity_type === 'golf_club' || tag.entity_type === 'golf_club'
+                              );
+                              
+                              if (golfCourseTag) {
+                                if (golfCourseTag.entity_type === 'golf_club') {
+                                  return {
+                                    id: golfCourseTag.entity_id,
+                                    name: golfCourseTag.name,
+                                    country: '',
+                                    region: ''
+                                  };
+                                } else if (golfCourseTag.tagged_entity) {
+                                  return {
+                                    id: golfCourseTag.tagged_entity.entity_id,
+                                    name: golfCourseTag.tagged_entity.name,
+                                    country: '',
+                                    region: ''
+                                  };
+                                }
                               }
-                            }
-                            
-                            const courseFromContent = extractGolfCourseFromContent(content);
-                            if (courseFromContent) {
-                              return courseFromContent;
-                            }
-                            
-                            return undefined;
-                          };
+                              
+                              const courseFromContent = extractGolfCourseFromContent(content);
+                              if (courseFromContent) {
+                                return courseFromContent;
+                              }
+                              
+                              return undefined;
+                            };
 
-                          const transformedPost = {
-                            id: post.id,
-                            content: post.content,
-                            created_at: post.created_at,
-                            user: post.user,
-                            post_media: post.post_media || [],
-                            post_tags: post.post_tags || [],
-                            golfCourse: extractGolfCourse(post.post_tags || [], post.content)
-                          };
-                          
-                          const transformedPosts = posts.map(p => ({
-                            id: p.id,
-                            content: p.content,
-                            created_at: p.created_at,
-                            user: p.user,
-                            post_media: p.post_media || [],
-                            post_tags: p.post_tags || [],
-                            golfCourse: extractGolfCourse(p.post_tags || [], p.content)
-                          }));
-                          
-                          openPostViewer(transformedPost, transformedPosts);
-                        }}
-                      />
-                    ))}
+                            const transformedPost = {
+                              id: post.id,
+                              content: post.content,
+                              created_at: post.created_at,
+                              user: post.user,
+                              post_media: post.post_media || [],
+                              post_tags: post.post_tags || [],
+                              golfCourse: extractGolfCourse(post.post_tags || [], post.content)
+                            };
+                            
+                            const transformedPosts = posts.map(p => ({
+                              id: p.id,
+                              content: p.content,
+                              created_at: p.created_at,
+                              user: p.user,
+                              post_media: p.post_media || [],
+                              post_tags: p.post_tags || [],
+                              golfCourse: extractGolfCourse(p.post_tags || [], p.content)
+                            }));
+                            
+                            openPostViewer(transformedPost, transformedPosts);
+                          }}
+                        />
+                      );
+                    })}
                   </div>
 
                   {posts.length === 0 && (

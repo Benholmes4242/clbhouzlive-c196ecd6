@@ -127,14 +127,20 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
 
       {/* Grid layout for square posts - increased rounded corners */}
       <div className="grid grid-cols-3 gap-2 mt-4">
-        {posts.map((post) => (
-          <ActivityPostCard
-            key={post.id}
-            post={post}
-            attributionText={getPostAttribution()}
-            onClick={handlePostClick}
-          />
-        ))}
+        {posts.map((post, index) => {
+          // Check if this is the first video post
+          const isFirstVideo = index === 0 && post.post_media?.[0]?.media_type === 'video';
+          
+          return (
+            <ActivityPostCard
+              key={post.id}
+              post={post}
+              attributionText={getPostAttribution()}
+              isFirstVideo={isFirstVideo}
+              onClick={handlePostClick}
+            />
+          );
+        })}
       </div>
 
       {posts.length === 0 && (
