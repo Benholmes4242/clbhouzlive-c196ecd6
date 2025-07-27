@@ -170,9 +170,9 @@ const Top100AchievementsSection: React.FC<Top100AchievementsSectionProps> = ({
   };
 
   return (
-    <div className="flex gap-4 mb-6">
-      {/* Achievements Stats Card - Only takes space it needs */}
-      <div className="flex-shrink-0">
+    <div className="flex flex-col gap-4 mb-6">
+      {/* Achievements Stats Card */}
+      <div className="w-full">
         <div className="bg-white/20 backdrop-blur-sm rounded-[8px] px-4 py-3 border border-white/30">
           <div className="space-y-2">
             <h3 className="font-bold text-lg text-white">Achievements</h3>
@@ -183,9 +183,9 @@ const Top100AchievementsSection: React.FC<Top100AchievementsSectionProps> = ({
         </div>
       </div>
 
-      {/* Earned Badge Card - Only show if user has earned badges */}
+      {/* Earned Badge Card - Show below achievements */}
       {hasEarnedBadges && highestEarnedAchievement && (
-        <div className="flex-shrink-0">
+        <div className="w-full">
           <div className="bg-white/20 backdrop-blur-sm rounded-[8px] px-4 py-3 border border-white/30">
             <div className="space-y-3 text-center">
               <div className="text-4xl mb-2">
