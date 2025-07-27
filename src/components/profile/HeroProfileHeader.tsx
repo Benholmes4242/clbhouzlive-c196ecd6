@@ -347,7 +347,7 @@ const HeroProfileHeader = ({
         </div>
 
         {/* Stats Bar - Full Width with equal padding */}
-        <div className="relative px-8 pb-8" style={{ marginTop: '-40px' }}>
+        <div className="relative px-8 pb-4" style={{ marginTop: '-40px' }}>
           <div className="bg-black/40 backdrop-blur-sm px-6 py-1 shadow-lg" style={{ borderRadius: '8px' }}>
             <div className="flex items-center justify-between w-full text-white">
               <div className="text-center">
@@ -375,7 +375,7 @@ const HeroProfileHeader = ({
           {/* Activity Section */}
           <div 
             id="activity"
-            className="px-8 pb-8"
+            className="px-8 pt-4 pb-8"
             ref={activityRef}
           >
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
