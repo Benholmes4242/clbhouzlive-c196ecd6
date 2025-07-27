@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { MapPin, X, Maximize2, VolumeX, Volume2 } from 'lucide-react';
@@ -28,7 +28,7 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId })
       videoRef.current.muted = !isMuted;
     }
   };
-  
+
   // Function to extract video ID from Cloudflare Stream URL and generate thumbnail
   const getVideoThumbnail = (videoUrl: string) => {
     if (videoUrl.includes('cloudflarestream.com')) {
@@ -42,6 +42,7 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId })
     }
     return null;
   };
+
   const { data: videoHighlights = [], isLoading } = useQuery({
     queryKey: ['top100VideoHighlights', userId],
     queryFn: async () => {
@@ -124,6 +125,33 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId })
     staleTime: 5 * 60 * 1000, // 5 minutes
     enabled: !!userId
   });
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || videoHighlights.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const [entry] = entries;
+        if (entry.isIntersecting) {
+          // Video is in view, play it
+          video.play().catch(console.error);
+        } else {
+          // Video is out of view, pause it
+          video.pause();
+        }
+      },
+      {
+        threshold: 0.5, // Trigger when 50% of video is visible
+      }
+    );
+
+    observer.observe(video);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [videoHighlights]);
 
   if (isLoading) {
     return (
