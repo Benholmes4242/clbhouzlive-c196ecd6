@@ -6,6 +6,7 @@ import ActivityHeader from './components/ActivityHeader';
 import ActivityPostCard from './components/ActivityPostCard';
 import PostViewerModal from '../posts/PostViewerModal';
 import { usePostViewer } from '@/hooks/usePostViewer';
+import BadgeCarousel from '../badges/BadgeCarousel';
 import { extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 
 const SocialActivity: React.FC<SocialActivityProps> = ({
@@ -124,7 +125,7 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
       />
 
 
-      {/* Grid layout for square posts */}
+      {/* Grid layout for square posts - increased rounded corners */}
       <div className="grid grid-cols-3 gap-2 mt-4">
         {posts.map((post, index) => {
           // Check if this is the first video post

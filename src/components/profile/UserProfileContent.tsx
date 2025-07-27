@@ -1,7 +1,7 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import InstagramStyleProfileHeader from './InstagramStyleProfileHeader';
-import SlidingProfileSections from './SlidingProfileSections';
+import UniversalProfileTabs from './UniversalProfileTabs';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 interface UserProfileContentProps {
@@ -18,7 +18,6 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({
   relationshipStatus
 }) => {
   const { user } = useSupabaseSession();
-  const [activeSection, setActiveSection] = useState('activity');
   const isOwnProfile = user?.id === profile?.id;
 
   if (!profile) {
@@ -33,11 +32,10 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({
         relationshipStatus={relationshipStatus}
       />
       
-      <SlidingProfileSections
+      <UniversalProfileTabs
         userId={profile?.id}
         profile={profile}
         isOwnProfile={isOwnProfile}
-        activeSection={activeSection}
       />
     </div>
   );

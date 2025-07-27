@@ -9,46 +9,30 @@ interface UniversalProfileTabsProps {
   userId: string;
   profile: any;
   isOwnProfile: boolean;
-  activeTab?: string;
-  onTabChange?: (tab: string) => void;
-  hideActivityTab?: boolean;
 }
 
 const UniversalProfileTabs: React.FC<UniversalProfileTabsProps> = ({
   userId,
   profile,
-  isOwnProfile,
-  activeTab: externalActiveTab,
-  onTabChange,
-  hideActivityTab = false
+  isOwnProfile
 }) => {
   const { user } = useSupabaseSession();
-  const [internalActiveTab, setInternalActiveTab] = useState('handicap'); // Default to handicap since activity is hidden
-  
-  // Use external tab state if provided, otherwise use internal state
-  const activeTab = externalActiveTab || internalActiveTab;
-  const setActiveTab = onTabChange || setInternalActiveTab;
+  const [activeTab, setActiveTab] = useState('activity');
 
   const firstName = profile?.display_name?.split(' ')[0] || profile?.username || 'User';
   const top100Title = isOwnProfile ? 'My Top 100 Golf Courses' : `${firstName}'s Top 100 Golf Courses`;
   const isBusinessAccount = profile?.user_type !== 'individual';
 
-  // For business accounts, only show activity tab (but activity is hidden, so show handicap)
+  // For business accounts, only show activity tab
   const showIndividualTabs = !isBusinessAccount;
-  
-  // Calculate grid columns based on visible tabs
-  const gridCols = hideActivityTab && showIndividualTabs ? 'grid-cols-2' : 
-                   showIndividualTabs ? 'grid-cols-3' : 'grid-cols-1';
 
   return (
     <div className="mt-6">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className={`grid w-full mb-6 ${gridCols}`}>
-          {!hideActivityTab && (
-            <TabsTrigger value="activity" className="text-sm font-medium">
-              Activity
-            </TabsTrigger>
-          )}
+        <TabsList className={`grid w-full mb-6 ${showIndividualTabs ? 'grid-cols-3' : 'grid-cols-1'}`}>
+          <TabsTrigger value="activity" className="text-sm font-medium">
+            Activity
+          </TabsTrigger>
           {showIndividualTabs && (
             <>
               <TabsTrigger value="handicap" className="text-sm font-medium">
@@ -61,17 +45,15 @@ const UniversalProfileTabs: React.FC<UniversalProfileTabsProps> = ({
           )}
         </TabsList>
 
-        {!hideActivityTab && (
-          <TabsContent value="activity" className="mt-0">
-            <SocialActivity
-              userId={userId}
-              isOwnProfile={isOwnProfile}
-              activityVisible={true}
-              profileDisplayName={profile?.display_name}
-              userType={profile?.user_type || 'individual'}
-            />
-          </TabsContent>
-        )}
+        <TabsContent value="activity" className="mt-0">
+          <SocialActivity
+            userId={userId}
+            isOwnProfile={isOwnProfile}
+            activityVisible={true}
+            profileDisplayName={profile?.display_name}
+            userType={profile?.user_type || 'individual'}
+          />
+        </TabsContent>
 
         {showIndividualTabs && (
           <>

@@ -3,29 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import Header from "@/components/Header";
 import BottomNavigation from '@/components/BottomNavigation';
 import HeroProfileHeader from '@/components/profile/HeroProfileHeader';
-import SlidingProfileSections from '@/components/profile/SlidingProfileSections';
 import { useProfileData } from '@/hooks/useProfileData';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
-  const [activeSection, setActiveSection] = useState('activity'); // State for section control
-  
-  // Functions to handle card clicks and scroll to sections
-  const scrollToHandicap = () => {
-    setActiveSection('handicap');
-    const element = document.getElementById('profile-sections');
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  };
-  
-  const scrollToTop100 = () => {
-    setActiveSection('top100');
-    const element = document.getElementById('profile-sections');
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  };
   
   const {
     user,
@@ -105,18 +86,7 @@ const ProfilePage = () => {
         <HeroProfileHeader 
           profile={profile}
           onProfileUpdate={refreshProfile}
-          onHandicapClick={scrollToHandicap}
-          onTop100Click={scrollToTop100}
         />
-        
-        <div id="profile-sections" className="mt-6">
-          <SlidingProfileSections
-            userId={profile?.id}
-            profile={profile}
-            isOwnProfile={true}
-            activeSection={activeSection}
-          />
-        </div>
       </div>
       
       <BottomNavigation />

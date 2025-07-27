@@ -43,15 +43,11 @@ interface UserProfile {
 interface HeroProfileHeaderProps {
   profile: UserProfile | null;
   onProfileUpdate: () => void;
-  onHandicapClick?: () => void;
-  onTop100Click?: () => void;
 }
 
 const HeroProfileHeader = ({ 
   profile, 
-  onProfileUpdate,
-  onHandicapClick,
-  onTop100Click
+  onProfileUpdate
 }: HeroProfileHeaderProps) => {
   const { user } = useSupabaseSession();
   const [uploading, setUploading] = useState(false);
@@ -435,7 +431,7 @@ const HeroProfileHeader = ({
               className="relative overflow-hidden bg-gradient-to-br from-emerald-500 to-emerald-700 flex flex-col justify-end text-white h-[200px] cursor-pointer group"
               style={{ borderRadius: '8px' }}
               ref={null}
-              onClick={onHandicapClick || (() => scrollToSection('handicap-tracker'))}
+              onClick={() => scrollToSection('handicap-tracker')}
             >
               {/* Handicap Pattern Background */}
               <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-transparent">
@@ -478,7 +474,7 @@ const HeroProfileHeader = ({
               className="relative overflow-hidden bg-gradient-to-br from-amber-500 to-orange-600 flex flex-col justify-end text-white h-[200px] cursor-pointer group"
               style={{ borderRadius: '8px' }}
               ref={null}
-              onClick={onTop100Click || (() => scrollToSection('top100'))}
+              onClick={() => scrollToSection('top100')}
             >
               {/* Golf Course Background Image */}
               <div 
