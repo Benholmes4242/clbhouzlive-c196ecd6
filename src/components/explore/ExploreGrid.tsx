@@ -195,7 +195,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
               
               {/* Golf Club Tag */}
               {item.golfCourse && (
-                <div className="absolute top-3 left-3 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-2 max-w-[70%]">
+                <div className="absolute top-3 left-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg px-3 py-1 flex items-center gap-2 max-w-[70%] shadow-lg">
                   <MapPin className="w-4 h-4 text-white flex-shrink-0" />
                   <span className="text-white text-sm font-medium truncate">
                     {item.golfCourse.name}
@@ -420,7 +420,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                 
                 {/* Golf Club Tag for large cards - matching clubhouse CoursePostBadge design */}
                 {layoutItem.item.golfCourse && (
-                  <div className="absolute top-3 left-3 flex items-center cursor-pointer bg-black/20 backdrop-blur-sm border border-white/30 px-2 py-1 text-white shadow-lg" style={{ borderRadius: '8px' }}>
+                  <div className="absolute top-3 left-3 flex items-center cursor-pointer bg-white/20 backdrop-blur-sm border border-white/30 px-2 py-1 text-white shadow-lg hover:bg-white/30 transition-colors" style={{ borderRadius: '8px' }}>
                     <MapPin className="h-5 w-5 mr-0.5 text-white" />
                     <span className="text-base font-medium">{layoutItem.item.golfCourse.name}</span>
                   </div>

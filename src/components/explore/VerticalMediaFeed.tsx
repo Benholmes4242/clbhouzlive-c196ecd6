@@ -526,16 +526,16 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
                   {isMobile ? (
                     // Mobile: Map pin that expands to show golf club name
                     <div className="flex items-center">
-                      <button className="w-6 h-6 bg-black/20 backdrop-blur-sm border border-white/30 flex items-center justify-center mr-2 transition-all duration-200" style={{ borderRadius: '8px' }}>
+                      <button className="w-6 h-6 bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center mr-2 transition-all duration-200 hover:bg-white/30" style={{ borderRadius: '8px' }}>
                         <MapPin className="w-4 h-4 text-white" />
                       </button>
-                      <div className="bg-black/20 border border-white/30 text-white text-xs font-medium px-2 py-1 backdrop-blur-sm whitespace-nowrap" style={{ borderRadius: '8px' }}>
+                      <div className="bg-white/20 backdrop-blur-sm border border-white/30 text-white text-xs font-medium px-2 py-1 shadow-lg whitespace-nowrap" style={{ borderRadius: '8px' }}>
                         {item.golfCourse.name}
                       </div>
                     </div>
                   ) : (
                     // Desktop: Single pill with map pin and golf club name together
-                    <div className="inline-flex items-center bg-black/20 backdrop-blur-sm border border-white/30 text-white text-sm font-medium px-3 py-1.5 whitespace-nowrap" style={{ borderRadius: '8px' }}>
+                    <div className="inline-flex items-center bg-white/20 backdrop-blur-sm border border-white/30 text-white text-sm font-medium px-3 py-1.5 shadow-lg whitespace-nowrap" style={{ borderRadius: '8px' }}>
                       <MapPin className="w-5 h-5 text-white mr-2" />
                       {item.golfCourse.name}
                     </div>
