@@ -201,11 +201,11 @@ const Top100AchievementsSection: React.FC<Top100AchievementsSectionProps> = ({
                   }`}
                 >
                   {/* Achievement Icon */}
-                  <div className="flex items-center justify-center w-6 h-6 rounded-full text-lg">
+                  <div className="flex items-center justify-center w-6 h-6 rounded-full text-2xl">
                     {achievement.id === '20-club' ? (
-                      <MedalIcon size="md" />
+                      <MedalIcon size="lg" />
                     ) : (
-                      <span className="text-lg">{achievement.emoji}</span>
+                      <span className="text-2xl">{achievement.emoji}</span>
                     )}
                   </div>
 
