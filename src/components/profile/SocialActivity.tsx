@@ -6,7 +6,6 @@ import ActivityHeader from './components/ActivityHeader';
 import ActivityPostCard from './components/ActivityPostCard';
 import PostViewerModal from '../posts/PostViewerModal';
 import { usePostViewer } from '@/hooks/usePostViewer';
-import BadgeCarousel from '../badges/BadgeCarousel';
 import { extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 
 const SocialActivity: React.FC<SocialActivityProps> = ({
