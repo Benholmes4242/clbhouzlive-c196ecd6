@@ -196,7 +196,7 @@ const Top100AchievementsSection: React.FC<Top100AchievementsSectionProps> = ({
                   {highestEarnedAchievement.title}
                 </div>
                 <div className="text-xs text-white/80">
-                  Played {userProgress} top 100 courses
+                  Played {highestEarnedAchievement.threshold} top 100 courses
                 </div>
               </div>
             </div>
