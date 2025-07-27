@@ -399,16 +399,18 @@ const HeroProfileHeader = ({
             >
               {/* Video Background or Fallback */}
               {latestHorizontalVideo ? (
-                <EnhancedVideoPlayer
-                  src={latestHorizontalVideo}
-                  autoplay
-                  muted
-                  loop
-                  hideControls
-                  objectFit="cover"
-                  enableHLS
-                  className="absolute inset-0 w-full h-full"
-                />
+                <div className="absolute inset-0 w-full h-full overflow-hidden">
+                  <EnhancedVideoPlayer
+                    src={latestHorizontalVideo}
+                    autoplay
+                    muted
+                    loop
+                    hideControls
+                    objectFit="cover"
+                    enableHLS
+                    className="w-full h-full"
+                  />
+                </div>
               ) : (
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-blue-700">
                   <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-transparent">
