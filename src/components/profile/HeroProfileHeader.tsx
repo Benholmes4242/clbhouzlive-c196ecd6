@@ -4,6 +4,7 @@ import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { OptimizedAvatar } from '@/components/ui/optimized-avatar';
 import { useStaggeredInView } from '@/hooks/useInViewAnimation';
+import ProfileEditDialog from './ProfileEditDialog';
 
 interface Course {
   id: string;
@@ -231,13 +232,11 @@ const HeroProfileHeader = ({
                 {/* Action Buttons (only for own profile) */}
                 {isOwnProfile && (
                   <div className="flex flex-col space-y-2 -translate-y-10">
-                    <button 
-                      className="bg-transparent backdrop-blur-[1px] border border-white/25 text-white px-0.5 py-0 shadow-lg shadow-black/10 transition-colors text-base font-medium"
-                      style={{ borderRadius: '8px' }}
-                      onClick={() => window.location.href = '/settings'}
-                    >
-                      Edit Profile
-                    </button>
+                    <ProfileEditDialog
+                      profile={profile}
+                      userId={user.id}
+                      onProfileUpdate={onProfileUpdate}
+                    />
                     <button 
                       className="bg-transparent backdrop-blur-[1px] border border-white/25 text-white px-0.5 py-0 shadow-lg shadow-black/10 transition-colors text-base font-medium"
                       style={{ borderRadius: '8px' }}
