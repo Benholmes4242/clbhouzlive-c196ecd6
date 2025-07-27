@@ -140,6 +140,7 @@ const Top100AchievementsSection: React.FC<Top100AchievementsSectionProps> = ({
   ], [userProgress]);
 
   const earnedAchievements = achievements.filter(achievement => achievement.isEarned);
+  const hasEarnedBadges = earnedAchievements.length > 0;
 
   const getTierColor = (tier: string, isEarned: boolean) => {
     if (!isEarned) return 'bg-gray-300 text-gray-500';
@@ -168,32 +169,34 @@ const Top100AchievementsSection: React.FC<Top100AchievementsSectionProps> = ({
         </div>
       </div>
 
-      {/* Earned Badges Card - Takes remaining space */}
-      <div className="flex-grow">
-        <div className="bg-black/20 backdrop-blur-sm rounded-[8px] px-4 py-3 border border-white/20">
-          <div className="space-y-3">
-            <h4 className="font-semibold text-sm text-white">Earned Badges</h4>
-            <div className="flex flex-wrap gap-2">
-              {achievements.map((achievement) => (
-                <div key={achievement.id} className="text-center">
-                  <div 
-                    className={`w-10 h-10 rounded-full flex items-center justify-center text-sm mb-1 transition-all duration-300 ${
-                      getTierColor(achievement.tier, achievement.isEarned)
-                    } ${achievement.isEarned ? 'shadow-md' : 'opacity-50'}`}
-                  >
-                    {achievement.emoji}
-                  </div>
-                  <div className="text-xs">
-                    <div className={`font-medium ${achievement.isEarned ? 'text-white' : 'text-gray-400'}`}>
-                      {achievement.title}
+      {/* Earned Badges Card - Only show if user has earned badges */}
+      {hasEarnedBadges && (
+        <div className="flex-shrink-0">
+          <div className="bg-black/20 backdrop-blur-sm rounded-[8px] px-4 py-3 border border-white/20">
+            <div className="space-y-3">
+              <h4 className="font-semibold text-sm text-white">Earned Badges</h4>
+              <div className="flex flex-wrap gap-2">
+                {earnedAchievements.map((achievement) => (
+                  <div key={achievement.id} className="text-center">
+                    <div 
+                      className={`w-10 h-10 rounded-full flex items-center justify-center text-sm mb-1 transition-all duration-300 ${
+                        getTierColor(achievement.tier, achievement.isEarned)
+                      } shadow-md`}
+                    >
+                      {achievement.emoji}
+                    </div>
+                    <div className="text-xs">
+                      <div className="font-medium text-white">
+                        {achievement.title}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
