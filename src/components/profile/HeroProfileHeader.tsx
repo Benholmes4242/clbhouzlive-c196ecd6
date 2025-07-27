@@ -375,12 +375,14 @@ const HeroProfileHeader = ({
           {/* Activity Section */}
           <div 
             id="activity"
-            className="grid grid-cols-1 md:grid-cols-2 gap-0 h-[400px]"
+            className="px-8 pb-8"
             ref={activityRef}
           >
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Activity Card */}
             <div 
-              className="relative overflow-hidden bg-gradient-to-br from-blue-500 to-blue-700 flex flex-col justify-end text-white"
+              className="relative overflow-hidden bg-gradient-to-br from-blue-500 to-blue-700 flex flex-col justify-end text-white h-[200px] cursor-pointer group"
+              style={{ borderRadius: '8px' }}
               ref={null}
               onClick={() => scrollToSection('recent-activity')}
             >
@@ -421,7 +423,8 @@ const HeroProfileHeader = ({
 
             {/* Handicap Card */}
             <div 
-              className="relative overflow-hidden bg-gradient-to-br from-emerald-500 to-emerald-700 flex flex-col justify-end text-white"
+              className="relative overflow-hidden bg-gradient-to-br from-emerald-500 to-emerald-700 flex flex-col justify-end text-white h-[200px] cursor-pointer group"
+              style={{ borderRadius: '8px' }}
               ref={null}
               onClick={() => scrollToSection('handicap-tracker')}
             >
@@ -458,6 +461,7 @@ const HeroProfileHeader = ({
                 </div>
                 <p className="text-white/80 text-lg leading-relaxed">Track your progress and handicap development over time.</p>
               </div>
+            </div>
             </div>
           </div>
 
