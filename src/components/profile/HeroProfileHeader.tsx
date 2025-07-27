@@ -15,6 +15,7 @@ import ActivityPostCard from './components/ActivityPostCard';
 import PostViewerModal from '../posts/PostViewerModal';
 import { usePostViewer } from '@/hooks/usePostViewer';
 import { extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
+import UserCoursesContent from '@/components/courses/UserCoursesContent';
 
 interface Course {
   id: string;
@@ -595,6 +596,22 @@ const HeroProfileHeader = ({
                     )}
                   </>
                 )}
+              </div>
+            )}
+            
+            {/* Top 100 Section - Only show when top100 section is active */}
+            {activeSection === 'top100' && (
+              <div className="mt-8 px-2">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-3xl font-bold text-white">Top 100 courses</h2>
+                </div>
+                <div className="bg-white rounded-lg p-6 shadow-lg border">
+                  <UserCoursesContent 
+                    username={profile?.username || ''}
+                    isOwnProfile={isOwnProfile}
+                    displayName={profile?.display_name || 'User'}
+                  />
+                </div>
               </div>
             )}
         </div>
