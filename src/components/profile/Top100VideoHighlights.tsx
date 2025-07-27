@@ -21,6 +21,13 @@ interface Top100VideoHighlightsProps {
 const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId }) => {
   const [isMuted, setIsMuted] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  const handleMuteToggle = () => {
+    setIsMuted(!isMuted);
+    if (videoRef.current) {
+      videoRef.current.muted = !isMuted;
+    }
+  };
   
   // Function to extract video ID from Cloudflare Stream URL and generate thumbnail
   const getVideoThumbnail = (videoUrl: string) => {
@@ -172,6 +179,21 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId })
                   preload="metadata"
                   poster={getVideoThumbnail(highlight.media_url) || undefined}
                 />
+
+                {/* Mute/Unmute button - bottom right */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleMuteToggle();
+                  }}
+                  className="absolute bottom-2 right-2 z-20 text-white hover:text-white/80 transition-colors"
+                >
+                  {isMuted ? (
+                    <VolumeX className="h-5 w-5" />
+                  ) : (
+                    <Volume2 className="h-5 w-5" />
+                  )}
+                </button>
 
               </div>
             ))}
