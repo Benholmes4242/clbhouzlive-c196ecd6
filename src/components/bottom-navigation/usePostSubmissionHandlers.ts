@@ -1,6 +1,7 @@
 import React from 'react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePostHandlers } from '@/hooks/usePostHandlers';
+import { useLocation } from 'react-router-dom';
 
 export const usePostSubmissionHandlers = (
   captionInputRef: React.RefObject<HTMLDivElement>,
@@ -19,6 +20,7 @@ export const usePostSubmissionHandlers = (
   showConfirmationToast: (message: string) => void
 ) => {
   const { user } = useSupabaseSession();
+  const location = useLocation();
   const { handleCaptionInput, selectMention } = usePostHandlers();
 
   const onTabClick = (tab: { id: string; path: string | null; isAction?: boolean }, handleTabClick: Function) => {
@@ -39,6 +41,18 @@ export const usePostSubmissionHandlers = (
       console.log('usePostSubmissionHandlers: openComposer called');
     } else {
       console.log('usePostSubmissionHandlers: Not a post action, calling handleTabClick');
+      
+      // Special case: if clicking home/clubhouse while already on clubhouse page, scroll to top
+      if (tab.id === 'clubhouse' && (location.pathname === '/clubhouse' || location.pathname === '/')) {
+        console.log('usePostSubmissionHandlers: Scrolling to top of clubhouse page');
+        window.scrollTo({
+          top: 0,
+          left: 0,
+          behavior: 'smooth'
+        });
+        return;
+      }
+      
       handleTabClick(tab);
     }
   };
