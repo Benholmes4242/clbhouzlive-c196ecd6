@@ -107,11 +107,12 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
                   <button
                     key={option.key}
                     onClick={() => onSortChange(option.key)}
-                    className={`flex items-center gap-2 text-sm font-semibold whitespace-nowrap px-4 py-2 rounded-full transition-all duration-200 hover:shadow-sm ${
+                    className={`flex items-center gap-2 text-base font-medium whitespace-nowrap px-3 py-1.5 shadow-lg shadow-black/10 transition-colors ${
                       sortBy === option.key 
-                        ? "bg-[#E0E0E0] text-foreground border border-gray-300 font-bold" 
-                        : "bg-[#F4F4F4] text-muted-foreground hover:bg-gray-200"
+                        ? "bg-white/20 backdrop-blur-[1px] border border-white/40 text-white" 
+                        : "bg-transparent backdrop-blur-[1px] border border-white/25 text-white"
                     }`}
+                    style={{ borderRadius: '8px' }}
                   >
                     <IconComponent className="w-4 h-4" />
                     {option.label}
@@ -128,11 +129,12 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
                     <button
                       key={option.key}
                       onClick={() => onSortChange(option.key)}
-                      className={`flex items-center gap-2 text-sm font-semibold whitespace-nowrap px-4 py-2 rounded-full transition-all duration-200 flex-shrink-0 ${
+                      className={`flex items-center gap-2 text-base font-medium whitespace-nowrap px-3 py-1.5 shadow-lg shadow-black/10 transition-colors flex-shrink-0 ${
                         sortBy === option.key 
-                          ? "bg-[#E0E0E0] text-foreground border border-gray-300 font-bold" 
-                          : "bg-[#F4F4F4] text-muted-foreground"
+                          ? "bg-white/20 backdrop-blur-[1px] border border-white/40 text-white" 
+                          : "bg-transparent backdrop-blur-[1px] border border-white/25 text-white"
                       }`}
+                      style={{ borderRadius: '8px' }}
                     >
                       <IconComponent className="w-4 h-4" />
                       {option.label}
@@ -155,14 +157,15 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
                     <TooltipTrigger asChild>
                       <button
                         onClick={() => onFilterChange(activeFilter === tile.key ? null : tile.key)}
-                        className={`flex items-center justify-center gap-2 cursor-pointer transition-all duration-200 hover:scale-105 hover:text-[#b66b41] whitespace-nowrap px-3 py-2 rounded-full ${
+                        className={`flex items-center justify-center gap-2 cursor-pointer transition-colors whitespace-nowrap px-3 py-1.5 shadow-lg shadow-black/10 text-base font-medium ${
                           activeFilter === tile.key 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'text-foreground bg-gray-100'
+                            ? 'bg-white/20 backdrop-blur-[1px] border border-white/40 text-white' 
+                            : 'bg-transparent backdrop-blur-[1px] border border-white/25 text-white'
                         }`}
+                        style={{ borderRadius: '8px' }}
                       >
                         {tile.flag === 'earth' ? (
-                          <Earth className="w-5 h-4 text-gray-600 flex-shrink-0" />
+                          <Earth className="w-5 h-4 text-white flex-shrink-0" />
                         ) : (
                           <CountryFlag country={tile.country} size="md" className="flex-shrink-0" />
                         )}
@@ -200,14 +203,15 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
                       <TooltipTrigger asChild>
                         <button
                           onClick={() => onFilterChange(activeFilter === tile.key ? null : tile.key)}
-                          className={`flex items-center gap-2 cursor-pointer transition-all duration-200 hover:scale-105 hover:text-[#b66b41] whitespace-nowrap flex-shrink-0 px-3 py-2 rounded-full ${
+                          className={`flex items-center gap-2 cursor-pointer transition-colors whitespace-nowrap flex-shrink-0 px-3 py-1.5 shadow-lg shadow-black/10 text-base font-medium ${
                             activeFilter === tile.key 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'text-foreground bg-gray-100'
+                              ? 'bg-white/20 backdrop-blur-[1px] border border-white/40 text-white' 
+                              : 'bg-transparent backdrop-blur-[1px] border border-white/25 text-white'
                           }`}
+                          style={{ borderRadius: '8px' }}
                         >
                           {tile.flag === 'earth' ? (
-                            <Earth className="w-5 h-4 text-gray-600 flex-shrink-0" />
+                            <Earth className="w-5 h-4 text-white flex-shrink-0" />
                           ) : (
                             <CountryFlag country={tile.country} size="md" className="flex-shrink-0" />
                           )}
