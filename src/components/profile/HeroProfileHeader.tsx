@@ -165,7 +165,7 @@ const HeroProfileHeader = ({
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
         
         {/* Content Container - Top Section */}
-        <div className="relative flex items-start justify-between px-8 py-8 pt-16">
+        <div className="relative flex items-start justify-between px-8 pt-16" style={{ paddingBottom: '32px' }}>
           
           {/* Left Side - Profile Info */}
           <div className="text-white flex-1">
