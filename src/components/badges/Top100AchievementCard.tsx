@@ -48,23 +48,25 @@ const Top100AchievementCard: React.FC<Top100AchievementCardProps> = ({ achieveme
       {/* Badge Content */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between">
-          <div className="flex-1">
-            <h3
-              className={cn(
-                "font-semibold text-base leading-tight",
-                isEarned ? "text-orange-900" : "text-foreground"
-              )}
-            >
-              {title}
-            </h3>
-            <p
-              className={cn(
-                "text-xs",
-                isEarned ? "text-orange-700" : "text-muted-foreground"
-              )}
-            >
-              {requirement}
-            </p>
+          <div className="flex-1 flex items-center">
+            <div>
+              <h3
+                className={cn(
+                  "font-semibold text-base leading-tight",
+                  isEarned ? "text-orange-900" : "text-foreground"
+                )}
+              >
+                {title}
+              </h3>
+              <p
+                className={cn(
+                  "text-xs",
+                  isEarned ? "text-orange-700" : "text-muted-foreground"
+                )}
+              >
+                {requirement}
+              </p>
+            </div>
           </div>
           {isEarned && (
             <div className="flex items-center justify-center ml-2">
