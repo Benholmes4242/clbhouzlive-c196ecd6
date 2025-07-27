@@ -107,7 +107,7 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
                   <button
                     key={option.key}
                     onClick={() => onSortChange(option.key)}
-                    className={`flex items-center gap-2 text-base font-medium whitespace-nowrap px-1.5 py-1.5 shadow-lg shadow-black/10 transition-colors ${
+                    className={`flex items-center gap-2 text-base font-medium whitespace-nowrap px-1 py-1.5 shadow-lg shadow-black/10 transition-colors ${
                       sortBy === option.key 
                         ? "bg-white/20 backdrop-blur-sm border border-white/30 text-white" 
                         : "bg-white/20 backdrop-blur-sm border border-white/30 text-white"
@@ -129,7 +129,7 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
                     <button
                       key={option.key}
                       onClick={() => onSortChange(option.key)}
-                      className={`flex items-center gap-2 text-base font-medium whitespace-nowrap px-1.5 py-1.5 shadow-lg shadow-black/10 transition-colors flex-shrink-0 ${
+                      className={`flex items-center gap-2 text-base font-medium whitespace-nowrap px-1 py-1.5 shadow-lg shadow-black/10 transition-colors flex-shrink-0 ${
                         sortBy === option.key 
                           ? "bg-white/20 backdrop-blur-sm border border-white/30 text-white" 
                           : "bg-white/20 backdrop-blur-sm border border-white/30 text-white"
@@ -157,7 +157,7 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
                     <TooltipTrigger asChild>
                       <button
                         onClick={() => onFilterChange(activeFilter === tile.key ? null : tile.key)}
-                        className={`flex items-center justify-center gap-2 cursor-pointer transition-colors whitespace-nowrap px-1.5 py-1.5 shadow-lg shadow-black/10 text-base font-medium ${
+                        className={`flex items-center justify-center gap-2 cursor-pointer transition-colors whitespace-nowrap px-1 py-1.5 shadow-lg shadow-black/10 text-base font-medium ${
                           activeFilter === tile.key 
                             ? 'bg-white/20 backdrop-blur-sm border border-white/30 text-white' 
                             : 'bg-white/20 backdrop-blur-sm border border-white/30 text-white'
@@ -203,7 +203,7 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
                       <TooltipTrigger asChild>
                         <button
                           onClick={() => onFilterChange(activeFilter === tile.key ? null : tile.key)}
-                          className={`flex items-center gap-2 cursor-pointer transition-colors whitespace-nowrap flex-shrink-0 px-1.5 py-1.5 shadow-lg shadow-black/10 text-base font-medium ${
+                          className={`flex items-center gap-2 cursor-pointer transition-colors whitespace-nowrap flex-shrink-0 px-1 py-1.5 shadow-lg shadow-black/10 text-base font-medium ${
                             activeFilter === tile.key 
                               ? 'bg-white/20 backdrop-blur-sm border border-white/30 text-white' 
                               : 'bg-white/20 backdrop-blur-sm border border-white/30 text-white'
