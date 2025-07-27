@@ -20,6 +20,20 @@ interface Top100VideoHighlightsProps {
 
 const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId }) => {
   const [fullscreenVideo, setFullscreenVideo] = useState<string | null>(null);
+  
+  // Function to extract video ID from Cloudflare Stream URL and generate thumbnail
+  const getVideoThumbnail = (videoUrl: string) => {
+    if (videoUrl.includes('cloudflarestream.com')) {
+      // Extract video ID from HLS URL pattern
+      const match = videoUrl.match(/cloudflarestream\.com\/([^/]+)\/manifest/);
+      if (match && match[1]) {
+        const videoId = match[1];
+        const baseUrl = videoUrl.split('/manifest')[0];
+        return `${baseUrl}/thumbnails/thumbnail.jpg`;
+      }
+    }
+    return null;
+  };
   const { data: videoHighlights = [], isLoading } = useQuery({
     queryKey: ['top100VideoHighlights', userId],
     queryFn: async () => {
@@ -153,12 +167,30 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId })
               >
                 {/* Video Thumbnail */}
                 <div className="relative w-20 h-14 rounded-lg overflow-hidden flex-shrink-0 bg-gray-800/50 border border-white/20">
-                  <video 
-                    src={highlight.media_url}
-                    className="w-full h-full object-cover"
-                    muted
-                    preload="metadata"
-                  />
+                  {getVideoThumbnail(highlight.media_url) ? (
+                    <img 
+                      src={getVideoThumbnail(highlight.media_url)!}
+                      alt={`${highlight.course_name} video thumbnail`}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        // Fallback to video element if thumbnail fails
+                        const target = e.target as HTMLImageElement;
+                        const videoElement = document.createElement('video');
+                        videoElement.src = highlight.media_url;
+                        videoElement.className = 'w-full h-full object-cover';
+                        videoElement.muted = true;
+                        videoElement.preload = 'metadata';
+                        target.parentNode?.replaceChild(videoElement, target);
+                      }}
+                    />
+                  ) : (
+                    <video 
+                      src={highlight.media_url}
+                      className="w-full h-full object-cover"
+                      muted
+                      preload="metadata"
+                    />
+                  )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
                 </div>
 
