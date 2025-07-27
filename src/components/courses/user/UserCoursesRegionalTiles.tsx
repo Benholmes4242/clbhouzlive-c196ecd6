@@ -109,8 +109,8 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
                     onClick={() => onSortChange(option.key)}
                     className={`flex items-center gap-2 text-base font-medium whitespace-nowrap px-3 py-1.5 shadow-lg shadow-black/10 transition-colors ${
                       sortBy === option.key 
-                        ? "bg-black/20 backdrop-blur-sm border border-white/20 text-white" 
-                        : "bg-black/20 backdrop-blur-sm border border-white/20 text-white"
+                        ? "bg-white/20 backdrop-blur-sm border border-white/30 text-white" 
+                        : "bg-white/20 backdrop-blur-sm border border-white/30 text-white"
                     }`}
                     style={{ borderRadius: '8px' }}
                   >
@@ -131,8 +131,8 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
                       onClick={() => onSortChange(option.key)}
                       className={`flex items-center gap-2 text-base font-medium whitespace-nowrap px-3 py-1.5 shadow-lg shadow-black/10 transition-colors flex-shrink-0 ${
                         sortBy === option.key 
-                          ? "bg-black/20 backdrop-blur-sm border border-white/20 text-white" 
-                          : "bg-black/20 backdrop-blur-sm border border-white/20 text-white"
+                          ? "bg-white/20 backdrop-blur-sm border border-white/30 text-white" 
+                          : "bg-white/20 backdrop-blur-sm border border-white/30 text-white"
                       }`}
                       style={{ borderRadius: '8px' }}
                     >
@@ -159,8 +159,8 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
                         onClick={() => onFilterChange(activeFilter === tile.key ? null : tile.key)}
                         className={`flex items-center justify-center gap-2 cursor-pointer transition-colors whitespace-nowrap px-3 py-1.5 shadow-lg shadow-black/10 text-base font-medium ${
                           activeFilter === tile.key 
-                            ? 'bg-black/20 backdrop-blur-sm border border-white/20 text-white' 
-                            : 'bg-black/20 backdrop-blur-sm border border-white/20 text-white'
+                            ? 'bg-white/20 backdrop-blur-sm border border-white/30 text-white' 
+                            : 'bg-white/20 backdrop-blur-sm border border-white/30 text-white'
                         }`}
                         style={{ borderRadius: '8px' }}
                       >
@@ -205,8 +205,8 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
                           onClick={() => onFilterChange(activeFilter === tile.key ? null : tile.key)}
                           className={`flex items-center gap-2 cursor-pointer transition-colors whitespace-nowrap flex-shrink-0 px-3 py-1.5 shadow-lg shadow-black/10 text-base font-medium ${
                             activeFilter === tile.key 
-                              ? 'bg-black/20 backdrop-blur-sm border border-white/20 text-white' 
-                              : 'bg-black/20 backdrop-blur-sm border border-white/20 text-white'
+                              ? 'bg-white/20 backdrop-blur-sm border border-white/30 text-white' 
+                              : 'bg-white/20 backdrop-blur-sm border border-white/30 text-white'
                           }`}
                           style={{ borderRadius: '8px' }}
                         >
