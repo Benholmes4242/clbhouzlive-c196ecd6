@@ -23,7 +23,7 @@ const Top100AchievementCard: React.FC<Top100AchievementCardProps> = ({ achieveme
   return (
     <div
       className={cn(
-        "flex items-center gap-3 p-3 rounded-full border transition-all duration-300",
+        "flex gap-3 p-3 rounded-full border transition-all duration-300",
         isEarned
           ? "bg-gradient-to-r from-orange-50 to-yellow-50 border-orange-200"
           : "bg-card border-border hover:border-border/80"
@@ -32,7 +32,7 @@ const Top100AchievementCard: React.FC<Top100AchievementCardProps> = ({ achieveme
       {/* Badge Icon */}
         <div
           className={cn(
-            "flex items-center justify-center w-8 h-8 rounded-full text-lg transition-all duration-300 self-start mt-0.5",
+            "flex items-center justify-center w-8 h-8 rounded-full text-lg transition-all duration-300 mt-2",
             isEarned
               ? "bg-gradient-to-r from-orange-400 to-yellow-400"
               : "bg-muted text-muted-foreground"
@@ -46,9 +46,9 @@ const Top100AchievementCard: React.FC<Top100AchievementCardProps> = ({ achieveme
       </div>
 
       {/* Badge Content */}
-      <div className="flex-1 min-w-0">
+      <div className="flex-1 min-w-0 mt-2">
         <div className="flex items-center justify-between">
-          <div className="flex-1 flex items-center">
+          <div className="flex-1">
             <div>
               <h3
                 className={cn(
@@ -79,7 +79,7 @@ const Top100AchievementCard: React.FC<Top100AchievementCardProps> = ({ achieveme
       </div>
 
       {/* Progress Indicator */}
-      <div className="flex items-center">
+      <div className="flex items-center mt-2">
         <div
           className={cn(
             "px-2.5 py-1.5 rounded-full text-xs font-semibold border",
