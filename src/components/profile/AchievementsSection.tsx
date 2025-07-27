@@ -54,25 +54,25 @@ const AchievementsSection: React.FC<AchievementsSectionProps> = ({
   }
 
   return (
-    <Card className="!bg-black/40 backdrop-blur-sm !border-black/20 rounded-lg">
+    <Card>
       <CardContent className="p-6">
-         <div className="flex items-center gap-2 mb-4">
-           <Trophy className="h-5 w-5 text-yellow-400" />
-           <h3 className="font-semibold text-lg text-white">Achievements</h3>
-           <Badge variant="secondary" className="ml-auto bg-white/20 text-white border-white/20">
-             {unlockedAchievements.length}/{achievements.length}
-           </Badge>
-         </div>
+        <div className="flex items-center gap-2 mb-4">
+          <Trophy className="h-5 w-5 text-yellow-600" />
+          <h3 className="font-semibold text-lg">Achievements</h3>
+          <Badge variant="secondary" className="ml-auto">
+            {unlockedAchievements.length}/{achievements.length}
+          </Badge>
+        </div>
 
         {/* Unlocked Achievements */}
         {unlockedAchievements.length > 0 && (
           <div className="mb-6">
-            <h4 className="font-medium text-sm text-white/80 mb-3">Unlocked</h4>
+            <h4 className="font-medium text-sm text-gray-700 mb-3">Unlocked</h4>
             <div className="flex flex-wrap gap-2">
               {unlockedAchievements.map((achievement) => (
                 <Badge
                   key={achievement.id}
-                  className="bg-yellow-400/20 text-yellow-300 border-yellow-400/30 hover:bg-yellow-400/30 transition-colors p-2 flex items-center gap-2"
+                  className="bg-yellow-100 text-yellow-800 border-yellow-300 hover:bg-yellow-200 transition-colors p-2 flex items-center gap-2"
                   title={achievement.description}
                 >
                   {getAchievementIcon(achievement.type)}
@@ -86,29 +86,29 @@ const AchievementsSection: React.FC<AchievementsSectionProps> = ({
         {/* In Progress Achievements */}
         {inProgressAchievements.length > 0 && isOwnProfile && (
           <div>
-            <h4 className="font-medium text-sm text-white/80 mb-3">In Progress</h4>
+            <h4 className="font-medium text-sm text-gray-700 mb-3">In Progress</h4>
             <div className="space-y-2">
               {inProgressAchievements.map((achievement) => (
                 <div
                   key={achievement.id}
-                  className="flex items-center gap-3 p-3 bg-white/10 rounded-lg border border-white/20"
+                  className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border"
                 >
-                  <div className="text-white/60">
+                  <div className="text-gray-400">
                     {getAchievementIcon(achievement.type)}
                   </div>
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-white">{achievement.title}</p>
+                    <p className="text-sm font-medium text-gray-700">{achievement.title}</p>
                     {achievement.progress && (
                       <div className="flex items-center gap-2 mt-1">
-                        <div className="flex-1 bg-white/20 rounded-full h-2">
+                        <div className="flex-1 bg-gray-200 rounded-full h-2">
                           <div 
-                            className="bg-yellow-400 h-2 rounded-full transition-all"
+                            className="bg-[#b66b41] h-2 rounded-full transition-all"
                             style={{ 
                               width: `${Math.min((achievement.progress.current / achievement.progress.target) * 100, 100)}%` 
                             }}
                           />
                         </div>
-                        <span className="text-xs text-white/80">
+                        <span className="text-xs text-gray-600">
                           {achievement.progress.current}/{achievement.progress.target}
                         </span>
                       </div>
