@@ -152,13 +152,14 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId })
                 onClick={() => setFullscreenVideo(highlight.media_url)}
               >
                 {/* Video Thumbnail */}
-                <div className="relative w-16 h-12 rounded overflow-hidden flex-shrink-0">
+                <div className="relative w-20 h-14 rounded-lg overflow-hidden flex-shrink-0 bg-gray-800/50 border border-white/20">
                   <video 
                     src={highlight.media_url}
                     className="w-full h-full object-cover"
                     muted
                     preload="metadata"
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
                 </div>
 
                 {/* Video Info */}
