@@ -96,20 +96,24 @@ const ProfilePage = () => {
         {/* Render section content based on active section */}
         {activeSection === 'handicap' && (
           <div className="px-8 pt-4 pb-8">
-            <HandicapSection 
-              userId={user?.id || ''}
-              profile={profile}
-            />
+            <div className="bg-background rounded-lg p-6 shadow-sm">
+              <HandicapSection 
+                userId={user?.id || ''}
+                profile={profile}
+              />
+            </div>
           </div>
         )}
         
         {activeSection === 'top100' && (
           <div className="px-8 pt-4 pb-8">
-            <UserCoursesContent 
-              username={profile?.username || ''}
-              isOwnProfile={true}
-              displayName={profile?.display_name || 'User'}
-            />
+            <div className="bg-background rounded-lg p-6 shadow-sm">
+              <UserCoursesContent 
+                username={profile?.username || ''}
+                isOwnProfile={true}
+                displayName={profile?.display_name || 'User'}
+              />
+            </div>
           </div>
         )}
       </div>
