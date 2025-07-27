@@ -39,7 +39,8 @@ const ActivityPostCard = ({ post, attributionText, onClick }: ActivityPostCardPr
   return (
     <div 
       ref={autoplayRef}
-      className="relative aspect-square bg-gray-100 cursor-pointer group overflow-hidden"
+      className="relative aspect-square bg-gray-100 cursor-pointer group overflow-hidden" 
+      style={{ borderRadius: '8px' }}
       onClick={handleClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
