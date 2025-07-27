@@ -10,6 +10,8 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import Top100AchievementsSection from '@/components/profile/Top100AchievementsSection';
 import Top100VideoHighlights from '@/components/profile/Top100VideoHighlights';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 
 interface UserCoursesContentProps {
   username?: string;
@@ -89,6 +91,8 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
 }) => {
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<string>('rating-high-low');
+  const [carouselIndex, setCarouselIndex] = useState(0);
+  const isMobile = useIsMobile();
   
   const {
     targetUserId,
@@ -251,14 +255,60 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
 
       {/* Achievements and Video Highlights Section */}
       {targetUserId && (
-        <div className="flex gap-4">
-          <Top100AchievementsSection 
-            userId={targetUserId} 
-            isOwnProfile={finalIsOwnProfile}
-            userDisplayName={finalDisplayName}
-          />
-          <Top100VideoHighlights />
-        </div>
+        <>
+          {isMobile ? (
+            // Mobile: Carousel view
+            <div className="relative mb-6">
+              <div 
+                className="overflow-hidden"
+                ref={useSwipeGesture({
+                  onSwipeLeft: () => setCarouselIndex(1),
+                  onSwipeRight: () => setCarouselIndex(0),
+                  threshold: 50
+                })}
+              >
+                <div 
+                  className="flex transition-transform duration-300 ease-out"
+                  style={{ transform: `translateX(-${carouselIndex * 100}%)` }}
+                >
+                  <div className="w-full flex-shrink-0">
+                    <Top100AchievementsSection 
+                      userId={targetUserId} 
+                      isOwnProfile={finalIsOwnProfile}
+                      userDisplayName={finalDisplayName}
+                    />
+                  </div>
+                  <div className="w-full flex-shrink-0">
+                    <Top100VideoHighlights />
+                  </div>
+                </div>
+              </div>
+              
+              {/* Dot indicators */}
+              <div className="flex justify-center mt-4 space-x-2">
+                {[0, 1].map((index) => (
+                  <button
+                    key={index}
+                    onClick={() => setCarouselIndex(index)}
+                    className={`w-2 h-2 rounded-full transition-colors ${
+                      index === carouselIndex ? 'bg-white' : 'bg-white/50'
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+          ) : (
+            // Desktop: Side by side view
+            <div className="flex gap-4 mb-6">
+              <Top100AchievementsSection 
+                userId={targetUserId} 
+                isOwnProfile={finalIsOwnProfile}
+                userDisplayName={finalDisplayName}
+              />
+              <Top100VideoHighlights />
+            </div>
+          )}
+        </>
       )}
 
       <UserCoursesRegionalTiles
