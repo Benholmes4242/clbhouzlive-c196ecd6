@@ -2,6 +2,8 @@
 import React, { useState, useRef } from 'react';
 import { Camera, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 interface ProfileCoverSectionProps {
   coverImageUrl?: string | null;
@@ -16,17 +18,53 @@ const ProfileCoverSection: React.FC<ProfileCoverSectionProps> = ({
 }) => {
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const { user } = useSupabaseSession();
 
   const handleCoverUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file || !isOwnProfile) return;
 
     setUploading(true);
-    // TODO: Implement cover image upload to Supabase storage
-    // For now, create a preview URL
-    const previewUrl = URL.createObjectURL(file);
-    onCoverUpdate(previewUrl);
-    setUploading(false);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `cover_${Date.now()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      // Upload to Supabase storage
+      const { error: uploadError } = await supabase.storage
+        .from('profile-backgrounds')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        console.error('Error uploading cover image:', uploadError);
+        return;
+      }
+
+      // Get public URL
+      const { data } = supabase.storage
+        .from('profile-backgrounds')
+        .getPublicUrl(filePath);
+
+      const publicUrl = data.publicUrl;
+
+      // Update user profile with new cover photo URL
+      const { error: updateError } = await supabase
+        .from('user_profiles')
+        .update({ cover_photo_url: publicUrl })
+        .eq('id', user?.id);
+
+      if (updateError) {
+        console.error('Error updating profile:', updateError);
+        return;
+      }
+
+      // Update the UI
+      onCoverUpdate(publicUrl);
+    } catch (error) {
+      console.error('Error uploading cover image:', error);
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
