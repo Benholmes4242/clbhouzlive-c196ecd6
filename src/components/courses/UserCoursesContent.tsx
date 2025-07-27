@@ -260,58 +260,22 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
         isOwnProfile={finalIsOwnProfile} 
       />
 
-      {/* Achievements and Video Highlights Section */}
+      {/* Video Highlights Section */}
       {targetUserId && (
-        <>
-          {isMobile ? (
-            // Mobile: Carousel view
-            <div className="relative mb-6">
-              <div 
-                className="overflow-hidden"
-                ref={swipeRef}
-              >
-                <div 
-                  className="flex transition-transform duration-300 ease-out"
-                  style={{ transform: `translateX(-${carouselIndex * 100}%)` }}
-                >
-                  <div className="w-full flex-shrink-0">
-                    <Top100VideoHighlights userId={targetUserId} />
-                  </div>
-                  <div className="w-full flex-shrink-0">
-                    <Top100AchievementsSection 
-                      userId={targetUserId} 
-                      isOwnProfile={finalIsOwnProfile}
-                      userDisplayName={finalDisplayName}
-                    />
-                  </div>
-                </div>
-              </div>
-              
-              {/* Dot indicators */}
-              <div className="flex justify-center mt-4 space-x-2">
-                {[0, 1].map((index) => (
-                  <button
-                    key={index}
-                    onClick={() => setCarouselIndex(index)}
-                    className={`w-2 h-2 rounded-full transition-colors ${
-                      index === carouselIndex ? 'bg-white' : 'bg-white/50'
-                    }`}
-                  />
-                ))}
-              </div>
-            </div>
-          ) : (
-            // Desktop: Side by side view
-            <div className="flex gap-4 mb-6">
-              <Top100AchievementsSection 
-                userId={targetUserId} 
-                isOwnProfile={finalIsOwnProfile}
-                userDisplayName={finalDisplayName}
-              />
-              <Top100VideoHighlights userId={targetUserId} />
-            </div>
-          )}
-        </>
+        <div className="mb-6">
+          <Top100VideoHighlights userId={targetUserId} />
+        </div>
+      )}
+
+      {/* Achievements Section */}
+      {targetUserId && (
+        <div className="mb-6">
+          <Top100AchievementsSection 
+            userId={targetUserId} 
+            isOwnProfile={finalIsOwnProfile}
+            userDisplayName={finalDisplayName}
+          />
+        </div>
       )}
 
       <UserCoursesRegionalTiles
