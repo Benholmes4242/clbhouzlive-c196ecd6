@@ -25,8 +25,12 @@ const UserProfilePage = () => {
 
   return (
     <div className="min-h-screen bg-background pb-28">
-      {/* Header with frosted glass effect - positioned absolutely over content */}
-      <div className="absolute top-0 left-0 right-0 z-50 backdrop-blur-[2px] bg-white/0 supports-[backdrop-filter]:bg-white/0">
+      {/* Header with conditional frosted glass effect - only when cover photo exists */}
+      <div className={`absolute top-0 left-0 right-0 z-50 ${
+        profile?.cover_photo_url 
+          ? 'backdrop-blur-[2px] bg-white/0 supports-[backdrop-filter]:bg-white/0' 
+          : 'bg-background'
+      }`}>
         <Header />
       </div>
       

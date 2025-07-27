@@ -185,8 +185,10 @@ const HeroProfileHeader = ({
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
         
-        {/* Content Container - Top Section - content starts from very top */}
-        <div className="relative flex items-end justify-between px-8 pt-20 pb-8" style={{ marginBottom: '24px' }}>
+        {/* Content Container - Top Section - conditional padding based on cover photo */}
+        <div className={`relative flex items-end justify-between px-8 pb-8 ${
+          backgroundImage ? 'pt-20' : 'pt-24'
+        }`} style={{ marginBottom: '24px' }}>
           
           {/* Left Side - Profile Information */}
           <div className="flex flex-col text-white">
