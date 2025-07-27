@@ -45,11 +45,22 @@ export const usePostSubmissionHandlers = (
       // Special case: if clicking home/clubhouse while already on clubhouse page, scroll to top
       if (tab.id === 'clubhouse' && (location.pathname === '/clubhouse' || location.pathname === '/')) {
         console.log('usePostSubmissionHandlers: Scrolling to top of clubhouse page');
-        window.scrollTo({
-          top: 0,
-          left: 0,
-          behavior: 'smooth'
-        });
+        
+        // Try multiple scroll methods to ensure it works
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+        
+        // Also try the window scroll with immediate behavior first, then smooth
+        window.scrollTo(0, 0);
+        
+        setTimeout(() => {
+          window.scrollTo({
+            top: 0,
+            left: 0,
+            behavior: 'smooth'
+          });
+        }, 10);
+        
         return;
       }
       
