@@ -5,6 +5,8 @@ import { supabase } from '@/integrations/supabase/client';
 
 interface Top100AchievementsSectionProps {
   userId: string;
+  isOwnProfile?: boolean;
+  userDisplayName?: string;
 }
 
 interface Achievement {
@@ -18,7 +20,9 @@ interface Achievement {
 }
 
 const Top100AchievementsSection: React.FC<Top100AchievementsSectionProps> = ({
-  userId
+  userId,
+  isOwnProfile = false,
+  userDisplayName
 }) => {
   console.log('Top100AchievementsSection rendering with userId:', userId);
   
@@ -141,6 +145,16 @@ const Top100AchievementsSection: React.FC<Top100AchievementsSectionProps> = ({
 
   const earnedAchievements = achievements.filter(achievement => achievement.isEarned);
   const hasEarnedBadges = earnedAchievements.length > 0;
+  
+  // Get the highest earned achievement for display
+  const highestEarnedAchievement = earnedAchievements.length > 0 
+    ? earnedAchievements[earnedAchievements.length - 1] 
+    : null;
+
+  // Get user's first name for display text
+  const firstName = isOwnProfile 
+    ? 'You' 
+    : userDisplayName?.split(' ')[0] || 'This user';
 
   const getTierColor = (tier: string, isEarned: boolean) => {
     if (!isEarned) return 'bg-gray-300 text-gray-500';
@@ -169,29 +183,24 @@ const Top100AchievementsSection: React.FC<Top100AchievementsSectionProps> = ({
         </div>
       </div>
 
-      {/* Earned Badges Card - Only show if user has earned badges */}
-      {hasEarnedBadges && (
+      {/* Earned Badge Card - Only show if user has earned badges */}
+      {hasEarnedBadges && highestEarnedAchievement && (
         <div className="flex-shrink-0">
           <div className="bg-black/20 backdrop-blur-sm rounded-[8px] px-4 py-3 border border-white/20">
-            <div className="space-y-3">
-              <h4 className="font-semibold text-sm text-white">Earned Badges</h4>
-              <div className="flex flex-wrap gap-2">
-                {earnedAchievements.map((achievement) => (
-                  <div key={achievement.id} className="text-center">
-                    <div 
-                      className={`w-10 h-10 rounded-full flex items-center justify-center text-sm mb-1 transition-all duration-300 ${
-                        getTierColor(achievement.tier, achievement.isEarned)
-                      } shadow-md`}
-                    >
-                      {achievement.emoji}
-                    </div>
-                    <div className="text-xs">
-                      <div className="font-medium text-white">
-                        {achievement.title}
-                      </div>
-                    </div>
-                  </div>
-                ))}
+            <div className="space-y-3 text-center">
+              <div className="text-4xl mb-2">
+                {highestEarnedAchievement.emoji}
+              </div>
+              <div className="space-y-1">
+                <div className="font-semibold text-white">
+                  {highestEarnedAchievement.title}
+                </div>
+                <div className="text-xs text-white/80">
+                  {isOwnProfile 
+                    ? `You've played ${userProgress} top 100 courses`
+                    : `${firstName} has played ${userProgress} top 100 courses`
+                  }
+                </div>
               </div>
             </div>
           </div>

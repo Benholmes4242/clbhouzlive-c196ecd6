@@ -250,7 +250,11 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
 
       {/* Achievements Section */}
       {targetUserId && (
-        <Top100AchievementsSection userId={targetUserId} />
+        <Top100AchievementsSection 
+          userId={targetUserId} 
+          isOwnProfile={finalIsOwnProfile}
+          userDisplayName={finalDisplayName}
+        />
       )}
 
       <UserCoursesRegionalTiles
