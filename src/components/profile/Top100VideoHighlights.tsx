@@ -152,14 +152,9 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId })
         </div>
         
         {videoHighlights.length > 0 ? (
-          <div 
-            className="max-h-48 overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent space-y-2"
-            style={{
-              WebkitOverflowScrolling: 'touch',
-              scrollbarWidth: 'thin'
-            }}
-          >
-            {videoHighlights.map((highlight) => (
+          <div className="space-y-2">
+            {/* Show only the first video highlight */}
+            {videoHighlights.slice(0, 1).map((highlight) => (
               <div
                 key={highlight.id}
                 className="flex items-center gap-3 p-2 rounded-lg border bg-white/10 border-white/30 hover:bg-white/15 transition-colors cursor-pointer"
@@ -244,13 +239,6 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId })
               />
             </div>
           </div>
-        )}
-        
-        {videoHighlights.length > 0 && (
-          <>
-            {/* Scroll indicator gradient */}
-            <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-white/10 to-transparent pointer-events-none rounded-b-lg"></div>
-          </>
         )}
       </div>
     </div>
