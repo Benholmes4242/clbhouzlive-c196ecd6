@@ -238,14 +238,6 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
           <span>
             Showing {tiles.find(t => t.key === activeFilter)?.label.replace(' Played', '')} courses
           </span>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onFilterChange(null)}
-            className="h-auto p-1 text-muted-foreground"
-          >
-            <X className="h-3 w-3" />
-          </Button>
         </div>
       )}
     </div>
