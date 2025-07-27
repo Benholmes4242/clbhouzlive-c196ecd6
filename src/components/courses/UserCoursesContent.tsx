@@ -94,6 +94,13 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
   const [carouselIndex, setCarouselIndex] = useState(0);
   const isMobile = useIsMobile();
   
+  // Always call the hook to avoid conditional hook errors
+  const swipeRef = useSwipeGesture({
+    onSwipeLeft: () => setCarouselIndex(1),
+    onSwipeRight: () => setCarouselIndex(0),
+    threshold: 50
+  });
+  
   const {
     targetUserId,
     displayName: hookDisplayName,
@@ -261,11 +268,7 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
             <div className="relative mb-6">
               <div 
                 className="overflow-hidden"
-                ref={useSwipeGesture({
-                  onSwipeLeft: () => setCarouselIndex(1),
-                  onSwipeRight: () => setCarouselIndex(0),
-                  threshold: 50
-                })}
+                ref={swipeRef}
               >
                 <div 
                   className="flex transition-transform duration-300 ease-out"
