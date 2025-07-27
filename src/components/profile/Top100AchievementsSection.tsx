@@ -171,41 +171,68 @@ const Top100AchievementsSection: React.FC<Top100AchievementsSectionProps> = ({
   };
 
   return (
-    <div className="flex gap-4 mb-6">
-      {/* Achievements Stats Card - Only takes space it needs */}
-      <div className="flex-shrink-0">
-        <div className="bg-white/20 backdrop-blur-sm rounded-[8px] px-4 py-3 border border-white/30">
-          <div className="space-y-2">
+    <div className="mb-6">
+      {/* Achievements Stats Card with embedded achievements */}
+      <div className="bg-white/20 backdrop-blur-sm rounded-[8px] px-4 py-3 border border-white/30">
+        <div className="space-y-4">
+          <div>
             <h3 className="font-bold text-lg text-white">Achievements</h3>
             <p className="text-white">
               You've played <span className="font-semibold text-white">{userProgress}</span> of 300 Top 100 courses
             </p>
           </div>
-        </div>
-      </div>
+          
+          {/* Achievement Cards */}
+          <div className="space-y-2">
+            {achievements.map((achievement) => (
+              <div
+                key={achievement.id}
+                className={`flex items-center gap-3 p-2 rounded-lg border transition-all duration-300 ${
+                  achievement.isEarned
+                    ? "bg-white/10 border-white/30"
+                    : "bg-white/5 border-white/20 opacity-60"
+                }`}
+              >
+                {/* Achievement Icon */}
+                <div className="flex items-center justify-center w-6 h-6 rounded-full text-sm">
+                  {achievement.id === '20-club' ? (
+                    <MedalIcon size="sm" />
+                  ) : (
+                    <span>{achievement.emoji}</span>
+                  )}
+                </div>
 
-      {/* Earned Badge Card - Only show if user has earned badges */}
-      {hasEarnedBadges && highestEarnedAchievement && (
-        <div className="flex-shrink-0">
-          <div className="text-center px-4 py-3">
-            <div className="text-4xl mb-2">
-              {highestEarnedAchievement.id === '20-club' ? (
-                <MedalIcon size="xl" />
-              ) : (
-                highestEarnedAchievement.emoji
-              )}
-            </div>
-            <div>
-              <div className="font-semibold text-white leading-tight">
-                {highestEarnedAchievement.title}
+                {/* Achievement Content */}
+                <div className="flex-1">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h4 className="font-medium text-white text-sm leading-tight">
+                        {achievement.title}
+                      </h4>
+                      <p className="text-xs text-white/70">
+                        {achievement.description}
+                      </p>
+                    </div>
+                    
+                    {/* Progress/Status */}
+                    <div className="text-right">
+                      {achievement.isEarned ? (
+                        <span className="text-xs font-medium text-green-300">
+                          ✓ Earned!
+                        </span>
+                      ) : (
+                        <span className="text-xs text-white/60">
+                          {Math.min(userProgress, achievement.threshold)}/{achievement.threshold}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div className="text-xs text-white/80 -mt-0.5">
-                Played {highestEarnedAchievement.threshold} top 100 courses
-              </div>
-            </div>
+            ))}
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };
