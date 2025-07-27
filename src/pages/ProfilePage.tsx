@@ -3,10 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import Header from "@/components/Header";
 import BottomNavigation from '@/components/BottomNavigation';
 import HeroProfileHeader from '@/components/profile/HeroProfileHeader';
+import HandicapSection from '@/components/profile/HandicapSection';
+import UserCoursesContent from '@/components/courses/UserCoursesContent';
 import { useProfileData } from '@/hooks/useProfileData';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
+  const [activeSection, setActiveSection] = useState('activity');
   
   const {
     user,
@@ -86,7 +89,29 @@ const ProfilePage = () => {
         <HeroProfileHeader 
           profile={profile}
           onProfileUpdate={refreshProfile}
+          activeSection={activeSection}
+          onSectionChange={setActiveSection}
         />
+        
+        {/* Render section content based on active section */}
+        {activeSection === 'handicap' && (
+          <div className="px-8 pb-8">
+            <HandicapSection 
+              userId={user?.id || ''}
+              profile={profile}
+            />
+          </div>
+        )}
+        
+        {activeSection === 'top100' && (
+          <div className="px-8 pb-8">
+            <UserCoursesContent 
+              username={profile?.username || ''}
+              isOwnProfile={true}
+              displayName={profile?.display_name || 'User'}
+            />
+          </div>
+        )}
       </div>
       
       <BottomNavigation />
