@@ -141,7 +141,7 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
           {/* Left Side - Profile Info */}
           <div className="text-white flex-1">
             {/* Profile Photo */}
-            <div className="w-20 h-20 mb-4">
+            <div className="w-24 h-24 mb-4">
               {isOwnProfile ? (
                 <div 
                   className="relative cursor-pointer group"
@@ -163,7 +163,7 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
                   <OptimizedAvatar
                     src={profile?.profile_photo_url}
                     alt={displayName}
-                    size={80}
+                    size={96}
                     fallback={displayName.charAt(0)}
                     className="shadow-lg group-hover:opacity-80 transition-opacity"
                   />
@@ -176,7 +176,7 @@ const HeroProfileHeader: React.FC<HeroProfileHeaderProps> = ({
                 <OptimizedAvatar
                   src={profile?.profile_photo_url}
                   alt={displayName}
-                  size={80}
+                  size={96}
                   fallback={displayName.charAt(0)}
                   className="shadow-lg"
                 />
