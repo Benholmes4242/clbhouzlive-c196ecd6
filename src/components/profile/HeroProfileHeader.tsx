@@ -403,102 +403,137 @@ const HeroProfileHeader = ({
           className="px-8 pb-8"
           ref={activityRef}
         >
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Activity Card */}
-            <div 
-              className="relative overflow-hidden flex flex-col justify-end text-white h-[200px] cursor-pointer group"
-              style={{ borderRadius: '8px' }}
-              ref={null}
-              onClick={() => onSectionChange?.('activity')}
-            >
-              {/* Golf Course Background Image */}
+            {/* Show cards only when in activity mode */}
+            {activeSection === 'activity' && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Activity Card */}
               <div 
-                className="absolute inset-0 bg-cover bg-center"
-                style={{
-                  backgroundImage: `url('/lovable-uploads/2a145957-bebc-43ef-bd85-1f1343e05210.png')`
-                }}
+                className="relative overflow-hidden flex flex-col justify-end text-white h-[200px] cursor-pointer group"
+                style={{ borderRadius: '8px' }}
+                ref={null}
+                onClick={() => onSectionChange?.('activity')}
               >
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-              </div>
-              
-              {/* Content */}
-              <div className="relative p-8 cursor-pointer group">
-                <div className="flex items-center mb-3">
-                  <h3 className="text-3xl font-bold">Activity</h3>
+                {/* Golf Course Background Image */}
+                <div 
+                  className="absolute inset-0 bg-cover bg-center"
+                  style={{
+                    backgroundImage: `url('/lovable-uploads/2a145957-bebc-43ef-bd85-1f1343e05210.png')`
+                  }}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
                 </div>
-                <p className="text-white/90 text-lg leading-relaxed drop-shadow-lg">View your recent golf moments, rounds played, and course discoveries.</p>
-              </div>
-            </div>
-
-            {/* Handicap Card */}
-            <div 
-              className="relative overflow-hidden bg-gradient-to-br from-emerald-500 to-emerald-700 flex flex-col justify-end text-white h-[200px] cursor-pointer group"
-              style={{ borderRadius: '8px' }}
-              ref={null}
-              onClick={() => onSectionChange?.('handicap')}
-            >
-              {/* Handicap Pattern Background */}
-              <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-transparent">
-                <div className="absolute inset-0" style={{
-                  backgroundImage: `
-                    conic-gradient(from 0deg at 50% 50%, rgba(255,255,255,0.1) 0deg, transparent 60deg, rgba(255,255,255,0.1) 120deg, transparent 180deg, rgba(255,255,255,0.1) 240deg, transparent 300deg),
-                    radial-gradient(circle at 70% 30%, rgba(255,255,255,0.1) 0%, transparent 50%)
-                  `,
-                  backgroundSize: '80px 80px, 100% 100%'
-                }}>
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-              </div>
-              
-              {/* Content */}
-              <div className="relative p-8 cursor-pointer group">
-                <div className="flex items-center mb-3">
-                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mr-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
-                      <path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/>
-                      <path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/>
-                      <path d="M12 2v2"/>
-                      <path d="M12 20v2"/>
-                      <path d="M4.93 4.93l1.41 1.41"/>
-                      <path d="M17.66 17.66l1.41 1.41"/>
-                      <path d="M2 12h2"/>
-                      <path d="M20 12h2"/>
-                      <path d="M6.34 17.66l-1.41 1.41"/>
-                      <path d="M19.07 4.93l-1.41 1.41"/>
-                    </svg>
+                
+                {/* Content */}
+                <div className="relative p-8 cursor-pointer group">
+                  <div className="flex items-center mb-3">
+                    <h3 className="text-3xl font-bold">Activity</h3>
                   </div>
-                  <h3 className="text-3xl font-bold group-hover:scale-105 transition-transform">Handicap</h3>
+                  <p className="text-white/90 text-lg leading-relaxed drop-shadow-lg">View your recent golf moments, rounds played, and course discoveries.</p>
                 </div>
-                <p className="text-white/80 text-lg leading-relaxed">Track your progress and handicap development over time.</p>
               </div>
-            </div>
 
-            {/* Top 100 Courses Card */}
-            <div 
-              className="relative overflow-hidden bg-gradient-to-br from-amber-500 to-orange-600 flex flex-col justify-end text-white h-[200px] cursor-pointer group"
-              style={{ borderRadius: '8px' }}
-              ref={null}
-              onClick={() => onSectionChange?.('top100')}
-            >
-              {/* Golf Course Background Image */}
+              {/* Handicap Card */}
               <div 
-                className="absolute inset-0 bg-cover bg-center"
-                style={{
-                  backgroundImage: `url('/lovable-uploads/b5c44b64-e08d-4c79-b3d0-e15cad97b1b3.png')`
-                }}
+                className="relative overflow-hidden bg-gradient-to-br from-emerald-500 to-emerald-700 flex flex-col justify-end text-white h-[200px] cursor-pointer group"
+                style={{ borderRadius: '8px' }}
+                ref={null}
+                onClick={() => onSectionChange?.('handicap')}
               >
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-              </div>
-              
-              {/* Content */}
-              <div className="relative p-8 cursor-pointer group">
-                <div className="flex items-center mb-3">
-                  <h3 className="text-3xl font-bold">Top 100</h3>
+                {/* Handicap Pattern Background */}
+                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-transparent">
+                  <div className="absolute inset-0" style={{
+                    backgroundImage: `
+                      conic-gradient(from 0deg at 50% 50%, rgba(255,255,255,0.1) 0deg, transparent 60deg, rgba(255,255,255,0.1) 120deg, transparent 180deg, rgba(255,255,255,0.1) 240deg, transparent 300deg),
+                      radial-gradient(circle at 70% 30%, rgba(255,255,255,0.1) 0%, transparent 50%)
+                    `,
+                    backgroundSize: '80px 80px, 100% 100%'
+                  }}>
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
                 </div>
-                <p className="text-white/90 text-lg leading-relaxed drop-shadow-lg">Discover and track the world's greatest golf courses.</p>
+                
+                {/* Content */}
+                <div className="relative p-8 cursor-pointer group">
+                  <div className="flex items-center mb-3">
+                    <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mr-4">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
+                        <path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/>
+                        <path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/>
+                        <path d="M12 2v2"/>
+                        <path d="M12 20v2"/>
+                        <path d="M4.93 4.93l1.41 1.41"/>
+                        <path d="M17.66 17.66l1.41 1.41"/>
+                        <path d="M2 12h2"/>
+                        <path d="M20 12h2"/>
+                        <path d="M6.34 17.66l-1.41 1.41"/>
+                        <path d="M19.07 4.93l-1.41 1.41"/>
+                      </svg>
+                    </div>
+                    <h3 className="text-3xl font-bold group-hover:scale-105 transition-transform">Handicap</h3>
+                  </div>
+                  <p className="text-white/80 text-lg leading-relaxed">Track your progress and handicap development over time.</p>
+                </div>
               </div>
-            </div>
-            </div>
+
+              {/* Top 100 Courses Card */}
+              <div 
+                className="relative overflow-hidden bg-gradient-to-br from-amber-500 to-orange-600 flex flex-col justify-end text-white h-[200px] cursor-pointer group"
+                style={{ borderRadius: '8px' }}
+                ref={null}
+                onClick={() => onSectionChange?.('top100')}
+              >
+                {/* Golf Course Background Image */}
+                <div 
+                  className="absolute inset-0 bg-cover bg-center"
+                  style={{
+                    backgroundImage: `url('/lovable-uploads/b5c44b64-e08d-4c79-b3d0-e15cad97b1b3.png')`
+                  }}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                </div>
+                
+                {/* Content */}
+                <div className="relative p-8 cursor-pointer group">
+                  <div className="flex items-center mb-3">
+                    <h3 className="text-3xl font-bold">Top 100</h3>
+                  </div>
+                  <p className="text-white/90 text-lg leading-relaxed drop-shadow-lg">Discover and track the world's greatest golf courses.</p>
+                </div>
+              </div>
+              </div>
+            )}
+
+            {/* Show navigation tabs when not in activity mode */}
+            {activeSection !== 'activity' && (
+              <div className="flex justify-center space-x-4 mb-6">
+                <button 
+                  onClick={() => onSectionChange?.('activity')}
+                  className="px-6 py-2 bg-white/20 backdrop-blur-sm text-white rounded-lg hover:bg-white/30 transition-all"
+                >
+                  Activity
+                </button>
+                <button 
+                  onClick={() => onSectionChange?.('handicap')}
+                  className={`px-6 py-2 backdrop-blur-sm text-white rounded-lg transition-all ${
+                    activeSection === 'handicap' 
+                      ? 'bg-emerald-500 hover:bg-emerald-600' 
+                      : 'bg-white/20 hover:bg-white/30'
+                  }`}
+                >
+                  Handicap
+                </button>
+                <button 
+                  onClick={() => onSectionChange?.('top100')}
+                  className={`px-6 py-2 backdrop-blur-sm text-white rounded-lg transition-all ${
+                    activeSection === 'top100' 
+                      ? 'bg-amber-500 hover:bg-amber-600' 
+                      : 'bg-white/20 hover:bg-white/30'
+                  }`}
+                >
+                  Top 100
+                </button>
+              </div>
+            )}
             
             {/* Activity Posts Section - Only show when activity section is active */}
             {activeSection === 'activity' && (
