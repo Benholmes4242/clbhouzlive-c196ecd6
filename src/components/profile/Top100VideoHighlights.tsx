@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { Play, MapPin } from 'lucide-react';
+import { MapPin, X } from 'lucide-react';
 
 interface VideoHighlight {
   id: string;
@@ -19,6 +19,7 @@ interface Top100VideoHighlightsProps {
 }
 
 const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId }) => {
+  const [fullscreenVideo, setFullscreenVideo] = useState<string | null>(null);
   const { data: videoHighlights = [], isLoading } = useQuery({
     queryKey: ['top100VideoHighlights', userId],
     queryFn: async () => {
@@ -138,7 +139,7 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId })
         
         {videoHighlights.length > 0 ? (
           <div 
-            className="max-h-32 overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent space-y-2"
+            className="max-h-48 overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent space-y-2"
             style={{
               WebkitOverflowScrolling: 'touch',
               scrollbarWidth: 'thin'
@@ -148,6 +149,7 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId })
               <div
                 key={highlight.id}
                 className="flex items-center gap-3 p-2 rounded-lg border bg-white/10 border-white/30 hover:bg-white/15 transition-colors cursor-pointer"
+                onClick={() => setFullscreenVideo(highlight.media_url)}
               >
                 {/* Video Thumbnail */}
                 <div className="relative w-16 h-12 rounded overflow-hidden flex-shrink-0">
@@ -155,10 +157,8 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId })
                     src={highlight.media_url}
                     className="w-full h-full object-cover"
                     muted
+                    preload="metadata"
                   />
-                  <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                    <Play className="w-4 h-4 text-white" />
-                  </div>
                 </div>
 
                 {/* Video Info */}
@@ -183,9 +183,33 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId })
           </div>
         ) : (
           <div className="text-center py-6">
-            <Play className="w-8 h-8 text-white/40 mx-auto mb-2" />
+            <div className="w-8 h-8 text-white/40 mx-auto mb-2 flex items-center justify-center">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+            </div>
             <p className="text-white/60 text-sm">No video highlights yet</p>
             <p className="text-white/40 text-xs">Be the first to share a moment!</p>
+          </div>
+        )}
+        
+        {/* Fullscreen Video Modal */}
+        {fullscreenVideo && (
+          <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center">
+            <div className="relative w-full h-full max-w-6xl max-h-full p-4">
+              <button
+                onClick={() => setFullscreenVideo(null)}
+                className="absolute top-4 right-4 z-10 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+              <video
+                src={fullscreenVideo}
+                className="w-full h-full object-contain"
+                controls
+                autoPlay
+              />
+            </div>
           </div>
         )}
         

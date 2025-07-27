@@ -185,7 +185,7 @@ const Top100AchievementsSection: React.FC<Top100AchievementsSectionProps> = ({
           {/* Achievement Cards - Limited height with scroll */}
           <div className="relative">
             <div 
-              className="max-h-32 overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent space-y-2"
+              className="max-h-48 overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent space-y-2"
               style={{
                 WebkitOverflowScrolling: 'touch',
                 scrollbarWidth: 'thin'
