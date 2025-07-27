@@ -128,14 +128,14 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
                     <button
                       key={option.key}
                       onClick={() => onSortChange(option.key)}
-                      className={`flex items-center justify-center text-xs font-medium px-2 py-1.5 shadow-lg shadow-black/10 transition-colors flex-1 hover:bg-white/30 ${
+                      className={`flex items-center justify-center text-sm font-medium px-2 py-1.5 shadow-lg shadow-black/10 transition-colors flex-1 hover:bg-white/30 ${
                         sortBy === option.key 
                           ? "bg-white/40 backdrop-blur-sm border border-white/50 text-white" 
                           : "bg-white/20 backdrop-blur-sm border border-white/30 text-white"
                       }`}
                       style={{ borderRadius: '8px' }}
                     >
-                      <span className="text-xs">{option.label}</span>
+                      <span className="text-sm">{option.label}</span>
                     </button>
                   );
                 })}
