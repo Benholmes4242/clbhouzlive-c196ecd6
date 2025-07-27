@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import SmartMediaContainer from '@/components/ui/smart-media-container';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
-import { FaPlay } from 'react-icons/fa';
+import { MdOutlinePlayCircle } from 'react-icons/md';
 import { Loader2 } from 'lucide-react';
 
 interface MediaItem {
@@ -114,7 +114,7 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
           {/* Play icon for non-autoplaying videos */}
           {!shouldAutoplay && !hidePlayButton && (
             <div className="absolute bottom-3 right-3 z-20">
-              <FaPlay className="h-4 w-4 text-white drop-shadow-lg" />
+              <MdOutlinePlayCircle className="h-8 w-8 text-white drop-shadow-lg" />
             </div>
           )}
         </div>
