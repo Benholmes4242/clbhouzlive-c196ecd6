@@ -198,9 +198,9 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
                         style={{ borderRadius: '8px' }}
                       >
                         {tile.flag === 'earth' ? (
-                          <Earth className="w-4 h-4 text-white flex-shrink-0" />
+                          <Earth className="w-8 h-8 text-white flex-shrink-0" />
                         ) : (
-                          <CountryFlag country={tile.country} size="sm" className="flex-shrink-0" />
+                          <CountryFlag country={tile.country} size="lg" className="flex-shrink-0" />
                         )}
                         <span className="text-xs font-semibold">
                           {tile.progress.played} / {tile.progress.total}
