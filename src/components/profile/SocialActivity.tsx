@@ -124,12 +124,6 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
         onPostCreated={fetchUserPosts}
       />
 
-      {/* Badges Section - Only for individual users */}
-      {userType === 'individual' && (
-        <div className="mb-6">
-          <BadgeCarousel userId={userId} />
-        </div>
-      )}
 
       {/* Grid layout for square posts - increased rounded corners */}
       <div className="grid grid-cols-3 gap-2 mt-4">

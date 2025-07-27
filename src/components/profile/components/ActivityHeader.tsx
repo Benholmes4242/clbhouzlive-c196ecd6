@@ -17,9 +17,6 @@ const ActivityHeader: React.FC<ActivityHeaderProps> = ({ postsCount, isOwnProfil
           {postsCount} posts
         </span>
       </div>
-      {isOwnProfile && (
-        <CreatePostDialog onPostCreated={onPostCreated} />
-      )}
     </div>
   );
 };
