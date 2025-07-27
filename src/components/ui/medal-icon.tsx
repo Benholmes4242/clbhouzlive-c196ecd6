@@ -15,7 +15,7 @@ const MedalIcon: React.FC<MedalIconProps> = ({ className, size = 'md' }) => {
 
   return (
     <img 
-      src="/lovable-uploads/05bdf179-35ec-4957-af0a-907d2d47b4d6.png"
+      src="/lovable-uploads/259a3045-a655-4b79-ae21-972c7962d5d6.png"
       alt="20 Club Medal"
       className={`${sizeClasses[size]} object-contain ${className || ''}`}
     />
