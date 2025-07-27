@@ -285,14 +285,14 @@ const HeroProfileHeader = ({
           {isOwnProfile && (
             <div className="flex flex-col space-y-2 items-end justify-end">
               <button 
-                className="bg-transparent backdrop-blur-[1px] border border-white/25 text-white px-3 py-1.5 shadow-lg shadow-black/10 transition-colors text-base font-medium"
+                className="bg-black/20 backdrop-blur-sm border border-white/20 text-white px-3 py-1.5 shadow-lg shadow-black/10 transition-colors text-base font-medium"
                 style={{ borderRadius: '8px' }}
                 onClick={() => setEditDialogOpen(true)}
               >
                 Edit Profile
               </button>
               <button 
-                className="bg-transparent backdrop-blur-[1px] border border-white/25 text-white px-3 py-1.5 shadow-lg shadow-black/10 transition-colors text-base font-medium"
+                className="bg-black/20 backdrop-blur-sm border border-white/20 text-white px-3 py-1.5 shadow-lg shadow-black/10 transition-colors text-base font-medium"
                 style={{ borderRadius: '8px' }}
                 onClick={async () => {
                   // Handle cover photo upload
@@ -377,7 +377,7 @@ const HeroProfileHeader = ({
 
         {/* Stats Bar - Full Width with equal padding */}
         <div className="relative px-8 mb-6">
-          <div className="bg-black/40 backdrop-blur-sm px-6 py-1 shadow-lg" style={{ borderRadius: '8px' }}>
+          <div className="bg-black/20 backdrop-blur-sm border border-white/20 px-6 py-1 shadow-lg" style={{ borderRadius: '8px' }}>
             <div className="flex items-center justify-between w-full text-white">
               <div className="text-center">
                 <div className="font-bold text-lg drop-shadow">4.0</div>
