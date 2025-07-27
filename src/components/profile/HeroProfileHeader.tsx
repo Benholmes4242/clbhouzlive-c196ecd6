@@ -44,6 +44,7 @@ interface UserProfile {
 
 interface HeroProfileHeaderProps {
   profile: UserProfile | null;
+  isOwnProfile: boolean;
   onProfileUpdate: () => void;
   activeSection?: string;
   onSectionChange?: (section: string) => void;
@@ -51,6 +52,7 @@ interface HeroProfileHeaderProps {
 
 const HeroProfileHeader = ({ 
   profile, 
+  isOwnProfile,
   onProfileUpdate,
   activeSection = 'activity',
   onSectionChange
@@ -67,7 +69,6 @@ const HeroProfileHeader = ({
   const [selectedPost, setSelectedPost] = useState<ActivityPost | null>(null);
   
   // Derived values
-  const isOwnProfile = user?.id === profile?.id;
   const displayName = profile?.display_name || 'User';
   const username = profile?.username;
   const homeClub = profile?.home_club || 'No Club';

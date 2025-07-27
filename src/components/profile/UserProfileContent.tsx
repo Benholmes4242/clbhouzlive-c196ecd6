@@ -1,7 +1,6 @@
 
 import React from 'react';
-import InstagramStyleProfileHeader from './InstagramStyleProfileHeader';
-import UniversalProfileTabs from './UniversalProfileTabs';
+import HeroProfileHeader from './HeroProfileHeader';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
 interface UserProfileContentProps {
@@ -25,17 +24,16 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <InstagramStyleProfileHeader 
-        profile={profile}
-        currentUser={currentUser}
-        relationshipStatus={relationshipStatus}
-      />
-      
-      <UniversalProfileTabs
-        userId={profile?.id}
+    <div className="w-full">
+      <HeroProfileHeader 
         profile={profile}
         isOwnProfile={isOwnProfile}
+        onProfileUpdate={() => {
+          // Profile update will be handled by the HeroProfileHeader component
+        }}
+        onSectionChange={() => {
+          // Section changes will be handled internally by HeroProfileHeader
+        }}
       />
     </div>
   );

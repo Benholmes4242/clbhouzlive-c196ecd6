@@ -93,6 +93,7 @@ const ProfilePage = () => {
       <div className="max-w-4xl mx-auto">
         <HeroProfileHeader 
           profile={profile}
+          isOwnProfile={true} // This is always the user's own profile on this route
           onProfileUpdate={refreshProfile}
           activeSection={activeSection}
           onSectionChange={setActiveSection}
