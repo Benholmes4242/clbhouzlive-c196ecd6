@@ -414,7 +414,7 @@ const HeroProfileHeader = ({
 
         {/* Stats Bar - Full Width with equal padding */}
         <div className="relative px-8 mb-6">
-          <div className="bg-black/20 backdrop-blur-sm border border-white/20 px-6 py-1 shadow-lg" style={{ borderRadius: '8px' }}>
+          <div className="bg-white/20 backdrop-blur-sm border border-white/30 px-6 py-1 shadow-lg" style={{ borderRadius: '8px' }}>
             <div className="flex items-center justify-between w-full text-white">
               <div className="text-center">
                 <div className="font-bold text-lg drop-shadow">
