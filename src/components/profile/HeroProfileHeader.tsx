@@ -301,7 +301,7 @@ const HeroProfileHeader = ({
             </div>
             
             {/* User's Name */}
-            <h1 className="text-4xl font-bold mb-2 drop-shadow-lg">
+            <h1 className="text-4xl font-bold mb-2 drop-shadow-lg whitespace-nowrap overflow-hidden text-ellipsis max-w-full">
               {displayName}
             </h1>
             
