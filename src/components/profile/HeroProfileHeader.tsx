@@ -475,18 +475,14 @@ const HeroProfileHeader = ({
               ref={null}
               onClick={() => scrollToSection('top100')}
             >
-              {/* Top 100 Pattern Background */}
-              <div className="absolute inset-0 bg-gradient-to-br from-amber-500/20 to-transparent">
-                <div className="absolute inset-0" style={{
-                  backgroundImage: `
-                    radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%),
-                    radial-gradient(circle at 75% 75%, rgba(255,255,255,0.1) 0%, transparent 50%),
-                    linear-gradient(45deg, rgba(255,255,255,0.05) 25%, transparent 25%), 
-                    linear-gradient(-45deg, rgba(255,255,255,0.05) 25%, transparent 25%)
-                  `,
-                  backgroundSize: '60px 60px, 60px 60px, 30px 30px, 30px 30px'
-                }}>
-                </div>
+              {/* Golf Course Background Image */}
+              <div 
+                className="absolute inset-0 bg-cover bg-center"
+                style={{
+                  backgroundImage: `url('/lovable-uploads/b5c44b64-e08d-4c79-b3d0-e15cad97b1b3.png')`
+                }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
               </div>
               
               {/* Content */}
