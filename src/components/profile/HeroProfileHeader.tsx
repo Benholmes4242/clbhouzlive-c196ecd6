@@ -224,8 +224,8 @@ const HeroProfileHeader = ({
                   @{username}
                 </p>
               )}
-              <div className="flex items-center justify-between">
-                <p className="text-lg text-white/80 drop-shadow">
+              <div className="flex items-end justify-between">
+                <p className="text-lg text-white/80 drop-shadow mb-2">
                   {homeClub}
                 </p>
                 {/* Edit Profile Button (only for own profile) */}
