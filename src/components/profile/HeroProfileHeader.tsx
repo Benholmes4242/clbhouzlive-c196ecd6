@@ -254,7 +254,7 @@ const HeroProfileHeader = ({
                         input.click();
                       }}
                     >
-                      Change Cover
+                      Change Cover Photo
                     </button>
                   </div>
                 )}
