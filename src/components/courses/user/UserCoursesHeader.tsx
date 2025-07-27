@@ -19,10 +19,15 @@ const UserCoursesHeader: React.FC<UserCoursesHeaderProps> = ({
     : `Here's how ${firstName} rates the world's top courses`;
 
   return (
-    <div className="text-center mb-6">
-      <p className="text-lg text-foreground font-normal">
-        {introText}
-      </p>
+    <div className="mb-6">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-3xl font-bold text-white">Top 100 courses</h2>
+      </div>
+      <div className="text-center">
+        <p className="text-lg text-foreground font-normal">
+          {introText}
+        </p>
+      </div>
     </div>
   );
 };
