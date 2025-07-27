@@ -168,7 +168,7 @@ const HeroProfileHeader = ({
         <div className="relative flex items-start justify-between px-8 py-8 pt-16">
           
           {/* Left Side - Profile Info */}
-          <div className="text-white flex-1 ml-4">
+          <div className="text-white flex-1">
             {/* Profile Photo */}
             <div className="w-24 h-24 mb-4">
               {isOwnProfile ? (
