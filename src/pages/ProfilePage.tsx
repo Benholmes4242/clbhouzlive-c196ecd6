@@ -99,37 +99,6 @@ const ProfilePage = () => {
         />
         
         {/* Render section content based on active section */}
-        {activeSection === 'top100' && (
-          <div className="px-4 space-y-6">
-            <HandicapSection 
-              profile={profile}
-              userId={user?.id || ''}
-            />
-            <UserCoursesContent 
-              username={profile?.username}
-              isOwnProfile={true}
-              displayName={profile?.display_name}
-            />
-          </div>
-        )}
-        
-        {activeSection === 'activity' && (
-          <div className="px-4">
-            {/* Activity content will go here */}
-            <div className="text-center py-8 text-muted-foreground">
-              Activity section coming soon
-            </div>
-          </div>
-        )}
-        
-        {activeSection === 'about' && (
-          <div className="px-4">
-            {/* About content will go here */}
-            <div className="text-center py-8 text-muted-foreground">
-              About section coming soon
-            </div>
-          </div>
-        )}
         
       </div>
       
