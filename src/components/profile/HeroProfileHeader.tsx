@@ -432,7 +432,7 @@ const HeroProfileHeader = ({
               {/* Content */}
               <div className="relative p-8 cursor-pointer group">
                 <div className="flex items-center mb-3">
-                  <h3 className="text-3xl font-bold group-hover:scale-105 transition-transform">Activity</h3>
+                  <h3 className="text-3xl font-bold">Activity</h3>
                 </div>
                 <p className="text-white/90 text-lg leading-relaxed drop-shadow-lg">View your recent golf moments, rounds played, and course discoveries.</p>
               </div>
