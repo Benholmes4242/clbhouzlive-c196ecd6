@@ -96,7 +96,7 @@ const ProfilePage = () => {
         {/* Render section content based on active section */}
         {activeSection === 'handicap' && (
           <div className="px-8 pt-4 pb-8">
-            <div className="bg-background rounded-lg p-6 shadow-sm">
+            <div className="bg-white rounded-lg p-6 shadow-lg border">
               <HandicapSection 
                 userId={user?.id || ''}
                 profile={profile}
@@ -107,7 +107,7 @@ const ProfilePage = () => {
         
         {activeSection === 'top100' && (
           <div className="px-8 pt-4 pb-8">
-            <div className="bg-background rounded-lg p-6 shadow-sm">
+            <div className="bg-white rounded-lg p-6 shadow-lg border">
               <UserCoursesContent 
                 username={profile?.username || ''}
                 isOwnProfile={true}
