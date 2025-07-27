@@ -161,9 +161,9 @@ const Top100AchievementsSection: React.FC<Top100AchievementsSectionProps> = ({
         <Card className="bg-gray-50/50">
           <CardContent className="p-4">
             <div className="space-y-2">
-              <h3 className="font-bold text-lg">Achievements</h3>
-              <p className="text-muted-foreground">
-                You've played <span className="font-semibold text-foreground">{userProgress}</span> of 300 Top 100 courses
+              <h3 className="font-bold text-lg text-white">Achievements</h3>
+              <p className="text-white">
+                You've played <span className="font-semibold text-white">{userProgress}</span> of 300 Top 100 courses
               </p>
             </div>
           </CardContent>
