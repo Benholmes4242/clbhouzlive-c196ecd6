@@ -16,20 +16,20 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
       title: 'Activity',
       description: 'View your recent golf moments, rounds played, and course discoveries.',
       backgroundImage: `url('/lovable-uploads/2a145957-bebc-43ef-bd85-1f1343e05210.png')`,
-      className: 'relative overflow-hidden flex flex-col justify-end text-white h-[250px] cursor-pointer group'
+      className: 'relative overflow-hidden flex flex-col justify-end text-white h-[200px] cursor-pointer group'
     },
     {
       id: 'top100',
       title: 'Top 100 Courses',
       description: 'Discover and track the world\'s greatest golf courses.',
       backgroundImage: `url('/lovable-uploads/b5c44b64-e08d-4c79-b3d0-e15cad97b1b3.png')`,
-      className: 'relative overflow-hidden bg-gradient-to-br from-amber-500 to-orange-600 flex flex-col justify-end text-white h-[250px] cursor-pointer group'
+      className: 'relative overflow-hidden bg-gradient-to-br from-amber-500 to-orange-600 flex flex-col justify-end text-white h-[200px] cursor-pointer group'
     },
     {
       id: 'handicap',
       title: 'Handicap',
       description: 'Track your progress and handicap development over time.',
-      className: 'relative overflow-hidden bg-gradient-to-br from-emerald-500 to-emerald-700 flex flex-col justify-end text-white h-[250px] cursor-pointer group'
+      className: 'relative overflow-hidden bg-gradient-to-br from-emerald-500 to-emerald-700 flex flex-col justify-end text-white h-[200px] cursor-pointer group'
     }
   ];
 
@@ -138,7 +138,7 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
           {cards.map((card) => (
             <div
               key={card.id}
-              className={`${card.className} flex-shrink-0 w-full`}
+              className={`${card.className.replace('h-[200px]', 'h-[250px]')} flex-shrink-0 w-full`}
               style={{ borderRadius: '8px' }}
               onClick={() => handleCardClick(card.id)}
             >
