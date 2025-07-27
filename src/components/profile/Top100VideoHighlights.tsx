@@ -213,36 +213,6 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId })
                   </div>
                 )}
 
-                {/* Control icons - only show when playing */}
-                {isPlaying === highlight.id && (
-                  <>
-                    {/* Maximize button - top right */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleFullscreen(highlight.media_url);
-                      }}
-                      className="absolute top-2 right-2 z-20 text-white hover:text-white/80 transition-colors"
-                    >
-                      <Maximize2 className="h-5 w-5" />
-                    </button>
-
-                    {/* Mute/Unmute button - bottom right */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleMuteToggle();
-                      }}
-                      className="absolute bottom-2 right-2 z-20 text-white hover:text-white/80 transition-colors"
-                    >
-                      {isMuted ? (
-                        <VolumeX className="h-5 w-5" />
-                      ) : (
-                        <Volume2 className="h-5 w-5" />
-                      )}
-                    </button>
-                  </>
-                )}
               </div>
             ))}
           </div>
