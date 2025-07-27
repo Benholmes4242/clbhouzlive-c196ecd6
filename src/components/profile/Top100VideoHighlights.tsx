@@ -157,53 +157,44 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId })
             {videoHighlights.slice(0, 1).map((highlight) => (
               <div
                 key={highlight.id}
-                className="flex items-center gap-3 p-2 rounded-lg border bg-white/10 border-white/30 hover:bg-white/15 transition-colors cursor-pointer"
+                className="relative w-full aspect-video rounded-lg overflow-hidden bg-gray-800/50 border border-white/20 hover:border-white/40 transition-all cursor-pointer group"
                 onClick={() => setFullscreenVideo(highlight.media_url)}
               >
-                {/* Video Thumbnail */}
-                <div className="relative w-20 h-14 rounded-lg overflow-hidden flex-shrink-0 bg-gray-800/50 border border-white/20">
-                  {getVideoThumbnail(highlight.media_url) ? (
-                    <img 
-                      src={getVideoThumbnail(highlight.media_url)!}
-                      alt={`${highlight.course_name} video thumbnail`}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        // Fallback to video element if thumbnail fails
-                        const target = e.target as HTMLImageElement;
-                        const videoElement = document.createElement('video');
-                        videoElement.src = highlight.media_url;
-                        videoElement.className = 'w-full h-full object-cover';
-                        videoElement.muted = true;
-                        videoElement.preload = 'metadata';
-                        target.parentNode?.replaceChild(videoElement, target);
-                      }}
-                    />
-                  ) : (
-                    <video 
-                      src={highlight.media_url}
-                      className="w-full h-full object-cover"
-                      muted
-                      preload="metadata"
-                    />
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
-                </div>
-
-                {/* Video Info */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between">
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-1 mb-1">
-                        <div className="w-3 h-3 rounded-full bg-gradient-to-r from-orange-400 to-yellow-400"></div>
-                        <span className="text-sm text-white font-medium truncate">
-                          {highlight.course_name}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-1 text-xs text-white/70">
-                        <MapPin className="w-3 h-3" />
-                        <span className="truncate">{highlight.course_location}</span>
-                      </div>
-                    </div>
+                {/* Video Thumbnail - Full Size */}
+                {getVideoThumbnail(highlight.media_url) ? (
+                  <img 
+                    src={getVideoThumbnail(highlight.media_url)!}
+                    alt={`${highlight.course_name} video thumbnail`}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      // Fallback to video element if thumbnail fails
+                      const target = e.target as HTMLImageElement;
+                      const videoElement = document.createElement('video');
+                      videoElement.src = highlight.media_url;
+                      videoElement.className = 'w-full h-full object-cover';
+                      videoElement.muted = true;
+                      videoElement.preload = 'metadata';
+                      target.parentNode?.replaceChild(videoElement, target);
+                    }}
+                  />
+                ) : (
+                  <video 
+                    src={highlight.media_url}
+                    className="w-full h-full object-cover"
+                    muted
+                    preload="metadata"
+                  />
+                )}
+                
+                {/* Gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                
+                {/* Play button overlay */}
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center group-hover:bg-white/30 transition-all">
+                    <svg className="w-8 h-8 text-white ml-1" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M8 5v14l11-7z"/>
+                    </svg>
                   </div>
                 </div>
               </div>
