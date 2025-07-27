@@ -39,7 +39,7 @@ const CourseRankBadges = ({
   if (globalRank && globalRank <= 100) {
     rankingBadges.push({
       rank: globalRank,
-      icon: <Earth className="h-5 w-5 text-gray-600" />,
+      icon: <Earth className="h-5 w-5 text-white" />,
       tooltip: "Worldwide Ranking"
     });
   }
@@ -90,9 +90,9 @@ const CourseRankBadges = ({
           {rankingBadges.map((badge, index) => (
             <Tooltip key={index}>
               <TooltipTrigger asChild>
-                <div className="flex items-center gap-1.5 px-2 py-1 bg-gray-100/90 backdrop-blur-sm rounded-xl shadow-sm">
+                <div className="flex items-center gap-1.5 px-2 py-1 bg-black/20 backdrop-blur-sm border border-white/20 rounded-xl shadow-sm" style={{ borderRadius: '8px' }}>
                   {badge.icon}
-                  <span className="text-sm font-bold text-gray-800">{badge.rank}</span>
+                  <span className="text-sm font-bold text-white">{badge.rank}</span>
                 </div>
               </TooltipTrigger>
               <TooltipContent>
@@ -108,9 +108,9 @@ const CourseRankBadges = ({
         <div className="absolute top-2 right-2">
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="flex items-center gap-1.5 px-2 py-1 bg-white/90 backdrop-blur-sm rounded-xl shadow-sm">
+              <div className="flex items-center gap-1.5 px-2 py-1 bg-black/20 backdrop-blur-sm border border-white/20 rounded-xl shadow-sm" style={{ borderRadius: '8px' }}>
                 <ClubhouseLogo size="sm" />
-                <span className="text-sm font-bold text-gray-800">{playerRatingBadge.content}</span>
+                <span className="text-sm font-bold text-white">{playerRatingBadge.content}</span>
               </div>
             </TooltipTrigger>
             <TooltipContent>
