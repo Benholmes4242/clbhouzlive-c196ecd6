@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import Header from "@/components/Header";
 import BottomNavigation from '@/components/BottomNavigation';
 import HeroProfileHeader from '@/components/profile/HeroProfileHeader';
-import UniversalProfileTabs from '@/components/profile/UniversalProfileTabs';
 import { useProfileData } from '@/hooks/useProfileData';
 
 const ProfilePage = () => {
@@ -87,12 +86,6 @@ const ProfilePage = () => {
         <HeroProfileHeader 
           profile={profile}
           onProfileUpdate={refreshProfile}
-        />
-        
-        <UniversalProfileTabs
-          userId={profile?.id}
-          profile={profile}
-          isOwnProfile={true}
         />
       </div>
       
