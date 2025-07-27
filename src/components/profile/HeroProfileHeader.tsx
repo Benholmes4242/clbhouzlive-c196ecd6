@@ -197,7 +197,7 @@ const HeroProfileHeader = ({
       <div className="relative w-full min-h-screen z-10">
         {/* Content Container - Top Section - conditional padding based on cover photo */}
         <div className={`relative flex items-end justify-between px-8 pb-12 ${
-          backgroundImage ? 'pt-40' : 'pt-44'
+          backgroundImage ? 'pt-48' : 'pt-52'
         }`}>
           
           {/* Left Side - Profile Information */}
