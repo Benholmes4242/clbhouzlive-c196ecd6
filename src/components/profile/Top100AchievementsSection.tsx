@@ -186,18 +186,16 @@ const Top100AchievementsSection: React.FC<Top100AchievementsSectionProps> = ({
       {/* Earned Badge Card - Only show if user has earned badges */}
       {hasEarnedBadges && highestEarnedAchievement && (
         <div className="flex-shrink-0">
-          <div className="bg-white/20 backdrop-blur-sm rounded-[8px] px-4 py-3 border border-white/30">
-            <div className="space-y-3 text-center">
-              <div className="text-4xl mb-2">
-                {highestEarnedAchievement.emoji}
+          <div className="space-y-3 text-center px-4 py-3">
+            <div className="text-4xl mb-2">
+              {highestEarnedAchievement.emoji}
+            </div>
+            <div className="space-y-1">
+              <div className="font-semibold text-white">
+                {highestEarnedAchievement.title}
               </div>
-              <div className="space-y-1">
-                <div className="font-semibold text-white">
-                  {highestEarnedAchievement.title}
-                </div>
-                <div className="text-xs text-white/80">
-                  Played {highestEarnedAchievement.threshold} top 100 courses
-                </div>
+              <div className="text-xs text-white/80">
+                Played {highestEarnedAchievement.threshold} top 100 courses
               </div>
             </div>
           </div>
