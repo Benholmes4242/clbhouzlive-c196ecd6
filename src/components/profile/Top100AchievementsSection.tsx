@@ -196,7 +196,7 @@ const Top100AchievementsSection: React.FC<Top100AchievementsSectionProps> = ({
                   key={achievement.id}
                   className={`flex items-center gap-3 p-2 rounded-lg border transition-all duration-300 ${
                     achievement.isEarned
-                      ? "bg-white/10 border-white/30"
+                      ? "bg-green-500/10 border-green-400/30"
                       : "bg-white/5 border-white/20 opacity-60"
                   }`}
                 >
