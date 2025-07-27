@@ -173,20 +173,22 @@ const HeroProfileHeader = ({
 
   return (
     <>
+      {/* Cover photo background - extends to absolute top */}
       <div 
-        className="relative w-full min-h-screen bg-gradient-to-br from-primary to-primary/80 overflow-hidden"
+        className="fixed top-0 left-0 right-0 w-full min-h-screen bg-gradient-to-br from-primary to-primary/80 overflow-hidden -z-10"
         style={{
           backgroundImage: backgroundImage ? `url(${backgroundImage})` : undefined,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          // Ensure cover photo extends to the very top
-          marginTop: backgroundImage ? '0' : '0'
+          backgroundRepeat: 'no-repeat'
         }}
       >
         {/* Gradient overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent" />
-        
+      </div>
+      
+      {/* Content container - positioned above the background */}
+      <div className="relative w-full min-h-screen">
         {/* Content Container - Top Section - conditional padding based on cover photo */}
         <div className={`relative flex items-end justify-between px-8 pb-8 ${
           backgroundImage ? 'pt-20' : 'pt-24'
