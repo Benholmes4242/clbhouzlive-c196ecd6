@@ -3,17 +3,17 @@ import { useNavigate } from 'react-router-dom';
 import Header from "@/components/Header";
 import BottomNavigation from '@/components/BottomNavigation';
 import HeroProfileHeader from '@/components/profile/HeroProfileHeader';
-import UniversalProfileTabs from '@/components/profile/UniversalProfileTabs';
+import SlidingProfileSections from '@/components/profile/SlidingProfileSections';
 import { useProfileData } from '@/hooks/useProfileData';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('activity'); // State for tab control
   
-  // Functions to handle card clicks and scroll to tabs
+  // Functions to handle card clicks and scroll to sections
   const scrollToHandicap = () => {
     setActiveTab('handicap');
-    const element = document.getElementById('profile-tabs');
+    const element = document.getElementById('profile-sections');
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
@@ -21,7 +21,7 @@ const ProfilePage = () => {
   
   const scrollToTop100 = () => {
     setActiveTab('top100');
-    const element = document.getElementById('profile-tabs');
+    const element = document.getElementById('profile-sections');
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
@@ -109,14 +109,12 @@ const ProfilePage = () => {
           onTop100Click={scrollToTop100}
         />
         
-        <div id="profile-tabs">
-          <UniversalProfileTabs
+        <div id="profile-sections" className="mt-6">
+          <SlidingProfileSections
             userId={profile?.id}
             profile={profile}
             isOwnProfile={true}
-            activeTab={activeTab}
-            onTabChange={setActiveTab}
-            hideActivityTab={true}
+            activeSection={activeTab}
           />
         </div>
       </div>
