@@ -158,16 +158,14 @@ const Top100AchievementsSection: React.FC<Top100AchievementsSectionProps> = ({
     <div className="flex gap-4 mb-6">
       {/* Achievements Stats Card - Only takes space it needs */}
       <div className="flex-shrink-0">
-        <Card className="bg-gray-50/50">
-          <CardContent className="p-4">
-            <div className="space-y-2">
-              <h3 className="font-bold text-lg text-white">Achievements</h3>
-              <p className="text-white">
-                You've played <span className="font-semibold text-white">{userProgress}</span> of 300 Top 100 courses
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="bg-black/20 backdrop-blur-sm rounded-lg px-4 py-3 border border-white/20">
+          <div className="space-y-2">
+            <h3 className="font-bold text-lg text-white">Achievements</h3>
+            <p className="text-white">
+              You've played <span className="font-semibold text-white">{userProgress}</span> of 300 Top 100 courses
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Earned Badges Card - Takes remaining space */}
