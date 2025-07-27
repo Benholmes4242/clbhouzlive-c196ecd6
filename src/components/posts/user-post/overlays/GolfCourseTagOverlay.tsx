@@ -30,7 +30,7 @@ export const GolfCourseTagOverlay: React.FC<GolfCourseTagOverlayProps> = ({
               country: golfCourse.country,
               region: golfCourse.region
             }}
-            className="bg-white/20 text-white text-sm font-medium px-3 py-1.5 rounded-full backdrop-blur-sm"
+            className="bg-black/20 backdrop-blur-sm border border-white/30 text-white text-sm font-medium px-3 py-1.5"
           />
         </div>
       ) : null}
