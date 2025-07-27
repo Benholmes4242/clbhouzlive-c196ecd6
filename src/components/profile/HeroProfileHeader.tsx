@@ -268,7 +268,7 @@ const HeroProfileHeader = ({
         {/* Stats Bar - Full Width with equal padding */}
         <div className="relative px-8 pb-8" style={{ marginTop: '-8px' }}>
           <div className="bg-black/80 backdrop-blur-sm rounded-lg px-6 py-4 shadow-lg">
-            <div className="flex items-center justify-center space-x-8 text-white">
+            <div className="flex items-center justify-between w-full text-white">
               <div className="text-center">
                 <div className="font-bold text-lg drop-shadow">4.0</div>
                 <div className="text-xs text-white/80 drop-shadow">Handicap</div>
