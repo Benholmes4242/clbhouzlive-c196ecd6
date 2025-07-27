@@ -25,7 +25,10 @@ const UserProfilePage = () => {
 
   return (
     <div className="min-h-screen bg-background pb-28">
-      <Header />
+      {/* Header with frosted glass effect - positioned over content */}
+      <div className="sticky top-0 z-50 backdrop-blur-[2px] bg-white/10 supports-[backdrop-filter]:bg-white/10">
+        <Header />
+      </div>
       
       <UserProfileLoader isLoading={isLoading} profile={profile} />
       
