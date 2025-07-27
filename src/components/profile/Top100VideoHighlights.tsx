@@ -22,6 +22,7 @@ interface Top100VideoHighlightsProps {
 const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isMuted, setIsMuted] = useState(true);
+  const [fullscreenVideo, setFullscreenVideo] = useState<string | null>(null);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
   const handleMuteToggle = () => {
@@ -229,6 +230,17 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId })
                 poster={getVideoThumbnail(videoHighlights[currentIndex]?.media_url) || undefined}
               />
 
+              {/* Maximize button - top right */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setFullscreenVideo(videoHighlights[currentIndex]?.media_url);
+                }}
+                className="absolute top-2 right-2 z-20 text-white hover:text-white/80 transition-colors"
+              >
+                <Maximize2 className="h-5 w-5" />
+              </button>
+
               {/* Mute/Unmute button - bottom right */}
               <button
                 onClick={(e) => {
@@ -274,6 +286,27 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId })
           </div>
         )}
         
+        {/* Fullscreen Video Modal */}
+        {fullscreenVideo && (
+          <div className="fixed inset-0 bg-black/90 z-50 flex items-center justify-center">
+            <div className="relative w-full h-full max-w-6xl max-h-full p-4">
+              <button
+                onClick={() => setFullscreenVideo(null)}
+                className="absolute top-4 right-4 z-10 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
+              >
+                <X className="w-6 h-6" />
+              </button>
+              <video
+                src={fullscreenVideo}
+                className="w-full h-full object-contain"
+                controls
+                autoPlay
+                muted={isMuted}
+              />
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   );
