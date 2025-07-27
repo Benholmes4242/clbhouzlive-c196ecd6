@@ -13,7 +13,7 @@ const HandicapSection: React.FC<HandicapSectionProps> = ({ userId, profile }) =>
   return (
     <div className="space-y-6">
       {/* Handicap Performance Chart */}
-      <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6">
+      <div className="bg-black/40 backdrop-blur-sm border border-black/20 rounded-lg p-6">
         <div className="mb-6">
           <h3 className="flex items-center gap-2 text-lg font-semibold text-white">
             <TrendingUp className="h-5 w-5 text-[#6e9277]" />
@@ -23,7 +23,7 @@ const HandicapSection: React.FC<HandicapSectionProps> = ({ userId, profile }) =>
         <div>
           {currentHandicap !== null ? (
             <>
-              <div className="mb-4 p-4 bg-white/10 backdrop-blur-sm border border-white/10 rounded-lg">
+              <div className="mb-4 p-4 bg-black/40 backdrop-blur-sm border border-black/20 rounded-lg">
                 <div className="text-center">
                   <div className="text-3xl font-bold text-white">
                     {currentHandicap.toFixed(1)}
@@ -46,7 +46,7 @@ const HandicapSection: React.FC<HandicapSectionProps> = ({ userId, profile }) =>
       </div>
 
       {/* Future Rounds Section */}
-      <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6">
+      <div className="bg-black/40 backdrop-blur-sm border border-black/20 rounded-lg p-6">
         <div className="mb-6">
           <h3 className="flex items-center gap-2 text-lg font-semibold text-white">
             <Calendar className="h-5 w-5 text-[#6e9277]" />

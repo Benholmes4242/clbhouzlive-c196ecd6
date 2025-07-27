@@ -99,7 +99,7 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
             <div className="relative p-8 cursor-pointer group">
               <div className="flex items-center mb-3">
                 {card.id === 'handicap' && (
-                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mr-4">
+                  <div className="w-12 h-12 bg-black/40 rounded-full flex items-center justify-center mr-4">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
                       <path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/>
                       <path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/>
@@ -171,7 +171,7 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
               <div className="relative p-8 cursor-pointer group">
                 <div className="flex items-center mb-3">
                   {card.id === 'handicap' && (
-                    <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mr-4">
+                    <div className="w-12 h-12 bg-black/40 rounded-full flex items-center justify-center mr-4">
                       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
                         <path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/>
                         <path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/>

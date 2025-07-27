@@ -94,8 +94,8 @@ const HandicapPerformanceChart: React.FC = () => {
       {/* Score filters */}
       <div className="flex gap-2 mt-4">
         <Badge variant="destructive" className="text-xs text-white">Last 20 Scores</Badge>
-        <Badge variant="secondary" className="text-xs text-white bg-white/20 border-white/20">Last 50 Scores</Badge>
-        <Badge variant="secondary" className="text-xs text-white bg-white/20 border-white/20">Last 100 Scores</Badge>
+        <Badge variant="secondary" className="text-xs text-white bg-black/40 border-black/20">Last 50 Scores</Badge>
+        <Badge variant="secondary" className="text-xs text-white bg-black/40 border-black/20">Last 100 Scores</Badge>
       </div>
     </div>
   );
