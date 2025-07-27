@@ -526,6 +526,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                               name: item.golfCourse.name,
                               country: item.golfCourse.country
                             }}
+                            className="bg-black/20 backdrop-blur-sm border border-white/30"
                             isClubhouse={true}
                           />
                         </div>
