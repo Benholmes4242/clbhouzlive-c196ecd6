@@ -169,7 +169,7 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
                         ) : (
                           <CountryFlag country={tile.country} size="md" className="flex-shrink-0" />
                         )}
-                        <span className="text-sm font-semibold">
+                        <span className="text-sm font-semibold text-white">
                           {tile.progress.played} / {tile.progress.total}
                         </span>
                       </button>
@@ -215,7 +215,7 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
                           ) : (
                             <CountryFlag country={tile.country} size="md" className="flex-shrink-0" />
                           )}
-                          <span className="text-sm font-semibold">
+                          <span className="text-sm font-semibold text-white">
                             {tile.progress.played} / {tile.progress.total}
                           </span>
                         </button>
