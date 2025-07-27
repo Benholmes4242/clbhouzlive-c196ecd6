@@ -4,7 +4,10 @@ import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { OptimizedAvatar } from '@/components/ui/optimized-avatar';
 import { useStaggeredInView } from '@/hooks/useInViewAnimation';
-import ProfileEditDialog from './ProfileEditDialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import ProfileFormFields from "./ProfileFormFields";
+import { useProfileForm } from "./hooks/useProfileForm";
 
 interface Course {
   id: string;
@@ -25,6 +28,8 @@ interface UserProfile {
   bio?: string;
   eg_handicap_index?: number;
   eg_app_connected?: boolean;
+  user_type?: string;
+  is_public?: boolean;
 }
 
 interface HeroProfileHeaderProps {
@@ -39,6 +44,7 @@ const HeroProfileHeader = ({
   const { user } = useSupabaseSession();
   const [uploading, setUploading] = useState(false);
   const [avatarKey, setAvatarKey] = useState(Date.now()); // Add cache-busting key
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   
   // Derived values
   const isOwnProfile = user?.id === profile?.id;
@@ -50,6 +56,19 @@ const HeroProfileHeader = ({
   
   // Animation hook for badges
   const badgesAnimation = useStaggeredInView(5, { threshold: 0.1, staggerDelay: 100 });
+
+  // Profile form hook
+  const {
+    formData,
+    saving,
+    isUsernameSet,
+    handleInputChange,
+    handleHandicapChange,
+    handlePublicToggle,
+    handleTextareaChange,
+    handleSelectChange,
+    handleSave,
+  } = useProfileForm(profile, user?.id || '', onProfileUpdate, () => setEditDialogOpen(false));
   
   // Update avatar key when profile photo URL changes to force re-render
   useEffect(() => {
@@ -232,11 +251,13 @@ const HeroProfileHeader = ({
                 {/* Action Buttons (only for own profile) */}
                 {isOwnProfile && (
                   <div className="flex flex-col space-y-2 -translate-y-10">
-                    <ProfileEditDialog
-                      profile={profile}
-                      userId={user.id}
-                      onProfileUpdate={onProfileUpdate}
-                    />
+                    <button 
+                      className="bg-transparent backdrop-blur-[1px] border border-white/25 text-white px-0.5 py-0 shadow-lg shadow-black/10 transition-colors text-base font-medium"
+                      style={{ borderRadius: '8px' }}
+                      onClick={() => setEditDialogOpen(true)}
+                    >
+                      Edit Profile
+                    </button>
                     <button 
                       className="bg-transparent backdrop-blur-[1px] border border-white/25 text-white px-0.5 py-0 shadow-lg shadow-black/10 transition-colors text-base font-medium"
                       style={{ borderRadius: '8px' }}
@@ -615,6 +636,35 @@ const HeroProfileHeader = ({
           </div>
         </div>
       </div>
+      
+      {/* Custom Edit Profile Dialog with glass effect trigger */}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Edit Profile</DialogTitle>
+          </DialogHeader>
+          <ProfileFormFields
+            formData={formData}
+            isUsernameSet={isUsernameSet}
+            userId={user?.id || ''}
+            userType={profile?.user_type}
+            onInputChange={handleInputChange}
+            onTextareaChange={handleTextareaChange}
+            onSelectChange={handleSelectChange}
+            onHandicapChange={handleHandicapChange}
+            onPublicToggle={handlePublicToggle}
+            onProfileUpdate={onProfileUpdate}
+          />
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSave} disabled={saving}>
+              {saving ? "Saving..." : "Save"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
