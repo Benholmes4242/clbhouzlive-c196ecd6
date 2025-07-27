@@ -124,7 +124,7 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
       />
 
 
-      {/* Grid layout for square posts - increased rounded corners */}
+      {/* Grid layout for square posts */}
       <div className="grid grid-cols-3 gap-2 mt-4">
         {posts.map((post, index) => {
           // Check if this is the first video post

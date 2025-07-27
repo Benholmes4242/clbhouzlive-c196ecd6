@@ -8,11 +8,11 @@ import { useProfileData } from '@/hooks/useProfileData';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('activity'); // State for tab control
+  const [activeSection, setActiveSection] = useState('activity'); // State for section control
   
   // Functions to handle card clicks and scroll to sections
   const scrollToHandicap = () => {
-    setActiveTab('handicap');
+    setActiveSection('handicap');
     const element = document.getElementById('profile-sections');
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -20,7 +20,7 @@ const ProfilePage = () => {
   };
   
   const scrollToTop100 = () => {
-    setActiveTab('top100');
+    setActiveSection('top100');
     const element = document.getElementById('profile-sections');
     if (element) {
       element.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -114,7 +114,7 @@ const ProfilePage = () => {
             userId={profile?.id}
             profile={profile}
             isOwnProfile={true}
-            activeSection={activeTab}
+            activeSection={activeSection}
           />
         </div>
       </div>
