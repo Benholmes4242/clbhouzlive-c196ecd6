@@ -429,7 +429,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                 {/* Film icon for videos */}
                 {layoutItem.item.type === 'video' && (
                   <div className="absolute bottom-3 right-3 z-20">
-                    <MdOutlinePlayCircle className="w-5 h-5 text-white drop-shadow-lg" />
+                    <MdOutlinePlayCircle className="w-8 h-8 text-white drop-shadow-lg" />
                   </div>
                 )}
                 
@@ -487,7 +487,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                 {/* Film icon for videos in regular cards */}
                 {layoutItem.item.type === 'video' && (
                   <div className="absolute bottom-2 right-2 z-20">
-                    <MdOutlinePlayCircle className="w-5 h-5 text-white drop-shadow-lg" />
+                    <MdOutlinePlayCircle className="w-8 h-8 text-white drop-shadow-lg" />
                   </div>
                 )}
               </div>

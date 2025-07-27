@@ -113,7 +113,7 @@ const ActivityPostCard = ({ post, attributionText, onClick, isFirstVideo }: Acti
                 />
                 {/* Film icon for videos */}
                 <div className="absolute bottom-2 right-2 z-10">
-                  <MdOutlinePlayCircle className="w-4 h-4 text-white drop-shadow-lg" />
+                  <MdOutlinePlayCircle className="w-6 h-6 text-white drop-shadow-lg" />
                 </div>
               </div>
             )
