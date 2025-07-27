@@ -99,19 +99,6 @@ const ProfilePage = () => {
         />
         
         {/* Render section content based on active section */}
-        {activeSection === 'handicap' && (
-          <div className="px-8 pt-4 pb-8">
-            <div className="bg-white rounded-lg p-6 shadow-lg border">
-              <div className="mb-4 text-center">
-                <h2 className="text-xl font-semibold text-gray-800">Handicap Section Active</h2>
-              </div>
-              <HandicapSection 
-                userId={user?.id || ''}
-                profile={profile}
-              />
-            </div>
-          </div>
-        )}
         
       </div>
       

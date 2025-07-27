@@ -16,6 +16,7 @@ import PostViewerModal from '../posts/PostViewerModal';
 import { usePostViewer } from '@/hooks/usePostViewer';
 import { extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import UserCoursesContent from '@/components/courses/UserCoursesContent';
+import HandicapSection from './HandicapSection';
 
 interface Course {
   id: string;
@@ -596,6 +597,21 @@ const HeroProfileHeader = ({
                     )}
                   </>
                 )}
+              </div>
+            )}
+            
+            {/* Handicap Section - Only show when handicap section is active */}
+            {activeSection === 'handicap' && (
+              <div className="mt-8 px-2">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-3xl font-bold text-white">Handicap & Rounds</h2>
+                </div>
+                <div className="bg-white rounded-lg p-6 shadow-lg border">
+                  <HandicapSection 
+                    userId={profile?.id || ''}
+                    profile={profile}
+                  />
+                </div>
               </div>
             )}
             
