@@ -9,6 +9,7 @@ import { EmptyTop100State } from './user/UserCoursesEmptyStates';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import Top100AchievementsSection from '@/components/profile/Top100AchievementsSection';
+import Top100VideoHighlights from '@/components/profile/Top100VideoHighlights';
 
 interface UserCoursesContentProps {
   username?: string;
@@ -248,13 +249,16 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
         isOwnProfile={finalIsOwnProfile} 
       />
 
-      {/* Achievements Section */}
+      {/* Achievements and Video Highlights Section */}
       {targetUserId && (
-        <Top100AchievementsSection 
-          userId={targetUserId} 
-          isOwnProfile={finalIsOwnProfile}
-          userDisplayName={finalDisplayName}
-        />
+        <div className="flex gap-4">
+          <Top100AchievementsSection 
+            userId={targetUserId} 
+            isOwnProfile={finalIsOwnProfile}
+            userDisplayName={finalDisplayName}
+          />
+          <Top100VideoHighlights />
+        </div>
       )}
 
       <UserCoursesRegionalTiles
