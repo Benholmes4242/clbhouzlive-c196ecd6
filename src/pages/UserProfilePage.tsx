@@ -25,8 +25,8 @@ const UserProfilePage = () => {
 
   return (
     <div className="min-h-screen bg-background pb-28">
-      {/* Header with frosted glass effect - positioned over content */}
-      <div className="sticky top-0 z-50 backdrop-blur-[2px] bg-white/10 supports-[backdrop-filter]:bg-white/10">
+      {/* Header with frosted glass effect - positioned absolutely over content */}
+      <div className="absolute top-0 left-0 right-0 z-50 backdrop-blur-[2px] bg-white/0 supports-[backdrop-filter]:bg-white/0">
         <Header />
       </div>
       
