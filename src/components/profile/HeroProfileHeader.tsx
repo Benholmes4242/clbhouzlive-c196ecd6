@@ -264,7 +264,7 @@ const HeroProfileHeader = ({
           
           {/* Right Side - Action Buttons (only for own profile) */}
           {isOwnProfile && (
-            <div className="flex flex-col space-y-2 items-end">
+            <div className="flex flex-col space-y-2 items-end justify-end">
               <button 
                 className="bg-transparent backdrop-blur-[1px] border border-white/25 text-white px-3 py-1.5 shadow-lg shadow-black/10 transition-colors text-base font-medium"
                 style={{ borderRadius: '8px' }}
