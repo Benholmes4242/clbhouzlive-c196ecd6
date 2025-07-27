@@ -25,7 +25,7 @@ const HandicapSection: React.FC<HandicapSectionProps> = ({ userId, profile }) =>
             <>
               <div className="mb-4 p-4 bg-white/10 backdrop-blur-sm border border-white/10 rounded-lg">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-[#6e9277]">
+                  <div className="text-3xl font-bold text-white">
                     {currentHandicap.toFixed(1)}
                   </div>
                   <div className="text-sm text-white/70">Current Handicap</div>
