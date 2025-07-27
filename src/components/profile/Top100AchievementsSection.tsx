@@ -155,48 +155,49 @@ const Top100AchievementsSection: React.FC<Top100AchievementsSectionProps> = ({
   };
 
   return (
-    <div className="space-y-4 mb-6">
-      {/* Achievements Stats Card */}
-      <Card className="bg-gray-50/50">
-        <CardContent className="p-4">
-          <div className="space-y-2">
-            <h3 className="font-bold text-lg">Achievements</h3>
-            <p className="text-muted-foreground">
-              You've played <span className="font-semibold text-foreground">{userProgress}</span> of 300 Top 100 courses
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Earned Badges Card */}
-      <Card className="bg-gray-50/50">
-        <CardContent className="p-4">
-          <div className="space-y-3">
-            <h4 className="font-semibold text-sm">Earned Badges</h4>
-            <div className="flex flex-wrap gap-2">
-              {achievements.map((achievement) => (
-                <div key={achievement.id} className="text-center">
-                  <div 
-                    className={`w-12 h-12 rounded-full flex items-center justify-center text-lg mb-1 transition-all duration-300 ${
-                      getTierColor(achievement.tier, achievement.isEarned)
-                    } ${achievement.isEarned ? 'shadow-md' : 'opacity-50'}`}
-                  >
-                    {achievement.emoji}
-                  </div>
-                  <div className="text-xs">
-                    <div className={`font-medium ${achievement.isEarned ? 'text-foreground' : 'text-gray-400'}`}>
-                      {achievement.title}
-                    </div>
-                    <div className={`text-xs ${achievement.isEarned ? 'text-muted-foreground' : 'text-gray-400'}`}>
-                      {achievement.description}
-                    </div>
-                  </div>
-                </div>
-              ))}
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      {/* Achievements Stats Card - Takes up 2/3 of the space */}
+      <div className="md:col-span-2">
+        <Card className="bg-gray-50/50">
+          <CardContent className="p-4">
+            <div className="space-y-2">
+              <h3 className="font-bold text-lg">Achievements</h3>
+              <p className="text-muted-foreground">
+                You've played <span className="font-semibold text-foreground">{userProgress}</span> of 300 Top 100 courses
+              </p>
             </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Earned Badges Card - Takes up 1/3 of the space */}
+      <div className="md:col-span-1">
+        <Card className="bg-gray-50/50">
+          <CardContent className="p-4">
+            <div className="space-y-3">
+              <h4 className="font-semibold text-sm">Earned Badges</h4>
+              <div className="flex flex-wrap gap-2">
+                {achievements.map((achievement) => (
+                  <div key={achievement.id} className="text-center">
+                    <div 
+                      className={`w-10 h-10 rounded-full flex items-center justify-center text-sm mb-1 transition-all duration-300 ${
+                        getTierColor(achievement.tier, achievement.isEarned)
+                      } ${achievement.isEarned ? 'shadow-md' : 'opacity-50'}`}
+                    >
+                      {achievement.emoji}
+                    </div>
+                    <div className="text-xs">
+                      <div className={`font-medium ${achievement.isEarned ? 'text-foreground' : 'text-gray-400'}`}>
+                        {achievement.title}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
