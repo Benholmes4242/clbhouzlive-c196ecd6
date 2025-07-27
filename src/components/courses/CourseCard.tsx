@@ -88,63 +88,50 @@ const CourseCard: React.FC<CourseCardProps> = ({
 
   return (
     <>
-      <Card 
-        className="group hover:shadow-lg transition-all duration-200 cursor-pointer overflow-hidden relative"
+      <div 
+        className="group hover:shadow-lg transition-all duration-200 cursor-pointer overflow-hidden relative h-48"
         style={{ borderRadius: '8px' }}
         onClick={handleCardClick}
       >
-        <div className="relative">
-          <div className="aspect-video bg-muted overflow-hidden">
-            {course.thumbnail_image ? (
-              <img
-                src={course.thumbnail_image}
-                alt={course.name}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                onError={(e) => {
-                  e.currentTarget.src = 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=400&h=300&fit=crop';
-                }}
-              />
-            ) : (
-              <div className="w-full h-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center">
-                <Star className="h-12 w-12 text-white opacity-50" />
-              </div>
-            )}
-          </div>
-          
-          {/* Ranking badges - positioned relative to the outer container */}
-          <CourseRankBadges
-            globalRank={course.global_rank}
-            regionalRank={course.regional_rank}
-            usaRank={course.usa_rank}
-            country={course.country}
-            viewContext={viewContext}
-            userRating={userRating}
-            showUserRating={showUserRating}
-            positioning="bottom-left"
-          />
+        {/* Background Image */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center"
+          style={{
+            backgroundImage: course.thumbnail_image 
+              ? `url(${course.thumbnail_image})`
+              : `url('https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=400&h=300&fit=crop')`
+          }}
+        >
+          {/* Gradient overlay for better text readability */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
         </div>
-        
-        <CardHeader className="pb-2">
-          <h3 className="font-semibold text-lg leading-tight line-clamp-2 group-hover:text-[#b66b41] transition-colors">
+
+        {/* Course ranking badges - positioned at top-left */}
+        <CourseRankBadges
+          globalRank={course.global_rank}
+          regionalRank={course.regional_rank}
+          usaRank={course.usa_rank}
+          country={course.country}
+          viewContext={viewContext}
+          userRating={userRating}
+          showUserRating={showUserRating}
+          positioning="top-left"
+        />
+
+        {/* Course Information Overlay - positioned at bottom */}
+        <div className="absolute bottom-0 left-0 right-0 p-4">
+          {/* Course Name */}
+          <h3 className="text-white font-bold text-lg leading-tight mb-2 drop-shadow-lg group-hover:text-white/80 transition-colors">
             {course.name}
           </h3>
-        </CardHeader>
-        
-        <CardContent className="pt-0">
-          <div className="flex items-center gap-1 text-muted-foreground text-sm mb-3">
-            <MapPin className="h-4 w-4 flex-shrink-0" />
-            <span className="line-clamp-1">
-              {formatLocation(course)}
-            </span>
-          </div>
           
-          {course.description && (
-            <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
-              {formatDescription(course.description)}
-            </p>
-          )}
-        </CardContent>
-      </Card>
+          {/* Location with map pin */}
+          <div className="flex items-center text-white/90 text-sm drop-shadow">
+            <MapPin className="h-4 w-4 mr-1 flex-shrink-0" />
+            <span>{formatLocation(course)}</span>
+          </div>
+        </div>
+      </div>
     </>
   );
 };
