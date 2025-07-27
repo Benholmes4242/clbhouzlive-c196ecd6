@@ -224,23 +224,22 @@ const HeroProfileHeader = ({
                   @{username}
                 </p>
               )}
-              <p className="text-lg text-white/80 drop-shadow">
-                {homeClub}
-              </p>
+              <div className="flex items-center justify-between">
+                <p className="text-lg text-white/80 drop-shadow">
+                  {homeClub}
+                </p>
+                {/* Edit Profile Button (only for own profile) */}
+                {isOwnProfile && (
+                  <button 
+                    className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg backdrop-blur-sm transition-colors text-sm"
+                    onClick={() => window.location.href = '/settings'}
+                  >
+                    Edit Profile
+                  </button>
+                )}
+              </div>
             </div>
           </div>
-          
-          {/* Right Side - Edit Profile Button (only for own profile) */}
-          {isOwnProfile && (
-            <div className="ml-4">
-              <button 
-                className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg backdrop-blur-sm transition-colors text-sm"
-                onClick={() => window.location.href = '/settings'}
-              >
-                Edit Profile
-              </button>
-            </div>
-          )}
         </div>
 
         {/* Stats Bar - Full Width with equal padding */}
