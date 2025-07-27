@@ -8,8 +8,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import ProfileFormFields from "./ProfileFormFields";
 import { useProfileForm } from "./hooks/useProfileForm";
-import { useLatestHorizontalVideo } from '@/hooks/useLatestHorizontalVideo';
-import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import { useActivityPosts } from './hooks/useActivityPosts';
 import { ActivityPost } from './types/ActivityTypes';
 import ActivityHeader from './components/ActivityHeader';
@@ -55,7 +53,7 @@ const HeroProfileHeader = ({
   const [uploading, setUploading] = useState(false);
   const [avatarKey, setAvatarKey] = useState(Date.now()); // Add cache-busting key
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const { videoUrl: latestHorizontalVideo } = useLatestHorizontalVideo(profile?.id);
+  
   
   // Activity posts logic
   const { posts, loading: postsLoading, fetchUserPosts } = useActivityPosts(profile?.id);
@@ -409,36 +407,15 @@ const HeroProfileHeader = ({
               ref={null}
               onClick={() => scrollToSection('recent-activity')}
             >
-              {/* Video Background or Fallback */}
-              {latestHorizontalVideo ? (
-                <div className="absolute inset-0 w-full h-full overflow-hidden">
-                  <EnhancedVideoPlayer
-                    src={latestHorizontalVideo}
-                    autoplay
-                    muted
-                    loop
-                    hideControls
-                    objectFit="cover"
-                    enableHLS
-                    className="w-full h-full"
-                  />
-                </div>
-              ) : (
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-blue-700">
-                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-transparent">
-                    <div className="absolute inset-0" style={{
-                      backgroundImage: `
-                        radial-gradient(circle at 20% 80%, rgba(255,255,255,0.1) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 20%, rgba(255,255,255,0.1) 0%, transparent 50%),
-                        linear-gradient(45deg, rgba(255,255,255,0.05) 25%, transparent 25%), 
-                        linear-gradient(-45deg, rgba(255,255,255,0.05) 25%, transparent 25%)
-                      `,
-                      backgroundSize: '100% 100%, 100% 100%, 40px 40px, 40px 40px'
-                    }}>
-                    </div>
-                  </div>
-                </div>
-              )}
+              {/* Golf Course Background Image */}
+              <div 
+                className="absolute inset-0 bg-cover bg-center"
+                style={{
+                  backgroundImage: `url('/lovable-uploads/2a145957-bebc-43ef-bd85-1f1343e05210.png')`
+                }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+              </div>
               
               {/* Content */}
               <div className="relative p-8 cursor-pointer group">
