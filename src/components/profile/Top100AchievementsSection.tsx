@@ -187,7 +187,7 @@ const Top100AchievementsSection: React.FC<Top100AchievementsSectionProps> = ({
       {hasEarnedBadges && highestEarnedAchievement && (
         <div className="flex-shrink-0">
           <div className="text-center px-4 py-3">
-            <div className="text-4xl -mb-1">
+            <div className="text-4xl mb-2">
               {highestEarnedAchievement.emoji}
             </div>
             <div>
