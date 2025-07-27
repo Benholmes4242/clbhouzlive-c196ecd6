@@ -249,7 +249,7 @@ const HeroProfileHeader = ({
       {/* Content container - positioned above the background */}
       <div className="relative w-full min-h-screen z-10">
         {/* Content Container - Top Section - conditional padding based on cover photo */}
-        <div className={`relative flex items-end justify-between px-8 pb-12 ${
+        <div className={`relative flex items-end justify-between pb-12 ${
           backgroundImage ? 'pt-28' : 'pt-32'
         }`}>
           
@@ -413,7 +413,7 @@ const HeroProfileHeader = ({
         </div>
 
         {/* Stats Bar - Full Width with equal padding */}
-        <div className="relative px-8 mb-6">
+        <div className="relative mb-6">
           <div className="bg-white/20 backdrop-blur-sm border border-white/30 px-6 py-1 shadow-lg" style={{ borderRadius: '8px' }}>
             <div className="flex items-center justify-between w-full text-white">
               <div className="text-center">
@@ -443,7 +443,7 @@ const HeroProfileHeader = ({
         {/* Activity Section - directly after stats bar */}
         <div 
           id="activity"
-          className="px-8 pb-8"
+          className="pb-8"
           ref={activityRef}
         >
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -545,7 +545,7 @@ const HeroProfileHeader = ({
             
             {/* Activity Posts Section - Only show when activity section is active */}
             {activeSection === 'activity' && (
-              <div className="mt-8 px-2">
+              <div className="mt-8 px-0">
                 <ActivityHeader 
                   postsCount={posts.length}
                   isOwnProfile={isOwnProfile}
@@ -643,7 +643,7 @@ const HeroProfileHeader = ({
             
             {/* Handicap Section - Only show when handicap section is active */}
             {activeSection === 'handicap' && (
-              <div className="mt-8 px-2">
+              <div className="mt-8 px-0">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-3xl font-bold text-white">Handicap & Rounds</h2>
                 </div>
@@ -658,7 +658,7 @@ const HeroProfileHeader = ({
             
             {/* Top 100 Section - Only show when top100 section is active */}
             {activeSection === 'top100' && (
-              <div className="mt-8 px-2">
+              <div className="mt-8 px-0">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-3xl font-bold text-white">Top 100 courses</h2>
                 </div>

@@ -103,7 +103,7 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
   // Show loading state
   if (loading) {
     return (
-      <div className="mt-10 px-2">
+      <div className="mt-10 px-0">
         <ActivityHeader 
           postsCount={0}
           isOwnProfile={isOwnProfile}
@@ -117,7 +117,7 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
   }
 
   return (
-    <div className="mt-10 px-2">
+    <div className="mt-10 px-0">
       <ActivityHeader 
         postsCount={posts.length}
         isOwnProfile={isOwnProfile}
