@@ -121,7 +121,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
         {/* Course Information Overlay - positioned at bottom */}
         <div className="absolute bottom-0 left-0 right-0 p-4">
           {/* Course Name */}
-          <h3 className="text-3xl font-bold text-white leading-tight mb-2 drop-shadow-lg group-hover:text-white/80 transition-colors">
+          <h3 className="text-3xl font-bold text-white leading-tight mb-1 drop-shadow-lg group-hover:text-white/80 transition-colors">
             {course.name}
           </h3>
           
