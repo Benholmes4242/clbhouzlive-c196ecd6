@@ -25,6 +25,7 @@ interface UserProfile {
   home_club?: string;
   profile_photo_url?: string;
   background_image_url?: string;
+  cover_photo_url?: string;
   bio?: string;
   eg_handicap_index?: number;
   eg_app_connected?: boolean;
@@ -51,7 +52,7 @@ const HeroProfileHeader = ({
   const displayName = profile?.display_name || 'User';
   const username = profile?.username;
   const homeClub = profile?.home_club || 'No Club';
-  const backgroundImage = profile?.background_image_url;
+  const backgroundImage = profile?.cover_photo_url;
   const postsCount = 0; // This would be fetched from actual data
   
   // Animation hook for badges
@@ -261,16 +262,76 @@ const HeroProfileHeader = ({
                     <button 
                       className="bg-transparent backdrop-blur-[1px] border border-white/25 text-white px-0.5 py-0 shadow-lg shadow-black/10 transition-colors text-base font-medium"
                       style={{ borderRadius: '8px' }}
-                      onClick={() => {
+                      onClick={async () => {
                         // Handle cover photo upload
                         const input = document.createElement('input');
                         input.type = 'file';
                         input.accept = 'image/*';
-                        input.onchange = (e) => {
+                        input.onchange = async (e) => {
                           const file = (e.target as HTMLInputElement).files?.[0];
-                          if (file) {
-                            // TODO: Implement cover photo upload
-                            console.log('Cover photo selected:', file);
+                          if (file && user) {
+                            try {
+                              setUploading(true);
+                              const fileExt = file.name.split('.').pop();
+                              const fileName = `cover_${Date.now()}.${fileExt}`;
+                              const filePath = `${fileName}`;
+
+                              // Upload to Supabase storage
+                              const { error: uploadError } = await supabase.storage
+                                .from('profile-backgrounds')
+                                .upload(filePath, file);
+
+                              if (uploadError) {
+                                console.error('Error uploading cover image:', uploadError);
+                                toast({
+                                  title: "Upload Failed",
+                                  description: "Failed to upload cover photo",
+                                  variant: "destructive",
+                                });
+                                return;
+                              }
+
+                              // Get public URL
+                              const { data } = supabase.storage
+                                .from('profile-backgrounds')
+                                .getPublicUrl(filePath);
+
+                              const publicUrl = data.publicUrl;
+
+                              // Update user profile with new cover photo URL
+                              const { error: updateError } = await supabase
+                                .from('user_profiles')
+                                .update({ cover_photo_url: publicUrl })
+                                .eq('id', user.id);
+
+                              if (updateError) {
+                                console.error('Error updating profile:', updateError);
+                                toast({
+                                  title: "Update Failed",
+                                  description: "Failed to update cover photo",
+                                  variant: "destructive",
+                                });
+                                return;
+                              }
+
+                              // Refresh the profile data
+                              onProfileUpdate();
+                              
+                              toast({
+                                title: "Success",
+                                description: "Cover photo updated successfully!",
+                                variant: "default",
+                              });
+                            } catch (error) {
+                              console.error('Error uploading cover image:', error);
+                              toast({
+                                title: "Upload Failed",
+                                description: "Failed to upload cover photo",
+                                variant: "destructive",
+                              });
+                            } finally {
+                              setUploading(false);
+                            }
                           }
                         };
                         input.click();
