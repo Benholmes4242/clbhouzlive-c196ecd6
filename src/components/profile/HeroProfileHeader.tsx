@@ -224,7 +224,7 @@ const HeroProfileHeader = ({
                   @{username}
                 </p>
               )}
-              <div className="flex items-center justify-between">
+              <div className="flex items-baseline justify-between">
                 <p className="text-lg text-white/80 drop-shadow">
                   {homeClub}
                 </p>
