@@ -171,11 +171,14 @@ const HeroProfileHeader = ({
     }
   };
 
+  console.log('HeroProfileHeader - profile cover_photo_url:', profile?.cover_photo_url);
+  console.log('HeroProfileHeader - backgroundImage:', backgroundImage);
+
   return (
     <>
       {/* Cover photo background - extends to absolute top */}
       <div 
-        className="fixed top-0 left-0 right-0 w-full min-h-screen bg-gradient-to-br from-primary to-primary/80 overflow-hidden -z-10"
+        className="fixed top-0 left-0 right-0 w-full h-screen bg-gradient-to-br from-primary to-primary/80 overflow-hidden z-0"
         style={{
           backgroundImage: backgroundImage ? `url(${backgroundImage})` : undefined,
           backgroundSize: 'cover',
@@ -188,7 +191,7 @@ const HeroProfileHeader = ({
       </div>
       
       {/* Content container - positioned above the background */}
-      <div className="relative w-full min-h-screen">
+      <div className="relative w-full min-h-screen z-10">
         {/* Content Container - Top Section - conditional padding based on cover photo */}
         <div className={`relative flex items-end justify-between px-8 pb-8 ${
           backgroundImage ? 'pt-20' : 'pt-24'
