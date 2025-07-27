@@ -215,7 +215,7 @@ const HeroProfileHeader = ({
             </div>
             
             {/* Text Info */}
-            <div className="mb-4">
+            <div className="mb-2">
               <h1 className="text-4xl font-bold mb-2 drop-shadow-lg">
                 {displayName}
               </h1>
@@ -244,7 +244,7 @@ const HeroProfileHeader = ({
         </div>
 
         {/* Stats Bar - Full Width with equal padding */}
-        <div className="relative px-8 pb-8">
+        <div className="relative px-8 pb-8 -mt-2">
           <div className="bg-black/80 backdrop-blur-sm rounded-lg px-6 py-4 shadow-lg">
             <div className="flex items-center justify-center space-x-8 text-white">
               <div className="text-center">
