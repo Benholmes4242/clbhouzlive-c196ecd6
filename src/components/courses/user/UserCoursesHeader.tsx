@@ -20,9 +20,6 @@ const UserCoursesHeader: React.FC<UserCoursesHeaderProps> = ({
 
   return (
     <div className="text-center mb-6">
-      <p className="text-white/80 text-lg leading-relaxed">
-        {introText}
-      </p>
     </div>
   );
 };
