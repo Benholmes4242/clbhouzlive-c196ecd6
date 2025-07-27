@@ -32,7 +32,7 @@ const Top100AchievementCard: React.FC<Top100AchievementCardProps> = ({ achieveme
       {/* Badge Icon */}
         <div
           className={cn(
-            "flex items-center justify-center w-8 h-8 rounded-full text-lg transition-all duration-300",
+            "flex items-center justify-center w-8 h-8 rounded-full text-lg transition-all duration-300 self-start mt-0.5",
             isEarned
               ? "bg-gradient-to-r from-orange-400 to-yellow-400"
               : "bg-muted text-muted-foreground"
