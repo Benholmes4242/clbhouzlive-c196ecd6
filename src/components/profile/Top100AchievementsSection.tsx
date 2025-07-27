@@ -155,18 +155,22 @@ const Top100AchievementsSection: React.FC<Top100AchievementsSectionProps> = ({
   };
 
   return (
-    <Card className="mb-6 bg-gray-50/50">
-      <CardContent className="p-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Left Side: User's Top 100 Stats */}
+    <div className="space-y-4 mb-6">
+      {/* Achievements Stats Card */}
+      <Card className="bg-gray-50/50">
+        <CardContent className="p-4">
           <div className="space-y-2">
             <h3 className="font-bold text-lg">Achievements</h3>
             <p className="text-muted-foreground">
               You've played <span className="font-semibold text-foreground">{userProgress}</span> of 300 Top 100 courses
             </p>
           </div>
+        </CardContent>
+      </Card>
 
-          {/* Right Side: User's Earned Badges */}
+      {/* Earned Badges Card */}
+      <Card className="bg-gray-50/50">
+        <CardContent className="p-4">
           <div className="space-y-3">
             <h4 className="font-semibold text-sm">Earned Badges</h4>
             <div className="flex flex-wrap gap-2">
@@ -191,9 +195,9 @@ const Top100AchievementsSection: React.FC<Top100AchievementsSectionProps> = ({
               ))}
             </div>
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </div>
   );
 };
 
