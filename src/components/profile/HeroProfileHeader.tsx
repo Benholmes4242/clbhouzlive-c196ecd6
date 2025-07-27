@@ -62,18 +62,54 @@ const HeroProfileHeader = ({
   const [avatarKey, setAvatarKey] = useState(Date.now()); // Add cache-busting key
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   
+  // Stats state
+  const [ratedCoursesCount, setRatedCoursesCount] = useState(0);
+  const [averageRating, setAverageRating] = useState(0);
   
   // Activity posts logic
   const { posts, loading: postsLoading, fetchUserPosts } = useActivityPosts(profile?.id);
   const { isOpen, currentPost, allUserPosts: viewerPosts, openPostViewer, closePostViewer } = usePostViewer({ source: 'profile' });
   const [selectedPost, setSelectedPost] = useState<ActivityPost | null>(null);
   
+  // Fetch stats data
+  useEffect(() => {
+    const fetchStats = async () => {
+      if (!profile?.id) return;
+      
+      try {
+        // Fetch rated courses count and average rating
+        const { data: ratingsData, error: ratingsError } = await supabase
+          .from('course_ratings')
+          .select('rating')
+          .eq('user_id', profile.id);
+          
+        if (ratingsError) {
+          console.error('Error fetching ratings:', ratingsError);
+          return;
+        }
+        
+        if (ratingsData && ratingsData.length > 0) {
+          setRatedCoursesCount(ratingsData.length);
+          const avgRating = ratingsData.reduce((sum, r) => sum + Number(r.rating), 0) / ratingsData.length;
+          setAverageRating(Math.round(avgRating * 10) / 10); // Round to 1 decimal place
+        } else {
+          setRatedCoursesCount(0);
+          setAverageRating(0);
+        }
+      } catch (error) {
+        console.error('Error fetching stats:', error);
+      }
+    };
+    
+    fetchStats();
+  }, [profile?.id]);
+  
   // Derived values
   const displayName = profile?.display_name || 'User';
   const username = profile?.username;
   const homeClub = profile?.home_club || 'No Club';
   const backgroundImage = profile?.cover_photo_url;
-  const postsCount = 0; // This would be fetched from actual data
+  const postsCount = posts.length; // Use actual posts count
   
   // Animation hook for badges
   const badgesAnimation = useStaggeredInView(5, { threshold: 0.1, staggerDelay: 100 });
@@ -381,7 +417,9 @@ const HeroProfileHeader = ({
           <div className="bg-black/20 backdrop-blur-sm border border-white/20 px-6 py-1 shadow-lg" style={{ borderRadius: '8px' }}>
             <div className="flex items-center justify-between w-full text-white">
               <div className="text-center">
-                <div className="font-bold text-lg drop-shadow">4.0</div>
+                <div className="font-bold text-lg drop-shadow">
+                  {profile?.eg_handicap_index ? profile.eg_handicap_index.toFixed(1) : '--'}
+                </div>
                 <div className="text-xs text-white/80 drop-shadow">Handicap</div>
               </div>
               <div className="text-center">
@@ -389,11 +427,13 @@ const HeroProfileHeader = ({
                 <div className="text-xs text-white/80 drop-shadow">Posts</div>
               </div>
               <div className="text-center">
-                <div className="font-bold text-lg drop-shadow">32</div>
+                <div className="font-bold text-lg drop-shadow">{ratedCoursesCount}</div>
                 <div className="text-xs text-white/80 drop-shadow">Rated Courses</div>
               </div>
               <div className="text-center">
-                <div className="font-bold text-lg drop-shadow">8.6/10</div>
+                <div className="font-bold text-lg drop-shadow">
+                  {averageRating > 0 ? `${averageRating}/10` : '--'}
+                </div>
                 <div className="text-xs text-white/80 drop-shadow">Avg. Rating</div>
               </div>
             </div>
