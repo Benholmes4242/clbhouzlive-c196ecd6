@@ -114,9 +114,9 @@ const ProfilePage = () => {
         )}
         
         {activeSection === 'top100' && (
-          <div className="px-8 pt-4 pb-8">
+          <div className="px-8 pb-8">
             {/* Title positioned like ActivityHeader - right after the cards */}
-            <div className="flex items-center justify-between mb-4 px-2">
+            <div className="flex items-center justify-between mb-2 px-2">
               <h2 className="text-3xl font-bold text-white">Top 100 courses</h2>
             </div>
             <div className="bg-white rounded-lg p-6 shadow-lg border">
