@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '@/lib/utils';
+import MedalIcon from '@/components/ui/medal-icon';
 
 interface Top100Achievement {
   id: string;
@@ -37,7 +38,11 @@ const Top100AchievementCard: React.FC<Top100AchievementCardProps> = ({ achieveme
               : "bg-muted text-muted-foreground"
           )}
         >
-        {emoji}
+        {achievement.id === '20-club' ? (
+          <MedalIcon size="sm" />
+        ) : (
+          emoji
+        )}
       </div>
 
       {/* Badge Content */}

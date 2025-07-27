@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import MedalIcon from '@/components/ui/medal-icon';
 
 interface Top100AchievementsSectionProps {
   userId: string;
@@ -188,7 +189,11 @@ const Top100AchievementsSection: React.FC<Top100AchievementsSectionProps> = ({
         <div className="flex-shrink-0">
           <div className="text-center px-4 py-3">
             <div className="text-4xl mb-2">
-              {highestEarnedAchievement.emoji}
+              {highestEarnedAchievement.id === '20-club' ? (
+                <MedalIcon size="xl" />
+              ) : (
+                highestEarnedAchievement.emoji
+              )}
             </div>
             <div>
               <div className="font-semibold text-white leading-tight">

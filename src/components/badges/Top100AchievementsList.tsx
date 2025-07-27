@@ -3,6 +3,7 @@ import Top100AchievementCard from './Top100AchievementCard';
 import { useBadges } from '@/hooks/useBadges';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import MedalIcon from '@/components/ui/medal-icon';
 
 interface Top100Achievement {
   id: string;
