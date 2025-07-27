@@ -9,16 +9,21 @@ interface VideoHighlight {
   created_at: string;
   user_id: string;
   course_name: string;
+  course_location: string;
   course_rank: number;
   media_url: string;
-  user_name: string;
-  user_avatar: string;
 }
 
-const Top100VideoHighlights: React.FC = () => {
+interface Top100VideoHighlightsProps {
+  userId?: string;
+}
+
+const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId }) => {
   const { data: videoHighlights = [], isLoading } = useQuery({
-    queryKey: ['top100VideoHighlights'],
+    queryKey: ['top100VideoHighlights', userId],
     queryFn: async () => {
+      if (!userId) return [];
+
       const { data, error } = await supabase
         .from('posts')
         .select(`
@@ -38,6 +43,7 @@ const Top100VideoHighlights: React.FC = () => {
             )
           )
         `)
+        .eq('user_id', userId)
         .eq('post_media.media_type', 'video')
         .eq('post_tags.taggable_entities.entity_type', 'golf_club')
         .order('created_at', { ascending: false })
@@ -58,7 +64,7 @@ const Top100VideoHighlights: React.FC = () => {
 
         const { data: courseData } = await supabase
           .from('golf_courses')
-          .select('name, global_rank, regional_rank, usa_rank')
+          .select('name, global_rank, regional_rank, usa_rank, country, region, sub_country')
           .eq('id', courseId)
           .single();
 
@@ -71,12 +77,10 @@ const Top100VideoHighlights: React.FC = () => {
 
         if (!isTop100) continue;
 
-        // Get user profile
-        const { data: userProfile } = await supabase
-          .from('user_profiles')
-          .select('display_name, username, profile_photo_url')
-          .eq('id', post.user_id)
-          .single();
+        // Create location string
+        const location = [courseData?.sub_country, courseData?.region, courseData?.country]
+          .filter(Boolean)
+          .join(', ');
 
         processedHighlights.push({
           id: post.id,
@@ -84,10 +88,9 @@ const Top100VideoHighlights: React.FC = () => {
           created_at: post.created_at,
           user_id: post.user_id,
           course_name: courseData?.name || 'Unknown Course',
+          course_location: location || 'Unknown Location',
           course_rank: courseData?.global_rank || courseData?.regional_rank || courseData?.usa_rank || 0,
-          media_url: post.post_media[0]?.media_url || '',
-          user_name: userProfile?.display_name || userProfile?.username || 'Unknown User',
-          user_avatar: userProfile?.profile_photo_url || ''
+          media_url: post.post_media[0]?.media_url || ''
         });
 
         if (processedHighlights.length >= 3) break;
@@ -96,6 +99,7 @@ const Top100VideoHighlights: React.FC = () => {
       return processedHighlights;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
+    enabled: !!userId
   });
 
   if (isLoading) {
@@ -163,13 +167,13 @@ const Top100VideoHighlights: React.FC = () => {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1 mb-1">
                         <div className="w-3 h-3 rounded-full bg-gradient-to-r from-orange-400 to-yellow-400"></div>
-                        <span className="text-xs text-white/90 font-medium truncate">
-                          {highlight.user_name}
+                        <span className="text-sm text-white font-medium truncate">
+                          {highlight.course_name}
                         </span>
                       </div>
                       <div className="flex items-center gap-1 text-xs text-white/70">
                         <MapPin className="w-3 h-3" />
-                        <span className="truncate">{highlight.course_name}</span>
+                        <span className="truncate">{highlight.course_location}</span>
                       </div>
                     </div>
                   </div>

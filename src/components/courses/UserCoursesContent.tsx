@@ -275,7 +275,7 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
                   style={{ transform: `translateX(-${carouselIndex * 100}%)` }}
                 >
                   <div className="w-full flex-shrink-0">
-                    <Top100VideoHighlights />
+                    <Top100VideoHighlights userId={targetUserId} />
                   </div>
                   <div className="w-full flex-shrink-0">
                     <Top100AchievementsSection 
@@ -308,7 +308,7 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
                 isOwnProfile={finalIsOwnProfile}
                 userDisplayName={finalDisplayName}
               />
-              <Top100VideoHighlights />
+              <Top100VideoHighlights userId={targetUserId} />
             </div>
           )}
         </>
