@@ -389,7 +389,7 @@ const HeroProfileHeader = ({
           className="px-8 pb-8"
           ref={activityRef}
         >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Activity Card */}
             <div 
               className="relative overflow-hidden flex flex-col justify-end text-white h-[200px] cursor-pointer group"
@@ -476,6 +476,36 @@ const HeroProfileHeader = ({
                   <h3 className="text-3xl font-bold group-hover:scale-105 transition-transform">Handicap</h3>
                 </div>
                 <p className="text-white/80 text-lg leading-relaxed">Track your progress and handicap development over time.</p>
+              </div>
+            </div>
+
+            {/* Top 100 Courses Card */}
+            <div 
+              className="relative overflow-hidden bg-gradient-to-br from-amber-500 to-orange-600 flex flex-col justify-end text-white h-[200px] cursor-pointer group"
+              style={{ borderRadius: '8px' }}
+              ref={null}
+              onClick={() => scrollToSection('top100')}
+            >
+              {/* Top 100 Pattern Background */}
+              <div className="absolute inset-0 bg-gradient-to-br from-amber-500/20 to-transparent">
+                <div className="absolute inset-0" style={{
+                  backgroundImage: `
+                    radial-gradient(circle at 25% 25%, rgba(255,255,255,0.1) 0%, transparent 50%),
+                    radial-gradient(circle at 75% 75%, rgba(255,255,255,0.1) 0%, transparent 50%),
+                    linear-gradient(45deg, rgba(255,255,255,0.05) 25%, transparent 25%), 
+                    linear-gradient(-45deg, rgba(255,255,255,0.05) 25%, transparent 25%)
+                  `,
+                  backgroundSize: '60px 60px, 60px 60px, 30px 30px, 30px 30px'
+                }}>
+                </div>
+              </div>
+              
+              {/* Content */}
+              <div className="relative p-8 cursor-pointer group">
+                <div className="flex items-center mb-3">
+                  <h3 className="text-3xl font-bold">Top 100</h3>
+                </div>
+                <p className="text-white/90 text-lg leading-relaxed drop-shadow-lg">Discover and track the world's greatest golf courses.</p>
               </div>
             </div>
             </div>
