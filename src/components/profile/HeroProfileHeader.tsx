@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import ProfileFormFields from "./ProfileFormFields";
 import { useProfileForm } from "./hooks/useProfileForm";
 import { useLatestHorizontalVideo } from '@/hooks/useLatestHorizontalVideo';
+import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 
 interface Course {
   id: string;
@@ -398,13 +399,15 @@ const HeroProfileHeader = ({
             >
               {/* Video Background or Fallback */}
               {latestHorizontalVideo ? (
-                <video
-                  className="absolute inset-0 w-full h-full object-cover"
+                <EnhancedVideoPlayer
                   src={latestHorizontalVideo}
+                  autoplay
                   muted
                   loop
-                  autoPlay
-                  playsInline
+                  hideControls
+                  objectFit="cover"
+                  enableHLS
+                  className="absolute inset-0 w-full h-full"
                 />
               ) : (
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-blue-700">
