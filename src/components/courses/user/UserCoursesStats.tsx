@@ -18,30 +18,30 @@ const UserCoursesStats: React.FC<UserCoursesStatsProps> = ({
 }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <Card className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-full shadow-lg">
+      <Card className="bg-black/20 backdrop-blur-sm border border-white/30 rounded-full shadow-lg">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium text-gray-800">Top 100 Played</CardTitle>
+          <CardTitle className="text-sm font-medium">Top 100 Played</CardTitle>
           <Trophy className="h-4 w-4 text-yellow-600" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-gray-900">{totalTop100Played}</div>
+          <div className="text-2xl font-bold">{totalTop100Played}</div>
         </CardContent>
       </Card>
 
       <Card 
-        className={`bg-white/20 backdrop-blur-sm border border-white/30 rounded-full shadow-lg ${isOwnProfile ? "cursor-pointer hover:shadow-md transition-shadow" : ""}`}
+        className={`bg-black/20 backdrop-blur-sm border border-white/30 rounded-full shadow-lg ${isOwnProfile ? "cursor-pointer hover:shadow-md transition-shadow" : ""}`}
         onClick={isOwnProfile ? onAverageRatingClick : undefined}
       >
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium text-gray-800">Average Rating</CardTitle>
+          <CardTitle className="text-sm font-medium">Average Rating</CardTitle>
           <Star className="h-4 w-4 text-yellow-500" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-gray-900">
+          <div className="text-2xl font-bold">
             {averageRating ? `${averageRating}/10` : 'N/A'}
           </div>
           {isOwnProfile && (
-            <p className="text-xs text-gray-600">
+            <p className="text-xs text-muted-foreground">
               Click to view all ratings
             </p>
           )}
