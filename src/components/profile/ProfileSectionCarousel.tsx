@@ -60,9 +60,9 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
   };
 
   if (!isMobile) {
-    // Desktop: Show original grid layout with no gaps
+    // Desktop: Show original grid layout
     return (
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-0">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {cards.map((card) => (
           <div
             key={card.id}

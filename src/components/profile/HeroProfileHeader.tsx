@@ -236,7 +236,7 @@ const HeroProfileHeader = ({
       <div className="relative w-full">
         {/* Apple Music Style Dynamic Background */}
         <div 
-          className="absolute left-0 right-0 w-screen h-[600px] overflow-hidden -ml-[50vw] left-1/2"
+          className="absolute inset-0 w-full h-[600px] overflow-hidden"
           style={{
             backgroundImage: profile?.profile_photo_url 
               ? `url(${profile.profile_photo_url}?t=${avatarKey})`
@@ -251,7 +251,7 @@ const HeroProfileHeader = ({
         
         {/* Gradient fade overlay to blend into background */}
         <div 
-          className="absolute left-0 right-0 w-screen h-[600px] -ml-[50vw] left-1/2"
+          className="absolute inset-0 w-full h-[600px]"
           style={{
             background: 'linear-gradient(180deg, transparent 0%, transparent 70%, hsl(var(--background)) 100%)'
           }}
