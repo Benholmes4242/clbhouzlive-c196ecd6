@@ -119,17 +119,17 @@ const HeaderNavigation = () => {
     return (
       <>
         <Button variant="ghost" size="sm" className="p-2 md:p-3 flex-shrink-0" onClick={handleNotificationsClick}>
-          <Bell className="h-4 w-4" />
+          <Bell className="h-4 w-4 text-white" />
         </Button>
 
         <Button variant="ghost" size="sm" className="p-2 md:p-3 flex-shrink-0" onClick={handleProfileClick}>
-          <CircleUserRound className="h-4 w-4 md:h-5 md:w-5" />
+          <CircleUserRound className="h-4 w-4 md:h-5 md:w-5 text-white" />
         </Button>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="sm" className="p-2 md:p-3 flex-shrink-0">
-              <Settings className="h-4 w-4 md:h-5 md:w-5" />
+              <Settings className="h-4 w-4 md:h-5 md:w-5 text-white" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48 mr-2">
@@ -149,7 +149,7 @@ const HeaderNavigation = () => {
   return (
     <>
       <Button variant="ghost" size="sm" className="relative p-2 md:p-3 flex-shrink-0" onClick={handleNotificationsClick}>
-        <Bell className="h-4 w-4" />
+        <Bell className="h-4 w-4 text-white" />
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
             {unreadCount > 9 ? '9+' : unreadCount}
@@ -158,13 +158,13 @@ const HeaderNavigation = () => {
       </Button>
 
       <Button variant="ghost" size="sm" className="p-2 md:p-3 flex-shrink-0" onClick={handleProfileClick}>
-        <CircleUserRound className="h-4 w-4 md:h-5 md:w-5" />
+        <CircleUserRound className="h-4 w-4 md:h-5 md:w-5 text-white" />
       </Button>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="sm" className="p-2 md:p-3 flex-shrink-0">
-            <Settings className="h-4 w-4 md:h-5 md:w-5" />
+            <Settings className="h-4 w-4 md:h-5 md:w-5 text-white" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48 mr-2">
