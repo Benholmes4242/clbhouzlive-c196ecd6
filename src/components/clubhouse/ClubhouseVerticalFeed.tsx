@@ -580,7 +580,20 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 )}
               </div>
 
-              {/* Golf Course Tag - REMOVED - Now shown in UserInfoOverlay for clubhouse */}
+              
+              {/* Golf Course Tag - Top Right */}
+              {item.golfCourse && (
+                <div className={`absolute ${index === 0 ? 'top-20' : 'top-4'} right-4 z-30`}>
+                  <CoursePostBadge 
+                    course={{
+                      id: item.golfCourse.id,
+                      name: item.golfCourse.name,
+                      country: item.golfCourse.country
+                    }}
+                    isClubhouse={true}
+                  />
+                </div>
+              )}
 
               {/* User Profile and Caption - Bottom Left */}
               <div className="absolute bottom-24 left-3 right-20 z-20">
@@ -598,23 +611,9 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                         }}
                       />
                     </div>
-                    
-                     {/* Golf Course and Username */}
+                     
+                     {/* Username only */}
                      <div className="flex flex-col">
-                        {/* Golf Course Badge at top */}
-                        {item.golfCourse && (
-                          <div className="mb-1">
-                            <CoursePostBadge 
-                              course={{
-                                id: item.golfCourse.id,
-                                name: item.golfCourse.name,
-                                country: item.golfCourse.country
-                              }}
-                              isClubhouse={true}
-                            />
-                          </div>
-                        )}
-                        
                        <span className="font-semibold text-xl text-white" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
                          {item.user?.name || 'Unknown User'}
                        </span>
