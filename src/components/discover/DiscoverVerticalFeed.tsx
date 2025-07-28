@@ -512,20 +512,20 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
               <div className="absolute bottom-24 left-3 right-20 z-20">
                 {/* User Profile Section */}
                 {index === currentIndex && (
-                  <div className="mb-3 flex items-center space-x-3">
+                  <div className="mb-3 flex items-end space-x-3">
                     {/* Profile Photo */}
                     <div className="relative">
                       <img
                         src={item.user?.avatar || '/placeholder.svg'}
                         alt={item.user?.name || 'User'}
-                        className="w-16 h-16 rounded-full object-cover"
+                        className="w-12 h-12 rounded-full object-cover"
                         onError={(e) => {
                           e.currentTarget.src = '/placeholder.svg';
                         }}
                       />
                     </div>
                     
-                    {/* Username and Golf Course */}
+                    {/* Username */}
                     <div className="flex flex-col">
                       <span className="font-semibold text-xl text-white" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
                         {item.user?.name || 'Unknown User'}
