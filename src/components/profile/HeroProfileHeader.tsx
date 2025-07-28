@@ -228,12 +228,12 @@ const HeroProfileHeader = ({
 
   return (
     <>
-      {/* Fullscreen Blurred Background */}
-      <div className="relative w-full min-h-screen">
-        {/* Blurred Background Image */}
+      {/* Profile Header Section with Blurred Background */}
+      <div className="relative w-full">
+        {/* Blurred Background Image - Only for profile section */}
         {profile?.profile_photo_url && (
           <div 
-            className="absolute inset-0 w-full bg-cover bg-center"
+            className="absolute inset-0 w-full h-full bg-cover bg-center"
             style={{
               backgroundImage: `url(${profile.profile_photo_url}?t=${avatarKey})`,
               filter: 'blur(20px)',
@@ -245,8 +245,8 @@ const HeroProfileHeader = ({
         {/* Overlay to darken background for better text contrast */}
         <div className="absolute inset-0 bg-black/40" />
         
-        {/* Content container */}
-        <div className="relative w-full min-h-screen z-10">
+        {/* Content container for profile section only */}
+        <div className="relative w-full z-10">
           {/* Edit Profile Button - Top Right (Only for own profile) */}
           {isOwnProfile && (
             <div className="absolute top-6 right-4 z-20">
@@ -353,12 +353,15 @@ const HeroProfileHeader = ({
             </div>
           </div>
         
-        {/* Activity Section - directly after stats bar */}
-        <div 
-          id="activity"
-          className="pb-8"
-          ref={activityRef}
-        >
+        </div>
+      </div>
+
+      {/* Activity Section - Now with normal background */}
+      <div 
+        id="activity"
+        className="pb-8 bg-background"
+        ref={activityRef}
+      >
             <ProfileSectionCarousel onSectionChange={onSectionChange} />
             
             {/* Activity Posts Section - Only show when activity section is active */}
@@ -489,21 +492,17 @@ const HeroProfileHeader = ({
             )}
         </div>
         
-        {/* Post Viewer Modal */}
-        {currentPost && (
-          <PostViewerModal
-            isOpen={isOpen}
-            onClose={closePostViewer}
-            initialPost={currentPost}
-            allUserPosts={viewerPosts}
-          />
-        )}
-        
-        </div>
-      </div>
-
-      {/* Rest of content sections would continue here... */}
       
+      {/* Post Viewer Modal */}
+      {currentPost && (
+        <PostViewerModal
+          isOpen={isOpen}
+          onClose={closePostViewer}
+          initialPost={currentPost}
+          allUserPosts={viewerPosts}
+        />
+      )}
+
       {/* Custom Edit Profile Dialog with glass effect trigger */}
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
         <DialogContent className="sm:max-w-[425px]">
