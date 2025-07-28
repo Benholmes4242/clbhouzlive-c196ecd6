@@ -260,6 +260,13 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
         isOwnProfile={finalIsOwnProfile} 
       />
 
+      {/* Video Highlights Section - Fan Deck Style */}
+      {targetUserId && (
+        <div className="mb-6">
+          <Top100VideoHighlights userId={targetUserId} />
+        </div>
+      )}
+
 
       {/* Achievements Section */}
       {targetUserId && (

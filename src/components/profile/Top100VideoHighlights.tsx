@@ -202,79 +202,129 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId })
   }
 
   return (
-    <div className="bg-black/40 backdrop-blur-sm rounded-[8px] px-4 py-3 border border-black/20">
-      <div className="space-y-4">
-        <div>
-          <h3 className="font-bold text-lg text-white">Latest Highlights</h3>
-          <p className="text-white/80 text-sm">Recent videos from Top 100 courses</p>
-        </div>
-        
-        {videoHighlights.length > 0 ? (
-          <div className="space-y-3">
-            {/* Swipeable video container */}
-            <div 
-              {...swipeHandlers}
-              className="relative w-full aspect-video rounded-[8px] overflow-hidden bg-gray-800/50 border border-white/20 hover:border-white/40 transition-all group"
-            >
-              {/* Video Player */}
-              <video 
-                ref={(el) => (videoRefs.current[currentIndex] = el)}
-                src={videoHighlights[currentIndex]?.media_url}
-                className="w-full h-full object-cover"
-                muted={isMuted}
-                autoPlay
-                loop
-                playsInline
-                preload="metadata"
-                poster={getVideoThumbnail(videoHighlights[currentIndex]?.media_url) || undefined}
-              />
-
-              {/* Mute/Unmute button - bottom right */}
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleMuteToggle();
-                }}
-                className="absolute bottom-2 right-2 z-20 text-white hover:text-white/80 transition-colors"
-              >
-                {isMuted ? (
-                  <VolumeX className="h-5 w-5" />
-                ) : (
-                  <Volume2 className="h-5 w-5" />
-                )}
-              </button>
-            </div>
-
-            {/* Pagination dots */}
-            {videoHighlights.length > 1 && (
-              <div className="flex justify-center space-x-2">
-                {videoHighlights.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setCurrentIndex(index)}
-                    className={`w-2 h-2 rounded-full transition-all ${
-                      index === currentIndex 
-                        ? 'bg-white' 
-                        : 'bg-white/40 hover:bg-white/60'
-                    }`}
-                  />
-                ))}
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="text-center py-6">
-            <div className="w-8 h-8 text-white/40 mx-auto mb-2 flex items-center justify-center">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M8 5v14l11-7z"/>
-              </svg>
-            </div>
-            <p className="text-white/60 text-sm">No video highlights yet</p>
-            <p className="text-white/40 text-xs">Be the first to share a moment!</p>
-          </div>
-        )}
-        
+    <div className="space-y-4">
+      <div>
+        <h3 className="font-bold text-lg text-foreground">Latest Highlights</h3>
+        <p className="text-muted-foreground text-sm">Recent videos from Top 100 courses</p>
       </div>
+      
+      {videoHighlights.length > 0 ? (
+        <div className="space-y-6">
+          {/* Fan Deck Video Container */}
+          <div 
+            {...swipeHandlers}
+            className="relative w-full h-[300px] md:h-[400px] overflow-visible"
+            style={{ perspective: '1000px' }}
+          >
+            {videoHighlights.map((highlight, index) => {
+              // Calculate fan deck positions
+              const offset = index - currentIndex;
+              const absOffset = Math.abs(offset);
+              
+              // Only show up to 5 videos in the fan deck
+              const isVisible = absOffset <= 2;
+              
+              // Calculate positioning for fan deck effect
+              const translateX = offset * 15; // Horizontal spread
+              const translateY = absOffset * 8; // Vertical offset for depth
+              const rotateY = offset * 6; // Rotation for fan effect
+              const scale = 1 - (absOffset * 0.08); // Scale for depth
+              const zIndex = 10 - absOffset; // Z-index for layering
+              const opacity = index === currentIndex ? 1 : 0.8;
+              
+              return (
+                <div
+                  key={highlight.id}
+                  className={`absolute inset-0 transition-all duration-500 ease-out cursor-pointer ${
+                    isVisible ? 'pointer-events-auto' : 'pointer-events-none opacity-0'
+                  }`}
+                  style={{
+                    transform: `translateX(${translateX}px) translateY(${translateY}px) rotateY(${rotateY}deg) scale(${scale})`,
+                    zIndex,
+                    opacity: isVisible ? opacity : 0,
+                    transformOrigin: 'center center'
+                  }}
+                  onClick={() => setCurrentIndex(index)}
+                >
+                  <div className="relative w-full h-full bg-black rounded-2xl overflow-hidden shadow-2xl">
+                    <video
+                      ref={(el) => {
+                        if (el) videoRefs.current[index] = el;
+                      }}
+                      className="w-full h-full object-cover"
+                      src={highlight.media_url}
+                      muted={isMuted}
+                      loop
+                      playsInline
+                      autoPlay={index === currentIndex}
+                      poster={getVideoThumbnail(highlight.media_url) || undefined}
+                    />
+                    
+                    {/* Video Info Overlay - Only show on current video */}
+                    {index === currentIndex && (
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-6">
+                        <h4 className="text-white font-semibold text-base line-clamp-2">
+                          {highlight.content}
+                        </h4>
+                        <p className="text-white/90 text-sm mt-2">
+                          {highlight.course_name} • #{highlight.course_rank}
+                        </p>
+                        <p className="text-white/70 text-xs mt-1">
+                          {highlight.course_location}
+                        </p>
+                      </div>
+                    )}
+                    
+                    {/* Mute Toggle - Only show on current video */}
+                    {index === currentIndex && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleMuteToggle();
+                        }}
+                        className="absolute top-4 right-4 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
+                      >
+                        {isMuted ? (
+                          <VolumeX className="w-5 h-5" />
+                        ) : (
+                          <Volume2 className="w-5 h-5" />
+                        )}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          
+          {/* White Pagination Dots */}
+          {videoHighlights.length > 1 && (
+            <div className="flex justify-center space-x-3">
+              {videoHighlights.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentIndex(index)}
+                  className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                    index === currentIndex 
+                      ? 'bg-white scale-110' 
+                      : 'bg-white/50 hover:bg-white/70'
+                  }`}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="text-center py-8">
+          <div className="w-8 h-8 text-muted-foreground/40 mx-auto mb-2 flex items-center justify-center">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+          </div>
+          <p className="text-muted-foreground text-sm">No video highlights yet</p>
+          <p className="text-muted-foreground/60 text-xs">Be the first to share a moment!</p>
+        </div>
+      )}
     </div>
   );
 };
