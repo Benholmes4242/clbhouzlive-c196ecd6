@@ -266,7 +266,7 @@ const HeroProfileHeader = ({
           )}
           
           {/* Large Centered Profile Photo */}
-          <div className="w-48 h-48 mb-6">
+          <div className="w-52 h-52 mb-6">
             {isOwnProfile ? (
               <div 
                 className="relative cursor-pointer group"
@@ -289,7 +289,7 @@ const HeroProfileHeader = ({
                   key={avatarKey}
                   src={profile?.profile_photo_url ? `${profile.profile_photo_url}?t=${avatarKey}` : undefined}
                   alt={displayName}
-                  size={192}
+                  size={208}
                   fallback={displayName.charAt(0)}
                   className="shadow-2xl group-hover:opacity-80 transition-opacity"
                 />
@@ -303,7 +303,7 @@ const HeroProfileHeader = ({
                 key={avatarKey}
                 src={profile?.profile_photo_url ? `${profile.profile_photo_url}?t=${avatarKey}` : undefined}
                 alt={displayName}
-                size={192}
+                size={208}
                 fallback={displayName.charAt(0)}
                 className="shadow-2xl"
               />
