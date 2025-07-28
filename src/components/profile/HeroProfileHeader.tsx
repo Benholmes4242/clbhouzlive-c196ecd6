@@ -230,9 +230,9 @@ const HeroProfileHeader = ({
     <>
       {/* Fullscreen Blurred Background - stops between stats bar and activity cards */}
       <div className="relative w-full">
-        {/* Blurred Background Image - extends to top of screen */}
+        {/* Blurred Background Image */}
         <div 
-          className="fixed top-0 left-0 w-full h-[500px] bg-cover bg-center z-[60]"
+          className="absolute inset-0 w-full h-[500px] bg-cover bg-center"
           style={{
             backgroundImage: profile?.profile_photo_url 
               ? `url(${profile.profile_photo_url}?t=${avatarKey})` 
@@ -243,7 +243,7 @@ const HeroProfileHeader = ({
         />
         
         {/* Profile Content */}
-        <div className="relative z-[70] flex flex-col items-center text-center pt-20 pb-8">
+        <div className="relative z-10 flex flex-col items-center text-center pt-20 pb-8">
           
           {/* Edit Profile Button - Top Right for own profile */}
           {isOwnProfile && (
