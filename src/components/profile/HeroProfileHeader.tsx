@@ -228,116 +228,133 @@ const HeroProfileHeader = ({
 
   return (
     <>
-      {/* Content container with background color */}
-      <div className="relative w-full min-h-screen z-10">
-        {/* Content Container - Top Section */}
-        <div className="relative flex items-end justify-between pb-12 pt-32">
+      {/* Fullscreen Blurred Background - stops between stats bar and activity cards */}
+      <div className="relative w-full">
+        {/* Blurred Background Image */}
+        <div 
+          className="absolute inset-0 w-full h-[500px] bg-cover bg-center"
+          style={{
+            backgroundImage: profile?.profile_photo_url 
+              ? `url(${profile.profile_photo_url}?t=${avatarKey})` 
+              : 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-foreground)))',
+            filter: 'blur(20px)',
+            transform: 'scale(1.1)', // Slightly larger to avoid edge artifacts
+          }}
+        />
+        
+        {/* Overlay for better text readability */}
+        <div className="absolute inset-0 w-full h-[500px] bg-black/40" />
+        
+        {/* Profile Content */}
+        <div className="relative z-10 flex flex-col items-center text-center pt-20 pb-8">
           
-          {/* Left Side - Profile Information */}
-          <div className="flex flex-col text-foreground">
-            {/* Profile Photo */}
-            <div className="w-24 h-24 mb-4">
-              {isOwnProfile ? (
-                <div 
-                  className="relative cursor-pointer group"
-                  onClick={() => {
-                    if (uploading) return;
-                    const input = document.createElement('input');
-                    input.type = 'file';
-                    input.accept = 'image/*';
-                    input.onchange = (e) => {
-                      const file = (e.target as HTMLInputElement).files?.[0];
-                      if (file) {
-                        console.log('Photo selected for upload:', file);
-                        handlePhotoUpload(file);
-                      }
-                    };
-                    input.click();
-                  }}
-                >
-                  <OptimizedAvatar
-                    key={avatarKey}
-                    src={profile?.profile_photo_url ? `${profile.profile_photo_url}?t=${avatarKey}` : undefined}
-                    alt={displayName}
-                    size={96}
-                    fallback={displayName.charAt(0)}
-                    className="shadow-lg group-hover:opacity-80 transition-opacity"
-                  />
-                  {/* Hover overlay */}
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
-                    <span className="text-white text-xs font-medium">Edit</span>
-                  </div>
-                </div>
-              ) : (
+          {/* Edit Profile Button - Top Right for own profile */}
+          {isOwnProfile && (
+            <button 
+              className="absolute top-6 right-6 bg-white/20 backdrop-blur-sm text-white px-3 py-1.5 text-sm font-medium rounded-full border border-white/30 hover:bg-white/30 transition-colors"
+              onClick={() => setEditDialogOpen(true)}
+            >
+              Edit
+            </button>
+          )}
+          
+          {/* Large Centered Profile Photo */}
+          <div className="w-40 h-40 mb-6">
+            {isOwnProfile ? (
+              <div 
+                className="relative cursor-pointer group"
+                onClick={() => {
+                  if (uploading) return;
+                  const input = document.createElement('input');
+                  input.type = 'file';
+                  input.accept = 'image/*';
+                  input.onchange = (e) => {
+                    const file = (e.target as HTMLInputElement).files?.[0];
+                    if (file) {
+                      console.log('Photo selected for upload:', file);
+                      handlePhotoUpload(file);
+                    }
+                  };
+                  input.click();
+                }}
+              >
                 <OptimizedAvatar
                   key={avatarKey}
                   src={profile?.profile_photo_url ? `${profile.profile_photo_url}?t=${avatarKey}` : undefined}
                   alt={displayName}
-                  size={96}
+                  size={160}
                   fallback={displayName.charAt(0)}
-                  className="shadow-lg"
+                  className="shadow-2xl group-hover:opacity-80 transition-opacity ring-4 ring-white/30"
                 />
-              )}
-            </div>
-            
+                {/* Hover overlay */}
+                <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
+                  <span className="text-white text-sm font-medium">Edit Photo</span>
+                </div>
+              </div>
+            ) : (
+              <OptimizedAvatar
+                key={avatarKey}
+                src={profile?.profile_photo_url ? `${profile.profile_photo_url}?t=${avatarKey}` : undefined}
+                alt={displayName}
+                size={160}
+                fallback={displayName.charAt(0)}
+                className="shadow-2xl ring-4 ring-white/30"
+              />
+            )}
+          </div>
+          
+          {/* Centered User Information */}
+          <div className="text-center mb-6">
             {/* User's Name */}
-            <h1 className="text-4xl font-bold mb-2 whitespace-nowrap overflow-hidden text-ellipsis max-w-full">
+            <h1 className="text-4xl font-bold mb-2 text-white">
               {displayName}
             </h1>
             
             {/* Username */}
             {username && (
-              <p className="text-xl text-muted-foreground mb-2">
+              <p className="text-lg text-white/80 mb-2">
                 @{username}
               </p>
             )}
             
             {/* Home Golf Club */}
-            <p className="text-lg text-muted-foreground">
+            <p className="text-base text-white/70">
               {homeClub}
             </p>
           </div>
-          
-          {/* Right Side - Action Buttons (only for own profile) */}
-          {isOwnProfile && (
-            <div className="flex flex-col space-y-2 items-end justify-end">
-              <button 
-                className="bg-primary text-primary-foreground px-4 py-2 shadow-lg hover:bg-primary/90 transition-colors text-base font-medium rounded-full"
-                onClick={() => setEditDialogOpen(true)}
-              >
-                Edit Profile
-              </button>
-            </div>
-          )}
-        </div>
 
-        {/* Stats Bar - Glassmorphism design */}
-        <div className="relative mb-6">
-          <div className="bg-black/20 backdrop-blur-sm border border-black/30 shadow-lg rounded-xl p-4">
-            <div className="flex items-center justify-around w-full">
-              <div className="text-center">
-                <div className="text-lg font-bold text-[#222]">
-                  {profile?.eg_handicap_index ? profile.eg_handicap_index.toFixed(1) : '--'}
+          {/* Thinner Stats Bar */}
+          <div className="w-full max-w-md">
+            <div className="bg-white/20 backdrop-blur-sm border border-white/30 shadow-lg rounded-xl py-3 px-4">
+              <div className="flex items-center justify-around w-full">
+                <div className="text-center">
+                  <div className="text-lg font-bold text-white">
+                    {profile?.eg_handicap_index ? profile.eg_handicap_index.toFixed(1) : '--'}
+                  </div>
+                  <div className="text-xs text-white/70">Handicap</div>
                 </div>
-                <div className="text-sm text-[#888]">Handicap</div>
-              </div>
-              <div className="text-center">
-                <div className="text-lg font-bold text-[#222]">{postsCount}</div>
-                <div className="text-sm text-[#888]">Posts</div>
-              </div>
-              <div className="text-center">
-                <div className="text-lg font-bold text-[#222]">{ratedCoursesCount}</div>
-                <div className="text-sm text-[#888]">Rated Courses</div>
-              </div>
-              <div className="text-center">
-                <div className="text-lg font-bold text-[#222]">
-                  {averageRating > 0 ? `${averageRating}/10` : '--'}
+                <div className="text-center">
+                  <div className="text-lg font-bold text-white">{postsCount}</div>
+                  <div className="text-xs text-white/70">Posts</div>
                 </div>
-                <div className="text-sm text-[#888]">Avg. Rating</div>
+                <div className="text-center">
+                  <div className="text-lg font-bold text-white">{ratedCoursesCount}</div>
+                  <div className="text-xs text-white/70">Rated Courses</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-lg font-bold text-white">
+                    {averageRating > 0 ? `${averageRating}/10` : '--'}
+                  </div>
+                  <div className="text-xs text-white/70">Avg. Rating</div>
+                </div>
               </div>
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Content container with normal background */}
+      <div className="relative w-full bg-background">
         
         {/* Activity Section - directly after stats bar */}
         <div 
