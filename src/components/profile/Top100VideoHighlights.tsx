@@ -213,7 +213,7 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId })
           {/* Fan Deck Video Container */}
           <div 
             {...swipeHandlers}
-            className="relative w-full h-[300px] md:h-[400px] flex items-center justify-center overflow-visible"
+            className="relative w-full h-[300px] md:h-[400px] overflow-visible"
           >
             {videoHighlights.map((highlight, index) => {
               // Calculate deck positions (cards lean out from bottom right)
