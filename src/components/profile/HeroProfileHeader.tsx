@@ -236,7 +236,7 @@ const HeroProfileHeader = ({
       <div className="relative w-full">
         {/* Apple Music Style Dynamic Background */}
         <div 
-          className="absolute inset-0 w-full h-[600px] overflow-hidden"
+          className="absolute inset-0 w-full h-[700px] overflow-hidden"
           style={{
             backgroundImage: profile?.profile_photo_url 
               ? `url(${profile.profile_photo_url}?t=${avatarKey})`
@@ -246,6 +246,8 @@ const HeroProfileHeader = ({
             backgroundRepeat: 'no-repeat',
             filter: 'blur(40px) saturate(1.3) brightness(0.9)', // Heavy blur to obscure details
             transform: 'scale(1.2)', // Larger scale to crop edges and hide recognizable features
+            maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 60%, rgba(0,0,0,0.8) 80%, rgba(0,0,0,0) 100%)',
+            WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 60%, rgba(0,0,0,0.8) 80%, rgba(0,0,0,0) 100%)',
           }}
         />
         
