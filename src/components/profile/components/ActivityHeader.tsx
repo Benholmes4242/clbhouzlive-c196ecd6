@@ -12,8 +12,8 @@ const ActivityHeader: React.FC<ActivityHeaderProps> = ({ postsCount, isOwnProfil
   return (
     <div className="flex items-center justify-between mb-4">
       <div className="flex items-center gap-4">
-        <h2 className="text-3xl font-bold text-white">Activity</h2>
-        <span className="text-lg text-white/90">
+        <h2 className="text-3xl font-bold text-black">Activity</h2>
+        <span className="text-lg text-black/90">
           {postsCount} posts
         </span>
       </div>
