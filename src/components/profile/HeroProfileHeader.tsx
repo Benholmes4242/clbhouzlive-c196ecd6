@@ -234,17 +234,20 @@ const HeroProfileHeader = ({
     <>
       {/* Dynamic Background - Auto-generated from profile photo */}
       <div className="relative w-full">
-        {/* Dynamic Blurred Background */}
+        {/* Dynamic Blurred Background with integrated gradient overlay */}
         <div 
           className="absolute inset-0 w-full h-[500px]"
-          style={createDynamicBackgroundStyle(
-            profile?.profile_photo_url ? `${profile.profile_photo_url}?t=${avatarKey}` : null,
-            'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-foreground)) 100%)'
-          )}
+          style={{
+            backgroundImage: profile?.profile_photo_url 
+              ? `linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.4) 70%, rgba(0, 0, 0, 0.6) 100%), url(${profile.profile_photo_url}?t=${avatarKey})`
+              : 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-foreground)) 100%)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat',
+            filter: 'blur(20px) saturate(1.2)',
+            transform: 'scale(1.1)', // Prevent edge artifacts
+          }}
         />
-        
-        {/* Additional text contrast overlay */}
-        <div className="absolute inset-0 w-full h-[500px] bg-gradient-to-b from-black/20 via-black/30 to-black/50" />
         
         {/* Profile Content */}
         <div className="relative z-10 flex flex-col items-center text-center pt-20 pb-8">
