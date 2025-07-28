@@ -311,29 +311,29 @@ const HeroProfileHeader = ({
           )}
         </div>
 
-        {/* Stats Bar - Full Width with equal padding */}
+        {/* Stats Bar - Clean modern design */}
         <div className="relative mb-6">
-          <div className="bg-card border px-6 py-4 shadow-sm rounded-lg">
-            <div className="flex items-center justify-between w-full text-foreground">
+          <div className="bg-white shadow-[0_2px_8px_rgba(0,0,0,0.04)] rounded-xl p-4">
+            <div className="flex items-center justify-around w-full">
               <div className="text-center">
-                <div className="font-bold text-lg">
+                <div className="text-lg font-bold text-[#222]">
                   {profile?.eg_handicap_index ? profile.eg_handicap_index.toFixed(1) : '--'}
                 </div>
-                <div className="text-xs text-muted-foreground">Handicap</div>
+                <div className="text-sm text-[#888]">Handicap</div>
               </div>
               <div className="text-center">
-                <div className="font-bold text-lg">{postsCount}</div>
-                <div className="text-xs text-muted-foreground">Posts</div>
+                <div className="text-lg font-bold text-[#222]">{postsCount}</div>
+                <div className="text-sm text-[#888]">Posts</div>
               </div>
               <div className="text-center">
-                <div className="font-bold text-lg">{ratedCoursesCount}</div>
-                <div className="text-xs text-muted-foreground">Rated Courses</div>
+                <div className="text-lg font-bold text-[#222]">{ratedCoursesCount}</div>
+                <div className="text-sm text-[#888]">Rated Courses</div>
               </div>
               <div className="text-center">
-                <div className="font-bold text-lg">
+                <div className="text-lg font-bold text-[#222]">
                   {averageRating > 0 ? `${averageRating}/10` : '--'}
                 </div>
-                <div className="text-xs text-muted-foreground">Avg. Rating</div>
+                <div className="text-sm text-[#888]">Avg. Rating</div>
               </div>
             </div>
           </div>
