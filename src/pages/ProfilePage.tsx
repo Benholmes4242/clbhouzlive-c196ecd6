@@ -82,9 +82,7 @@ const ProfilePage = () => {
   return (
     <div className="min-h-screen bg-background pb-28 relative">
       {/* Header */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-background">
-        <Header />
-      </div>
+      <Header />
       
       <div className="container px-4 sm:px-8">
         <HeroProfileHeader 
