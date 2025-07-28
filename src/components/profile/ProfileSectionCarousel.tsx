@@ -67,7 +67,6 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
           <div
             key={card.id}
             className={card.className}
-            style={{ borderRadius: '8px' }}
             onClick={() => handleCardClick(card.id)}
           >
             {/* Background for activity and top100 cards */}
@@ -139,7 +138,6 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
             <div
               key={card.id}
               className={`${card.className.replace('h-[200px]', 'h-[250px]')} flex-shrink-0 w-full`}
-              style={{ borderRadius: '8px' }}
               onClick={() => handleCardClick(card.id)}
             >
               {/* Background for activity and top100 cards */}
