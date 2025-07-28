@@ -213,7 +213,7 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId })
           {/* Fan Deck Video Container */}
           <div 
             {...swipeHandlers}
-            className="relative w-full h-[300px] md:h-[400px] overflow-visible"
+            className="relative w-full h-[300px] md:h-[400px] flex items-center justify-center"
             style={{ perspective: '1000px' }}
           >
             {videoHighlights.map((highlight, index) => {
@@ -221,28 +221,26 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId })
               const offset = index - currentIndex;
               const absOffset = Math.abs(offset);
               
-              // Only show up to 5 videos in the fan deck
-              const isVisible = absOffset <= 2;
+              // Show cards with a fan effect
+              const isVisible = absOffset <= 2; // Show 2 cards on each side
               
               // Calculate positioning for fan deck effect
-              const translateX = offset * 15; // Horizontal spread
-              const translateY = absOffset * 8; // Vertical offset for depth
-              const rotateY = offset * 6; // Rotation for fan effect
-              const scale = 1 - (absOffset * 0.08); // Scale for depth
+              const translateX = offset * 20; // Horizontal spread
+              const translateZ = -absOffset * 50; // Depth positioning
+              const rotateY = offset * 8; // Rotation for fan effect
+              const scale = 1 - (absOffset * 0.1); // Scale for depth
               const zIndex = 10 - absOffset; // Z-index for layering
-              const opacity = index === currentIndex ? 1 : 0.8;
               
               return (
                 <div
                   key={highlight.id}
-                  className={`absolute inset-0 transition-all duration-500 ease-out cursor-pointer ${
+                  className={`absolute w-[280px] h-[280px] md:w-[350px] md:h-[350px] transition-all duration-500 ease-out cursor-pointer ${
                     isVisible ? 'pointer-events-auto' : 'pointer-events-none opacity-0'
                   }`}
                   style={{
-                    transform: `translateX(${translateX}px) translateY(${translateY}px) rotateY(${rotateY}deg) scale(${scale})`,
+                    transform: `translateX(${translateX}px) translateZ(${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`,
                     zIndex,
-                    opacity: isVisible ? opacity : 0,
-                    transformOrigin: 'center center'
+                    transformStyle: 'preserve-3d'
                   }}
                   onClick={() => setCurrentIndex(index)}
                 >
@@ -262,11 +260,11 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId })
                     
                     {/* Video Info Overlay - Only show on current video */}
                     {index === currentIndex && (
-                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-6">
-                        <h4 className="text-white font-semibold text-base line-clamp-2">
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-4 md:p-6">
+                        <h4 className="text-white font-semibold text-sm md:text-base line-clamp-2">
                           {highlight.content}
                         </h4>
-                        <p className="text-white/90 text-sm mt-2">
+                        <p className="text-white/90 text-xs md:text-sm mt-1 md:mt-2">
                           {highlight.course_name} • #{highlight.course_rank}
                         </p>
                         <p className="text-white/70 text-xs mt-1">
@@ -282,14 +280,19 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId })
                           e.stopPropagation();
                           handleMuteToggle();
                         }}
-                        className="absolute top-4 right-4 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
+                        className="absolute top-3 right-3 md:top-4 md:right-4 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
                       >
                         {isMuted ? (
-                          <VolumeX className="w-5 h-5" />
+                          <VolumeX className="w-4 h-4 md:w-5 md:h-5" />
                         ) : (
-                          <Volume2 className="w-5 h-5" />
+                          <Volume2 className="w-4 h-4 md:w-5 md:h-5" />
                         )}
                       </button>
+                    )}
+                    
+                    {/* Card overlay for non-current cards to show they're interactive */}
+                    {index !== currentIndex && (
+                      <div className="absolute inset-0 bg-black/20 hover:bg-black/10 transition-colors" />
                     )}
                   </div>
                 </div>
