@@ -242,9 +242,6 @@ const HeroProfileHeader = ({
           }}
         />
         
-        {/* Overlay for better text readability */}
-        <div className="absolute inset-0 w-full h-[500px] bg-black/40" />
-        
         {/* Profile Content */}
         <div className="relative z-10 flex flex-col items-center text-center pt-20 pb-8">
           
