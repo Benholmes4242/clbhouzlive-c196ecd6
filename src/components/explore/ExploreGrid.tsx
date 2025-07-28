@@ -195,7 +195,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
               
               {/* Golf Club Tag */}
               {item.golfCourse && (
-                <div className="absolute top-3 left-3 bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg px-3 py-1 flex items-center gap-2 max-w-[70%] shadow-lg">
+                <div className="absolute top-3 left-3 bg-black/30 backdrop-blur-sm px-3 py-1.5 text-white shadow-lg hover:bg-black/40 transition-colors rounded-full flex items-center gap-2 max-w-[70%]">
                   <MapPin className="w-4 h-4 text-white flex-shrink-0" />
                   <span className="text-white text-sm font-medium truncate">
                     {item.golfCourse.name}
@@ -420,7 +420,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                 
                 {/* Golf Club Tag for large cards - matching clubhouse CoursePostBadge design */}
                 {layoutItem.item.golfCourse && (
-                  <div className="absolute top-3 left-3 flex items-center cursor-pointer bg-white/20 backdrop-blur-sm border border-white/30 px-2 py-1 text-white shadow-lg hover:bg-white/30 transition-colors" style={{ borderRadius: '8px' }}>
+                  <div className="absolute top-3 left-3 flex items-center cursor-pointer bg-black/30 backdrop-blur-sm px-3 py-1.5 text-white shadow-lg hover:bg-black/40 transition-colors rounded-full">
                     <MapPin className="h-5 w-5 mr-0.5 text-white" />
                     <span className="text-base font-medium">{layoutItem.item.golfCourse.name}</span>
                   </div>
@@ -429,7 +429,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                 {/* Film icon for videos */}
                 {layoutItem.item.type === 'video' && (
                   <div className="absolute bottom-3 right-3 z-20">
-                    <MdOutlinePlayCircle className="w-8 h-8 text-white drop-shadow-lg" />
+                    <MdOutlinePlayCircle className="w-6 h-6 text-white drop-shadow-lg" />
                   </div>
                 )}
                 
@@ -487,7 +487,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                 {/* Film icon for videos in regular cards */}
                 {layoutItem.item.type === 'video' && (
                   <div className="absolute bottom-2 right-2 z-20">
-                    <MdOutlinePlayCircle className="w-8 h-8 text-white drop-shadow-lg" />
+                    <MdOutlinePlayCircle className="w-6 h-6 text-white drop-shadow-lg" />
                   </div>
                 )}
               </div>

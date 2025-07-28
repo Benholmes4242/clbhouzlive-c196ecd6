@@ -114,7 +114,7 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
           {/* Play icon for non-autoplaying videos */}
           {!shouldAutoplay && !hidePlayButton && (
             <div className="absolute bottom-3 right-3 z-20">
-              <MdOutlinePlayCircle className="h-8 w-8 text-white drop-shadow-lg" />
+              <MdOutlinePlayCircle className="h-6 w-6 text-white drop-shadow-lg" />
             </div>
           )}
         </div>
