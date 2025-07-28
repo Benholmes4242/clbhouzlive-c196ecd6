@@ -1,6 +1,7 @@
 
 import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface MediaCarouselProps {
   mediaUrls: string[];
@@ -11,6 +12,7 @@ interface MediaCarouselProps {
 const MediaCarousel = ({ mediaUrls, mediaTypes, className = '' }: MediaCarouselProps) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const hasMultipleMedia = mediaUrls.length > 1;
+  const isMobile = useIsMobile();
 
   const handlePrevious = () => {
     setCurrentIndex(prev => prev > 0 ? prev - 1 : mediaUrls.length - 1);
@@ -74,8 +76,8 @@ const MediaCarousel = ({ mediaUrls, mediaTypes, className = '' }: MediaCarouselP
     <div className={`relative ${className}`}>
       {getCurrentMedia()}
       
-      {/* Dots indicator */}
-      {hasMultipleMedia && (
+      {/* Dots indicator - Hidden on mobile */}
+      {hasMultipleMedia && !isMobile && (
         <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-1 z-10">
           {mediaUrls.map((_, index) => (
             <button
