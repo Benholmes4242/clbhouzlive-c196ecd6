@@ -216,29 +216,33 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId })
             className="relative w-full h-[300px] md:h-[400px] flex items-center justify-center overflow-visible"
           >
             {videoHighlights.map((highlight, index) => {
-              // Calculate fan deck positions
+              // Calculate deck positions (cards lean out from bottom right)
               const offset = index - currentIndex;
               const absOffset = Math.abs(offset);
               
-              // Show cards with a fan effect
-              const isVisible = absOffset <= 2; // Show 2 cards on each side
+              // Show cards with a deck effect
+              const isVisible = absOffset <= 2; // Show 2 cards behind
               
-              // Calculate positioning for fan deck effect (simplified)
-              const translateX = offset * 25; // Horizontal spread
-              const translateY = absOffset * 10; // Vertical offset for depth
-              const rotateY = offset * 5; // Rotation for fan effect
-              const scale = 1 - (absOffset * 0.08); // Scale for depth
+              // Calculate positioning for deck effect from bottom right
+              const translateX = absOffset * 8; // Small horizontal offset to the right
+              const translateY = -absOffset * 8; // Move up slightly for depth
+              const rotate = absOffset * 3; // Slight rotation for deck effect
+              const scale = 1 - (absOffset * 0.05); // Very subtle scale for depth
               const zIndex = 10 - absOffset; // Z-index for layering
+              
+              // Only show cards behind the current one (positive offset) and current
+              const shouldShow = offset >= 0 && isVisible;
               
               return (
                 <div
                   key={highlight.id}
                   className={`absolute w-[280px] h-[280px] md:w-[350px] md:h-[350px] transition-all duration-500 ease-out cursor-pointer ${
-                    isVisible ? 'pointer-events-auto' : 'pointer-events-none opacity-0'
+                    shouldShow ? 'pointer-events-auto' : 'pointer-events-none opacity-0'
                   }`}
                   style={{
-                    transform: `translateX(${translateX}px) translateY(${translateY}px) rotateY(${rotateY}deg) scale(${scale})`,
-                    zIndex
+                    transform: `translateX(${translateX}px) translateY(${translateY}px) rotate(${rotate}deg) scale(${scale})`,
+                    zIndex,
+                    transformOrigin: 'bottom right'
                   }}
                   onClick={() => setCurrentIndex(index)}
                 >
@@ -252,7 +256,7 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId })
                       muted={isMuted}
                       loop
                       playsInline
-                      autoPlay={index === currentIndex}
+                      autoPlay={index === currentIndex} // Only autoplay the front card
                       poster={getVideoThumbnail(highlight.media_url) || undefined}
                     />
                     
