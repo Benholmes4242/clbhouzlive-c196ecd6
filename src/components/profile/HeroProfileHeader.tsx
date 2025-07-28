@@ -234,18 +234,32 @@ const HeroProfileHeader = ({
     <>
       {/* Dynamic Background - Auto-generated from profile photo */}
       <div className="relative w-full">
-        {/* Dynamic Blurred Background with integrated gradient overlay */}
+        {/* Apple Music Style Dynamic Background */}
+        <div 
+          className="absolute inset-0 w-full h-[500px] overflow-hidden"
+          style={{
+            backgroundImage: profile?.profile_photo_url 
+              ? `url(${profile.profile_photo_url}?t=${avatarKey})`
+              : 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-foreground)) 100%)',
+            backgroundSize: 'cover',
+            backgroundPosition: 'center top', // Focus on upper portion to avoid faces
+            backgroundRepeat: 'no-repeat',
+            filter: 'blur(40px) saturate(1.3) brightness(0.9)', // Heavy blur to obscure details
+            transform: 'scale(1.2)', // Larger scale to crop edges and hide recognizable features
+          }}
+        />
+        
+        {/* Enhanced Gradient Overlay for Text Contrast */}
         <div 
           className="absolute inset-0 w-full h-[500px]"
           style={{
-            backgroundImage: profile?.profile_photo_url 
-              ? `linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.4) 70%, rgba(0, 0, 0, 0.6) 100%), url(${profile.profile_photo_url}?t=${avatarKey})`
-              : 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-foreground)) 100%)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-            filter: 'blur(20px) saturate(1.2)',
-            transform: 'scale(1.1)', // Prevent edge artifacts
+            background: `
+              linear-gradient(180deg, 
+                rgba(0, 0, 0, 0.2) 0%, 
+                rgba(0, 0, 0, 0.4) 50%, 
+                rgba(0, 0, 0, 0.7) 100%
+              )
+            `,
           }}
         />
         
