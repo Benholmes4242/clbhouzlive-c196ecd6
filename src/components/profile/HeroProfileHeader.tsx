@@ -249,13 +249,6 @@ const HeroProfileHeader = ({
           }}
         />
         
-        {/* Gradient fade overlay to blend into background - shorter to stop before cards */}
-        <div 
-          className="absolute inset-0 w-full h-[450px]"
-          style={{
-            background: 'linear-gradient(180deg, transparent 0%, transparent 60%, hsl(var(--background)) 100%)'
-          }}
-        />
         
         {/* Profile Content */}
         <div className="relative z-10 flex flex-col items-center text-center pt-20 pb-8">
