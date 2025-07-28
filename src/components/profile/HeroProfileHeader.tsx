@@ -315,19 +315,19 @@ const HeroProfileHeader = ({
           {/* Centered User Information */}
           <div className="text-center mb-6">
             {/* User's Name */}
-            <h1 className="text-4xl font-bold mb-2 text-black">
+            <h1 className="text-4xl font-bold mb-2 text-white">
               {displayName}
             </h1>
             
             {/* Username */}
             {username && (
-              <p className="text-lg text-black mb-2">
+              <p className="text-lg text-white/80 mb-2">
                 @{username}
               </p>
             )}
             
             {/* Home Golf Club */}
-            <p className="text-base text-black">
+            <p className="text-base text-white/70">
               {homeClub}
             </p>
           </div>
