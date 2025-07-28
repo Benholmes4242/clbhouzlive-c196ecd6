@@ -456,14 +456,28 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                 maxHeight: '100vh'
               }}
             >
-              {/* Close Button - Top Right */}
+              {/* Close Button - Top Left */}
               <button
                 onClick={onClose}
-                className="absolute top-6 right-6 z-30 p-0 rounded-full text-white hover:bg-white/20 transition-colors"
+                className="absolute top-6 left-6 z-30 p-0 rounded-full text-white hover:bg-white/20 transition-colors"
                 aria-label="Close"
               >
                 <Minimize2 className="w-6 h-6" />
               </button>
+
+              {/* Golf Course Tag - Top Right */}
+              {item.golfCourse && (
+                <div className="absolute top-6 right-6 z-30">
+                  <CoursePostBadge 
+                    course={{
+                      id: item.golfCourse.id,
+                      name: item.golfCourse.name,
+                      country: item.golfCourse.country
+                    }}
+                    isClubhouse={true}
+                  />
+                </div>
+              )}
 
 
               {/* Media Content */}
@@ -516,21 +530,6 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                       <span className="font-semibold text-xl text-white" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
                         {item.user?.name || 'Unknown User'}
                       </span>
-                      
-                      {/* Golf Course Badge below username */}
-                      {item.golfCourse && (
-                        <div className="mt-1">
-                          <CoursePostBadge 
-                            course={{
-                              id: item.golfCourse.id,
-                              name: item.golfCourse.name,
-                              country: item.golfCourse.country
-                            }}
-                            className="bg-black/20 backdrop-blur-sm border border-white/30"
-                            isClubhouse={true}
-                          />
-                        </div>
-                      )}
                     </div>
                   </div>
                 )}
