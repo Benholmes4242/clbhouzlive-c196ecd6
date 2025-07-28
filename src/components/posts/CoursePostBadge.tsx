@@ -22,27 +22,57 @@ const CoursePostBadge = ({ course, className = "", isClubhouse = false }: Course
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [showFullName, setShowFullName] = useState(false);
+  const [needsTruncation, setNeedsTruncation] = useState(false);
 
-  // Truncate to 4 words on mobile clubhouse only
+  // Truncate to 4 words when text is too long
   const truncateToFourWords = (text: string) => {
     const words = text.split(' ');
     if (words.length <= 4) return text;
     return words.slice(0, 4).join(' ') + '...';
   };
 
-  const shouldTruncate = isMobile && isClubhouse;
-  const isTruncated = shouldTruncate && course.name.split(' ').length > 4;
-  const displayName = (shouldTruncate && !showFullName) ? truncateToFourWords(course.name) : course.name;
+  // Check if text needs truncation based on available screen width
+  React.useEffect(() => {
+    if (!isClubhouse) {
+      setNeedsTruncation(false);
+      return;
+    }
+
+    const checkTextWidth = () => {
+      // Create a temporary element to measure text width
+      const tempElement = document.createElement('span');
+      tempElement.style.visibility = 'hidden';
+      tempElement.style.position = 'absolute';
+      tempElement.style.fontSize = '16px';
+      tempElement.style.fontWeight = '500';
+      tempElement.style.fontFamily = getComputedStyle(document.body).fontFamily;
+      tempElement.textContent = course.name;
+      document.body.appendChild(tempElement);
+      
+      const textWidth = tempElement.offsetWidth;
+      document.body.removeChild(tempElement);
+      
+      // Calculate available width (screen width minus padding and icon space)
+      const screenWidth = window.innerWidth;
+      const availableWidth = screenWidth - 120; // Account for padding, icon, and margins
+      
+      setNeedsTruncation(textWidth > availableWidth);
+    };
+
+    checkTextWidth();
+    window.addEventListener('resize', checkTextWidth);
+    return () => window.removeEventListener('resize', checkTextWidth);
+  }, [course.name, isClubhouse]);
+
+  const displayName = (needsTruncation && !showFullName) ? truncateToFourWords(course.name) : course.name;
 
   const handleCourseClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     
-    // Mobile behavior: first click shows full name, second click navigates
-    if (isMobile && isClubhouse && isTruncated) {
-      if (!showFullName) {
-        setShowFullName(true);
-        return;
-      }
+    // If text is truncated, first click shows full name, second click navigates
+    if (needsTruncation && !showFullName) {
+      setShowFullName(true);
+      return;
     }
     
     // Navigate to course page
