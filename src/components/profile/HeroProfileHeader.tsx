@@ -373,7 +373,7 @@ const HeroProfileHeader = ({
         {/* Activity Section - directly after stats bar */}
         <div 
           id="activity"
-          className="pb-8"
+          className=""
           ref={activityRef}
         >
             <ProfileSectionCarousel onSectionChange={onSectionChange} />
