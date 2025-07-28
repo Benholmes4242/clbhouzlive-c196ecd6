@@ -213,8 +213,7 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId })
           {/* Fan Deck Video Container */}
           <div 
             {...swipeHandlers}
-            className="relative w-full h-[300px] md:h-[400px] flex items-center justify-center"
-            style={{ perspective: '1000px' }}
+            className="relative w-full h-[300px] md:h-[400px] flex items-center justify-center overflow-visible"
           >
             {videoHighlights.map((highlight, index) => {
               // Calculate fan deck positions
@@ -224,11 +223,11 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId })
               // Show cards with a fan effect
               const isVisible = absOffset <= 2; // Show 2 cards on each side
               
-              // Calculate positioning for fan deck effect
-              const translateX = offset * 20; // Horizontal spread
-              const translateZ = -absOffset * 50; // Depth positioning
-              const rotateY = offset * 8; // Rotation for fan effect
-              const scale = 1 - (absOffset * 0.1); // Scale for depth
+              // Calculate positioning for fan deck effect (simplified)
+              const translateX = offset * 25; // Horizontal spread
+              const translateY = absOffset * 10; // Vertical offset for depth
+              const rotateY = offset * 5; // Rotation for fan effect
+              const scale = 1 - (absOffset * 0.08); // Scale for depth
               const zIndex = 10 - absOffset; // Z-index for layering
               
               return (
@@ -238,9 +237,8 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId })
                     isVisible ? 'pointer-events-auto' : 'pointer-events-none opacity-0'
                   }`}
                   style={{
-                    transform: `translateX(${translateX}px) translateZ(${translateZ}px) rotateY(${rotateY}deg) scale(${scale})`,
-                    zIndex,
-                    transformStyle: 'preserve-3d'
+                    transform: `translateX(${translateX}px) translateY(${translateY}px) rotateY(${rotateY}deg) scale(${scale})`,
+                    zIndex
                   }}
                   onClick={() => setCurrentIndex(index)}
                 >
