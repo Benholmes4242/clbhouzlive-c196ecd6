@@ -249,20 +249,6 @@ const HeroProfileHeader = ({
           }}
         />
         
-        {/* Enhanced Gradient Overlay for Text Contrast */}
-        <div 
-          className="absolute inset-0 w-full h-[500px]"
-          style={{
-            background: `
-              linear-gradient(180deg, 
-                rgba(0, 0, 0, 0.2) 0%, 
-                rgba(0, 0, 0, 0.4) 50%, 
-                rgba(0, 0, 0, 0.7) 100%
-              )
-            `,
-          }}
-        />
-        
         {/* Profile Content */}
         <div className="relative z-10 flex flex-col items-center text-center pt-20 pb-8">
           
