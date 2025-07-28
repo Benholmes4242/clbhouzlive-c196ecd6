@@ -230,9 +230,9 @@ const HeroProfileHeader = ({
     <>
       {/* Fullscreen Blurred Background - stops between stats bar and activity cards */}
       <div className="relative w-full">
-        {/* Blurred Background Image - extends under header */}
+        {/* Blurred Background Image - extends up to cover header area */}
         <div 
-          className="fixed top-0 left-0 w-full h-[500px] bg-cover bg-center z-0"
+          className="absolute -top-16 left-0 w-full h-[516px] bg-cover bg-center"
           style={{
             backgroundImage: profile?.profile_photo_url 
               ? `url(${profile.profile_photo_url}?t=${avatarKey})` 
