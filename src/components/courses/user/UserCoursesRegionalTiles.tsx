@@ -107,10 +107,10 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
                   <button
                     key={option.key}
                     onClick={() => onSortChange(option.key)}
-                    className={`flex items-center gap-2 text-base font-medium whitespace-nowrap px-1 py-1.5 shadow-lg shadow-black/10 transition-colors hover:bg-white/30 ${
+                    className={`flex items-center gap-2 text-base font-medium whitespace-nowrap px-1 py-1.5 shadow-lg shadow-black/10 transition-colors hover:bg-black/60 ${
                       sortBy === option.key 
-                        ? "bg-white/40 backdrop-blur-sm border border-white/50 text-white" 
-                        : "bg-white/20 backdrop-blur-sm border border-white/30 text-white"
+                        ? "bg-black/50 backdrop-blur-sm border border-black/30 text-white" 
+                        : "bg-black/40 backdrop-blur-sm border border-black/20 text-white"
                     }`}
                     style={{ borderRadius: '8px' }}
                   >
@@ -128,10 +128,10 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
                     <button
                       key={option.key}
                       onClick={() => onSortChange(option.key)}
-                      className={`flex items-center justify-center text-sm font-medium px-2 py-1.5 shadow-lg shadow-black/10 transition-colors flex-1 hover:bg-white/30 ${
+                      className={`flex items-center justify-center text-sm font-medium px-2 py-1.5 shadow-lg shadow-black/10 transition-colors flex-1 hover:bg-black/60 ${
                         sortBy === option.key 
-                          ? "bg-white/40 backdrop-blur-sm border border-white/50 text-white" 
-                          : "bg-white/20 backdrop-blur-sm border border-white/30 text-white"
+                          ? "bg-black/50 backdrop-blur-sm border border-black/30 text-white" 
+                          : "bg-black/40 backdrop-blur-sm border border-black/20 text-white"
                       }`}
                       style={{ borderRadius: '8px' }}
                     >
@@ -155,10 +155,10 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
                     <TooltipTrigger asChild>
                       <button
                         onClick={() => onFilterChange(activeFilter === tile.key ? null : tile.key)}
-                        className={`flex items-center justify-center gap-1 cursor-pointer transition-colors whitespace-nowrap px-0.5 py-1.5 shadow-lg shadow-black/10 text-base font-medium hover:bg-white/30 ${
+                        className={`flex items-center justify-center gap-1 cursor-pointer transition-colors whitespace-nowrap px-0.5 py-1.5 shadow-lg shadow-black/10 text-base font-medium hover:bg-black/60 ${
                           activeFilter === tile.key 
-                            ? 'bg-white/40 backdrop-blur-sm border border-white/50 text-white' 
-                            : 'bg-white/20 backdrop-blur-sm border border-white/30 text-white'
+                            ? 'bg-black/50 backdrop-blur-sm border border-black/30 text-white' 
+                            : 'bg-black/40 backdrop-blur-sm border border-black/20 text-white'
                         }`}
                         style={{ borderRadius: '8px' }}
                       >
@@ -188,10 +188,10 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
                     <TooltipTrigger asChild>
                       <button
                         onClick={() => onFilterChange(activeFilter === tile.key ? null : tile.key)}
-                        className={`flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors px-1 py-0.5 shadow-lg shadow-black/10 text-sm font-medium hover:bg-white/30 ${
+                        className={`flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors px-1 py-0.5 shadow-lg shadow-black/10 text-sm font-medium hover:bg-black/60 ${
                           activeFilter === tile.key 
-                            ? 'bg-white/40 backdrop-blur-sm border border-white/50 text-white' 
-                            : 'bg-white/20 backdrop-blur-sm border border-white/30 text-white'
+                            ? 'bg-black/50 backdrop-blur-sm border border-black/30 text-white' 
+                            : 'bg-black/40 backdrop-blur-sm border border-black/20 text-white'
                         }`}
                         style={{ borderRadius: '8px' }}
                       >
