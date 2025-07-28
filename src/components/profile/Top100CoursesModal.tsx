@@ -52,7 +52,7 @@ const Top100CoursesModal: React.FC<Top100CoursesModalProps> = ({
             placeholder="Search courses by name, country, or region..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
+            className="pl-10 bg-black/25 backdrop-blur-md shadow-xl rounded-full py-2 border-none text-white placeholder:text-white/70"
           />
         </div>
         
