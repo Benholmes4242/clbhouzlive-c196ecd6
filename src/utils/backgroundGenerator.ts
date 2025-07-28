@@ -1,17 +1,12 @@
 /**
  * Utility functions for generating dynamic backgrounds from profile photos
- * Inspired by Apple Music and Spotify's dynamic background approach
+ * Inspired by Apple Music and Spotify's color-based background approach
  */
 
 /**
- * Creates a canvas element with a blurred and colorized version of the source image
- * This mimics Apple Music's background generation approach
+ * Extracts dominant colors from an image using canvas analysis
  */
-export const generateDynamicBackground = (
-  imageUrl: string,
-  width: number = 400,
-  height: number = 600
-): Promise<string> => {
+export const extractDominantColors = (imageUrl: string): Promise<string[]> => {
   return new Promise((resolve, reject) => {
     const img = new Image();
     img.crossOrigin = 'anonymous';
@@ -25,43 +20,93 @@ export const generateDynamicBackground = (
         return;
       }
       
-      canvas.width = width;
-      canvas.height = height;
+      // Use a smaller canvas for color analysis (performance)
+      const analysisSize = 100;
+      canvas.width = analysisSize;
+      canvas.height = analysisSize;
       
-      // Draw the image scaled to fill the canvas
-      const scale = Math.max(width / img.width, height / img.height);
-      const scaledWidth = img.width * scale;
-      const scaledHeight = img.height * scale;
-      const offsetX = (width - scaledWidth) / 2;
-      const offsetY = (height - scaledHeight) / 2;
+      // Draw the image scaled down
+      ctx.drawImage(img, 0, 0, analysisSize, analysisSize);
       
-      ctx.drawImage(img, offsetX, offsetY, scaledWidth, scaledHeight);
+      // Get image data
+      const imageData = ctx.getImageData(0, 0, analysisSize, analysisSize);
+      const data = imageData.data;
       
-      // Apply blur effect using canvas filter
-      ctx.filter = 'blur(40px) saturate(1.2) brightness(0.8)';
-      ctx.drawImage(canvas, 0, 0);
+      // Collect colors (sample every 4th pixel for performance)
+      const colorMap = new Map<string, number>();
       
-      // Add a subtle gradient overlay for better text contrast
-      const gradient = ctx.createLinearGradient(0, 0, 0, height);
-      gradient.addColorStop(0, 'rgba(0, 0, 0, 0.3)');
-      gradient.addColorStop(0.7, 'rgba(0, 0, 0, 0.4)');
-      gradient.addColorStop(1, 'rgba(0, 0, 0, 0.6)');
+      for (let i = 0; i < data.length; i += 16) { // Skip pixels for performance
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+        const a = data[i + 3];
+        
+        // Skip transparent or very light/dark pixels
+        if (a < 128 || (r + g + b) < 50 || (r + g + b) > 650) continue;
+        
+        // Group similar colors together (reduce precision)
+        const rBucket = Math.floor(r / 32) * 32;
+        const gBucket = Math.floor(g / 32) * 32;
+        const bBucket = Math.floor(b / 32) * 32;
+        
+        const colorKey = `${rBucket},${gBucket},${bBucket}`;
+        colorMap.set(colorKey, (colorMap.get(colorKey) || 0) + 1);
+      }
       
-      ctx.globalCompositeOperation = 'overlay';
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, width, height);
+      // Sort colors by frequency and get top colors
+      const sortedColors = Array.from(colorMap.entries())
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5) // Get top 5 colors
+        .map(([color]) => {
+          const [r, g, b] = color.split(',').map(Number);
+          return `rgb(${r}, ${g}, ${b})`;
+        });
       
-      // Convert to data URL
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-      resolve(dataUrl);
+      // Ensure we have at least 2 colors for gradient
+      if (sortedColors.length < 2) {
+        sortedColors.push('rgb(64, 64, 64)', 'rgb(32, 32, 32)');
+      }
+      
+      resolve(sortedColors);
     };
     
     img.onerror = () => {
-      reject(new Error('Failed to load image'));
+      reject(new Error('Failed to load image for color analysis'));
     };
     
     img.src = imageUrl;
   });
+};
+
+/**
+ * Generates a color palette gradient from an image
+ */
+export const generateColorBasedBackground = async (imageUrl: string): Promise<string> => {
+  try {
+    const colors = await extractDominantColors(imageUrl);
+    
+    // Create a gradient using the dominant colors
+    const primaryColor = colors[0];
+    const secondaryColor = colors[1] || colors[0];
+    
+    // Convert RGB to darker, more muted versions for better text contrast
+    const darkenColor = (rgb: string, factor: number = 0.3) => {
+      const match = rgb.match(/\d+/g);
+      if (!match) return rgb;
+      
+      const [r, g, b] = match.map(Number);
+      return `rgb(${Math.floor(r * factor)}, ${Math.floor(g * factor)}, ${Math.floor(b * factor)})`;
+    };
+    
+    const darkPrimary = darkenColor(primaryColor, 0.4);
+    const darkSecondary = darkenColor(secondaryColor, 0.2);
+    
+    return `linear-gradient(135deg, ${darkPrimary} 0%, ${darkSecondary} 50%, rgba(0, 0, 0, 0.8) 100%)`;
+  } catch (error) {
+    console.error('Error generating color-based background:', error);
+    // Fallback to default gradient
+    return 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-foreground)) 100%)';
+  }
 };
 
 /**

@@ -18,7 +18,7 @@ import { extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import UserCoursesContent from '@/components/courses/UserCoursesContent';
 import HandicapSection from './HandicapSection';
 import ProfileSectionCarousel from './ProfileSectionCarousel';
-import { createDynamicBackgroundStyle } from '@/utils/backgroundGenerator';
+import { generateColorBasedBackground } from '@/utils/backgroundGenerator';
 
 interface Course {
   id: string;
@@ -63,6 +63,7 @@ const HeroProfileHeader = ({
   const [uploading, setUploading] = useState(false);
   const [avatarKey, setAvatarKey] = useState(Date.now()); // Add cache-busting key
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [colorBasedBackground, setColorBasedBackground] = useState<string>('');
   
   // Stats state
   const [ratedCoursesCount, setRatedCoursesCount] = useState(0);
@@ -132,6 +133,27 @@ const HeroProfileHeader = ({
   useEffect(() => {
     setAvatarKey(Date.now());
   }, [profile?.profile_photo_url]);
+
+  // Generate color-based background from profile photo
+  useEffect(() => {
+    const generateBackground = async () => {
+      if (profile?.profile_photo_url) {
+        try {
+          const backgroundGradient = await generateColorBasedBackground(
+            `${profile.profile_photo_url}?t=${avatarKey}`
+          );
+          setColorBasedBackground(backgroundGradient);
+        } catch (error) {
+          console.error('Failed to generate color-based background:', error);
+          setColorBasedBackground('linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-foreground)) 100%)');
+        }
+      } else {
+        setColorBasedBackground('linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-foreground)) 100%)');
+      }
+    };
+
+    generateBackground();
+  }, [profile?.profile_photo_url, avatarKey]);
 
 
   const handlePhotoUpload = async (file: File) => {
@@ -234,18 +256,11 @@ const HeroProfileHeader = ({
     <>
       {/* Dynamic Background - Auto-generated from profile photo */}
       <div className="relative w-full">
-        {/* Dynamic Blurred Background with integrated gradient overlay */}
+        {/* Color-based Dynamic Background */}
         <div 
           className="absolute inset-0 w-full h-[500px]"
           style={{
-            backgroundImage: profile?.profile_photo_url 
-              ? `linear-gradient(180deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.4) 70%, rgba(0, 0, 0, 0.6) 100%), url(${profile.profile_photo_url}?t=${avatarKey})`
-              : 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-foreground)) 100%)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-            filter: 'blur(20px) saturate(1.2)',
-            transform: 'scale(1.1)', // Prevent edge artifacts
+            background: colorBasedBackground || 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-foreground)) 100%)',
           }}
         />
         
