@@ -27,12 +27,12 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
     <div className="text-center space-y-2">
       {/* Add more spacing for business profiles */}
       <div className={isIndividual ? "mt-0" : "mt-8"}>
-        <h1 className="text-2xl font-bold">{displayName}</h1>
+        <h1 className="text-2xl font-bold text-black">{displayName}</h1>
       </div>
       
       {/* Only show username for individual users */}
       {isIndividual && username && (
-        <p className="text-muted-foreground text-lg">{username}</p>
+        <p className="text-black text-lg">{username}</p>
       )}
       
       {/* Show follower stats under name for non-individual users */}

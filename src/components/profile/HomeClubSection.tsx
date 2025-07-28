@@ -39,7 +39,7 @@ const HomeClubSection: React.FC<HomeClubSectionProps> = ({
         </>
       ) : (
         <>
-          <span className="font-semibold px-2">{homeClub || "Not set"}</span>
+          <span className="font-semibold px-2 text-black">{homeClub || "Not set"}</span>
           <Button variant="ghost" size="sm" onClick={onEditClick}>Edit</Button>
         </>
       )}
