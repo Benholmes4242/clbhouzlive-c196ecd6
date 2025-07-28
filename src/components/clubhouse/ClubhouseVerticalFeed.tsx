@@ -586,7 +586,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
               <div className="absolute bottom-24 left-3 right-20 z-20">
                 {/* User Profile Section */}
                 {index === currentIndex && (
-                  <div className="mb-3 flex items-center space-x-3">
+                  <div className="mb-3 flex items-end space-x-3">
                     {/* Profile Photo */}
                     <div className="relative">
                       <img
@@ -599,15 +599,11 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                       />
                     </div>
                     
-                     {/* Username and Golf Course */}
+                     {/* Golf Course and Username */}
                      <div className="flex flex-col">
-                       <span className="font-semibold text-xl text-white" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
-                         {item.user?.name || 'Unknown User'}
-                       </span>
-                       
-                        {/* Golf Course Badge below username */}
+                        {/* Golf Course Badge at top */}
                         {item.golfCourse && (
-                          <div className="mt-1">
+                          <div className="mb-1">
                             <CoursePostBadge 
                               course={{
                                 id: item.golfCourse.id,
@@ -618,6 +614,10 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                             />
                           </div>
                         )}
+                        
+                       <span className="font-semibold text-xl text-white" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
+                         {item.user?.name || 'Unknown User'}
+                       </span>
                      </div>
                   </div>
                 )}
