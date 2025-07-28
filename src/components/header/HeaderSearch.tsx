@@ -130,11 +130,11 @@ const HeaderSearch = () => {
       {/* Desktop Search Bar */}
       <div className="hidden md:flex items-center max-w-md w-full mx-4" ref={searchRef}>
         <div className="relative w-full">
-          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4 z-10" />
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white h-4 w-4 z-10" />
           <input
             type="text"
             placeholder="Search players, courses, or content..."
-            className="w-full pl-12 pr-10 py-3 bg-black/20 backdrop-blur-sm rounded-full focus:outline-none focus:ring-2 focus:ring-muted-foreground/10 transition-all duration-200 text-white placeholder-white/70"
+            className="w-full pl-12 pr-10 py-2 bg-black/20 backdrop-blur-sm rounded-full focus:outline-none focus:ring-2 focus:ring-muted-foreground/10 transition-all duration-200 text-white placeholder-white/70"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onFocus={handleInputFocus}
@@ -143,7 +143,7 @@ const HeaderSearch = () => {
           {query && (
             <button
               onClick={handleClearInput}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors z-10"
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white hover:text-white/70 transition-colors z-10"
             >
               <X className="h-4 w-4" />
             </button>
@@ -189,12 +189,12 @@ const HeaderSearch = () => {
           style={{ pointerEvents: 'auto' }}
         >
           <div className="relative w-full" style={{ pointerEvents: 'auto' }}>
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4 z-10" />
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white h-4 w-4 z-10" />
             <input
               ref={inputRef}
               type="text"
               placeholder="Search players, courses, or content..."
-              className="w-full pl-12 pr-10 py-3 bg-black/20 backdrop-blur-sm rounded-full focus:outline-none focus:ring-2 focus:ring-muted-foreground/10 transition-all duration-200 text-white placeholder-white/70"
+              className="w-full pl-12 pr-10 py-2 bg-black/20 backdrop-blur-sm rounded-full focus:outline-none focus:ring-2 focus:ring-muted-foreground/10 transition-all duration-200 text-white placeholder-white/70"
               value={query}
               onChange={(e) => {
                 setQuery(e.target.value);
@@ -206,7 +206,7 @@ const HeaderSearch = () => {
             {query && (
               <button
                 onClick={handleClearInput}
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors z-10"
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white hover:text-white/70 transition-colors z-10"
               >
                 <X className="h-4 w-4" />
               </button>
