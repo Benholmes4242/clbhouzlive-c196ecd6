@@ -332,7 +332,7 @@ const HeroProfileHeader = ({
           {/* Thinner Stats Bar */}
           <div className="w-full max-w-md">
             <div className="bg-black/25 backdrop-blur-md shadow-xl rounded-full py-2">
-              <div className="flex items-center justify-around w-full">
+              <div className="flex items-center justify-around w-full px-6 space-x-4">
                 <div className="text-center">
                   <div className="text-lg font-bold text-white">
                     {profile?.eg_handicap_index ? profile.eg_handicap_index.toFixed(1) : '--'}
