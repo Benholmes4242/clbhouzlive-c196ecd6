@@ -331,7 +331,7 @@ const HeroProfileHeader = ({
 
           {/* Thinner Stats Bar */}
           <div className="w-full max-w-md">
-            <div className="bg-white/20 backdrop-blur-sm border border-white/30 shadow-lg rounded-xl py-3 px-4">
+            <div className="bg-black/40 backdrop-blur-md border border-white/20 shadow-xl rounded-xl py-3 px-4">
               <div className="flex items-center justify-around w-full">
                 <div className="text-center">
                   <div className="text-lg font-bold text-white">
