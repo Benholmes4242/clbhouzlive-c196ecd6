@@ -200,7 +200,7 @@ const MosaicFeedContent: React.FC<MosaicFeedContentProps> = ({
                       <div
                         key={index}
                         className={`w-2 h-2 rounded-full transition-colors ${
-                          index === currentIndex ? 'bg-white' : 'bg-white/40'
+                          index === currentIndex ? 'bg-black' : 'bg-black/40'
                         }`}
                       />
                     ))}

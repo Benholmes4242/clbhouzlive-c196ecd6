@@ -241,7 +241,7 @@ const CreateMomentModal = ({
                 key={index}
                 onClick={() => setCurrentMediaIndex(index)}
                 className={`w-2 h-2 rounded-full transition-colors ${
-                  index === currentMediaIndex ? 'bg-white' : 'bg-white/50'
+                  index === currentMediaIndex ? 'bg-black' : 'bg-black/50'
                 }`}
               />
             ))}

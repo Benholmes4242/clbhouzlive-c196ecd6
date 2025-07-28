@@ -404,8 +404,8 @@ const FullscreenMediaModal = ({
                 disabled={isTransitioning}
                 className={`w-2 h-2 rounded-full transition-colors duration-200 ${
                   index === currentIndex 
-                    ? "bg-white" 
-                    : "bg-white/50 hover:bg-white/70"
+                    ? "bg-black" 
+                    : "bg-black/50 hover:bg-black/70"
                 }`}
                 aria-label={`Go to media ${index + 1}`}
               />
