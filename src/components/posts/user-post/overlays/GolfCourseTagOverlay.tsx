@@ -22,7 +22,7 @@ export const GolfCourseTagOverlay: React.FC<GolfCourseTagOverlayProps> = ({
     <>
       {/* Desktop: Show full tag in top-right */}
       {!isMobile ? (
-        <div className="absolute top-20 right-3 z-20">
+        <div className="absolute top-6 right-6 z-20">
           <CoursePostBadge 
             course={{
               id: golfCourse.id,
