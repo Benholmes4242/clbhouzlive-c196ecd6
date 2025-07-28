@@ -228,9 +228,9 @@ const HeroProfileHeader = ({
       const fileName = `cover_${Date.now()}.${fileExt}`;
       const filePath = `${user.id}/${fileName}`; // Include user ID in path
 
-      // Upload to Supabase storage
+      // Upload to Supabase storage (using avatars bucket which we know works)
       const { error: uploadError } = await supabase.storage
-        .from('profile-backgrounds')
+        .from('avatars')
         .upload(filePath, file, {
           upsert: true,
           contentType: file.type
@@ -243,7 +243,7 @@ const HeroProfileHeader = ({
 
       // Get public URL
       const { data } = supabase.storage
-        .from('profile-backgrounds')
+        .from('avatars')
         .getPublicUrl(filePath);
 
       const publicUrl = data.publicUrl;
