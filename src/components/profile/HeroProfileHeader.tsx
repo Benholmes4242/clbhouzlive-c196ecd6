@@ -308,13 +308,13 @@ const HeroProfileHeader = ({
             
             {/* Username */}
             {username && (
-              <p className="text-xl text-white/90 mb-2 drop-shadow">
+              <p className="text-xl text-white mb-2 drop-shadow">
                 @{username}
               </p>
             )}
             
             {/* Home Golf Club - aligned with Change Cover Photo button */}
-            <p className="text-lg text-white/80 drop-shadow">
+            <p className="text-lg text-white drop-shadow">
               {homeClub}
             </p>
           </div>
