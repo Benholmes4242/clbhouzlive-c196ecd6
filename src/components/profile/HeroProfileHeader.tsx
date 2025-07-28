@@ -311,9 +311,9 @@ const HeroProfileHeader = ({
           )}
         </div>
 
-        {/* Stats Bar - Clean modern design */}
+        {/* Stats Bar - Glassmorphism design */}
         <div className="relative mb-6">
-          <div className="bg-white shadow-[0_2px_8px_rgba(0,0,0,0.04)] rounded-xl p-4">
+          <div className="bg-white/20 backdrop-blur-sm border border-white/30 shadow-lg rounded-xl p-4">
             <div className="flex items-center justify-around w-full">
               <div className="text-center">
                 <div className="text-lg font-bold text-[#222]">
