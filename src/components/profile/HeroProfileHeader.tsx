@@ -318,8 +318,6 @@ const HeroProfileHeader = ({
           }}
         />
         
-        {/* Dark overlay for text readability */}
-        <div className="absolute inset-0 w-full h-[500px] bg-gradient-to-b from-black/40 via-black/50 to-black/60" />
         
         {/* Profile Content */}
         <div className="relative z-10 flex flex-col items-center text-center pt-20 pb-8">
