@@ -34,7 +34,7 @@ const Header = () => {
           </div>
 
           {/* Search Bar - Desktop */}
-          <div className="flex-1 max-w-md mx-2 md:mx-4 min-w-0">
+          <div className="flex-1 max-w-md mx-2 md:mx-4 min-w-0 flex items-end h-10 md:h-12">
             <HeaderSearch />
           </div>
 
