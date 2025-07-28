@@ -4,7 +4,52 @@
  */
 
 /**
- * Extracts dominant colors from an image using canvas analysis
+ * Converts RGB to HSL for better color manipulation
+ */
+const rgbToHsl = (r: number, g: number, b: number): [number, number, number] => {
+  r /= 255; g /= 255; b /= 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  let h = 0, s = 0, l = (max + min) / 2;
+
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    switch (max) {
+      case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+      case g: h = (b - r) / d + 2; break;
+      case b: h = (r - g) / d + 4; break;
+    }
+    h /= 6;
+  }
+  return [h * 360, s * 100, l * 100];
+};
+
+/**
+ * Converts HSL back to RGB
+ */
+const hslToRgb = (h: number, s: number, l: number): [number, number, number] => {
+  h /= 360; s /= 100; l /= 100;
+  const c = (1 - Math.abs(2 * l - 1)) * s;
+  const x = c * (1 - Math.abs((h * 6) % 2 - 1));
+  const m = l - c / 2;
+  let r = 0, g = 0, b = 0;
+
+  if (0 <= h && h < 1/6) { r = c; g = x; b = 0; }
+  else if (1/6 <= h && h < 2/6) { r = x; g = c; b = 0; }
+  else if (2/6 <= h && h < 3/6) { r = 0; g = c; b = x; }
+  else if (3/6 <= h && h < 4/6) { r = 0; g = x; b = c; }
+  else if (4/6 <= h && h < 5/6) { r = x; g = 0; b = c; }
+  else if (5/6 <= h && h < 1) { r = c; g = 0; b = x; }
+
+  return [
+    Math.round((r + m) * 255),
+    Math.round((g + m) * 255),
+    Math.round((b + m) * 255)
+  ];
+};
+
+/**
+ * Extracts and harmonizes colors from an image for elegant gradients
  */
 export const extractDominantColors = (imageUrl: string): Promise<string[]> => {
   return new Promise((resolve, reject) => {
@@ -20,8 +65,8 @@ export const extractDominantColors = (imageUrl: string): Promise<string[]> => {
         return;
       }
       
-      // Use a smaller canvas for color analysis (performance)
-      const analysisSize = 100;
+      // Use a smaller canvas for color analysis
+      const analysisSize = 150;
       canvas.width = analysisSize;
       canvas.height = analysisSize;
       
@@ -32,42 +77,79 @@ export const extractDominantColors = (imageUrl: string): Promise<string[]> => {
       const imageData = ctx.getImageData(0, 0, analysisSize, analysisSize);
       const data = imageData.data;
       
-      // Collect colors (sample every 4th pixel for performance)
+      // Collect colors with better filtering
       const colorMap = new Map<string, number>();
       
-      for (let i = 0; i < data.length; i += 16) { // Skip pixels for performance
+      for (let i = 0; i < data.length; i += 12) { // Sample more pixels
         const r = data[i];
         const g = data[i + 1];
         const b = data[i + 2];
         const a = data[i + 3];
         
-        // Skip transparent or very light/dark pixels
-        if (a < 128 || (r + g + b) < 50 || (r + g + b) > 650) continue;
+        // Skip transparent pixels
+        if (a < 200) continue;
         
-        // Group similar colors together (reduce precision)
-        const rBucket = Math.floor(r / 32) * 32;
-        const gBucket = Math.floor(g / 32) * 32;
-        const bBucket = Math.floor(b / 32) * 32;
+        // Convert to HSL for better analysis
+        const [h, s, l] = rgbToHsl(r, g, b);
         
-        const colorKey = `${rBucket},${gBucket},${bBucket}`;
+        // Filter out colors that are too dark, too light, or too gray
+        if (l < 20 || l > 85 || s < 15) continue;
+        
+        // Group similar colors with higher precision
+        const hBucket = Math.round(h / 15) * 15; // Group hues in 15° buckets
+        const sBucket = Math.round(s / 20) * 20; // Group saturation in 20% buckets
+        const lBucket = Math.round(l / 15) * 15; // Group lightness in 15% buckets
+        
+        const colorKey = `${hBucket},${sBucket},${lBucket}`;
         colorMap.set(colorKey, (colorMap.get(colorKey) || 0) + 1);
       }
       
-      // Sort colors by frequency and get top colors
+      // Get top colors and harmonize them
       const sortedColors = Array.from(colorMap.entries())
         .sort((a, b) => b[1] - a[1])
-        .slice(0, 5) // Get top 5 colors
+        .slice(0, 8) // Get more colors to work with
         .map(([color]) => {
-          const [r, g, b] = color.split(',').map(Number);
-          return `rgb(${r}, ${g}, ${b})`;
+          const [h, s, l] = color.split(',').map(Number);
+          
+          // Harmonize colors: boost saturation slightly, adjust lightness
+          const harmonizedS = Math.min(s + 10, 70); // Boost saturation but cap it
+          const harmonizedL = Math.max(30, Math.min(70, l)); // Keep lightness in pleasant range
+          
+          const [r, g, b] = hslToRgb(h, harmonizedS, harmonizedL);
+          return { r, g, b, h, s: harmonizedS, l: harmonizedL, count: colorMap.get(color)! };
         });
       
-      // Ensure we have at least 2 colors for gradient
-      if (sortedColors.length < 2) {
-        sortedColors.push('rgb(64, 64, 64)', 'rgb(32, 32, 32)');
+      if (sortedColors.length === 0) {
+        // Fallback to warm neutral colors
+        resolve(['rgb(120, 119, 196)', 'rgb(255, 159, 124)', 'rgb(255, 207, 84)']);
+        return;
       }
       
-      resolve(sortedColors);
+      // Generate harmonious color palette
+      const baseColor = sortedColors[0];
+      const harmonizedColors: string[] = [];
+      
+      // Add the primary color
+      harmonizedColors.push(`rgb(${baseColor.r}, ${baseColor.g}, ${baseColor.b})`);
+      
+      // Generate complementary and analogous colors
+      const complementaryH = (baseColor.h + 180) % 360;
+      const analogous1H = (baseColor.h + 30) % 360;
+      const analogous2H = (baseColor.h - 30 + 360) % 360;
+      
+      // Create harmonious variations
+      const variations = [
+        { h: complementaryH, s: Math.max(25, baseColor.s - 15), l: Math.max(40, baseColor.l + 10) },
+        { h: analogous1H, s: Math.max(30, baseColor.s - 10), l: Math.min(65, baseColor.l + 15) },
+        { h: analogous2H, s: Math.max(35, baseColor.s - 5), l: Math.max(35, baseColor.l - 5) }
+      ];
+      
+      variations.forEach(({ h, s, l }) => {
+        const [r, g, b] = hslToRgb(h, s, l);
+        harmonizedColors.push(`rgb(${r}, ${g}, ${b})`);
+      });
+      
+      resolve(harmonizedColors.slice(0, 3)); // Return max 3 colors
     };
     
     img.onerror = () => {
@@ -79,33 +161,46 @@ export const extractDominantColors = (imageUrl: string): Promise<string[]> => {
 };
 
 /**
- * Generates a color palette gradient from an image
+ * Generates a stylized color-based gradient from an image
  */
 export const generateColorBasedBackground = async (imageUrl: string): Promise<string> => {
   try {
     const colors = await extractDominantColors(imageUrl);
     
-    // Create a gradient using the dominant colors
+    // Create a balanced, harmonious gradient
     const primaryColor = colors[0];
-    const secondaryColor = colors[1] || colors[0];
+    const secondaryColor = colors[1] || primaryColor;
+    const tertiaryColor = colors[2] || secondaryColor;
     
-    // Convert RGB to darker, more muted versions for better text contrast
-    const darkenColor = (rgb: string, factor: number = 0.3) => {
+    // Apply gentle darkening for text contrast while maintaining color beauty
+    const adjustColorForBackground = (rgb: string, darknessFactor: number = 0.7) => {
       const match = rgb.match(/\d+/g);
       if (!match) return rgb;
       
       const [r, g, b] = match.map(Number);
-      return `rgb(${Math.floor(r * factor)}, ${Math.floor(g * factor)}, ${Math.floor(b * factor)})`;
+      
+      // Convert to HSL for better control
+      const [h, s, l] = rgbToHsl(r, g, b);
+      
+      // Adjust lightness for background use - keep it elegant but readable
+      const adjustedL = Math.max(25, Math.min(55, l * darknessFactor));
+      // Slightly reduce saturation for more sophisticated look
+      const adjustedS = Math.max(20, s * 0.85);
+      
+      const [newR, newG, newB] = hslToRgb(h, adjustedS, adjustedL);
+      return `rgb(${newR}, ${newG}, ${newB})`;
     };
     
-    const darkPrimary = darkenColor(primaryColor, 0.4);
-    const darkSecondary = darkenColor(secondaryColor, 0.2);
+    const backgroundPrimary = adjustColorForBackground(primaryColor, 0.8);
+    const backgroundSecondary = adjustColorForBackground(secondaryColor, 0.65);
+    const backgroundTertiary = adjustColorForBackground(tertiaryColor, 0.5);
     
-    return `linear-gradient(135deg, ${darkPrimary} 0%, ${darkSecondary} 50%, rgba(0, 0, 0, 0.8) 100%)`;
+    // Create a sophisticated 3-color gradient
+    return `linear-gradient(135deg, ${backgroundPrimary} 0%, ${backgroundSecondary} 60%, ${backgroundTertiary} 100%)`;
   } catch (error) {
     console.error('Error generating color-based background:', error);
-    // Fallback to default gradient
-    return 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-foreground)) 100%)';
+    // Elegant fallback gradient
+    return 'linear-gradient(135deg, rgb(120, 119, 196) 0%, rgb(255, 159, 124) 60%, rgb(255, 207, 84) 100%)';
   }
 };
 
