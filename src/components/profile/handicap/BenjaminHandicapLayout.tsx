@@ -10,7 +10,7 @@ const BenjaminHandicapLayout: React.FC = () => {
       <HandicapPerformanceChart />
 
       {/* My Handicap Card - Stacked Below */}
-      <Card className="bg-white border shadow-sm">
+      <Card className="bg-black/20 backdrop-blur-sm border border-white/30 rounded-full shadow-lg">
         <CardContent className="p-3">
           <div className="space-y-0">
             {/* Top Row: Title and England Golf Logo */}

@@ -25,7 +25,7 @@ const ManualHandicapCard: React.FC<ManualHandicapCardProps> = ({
   };
 
   return (
-    <Card className="bg-white border shadow-sm">
+    <Card className="bg-black/20 backdrop-blur-sm border border-white/30 rounded-full shadow-lg">
       <CardContent className="p-4 relative">
         {showEditButton && (
           <Button
