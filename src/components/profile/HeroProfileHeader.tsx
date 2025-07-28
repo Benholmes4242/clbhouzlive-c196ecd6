@@ -367,8 +367,8 @@ const HeroProfileHeader = ({
         </div>
       </div>
 
-      {/* Content container with normal background */}
-      <div className="relative w-full bg-background">
+      {/* Content container - transparent to show blur behind */}
+      <div className="relative w-full">
         
         {/* Activity Section - directly after stats bar */}
         <div 
