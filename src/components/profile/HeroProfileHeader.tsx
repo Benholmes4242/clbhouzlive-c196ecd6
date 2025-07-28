@@ -249,11 +249,11 @@ const HeroProfileHeader = ({
           }}
         />
         
-        {/* Gradient fade overlay to blend into background */}
+        {/* Gradient fade overlay to blend into background - shorter to stop before cards */}
         <div 
-          className="absolute inset-0 w-full h-[600px]"
+          className="absolute inset-0 w-full h-[450px]"
           style={{
-            background: 'linear-gradient(180deg, transparent 0%, transparent 70%, hsl(var(--background)) 100%)'
+            background: 'linear-gradient(180deg, transparent 0%, transparent 60%, hsl(var(--background)) 100%)'
           }}
         />
         
