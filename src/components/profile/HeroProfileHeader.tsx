@@ -35,7 +35,6 @@ interface UserProfile {
   home_club?: string;
   profile_photo_url?: string;
   background_image_url?: string;
-  cover_photo_url?: string;
   bio?: string;
   eg_handicap_index?: number;
   eg_app_connected?: boolean;
@@ -109,7 +108,6 @@ const HeroProfileHeader = ({
   const displayName = profile?.display_name || 'User';
   const username = profile?.username;
   const homeClub = profile?.home_club || 'No Club';
-  const backgroundImage = profile?.cover_photo_url;
   const postsCount = posts.length; // Use actual posts count
   
   // Animation hook for badges
@@ -228,34 +226,15 @@ const HeroProfileHeader = ({
     }
   };
 
-  console.log('HeroProfileHeader - profile cover_photo_url:', profile?.cover_photo_url);
-  console.log('HeroProfileHeader - backgroundImage:', backgroundImage);
-
   return (
     <>
-      {/* Cover photo background - extends to absolute top */}
-      <div 
-        className="fixed top-0 left-0 right-0 w-full h-screen bg-gradient-to-br from-primary to-primary/80 overflow-hidden z-0"
-        style={{
-          backgroundImage: backgroundImage ? `url(${backgroundImage})` : undefined,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
-        }}
-      >
-        {/* Gradient overlay - even stronger gradient */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-      </div>
-      
-      {/* Content container - positioned above the background */}
+      {/* Content container with background color */}
       <div className="relative w-full min-h-screen z-10">
-        {/* Content Container - Top Section - conditional padding based on cover photo */}
-        <div className={`relative flex items-end justify-between pb-12 ${
-          backgroundImage ? 'pt-28' : 'pt-32'
-        }`}>
+        {/* Content Container - Top Section */}
+        <div className="relative flex items-end justify-between pb-12 pt-32">
           
           {/* Left Side - Profile Information */}
-          <div className="flex flex-col text-white">
+          <div className="flex flex-col text-foreground">
             {/* Profile Photo */}
             <div className="w-24 h-24 mb-4">
               {isOwnProfile ? (
@@ -302,19 +281,19 @@ const HeroProfileHeader = ({
             </div>
             
             {/* User's Name */}
-            <h1 className="text-4xl font-bold mb-2 drop-shadow-lg whitespace-nowrap overflow-hidden text-ellipsis max-w-full">
+            <h1 className="text-4xl font-bold mb-2 whitespace-nowrap overflow-hidden text-ellipsis max-w-full">
               {displayName}
             </h1>
             
             {/* Username */}
             {username && (
-              <p className="text-xl text-white mb-2 drop-shadow">
+              <p className="text-xl text-muted-foreground mb-2">
                 @{username}
               </p>
             )}
             
-            {/* Home Golf Club - aligned with Change Cover Photo button */}
-            <p className="text-lg text-white drop-shadow">
+            {/* Home Golf Club */}
+            <p className="text-lg text-muted-foreground">
               {homeClub}
             </p>
           </div>
@@ -323,87 +302,10 @@ const HeroProfileHeader = ({
           {isOwnProfile && (
             <div className="flex flex-col space-y-2 items-end justify-end">
               <button 
-                className="bg-black/20 backdrop-blur-sm text-white px-3 py-1.5 shadow-lg hover:bg-black/30 transition-colors text-base font-medium rounded-full"
+                className="bg-primary text-primary-foreground px-4 py-2 shadow-lg hover:bg-primary/90 transition-colors text-base font-medium rounded-full"
                 onClick={() => setEditDialogOpen(true)}
               >
                 Edit Profile
-              </button>
-              <button 
-                className="bg-black/20 backdrop-blur-sm text-white px-3 py-1.5 shadow-lg hover:bg-black/30 transition-colors text-base font-medium rounded-full"
-                onClick={async () => {
-                  // Handle cover photo upload
-                  const input = document.createElement('input');
-                  input.type = 'file';
-                  input.accept = 'image/*';
-                  input.onchange = async (e) => {
-                    const file = (e.target as HTMLInputElement).files?.[0];
-                    if (file && user) {
-                      try {
-                        setUploading(true);
-                        const fileExt = file.name.split('.').pop();
-                        const fileName = `cover_${Date.now()}.${fileExt}`;
-                        const filePath = `${user.id}/${fileName}`;
-
-                        // Upload to Supabase storage
-                        const { error: uploadError } = await supabase.storage
-                          .from('profile-backgrounds')
-                          .upload(filePath, file);
-
-                        if (uploadError) {
-                          console.error('Error uploading cover photo:', uploadError);
-                          toast({
-                            title: "Upload Failed",
-                            description: "Error uploading cover photo",
-                            variant: "destructive",
-                          });
-                          return;
-                        }
-
-                        // Get the public URL
-                        const { data: urlData } = supabase.storage
-                          .from('profile-backgrounds')
-                          .getPublicUrl(filePath);
-
-                        // Update profile with the new cover photo URL
-                        const { error: updateError } = await supabase
-                          .from('user_profiles')
-                          .update({ cover_photo_url: urlData.publicUrl })
-                          .eq('id', user.id);
-
-                        if (updateError) {
-                          console.error('Error updating profile with cover photo URL:', updateError);
-                          toast({
-                            title: "Update Failed",
-                            description: "Error updating profile",
-                            variant: "destructive",
-                          });
-                          return;
-                        }
-
-                        toast({
-                          title: "Success",
-                          description: "Cover photo updated successfully!",
-                          variant: "default",
-                        });
-                        
-                        // Refresh the profile data
-                        onProfileUpdate();
-                      } catch (error) {
-                        console.error('Error in cover photo upload:', error);
-                        toast({
-                          title: "Upload Failed",
-                          description: "Error uploading cover photo",
-                          variant: "destructive",
-                        });
-                      } finally {
-                        setUploading(false);
-                      }
-                    }
-                  };
-                  input.click();
-                }}
-              >
-                Change Cover Photo
               </button>
             </div>
           )}
@@ -411,27 +313,27 @@ const HeroProfileHeader = ({
 
         {/* Stats Bar - Full Width with equal padding */}
         <div className="relative mb-6">
-          <div className="bg-black/20 backdrop-blur-sm px-6 py-1 shadow-lg" style={{ borderRadius: '8px' }}>
-            <div className="flex items-center justify-between w-full text-white">
+          <div className="bg-card border px-6 py-4 shadow-sm rounded-lg">
+            <div className="flex items-center justify-between w-full text-foreground">
               <div className="text-center">
-                <div className="font-bold text-lg drop-shadow">
+                <div className="font-bold text-lg">
                   {profile?.eg_handicap_index ? profile.eg_handicap_index.toFixed(1) : '--'}
                 </div>
-                <div className="text-xs text-white/80 drop-shadow">Handicap</div>
+                <div className="text-xs text-muted-foreground">Handicap</div>
               </div>
               <div className="text-center">
-                <div className="font-bold text-lg drop-shadow">{postsCount}</div>
-                <div className="text-xs text-white/80 drop-shadow">Posts</div>
+                <div className="font-bold text-lg">{postsCount}</div>
+                <div className="text-xs text-muted-foreground">Posts</div>
               </div>
               <div className="text-center">
-                <div className="font-bold text-lg drop-shadow">{ratedCoursesCount}</div>
-                <div className="text-xs text-white/80 drop-shadow">Rated Courses</div>
+                <div className="font-bold text-lg">{ratedCoursesCount}</div>
+                <div className="text-xs text-muted-foreground">Rated Courses</div>
               </div>
               <div className="text-center">
-                <div className="font-bold text-lg drop-shadow">
+                <div className="font-bold text-lg">
                   {averageRating > 0 ? `${averageRating}/10` : '--'}
                 </div>
-                <div className="text-xs text-white/80 drop-shadow">Avg. Rating</div>
+                <div className="text-xs text-muted-foreground">Avg. Rating</div>
               </div>
             </div>
           </div>
