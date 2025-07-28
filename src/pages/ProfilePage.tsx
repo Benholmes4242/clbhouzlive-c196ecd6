@@ -8,7 +8,6 @@ import UserCoursesContent from '@/components/courses/UserCoursesContent';
 import { useProfileData } from '@/hooks/useProfileData';
 
 const ProfilePage = () => {
-  console.log('ProfilePage rendering');
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('activity');
   

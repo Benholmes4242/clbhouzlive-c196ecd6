@@ -7,7 +7,6 @@ interface ProfileSectionCarouselProps {
 }
 
 const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSectionChange }) => {
-  console.log('ProfileSectionCarousel rendering');
   const [currentIndex, setCurrentIndex] = useState(0);
   const isMobile = useIsMobile();
 

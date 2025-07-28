@@ -226,7 +226,7 @@ const HeroProfileHeader = ({
     try {
       const fileExt = file.name.split('.').pop();
       const fileName = `cover_${Date.now()}.${fileExt}`;
-      const filePath = `${fileName}`;
+      const filePath = `${user.id}/${fileName}`; // Include user ID in path
 
       // Upload to Supabase storage
       const { error: uploadError } = await supabase.storage
