@@ -203,7 +203,7 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
             )}
           </div>
           <button className="p-2">
-            <MoreHorizontal className="w-5 h-5 text-white" />
+            <MoreHorizontal className="w-5 h-5 text-black" />
           </button>
         </div>
 

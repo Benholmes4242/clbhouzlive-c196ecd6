@@ -390,7 +390,7 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
               {user && currentPost.user.id === user.id && (
                 <DropdownMenu modal={false}>
                   <DropdownMenuTrigger asChild>
-                    <button className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform">
+                    <button className="flex flex-col items-center space-y-1 text-black hover:scale-110 transition-transform">
                       <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
                         <MoreHorizontal className="h-8 w-8" />
                       </div>
