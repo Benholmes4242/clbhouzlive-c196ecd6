@@ -583,7 +583,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
               
               {/* Golf Course Tag - Top Right */}
               {item.golfCourse && (
-                <div className={`absolute ${index === 0 ? 'top-20' : 'top-4'} right-4 z-30`}>
+                <div className={`absolute ${index === 0 ? 'top-32' : 'top-4'} right-4 z-30`}>
                   <CoursePostBadge 
                     course={{
                       id: item.golfCourse.id,
