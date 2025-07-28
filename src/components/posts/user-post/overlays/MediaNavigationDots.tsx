@@ -16,8 +16,8 @@ export const MediaNavigationDots: React.FC<MediaNavigationDotsProps> = ({
       {Array.from({ length: mediaCount }).map((_, index) => (
         <span
           key={index}
-          className={`text-white text-sm transition-all ${
-            index === currentIndex ? 'font-bold text-white' : 'font-normal text-white/60'
+          className={`text-black text-sm transition-all ${
+            index === currentIndex ? 'font-bold text-black' : 'font-normal text-black/60'
           }`}
         >
           {index + 1}
