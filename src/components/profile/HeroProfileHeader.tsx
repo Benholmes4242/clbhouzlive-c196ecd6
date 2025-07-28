@@ -35,6 +35,7 @@ interface UserProfile {
   home_club?: string;
   profile_photo_url?: string;
   background_image_url?: string;
+  cover_photo_url?: string;
   bio?: string;
   eg_handicap_index?: number;
   eg_app_connected?: boolean;
@@ -59,7 +60,9 @@ const HeroProfileHeader = ({
 }: HeroProfileHeaderProps) => {
   const { user } = useSupabaseSession();
   const [uploading, setUploading] = useState(false);
+  const [coverUploading, setCoverUploading] = useState(false);
   const [avatarKey, setAvatarKey] = useState(Date.now()); // Add cache-busting key
+  const [coverKey, setCoverKey] = useState(Date.now());
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   
   // Stats state
@@ -130,6 +133,11 @@ const HeroProfileHeader = ({
   useEffect(() => {
     setAvatarKey(Date.now());
   }, [profile?.profile_photo_url]);
+
+  // Update cover key when cover photo URL changes
+  useEffect(() => {
+    setCoverKey(Date.now());
+  }, [profile?.cover_photo_url]);
 
   const handlePhotoUpload = async (file: File) => {
     if (!user || uploading) return;
@@ -209,6 +217,72 @@ const HeroProfileHeader = ({
     }
   };
 
+  const handleCoverUpload = async (file: File) => {
+    if (!user || coverUploading) return;
+
+    console.log('Starting cover photo upload process:', file);
+    setCoverUploading(true);
+
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `cover_${Date.now()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      // Upload to Supabase storage
+      const { error: uploadError } = await supabase.storage
+        .from('profile-backgrounds')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        console.error('Error uploading cover image:', uploadError);
+        throw uploadError;
+      }
+
+      // Get public URL
+      const { data } = supabase.storage
+        .from('profile-backgrounds')
+        .getPublicUrl(filePath);
+
+      const publicUrl = data.publicUrl;
+
+      // Update user profile with new cover photo URL
+      const { error: updateError } = await supabase
+        .from('user_profiles')
+        .update({ 
+          cover_photo_url: publicUrl,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user.id);
+
+      if (updateError) {
+        console.error('Error updating profile:', updateError);
+        throw updateError;
+      }
+
+      // Force cover to refresh
+      setCoverKey(Date.now());
+      
+      // Refresh the profile data
+      onProfileUpdate();
+      
+      toast({
+        title: "Success", 
+        description: "Cover photo updated successfully!",
+        variant: "default",
+      });
+      
+    } catch (error) {
+      console.error('Cover photo upload error:', error);
+      toast({
+        title: "Upload Failed", 
+        description: "Failed to upload cover photo: " + (error as Error).message,
+        variant: "destructive",
+      });
+    } finally {
+      setCoverUploading(false);
+    }
+  };
+
   // Simple refs for animation (removed complex animation hooks)
   const activityRef = React.useRef<HTMLDivElement>(null);
   const top100Ref = React.useRef<HTMLDivElement>(null);
@@ -230,29 +304,56 @@ const HeroProfileHeader = ({
     <>
       {/* Fullscreen Blurred Background - stops between stats bar and activity cards */}
       <div className="relative w-full">
-        {/* Blurred Background Image */}
+        {/* Blurred Background Image with Cover Photo */}
         <div 
           className="absolute inset-0 w-full h-[500px] bg-cover bg-center"
           style={{
-            backgroundImage: profile?.profile_photo_url 
-              ? `url(${profile.profile_photo_url}?t=${avatarKey})` 
-              : 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-foreground)))',
+            backgroundImage: profile?.cover_photo_url 
+              ? `url(${profile.cover_photo_url}?t=${coverKey})` 
+              : profile?.profile_photo_url 
+                ? `url(${profile.profile_photo_url}?t=${avatarKey})` 
+                : 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-foreground)))',
             filter: 'blur(20px)',
             transform: 'scale(1.1)', // Slightly larger to avoid edge artifacts
           }}
         />
         
+        {/* Dark overlay for text readability */}
+        <div className="absolute inset-0 w-full h-[500px] bg-gradient-to-b from-black/40 via-black/50 to-black/60" />
+        
         {/* Profile Content */}
         <div className="relative z-10 flex flex-col items-center text-center pt-20 pb-8">
           
-          {/* Edit Profile Button - Top Right for own profile */}
+          {/* Edit Buttons - Top Right for own profile */}
           {isOwnProfile && (
-            <button 
-              className="absolute top-6 right-6 bg-white/20 backdrop-blur-sm text-white px-3 py-1.5 text-sm font-medium rounded-full border border-white/30 hover:bg-white/30 transition-colors"
-              onClick={() => setEditDialogOpen(true)}
-            >
-              Edit
-            </button>
+            <div className="absolute top-6 right-6 flex flex-col gap-2">
+              <button 
+                className="bg-white/20 backdrop-blur-sm text-white px-3 py-1.5 text-sm font-medium rounded-full border border-white/30 hover:bg-white/30 transition-colors"
+                onClick={() => setEditDialogOpen(true)}
+              >
+                Edit Profile
+              </button>
+              <button 
+                className="bg-white/20 backdrop-blur-sm text-white px-3 py-1.5 text-sm font-medium rounded-full border border-white/30 hover:bg-white/30 transition-colors"
+                onClick={() => {
+                  if (coverUploading) return;
+                  const input = document.createElement('input');
+                  input.type = 'file';
+                  input.accept = 'image/*';
+                  input.onchange = (e) => {
+                    const file = (e.target as HTMLInputElement).files?.[0];
+                    if (file) {
+                      console.log('Cover photo selected for upload:', file);
+                      handleCoverUpload(file);
+                    }
+                  };
+                  input.click();
+                }}
+                disabled={coverUploading}
+              >
+                {coverUploading ? 'Uploading...' : profile?.cover_photo_url ? 'Change Cover' : 'Add Cover'}
+              </button>
+            </div>
           )}
           
           {/* Large Centered Profile Photo */}
