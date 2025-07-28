@@ -323,15 +323,13 @@ const HeroProfileHeader = ({
           {isOwnProfile && (
             <div className="flex flex-col space-y-2 items-end justify-end">
               <button 
-                className="bg-white/20 backdrop-blur-sm border border-white/30 text-white px-3 py-1.5 shadow-lg shadow-black/10 transition-colors text-base font-medium"
-                style={{ borderRadius: '8px' }}
+                className="bg-black/20 backdrop-blur-sm border border-white/30 text-white px-3 py-1.5 shadow-lg transition-colors text-base font-medium rounded-full"
                 onClick={() => setEditDialogOpen(true)}
               >
                 Edit Profile
               </button>
               <button 
-                className="bg-white/20 backdrop-blur-sm border border-white/30 text-white px-3 py-1.5 shadow-lg shadow-black/10 transition-colors text-base font-medium"
-                style={{ borderRadius: '8px' }}
+                className="bg-black/20 backdrop-blur-sm border border-white/30 text-white px-3 py-1.5 shadow-lg transition-colors text-base font-medium rounded-full"
                 onClick={async () => {
                   // Handle cover photo upload
                   const input = document.createElement('input');
