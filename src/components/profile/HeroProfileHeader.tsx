@@ -243,8 +243,8 @@ const HeroProfileHeader = ({
           backgroundRepeat: 'no-repeat'
         }}
       >
-        {/* Gradient overlay - maximum darkness */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/75 to-black/30" />
+        {/* Gradient overlay - even stronger gradient */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
       </div>
       
       {/* Content container - positioned above the background */}
