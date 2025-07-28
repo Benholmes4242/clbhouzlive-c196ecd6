@@ -231,11 +231,14 @@ const HeroProfileHeader = ({
       // Upload to Supabase storage
       const { error: uploadError } = await supabase.storage
         .from('profile-backgrounds')
-        .upload(filePath, file);
+        .upload(filePath, file, {
+          upsert: true,
+          contentType: file.type
+        });
 
       if (uploadError) {
         console.error('Error uploading cover image:', uploadError);
-        throw uploadError;
+        throw new Error(`Upload failed: ${uploadError.message}`);
       }
 
       // Get public URL
