@@ -323,13 +323,13 @@ const HeroProfileHeader = ({
           {isOwnProfile && (
             <div className="flex flex-col space-y-2 items-end justify-end">
               <button 
-                className="bg-black/20 backdrop-blur-sm text-white px-3 py-1.5 shadow-lg transition-colors text-base font-medium rounded-full"
+                className="bg-black/20 backdrop-blur-sm text-white px-3 py-1.5 shadow-lg hover:bg-black/30 transition-colors text-base font-medium rounded-full"
                 onClick={() => setEditDialogOpen(true)}
               >
                 Edit Profile
               </button>
               <button 
-                className="bg-black/20 backdrop-blur-sm text-white px-3 py-1.5 shadow-lg transition-colors text-base font-medium rounded-full"
+                className="bg-black/20 backdrop-blur-sm text-white px-3 py-1.5 shadow-lg hover:bg-black/30 transition-colors text-base font-medium rounded-full"
                 onClick={async () => {
                   // Handle cover photo upload
                   const input = document.createElement('input');
@@ -350,51 +350,49 @@ const HeroProfileHeader = ({
                           .upload(filePath, file);
 
                         if (uploadError) {
-                          console.error('Error uploading cover image:', uploadError);
+                          console.error('Error uploading cover photo:', uploadError);
                           toast({
                             title: "Upload Failed",
-                            description: "Failed to upload cover photo",
+                            description: "Error uploading cover photo",
                             variant: "destructive",
                           });
                           return;
                         }
 
-                        // Get public URL
-                        const { data } = supabase.storage
+                        // Get the public URL
+                        const { data: urlData } = supabase.storage
                           .from('profile-backgrounds')
                           .getPublicUrl(filePath);
 
-                        const publicUrl = data.publicUrl;
-
-                        // Update user profile with new cover photo URL
+                        // Update profile with the new cover photo URL
                         const { error: updateError } = await supabase
                           .from('user_profiles')
-                          .update({ cover_photo_url: publicUrl })
+                          .update({ cover_photo_url: urlData.publicUrl })
                           .eq('id', user.id);
 
                         if (updateError) {
-                          console.error('Error updating profile:', updateError);
+                          console.error('Error updating profile with cover photo URL:', updateError);
                           toast({
                             title: "Update Failed",
-                            description: "Failed to update cover photo",
+                            description: "Error updating profile",
                             variant: "destructive",
                           });
                           return;
                         }
 
-                        // Refresh the profile data
-                        onProfileUpdate();
-                        
                         toast({
                           title: "Success",
                           description: "Cover photo updated successfully!",
                           variant: "default",
                         });
+                        
+                        // Refresh the profile data
+                        onProfileUpdate();
                       } catch (error) {
-                        console.error('Error uploading cover image:', error);
+                        console.error('Error in cover photo upload:', error);
                         toast({
                           title: "Upload Failed",
-                          description: "Failed to upload cover photo",
+                          description: "Error uploading cover photo",
                           variant: "destructive",
                         });
                       } finally {
