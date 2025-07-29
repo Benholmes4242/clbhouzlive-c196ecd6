@@ -248,17 +248,19 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                   )}
                   
                   {/* Course ranking badges */}
-                  <CourseRankBadges
-                    globalRank={highlight.globalRank}
-                    regionalRank={highlight.regionalRank}
-                    usaRank={highlight.usaRank}
-                    country={highlight.country}
-                    positioning="top-left"
-                  />
+                  <div className="absolute top-2 left-2 flex flex-col gap-1 z-10 scale-75 origin-top-left">
+                    <CourseRankBadges
+                      globalRank={highlight.globalRank}
+                      regionalRank={highlight.regionalRank}
+                      usaRank={highlight.usaRank}
+                      country={highlight.country}
+                      positioning="top-left"
+                    />
+                  </div>
                   
                   {/* ClbHouse average rating top right */}
                   {highlight.averageRating && (
-                    <div className="absolute top-2 right-2">
+                    <div className="absolute top-2 right-2 scale-75 origin-top-right">
                       <CourseRankBadges
                         globalRank={null}
                         regionalRank={null}
