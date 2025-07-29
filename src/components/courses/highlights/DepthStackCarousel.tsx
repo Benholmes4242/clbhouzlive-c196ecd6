@@ -233,12 +233,115 @@ const VideoCard: React.FC<{
 };
 
 const LiquidGlassCard: React.FC = () => {
+  // Mock data - in real app this would come from user's progress
+  const userProgress = {
+    played: 21,
+    total: 300,
+    achievements: [
+      { id: '20-club', name: '20 Club', description: 'Play 20 Top 100 courses', target: 20, earned: true },
+      { id: '50-club', name: '50 Club', description: 'Play 50 Top 100 courses', target: 50, earned: false },
+      { id: '100-club', name: '100 Club', description: 'Play 100 Top 100 courses', target: 100, earned: false },
+      { id: '300-club', name: '300 Club', description: 'Play 300 Top 100 courses', target: 300, earned: false },
+    ]
+  };
+
+  const progressPercentage = (userProgress.played / userProgress.total) * 100;
+
   return (
     <div 
       className="relative h-[28rem] rounded-lg overflow-hidden bg-white/10 backdrop-blur-2xl border border-white/20"
       style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
     >
       <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" />
+      
+      {/* Achievement Content */}
+      <div className="relative h-full p-6 flex flex-col">
+        {/* Header */}
+        <div className="mb-6">
+          <h3 className="text-white font-bold text-2xl mb-2">Achievements</h3>
+          <p className="text-white/70 text-base">
+            You&apos;ve played {userProgress.played} of {userProgress.total} Top 100 courses
+          </p>
+        </div>
+
+        {/* Progress Bar */}
+        <div className="mb-6">
+          <div className="flex justify-between text-white/70 text-xs mb-2">
+            <span>{userProgress.played}</span>
+            <span>{userProgress.total}</span>
+          </div>
+          <div className="w-full bg-white/20 rounded-full h-2 backdrop-blur-sm">
+            <div 
+              className="bg-green-400 h-2 rounded-full transition-all duration-300 ease-out"
+              style={{ width: `${progressPercentage}%` }}
+            />
+          </div>
+        </div>
+
+        {/* Achievement List */}
+        <div className="flex-1 overflow-y-auto scrollbar-hide space-y-3">
+          {userProgress.achievements.map((achievement) => (
+            <div 
+              key={achievement.id}
+              className={`relative backdrop-blur-sm rounded-lg p-4 border ${
+                achievement.earned 
+                  ? 'bg-green-500/10 border-green-400/20' 
+                  : 'bg-white/10 border-white/10'
+              }`}
+            >
+              {/* Completed Stamp */}
+              {achievement.earned && (
+                <div className="absolute top-2 right-2 transform rotate-12 animate-scale-in">
+                  <div className="relative">
+                    {/* Outer border */}
+                    <div className="absolute inset-0 border-4 border-red-600 rounded-lg opacity-80"></div>
+                    {/* Inner border */}
+                    <div className="absolute inset-1 border-2 border-red-600 rounded-md opacity-60"></div>
+                    {/* Main stamp */}
+                    <div className="relative bg-red-600/90 text-white text-xs font-black px-4 py-2 rounded-lg border-2 border-red-700 shadow-lg backdrop-blur-sm" 
+                         style={{ 
+                           fontFamily: 'Arial Black, sans-serif',
+                           letterSpacing: '2px',
+                           textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
+                           filter: 'contrast(1.1) saturate(1.2)'
+                         }}>
+                      COMPLETED
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex items-center justify-between pr-16">
+                <div className="flex items-center space-x-3">
+                  {/* Achievement Icon */}
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                    achievement.earned 
+                      ? 'bg-green-500/20 border border-green-400/30' 
+                      : 'bg-white/10 border border-white/20'
+                  }`}>
+                    <span className="text-lg font-bold text-white">
+                      {achievement.target}
+                    </span>
+                  </div>
+                  
+                  {/* Achievement Info */}
+                  <div>
+                    <h4 className="text-white font-medium text-sm">{achievement.name}</h4>
+                    <p className="text-white/60 text-xs">{achievement.description}</p>
+                  </div>
+                </div>
+
+                {/* Progress for unearned achievements */}
+                {!achievement.earned && (
+                  <div className="text-white/40 text-xs">
+                    {userProgress.played}/{achievement.target}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 };
