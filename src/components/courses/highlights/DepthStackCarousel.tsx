@@ -289,10 +289,17 @@ const LiquidGlassCard: React.FC = () => {
                   : 'bg-white/10 border-white/10'
               }`}
             >
-              {/* Earned Stamp */}
+              {/* Completed Stamp */}
               {achievement.earned && (
-                <div className="absolute top-2 right-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
-                  EARNED!
+                <div className="absolute top-2 right-2 transform rotate-12">
+                  <div className="bg-red-600 text-white text-xs font-bold px-3 py-1 border-2 border-red-600 rounded-sm opacity-90 shadow-lg" 
+                       style={{ 
+                         fontFamily: 'monospace',
+                         letterSpacing: '1px',
+                         textShadow: '1px 1px 2px rgba(0,0,0,0.3)'
+                       }}>
+                    COMPLETED
+                  </div>
                 </div>
               )}
 
