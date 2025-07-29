@@ -259,7 +259,7 @@ const HeroProfileHeader = ({
           {isOwnProfile && (
             <div className="absolute top-6 right-6">
               <button 
-                className="bg-black/25 backdrop-blur-md shadow-xl rounded-full py-2 px-4 text-white text-sm font-medium hover:bg-black/35 transition-colors"
+                className="bg-white/5 backdrop-blur-2xl border border-white/20 shadow-[0_0_20px_rgba(0,0,0,0.2)] rounded-full py-2 px-4 text-white text-sm font-medium hover:bg-white/10 transition-colors" style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
                 onClick={() => setEditDialogOpen(true)}
               >
                 Edit Profile
