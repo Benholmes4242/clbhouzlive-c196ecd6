@@ -157,11 +157,15 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
 
   return (
     <div className="relative w-full h-[28rem] overflow-hidden" style={{ perspective: '1000px' }}>
+      {/* Dedicated background layer for blur isolation */}
+      <div className="absolute inset-0 bg-gradient-to-br from-background/50 to-background/80 pointer-events-none" 
+           style={{ isolation: 'isolate' }} />
+      
       {/* Carousel container */}
       <div 
         ref={swipeRef}
         className="relative w-full h-full flex items-center justify-center"
-        style={{ transformStyle: 'preserve-3d' }}
+        style={{ transformStyle: 'preserve-3d', isolation: 'isolate' }}
       >
         {highlights.map((highlight, index) => {
           const isMobile = window.innerWidth < 768;
@@ -275,12 +279,19 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                 
                 {/* Course info */}
                 <div className="relative p-3">
-                  {/* Solid background for active card, glass for others */}
+                  {/* Isolated glass background that only blurs the page background */}
                   <div className={`absolute inset-0 border-t ${
                     index === activeIndex 
-                      ? 'bg-black/90 border-white/30' // Fully opaque for active card
+                      ? 'bg-white/5 backdrop-blur-2xl border-white/20' // Glass effect for active card
                       : 'bg-white/5 backdrop-blur-2xl border-white/20' // Glass effect for inactive cards
-                  }`} style={index === activeIndex ? {} : { backdropFilter: 'blur(40px) saturate(180%)' }}>
+                  }`} style={{ 
+                    backdropFilter: 'blur(40px) saturate(180%)',
+                    isolation: 'isolate'
+                  }}>
+                    {/* Solid overlay for active card to prevent other cards from showing through */}
+                    {index === activeIndex && (
+                      <div className="absolute inset-0 bg-black/75" />
+                    )}
                   </div>
                   
                   {/* Content - only visible on active card */}
