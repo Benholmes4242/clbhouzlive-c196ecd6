@@ -28,7 +28,7 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
       id: 'handicap',
       title: 'Handicap',
       description: 'Track your progress and handicap development over time.',
-      className: 'relative overflow-hidden bg-gradient-to-br from-emerald-500 to-emerald-700 flex flex-col justify-end text-white h-[200px] cursor-pointer group !rounded-lg'
+      className: 'relative overflow-hidden flex flex-col justify-end text-white h-[200px] cursor-pointer group !rounded-lg'
     }
   ];
 
