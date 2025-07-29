@@ -324,16 +324,14 @@ const LiquidGlassCard: React.FC = () => {
                   {/* Achievement Info */}
                   <div>
                     <h4 className="text-white font-medium text-sm">{achievement.name}</h4>
-                    <p className="text-white/60 text-xs">{achievement.description}</p>
+                    <p className="text-white/60 text-xs">{achievement.description} courses</p>
+                    {!achievement.earned && (
+                      <div className="text-white/40 text-xs mt-1">
+                        {userProgress.played}/{achievement.target}
+                      </div>
+                    )}
                   </div>
                 </div>
-
-                {/* Progress for unearned achievements */}
-                {!achievement.earned && (
-                  <div className="text-white/40 text-xs">
-                    {userProgress.played}/{achievement.target}
-                  </div>
-                )}
               </div>
             </div>
           ))}
