@@ -157,14 +157,11 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
 
   return (
     <div className="relative w-full h-[28rem] overflow-hidden" style={{ perspective: '1000px' }}>
-      {/* Background layer for blur isolation */}
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-900/50 via-slate-800/30 to-slate-900/50"></div>
-      
-      {/* Carousel container with isolation */}
+      {/* Carousel container */}
       <div 
         ref={swipeRef}
         className="relative w-full h-full flex items-center justify-center"
-        style={{ transformStyle: 'preserve-3d', isolation: 'isolate' }}
+        style={{ transformStyle: 'preserve-3d' }}
       >
         {highlights.map((highlight, index) => {
           const isMobile = window.innerWidth < 768;
