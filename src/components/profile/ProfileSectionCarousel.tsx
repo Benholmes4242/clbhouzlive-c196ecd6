@@ -71,24 +71,36 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
             {card.id === 'activity' && (
               <>
                 <img 
-                  src="/lovable-uploads/70d040be-d694-484a-b816-3af072d8293b.png" 
-                  alt="Golf course at sunset"
+                  src="/lovable-uploads/88578314-636a-402e-8435-ad54169af886.png" 
+                  alt="Golf course at sunset with ocean view"
                   className="absolute inset-0 w-full h-full object-cover rounded-lg"
                 />
                 <div className="absolute inset-0 bg-black/40 rounded-lg"></div>
               </>
             )}
 
-            {/* Top 100 liquid glass background */}
+            {/* Top 100 background image */}
             {card.id === 'top100' && (
-              <div className="absolute inset-0 bg-white/5 backdrop-blur-2xl border border-white/20 rounded-lg" style={{ backdropFilter: 'blur(40px) saturate(180%)' }}>
-              </div>
+              <>
+                <img 
+                  src="/lovable-uploads/a8a80045-1c4d-4933-9a97-55d3cb2fa17b.png" 
+                  alt="Coastal golf course with dramatic cliffs"
+                  className="absolute inset-0 w-full h-full object-cover rounded-lg"
+                />
+                <div className="absolute inset-0 bg-black/40 rounded-lg"></div>
+              </>
             )}
             
-            {/* Handicap liquid glass background */}
+            {/* Handicap background image */}
             {card.id === 'handicap' && (
-              <div className="absolute inset-0 bg-white/5 backdrop-blur-2xl border border-white/20 rounded-lg" style={{ backdropFilter: 'blur(40px) saturate(180%)' }}>
-              </div>
+              <>
+                <img 
+                  src="/lovable-uploads/9f2d3d71-10e3-487e-8e02-de14d44ce950.png" 
+                  alt="Golfer with Trackman technology"
+                  className="absolute inset-0 w-full h-full object-cover rounded-lg"
+                />
+                <div className="absolute inset-0 bg-black/40 rounded-lg"></div>
+              </>
             )}
             
             {/* Content */}
@@ -125,24 +137,36 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
               {card.id === 'activity' && (
                 <>
                   <img 
-                    src="/lovable-uploads/70d040be-d694-484a-b816-3af072d8293b.png" 
-                    alt="Golf course at sunset"
+                    src="/lovable-uploads/88578314-636a-402e-8435-ad54169af886.png" 
+                    alt="Golf course at sunset with ocean view"
                     className="absolute inset-0 w-full h-full object-cover rounded-lg"
                   />
                   <div className="absolute inset-0 bg-black/40 rounded-lg"></div>
                 </>
               )}
 
-              {/* Top 100 liquid glass background */}
+              {/* Top 100 background image */}
               {card.id === 'top100' && (
-                <div className="absolute inset-0 bg-white/5 backdrop-blur-2xl border border-white/20 rounded-lg" style={{ backdropFilter: 'blur(40px) saturate(180%)' }}>
-                </div>
+                <>
+                  <img 
+                    src="/lovable-uploads/a8a80045-1c4d-4933-9a97-55d3cb2fa17b.png" 
+                    alt="Coastal golf course with dramatic cliffs"
+                    className="absolute inset-0 w-full h-full object-cover rounded-lg"
+                  />
+                  <div className="absolute inset-0 bg-black/40 rounded-lg"></div>
+                </>
               )}
               
-              {/* Handicap liquid glass background */}
+              {/* Handicap background image */}
               {card.id === 'handicap' && (
-                <div className="absolute inset-0 bg-white/5 backdrop-blur-2xl border border-white/20 rounded-lg" style={{ backdropFilter: 'blur(40px) saturate(180%)' }}>
-                </div>
+                <>
+                  <img 
+                    src="/lovable-uploads/9f2d3d71-10e3-487e-8e02-de14d44ce950.png" 
+                    alt="Golfer with Trackman technology"
+                    className="absolute inset-0 w-full h-full object-cover rounded-lg"
+                  />
+                  <div className="absolute inset-0 bg-black/40 rounded-lg"></div>
+                </>
               )}
               
               {/* Content */}
