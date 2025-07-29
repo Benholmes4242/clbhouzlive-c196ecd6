@@ -271,31 +271,6 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                     </div>
                   )}
                   
-                  {/* Course ranking badges */}
-                  <div className="absolute top-3 left-3 flex flex-col gap-1 z-10">
-                    <CourseRankBadges
-                      globalRank={highlight.globalRank}
-                      regionalRank={highlight.regionalRank}
-                      usaRank={highlight.usaRank}
-                      country={highlight.country}
-                      positioning="top-left"
-                    />
-                  </div>
-                  
-                  {/* ClbHouse average rating top right */}
-                  {highlight.averageRating && (
-                    <div className="absolute top-3 right-3 z-20">
-                      <div className="flex items-center gap-2 px-2 py-1.5 bg-white/90 rounded-lg shadow-sm">
-                        <img
-                          src="/lovable-uploads/2b0e2d79-6b26-4b6b-a27b-8dd5f8cc5aad.png"
-                          alt="Clubhouse Community Rating"
-                          className="h-5 w-5"
-                          style={{ objectFit: 'contain' }}
-                        />
-                        <span className="text-sm font-bold text-gray-900">{highlight.averageRating}/10</span>
-                      </div>
-                    </div>
-                  )}
                 </div>
                 
                 {/* Course info */}
