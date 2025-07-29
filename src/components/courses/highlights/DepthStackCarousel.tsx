@@ -156,7 +156,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
   }
 
   return (
-    <div className="relative w-full h-96 overflow-hidden" style={{ perspective: '1000px' }}>
+    <div className="relative w-full h-[28rem] overflow-hidden" style={{ perspective: '1000px' }}>
       {/* Carousel container */}
       <div 
         ref={swipeRef}
@@ -170,7 +170,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
           return (
             <div
               key={highlight.id}
-              className={`absolute w-80 h-72 cursor-pointer transition-all duration-500 ease-out ${
+              className={`absolute w-80 h-96 cursor-pointer transition-all duration-500 ease-out ${
                 isTransitioning ? 'pointer-events-none' : ''
               }`}
               style={cardStyle}
@@ -178,8 +178,8 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
             >
               {/* Video card */}
               <div className="relative w-full h-full bg-white/5 backdrop-blur-2xl border border-white/20 rounded-xl overflow-hidden shadow-2xl">
-                {/* Video player */}
-                <div className="relative w-full h-48 overflow-hidden bg-black">
+                {/* Video player - increased height */}
+                <div className="relative w-full h-72 overflow-hidden bg-black">
                   {highlight.videoUrl ? (
                     <video
                       ref={(el) => {
