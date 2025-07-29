@@ -20,6 +20,22 @@ const HeaderNavigation = () => {
   const { user } = useSupabaseSession();
   const { unreadCount } = useNotifications();
 
+  // Debug: Log when component renders
+  console.log('HeaderNavigation rendered - checking icon sizes');
+  
+  // Debug: Check if CSS is overriding icon sizes
+  React.useEffect(() => {
+    const icons = document.querySelectorAll('.header-debug-icon');
+    icons.forEach((icon, index) => {
+      const computedStyle = window.getComputedStyle(icon);
+      console.log(`Icon ${index} computed size:`, {
+        width: computedStyle.width,
+        height: computedStyle.height,
+        fontSize: computedStyle.fontSize
+      });
+    });
+  }, []);
+
   // Check if user is admin or limited admin
   const { data: adminStatus } = useQuery({
     queryKey: ['adminStatus', user?.id],
@@ -119,17 +135,17 @@ const HeaderNavigation = () => {
     return (
       <>
         <Button variant="ghost" className="p-2 md:p-3 flex-shrink-0" onClick={handleNotificationsClick}>
-          <Bell className="h-8 w-8 text-black" />
+          <Bell className="h-8 w-8 text-black header-debug-icon" style={{ minWidth: '32px', minHeight: '32px' }} />
         </Button>
 
         <Button variant="ghost" className="p-2 md:p-3 flex-shrink-0" onClick={handleProfileClick}>
-          <CircleUserRound className="h-8 w-8 md:h-9 md:w-9 text-black" />
+          <CircleUserRound className="h-8 w-8 md:h-9 md:w-9 text-black header-debug-icon" style={{ minWidth: '32px', minHeight: '32px' }} />
         </Button>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="p-2 md:p-3 flex-shrink-0">
-              <Settings className="h-8 w-8 md:h-9 md:w-9 text-black" />
+              <Settings className="h-8 w-8 md:h-9 md:w-9 text-black header-debug-icon" style={{ minWidth: '32px', minHeight: '32px' }} />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48 mr-2">
@@ -149,7 +165,7 @@ const HeaderNavigation = () => {
   return (
     <>
       <Button variant="ghost" className="relative p-2 md:p-3 flex-shrink-0" onClick={handleNotificationsClick}>
-        <Bell className="h-8 w-8 text-black" />
+        <Bell className="h-8 w-8 text-black header-debug-icon" style={{ minWidth: '32px', minHeight: '32px' }} />
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
             {unreadCount > 9 ? '9+' : unreadCount}
@@ -158,13 +174,13 @@ const HeaderNavigation = () => {
       </Button>
 
       <Button variant="ghost" className="p-2 md:p-3 flex-shrink-0" onClick={handleProfileClick}>
-        <CircleUserRound className="h-8 w-8 md:h-9 md:w-9 text-black" />
+        <CircleUserRound className="h-8 w-8 md:h-9 md:w-9 text-black header-debug-icon" style={{ minWidth: '32px', minHeight: '32px' }} />
       </Button>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="p-2 md:p-3 flex-shrink-0">
-            <Settings className="h-8 w-8 md:h-9 md:w-9 text-black" />
+            <Settings className="h-8 w-8 md:h-9 md:w-9 text-black header-debug-icon" style={{ minWidth: '32px', minHeight: '32px' }} />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48 mr-2">
