@@ -17,6 +17,7 @@ interface HighlightVideo {
   regionalRank?: number | null;
   usaRank?: number | null;
   country: string;
+  averageRating?: number | null;
 }
 
 interface DepthStackCarouselProps {
@@ -255,15 +256,18 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                     positioning="top-left"
                   />
                   
-                  {/* ClbHouse ranking top right */}
-                  {(highlight.globalRank || highlight.regionalRank || highlight.usaRank) && (
-                    <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm rounded-lg px-2 py-1 flex items-center gap-1 shadow-sm">
-                      <div className="w-4 h-4 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center">
-                        <span className="text-white text-[8px] font-bold">C</span>
-                      </div>
-                      <span className="text-gray-800 text-xs font-medium">
-                        {highlight.globalRank || highlight.regionalRank || highlight.usaRank}/100
-                      </span>
+                  {/* ClbHouse average rating top right */}
+                  {highlight.averageRating && (
+                    <div className="absolute top-2 right-2">
+                      <CourseRankBadges
+                        globalRank={null}
+                        regionalRank={null}
+                        usaRank={null}
+                        country={highlight.country}
+                        userRating={highlight.averageRating}
+                        showUserRating={true}
+                        positioning="top-left"
+                      />
                     </div>
                   )}
                 </div>

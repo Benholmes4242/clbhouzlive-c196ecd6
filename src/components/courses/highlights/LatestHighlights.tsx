@@ -16,6 +16,7 @@ interface HighlightVideo {
   regionalRank?: number | null;
   usaRank?: number | null;
   country: string;
+  averageRating?: number | null;
 }
 
 interface LatestHighlightsProps {
@@ -112,6 +113,16 @@ const LatestHighlights: React.FC<LatestHighlightsProps> = ({
           return;
         }
 
+        // Get average ratings for these courses
+        const { data: ratingStats, error: ratingsError } = await supabase
+          .from('course_rating_stats')
+          .select('course_id, average_rating')
+          .in('course_id', courseIds);
+
+        if (ratingsError) {
+          console.error('Error fetching course ratings:', ratingsError);
+        }
+
         // Combine the data and filter for posts that have golf course tags
         const transformedHighlights: HighlightVideo[] = posts
           .map(post => {
@@ -136,6 +147,9 @@ const LatestHighlights: React.FC<LatestHighlightsProps> = ({
               return course.country || 'Unknown Location';
             };
 
+            // Find the course rating stats
+            const courseRating = ratingStats?.find(r => r.course_id === course.id);
+
             const highlight: HighlightVideo = {
               id: post.id,
               courseId: course.id,
@@ -148,7 +162,8 @@ const LatestHighlights: React.FC<LatestHighlightsProps> = ({
               globalRank: course.global_rank,
               regionalRank: course.regional_rank,
               usaRank: course.usa_rank,
-              country: course.country
+              country: course.country,
+              averageRating: courseRating?.average_rating ? Math.round(courseRating.average_rating * 10) / 10 : null
             };
 
             return highlight;
