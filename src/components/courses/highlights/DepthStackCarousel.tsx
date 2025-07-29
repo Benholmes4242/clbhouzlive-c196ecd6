@@ -63,18 +63,24 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
     threshold: 50
   });
 
-  // Video management effect - smoother transitions
+  // Video management effect - prevent race conditions
   useEffect(() => {
+    console.log('Video management effect triggered, activeIndex:', activeIndex);
+    
     videoRefs.current.forEach((video, index) => {
       if (video) {
+        console.log(`Video ${index} - isActive: ${index === activeIndex}, paused: ${video.paused}, readyState: ${video.readyState}`);
+        
         if (index === activeIndex) {
-          // Only play if not already playing to avoid restart
-          if (video.paused) {
-            video.play().catch(console.error);
+          // Only play if not already playing and video is ready
+          if (video.paused && video.readyState >= 2) {
+            console.log(`Playing video ${index}`);
+            video.play().catch(e => console.error('Play error:', e));
           }
         } else {
-          // Pause non-active videos but keep them loaded
+          // Pause non-active videos
           if (!video.paused) {
+            console.log(`Pausing video ${index}`);
             video.pause();
           }
         }
@@ -170,44 +176,49 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                 <div className="relative w-full h-48 overflow-hidden bg-black">
                   {highlight.videoUrl ? (
                     <video
+                      key={`video-${highlight.id}`} // Add key to prevent recreation
                       ref={(el) => {
                         if (el && highlight.videoUrl) {
-                          videoRefs.current[index] = el;
-                          
-                          // Clean up previous HLS instance for this index
-                          if (hlsInstances.current[index]) {
-                            hlsInstances.current[index]?.destroy();
-                            hlsInstances.current[index] = null;
-                          }
-                          
-                          // Check if it's an HLS stream
-                          if (highlight.videoUrl.includes('.m3u8')) {
-                            if (Hls.isSupported()) {
-                              const hls = new Hls({
-                                enableWorker: false,
-                                lowLatencyMode: false,
-                                startLevel: 0,
-                                capLevelToPlayerSize: true
-                              });
-                              hlsInstances.current[index] = hls;
-                              hls.loadSource(highlight.videoUrl);
-                              hls.attachMedia(el);
-                              
-                              hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                                console.log('HLS manifest parsed for:', highlight.videoUrl);
-                                // Let the video management effect handle playback
-                              });
-                              
-                              hls.on(Hls.Events.ERROR, (event, data) => {
-                                console.error('HLS error:', event, data);
-                              });
-                            } else if (el.canPlayType('application/vnd.apple.mpegurl')) {
-                              // Safari native HLS support
+                          // Only set up if not already set up for this index
+                          if (videoRefs.current[index] !== el) {
+                            console.log(`Setting up video ${index} for ${highlight.videoUrl}`);
+                            videoRefs.current[index] = el;
+                            
+                            // Clean up previous HLS instance for this index
+                            if (hlsInstances.current[index]) {
+                              console.log(`Cleaning up HLS instance ${index}`);
+                              hlsInstances.current[index]?.destroy();
+                              hlsInstances.current[index] = null;
+                            }
+                            
+                            // Check if it's an HLS stream
+                            if (highlight.videoUrl.includes('.m3u8')) {
+                              if (Hls.isSupported()) {
+                                const hls = new Hls({
+                                  enableWorker: false,
+                                  lowLatencyMode: false,
+                                  startLevel: 0,
+                                  capLevelToPlayerSize: true
+                                });
+                                hlsInstances.current[index] = hls;
+                                hls.loadSource(highlight.videoUrl);
+                                hls.attachMedia(el);
+                                
+                                hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                                  console.log(`HLS manifest parsed for video ${index}:`, highlight.videoUrl);
+                                });
+                                
+                                hls.on(Hls.Events.ERROR, (event, data) => {
+                                  console.error(`HLS error for video ${index}:`, event, data);
+                                });
+                              } else if (el.canPlayType('application/vnd.apple.mpegurl')) {
+                                // Safari native HLS support
+                                el.src = highlight.videoUrl;
+                              }
+                            } else {
+                              // Regular video file
                               el.src = highlight.videoUrl;
                             }
-                          } else {
-                            // Regular video file
-                            el.src = highlight.videoUrl;
                           }
                         }
                       }}
@@ -219,8 +230,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                       controls={false}
                       preload="auto"
                       onLoadedData={(e) => {
-                        console.log('Video loaded:', highlight.videoUrl);
-                        // Don't auto-play or reset currentTime here to avoid flickering
+                        console.log(`Video ${index} loaded:`, highlight.videoUrl);
                       }}
                       onError={(e) => {
                         console.error('Video error for:', highlight.videoUrl, e);
