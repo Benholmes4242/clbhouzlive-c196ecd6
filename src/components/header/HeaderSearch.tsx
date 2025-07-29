@@ -35,17 +35,18 @@ const HeaderSearch = () => {
   };
 
   const handleMobileSearchToggle = () => {
-    setShowMobileSearch(!showMobileSearch);
-    if (!showMobileSearch) {
-      // Opening mobile search
-      setTimeout(() => {
-        inputRef.current?.focus();
-      }, 100);
-    } else {
-      // Closing mobile search
+    if (showMobileSearch) {
+      // Closing mobile search - clear everything
+      setShowMobileSearch(false);
       setQuery('');
       setShowResults(false);
       setIsFocused(false);
+    } else {
+      // Opening mobile search
+      setShowMobileSearch(true);
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
     }
   };
 
