@@ -123,13 +123,13 @@ const HeaderNavigation = () => {
         </Button>
 
         <Button variant="ghost" className="p-2 md:p-3 flex-shrink-0" onClick={handleProfileClick}>
-          <CircleUserRound className="h-11 w-11 md:h-14 md:w-14 text-black" style={{ minWidth: '25px', minHeight: '25px' }} />
+          <CircleUserRound className="h-11 w-11 md:h-14 md:w-14 text-black" />
         </Button>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="p-2 md:p-3 flex-shrink-0">
-              <Settings className="h-11 w-11 md:h-14 md:w-14 text-black" style={{ minWidth: '25px', minHeight: '25px' }} />
+              <Settings className="h-11 w-11 md:h-14 md:w-14 text-black" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48 mr-2">
@@ -158,13 +158,13 @@ const HeaderNavigation = () => {
       </Button>
 
       <Button variant="ghost" className="p-2 md:p-3 flex-shrink-0" onClick={handleProfileClick}>
-        <CircleUserRound className="h-11 w-11 md:h-14 md:w-14 text-black" style={{ minWidth: '25px', minHeight: '25px' }} />
+        <CircleUserRound className="h-11 w-11 md:h-14 md:w-14 text-black" />
       </Button>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="p-2 md:p-3 flex-shrink-0">
-            <Settings className="h-11 w-11 md:h-14 md:w-14 text-black" style={{ minWidth: '25px', minHeight: '25px' }} />
+            <Settings className="h-11 w-11 md:h-14 md:w-14 text-black" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48 mr-2">
@@ -173,7 +173,7 @@ const HeaderNavigation = () => {
           </DropdownMenuItem>
           {hasAdminAccess && (
             <DropdownMenuItem onClick={handleAdminClick}>
-              <Shield className="h-11 w-11 mr-2" style={{ minWidth: '25px', minHeight: '25px' }} />
+              <Shield className="h-11 w-11 mr-2" />
               Admin Dashboard
             </DropdownMenuItem>
           )}
