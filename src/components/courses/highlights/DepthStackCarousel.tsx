@@ -69,16 +69,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
     });
   }, [activeIndex]);
 
-  // Auto-play functionality (optional)
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (!isTransitioning) {
-        goToNext();
-      }
-    }, 8000); // Auto-advance every 8 seconds
-
-    return () => clearInterval(interval);
-  }, [goToNext, isTransitioning]);
+  // Auto-advance removed - user controls only
 
   const getCardStyle = (index: number, isMobile: boolean) => {
     const diff = index - activeIndex;
@@ -166,10 +157,16 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                       playsInline
                       controls={false}
                       onLoadedData={(e) => {
-                        // Ensure autoplay works for the active video
+                        console.log('Video loaded:', highlight.videoUrl);
                         if (index === activeIndex) {
                           e.currentTarget.play().catch(console.error);
                         }
+                      }}
+                      onError={(e) => {
+                        console.error('Video error for:', highlight.videoUrl, e);
+                      }}
+                      onCanPlay={() => {
+                        console.log('Video can play:', highlight.videoUrl);
                       }}
                     />
                   ) : (
