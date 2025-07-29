@@ -18,7 +18,7 @@ const ViewToggle: React.FC<ViewToggleProps> = ({ currentView, onViewChange }) =>
         variant="ghost"
         size="sm"
         onClick={() => onViewChange('cards')}
-        className={`relative rounded-full h-9 px-3 text-xs font-medium transition-all ${
+        className={`relative rounded-full px-3 py-1 text-xs font-medium transition-all ${
           currentView === 'cards'
             ? 'bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm'
             : 'text-white/70 hover:text-white hover:bg-white/10'
@@ -31,7 +31,7 @@ const ViewToggle: React.FC<ViewToggleProps> = ({ currentView, onViewChange }) =>
         variant="ghost"
         size="sm"
         onClick={() => onViewChange('list')}
-        className={`relative rounded-full h-9 px-3 text-xs font-medium transition-all ${
+        className={`relative rounded-full px-3 py-1 text-xs font-medium transition-all ${
           currentView === 'list'
             ? 'bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm'
             : 'text-white/70 hover:text-white hover:bg-white/10'
