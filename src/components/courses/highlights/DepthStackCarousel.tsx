@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Play, MapPin, Trophy } from 'lucide-react';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
+import Hls from 'hls.js';
 
 interface HighlightVideo {
   id: string;
@@ -26,8 +27,9 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
   const [activeIndex, setActiveIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   
-  // Ref to track all video elements
+  // Ref to track all video elements and HLS instances
   const videoRefs = React.useRef<(HTMLVideoElement | null)[]>([]);
+  const hlsInstances = React.useRef<(Hls | null)[]>([]);
 
   const goToNext = useCallback(() => {
     if (isTransitioning) return;
@@ -68,6 +70,17 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
       }
     });
   }, [activeIndex]);
+
+  // Cleanup HLS instances on unmount
+  useEffect(() => {
+    return () => {
+      hlsInstances.current.forEach(hls => {
+        if (hls) {
+          hls.destroy();
+        }
+      });
+    };
+  }, []);
 
   // Auto-advance removed - user controls only
 
@@ -147,10 +160,46 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                   {highlight.videoUrl ? (
                     <video
                       ref={(el) => {
-                        videoRefs.current[index] = el;
+                        if (el && highlight.videoUrl) {
+                          videoRefs.current[index] = el;
+                          
+                          // Clean up previous HLS instance
+                          if (hlsInstances.current[index]) {
+                            hlsInstances.current[index]?.destroy();
+                          }
+                          
+                          // Check if it's an HLS stream
+                          if (highlight.videoUrl.includes('.m3u8')) {
+                            if (Hls.isSupported()) {
+                              const hls = new Hls({
+                                enableWorker: false,
+                                lowLatencyMode: false
+                              });
+                              hlsInstances.current[index] = hls;
+                              hls.loadSource(highlight.videoUrl);
+                              hls.attachMedia(el);
+                              
+                              hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                                console.log('HLS manifest parsed for:', highlight.videoUrl);
+                                if (index === activeIndex) {
+                                  el.play().catch(console.error);
+                                }
+                              });
+                              
+                              hls.on(Hls.Events.ERROR, (event, data) => {
+                                console.error('HLS error:', event, data);
+                              });
+                            } else if (el.canPlayType('application/vnd.apple.mpegurl')) {
+                              // Safari native HLS support
+                              el.src = highlight.videoUrl;
+                            }
+                          } else {
+                            // Regular video file
+                            el.src = highlight.videoUrl;
+                          }
+                        }
                       }}
                       className="w-full h-full object-cover"
-                      src={highlight.videoUrl}
                       poster={highlight.thumbnail}
                       muted
                       loop
