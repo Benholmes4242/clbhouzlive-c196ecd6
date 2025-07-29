@@ -177,7 +177,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
               onClick={() => index !== activeIndex ? goToIndex(index) : onVideoPlay?.(highlight.id)}
             >
               {/* Video card */}
-              <div className="relative w-full h-full bg-white/5 backdrop-blur-2xl border border-white/20 rounded-xl overflow-hidden shadow-2xl">
+              <div className="relative w-full h-full bg-white/5 backdrop-blur-2xl border border-white/20 rounded-xl overflow-hidden">
                 {/* Video player - increased height */}
                 <div className="relative w-full h-72 overflow-hidden bg-black">
                   {highlight.videoUrl ? (
@@ -285,9 +285,8 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                   {/* ClbHouse average rating top right */}
                   {highlight.averageRating && (
                     <div className="absolute top-2 right-2 scale-75 origin-top-right z-20">
-                      <div className="relative flex items-center gap-2 px-1.5 py-1.5 rounded-xl shadow-[0_0_20px_rgba(0,0,0,0.2)] overflow-hidden">
+                      <div className="relative flex items-center gap-2 px-1.5 py-1.5 rounded-xl overflow-hidden">
                         <div className="absolute inset-0 bg-white/5 backdrop-blur-2xl border border-white/20 rounded-xl" style={{ backdropFilter: 'blur(40px) saturate(180%)' }}>
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent rounded-xl" />
                         </div>
                         <div className="relative z-10 flex items-center gap-2">
                           <img
