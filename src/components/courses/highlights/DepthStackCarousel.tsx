@@ -261,14 +261,19 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                   {/* ClbHouse average rating top right */}
                   {highlight.averageRating && (
                     <div className="absolute top-2 right-2 scale-75 origin-top-right z-20">
-                      <div className="flex items-center gap-2 px-1.5 py-1.5 bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl shadow-sm">
-                        <img
-                          src="/lovable-uploads/2b0e2d79-6b26-4b6b-a27b-8dd5f8cc5aad.png"
-                          alt="Clubhouse Community Rating"
-                          className="h-6 w-6"
-                          style={{ objectFit: 'contain' }}
-                        />
-                        <span className="text-base font-bold text-white">{highlight.averageRating}/10</span>
+                      <div className="relative flex items-center gap-2 px-1.5 py-1.5 rounded-xl shadow-[0_0_20px_rgba(0,0,0,0.2)] overflow-hidden">
+                        <div className="absolute inset-0 bg-white/5 backdrop-blur-2xl border border-white/20 rounded-xl" style={{ backdropFilter: 'blur(40px) saturate(180%)' }}>
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent rounded-xl" />
+                        </div>
+                        <div className="relative z-10 flex items-center gap-2">
+                          <img
+                            src="/lovable-uploads/2b0e2d79-6b26-4b6b-a27b-8dd5f8cc5aad.png"
+                            alt="Clubhouse Community Rating"
+                            className="h-6 w-6"
+                            style={{ objectFit: 'contain' }}
+                          />
+                          <span className="text-base font-bold text-white">{highlight.averageRating}/10</span>
+                        </div>
                       </div>
                     </div>
                   )}
