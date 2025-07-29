@@ -177,9 +177,9 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
               onClick={() => index !== activeIndex ? goToIndex(index) : onVideoPlay?.(highlight.id)}
             >
               {/* Video card */}
-              <div className="relative w-full h-full bg-white/5 backdrop-blur-2xl rounded-xl overflow-hidden">
-                {/* Video player - increased height */}
-                <div className="relative w-full h-80 overflow-hidden bg-black">
+              <div className="relative w-full h-full rounded-xl overflow-hidden">
+                {/* Full height video */}
+                <div className="relative w-full h-full overflow-hidden bg-black">
                   {highlight.videoUrl ? (
                     <video
                       ref={(el) => {
@@ -262,8 +262,6 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                     />
                   )}
                   
-                  {/* No play button overlay - videos show paused frame */}
-                  
                   {/* Duration badge */}
                   {highlight.duration && (
                     <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-2 py-1 rounded">
@@ -271,16 +269,8 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                     </div>
                   )}
                   
-                </div>
-                
-                {/* Course info */}
-                <div className="relative p-3">
-                  {/* Liquid glass background - always visible */}
-                  <div className="absolute inset-0 bg-white/5 backdrop-blur-2xl border-t border-white/20" style={{ backdropFilter: 'blur(40px) saturate(180%)' }}>
-                  </div>
-                  
-                  {/* Content - only visible on active card */}
-                  <div className={`relative transition-all duration-300 ${
+                  {/* Text overlay - only visible on active card */}
+                  <div className={`absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent transition-all duration-300 ${
                     index === activeIndex 
                       ? 'opacity-100 translate-y-0' 
                       : 'opacity-0 translate-y-2 pointer-events-none'
