@@ -167,7 +167,7 @@ const HeaderSearch = () => {
       <Button 
         variant="ghost" 
         size="icon" 
-        className="md:hidden mt-3" 
+        className="md:hidden mt-3 hover:bg-transparent active:bg-transparent" 
         onClick={handleMobileSearchToggle}
       >
         {showMobileSearch ? <X className="h-5 w-5" /> : <Search style={{ width: '20px', height: '20px' }} />}
