@@ -2,9 +2,22 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight, Volume2, VolumeX } from 'lucide-react';
 import { useCarouselNavigation } from '@/hooks/useCarouselNavigation';
 import { useThumbnailGenerator } from '@/components/posts/video/ThumbnailGenerator';
+import { useVideoAutoplay } from '@/hooks/useVideoAutoplay';
 import { Button } from '@/components/ui/button';
 import CourseRankBadges from '../CourseRankBadges';
 import Hls from 'hls.js';
+
+// Session-based mute preference management
+const MUTE_PREFERENCE_KEY = 'videoMutePreference';
+
+const getSessionMutePreference = (): boolean => {
+  const stored = sessionStorage.getItem(MUTE_PREFERENCE_KEY);
+  return stored ? JSON.parse(stored) : true; // Default to muted
+};
+
+const setSessionMutePreference = (isMuted: boolean): void => {
+  sessionStorage.setItem(MUTE_PREFERENCE_KEY, JSON.stringify(isMuted));
+};
 
 interface HighlightVideo {
   id: string;
@@ -38,16 +51,28 @@ const VideoCard: React.FC<{
   video: HighlightVideo; 
   isActive: boolean; 
   onVideoPlay?: (videoId: string) => void;
-}> = ({ video, isActive, onVideoPlay }) => {
+  isMobile: boolean;
+}> = ({ video, isActive, onVideoPlay, isMobile }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(true);
+  const [isMuted, setIsMuted] = useState(() => getSessionMutePreference());
   const { thumbnailSrc, thumbnailReady } = useThumbnailGenerator(
     video.videoUrl || '', 
     video.id, 
     video.thumbnail
   );
+
+  const {
+    ref: autoplayRef,
+    shouldAutoplay,
+    isInView,
+    handleMouseEnter,
+    handleMouseLeave
+  } = useVideoAutoplay({
+    enabled: true,
+    threshold: isMobile ? 0.8 : 0.6 // Higher threshold for mobile (more of card must be visible)
+  });
 
   // Initialize HLS for .m3u8 streams
   useEffect(() => {
@@ -69,20 +94,28 @@ const VideoCard: React.FC<{
     };
   }, [video.videoUrl]);
 
+  // Handle autoplay based on intersection observer
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
 
-    if (isActive) {
-      // Auto-play active video
+    if (isActive && shouldAutoplay && isInView) {
+      video.muted = isMuted;
       video.play().catch(() => {});
       setIsPlaying(true);
     } else {
-      // Pause non-active videos
       video.pause();
       setIsPlaying(false);
     }
-  }, [isActive]);
+  }, [isActive, shouldAutoplay, isInView, isMuted]);
+
+  // Update video mute state when session preference changes
+  useEffect(() => {
+    const video = videoRef.current;
+    if (video) {
+      video.muted = isMuted;
+    }
+  }, [isMuted]);
 
   const handleVideoClick = () => {
     if (videoRef.current) {
@@ -99,14 +132,23 @@ const VideoCard: React.FC<{
 
   const toggleMute = (e: React.MouseEvent) => {
     e.stopPropagation();
+    const newMutedState = !isMuted;
+    setIsMuted(newMutedState);
+    setSessionMutePreference(newMutedState);
+    
     if (videoRef.current) {
-      videoRef.current.muted = !isMuted;
-      setIsMuted(!isMuted);
+      videoRef.current.muted = newMutedState;
     }
   };
 
   return (
-    <div className="relative h-[28rem] rounded-lg overflow-hidden bg-black cursor-pointer group" onClick={handleVideoClick}>
+    <div 
+      ref={autoplayRef}
+      className="relative h-[28rem] rounded-lg overflow-hidden bg-black cursor-pointer group" 
+      onClick={handleVideoClick}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       {video.videoUrl ? (
         <video
           ref={videoRef}
@@ -114,6 +156,7 @@ const VideoCard: React.FC<{
           muted={isMuted}
           loop
           playsInline
+          controls={false}
           poster={thumbnailReady ? thumbnailSrc : video.thumbnail}
           onLoadedData={() => console.log('Video loaded:', video.id)}
           onError={(e) => console.error('Video error:', e)}
@@ -175,7 +218,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
   highlights,
   onVideoPlay
 }) => {
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [activeVideoIndex, setActiveVideoIndex] = useState(0);
   
   // Create carousel items with liquid glass card as second item
   const carouselItems: CarouselItem[] = [
@@ -193,6 +236,51 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
   } = useCarouselNavigation(carouselItems.length);
 
   const visibleCards = isMobile ? 1 : 3;
+
+  // Create a local ref to access the container element
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Handle scroll to detect which card should be active
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const containerRect = container.getBoundingClientRect();
+      const cards = container.children;
+      
+      let newActiveIndex = 0;
+      let maxVisibility = 0;
+
+      for (let i = 0; i < cards.length; i++) {
+        const card = cards[i] as HTMLElement;
+        const cardRect = card.getBoundingClientRect();
+        
+        // Calculate how much of the card is visible
+        const left = Math.max(cardRect.left, containerRect.left);
+        const right = Math.min(cardRect.right, containerRect.right);
+        const visibleWidth = Math.max(0, right - left);
+        const visibility = visibleWidth / cardRect.width;
+        
+        // For mobile, require higher visibility threshold
+        const threshold = isMobile ? 0.8 : 0.6;
+        
+        if (visibility > threshold && visibility > maxVisibility) {
+          maxVisibility = visibility;
+          newActiveIndex = i;
+        }
+      }
+
+      if (newActiveIndex !== activeVideoIndex) {
+        setActiveVideoIndex(newActiveIndex);
+      }
+    };
+
+    container.addEventListener('scroll', handleScroll);
+    handleScroll(); // Initial check
+    
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, [activeVideoIndex, isMobile]);
 
   return (
     <div className="relative w-full">
@@ -223,7 +311,10 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
 
       {/* Carousel container */}
       <div
-        ref={carouselRef}
+        ref={(node) => {
+          carouselRef(node);
+          containerRef.current = node;
+        }}
         className="flex gap-4 overflow-x-auto scrollbar-hide"
         style={{
           scrollSnapType: 'x mandatory',
@@ -242,8 +333,9 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
             ) : (
               <VideoCard
                 video={item as HighlightVideo}
-                isActive={index === 0} // Only first card autoplays
+                isActive={index === activeVideoIndex && 'type' in item === false}
                 onVideoPlay={onVideoPlay}
+                isMobile={isMobile}
               />
             )}
           </div>
