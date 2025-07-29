@@ -394,7 +394,7 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
               <button 
                 onClick={handleFollowToggle}
                 disabled={followMutation.isPending || isFollowingLoading}
-                className="flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-full px-3 h-9 hover:bg-white/30 transition-colors disabled:opacity-50"
+                className="flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-full px-3 py-1.5 hover:bg-white/30 transition-colors disabled:opacity-50"
               >
                 {isFollowing ? (
                   <>
