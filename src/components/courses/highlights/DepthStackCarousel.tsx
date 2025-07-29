@@ -25,6 +25,9 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
 }) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  
+  // Ref to track all video elements
+  const videoRefs = React.useRef<(HTMLVideoElement | null)[]>([]);
 
   const goToNext = useCallback(() => {
     if (isTransitioning) return;
@@ -52,6 +55,19 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
     onSwipeRight: goToPrevious,
     threshold: 50
   });
+
+  // Video management effect
+  useEffect(() => {
+    videoRefs.current.forEach((video, index) => {
+      if (video) {
+        if (index === activeIndex) {
+          video.play().catch(console.error);
+        } else {
+          video.pause();
+        }
+      }
+    });
+  }, [activeIndex]);
 
   // Auto-play functionality (optional)
   useEffect(() => {
@@ -135,20 +151,43 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
             >
               {/* Video card */}
               <div className="relative w-full h-full bg-white/5 backdrop-blur-2xl border border-white/20 rounded-xl overflow-hidden shadow-2xl">
-                {/* Video thumbnail */}
-                <div className="relative w-full h-48 overflow-hidden">
-                  <img
-                    src={highlight.thumbnail}
-                    alt={highlight.courseName}
-                    className="w-full h-full object-cover"
-                  />
+                {/* Video player */}
+                <div className="relative w-full h-48 overflow-hidden bg-black">
+                  {highlight.videoUrl ? (
+                    <video
+                      ref={(el) => {
+                        videoRefs.current[index] = el;
+                      }}
+                      className="w-full h-full object-cover"
+                      src={highlight.videoUrl}
+                      poster={highlight.thumbnail}
+                      muted
+                      loop
+                      playsInline
+                      controls={false}
+                      onLoadedData={(e) => {
+                        // Ensure autoplay works for the active video
+                        if (index === activeIndex) {
+                          e.currentTarget.play().catch(console.error);
+                        }
+                      }}
+                    />
+                  ) : (
+                    <img
+                      src={highlight.thumbnail}
+                      alt={highlight.courseName}
+                      className="w-full h-full object-cover"
+                    />
+                  )}
                   
-                  {/* Play button overlay */}
-                  <div className="absolute inset-0 bg-black/20 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-200">
-                    <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                      <Play className="w-6 h-6 text-white ml-1" fill="white" />
+                  {/* Play button overlay for non-active cards */}
+                  {index !== activeIndex && (
+                    <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+                      <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                        <Play className="w-6 h-6 text-white ml-1" fill="white" />
+                      </div>
                     </div>
-                  </div>
+                  )}
                   
                   {/* Duration badge */}
                   {highlight.duration && (

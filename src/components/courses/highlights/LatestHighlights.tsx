@@ -143,7 +143,7 @@ const LatestHighlights: React.FC<LatestHighlightsProps> = ({
               courseName: course.name,
               location: getLocation(),
               rank: getRank(),
-              thumbnail: course.thumbnail_image || media?.media_url || '/placeholder.svg',
+              thumbnail: media?.media_url || course.thumbnail_image || '/placeholder.svg',
               videoUrl: media?.media_url,
               caption: post.content || 'Golf moment at this amazing course',
               created_at: post.created_at
