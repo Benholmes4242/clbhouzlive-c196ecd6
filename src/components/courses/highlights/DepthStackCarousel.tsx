@@ -285,16 +285,13 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                       ? 'opacity-100 translate-y-0' 
                       : 'opacity-0 translate-y-2 pointer-events-none'
                   }`}>
-                    <h3 className="text-white font-bold text-lg mb-1 line-clamp-1">
+                    <h3 className="text-white font-bold text-2xl mb-3">
                       {highlight.courseName}
                     </h3>
-                    <div className="flex items-center gap-1 mb-2">
-                      <MapPin className="w-3 h-3 text-white/60" />
-                      <span className="text-white/80 text-sm">{highlight.location}</span>
+                    <div className="flex items-center gap-1">
+                      <MapPin className="w-4 h-4 text-white/60" />
+                      <span className="text-white/80 text-base">{highlight.location}</span>
                     </div>
-                    <p className="text-white/70 text-sm line-clamp-2">
-                      {highlight.caption}
-                    </p>
                   </div>
                 </div>
               </div>
