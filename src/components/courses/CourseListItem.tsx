@@ -72,12 +72,17 @@ const CourseListItem: React.FC<CourseListItemProps> = ({
 
       {/* Top right badges - regional rank and user rating on same row */}
       <div className="absolute top-2 right-2 flex items-center gap-2 z-20">
-        {/* Regional ranking badge only */}
-        {course.regional_rank && (
-          <div className="bg-white/20 backdrop-blur-sm rounded-full px-2 py-1 border border-white/30">
-            <span className="text-xs font-bold text-white">#{course.regional_rank}</span>
-          </div>
-        )}
+        {/* Regional ranking badge only - using original styling */}
+        <CourseRankBadges
+          globalRank={null}
+          regionalRank={course.regional_rank}
+          usaRank={null}
+          country={course.country}
+          viewContext={viewContext}
+          userRating={null}
+          showUserRating={false}
+          positioning="top-left"
+        />
 
         {/* User Rating Display */}
         {userRating && showUserRating && (
