@@ -63,38 +63,21 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
     threshold: 50
   });
 
-  // Video management effect - only play when videos are ready
+  // Simplified video management - just play/pause
   useEffect(() => {
     console.log('Video management effect triggered, activeIndex:', activeIndex);
     
+    const activeVideo = videoRefs.current[activeIndex];
+    if (activeVideo) {
+      console.log(`Attempting to play active video ${activeIndex}, readyState:`, activeVideo.readyState);
+      activeVideo.play().catch(e => console.error('Play error:', e));
+    }
+
+    // Pause all other videos
     videoRefs.current.forEach((video, index) => {
-      if (video) {
-        console.log(`Video ${index} - isActive: ${index === activeIndex}, paused: ${video.paused}, readyState: ${video.readyState}`);
-        
-        if (index === activeIndex) {
-          // Only play if video is ready and not already playing
-          if (video.paused && video.readyState >= 3) { // HAVE_FUTURE_DATA or better
-            console.log(`Playing video ${index}`);
-            video.play().catch(e => console.error('Play error:', e));
-          } else if (video.readyState < 3) {
-            console.log(`Video ${index} not ready yet, waiting...`);
-            // Wait for video to be ready
-            const onCanPlay = () => {
-              if (index === activeIndex && video.paused) {
-                console.log(`Video ${index} now ready, playing`);
-                video.play().catch(e => console.error('Play error:', e));
-              }
-              video.removeEventListener('canplay', onCanPlay);
-            };
-            video.addEventListener('canplay', onCanPlay);
-          }
-        } else {
-          // Pause non-active videos
-          if (!video.paused) {
-            console.log(`Pausing video ${index}`);
-            video.pause();
-          }
-        }
+      if (video && index !== activeIndex && !video.paused) {
+        console.log(`Pausing video ${index}`);
+        video.pause();
       }
     });
   }, [activeIndex]);
@@ -187,50 +170,35 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                 <div className="relative w-full h-48 overflow-hidden bg-black">
                   {highlight.videoUrl ? (
                     <video
-                      key={`video-${highlight.id}`}
                       ref={(el) => {
                         if (el && highlight.videoUrl) {
-                          // Prevent duplicate setup
-                          if (videoRefs.current[index] === el) return;
-                          
-                          console.log(`Setting up video ${index} for ${highlight.videoUrl}`);
                           videoRefs.current[index] = el;
+                          console.log(`Setting up video ${index}`);
                           
-                          // Clean up previous HLS instance
+                          // Clean up any existing HLS instance
                           if (hlsInstances.current[index]) {
-                            console.log(`Cleaning up HLS instance ${index}`);
                             hlsInstances.current[index]?.destroy();
-                            hlsInstances.current[index] = null;
                           }
                           
-                          // Set up video
+                          // Set up HLS or regular video
                           if (highlight.videoUrl.includes('.m3u8')) {
                             if (Hls.isSupported()) {
-                              const hls = new Hls({
-                                enableWorker: false,
-                                lowLatencyMode: false,
-                                autoStartLoad: true,
-                                startLevel: -1 // Auto quality
-                              });
+                              const hls = new Hls();
                               hlsInstances.current[index] = hls;
                               hls.loadSource(highlight.videoUrl);
                               hls.attachMedia(el);
                               
                               hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                                console.log(`HLS manifest parsed for video ${index}`);
-                                el.load(); // Ensure video loads
-                              });
-                              
-                              hls.on(Hls.Events.ERROR, (event, data) => {
-                                console.error(`HLS error for video ${index}:`, event, data);
+                                console.log(`HLS ready for video ${index}`);
+                                if (index === activeIndex) {
+                                  el.play().catch(console.error);
+                                }
                               });
                             } else if (el.canPlayType('application/vnd.apple.mpegurl')) {
                               el.src = highlight.videoUrl;
-                              el.load();
                             }
                           } else {
                             el.src = highlight.videoUrl;
-                            el.load();
                           }
                         }
                       }}
@@ -240,15 +208,14 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                       loop
                       playsInline
                       controls={false}
-                      preload="auto"
-                      onLoadedData={(e) => {
-                        console.log(`Video ${index} loaded data, readyState:`, e.currentTarget.readyState);
+                      preload="metadata"
+                      onLoadedData={() => {
+                        console.log(`Video ${index} loaded data`);
                       }}
-                      onCanPlay={(e) => {
-                        console.log(`Video ${index} can play, readyState:`, e.currentTarget.readyState);
-                        // Try to play if this is the active video
-                        if (index === activeIndex && e.currentTarget.paused) {
-                          e.currentTarget.play().catch(err => console.error('Auto-play failed:', err));
+                      onCanPlay={() => {
+                        console.log(`Video ${index} can play`);
+                        if (index === activeIndex) {
+                          videoRefs.current[index]?.play().catch(console.error);
                         }
                       }}
                       onError={(e) => {
