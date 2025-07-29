@@ -223,7 +223,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                         }
                       }
                     }}
-                    className="w-full h-full object-cover"
+                     className="w-full h-full object-cover rounded-lg"
                     poster={highlight.thumbnail}
                     muted
                     loop
@@ -256,7 +256,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                   <img
                     src={highlight.thumbnail}
                     alt={highlight.courseName}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover rounded-lg"
                   />
                 )}
                 
