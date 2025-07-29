@@ -210,10 +210,10 @@ const Top100AchievementsSection: React.FC<Top100AchievementsSectionProps> = ({
                       boxShadow: '0 0 25px #22c55e'
                     } : {}}
                   >
-                    {/* Debug text for 20 Club always */}
+                    {/* Debug text for 20 Club always - moved outside blur area */}
                     {is20Club && (
-                      <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1 rounded z-10">
-                        {userProgress >= 20 ? 'EARNED' : 'NOT EARNED'} - {userProgress}/20
+                      <div className="absolute -top-4 -right-4 bg-red-600 text-white text-sm px-2 py-1 rounded-lg shadow-lg z-50 border-2 border-white">
+                        DEBUG: {userProgress >= 20 ? 'EARNED' : 'NOT EARNED'} - {userProgress}/20
                       </div>
                     )}
                     
