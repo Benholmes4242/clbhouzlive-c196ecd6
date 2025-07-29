@@ -180,8 +180,14 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                   {highlight.videoUrl ? (
                     <video
                       ref={(el) => {
-                        if (el && highlight.videoUrl && !videoRefs.current[index]) {
+                        if (el && highlight.videoUrl) {
                           videoRefs.current[index] = el;
+                          
+                          // Clean up previous HLS instance for this index
+                          if (hlsInstances.current[index]) {
+                            hlsInstances.current[index]?.destroy();
+                            hlsInstances.current[index] = null;
+                          }
                           
                           // Check if it's an HLS stream
                           if (highlight.videoUrl.includes('.m3u8')) {
@@ -189,7 +195,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                               const hls = new Hls({
                                 enableWorker: false,
                                 lowLatencyMode: false,
-                                startLevel: 0, // Start with lowest quality for faster loading
+                                startLevel: 0,
                                 capLevelToPlayerSize: true
                               });
                               hlsInstances.current[index] = hls;
@@ -198,8 +204,11 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                               
                               hls.on(Hls.Events.MANIFEST_PARSED, () => {
                                 console.log('HLS manifest parsed for:', highlight.videoUrl);
-                                // Preload the video
-                                el.load();
+                                // Set to first frame and pause by default
+                                el.currentTime = 0;
+                                if (index === activeIndex) {
+                                  el.play().catch(console.error);
+                                }
                               });
                               
                               hls.on(Hls.Events.ERROR, (event, data) => {
@@ -208,12 +217,10 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                             } else if (el.canPlayType('application/vnd.apple.mpegurl')) {
                               // Safari native HLS support
                               el.src = highlight.videoUrl;
-                              el.load();
                             }
                           } else {
                             // Regular video file
                             el.src = highlight.videoUrl;
-                            el.load();
                           }
                         }
                       }}
@@ -223,11 +230,14 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                       loop
                       playsInline
                       controls={false}
-                      preload="metadata"
+                      preload="auto"
                       onLoadedData={(e) => {
                         console.log('Video loaded:', highlight.videoUrl);
-                        // Just ensure video is at start position
+                        // Ensure video shows first frame
                         e.currentTarget.currentTime = 0;
+                        if (index === activeIndex) {
+                          e.currentTarget.play().catch(console.error);
+                        }
                       }}
                       onError={(e) => {
                         console.error('Video error for:', highlight.videoUrl, e);
