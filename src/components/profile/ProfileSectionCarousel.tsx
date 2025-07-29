@@ -67,10 +67,16 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
             className={card.className}
             onClick={() => handleCardClick(card.id)}
           >
-            {/* Activity liquid glass background */}
+            {/* Activity background image */}
             {card.id === 'activity' && (
-              <div className="absolute inset-0 bg-white/5 backdrop-blur-2xl border border-white/20 rounded-lg">
-              </div>
+              <>
+                <img 
+                  src="/lovable-uploads/70d040be-d694-484a-b816-3af072d8293b.png" 
+                  alt="Golf course at sunset"
+                  className="absolute inset-0 w-full h-full object-cover rounded-lg"
+                />
+                <div className="absolute inset-0 bg-black/40 rounded-lg"></div>
+              </>
             )}
 
             {/* Top 100 liquid glass background */}
@@ -115,10 +121,16 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
               className={`${card.className.replace('h-[200px]', 'h-[250px]')} flex-shrink-0 w-full`}
               onClick={() => handleCardClick(card.id)}
             >
-              {/* Activity liquid glass background */}
+              {/* Activity background image */}
               {card.id === 'activity' && (
-                <div className="absolute inset-0 bg-white/5 backdrop-blur-2xl border border-white/20 rounded-lg">
-                </div>
+                <>
+                  <img 
+                    src="/lovable-uploads/70d040be-d694-484a-b816-3af072d8293b.png" 
+                    alt="Golf course at sunset"
+                    className="absolute inset-0 w-full h-full object-cover rounded-lg"
+                  />
+                  <div className="absolute inset-0 bg-black/40 rounded-lg"></div>
+                </>
               )}
 
               {/* Top 100 liquid glass background */}
