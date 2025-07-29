@@ -177,7 +177,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
               onClick={() => index !== activeIndex ? goToIndex(index) : onVideoPlay?.(highlight.id)}
             >
               {/* Video card - full card is video */}
-              <div className="relative w-full h-full overflow-hidden rounded-xl">
+              <div className="relative w-full h-full overflow-hidden">
                 {highlight.videoUrl ? (
                   <video
                     ref={(el) => {
