@@ -17,6 +17,7 @@ import PostViewerModal from '../posts/PostViewerModal';
 import { usePostViewer } from '@/hooks/usePostViewer';
 import { extractGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import UserCoursesContent from '@/components/courses/UserCoursesContent';
+import LatestHighlights from '@/components/courses/highlights/LatestHighlights';
 import HandicapSection from './HandicapSection';
 import ProfileSectionCarousel from './ProfileSectionCarousel';
 import { createDynamicBackgroundStyle } from '@/utils/backgroundGenerator';
@@ -408,6 +409,7 @@ const HeroProfileHeader = ({
                     <h2 className="text-3xl font-bold text-white">Top 100 courses</h2>
                   </div>
                 </div>
+                <LatestHighlights userId={profile?.id || ''} isOwnProfile={isOwnProfile} />
                 <UserCoursesContent 
                   username={profile?.username || ''}
                   isOwnProfile={isOwnProfile}
