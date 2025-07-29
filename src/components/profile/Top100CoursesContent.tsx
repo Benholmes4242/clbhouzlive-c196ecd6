@@ -38,6 +38,13 @@ const Top100CoursesContent: React.FC<Top100CoursesContentProps> = ({
     );
   }, [courses, searchTerm]);
 
+  // Debug logging for viewType
+  console.log('🔍 Top100CoursesContent DEBUG:', {
+    viewType,
+    coursesCount: filteredCourses.length,
+    isListView: viewType === 'list'
+  });
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-8">

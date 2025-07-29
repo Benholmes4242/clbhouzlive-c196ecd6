@@ -102,9 +102,9 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
     isListView: viewType === 'list'
   });
 
-  // FORCE LIST VIEW FOR TESTING
+  // FORCE LIST VIEW FOR TESTING - ALL CARDS WILL BE LIST VIEW
   const isListViewForced = true;
-  if (isListViewForced || viewType === 'list') {
+  if (true) { // Always render as list view for testing
     return (
       <>
         <div
