@@ -249,7 +249,7 @@ const LiquidGlassCard: React.FC = () => {
 
   return (
     <div 
-      className="relative h-[28rem] rounded-lg bg-white/10 backdrop-blur-2xl border border-white/20"
+      className="relative h-[28rem] rounded-lg overflow-hidden bg-white/10 backdrop-blur-2xl border border-white/20"
       style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
     >
       <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" />
@@ -279,7 +279,7 @@ const LiquidGlassCard: React.FC = () => {
         </div>
 
         {/* Achievement List */}
-        <div className="flex-1 overflow-y-auto scrollbar-hide space-y-3 relative">
+        <div className="flex-1 overflow-y-auto scrollbar-hide space-y-3">
           {userProgress.achievements.map((achievement) => (
             <div 
               key={achievement.id}
@@ -291,7 +291,7 @@ const LiquidGlassCard: React.FC = () => {
             >
               {/* Completed Stamp */}
               {achievement.earned && (
-                <div className="absolute -top-4 -right-4 transform -rotate-12 animate-scale-in" style={{ zIndex: 9999 }}>
+                <div className="absolute -top-1 -right-1 transform -rotate-12 animate-scale-in">
                   <img 
                     src="/lovable-uploads/e4e44275-1266-4a51-a3d2-1e02f989f7d8.png" 
                     alt="Completed"
@@ -449,9 +449,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
         {carouselItems.map((item, index) => (
           <div
             key={item.id}
-            className={`flex-shrink-0 ${isMobile ? 'w-full' : 'w-80'} ${
-              'type' in item && item.type === 'glass' ? 'overflow-visible pr-8 pt-4' : ''
-            }`}
+            className={`flex-shrink-0 ${isMobile ? 'w-full' : 'w-80'}`}
             style={{ scrollSnapAlign: 'start' }}
           >
             {'type' in item && item.type === 'glass' ? (
