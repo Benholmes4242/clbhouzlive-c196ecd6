@@ -70,8 +70,8 @@ const CourseListItem: React.FC<CourseListItemProps> = ({
         </div>
       </div>
 
-      {/* Top right badges */}
-      <div className="absolute top-2 right-2 flex items-center gap-2 z-20">
+      {/* Top right badges - spread horizontally */}
+      <div className="absolute top-2 right-2 flex items-center gap-3 z-20">
         {/* Course ranking badges */}
         <CourseRankBadges
           globalRank={course.global_rank}
@@ -80,7 +80,7 @@ const CourseListItem: React.FC<CourseListItemProps> = ({
           country={course.country}
           viewContext={viewContext}
           userRating={userRating}
-          showUserRating={showUserRating}
+          showUserRating={false}
           positioning="top-left"
         />
 
