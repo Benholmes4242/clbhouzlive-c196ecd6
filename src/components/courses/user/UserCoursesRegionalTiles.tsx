@@ -108,7 +108,7 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
                     <TooltipTrigger asChild>
                       <button
                         onClick={() => onFilterChange(activeFilter === tile.key ? null : tile.key)}
-                        className={`relative flex items-center justify-center gap-1 cursor-pointer transition-colors whitespace-nowrap py-1 shadow-lg shadow-black/10 text-base font-medium overflow-hidden h-10 ${
+                        className={`relative flex items-center justify-center gap-1 cursor-pointer transition-colors whitespace-nowrap px-4 py-1 shadow-lg shadow-black/10 text-base font-medium overflow-hidden h-10 ${
                           activeFilter === tile.key 
                             ? 'text-white' 
                             : 'text-white hover:bg-white/20'
@@ -158,7 +158,7 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
                     <TooltipTrigger asChild>
                       <button
                         onClick={() => onFilterChange(activeFilter === tile.key ? null : tile.key)}
-                        className={`relative flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors px-1 py-0.5 shadow-lg shadow-black/10 text-sm font-medium overflow-hidden ${
+                        className={`relative flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors px-2 py-0.5 shadow-lg shadow-black/10 text-sm font-medium overflow-hidden ${
                           activeFilter === tile.key 
                             ? 'text-white' 
                             : 'text-white hover:bg-white/20'
