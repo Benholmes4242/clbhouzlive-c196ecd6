@@ -76,14 +76,14 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
 
             {/* Top 100 liquid glass background */}
             {card.id === 'top100' && (
-              <div className="absolute inset-0 bg-white/5 backdrop-blur-2xl border border-white/20 rounded-lg shadow-[0_0_20px_rgba(0,0,0,0.2)]" style={{ backdropFilter: 'blur(1200px) saturate(180%)' }}>
+              <div className="absolute inset-0 bg-white/5 backdrop-blur-2xl border border-white/20 rounded-lg shadow-[0_0_20px_rgba(0,0,0,0.2)]" style={{ backdropFilter: 'blur(40px) saturate(180%)' }}>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent rounded-lg" />
               </div>
             )}
             
             {/* Handicap liquid glass background */}
             {card.id === 'handicap' && (
-              <div className="absolute inset-0 bg-white/5 backdrop-blur-2xl border border-white/20 rounded-lg shadow-[0_0_20px_rgba(0,0,0,0.2)]" style={{ backdropFilter: 'blur(1200px) saturate(180%)' }}>
+              <div className="absolute inset-0 bg-white/5 backdrop-blur-2xl border border-white/20 rounded-lg shadow-[0_0_20px_rgba(0,0,0,0.2)]" style={{ backdropFilter: 'blur(40px) saturate(180%)' }}>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent rounded-lg" />
               </div>
             )}
@@ -127,14 +127,14 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
 
               {/* Top 100 liquid glass background */}
               {card.id === 'top100' && (
-                <div className="absolute inset-0 bg-white/5 backdrop-blur-2xl border border-white/20 rounded-lg shadow-[0_0_20px_rgba(0,0,0,0.2)]" style={{ backdropFilter: 'blur(1200px) saturate(180%)' }}>
+                <div className="absolute inset-0 bg-white/5 backdrop-blur-2xl border border-white/20 rounded-lg shadow-[0_0_20px_rgba(0,0,0,0.2)]" style={{ backdropFilter: 'blur(40px) saturate(180%)' }}>
                   <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent rounded-lg" />
                 </div>
               )}
               
               {/* Handicap liquid glass background */}
               {card.id === 'handicap' && (
-                <div className="absolute inset-0 bg-white/5 backdrop-blur-2xl border border-white/20 rounded-lg shadow-[0_0_20px_rgba(0,0,0,0.2)]" style={{ backdropFilter: 'blur(1200px) saturate(180%)' }}>
+                <div className="absolute inset-0 bg-white/5 backdrop-blur-2xl border border-white/20 rounded-lg shadow-[0_0_20px_rgba(0,0,0,0.2)]" style={{ backdropFilter: 'blur(40px) saturate(180%)' }}>
                   <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent rounded-lg" />
                 </div>
               )}
