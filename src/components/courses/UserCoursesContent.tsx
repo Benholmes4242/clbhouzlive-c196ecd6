@@ -265,7 +265,7 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
 
 
       <div className="flex flex-col gap-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-end justify-between">
           <div className="flex-1">
             <UserCoursesRegionalTiles
               regionProgress={regionProgress}
@@ -277,8 +277,8 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
             />
           </div>
           
-          {/* View Toggle - positioned on the far right */}
-          <div className="flex-shrink-0 ml-4">
+          {/* View Toggle - positioned to align bottom with rank filters */}
+          <div className="flex-shrink-0 ml-4 self-end">
             <ViewToggle 
               currentView={viewType}
               onViewChange={setViewType}
