@@ -131,7 +131,7 @@ const Top100Courses: React.FC<Top100CoursesProps> = ({
         <p className="text-lg text-foreground font-normal">{headlineText}</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 px-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {regions.map((region) => {
           const progress = regionProgress[region.key];
           const percentage = progress?.total > 0 ? Math.round((progress.played / progress.total) * 100) : 0;
