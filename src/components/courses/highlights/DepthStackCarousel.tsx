@@ -286,7 +286,7 @@ const LiquidGlassCard: React.FC = () => {
               className={`relative backdrop-blur-sm rounded-lg p-4 border ${
                 achievement.earned 
                   ? achievement.id === '20-club'
-                    ? 'bg-green-500/20 border-green-400 shadow-2xl shadow-green-400/50 animate-pulse'
+                    ? 'bg-green-500/20 border-green-400 shadow-2xl shadow-green-400/50'
                     : 'bg-green-500/10 border-green-400/20' 
                   : 'bg-white/10 border-white/10'
               }`}
