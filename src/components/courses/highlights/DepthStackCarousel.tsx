@@ -121,11 +121,11 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
     }
 
     if (diff === 0) {
-      // Center card
+      // Center card - highest z-index and fully opaque
       return {
         opacity: 1,
         transform: 'translateX(0%) translateZ(0px) scale(1)',
-        zIndex: 10,
+        zIndex: 20, // Higher z-index to ensure it's above everything
         pointerEvents: 'auto' as const
       };
     } else if (Math.abs(diff) === 1) {
@@ -275,8 +275,12 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                 
                 {/* Course info */}
                 <div className="relative p-3">
-                  {/* Liquid glass background - always visible */}
-                  <div className="absolute inset-0 bg-white/5 backdrop-blur-2xl border-t border-white/20" style={{ backdropFilter: 'blur(40px) saturate(180%)' }}>
+                  {/* Solid background for active card, glass for others */}
+                  <div className={`absolute inset-0 border-t ${
+                    index === activeIndex 
+                      ? 'bg-black/90 border-white/30' // Fully opaque for active card
+                      : 'bg-white/5 backdrop-blur-2xl border-white/20' // Glass effect for inactive cards
+                  }`} style={index === activeIndex ? {} : { backdropFilter: 'blur(40px) saturate(180%)' }}>
                   </div>
                   
                   {/* Content - only visible on active card */}
