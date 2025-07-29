@@ -63,15 +63,29 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
     threshold: 50
   });
 
-  // Video management effect
+  // Video management effect - smoother transitions
   useEffect(() => {
     videoRefs.current.forEach((video, index) => {
       if (video) {
         if (index === activeIndex) {
-          video.play().catch(console.error);
+          // Ensure video is ready before playing
+          if (video.readyState >= 2) { // HAVE_CURRENT_DATA
+            video.currentTime = 0; // Reset to start
+            video.play().catch(console.error);
+          } else {
+            // Wait for video to be ready
+            const onCanPlay = () => {
+              video.currentTime = 0;
+              video.play().catch(console.error);
+              video.removeEventListener('canplay', onCanPlay);
+            };
+            video.addEventListener('canplay', onCanPlay);
+          }
         } else {
-          // Don't pause videos that are partially visible - just don't auto-play them
-          // This keeps the video frame visible without the black screen
+          // Pause non-active videos but keep them loaded
+          if (!video.paused) {
+            video.pause();
+          }
         }
       }
     });
@@ -166,20 +180,17 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                   {highlight.videoUrl ? (
                     <video
                       ref={(el) => {
-                        if (el && highlight.videoUrl) {
+                        if (el && highlight.videoUrl && !videoRefs.current[index]) {
                           videoRefs.current[index] = el;
-                          
-                          // Clean up previous HLS instance
-                          if (hlsInstances.current[index]) {
-                            hlsInstances.current[index]?.destroy();
-                          }
                           
                           // Check if it's an HLS stream
                           if (highlight.videoUrl.includes('.m3u8')) {
                             if (Hls.isSupported()) {
                               const hls = new Hls({
                                 enableWorker: false,
-                                lowLatencyMode: false
+                                lowLatencyMode: false,
+                                startLevel: 0, // Start with lowest quality for faster loading
+                                capLevelToPlayerSize: true
                               });
                               hlsInstances.current[index] = hls;
                               hls.loadSource(highlight.videoUrl);
@@ -187,9 +198,8 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                               
                               hls.on(Hls.Events.MANIFEST_PARSED, () => {
                                 console.log('HLS manifest parsed for:', highlight.videoUrl);
-                                if (index === activeIndex) {
-                                  el.play().catch(console.error);
-                                }
+                                // Preload the video
+                                el.load();
                               });
                               
                               hls.on(Hls.Events.ERROR, (event, data) => {
@@ -198,10 +208,12 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                             } else if (el.canPlayType('application/vnd.apple.mpegurl')) {
                               // Safari native HLS support
                               el.src = highlight.videoUrl;
+                              el.load();
                             }
                           } else {
                             // Regular video file
                             el.src = highlight.videoUrl;
+                            el.load();
                           }
                         }
                       }}
@@ -211,13 +223,11 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                       loop
                       playsInline
                       controls={false}
+                      preload="metadata"
                       onLoadedData={(e) => {
                         console.log('Video loaded:', highlight.videoUrl);
-                        // Load the video to first frame for all cards
+                        // Just ensure video is at start position
                         e.currentTarget.currentTime = 0;
-                        if (index === activeIndex) {
-                          e.currentTarget.play().catch(console.error);
-                        }
                       }}
                       onError={(e) => {
                         console.error('Video error for:', highlight.videoUrl, e);
