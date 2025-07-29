@@ -244,8 +244,9 @@ const HeroProfileHeader = ({
       <div className="relative w-full">
         {/* Apple Music Style Dynamic Background */}
         <div 
-          className="fixed inset-0 w-full overflow-hidden transition-all duration-500 -z-10"
+          className="absolute inset-0 w-full overflow-hidden transition-all duration-500"
           style={{
+            height: activeSection === 'top100' ? '300vh' : '1300px',
             backgroundImage: profile?.profile_photo_url 
               ? `url(${profile.profile_photo_url}?t=${avatarKey})`
               : 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-foreground)) 100%)',
@@ -375,7 +376,7 @@ const HeroProfileHeader = ({
       </div>
 
       {/* Content container - transparent to show blur behind */}
-      <div className="relative w-full z-10">
+      <div className="relative w-full">
         
         {/* Activity Section - directly after stats bar */}
         <div 
