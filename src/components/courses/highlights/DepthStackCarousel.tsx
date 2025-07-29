@@ -248,7 +248,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                   )}
                   
                   {/* Course ranking badges */}
-                  <div className="absolute top-2 left-2 right-16 flex flex-col gap-1 z-10 scale-75 origin-top-left">
+                  <div className="absolute top-2 left-2 right-16 flex flex-col gap-1 z-10 scale-75 origin-top-left items-center">
                     <CourseRankBadges
                       globalRank={highlight.globalRank}
                       regionalRank={highlight.regionalRank}
