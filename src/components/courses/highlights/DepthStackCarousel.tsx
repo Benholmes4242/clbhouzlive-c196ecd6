@@ -68,18 +68,9 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
     videoRefs.current.forEach((video, index) => {
       if (video) {
         if (index === activeIndex) {
-          // Ensure video is ready before playing
-          if (video.readyState >= 2) { // HAVE_CURRENT_DATA
-            video.currentTime = 0; // Reset to start
+          // Only play if not already playing to avoid restart
+          if (video.paused) {
             video.play().catch(console.error);
-          } else {
-            // Wait for video to be ready
-            const onCanPlay = () => {
-              video.currentTime = 0;
-              video.play().catch(console.error);
-              video.removeEventListener('canplay', onCanPlay);
-            };
-            video.addEventListener('canplay', onCanPlay);
           }
         } else {
           // Pause non-active videos but keep them loaded
@@ -204,11 +195,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                               
                               hls.on(Hls.Events.MANIFEST_PARSED, () => {
                                 console.log('HLS manifest parsed for:', highlight.videoUrl);
-                                // Set to first frame and pause by default
-                                el.currentTime = 0;
-                                if (index === activeIndex) {
-                                  el.play().catch(console.error);
-                                }
+                                // Let the video management effect handle playback
                               });
                               
                               hls.on(Hls.Events.ERROR, (event, data) => {
@@ -233,11 +220,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                       preload="auto"
                       onLoadedData={(e) => {
                         console.log('Video loaded:', highlight.videoUrl);
-                        // Ensure video shows first frame
-                        e.currentTarget.currentTime = 0;
-                        if (index === activeIndex) {
-                          e.currentTarget.play().catch(console.error);
-                        }
+                        // Don't auto-play or reset currentTime here to avoid flickering
                       }}
                       onError={(e) => {
                         console.error('Video error for:', highlight.videoUrl, e);
