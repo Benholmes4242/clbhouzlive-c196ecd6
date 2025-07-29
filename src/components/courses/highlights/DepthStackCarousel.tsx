@@ -238,10 +238,10 @@ const LiquidGlassCard: React.FC = () => {
     played: 21,
     total: 300,
     achievements: [
-      { id: '20-club', name: '20 Club', description: 'Play 20 Top 100', target: 20, earned: true },
-      { id: '50-club', name: '50 Club', description: 'Play 50 Top 100', target: 50, earned: false },
-      { id: '100-club', name: '100 Club', description: 'Play 100 Top 100', target: 100, earned: false },
-      { id: '300-club', name: '300 Club', description: 'Play 300 Top 100', target: 300, earned: false },
+      { id: '20-club', name: '20 Club', description: 'Play 20 Top 100 courses', target: 20, earned: true },
+      { id: '50-club', name: '50 Club', description: 'Play 50 Top 100 courses', target: 50, earned: false },
+      { id: '100-club', name: '100 Club', description: 'Play 100 Top 100 courses', target: 100, earned: false },
+      { id: '300-club', name: '300 Club', description: 'Play 300 Top 100 courses', target: 300, earned: false },
     ]
   };
 
