@@ -90,10 +90,9 @@ const CourseRankBadges = ({
           {rankingBadges.map((badge, index) => (
             <Tooltip key={index}>
               <TooltipTrigger asChild>
-                <div className="relative flex items-center px-1.5 py-1.5 rounded-xl shadow-[0_0_20px_rgba(0,0,0,0.2)] overflow-hidden" style={{ borderRadius: '8px' }}>
-                  <div className="absolute inset-0 bg-white/5 backdrop-blur-2xl border border-white/20 rounded-xl" style={{ backdropFilter: 'blur(40px) saturate(180%)' }}>
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent rounded-xl" />
-                  </div>
+                <div className="relative flex items-center px-1.5 py-1.5 rounded-xl shadow-lg shadow-black/10 overflow-hidden" style={{ borderRadius: '8px' }}>
+                  <div className="absolute inset-0 bg-white/10 border border-white/20" style={{ backdropFilter: 'blur(40px) saturate(180%)', borderRadius: '8px' }} />
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" style={{ borderRadius: '8px' }} />
                   <div className="relative z-10 flex items-center">
                     {badge.icon}
                     <span className={`text-base font-bold text-white ${index === 0 ? 'ml-4' : 'ml-2'}`}>{badge.rank}</span>
@@ -113,10 +112,9 @@ const CourseRankBadges = ({
         <div className="absolute top-2 right-2">
           <Tooltip>
             <TooltipTrigger asChild>
-               <div className="relative flex items-center gap-2 px-1.5 py-1.5 rounded-xl shadow-[0_0_20px_rgba(0,0,0,0.2)] overflow-hidden" style={{ borderRadius: '8px' }}>
-                 <div className="absolute inset-0 bg-white/5 backdrop-blur-2xl border border-white/20 rounded-xl" style={{ backdropFilter: 'blur(40px) saturate(180%)' }}>
-                   <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent rounded-xl" />
-                 </div>
+               <div className="relative flex items-center gap-2 px-1.5 py-1.5 rounded-xl shadow-lg shadow-black/10 overflow-hidden" style={{ borderRadius: '8px' }}>
+                 <div className="absolute inset-0 bg-white/10 border border-white/20" style={{ backdropFilter: 'blur(40px) saturate(180%)', borderRadius: '8px' }} />
+                 <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" style={{ borderRadius: '8px' }} />
                  <div className="relative z-10 flex items-center gap-2">
                    <ClubhouseLogo size="md" />
                    <span className="text-base font-bold text-white">{playerRatingBadge.content}</span>
