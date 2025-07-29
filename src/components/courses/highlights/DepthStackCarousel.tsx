@@ -94,26 +94,48 @@ const VideoCard: React.FC<{
     };
   }, [video.videoUrl]);
 
+  // Initialize video loading and ensure first frame is visible
+  useEffect(() => {
+    const videoElement = videoRef.current;
+    if (!videoElement || !video.videoUrl) return;
+
+    // Ensure video loads metadata and first frame
+    videoElement.load();
+    
+    // Set to first frame when loaded
+    const handleLoadedData = () => {
+      if (videoElement.paused) {
+        videoElement.currentTime = 0;
+      }
+    };
+
+    videoElement.addEventListener('loadeddata', handleLoadedData);
+    return () => videoElement.removeEventListener('loadeddata', handleLoadedData);
+  }, [video.videoUrl]);
+
   // Handle autoplay based on intersection observer
   useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
+    const videoElement = videoRef.current;
+    if (!videoElement) return;
+
+    videoElement.muted = isMuted;
 
     if (isActive && shouldAutoplay && isInView) {
-      video.muted = isMuted;
-      video.play().catch(() => {});
+      videoElement.play().catch(() => {});
       setIsPlaying(true);
     } else {
-      video.pause();
+      // Pause but ensure video shows first frame (not black)
+      videoElement.pause();
+      videoElement.currentTime = 0; // Reset to first frame
       setIsPlaying(false);
     }
   }, [isActive, shouldAutoplay, isInView, isMuted]);
 
   // Update video mute state when session preference changes
   useEffect(() => {
-    const video = videoRef.current;
-    if (video) {
-      video.muted = isMuted;
+    const videoElement = videoRef.current;
+    if (videoElement) {
+      videoElement.muted = isMuted;
     }
   }, [isMuted]);
 
@@ -157,8 +179,15 @@ const VideoCard: React.FC<{
           loop
           playsInline
           controls={false}
+          preload="metadata" // Ensure first frame loads
           poster={thumbnailReady ? thumbnailSrc : video.thumbnail}
-          onLoadedData={() => console.log('Video loaded:', video.id)}
+          onLoadedData={() => {
+            console.log('Video loaded:', video.id);
+            // Ensure paused videos show first frame
+            if (videoRef.current && videoRef.current.paused) {
+              videoRef.current.currentTime = 0;
+            }
+          }}
           onError={(e) => console.error('Video error:', e)}
         />
       ) : (
