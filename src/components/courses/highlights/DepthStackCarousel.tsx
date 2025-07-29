@@ -449,7 +449,9 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
         {carouselItems.map((item, index) => (
           <div
             key={item.id}
-            className={`flex-shrink-0 ${isMobile ? 'w-full' : 'w-80'}`}
+            className={`flex-shrink-0 ${isMobile ? 'w-full' : 'w-80'} ${
+              'type' in item && item.type === 'glass' ? 'overflow-visible pr-8 pt-4' : ''
+            }`}
             style={{ scrollSnapAlign: 'start' }}
           >
             {'type' in item && item.type === 'glass' ? (
