@@ -197,7 +197,7 @@ const Top100AchievementsSection: React.FC<Top100AchievementsSectionProps> = ({
                   className={`flex items-center gap-3 p-3 rounded-lg border transition-all duration-300 ${
                     achievement.isEarned
                       ? achievement.id === '20-club'
-                        ? "bg-gradient-to-r from-amber-500/30 to-yellow-500/30 border-amber-400 shadow-xl shadow-amber-500/40 ring-2 ring-amber-400/50"
+                        ? "bg-gradient-to-r from-emerald-500/20 to-green-500/20 border-emerald-400 shadow-xl shadow-emerald-500/50 ring-2 ring-emerald-400 animate-pulse"
                         : "bg-green-500/10 border-green-400/30"
                       : "bg-white/5 border-white/20 opacity-60"
                   }`}
