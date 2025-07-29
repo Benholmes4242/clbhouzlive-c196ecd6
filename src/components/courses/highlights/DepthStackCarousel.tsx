@@ -63,25 +63,36 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
     threshold: 50
   });
 
-  // Video management - play active, pause others but keep them visible
+  // Smooth video transitions - no black screens during swipe
   useEffect(() => {
+    // Don't manage videos during transitions to prevent black screens
+    if (isTransitioning) return;
+    
     console.log('Video management effect triggered, activeIndex:', activeIndex);
     
-    videoRefs.current.forEach((video, index) => {
-      if (video) {
-        if (index === activeIndex) {
-          console.log(`Playing active video ${index}`);
-          video.play().catch(e => console.error('Play error:', e));
-        } else {
-          // Pause but don't reset - keep video frame visible
-          if (!video.paused) {
-            console.log(`Pausing video ${index} but keeping frame visible`);
-            video.pause();
+    // Small delay to ensure card positioning is complete before video management
+    const timeoutId = setTimeout(() => {
+      videoRefs.current.forEach((video, index) => {
+        if (video) {
+          if (index === activeIndex) {
+            // Only play if video is ready and not already playing
+            if (video.paused && video.readyState >= 2) {
+              console.log(`Playing active video ${index}`);
+              video.play().catch(e => console.error('Play error:', e));
+            }
+          } else {
+            // Pause but keep frame visible - no currentTime reset to avoid black screen
+            if (!video.paused) {
+              console.log(`Pausing video ${index} but keeping frame`);
+              video.pause();
+            }
           }
         }
-      }
-    });
-  }, [activeIndex]);
+      });
+    }, 100); // Small delay to ensure smooth transition
+
+    return () => clearTimeout(timeoutId);
+  }, [activeIndex, isTransitioning]);
 
   // Cleanup HLS instances on unmount
   useEffect(() => {
@@ -181,18 +192,29 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                             hlsInstances.current[index]?.destroy();
                           }
                           
-                          // Set up HLS or regular video
+                          // Set up HLS or regular video with preloading for smooth transitions
                           if (highlight.videoUrl.includes('.m3u8')) {
                             if (Hls.isSupported()) {
-                              const hls = new Hls();
+                              const hls = new Hls({
+                                enableWorker: false,
+                                lowLatencyMode: false,
+                                startLevel: 0, // Start with lowest quality for faster loading
+                                maxBufferLength: 10 // Smaller buffer for faster switching
+                              });
                               hlsInstances.current[index] = hls;
                               hls.loadSource(highlight.videoUrl);
                               hls.attachMedia(el);
                               
                               hls.on(Hls.Events.MANIFEST_PARSED, () => {
                                 console.log(`HLS ready for video ${index}`);
-                                if (index === activeIndex) {
-                                  el.play().catch(console.error);
+                                // Preload a small amount to ensure frame visibility
+                                el.currentTime = 0.1;
+                              });
+
+                              hls.on(Hls.Events.FRAG_LOADED, () => {
+                                // Ensure we have at least one frame loaded
+                                if (el.currentTime === 0) {
+                                  el.currentTime = 0.1;
                                 }
                               });
                             } else if (el.canPlayType('application/vnd.apple.mpegurl')) {
@@ -212,17 +234,20 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                       preload="metadata"
                       onLoadedData={() => {
                         console.log(`Video ${index} loaded data`);
-                        // Ensure all videos show their first frame when loaded
+                        // Only set currentTime on initial load, not during transitions
                         const video = videoRefs.current[index];
-                        if (video) {
-                          video.currentTime = 0;
+                        if (video && video.currentTime === 0) {
+                          video.currentTime = 0.1; // Slightly ahead to ensure frame is visible
                         }
                       }}
                       onCanPlay={() => {
                         console.log(`Video ${index} can play`);
-                        const video = videoRefs.current[index];
-                        if (video && index === activeIndex && video.paused) {
-                          video.play().catch(console.error);
+                        // Don't auto-play during transitions
+                        if (!isTransitioning) {
+                          const video = videoRefs.current[index];
+                          if (video && index === activeIndex && video.paused) {
+                            video.play().catch(console.error);
+                          }
                         }
                       }}
                       onError={(e) => {
