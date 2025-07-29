@@ -321,13 +321,13 @@ const HeroProfileHeader = ({
             
             {/* Username */}
             {username && (
-              <p className="text-lg text-white/80 mb-2">
+              <p className="text-lg text-white mb-2">
                 @{username}
               </p>
             )}
             
             {/* Home Golf Club */}
-            <p className="text-base text-white/70">
+            <p className="text-base text-white">
               {homeClub}
             </p>
           </div>
