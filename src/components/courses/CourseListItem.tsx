@@ -71,27 +71,16 @@ const CourseListItem: React.FC<CourseListItemProps> = ({
       </div>
 
       {/* Top right badges */}
-      <div className="absolute top-2 right-2 flex items-center gap-2 z-20">
-        {/* Course ranking badges */}
-        <CourseRankBadges
-          globalRank={course.global_rank}
-          regionalRank={course.regional_rank}
-          usaRank={course.usa_rank}
-          country={course.country}
-          viewContext={viewContext}
-          userRating={userRating}
-          showUserRating={showUserRating}
-          positioning="top-left"
-        />
-
-        {/* User Rating Display */}
-        {userRating && showUserRating && (
-          <div className="flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-full px-2 py-1">
-            <Star className="h-3 w-3 text-yellow-400 fill-current" />
-            <span className="text-xs font-medium text-white">{userRating}/10</span>
-          </div>
-        )}
-      </div>
+      <CourseRankBadges
+        globalRank={course.global_rank}
+        regionalRank={course.regional_rank}
+        usaRank={course.usa_rank}
+        country={course.country}
+        viewContext={viewContext}
+        userRating={userRating}
+        showUserRating={showUserRating}
+        positioning="top-left"
+      />
     </div>
   );
 };

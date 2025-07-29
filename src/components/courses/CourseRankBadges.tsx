@@ -78,14 +78,14 @@ const CourseRankBadges = ({
         return 'absolute bottom-3 left-6 flex flex-row gap-2 z-10';
       case 'top-left':
       default:
-        return 'absolute top-2 left-2 flex flex-col gap-1 z-10';
+        return 'absolute top-2 right-2 flex flex-row gap-2 z-10';
     }
   };
 
   return (
     <TooltipProvider>
-      {/* Ranking badges */}
-      {rankingBadges.length > 0 && (
+      {/* Ranking badges with integrated player rating */}
+      {(rankingBadges.length > 0 || playerRatingBadge) && (
         <div className={getPositioningClasses()}>
           {rankingBadges.map((badge, index) => (
             <Tooltip key={index}>
@@ -104,11 +104,30 @@ const CourseRankBadges = ({
               </TooltipContent>
             </Tooltip>
           ))}
+          
+          {/* Add Clubhouse rating badge as the rightmost badge */}
+          {playerRatingBadge && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                 <div className="relative flex items-center gap-2 px-1.5 py-1.5 rounded-xl shadow-lg shadow-black/10 overflow-hidden" style={{ borderRadius: '8px' }}>
+                   <div className="absolute inset-0 bg-white/10 border border-white/20" style={{ backdropFilter: 'blur(40px) saturate(180%)', borderRadius: '8px' }} />
+                   <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" style={{ borderRadius: '8px' }} />
+                   <div className="relative z-10 flex items-center gap-2">
+                     <ClubhouseLogo size="sm" />
+                     <span className="text-sm font-bold text-white">{playerRatingBadge.content}</span>
+                   </div>
+                 </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{playerRatingBadge.tooltip}</p>
+              </TooltipContent>
+            </Tooltip>
+          )}
         </div>
       )}
 
-      {/* Player rating badge - show on top-right when user rating exists */}
-      {playerRatingBadge && (
+      {/* Player rating badge - integrated with ranking badges */}
+      {playerRatingBadge && rankingBadges.length === 0 && (
         <div className="absolute top-2 right-2">
           <Tooltip>
             <TooltipTrigger asChild>
