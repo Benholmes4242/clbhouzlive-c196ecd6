@@ -92,7 +92,7 @@ const CourseRankBadges = ({
               <TooltipTrigger asChild>
                 <div className="flex items-center px-1.5 py-1.5 bg-white/20 backdrop-blur-sm border border-white/30 rounded-xl shadow-sm" style={{ borderRadius: '8px' }}>
                   {badge.icon}
-                  <span className={`text-base font-bold text-white ${index === 0 ? 'ml-3' : 'ml-2'}`}>{badge.rank}</span>
+                  <span className={`text-base font-bold text-white ${index === 0 ? 'ml-4' : 'ml-2'}`}>{badge.rank}</span>
                 </div>
               </TooltipTrigger>
               <TooltipContent>
