@@ -179,7 +179,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
               {/* Video card */}
               <div className="relative w-full h-full bg-white/5 backdrop-blur-2xl border border-white/20 rounded-xl overflow-hidden">
                 {/* Video player - increased height */}
-                <div className="relative w-full h-72 overflow-hidden bg-black">
+                <div className="relative w-full h-80 overflow-hidden bg-black">
                   {highlight.videoUrl ? (
                     <video
                       ref={(el) => {
