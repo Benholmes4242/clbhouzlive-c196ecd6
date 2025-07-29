@@ -198,23 +198,22 @@ const Top100AchievementsSection: React.FC<Top100AchievementsSectionProps> = ({
                 return (
                   <div
                     key={achievement.id}
-                    className={`flex items-center gap-3 p-3 rounded-lg border-2 transition-all duration-300 ${
+                    className={`relative flex items-center gap-3 p-3 rounded-lg border-2 transition-all duration-300 ${
                       isEarned
                         ? "bg-green-500/10 border-green-400/30"
                         : "bg-white/5 border-white/20 opacity-60"
                     }`}
-                    style={is20Club && isEarned ? {
+                    style={is20Club ? {
                       backgroundColor: '#22c55e33',
                       borderColor: '#22c55e',
                       borderWidth: '3px',
-                      boxShadow: '0 0 25px #22c55e, inset 0 0 25px #22c55e22',
-                      animation: 'pulse 2s infinite'
+                      boxShadow: '0 0 25px #22c55e'
                     } : {}}
                   >
-                    {/* Debug text */}
+                    {/* Debug text for 20 Club always */}
                     {is20Club && (
-                      <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1 rounded">
-                        {isEarned ? 'EARNED' : 'NOT EARNED'} - {userProgress}/20
+                      <div className="absolute -top-2 -right-2 bg-red-500 text-white text-xs px-1 rounded z-10">
+                        {userProgress >= 20 ? 'EARNED' : 'NOT EARNED'} - {userProgress}/20
                       </div>
                     )}
                     
