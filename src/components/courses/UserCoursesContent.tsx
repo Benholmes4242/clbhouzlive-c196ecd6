@@ -8,7 +8,7 @@ import CourseCard from './CourseCard';
 import { EmptyTop100State } from './user/UserCoursesEmptyStates';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import Top100AchievementsSection from '@/components/profile/Top100AchievementsSection';
+
 
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
@@ -260,16 +260,6 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
         isOwnProfile={finalIsOwnProfile} 
       />
 
-      {/* Achievements Section */}
-      {targetUserId && (
-        <div className="mb-6">
-          <Top100AchievementsSection 
-            userId={targetUserId} 
-            isOwnProfile={finalIsOwnProfile}
-            userDisplayName={finalDisplayName}
-          />
-        </div>
-      )}
 
       <UserCoursesRegionalTiles
         regionProgress={regionProgress}
