@@ -130,7 +130,7 @@ const HeaderSearch = () => {
       {/* Desktop Search Bar */}
       <div className="hidden md:flex items-center max-w-md w-full mx-4" ref={searchRef}>
         <div className="relative w-full">
-          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white h-8 w-8 z-10" />
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white h-10 w-10 z-10" />
           <input
             type="text"
             placeholder="Search players, courses, or content..."
@@ -189,7 +189,7 @@ const HeaderSearch = () => {
           style={{ pointerEvents: 'auto' }}
         >
           <div className="relative w-full" style={{ pointerEvents: 'auto' }}>
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white h-8 w-8 z-10" />
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white h-10 w-10 z-10" />
             <input
               ref={inputRef}
               type="text"
