@@ -177,7 +177,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
               onClick={() => index !== activeIndex ? goToIndex(index) : onVideoPlay?.(highlight.id)}
             >
               {/* Video card */}
-              <div className="relative w-full h-full bg-transparent rounded-xl overflow-hidden">
+              <div className="relative w-full h-full bg-white/5 backdrop-blur-2xl border border-white/20 rounded-xl overflow-hidden">
                 {/* Video player - increased height */}
                 <div className="relative w-full h-72 overflow-hidden bg-black">
                   {highlight.videoUrl ? (
@@ -286,7 +286,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                   {highlight.averageRating && (
                     <div className="absolute top-2 right-2 scale-75 origin-top-right z-20">
                       <div className="relative flex items-center gap-2 px-1.5 py-1.5 rounded-xl overflow-hidden">
-                        <div className="absolute inset-0 bg-black/60 rounded-xl">
+                        <div className="absolute inset-0 bg-white/5 backdrop-blur-2xl border border-white/20 rounded-xl" style={{ backdropFilter: 'blur(40px) saturate(180%)' }}>
                         </div>
                         <div className="relative z-10 flex items-center gap-2">
                           <img
@@ -304,8 +304,8 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                 
                 {/* Course info */}
                 <div className="relative p-4">
-                  {/* Background */}
-                  <div className="absolute inset-0 bg-black/60">
+                  {/* Liquid glass background */}
+                  <div className="absolute inset-0 bg-white/5 backdrop-blur-2xl border-t border-white/20" style={{ backdropFilter: 'blur(40px) saturate(180%)' }}>
                   </div>
                   
                   {/* Content */}
