@@ -191,19 +191,23 @@ const Top100AchievementsSection: React.FC<Top100AchievementsSectionProps> = ({
                 scrollbarWidth: 'thin'
               }}
             >
-              {achievements.map((achievement) => {
-                console.log(`Achievement ${achievement.id}: isEarned=${achievement.isEarned}, userProgress=${userProgress}`);
+              {achievements.map((achievement, index) => {
+                const is20Club = achievement.id === '20-club';
+                const isEarned = achievement.isEarned;
                 
                 return (
                   <div
                     key={achievement.id}
                     className={`flex items-center gap-3 p-3 rounded-lg border transition-all duration-300 ${
-                      achievement.isEarned
-                        ? achievement.id === '20-club'
-                          ? "bg-gradient-to-r from-emerald-500/20 to-green-500/20 border-emerald-400 shadow-xl shadow-emerald-500/50 ring-2 ring-emerald-400 animate-pulse"
+                      isEarned
+                        ? is20Club
+                          ? "bg-gradient-to-r from-emerald-500/30 to-green-400/30 border-2 border-emerald-400 shadow-2xl shadow-emerald-500/60 ring-4 ring-emerald-400/50 glow-green"
                           : "bg-green-500/10 border-green-400/30"
                         : "bg-white/5 border-white/20 opacity-60"
                     }`}
+                    style={is20Club && isEarned ? {
+                      boxShadow: '0 0 30px rgba(16, 185, 129, 0.8), inset 0 0 30px rgba(16, 185, 129, 0.2)'
+                    } : {}}
                   >
                     {/* Achievement Icon */}
                     <div className="flex items-center justify-center w-8 h-8 rounded-full text-3xl">
