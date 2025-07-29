@@ -100,13 +100,13 @@ const LatestHighlights: React.FC<LatestHighlightsProps> = ({
   }
 
   return (
-    <div className="p-6">
-      <div className="mb-6">
+    <div className="px-4">
+      <div className="mb-4">
         <h2 className="text-2xl font-bold text-white mb-2">Latest Highlights</h2>
         <p className="text-white/70">
           {isOwnProfile 
-            ? 'Your most memorable moments from the world\'s greatest courses'
-            : 'Recent highlights from top golf courses'
+            ? "Your most memorable moments from the world's greatest courses"
+            : "Recent highlights from top golf courses"
           }
         </p>
       </div>
