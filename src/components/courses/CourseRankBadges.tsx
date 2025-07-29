@@ -39,7 +39,7 @@ const CourseRankBadges = ({
   if (globalRank && globalRank <= 100) {
     rankingBadges.push({
       rank: globalRank,
-      icon: <Earth className="h-6 w-6 text-white" />,
+      icon: <Earth className="h-5 w-5 text-white" />,
       tooltip: "Worldwide Ranking"
     });
   }
@@ -48,19 +48,19 @@ const CourseRankBadges = ({
   if (isGBI && regionalRank && regionalRank <= 100) {
     rankingBadges.push({
       rank: regionalRank,
-      icon: <CountryFlag country="Britain & Ireland" size="lg" />,
+      icon: <CountryFlag country="Britain & Ireland" size="md" />,
       tooltip: "GB&I Ranking"
     });
   } else if (isUSA && usaRank && usaRank <= 100) {
     rankingBadges.push({
       rank: usaRank,
-      icon: <CountryFlag country="USA" size="lg" />,
+      icon: <CountryFlag country="USA" size="md" />,
       tooltip: "USA Ranking"
     });
   } else if (isEurope && regionalRank && regionalRank <= 100) {
     rankingBadges.push({
       rank: regionalRank,
-      icon: <CountryFlag country="Continental Europe" size="lg" />,
+      icon: <CountryFlag country="Continental Europe" size="md" />,
       tooltip: "Continental Europe Ranking"
     });
   }
@@ -95,7 +95,7 @@ const CourseRankBadges = ({
                   <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" style={{ borderRadius: '8px' }} />
                   <div className="relative z-10 flex items-center">
                     {badge.icon}
-                    <span className={`text-base font-bold text-white ${index === 0 ? 'ml-4' : 'ml-2'}`}>{badge.rank}</span>
+                    <span className={`text-sm font-bold text-white ${index === 0 ? 'ml-4' : 'ml-2'}`}>{badge.rank}</span>
                   </div>
                 </div>
               </TooltipTrigger>
@@ -116,8 +116,8 @@ const CourseRankBadges = ({
                  <div className="absolute inset-0 bg-white/10 border border-white/20" style={{ backdropFilter: 'blur(40px) saturate(180%)', borderRadius: '8px' }} />
                  <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" style={{ borderRadius: '8px' }} />
                  <div className="relative z-10 flex items-center gap-2">
-                   <ClubhouseLogo size="md" />
-                   <span className="text-base font-bold text-white">{playerRatingBadge.content}</span>
+                   <ClubhouseLogo size="sm" />
+                   <span className="text-sm font-bold text-white">{playerRatingBadge.content}</span>
                  </div>
                </div>
             </TooltipTrigger>
