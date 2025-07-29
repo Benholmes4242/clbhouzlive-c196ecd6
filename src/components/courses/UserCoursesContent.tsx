@@ -9,7 +9,7 @@ import { EmptyTop100State } from './user/UserCoursesEmptyStates';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import Top100AchievementsSection from '@/components/profile/Top100AchievementsSection';
-import Top100VideoHighlights from '@/components/profile/Top100VideoHighlights';
+import LatestHighlights from './highlights/LatestHighlights';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 
@@ -260,11 +260,9 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
         isOwnProfile={finalIsOwnProfile} 
       />
 
-      {/* Video Highlights Section - Fan Deck Style */}
+      {/* Latest Highlights Section - 3D Depth Stack Video Carousel */}
       {targetUserId && (
-        <div className="mb-6">
-          <Top100VideoHighlights userId={targetUserId} />
-        </div>
+        <LatestHighlights userId={targetUserId} isOwnProfile={finalIsOwnProfile} />
       )}
 
 
