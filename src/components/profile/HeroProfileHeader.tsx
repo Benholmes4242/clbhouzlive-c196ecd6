@@ -268,7 +268,7 @@ const HeroProfileHeader = ({
           )}
           
           {/* Large Centered Profile Photo */}
-          <div className="w-52 h-52 mb-6">
+          <div className="w-64 h-64 mb-6">
             {isOwnProfile ? (
               <div 
                 className="relative cursor-pointer group"
