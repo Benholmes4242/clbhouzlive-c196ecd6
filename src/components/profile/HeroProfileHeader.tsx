@@ -291,7 +291,7 @@ const HeroProfileHeader = ({
                   key={avatarKey}
                   src={profile?.profile_photo_url ? `${profile.profile_photo_url}?t=${avatarKey}` : undefined}
                   alt={displayName}
-                  size={208}
+                  size={256}
                   fallback={displayName.charAt(0)}
                   className="shadow-2xl group-hover:opacity-80 transition-opacity"
                 />
@@ -305,7 +305,7 @@ const HeroProfileHeader = ({
                 key={avatarKey}
                 src={profile?.profile_photo_url ? `${profile.profile_photo_url}?t=${avatarKey}` : undefined}
                 alt={displayName}
-                size={208}
+                size={256}
                 fallback={displayName.charAt(0)}
                 className="shadow-2xl"
               />
