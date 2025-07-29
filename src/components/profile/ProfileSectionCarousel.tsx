@@ -71,9 +71,13 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
             {card.id === 'activity' && (
               <>
                 <img 
-                  src="/lovable-uploads/88578314-636a-402e-8435-ad54169af886.png" 
+                  src="/lovable-uploads/88578314-636a-402e-8435-ad54169af886.png?v=1" 
                   alt="Golf course at sunset with ocean view"
                   className="absolute inset-0 w-full h-full object-cover rounded-lg"
+                  onError={(e) => {
+                    console.error('Failed to load Activity image');
+                    (e.target as HTMLImageElement).style.display = 'none';
+                  }}
                 />
                 <div className="absolute inset-0 bg-black/40 rounded-lg"></div>
               </>
@@ -83,9 +87,13 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
             {card.id === 'top100' && (
               <>
                 <img 
-                  src="/lovable-uploads/a8a80045-1c4d-4933-9a97-55d3cb2fa17b.png" 
+                  src="/lovable-uploads/a8a80045-1c4d-4933-9a97-55d3cb2fa17b.png?v=1" 
                   alt="Coastal golf course with dramatic cliffs"
                   className="absolute inset-0 w-full h-full object-cover rounded-lg"
+                  onError={(e) => {
+                    console.error('Failed to load Top 100 image');
+                    (e.target as HTMLImageElement).style.display = 'none';
+                  }}
                 />
                 <div className="absolute inset-0 bg-black/40 rounded-lg"></div>
               </>
@@ -95,9 +103,13 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
             {card.id === 'handicap' && (
               <>
                 <img 
-                  src="/lovable-uploads/9f2d3d71-10e3-487e-8e02-de14d44ce950.png" 
+                  src="/lovable-uploads/9f2d3d71-10e3-487e-8e02-de14d44ce950.png?v=1" 
                   alt="Golfer with Trackman technology"
                   className="absolute inset-0 w-full h-full object-cover rounded-lg"
+                  onError={(e) => {
+                    console.error('Failed to load Handicap image');
+                    (e.target as HTMLImageElement).style.display = 'none';
+                  }}
                 />
                 <div className="absolute inset-0 bg-black/40 rounded-lg"></div>
               </>
@@ -137,9 +149,13 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
               {card.id === 'activity' && (
                 <>
                   <img 
-                    src="/lovable-uploads/88578314-636a-402e-8435-ad54169af886.png" 
+                    src="/lovable-uploads/88578314-636a-402e-8435-ad54169af886.png?v=1" 
                     alt="Golf course at sunset with ocean view"
                     className="absolute inset-0 w-full h-full object-cover rounded-lg"
+                    onError={(e) => {
+                      console.error('Failed to load Activity image');
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
                   />
                   <div className="absolute inset-0 bg-black/40 rounded-lg"></div>
                 </>
@@ -149,9 +165,13 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
               {card.id === 'top100' && (
                 <>
                   <img 
-                    src="/lovable-uploads/a8a80045-1c4d-4933-9a97-55d3cb2fa17b.png" 
+                    src="/lovable-uploads/a8a80045-1c4d-4933-9a97-55d3cb2fa17b.png?v=1" 
                     alt="Coastal golf course with dramatic cliffs"
                     className="absolute inset-0 w-full h-full object-cover rounded-lg"
+                    onError={(e) => {
+                      console.error('Failed to load Top 100 image');
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
                   />
                   <div className="absolute inset-0 bg-black/40 rounded-lg"></div>
                 </>
@@ -161,9 +181,13 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
               {card.id === 'handicap' && (
                 <>
                   <img 
-                    src="/lovable-uploads/9f2d3d71-10e3-487e-8e02-de14d44ce950.png" 
+                    src="/lovable-uploads/9f2d3d71-10e3-487e-8e02-de14d44ce950.png?v=1" 
                     alt="Golfer with Trackman technology"
                     className="absolute inset-0 w-full h-full object-cover rounded-lg"
+                    onError={(e) => {
+                      console.error('Failed to load Handicap image');
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
                   />
                   <div className="absolute inset-0 bg-black/40 rounded-lg"></div>
                 </>
