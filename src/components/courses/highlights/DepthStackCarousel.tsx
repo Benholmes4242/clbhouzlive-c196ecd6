@@ -121,11 +121,11 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
     }
 
     if (diff === 0) {
-      // Center card - highest z-index and fully opaque
+      // Center card
       return {
         opacity: 1,
         transform: 'translateX(0%) translateZ(0px) scale(1)',
-        zIndex: 20, // Higher z-index to ensure it's above everything
+        zIndex: 10,
         pointerEvents: 'auto' as const
       };
     } else if (Math.abs(diff) === 1) {
@@ -157,15 +157,11 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
 
   return (
     <div className="relative w-full h-[28rem] overflow-hidden" style={{ perspective: '1000px' }}>
-      {/* Dedicated background layer for blur isolation */}
-      <div className="absolute inset-0 bg-gradient-to-br from-background/50 to-background/80 pointer-events-none" 
-           style={{ isolation: 'isolate' }} />
-      
       {/* Carousel container */}
       <div 
         ref={swipeRef}
         className="relative w-full h-full flex items-center justify-center"
-        style={{ transformStyle: 'preserve-3d', isolation: 'isolate' }}
+        style={{ transformStyle: 'preserve-3d' }}
       >
         {highlights.map((highlight, index) => {
           const isMobile = window.innerWidth < 768;
@@ -279,19 +275,8 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                 
                 {/* Course info */}
                 <div className="relative p-3">
-                  {/* Isolated glass background that only blurs the page background */}
-                  <div className={`absolute inset-0 border-t ${
-                    index === activeIndex 
-                      ? 'bg-white/5 backdrop-blur-2xl border-white/20' // Glass effect for active card
-                      : 'bg-white/5 backdrop-blur-2xl border-white/20' // Glass effect for inactive cards
-                  }`} style={{ 
-                    backdropFilter: 'blur(40px) saturate(180%)',
-                    isolation: 'isolate'
-                  }}>
-                    {/* Solid overlay for active card to prevent other cards from showing through */}
-                    {index === activeIndex && (
-                      <div className="absolute inset-0 bg-black/75" />
-                    )}
+                  {/* Liquid glass background - always visible */}
+                  <div className="absolute inset-0 bg-white/5 backdrop-blur-2xl border-t border-white/20" style={{ backdropFilter: 'blur(40px) saturate(180%)' }}>
                   </div>
                   
                   {/* Content - only visible on active card */}
