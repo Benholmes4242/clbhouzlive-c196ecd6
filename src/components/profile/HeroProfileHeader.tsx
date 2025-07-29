@@ -235,9 +235,9 @@ const HeroProfileHeader = ({
   // Dynamic height based on active section
   const getBackgroundHeight = () => {
     switch (activeSection) {
-      case 'activity': return '900px';
-      case 'top100': return '1500px';
-      case 'handicap': return '800px';
+      case 'activity': return '1000px';
+      case 'top100': return '1600px';
+      case 'handicap': return '1000px';
       default: return '1300px';
     }
   };
