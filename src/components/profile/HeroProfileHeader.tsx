@@ -21,6 +21,7 @@ import LatestHighlights from '@/components/courses/highlights/LatestHighlights';
 import HandicapSection from './HandicapSection';
 import ProfileSectionCarousel from './ProfileSectionCarousel';
 import { createDynamicBackgroundStyle } from '@/utils/backgroundGenerator';
+import { useDynamicBackdropHeight } from '@/hooks/useDynamicBackdropHeight';
 
 interface Course {
   id: string;
@@ -74,6 +75,9 @@ const HeroProfileHeader = ({
   const { posts, loading: postsLoading, fetchUserPosts } = useActivityPosts(profile?.id);
   const { isOpen, currentPost, allUserPosts: viewerPosts, openPostViewer, closePostViewer } = usePostViewer({ source: 'profile' });
   const [selectedPost, setSelectedPost] = useState<ActivityPost | null>(null);
+  
+  // Dynamic backdrop height hook
+  const { contentRef, getBackdropHeight } = useDynamicBackdropHeight(activeSection);
   
   // Fetch stats data
   useEffect(() => {
@@ -232,15 +236,7 @@ const HeroProfileHeader = ({
     }
   };
 
-  // Dynamic height based on active section
-  const getBackgroundHeight = () => {
-    switch (activeSection) {
-      case 'activity': return '1000px';
-      case 'top100': return '200vh'; // Extended height to ensure full coverage
-      case 'handicap': return '1000px';
-      default: return '1300px';
-    }
-  };
+  // Remove the static getBackgroundHeight function since we're using the dynamic hook
 
   return (
     <>
@@ -250,7 +246,7 @@ const HeroProfileHeader = ({
         <div 
           className="absolute inset-0 w-full overflow-hidden transition-all duration-500"
           style={{
-            height: getBackgroundHeight(),
+            height: getBackdropHeight(),
             backgroundImage: profile?.profile_photo_url 
               ? `url(${profile.profile_photo_url}?t=${avatarKey})`
               : 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-foreground)) 100%)',
@@ -380,7 +376,7 @@ const HeroProfileHeader = ({
       </div>
 
       {/* Content container - transparent to show blur behind */}
-      <div className="relative w-full">
+      <div ref={contentRef} className="relative w-full">
         
         {/* Activity Section - directly after stats bar */}
         <div 
