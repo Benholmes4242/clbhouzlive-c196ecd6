@@ -265,23 +265,50 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
 
 
       <div className="flex flex-col gap-4">
-        {/* Regional tiles and sorting buttons */}
-        <UserCoursesRegionalTiles
-          regionProgress={regionProgress}
-          activeFilter={activeFilter}
-          onFilterChange={setActiveFilter}
-          isLoading={isLoadingProgress}
-          sortBy={sortBy}
-          onSortChange={setSortBy}
-        />
-        
-        {/* View Toggle - moved underneath the buttons */}
-        <div className="flex justify-center">
-          <ViewToggle 
-            currentView={viewType}
-            onViewChange={setViewType}
-          />
-        </div>
+        {/* Mobile layout - stacked */}
+        {isMobile ? (
+          <>
+            {/* Regional tiles and sorting buttons */}
+            <UserCoursesRegionalTiles
+              regionProgress={regionProgress}
+              activeFilter={activeFilter}
+              onFilterChange={setActiveFilter}
+              isLoading={isLoadingProgress}
+              sortBy={sortBy}
+              onSortChange={setSortBy}
+            />
+            
+            {/* View Toggle - underneath the buttons on mobile */}
+            <div className="flex justify-center">
+              <ViewToggle 
+                currentView={viewType}
+                onViewChange={setViewType}
+              />
+            </div>
+          </>
+        ) : (
+          /* Desktop layout - side by side */
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
+              <UserCoursesRegionalTiles
+                regionProgress={regionProgress}
+                activeFilter={activeFilter}
+                onFilterChange={setActiveFilter}
+                isLoading={isLoadingProgress}
+                sortBy={sortBy}
+                onSortChange={setSortBy}
+              />
+            </div>
+            
+            {/* View Toggle - positioned to align with sorting buttons on desktop */}
+            <div className="flex-shrink-0 ml-4 mt-4">
+              <ViewToggle 
+                currentView={viewType}
+                onViewChange={setViewType}
+              />
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="space-y-4">
