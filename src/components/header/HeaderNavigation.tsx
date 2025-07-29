@@ -119,17 +119,17 @@ const HeaderNavigation = () => {
     return (
       <>
         <Button variant="ghost" className="p-2 md:p-3 flex-shrink-0" onClick={handleNotificationsClick}>
-          <Bell className="h-14 w-14 text-black" style={{ minWidth: '25px', minHeight: '25px' }} />
+          <Bell className="h-14 w-14 text-black" style={{ minWidth: '20px', minHeight: '20px' }} />
         </Button>
 
         <Button variant="ghost" className="p-2 md:p-3 flex-shrink-0" onClick={handleProfileClick}>
-          <CircleUserRound className="h-11 w-11 md:h-14 md:w-14 text-black" style={{ minWidth: '25px', minHeight: '25px' }} />
+          <CircleUserRound className="h-11 w-11 md:h-14 md:w-14 text-black" style={{ minWidth: '20px', minHeight: '20px' }} />
         </Button>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="p-2 md:p-3 flex-shrink-0">
-              <Settings className="h-11 w-11 md:h-14 md:w-14 text-black" style={{ minWidth: '25px', minHeight: '25px' }} />
+              <Settings className="h-11 w-11 md:h-14 md:w-14 text-black" style={{ minWidth: '20px', minHeight: '20px' }} />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48 mr-2">
@@ -149,7 +149,7 @@ const HeaderNavigation = () => {
   return (
     <>
       <Button variant="ghost" className="relative p-2 md:p-3 flex-shrink-0" onClick={handleNotificationsClick}>
-        <Bell className="h-14 w-14 text-black" style={{ minWidth: '25px', minHeight: '25px' }} />
+        <Bell className="h-14 w-14 text-black" style={{ minWidth: '20px', minHeight: '20px' }} />
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
             {unreadCount > 9 ? '9+' : unreadCount}
@@ -158,13 +158,13 @@ const HeaderNavigation = () => {
       </Button>
 
       <Button variant="ghost" className="p-2 md:p-3 flex-shrink-0" onClick={handleProfileClick}>
-        <CircleUserRound className="h-11 w-11 md:h-14 md:w-14 text-black" style={{ minWidth: '25px', minHeight: '25px' }} />
+        <CircleUserRound className="h-11 w-11 md:h-14 md:w-14 text-black" style={{ minWidth: '20px', minHeight: '20px' }} />
       </Button>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="p-2 md:p-3 flex-shrink-0">
-            <Settings className="h-11 w-11 md:h-14 md:w-14 text-black" style={{ minWidth: '25px', minHeight: '25px' }} />
+            <Settings className="h-11 w-11 md:h-14 md:w-14 text-black" style={{ minWidth: '20px', minHeight: '20px' }} />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48 mr-2">
