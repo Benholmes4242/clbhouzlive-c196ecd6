@@ -34,12 +34,12 @@ const Header = () => {
           </div>
 
           {/* Search Bar - Desktop */}
-          <div className="flex-1 max-w-md mx-2 md:mx-4 min-w-0 flex items-end mb-2">
+          <div className="flex-1 max-w-md mx-2 md:mx-4 min-w-0 flex items-end pb-2">
             <HeaderSearch />
           </div>
 
           {/* Navigation Icons */}
-          <div className="flex items-end space-x-1 md:space-x-4 flex-shrink-0 min-w-0 mb-2">
+          <div className="flex items-end space-x-1 md:space-x-4 flex-shrink-0 min-w-0 pb-2">
             <HeaderNavigation />
           </div>
         </div>
