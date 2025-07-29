@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Play, MapPin } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Play, MapPin, Trophy } from 'lucide-react';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 import Hls from 'hls.js';
 import CourseRankBadges from '../CourseRankBadges';
@@ -254,6 +254,16 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                     country={highlight.country}
                     positioning="top-left"
                   />
+                  
+                  {/* ClbHouse ranking top right */}
+                  {(highlight.globalRank || highlight.regionalRank || highlight.usaRank) && (
+                    <div className="absolute top-2 right-2 bg-primary/90 backdrop-blur-sm border border-white/30 rounded-lg px-2 py-1 flex items-center gap-1">
+                      <Trophy className="w-3 h-3 text-white" />
+                      <span className="text-white text-xs font-medium">
+                        #{highlight.globalRank || highlight.regionalRank || highlight.usaRank}
+                      </span>
+                    </div>
+                  )}
                 </div>
                 
                 {/* Course info */}
