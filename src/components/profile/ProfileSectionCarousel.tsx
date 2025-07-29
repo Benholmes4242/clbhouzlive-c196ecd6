@@ -21,8 +21,7 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
       id: 'top100',
       title: 'Top 100 Courses',
       description: 'Discover and track the world\'s greatest golf courses.',
-      backgroundImage: `url('/lovable-uploads/b5c44b64-e08d-4c79-b3d0-e15cad97b1b3.png')`,
-      className: 'relative overflow-hidden bg-gradient-to-br from-amber-500 to-orange-600 flex flex-col justify-end text-white h-[200px] cursor-pointer group !rounded-lg'
+      className: 'relative overflow-hidden flex flex-col justify-end text-white h-[200px] cursor-pointer group !rounded-lg'
     },
     {
       id: 'handicap',
@@ -75,13 +74,10 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
               </div>
             )}
 
-            {/* Background for top100 cards */}
-            {card.backgroundImage && card.id !== 'activity' && (
-              <div 
-                className="absolute inset-0 bg-cover bg-center rounded-lg"
-                style={{ backgroundImage: card.backgroundImage }}
-              >
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent rounded-lg" />
+            {/* Top 100 liquid glass background */}
+            {card.id === 'top100' && (
+              <div className="absolute inset-0 bg-white/5 backdrop-blur-2xl border border-white/20 rounded-lg shadow-[0_0_20px_rgba(0,0,0,0.2)]" style={{ backdropFilter: 'blur(40px) saturate(180%)' }}>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent rounded-lg" />
               </div>
             )}
             
@@ -145,13 +141,10 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
                 </div>
               )}
 
-              {/* Background for top100 cards */}
-              {card.backgroundImage && card.id !== 'activity' && (
-                <div 
-                  className="absolute inset-0 bg-cover bg-center rounded-lg"
-                  style={{ backgroundImage: card.backgroundImage }}
-                >
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent rounded-lg" />
+              {/* Top 100 liquid glass background */}
+              {card.id === 'top100' && (
+                <div className="absolute inset-0 bg-white/5 backdrop-blur-2xl border border-white/20 rounded-lg shadow-[0_0_20px_rgba(0,0,0,0.2)]" style={{ backdropFilter: 'blur(40px) saturate(180%)' }}>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent rounded-lg" />
                 </div>
               )}
               
