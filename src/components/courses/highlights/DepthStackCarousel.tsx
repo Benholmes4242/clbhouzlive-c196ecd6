@@ -465,6 +465,32 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
           </div>
         ))}
       </div>
+
+      {/* Carousel dots */}
+      {carouselItems.length > 1 && (
+        <div className="flex justify-center gap-2 mt-4">
+          {carouselItems.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => {
+                const container = containerRef.current;
+                if (container) {
+                  const cardWidth = isMobile ? container.offsetWidth : 320; // w-80 = 320px
+                  const gap = 16; // gap-4 = 16px
+                  const scrollPosition = index * (cardWidth + gap);
+                  container.scrollTo({ left: scrollPosition, behavior: 'smooth' });
+                }
+              }}
+              className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                index === activeVideoIndex 
+                  ? 'bg-white scale-125' 
+                  : 'bg-white/50 hover:bg-white/70'
+              }`}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 };
