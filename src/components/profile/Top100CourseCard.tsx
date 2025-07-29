@@ -100,14 +100,14 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
     return (
       <>
         <div
-          className={`relative rounded-lg overflow-hidden transition-all duration-300 cursor-pointer h-24 bg-gray-800 ${
+          className={`relative rounded-lg overflow-hidden transition-all duration-300 cursor-pointer h-24 ${
             isPlayed 
               ? 'ring-2 ring-green-400 shadow-md transform scale-[1.01]' 
               : 'hover:shadow-lg'
           }`}
           onClick={handleCardClick}
         >
-          {/* Background image */}
+          {/* Background image covering entire card */}
           <div 
             className="absolute inset-0 bg-cover bg-center bg-no-repeat"
             style={{
@@ -119,7 +119,7 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
           <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-black/20" />
 
           {/* Content overlay */}
-          <div className="absolute inset-0 flex items-center justify-between p-4">
+          <div className="absolute inset-0 flex items-center justify-between p-4 z-10">
             <div className="flex-1 text-white">
               <h3 className="font-semibold text-lg leading-tight mb-1">
                 {course.name}
@@ -154,7 +154,7 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
 
           {/* Hover overlay for own profile */}
           {isOwnProfile && !isPlayed && (
-            <div className="absolute inset-0 bg-black/0 hover:bg-black/10 transition-colors duration-200 flex items-center justify-center">
+            <div className="absolute inset-0 bg-black/0 hover:bg-black/10 transition-colors duration-200 flex items-center justify-center z-20">
               <div className="opacity-0 hover:opacity-100 transition-opacity duration-200 bg-white/90 rounded-full p-2">
                 <Check className="h-5 w-5 text-green-600" />
               </div>
@@ -163,7 +163,7 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
 
           {/* Visual feedback for played state */}
           {isPlayed && (
-            <div className="absolute inset-0 bg-green-500/10 pointer-events-none" />
+            <div className="absolute inset-0 bg-green-500/10 pointer-events-none z-5" />
           )}
         </div>
 
