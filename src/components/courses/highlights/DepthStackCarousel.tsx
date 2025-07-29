@@ -439,7 +439,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
           carouselRef(node);
           containerRef.current = node;
         }}
-        className="flex gap-4 overflow-x-auto scrollbar-hide"
+        className="flex gap-4 overflow-x-auto scrollbar-hide px-2"
         style={{
           scrollSnapType: 'x mandatory',
           scrollbarWidth: 'none',
