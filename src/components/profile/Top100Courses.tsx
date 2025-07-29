@@ -95,7 +95,7 @@ const Top100Courses: React.FC<Top100CoursesProps> = ({
 
   return (
     <section className="mt-10 py-2">
-      <div className="flex items-center justify-between mb-3 px-2">
+      <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <Trophy className="h-5 w-5 text-yellow-600" />
           <h2 className="text-xl font-bold">Top 100 Courses</h2>
@@ -127,7 +127,7 @@ const Top100Courses: React.FC<Top100CoursesProps> = ({
 
 
       {/* Dynamic heading text */}
-      <div className="text-center mb-6 px-2">
+      <div className="text-center mb-6">
         <p className="text-lg text-foreground font-normal">{headlineText}</p>
       </div>
 
