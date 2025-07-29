@@ -15,7 +15,6 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
       id: 'activity',
       title: 'Activity',
       description: 'View your recent golf moments, rounds played, and course discoveries.',
-      backgroundImage: `url('/lovable-uploads/2a145957-bebc-43ef-bd85-1f1343e05210.png')`,
       className: 'relative overflow-hidden flex flex-col justify-end text-white h-[200px] cursor-pointer group !rounded-lg'
     },
     {
@@ -69,8 +68,15 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
             className={card.className}
             onClick={() => handleCardClick(card.id)}
           >
-            {/* Background for activity and top100 cards */}
-            {card.backgroundImage && (
+            {/* Activity liquid glass background */}
+            {card.id === 'activity' && (
+              <div className="absolute inset-0 bg-white/10 backdrop-blur-md border border-white/20 rounded-lg">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent rounded-lg" />
+              </div>
+            )}
+
+            {/* Background for top100 cards */}
+            {card.backgroundImage && card.id !== 'activity' && (
               <div 
                 className="absolute inset-0 bg-cover bg-center rounded-lg"
                 style={{ backgroundImage: card.backgroundImage }}
@@ -140,8 +146,15 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
               className={`${card.className.replace('h-[200px]', 'h-[250px]')} flex-shrink-0 w-full`}
               onClick={() => handleCardClick(card.id)}
             >
-              {/* Background for activity and top100 cards */}
-              {card.backgroundImage && (
+              {/* Activity liquid glass background */}
+              {card.id === 'activity' && (
+                <div className="absolute inset-0 bg-white/10 backdrop-blur-md border border-white/20 rounded-lg">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent rounded-lg" />
+                </div>
+              )}
+
+              {/* Background for top100 cards */}
+              {card.backgroundImage && card.id !== 'activity' && (
                 <div 
                   className="absolute inset-0 bg-cover bg-center rounded-lg"
                   style={{ backgroundImage: card.backgroundImage }}
