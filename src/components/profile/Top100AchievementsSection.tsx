@@ -198,15 +198,17 @@ const Top100AchievementsSection: React.FC<Top100AchievementsSectionProps> = ({
                 return (
                   <div
                     key={achievement.id}
-                    className={`flex items-center gap-3 p-3 rounded-lg border transition-all duration-300 ${
-                      isEarned
-                        ? is20Club
-                          ? "bg-gradient-to-r from-emerald-500/30 to-green-400/30 border-2 border-emerald-400 shadow-2xl shadow-emerald-500/60 ring-4 ring-emerald-400/50 glow-green"
-                          : "bg-green-500/10 border-green-400/30"
+                    className={`flex items-center gap-3 p-3 rounded-lg border-2 transition-all duration-300 ${
+                      isEarned && is20Club
+                        ? "bg-green-400/30 border-green-300 shadow-green-400/50 shadow-2xl animate-pulse"
+                        : isEarned
+                        ? "bg-green-500/10 border-green-400/30"
                         : "bg-white/5 border-white/20 opacity-60"
                     }`}
                     style={is20Club && isEarned ? {
-                      boxShadow: '0 0 30px rgba(16, 185, 129, 0.8), inset 0 0 30px rgba(16, 185, 129, 0.2)'
+                      backgroundColor: 'rgba(34, 197, 94, 0.2)',
+                      borderColor: '#10b981',
+                      boxShadow: '0 0 20px #10b981'
                     } : {}}
                   >
                     {/* Achievement Icon */}
