@@ -21,7 +21,6 @@ import LatestHighlights from '@/components/courses/highlights/LatestHighlights';
 import HandicapSection from './HandicapSection';
 import ProfileSectionCarousel from './ProfileSectionCarousel';
 import { createDynamicBackgroundStyle } from '@/utils/backgroundGenerator';
-import { useDynamicBackdropHeight } from '@/hooks/useDynamicBackdropHeight';
 
 interface Course {
   id: string;
@@ -75,9 +74,6 @@ const HeroProfileHeader = ({
   const { posts, loading: postsLoading, fetchUserPosts } = useActivityPosts(profile?.id);
   const { isOpen, currentPost, allUserPosts: viewerPosts, openPostViewer, closePostViewer } = usePostViewer({ source: 'profile' });
   const [selectedPost, setSelectedPost] = useState<ActivityPost | null>(null);
-  
-  // Dynamic backdrop height hook
-  const { contentRef, getBackdropHeight } = useDynamicBackdropHeight(activeSection);
   
   // Fetch stats data
   useEffect(() => {
@@ -236,7 +232,15 @@ const HeroProfileHeader = ({
     }
   };
 
-  // Remove the static getBackgroundHeight function since we're using the dynamic hook
+  // Dynamic height based on active section
+  const getBackgroundHeight = () => {
+    switch (activeSection) {
+      case 'activity': return '1000px';
+      case 'top100': return '1600px';
+      case 'handicap': return '1000px';
+      default: return '1300px';
+    }
+  };
 
   return (
     <>
@@ -246,21 +250,17 @@ const HeroProfileHeader = ({
         <div 
           className="absolute inset-0 w-full overflow-hidden transition-all duration-500"
           style={{
-            height: activeSection === 'top100' ? '300vh' : '1300px',
+            height: getBackgroundHeight(),
             backgroundImage: profile?.profile_photo_url 
               ? `url(${profile.profile_photo_url}?t=${avatarKey})`
               : 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-foreground)) 100%)',
             backgroundSize: 'cover',
-            backgroundPosition: 'center top',
+            backgroundPosition: 'center top', // Focus on upper portion to avoid faces
             backgroundRepeat: 'no-repeat',
-            filter: 'blur(40px) saturate(1.3) brightness(0.9)',
-            transform: 'scale(1.2)',
-            maskImage: activeSection === 'top100' 
-              ? 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 40%, rgba(0,0,0,0.95) 60%, rgba(0,0,0,0.9) 75%, rgba(0,0,0,0.8) 85%, rgba(0,0,0,0.7) 95%, rgba(0,0,0,0.5) 100%)'
-              : 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 60%, rgba(0,0,0,0.8) 80%, rgba(0,0,0,0) 100%)',
-            WebkitMaskImage: activeSection === 'top100'
-              ? 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 40%, rgba(0,0,0,0.95) 60%, rgba(0,0,0,0.9) 75%, rgba(0,0,0,0.8) 85%, rgba(0,0,0,0.7) 95%, rgba(0,0,0,0.5) 100%)'
-              : 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 60%, rgba(0,0,0,0.8) 80%, rgba(0,0,0,0) 100%)',
+            filter: 'blur(40px) saturate(1.3) brightness(0.9)', // Heavy blur to obscure details
+            transform: 'scale(1.2)', // Larger scale to crop edges and hide recognizable features
+            maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 60%, rgba(0,0,0,0.8) 80%, rgba(0,0,0,0) 100%)',
+            WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 60%, rgba(0,0,0,0.8) 80%, rgba(0,0,0,0) 100%)',
           }}
         />
         
