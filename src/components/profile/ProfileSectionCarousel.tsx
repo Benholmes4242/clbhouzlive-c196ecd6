@@ -93,7 +93,7 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
               <div className="flex items-center mb-3">
                 <h3 className="text-3xl font-bold group-hover:scale-105 transition-transform">{card.title}</h3>
               </div>
-               <p className="text-white/90 text-lg leading-relaxed drop-shadow-lg whitespace-nowrap">{card.description}</p>
+              <p className="text-white/90 text-lg leading-relaxed drop-shadow-lg">{card.description}</p>
             </div>
           </div>
         ))}
@@ -144,7 +144,7 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
                 <div className="flex items-center mb-3">
                   <h3 className="text-3xl font-bold">{card.title}</h3>
                 </div>
-                <p className="text-white/90 text-lg leading-relaxed drop-shadow-lg whitespace-nowrap">{card.description}</p>
+                <p className="text-white/90 text-lg leading-relaxed drop-shadow-lg">{card.description}</p>
               </div>
             </div>
           ))}
