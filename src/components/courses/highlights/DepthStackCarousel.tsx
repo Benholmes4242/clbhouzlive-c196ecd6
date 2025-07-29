@@ -285,9 +285,14 @@ const LiquidGlassCard: React.FC = () => {
               key={achievement.id}
               className={`relative backdrop-blur-sm rounded-lg p-4 border ${
                 achievement.earned 
-                  ? 'bg-green-500/10 border-green-400/20' 
+                  ? achievement.id === '20-club'
+                    ? 'bg-green-500/20 border-green-400 shadow-2xl shadow-green-400/50 animate-pulse'
+                    : 'bg-green-500/10 border-green-400/20' 
                   : 'bg-white/10 border-white/10'
               }`}
+              style={achievement.earned && achievement.id === '20-club' ? {
+                boxShadow: '0 0 30px #22c55e, inset 0 0 20px rgba(34, 197, 94, 0.2)'
+              } : {}}
             >
               {/* Completed Stamp */}
               {achievement.earned && (
