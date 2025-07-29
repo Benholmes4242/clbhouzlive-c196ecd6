@@ -244,22 +244,21 @@ const HeroProfileHeader = ({
       <div className="relative w-full">
         {/* Apple Music Style Dynamic Background */}
         <div 
-          className="absolute inset-0 w-full overflow-hidden transition-all duration-500"
+          className="fixed inset-0 w-full overflow-hidden transition-all duration-500 -z-10"
           style={{
-            height: getBackdropHeight(),
             backgroundImage: profile?.profile_photo_url 
               ? `url(${profile.profile_photo_url}?t=${avatarKey})`
               : 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-foreground)) 100%)',
             backgroundSize: 'cover',
-            backgroundPosition: 'center top', // Focus on upper portion to avoid faces
+            backgroundPosition: 'center top',
             backgroundRepeat: 'no-repeat',
-            filter: 'blur(40px) saturate(1.3) brightness(0.9)', // Heavy blur to obscure details
-            transform: 'scale(1.2)', // Larger scale to crop edges and hide recognizable features
+            filter: 'blur(40px) saturate(1.3) brightness(0.9)',
+            transform: 'scale(1.2)',
             maskImage: activeSection === 'top100' 
-              ? 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 60%, rgba(0,0,0,0.95) 75%, rgba(0,0,0,0.9) 85%, rgba(0,0,0,0.8) 95%, rgba(0,0,0,0.7) 100%)'
+              ? 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 40%, rgba(0,0,0,0.95) 60%, rgba(0,0,0,0.9) 75%, rgba(0,0,0,0.8) 85%, rgba(0,0,0,0.7) 95%, rgba(0,0,0,0.5) 100%)'
               : 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 60%, rgba(0,0,0,0.8) 80%, rgba(0,0,0,0) 100%)',
             WebkitMaskImage: activeSection === 'top100'
-              ? 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 60%, rgba(0,0,0,0.95) 75%, rgba(0,0,0,0.9) 85%, rgba(0,0,0,0.8) 95%, rgba(0,0,0,0.7) 100%)'
+              ? 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 40%, rgba(0,0,0,0.95) 60%, rgba(0,0,0,0.9) 75%, rgba(0,0,0,0.8) 85%, rgba(0,0,0,0.7) 95%, rgba(0,0,0,0.5) 100%)'
               : 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 60%, rgba(0,0,0,0.8) 80%, rgba(0,0,0,0) 100%)',
           }}
         />
@@ -376,7 +375,7 @@ const HeroProfileHeader = ({
       </div>
 
       {/* Content container - transparent to show blur behind */}
-      <div ref={contentRef} className="relative w-full">
+      <div className="relative w-full z-10">
         
         {/* Activity Section - directly after stats bar */}
         <div 
