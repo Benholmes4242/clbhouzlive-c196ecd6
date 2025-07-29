@@ -274,7 +274,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                 </div>
                 
                 {/* Course info */}
-                <div className="relative p-4">
+                <div className="absolute bottom-0 left-0 right-0 p-4">
                   {/* Liquid glass background - always visible */}
                   <div className="absolute inset-0 bg-white/5 backdrop-blur-2xl border-t border-white/20" style={{ backdropFilter: 'blur(40px) saturate(180%)' }}>
                   </div>
