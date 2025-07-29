@@ -43,19 +43,34 @@ const CourseListItem: React.FC<CourseListItemProps> = ({
 
   return (
     <div
-      className="flex items-center gap-4 p-4 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 hover:bg-white/20 transition-all cursor-pointer group"
+      className="relative h-24 rounded-lg overflow-hidden cursor-pointer group transition-all duration-300 hover:shadow-lg"
       onClick={handleClick}
     >
-      {/* Course Image */}
-      <div className="relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden">
-        <img
-          src={course.thumbnail_image || 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=400&h=300&fit=crop'}
-          alt={course.name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-        />
-        
-        {/* Rank Badge */}
-        <div className="absolute top-1 left-1">
+      {/* Full background image */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: `url(${course.thumbnail_image || 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=400&h=300&fit=crop'})`
+        }}
+      />
+
+      {/* Dark overlay for text readability */}
+      <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-black/20" />
+
+      {/* Content overlay */}
+      <div className="absolute inset-0 flex items-center justify-between p-4 z-10">
+        <div className="flex-1 text-white">
+          <h3 className="font-semibold text-lg leading-tight mb-1">
+            {course.name}
+          </h3>
+          <div className="flex items-center text-sm text-white/90">
+            <MapPin className="h-3 w-3 mr-1" />
+            <span>{formatLocation(course)}</span>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          {/* Course ranking badges */}
           <CourseRankBadges
             globalRank={course.global_rank}
             regionalRank={course.regional_rank}
@@ -66,34 +81,16 @@ const CourseListItem: React.FC<CourseListItemProps> = ({
             showUserRating={showUserRating}
             positioning="top-left"
           />
+
+          {/* User Rating Display */}
+          {userRating && showUserRating && (
+            <div className="flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-full px-2 py-1">
+              <Star className="h-3 w-3 text-yellow-400 fill-current" />
+              <span className="text-xs font-medium text-white">{userRating}/10</span>
+            </div>
+          )}
         </div>
       </div>
-
-      {/* Course Details */}
-      <div className="flex-1 min-w-0">
-        <h3 className="font-semibold text-white text-sm line-clamp-1 mb-1 group-hover:text-white/90">
-          {course.name}
-        </h3>
-        
-        <div className="flex items-center text-xs text-white/70 mb-2">
-          <MapPin className="h-3 w-3 mr-1 flex-shrink-0" />
-          <span className="line-clamp-1">{formatLocation(course)}</span>
-        </div>
-
-        {course.description && (
-          <p className="text-xs text-white/60 line-clamp-2 leading-relaxed">
-            {course.description}
-          </p>
-        )}
-      </div>
-
-      {/* User Rating Display */}
-      {userRating && showUserRating && (
-        <div className="flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-full px-2 py-1">
-          <Star className="h-3 w-3 text-yellow-400 fill-current" />
-          <span className="text-xs font-medium text-white">{userRating}/10</span>
-        </div>
-      )}
     </div>
   );
 };
