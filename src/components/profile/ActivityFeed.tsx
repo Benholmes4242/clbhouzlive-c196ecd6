@@ -68,31 +68,29 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   return (
     <>
       <div className="p-4">
-        <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-6 shadow-lg">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-end gap-2">
-              <h3 className="text-3xl font-bold text-white">Activity</h3>
-              <span className="text-white/80 text-base">{posts.length} posts</span>
-            </div>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-end gap-2">
+            <h3 className="text-3xl font-bold text-white">Activity</h3>
+            <span className="text-white/80 text-base">{posts.length} posts</span>
           </div>
-
-          {posts.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-muted-foreground">No posts yet.</p>
-            </div>
-          ) : (
-            <ExploreGrid
-              content={exploreContent}
-              onLike={handleLike}
-              onFollow={handleFollow}
-              onMediaClick={handleMediaClick}
-              isLoading={false}
-              hasMore={false}
-              onLoadMore={handleLoadMore}
-              isDiscoverPage={true}
-            />
-          )}
         </div>
+
+        {posts.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-muted-foreground">No posts yet.</p>
+          </div>
+        ) : (
+          <ExploreGrid
+            content={exploreContent}
+            onLike={handleLike}
+            onFollow={handleFollow}
+            onMediaClick={handleMediaClick}
+            isLoading={false}
+            hasMore={false}
+            onLoadMore={handleLoadMore}
+            isDiscoverPage={true}
+          />
+        )}
       </div>
 
       {/* Vertical Media Feed Modal */}
