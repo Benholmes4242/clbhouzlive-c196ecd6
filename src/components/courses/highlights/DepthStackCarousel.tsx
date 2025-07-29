@@ -291,14 +291,22 @@ const LiquidGlassCard: React.FC = () => {
             >
               {/* Completed Stamp */}
               {achievement.earned && (
-                <div className="absolute top-2 right-2 transform rotate-12">
-                  <div className="bg-red-600 text-white text-xs font-bold px-3 py-1 border-2 border-red-600 rounded-sm opacity-90 shadow-lg" 
-                       style={{ 
-                         fontFamily: 'monospace',
-                         letterSpacing: '1px',
-                         textShadow: '1px 1px 2px rgba(0,0,0,0.3)'
-                       }}>
-                    COMPLETED
+                <div className="absolute top-2 right-2 transform rotate-12 animate-scale-in">
+                  <div className="relative">
+                    {/* Outer border */}
+                    <div className="absolute inset-0 border-4 border-red-600 rounded-lg opacity-80"></div>
+                    {/* Inner border */}
+                    <div className="absolute inset-1 border-2 border-red-600 rounded-md opacity-60"></div>
+                    {/* Main stamp */}
+                    <div className="relative bg-red-600/90 text-white text-xs font-black px-4 py-2 rounded-lg border-2 border-red-700 shadow-lg backdrop-blur-sm" 
+                         style={{ 
+                           fontFamily: 'Arial Black, sans-serif',
+                           letterSpacing: '2px',
+                           textShadow: '2px 2px 4px rgba(0,0,0,0.5)',
+                           filter: 'contrast(1.1) saturate(1.2)'
+                         }}>
+                      COMPLETED
+                    </div>
                   </div>
                 </div>
               )}
