@@ -1,18 +1,22 @@
 import React, { useState, useCallback, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Play, MapPin, Trophy } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Play, MapPin } from 'lucide-react';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 import Hls from 'hls.js';
+import CourseRankBadges from '../CourseRankBadges';
 
 interface HighlightVideo {
   id: string;
   courseId: string;
   courseName: string;
   location: string;
-  rank: number;
   thumbnail: string;
   videoUrl?: string;
   caption: string;
   duration?: string;
+  globalRank?: number | null;
+  regionalRank?: number | null;
+  usaRank?: number | null;
+  country: string;
 }
 
 interface DepthStackCarouselProps {
@@ -242,11 +246,14 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                     </div>
                   )}
                   
-                  {/* Rank badge */}
-                  <div className="absolute top-2 left-2 bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg px-2 py-1 flex items-center gap-1">
-                    <Trophy className="w-3 h-3 text-yellow-400" />
-                    <span className="text-white text-xs font-medium">#{highlight.rank}</span>
-                  </div>
+                  {/* Course ranking badges */}
+                  <CourseRankBadges
+                    globalRank={highlight.globalRank}
+                    regionalRank={highlight.regionalRank}
+                    usaRank={highlight.usaRank}
+                    country={highlight.country}
+                    positioning="top-left"
+                  />
                 </div>
                 
                 {/* Course info */}

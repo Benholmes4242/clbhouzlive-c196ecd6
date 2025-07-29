@@ -7,12 +7,15 @@ interface HighlightVideo {
   courseId: string;
   courseName: string;
   location: string;
-  rank: number;
   thumbnail: string;
   videoUrl?: string;
   caption: string;
   duration?: string;
   created_at: string;
+  globalRank?: number | null;
+  regionalRank?: number | null;
+  usaRank?: number | null;
+  country: string;
 }
 
 interface LatestHighlightsProps {
@@ -95,6 +98,7 @@ const LatestHighlights: React.FC<LatestHighlightsProps> = ({
             id,
             name,
             country,
+            sub_country,
             region,
             global_rank,
             regional_rank,
@@ -120,17 +124,12 @@ const LatestHighlights: React.FC<LatestHighlightsProps> = ({
             if (!course) return null;
 
             const media = post.post_media[0];
-            
-            // Determine the best rank to display
-            const getRank = () => {
-              if (course.global_rank) return course.global_rank;
-              if (course.regional_rank) return course.regional_rank;
-              if (course.usa_rank) return course.usa_rank;
-              return 999; // fallback for unranked courses
-            };
 
             // Format location
             const getLocation = () => {
+              if (course.sub_country && course.country) {
+                return `${course.sub_country}, ${course.country}`;
+              }
               if (course.region && course.country) {
                 return `${course.region}, ${course.country}`;
               }
@@ -142,11 +141,14 @@ const LatestHighlights: React.FC<LatestHighlightsProps> = ({
               courseId: course.id,
               courseName: course.name,
               location: getLocation(),
-              rank: getRank(),
               thumbnail: media?.media_url || course.thumbnail_image || '/placeholder.svg',
               videoUrl: media?.media_url,
               caption: post.content || 'Golf moment at this amazing course',
-              created_at: post.created_at
+              created_at: post.created_at,
+              globalRank: course.global_rank,
+              regionalRank: course.regional_rank,
+              usaRank: course.usa_rank,
+              country: course.country
             };
 
             return highlight;
@@ -229,7 +231,7 @@ const LatestHighlights: React.FC<LatestHighlightsProps> = ({
         {highlights.length > 0 && (
           <>
             <span>•</span>
-            <span>Top {Math.min(...highlights.map(h => h.rank))} course played</span>
+            <span>Top {Math.min(...highlights.map(h => h.globalRank || h.regionalRank || h.usaRank || 999))} course played</span>
           </>
         )}
       </div>
