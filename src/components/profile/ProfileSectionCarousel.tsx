@@ -72,17 +72,17 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
             {/* Background for activity and top100 cards */}
             {card.backgroundImage && (
               <div 
-                className="absolute inset-0 bg-cover bg-center"
+                className="absolute inset-0 bg-cover bg-center rounded-lg"
                 style={{ backgroundImage: card.backgroundImage }}
               >
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent rounded-lg" />
               </div>
             )}
             
             {/* Handicap special background */}
             {card.id === 'handicap' && (
-              <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-transparent">
-                <div className="absolute inset-0" style={{
+              <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-transparent rounded-lg">
+                <div className="absolute inset-0 rounded-lg" style={{
                   backgroundImage: `
                     conic-gradient(from 0deg at 50% 50%, rgba(255,255,255,0.1) 0deg, transparent 60deg, rgba(255,255,255,0.1) 120deg, transparent 180deg, rgba(255,255,255,0.1) 240deg, transparent 300deg),
                     radial-gradient(circle at 70% 30%, rgba(255,255,255,0.1) 0%, transparent 50%)
@@ -90,7 +90,7 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
                   backgroundSize: '80px 80px, 100% 100%'
                 }}>
                 </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent rounded-lg" />
               </div>
             )}
             
@@ -143,17 +143,17 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
               {/* Background for activity and top100 cards */}
               {card.backgroundImage && (
                 <div 
-                  className="absolute inset-0 bg-cover bg-center"
+                  className="absolute inset-0 bg-cover bg-center rounded-lg"
                   style={{ backgroundImage: card.backgroundImage }}
                 >
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent rounded-lg" />
                 </div>
               )}
               
               {/* Handicap special background */}
               {card.id === 'handicap' && (
-                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-transparent">
-                  <div className="absolute inset-0" style={{
+                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-transparent rounded-lg">
+                  <div className="absolute inset-0 rounded-lg" style={{
                     backgroundImage: `
                       conic-gradient(from 0deg at 50% 50%, rgba(255,255,255,0.1) 0deg, transparent 60deg, rgba(255,255,255,0.1) 120deg, transparent 180deg, rgba(255,255,255,0.1) 240deg, transparent 300deg),
                       radial-gradient(circle at 70% 30%, rgba(255,255,255,0.1) 0%, transparent 50%)
@@ -161,7 +161,7 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
                     backgroundSize: '80px 80px, 100% 100%'
                   }}>
                   </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent rounded-lg" />
                 </div>
               )}
               
