@@ -70,7 +70,8 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
         if (index === activeIndex) {
           video.play().catch(console.error);
         } else {
-          video.pause();
+          // Don't pause videos that are partially visible - just don't auto-play them
+          // This keeps the video frame visible without the black screen
         }
       }
     });
@@ -212,6 +213,8 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                       controls={false}
                       onLoadedData={(e) => {
                         console.log('Video loaded:', highlight.videoUrl);
+                        // Load the video to first frame for all cards
+                        e.currentTarget.currentTime = 0;
                         if (index === activeIndex) {
                           e.currentTarget.play().catch(console.error);
                         }
@@ -231,14 +234,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                     />
                   )}
                   
-                  {/* Play button overlay for non-active cards */}
-                  {index !== activeIndex && (
-                    <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                      <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                        <Play className="w-6 h-6 text-white ml-1" fill="white" />
-                      </div>
-                    </div>
-                  )}
+                  {/* No play button overlay - videos show paused frame */}
                   
                   {/* Duration badge */}
                   {highlight.duration && (
