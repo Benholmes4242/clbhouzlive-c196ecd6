@@ -70,17 +70,17 @@ const CourseListItem: React.FC<CourseListItemProps> = ({
         </div>
       </div>
 
-      {/* Top right badges - regional rank and user rating on same row */}
+      {/* Top right badges */}
       <div className="absolute top-2 right-2 flex items-center gap-2 z-20">
-        {/* Regional ranking badge only - using original styling */}
+        {/* Course ranking badges */}
         <CourseRankBadges
-          globalRank={null}
+          globalRank={course.global_rank}
           regionalRank={course.regional_rank}
-          usaRank={null}
+          usaRank={course.usa_rank}
           country={course.country}
           viewContext={viewContext}
-          userRating={null}
-          showUserRating={false}
+          userRating={userRating}
+          showUserRating={showUserRating}
           positioning="top-left"
         />
 
@@ -91,20 +91,6 @@ const CourseListItem: React.FC<CourseListItemProps> = ({
             <span className="text-xs font-medium text-white">{userRating}/10</span>
           </div>
         )}
-      </div>
-
-      {/* Other ranking badges in original position */}
-      <div className="absolute top-2 left-2 z-20">
-        <CourseRankBadges
-          globalRank={course.global_rank}
-          regionalRank={null}
-          usaRank={course.usa_rank}
-          country={course.country}
-          viewContext={viewContext}
-          userRating={null}
-          showUserRating={false}
-          positioning="top-left"
-        />
       </div>
     </div>
   );
