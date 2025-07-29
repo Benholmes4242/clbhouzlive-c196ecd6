@@ -96,10 +96,15 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
   };
 
   // Debug logging for viewType
-  console.log('Top100CourseCard viewType:', viewType, 'course:', course.name);
+  console.log('🔍 Top100CourseCard DEBUG:', {
+    viewType,
+    courseName: course.name,
+    isListView: viewType === 'list'
+  });
 
-  // List view render
-  if (viewType === 'list') {
+  // FORCE LIST VIEW FOR TESTING
+  const isListViewForced = true;
+  if (isListViewForced || viewType === 'list') {
     return (
       <>
         <div
