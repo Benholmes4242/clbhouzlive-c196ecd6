@@ -283,9 +283,20 @@ const LiquidGlassCard: React.FC = () => {
           {userProgress.achievements.map((achievement) => (
             <div 
               key={achievement.id}
-              className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/10"
+              className={`relative backdrop-blur-sm rounded-lg p-4 border ${
+                achievement.earned 
+                  ? 'bg-green-500/10 border-green-400/20' 
+                  : 'bg-white/10 border-white/10'
+              }`}
             >
-              <div className="flex items-center justify-between">
+              {/* Earned Stamp */}
+              {achievement.earned && (
+                <div className="absolute top-2 right-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">
+                  EARNED
+                </div>
+              )}
+
+              <div className="flex items-center justify-between pr-16">
                 <div className="flex items-center space-x-3">
                   {/* Achievement Icon */}
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
@@ -305,16 +316,6 @@ const LiquidGlassCard: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Earned Status */}
-                {achievement.earned && (
-                  <div className="flex items-center text-green-400 text-xs font-medium">
-                    <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                    Earned!
-                  </div>
-                )}
-                
                 {/* Progress for unearned achievements */}
                 {!achievement.earned && (
                   <div className="text-white/40 text-xs">
