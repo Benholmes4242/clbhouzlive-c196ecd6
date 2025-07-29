@@ -85,7 +85,7 @@ const VideoCard: React.FC<{
 
   return (
     <div className="relative h-[28rem] rounded-lg overflow-hidden bg-black cursor-pointer group" onClick={handleVideoClick}>
-      {video.videoUrl && (
+      {video.videoUrl ? (
         <video
           ref={videoRef}
           className="w-full h-full object-cover"
@@ -93,9 +93,17 @@ const VideoCard: React.FC<{
           loop
           playsInline
           poster={thumbnailReady ? thumbnailSrc : video.thumbnail}
+          onLoadedData={() => console.log('Video loaded:', video.id)}
+          onError={(e) => console.error('Video error:', e)}
         >
           <source src={video.videoUrl} type="video/mp4" />
         </video>
+      ) : (
+        <img 
+          src={thumbnailReady ? thumbnailSrc : video.thumbnail}
+          alt={video.courseName}
+          className="w-full h-full object-cover"
+        />
       )}
       
       {/* Dark overlay for text readability */}
