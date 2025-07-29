@@ -100,19 +100,21 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
     return (
       <>
         <div
-          className={`relative rounded-lg overflow-hidden transition-all duration-300 cursor-pointer h-24 ${
+          className={`relative rounded-lg overflow-hidden transition-all duration-300 cursor-pointer h-24 bg-gray-800 ${
             isPlayed 
               ? 'ring-2 ring-green-400 shadow-md transform scale-[1.01]' 
               : 'hover:shadow-lg'
           }`}
           onClick={handleCardClick}
-          style={{
-            backgroundImage: `url(${course.thumbnail_image || 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=400&h=300&fit=crop'})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat'
-          }}
         >
+          {/* Background image */}
+          <div 
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{
+              backgroundImage: `url(${course.thumbnail_image || 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=400&h=300&fit=crop'})`
+            }}
+          />
+
           {/* Dark overlay for text readability */}
           <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-black/20" />
 
