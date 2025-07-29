@@ -291,7 +291,7 @@ const LiquidGlassCard: React.FC = () => {
             >
               {/* Completed Stamp */}
               {achievement.earned && (
-                <div className="absolute -top-4 -right-4 transform -rotate-12 animate-scale-in z-10">
+                <div className="absolute -top-4 -right-4 transform -rotate-12 animate-scale-in z-50">
                   <img 
                     src="/lovable-uploads/e4e44275-1266-4a51-a3d2-1e02f989f7d8.png" 
                     alt="Completed"
