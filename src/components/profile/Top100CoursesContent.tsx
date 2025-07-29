@@ -12,6 +12,7 @@ interface Top100CoursesContentProps {
   isLoading: boolean;
   toggleCourse: (courseId: string) => void;
   getUserRating: (courseId: string) => number | null;
+  viewType?: 'cards' | 'list';
 }
 
 const Top100CoursesContent: React.FC<Top100CoursesContentProps> = ({
@@ -22,7 +23,8 @@ const Top100CoursesContent: React.FC<Top100CoursesContentProps> = ({
   isOwnProfile,
   isLoading,
   toggleCourse,
-  getUserRating
+  getUserRating,
+  viewType = 'cards'
 }) => {
   // Filter courses based on search term
   const filteredCourses = useMemo(() => {
@@ -46,8 +48,8 @@ const Top100CoursesContent: React.FC<Top100CoursesContentProps> = ({
 
   return (
     <ScrollArea className="h-[60vh] pr-4">
-      {/* Consistent card grid layout for both own profile and viewing others */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {/* Dynamic layout based on view type */}
+      <div className={viewType === 'list' ? "space-y-3" : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"}>
         {filteredCourses.map((course) => {
           const isPlayed = playedCourses.has(course.id);
           const userRating = getUserRating(course.id);
@@ -72,6 +74,7 @@ const Top100CoursesContent: React.FC<Top100CoursesContentProps> = ({
               isOwnProfile={isOwnProfile}
               onToggle={isOwnProfile ? () => toggleCourse(course.id) : undefined}
               userRating={userRating}
+              viewType={viewType}
             />
           );
         })}

@@ -9,7 +9,9 @@ import {
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
 import { useTop100CoursesList } from '@/hooks/useTop100CoursesList';
+import { useViewPreference } from '@/hooks/useViewPreference';
 import Top100CoursesContent from './Top100CoursesContent';
+import ViewToggle from './ViewToggle';
 
 interface Top100CoursesModalProps {
   region: string;
@@ -29,6 +31,7 @@ const Top100CoursesModal: React.FC<Top100CoursesModalProps> = ({
   onClose
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const { viewType, setViewType } = useViewPreference();
   
   const {
     courses,
@@ -42,7 +45,10 @@ const Top100CoursesModal: React.FC<Top100CoursesModalProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[85vh]">
         <DialogHeader className="pb-2">
-          <DialogTitle>{regionName} - Top 100 Courses</DialogTitle>
+          <div className="flex items-center justify-between">
+            <DialogTitle>{regionName} - Top 100 Courses</DialogTitle>
+            <ViewToggle currentView={viewType} onViewChange={setViewType} />
+          </div>
         </DialogHeader>
         
         {/* Search Bar */}
@@ -65,6 +71,7 @@ const Top100CoursesModal: React.FC<Top100CoursesModalProps> = ({
           isLoading={isLoading}
           toggleCourse={toggleCourse}
           getUserRating={getUserRating}
+          viewType={viewType}
         />
       </DialogContent>
     </Dialog>

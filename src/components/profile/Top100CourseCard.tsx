@@ -12,6 +12,7 @@ interface Top100CourseCardProps {
   isOwnProfile?: boolean;
   onToggle?: () => void;
   userRating?: number | null;
+  viewType?: 'cards' | 'list';
 }
 
 // Helper function to format description text with line breaks
@@ -52,7 +53,8 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
   region,
   isOwnProfile = false,
   onToggle,
-  userRating
+  userRating,
+  viewType = 'cards'
 }) => {
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [wasAlreadyPlayed, setWasAlreadyPlayed] = useState(false);
@@ -93,6 +95,96 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
     }
   };
 
+  // List view render
+  if (viewType === 'list') {
+    return (
+      <>
+        <div
+          className={`relative rounded-lg overflow-hidden transition-all duration-300 cursor-pointer h-24 ${
+            isPlayed 
+              ? 'ring-2 ring-green-400 shadow-md transform scale-[1.01]' 
+              : 'hover:shadow-lg'
+          }`}
+          onClick={handleCardClick}
+        >
+          {/* Full background image */}
+          <img
+            src={course.thumbnail_image || 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=400&h=300&fit=crop'}
+            alt={course.name}
+            className="w-full h-full object-cover"
+          />
+
+          {/* Dark overlay for text readability */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
+
+          {/* Content overlay */}
+          <div className="absolute inset-0 flex items-center justify-between p-4">
+            <div className="flex-1 text-white">
+              <h3 className="font-semibold text-lg leading-tight mb-1">
+                {course.name}
+              </h3>
+              <div className="flex items-center text-sm text-white/90">
+                <MapPin className="h-3 w-3 mr-1" />
+                <span>{formatLocation(course)}</span>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2">
+              {/* Course ranking badges */}
+              <CourseRankBadges
+                globalRank={course.global_rank}
+                regionalRank={course.regional_rank}
+                usaRank={course.usa_rank}
+                country={course.country}
+                viewContext={region === 'britain-ireland' ? 'regional' : region === 'usa' ? 'usa' : region === 'europe' ? 'europe' : 'global'}
+                userRating={userRating}
+                showUserRating={!!userRating}
+                positioning="top-left"
+              />
+
+              {/* Played Indicator */}
+              {isPlayed && (
+                <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
+                  <Check className="h-4 w-4 text-white" />
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Hover overlay for own profile */}
+          {isOwnProfile && !isPlayed && (
+            <div className="absolute inset-0 bg-black/0 hover:bg-black/10 transition-colors duration-200 flex items-center justify-center">
+              <div className="opacity-0 hover:opacity-100 transition-opacity duration-200 bg-white/90 rounded-full p-2">
+                <Check className="h-5 w-5 text-green-600" />
+              </div>
+            </div>
+          )}
+
+          {/* Visual feedback for played state */}
+          {isPlayed && (
+            <div className="absolute inset-0 bg-green-500/10 pointer-events-none" />
+          )}
+        </div>
+
+        {/* Rating Modal - show for both new ratings and editing existing ones */}
+        {showRatingModal && isOwnProfile && (
+          <PostPlayRatingModal
+            course={{
+              id: course.id,
+              name: course.name,
+              thumbnail_image: course.thumbnail_image
+            }}
+            isOpen={showRatingModal}
+            onClose={() => setShowRatingModal(false)}
+            isEditMode={wasAlreadyPlayed}
+            onRemoveFromPlayed={onToggle}
+          />
+        )}
+      </>
+    );
+  }
+
+  // Cards view render (default)
   return (
     <>
       <div
@@ -122,7 +214,6 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
             showUserRating={!!userRating}
             positioning="top-left"
           />
-
 
           {/* Played Indicator */}
           {isPlayed && (
