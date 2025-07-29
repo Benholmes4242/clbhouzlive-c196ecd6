@@ -176,112 +176,109 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
               style={cardStyle}
               onClick={() => index !== activeIndex ? goToIndex(index) : onVideoPlay?.(highlight.id)}
             >
-              {/* Video card */}
-              <div className="relative w-full h-full rounded-xl overflow-hidden bg-black">
-                {/* Full height video */}
-                <div className="relative w-full h-full overflow-hidden">
-                  {highlight.videoUrl ? (
-                    <video
-                      ref={(el) => {
-                        if (el && highlight.videoUrl) {
-                          videoRefs.current[index] = el;
-                          console.log(`Setting up video ${index}`);
-                          
-                          // Clean up any existing HLS instance
-                          if (hlsInstances.current[index]) {
-                            hlsInstances.current[index]?.destroy();
-                          }
-                          
-                          // Set up HLS or regular video with preloading for smooth transitions
-                          if (highlight.videoUrl.includes('.m3u8')) {
-                            if (Hls.isSupported()) {
-                              const hls = new Hls({
-                                enableWorker: false,
-                                lowLatencyMode: false,
-                                startLevel: 0, // Start with lowest quality for faster loading
-                                maxBufferLength: 10 // Smaller buffer for faster switching
-                              });
-                              hlsInstances.current[index] = hls;
-                              hls.loadSource(highlight.videoUrl);
-                              hls.attachMedia(el);
-                              
-                              hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                                console.log(`HLS ready for video ${index}`);
-                                // Preload a small amount to ensure frame visibility
-                                el.currentTime = 0.1;
-                              });
+              {/* Video card - full card is video */}
+              <div className="relative w-full h-full overflow-hidden bg-black rounded-xl">
+                {highlight.videoUrl ? (
+                  <video
+                    ref={(el) => {
+                      if (el && highlight.videoUrl) {
+                        videoRefs.current[index] = el;
+                        console.log(`Setting up video ${index}`);
+                        
+                        // Clean up any existing HLS instance
+                        if (hlsInstances.current[index]) {
+                          hlsInstances.current[index]?.destroy();
+                        }
+                        
+                        // Set up HLS or regular video with preloading for smooth transitions
+                        if (highlight.videoUrl.includes('.m3u8')) {
+                          if (Hls.isSupported()) {
+                            const hls = new Hls({
+                              enableWorker: false,
+                              lowLatencyMode: false,
+                              startLevel: 0, // Start with lowest quality for faster loading
+                              maxBufferLength: 10 // Smaller buffer for faster switching
+                            });
+                            hlsInstances.current[index] = hls;
+                            hls.loadSource(highlight.videoUrl);
+                            hls.attachMedia(el);
+                            
+                            hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                              console.log(`HLS ready for video ${index}`);
+                              // Preload a small amount to ensure frame visibility
+                              el.currentTime = 0.1;
+                            });
 
-                              hls.on(Hls.Events.FRAG_LOADED, () => {
-                                // Ensure we have at least one frame loaded
-                                if (el.currentTime === 0) {
-                                  el.currentTime = 0.1;
-                                }
-                              });
-                            } else if (el.canPlayType('application/vnd.apple.mpegurl')) {
-                              el.src = highlight.videoUrl;
-                            }
-                          } else {
+                            hls.on(Hls.Events.FRAG_LOADED, () => {
+                              // Ensure we have at least one frame loaded
+                              if (el.currentTime === 0) {
+                                el.currentTime = 0.1;
+                              }
+                            });
+                          } else if (el.canPlayType('application/vnd.apple.mpegurl')) {
                             el.src = highlight.videoUrl;
                           }
+                        } else {
+                          el.src = highlight.videoUrl;
                         }
-                      }}
-                      className="w-full h-full object-cover"
-                      poster={highlight.thumbnail}
-                      muted
-                      loop
-                      playsInline
-                      controls={false}
-                      preload="metadata"
-                      onLoadedData={() => {
-                        console.log(`Video ${index} loaded data`);
-                        // Only set currentTime on initial load, not during transitions
+                      }
+                    }}
+                    className="w-full h-full object-cover"
+                    poster={highlight.thumbnail}
+                    muted
+                    loop
+                    playsInline
+                    controls={false}
+                    preload="metadata"
+                    onLoadedData={() => {
+                      console.log(`Video ${index} loaded data`);
+                      // Only set currentTime on initial load, not during transitions
+                      const video = videoRefs.current[index];
+                      if (video && video.currentTime === 0) {
+                        video.currentTime = 0.1; // Slightly ahead to ensure frame is visible
+                      }
+                    }}
+                    onCanPlay={() => {
+                      console.log(`Video ${index} can play`);
+                      // Don't auto-play during transitions
+                      if (!isTransitioning) {
                         const video = videoRefs.current[index];
-                        if (video && video.currentTime === 0) {
-                          video.currentTime = 0.1; // Slightly ahead to ensure frame is visible
+                        if (video && index === activeIndex && video.paused) {
+                          video.play().catch(console.error);
                         }
-                      }}
-                      onCanPlay={() => {
-                        console.log(`Video ${index} can play`);
-                        // Don't auto-play during transitions
-                        if (!isTransitioning) {
-                          const video = videoRefs.current[index];
-                          if (video && index === activeIndex && video.paused) {
-                            video.play().catch(console.error);
-                          }
-                        }
-                      }}
-                      onError={(e) => {
-                        console.error(`Video ${index} error:`, e);
-                      }}
-                    />
-                  ) : (
-                    <img
-                      src={highlight.thumbnail}
-                      alt={highlight.courseName}
-                      className="w-full h-full object-cover"
-                    />
-                  )}
-                  
-                  {/* Duration badge */}
-                  {highlight.duration && (
-                    <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-2 py-1 rounded">
-                      {highlight.duration}
-                    </div>
-                  )}
-                  
-                  {/* Text overlay - only visible on active card */}
-                  <div className={`absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent transition-all duration-300 ${
-                    index === activeIndex 
-                      ? 'opacity-100 translate-y-0' 
-                      : 'opacity-0 translate-y-2 pointer-events-none'
-                  }`}>
-                    <h3 className="text-white font-bold text-xl leading-tight mb-1">
-                      {highlight.courseName}
-                    </h3>
-                    <div className="flex items-center gap-1">
-                      <MapPin className="w-4 h-4 text-white/60" />
-                      <span className="text-white/80 text-sm">{highlight.location}</span>
-                    </div>
+                      }
+                    }}
+                    onError={(e) => {
+                      console.error(`Video ${index} error:`, e);
+                    }}
+                  />
+                ) : (
+                  <img
+                    src={highlight.thumbnail}
+                    alt={highlight.courseName}
+                    className="w-full h-full object-cover"
+                  />
+                )}
+                
+                {/* Duration badge */}
+                {highlight.duration && (
+                  <div className="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-2 py-1 rounded">
+                    {highlight.duration}
+                  </div>
+                )}
+                
+                {/* Text overlay - only visible on active card */}
+                <div className={`absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent transition-all duration-300 ${
+                  index === activeIndex 
+                    ? 'opacity-100 translate-y-0' 
+                    : 'opacity-0 translate-y-2 pointer-events-none'
+                }`}>
+                  <h3 className="text-white font-bold text-xl leading-tight mb-1">
+                    {highlight.courseName}
+                  </h3>
+                  <div className="flex items-center gap-1">
+                    <MapPin className="w-4 h-4 text-white/60" />
+                    <span className="text-white/80 text-sm">{highlight.location}</span>
                   </div>
                 </div>
               </div>
