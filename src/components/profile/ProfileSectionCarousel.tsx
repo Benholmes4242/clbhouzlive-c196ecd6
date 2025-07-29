@@ -85,18 +85,10 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
               </div>
             )}
             
-            {/* Handicap special background */}
+            {/* Handicap liquid glass background */}
             {card.id === 'handicap' && (
-              <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-transparent rounded-lg">
-                <div className="absolute inset-0 rounded-lg" style={{
-                  backgroundImage: `
-                    conic-gradient(from 0deg at 50% 50%, rgba(255,255,255,0.1) 0deg, transparent 60deg, rgba(255,255,255,0.1) 120deg, transparent 180deg, rgba(255,255,255,0.1) 240deg, transparent 300deg),
-                    radial-gradient(circle at 70% 30%, rgba(255,255,255,0.1) 0%, transparent 50%)
-                  `,
-                  backgroundSize: '80px 80px, 100% 100%'
-                }}>
-                </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent rounded-lg" />
+              <div className="absolute inset-0 bg-white/5 backdrop-blur-2xl border border-white/20 rounded-lg shadow-[0_0_20px_rgba(0,0,0,0.2)]" style={{ backdropFilter: 'blur(40px) saturate(180%)' }}>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent rounded-lg" />
               </div>
             )}
             
@@ -163,18 +155,10 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
                 </div>
               )}
               
-              {/* Handicap special background */}
+              {/* Handicap liquid glass background */}
               {card.id === 'handicap' && (
-                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-transparent rounded-lg">
-                  <div className="absolute inset-0 rounded-lg" style={{
-                    backgroundImage: `
-                      conic-gradient(from 0deg at 50% 50%, rgba(255,255,255,0.1) 0deg, transparent 60deg, rgba(255,255,255,0.1) 120deg, transparent 180deg, rgba(255,255,255,0.1) 240deg, transparent 300deg),
-                      radial-gradient(circle at 70% 30%, rgba(255,255,255,0.1) 0%, transparent 50%)
-                    `,
-                    backgroundSize: '80px 80px, 100% 100%'
-                  }}>
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent rounded-lg" />
+                <div className="absolute inset-0 bg-white/5 backdrop-blur-2xl border border-white/20 rounded-lg shadow-[0_0_20px_rgba(0,0,0,0.2)]" style={{ backdropFilter: 'blur(40px) saturate(180%)' }}>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent rounded-lg" />
                 </div>
               )}
               
