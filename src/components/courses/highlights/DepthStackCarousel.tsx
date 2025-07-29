@@ -4,6 +4,7 @@ import { useCarouselNavigation } from '@/hooks/useCarouselNavigation';
 import { useThumbnailGenerator } from '@/components/posts/video/ThumbnailGenerator';
 import { Button } from '@/components/ui/button';
 import CourseRankBadges from '../CourseRankBadges';
+import Hls from 'hls.js';
 
 interface HighlightVideo {
   id: string;
@@ -39,6 +40,7 @@ const VideoCard: React.FC<{
   onVideoPlay?: (videoId: string) => void;
 }> = ({ video, isActive, onVideoPlay }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const hlsRef = useRef<Hls | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
   const { thumbnailSrc, thumbnailReady } = useThumbnailGenerator(
@@ -46,6 +48,26 @@ const VideoCard: React.FC<{
     video.id, 
     video.thumbnail
   );
+
+  // Initialize HLS for .m3u8 streams
+  useEffect(() => {
+    if (!video.videoUrl || !videoRef.current) return;
+
+    if (video.videoUrl.includes('.m3u8')) {
+      if (Hls.isSupported()) {
+        hlsRef.current = new Hls();
+        hlsRef.current.loadSource(video.videoUrl);
+        hlsRef.current.attachMedia(videoRef.current);
+      }
+    }
+
+    return () => {
+      if (hlsRef.current) {
+        hlsRef.current.destroy();
+        hlsRef.current = null;
+      }
+    };
+  }, [video.videoUrl]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -95,9 +117,7 @@ const VideoCard: React.FC<{
           poster={thumbnailReady ? thumbnailSrc : video.thumbnail}
           onLoadedData={() => console.log('Video loaded:', video.id)}
           onError={(e) => console.error('Video error:', e)}
-        >
-          <source src={video.videoUrl} type="video/mp4" />
-        </video>
+        />
       ) : (
         <img 
           src={thumbnailReady ? thumbnailSrc : video.thumbnail}
