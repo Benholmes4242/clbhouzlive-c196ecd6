@@ -189,7 +189,7 @@ const LatestHighlights: React.FC<LatestHighlightsProps> = ({
   if (loading) {
     return (
       <div className="py-4">
-        <div className="mb-1">
+        <div className="mb-1 px-4">
           <h2 className="text-2xl font-bold text-white mb-2">Highlights & Achievements</h2>
           <p className="text-white/70">Loading your golf highlights...</p>
         </div>
@@ -200,7 +200,7 @@ const LatestHighlights: React.FC<LatestHighlightsProps> = ({
   if (!highlights.length) {
     return (
       <div className="py-4">
-        <div className="mb-1">
+        <div className="mb-1 px-4">
           <h2 className="text-2xl font-bold text-white mb-2">Highlights & Achievements</h2>
           <p className="text-white/70">
             {isOwnProfile 
@@ -209,7 +209,7 @@ const LatestHighlights: React.FC<LatestHighlightsProps> = ({
             }
           </p>
         </div>
-        <div className="bg-white/5 backdrop-blur-2xl border border-white/20 rounded-xl p-8 text-center mt-4">
+        <div className="bg-white/5 backdrop-blur-2xl border border-white/20 rounded-xl p-8 text-center mt-4 mx-4">
           <p className="text-white/60">No video highlights available yet.</p>
           {isOwnProfile && (
             <p className="text-white/40 text-sm mt-2">
@@ -223,7 +223,7 @@ const LatestHighlights: React.FC<LatestHighlightsProps> = ({
 
   return (
     <div className="py-4">
-      <div className="mb-1">
+      <div className="mb-1 px-4">
         <h2 className="text-2xl font-bold text-white mb-2">Highlights & Achievements</h2>
         <p className="text-white/70">
           {isOwnProfile 
