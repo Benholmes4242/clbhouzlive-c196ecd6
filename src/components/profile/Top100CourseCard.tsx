@@ -108,18 +108,17 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
           onClick={handleCardClick}
         >
           {/* Background image covering entire card */}
-          <div 
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-            style={{
-              backgroundImage: `url(${course.thumbnail_image || 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=400&h=300&fit=crop'})`
-            }}
+          <img 
+            src={course.thumbnail_image || 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=400&h=300&fit=crop'}
+            alt={course.name}
+            className="absolute inset-0 w-full h-full object-cover"
           />
 
           {/* Dark overlay for text readability */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-black/20" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-black/20 z-10" />
 
           {/* Content overlay */}
-          <div className="absolute inset-0 flex items-center justify-between p-4 z-10">
+          <div className="absolute inset-0 flex items-center justify-between p-4 z-20">
             <div className="flex-1 text-white">
               <h3 className="font-semibold text-lg leading-tight mb-1">
                 {course.name}
