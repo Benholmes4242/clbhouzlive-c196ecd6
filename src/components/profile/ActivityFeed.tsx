@@ -67,7 +67,7 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
 
   return (
     <>
-      <div className="p-4">
+      <div className="bg-white/20 backdrop-blur-sm border border-white/30 shadow-lg p-4" style={{ borderRadius: '8px' }}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-end gap-2">
             <h3 className="text-3xl font-bold text-white">Activity</h3>
