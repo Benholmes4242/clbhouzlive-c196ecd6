@@ -246,7 +246,7 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId })
                   }}
                   onClick={() => setCurrentIndex(index)}
                 >
-                  <div className="relative w-full h-full bg-black rounded-2xl overflow-hidden shadow-2xl">
+                  <div className="relative w-full h-full bg-black rounded-lg overflow-hidden shadow-2xl">
                     <video
                       ref={(el) => {
                         if (el) videoRefs.current[index] = el;
