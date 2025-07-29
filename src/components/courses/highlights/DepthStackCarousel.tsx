@@ -257,10 +257,12 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                   
                   {/* ClbHouse ranking top right */}
                   {(highlight.globalRank || highlight.regionalRank || highlight.usaRank) && (
-                    <div className="absolute top-2 right-2 bg-primary/90 backdrop-blur-sm border border-white/30 rounded-lg px-2 py-1 flex items-center gap-1">
-                      <Trophy className="w-3 h-3 text-white" />
-                      <span className="text-white text-xs font-medium">
-                        #{highlight.globalRank || highlight.regionalRank || highlight.usaRank}
+                    <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm rounded-lg px-2 py-1 flex items-center gap-1 shadow-sm">
+                      <div className="w-4 h-4 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full flex items-center justify-center">
+                        <span className="text-white text-[8px] font-bold">C</span>
+                      </div>
+                      <span className="text-gray-800 text-xs font-medium">
+                        {highlight.globalRank || highlight.regionalRank || highlight.usaRank}/100
                       </span>
                     </div>
                   )}
