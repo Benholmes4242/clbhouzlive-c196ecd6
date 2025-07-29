@@ -58,7 +58,7 @@ const CourseListItem: React.FC<CourseListItemProps> = ({
       <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-black/20" />
 
       {/* Content overlay */}
-      <div className="absolute inset-0 flex items-center justify-between p-4 z-10">
+      <div className="absolute inset-0 flex items-center p-4 z-10">
         <div className="flex-1 text-white">
           <h3 className="font-semibold text-lg leading-tight mb-1">
             {course.name}
@@ -68,28 +68,29 @@ const CourseListItem: React.FC<CourseListItemProps> = ({
             <span>{formatLocation(course)}</span>
           </div>
         </div>
+      </div>
 
-        <div className="flex items-center gap-2">
-          {/* Course ranking badges */}
-          <CourseRankBadges
-            globalRank={course.global_rank}
-            regionalRank={course.regional_rank}
-            usaRank={course.usa_rank}
-            country={course.country}
-            viewContext={viewContext}
-            userRating={userRating}
-            showUserRating={showUserRating}
-            positioning="top-left"
-          />
+      {/* Top right badges */}
+      <div className="absolute top-2 right-2 flex items-center gap-2 z-20">
+        {/* Course ranking badges */}
+        <CourseRankBadges
+          globalRank={course.global_rank}
+          regionalRank={course.regional_rank}
+          usaRank={course.usa_rank}
+          country={course.country}
+          viewContext={viewContext}
+          userRating={userRating}
+          showUserRating={showUserRating}
+          positioning="top-left"
+        />
 
-          {/* User Rating Display */}
-          {userRating && showUserRating && (
-            <div className="flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-full px-2 py-1">
-              <Star className="h-3 w-3 text-yellow-400 fill-current" />
-              <span className="text-xs font-medium text-white">{userRating}/10</span>
-            </div>
-          )}
-        </div>
+        {/* User Rating Display */}
+        {userRating && showUserRating && (
+          <div className="flex items-center gap-1 bg-white/20 backdrop-blur-sm rounded-full px-2 py-1">
+            <Star className="h-3 w-3 text-yellow-400 fill-current" />
+            <span className="text-xs font-medium text-white">{userRating}/10</span>
+          </div>
+        )}
       </div>
     </div>
   );
