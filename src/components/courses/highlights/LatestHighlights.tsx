@@ -238,18 +238,6 @@ const LatestHighlights: React.FC<LatestHighlightsProps> = ({
         onVideoPlay={handleVideoPlay}
       />
       
-      {/* Additional stats or info */}
-      <div className="mt-6 flex flex-wrap gap-4 text-sm text-white/60">
-        <span>{highlights.length} highlights</span>
-        <span>•</span>
-        <span>{new Set(highlights.map(h => h.courseId)).size} courses featured</span>
-        {highlights.length > 0 && (
-          <>
-            <span>•</span>
-            <span>Top {Math.min(...highlights.map(h => h.globalRank || h.regionalRank || h.usaRank || 999))} course played</span>
-          </>
-        )}
-      </div>
     </div>
   );
 };
