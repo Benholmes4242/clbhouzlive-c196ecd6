@@ -278,7 +278,7 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
           </div>
           
           {/* View Toggle - positioned to align with sorting buttons */}
-          <div className="flex-shrink-0 ml-4">
+          <div className="flex-shrink-0 ml-4 mt-1">
             <ViewToggle 
               currentView={viewType}
               onViewChange={setViewType}
