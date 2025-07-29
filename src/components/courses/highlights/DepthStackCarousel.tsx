@@ -303,17 +303,24 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                 </div>
                 
                 {/* Course info */}
-                <div className="p-4">
-                  <h3 className="text-white font-bold text-lg mb-1 line-clamp-1">
-                    {highlight.courseName}
-                  </h3>
-                  <div className="flex items-center gap-1 mb-2">
-                    <MapPin className="w-3 h-3 text-white/60" />
-                    <span className="text-white/80 text-sm">{highlight.location}</span>
+                <div className="relative p-4">
+                  {/* Liquid glass background */}
+                  <div className="absolute inset-0 bg-white/5 backdrop-blur-2xl border-t border-white/20" style={{ backdropFilter: 'blur(40px) saturate(180%)' }}>
                   </div>
-                  <p className="text-white/70 text-sm line-clamp-2">
-                    {highlight.caption}
-                  </p>
+                  
+                  {/* Content */}
+                  <div className="relative">
+                    <h3 className="text-white font-bold text-lg mb-1 line-clamp-1">
+                      {highlight.courseName}
+                    </h3>
+                    <div className="flex items-center gap-1 mb-2">
+                      <MapPin className="w-3 h-3 text-white/60" />
+                      <span className="text-white/80 text-sm">{highlight.location}</span>
+                    </div>
+                    <p className="text-white/70 text-sm line-clamp-2">
+                      {highlight.caption}
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
