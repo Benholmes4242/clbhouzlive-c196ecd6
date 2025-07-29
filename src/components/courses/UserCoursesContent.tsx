@@ -5,10 +5,12 @@ import { useTop100CoursesData } from '@/hooks/useTop100CoursesData';
 import UserCoursesHeader from './user/UserCoursesHeader';
 import UserCoursesRegionalTiles from './user/UserCoursesRegionalTiles';
 import CourseCard from './CourseCard';
+import CourseListItem from './CourseListItem';
 import { EmptyTop100State } from './user/UserCoursesEmptyStates';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-
+import ViewToggle from '@/components/profile/ViewToggle';
+import { useViewPreference } from '@/hooks/useViewPreference';
 
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
@@ -92,6 +94,7 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<string>('rating-high-low');
   const [carouselIndex, setCarouselIndex] = useState(0);
+  const { viewType, setViewType } = useViewPreference();
   const isMobile = useIsMobile();
   
   // Always call the hook to avoid conditional hook errors
@@ -261,33 +264,64 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
       />
 
 
-      <UserCoursesRegionalTiles
-        regionProgress={regionProgress}
-        activeFilter={activeFilter}
-        onFilterChange={setActiveFilter}
-        isLoading={isLoadingProgress}
-        sortBy={sortBy}
-        onSortChange={setSortBy}
-      />
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <div className="flex-1">
+            <UserCoursesRegionalTiles
+              regionProgress={regionProgress}
+              activeFilter={activeFilter}
+              onFilterChange={setActiveFilter}
+              isLoading={isLoadingProgress}
+              sortBy={sortBy}
+              onSortChange={setSortBy}
+            />
+          </div>
+          
+          {/* View Toggle - positioned on the far right */}
+          <div className="flex-shrink-0 ml-4">
+            <ViewToggle 
+              currentView={viewType}
+              onViewChange={setViewType}
+            />
+          </div>
+        </div>
+      </div>
 
       <div className="space-y-4">
         {isLoadingTop100 ? (
           <div className="text-center py-8">Loading courses...</div>
         ) : filteredCourses.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {filteredCourses.map((userCourse) => (
-              <CourseCard 
-                key={userCourse.id} 
-                course={userCourse.golf_courses}
-                viewingUserId={targetUserId}
-                viewContext="global"
-                userRating={userCourse.rating}
-                isReadOnly={!finalIsOwnProfile}
-                showUserRating={true}
-                isFromUserCoursesPage={true}
-              />
-            ))}
-          </div>
+          viewType === 'cards' ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {filteredCourses.map((userCourse) => (
+                <CourseCard 
+                  key={userCourse.id} 
+                  course={userCourse.golf_courses}
+                  viewingUserId={targetUserId}
+                  viewContext="global"
+                  userRating={userCourse.rating}
+                  isReadOnly={!finalIsOwnProfile}
+                  showUserRating={true}
+                  isFromUserCoursesPage={true}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+              {filteredCourses.map((userCourse) => (
+                <CourseListItem
+                  key={userCourse.id}
+                  course={userCourse.golf_courses}
+                  viewingUserId={targetUserId}
+                  viewContext="global"
+                  userRating={userCourse.rating}
+                  isReadOnly={!finalIsOwnProfile}
+                  showUserRating={true}
+                  isFromUserCoursesPage={true}
+                />
+              ))}
+            </div>
+          )
         ) : activeFilter ? (
           <div className="text-center py-12">
             <p className="text-muted-foreground">
