@@ -177,7 +177,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
               onClick={() => index !== activeIndex ? goToIndex(index) : onVideoPlay?.(highlight.id)}
             >
               {/* Video card */}
-              <div className="relative w-full h-full bg-white/5 backdrop-blur-2xl border border-white/20 rounded-xl overflow-hidden">
+              <div className="relative w-full h-full bg-white/5 backdrop-blur-2xl rounded-xl overflow-hidden">
                 {/* Video player - increased height */}
                 <div className="relative w-full h-72 overflow-hidden bg-black">
                   {highlight.videoUrl ? (
