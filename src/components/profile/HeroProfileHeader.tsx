@@ -232,14 +232,25 @@ const HeroProfileHeader = ({
     }
   };
 
+  // Dynamic height based on active section
+  const getBackgroundHeight = () => {
+    switch (activeSection) {
+      case 'activity': return '900px';
+      case 'top100': return '1500px';
+      case 'handicap': return '800px';
+      default: return '1300px';
+    }
+  };
+
   return (
     <>
       {/* Dynamic Background - Auto-generated from profile photo */}
       <div className="relative w-full">
         {/* Apple Music Style Dynamic Background */}
         <div 
-          className="absolute inset-0 w-full h-[1300px] overflow-hidden"
+          className="absolute inset-0 w-full overflow-hidden transition-all duration-500"
           style={{
+            height: getBackgroundHeight(),
             backgroundImage: profile?.profile_photo_url 
               ? `url(${profile.profile_photo_url}?t=${avatarKey})`
               : 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-foreground)) 100%)',
