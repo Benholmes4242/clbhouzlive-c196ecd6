@@ -114,9 +114,6 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
 
   return (
     <div className="relative w-full h-96 overflow-hidden" style={{ perspective: '1000px' }}>
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/20 to-black/40 pointer-events-none" />
-      
       {/* Carousel container */}
       <div 
         ref={swipeRef}
