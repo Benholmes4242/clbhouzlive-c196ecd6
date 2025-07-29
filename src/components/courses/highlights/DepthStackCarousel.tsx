@@ -293,7 +293,7 @@ const LiquidGlassCard: React.FC = () => {
               {achievement.earned && (
                 <div className="absolute -top-1 -right-1 transform -rotate-12 animate-scale-in">
                   <img 
-                    src="/lovable-uploads/02bca49a-e8d5-4d47-9bc2-896252c93b76.png" 
+                    src="/lovable-uploads/e4e44275-1266-4a51-a3d2-1e02f989f7d8.png" 
                     alt="Completed"
                     className="w-16 h-16 drop-shadow-lg"
                     style={{ 
