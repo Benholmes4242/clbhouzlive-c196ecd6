@@ -70,8 +70,8 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
       <div className="p-4">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <h3 className="font-semibold text-lg">Posts</h3>
-            <Badge variant="secondary">{posts.length}</Badge>
+            <h3 className="font-semibold text-lg">Activity</h3>
+            <span className="text-muted-foreground text-sm">{posts.length} posts</span>
           </div>
         </div>
 
