@@ -82,7 +82,7 @@ const Top100Courses: React.FC<Top100CoursesProps> = ({
 
   if (isLoading) {
     return (
-      <section className="mt-10 py-2">
+      <section className="mt-10">
         <div className="flex items-center gap-2 mb-3">
           <h2 className="text-xl font-bold">Top 100 Courses</h2>
         </div>
@@ -94,7 +94,7 @@ const Top100Courses: React.FC<Top100CoursesProps> = ({
   }
 
   return (
-    <section className="mt-10 py-2">
+    <section className="mt-10">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           <Trophy className="h-5 w-5 text-yellow-600" />
