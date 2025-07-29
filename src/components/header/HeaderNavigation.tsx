@@ -119,17 +119,17 @@ const HeaderNavigation = () => {
     return (
       <>
         <Button variant="ghost" size="sm" className="p-2 md:p-3 flex-shrink-0" onClick={handleNotificationsClick}>
-          <Bell className="h-5 w-5 text-black" />
+          <Bell className="h-6 w-6 text-black" />
         </Button>
 
         <Button variant="ghost" size="sm" className="p-2 md:p-3 flex-shrink-0" onClick={handleProfileClick}>
-          <CircleUserRound className="h-5 w-5 md:h-6 md:w-6 text-black" />
+          <CircleUserRound className="h-6 w-6 md:h-7 md:w-7 text-black" />
         </Button>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="sm" className="p-2 md:p-3 flex-shrink-0">
-              <Settings className="h-5 w-5 md:h-6 md:w-6 text-black" />
+              <Settings className="h-6 w-6 md:h-7 md:w-7 text-black" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48 mr-2">
@@ -149,7 +149,7 @@ const HeaderNavigation = () => {
   return (
     <>
       <Button variant="ghost" size="sm" className="relative p-2 md:p-3 flex-shrink-0" onClick={handleNotificationsClick}>
-        <Bell className="h-5 w-5 text-black" />
+        <Bell className="h-6 w-6 text-black" />
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
             {unreadCount > 9 ? '9+' : unreadCount}
@@ -158,13 +158,13 @@ const HeaderNavigation = () => {
       </Button>
 
       <Button variant="ghost" size="sm" className="p-2 md:p-3 flex-shrink-0" onClick={handleProfileClick}>
-        <CircleUserRound className="h-5 w-5 md:h-6 md:w-6 text-black" />
+        <CircleUserRound className="h-6 w-6 md:h-7 md:w-7 text-black" />
       </Button>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="sm" className="p-2 md:p-3 flex-shrink-0">
-            <Settings className="h-5 w-5 md:h-6 md:w-6 text-black" />
+            <Settings className="h-6 w-6 md:h-7 md:w-7 text-black" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48 mr-2">
@@ -173,7 +173,7 @@ const HeaderNavigation = () => {
           </DropdownMenuItem>
           {hasAdminAccess && (
             <DropdownMenuItem onClick={handleAdminClick}>
-              <Shield className="h-4 w-4 mr-2" />
+              <Shield className="h-5 w-5 mr-2" />
               Admin Dashboard
             </DropdownMenuItem>
           )}
