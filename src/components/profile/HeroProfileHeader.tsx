@@ -236,7 +236,7 @@ const HeroProfileHeader = ({
   const getBackgroundHeight = () => {
     switch (activeSection) {
       case 'activity': return '1000px';
-      case 'top100': return window.innerWidth <= 768 ? '2500px' : '1600px'; // Extended for mobile only
+      case 'top100': return window.innerWidth <= 768 ? '2000px' : '1600px'; // Extended for mobile only
       case 'handicap': return '1000px';
       default: return '1300px';
     }
