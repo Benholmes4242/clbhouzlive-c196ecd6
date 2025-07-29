@@ -272,7 +272,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                   )}
                   
                   {/* Course ranking badges */}
-                  <div className="absolute top-2 left-2 right-16 flex flex-col gap-1 z-10 scale-75 origin-top-left items-end">
+                  <div className="absolute top-3 left-3 flex flex-col gap-1 z-10">
                     <CourseRankBadges
                       globalRank={highlight.globalRank}
                       regionalRank={highlight.regionalRank}
@@ -284,19 +284,15 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                   
                   {/* ClbHouse average rating top right */}
                   {highlight.averageRating && (
-                    <div className="absolute top-2 right-2 scale-75 origin-top-right z-20">
-                      <div className="relative flex items-center gap-2 px-1.5 py-1.5 rounded-xl overflow-hidden">
-                        <div className="absolute inset-0 bg-white/5 backdrop-blur-2xl border border-white/20 rounded-xl" style={{ backdropFilter: 'blur(40px) saturate(180%)' }}>
-                        </div>
-                        <div className="relative z-10 flex items-center gap-2">
-                          <img
-                            src="/lovable-uploads/2b0e2d79-6b26-4b6b-a27b-8dd5f8cc5aad.png"
-                            alt="Clubhouse Community Rating"
-                            className="h-6 w-6"
-                            style={{ objectFit: 'contain' }}
-                          />
-                          <span className="text-base font-bold text-white">{highlight.averageRating}/10</span>
-                        </div>
+                    <div className="absolute top-3 right-3 z-20">
+                      <div className="flex items-center gap-2 px-2 py-1.5 bg-white/90 rounded-lg shadow-sm">
+                        <img
+                          src="/lovable-uploads/2b0e2d79-6b26-4b6b-a27b-8dd5f8cc5aad.png"
+                          alt="Clubhouse Community Rating"
+                          className="h-5 w-5"
+                          style={{ objectFit: 'contain' }}
+                        />
+                        <span className="text-sm font-bold text-gray-900">{highlight.averageRating}/10</span>
                       </div>
                     </div>
                   )}
