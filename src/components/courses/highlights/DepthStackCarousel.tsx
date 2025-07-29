@@ -266,21 +266,6 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                     {highlight.duration}
                   </div>
                 )}
-                
-                {/* Text overlay - only visible on active card */}
-                <div className={`absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent transition-all duration-300 ${
-                  index === activeIndex 
-                    ? 'opacity-100 translate-y-0' 
-                    : 'opacity-0 translate-y-2 pointer-events-none'
-                }`}>
-                  <h3 className="text-white font-bold text-xl leading-tight mb-1">
-                    {highlight.courseName}
-                  </h3>
-                  <div className="flex items-center gap-1">
-                    <MapPin className="w-4 h-4 text-white/60" />
-                    <span className="text-white/80 text-sm">{highlight.location}</span>
-                  </div>
-                </div>
               </div>
             </div>
           );
