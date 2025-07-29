@@ -157,49 +157,8 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
 
   return (
     <div className="relative w-full h-[28rem] overflow-hidden" style={{ perspective: '1000px' }}>
-      {/* Carousel container */}
-      <div 
-        ref={swipeRef}
-        className="relative w-full h-full flex items-center justify-center"
-        style={{ transformStyle: 'preserve-3d' }}
-      >
-        {/* Cards container - ready for new implementation */}
-        <div className="relative w-full h-full flex items-center justify-center text-white">
-          <p>Cards will be implemented here</p>
-        </div>
-      </div>
-      
-      {/* Navigation arrows */}
-      <button
-        onClick={goToPrevious}
-        disabled={isTransitioning}
-        className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-colors disabled:opacity-50 z-20"
-      >
-        <ChevronLeft className="w-6 h-6" />
-      </button>
-      
-      <button
-        onClick={goToNext}
-        disabled={isTransitioning}
-        className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-colors disabled:opacity-50 z-20"
-      >
-        <ChevronRight className="w-6 h-6" />
-      </button>
-      
-      {/* Dot indicators */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20">
-        {highlights.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => goToIndex(index)}
-            disabled={isTransitioning}
-            className={`w-2 h-2 rounded-full transition-all duration-200 ${
-              index === activeIndex 
-                ? 'bg-white' 
-                : 'bg-white/40 hover:bg-white/60'
-            }`}
-          />
-        ))}
+      <div className="relative w-full h-full flex items-center justify-center text-white">
+        <p>Ready for new implementation</p>
       </div>
     </div>
   );
