@@ -191,25 +191,28 @@ const Top100AchievementsSection: React.FC<Top100AchievementsSectionProps> = ({
                 scrollbarWidth: 'thin'
               }}
             >
-              {achievements.map((achievement) => (
-                <div
-                  key={achievement.id}
-                  className={`flex items-center gap-3 p-3 rounded-lg border transition-all duration-300 ${
-                    achievement.isEarned
-                      ? achievement.id === '20-club'
-                        ? "bg-gradient-to-r from-emerald-500/20 to-green-500/20 border-emerald-400 shadow-xl shadow-emerald-500/50 ring-2 ring-emerald-400 animate-pulse"
-                        : "bg-green-500/10 border-green-400/30"
-                      : "bg-white/5 border-white/20 opacity-60"
-                  }`}
-                >
-                  {/* Achievement Icon */}
-                  <div className="flex items-center justify-center w-8 h-8 rounded-full text-3xl">
-                    {achievement.id === '20-club' ? (
-                      <MedalIcon size="xl" />
-                    ) : (
-                      <span className="text-3xl">{achievement.emoji}</span>
-                    )}
-                  </div>
+              {achievements.map((achievement) => {
+                console.log(`Achievement ${achievement.id}: isEarned=${achievement.isEarned}, userProgress=${userProgress}`);
+                
+                return (
+                  <div
+                    key={achievement.id}
+                    className={`flex items-center gap-3 p-3 rounded-lg border transition-all duration-300 ${
+                      achievement.isEarned
+                        ? achievement.id === '20-club'
+                          ? "bg-gradient-to-r from-emerald-500/20 to-green-500/20 border-emerald-400 shadow-xl shadow-emerald-500/50 ring-2 ring-emerald-400 animate-pulse"
+                          : "bg-green-500/10 border-green-400/30"
+                        : "bg-white/5 border-white/20 opacity-60"
+                    }`}
+                  >
+                    {/* Achievement Icon */}
+                    <div className="flex items-center justify-center w-8 h-8 rounded-full text-3xl">
+                      {achievement.id === '20-club' ? (
+                        <MedalIcon size="xl" />
+                      ) : (
+                        <span className="text-3xl">{achievement.emoji}</span>
+                      )}
+                    </div>
 
                   {/* Achievement Content */}
                   <div className="flex-1">
@@ -237,8 +240,9 @@ const Top100AchievementsSection: React.FC<Top100AchievementsSectionProps> = ({
                       </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                  </div>
+                );
+              })}
             </div>
             
             {/* Scroll indicator gradient */}
