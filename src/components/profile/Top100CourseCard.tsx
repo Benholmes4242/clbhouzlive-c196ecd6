@@ -106,16 +106,15 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
               : 'hover:shadow-lg'
           }`}
           onClick={handleCardClick}
+          style={{
+            backgroundImage: `url(${course.thumbnail_image || 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=400&h=300&fit=crop'})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            backgroundRepeat: 'no-repeat'
+          }}
         >
-          {/* Full background image */}
-          <img
-            src={course.thumbnail_image || 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=400&h=300&fit=crop'}
-            alt={course.name}
-            className="w-full h-full object-cover"
-          />
-
           {/* Dark overlay for text readability */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-black/20" />
 
           {/* Content overlay */}
           <div className="absolute inset-0 flex items-center justify-between p-4">
