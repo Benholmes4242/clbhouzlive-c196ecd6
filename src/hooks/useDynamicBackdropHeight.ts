@@ -10,11 +10,16 @@ export const useDynamicBackdropHeight = (activeSection: string) => {
       const element = contentRef.current;
       const scrollHeight = element.scrollHeight;
       const offsetHeight = element.offsetHeight;
-      const actualHeight = Math.max(scrollHeight, offsetHeight);
+      const clientHeight = element.clientHeight;
       
-      // Add extra padding to ensure full coverage
-      const dynamicHeight = actualHeight + 200;
+      // Get the maximum of all height measurements
+      const actualHeight = Math.max(scrollHeight, offsetHeight, clientHeight);
+      
+      // Add significant extra padding to ensure full coverage
+      const dynamicHeight = actualHeight + 500; // Increased from 200 to 500
       setContentHeight(dynamicHeight);
+      
+      console.log('Content height updated:', { scrollHeight, offsetHeight, clientHeight, actualHeight, dynamicHeight });
     }
   }, [activeSection]);
 
@@ -63,7 +68,7 @@ export const useDynamicBackdropHeight = (activeSection: string) => {
       case 'activity': 
         return '1000px';
       case 'top100': 
-        return contentHeight > 0 ? `${contentHeight}px` : '200vh';
+        return contentHeight > 0 ? `${contentHeight}px` : '300vh'; // Increased fallback from 200vh to 300vh
       case 'handicap': 
         return '1000px';
       default: 
