@@ -48,16 +48,19 @@ const VideoCard: React.FC<{
   );
 
   useEffect(() => {
-    if (videoRef.current) {
-      if (isActive && !isPlaying) {
-        videoRef.current.play().catch(() => {});
-        setIsPlaying(true);
-      } else if (!isActive && isPlaying) {
-        videoRef.current.pause();
-        setIsPlaying(false);
-      }
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (isActive) {
+      // Auto-play active video
+      video.play().catch(() => {});
+      setIsPlaying(true);
+    } else {
+      // Pause non-active videos
+      video.pause();
+      setIsPlaying(false);
     }
-  }, [isActive, isPlaying]);
+  }, [isActive]);
 
   const handleVideoClick = () => {
     if (videoRef.current) {
