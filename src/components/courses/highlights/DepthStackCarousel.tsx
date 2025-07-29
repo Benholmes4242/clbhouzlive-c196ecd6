@@ -275,12 +275,16 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                 
                 {/* Course info */}
                 <div className="relative p-4">
-                  {/* Liquid glass background */}
+                  {/* Liquid glass background - always visible */}
                   <div className="absolute inset-0 bg-white/5 backdrop-blur-2xl border-t border-white/20" style={{ backdropFilter: 'blur(40px) saturate(180%)' }}>
                   </div>
                   
-                  {/* Content */}
-                  <div className="relative">
+                  {/* Content - only visible on active card */}
+                  <div className={`relative transition-all duration-300 ${
+                    index === activeIndex 
+                      ? 'opacity-100 translate-y-0' 
+                      : 'opacity-0 translate-y-2 pointer-events-none'
+                  }`}>
                     <h3 className="text-white font-bold text-lg mb-1 line-clamp-1">
                       {highlight.courseName}
                     </h3>
