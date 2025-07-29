@@ -180,7 +180,7 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId })
       <div className="bg-black/40 backdrop-blur-sm rounded-[8px] px-4 py-3 border border-black/20">
         <div className="space-y-4">
           <div>
-            <h3 className="font-bold text-lg text-white">Latest Highlights</h3>
+            <h3 className="font-bold text-lg text-white">Highlights & Achievements</h3>
             <p className="text-white/80 text-sm">Recent videos from Top 100 courses</p>
           </div>
           <div className="space-y-2">
@@ -204,7 +204,7 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId })
   return (
     <div className="space-y-4">
       <div>
-        <h3 className="font-bold text-lg text-foreground">Latest Highlights</h3>
+        <h3 className="font-bold text-lg text-foreground">Highlights & Achievements</h3>
         <p className="text-muted-foreground text-sm">Recent videos from Top 100 courses</p>
       </div>
       

@@ -190,7 +190,7 @@ const LatestHighlights: React.FC<LatestHighlightsProps> = ({
     return (
       <div className="px-4">
         <div className="mb-1">
-          <h2 className="text-2xl font-bold text-white mb-2">Latest Highlights</h2>
+          <h2 className="text-2xl font-bold text-white mb-2">Highlights & Achievements</h2>
           <p className="text-white/70">Loading your golf highlights...</p>
         </div>
       </div>
@@ -201,7 +201,7 @@ const LatestHighlights: React.FC<LatestHighlightsProps> = ({
     return (
       <div className="px-4">
         <div className="mb-1">
-          <h2 className="text-2xl font-bold text-white mb-2">Latest Highlights</h2>
+          <h2 className="text-2xl font-bold text-white mb-2">Highlights & Achievements</h2>
           <p className="text-white/70">
             {isOwnProfile 
               ? "Your most memorable moments from the world's greatest courses"
@@ -224,7 +224,7 @@ const LatestHighlights: React.FC<LatestHighlightsProps> = ({
   return (
     <div className="px-4">
       <div className="mb-1">
-        <h2 className="text-2xl font-bold text-white mb-2">Latest Highlights</h2>
+        <h2 className="text-2xl font-bold text-white mb-2">Highlights & Achievements</h2>
         <p className="text-white/70">
           {isOwnProfile 
             ? "Your most memorable moments from the world's greatest courses"
