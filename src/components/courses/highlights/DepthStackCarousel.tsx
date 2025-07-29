@@ -285,7 +285,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                       ? 'opacity-100 translate-y-0' 
                       : 'opacity-0 translate-y-2 pointer-events-none'
                   }`}>
-                    <h3 className="text-white font-bold text-2xl mb-0.5">
+                    <h3 className="text-white font-bold text-2xl">
                       {highlight.courseName}
                     </h3>
                     <div className="flex items-center gap-1">
