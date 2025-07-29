@@ -63,21 +63,22 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
     threshold: 50
   });
 
-  // Simplified video management - just play/pause
+  // Video management - play active, pause others but keep them visible
   useEffect(() => {
     console.log('Video management effect triggered, activeIndex:', activeIndex);
     
-    const activeVideo = videoRefs.current[activeIndex];
-    if (activeVideo) {
-      console.log(`Attempting to play active video ${activeIndex}, readyState:`, activeVideo.readyState);
-      activeVideo.play().catch(e => console.error('Play error:', e));
-    }
-
-    // Pause all other videos
     videoRefs.current.forEach((video, index) => {
-      if (video && index !== activeIndex && !video.paused) {
-        console.log(`Pausing video ${index}`);
-        video.pause();
+      if (video) {
+        if (index === activeIndex) {
+          console.log(`Playing active video ${index}`);
+          video.play().catch(e => console.error('Play error:', e));
+        } else {
+          // Pause but don't reset - keep video frame visible
+          if (!video.paused) {
+            console.log(`Pausing video ${index} but keeping frame visible`);
+            video.pause();
+          }
+        }
       }
     });
   }, [activeIndex]);
@@ -211,11 +212,17 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                       preload="metadata"
                       onLoadedData={() => {
                         console.log(`Video ${index} loaded data`);
+                        // Ensure all videos show their first frame when loaded
+                        const video = videoRefs.current[index];
+                        if (video) {
+                          video.currentTime = 0;
+                        }
                       }}
                       onCanPlay={() => {
                         console.log(`Video ${index} can play`);
-                        if (index === activeIndex) {
-                          videoRefs.current[index]?.play().catch(console.error);
+                        const video = videoRefs.current[index];
+                        if (video && index === activeIndex && video.paused) {
+                          video.play().catch(console.error);
                         }
                       }}
                       onError={(e) => {
