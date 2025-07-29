@@ -236,7 +236,7 @@ const HeroProfileHeader = ({
   const getBackgroundHeight = () => {
     switch (activeSection) {
       case 'activity': return '1000px';
-      case 'top100': return '100vh'; // Full viewport height for top100 section
+      case 'top100': return '200vh'; // Extended height to ensure full coverage
       case 'handicap': return '1000px';
       default: return '1300px';
     }
@@ -260,10 +260,10 @@ const HeroProfileHeader = ({
             filter: 'blur(40px) saturate(1.3) brightness(0.9)', // Heavy blur to obscure details
             transform: 'scale(1.2)', // Larger scale to crop edges and hide recognizable features
             maskImage: activeSection === 'top100' 
-              ? 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 80%, rgba(0,0,0,0.9) 90%, rgba(0,0,0,0.8) 100%)'
+              ? 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 70%, rgba(0,0,0,0.95) 85%, rgba(0,0,0,0.8) 95%, rgba(0,0,0,0.6) 100%)'
               : 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 60%, rgba(0,0,0,0.8) 80%, rgba(0,0,0,0) 100%)',
             WebkitMaskImage: activeSection === 'top100'
-              ? 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 80%, rgba(0,0,0,0.9) 90%, rgba(0,0,0,0.8) 100%)'
+              ? 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 70%, rgba(0,0,0,0.95) 85%, rgba(0,0,0,0.8) 95%, rgba(0,0,0,0.6) 100%)'
               : 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 60%, rgba(0,0,0,0.8) 80%, rgba(0,0,0,0) 100%)',
           }}
         />
