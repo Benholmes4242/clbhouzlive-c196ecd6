@@ -238,7 +238,7 @@ const HeroProfileHeader = ({
       <div className="relative w-full">
         {/* Apple Music Style Dynamic Background */}
         <div 
-          className="absolute inset-0 w-full h-[960px] overflow-hidden"
+          className="absolute inset-0 w-full h-[1200px] overflow-hidden"
           style={{
             backgroundImage: profile?.profile_photo_url 
               ? `url(${profile.profile_photo_url}?t=${avatarKey})`
