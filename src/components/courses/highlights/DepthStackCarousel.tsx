@@ -286,7 +286,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                   {highlight.averageRating && (
                     <div className="absolute top-2 right-2 scale-75 origin-top-right z-20">
                       <div className="relative flex items-center gap-2 px-1.5 py-1.5 rounded-xl overflow-hidden">
-                        <div className="absolute inset-0 bg-white/5 backdrop-blur-2xl border border-white/20 rounded-xl" style={{ backdropFilter: 'blur(40px) saturate(180%)' }}>
+                        <div className="absolute inset-0 bg-white/5 backdrop-blur-2xl rounded-xl" style={{ backdropFilter: 'blur(40px) saturate(180%)' }}>
                         </div>
                         <div className="relative z-10 flex items-center gap-2">
                           <img
@@ -305,7 +305,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
                 {/* Course info */}
                 <div className="relative p-4">
                   {/* Liquid glass background */}
-                  <div className="absolute inset-0 bg-white/5 backdrop-blur-2xl border-t border-white/20" style={{ backdropFilter: 'blur(40px) saturate(180%)' }}>
+                  <div className="absolute inset-0 bg-white/5 backdrop-blur-2xl" style={{ backdropFilter: 'blur(40px) saturate(180%)' }}>
                   </div>
                   
                   {/* Content */}
