@@ -70,8 +70,8 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
           >
             {/* Activity liquid glass background */}
             {card.id === 'activity' && (
-              <div className="absolute inset-0 bg-white/10 backdrop-blur-md border border-white/20 rounded-lg">
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent rounded-lg" />
+              <div className="absolute inset-0 bg-gradient-to-br from-white/8 via-white/3 to-transparent backdrop-blur-xl border border-white/20 rounded-lg shadow-2xl">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent rounded-lg" />
               </div>
             )}
 
@@ -148,8 +148,8 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
             >
               {/* Activity liquid glass background */}
               {card.id === 'activity' && (
-                <div className="absolute inset-0 bg-white/10 backdrop-blur-md border border-white/20 rounded-lg">
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent rounded-lg" />
+                <div className="absolute inset-0 bg-gradient-to-br from-white/8 via-white/3 to-transparent backdrop-blur-xl border border-white/20 rounded-lg shadow-2xl">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent rounded-lg" />
                 </div>
               )}
 
