@@ -108,7 +108,7 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
                     <TooltipTrigger asChild>
                       <button
                         onClick={() => onFilterChange(activeFilter === tile.key ? null : tile.key)}
-                        className={`relative flex items-center justify-center gap-1 cursor-pointer transition-colors whitespace-nowrap py-0.5 shadow-lg shadow-black/10 text-base font-medium overflow-hidden h-9 ${
+                        className={`relative flex items-center justify-center gap-1 cursor-pointer transition-colors whitespace-nowrap py-0 shadow-lg shadow-black/10 text-base font-medium overflow-hidden h-8 ${
                           activeFilter === tile.key 
                             ? 'text-white' 
                             : 'text-white hover:bg-white/20'
@@ -212,7 +212,7 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
                   <button
                     key={option.key}
                     onClick={() => onSortChange(option.key)}
-                    className={`relative flex items-center gap-2 text-base font-medium whitespace-nowrap px-4 py-0.5 shadow-lg shadow-black/10 transition-colors overflow-hidden h-9 ${
+                    className={`relative flex items-center gap-2 text-base font-medium whitespace-nowrap px-4 py-0 shadow-lg shadow-black/10 transition-colors overflow-hidden h-8 ${
                       sortBy === option.key 
                         ? "text-white" 
                         : "text-white hover:bg-white/20"
