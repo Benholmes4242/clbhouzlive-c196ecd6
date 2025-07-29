@@ -91,22 +91,6 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
             {/* Content */}
             <div className="relative p-8 cursor-pointer group">
               <div className="flex items-center mb-3">
-                {card.id === 'handicap' && (
-                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mr-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
-                      <path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/>
-                      <path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/>
-                      <path d="M12 2v2"/>
-                      <path d="M12 20v2"/>
-                      <path d="M4.93 4.93l1.41 1.41"/>
-                      <path d="M17.66 17.66l1.41 1.41"/>
-                      <path d="M2 12h2"/>
-                      <path d="M20 12h2"/>
-                      <path d="M6.34 17.66l-1.41 1.41"/>
-                      <path d="M19.07 4.93l-1.41 1.41"/>
-                    </svg>
-                  </div>
-                )}
                 <h3 className="text-3xl font-bold group-hover:scale-105 transition-transform">{card.title}</h3>
               </div>
               <p className="text-white/90 text-lg leading-relaxed drop-shadow-lg">{card.description}</p>
@@ -158,22 +142,6 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
               {/* Content */}
               <div className="relative p-8 cursor-pointer group">
                 <div className="flex items-center mb-3">
-                  {card.id === 'handicap' && (
-                    <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mr-4">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
-                        <path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z"/>
-                        <path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/>
-                        <path d="M12 2v2"/>
-                        <path d="M12 20v2"/>
-                        <path d="M4.93 4.93l1.41 1.41"/>
-                        <path d="M17.66 17.66l1.41 1.41"/>
-                        <path d="M2 12h2"/>
-                        <path d="M20 12h2"/>
-                        <path d="M6.34 17.66l-1.41 1.41"/>
-                        <path d="M19.07 4.93l-1.41 1.41"/>
-                      </svg>
-                    </div>
-                  )}
                   <h3 className="text-3xl font-bold">{card.title}</h3>
                 </div>
                 <p className="text-white/90 text-lg leading-relaxed drop-shadow-lg">{card.description}</p>
