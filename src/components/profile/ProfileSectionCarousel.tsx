@@ -79,7 +79,7 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
                     (e.target as HTMLImageElement).style.display = 'none';
                   }}
                 />
-                <div className="absolute inset-0 bg-black/40 rounded-lg"></div>
+                <div className="absolute inset-0 bg-black/25 rounded-lg"></div>
               </>
             )}
 
@@ -95,7 +95,7 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
                     (e.target as HTMLImageElement).style.display = 'none';
                   }}
                 />
-                <div className="absolute inset-0 bg-black/40 rounded-lg"></div>
+                <div className="absolute inset-0 bg-black/25 rounded-lg"></div>
               </>
             )}
             
@@ -111,7 +111,7 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
                     (e.target as HTMLImageElement).style.display = 'none';
                   }}
                 />
-                <div className="absolute inset-0 bg-black/40 rounded-lg"></div>
+                <div className="absolute inset-0 bg-black/25 rounded-lg"></div>
               </>
             )}
             
@@ -157,7 +157,7 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
                       (e.target as HTMLImageElement).style.display = 'none';
                     }}
                   />
-                  <div className="absolute inset-0 bg-black/40 rounded-lg"></div>
+                  <div className="absolute inset-0 bg-black/25 rounded-lg"></div>
                 </>
               )}
 
@@ -173,7 +173,7 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
                       (e.target as HTMLImageElement).style.display = 'none';
                     }}
                   />
-                  <div className="absolute inset-0 bg-black/40 rounded-lg"></div>
+                  <div className="absolute inset-0 bg-black/25 rounded-lg"></div>
                 </>
               )}
               
@@ -189,7 +189,7 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
                       (e.target as HTMLImageElement).style.display = 'none';
                     }}
                   />
-                  <div className="absolute inset-0 bg-black/40 rounded-lg"></div>
+                  <div className="absolute inset-0 bg-black/25 rounded-lg"></div>
                 </>
               )}
               
