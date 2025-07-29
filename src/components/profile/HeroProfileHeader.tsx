@@ -403,8 +403,10 @@ const HeroProfileHeader = ({
             {/* Top 100 Section - Only show when top100 section is active */}
             {activeSection === 'top100' && (
               <div className="mt-8 px-0">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-3xl font-bold text-white">Top 100 courses</h2>
+                <div className="p-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-3xl font-bold text-white">Top 100 courses</h2>
+                  </div>
                 </div>
                 <UserCoursesContent 
                   username={profile?.username || ''}
