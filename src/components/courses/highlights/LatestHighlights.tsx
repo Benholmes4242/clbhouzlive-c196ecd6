@@ -138,13 +138,11 @@ const LatestHighlights: React.FC<LatestHighlightsProps> = ({
 
             // Format location
             const getLocation = () => {
-              if (course.sub_country && course.country) {
-                return `${course.sub_country}, ${course.country}`;
+              const baseLocation = course.sub_country || course.region || course.country || 'Unknown Location';
+              if (course.regional_rank) {
+                return `${baseLocation} #${course.regional_rank}`;
               }
-              if (course.region && course.country) {
-                return `${course.region}, ${course.country}`;
-              }
-              return course.country || 'Unknown Location';
+              return baseLocation;
             };
 
             // Find the course rating stats

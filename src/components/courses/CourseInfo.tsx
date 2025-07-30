@@ -36,12 +36,19 @@ const CourseInfo: React.FC<CourseInfoProps> = ({ course, viewContext = 'global' 
   const rankDisplay = getRankDisplay();
 
   return (
-    <div className="flex items-center gap-2">
-      <CountryFlag country={course.country} size="sm" />
-      <span className="text-sm text-muted-foreground">
-        {course.sub_country || course.country}
-        {course.regional_rank && ` #${course.regional_rank}`}
-      </span>
+    <div className="space-y-2">
+      <div className="flex items-center gap-2">
+        <CountryFlag country={course.country} size="sm" />
+        <span className="text-sm text-muted-foreground">
+          {course.sub_country || course.country}
+        </span>
+      </div>
+      
+      {rankDisplay && (
+        <Badge variant="secondary" className="text-xs">
+          {rankDisplay}
+        </Badge>
+      )}
     </div>
   );
 };
