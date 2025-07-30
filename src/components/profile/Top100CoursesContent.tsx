@@ -13,6 +13,7 @@ interface Top100CoursesContentProps {
   toggleCourse: (courseId: string) => void;
   getUserRating: (courseId: string) => number | null;
   viewType?: 'cards' | 'list';
+  sortType?: 'rank-asc' | 'rank-desc' | 'recent';
 }
 
 const Top100CoursesContent: React.FC<Top100CoursesContentProps> = ({
@@ -24,24 +25,51 @@ const Top100CoursesContent: React.FC<Top100CoursesContentProps> = ({
   isLoading,
   toggleCourse,
   getUserRating,
-  viewType = 'cards'
+  viewType = 'cards',
+  sortType = 'rank-asc'
 }) => {
-  // Filter courses based on search term
-  const filteredCourses = useMemo(() => {
-    if (!searchTerm.trim()) return courses;
+  // Filter and sort courses based on search term and sort preference
+  const filteredAndSortedCourses = useMemo(() => {
+    let filtered = courses;
     
-    const term = searchTerm.toLowerCase();
-    return courses.filter(course => 
-      course.name.toLowerCase().includes(term) ||
-      course.country.toLowerCase().includes(term) ||
-      course.region?.toLowerCase().includes(term)
-    );
-  }, [courses, searchTerm]);
+    // First filter by search term
+    if (searchTerm.trim()) {
+      const term = searchTerm.toLowerCase();
+      filtered = courses.filter(course => 
+        course.name.toLowerCase().includes(term) ||
+        course.country.toLowerCase().includes(term) ||
+        course.region?.toLowerCase().includes(term)
+      );
+    }
+    
+    // Then sort based on sortType
+    const sorted = [...filtered].sort((a, b) => {
+      if (sortType === 'rank-asc') {
+        const rankA = region === 'global' ? a.global_rank : a.regional_rank;
+        const rankB = region === 'global' ? b.global_rank : b.regional_rank;
+        return (rankA || 999) - (rankB || 999);
+      } else if (sortType === 'rank-desc') {
+        const rankA = region === 'global' ? a.global_rank : a.regional_rank;
+        const rankB = region === 'global' ? b.global_rank : b.regional_rank;
+        return (rankB || 0) - (rankA || 0);
+      } else if (sortType === 'recent') {
+        // For recent, we'd need played_date from the user_top100_courses table
+        // For now, just sort by rank ascending as fallback
+        const rankA = region === 'global' ? a.global_rank : a.regional_rank;
+        const rankB = region === 'global' ? b.global_rank : b.regional_rank;
+        return (rankA || 999) - (rankB || 999);
+      }
+      return 0;
+    });
+    
+    return sorted;
+  }, [courses, searchTerm, sortType, region]);
 
   // Debug logging for viewType
   console.log('🔍 Top100CoursesContent DEBUG:', {
     viewType,
-    coursesCount: filteredCourses.length,
+    sortType,
+    coursesCount: filteredAndSortedCourses.length,
     isListView: viewType === 'list'
   });
 
@@ -57,7 +85,7 @@ const Top100CoursesContent: React.FC<Top100CoursesContentProps> = ({
     <ScrollArea className="h-[60vh] pr-4">
       {/* Dynamic layout based on view type */}
       <div className={viewType === 'list' ? "space-y-3" : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"}>
-        {filteredCourses.map((course) => {
+        {filteredAndSortedCourses.map((course) => {
           const isPlayed = playedCourses.has(course.id);
           const userRating = getUserRating(course.id);
           
@@ -87,7 +115,7 @@ const Top100CoursesContent: React.FC<Top100CoursesContentProps> = ({
         })}
       </div>
       
-      {filteredCourses.length === 0 && courses.length > 0 && (
+      {filteredAndSortedCourses.length === 0 && courses.length > 0 && (
         <div className="text-center py-8 text-muted-foreground">
           No courses found matching "{searchTerm}".
         </div>
