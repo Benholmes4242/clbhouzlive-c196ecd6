@@ -68,7 +68,7 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   return (
     <>
       <div className="py-4">
-        <div className="flex items-center justify-between mb-4 px-4">
+        <div className="flex items-center justify-between mb-4 px-4 md:px-0">
           <div className="flex items-end gap-2">
             <h3 className="text-3xl font-bold text-white">Activity</h3>
             <span className="text-white/80 text-base">{posts.length} posts</span>

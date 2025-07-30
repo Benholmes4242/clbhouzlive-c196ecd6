@@ -386,7 +386,7 @@ const HeroProfileHeader = ({
             
             {/* Activity Posts Section - Only show when activity section is active */}
             {activeSection === 'activity' && (
-              <div className="mt-8 px-0">
+              <div className="mt-8 px-0 md:px-4">
                 <ActivityFeed
                   userId={profile?.id || ''}
                   isOwnProfile={isOwnProfile}
