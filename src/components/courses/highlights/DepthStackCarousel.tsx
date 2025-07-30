@@ -432,7 +432,9 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
           carouselRef(node);
           containerRef.current = node;
         }}
-        className="flex gap-4 overflow-x-auto scrollbar-hide"
+        className={`flex gap-4 overflow-x-auto scrollbar-hide ${
+          isMobile ? 'px-4 -mx-4' : ''
+        }`}
         style={{
           scrollSnapType: 'x mandatory',
           scrollbarWidth: 'none',
@@ -442,7 +444,9 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
         {carouselItems.map((item, index) => (
           <div
             key={item.id}
-            className={`flex-shrink-0 ${isMobile ? 'w-full' : 'w-80'}`}
+            className={`flex-shrink-0 ${
+              isMobile ? 'w-[calc(100vw-6rem)]' : 'w-80'
+            }`}
             style={{ scrollSnapAlign: 'start' }}
           >
             {'type' in item && item.type === 'glass' ? (
