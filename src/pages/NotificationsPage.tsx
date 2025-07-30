@@ -39,7 +39,7 @@ const NotificationsPage = () => {
     return (
       <div className="min-h-screen bg-background">
         <Header />
-        <div className="container mx-auto px-4 md:px-0 py-6">
+        <div className="px-4 md:container md:mx-auto md:px-0 py-6">
           <div className="max-w-2xl mx-auto">
             <NotificationsHeader />
             <p className="text-center text-muted-foreground">Loading notifications...</p>
@@ -54,7 +54,7 @@ const NotificationsPage = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <main className="container mx-auto px-4 md:px-0 py-6">
+      <main className="px-4 md:container md:mx-auto md:px-0 py-6">
         <div className="max-w-2xl mx-auto">
           <NotificationsHeader />
 

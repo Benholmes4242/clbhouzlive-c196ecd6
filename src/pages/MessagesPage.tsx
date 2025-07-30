@@ -48,7 +48,7 @@ const MessagesPage = () => {
     return (
       <div className="min-h-screen bg-background">
         <Header />
-        <div className="container mx-auto px-4 md:px-0 py-6">
+        <div className="px-4 md:container md:mx-auto md:px-0 py-6">
           <p className="text-center text-muted-foreground">Please log in to view messages.</p>
         </div>
         <BottomNavigation />
@@ -60,7 +60,7 @@ const MessagesPage = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <main className="container mx-auto px-4 md:px-0 py-6">
+      <main className="px-4 md:container md:mx-auto md:px-0 py-6">
         <div className="max-w-6xl mx-auto">
           <div className="flex items-center gap-4 mb-6">
             <Button

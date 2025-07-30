@@ -256,7 +256,7 @@ const CreateProfile = () => {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background/95 backdrop-blur border-b border-border">
-        <div className="container mx-auto px-4 md:px-0">
+        <div className="px-4 md:container md:mx-auto md:px-0">
           <div className="flex items-center justify-between h-16">
             <Link to="/" className="flex items-center space-x-2">
               <ArrowLeft className="h-5 w-5" />
@@ -278,7 +278,7 @@ const CreateProfile = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 md:px-0 py-6 max-w-2xl">
+      <main className="px-4 md:container md:mx-auto md:px-0 py-6 max-w-2xl">
         {/* Progress indicator */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
