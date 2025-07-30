@@ -5,6 +5,7 @@ import { X, Earth, Trophy, TrendingUp, Clock } from 'lucide-react';
 import CountryFlag from '@/components/ui/country-flag';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useIsMobile } from '@/hooks/use-mobile';
+import ViewToggle from '@/components/profile/ViewToggle';
 
 interface RegionalProgress {
   played: number;
@@ -18,6 +19,8 @@ interface UserCoursesRegionalTilesProps {
   isLoading: boolean;
   sortBy: string;
   onSortChange: (sort: string) => void;
+  viewType: 'cards' | 'list';
+  onViewTypeChange: (view: 'cards' | 'list') => void;
 }
 
 const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
@@ -26,7 +29,9 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
   onFilterChange,
   isLoading,
   sortBy,
-  onSortChange
+  onSortChange,
+  viewType,
+  onViewTypeChange
 }) => {
   const isMobile = useIsMobile();
 
@@ -205,7 +210,7 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
         {/* Sorting Controls - moved to bottom */}
         <div className="flex justify-center">
           {!isMobile ? (
-            <div className="flex gap-2">
+            <div className="flex gap-2 items-center">
               {sortOptions.map((option) => {
                 const IconComponent = option.icon;
                 return (
@@ -241,6 +246,14 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
                   </button>
                 );
               })}
+              
+              {/* View Toggle positioned next to sorting buttons */}
+              <div className="ml-2">
+                <ViewToggle 
+                  currentView={viewType}
+                  onViewChange={onViewTypeChange}
+                />
+              </div>
             </div>
           ) : (
             <div className="w-full">
@@ -276,6 +289,14 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
                     </button>
                   );
                 })}
+              </div>
+              
+              {/* View Toggle below sorting buttons on mobile */}
+              <div className="flex justify-center mt-2">
+                <ViewToggle 
+                  currentView={viewType}
+                  onViewChange={onViewTypeChange}
+                />
               </div>
             </div>
           )}

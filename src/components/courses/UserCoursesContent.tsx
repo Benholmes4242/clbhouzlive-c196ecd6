@@ -276,15 +276,9 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
               isLoading={isLoadingProgress}
               sortBy={sortBy}
               onSortChange={setSortBy}
+              viewType={viewType}
+              onViewTypeChange={setViewType}
             />
-            
-            {/* View Toggle - underneath the buttons on mobile */}
-            <div className="flex justify-center">
-              <ViewToggle 
-                currentView={viewType}
-                onViewChange={setViewType}
-              />
-            </div>
           </>
         ) : (
           /* Desktop layout - side by side */
@@ -297,14 +291,8 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
                 isLoading={isLoadingProgress}
                 sortBy={sortBy}
                 onSortChange={setSortBy}
-              />
-            </div>
-            
-            {/* View Toggle - positioned to align with sorting buttons on desktop */}
-            <div className="flex-shrink-0 ml-4 mt-4">
-              <ViewToggle 
-                currentView={viewType}
-                onViewChange={setViewType}
+                viewType={viewType}
+                onViewTypeChange={setViewType}
               />
             </div>
           </div>
