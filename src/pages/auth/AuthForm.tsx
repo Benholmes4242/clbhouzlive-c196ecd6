@@ -233,9 +233,9 @@ const AuthForm: React.FC<AuthFormProps> = ({
         </div>
         <Button 
           type="submit" 
+          variant="gradient-primary"
           disabled={resetSubmitting} 
-          className="w-full mb-3 text-white hover:opacity-90"
-          style={{ backgroundColor: '#000000' }}
+          className="w-full mb-3"
         >
           {resetSubmitting ? "Sending..." : "Send Reset Email"}
         </Button>

@@ -143,9 +143,13 @@ const FeaturedCreator: React.FC<FeaturedCreatorProps> = ({ onCreatorClick }) => 
 
           {/* CTA Button */}
           <div className="flex-shrink-0">
-            <div className="flex items-center gap-2 px-3 py-2 bg-white/80 backdrop-blur-sm rounded-lg border border-emerald-200/50 hover:bg-white transition-colors">
-              <Play className="w-4 h-4 text-emerald-600 fill-current" />
-              <span className="text-sm font-medium text-emerald-700">View</span>
+            <div className={cn(
+              "flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200",
+              "bg-gradient-to-b from-white to-gray-50 border border-gray-200",
+              "hover:from-gray-50 hover:to-gray-100 active:from-gray-100 active:to-gray-200"
+            )}>
+              <Play className="w-4 h-4 text-gray-700 fill-current" />
+              <span className="text-sm font-semibold text-gray-700">View</span>
             </div>
           </div>
         </div>

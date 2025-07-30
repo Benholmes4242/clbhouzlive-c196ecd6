@@ -18,12 +18,21 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
+        gradient: 
+          "bg-gradient-to-b from-white to-gray-100 border border-gray-300 text-gray-800 font-semibold hover:from-gray-50 hover:to-gray-200 active:from-gray-100 active:to-gray-300 transition-all duration-200",
+        "gradient-primary": 
+          "bg-gradient-to-b from-emerald-50 to-emerald-100 border border-emerald-200 text-emerald-800 font-semibold hover:from-emerald-100 hover:to-emerald-200 active:from-emerald-200 active:to-emerald-300 transition-all duration-200",
+        chip: 
+          "bg-gradient-to-b from-white to-gray-50 border border-gray-200 text-gray-700 font-medium hover:from-gray-50 hover:to-gray-100 active:from-gray-100 active:to-gray-200 transition-all duration-150 rounded-full",
+        "chip-active":
+          "bg-gradient-to-b from-emerald-50 to-emerald-100 border border-emerald-300 text-emerald-700 font-medium hover:from-emerald-100 hover:to-emerald-200 transition-all duration-150 rounded-full",
       },
       size: {
         default: "h-10 px-4 py-2",
         sm: "h-9 rounded-md px-3",
         lg: "h-11 rounded-md px-8",
         icon: "h-10 w-10",
+        chip: "h-8 px-3 py-1.5 text-sm",
       },
     },
     defaultVariants: {

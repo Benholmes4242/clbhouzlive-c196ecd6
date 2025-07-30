@@ -61,11 +61,11 @@ const UserProfileActions: React.FC<UserProfileActionsProps> = ({
       >
         {/* Follow Button */}
         <Button
-          variant={isFollowing ? "secondary" : "default"}
-          size="sm"
+          variant={isFollowing ? "chip-active" : "gradient"}
+          size="chip"
           onClick={() => handleFollow(isFollowing)}
           disabled={loading}
-          className="px-3 py-1 text-xs h-7 flex-shrink-0"
+          className="flex-shrink-0"
         >
           {isFollowing ? (
             <>
@@ -86,10 +86,10 @@ const UserProfileActions: React.FC<UserProfileActionsProps> = ({
 
         {/* Message Button */}
         <Button 
-          variant="outline" 
-          size="sm"
+          variant="gradient" 
+          size="chip"
           onClick={handleMessageClick}
-          className="px-2 py-1 text-xs h-7 flex-shrink-0"
+          className="flex-shrink-0"
         >
           Message
         </Button>

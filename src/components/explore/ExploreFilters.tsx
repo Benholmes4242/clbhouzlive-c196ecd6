@@ -52,23 +52,28 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
     }
   };
 
-  const renderFilterButton = (filter: string) => (
-    <button
-      key={filter}
-      onClick={() => onFilterChange(filter)}
-      className={`
-        px-2 py-0.5 text-lg font-medium whitespace-nowrap flex-shrink-0 
-        flex items-center transition-colors duration-100 ease-in-out
-        focus:outline-none border border-black/25 outline-0
-        text-black bg-transparent hover:bg-black/5
-        ${activeFilter === filter ? 'bg-orange-50 border-orange-200 shadow-sm shadow-orange-200/50' : ''}
-      `}
-      style={{ outline: 'none', borderRadius: '8px' }}
-    >
-      {getFilterIcon(filter)}
-      {filter}
-    </button>
-  );
+  const renderFilterButton = (filter: string) => {
+    const isActive = activeFilter === filter;
+    
+    return (
+      <button
+        key={filter}
+        onClick={() => onFilterChange(filter)}
+        className={`
+          px-4 py-2 text-sm font-semibold whitespace-nowrap flex-shrink-0 
+          flex items-center transition-all duration-200 ease-in-out
+          focus:outline-none border rounded-lg bg-gradient-to-b
+          ${isActive 
+            ? 'from-emerald-50 to-emerald-100 border-emerald-300 text-emerald-700 hover:from-emerald-100 hover:to-emerald-200' 
+            : 'from-white to-gray-50 border-gray-200 text-gray-700 hover:from-gray-50 hover:to-gray-100 active:from-gray-100 active:to-gray-200'
+          }
+        `}
+      >
+        {getFilterIcon(filter)}
+        {filter}
+      </button>
+    );
+  };
 
   const renderCarouselRow = (filters: string[], carouselRef: (node: HTMLDivElement | null) => void) => {
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {

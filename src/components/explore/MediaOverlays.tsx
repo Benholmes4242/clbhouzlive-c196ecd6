@@ -28,16 +28,14 @@ const MediaOverlays: React.FC<MediaOverlaysProps> = ({
 }) => {
   return (
     <>
-      {/* Like button overlay - hidden on mobile */}
-      <div className="absolute bottom-0 left-3 hidden md:block pointer-events-auto z-20">
+      {/* Like button overlay - with gradient styling */}
+      <div className="absolute bottom-2 left-2 hidden md:block pointer-events-auto z-20">
         <button
           onClick={onLike}
-          className="flex items-center justify-center w-10 h-10 text-white hover:bg-white/10 rounded-full transition-colors pointer-events-auto"
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-b from-white/90 to-gray-100/90 border border-gray-200/50 backdrop-blur-sm rounded-full transition-all duration-200 hover:from-gray-50/90 hover:to-gray-200/90 active:from-gray-100/90 active:to-gray-300/90 pointer-events-auto"
         >
-          <div className="flex items-center space-x-1">
-            <PiHandsClappingDuotone className="h-5 w-5" />
-            <span className="font-medium text-sm leading-none mt-1">{likes}</span>
-          </div>
+          <PiHandsClappingDuotone className="h-4 w-4 text-gray-700" />
+          <span className="font-semibold text-sm text-gray-700 leading-none">{likes}</span>
         </button>
       </div>
 

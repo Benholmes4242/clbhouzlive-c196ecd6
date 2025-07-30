@@ -34,10 +34,10 @@ const SortingChips: React.FC<SortingChipsProps> = ({ selectedChip, onChipSelect 
               onClick={() => onChipSelect(isSelected ? null : chip.id)}
               className={cn(
                 "flex-shrink-0 px-3.5 py-1.5 rounded-full text-sm font-medium transition-all duration-200",
-                "hover:scale-105",
+                "bg-gradient-to-b border",
                 isSelected
-                  ? "bg-emerald-50 border border-emerald-300 text-emerald-700"
-                  : "bg-muted/70 hover:bg-muted text-foreground/80 hover:text-foreground"
+                  ? "from-emerald-50 to-emerald-100 border-emerald-300 text-emerald-700 hover:from-emerald-100 hover:to-emerald-200"
+                  : "from-white to-gray-50 border-gray-200 text-gray-700 hover:from-gray-50 hover:to-gray-100 active:from-gray-100 active:to-gray-200"
               )}
             >
               {chip.label}

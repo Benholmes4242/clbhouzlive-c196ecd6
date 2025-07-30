@@ -301,7 +301,7 @@ const CreateProfile = () => {
             {step > 1 && (
               <Button
                 type="button"
-                variant="outline"
+                variant="gradient"
                 onClick={handleBack}
                 disabled={submitting}
               >
@@ -312,6 +312,7 @@ const CreateProfile = () => {
             {isLastStep ? (
               <Button 
                 type="submit" 
+                variant="gradient-primary"
                 disabled={submitting || !canProceed()}
                 className="ml-auto"
               >
@@ -320,6 +321,7 @@ const CreateProfile = () => {
             ) : (
               <Button
                 type="button"
+                variant="gradient-primary"
                 onClick={handleNext}
                 disabled={!canProceed()}
                 className="ml-auto"
