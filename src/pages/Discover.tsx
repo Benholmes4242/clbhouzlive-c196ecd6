@@ -4,12 +4,14 @@ import BottomNavigation from '@/components/BottomNavigation';
 import ExploreFilters from '@/components/explore/ExploreFilters';
 import ExploreGrid from '@/components/explore/ExploreGrid';
 import DiscoverVerticalFeed from '@/components/discover/DiscoverVerticalFeed';
+import SortingChips from '@/components/discover/SortingChips';
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
 import { FILTER_TYPES, MEDIA_TYPES } from '@/components/explore/types';
 
 const Discover = () => {
   const [activeFilter, setActiveFilter] = useState<string>(FILTER_TYPES.VIDEOS);
+  const [selectedChip, setSelectedChip] = useState<string | null>('all');
   
   // Get content for the active filter (for the tabs section)
   const { 
@@ -46,45 +48,67 @@ const Discover = () => {
     openFeed(item);
   };
 
-  // Apply client-side filtering for non-database filters
+  // Apply client-side filtering for non-database filters and sorting chips
   const filteredContent = (activeFilter === FILTER_TYPES.TRENDING ? trendingContent : content).filter(item => {
+    // First apply existing filter logic
+    let passesFilter = true;
+    
     // Friends filtering is handled in the database
     if (activeFilter === FILTER_TYPES.FRIENDS || activeFilter === FILTER_TYPES.TRENDING) {
-      return true;
+      passesFilter = true;
     }
-    
     // Videos and Photos filtering is handled in the database
-    if (activeFilter === FILTER_TYPES.VIDEOS || activeFilter === FILTER_TYPES.PHOTOS) {
-      return true;
+    else if (activeFilter === FILTER_TYPES.VIDEOS || activeFilter === FILTER_TYPES.PHOTOS) {
+      passesFilter = true;
     }
-    
     // Verified Pros: Empty for now (no content yet)
-    if (activeFilter === FILTER_TYPES.VERIFIED_PROS) {
-      return false; // No content for verified pros yet
+    else if (activeFilter === FILTER_TYPES.VERIFIED_PROS) {
+      passesFilter = false; // No content for verified pros yet
     }
-    
     // Channels: Empty for now (no content yet)
-    if (activeFilter === FILTER_TYPES.CHANNELS) {
-      return false; // No content for channels yet
+    else if (activeFilter === FILTER_TYPES.CHANNELS) {
+      passesFilter = false; // No content for channels yet
     }
-    
     // Hack Shack: Only videos with #hackshack hashtag
-    if (activeFilter === FILTER_TYPES.HACK_SHACK) {
-      return item.type === MEDIA_TYPES.VIDEO && (
+    else if (activeFilter === FILTER_TYPES.HACK_SHACK) {
+      passesFilter = item.type === MEDIA_TYPES.VIDEO && (
         item.title?.toLowerCase().includes('#hackshack') || 
         item.title?.toLowerCase().includes('hackshack')
       );
     }
-    
     // Brain Game: Videos and photos with #braingame hashtag
-    if (activeFilter === FILTER_TYPES.BRAIN_GAME) {
-      return (item.type === MEDIA_TYPES.VIDEO || item.type === MEDIA_TYPES.IMAGE) && (
+    else if (activeFilter === FILTER_TYPES.BRAIN_GAME) {
+      passesFilter = (item.type === MEDIA_TYPES.VIDEO || item.type === MEDIA_TYPES.IMAGE) && (
         item.title?.toLowerCase().includes('#braingame') || 
         item.title?.toLowerCase().includes('braingame')
       );
     }
-    
-    return true;
+
+    if (!passesFilter) return false;
+
+    // Then apply sorting chip filtering
+    if (!selectedChip || selectedChip === 'all') {
+      return true;
+    }
+
+    const title = item.title?.toLowerCase() || '';
+    const ctaDescription = item.ctaDescription?.toLowerCase() || '';
+    const content = `${title} ${ctaDescription}`;
+
+    switch (selectedChip) {
+      case 'funny':
+        return content.includes('funny') || content.includes('lol') || content.includes('hilarious') || content.includes('laugh');
+      case 'tips':
+        return content.includes('tip') || content.includes('lesson') || content.includes('how to') || content.includes('tutorial');
+      case 'shots':
+        return content.includes('shot') || content.includes('drive') || content.includes('putt') || content.includes('swing');
+      case 'courses':
+        return content.includes('course') || content.includes('golf course') || content.includes('green') || content.includes('fairway');
+      case 'reactions':
+        return content.includes('reaction') || content.includes('amazing') || content.includes('wow') || content.includes('incredible');
+      default:
+        return true;
+    }
   });
 
   // Remove duplicates based on src URL for tab content
@@ -103,6 +127,14 @@ const Discover = () => {
             <ExploreFilters 
               activeFilter={activeFilter} 
               onFilterChange={setActiveFilter}
+            />
+          </div>
+
+          {/* Sorting Chips */}
+          <div className="md:container md:mx-auto md:px-0">
+            <SortingChips 
+              selectedChip={selectedChip}
+              onChipSelect={setSelectedChip}
             />
           </div>
 
