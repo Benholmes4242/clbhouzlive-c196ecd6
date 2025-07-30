@@ -99,7 +99,7 @@ const Discover = () => {
         
         <main className="pb-20">
           {/* Your Discover Section */}
-          <div className="container pt-6 pb-2 px-0 md:px-0">
+          <div className="pt-6 pb-2 px-4 md:container md:mx-auto md:px-0">
             <ExploreFilters 
               activeFilter={activeFilter} 
               onFilterChange={setActiveFilter}
@@ -107,7 +107,7 @@ const Discover = () => {
           </div>
 
           {/* Main Grid with Container */}
-          <div className="container px-0 md:px-0">
+          <div className="md:container md:mx-auto md:px-0">
             <ExploreGrid 
               content={uniqueContent}
               onLike={handleLike}
