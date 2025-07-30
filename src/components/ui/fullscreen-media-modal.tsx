@@ -366,34 +366,6 @@ const FullscreenMediaModal = ({
     >
       {/* Top Controls */}
       <div className="absolute top-4 right-4 z-10 flex items-start gap-2">
-        {/* Three dots menu - only show for own posts */}
-        {isOwnPost && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="w-10 h-10 text-white hover:bg-white/10 rounded-full"
-              >
-                <MoreHorizontal className="h-6 w-6" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuItem onClick={handleEditPost}>
-                <Edit className="h-4 w-4 mr-2" />
-                Edit Post
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={handleDeletePost}
-                className="text-destructive focus:text-destructive"
-              >
-                <Trash2 className="h-4 w-4 mr-2" />
-                Delete Post
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
-        
         {/* Close button */}
         <button
           onClick={() => onClose()}
@@ -560,6 +532,30 @@ const FullscreenMediaModal = ({
           >
             <PiShareFat className="w-8 h-8" />
           </button>
+          
+          {/* Three dots menu - only show for own posts */}
+          {isOwnPost && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="cursor-pointer hover:opacity-100 transition-opacity">
+                  <MoreHorizontal className="w-8 h-8" />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem onClick={handleEditPost}>
+                  <Edit className="h-4 w-4 mr-2" />
+                  Edit Post
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={handleDeletePost}
+                  className="text-destructive focus:text-destructive"
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete Post
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
       </div>
 
