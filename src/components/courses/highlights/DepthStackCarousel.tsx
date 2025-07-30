@@ -211,17 +211,7 @@ const VideoCard: React.FC<{
         {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
       </Button>
 
-      {/* Course rankings */}
-      <div className="absolute top-3 right-3">
-        <CourseRankBadges
-          globalRank={video.globalRank}
-          regionalRank={video.regionalRank}
-          usaRank={video.usaRank}
-          country={video.country}
-          viewContext="global"
-          positioning="top-left"
-        />
-      </div>
+      {/* Course rankings - removed for highlights section */}
 
       {/* Course info overlay */}
       <div className="absolute bottom-0 left-0 right-0 p-4">
