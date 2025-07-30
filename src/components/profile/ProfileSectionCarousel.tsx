@@ -128,21 +128,23 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
     );
   }
 
-  // Mobile: Show carousel
+  // Mobile: Show carousel with peek effect
   return (
-    <div className="relative">
+    <div className="relative -mx-4">
       <div 
         ref={swipeRef}
-        className="overflow-hidden"
+        className="overflow-hidden px-4"
       >
         <div 
-          className="flex transition-transform duration-300 ease-out"
-          style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+          className="flex transition-transform duration-300 ease-out gap-4"
+          style={{ transform: `translateX(-${currentIndex * (100 - 15)}%)` }}
         >
-          {cards.map((card) => (
+          {cards.map((card, index) => (
             <div
               key={card.id}
-              className={`${card.className.replace('h-[200px]', 'h-[250px]')} flex-shrink-0 w-full`}
+              className={`${card.className.replace('h-[200px]', 'h-[250px]')} flex-shrink-0 ${
+                index === currentIndex ? 'w-[85%]' : 'w-[85%] opacity-60 scale-95'
+              } transition-all duration-300`}
               onClick={() => handleCardClick(card.id)}
             >
               {/* Activity background image */}
