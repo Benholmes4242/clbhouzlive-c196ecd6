@@ -35,14 +35,16 @@ export const useInfiniteExploreContent = (activeFilter?: string) => {
     setLoadingStates(prev => ({ ...prev, [currentFilter]: true }));
 
     try {
+      // Get fresh offset value from state to avoid stale closure
+      const freshOffset = offsetStates[currentFilter] || 0;
       let posts = [];
       
       // Use specific fetcher for Friends filter
       if (currentFilter === 'Friends') {
-        posts = await fetchFriendsPosts(currentOffset, POSTS_PER_PAGE);
+        posts = await fetchFriendsPosts(freshOffset, POSTS_PER_PAGE);
       } else {
         // Try to fetch real posts with filter
-        posts = await fetchRealPosts(currentOffset, POSTS_PER_PAGE, currentFilter);
+        posts = await fetchRealPosts(freshOffset, POSTS_PER_PAGE, currentFilter);
       }
       
       if (posts.length > 0) {
@@ -55,7 +57,7 @@ export const useInfiniteExploreContent = (activeFilter?: string) => {
         // Update offset for current filter
         setOffsetStates(prev => ({
           ...prev,
-          [currentFilter]: (prev[currentFilter] || 0) + POSTS_PER_PAGE
+          [currentFilter]: freshOffset + POSTS_PER_PAGE
         }));
         
         // If we got fewer posts than requested, we might be at the end
@@ -72,7 +74,7 @@ export const useInfiniteExploreContent = (activeFilter?: string) => {
     } finally {
       setLoadingStates(prev => ({ ...prev, [currentFilter]: false }));
     }
-  }, [loading, hasMore, currentOffset, currentMockOffset, fetchRealPosts, fetchFriendsPosts, getMockPosts, currentFilter]);
+  }, [loading, hasMore, offsetStates, fetchRealPosts, fetchFriendsPosts, currentFilter]);
 
   // Initialize states for new filters (but don't reset existing ones)
   useEffect(() => {
