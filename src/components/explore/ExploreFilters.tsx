@@ -104,7 +104,7 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
 
   return (
     <div className="sticky top-16 z-10 bg-background/95 backdrop-blur-sm pb-2 mb-3">
-      <div className="space-y-2">
+      <div className="space-y-2 px-4 md:px-0">
         {/* Top Row */}
         {renderCarouselRow(topRowFilters, topRowCarousel.carouselRef)}
         
