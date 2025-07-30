@@ -21,6 +21,7 @@ import LatestHighlights from '@/components/courses/highlights/LatestHighlights';
 import HandicapSection from './HandicapSection';
 import ProfileSectionCarousel from './ProfileSectionCarousel';
 import { createDynamicBackgroundStyle } from '@/utils/backgroundGenerator';
+import { getOptimizedImageUrl } from '@/utils/imageOptimization';
 
 interface Course {
   id: string;
@@ -252,7 +253,7 @@ const HeroProfileHeader = ({
           style={{
             height: getBackgroundHeight(),
             backgroundImage: profile?.profile_photo_url 
-              ? `url(${profile.profile_photo_url}?t=${avatarKey})`
+              ? `url(${getOptimizedImageUrl(profile.profile_photo_url, 800, 600, 75)})`
               : 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-foreground)) 100%)',
             backgroundSize: 'cover',
             backgroundPosition: 'center top', // Focus on upper portion to avoid faces

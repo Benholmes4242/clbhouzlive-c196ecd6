@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import HeroProfileHeader from './HeroProfileHeader';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import ProfileImagePreloader from '@/components/ui/profile-image-preloader';
 
 interface UserProfileContentProps {
   profile: any;
@@ -25,17 +26,25 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({
   }
 
   return (
-    <div className="w-full px-4 md:px-8">
-      <HeroProfileHeader 
-        profile={profile}
-        isOwnProfile={isOwnProfile}
-        onProfileUpdate={() => {
-          // Profile update will be handled by the HeroProfileHeader component
-        }}
-        activeSection={activeSection}
-        onSectionChange={setActiveSection}
+    <>
+      {/* Preload profile images for better performance */}
+      <ProfileImagePreloader 
+        profilePhotoUrl={profile.profile_photo_url}
+        priority={true}
       />
-    </div>
+      
+      <div className="w-full px-4 md:px-8">
+        <HeroProfileHeader 
+          profile={profile}
+          isOwnProfile={isOwnProfile}
+          onProfileUpdate={() => {
+            // Profile update will be handled by the HeroProfileHeader component
+          }}
+          activeSection={activeSection}
+          onSectionChange={setActiveSection}
+        />
+      </div>
+    </>
   );
 };
 

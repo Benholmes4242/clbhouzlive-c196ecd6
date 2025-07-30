@@ -1,126 +1,88 @@
 // Image optimization utilities for better performance
 
-export const getOptimizedImageUrl = (url: string, width?: number, height?: number, quality: number = 80, format: string = 'auto'): string => {
-  if (!url) return url;
-  
-  // For Supabase storage URLs - Supabase doesn't support query param transformations
-  // Instead, return the original URL and let the browser handle caching
-  if (url.includes('supabase.co/storage/v1/object/public/')) {
-    return url;
-  }
-  
-  // For external URLs (like Unsplash), add optimized parameters
-  if (url.includes('unsplash.com')) {
-    const urlObj = new URL(url);
-    if (width) urlObj.searchParams.set('w', width.toString());
-    if (height) urlObj.searchParams.set('h', height.toString());
-    urlObj.searchParams.set('fit', 'crop');
-    urlObj.searchParams.set('crop', 'face');
-    urlObj.searchParams.set('q', quality.toString());
+export const getOptimizedImageUrl = (
+  originalUrl: string,
+  width?: number,
+  height?: number,
+  quality: number = 85,
+  format: string = 'webp'
+): string => {
+  try {
+    const url = new URL(originalUrl);
     
-    // Set format based on browser support
-    if (format === 'auto' || format === 'webp') {
-      urlObj.searchParams.set('fm', 'webp');
-    } else if (format === 'avif') {
-      urlObj.searchParams.set('fm', 'avif');
+    // Add optimization parameters
+    if (width) url.searchParams.set('w', width.toString());
+    if (height) url.searchParams.set('h', height.toString());
+    url.searchParams.set('fit', 'cover');
+    url.searchParams.set('q', quality.toString());
+    url.searchParams.set('f', format); // Use specified format
+    
+    return url.toString();
+  } catch (error) {
+    console.warn('Failed to optimize image URL:', error);
+    return originalUrl;
+  }
+};
+
+export const preloadImage = (url: string, priority: boolean = false): Promise<HTMLImageElement> => {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    
+    if (priority) {
+      img.fetchPriority = 'high';
     }
     
-    return urlObj.toString();
-  }
-  
-  return url;
-};
-
-// Get optimized avatar sizes based on context
-export const getAvatarSize = (context: 'thumbnail' | 'small' | 'medium' | 'large' = 'small'): number => {
-  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768;
-  
-  const sizes = {
-    thumbnail: isMobile ? 32 : 40,
-    small: isMobile ? 40 : 48,
-    medium: isMobile ? 64 : 80,
-    large: isMobile ? 120 : 160
-  };
-  
-  return sizes[context];
-};
-
-export const preloadImage = (src: string): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => resolve();
-    img.onerror = reject;
-    img.src = src;
+    img.src = url;
   });
 };
 
-export const getImageDimensions = (src: string): Promise<{ width: number; height: number }> => {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => resolve({ width: img.naturalWidth, height: img.naturalHeight });
-    img.onerror = reject;
-    img.src = src;
-  });
-};
+export const getProfileImageSizes = () => ({
+  avatar: { width: 256, height: 256 },
+  avatarSmall: { width: 128, height: 128 },
+  background: { width: 800, height: 600 },
+  thumbnail: { width: 64, height: 64 }
+});
 
-// Optimize images for different screen sizes
-export const getResponsiveImageSizes = () => {
-  const screenWidth = typeof window !== 'undefined' ? window.innerWidth : 1024;
-  
-  if (screenWidth <= 640) { // Mobile - more aggressive compression
-    return { width: 320, height: 320 };
-  } else if (screenWidth <= 1024) { // Tablet
-    return { width: 480, height: 480 };
-  } else { // Desktop
-    return { width: 640, height: 640 };
-  }
-};
-
-// Preload critical images for better perceived performance
-// Generate responsive image sizes for srcset
-export const generateResponsiveSizes = (baseWidth?: number, baseHeight?: number) => {
-  const sizes = [320, 640, 768, 1024, 1280, 1920];
-  const aspectRatio = baseWidth && baseHeight ? baseWidth / baseHeight : 1;
-  
+export const generateImageSrcSet = (originalUrl: string, sizes: Array<{width: number, height: number}>): string => {
   return sizes
-    .filter(size => !baseWidth || size <= baseWidth * 1.5) // Don't generate sizes much larger than original
-    .map(width => ({
-      width,
-      height: Math.round(width / aspectRatio)
-    }));
+    .map(({ width, height }) => {
+      const optimizedUrl = getOptimizedImageUrl(originalUrl, width, height);
+      return `${optimizedUrl} ${width}w`;
+    })
+    .join(', ');
 };
 
-// Enhanced critical image preloading with responsive sizes
-export const preloadCriticalImages = (urls: string[], options: { quality?: number, format?: string } = {}) => {
-  if (typeof window === 'undefined') return;
-  
-  const { quality = 80, format = 'webp' } = options;
-  
-  urls.slice(0, 3).forEach(url => { // Only preload first 3 images
-    // Preload multiple sizes for responsive images
-    const sizes = [320, 640, 1024];
-    
-    sizes.forEach(size => {
-      const link = document.createElement('link');
-      link.rel = 'preload';
-      link.as = 'image';
-      link.href = getOptimizedImageUrl(url, size, undefined, quality, format);
-      link.media = `(max-width: ${size}px)`;
-      document.head.appendChild(link);
-    });
-  });
+// Additional functions for compatibility
+export const getAvatarSize = (size: 'small' | 'medium' | 'large' | 'thumbnail' = 'medium'): number => {
+  const sizes = {
+    small: 32,
+    medium: 64,
+    large: 128,
+    thumbnail: 24
+  };
+  return sizes[size];
 };
 
-// Smart preloading based on connection and device
-export const smartPreload = (urls: string[]) => {
-  if (typeof window === 'undefined') return;
+export const generateResponsiveSizes = (baseWidth?: number, baseHeight?: number): Array<{width: number, height: number}> => {
+  const width = baseWidth || 400;
+  const height = baseHeight || width;
   
-  const connection = (navigator as any).connection;
-  const isSlowConnection = connection && (connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g');
-  const preloadCount = isSlowConnection ? 1 : 3;
-  
-  preloadCriticalImages(urls.slice(0, preloadCount), {
-    quality: isSlowConnection ? 60 : 80,
-    format: 'webp'
-  });
+  return [
+    { width: width, height: height },
+    { width: Math.floor(width * 0.75), height: Math.floor(height * 0.75) },
+    { width: Math.floor(width * 0.5), height: Math.floor(height * 0.5) }
+  ];
+};
+
+export const preloadCriticalImages = async (imageUrls: string[]): Promise<void> => {
+  const preloadPromises = imageUrls.map(url => preloadImage(url, true));
+  try {
+    await Promise.allSettled(preloadPromises);
+    console.log('Critical images preloaded');
+  } catch (error) {
+    console.warn('Some critical images failed to preload:', error);
+  }
 };

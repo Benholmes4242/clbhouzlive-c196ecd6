@@ -11,7 +11,7 @@ export const useUserProfileQueries = () => {
   console.log('useUserProfileQueries - username:', username);
   console.log('useUserProfileQueries - currentUser:', currentUser);
 
-  // Fetch the user profile by username or ID
+  // Fetch the user profile by username or ID with aggressive optimization
   const { data: profile, isLoading, error } = useQuery({
     queryKey: ['userProfile', username],
     queryFn: async () => {
@@ -56,11 +56,14 @@ export const useUserProfileQueries = () => {
       return data;
     },
     enabled: !!username,
-    retry: 3,
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    retry: 2, // Reduced retries for faster failure
+    staleTime: 1000 * 60 * 10, // 10 minutes - longer cache
+    gcTime: 1000 * 60 * 15, // 15 minutes - keep in memory longer
+    refetchOnWindowFocus: false, // Don't refetch on focus
+    refetchOnMount: false, // Don't refetch on mount if data exists
   });
 
-  // Fetch current user profile to get user_type
+  // Fetch current user profile to get user_type - only if needed
   const { data: currentUserProfile } = useQuery({
     queryKey: ['currentUserProfile', currentUser?.id],
     queryFn: async () => {
@@ -79,9 +82,12 @@ export const useUserProfileQueries = () => {
       return data;
     },
     enabled: !!currentUser?.id,
+    staleTime: 1000 * 60 * 15, // 15 minutes - very long cache
+    gcTime: 1000 * 60 * 30, // 30 minutes
+    refetchOnWindowFocus: false,
   });
 
-  // Check relationship status with current user (follow-only system)
+  // Check relationship status with current user (follow-only system) - only when both users exist
   const { data: relationshipStatus } = useQuery({
     queryKey: ['relationshipStatus', currentUser?.id, profile?.id],
     queryFn: async () => {
@@ -100,6 +106,9 @@ export const useUserProfileQueries = () => {
       };
     },
     enabled: !!currentUser?.id && !!profile?.id && currentUser.id !== profile.id,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    gcTime: 1000 * 60 * 10, // 10 minutes
+    refetchOnWindowFocus: false,
   });
 
   console.log('useUserProfileQueries - final state:', {
