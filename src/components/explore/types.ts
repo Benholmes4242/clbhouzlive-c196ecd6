@@ -30,6 +30,11 @@ export interface ExploreContentItem {
     media_type: 'video' | 'image';
     media_url: string;
   }[];
+  audioTrack?: {
+    title: string;
+    artist?: string;
+    isOriginal?: boolean;
+  };
 }
 
 export interface CTAContentItem {

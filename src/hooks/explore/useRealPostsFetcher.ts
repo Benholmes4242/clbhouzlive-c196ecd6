@@ -128,6 +128,24 @@ export const useRealPostsFetcher = () => {
           }
         }
 
+        // Generate random audio track for video posts (demo purposes)
+        const generateAudioTrack = () => {
+          if (primaryMedia.media_type !== 'video' || Math.random() > 0.4) return undefined;
+          
+          const tracks = [
+            { title: "Eye of the Tiger", artist: "Survivor" },
+            { title: "The Final Countdown", artist: "Europe" },
+            { title: "We Will Rock You", artist: "Queen" },
+            { title: "Born to Be Wild", artist: "Steppenwolf" },
+            { title: "Thunderstruck", artist: "AC/DC" },
+            { title: "Original Audio", isOriginal: true },
+            { title: "Golf Swing Audio", isOriginal: true },
+            { title: "Course Ambience", isOriginal: true }
+          ];
+          
+          return tracks[Math.floor(Math.random() * tracks.length)];
+        };
+
         const formattedPost = {
           id: post.id,
           type: primaryMedia.media_type as 'video' | 'image',
@@ -147,7 +165,8 @@ export const useRealPostsFetcher = () => {
           golfCourse,
           label: Math.random() > 0.6 ? ['Pro Tip', 'Trending', 'Featured'][Math.floor(Math.random() * 3)] : undefined,
           isFollowing: true, // All posts in friends feed should be from followed users
-          media: allMedia.filter(m => isValidImageUrl(m.media_url))
+          media: allMedia.filter(m => isValidImageUrl(m.media_url)),
+          audioTrack: generateAudioTrack()
         };
 
         return formattedPost;
@@ -270,6 +289,24 @@ export const useRealPostsFetcher = () => {
           }
         }
 
+        // Generate random audio track for video posts (demo purposes)
+        const generateAudioTrack = () => {
+          if (primaryMedia.media_type !== 'video' || Math.random() > 0.4) return undefined;
+          
+          const tracks = [
+            { title: "Eye of the Tiger", artist: "Survivor" },
+            { title: "The Final Countdown", artist: "Europe" },
+            { title: "We Will Rock You", artist: "Queen" },
+            { title: "Born to Be Wild", artist: "Steppenwolf" },
+            { title: "Thunderstruck", artist: "AC/DC" },
+            { title: "Original Audio", isOriginal: true },
+            { title: "Golf Swing Audio", isOriginal: true },
+            { title: "Course Ambience", isOriginal: true }
+          ];
+          
+          return tracks[Math.floor(Math.random() * tracks.length)];
+        };
+
         const formattedPost = {
           id: post.id,
           type: primaryMedia.media_type as 'video' | 'image',
@@ -289,7 +326,8 @@ export const useRealPostsFetcher = () => {
           golfCourse,
           label: Math.random() > 0.6 ? ['Pro Tip', 'Trending', 'Featured'][Math.floor(Math.random() * 3)] : undefined,
           isFollowing: Math.random() > 0.5,
-          media: allMedia.filter(m => isValidImageUrl(m.media_url))
+          media: allMedia.filter(m => isValidImageUrl(m.media_url)),
+          audioTrack: generateAudioTrack()
         };
 
         return formattedPost;

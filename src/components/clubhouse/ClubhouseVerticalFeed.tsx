@@ -15,6 +15,7 @@ import { MediaNavigationDots } from '@/components/posts/user-post/overlays/Media
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import CommentsModal from '@/components/posts/CommentsModal';
 import { useVideoManager } from '@/contexts/VideoManagerContext';
+import { AudioStrip } from './AudioStrip';
 
 interface ClubhouseVerticalFeedProps {
   posts: ExploreContentItem[];
@@ -642,6 +643,13 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                     <span className="text-base font-medium">
                       {removeGolfCourseFromContent(item.title)}
                     </span>
+                  </div>
+                )}
+
+                {/* Audio Strip - Only show for video posts with audio */}
+                {currentMedia.media_type === 'video' && item.audioTrack && (
+                  <div className="mt-3">
+                    <AudioStrip audioTrack={item.audioTrack} />
                   </div>
                 )}
 
