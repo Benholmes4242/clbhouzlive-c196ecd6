@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from '@/components/ui/button';
-import { X, Earth, Trophy, TrendingUp, Clock } from 'lucide-react';
+import { X, Earth, Trophy, TrendingUp, Clock, ChevronRight } from 'lucide-react';
 import CountryFlag from '@/components/ui/country-flag';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -207,97 +207,19 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
           )}
         </div>
 
-        {/* Sorting Controls - moved to bottom */}
+        {/* Sort & View Controls */}
         <div className="flex justify-center">
-          {!isMobile ? (
-            <div className="flex gap-2 items-center">
-              {sortOptions.map((option) => {
-                const IconComponent = option.icon;
-                return (
-                  <button
-                    key={option.key}
-                    onClick={() => onSortChange(option.key)}
-                    className={`relative flex items-center gap-2 text-base font-medium whitespace-nowrap px-4 py-1 shadow-lg shadow-black/10 transition-colors overflow-hidden h-10 ${
-                      sortBy === option.key 
-                        ? "text-white" 
-                        : "text-white hover:bg-white/20"
-                    }`}
-                    style={{ borderRadius: '8px' }}
-                  >
-                    {/* Liquid glass background */}
-                    <div 
-                      className={`absolute inset-0 ${
-                        sortBy === option.key 
-                          ? 'bg-white/20 border border-white/30' 
-                          : 'bg-white/10 border border-white/20'
-                      }`}
-                      style={{ 
-                        backdropFilter: 'blur(40px) saturate(180%)',
-                        borderRadius: '8px'
-                      }}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" style={{ borderRadius: '8px' }} />
-                    
-                    {/* Content */}
-                    <div className="relative flex items-center gap-2">
-                      <IconComponent className="w-4 h-4" />
-                      {option.label}
-                    </div>
-                  </button>
-                );
-              })}
-              
-              {/* View Toggle positioned next to sorting buttons */}
-              <ViewToggle 
-                currentView={viewType}
-                onViewChange={onViewTypeChange}
-              />
-            </div>
-          ) : (
-            <div className="w-full">
-              <div className="flex gap-1 w-full">
-                {sortOptions.map((option) => {
-                  return (
-                    <button
-                      key={option.key}
-                      onClick={() => onSortChange(option.key)}
-                      className={`relative flex items-center justify-center text-sm font-medium px-2 py-1.5 shadow-lg shadow-black/10 transition-colors flex-1 overflow-hidden ${
-                        sortBy === option.key 
-                          ? "text-white" 
-                          : "text-white hover:bg-white/20"
-                      }`}
-                      style={{ borderRadius: '8px' }}
-                    >
-                      {/* Liquid glass background */}
-                      <div 
-                        className={`absolute inset-0 ${
-                          sortBy === option.key 
-                            ? 'bg-white/20 border border-white/30' 
-                            : 'bg-white/10 border border-white/20'
-                        }`}
-                        style={{ 
-                          backdropFilter: 'blur(40px) saturate(180%)',
-                          borderRadius: '8px'
-                        }}
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" style={{ borderRadius: '8px' }} />
-                      
-                      {/* Content */}
-                      <span className="relative text-sm">{option.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-              
-              {/* View Toggle below sorting buttons on mobile */}
-              <div className="flex justify-center mt-2">
-                <ViewToggle 
-                  currentView={viewType}
-                  onViewChange={onViewTypeChange}
-                />
-              </div>
-            </div>
-          )}
+          <Button
+            variant="outline"
+            onClick={() => {
+              // TODO: Open sort & view modal
+              console.log('Sort & View clicked');
+            }}
+            className="px-6 py-2 rounded-lg bg-muted/50 hover:bg-muted"
+          >
+            Sort & View
+            <ChevronRight className="ml-2 h-4 w-4" />
+          </Button>
         </div>
       </div>
 
