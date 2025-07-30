@@ -248,12 +248,10 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
               })}
               
               {/* View Toggle positioned next to sorting buttons */}
-              <div className="ml-2">
-                <ViewToggle 
-                  currentView={viewType}
-                  onViewChange={onViewTypeChange}
-                />
-              </div>
+              <ViewToggle 
+                currentView={viewType}
+                onViewChange={onViewTypeChange}
+              />
             </div>
           ) : (
             <div className="w-full">
