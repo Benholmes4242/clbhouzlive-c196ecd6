@@ -386,13 +386,24 @@ const HeroProfileHeader = ({
             
             {/* Activity Posts Section - Only show when activity section is active */}
             {activeSection === 'activity' && (
-              <div className="mt-8 px-0 md:px-4">
-                <ActivityFeed
-                  userId={profile?.id || ''}
-                  isOwnProfile={isOwnProfile}
-                  profileDisplayName={profile?.display_name}
-                />
-              </div>
+              <>
+                {/* Break out of container on mobile for edge-to-edge activity feed */}
+                <div className="block md:hidden mt-8 -mx-4">
+                  <ActivityFeed
+                    userId={profile?.id || ''}
+                    isOwnProfile={isOwnProfile}
+                    profileDisplayName={profile?.display_name}
+                  />
+                </div>
+                {/* Desktop version with normal container */}
+                <div className="hidden md:block mt-8 px-4">
+                  <ActivityFeed
+                    userId={profile?.id || ''}
+                    isOwnProfile={isOwnProfile}
+                    profileDisplayName={profile?.display_name}
+                  />
+                </div>
+              </>
             )}
             
             {/* Handicap Section - Only show when handicap section is active */}
