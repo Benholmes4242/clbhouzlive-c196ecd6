@@ -18,7 +18,7 @@ const ViewToggle: React.FC<ViewToggleProps> = ({ currentView, onViewChange }) =>
         variant="ghost"
         size="sm"
         onClick={() => onViewChange('cards')}
-        className={`relative px-1.5 py-1 text-xs font-medium transition-all ${
+        className={`relative px-1.5 py-1 text-base font-medium transition-all ${
           currentView === 'cards'
             ? 'bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm'
             : 'text-white/70 hover:text-white hover:bg-white/10'
@@ -32,7 +32,7 @@ const ViewToggle: React.FC<ViewToggleProps> = ({ currentView, onViewChange }) =>
         variant="ghost"
         size="sm"
         onClick={() => onViewChange('list')}
-        className={`relative px-1.5 py-1 text-xs font-medium transition-all ${
+        className={`relative px-1.5 py-1 text-base font-medium transition-all ${
           currentView === 'list'
             ? 'bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm'
             : 'text-white/70 hover:text-white hover:bg-white/10'
