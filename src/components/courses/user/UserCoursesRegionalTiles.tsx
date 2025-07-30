@@ -187,7 +187,7 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
                         {/* Content */}
                         <div className="relative flex flex-col items-center justify-center gap-1">
                           {tile.flag === 'earth' ? (
-                            <Earth className="w-10 h-10 text-white flex-shrink-0" />
+                            <Earth className="w-8 h-8 text-white flex-shrink-0" />
                           ) : (
                             <CountryFlag country={tile.country} size="lg" className="flex-shrink-0" />
                           )}
