@@ -27,12 +27,6 @@ serve(async (req) => {
   }
 
   try {
-    // Create Supabase client with service role key
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
-
     // Get the JWT from the request
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
@@ -42,9 +36,23 @@ serve(async (req) => {
       });
     }
 
-    // Verify the user is authenticated and is admin
     const jwt = authHeader.replace('Bearer ', '');
-    const { data: { user }, error: userError } = await supabase.auth.getUser(jwt);
+
+    // Create Supabase client with user JWT for admin check
+    const userSupabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      {
+        global: {
+          headers: {
+            Authorization: authHeader,
+          },
+        },
+      }
+    );
+
+    // Verify the user is authenticated and is admin
+    const { data: { user }, error: userError } = await userSupabase.auth.getUser();
     
     if (userError || !user) {
       console.log('User verification failed:', userError);
@@ -54,15 +62,21 @@ serve(async (req) => {
       });
     }
 
-    // Check if user is admin
-    const { data: isAdminData, error: adminError } = await supabase.rpc('is_admin');
+    // Check if user is admin using user context
+    const { data: isAdminData, error: adminError } = await userSupabase.rpc('is_admin');
     if (adminError || !isAdminData) {
-      console.log('Admin check failed:', adminError);
+      console.log('Admin check failed:', isAdminData, adminError);
       return new Response(JSON.stringify({ error: 'Insufficient permissions' }), {
         status: 403,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+
+    // Create Supabase client with service role key for admin operations
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
 
     const { action, targetUserId, targetEmail, reason }: AdminOperationRequest = await req.json();
 
