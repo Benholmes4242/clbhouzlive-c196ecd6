@@ -26,9 +26,7 @@ const UserProfilePage = () => {
   return (
     <div className="min-h-screen bg-background pb-28 relative">
       {/* Header */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-background">
-        <Header />
-      </div>
+      <Header />
       
       <UserProfileLoader isLoading={isLoading} profile={profile} />
       
