@@ -282,6 +282,8 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
               onSortChange={setSortBy}
               viewType={viewType}
               onViewTypeChange={setViewType}
+              isOwnProfile={finalIsOwnProfile}
+              onAddCoursesClick={() => setIsCoursePickerOpen(true)}
             />
           </>
         ) : (
@@ -297,6 +299,8 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
                 onSortChange={setSortBy}
                 viewType={viewType}
                 onViewTypeChange={setViewType}
+                isOwnProfile={finalIsOwnProfile}
+                onAddCoursesClick={() => setIsCoursePickerOpen(true)}
               />
             </div>
           </div>
@@ -348,33 +352,6 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
           <EmptyTop100State isOwnProfile={finalIsOwnProfile} displayName={finalDisplayName} />
         )}
       </div>
-
-      {/* Floating Add Courses Button - Only for own profile */}
-      {finalIsOwnProfile && (
-        <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
-          <Button
-            onClick={() => setIsCoursePickerOpen(true)}
-            className="relative px-6 py-3 rounded-full shadow-lg overflow-hidden"
-            style={{ 
-              backdropFilter: 'blur(40px) saturate(180%)',
-              borderRadius: '32px'
-            }}
-          >
-            <div 
-              className="absolute inset-0 bg-white/10 border border-white/20"
-              style={{ 
-                backdropFilter: 'blur(40px) saturate(180%)',
-                borderRadius: '32px'
-              }}
-            />
-            <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" style={{ borderRadius: '32px' }} />
-            <div className="relative flex items-center gap-2 text-white font-medium">
-              📍 <Plus className="h-4 w-4" />
-              Add Courses
-            </div>
-          </Button>
-        </div>
-      )}
 
       {/* Course Picker Modal */}
       <CoursePickerModal

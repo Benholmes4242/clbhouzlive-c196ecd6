@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { X, Earth, Trophy, TrendingUp, Clock, ChevronRight } from 'lucide-react';
+import { X, Earth, Trophy, TrendingUp, Clock, ChevronRight, Plus } from 'lucide-react';
 import CountryFlag from '@/components/ui/country-flag';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -23,6 +23,8 @@ interface UserCoursesRegionalTilesProps {
   onSortChange: (sort: string) => void;
   viewType: 'cards' | 'list';
   onViewTypeChange: (view: 'cards' | 'list') => void;
+  isOwnProfile?: boolean;
+  onAddCoursesClick?: () => void;
 }
 
 const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
@@ -33,7 +35,9 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
   sortBy,
   onSortChange,
   viewType,
-  onViewTypeChange
+  onViewTypeChange,
+  isOwnProfile = false,
+  onAddCoursesClick
 }) => {
   const isMobile = useIsMobile();
   const [isSortViewModalOpen, setIsSortViewModalOpen] = useState(false);
@@ -238,7 +242,7 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
         </div>
 
         {/* Sort & View Controls */}
-        <div className="flex justify-center">
+        <div className="flex justify-center gap-3">
           <button
             onClick={() => setIsSortViewModalOpen(true)}
             className="relative flex items-center gap-2 text-base font-medium whitespace-nowrap px-6 py-2 shadow-lg shadow-black/10 transition-colors overflow-hidden text-white hover:bg-white/20"
@@ -260,6 +264,31 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
               <ChevronRight className="ml-2 h-4 w-4" />
             </div>
           </button>
+
+          {/* Add Courses Button - Only for own profile */}
+          {isOwnProfile && onAddCoursesClick && (
+            <button
+              onClick={onAddCoursesClick}
+              className="relative flex items-center gap-2 text-base font-medium whitespace-nowrap px-6 py-2 shadow-lg shadow-black/10 transition-colors overflow-hidden text-white hover:bg-white/20"
+              style={{ borderRadius: '8px' }}
+            >
+              {/* Liquid glass background */}
+              <div 
+                className="absolute inset-0 bg-white/10 border border-white/20"
+                style={{ 
+                  backdropFilter: 'blur(40px) saturate(180%)',
+                  borderRadius: '8px'
+                }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" style={{ borderRadius: '8px' }} />
+              
+              {/* Content */}
+              <div className="relative flex items-center gap-2">
+                📍 <Plus className="h-4 w-4" />
+                Add Courses
+              </div>
+            </button>
+          )}
         </div>
       </div>
 
