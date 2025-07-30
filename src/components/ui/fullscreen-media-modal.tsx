@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
-import { Minimize2, Volume2, VolumeX, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Minimize2, Volume2, VolumeX, ChevronLeft, ChevronRight, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
 import { PiHandsClapping, PiShareFat } from 'react-icons/pi';
 import { GoCommentDiscussion } from 'react-icons/go';
 import { useSwipeable } from 'react-swipeable';
@@ -14,6 +14,10 @@ import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useVideoPlaybackManager } from '@/contexts/VideoPlaybackManager';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { usePostDeletion } from '@/hooks/usePostDeletion';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
 
 interface FullscreenMediaModalProps {
   isOpen: boolean;
@@ -45,6 +49,10 @@ interface FullscreenMediaModalProps {
   // Video resume props
   initialVideoPosition?: number;
   initialVideoMuted?: boolean;
+  // Post management props
+  postId?: string;
+  onPostDeleted?: () => void;
+  onPostEdit?: (postId: string) => void;
 }
 
 // Helper function to check if element is in viewport
@@ -78,7 +86,10 @@ const FullscreenMediaModal = ({
   currentPostIndex = 0,
   totalPosts = 0,
   initialVideoPosition = 0,
-  initialVideoMuted = true
+  initialVideoMuted = true,
+  postId,
+  onPostDeleted,
+  onPostEdit
 }: FullscreenMediaModalProps) => {
   // Convert single media to array format for consistent handling
   const mediaUrls = Array.isArray(mediaUrl) ? mediaUrl : [mediaUrl];
@@ -93,6 +104,8 @@ const FullscreenMediaModal = ({
   const { isTextExpanded, handleMouseEnter, handleMouseLeave } = useTextExpansion();
   const { registerVideo, unregisterVideo, pauseAllAndSetActive, storeVideoPosition, resumeVideoFromPosition } = useVideoPlaybackManager();
   const { isGloballyMuted } = useGlobalAudio();
+  const { user: currentUser } = useSupabaseSession();
+  const { deletePost } = usePostDeletion();
   
   // Store the original global mute state when modal opens
   const originalGlobalMuteState = useRef<boolean | null>(null);
@@ -107,6 +120,27 @@ const FullscreenMediaModal = ({
   if (golfCourse) {
     console.log('FullscreenMediaModal - golf course data:', golfCourse);
   }
+
+  // Check if this is the current user's post
+  const isOwnPost = postId && currentUser && user && currentUser.id === user.id;
+
+  // Handle post deletion
+  const handleDeletePost = async () => {
+    if (!postId) return;
+    
+    const confirmed = window.confirm('Are you sure you want to delete this post?');
+    if (!confirmed) return;
+    
+    await deletePost(postId);
+    onPostDeleted?.();
+    onClose();
+  };
+
+  // Handle post editing
+  const handleEditPost = () => {
+    if (!postId) return;
+    onPostEdit?.(postId);
+  };
 
   // Navigation functions
   const goToPrevious = () => {
@@ -332,7 +366,35 @@ const FullscreenMediaModal = ({
     >
       {/* Top Controls */}
       <div className="absolute top-4 right-4 z-10 flex items-start gap-2">
-        {/* Maximize - Top Right */}
+        {/* Three dots menu - only show for own posts */}
+        {isOwnPost && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="w-10 h-10 text-white hover:bg-white/10 rounded-full"
+              >
+                <MoreHorizontal className="h-6 w-6" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              <DropdownMenuItem onClick={handleEditPost}>
+                <Edit className="h-4 w-4 mr-2" />
+                Edit Post
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={handleDeletePost}
+                className="text-destructive focus:text-destructive"
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Delete Post
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
+        
+        {/* Close button */}
         <button
           onClick={() => onClose()}
           className="flex items-center justify-center w-10 h-10 text-white hover:bg-white/10 rounded-full transition-colors"

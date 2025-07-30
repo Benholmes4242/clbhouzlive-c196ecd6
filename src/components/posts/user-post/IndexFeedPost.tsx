@@ -278,6 +278,16 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
         totalPosts={userPosts.length}
         initialVideoPosition={currentMedia?.videoPosition}
         initialVideoMuted={currentMedia?.videoMuted}
+        postId={post.id}
+        onPostDeleted={() => {
+          onDeletePost?.();
+          closeFullscreenMedia();
+        }}
+        onPostEdit={(postId) => {
+          // TODO: Implement edit functionality 
+          console.log('Edit post:', postId);
+          closeFullscreenMedia();
+        }}
       />
     </div>
   );
