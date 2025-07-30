@@ -1,11 +1,13 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { X, Earth, Trophy, TrendingUp, Clock, ChevronRight } from 'lucide-react';
 import CountryFlag from '@/components/ui/country-flag';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useIsMobile } from '@/hooks/use-mobile';
 import ViewToggle from '@/components/profile/ViewToggle';
+import SortViewModal from '@/components/profile/SortViewModal';
+import type { SortType } from '@/components/profile/SortViewModal';
 
 interface RegionalProgress {
   played: number;
@@ -34,6 +36,34 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
   onViewTypeChange
 }) => {
   const isMobile = useIsMobile();
+  const [isSortViewModalOpen, setIsSortViewModalOpen] = useState(false);
+
+  // Convert between different sort value formats
+  const convertToModalSort = (sort: string): SortType => {
+    switch (sort) {
+      case 'rating-high-low':
+        return 'rank-desc';
+      case 'rating-low-high':
+        return 'rank-asc';
+      case 'recently-played':
+        return 'recent';
+      default:
+        return 'rank-desc';
+    }
+  };
+
+  const convertFromModalSort = (sort: SortType): string => {
+    switch (sort) {
+      case 'rank-desc':
+        return 'rating-high-low';
+      case 'rank-asc':
+        return 'rating-low-high';
+      case 'recent':
+        return 'recently-played';
+      default:
+        return 'rating-high-low';
+    }
+  };
 
   const tiles = [
     {
@@ -211,10 +241,7 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
         <div className="flex justify-center">
           <Button
             variant="outline"
-            onClick={() => {
-              // TODO: Open sort & view modal
-              console.log('Sort & View clicked');
-            }}
+            onClick={() => setIsSortViewModalOpen(true)}
             className="px-6 py-2 rounded-lg bg-muted/50 hover:bg-muted"
           >
             Sort & View
@@ -231,6 +258,16 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
           </span>
         </div>
       )}
+
+      {/* Sort & View Modal */}
+      <SortViewModal
+        isOpen={isSortViewModalOpen}
+        onClose={() => setIsSortViewModalOpen(false)}
+        currentSort={convertToModalSort(sortBy)}
+        currentView={viewType}
+        onSortChange={(sort) => onSortChange(convertFromModalSort(sort))}
+        onViewChange={onViewTypeChange}
+      />
     </div>
   );
 };
