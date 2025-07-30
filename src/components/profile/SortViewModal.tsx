@@ -41,45 +41,97 @@ const SortViewModal: React.FC<SortViewModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
-        <DialogHeader>
-          <DialogTitle>Sort & View Options</DialogTitle>
-        </DialogHeader>
-        
-        <div className="space-y-6">
-          {/* Sort Options */}
-          <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-foreground">Sort by</h3>
-            <div className="space-y-2">
-              {sortOptions.map((option) => (
-                <Button
-                  key={option.value}
-                  variant={currentSort === option.value ? "default" : "outline"}
-                  className="w-full justify-start"
-                  onClick={() => onSortChange(option.value)}
-                >
-                  {option.icon && <span className="mr-2">{option.icon}</span>}
-                  {option.label}
-                </Button>
-              ))}
-            </div>
-          </div>
+      <DialogContent className="max-w-md bg-transparent border-0 shadow-none">
+        <div 
+          className="relative bg-white/10 border border-white/20 text-white p-6"
+          style={{ 
+            backdropFilter: 'blur(40px) saturate(180%)',
+            borderRadius: '16px'
+          }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" style={{ borderRadius: '16px' }} />
+          
+          <div className="relative">
+            <DialogHeader className="mb-6">
+              <DialogTitle className="text-white text-lg font-semibold">Sort & View Options</DialogTitle>
+            </DialogHeader>
+            
+            <div className="space-y-6">
+              {/* Sort Options */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-semibold text-white/80">Sort by</h3>
+                <div className="space-y-2">
+                  {sortOptions.map((option) => (
+                    <button
+                      key={option.value}
+                      onClick={() => onSortChange(option.value)}
+                      className={`relative w-full flex items-center gap-3 p-3 text-left transition-colors overflow-hidden ${
+                        currentSort === option.value 
+                          ? 'text-white' 
+                          : 'text-white/80 hover:bg-white/10'
+                      }`}
+                      style={{ borderRadius: '8px' }}
+                    >
+                      {/* Liquid glass background for selected */}
+                      {currentSort === option.value && (
+                        <>
+                          <div 
+                            className="absolute inset-0 bg-white/20 border border-white/30"
+                            style={{ 
+                              backdropFilter: 'blur(40px) saturate(180%)',
+                              borderRadius: '8px'
+                            }}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" style={{ borderRadius: '8px' }} />
+                        </>
+                      )}
+                      
+                      <div className="relative flex items-center gap-3">
+                        {option.icon && <span>{option.icon}</span>}
+                        <span className="font-medium">{option.label}</span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-          {/* View Options */}
-          <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-foreground">View</h3>
-            <div className="grid grid-cols-2 gap-2">
-              {viewOptions.map((option) => (
-                <Button
-                  key={option.value}
-                  variant={currentView === option.value ? "default" : "outline"}
-                  className="justify-start"
-                  onClick={() => onViewChange(option.value)}
-                >
-                  <span className="mr-2">{option.icon}</span>
-                  {option.label}
-                </Button>
-              ))}
+              {/* View Options */}
+              <div className="space-y-3">
+                <h3 className="text-sm font-semibold text-white/80">View</h3>
+                <div className="grid grid-cols-2 gap-2">
+                  {viewOptions.map((option) => (
+                    <button
+                      key={option.value}
+                      onClick={() => onViewChange(option.value)}
+                      className={`relative flex items-center gap-2 p-3 text-left transition-colors overflow-hidden ${
+                        currentView === option.value 
+                          ? 'text-white' 
+                          : 'text-white/80 hover:bg-white/10'
+                      }`}
+                      style={{ borderRadius: '8px' }}
+                    >
+                      {/* Liquid glass background for selected */}
+                      {currentView === option.value && (
+                        <>
+                          <div 
+                            className="absolute inset-0 bg-white/20 border border-white/30"
+                            style={{ 
+                              backdropFilter: 'blur(40px) saturate(180%)',
+                              borderRadius: '8px'
+                            }}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent" style={{ borderRadius: '8px' }} />
+                        </>
+                      )}
+                      
+                      <div className="relative flex items-center gap-2">
+                        <span>{option.icon}</span>
+                        <span className="font-medium text-sm">{option.label}</span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </div>

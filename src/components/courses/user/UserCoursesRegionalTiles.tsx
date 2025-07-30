@@ -239,14 +239,27 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
 
         {/* Sort & View Controls */}
         <div className="flex justify-center">
-          <Button
-            variant="outline"
+          <button
             onClick={() => setIsSortViewModalOpen(true)}
-            className="px-6 py-2 rounded-lg bg-muted/50 hover:bg-muted"
+            className="relative flex items-center gap-2 text-base font-medium whitespace-nowrap px-6 py-2 shadow-lg shadow-black/10 transition-colors overflow-hidden text-white hover:bg-white/20"
+            style={{ borderRadius: '8px' }}
           >
-            Sort & View
-            <ChevronRight className="ml-2 h-4 w-4" />
-          </Button>
+            {/* Liquid glass background */}
+            <div 
+              className="absolute inset-0 bg-white/10 border border-white/20"
+              style={{ 
+                backdropFilter: 'blur(40px) saturate(180%)',
+                borderRadius: '8px'
+              }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" style={{ borderRadius: '8px' }} />
+            
+            {/* Content */}
+            <div className="relative flex items-center gap-2">
+              Sort & View
+              <ChevronRight className="ml-2 h-4 w-4" />
+            </div>
+          </button>
         </div>
       </div>
 
