@@ -6,6 +6,7 @@ import ExploreGrid from '@/components/explore/ExploreGrid';
 import DiscoverVerticalFeed from '@/components/discover/DiscoverVerticalFeed';
 import SortingChips from '@/components/discover/SortingChips';
 import FeaturedCreator from '@/components/discover/FeaturedCreator';
+import TrendingNow from '@/components/discover/TrendingNow';
 import type { FeaturedCreatorType } from '@/components/discover/FeaturedCreator';
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
@@ -54,6 +55,20 @@ const Discover = () => {
     // Navigate to creator's profile - for now just log
     console.log('Navigate to creator profile:', creator);
     // In real app: navigate(`/profile/${creator.id}`)
+  };
+
+  const handleHashtagClick = (tag: string) => {
+    // Filter content by hashtag
+    console.log('Filter by hashtag:', tag);
+    // Could update the selected chip or add hashtag filtering
+    // For now, just simulate a search
+    setSelectedChip('all'); // Reset sorting chip
+  };
+
+  const handleAudioClick = (audioId: string) => {
+    // Show posts using this audio or preview the audio
+    console.log('Audio clicked:', audioId);
+    // In real app: could open audio preview modal or filter by audio
   };
 
   // Apply client-side filtering for non-database filters and sorting chips
@@ -145,6 +160,12 @@ const Discover = () => {
               onChipSelect={setSelectedChip}
             />
           </div>
+
+          {/* Trending Now Section */}
+          <TrendingNow 
+            onHashtagClick={handleHashtagClick}
+            onAudioClick={handleAudioClick}
+          />
 
           {/* Featured Creator */}
           <div className="md:container md:mx-auto md:px-0">
