@@ -123,11 +123,11 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
           {/* Content overlay */}
           <div className="absolute inset-0 flex items-center justify-between p-4 z-20">
             <div className="flex-1 text-white">
-              <h3 className="font-semibold text-xl leading-tight mb-1">
+              <h3 className="font-semibold text-2xl leading-tight mb-1">
                 {course.name}
               </h3>
-              <div className="flex items-center text-base text-white/90">
-                <MapPin className="h-3 w-3 mr-1" />
+              <div className="flex items-center text-lg text-white/90">
+                <MapPin className="h-4 w-4 mr-1" />
                 <span>{formatLocation(course)}</span>
               </div>
             </div>
