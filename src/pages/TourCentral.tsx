@@ -14,7 +14,7 @@ const TourCentral = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <div className="container mx-auto px-4 py-6 pb-20">
+      <div className="container mx-auto px-4 md:px-0 py-6 pb-20">
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-center">Tour Central</h1>
           <p className="text-muted-foreground text-center mt-2">

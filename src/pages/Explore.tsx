@@ -86,10 +86,10 @@ const Explore = () => {
         
         <main className="pb-20">
           {/* Sticky Filter Bar with padding */}
-          <div className="container mx-auto px-4 py-6">
+          <div className="container mx-auto px-4 md:px-0 py-6">
             <ExploreFilters 
               activeFilter={activeFilter} 
-              onFilterChange={setActiveFilter} 
+              onFilterChange={setActiveFilter}
             />
           </div>
 

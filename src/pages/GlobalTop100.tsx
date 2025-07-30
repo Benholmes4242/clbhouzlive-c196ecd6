@@ -8,7 +8,7 @@ const GlobalTop100 = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <main className="container mx-auto px-4 py-6 pb-20">
+      <main className="container mx-auto px-4 md:px-0 py-6 pb-20">
         <div className="max-w-6xl mx-auto">
           {/* Page Header */}
           <div className="text-center mb-8">

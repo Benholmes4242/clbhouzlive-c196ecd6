@@ -9,7 +9,7 @@ const MyRatings = () => {
     <div className="min-h-screen bg-background">
       <Header />
       
-      <main className="container mx-auto px-4 py-6 pb-20">
+      <main className="container mx-auto px-4 md:px-0 py-6 pb-20">
         <div className="max-w-4xl mx-auto">
           <MyRatingsContent />
         </div>
