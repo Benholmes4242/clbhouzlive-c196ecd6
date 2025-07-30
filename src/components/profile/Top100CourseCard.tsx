@@ -103,12 +103,11 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
   });
 
   // Check if this should render as list view
-  console.log('🔍 RENDERING LIST VIEW:', viewType === 'list', 'for course:', course.name);
   if (viewType === 'list') {
     return (
       <>
          <div
-           className="relative rounded-lg overflow-hidden transition-all duration-300 cursor-pointer h-24 border-4 border-red-500"
+           className="relative rounded-lg overflow-hidden transition-all duration-300 cursor-pointer h-32"
            style={{
              backgroundImage: `url(${course.thumbnail_image || 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=400&h=300&fit=crop'})`,
              backgroundSize: 'cover',
