@@ -18,7 +18,7 @@ const UserCoursesStats: React.FC<UserCoursesStatsProps> = ({
 }) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <Card className="bg-black/20 backdrop-blur-sm border border-white/30 rounded-full shadow-lg">
+      <Card className="bg-black/20 backdrop-blur-sm border border-white/30 rounded-lg shadow-lg">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Top 100 Played</CardTitle>
           <Trophy className="h-4 w-4 text-yellow-600" />
@@ -29,7 +29,7 @@ const UserCoursesStats: React.FC<UserCoursesStatsProps> = ({
       </Card>
 
       <Card 
-        className={`bg-black/20 backdrop-blur-sm border border-white/30 rounded-full shadow-lg ${isOwnProfile ? "cursor-pointer hover:shadow-md transition-shadow" : ""}`}
+        className={`bg-black/20 backdrop-blur-sm border border-white/30 rounded-lg shadow-lg ${isOwnProfile ? "cursor-pointer hover:shadow-md transition-shadow" : ""}`}
         onClick={isOwnProfile ? onAverageRatingClick : undefined}
       >
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
