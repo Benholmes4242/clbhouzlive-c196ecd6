@@ -7,14 +7,19 @@ import DiscoverVerticalFeed from '@/components/discover/DiscoverVerticalFeed';
 import SortingChips from '@/components/discover/SortingChips';
 import FeaturedCreator from '@/components/discover/FeaturedCreator';
 import TrendingNow from '@/components/discover/TrendingNow';
+import EngagementPrompts from '@/components/discover/EngagementPrompts';
 import type { FeaturedCreatorType } from '@/components/discover/FeaturedCreator';
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
+import { useUserEngagement } from '@/hooks/useUserEngagement';
 import { FILTER_TYPES, MEDIA_TYPES } from '@/components/explore/types';
 
 const Discover = () => {
   const [activeFilter, setActiveFilter] = useState<string>(FILTER_TYPES.VIDEOS);
   const [selectedChip, setSelectedChip] = useState<string | null>('all');
+  
+  // User engagement data
+  const { isNewUser, isInactiveUser } = useUserEngagement();
   
   // Get content for the active filter (for the tabs section)
   const { 
@@ -69,6 +74,27 @@ const Discover = () => {
     // Show posts using this audio or preview the audio
     console.log('Audio clicked:', audioId);
     // In real app: could open audio preview modal or filter by audio
+  };
+
+  // Engagement prompt handlers
+  const handleCreatePost = () => {
+    console.log('Navigate to create post');
+    // In real app: navigate to post creation
+  };
+
+  const handleTagCourse = () => {
+    console.log('Navigate to course tagging');
+    // In real app: open course selection modal
+  };
+
+  const handleCompleteProfile = () => {
+    console.log('Navigate to profile completion');
+    // In real app: navigate to profile settings
+  };
+
+  const handleFollowCreators = () => {
+    console.log('Navigate to creator discovery');
+    // In real app: navigate to creators page or open follow suggestions
   };
 
   // Apply client-side filtering for non-database filters and sorting chips
@@ -170,6 +196,18 @@ const Discover = () => {
           {/* Featured Creator */}
           <div className="md:container md:mx-auto md:px-0">
             <FeaturedCreator onCreatorClick={handleCreatorClick} />
+          </div>
+
+          {/* Engagement Prompts */}
+          <div className="md:container md:mx-auto md:px-0">
+            <EngagementPrompts
+              isNewUser={isNewUser}
+              isInactiveUser={isInactiveUser}
+              onCreatePost={handleCreatePost}
+              onTagCourse={handleTagCourse}
+              onCompleteProfile={handleCompleteProfile}
+              onFollowCreators={handleFollowCreators}
+            />
           </div>
 
           {/* Main Grid with Container */}
