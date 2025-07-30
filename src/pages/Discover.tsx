@@ -5,6 +5,8 @@ import ExploreFilters from '@/components/explore/ExploreFilters';
 import ExploreGrid from '@/components/explore/ExploreGrid';
 import DiscoverVerticalFeed from '@/components/discover/DiscoverVerticalFeed';
 import SortingChips from '@/components/discover/SortingChips';
+import FeaturedCreator from '@/components/discover/FeaturedCreator';
+import type { FeaturedCreatorType } from '@/components/discover/FeaturedCreator';
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
 import { FILTER_TYPES, MEDIA_TYPES } from '@/components/explore/types';
@@ -46,6 +48,12 @@ const Discover = () => {
 
   const handleMediaClick = (item: any) => {
     openFeed(item);
+  };
+
+  const handleCreatorClick = (creator: FeaturedCreatorType) => {
+    // Navigate to creator's profile - for now just log
+    console.log('Navigate to creator profile:', creator);
+    // In real app: navigate(`/profile/${creator.id}`)
   };
 
   // Apply client-side filtering for non-database filters and sorting chips
@@ -136,6 +144,11 @@ const Discover = () => {
               selectedChip={selectedChip}
               onChipSelect={setSelectedChip}
             />
+          </div>
+
+          {/* Featured Creator */}
+          <div className="md:container md:mx-auto md:px-0">
+            <FeaturedCreator onCreatorClick={handleCreatorClick} />
           </div>
 
           {/* Main Grid with Container */}
