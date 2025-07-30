@@ -122,7 +122,21 @@ const FullscreenMediaModal = ({
   }
 
   // Check if this is the current user's post
-  const isOwnPost = postId && currentUser && user && currentUser.id === user.id;
+  // Handle different user object structures that might come from different sources
+  const userIdFromProp = user?.id || (user as any)?.user_id;
+  const isOwnPost = postId && currentUser && userIdFromProp && currentUser.id === userIdFromProp;
+  
+  // Debug logging
+  console.log('🔍 Fullscreen Modal Debug:', {
+    postId,
+    currentUserId: currentUser?.id,
+    postUserId: userIdFromProp,
+    userObject: user,
+    isOwnPost,
+    hasPostId: !!postId,
+    hasCurrentUser: !!currentUser,
+    hasUser: !!user
+  });
 
   // Handle post deletion
   const handleDeletePost = async () => {
