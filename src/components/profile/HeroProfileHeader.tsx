@@ -346,29 +346,27 @@ const HeroProfileHeader = ({
           </div>
 
           {/* Thinner Stats Bar */}
-          <div className="w-full max-w-md">
-            <div className="bg-white/5 backdrop-blur-2xl border border-white/20 shadow-[0_0_20px_rgba(0,0,0,0.2)] rounded-lg py-1" style={{ backdropFilter: 'blur(40px) saturate(180%)' }}>
-              <div className="flex items-center justify-around w-full px-6 space-x-4">
-                <div className="text-center">
-                  <div className="text-lg font-bold text-white">
-                    {profile?.eg_handicap_index ? profile.eg_handicap_index.toFixed(1) : '--'}
-                  </div>
-                  <div className="text-xs text-white/70">Handicap</div>
+          <div className="w-full max-w-md bg-white/5 backdrop-blur-2xl border border-white/20 shadow-[0_0_20px_rgba(0,0,0,0.2)] rounded-lg py-1" style={{ backdropFilter: 'blur(40px) saturate(180%)' }}>
+            <div className="flex items-center justify-around w-full px-6 space-x-4">
+              <div className="text-center">
+                <div className="text-lg font-bold text-white">
+                  {profile?.eg_handicap_index ? profile.eg_handicap_index.toFixed(1) : '--'}
                 </div>
-                <div className="text-center">
-                  <div className="text-lg font-bold text-white">{postsCount}</div>
-                  <div className="text-xs text-white/70">Posts</div>
+                <div className="text-xs text-white/70">Handicap</div>
+              </div>
+              <div className="text-center">
+                <div className="text-lg font-bold text-white">{postsCount}</div>
+                <div className="text-xs text-white/70">Posts</div>
+              </div>
+              <div className="text-center">
+                <div className="text-lg font-bold text-white">{ratedCoursesCount}</div>
+                <div className="text-xs text-white/70">Rated Courses</div>
+              </div>
+              <div className="text-center">
+                <div className="text-lg font-bold text-white">
+                  {averageRating > 0 ? `${averageRating}/10` : '--'}
                 </div>
-                <div className="text-center">
-                  <div className="text-lg font-bold text-white">{ratedCoursesCount}</div>
-                  <div className="text-xs text-white/70">Rated Courses</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-lg font-bold text-white">
-                    {averageRating > 0 ? `${averageRating}/10` : '--'}
-                  </div>
-                  <div className="text-xs text-white/70">Avg. Rating</div>
-                </div>
+                <div className="text-xs text-white/70">Avg. Rating</div>
               </div>
             </div>
           </div>
