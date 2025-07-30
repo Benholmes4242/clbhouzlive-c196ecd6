@@ -415,14 +415,39 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                   hidePlayButton={true}
                 />
                 
-                {/* Overlay for large cards */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                {/* Gradient overlay for better text readability */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-black/40" />
                 
-                {/* Golf Club Tag for large cards - matching clubhouse CoursePostBadge design */}
+                {/* Top gradient overlay for context label */}
+                <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-transparent pointer-events-none" 
+                     style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 25%, transparent 50%)' }} />
+                
+                {/* Context Label */}
+                <div className="absolute top-2 left-2 z-30">
+                  <div className="bg-black/50 backdrop-blur-sm px-2.5 py-1 rounded-md flex items-center gap-1.5">
+                    <span className="text-sm font-bold text-white">
+                      {(() => {
+                        const labels = [
+                          '🔥 Trending Now',
+                          '🎯 Shot of the Week', 
+                          '💡 From the Pros',
+                          '⭐ Featured',
+                          '🚀 Going Viral',
+                          '🏆 Top Pick'
+                        ];
+                        // Use item ID to consistently pick the same label for the same content
+                        const labelIndex = layoutItem.item.id.charCodeAt(0) % labels.length;
+                        return labels[labelIndex];
+                      })()}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Golf Club Tag for large cards - positioned to avoid context label */}
                 {layoutItem.item.golfCourse && (
-                  <div className="absolute top-3 left-3 flex items-center cursor-pointer bg-black/30 backdrop-blur-sm px-3 py-1.5 text-white shadow-lg hover:bg-black/40 transition-colors rounded-full">
-                    <MapPin className="h-5 w-5 mr-0.5 text-white" />
-                    <span className="text-base font-medium">{layoutItem.item.golfCourse.name}</span>
+                  <div className="absolute top-12 left-2 flex items-center cursor-pointer bg-black/30 backdrop-blur-sm px-3 py-1.5 text-white shadow-lg hover:bg-black/40 transition-colors rounded-full z-20">
+                    <MapPin className="h-4 w-4 mr-1 text-white" />
+                    <span className="text-sm font-medium truncate max-w-[120px]">{layoutItem.item.golfCourse.name}</span>
                   </div>
                 )}
                 
@@ -453,6 +478,9 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                     </div>
                   </div>
                 </div>
+
+                {/* Hover animation */}
+                <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
               </div>
             ) : (
               <div
