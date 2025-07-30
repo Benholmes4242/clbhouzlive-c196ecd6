@@ -30,23 +30,25 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
   const bottomRowCarousel = useCarouselNavigation(bottomRowFilters.length);
 
   const getFilterIcon = (filter: string) => {
+    const iconProps = { className: "w-5 h-5", strokeWidth: 2 };
+    
     switch (filter) {
       case FILTER_TYPES.FRIENDS:
-        return <Users className="w-4 h-4 mr-2" />;
+        return <Users {...iconProps} />;
       case FILTER_TYPES.VIDEOS:
-        return <MdOutlinePlayCircle className="w-4 h-4 mr-2" />;
+        return <MdOutlinePlayCircle className="w-5 h-5" />;
       case FILTER_TYPES.PHOTOS:
-        return <Camera className="w-4 h-4 mr-2" />;
+        return <Camera {...iconProps} />;
       case FILTER_TYPES.TRENDING:
-        return <TrendingUp className="w-4 h-4 mr-2" />;
+        return <TrendingUp {...iconProps} />;
       case FILTER_TYPES.VERIFIED_PROS:
-        return <PiGolf className="w-4 h-4 mr-2" />;
+        return <PiGolf className="w-5 h-5" />;
       case FILTER_TYPES.CHANNELS:
-        return <TvMinimalPlay className="w-4 h-4 mr-2" />;
+        return <TvMinimalPlay {...iconProps} />;
       case FILTER_TYPES.HACK_SHACK:
-        return <Zap className="w-4 h-4 mr-2" />;
+        return <Zap {...iconProps} />;
       case FILTER_TYPES.BRAIN_GAME:
-        return <Brain className="w-4 h-4 mr-2" />;
+        return <Brain {...iconProps} />;
       default:
         return null;
     }
@@ -60,17 +62,33 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
         key={filter}
         onClick={() => onFilterChange(filter)}
         className={`
-          px-4 py-2 text-sm font-semibold whitespace-nowrap flex-shrink-0 
-          flex items-center transition-all duration-200 ease-in-out
-          focus:outline-none border rounded-lg bg-gradient-to-b
+          flex flex-col items-center gap-1 px-3 py-2 min-w-[80px] 
+          whitespace-nowrap flex-shrink-0 transition-all duration-200 ease-in-out
+          focus:outline-none border rounded-xl bg-gradient-to-b relative
           ${isActive 
-            ? 'from-emerald-50 to-emerald-100 border-emerald-300 text-emerald-700 hover:from-emerald-100 hover:to-emerald-200' 
-            : 'from-white to-gray-50 border-gray-200 text-gray-700 hover:from-gray-50 hover:to-gray-100 active:from-gray-100 active:to-gray-200'
+            ? 'from-emerald-50 to-emerald-100 border-emerald-300 shadow-sm' 
+            : 'from-white to-gray-50 border-gray-200 hover:from-gray-50 hover:to-gray-100 active:from-gray-100 active:to-gray-200'
           }
         `}
       >
-        {getFilterIcon(filter)}
-        {filter}
+        {/* Icon */}
+        <div className={`transition-colors duration-200 ${
+          isActive ? 'text-emerald-600' : 'text-gray-600'
+        }`}>
+          {getFilterIcon(filter)}
+        </div>
+        
+        {/* Label */}
+        <span className={`text-xs font-medium transition-colors duration-200 ${
+          isActive ? 'text-emerald-700 font-semibold' : 'text-gray-700'
+        }`}>
+          {filter}
+        </span>
+        
+        {/* Active indicator dot */}
+        {isActive && (
+          <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-emerald-500 rounded-full" />
+        )}
       </button>
     );
   };
@@ -94,7 +112,7 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
     return (
       <div 
         ref={carouselRef}
-        className="flex space-x-2 overflow-x-auto scrollbar-hide transition-transform duration-150 ease-out"
+        className="flex space-x-3 overflow-x-auto scrollbar-hide transition-transform duration-150 ease-out px-1"
         onScroll={handleScroll}
         style={{
           scrollbarWidth: 'none',
@@ -108,13 +126,17 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
   };
 
   return (
-    <div className="sticky top-16 z-10 bg-background/95 backdrop-blur-sm pb-2 mb-3">
-      <div className="space-y-2 md:px-4">
+    <div className="sticky top-16 z-10 bg-background/95 backdrop-blur-sm pb-3 mb-4">
+      <div className="space-y-3 md:px-4">
         {/* Top Row */}
-        {renderCarouselRow(topRowFilters, topRowCarousel.carouselRef)}
+        <div className="relative">
+          {renderCarouselRow(topRowFilters, topRowCarousel.carouselRef)}
+        </div>
         
         {/* Bottom Row */}
-        {renderCarouselRow(bottomRowFilters, bottomRowCarousel.carouselRef)}
+        <div className="relative">
+          {renderCarouselRow(bottomRowFilters, bottomRowCarousel.carouselRef)}
+        </div>
       </div>
     </div>
   );
