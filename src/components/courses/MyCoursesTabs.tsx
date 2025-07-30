@@ -80,7 +80,7 @@ const MyCoursesTabs = ({
           {isLoading ? (
             <div className="text-center py-8">Loading your courses...</div>
           ) : allPlayedCourses.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 md:gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {allPlayedCourses.map((userCourse) => (
                 <CourseCard 
                   key={`${userCourse.id}-${userCourse.source}`} 
@@ -111,7 +111,7 @@ const MyCoursesTabs = ({
           {isLoadingTop100 ? (
             <div className="text-center py-8">Loading your Top 100 courses...</div>
           ) : top100Courses.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 md:gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {top100Courses.map((userCourse) => (
                 <CourseCard 
                   key={userCourse.id} 
@@ -140,7 +140,7 @@ const MyCoursesTabs = ({
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">Recently Played (Last 30 Days)</h3>
           {recentCourses.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 md:gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {recentCourses.map((userCourse) => (
                 <CourseCard 
                   key={`${userCourse.id}-recent-${userCourse.source}`} 
