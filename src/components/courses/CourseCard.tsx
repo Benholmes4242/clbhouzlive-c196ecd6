@@ -90,7 +90,7 @@ const CourseCard: React.FC<CourseCardProps> = ({
     <>
       <div 
         className="group hover:shadow-lg transition-all duration-200 cursor-pointer overflow-hidden relative h-64"
-        style={{ borderRadius: '8px' }}
+        style={{ borderRadius: window.innerWidth < 768 ? '0px' : '8px' }}
         onClick={handleCardClick}
       >
         {/* Background Image */}

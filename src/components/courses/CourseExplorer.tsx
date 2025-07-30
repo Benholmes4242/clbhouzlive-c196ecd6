@@ -63,7 +63,7 @@ const CourseExplorer = () => {
   );
 
   const LoadingSkeleton = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 md:gap-6">
       {[1, 2, 3, 4, 5, 6].map((i) => (
         <div key={i} className="space-y-3">
           <Skeleton className="h-48 w-full rounded-lg" />
@@ -137,7 +137,7 @@ const CourseExplorer = () => {
       {isLoading ? (
         <LoadingSkeleton />
       ) : filteredCourses.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 md:gap-6">
           {filteredCourses.map((course) => (
             <CourseCard 
               key={course.id} 

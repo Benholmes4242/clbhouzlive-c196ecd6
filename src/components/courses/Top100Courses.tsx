@@ -87,7 +87,7 @@ const Top100Courses = () => {
   const regions = ['Britain & Ireland', 'USA', 'Continental Europe'];
 
   const LoadingSkeleton = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 md:gap-6">
       {[1, 2, 3, 4, 5, 6].map((i) => (
         <div key={i} className="space-y-3">
           <Skeleton className="h-48 w-full rounded-lg" />
@@ -142,7 +142,7 @@ const Top100Courses = () => {
             {loadingGlobal ? (
               <LoadingSkeleton />
             ) : globalTop100 && globalTop100.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 md:gap-6">
                 {globalTop100.map((course) => (
                   <CourseCard 
                     key={course.id} 
@@ -212,7 +212,7 @@ const Top100Courses = () => {
                     </p>
                   </div>
                 )}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 md:gap-6">
                   {regionalTop100.map((course) => (
                     <CourseCard 
                       key={course.id} 

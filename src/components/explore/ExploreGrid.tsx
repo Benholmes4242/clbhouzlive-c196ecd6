@@ -383,13 +383,13 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     return (
       <>
         {/* Discover Page Layout - Grid with large video cards */}
-        <div className="grid grid-cols-3 md:grid-cols-4 gap-0.5 auto-rows-fr">
+        <div className="grid grid-cols-3 md:grid-cols-4 gap-0 md:gap-0.5 auto-rows-fr">
           {layoutItems.map((layoutItem, index) => (
             layoutItem.type === 'large' ? (
               <div
                 key={`discover-large-${layoutItem.item.id}-${index}`}
                 className="col-span-2 row-span-2 relative bg-muted overflow-hidden cursor-pointer group aspect-square"
-                style={{ borderRadius: '8px' }}
+                style={{ borderRadius: window.innerWidth < 768 ? '0px' : '8px' }}
                 onClick={() => onMediaClick?.(layoutItem.item)}
               >
                 {/* Shimmer loading placeholder */}
@@ -458,7 +458,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
               <div
                 key={`discover-regular-${layoutItem.item.id}-${index}`}
                 className="relative bg-muted overflow-hidden cursor-pointer group aspect-square"
-                style={{ borderRadius: '8px' }}
+                style={{ borderRadius: window.innerWidth < 768 ? '0px' : '8px' }}
                 onClick={() => onMediaClick?.(layoutItem.item)}
               >
                 {/* Shimmer loading placeholder */}
@@ -510,7 +510,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
   return (
     <>
       {/* Instagram-style Grid Layout with Featured Cards */}
-      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-1 auto-rows-fr">
+      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-0 md:gap-1 auto-rows-fr">
         {gridItems.map((gridItem) => (
           gridItem.type === 'featured' ? (
             <div key={gridItem.key} className="col-span-2 row-span-2 aspect-square">
