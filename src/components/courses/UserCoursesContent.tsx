@@ -11,6 +11,9 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import ViewToggle from '@/components/profile/ViewToggle';
 import { useViewPreference } from '@/hooks/useViewPreference';
+import { Button } from '@/components/ui/button';
+import { Plus } from 'lucide-react';
+import CoursePickerModal from '@/components/profile/CoursePickerModal';
 
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
@@ -94,6 +97,7 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<string>('rating-high-low');
   const [carouselIndex, setCarouselIndex] = useState(0);
+  const [isCoursePickerOpen, setIsCoursePickerOpen] = useState(false);
   const { viewType, setViewType } = useViewPreference();
   const isMobile = useIsMobile();
   
@@ -257,8 +261,8 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
   }, [allPlayedCourses, activeFilter, sortBy]);
 
   return (
-    <div className="space-y-8">
-      <UserCoursesHeader 
+    <div className="relative space-y-8">
+      <UserCoursesHeader
         displayName={finalDisplayName} 
         isOwnProfile={finalIsOwnProfile} 
       />
@@ -344,6 +348,45 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
           <EmptyTop100State isOwnProfile={finalIsOwnProfile} displayName={finalDisplayName} />
         )}
       </div>
+
+      {/* Floating Add Courses Button - Only for own profile */}
+      {finalIsOwnProfile && (
+        <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
+          <Button
+            onClick={() => setIsCoursePickerOpen(true)}
+            className="relative px-6 py-3 rounded-full shadow-lg overflow-hidden"
+            style={{ 
+              backdropFilter: 'blur(40px) saturate(180%)',
+              borderRadius: '32px'
+            }}
+          >
+            <div 
+              className="absolute inset-0 bg-white/10 border border-white/20"
+              style={{ 
+                backdropFilter: 'blur(40px) saturate(180%)',
+                borderRadius: '32px'
+              }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" style={{ borderRadius: '32px' }} />
+            <div className="relative flex items-center gap-2 text-white font-medium">
+              📍 <Plus className="h-4 w-4" />
+              Add Courses
+            </div>
+          </Button>
+        </div>
+      )}
+
+      {/* Course Picker Modal */}
+      <CoursePickerModal
+        isOpen={isCoursePickerOpen}
+        onClose={() => setIsCoursePickerOpen(false)}
+        userId={targetUserId || ''}
+        region="global"
+        onCoursesAdded={() => {
+          // Refetch data when courses are added
+          window.location.reload();
+        }}
+      />
     </div>
   );
 };
