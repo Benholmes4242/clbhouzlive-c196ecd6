@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
 import ClubhouzLoading from '@/components/ClubhouzLoading';
-import { MapPin, UserPlus, UserCheck, Loader2, Minimize2 } from 'lucide-react';
+import { MapPin, UserPlus, UserCheck, Loader2, Minimize2, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
 import { PaperAirplaneIcon, HeartIcon, SpeakerXMarkIcon, SpeakerWaveIcon, ChatBubbleOvalLeftEllipsisIcon } from '@heroicons/react/24/solid';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -13,6 +13,8 @@ import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import { useVideoManager } from '@/contexts/VideoManagerContext';
 import CommentsModal from '@/components/posts/CommentsModal';
+import { usePostDeletion } from '@/hooks/usePostDeletion';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 interface DiscoverVerticalFeedProps {
   isOpen: boolean;
@@ -165,6 +167,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
   const isMobile = useIsMobile();
   const { isGloballyMuted, setGlobalMute } = useGlobalAudio();
   const { setActiveVideo } = useVideoManager();
+  const { deletePost } = usePostDeletion();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [commentsModalOpen, setCommentsModalOpen] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string>('');
@@ -346,9 +349,32 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
   }, []);
 
   const handleShare = useCallback(() => {
-    // TODO: Implement share functionality
-    console.log('Share clicked for post:', posts[currentIndex]?.id);
-  }, [posts, currentIndex]);
+    if (navigator.share) {
+      navigator.share({
+        title: 'Check out this post!',
+        url: window.location.href,
+      }).catch(console.error);
+    } else {
+      // Fallback for browsers that don't support Web Share API
+      navigator.clipboard.writeText(window.location.href);
+    }
+  }, []);
+
+  // Handle post deletion
+  const handleDeletePost = async (postId: string) => {
+    const confirmed = window.confirm('Are you sure you want to delete this post?');
+    if (!confirmed) return;
+    
+    await deletePost(postId);
+    onClose(); // Close the modal after deletion
+  };
+
+  // Handle post editing
+  const handleEditPost = (postId: string) => {
+    // TODO: Implement edit functionality
+    console.log('Edit post:', postId);
+    onClose();
+  };
 
   // Function to truncate words properly
   const truncateToWords = (text: string, wordLimit: number) => {
@@ -612,6 +638,30 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                 >
                   <PaperAirplaneIcon className="h-8 w-8 text-white" />
                 </button>
+
+                {/* Three dots menu - only show for own posts */}
+                {user && item.user?.id === user.id && (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="cursor-pointer hover:opacity-100 transition-opacity">
+                        <MoreHorizontal className="w-8 h-8 text-white" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-48">
+                      <DropdownMenuItem onClick={() => handleEditPost(item.id)}>
+                        <Edit className="h-4 w-4 mr-2" />
+                        Edit Post
+                      </DropdownMenuItem>
+                      <DropdownMenuItem 
+                        onClick={() => handleDeletePost(item.id)}
+                        className="text-destructive focus:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Delete Post
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                )}
               </div>
             </div>
           );
