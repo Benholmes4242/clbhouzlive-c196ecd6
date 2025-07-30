@@ -60,11 +60,11 @@ const CourseListItem: React.FC<CourseListItemProps> = ({
       {/* Content overlay */}
       <div className="absolute inset-0 flex items-center p-4 z-10">
         <div className="flex-1 text-white">
-          <h3 className="font-semibold text-3xl leading-tight mb-1">
+          <h3 className="font-semibold text-2xl leading-tight mb-1">
             {course.name}
           </h3>
-          <div className="flex items-center text-xl text-white/90">
-            <MapPin className="h-5 w-5 mr-1" />
+          <div className="flex items-center text-lg text-white/90">
+            <MapPin className="h-4 w-4 mr-1" />
             <span>{formatLocation(course)}</span>
           </div>
         </div>
