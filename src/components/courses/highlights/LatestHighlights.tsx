@@ -138,7 +138,7 @@ const LatestHighlights: React.FC<LatestHighlightsProps> = ({
 
             // Format location
             const getLocation = () => {
-              const baseLocation = course.sub_country || course.region || course.country || 'Unknown Location';
+              const baseLocation = course.country || course.sub_country || course.region || 'Unknown Location';
               if (course.regional_rank) {
                 return `${baseLocation} #${course.regional_rank}`;
               }
