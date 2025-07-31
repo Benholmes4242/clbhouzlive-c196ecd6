@@ -269,17 +269,6 @@ const HeroProfileHeader = ({
         {/* Profile Content */}
         <div className="relative z-10 flex flex-col items-center text-center pt-20 pb-8">
           
-          {/* Edit Profile Button - Top Right for own profile */}
-          {isOwnProfile && (
-            <div className="absolute top-6 right-6">
-              <button 
-                className="bg-white/5 backdrop-blur-2xl border border-white/20 shadow-[0_0_20px_rgba(0,0,0,0.2)] rounded-full py-1.5 px-3 text-white text-xs font-medium hover:bg-white/10 transition-colors flex items-center justify-center pt-2 pb-1" style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
-                onClick={() => setEditDialogOpen(true)}
-              >
-                Edit Profile
-              </button>
-            </div>
-          )}
           
           {/* Large Centered Profile Photo */}
           <div className="w-64 h-64 mb-6">
@@ -327,11 +316,24 @@ const HeroProfileHeader = ({
           </div>
           
           {/* Centered User Information */}
-          <div className="text-center mb-6">
+          <div className="text-center mb-6 relative">
             {/* User's Name */}
-            <h1 className="text-4xl font-bold mb-2 text-white">
-              {displayName}
-            </h1>
+            <div className="flex items-center justify-center gap-4">
+              <h1 className="text-4xl font-bold mb-2 text-white">
+                {displayName}
+              </h1>
+              
+              {/* Edit Profile Button - positioned to the right of name */}
+              {isOwnProfile && (
+                <button 
+                  className="bg-white/5 backdrop-blur-2xl border border-white/20 shadow-[0_0_20px_rgba(0,0,0,0.2)] rounded-full py-1.5 px-3 text-white text-xs font-medium hover:bg-white/10 transition-colors flex items-center justify-center mb-2" 
+                  style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
+                  onClick={() => setEditDialogOpen(true)}
+                >
+                  Edit Profile
+                </button>
+              )}
+            </div>
             
             {/* Username */}
             {username && (
