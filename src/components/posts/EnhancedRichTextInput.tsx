@@ -259,22 +259,25 @@ const EnhancedRichTextInput: React.FC<EnhancedRichTextInputProps> = ({
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
           disabled={disabled}
-          className={`w-full px-3.5 py-3.5 text-[15px] leading-6 border-0 rounded-xl bg-transparent resize-none placeholder:text-gray-400 focus:outline-none ${className}`}
+          className={`w-full px-3.5 py-3.5 pr-12 text-[15px] leading-6 border-0 rounded-xl bg-transparent resize-none placeholder:text-gray-400 focus:outline-none ${className}`}
           style={{ 
             minHeight: '72px', // 3 lines * 24px line height
             fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
           }}
         />
         
-        {/* Emoji Button - Made more visible */}
+        {/* Emoji Button - Made more prominent and visible */}
         <button
           type="button"
-          onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-          className="absolute bottom-2 right-2 p-2 rounded-full bg-gray-50 hover:bg-gray-100 border border-gray-200 transition-colors z-10 shadow-sm"
+          onClick={() => {
+            console.log('Emoji button clicked!');
+            setShowEmojiPicker(!showEmojiPicker);
+          }}
+          className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center rounded-full bg-orange-100 hover:bg-orange-200 border border-orange-300 transition-colors z-20"
           disabled={disabled}
-          title="Add emoji"
+          title="Add emoji 😄"
         >
-          <Smile className="w-4 h-4 text-gray-600" />
+          <span className="text-sm">😄</span>
         </button>
       </div>
       
