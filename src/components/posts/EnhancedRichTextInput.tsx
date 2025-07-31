@@ -14,6 +14,11 @@ interface TaggableEntity {
   profile_image_url?: string | null;
 }
 
+interface TaggedEntityWithPosition extends TaggableEntity {
+  startIndex: number;
+  endIndex: number;
+}
+
 interface HashtagSuggestion {
   tag: string;
   count: number;
@@ -58,6 +63,7 @@ const EnhancedRichTextInput: React.FC<EnhancedRichTextInputProps> = ({
   const [mentionPosition, setMentionPosition] = useState({ start: 0, end: 0 });
   const [hashtagPosition, setHashtagPosition] = useState({ start: 0, end: 0 });
   const [hashtagSuggestions, setHashtagSuggestions] = useState<HashtagSuggestion[]>([]);
+  const [taggedEntities, setTaggedEntities] = useState<Map<string, TaggedEntityWithPosition>>(new Map());
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { entities, loading, searchEntities } = useTaggableEntities();
 
@@ -151,12 +157,23 @@ const EnhancedRichTextInput: React.FC<EnhancedRichTextInputProps> = ({
   };
 
   const handleSelectEntity = (entity: TaggableEntity) => {
+    const displayText = entity.username ? `@${entity.username}` : `@${entity.name}`;
     const newText = 
       value.slice(0, mentionPosition.start) +
-      `@${entity.name} ` +
+      `${displayText} ` +
       value.slice(mentionPosition.end);
     
     onChange(newText);
+    
+    // Track the tagged entity with its position for database storage
+    const tagKey = `${mentionPosition.start}-${displayText}`;
+    const newTaggedEntities = new Map(taggedEntities);
+    newTaggedEntities.set(tagKey, {
+      ...entity,
+      startIndex: mentionPosition.start,
+      endIndex: mentionPosition.start + displayText.length
+    });
+    setTaggedEntities(newTaggedEntities);
     
     // Add to selected tags if callback provided
     if (onTagsChange && !selectedTags.find(tag => tag.id === entity.id)) {
@@ -170,7 +187,7 @@ const EnhancedRichTextInput: React.FC<EnhancedRichTextInputProps> = ({
     setTimeout(() => {
       const textarea = textareaRef.current;
       if (textarea) {
-        const newCursorPosition = mentionPosition.start + `@${entity.name} `.length;
+        const newCursorPosition = mentionPosition.start + `${displayText} `.length;
         textarea.focus();
         textarea.setSelectionRange(newCursorPosition, newCursorPosition);
       }
@@ -240,18 +257,26 @@ const EnhancedRichTextInput: React.FC<EnhancedRichTextInputProps> = ({
     }
   }, [value]);
 
-  // Format text with hashtags and mentions
-  const formatText = (text: string) => {
-    // This is a simplified version - for display purposes only
-    // The actual text manipulation happens in the onChange handlers
-    return text
-      .replace(/(#\w+)/g, '<span style="color: #6e9277; font-weight: 500;">$1</span>')
-      .replace(/(@\w+)/g, '<span style="color: #3b82f6; font-weight: 500;">$1</span>');
-  };
+  // Clean up tagged entities when text changes
+  useEffect(() => {
+    if (taggedEntities.size > 0) {
+      const newTaggedEntities = new Map();
+      taggedEntities.forEach((entity, key) => {
+        const displayText = entity.username ? `@${entity.username}` : `@${entity.name}`;
+        if (value.includes(displayText)) {
+          newTaggedEntities.set(key, entity);
+        }
+      });
+      
+      if (newTaggedEntities.size !== taggedEntities.size) {
+        setTaggedEntities(newTaggedEntities);
+      }
+    }
+  }, [value, taggedEntities]);
 
   return (
     <div className="relative">
-      <div className="relative rounded-xl border border-gray-200 bg-white focus-within:ring-2 focus-within:ring-orange-500 focus-within:border-orange-500 transition-all">
+      <div className="relative rounded-xl border border-gray-200 bg-white focus-within:ring-2 focus-within:ring-[#6e9277] focus-within:border-[#6e9277] transition-all">
         <textarea
           ref={textareaRef}
           value={value}
@@ -266,22 +291,23 @@ const EnhancedRichTextInput: React.FC<EnhancedRichTextInputProps> = ({
           }}
         />
         
-        {/* Emoji Button - Made more prominent and visible */}
+        {/* Enhanced Emoji Button */}
         <button
           type="button"
           onClick={() => {
             console.log('Emoji button clicked!');
             setShowEmojiPicker(!showEmojiPicker);
           }}
-          className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center rounded-full bg-orange-100 hover:bg-orange-200 border border-orange-300 transition-colors z-20"
+          className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center rounded-full bg-orange-100 hover:bg-orange-200 border border-orange-300 transition-colors z-20 focus:outline-none focus:ring-2 focus:ring-[#6e9277] focus:ring-offset-2"
           disabled={disabled}
           title="Add emoji 😄"
+          aria-label="Add emoji"
         >
           <span className="text-sm">😄</span>
         </button>
       </div>
       
-      {/* Mention Autocomplete */}
+      {/* Enhanced Mention Autocomplete with improved styling */}
       <TagAutocomplete
         entities={entities}
         isVisible={showMentionSuggestions}
@@ -304,6 +330,13 @@ const EnhancedRichTextInput: React.FC<EnhancedRichTextInputProps> = ({
         onSelect={handleEmojiSelect}
         onClose={() => setShowEmojiPicker(false)}
       />
+      
+      {/* Helper text for tagging */}
+      {(showMentionSuggestions || showHashtagSuggestions) && (
+        <div className="absolute top-full left-0 right-0 text-xs text-gray-500 mt-1 px-1">
+          Use ↑↓ arrows to navigate, Enter to select, Esc to cancel
+        </div>
+      )}
     </div>
   );
 };

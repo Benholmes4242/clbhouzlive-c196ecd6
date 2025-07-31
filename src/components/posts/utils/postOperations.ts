@@ -12,7 +12,8 @@ interface TaggableEntity {
 export const createPostTags = async (
   postId: string, 
   selectedTags: TaggableEntity[], 
-  userId: string
+  userId: string,
+  caption: string = ''
 ): Promise<void> => {
   if (selectedTags.length === 0) return;
 
@@ -20,13 +21,18 @@ export const createPostTags = async (
 
   try {
     // Calculate tag positions based on caption content
-    // For now, we'll create tags without specific positions since we don't have the actual caption here
-    const postTagsData = selectedTags.map(tag => ({
-      post_id: postId,
-      tagged_entity_id: tag.id,
-      start_index: 0, // These would need to be calculated based on actual caption content
-      end_index: tag.name.length + 1 // @name length
-    }));
+    const postTagsData = selectedTags.map(tag => {
+      const displayText = tag.username ? `@${tag.username}` : `@${tag.name}`;
+      const startIndex = caption.indexOf(displayText);
+      const endIndex = startIndex + displayText.length;
+      
+      return {
+        post_id: postId,
+        tagged_entity_id: tag.id,
+        start_index: Math.max(0, startIndex), // Ensure non-negative
+        end_index: Math.max(displayText.length, endIndex) // Ensure valid length
+      };
+    });
 
     const { error } = await supabase
       .from('post_tags')

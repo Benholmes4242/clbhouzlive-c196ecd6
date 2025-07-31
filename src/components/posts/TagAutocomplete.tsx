@@ -65,53 +65,63 @@ const TagAutocomplete: React.FC<TagAutocompleteProps> = ({
     return getEntityTypeLabel(entity.entity_type);
   };
 
+  // Limit to 6 suggestions maximum
+  const limitedEntities = entities.slice(0, 6);
+
   return (
-    <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-y-auto z-50 mt-1">
+    <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg max-h-80 overflow-y-auto z-50 mt-1">
       {loading ? (
         <div className="px-4 py-3 text-sm text-gray-500 flex items-center gap-2">
           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
           Searching...
         </div>
-      ) : entities.length === 0 ? (
+      ) : limitedEntities.length === 0 ? (
         <div className="px-4 py-3 text-sm text-gray-500">
           No users, clubs, or businesses found
         </div>
       ) : (
-        entities.map((entity, index) => (
-          <div
-            key={`${entity.entity_type}-${entity.entity_id}`}
-            className={`px-4 py-3 cursor-pointer flex items-center gap-3 transition-colors ${
-              index === selectedIndex
-                ? 'bg-blue-50 border-l-2 border-blue-500'
-                : 'hover:bg-gray-50'
-            }`}
-            onClick={() => onSelect(entity)}
-            onMouseDown={(e) => e.preventDefault()} // Prevent input blur
-          >
-            <div className="flex-shrink-0">
-              <Avatar className="w-8 h-8">
-                <AvatarImage 
-                  src={entity.profile_image_url || ''} 
-                  alt={entity.name}
-                />
-                <AvatarFallback className="text-xs">
-                  {getEntityIcon(entity.entity_type)}
-                </AvatarFallback>
-              </Avatar>
-            </div>
-            
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="font-medium text-gray-900 truncate">
-                  {getDisplayName(entity)}
-                </span>
+        <>
+          {limitedEntities.map((entity, index) => (
+            <div
+              key={`${entity.entity_type}-${entity.entity_id}`}
+              className={`px-4 py-3 cursor-pointer flex items-center gap-3 transition-colors ${
+                index === selectedIndex
+                  ? 'bg-blue-50 border-l-2 border-blue-500'
+                  : 'hover:bg-gray-50'
+              }`}
+              onClick={() => onSelect(entity)}
+              onMouseDown={(e) => e.preventDefault()} // Prevent input blur
+            >
+              <div className="flex-shrink-0">
+                <Avatar className="w-10 h-10">
+                  <AvatarImage 
+                    src={entity.profile_image_url || ''} 
+                    alt={entity.name}
+                  />
+                  <AvatarFallback className="text-xs bg-gray-100">
+                    {getEntityIcon(entity.entity_type)}
+                  </AvatarFallback>
+                </Avatar>
               </div>
-              <div className="text-xs text-gray-500 truncate">
-                {getSubtitle(entity)}
+              
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold text-gray-900 truncate text-sm">
+                    {getDisplayName(entity)}
+                  </span>
+                </div>
+                <div className="text-xs text-gray-500 truncate">
+                  {getSubtitle(entity)}
+                </div>
               </div>
             </div>
-          </div>
-        ))
+          ))}
+          {entities.length > 6 && (
+            <div className="px-4 py-2 text-xs text-gray-400 border-t border-gray-100 bg-gray-50">
+              {entities.length - 6} more results...
+            </div>
+          )}
+        </>
       )}
     </div>
   );

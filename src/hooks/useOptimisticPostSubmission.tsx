@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useBackgroundUpload } from './useBackgroundUpload';
 import { validateFiles } from '@/components/posts/utils/fileValidation';
+import { handlePostTags } from './usePostSubmission/uploadUtils';
 
 interface PostSubmissionData {
   user: any;
@@ -86,25 +87,14 @@ export const useOptimisticPostSubmission = () => {
 
       console.log('Post created successfully:', postData);
 
-      // Handle post tags
+      // Handle post tags with proper positions and notifications
       if (selectedTags && selectedTags.length > 0) {
-        console.log('Creating post tags:', selectedTags);
-        
-        const tagsWithPostId = selectedTags.map(tag => ({
-          post_id: postData.id,
-          tagged_entity_id: tag.id,
-          start_index: 0, // You can update this later to handle actual text positions
-          end_index: 0
-        }));
-
-        const { error: tagsError } = await supabase
-          .from('post_tags')
-          .insert(tagsWithPostId);
-
-        if (tagsError) {
-          console.error('Error creating post tags:', tagsError);
-        } else {
-          console.log('Post tags created successfully');
+        try {
+          await handlePostTags(postData.id, selectedTags, user.id, content || '');
+          console.log('Post tags and notifications created successfully');
+        } catch (tagError) {
+          console.error('Error handling post tags:', tagError);
+          // Don't fail the whole post submission for tag errors
         }
       }
 

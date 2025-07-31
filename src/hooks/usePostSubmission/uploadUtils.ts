@@ -68,14 +68,15 @@ export const uploadMediaFiles = async (
 export const handlePostTags = async (
   postId: string, 
   selectedTags: TaggableEntity[], 
-  userId: string
+  userId: string,
+  caption: string = ''
 ) => {
   if (!selectedTags || selectedTags.length === 0) return;
 
   console.log('Creating post tags...', { postId, tagCount: selectedTags.length });
   
   try {
-    await createPostTags(postId, selectedTags, userId);
+    await createPostTags(postId, selectedTags, userId, caption);
     console.log('Post tags created successfully');
 
     console.log('Creating tag notifications...');
