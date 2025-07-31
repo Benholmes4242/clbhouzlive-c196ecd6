@@ -293,23 +293,6 @@ const HeroProfileHeader = ({
           }`}
         >
           
-          {/* Edit Profile Button - Top Right for own profile */}
-          {isOwnProfile && (
-            <div className={`absolute transition-all duration-300 ease-in-out ${
-              isCompressed ? 'top-2 right-4' : 'top-6 right-6'
-            }`}>
-              <button 
-                className={`bg-white/5 backdrop-blur-2xl border border-white/20 shadow-[0_0_20px_rgba(0,0,0,0.2)] rounded-full text-white font-medium hover:bg-white/10 transition-all duration-300 ease-in-out flex items-center justify-center ${
-                  isCompressed ? 'py-1 px-2 text-xs' : 'py-1.5 px-3 text-xs pt-2 pb-1'
-                }`} 
-                style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
-                onClick={() => setEditDialogOpen(true)}
-              >
-                Edit Profile
-              </button>
-            </div>
-          )}
-          
           {/* Profile Photo with compression animation */}
           <div 
             className={`transition-all duration-300 ease-in-out ${
@@ -367,14 +350,29 @@ const HeroProfileHeader = ({
               isCompressed ? 'mb-2' : 'mb-6'
             }`}
           >
-            {/* User's Name with size animation */}
-            <h1 
-              className={`font-bold text-white transition-all duration-300 ease-in-out ${
-                isCompressed ? 'text-lg mb-1' : 'text-4xl mb-2'
-              }`}
-            >
-              {displayName}
-            </h1>
+            {/* User's Name with Edit Button */}
+            <div className="flex items-center justify-center gap-3">
+              <h1 
+                className={`font-bold text-white transition-all duration-300 ease-in-out ${
+                  isCompressed ? 'text-lg' : 'text-4xl'
+                }`}
+              >
+                {displayName}
+              </h1>
+              
+              {/* Edit Profile Button - Next to name for own profile */}
+              {isOwnProfile && (
+                <button 
+                  className={`bg-white/5 backdrop-blur-2xl border border-white/20 shadow-[0_0_20px_rgba(0,0,0,0.2)] rounded-full text-white font-medium hover:bg-white/10 transition-all duration-300 ease-in-out flex items-center justify-center ${
+                    isCompressed ? 'py-1 px-2 text-xs' : 'py-1.5 px-3 text-xs pt-2 pb-1'
+                  }`} 
+                  style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
+                  onClick={() => setEditDialogOpen(true)}
+                >
+                  Edit Profile
+                </button>
+              )}
+            </div>
             
             {/* Username - hide when compressed */}
             {username && !isCompressed && (
