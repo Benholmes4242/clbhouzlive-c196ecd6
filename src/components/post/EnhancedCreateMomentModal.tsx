@@ -33,6 +33,7 @@ interface EnhancedCreateMomentModalProps {
     files: File[];
     tags: TaggableEntity[];
     course?: GolfCourse | null;
+    isPrivate?: boolean;
   }) => void;
   isSubmitting: boolean;
   initialFiles?: File[];
@@ -43,6 +44,7 @@ interface EnhancedCreateMomentModalProps {
   initialCaption?: string;
   initialTags?: TaggableEntity[];
   existingMediaUrls?: string[];
+  initialIsPrivate?: boolean;
 }
 
 const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
@@ -56,11 +58,13 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
   editMode = false,
   initialCaption = '',
   initialTags = [],
-  existingMediaUrls = []
+  existingMediaUrls = [],
+  initialIsPrivate = false
 }) => {
   const [caption, setCaption] = useState('');
   const [files, setFiles] = useState<File[]>(initialFiles);
   const [selectedTags, setSelectedTags] = useState<TaggableEntity[]>([]);
+  const [isPrivate, setIsPrivate] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const { entities, searchEntities } = useTaggableEntities();
   const { toast } = useToast();
@@ -77,11 +81,13 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
         setCaption(initialCaption);
         setSelectedTags(initialTags);
         setFiles(initialFiles);
+        setIsPrivate(initialIsPrivate);
         setModalMode('upload'); // Skip selection for edit mode
       } else {
         setCaption('');
         setSelectedTags([]);
         setFiles(initialFiles);
+        setIsPrivate(false); // Default to public
         const mode = initialFiles.length > 0 ? 'upload' : 'selection';
         setModalMode(mode);
       }
@@ -94,7 +100,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
       setSubmitError(null);
       setIsButtonShaking(false);
     }
-  }, [isOpen, editMode, initialCaption, initialTags, initialFiles, isInitialized]);
+  }, [isOpen, editMode, initialCaption, initialTags, initialFiles, initialIsPrivate, isInitialized]);
 
   // Handle caption input with mention detection
   const handleCaptionChange = async (text: string) => {
@@ -130,7 +136,8 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
         caption,
         files,
         tags: selectedTags,
-        course: selectedCourse
+        course: selectedCourse,
+        isPrivate
       });
       
     } catch (error) {
@@ -154,6 +161,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
     setCaption('');
     setFiles([]);
     setSelectedTags([]);
+    setIsPrivate(false);
     setModalMode('selection');
     onClose();
   };
@@ -421,7 +429,57 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                   </div>
                 )}
 
-                {/* 4. Tag Field (Placeholder for future implementation) */}
+                {/* 4. Post Visibility Toggle */}
+                <div className="space-y-4 pt-6">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Post Visibility
+                  </label>
+                  <div className="space-y-3">
+                    {/* Segmented Control */}
+                    <div className="flex bg-gray-100 rounded-xl p-1 w-full">
+                      <button
+                        type="button"
+                        onClick={() => setIsPrivate(false)}
+                        className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
+                          !isPrivate
+                            ? 'text-white shadow-sm'
+                            : 'text-gray-600 hover:text-gray-800'
+                        }`}
+                        style={{
+                          backgroundColor: !isPrivate ? '#6e9277' : 'transparent'
+                        }}
+                        disabled={isSubmitting}
+                      >
+                        🟢 Public
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setIsPrivate(true)}
+                        className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${
+                          isPrivate
+                            ? 'text-white shadow-sm'
+                            : 'text-gray-600 hover:text-gray-800'
+                        }`}
+                        style={{
+                          backgroundColor: isPrivate ? '#6e9277' : 'transparent'
+                        }}
+                        disabled={isSubmitting}
+                      >
+                        👁️ Private Archive
+                      </button>
+                    </div>
+                    
+                    {/* Subtext */}
+                    <p className="text-xs text-gray-500">
+                      {isPrivate 
+                        ? "Private posts are visible only to you." 
+                        : "Public posts are visible on feed and profile."
+                      }
+                    </p>
+                  </div>
+                </div>
+
+                {/* 5. Tag Field (Placeholder for future implementation) */}
                 <div className="space-y-4 pt-6">
                   <label className="block text-sm font-medium text-gray-700">
                     Add tags
