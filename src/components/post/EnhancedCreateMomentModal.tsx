@@ -355,37 +355,14 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                       Add a caption
                     </label>
                     <div className="relative">
-                      {/* Temporary test to confirm this component is being used */}
-                      <div className="relative rounded-xl border-4 border-red-500 bg-white focus-within:ring-2 focus-within:ring-orange-500 focus-within:border-orange-500 transition-all">
-                        <textarea
-                          value={caption}
-                          onChange={(e) => {
-                            console.log('🚨 CAPTION CHANGED:', e.target.value);
-                            handleCaptionChange(e.target.value);
-                          }}
-                          placeholder="🚨 TEST: Write about your moment..."
-                          disabled={isSubmitting}
-                          className="w-full px-3.5 py-3.5 pr-12 text-[15px] leading-6 border-0 rounded-xl bg-yellow-100 resize-none placeholder:text-red-600 focus:outline-none"
-                          style={{ 
-                            minHeight: '72px',
-                            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
-                          }}
-                        />
-                        
-                        {/* GIANT TEST EMOJI BUTTON - should be IMPOSSIBLE to miss */}
-                        <button
-                          type="button"
-                          onClick={() => {
-                            console.log('🚨 TEST: Emoji button clicked!');
-                            alert('🚨 EMOJI BUTTON WORKS! Modal is working!');
-                          }}
-                          className="absolute top-1 right-1 w-16 h-16 flex items-center justify-center rounded-full bg-red-500 hover:bg-red-600 text-white font-bold transition-colors z-50 border-4 border-yellow-400"
-                          disabled={isSubmitting}
-                          title="🚨 GIANT TEST EMOJI BUTTON"
-                        >
-                          <span className="text-2xl">😄</span>
-                        </button>
-                      </div>
+                      <EnhancedRichTextInput
+                        value={caption}
+                        onChange={handleCaptionChange}
+                        onTagsChange={setSelectedTags}
+                        placeholder="Write about your moment..."
+                        selectedTags={selectedTags}
+                        disabled={isSubmitting}
+                      />
                     </div>
                   </div>
 
