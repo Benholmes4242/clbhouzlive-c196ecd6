@@ -266,14 +266,15 @@ const EnhancedRichTextInput: React.FC<EnhancedRichTextInputProps> = ({
           }}
         />
         
-        {/* Emoji Button */}
+        {/* Emoji Button - Made more visible */}
         <button
           type="button"
           onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-          className="absolute bottom-3 right-3 p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+          className="absolute bottom-2 right-2 p-2 rounded-full bg-gray-50 hover:bg-gray-100 border border-gray-200 transition-colors z-10 shadow-sm"
           disabled={disabled}
+          title="Add emoji"
         >
-          <Smile className="w-5 h-5 text-gray-400 hover:text-gray-600" />
+          <Smile className="w-4 h-4 text-gray-600" />
         </button>
       </div>
       
