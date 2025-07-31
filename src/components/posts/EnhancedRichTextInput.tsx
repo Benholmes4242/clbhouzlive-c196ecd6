@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef, KeyboardEvent } from 'react';
+import { Smile } from 'lucide-react';
 import { useTaggableEntities } from '@/hooks/useTaggableEntities';
 import TagAutocomplete from './TagAutocomplete';
+import HashtagAutocomplete from './HashtagAutocomplete';
+import EmojiPicker from './EmojiPicker';
 
 interface TaggableEntity {
   id: string;
@@ -9,6 +12,11 @@ interface TaggableEntity {
   name: string;
   username: string | null;
   profile_image_url?: string | null;
+}
+
+interface HashtagSuggestion {
+  tag: string;
+  count: number;
 }
 
 interface EnhancedRichTextInputProps {
@@ -21,6 +29,19 @@ interface EnhancedRichTextInputProps {
   selectedTags?: TaggableEntity[];
 }
 
+const popularHashtags: HashtagSuggestion[] = [
+  { tag: '#holeinone', count: 1234 },
+  { tag: '#golfhumour', count: 987 },
+  { tag: '#bestround', count: 856 },
+  { tag: '#golflife', count: 743 },
+  { tag: '#weekendgolf', count: 621 },
+  { tag: '#golfcourse', count: 543 },
+  { tag: '#putting', count: 432 },
+  { tag: '#golftips', count: 321 },
+  { tag: '#golfswing', count: 298 },
+  { tag: '#pga', count: 276 }
+];
+
 const EnhancedRichTextInput: React.FC<EnhancedRichTextInputProps> = ({
   value,
   onChange,
@@ -30,9 +51,13 @@ const EnhancedRichTextInput: React.FC<EnhancedRichTextInputProps> = ({
   className = '',
   selectedTags = []
 }) => {
-  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showMentionSuggestions, setShowMentionSuggestions] = useState(false);
+  const [showHashtagSuggestions, setShowHashtagSuggestions] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [mentionPosition, setMentionPosition] = useState({ start: 0, end: 0 });
+  const [hashtagPosition, setHashtagPosition] = useState({ start: 0, end: 0 });
+  const [hashtagSuggestions, setHashtagSuggestions] = useState<HashtagSuggestion[]>([]);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { entities, loading, searchEntities } = useTaggableEntities();
 
@@ -46,61 +71,86 @@ const EnhancedRichTextInput: React.FC<EnhancedRichTextInputProps> = ({
     
     // Look for @ followed by word characters at the end of the text before cursor
     const mentionRegex = /@(\w*)$/;
-    const match = textBeforeCursor.match(mentionRegex);
+    const mentionMatch = textBeforeCursor.match(mentionRegex);
     
-    if (match) {
-      const query = match[1];
-      const mentionStart = cursorPosition - match[0].length;
+    // Look for # followed by word characters at the end of the text before cursor
+    const hashtagRegex = /#(\w*)$/;
+    const hashtagMatch = textBeforeCursor.match(hashtagRegex);
+    
+    if (mentionMatch && !hashtagMatch) {
+      const query = mentionMatch[1];
+      const mentionStart = cursorPosition - mentionMatch[0].length;
       
       setMentionPosition({
         start: mentionStart,
-        end: mentionStart + match[0].length
+        end: mentionStart + mentionMatch[0].length
       });
       
-      if (query.length >= 0) {
-        searchEntities(query);
-        setShowSuggestions(true);
-        setSelectedIndex(0);
-      }
+      searchEntities(query);
+      setShowMentionSuggestions(true);
+      setShowHashtagSuggestions(false);
+      setSelectedIndex(0);
+    } else if (hashtagMatch && !mentionMatch) {
+      const query = hashtagMatch[1].toLowerCase();
+      const hashtagStart = cursorPosition - hashtagMatch[0].length;
+      
+      setHashtagPosition({
+        start: hashtagStart,
+        end: hashtagStart + hashtagMatch[0].length
+      });
+      
+      // Filter hashtags based on query
+      const filtered = popularHashtags.filter(h => 
+        h.tag.toLowerCase().includes('#' + query)
+      );
+      setHashtagSuggestions(filtered);
+      setShowHashtagSuggestions(true);
+      setShowMentionSuggestions(false);
+      setSelectedIndex(0);
     } else {
-      setShowSuggestions(false);
+      setShowMentionSuggestions(false);
+      setShowHashtagSuggestions(false);
     }
   }, [value, searchEntities]);
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (!showSuggestions || entities.length === 0) return;
+    const hasSuggestions = (showMentionSuggestions && entities.length > 0) || 
+                          (showHashtagSuggestions && hashtagSuggestions.length > 0);
+    
+    if (!hasSuggestions) return;
+
+    const maxItems = showMentionSuggestions ? entities.length : hashtagSuggestions.length;
 
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
         setSelectedIndex(prev => 
-          prev < entities.length - 1 ? prev + 1 : 0
+          prev < maxItems - 1 ? prev + 1 : 0
         );
         break;
       case 'ArrowUp':
         e.preventDefault();
         setSelectedIndex(prev => 
-          prev > 0 ? prev - 1 : entities.length - 1
+          prev > 0 ? prev - 1 : maxItems - 1
         );
         break;
       case 'Enter':
       case 'Tab':
         e.preventDefault();
-        if (entities[selectedIndex]) {
+        if (showMentionSuggestions && entities[selectedIndex]) {
           handleSelectEntity(entities[selectedIndex]);
+        } else if (showHashtagSuggestions && hashtagSuggestions[selectedIndex]) {
+          handleSelectHashtag(hashtagSuggestions[selectedIndex]);
         }
         break;
       case 'Escape':
-        setShowSuggestions(false);
+        setShowMentionSuggestions(false);
+        setShowHashtagSuggestions(false);
         break;
     }
   };
 
   const handleSelectEntity = (entity: TaggableEntity) => {
-    console.log('EnhancedRichTextInput: Selecting entity:', entity);
-    console.log('EnhancedRichTextInput: Current selectedTags:', selectedTags);
-    console.log('EnhancedRichTextInput: onTagsChange callback exists:', !!onTagsChange);
-    
     const newText = 
       value.slice(0, mentionPosition.start) +
       `@${entity.name} ` +
@@ -111,13 +161,10 @@ const EnhancedRichTextInput: React.FC<EnhancedRichTextInputProps> = ({
     // Add to selected tags if callback provided
     if (onTagsChange && !selectedTags.find(tag => tag.id === entity.id)) {
       const newTags = [...selectedTags, entity];
-      console.log('EnhancedRichTextInput: Adding entity to tags, new tags:', newTags);
       onTagsChange(newTags);
-    } else {
-      console.log('EnhancedRichTextInput: Not adding tag - callback missing or tag already exists');
     }
     
-    setShowSuggestions(false);
+    setShowMentionSuggestions(false);
     
     // Focus back to textarea and position cursor
     setTimeout(() => {
@@ -130,38 +177,128 @@ const EnhancedRichTextInput: React.FC<EnhancedRichTextInputProps> = ({
     }, 0);
   };
 
+  const handleSelectHashtag = (hashtag: HashtagSuggestion) => {
+    const newText = 
+      value.slice(0, hashtagPosition.start) +
+      `${hashtag.tag} ` +
+      value.slice(hashtagPosition.end);
+    
+    onChange(newText);
+    setShowHashtagSuggestions(false);
+    
+    // Focus back to textarea and position cursor
+    setTimeout(() => {
+      const textarea = textareaRef.current;
+      if (textarea) {
+        const newCursorPosition = hashtagPosition.start + `${hashtag.tag} `.length;
+        textarea.focus();
+        textarea.setSelectionRange(newCursorPosition, newCursorPosition);
+      }
+    }, 0);
+  };
+
+  const handleEmojiSelect = (emoji: string) => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const cursorPosition = textarea.selectionStart;
+    const newText = 
+      value.slice(0, cursorPosition) +
+      emoji +
+      value.slice(cursorPosition);
+    
+    onChange(newText);
+    setShowEmojiPicker(false);
+    
+    // Focus back to textarea and position cursor after emoji
+    setTimeout(() => {
+      const newCursorPosition = cursorPosition + emoji.length;
+      textarea.focus();
+      textarea.setSelectionRange(newCursorPosition, newCursorPosition);
+    }, 0);
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     onChange(e.target.value);
   };
 
-  // Auto-resize textarea
+  // Auto-resize textarea with min/max height constraints
   useEffect(() => {
     const textarea = textareaRef.current;
     if (textarea) {
       textarea.style.height = 'auto';
-      textarea.style.height = Math.min(textarea.scrollHeight, 200) + 'px';
+      const lineHeight = 24; // Approximate line height in pixels
+      const minLines = 3;
+      const maxLines = 6;
+      const minHeight = lineHeight * minLines;
+      const maxHeight = lineHeight * maxLines;
+      
+      const scrollHeight = textarea.scrollHeight;
+      const newHeight = Math.max(minHeight, Math.min(scrollHeight, maxHeight));
+      
+      textarea.style.height = newHeight + 'px';
     }
   }, [value]);
 
+  // Format text with hashtags and mentions
+  const formatText = (text: string) => {
+    // This is a simplified version - for display purposes only
+    // The actual text manipulation happens in the onChange handlers
+    return text
+      .replace(/(#\w+)/g, '<span style="color: #6e9277; font-weight: 500;">$1</span>')
+      .replace(/(@\w+)/g, '<span style="color: #3b82f6; font-weight: 500;">$1</span>');
+  };
+
   return (
     <div className="relative">
-      <textarea
-        ref={textareaRef}
-        value={value}
-        onChange={handleInputChange}
-        onKeyDown={handleKeyDown}
-        placeholder={placeholder}
-        disabled={disabled}
-        className={`w-full min-h-20 max-h-50 rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none ${className}`}
-        style={{ minHeight: '80px' }}
-      />
+      <div className="relative rounded-xl border border-gray-200 bg-white focus-within:ring-2 focus-within:ring-orange-500 focus-within:border-orange-500 transition-all">
+        <textarea
+          ref={textareaRef}
+          value={value}
+          onChange={handleInputChange}
+          onKeyDown={handleKeyDown}
+          placeholder={placeholder}
+          disabled={disabled}
+          className={`w-full px-3.5 py-3.5 text-[15px] leading-6 border-0 rounded-xl bg-transparent resize-none placeholder:text-gray-400 focus:outline-none ${className}`}
+          style={{ 
+            minHeight: '72px', // 3 lines * 24px line height
+            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+          }}
+        />
+        
+        {/* Emoji Button */}
+        <button
+          type="button"
+          onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+          className="absolute bottom-3 right-3 p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+          disabled={disabled}
+        >
+          <Smile className="w-5 h-5 text-gray-400 hover:text-gray-600" />
+        </button>
+      </div>
       
+      {/* Mention Autocomplete */}
       <TagAutocomplete
         entities={entities}
-        isVisible={showSuggestions}
+        isVisible={showMentionSuggestions}
         onSelect={handleSelectEntity}
         selectedIndex={selectedIndex}
         loading={loading}
+      />
+      
+      {/* Hashtag Autocomplete */}
+      <HashtagAutocomplete
+        hashtags={hashtagSuggestions}
+        isVisible={showHashtagSuggestions}
+        onSelect={handleSelectHashtag}
+        selectedIndex={selectedIndex}
+      />
+      
+      {/* Emoji Picker */}
+      <EmojiPicker
+        isVisible={showEmojiPicker}
+        onSelect={handleEmojiSelect}
+        onClose={() => setShowEmojiPicker(false)}
       />
     </div>
   );
