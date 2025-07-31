@@ -57,19 +57,7 @@ const EnhancedMediaUpload: React.FC<EnhancedMediaUploadProps> = ({
   
   // Define large file threshold (50MB)
   const LARGE_FILE_THRESHOLD = 50 * 1024 * 1024;
-  const [mediaFiles, setMediaFiles] = useState<MediaFile[]>(() => {
-    return initialFiles.map(file => {
-      const isLargeFile = file.size > LARGE_FILE_THRESHOLD;
-      return {
-        file,
-        url: URL.createObjectURL(file),
-        id: uuidv4(),
-        isLargeFile,
-        uploadProgress: 0,
-        isUploading: false
-      };
-    });
-  });
+  const [mediaFiles, setMediaFiles] = useState<MediaFile[]>([]);
 
   const [existingMedia, setExistingMedia] = useState<ExistingMedia[]>(() => {
     return existingMediaUrls.map(url => ({
@@ -351,6 +339,32 @@ const EnhancedMediaUpload: React.FC<EnhancedMediaUploadProps> = ({
       description: "Existing media rotated 90°",
     });
   }, [toast]);
+
+  // Initialize mediaFiles when initialFiles changes
+  React.useEffect(() => {
+    if (initialFiles.length > 0) {
+      const newMediaFiles = initialFiles.map(file => {
+        const isLargeFile = file.size > LARGE_FILE_THRESHOLD;
+        return {
+          file,
+          url: URL.createObjectURL(file),
+          id: uuidv4(),
+          isLargeFile,
+          uploadProgress: 0,
+          isUploading: false
+        };
+      });
+      
+      setMediaFiles(newMediaFiles);
+      
+      // Auto-upload if enabled
+      if (autoUpload) {
+        newMediaFiles.forEach(mediaFile => {
+          uploadFile(mediaFile);
+        });
+      }
+    }
+  }, [initialFiles, autoUpload, uploadFile]);
 
   // Cleanup URLs when component unmounts
   React.useEffect(() => {
