@@ -247,14 +247,13 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
         }
       }
       
-      // Attempt muted autoplay if requested
+      // Attempt autoplay if requested
       if (autoplay) {
-        // Ensure video is muted for autoplay compliance
-        video.muted = true;
+        // Set playsInline for mobile compatibility
         video.playsInline = true;
         
         video.play().catch(() => {
-          // Autoplay failed silently
+          // Autoplay failed silently - this is normal if user hasn't interacted with page
         });
       }
     };
@@ -302,14 +301,15 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
     };
   }, [onPlay, onPause]);
 
-  // Update video muted state when global audio state changes  
+  // Update video muted state when muted prop changes  
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
     
-    // For autoplay compliance, force muted if autoplay is enabled
-    video.muted = autoplay ? true : isGloballyMuted;
-  }, [isGloballyMuted, autoplay]);
+    // Always respect the muted prop passed to the component
+    // For autoplay compliance, the parent component should handle initial muting
+    video.muted = muted;
+  }, [muted]);
 
   // Cleanup HLS on unmount
   useEffect(() => {
@@ -400,7 +400,7 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
           }
         }}
         poster={poster}
-        muted={autoplay ? true : isGloballyMuted}
+        muted={muted}
         loop={loop}
         autoPlay={autoplay}
         playsInline

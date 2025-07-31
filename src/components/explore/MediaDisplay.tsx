@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import SmartMediaContainer from '@/components/ui/smart-media-container';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
+import SoundToggle from '@/components/ui/sound-toggle';
 import { MdOutlinePlayCircle } from 'react-icons/md';
 import { Loader2 } from 'lucide-react';
+import { useSoundPreference } from '@/hooks/useSoundPreference';
 
 interface MediaItem {
   id: string;
@@ -37,6 +39,9 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
   muted = true,
   hidePlayButton = false
 }) => {
+  // Sound preference hook for videos
+  const { isMuted, setMuted } = useSoundPreference();
+  
   // Fallback image for broken/missing images
   const fallbackImage = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
 
@@ -103,13 +108,25 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
           <EnhancedVideoPlayer
             src={media.media_url}
             autoplay={shouldAutoplay}
-            muted={muted}
+            muted={isMuted} // Use user's sound preference
             loop={loop}
             className="w-full h-full pointer-events-none"
             preloadLevel="metadata"
             enableHLS={true}
             quality="auto"
           />
+          
+          {/* Sound Toggle for autoplaying videos */}
+          {shouldAutoplay && (
+            <div className="absolute top-3 right-3 z-30">
+              <SoundToggle
+                isMuted={isMuted}
+                onToggle={setMuted}
+                size="sm"
+                className="rounded-full"
+              />
+            </div>
+          )}
           
           {/* Play icon for non-autoplaying videos */}
           {!shouldAutoplay && !hidePlayButton && (
