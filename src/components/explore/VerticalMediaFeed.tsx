@@ -11,7 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 import CoursePostBadge from '../posts/CoursePostBadge';
-import EnhancedCreateMomentModal from '../post/EnhancedCreateMomentModal';
+// import CreateMomentModal from '../post/CreateMomentModal'; // Temporarily removed
 import TaggedText from '../posts/TaggedText';
 import { removeGolfCourseFromContent } from '@/utils/golfCourseExtractor';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
@@ -613,22 +613,8 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
       </div>
 
 
-      {/* Edit Modal */}
-      <EnhancedCreateMomentModal
-        isOpen={editModalOpen}
-        onClose={() => {
-          setEditModalOpen(false);
-          setEditingItem(null);
-          setEditCourse(null);
-        }}
-        onSubmit={handleEditSubmit}
-        isSubmitting={isUpdating}
-        editMode={true}
-        initialCaption={editingItem?.title || ''}
-        existingMediaUrls={editingItem ? [editingItem.src] : []}
-        selectedCourse={editCourse}
-        onCourseSelect={setEditCourse}
-      />
+      {/* Edit Modal - Temporarily disabled */}
+      {/* TODO: Re-implement edit functionality with correct modal component */}
 
       <style>{`
         * {

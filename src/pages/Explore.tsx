@@ -10,6 +10,7 @@ import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
 import { FILTER_TYPES, MEDIA_TYPES } from '@/components/explore/types';
 
 const Explore = () => {
+  console.log('Explore component loading...');
   const [activeFilter, setActiveFilter] = useState<string>(FILTER_TYPES.VIDEOS);
   const { 
     content, 
