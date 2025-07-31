@@ -326,7 +326,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
           />
           
           {/* Modal */}
-          <div className="relative w-full max-w-[420px] md:max-w-[480px] bg-white rounded-[20px] shadow-[0_4px_16px_rgba(0,0,0,0.2)] py-6 px-5 max-h-[85vh] overflow-y-auto animate-slide-in-up">
+          <div className="relative w-full max-w-[420px] md:max-w-[480px] bg-white rounded-[20px] shadow-[0_4px_16px_rgba(0,0,0,0.2)] py-6 px-5 max-h-[85vh] overflow-y-auto animate-fade-in animate-scale-in">
             {/* Header */}
             <div className="flex items-center justify-between mb-6">
               {modalMode === 'upload' && (
@@ -365,10 +365,14 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                     onClick={handleCaptureClick}
                     className="w-full flex items-center gap-4 p-5 bg-[#f9f9f9] hover:bg-[#f0f0f0] active:bg-[#e8e8e8] text-[#222222] rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#6e9277] focus:ring-offset-2 cursor-pointer shadow-sm hover:shadow-md transform active:scale-[0.98]"
                     disabled={isSubmitting}
-                    aria-label="Capture photo or video with camera"
+                    aria-label="Open camera to record in real-time"
+                    tabIndex={0}
                   >
                     <Camera className="h-6 w-6 text-[#222222] flex-shrink-0" />
-                    <span className="text-base font-medium">Capture Photo or Video</span>
+                    <div className="text-left flex-1">
+                      <div className="text-base font-medium">Capture Photo or Video</div>
+                      <div className="text-xs text-[#666666] mt-1.5">Open camera to record in real-time</div>
+                    </div>
                   </button>
                 )}
 
@@ -377,10 +381,14 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                   onClick={handleSelectPhotos}
                   className="w-full flex items-center gap-4 p-5 bg-[#f9f9f9] hover:bg-[#f0f0f0] active:bg-[#e8e8e8] text-[#222222] rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#6e9277] focus:ring-offset-2 cursor-pointer shadow-sm hover:shadow-md transform active:scale-[0.98]"
                   disabled={isSubmitting}
-                  aria-label="Select photos from device"
+                  aria-label="Choose saved images from your gallery"
+                  tabIndex={0}
                 >
                   <Image className="h-6 w-6 text-[#222222] flex-shrink-0" />
-                  <span className="text-base font-medium">Select Photos from Gallery</span>
+                  <div className="text-left flex-1">
+                    <div className="text-base font-medium">Select Photos from Gallery</div>
+                    <div className="text-xs text-[#666666] mt-1.5">Choose saved images from your gallery</div>
+                  </div>
                 </button>
 
                 {/* Select Videos */}
@@ -388,16 +396,32 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                   onClick={handleSelectVideos}
                   className="w-full flex items-center gap-4 p-5 bg-[#f9f9f9] hover:bg-[#f0f0f0] active:bg-[#e8e8e8] text-[#222222] rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#6e9277] focus:ring-offset-2 cursor-pointer shadow-sm hover:shadow-md transform active:scale-[0.98]"
                   disabled={isSubmitting}
-                  aria-label="Select videos from device"
+                  aria-label="Upload pre-recorded golf clips"
+                  tabIndex={0}
                 >
                   <Video className="h-6 w-6 text-[#222222] flex-shrink-0" />
-                  <span className="text-base font-medium">Select Videos from Gallery</span>
+                  <div className="text-left flex-1">
+                    <div className="text-base font-medium">Select Videos from Gallery</div>
+                    <div className="text-xs text-[#666666] mt-1.5">Upload pre-recorded golf clips</div>
+                  </div>
                 </button>
 
                 {/* Helper Text */}
-                <p className="text-xs text-gray-500 mt-2 px-1 text-center">
+                <p className="text-xs text-gray-500 mt-4 px-1 text-center">
                   Select multiple files to create a carousel post with swipeable media.
                 </p>
+
+                {/* Cancel Button */}
+                <div className="mt-6 pt-4 border-t border-gray-100">
+                  <button
+                    onClick={onClose}
+                    className="w-full text-center py-3 text-[#6e9277] text-base font-medium hover:text-[#5a7c64] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#6e9277] focus:ring-offset-2 rounded-lg"
+                    tabIndex={0}
+                    aria-label="Cancel and close modal"
+                  >
+                    Cancel
+                  </button>
+                </div>
               </div>
             ) : (
               /* Upload View - Reorganized with better hierarchy and spacing */
