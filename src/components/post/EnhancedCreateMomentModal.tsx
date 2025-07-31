@@ -363,50 +363,35 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                 {isMobile && (
                   <button
                     onClick={handleCaptureClick}
-                    className="w-full flex items-center gap-4 justify-start h-16 bg-white border-2 border-[#b66b41] hover:bg-orange-50 text-gray-900 rounded-xl transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#6e9277] focus:ring-offset-2"
+                    className="w-full flex items-center gap-4 p-5 bg-[#f9f9f9] hover:bg-[#f0f0f0] active:bg-[#e8e8e8] text-[#222222] rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#6e9277] focus:ring-offset-2 cursor-pointer shadow-sm hover:shadow-md transform active:scale-[0.98]"
                     disabled={isSubmitting}
                     aria-label="Capture photo or video with camera"
                   >
-                    <div className="w-12 h-12 flex items-center justify-center bg-orange-50 rounded-lg">
-                      <Camera className="h-6 w-6 text-[#b66b41]" />
-                    </div>
-                    <div className="text-left">
-                      <div className="font-semibold text-base">Capture Photo or Video</div>
-                      <div className="text-sm text-gray-500">Use your device camera</div>
-                    </div>
+                    <Camera className="h-6 w-6 text-[#222222] flex-shrink-0" />
+                    <span className="text-base font-medium">Capture Photo or Video</span>
                   </button>
                 )}
 
                 {/* Select Photos */}
                 <button
                   onClick={handleSelectPhotos}
-                  className="w-full flex items-center gap-4 justify-start h-16 bg-white border-2 border-[#b66b41] hover:bg-orange-50 text-gray-900 rounded-xl transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#6e9277] focus:ring-offset-2"
+                  className="w-full flex items-center gap-4 p-5 bg-[#f9f9f9] hover:bg-[#f0f0f0] active:bg-[#e8e8e8] text-[#222222] rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#6e9277] focus:ring-offset-2 cursor-pointer shadow-sm hover:shadow-md transform active:scale-[0.98]"
                   disabled={isSubmitting}
                   aria-label="Select photos from device"
                 >
-                  <div className="w-12 h-12 flex items-center justify-center bg-orange-50 rounded-lg">
-                    <Image className="h-6 w-6 text-[#b66b41]" />
-                  </div>
-                  <div className="text-left">
-                    <div className="font-semibold text-base">Post a Photo</div>
-                    <div className="text-sm text-gray-500">Select from gallery</div>
-                  </div>
+                  <Image className="h-6 w-6 text-[#222222] flex-shrink-0" />
+                  <span className="text-base font-medium">Select Photos from Gallery</span>
                 </button>
 
                 {/* Select Videos */}
                 <button
                   onClick={handleSelectVideos}
-                  className="w-full flex items-center gap-4 justify-start h-16 bg-white border-2 border-[#b66b41] hover:bg-orange-50 text-gray-900 rounded-xl transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#6e9277] focus:ring-offset-2"
+                  className="w-full flex items-center gap-4 p-5 bg-[#f9f9f9] hover:bg-[#f0f0f0] active:bg-[#e8e8e8] text-[#222222] rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#6e9277] focus:ring-offset-2 cursor-pointer shadow-sm hover:shadow-md transform active:scale-[0.98]"
                   disabled={isSubmitting}
                   aria-label="Select videos from device"
                 >
-                  <div className="w-12 h-12 flex items-center justify-center bg-orange-50 rounded-lg">
-                    <Video className="h-6 w-6 text-[#b66b41]" />
-                  </div>
-                  <div className="text-left">
-                    <div className="font-semibold text-base">Post a Video</div>
-                    <div className="text-sm text-gray-500">Select from gallery</div>
-                  </div>
+                  <Video className="h-6 w-6 text-[#222222] flex-shrink-0" />
+                  <span className="text-base font-medium">Select Videos from Gallery</span>
                 </button>
 
                 {/* Helper Text */}
