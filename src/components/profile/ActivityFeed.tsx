@@ -1,11 +1,22 @@
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useMemo } from 'react';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from '@/components/ui/dropdown-menu';
+import { Filter, Video, Image, MapPin } from 'lucide-react';
 import { useActivityPosts } from './hooks/useActivityPosts';
 import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
 import ExploreGrid from '@/components/explore/ExploreGrid';
 import DiscoverVerticalFeed from '@/components/discover/DiscoverVerticalFeed';
 import { ExploreContentItem } from '@/components/explore/types';
+import { ActivityPost } from './types/ActivityTypes';
+
+type FilterType = 'all' | 'videos' | 'photos' | 'golf-courses';
 
 interface ActivityFeedProps {
   userId: string;
@@ -20,9 +31,30 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
 }) => {
   const { posts, loading, fetchUserPosts } = useActivityPosts(userId);
   const { isOpen, initialItem, openFeed, closeFeed } = useVerticalMediaFeed();
+  const [activeFilter, setActiveFilter] = useState<FilterType>('all');
 
-  // Convert activity posts to ExploreContentItem format
-  const exploreContent: ExploreContentItem[] = posts.map(post => ({
+  // Filter posts based on active filter
+  const filteredPosts = useMemo(() => {
+    switch (activeFilter) {
+      case 'videos':
+        return posts.filter(post => 
+          post.post_media.some(media => media.media_type === 'video')
+        );
+      case 'photos':
+        return posts.filter(post => 
+          post.post_media.some(media => media.media_type === 'image')
+        );
+      case 'golf-courses':
+        return posts.filter(post => 
+          post.post_tags.some(tag => tag.entity_type === 'golf_club')
+        );
+      default:
+        return posts;
+    }
+  }, [posts, activeFilter]);
+
+  // Convert filtered activity posts to ExploreContentItem format
+  const exploreContent: ExploreContentItem[] = filteredPosts.map(post => ({
     id: post.id,
     type: post.post_media?.[0]?.media_type === 'video' ? 'video' : 'image',
     src: post.post_media?.[0]?.media_url || '/placeholder.svg',
@@ -71,13 +103,67 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
         <div className="flex items-center justify-between mb-4 px-4 md:px-0">
           <div className="flex items-end gap-2">
             <h3 className="text-3xl font-bold text-white">Activity</h3>
-            <span className="text-white/80 text-base">{posts.length} posts</span>
+            <span className="text-white/80 text-base">
+              {activeFilter === 'all' ? `${posts.length} posts` : `${filteredPosts.length} of ${posts.length} posts`}
+            </span>
           </div>
+          
+          {/* Filter Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white transition-all duration-200"
+              >
+                <Filter className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent 
+              align="end" 
+              className="bg-background/95 backdrop-blur-md border border-border/50 shadow-lg"
+            >
+              <DropdownMenuItem 
+                onClick={() => setActiveFilter('all')}
+                className={`cursor-pointer ${activeFilter === 'all' ? 'bg-accent' : ''}`}
+              >
+                <span className="mr-2">📱</span>
+                All Posts
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => setActiveFilter('videos')}
+                className={`cursor-pointer ${activeFilter === 'videos' ? 'bg-accent' : ''}`}
+              >
+                <Video className="mr-2 h-4 w-4" />
+                Videos only
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => setActiveFilter('photos')}
+                className={`cursor-pointer ${activeFilter === 'photos' ? 'bg-accent' : ''}`}
+              >
+                <Image className="mr-2 h-4 w-4" />
+                Photos only
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onClick={() => setActiveFilter('golf-courses')}
+                className={`cursor-pointer ${activeFilter === 'golf-courses' ? 'bg-accent' : ''}`}
+              >
+                <MapPin className="mr-2 h-4 w-4" />
+                Posts tagged with golf course
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
         {posts.length === 0 ? (
           <div className="text-center py-8">
             <p className="text-muted-foreground">No posts yet.</p>
+          </div>
+        ) : filteredPosts.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-muted-foreground">
+              No posts found for the selected filter.
+            </p>
           </div>
         ) : (
           <ExploreGrid
