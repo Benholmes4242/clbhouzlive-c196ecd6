@@ -362,7 +362,6 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                         placeholder="Write about your moment..."
                         selectedTags={selectedTags}
                         disabled={isSubmitting}
-                        className="p-3.5 w-full max-w-full border-gray-200 rounded-xl focus:ring-orange-500 focus:border-orange-500"
                       />
                     </div>
                   </div>
