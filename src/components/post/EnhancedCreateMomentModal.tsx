@@ -355,14 +355,34 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                       Add a caption
                     </label>
                     <div className="relative">
-                      <EnhancedRichTextInput
-                        value={caption}
-                        onChange={handleCaptionChange}
-                        onTagsChange={setSelectedTags}
-                        placeholder="Write about your moment..."
-                        selectedTags={selectedTags}
-                        disabled={isSubmitting}
-                      />
+                      {/* Temporary test to confirm this component is being used */}
+                      <div className="relative rounded-xl border border-gray-200 bg-white focus-within:ring-2 focus-within:ring-orange-500 focus-within:border-orange-500 transition-all">
+                        <textarea
+                          value={caption}
+                          onChange={(e) => handleCaptionChange(e.target.value)}
+                          placeholder="Write about your moment..."
+                          disabled={isSubmitting}
+                          className="w-full px-3.5 py-3.5 pr-12 text-[15px] leading-6 border-0 rounded-xl bg-transparent resize-none placeholder:text-gray-400 focus:outline-none"
+                          style={{ 
+                            minHeight: '72px',
+                            fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+                          }}
+                        />
+                        
+                        {/* TEST EMOJI BUTTON - should be visible */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            console.log('TEST: Emoji button clicked!');
+                            alert('Emoji button works!');
+                          }}
+                          className="absolute top-2 right-2 w-10 h-10 flex items-center justify-center rounded-full bg-red-500 hover:bg-red-600 text-white font-bold transition-colors z-20"
+                          disabled={isSubmitting}
+                          title="TEST Emoji Button"
+                        >
+                          😄
+                        </button>
+                      </div>
                     </div>
                   </div>
 
