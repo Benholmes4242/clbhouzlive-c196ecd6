@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { X, Edit3, RotateCw, Trash2, Image as ImageIcon, Video as VideoIcon, Upload, CheckCircle, AlertCircle, GripVertical, Play, ArrowUpRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -48,7 +48,27 @@ const EnhancedMediaPreviewGrid: React.FC<EnhancedMediaPreviewGridProps> = ({
   const [draggedItem, setDraggedItem] = useState<MediaFile | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const [hoveredMedia, setHoveredMedia] = useState<string | null>(null);
+  const [videoDurations, setVideoDurations] = useState<Record<string, string>>({});
   const videoRefs = useRef<Record<string, HTMLVideoElement | null>>({});
+
+  // Format video duration as MM:SS
+  const formatDuration = (seconds: number): string => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
+
+  // Handle video metadata loaded to get duration
+  const handleVideoLoadedMetadata = (mediaId: string, video: HTMLVideoElement) => {
+    if (video.duration && !isNaN(video.duration) && isFinite(video.duration)) {
+      setVideoDurations(prev => ({
+        ...prev,
+        [mediaId]: formatDuration(video.duration)
+      }));
+    }
+    video.currentTime = Math.min(1, video.duration * 0.1);
+    handleImageLoad(mediaId);
+  };
 
   const handleEditClick = (fileId: string) => {
     setEditingFileId(fileId);
@@ -202,17 +222,29 @@ const EnhancedMediaPreviewGrid: React.FC<EnhancedMediaPreviewGridProps> = ({
                 }}
               >
                 <div className="aspect-square relative bg-gray-100">
-                  {/* Drag handle */}
-                  {onReorderFiles && mediaFiles.length > 1 && (
-                    <div className="absolute top-1 right-1 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
+                  {/* Remove button - Top-right corner, visible on hover */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onRemoveFile(media.id);
+                    }}
+                    className="absolute top-2 right-2 z-20 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110"
+                    title="Remove from post"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+
+                  {/* Drag handle - Only show when reordering is enabled and not uploading */}
+                  {onReorderFiles && mediaFiles.length > 1 && !media.isUploading && (
+                    <div className="absolute top-2 left-2 z-10 opacity-0 group-hover:opacity-100 transition-opacity">
                       <div className="bg-black/70 rounded p-1 cursor-grab active:cursor-grabbing">
                         <GripVertical className="h-3 w-3 text-white" />
                       </div>
                     </div>
                   )}
 
-                  {/* Media Type Badge */}
-                  <div className="absolute top-2 left-2 z-10">
+                  {/* Media Type Badge - Moved to avoid conflicts */}
+                  <div className="absolute top-8 left-2 z-10">
                     <span 
                       className="text-xs px-2 py-1 rounded font-bold text-white uppercase"
                       style={{ 
@@ -276,24 +308,23 @@ const EnhancedMediaPreviewGrid: React.FC<EnhancedMediaPreviewGridProps> = ({
                         onLoadStart={() => handleImageLoadStart(media.id)}
                         onLoadedMetadata={(e) => {
                           const video = e.target as HTMLVideoElement;
-                          video.currentTime = Math.min(1, video.duration * 0.1);
-                          handleImageLoad(media.id);
+                          handleVideoLoadedMetadata(media.id, video);
                         }}
                       />
-                      {/* Video play icon overlay when not hovered */}
-                      {!isHovered && (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="bg-black/50 rounded-full p-3">
-                            <Play className="h-6 w-6 text-white" fill="white" />
-                          </div>
+                      {/* Enhanced Video play icon overlay */}
+                      <div className={`absolute inset-0 flex items-center justify-center transition-opacity duration-200 ${
+                        isHovered ? 'opacity-0' : 'opacity-100'
+                      }`}>
+                        <div className="bg-black/50 rounded-full p-3 backdrop-blur-sm">
+                          <Play className="h-6 w-6 text-white" fill="white" />
                         </div>
-                      )}
+                      </div>
                     </>
                   )}
 
                   {/* Hover expand indicator */}
-                  {isHovered && (
-                    <div className="absolute top-2 right-2 z-10">
+                  {isHovered && !media.isUploading && (
+                    <div className="absolute top-2 right-8 z-10 animate-fade-in">
                       <div className="bg-black/70 rounded p-1">
                         <ArrowUpRight className="h-4 w-4 text-white" />
                       </div>
@@ -324,7 +355,7 @@ const EnhancedMediaPreviewGrid: React.FC<EnhancedMediaPreviewGridProps> = ({
 
                   {/* Success indicator with animated check */}
                   {media.uploadUrl && !media.isUploading && (
-                    <div className="absolute top-2 right-2 z-10 animate-scale-in">
+                    <div className="absolute top-2 right-8 z-10 animate-scale-in">
                       <div className="bg-green-500 rounded-full p-1">
                         <CheckCircle className="h-4 w-4 text-white" />
                       </div>
@@ -356,7 +387,7 @@ const EnhancedMediaPreviewGrid: React.FC<EnhancedMediaPreviewGridProps> = ({
                     </div>
                   )}
 
-                  {/* Overlay Controls */}
+                  {/* Overlay Controls - Only on hover and not uploading */}
                   {!media.isUploading && !media.error && (
                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2 z-10">
                       {isImage && onEditFile && (
@@ -389,19 +420,6 @@ const EnhancedMediaPreviewGrid: React.FC<EnhancedMediaPreviewGridProps> = ({
                           <RotateCw className="h-4 w-4" />
                         </Button>
                       )}
-                      
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onRemoveFile(media.id);
-                        }}
-                        className="h-8 w-8 p-0"
-                        title="Remove media"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
                     </div>
                   )}
 
@@ -431,11 +449,25 @@ const EnhancedMediaPreviewGrid: React.FC<EnhancedMediaPreviewGridProps> = ({
                     </div>
                   )}
 
-                  {/* File Size */}
+                  {/* Video Duration Badge or File Size */}
                   <div className="absolute bottom-2 right-2 z-10">
-                    <span className="text-xs px-2 py-1 rounded-full bg-black/70 text-white">
-                      {(media.file.size / 1024 / 1024).toFixed(1)}MB
-                    </span>
+                    {isVideo && videoDurations[media.id] ? (
+                      <span 
+                        className="text-xs px-2 py-1 rounded text-white font-medium"
+                        style={{
+                          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                          fontSize: '11px',
+                          borderRadius: '6px',
+                          padding: '2px 6px'
+                        }}
+                      >
+                        {videoDurations[media.id]}
+                      </span>
+                    ) : (
+                      <span className="text-xs px-2 py-1 rounded-full bg-black/70 text-white">
+                        {(media.file.size / 1024 / 1024).toFixed(1)}MB
+                      </span>
+                    )}
                   </div>
                 </div>
 
