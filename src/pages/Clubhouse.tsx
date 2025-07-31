@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ClubhouzLoading from '@/components/ClubhouzLoading';
 import { Search } from 'lucide-react';
 import BottomNavigation from '@/components/BottomNavigation';
