@@ -128,7 +128,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
       setValidationErrors({});
       setIsButtonShaking(false);
     }
-  }, [isOpen, editMode, initialCaption, initialTags, initialFiles, initialIsPrivate, isInitialized]);
+  }, [isOpen, editMode, initialCaption, initialTags, initialFiles, initialIsPrivate]);
 
   // Handle caption input with mention detection
   const handleCaptionChange = async (text: string) => {
