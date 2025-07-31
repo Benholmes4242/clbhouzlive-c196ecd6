@@ -12,6 +12,7 @@ import ClubhouzLoading from "@/components/ClubhouzLoading";
 import AuthWrapper from "@/components/auth/AuthWrapper";
 import { GlobalAudioProvider } from './contexts/GlobalAudioContext';
 import { VideoManagerProvider } from './contexts/VideoManagerContext';
+import { VideoPlaybackManagerProvider } from './contexts/VideoPlaybackManager';
 
 
 const Auth = lazy(() => import("./pages/Auth"));
@@ -60,7 +61,8 @@ const App: React.FC = () => {
               <ScrollToTop />
               <GlobalAudioProvider>
                 <VideoManagerProvider>
-                  <AuthWrapper>
+                  <VideoPlaybackManagerProvider>
+                    <AuthWrapper>
                     <Suspense fallback={<ClubhouzLoading />}>
                       <Routes>
                         <Route path="/" element={<Clubhouse />} />
@@ -91,7 +93,8 @@ const App: React.FC = () => {
                         <Route path="*" element={<NotFound />} />
                       </Routes>
                     </Suspense>
-                  </AuthWrapper>
+                    </AuthWrapper>
+                  </VideoPlaybackManagerProvider>
                 </VideoManagerProvider>
               </GlobalAudioProvider>
               <Toaster />
