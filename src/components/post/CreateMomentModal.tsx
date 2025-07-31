@@ -278,7 +278,7 @@ const CreateMomentModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md mx-auto max-h-[90vh] overflow-y-auto">
+      <DialogContent className="w-full max-w-[640px] h-[90vh] md:h-[85vh] mx-auto overflow-y-auto rounded-3xl shadow-lg backdrop-blur-sm border-0 p-6">
         <DialogTitle className="text-center text-lg font-semibold">
           Create a Moment
         </DialogTitle>
