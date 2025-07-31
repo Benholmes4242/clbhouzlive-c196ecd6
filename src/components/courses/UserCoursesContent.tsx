@@ -14,6 +14,7 @@ import { useViewPreference } from '@/hooks/useViewPreference';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import CoursePickerModal from '@/components/profile/CoursePickerModal';
+import Top100Progress from './Top100Progress';
 
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
@@ -260,12 +261,32 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
     return sortedCourses;
   }, [allPlayedCourses, activeFilter, sortBy]);
 
+  // Calculate total completed Top 100 courses (with global or regional rankings)
+  const top100CompletedCount = useMemo(() => {
+    return allPlayedCourses.filter((userCourse) => {
+      const course = userCourse.golf_courses;
+      if (!course) return false;
+      
+      // Count courses that have either global rank ≤ 100 or regional rank ≤ 100
+      return (course.global_rank && course.global_rank <= 100) || 
+             (course.regional_rank && course.regional_rank <= 100);
+    }).length;
+  }, [allPlayedCourses]);
+
   return (
     <div className="relative space-y-8">
       <UserCoursesHeader
         displayName={finalDisplayName} 
         isOwnProfile={finalIsOwnProfile} 
       />
+
+      {/* Top 100 Progress Ring */}
+      <div className="flex justify-center py-4">
+        <Top100Progress 
+          completedCount={top100CompletedCount}
+          totalCount={100}
+        />
+      </div>
 
 
       <div className="flex flex-col gap-4">
