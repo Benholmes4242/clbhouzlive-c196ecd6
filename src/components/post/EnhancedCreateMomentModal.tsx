@@ -318,75 +318,95 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
     <>
       {/* Bottom Sheet Overlay */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           {/* Semi-transparent background */}
           <div 
             className="absolute inset-0 bg-black/50 transition-opacity"
             onClick={onClose}
           />
           
-          {/* Bottom Sheet Modal */}
-          <div className="relative w-full max-w-2xl bg-white rounded-2xl p-6 animate-slide-in-up max-h-[85vh] overflow-y-auto">
+          {/* Modal */}
+          <div className="relative w-full max-w-[420px] md:max-w-[480px] bg-white rounded-[20px] shadow-[0_4px_16px_rgba(0,0,0,0.2)] py-6 px-5 max-h-[85vh] overflow-y-auto animate-slide-in-up">
             {/* Header */}
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-6">
               {modalMode === 'upload' && (
                 <button
                   onClick={handleBackToSelection}
-                  className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-gray-100 transition-colors"
+                  className="flex items-center justify-center w-6 h-6 text-gray-400 hover:text-gray-600 transition-colors"
+                  aria-label="Back to selection"
                 >
-                  <X className="w-5 h-5 text-gray-600" />
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
                 </button>
               )}
-              {modalMode === 'selection' && <div className="w-8 h-8" />}
-              <h2 className="text-lg font-semibold text-gray-900 flex-1 text-center">
+              {modalMode === 'selection' && <div className="w-6 h-6" />}
+              <h2 className="text-lg font-bold text-center flex-1">
                 {editMode ? 'Edit Moment' : 'Create a Moment'}
               </h2>
-              <div className="w-8 h-8" />
+              <button
+                onClick={onClose}
+                className="w-6 h-6 flex items-center justify-center text-gray-400 hover:text-gray-600 transition-colors"
+                aria-label="Close modal"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
 
             {modalMode === 'selection' ? (
               /* Action Selection View */
-              <div className="space-y-3">
+              <div className="space-y-6">
                 
                 {/* Capture Photo or Video - Mobile Only */}
                 {isMobile && (
                   <button
                     onClick={handleCaptureClick}
-                    className="w-full flex items-center gap-4 p-3 bg-gray-50 hover:bg-orange-50 rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-[#6e9277] focus:ring-offset-2"
+                    className="w-full flex items-center gap-4 justify-start h-16 bg-white border-2 border-[#b66b41] hover:bg-orange-50 text-gray-900 rounded-xl transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#6e9277] focus:ring-offset-2"
                     disabled={isSubmitting}
                     aria-label="Capture photo or video with camera"
                   >
-                    <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
-                      <Camera className="w-5 h-5 text-orange-600" />
+                    <div className="w-12 h-12 flex items-center justify-center bg-orange-50 rounded-lg">
+                      <Camera className="h-6 w-6 text-[#b66b41]" />
                     </div>
-                    <span className="text-gray-800 font-medium">Capture Photo or Video</span>
+                    <div className="text-left">
+                      <div className="font-semibold text-base">Capture Photo or Video</div>
+                      <div className="text-sm text-gray-500">Use your device camera</div>
+                    </div>
                   </button>
                 )}
 
                 {/* Select Photos */}
                 <button
                   onClick={handleSelectPhotos}
-                  className="w-full flex items-center gap-4 p-3 bg-gray-50 hover:bg-orange-50 rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-[#6e9277] focus:ring-offset-2"
+                  className="w-full flex items-center gap-4 justify-start h-16 bg-white border-2 border-[#b66b41] hover:bg-orange-50 text-gray-900 rounded-xl transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#6e9277] focus:ring-offset-2"
                   disabled={isSubmitting}
                   aria-label="Select photos from device"
                 >
-                  <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
-                    <Image className="w-5 h-5 text-orange-600" />
+                  <div className="w-12 h-12 flex items-center justify-center bg-orange-50 rounded-lg">
+                    <Image className="h-6 w-6 text-[#b66b41]" />
                   </div>
-                  <span className="text-gray-800 font-medium">Select Photos</span>
+                  <div className="text-left">
+                    <div className="font-semibold text-base">Post a Photo</div>
+                    <div className="text-sm text-gray-500">Select from gallery</div>
+                  </div>
                 </button>
 
                 {/* Select Videos */}
                 <button
                   onClick={handleSelectVideos}
-                  className="w-full flex items-center gap-4 p-3 bg-gray-50 hover:bg-orange-50 rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-[#6e9277] focus:ring-offset-2"
+                  className="w-full flex items-center gap-4 justify-start h-16 bg-white border-2 border-[#b66b41] hover:bg-orange-50 text-gray-900 rounded-xl transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#6e9277] focus:ring-offset-2"
                   disabled={isSubmitting}
                   aria-label="Select videos from device"
                 >
-                  <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
-                    <Video className="w-5 h-5 text-orange-600" />
+                  <div className="w-12 h-12 flex items-center justify-center bg-orange-50 rounded-lg">
+                    <Video className="h-6 w-6 text-[#b66b41]" />
                   </div>
-                  <span className="text-gray-800 font-medium">Select Videos</span>
+                  <div className="text-left">
+                    <div className="font-semibold text-base">Post a Video</div>
+                    <div className="text-sm text-gray-500">Select from gallery</div>
+                  </div>
                 </button>
 
                 {/* Helper Text */}
