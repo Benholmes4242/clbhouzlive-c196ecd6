@@ -342,6 +342,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                     existingMediaUrls={editMode ? existingMediaUrls : []}
                     acceptedTypes={['image/*', 'video/*']}
                     disabled={isSubmitting}
+                    autoUpload={true}
                   />
                 </div>
 
