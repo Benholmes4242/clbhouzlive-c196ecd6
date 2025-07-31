@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useOptimizedInfiniteQuery } from './useOptimizedQuery';
 import { useRealPostsFetcher } from './explore/useRealPostsFetcher';
 import { ExploreContentItem } from '@/components/explore/types';
 
@@ -16,17 +16,20 @@ export const useInfiniteFollowedPosts = () => {
     isError,
     error,
     refetch
-  } = useInfiniteQuery({
+  } = useOptimizedInfiniteQuery({
     queryKey: ['infinite-followed-posts'],
-    queryFn: async ({ pageParam = 0 }) => {
-      const posts = await fetchFriendsPosts(pageParam, 10);
+    queryFn: async ({ pageParam }: { pageParam: unknown }) => {
+      const posts = await fetchFriendsPosts(pageParam as number ?? 0, 10);
       return {
         posts,
-        nextCursor: posts.length === 10 ? pageParam + 10 : undefined,
+        nextCursor: posts.length === 10 ? (pageParam as number ?? 0) + 10 : undefined,
       };
     },
-    getNextPageParam: (lastPage) => lastPage.nextCursor,
+    getNextPageParam: (lastPage: any) => lastPage.nextCursor,
     initialPageParam: 0,
+    staleTime: 2 * 60 * 1000, // 2 minutes for social feed
+    dedupe: true,
+    ttl: 3000,
   });
 
   // Flatten all pages into a single array

@@ -1,10 +1,10 @@
 
-import { useQuery } from '@tanstack/react-query';
+import { useOptimizedQuery } from '@/hooks/useOptimizedQuery';
 import { supabase } from '@/integrations/supabase/client';
 import { GolfCourse } from './types';
 
 export const useGolfCourses = () => {
-  return useQuery({
+  return useOptimizedQuery({
     queryKey: ['admin-golf-courses'],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -15,5 +15,7 @@ export const useGolfCourses = () => {
       if (error) throw error;
       return data as GolfCourse[];
     },
+    staleTime: 10 * 60 * 1000, // 10 minutes for admin data
+    dedupe: true,
   });
 };
