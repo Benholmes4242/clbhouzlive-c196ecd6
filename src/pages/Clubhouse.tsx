@@ -3,10 +3,8 @@ import ClubhouzLoading from '@/components/ClubhouzLoading';
 import { Search } from 'lucide-react';
 import BottomNavigation from '@/components/BottomNavigation';
 import ClubhouseVerticalFeed from '@/components/clubhouse/ClubhouseVerticalFeed';
-import { SwipeUpPrompt } from '@/components/clubhouse/SwipeUpPrompt';
 import { useInfiniteFollowedPosts } from '@/hooks/useInfiniteFollowedPosts';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useSwipePrompt } from '@/hooks/useSwipePrompt';
 
 const Clubhouse = () => {
   const {
@@ -20,28 +18,15 @@ const Clubhouse = () => {
   const [activeTab, setActiveTab] = useState('Following');
   const [currentPostIndex, setCurrentPostIndex] = useState(0);
   const isMobile = useIsMobile();
-  
-  // Swipe prompt functionality
-  const { showPrompt, recordSwipe, dismissPrompt, updateLastVisit } = useSwipePrompt();
-
-  // Update last visit when component mounts
-  useEffect(() => {
-    updateLastVisit();
-  }, [updateLastVisit]);
 
   const handleLike = (contentId: string) => {
     // Handle like functionality
     console.log('Liked post:', contentId);
   };
 
-  // Handle post change and record swipe activity
+  // Handle post change
   const handleCurrentPostChange = (index: number) => {
     setCurrentPostIndex(index);
-    
-    // Record swipe if moving to next post
-    if (index > currentPostIndex) {
-      recordSwipe();
-    }
   };
 
   const menuItems = [
@@ -113,12 +98,6 @@ const Clubhouse = () => {
         hasMore={hasMore}
         isLoadingMore={isLoadingMore}
         onCurrentPostChange={handleCurrentPostChange}
-      />
-      
-      {/* Swipe Up Prompt for First-Time Users */}
-      <SwipeUpPrompt 
-        isVisible={showPrompt}
-        onDismiss={dismissPrompt}
       />
       
       {/* Bottom Navigation */}
