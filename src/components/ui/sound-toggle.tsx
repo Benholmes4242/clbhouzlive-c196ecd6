@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 
 interface SoundToggleProps {
   isMuted: boolean;
-  onToggle: (muted: boolean) => void;
+  onToggle: () => void; // Changed to not require boolean parameter
   className?: string;
   size?: 'sm' | 'md' | 'lg';
 }
@@ -17,7 +17,7 @@ const SoundToggle: React.FC<SoundToggleProps> = ({
 }) => {
   const handleToggle = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent triggering video click
-    onToggle(!isMuted);
+    onToggle(); // Call toggle function without parameters
   };
 
   const sizeClasses = {

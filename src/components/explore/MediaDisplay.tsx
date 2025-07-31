@@ -4,7 +4,7 @@ import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import SoundToggle from '@/components/ui/sound-toggle';
 import { MdOutlinePlayCircle } from 'react-icons/md';
 import { Loader2 } from 'lucide-react';
-import { useSoundPreference } from '@/hooks/useSoundPreference';
+import { useExclusiveVideoAudio } from '@/hooks/useExclusiveVideoAudio';
 
 interface MediaItem {
   id: string;
@@ -39,8 +39,8 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
   muted = true,
   hidePlayButton = false
 }) => {
-  // Sound preference hook for videos
-  const { isMuted, setMuted } = useSoundPreference();
+  // Exclusive video audio hook - ensures only one video plays audio at a time
+  const { isMuted, toggleMute } = useExclusiveVideoAudio(itemId);
   
   // Fallback image for broken/missing images
   const fallbackImage = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
@@ -121,7 +121,7 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
             <div className="absolute top-3 right-3 z-30">
               <SoundToggle
                 isMuted={isMuted}
-                onToggle={setMuted}
+                onToggle={toggleMute}
                 size="sm"
                 className="rounded-full"
               />

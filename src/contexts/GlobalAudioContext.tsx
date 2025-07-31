@@ -4,6 +4,9 @@ interface GlobalAudioContextType {
   isGloballyMuted: boolean;
   setGlobalMute: (muted: boolean) => void;
   toggleGlobalMute: () => void;
+  activeVideoId: string | null;
+  setActiveVideo: (videoId: string | null) => void;
+  isVideoActive: (videoId: string) => boolean;
 }
 
 const GlobalAudioContext = createContext<GlobalAudioContextType | undefined>(undefined);
@@ -28,6 +31,9 @@ export const GlobalAudioProvider: React.FC<{ children: React.ReactNode }> = ({ c
     return true;
   });
 
+  // Track which video is currently playing audio
+  const [activeVideoId, setActiveVideoId] = useState<string | null>(null);
+
   // Save state to sessionStorage whenever it changes
   useEffect(() => {
     try {
@@ -51,11 +57,23 @@ export const GlobalAudioProvider: React.FC<{ children: React.ReactNode }> = ({ c
     });
   }, []);
 
+  const setActiveVideo = useCallback((videoId: string | null) => {
+    console.log('🎥 Setting active video:', videoId);
+    setActiveVideoId(videoId);
+  }, []);
+
+  const isVideoActive = useCallback((videoId: string) => {
+    return activeVideoId === videoId;
+  }, [activeVideoId]);
+
   return (
     <GlobalAudioContext.Provider value={{
       isGloballyMuted,
       setGlobalMute,
-      toggleGlobalMute
+      toggleGlobalMute,
+      activeVideoId,
+      setActiveVideo,
+      isVideoActive
     }}>
       {children}
     </GlobalAudioContext.Provider>
