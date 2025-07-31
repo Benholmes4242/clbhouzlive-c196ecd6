@@ -32,7 +32,7 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
 
   // If user is authenticated and on auth page, redirect to main site
   if (user && location.pathname === '/auth') {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/explore" replace />;
   }
 
   return <>{children}</>;

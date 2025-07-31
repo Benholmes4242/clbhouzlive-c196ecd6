@@ -131,11 +131,11 @@ const HeaderSearch = () => {
       {/* Desktop Search Bar */}
       <div className="hidden md:flex items-center max-w-md w-full mx-4" ref={searchRef}>
         <div className="relative w-full">
-          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white z-10" style={{ width: '20px', height: '20px' }} />
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-black z-10" style={{ width: '20px', height: '20px' }} />
           <input
             type="text"
             placeholder="Search players, courses, or content..."
-            className="w-full pl-12 pr-10 py-0.5 pt-2 bg-white/5 backdrop-blur-2xl border border-white/20 shadow-[0_0_20px_rgba(0,0,0,0.2)] rounded-full focus:outline-none focus:ring-2 focus:ring-muted-foreground/10 transition-all duration-200 text-white placeholder-white/70 text-lg" style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
+            className="w-full pl-12 pr-10 py-0.5 pt-2 bg-white/5 backdrop-blur-2xl border border-white/20 shadow-[0_0_20px_rgba(0,0,0,0.2)] rounded-full focus:outline-none focus:ring-2 focus:ring-muted-foreground/10 transition-all duration-200 text-black placeholder-black/70 text-lg" style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onFocus={handleInputFocus}
@@ -144,7 +144,7 @@ const HeaderSearch = () => {
           {query && (
             <button
               onClick={handleClearInput}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white hover:text-white/70 transition-colors z-10"
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 text-black hover:text-black/70 transition-colors z-10"
             >
               <X className="h-4 w-4" />
             </button>
@@ -171,7 +171,7 @@ const HeaderSearch = () => {
         className="md:hidden mt-3 hover:bg-transparent active:bg-transparent" 
         onClick={handleMobileSearchToggle}
       >
-        <Search style={{ width: '20px', height: '20px' }} />
+        <Search className="text-black" style={{ width: '20px', height: '20px' }} />
       </Button>
 
       {/* Mobile Search Overlay */}
@@ -190,12 +190,12 @@ const HeaderSearch = () => {
           style={{ pointerEvents: 'auto' }}
         >
           <div className="relative w-full" style={{ pointerEvents: 'auto' }}>
-            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white z-10" style={{ width: '20px', height: '20px' }} />
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-black z-10" style={{ width: '20px', height: '20px' }} />
             <input
               ref={inputRef}
               type="text"
               placeholder="Search players, courses, or content..."
-              className="w-full pl-12 pr-10 py-2 pt-3 bg-white/5 backdrop-blur-2xl border border-white/20 shadow-[0_0_20px_rgba(0,0,0,0.2)] rounded-full focus:outline-none focus:ring-2 focus:ring-muted-foreground/10 transition-all duration-200 text-white placeholder-white/70 text-lg" style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
+              className="w-full pl-12 pr-10 py-2 pt-3 bg-white/5 backdrop-blur-2xl border border-white/20 shadow-[0_0_20px_rgba(0,0,0,0.2)] rounded-full focus:outline-none focus:ring-2 focus:ring-muted-foreground/10 transition-all duration-200 text-black placeholder-black/70 text-lg" style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
               value={query}
               onChange={(e) => {
                 setQuery(e.target.value);
@@ -207,7 +207,7 @@ const HeaderSearch = () => {
             {query && (
               <button
                 onClick={handleClearInput}
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white hover:text-white/70 transition-colors z-10"
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-black hover:text-black/70 transition-colors z-10"
               >
                 <X className="h-4 w-4" />
               </button>
