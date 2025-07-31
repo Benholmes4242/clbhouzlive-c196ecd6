@@ -14,7 +14,7 @@ const Header = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50">
+    <header className="absolute top-0 left-0 right-0 z-50 backdrop-blur-[2px] bg-transparent">
       <div className="container mx-auto px-4 md:px-0 max-w-full box-border bg-transparent">
         <div className="flex items-center justify-between h-16 max-w-full">
           {/* Logo - Enlarged and optimized positioning */}
