@@ -60,8 +60,7 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
   if (!isMobile) {
     // Desktop: Show original grid layout
     return (
-      <div className="sticky top-0 z-50 bg-[#f9f9f9] shadow-[0_1px_4px_rgba(0,0,0,0.1)] border-b border-border/20 backdrop-blur-sm py-4 px-4 -mx-4 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {cards.map((card) => (
           <div
             key={card.id}
@@ -125,7 +124,6 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
             </div>
           </div>
         ))}
-        </div>
       </div>
     );
   }
