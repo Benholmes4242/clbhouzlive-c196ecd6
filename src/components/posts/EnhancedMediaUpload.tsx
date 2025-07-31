@@ -4,7 +4,7 @@ import { RotateCw, CheckCircle, AlertCircle, Upload } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import MediaDropzone from './MediaDropzone';
-import MediaPreviewGrid from './MediaPreviewGrid';
+import EnhancedMediaPreviewGrid from './EnhancedMediaPreviewGrid';
 import { useToast } from '@/hooks/use-toast';
 import { useChunkedUpload } from '@/hooks/useChunkedUpload';
 
@@ -273,6 +273,14 @@ const EnhancedMediaUpload: React.FC<EnhancedMediaUploadProps> = ({
     });
   }, [onFilesChange]);
 
+  const handleReorderFiles = useCallback((reorderedFiles: MediaFile[]) => {
+    setMediaFiles(reorderedFiles);
+    
+    // Notify parent of changes
+    const allFiles = reorderedFiles.map(m => m.file);
+    onFilesChange(allFiles);
+  }, [onFilesChange]);
+
   const handleEditFile = useCallback((fileId: string, editedFile: File) => {
     setMediaFiles(prev => {
       const updated = prev.map(media => {
@@ -418,12 +426,13 @@ const EnhancedMediaUpload: React.FC<EnhancedMediaUploadProps> = ({
       )}
 
       {/* Show preview grid for new files */}
-      <MediaPreviewGrid
+      <EnhancedMediaPreviewGrid
         mediaFiles={mediaFiles}
         onRemoveFile={handleRemoveFile}
         onEditFile={handleEditFile}
         onRotateFile={handleRotateFile}
         onUploadFile={uploadFile}
+        onReorderFiles={handleReorderFiles}
         maxFiles={maxFiles}
         showUploadControls={!autoUpload}
       />
