@@ -330,11 +330,11 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                 </p>
               </div>
             ) : (
-              /* Upload View */
+              /* Upload View - Reorganized with better hierarchy and spacing */
               <div className="space-y-6">
 
-                {/* Enhanced Media Upload Section */}
-                <div>
+                {/* 1. Selected Media Preview */}
+                <div className="mb-6">
                   <EnhancedMediaUpload
                     onFilesChange={setFiles}
                     maxFiles={10}
@@ -345,58 +345,87 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                   />
                 </div>
 
-                {/* Caption Input */}
-                <div className="relative">
-                  <EnhancedRichTextInput
-                    value={caption}
-                    onChange={handleCaptionChange}
-                    onTagsChange={setSelectedTags}
-                    placeholder="Write about your moment..."
-                    selectedTags={selectedTags}
-                    disabled={isSubmitting}
-                  />
+                {/* Divider Line */}
+                <div className="border-t border-gray-100 -mx-6" />
+
+                {/* 2. Caption Field - with proper spacing and label */}
+                <div className="space-y-4 pt-6">
+                  <div className="space-y-4">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Add a caption
+                    </label>
+                    <div className="relative">
+                      <EnhancedRichTextInput
+                        value={caption}
+                        onChange={handleCaptionChange}
+                        onTagsChange={setSelectedTags}
+                        placeholder="Write about your moment..."
+                        selectedTags={selectedTags}
+                        disabled={isSubmitting}
+                        className="p-3.5 w-full max-w-full border-gray-200 rounded-xl focus:ring-orange-500 focus:border-orange-500"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Selected Tags Display */}
+                  {selectedTags.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-4">
+                      {selectedTags.map((tag) => (
+                        <div
+                          key={tag.id}
+                          className="inline-flex items-center gap-1 bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs"
+                        >
+                          <span>@{tag.username || tag.name}</span>
+                          <button
+                            onClick={() => setSelectedTags(prev => prev.filter(t => t.id !== tag.id))}
+                            className="ml-1 text-blue-600 hover:text-blue-800"
+                          >
+                            <X size={12} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
-                {/* Selected Tags */}
-                {selectedTags.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
-                    {selectedTags.map((tag) => (
-                      <div
-                        key={tag.id}
-                        className="inline-flex items-center gap-1 bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs"
-                      >
-                        <span>@{tag.username || tag.name}</span>
-                        <button
-                          onClick={() => setSelectedTags(prev => prev.filter(t => t.id !== tag.id))}
-                          className="ml-1 text-blue-600 hover:text-blue-800"
-                        >
-                          <X size={12} />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* Golf Course Selection */}
+                {/* 3. Golf Course Field - with proper spacing */}
                 {onCourseSelect && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Golf Course (Optional)
+                  <div className="space-y-4 pt-6">
+                    <label className="block text-sm font-medium text-gray-700">
+                      Tag a golf course
+                      <span className="text-gray-400 text-xs ml-1">(Optional)</span>
                     </label>
-                    <CourseTagInput
-                      selectedCourse={selectedCourse || null}
-                      onCourseSelect={onCourseSelect}
-                      placeholder="Start typing to find a course..."
-                    />
+                    <div className="max-w-full">
+                      <CourseTagInput
+                        selectedCourse={selectedCourse || null}
+                        onCourseSelect={onCourseSelect}
+                        placeholder="Start typing to find a course..."
+                      />
+                    </div>
                   </div>
                 )}
 
-                {/* Action Buttons */}
-                <div className="flex gap-3 justify-end pt-4 border-t">
+                {/* 4. Tag Field (Placeholder for future implementation) */}
+                <div className="space-y-4 pt-6">
+                  <label className="block text-sm font-medium text-gray-700">
+                    Add tags
+                    <span className="text-gray-400 text-xs ml-1">(Optional)</span>
+                  </label>
+                  <div className="p-3.5 w-full border border-gray-200 rounded-xl bg-gray-50 text-gray-400 text-sm">
+                    Tag functionality coming soon...
+                  </div>
+                </div>
+
+                {/* Divider Line before buttons */}
+                <div className="border-t border-gray-100 -mx-6 mt-8" />
+
+                {/* 5. Action Buttons - with consistent spacing */}
+                <div className="flex gap-3 justify-end pt-6">
                   <Button
                     variant="outline"
                     onClick={handleCancel}
                     disabled={isSubmitting}
+                    className="px-6 py-2.5 text-sm font-medium"
                   >
                     Cancel
                   </Button>
@@ -404,7 +433,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                     variant="outline"
                     onClick={handleSubmit}
                     disabled={isSubmitting || (files.length === 0 && existingMediaUrls.length === 0)}
-                    className="bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-200"
+                    className="px-6 py-2.5 text-sm font-medium bg-gray-900 text-white border-gray-900 hover:bg-gray-800 hover:border-gray-800"
                   >
                     {isSubmitting 
                       ? (editMode ? 'Updating...' : 'Posting...') 
