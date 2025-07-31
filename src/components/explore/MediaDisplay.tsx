@@ -39,8 +39,8 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
   muted = true,
   hidePlayButton = false
 }) => {
-  // Exclusive video audio hook - ensures only one video plays audio at a time
-  const { isMuted, toggleMute } = useExclusiveVideoAudio(itemId);
+  // Audio management: exclusive video audio hook - ensures only one video plays audio at a time
+  const { isMuted: videoIsMuted, toggleMute: toggleVideoMute } = useExclusiveVideoAudio(itemId);
   
   // Fallback image for broken/missing images
   const fallbackImage = 'https://images.unsplash.com/photo-1535131749006-b7f58c99034b?w=400&h=400&fit=crop&crop=center';
@@ -108,7 +108,7 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
           <EnhancedVideoPlayer
             src={media.media_url}
             autoplay={shouldAutoplay}
-            muted={isMuted} // Use user's sound preference
+            muted={videoIsMuted} // Use exclusive video audio state
             loop={loop}
             className="w-full h-full pointer-events-none"
             preloadLevel="metadata"
@@ -120,8 +120,8 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
           {shouldAutoplay && (
             <div className="absolute top-3 right-3 z-30">
               <SoundToggle
-                isMuted={isMuted}
-                onToggle={toggleMute}
+                isMuted={videoIsMuted}
+                onToggle={toggleVideoMute}
                 size="sm"
                 className="rounded-full"
               />
