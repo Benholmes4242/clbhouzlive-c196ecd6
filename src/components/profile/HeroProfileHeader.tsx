@@ -317,23 +317,23 @@ const HeroProfileHeader = ({
           
           {/* Centered User Information */}
           <div className="text-center mb-6 relative">
-            {/* User's Name */}
-            <div className="flex items-center justify-center gap-4">
-              <h1 className="text-4xl font-bold mb-2 text-white">
-                {displayName}
-              </h1>
-              
-              {/* Edit Profile Button - positioned to the right of name */}
-              {isOwnProfile && (
+            {/* Edit Profile Button - positioned above name */}
+            {isOwnProfile && (
+              <div className="flex justify-center mb-3">
                 <button 
-                  className="bg-white/5 backdrop-blur-2xl border border-white/20 shadow-[0_0_20px_rgba(0,0,0,0.2)] rounded-full py-1.5 px-3 text-white text-xs font-medium hover:bg-white/10 transition-colors flex items-center justify-center mb-2" 
+                  className="bg-white/5 backdrop-blur-2xl border border-white/20 shadow-[0_0_20px_rgba(0,0,0,0.2)] rounded-full py-1.5 px-3 text-white text-xs font-medium hover:bg-white/10 transition-colors flex items-center justify-center" 
                   style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
                   onClick={() => setEditDialogOpen(true)}
                 >
                   Edit Profile
                 </button>
-              )}
-            </div>
+              </div>
+            )}
+            
+            {/* User's Name */}
+            <h1 className="text-4xl font-bold mb-2 text-white">
+              {displayName}
+            </h1>
             
             {/* Username */}
             {username && (
