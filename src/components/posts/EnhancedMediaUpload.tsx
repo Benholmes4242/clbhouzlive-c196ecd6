@@ -161,10 +161,15 @@ const EnhancedMediaUpload: React.FC<EnhancedMediaUploadProps> = ({
         onFilesUploaded([{ file: mediaFile.file, url: uploadUrl }]);
       }
 
-      toast({
+      const uploadToast = toast({
         title: "Upload complete",
         description: `${mediaFile.file.name} uploaded successfully`,
       });
+
+      // Auto-dismiss after 2 seconds
+      setTimeout(() => {
+        uploadToast.dismiss();
+      }, 2000);
 
     } catch (error) {
       console.error('Upload failed:', error);
