@@ -342,9 +342,12 @@ const EnhancedMediaUpload: React.FC<EnhancedMediaUploadProps> = ({
 
   // Initialize mediaFiles when initialFiles changes
   React.useEffect(() => {
+    console.log('EnhancedMediaUpload: initialFiles changed:', initialFiles.length, initialFiles.map(f => f.name));
+    
     if (initialFiles.length > 0) {
       const newMediaFiles = initialFiles.map(file => {
         const isLargeFile = file.size > LARGE_FILE_THRESHOLD;
+        console.log('EnhancedMediaUpload: Creating media file for:', file.name, 'size:', file.size);
         return {
           file,
           url: URL.createObjectURL(file),
@@ -355,16 +358,24 @@ const EnhancedMediaUpload: React.FC<EnhancedMediaUploadProps> = ({
         };
       });
       
+      console.log('EnhancedMediaUpload: Setting mediaFiles to:', newMediaFiles.length, 'items');
       setMediaFiles(newMediaFiles);
+      
+      // Notify parent of changes
+      onFilesChange(initialFiles);
       
       // Auto-upload if enabled
       if (autoUpload) {
+        console.log('EnhancedMediaUpload: Auto-uploading files...');
         newMediaFiles.forEach(mediaFile => {
           uploadFile(mediaFile);
         });
       }
+    } else {
+      console.log('EnhancedMediaUpload: No initial files, clearing mediaFiles');
+      setMediaFiles([]);
     }
-  }, [initialFiles, autoUpload, uploadFile]);
+  }, [initialFiles, autoUpload, uploadFile, onFilesChange]);
 
   // Cleanup URLs when component unmounts
   React.useEffect(() => {
