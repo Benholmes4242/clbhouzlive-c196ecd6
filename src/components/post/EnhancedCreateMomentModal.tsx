@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { X, Camera, Image, Video, Loader2 } from 'lucide-react';
@@ -62,18 +62,18 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
   initialIsPrivate = false
 }) => {
   const [caption, setCaption] = useState('');
-  const [files, setFiles] = useState<File[]>(initialFiles);
+  const [files, setFiles] = useState<File[]>([]);
   const [selectedTags, setSelectedTags] = useState<TaggableEntity[]>([]);
   const [isPrivate, setIsPrivate] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const { entities, searchEntities } = useTaggableEntities();
   const { toast } = useToast();
-  const [isInitialized, setIsInitialized] = useState(false);
   const [modalMode, setModalMode] = useState<'selection' | 'upload'>('selection');
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isButtonShaking, setIsButtonShaking] = useState(false);
   const [validationErrors, setValidationErrors] = useState<{[key: string]: string}>({});
   const isMobile = useIsMobile();
+  const previouslyOpenRef = useRef(false);
 
   // Validation function
   const validateForm = () => {
@@ -100,35 +100,37 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
     }
   };
 
-  // Reset state when modal opens/closes
+  // Initialize modal state when it opens
   useEffect(() => {
-    if (isOpen && !isInitialized) {
+    if (isOpen && !previouslyOpenRef.current) {
+      // Initialize state based on mode
       if (editMode) {
         setCaption(initialCaption);
-        setSelectedTags(initialTags);
-        setFiles(initialFiles);
+        setSelectedTags([...initialTags]);
+        setFiles([...initialFiles]);
         setIsPrivate(initialIsPrivate);
         setModalMode('upload'); // Skip selection for edit mode
       } else {
         setCaption('');
         setSelectedTags([]);
-        setFiles(initialFiles);
+        setFiles([...initialFiles]);
         setIsPrivate(false); // Default to public
         const mode = initialFiles.length > 0 ? 'upload' : 'selection';
         setModalMode(mode);
       }
-      setSubmitError(null); // Clear any previous errors
-      setValidationErrors({}); // Clear validation errors
+      setSubmitError(null);
+      setValidationErrors({});
       setIsButtonShaking(false);
-      setIsInitialized(true);
-    } else if (!isOpen) {
-      setIsInitialized(false);
+      previouslyOpenRef.current = true;
+    } else if (!isOpen && previouslyOpenRef.current) {
+      // Reset when modal closes
+      previouslyOpenRef.current = false;
       setModalMode('selection');
       setSubmitError(null);
       setValidationErrors({});
       setIsButtonShaking(false);
     }
-  }, [isOpen, editMode, initialCaption, initialTags, initialFiles, initialIsPrivate]);
+  }, [isOpen]); // Only depend on isOpen to avoid infinite loops
 
   // Handle caption input with mention detection
   const handleCaptionChange = async (text: string) => {
