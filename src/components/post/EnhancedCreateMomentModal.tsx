@@ -72,7 +72,33 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
   const [modalMode, setModalMode] = useState<'selection' | 'upload'>('selection');
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isButtonShaking, setIsButtonShaking] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<{[key: string]: string}>({});
   const isMobile = useIsMobile();
+
+  // Validation function
+  const validateForm = () => {
+    const errors: {[key: string]: string} = {};
+    
+    // Check for media requirement
+    if (files.length === 0 && existingMediaUrls.length === 0) {
+      errors.media = "Please upload at least one photo or video";
+    }
+    
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  // Auto-focus on first invalid field
+  const focusFirstInvalidField = () => {
+    if (validationErrors.media) {
+      // Focus on media upload area
+      const mediaUpload = document.querySelector('[data-testid="media-upload"]') as HTMLElement;
+      if (mediaUpload) {
+        mediaUpload.focus();
+        mediaUpload.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  };
 
   // Reset state when modal opens/closes
   useEffect(() => {
@@ -92,12 +118,14 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
         setModalMode(mode);
       }
       setSubmitError(null); // Clear any previous errors
+      setValidationErrors({}); // Clear validation errors
       setIsButtonShaking(false);
       setIsInitialized(true);
     } else if (!isOpen) {
       setIsInitialized(false);
       setModalMode('selection');
       setSubmitError(null);
+      setValidationErrors({});
       setIsButtonShaking(false);
     }
   }, [isOpen, editMode, initialCaption, initialTags, initialFiles, initialIsPrivate, isInitialized]);
@@ -126,10 +154,20 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
   };
 
   const handleSubmit = async () => {
-    if (files.length === 0 && existingMediaUrls.length === 0) return;
+    // Validate form first
+    if (!validateForm()) {
+      // Shake button animation for validation errors
+      setIsButtonShaking(true);
+      setTimeout(() => setIsButtonShaking(false), 600);
+      
+      // Focus first invalid field
+      setTimeout(() => focusFirstInvalidField(), 100);
+      return;
+    }
 
     try {
       setSubmitError(null); // Clear any previous errors
+      setValidationErrors({}); // Clear validation errors
       
       // Call the submit handler (which handles success feedback)
       onSubmit({
@@ -314,8 +352,9 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                 {isMobile && (
                   <button
                     onClick={handleCaptureClick}
-                    className="w-full flex items-center gap-4 p-3 bg-gray-50 hover:bg-orange-50 rounded-xl transition-colors"
+                    className="w-full flex items-center gap-4 p-3 bg-gray-50 hover:bg-orange-50 rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-[#6e9277] focus:ring-offset-2"
                     disabled={isSubmitting}
+                    aria-label="Capture photo or video with camera"
                   >
                     <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
                       <Camera className="w-5 h-5 text-orange-600" />
@@ -327,8 +366,9 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                 {/* Select Photos */}
                 <button
                   onClick={handleSelectPhotos}
-                  className="w-full flex items-center gap-4 p-3 bg-gray-50 hover:bg-orange-50 rounded-xl transition-colors"
+                  className="w-full flex items-center gap-4 p-3 bg-gray-50 hover:bg-orange-50 rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-[#6e9277] focus:ring-offset-2"
                   disabled={isSubmitting}
+                  aria-label="Select photos from device"
                 >
                   <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
                     <Image className="w-5 h-5 text-orange-600" />
@@ -339,8 +379,9 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                 {/* Select Videos */}
                 <button
                   onClick={handleSelectVideos}
-                  className="w-full flex items-center gap-4 p-3 bg-gray-50 hover:bg-orange-50 rounded-xl transition-colors"
+                  className="w-full flex items-center gap-4 p-3 bg-gray-50 hover:bg-orange-50 rounded-xl transition-colors focus:outline-none focus:ring-2 focus:ring-[#6e9277] focus:ring-offset-2"
                   disabled={isSubmitting}
+                  aria-label="Select videos from device"
                 >
                   <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center">
                     <Video className="w-5 h-5 text-orange-600" />
@@ -367,7 +408,18 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                     acceptedTypes={['image/*', 'video/*']}
                     disabled={isSubmitting}
                     autoUpload={true}
+                    data-testid="media-upload"
+                    aria-label="Upload media files"
+                    className={`focus:outline-none focus:ring-2 focus:ring-[#6e9277] focus:ring-offset-2 rounded-xl ${validationErrors.media ? 'animate-shake border-red-300' : ''}`}
                   />
+                  {/* Validation Error for Media */}
+                  {validationErrors.media && (
+                    <div className="mt-2 animate-fade-in">
+                      <p className="text-sm text-[#d9534f] flex items-center gap-1">
+                        ⚠️ {validationErrors.media}
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Divider Line */}
@@ -387,6 +439,8 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                         placeholder="Write about your moment..."
                         selectedTags={selectedTags}
                         disabled={isSubmitting}
+                        aria-label="Caption input for your moment"
+                        className="focus:ring-2 focus:ring-[#6e9277] focus:ring-offset-2"
                       />
                     </div>
                   </div>
@@ -509,12 +563,14 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                     <Button
                       onClick={handleSubmit}
                       disabled={isSubmitting || (files.length === 0 && existingMediaUrls.length === 0)}
+                      aria-label="Post your moment"
                       className={`
                         px-6 py-3 text-sm font-medium rounded-xl
                         bg-[#6e9277] hover:bg-[#5a7c64] text-white
                         transition-all duration-200 ease-out
                         hover:scale-105 active:scale-95
                         disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100
+                        focus:outline-none focus:ring-2 focus:ring-[#6e9277] focus:ring-offset-2
                         ${isButtonShaking ? 'animate-shake' : ''}
                         ${isSubmitting ? 'animate-pulse' : ''}
                       `}
