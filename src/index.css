@@ -375,3 +375,8 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* Hover scale animation utility */
+.hover-scale {
+  @apply transition-transform duration-200 hover:scale-105;
+}

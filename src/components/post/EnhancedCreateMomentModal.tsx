@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { X, Camera, Image, Video } from 'lucide-react';
+import { X, Camera, Image, Video, Loader2 } from 'lucide-react';
 import CourseTagInput from '../posts/CourseTagInput';
 import GolfCoursePin from '../posts/GolfCoursePin';
 import EnhancedMediaUpload from '../posts/EnhancedMediaUpload';
@@ -66,6 +66,8 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
   const { toast } = useToast();
   const [isInitialized, setIsInitialized] = useState(false);
   const [modalMode, setModalMode] = useState<'selection' | 'upload'>('selection');
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isButtonShaking, setIsButtonShaking] = useState(false);
   const isMobile = useIsMobile();
 
   // Reset state when modal opens/closes
@@ -83,10 +85,14 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
         const mode = initialFiles.length > 0 ? 'upload' : 'selection';
         setModalMode(mode);
       }
+      setSubmitError(null); // Clear any previous errors
+      setIsButtonShaking(false);
       setIsInitialized(true);
     } else if (!isOpen) {
       setIsInitialized(false);
       setModalMode('selection');
+      setSubmitError(null);
+      setIsButtonShaking(false);
     }
   }, [isOpen, editMode, initialCaption, initialTags, initialFiles, isInitialized]);
 
@@ -113,15 +119,35 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
     setShowSuggestions(false);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (files.length === 0 && existingMediaUrls.length === 0) return;
 
-    onSubmit({
-      caption,
-      files,
-      tags: selectedTags,
-      course: selectedCourse
-    });
+    try {
+      setSubmitError(null); // Clear any previous errors
+      
+      // Call the submit handler (which handles success feedback)
+      onSubmit({
+        caption,
+        files,
+        tags: selectedTags,
+        course: selectedCourse
+      });
+      
+    } catch (error) {
+      // Error handling for immediate submission failures
+      const errorMessage = error instanceof Error ? error.message : "Upload failed. Please try again.";
+      setSubmitError(errorMessage);
+      
+      // Shake button animation
+      setIsButtonShaking(true);
+      setTimeout(() => setIsButtonShaking(false), 600);
+      
+      toast({
+        title: "Upload failed",
+        description: errorMessage,
+        variant: "destructive"
+      });
+    }
   };
 
   const handleCancel = () => {
@@ -272,19 +298,9 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
               <div className="w-8 h-8" />
             </div>
 
-            {(() => {
-              console.log('Rendering modal content, modalMode:', modalMode);
-              console.log('Rendering modal overlay, isOpen:', isOpen);
-              return null;
-            })()}
-
             {modalMode === 'selection' ? (
               /* Action Selection View */
               <div className="space-y-3">
-                {(() => {
-                  console.log('Rendering selection buttons, isMobile:', isMobile);
-                  return null;
-                })()}
                 
                 {/* Capture Photo or Video - Mobile Only */}
                 {isMobile && (
@@ -419,27 +435,60 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                 {/* Divider Line before buttons */}
                 <div className="border-t border-gray-100 -mx-6 mt-8" />
 
-                {/* 5. Action Buttons - with consistent spacing */}
+                {/* 5. Action Buttons - with enhanced styling and animations */}
                 <div className="flex gap-3 justify-end pt-6">
                   <Button
                     variant="outline"
                     onClick={handleCancel}
                     disabled={isSubmitting}
-                    className="px-6 py-2.5 text-sm font-medium"
+                    className="px-6 py-2.5 text-sm font-medium hover-scale"
                   >
                     Cancel
                   </Button>
-                  <Button
-                    variant="outline"
-                    onClick={handleSubmit}
-                    disabled={isSubmitting || (files.length === 0 && existingMediaUrls.length === 0)}
-                    className="px-6 py-2.5 text-sm font-medium bg-gray-900 text-white border-gray-900 hover:bg-gray-800 hover:border-gray-800"
-                  >
-                    {isSubmitting 
-                      ? (editMode ? 'Updating...' : 'Posting...') 
-                      : (editMode ? 'Update' : `Post ${files.length > 0 ? `(${files.length} file${files.length > 1 ? 's' : ''})` : ''}`)
-                    }
-                  </Button>
+                  
+                  {/* Enhanced Post Button with animations */}
+                  <div className="relative">
+                    <Button
+                      onClick={handleSubmit}
+                      disabled={isSubmitting || (files.length === 0 && existingMediaUrls.length === 0)}
+                      className={`
+                        px-6 py-3 text-sm font-medium rounded-xl
+                        bg-[#6e9277] hover:bg-[#5a7c64] text-white
+                        transition-all duration-200 ease-out
+                        hover:scale-105 active:scale-95
+                        disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100
+                        ${isButtonShaking ? 'animate-shake' : ''}
+                        ${isSubmitting ? 'animate-pulse' : ''}
+                      `}
+                      style={{
+                        background: isSubmitting ? '#6e9277' : undefined,
+                        minWidth: '140px' // Prevent button width changes
+                      }}
+                    >
+                      {isSubmitting ? (
+                        <div className="flex items-center gap-2">
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <span>{editMode ? 'Updating...' : 'Posting...'}</span>
+                        </div>
+                      ) : (
+                        <span className="transition-all duration-200">
+                          {editMode 
+                            ? 'Update' 
+                            : `Post${files.length > 0 ? ` (${files.length} file${files.length > 1 ? 's' : ''})` : ''}`
+                          }
+                        </span>
+                      )}
+                    </Button>
+                    
+                    {/* Error message display */}
+                    {submitError && (
+                      <div className="absolute top-full left-0 right-0 mt-2 animate-fade-in">
+                        <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg border border-red-200">
+                          {submitError}
+                        </p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
