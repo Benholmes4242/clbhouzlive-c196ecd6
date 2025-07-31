@@ -100,7 +100,7 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
   const [sortBy, setSortBy] = useState<string>('rating-high-low');
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [isCoursePickerOpen, setIsCoursePickerOpen] = useState(false);
-  const { viewType, setViewType } = useViewPreference();
+  const { viewType, setViewType, isHydrated } = useViewPreference();
   const isMobile = useIsMobile();
   
   // Always call the hook to avoid conditional hook errors
@@ -337,8 +337,15 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
       </div>
 
       <div className="space-y-4">
-        {isLoadingTop100 ? (
-          <div className="text-center py-8">Loading courses...</div>
+        {isLoadingTop100 || !isHydrated ? (
+          <div className="text-center py-8">
+            <div className="flex flex-col items-center gap-2">
+              <div className="w-6 h-6 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
+              <span className="text-muted-foreground">
+                {!isHydrated ? 'Loading preferences...' : 'Loading courses...'}
+              </span>
+            </div>
+          </div>
         ) : filteredCourses.length > 0 ? (
           viewType === 'cards' ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
