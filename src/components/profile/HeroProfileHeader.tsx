@@ -4,7 +4,6 @@ import { toast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { OptimizedAvatar } from '@/components/ui/optimized-avatar';
 import { useStaggeredInView } from '@/hooks/useInViewAnimation';
-import { useScrollPerformance } from '@/hooks/usePerformanceOptimizations';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import ProfileFormFields from "./ProfileFormFields";
@@ -72,10 +71,6 @@ const HeroProfileHeader = ({
   const [ratedCoursesCount, setRatedCoursesCount] = useState(0);
   const [averageRating, setAverageRating] = useState(0);
   
-  // Scroll state for header compression
-  const [scrollY, setScrollY] = useState(0);
-  const [isCompressed, setIsCompressed] = useState(false);
-  
   // Activity posts logic
   const { posts, loading: postsLoading, fetchUserPosts } = useActivityPosts(profile?.id);
   const { isOpen, currentPost, allUserPosts: viewerPosts, openPostViewer, closePostViewer } = usePostViewer({ source: 'profile' });
@@ -136,21 +131,6 @@ const HeroProfileHeader = ({
     handleSave,
   } = useProfileForm(profile, user?.id || '', onProfileUpdate, () => setEditDialogOpen(false));
   
-  // Scroll detection for header compression
-  const handleScroll = useScrollPerformance(() => {
-    const currentScrollY = window.scrollY;
-    setScrollY(currentScrollY);
-    
-    // Start compressing after 100px of scroll
-    const compressionThreshold = 100;
-    setIsCompressed(currentScrollY > compressionThreshold);
-  }, 16); // 60fps throttling
-
-  useEffect(() => {
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [handleScroll]);
-
   // Update avatar key when profile photo URL changes to force re-render
   useEffect(() => {
     setAvatarKey(Date.now());
@@ -286,23 +266,14 @@ const HeroProfileHeader = ({
         />
         
         
-        {/* Profile Content with compression */}
-        <div 
-          className={`relative z-10 flex flex-col items-center text-center transition-all duration-300 ease-in-out ${
-            isCompressed ? 'pt-4 pb-2' : 'pt-20 pb-8'
-          }`}
-        >
+        {/* Profile Content */}
+        <div className="relative z-10 flex flex-col items-center text-center pt-20 pb-8">
           
           {/* Edit Profile Button - Top Right for own profile */}
           {isOwnProfile && (
-            <div className={`absolute transition-all duration-300 ease-in-out ${
-              isCompressed ? 'top-2 right-4' : 'top-6 right-6'
-            }`}>
+            <div className="absolute top-6 right-6">
               <button 
-                className={`bg-white/5 backdrop-blur-2xl border border-white/20 shadow-[0_0_20px_rgba(0,0,0,0.2)] rounded-full text-white font-medium hover:bg-white/10 transition-all duration-300 ease-in-out flex items-center justify-center ${
-                  isCompressed ? 'py-1 px-2 text-xs' : 'py-1.5 px-3 text-xs pt-2 pb-1'
-                }`} 
-                style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
+                className="bg-white/5 backdrop-blur-2xl border border-white/20 shadow-[0_0_20px_rgba(0,0,0,0.2)] rounded-full py-1.5 px-3 text-white text-xs font-medium hover:bg-white/10 transition-colors flex items-center justify-center pt-2 pb-1" style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
                 onClick={() => setEditDialogOpen(true)}
               >
                 Edit Profile
@@ -310,15 +281,11 @@ const HeroProfileHeader = ({
             </div>
           )}
           
-          {/* Profile Photo with compression animation */}
-          <div 
-            className={`transition-all duration-300 ease-in-out ${
-              isCompressed ? 'w-16 h-16 mb-2' : 'w-64 h-64 mb-6'
-            }`}
-          >
+          {/* Large Centered Profile Photo */}
+          <div className="w-64 h-64 mb-6">
             {isOwnProfile ? (
               <div 
-                className="relative cursor-pointer group w-full h-full"
+                className="relative cursor-pointer group"
                 onClick={() => {
                   if (uploading) return;
                   const input = document.createElement('input');
@@ -338,134 +305,69 @@ const HeroProfileHeader = ({
                   key={avatarKey}
                   src={profile?.profile_photo_url ? `${profile.profile_photo_url}?t=${avatarKey}` : undefined}
                   alt={displayName}
-                  size={isCompressed ? 64 : 256}
+                  size={256}
                   fallback={displayName.charAt(0)}
-                  className="shadow-2xl group-hover:opacity-80 transition-opacity w-full h-full"
+                  className="shadow-2xl group-hover:opacity-80 transition-opacity"
                 />
-                {/* Hover overlay - hide when compressed */}
-                {!isCompressed && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
-                    <span className="text-white text-sm font-medium">Edit Photo</span>
-                  </div>
-                )}
+                {/* Hover overlay */}
+                <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
+                  <span className="text-white text-sm font-medium">Edit Photo</span>
+                </div>
               </div>
             ) : (
               <OptimizedAvatar
                 key={avatarKey}
                 src={profile?.profile_photo_url ? `${profile.profile_photo_url}?t=${avatarKey}` : undefined}
                 alt={displayName}
-                size={isCompressed ? 64 : 256}
+                size={256}
                 fallback={displayName.charAt(0)}
-                className="shadow-2xl w-full h-full"
+                className="shadow-2xl"
               />
             )}
           </div>
           
-          {/* User Information with compression animation */}
-          <div 
-            className={`text-center transition-all duration-300 ease-in-out ${
-              isCompressed ? 'mb-2' : 'mb-6'
-            }`}
-          >
-            {/* User's Name with size animation */}
-            <h1 
-              className={`font-bold text-white transition-all duration-300 ease-in-out ${
-                isCompressed ? 'text-lg mb-1' : 'text-4xl mb-2'
-              }`}
-            >
+          {/* Centered User Information */}
+          <div className="text-center mb-6">
+            {/* User's Name */}
+            <h1 className="text-4xl font-bold mb-2 text-white">
               {displayName}
             </h1>
             
-            {/* Username - hide when compressed */}
-            {username && !isCompressed && (
-              <p className="text-lg text-white mb-2 transition-opacity duration-300 ease-in-out">
+            {/* Username */}
+            {username && (
+              <p className="text-lg text-white mb-2">
                 @{username}
               </p>
             )}
             
-            {/* Home Golf Club with size animation */}
-            {!isCompressed && (
-              <p className="text-base text-white transition-opacity duration-300 ease-in-out">
-                {homeClub}
-              </p>
-            )}
+            {/* Home Golf Club */}
+            <p className="text-base text-white">
+              {homeClub}
+            </p>
           </div>
 
-          {/* Stats Bar with compression animation */}
-          <div 
-            className={`w-full bg-white/5 backdrop-blur-2xl border border-white/20 shadow-[0_0_20px_rgba(0,0,0,0.2)] rounded-lg transition-all duration-300 ease-in-out ${
-              isCompressed ? 'max-w-xs py-0.5' : 'max-w-md py-1'
-            }`} 
-            style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
-          >
-            <div 
-              className={`flex items-center justify-around w-full transition-all duration-300 ease-in-out ${
-                isCompressed ? 'px-4 space-x-2' : 'px-6 space-x-4'
-              }`}
-            >
+          {/* Thinner Stats Bar */}
+          <div className="w-full max-w-md bg-white/5 backdrop-blur-2xl border border-white/20 shadow-[0_0_20px_rgba(0,0,0,0.2)] rounded-lg py-1" style={{ backdropFilter: 'blur(40px) saturate(180%)' }}>
+            <div className="flex items-center justify-around w-full px-6 space-x-4">
               <div className="text-center">
-                <div 
-                  className={`font-bold text-white transition-all duration-300 ease-in-out ${
-                    isCompressed ? 'text-sm' : 'text-lg'
-                  }`}
-                >
+                <div className="text-lg font-bold text-white">
                   {profile?.eg_handicap_index ? profile.eg_handicap_index.toFixed(1) : '--'}
                 </div>
-                <div 
-                  className={`text-white/70 transition-all duration-300 ease-in-out ${
-                    isCompressed ? 'text-xs' : 'text-xs'
-                  }`}
-                >
-                  {isCompressed ? 'HC' : 'Handicap'}
-                </div>
+                <div className="text-xs text-white/70">Handicap</div>
               </div>
               <div className="text-center">
-                <div 
-                  className={`font-bold text-white transition-all duration-300 ease-in-out ${
-                    isCompressed ? 'text-sm' : 'text-lg'
-                  }`}
-                >
-                  {postsCount}
-                </div>
-                <div 
-                  className={`text-white/70 transition-all duration-300 ease-in-out ${
-                    isCompressed ? 'text-xs' : 'text-xs'
-                  }`}
-                >
-                  Posts
-                </div>
+                <div className="text-lg font-bold text-white">{postsCount}</div>
+                <div className="text-xs text-white/70">Posts</div>
               </div>
               <div className="text-center">
-                <div 
-                  className={`font-bold text-white transition-all duration-300 ease-in-out ${
-                    isCompressed ? 'text-sm' : 'text-lg'
-                  }`}
-                >
-                  {ratedCoursesCount}
-                </div>
-                <div 
-                  className={`text-white/70 transition-all duration-300 ease-in-out ${
-                    isCompressed ? 'text-xs' : 'text-xs'
-                  }`}
-                >
-                  {isCompressed ? 'Rated' : 'Rated Courses'}
-                </div>
+                <div className="text-lg font-bold text-white">{ratedCoursesCount}</div>
+                <div className="text-xs text-white/70">Rated Courses</div>
               </div>
               <div className="text-center">
-                <div 
-                  className={`font-bold text-white transition-all duration-300 ease-in-out ${
-                    isCompressed ? 'text-sm' : 'text-lg'
-                  }`}
-                >
+                <div className="text-lg font-bold text-white">
                   {averageRating > 0 ? `${averageRating}/10` : '--'}
                 </div>
-                <div 
-                  className={`text-white/70 transition-all duration-300 ease-in-out ${
-                    isCompressed ? 'text-xs' : 'text-xs'
-                  }`}
-                >
-                  {isCompressed ? 'Avg' : 'Avg. Rating'}
-                </div>
+                <div className="text-xs text-white/70">Avg. Rating</div>
               </div>
             </div>
           </div>
