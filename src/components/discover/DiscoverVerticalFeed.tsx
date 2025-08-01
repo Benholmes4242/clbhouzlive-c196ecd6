@@ -591,6 +591,20 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
 
               {/* Action Buttons - Bottom Right */}
               <div className="absolute bottom-24 right-4 z-10 flex flex-col space-y-6">
+                {/* Mute/Unmute toggle button - only show for video posts */}
+                {item.type === 'video' && (
+                  <button 
+                    className="cursor-pointer hover:opacity-100 transition-opacity"
+                    onClick={toggleGlobalMute}
+                  >
+                    {isGloballyMuted ? (
+                      <SpeakerXMarkIcon className="w-8 h-8 text-white" />
+                    ) : (
+                      <SpeakerWaveIcon className="w-8 h-8 text-white" />
+                    )}
+                  </button>
+                )}
+
                 {/* Long Hold Like Button */}
                 <QuickReactionButton
                   postId={item.id}
@@ -620,20 +634,6 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                 >
                   <PaperAirplaneIcon className="h-8 w-8 text-white" />
                 </button>
-
-                {/* Mute/Unmute toggle button - only show for video posts */}
-                {item.type === 'video' && (
-                  <button 
-                    className="cursor-pointer hover:opacity-100 transition-opacity"
-                    onClick={toggleGlobalMute}
-                  >
-                    {isGloballyMuted ? (
-                      <SpeakerXMarkIcon className="w-8 h-8 text-white" />
-                    ) : (
-                      <SpeakerWaveIcon className="w-8 h-8 text-white" />
-                    )}
-                  </button>
-                )}
 
                 {/* Three dots menu - only show for own posts */}
                 {user && item.user?.id === user.id && (
