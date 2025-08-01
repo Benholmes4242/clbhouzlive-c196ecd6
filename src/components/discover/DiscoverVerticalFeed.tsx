@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
 import ClubhouzLoading from '@/components/ClubhouzLoading';
 import { MapPin, UserPlus, UserCheck, Loader2, Minimize2, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
-import { PaperAirplaneIcon, HeartIcon, SpeakerXMarkIcon, SpeakerWaveIcon, ChatBubbleOvalLeftEllipsisIcon } from '@heroicons/react/24/solid';
+import { PaperAirplaneIcon, SpeakerXMarkIcon, SpeakerWaveIcon, ChatBubbleOvalLeftEllipsisIcon } from '@heroicons/react/24/solid';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ExploreContentItem } from '@/components/explore/types';
@@ -15,6 +15,8 @@ import { useVideoManager } from '@/contexts/VideoManagerContext';
 import CommentsModal from '@/components/posts/CommentsModal';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { QuickReactionButton } from '@/components/clubhouse/QuickReactionButton';
+import { usePostReactions } from '@/hooks/usePostReactions';
 
 interface DiscoverVerticalFeedProps {
   isOpen: boolean;
@@ -168,6 +170,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
   const { isGloballyMuted, setGlobalMute } = useGlobalAudio();
   const { setActiveVideo } = useVideoManager();
   const { deletePost } = usePostDeletion();
+  const { getPostReactions, getUserReaction, handleReaction } = usePostReactions();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [commentsModalOpen, setCommentsModalOpen] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string>('');
@@ -602,21 +605,14 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                   </button>
                 )}
 
-                {/* Heart Button with Like Count */}
-                <div className="flex flex-col items-center">
-                  <button
-                    onClick={() => handleLike(item.id)}
-                    className="cursor-pointer hover:opacity-100 transition-opacity"
-                    disabled={likeMutation.isPending}
-                  >
-                    <HeartIcon 
-                      className={`h-8 w-8 ${likedPosts?.includes(item.id) ? 'text-red-500 fill-red-500' : 'text-white'}`} 
-                    />
-                  </button>
-                  <span className="text-white text-sm font-medium mt-1" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
-                    {Math.floor(Math.random() * 1000) + 10}
-                  </span>
-                </div>
+                {/* Long Hold Like Button */}
+                <QuickReactionButton
+                  postId={item.id}
+                  reactions={getPostReactions(item.id)}
+                  userReaction={getUserReaction(item.id)}
+                  onReact={handleReaction}
+                  className="text-white"
+                />
 
                 {/* Message Button with Comment Count */}
                 <div className="flex flex-col items-center">
