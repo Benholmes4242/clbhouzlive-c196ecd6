@@ -177,12 +177,14 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
       <div className="absolute right-4 bottom-32 flex flex-col items-center gap-6 z-20" style={{ width: '56px' }}>
         {/* Mute/Unmute Toggle */}
         {currentPost.type === 'video' && (
-          <button
-            onClick={() => setIsMuted(!isMuted)}
-            className="p-3 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70"
-          >
-            {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-          </button>
+          <div className="w-14 flex justify-center">
+            <button
+              onClick={() => setIsMuted(!isMuted)}
+              className="p-3 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70"
+            >
+              {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+            </button>
+          </div>
         )}
         
         {/* Emoji Reaction Button */}
@@ -195,14 +197,18 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
         />
         
         {/* Share Button */}
-        <button className="p-3 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70">
-          <Share className="w-5 h-5" />
-        </button>
+        <div className="w-14 flex justify-center">
+          <button className="p-3 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70">
+            <Share className="w-5 h-5" />
+          </button>
+        </div>
         
         {/* More Options */}
-        <button className="p-3 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70">
-          <MoreHorizontal className="w-5 h-5" />
-        </button>
+        <div className="w-14 flex justify-center">
+          <button className="p-3 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70">
+            <MoreHorizontal className="w-5 h-5" />
+          </button>
+        </div>
       </div>
 
       {/* Content Overlay */}
