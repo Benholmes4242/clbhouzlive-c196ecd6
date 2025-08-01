@@ -16,6 +16,8 @@ import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import CommentsModal from '@/components/posts/CommentsModal';
 import { useVideoManager } from '@/contexts/VideoManagerContext';
 import { AudioStrip } from './AudioStrip';
+import { QuickReactionButton } from './QuickReactionButton';
+import { usePostReactions } from '@/hooks/usePostReactions';
 
 interface ClubhouseVerticalFeedProps {
   posts: ExploreContentItem[];
@@ -169,7 +171,8 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   const [mediaIndices, setMediaIndices] = useState<{[key: string]: number}>({});
   const queryClient = useQueryClient();
   
-  // Post reactions removed for now
+  // Post reactions hook
+  const { getPostReactions, getUserReaction, handleReaction } = usePostReactions();
 
   // Check if current user follows the displayed user
   const { data: isFollowing, isLoading: isFollowingLoading } = useQuery({
@@ -673,22 +676,14 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                   </button>
                 )}
 
-                {/* Heart/Like Button */}
-                <div className="flex flex-col items-center">
-                  <button
-                    onClick={() => handleLike(item.id)}
-                    className="cursor-pointer hover:opacity-100 transition-opacity"
-                  >
-                    <HeartIcon 
-                      className={`h-8 w-8 ${
-                        likedPosts?.includes(item.id) ? 'text-red-500' : 'text-white'
-                      }`} 
-                    />
-                  </button>
-                  <span className="text-white text-sm font-medium mt-1" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
-                    {Math.floor(Math.random() * 200) + 50}
-                  </span>
-                </div>
+                {/* Quick Reaction Button with long-hold functionality */}
+                <QuickReactionButton
+                  postId={item.id}
+                  reactions={getPostReactions(item.id)}
+                  userReaction={getUserReaction(item.id)}
+                  onReact={handleReaction}
+                  className=""
+                />
 
                 {/* Message Button with Comment Count */}
                 <div className="flex flex-col items-center">
