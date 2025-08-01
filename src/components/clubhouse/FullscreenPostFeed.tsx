@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { ChevronUp, ChevronDown, Volume2, VolumeX, MessageCircle, Share, MoreHorizontal } from 'lucide-react';
+import { HeartIcon } from '@heroicons/react/24/outline';
+import { HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid';
 import { useSwipeable } from 'react-swipeable';
 import { ExploreContentItem } from '@/components/explore/types';
 import MediaDisplay from '@/components/explore/MediaDisplay';
-import { QuickReactionButton } from './QuickReactionButton';
-import { usePostReactions } from '@/hooks/usePostReactions';
 
 interface FullscreenPostFeedProps {
   content: ExploreContentItem[];
@@ -26,10 +26,24 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isMuted, setIsMuted] = useState(true);
   const [commentText, setCommentText] = useState('');
+  const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
   const containerRef = useRef<HTMLDivElement>(null);
-  const { getPostReactions, getUserReaction, handleReaction } = usePostReactions();
 
   const currentPost = content[currentIndex];
+
+  // Handle like toggle
+  const handleLikeToggle = (postId: string) => {
+    setLikedPosts(prev => {
+      const newLikedPosts = new Set(prev);
+      if (newLikedPosts.has(postId)) {
+        newLikedPosts.delete(postId);
+      } else {
+        newLikedPosts.add(postId);
+      }
+      return newLikedPosts;
+    });
+    onLike(postId);
+  };
 
   // Navigate to next/previous post
   const goToNext = () => {
@@ -187,14 +201,19 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
           </div>
         )}
         
-        {/* Emoji Reaction Button */}
-        <QuickReactionButton
-          postId={currentPost.id}
-          reactions={getPostReactions(currentPost.id)}
-          userReaction={getUserReaction(currentPost.id)}
-          onReact={handleReaction}
-          className="flex flex-col items-center"
-        />
+        {/* Heart Like Button */}
+        <div className="w-14 flex justify-center">
+          <button
+            onClick={() => handleLikeToggle(currentPost.id)}
+            className="p-3 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70 transition-all duration-200"
+          >
+            {likedPosts.has(currentPost.id) ? (
+              <HeartSolidIcon className="w-5 h-5 text-red-500" />
+            ) : (
+              <HeartIcon className="w-5 h-5 text-white" />
+            )}
+          </button>
+        </div>
         
         {/* Share Button */}
         <div className="w-14 flex justify-center">
