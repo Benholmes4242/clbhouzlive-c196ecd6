@@ -1,5 +1,6 @@
 import React from 'react';
-import { PiHandsClappingDuotone } from 'react-icons/pi';
+import { QuickReactionButton } from '@/components/clubhouse/QuickReactionButton';
+import { usePostReactions } from '@/hooks/usePostReactions';
 
 interface User {
   id: string;
@@ -10,6 +11,7 @@ interface User {
 }
 
 interface MediaOverlaysProps {
+  postId: string;
   user?: User;
   likes: number;
   isFeatured?: boolean;
@@ -19,6 +21,7 @@ interface MediaOverlaysProps {
 }
 
 const MediaOverlays: React.FC<MediaOverlaysProps> = ({
+  postId,
   user,
   likes,
   isFeatured,
@@ -26,17 +29,20 @@ const MediaOverlays: React.FC<MediaOverlaysProps> = ({
   onMaximize,
   mediaType = 'image'
 }) => {
+  const { getPostReactions, getUserReaction, handleReaction } = usePostReactions();
   return (
     <>
-      {/* Like button overlay - with gradient styling */}
+      {/* Like button overlay - with emoji reaction functionality */}
       <div className="absolute bottom-2 left-2 hidden md:block pointer-events-auto z-20">
-        <button
-          onClick={onLike}
-          className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-b from-white/90 to-gray-100/90 border border-gray-200/50 backdrop-blur-sm rounded-full transition-all duration-200 hover:from-gray-50/90 hover:to-gray-200/90 active:from-gray-100/90 active:to-gray-300/90 pointer-events-auto"
-        >
-          <PiHandsClappingDuotone className="h-4 w-4 text-gray-700" />
-          <span className="font-semibold text-sm text-gray-700 leading-none">{likes}</span>
-        </button>
+        <div className="bg-gradient-to-b from-white/90 to-gray-100/90 border border-gray-200/50 backdrop-blur-sm rounded-full transition-all duration-200 hover:from-gray-50/90 hover:to-gray-200/90 active:from-gray-100/90 active:to-gray-300/90 pointer-events-auto px-2 py-1">
+          <QuickReactionButton
+            postId={postId}
+            reactions={getPostReactions(postId)}
+            userReaction={getUserReaction(postId)}
+            onReact={handleReaction}
+            className="scale-75"
+          />
+        </div>
       </div>
 
 

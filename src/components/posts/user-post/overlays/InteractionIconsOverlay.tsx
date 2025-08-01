@@ -1,19 +1,24 @@
 import React from 'react';
-import { Heart, MessageCircle, Share, VolumeX, Volume2 } from 'lucide-react';
+import { MessageCircle, Share, VolumeX, Volume2 } from 'lucide-react';
 import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import { useVideoPlaybackManager } from '@/contexts/VideoPlaybackManager';
+import { QuickReactionButton } from '@/components/clubhouse/QuickReactionButton';
+import { usePostReactions } from '@/hooks/usePostReactions';
 
 interface InteractionIconsOverlayProps {
+  postId: string;
   onInteractionClick: (e: React.MouseEvent, type: string) => void;
   currentMediaType?: 'image' | 'video';
 }
 
 export const InteractionIconsOverlay: React.FC<InteractionIconsOverlayProps> = ({
+  postId,
   onInteractionClick,
   currentMediaType = 'image'
 }) => {
   const { isGloballyMuted, toggleGlobalMute } = useGlobalAudio();
   const { muteAllVideos } = useVideoPlaybackManager();
+  const { getPostReactions, getUserReaction, handleReaction } = usePostReactions();
 
   const handleMuteToggle = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -42,12 +47,13 @@ export const InteractionIconsOverlay: React.FC<InteractionIconsOverlayProps> = (
           </button>
         )}
         
-        <button 
-          className="cursor-pointer hover:opacity-100 transition-opacity"
-          onClick={(e) => onInteractionClick(e, 'like')}
-        >
-          <Heart className="w-8 h-8" />
-        </button>
+        <QuickReactionButton
+          postId={postId}
+          reactions={getPostReactions(postId)}
+          userReaction={getUserReaction(postId)}
+          onReact={handleReaction}
+          className=""
+        />
         <button 
           className="cursor-pointer hover:opacity-100 transition-opacity"
           onClick={(e) => onInteractionClick(e, 'comment')}
