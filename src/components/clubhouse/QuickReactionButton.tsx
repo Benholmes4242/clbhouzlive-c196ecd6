@@ -145,9 +145,11 @@ export const QuickReactionButton: React.FC<QuickReactionButtonProps> = ({
 
       {/* Reaction Count */}
       {totalReactions > 0 && (
-        <div className="flex items-center gap-2 mt-1 text-white text-xs font-medium" 
+        <div className="flex flex-col items-center mt-1 text-white text-xs font-medium w-full max-w-[56px]" 
              style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
-          {getReactionDisplay()}
+          <div className="flex flex-wrap items-center justify-center gap-1">
+            {getReactionDisplay()}
+          </div>
         </div>
       )}
 
