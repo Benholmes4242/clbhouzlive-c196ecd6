@@ -79,7 +79,11 @@ export const QuickReactionButton: React.FC<QuickReactionButtonProps> = ({
 
     return entries.map(([emoji, count]) => (
       <span key={emoji} className="inline-flex items-center gap-1">
-        <span className="text-xs">{emoji}</span>
+        {emoji === '❤️' ? (
+          <HeartSolidIcon className="w-3 h-3 text-red-500" />
+        ) : (
+          <span className="text-xs">{emoji}</span>
+        )}
         <span className="text-xs">{count}</span>
       </span>
     ));
@@ -123,14 +127,18 @@ export const QuickReactionButton: React.FC<QuickReactionButtonProps> = ({
           
           {/* Floating Emoji Animation */}
           {floatingEmoji && (
-            <span 
-              className="absolute inset-0 text-2xl animate-bounce pointer-events-none"
+            <div 
+              className="absolute inset-0 flex items-center justify-center pointer-events-none"
               style={{
                 animation: 'float-up 1s ease-out forwards'
               }}
             >
-              {floatingEmoji}
-            </span>
+              {floatingEmoji === '❤️' ? (
+                <HeartSolidIcon className="w-6 h-6 text-red-500" />
+              ) : (
+                <span className="text-2xl">{floatingEmoji}</span>
+              )}
+            </div>
           )}
         </div>
       </button>
