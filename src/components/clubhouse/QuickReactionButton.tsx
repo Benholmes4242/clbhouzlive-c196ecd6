@@ -13,6 +13,7 @@ interface QuickReactionButtonProps {
   userReaction?: string;
   onReact: (postId: string, emoji: string) => void;
   className?: string;
+  variant?: 'default' | 'modal'; // Add variant prop for different styles
 }
 
 export const QuickReactionButton: React.FC<QuickReactionButtonProps> = ({
@@ -20,7 +21,8 @@ export const QuickReactionButton: React.FC<QuickReactionButtonProps> = ({
   reactions,
   userReaction,
   onReact,
-  className = ""
+  className = "",
+  variant = 'default'
 }) => {
   const [showTray, setShowTray] = useState(false);
   const [trayPosition, setTrayPosition] = useState({ x: 0, y: 0 });
@@ -90,11 +92,15 @@ export const QuickReactionButton: React.FC<QuickReactionButtonProps> = ({
   };
 
   return (
-    <div className={`flex flex-col items-center ${className}`}>
+    <div className={`flex flex-col items-center space-y-1 ${className}`}>
       {/* Main Reaction Button */}
       <button
         ref={buttonRef}
-        className="cursor-pointer hover:opacity-100 transition-all duration-200 relative"
+        className={`cursor-pointer hover:opacity-100 transition-all duration-200 relative hover:scale-110 ${
+          variant === 'modal' 
+            ? 'flex items-center justify-center w-12 h-12 bg-black/50 rounded-full' 
+            : ''
+        }`}
         onTouchStart={handleLongPressStart}
         onTouchEnd={handleLongPressEnd}
         onMouseDown={handleLongPressStart}
@@ -110,19 +116,19 @@ export const QuickReactionButton: React.FC<QuickReactionButtonProps> = ({
         {/* Current User's Reaction or Default Heart */}
         <div className="relative">
           {userReaction && userReaction !== '❤️' ? (
-            <span className={`text-2xl transition-transform duration-200 ${
+            <span className={`transition-transform duration-200 ${
               showTray ? 'scale-110' : 'scale-100'
-            }`}>
+            } ${variant === 'modal' ? 'text-lg' : 'text-2xl'}`}>
               {userReaction}
             </span>
           ) : userReaction === '❤️' ? (
-            <HeartSolidIcon className={`w-8 h-8 text-red-500 transition-transform duration-200 ${
+            <HeartSolidIcon className={`text-red-500 transition-transform duration-200 ${
               showTray ? 'scale-110' : 'scale-100'
-            }`} />
+            } ${variant === 'modal' ? 'w-6 h-6' : 'w-8 h-8'}`} />
           ) : (
-            <HeartIcon className={`w-8 h-8 text-white transition-transform duration-200 ${
+            <HeartIcon className={`text-white transition-transform duration-200 ${
               showTray ? 'scale-110' : 'scale-100'
-            }`} />
+            } ${variant === 'modal' ? 'w-6 h-6' : 'w-8 h-8'}`} />
           )}
           
           {/* Floating Emoji Animation */}
@@ -144,7 +150,14 @@ export const QuickReactionButton: React.FC<QuickReactionButtonProps> = ({
       </button>
 
       {/* Reaction Count */}
-      {totalReactions > 0 && (
+      {totalReactions > 0 && variant === 'modal' && (
+        <span className="text-xs font-medium text-white">
+          {totalReactions}
+        </span>
+      )}
+
+      {/* Reaction Count for default variant */}
+      {totalReactions > 0 && variant === 'default' && (
         <div className="flex items-center gap-2 mt-1 text-white text-xs font-medium" 
              style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
           {getReactionDisplay()}

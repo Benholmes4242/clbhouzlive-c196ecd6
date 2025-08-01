@@ -384,6 +384,7 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                 reactions={getPostReactions(currentPost.id)}
                 userReaction={getUserReaction(currentPost.id)}
                 onReact={handleReaction}
+                variant="modal"
                 className="text-white"
               />
 
@@ -586,6 +587,7 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                          reactions={getPostReactions(currentPost.id)}
                          userReaction={getUserReaction(currentPost.id)}
                          onReact={handleReaction}
+                         variant="modal"
                          className="text-white"
                        />
 
