@@ -21,12 +21,10 @@ const PostActions = ({ stats, isVideoPost = false }: PostActionsProps) => {
         <FeedMuteToggle isVideoPost={isVideoPost} />
         
         <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-red-500">
-          <Heart className="h-4 w-4 mr-1" />
-          {stats.likes.toLocaleString()}
+          <Heart className="h-4 w-4" />
         </Button>
         <Button variant="ghost" size="sm" className="text-muted-foreground">
-          <MessageCircle className="h-4 w-4 mr-1" />
-          {stats.comments}
+          <MessageCircle className="h-4 w-4" />
         </Button>
         <Button variant="ghost" size="sm" className="text-muted-foreground">
           <Share className="h-4 w-4 mr-1" />
