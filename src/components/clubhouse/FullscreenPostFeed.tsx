@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronUp, ChevronDown, Volume2, VolumeX, Heart, MessageCircle, Share, MoreHorizontal } from 'lucide-react';
+import { ChevronUp, ChevronDown, Volume2, VolumeX, MessageCircle, Send, MoreHorizontal } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
 import { ExploreContentItem } from '@/components/explore/types';
 import MediaDisplay from '@/components/explore/MediaDisplay';
+import { QuickReactionButton } from './QuickReactionButton';
+import { usePostReactions } from '@/hooks/usePostReactions';
 
 interface FullscreenPostFeedProps {
   content: ExploreContentItem[];
@@ -26,6 +28,7 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
   const [commentText, setCommentText] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
 
+  const { getUserReaction, handleReaction } = usePostReactions();
   const currentPost = content[currentIndex];
 
   // Navigate to next/previous post
@@ -170,15 +173,46 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
         </button>
       </div>
 
-      {/* Mute/Unmute Toggle */}
-      {currentPost.type === 'video' && (
+      {/* Right-hand Action Bar */}
+      <div className="absolute right-4 bottom-20 flex flex-col gap-4 z-20">
+        {/* Mute/Unmute Toggle */}
+        {currentPost.type === 'video' && (
+          <button
+            onClick={() => setIsMuted(!isMuted)}
+            className="w-12 h-12 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70"
+          >
+            {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+          </button>
+        )}
+        
+        {/* Emoji Reaction Button */}
+        <QuickReactionButton
+          postId={currentPost.id}
+          userReaction={getUserReaction(currentPost.id)}
+          onReact={handleReaction}
+        />
+        
+        {/* Comment Button */}
         <button
-          onClick={() => setIsMuted(!isMuted)}
-          className="absolute bottom-20 left-4 p-3 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70 z-20"
+          onClick={() => onMediaClick(currentPost)}
+          className="w-12 h-12 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70 relative"
         >
-          {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+          <MessageCircle className="w-5 h-5" />
+          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-medium">
+            24
+          </span>
         </button>
-      )}
+        
+        {/* Share Button */}
+        <button className="w-12 h-12 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70">
+          <Send className="w-5 h-5" />
+        </button>
+        
+        {/* More Options */}
+        <button className="w-12 h-12 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70">
+          <MoreHorizontal className="w-5 h-5" />
+        </button>
+      </div>
 
       {/* Content Overlay */}
       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 pb-6 z-10">
@@ -219,26 +253,6 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
           </div>
         )}
 
-        {/* Action Buttons */}
-        <div className="flex items-center gap-6 mb-4">
-          <button 
-            onClick={() => onLike(currentPost.id)}
-            className="flex items-center gap-2 text-white"
-          >
-            <Heart className="w-6 h-6" />
-            <span className="text-sm">{currentPost.likes}</span>
-          </button>
-          <button 
-            onClick={() => onMediaClick(currentPost)}
-            className="flex items-center gap-2 text-white"
-          >
-            <MessageCircle className="w-6 h-6" />
-            <span className="text-sm">24</span>
-          </button>
-          <button className="flex items-center gap-2 text-white">
-            <Share className="w-6 h-6" />
-          </button>
-        </div>
 
         {/* Recent Comment */}
         {mockComments.length > 0 && (

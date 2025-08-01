@@ -5,26 +5,28 @@ interface EmojiReactionTrayProps {
   onEmojiSelect: (emoji: string) => void;
   onCancel: () => void;
   position: { x: number; y: number };
+  selectedEmoji?: string;
 }
 
 const EMOJIS = [
-  { emoji: '😂', label: 'Laughing' },
+  { emoji: '❤️', label: 'Love' },
   { emoji: '🔥', label: 'Fire' },
   { emoji: '👏', label: 'Clap' },
-  { emoji: '❤️', label: 'Love' }
+  { emoji: '😂', label: 'Laughing' }
 ];
 
 export const EmojiReactionTray: React.FC<EmojiReactionTrayProps> = ({
   isVisible,
   onEmojiSelect,
   onCancel,
-  position
+  position,
+  selectedEmoji
 }) => {
-  const [selectedEmoji, setSelectedEmoji] = useState<string | null>(null);
+  const [hoveredEmoji, setHoveredEmoji] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isVisible) {
-      setSelectedEmoji(null);
+      setHoveredEmoji(null);
     }
   }, [isVisible]);
 
@@ -60,12 +62,15 @@ export const EmojiReactionTray: React.FC<EmojiReactionTrayProps> = ({
               w-10 h-10 flex items-center justify-center
               rounded-full transition-all duration-150
               ${selectedEmoji === item.emoji 
-                ? 'bg-white/20 scale-110' 
+                ? 'bg-white/30 scale-110' 
+                : hoveredEmoji === item.emoji
+                ? 'bg-white/20 scale-105'
                 : 'hover:bg-white/10 active:scale-95'
               }
             `}
-            onTouchStart={() => setSelectedEmoji(item.emoji)}
-            onMouseEnter={() => setSelectedEmoji(item.emoji)}
+            onTouchStart={() => setHoveredEmoji(item.emoji)}
+            onMouseEnter={() => setHoveredEmoji(item.emoji)}
+            onMouseLeave={() => setHoveredEmoji(null)}
             onTouchEnd={(e) => {
               e.preventDefault();
               e.stopPropagation();
