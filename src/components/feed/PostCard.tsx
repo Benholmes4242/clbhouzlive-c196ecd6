@@ -68,7 +68,6 @@ const PostCard = ({ post }: PostCardProps) => {
 
         <div className="flex items-center justify-between">
           <PostActions 
-            postId={post.id}
             stats={post.stats} 
             isVideoPost={post.content.type === 'video'}
           />

@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronUp, ChevronDown, Volume2, VolumeX, MessageCircle, Share, MoreHorizontal } from 'lucide-react';
-import { HeartIcon } from '@heroicons/react/24/outline';
-import { HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid';
+import { ChevronUp, ChevronDown, Volume2, VolumeX, Heart, MessageCircle, Share, MoreHorizontal } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
 import { ExploreContentItem } from '@/components/explore/types';
 import MediaDisplay from '@/components/explore/MediaDisplay';
@@ -26,24 +24,9 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isMuted, setIsMuted] = useState(true);
   const [commentText, setCommentText] = useState('');
-  const [likedPosts, setLikedPosts] = useState<Set<string>>(new Set());
   const containerRef = useRef<HTMLDivElement>(null);
 
   const currentPost = content[currentIndex];
-
-  // Handle like toggle
-  const handleLikeToggle = (postId: string) => {
-    setLikedPosts(prev => {
-      const newLikedPosts = new Set(prev);
-      if (newLikedPosts.has(postId)) {
-        newLikedPosts.delete(postId);
-      } else {
-        newLikedPosts.add(postId);
-      }
-      return newLikedPosts;
-    });
-    onLike(postId);
-  };
 
   // Navigate to next/previous post
   const goToNext = () => {
@@ -187,61 +170,15 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
         </button>
       </div>
 
-      {/* Right Action Column - Fixed Position */}
-      <div className="absolute right-4 bottom-32 flex flex-col items-center gap-6 z-20" style={{ width: '56px' }}>
-        {/* Mute/Unmute Toggle */}
-        {currentPost.type === 'video' && (
-          <div className="w-14 flex justify-center">
-            <button
-              onClick={() => setIsMuted(!isMuted)}
-              className="p-3 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70"
-            >
-              {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-            </button>
-          </div>
-        )}
-        
-        {/* Heart Like Button */}
-        <div className="w-14 flex justify-center">
-          <button
-            onClick={() => handleLikeToggle(currentPost.id)}
-            className="p-3 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70 transition-all duration-200"
-          >
-            {likedPosts.has(currentPost.id) ? (
-              <HeartSolidIcon className="w-5 h-5 text-red-500" />
-            ) : (
-              <HeartIcon className="w-5 h-5 text-white" />
-            )}
-          </button>
-        </div>
-        
-        {/* Comment Button */}
-        <div className="w-14 flex justify-center">
-          <button 
-            onClick={() => onMediaClick(currentPost)}
-            className="flex flex-col items-center"
-          >
-            <div className="p-3 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70">
-              <MessageCircle className="w-5 h-5" />
-            </div>
-            <span className="text-white text-xs mt-1 font-medium" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>27</span>
-          </button>
-        </div>
-        
-        {/* Share Button */}
-        <div className="w-14 flex justify-center">
-          <button className="p-3 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70">
-            <Share className="w-5 h-5" />
-          </button>
-        </div>
-        
-        {/* More Options */}
-        <div className="w-14 flex justify-center">
-          <button className="p-3 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70">
-            <MoreHorizontal className="w-5 h-5" />
-          </button>
-        </div>
-      </div>
+      {/* Mute/Unmute Toggle */}
+      {currentPost.type === 'video' && (
+        <button
+          onClick={() => setIsMuted(!isMuted)}
+          className="absolute bottom-20 left-4 p-3 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70 z-20"
+        >
+          {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+        </button>
+      )}
 
       {/* Content Overlay */}
       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 pb-6 z-10">
@@ -282,7 +219,26 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
           </div>
         )}
 
-        {/* Action Buttons - Removed duplicate comment button */}
+        {/* Action Buttons */}
+        <div className="flex items-center gap-6 mb-4">
+          <button 
+            onClick={() => onLike(currentPost.id)}
+            className="flex items-center gap-2 text-white"
+          >
+            <Heart className="w-6 h-6" />
+            <span className="text-sm">{currentPost.likes}</span>
+          </button>
+          <button 
+            onClick={() => onMediaClick(currentPost)}
+            className="flex items-center gap-2 text-white"
+          >
+            <MessageCircle className="w-6 h-6" />
+            <span className="text-sm">24</span>
+          </button>
+          <button className="flex items-center gap-2 text-white">
+            <Share className="w-6 h-6" />
+          </button>
+        </div>
 
         {/* Recent Comment */}
         {mockComments.length > 0 && (

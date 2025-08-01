@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
-import { ArrowLeft, MessageCircle, Share, ChevronLeft, ChevronRight, X, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
+import { ArrowLeft, Heart, MessageCircle, Share, ChevronLeft, ChevronRight, X, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useSwipeable } from 'react-swipeable';
@@ -10,8 +10,6 @@ import { usePostUpdate } from '@/hooks/usePostUpdate';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
 import HighQualityImage from '@/components/ui/high-quality-image';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
-import { QuickReactionButton } from '@/components/clubhouse/QuickReactionButton';
-import { usePostReactions } from '@/hooks/usePostReactions';
 
 import CoursePostBadge from './CoursePostBadge';
 import CommentsDrawer from './CommentsDrawer';
@@ -65,7 +63,6 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
   const { user } = useSupabaseSession();
   const { updatePost, isUpdating } = usePostUpdate();
   const { deletePost } = usePostDeletion();
-  const { getPostReactions, getUserReaction, handleReaction } = usePostReactions();
   const isMobile = useIsMobile();
   const [currentPostIndex, setCurrentPostIndex] = useState(0);
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
@@ -363,14 +360,13 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
 
             {/* Action Buttons - Bottom Right */}
             <div className="absolute bottom-4 right-4 z-10 flex flex-col space-y-8">
-              {/* Long Hold Like Button */}
-              <QuickReactionButton
-                postId={currentPost.id}
-                reactions={getPostReactions(currentPost.id)}
-                userReaction={getUserReaction(currentPost.id)}
-                onReact={handleReaction}
-                className="text-white"
-              />
+              {/* Like Button */}
+              <button className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform">
+                <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
+                  <Heart className="h-8 w-8" />
+                </div>
+                <span className="text-xs font-medium">0</span>
+              </button>
 
               {/* Comment Button */}
               <button 
@@ -550,14 +546,13 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
 
                     {/* Action Buttons - Bottom Right */}
                     <div className="absolute bottom-4 right-4 z-10 flex flex-col space-y-8">
-                      {/* Long Hold Like Button */}
-                      <QuickReactionButton
-                        postId={currentPost.id}
-                        reactions={getPostReactions(currentPost.id)}
-                        userReaction={getUserReaction(currentPost.id)}
-                        onReact={handleReaction}
-                        className="text-white"
-                      />
+                      {/* Like Button */}
+                      <button className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform">
+                        <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
+                          <Heart className="h-8 w-8" />
+                        </div>
+                        <span className="text-xs font-medium">0</span>
+                      </button>
 
                       {/* Comment Button */}
                       <button 
@@ -652,13 +647,10 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                 <div className="p-4 border-t">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
-                      <QuickReactionButton
-                        postId={currentPost.id}
-                        reactions={getPostReactions(currentPost.id)}
-                        userReaction={getUserReaction(currentPost.id)}
-                        onReact={handleReaction}
-                        className="hover:text-red-500"
-                      />
+                      <Button variant="ghost" size="sm" className="hover:text-red-500">
+                        <Heart className="h-5 w-5 mr-1" />
+                        Like
+                      </Button>
                       <Button variant="ghost" size="sm">
                         <MessageCircle className="h-5 w-5 mr-1" />
                         Comment
