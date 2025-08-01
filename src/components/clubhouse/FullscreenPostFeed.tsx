@@ -170,15 +170,6 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
         </button>
       </div>
 
-      {/* Mute/Unmute Toggle */}
-      {currentPost.type === 'video' && (
-        <button
-          onClick={() => setIsMuted(!isMuted)}
-          className="absolute bottom-20 left-4 p-3 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70 z-20"
-        >
-          {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-        </button>
-      )}
 
       {/* Content Overlay */}
       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 pb-6 z-10">
@@ -238,6 +229,15 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
           <button className="flex items-center gap-2 text-white">
             <Share className="w-6 h-6" />
           </button>
+          {/* Mute/Unmute Toggle - moved here to align with other action buttons */}
+          {currentPost.type === 'video' && (
+            <button
+              onClick={() => setIsMuted(!isMuted)}
+              className="flex items-center gap-2 text-white"
+            >
+              {isMuted ? <VolumeX className="w-6 h-6" /> : <Volume2 className="w-6 h-6" />}
+            </button>
+          )}
         </div>
 
         {/* Recent Comment */}

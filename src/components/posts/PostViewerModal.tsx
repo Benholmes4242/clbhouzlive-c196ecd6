@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
-import { ArrowLeft, MessageCircle, Share, ChevronLeft, ChevronRight, X, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
+import { ArrowLeft, MessageCircle, Share, ChevronLeft, ChevronRight, X, MoreHorizontal, Edit, Trash2, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useSwipeable } from 'react-swipeable';
@@ -8,6 +8,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePostUpdate } from '@/hooks/usePostUpdate';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
+import { useGlobalAudio } from '@/contexts/GlobalAudioContext';
 import HighQualityImage from '@/components/ui/high-quality-image';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import { QuickReactionButton } from '@/components/clubhouse/QuickReactionButton';
@@ -66,6 +67,7 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
   const { updatePost, isUpdating } = usePostUpdate();
   const { deletePost } = usePostDeletion();
   const { getPostReactions, getUserReaction, handleReaction } = usePostReactions();
+  const { isGloballyMuted, toggleGlobalMute } = useGlobalAudio();
   const isMobile = useIsMobile();
   const [currentPostIndex, setCurrentPostIndex] = useState(0);
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
@@ -383,12 +385,24 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                 <span className="text-xs font-medium">0</span>
               </button>
 
-              {/* Share Button */}
+               {/* Share Button */}
               <button className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform">
                 <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
                   <Share className="h-8 w-8" />
                 </div>
               </button>
+
+              {/* Mute/Unmute Toggle - Only show for video posts */}
+              {currentMedia?.media_type === 'video' && (
+                <button 
+                  onClick={toggleGlobalMute}
+                  className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform"
+                >
+                  <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
+                    {isGloballyMuted ? <VolumeX className="h-8 w-8" /> : <Volume2 className="h-8 w-8" />}
+                  </div>
+                </button>
+              )}
 
               {/* More Options Button - Only show for own posts */}
               {user && currentPost.user.id === user.id && (
