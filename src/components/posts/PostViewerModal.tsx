@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
-import { ArrowLeft, MessageCircle, Share, ChevronLeft, ChevronRight, X, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
+import { ArrowLeft, MessageCircle, Share, ChevronLeft, ChevronRight, X, MoreHorizontal, Edit, Trash2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useSwipeable } from 'react-swipeable';
@@ -362,7 +362,22 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
             )}
 
             {/* Action Buttons - Bottom Right */}
-            <div className="absolute bottom-4 right-4 z-10 flex flex-col space-y-8">
+            <div className="absolute bottom-4 right-4 z-10 flex flex-col space-y-6">
+              {/* Mute/Unmute Toggle - only for videos */}
+              {currentMedia?.media_type === 'video' && (
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    // Toggle mute functionality here
+                  }}
+                  className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform"
+                >
+                  <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
+                    <VolumeX className="h-6 w-6" />
+                  </div>
+                </button>
+              )}
+
               {/* Long Hold Like Button */}
               <QuickReactionButton
                 postId={currentPost.id}
@@ -378,7 +393,7 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                 className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform"
               >
                 <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
-                  <MessageCircle className="h-8 w-8" />
+                  <MessageCircle className="h-6 w-6" />
                 </div>
                 <span className="text-xs font-medium">0</span>
               </button>
@@ -386,7 +401,7 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
               {/* Share Button */}
               <button className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform">
                 <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
-                  <Share className="h-8 w-8" />
+                  <Share className="h-6 w-6" />
                 </div>
               </button>
 
@@ -394,9 +409,9 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
               {user && currentPost.user.id === user.id && (
                 <DropdownMenu modal={false}>
                   <DropdownMenuTrigger asChild>
-                    <button className="flex flex-col items-center space-y-1 text-black hover:scale-110 transition-transform">
+                    <button className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform">
                       <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
-                        <MoreHorizontal className="h-8 w-8" />
+                        <MoreHorizontal className="h-6 w-6" />
                       </div>
                     </button>
                   </DropdownMenuTrigger>
@@ -548,35 +563,50 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                       </>
                     )}
 
-                    {/* Action Buttons - Bottom Right */}
-                    <div className="absolute bottom-4 right-4 z-10 flex flex-col space-y-8">
-                      {/* Long Hold Like Button */}
-                      <QuickReactionButton
-                        postId={currentPost.id}
-                        reactions={getPostReactions(currentPost.id)}
-                        userReaction={getUserReaction(currentPost.id)}
-                        onReact={handleReaction}
-                        className="text-white"
-                      />
+                     {/* Action Buttons - Bottom Right */}
+                     <div className="absolute bottom-4 right-4 z-10 flex flex-col space-y-6">
+                       {/* Mute/Unmute Toggle - only for videos */}
+                       {currentMedia?.media_type === 'video' && (
+                         <button 
+                           onClick={(e) => {
+                             e.stopPropagation();
+                             // Toggle mute functionality here
+                           }}
+                           className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform"
+                         >
+                           <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
+                             <VolumeX className="h-6 w-6" />
+                           </div>
+                         </button>
+                       )}
 
-                      {/* Comment Button */}
-                      <button 
-                        onClick={() => setShowComments(true)}
-                        className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform"
-                      >
-                        <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
-                          <MessageCircle className="h-8 w-8" />
-                        </div>
-                        <span className="text-xs font-medium">0</span>
-                      </button>
+                       {/* Long Hold Like Button */}
+                       <QuickReactionButton
+                         postId={currentPost.id}
+                         reactions={getPostReactions(currentPost.id)}
+                         userReaction={getUserReaction(currentPost.id)}
+                         onReact={handleReaction}
+                         className="text-white"
+                       />
 
-                      {/* Share Button */}
-                      <button className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform">
-                        <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
-                          <Share className="h-8 w-8" />
-                        </div>
-                      </button>
-                    </div>
+                       {/* Comment Button */}
+                       <button 
+                         onClick={() => setShowComments(true)}
+                         className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform"
+                       >
+                         <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
+                           <MessageCircle className="h-6 w-6" />
+                         </div>
+                         <span className="text-xs font-medium">0</span>
+                       </button>
+
+                       {/* Share Button */}
+                       <button className="flex flex-col items-center space-y-1 text-white hover:scale-110 transition-transform">
+                         <div className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full">
+                           <Share className="h-6 w-6" />
+                         </div>
+                       </button>
+                     </div>
                   </>
                 )}
 
