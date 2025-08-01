@@ -25,7 +25,9 @@ export const QuickReactionButton: React.FC<QuickReactionButtonProps> = ({
 
   const handleLongPressStart = useCallback((e: React.TouchEvent | React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     console.log('Long press started');
+    
     
     if (buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
