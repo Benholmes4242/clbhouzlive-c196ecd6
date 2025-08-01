@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronUp, ChevronDown, Volume2, VolumeX, Heart, MessageCircle, Share, MoreHorizontal } from 'lucide-react';
+import { ChevronUp, ChevronDown, Volume2, VolumeX, MessageCircle, Share, MoreHorizontal } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
 import { ExploreContentItem } from '@/components/explore/types';
 import MediaDisplay from '@/components/explore/MediaDisplay';
+import { QuickReactionButton } from './QuickReactionButton';
+import { usePostReactions } from '@/hooks/usePostReactions';
 
 interface FullscreenPostFeedProps {
   content: ExploreContentItem[];
@@ -25,6 +27,7 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
   const [isMuted, setIsMuted] = useState(true);
   const [commentText, setCommentText] = useState('');
   const containerRef = useRef<HTMLDivElement>(null);
+  const { getPostReactions, getUserReaction, handleReaction } = usePostReactions();
 
   const currentPost = content[currentIndex];
 
@@ -170,15 +173,37 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
         </button>
       </div>
 
-      {/* Mute/Unmute Toggle */}
-      {currentPost.type === 'video' && (
-        <button
-          onClick={() => setIsMuted(!isMuted)}
-          className="absolute bottom-20 left-4 p-3 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70 z-20"
-        >
-          {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+      {/* Right Action Column - Fixed Position */}
+      <div className="absolute right-4 bottom-32 flex flex-col items-center gap-6 z-20" style={{ width: '56px' }}>
+        {/* Mute/Unmute Toggle */}
+        {currentPost.type === 'video' && (
+          <button
+            onClick={() => setIsMuted(!isMuted)}
+            className="p-3 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70"
+          >
+            {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+          </button>
+        )}
+        
+        {/* Emoji Reaction Button */}
+        <QuickReactionButton
+          postId={currentPost.id}
+          reactions={getPostReactions(currentPost.id)}
+          userReaction={getUserReaction(currentPost.id)}
+          onReact={handleReaction}
+          className="flex flex-col items-center"
+        />
+        
+        {/* Share Button */}
+        <button className="p-3 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70">
+          <Share className="w-5 h-5" />
         </button>
-      )}
+        
+        {/* More Options */}
+        <button className="p-3 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70">
+          <MoreHorizontal className="w-5 h-5" />
+        </button>
+      </div>
 
       {/* Content Overlay */}
       <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 pb-6 z-10">
@@ -222,21 +247,11 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
         {/* Action Buttons */}
         <div className="flex items-center gap-6 mb-4">
           <button 
-            onClick={() => onLike(currentPost.id)}
-            className="flex items-center gap-2 text-white"
-          >
-            <Heart className="w-6 h-6" />
-            <span className="text-sm">{currentPost.likes}</span>
-          </button>
-          <button 
             onClick={() => onMediaClick(currentPost)}
             className="flex items-center gap-2 text-white"
           >
             <MessageCircle className="w-6 h-6" />
             <span className="text-sm">24</span>
-          </button>
-          <button className="flex items-center gap-2 text-white">
-            <Share className="w-6 h-6" />
           </button>
         </div>
 
