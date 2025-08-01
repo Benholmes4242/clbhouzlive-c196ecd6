@@ -55,13 +55,27 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
     return () => el?.removeEventListener('touchmove', preventDefault);
   }, []);
 
-  // Swipe handlers
+  // Swipe handlers with exclusion for right action bar
   const swipeHandlers = useSwipeable({
-    onSwipedUp: () => goToNext(),
-    onSwipedDown: () => goToPrevious(),
+    onSwipedUp: (eventData) => {
+      // Don't handle swipe if it started from the right action area
+      if (eventData.event.target && (eventData.event.target as Element).closest('.right-action-bar')) {
+        return;
+      }
+      goToNext();
+    },
+    onSwipedDown: (eventData) => {
+      // Don't handle swipe if it started from the right action area
+      if (eventData.event.target && (eventData.event.target as Element).closest('.right-action-bar')) {
+        return;
+      }
+      goToPrevious();
+    },
     trackMouse: false,
     trackTouch: true,
-    delta: 50
+    delta: 50,
+    preventScrollOnSwipe: true,
+    touchEventOptions: { passive: false }
   });
 
   // Keyboard navigation
@@ -174,7 +188,7 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
       </div>
 
       {/* Right-hand Action Bar */}
-      <div className="absolute right-4 bottom-20 flex flex-col gap-4 z-20">
+      <div className="right-action-bar absolute right-4 bottom-20 flex flex-col gap-4 z-20">
         {/* Mute/Unmute Toggle */}
         {currentPost.type === 'video' && (
           <button
