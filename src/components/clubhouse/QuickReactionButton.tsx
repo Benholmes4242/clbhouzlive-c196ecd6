@@ -83,7 +83,7 @@ export const QuickReactionButton: React.FC<QuickReactionButtonProps> = ({
       {/* Main Reaction Button */}
       <button
         ref={buttonRef}
-        className="w-10 h-10 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm hover:bg-black/70 transition-all duration-200 pointer-events-auto relative z-50"
+        className="w-12 h-12 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm hover:bg-black/70 transition-all duration-200 pointer-events-auto relative z-50"
         onTouchStart={(e) => {
           console.log('🔥 EMOJI BUTTON TOUCH START');
           handleLongPressStart(e);
