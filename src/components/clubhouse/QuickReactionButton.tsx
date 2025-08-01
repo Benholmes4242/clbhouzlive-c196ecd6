@@ -102,8 +102,8 @@ export const QuickReactionButton: React.FC<QuickReactionButtonProps> = ({
         aria-label="React to post"
       >
         {/* Current User's Reaction or Default Heart */}
-        <div className="relative -ml-1">
-          <span className={`text-3xl transition-transform duration-200 ${
+        <div className="relative">
+          <span className={`text-2xl transition-transform duration-200 ${
             showTray ? 'scale-110' : 'scale-100'
           }`}>
             {userReaction || '❤️'}
@@ -112,7 +112,7 @@ export const QuickReactionButton: React.FC<QuickReactionButtonProps> = ({
           {/* Floating Emoji Animation */}
           {floatingEmoji && (
             <span 
-              className="absolute inset-0 text-3xl animate-bounce pointer-events-none"
+              className="absolute inset-0 text-2xl animate-bounce pointer-events-none"
               style={{
                 animation: 'float-up 1s ease-out forwards'
               }}

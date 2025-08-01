@@ -94,7 +94,6 @@ const MediaCard: React.FC<MediaCardProps> = ({ item, onLike, onFollow, isFeature
         />
 
         <MediaOverlays
-          postId={item.id}
           user={item.user}
           likes={item.likes}
           isFeatured={isFeatured}

@@ -220,7 +220,6 @@ const IndexFeedPostComponent: React.FC<IndexFeedPostProps> = ({
         />
 
         <InteractionIconsOverlay
-          postId={post.id}
           onInteractionClick={handleInteractionClick}
           currentMediaType={currentMediaMemo?.media_type}
         />
