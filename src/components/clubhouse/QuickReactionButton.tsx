@@ -90,66 +90,66 @@ export const QuickReactionButton: React.FC<QuickReactionButtonProps> = ({
   };
 
   return (
-    <div className={`relative flex flex-col items-center w-14 ${className}`}>
-      {/* Main Reaction Button */}
-      <button
-        ref={buttonRef}
-        className="cursor-pointer hover:opacity-100 transition-all duration-200 relative p-3 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70"
-        onTouchStart={handleLongPressStart}
-        onTouchEnd={handleLongPressEnd}
-        onMouseDown={handleLongPressStart}
-        onMouseUp={handleLongPressEnd}
-        onMouseLeave={() => {
-          if (longPressTimer.current) {
-            clearTimeout(longPressTimer.current);
-            longPressTimer.current = null;
-          }
-        }}
-        aria-label="React to post"
-      >
-        {/* Current User's Reaction or Default Heart */}
-        <div className="relative">
-          {userReaction && userReaction !== '❤️' ? (
-            <span className={`text-lg transition-transform duration-200 ${
-              showTray ? 'scale-110' : 'scale-100'
-            }`}>
-              {userReaction}
-            </span>
-          ) : userReaction === '❤️' ? (
-            <HeartSolidIcon className={`w-5 h-5 text-red-500 transition-transform duration-200 ${
-              showTray ? 'scale-110' : 'scale-100'
-            }`} />
-          ) : (
-            <HeartIcon className={`w-5 h-5 text-white transition-transform duration-200 ${
-              showTray ? 'scale-110' : 'scale-100'
-            }`} />
-          )}
-          
-          {/* Floating Emoji Animation */}
-          {floatingEmoji && (
-            <div 
-              className="absolute inset-0 flex items-center justify-center pointer-events-none"
-              style={{
-                animation: 'float-up 1s ease-out forwards'
-              }}
-            >
-              {floatingEmoji === '❤️' ? (
-                <HeartSolidIcon className="w-4 h-4 text-red-500" />
-              ) : (
-                <span className="text-sm">{floatingEmoji}</span>
-              )}
-            </div>
-          )}
-        </div>
-      </button>
-
-      {/* Reaction Count - Absolutely positioned to not affect layout */}
-      {totalReactions > 0 && (
-        <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 w-12 overflow-hidden">
-          <div className="flex flex-col items-center gap-1 text-white text-xs font-medium" 
-               style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
-            {getReactionDisplay()}
+    <div className={`relative flex flex-col items-center ${className}`}>
+      {/* Main Reaction Button - Fixed size to prevent column movement */}
+      <div className="w-14 flex justify-center">
+        <button
+          ref={buttonRef}
+          className="cursor-pointer hover:opacity-100 transition-all duration-200 relative p-3 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70"
+          onTouchStart={handleLongPressStart}
+          onTouchEnd={handleLongPressEnd}
+          onMouseDown={handleLongPressStart}
+          onMouseUp={handleLongPressEnd}
+          onMouseLeave={() => {
+            if (longPressTimer.current) {
+              clearTimeout(longPressTimer.current);
+              longPressTimer.current = null;
+            }
+          }}
+          aria-label="React to post"
+        >
+          {/* Current User's Reaction or Default Heart */}
+          <div className="relative">
+            {userReaction && userReaction !== '❤️' ? (
+              <span className={`text-lg transition-transform duration-200 ${
+                showTray ? 'scale-110' : 'scale-100'
+              }`}>
+                {userReaction}
+              </span>
+            ) : userReaction === '❤️' ? (
+              <HeartSolidIcon className={`w-5 h-5 text-red-500 transition-transform duration-200 ${
+                showTray ? 'scale-110' : 'scale-100'
+              }`} />
+            ) : (
+              <HeartIcon className={`w-5 h-5 text-white transition-transform duration-200 ${
+                showTray ? 'scale-110' : 'scale-100'
+              }`} />
+            )}
+            
+            {/* Floating Emoji Animation */}
+            {floatingEmoji && (
+              <div 
+                className="absolute inset-0 flex items-center justify-center pointer-events-none"
+                style={{
+                  animation: 'float-up 1s ease-out forwards'
+                }}
+              >
+                {floatingEmoji === '❤️' ? (
+                  <HeartSolidIcon className="w-4 h-4 text-red-500" />
+                ) : (
+                  <span className="text-sm">{floatingEmoji}</span>
+                )}
+              </div>
+            )}
           </div>
+        </button>
+      </div>
+
+      {/* Reaction Count - Horizontally displayed below button */}
+      {totalReactions > 0 && (
+        <div className="flex items-center gap-1 mt-1 text-white text-xs font-medium max-w-20 justify-center flex-wrap" 
+             style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
+          {getReactionDisplay()}
         </div>
       )}
 
