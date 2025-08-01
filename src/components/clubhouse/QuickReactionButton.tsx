@@ -78,8 +78,14 @@ export const QuickReactionButton: React.FC<QuickReactionButtonProps> = ({
     setShowTray(false);
   }, []);
 
+  console.log('🔥 QuickReactionButton rendered with:', { postId, userReaction, showTray });
+  
   return (
-    <div className={`flex flex-col items-center ${className}`}>
+    <div className={`flex flex-col items-center ${className}`} style={{ border: '2px solid red' }}>
+      {/* Debug overlay to see where the button is */}
+      <div className="absolute inset-0 bg-yellow-500/30 pointer-events-none z-40 text-black text-xs p-1">
+        QuickReactionButton
+      </div>
       {/* Main Reaction Button */}
       <button
         ref={buttonRef}
