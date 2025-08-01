@@ -102,7 +102,7 @@ export const QuickReactionButton: React.FC<QuickReactionButtonProps> = ({
         aria-label="React to post"
       >
         {/* Current User's Reaction or Default Heart */}
-        <div className="relative">
+        <div className="relative -ml-1">
           <span className={`text-3xl transition-transform duration-200 ${
             showTray ? 'scale-110' : 'scale-100'
           }`}>
