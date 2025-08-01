@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
 import { Minimize2, Volume2, VolumeX, ChevronLeft, ChevronRight, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
-import { PiHandsClapping, PiShareFat } from 'react-icons/pi';
+import { PiShareFat } from 'react-icons/pi';
 import { GoCommentDiscussion } from 'react-icons/go';
 import { useSwipeable } from 'react-swipeable';
 import { useTextExpansion } from '@/hooks/useTextExpansion';
@@ -18,6 +18,8 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
+import { QuickReactionButton } from '@/components/clubhouse/QuickReactionButton';
+import { usePostReactions } from '@/hooks/usePostReactions';
 
 interface FullscreenMediaModalProps {
   isOpen: boolean;
@@ -106,6 +108,7 @@ const FullscreenMediaModal = ({
   const { isGloballyMuted } = useGlobalAudio();
   const { user: currentUser } = useSupabaseSession();
   const { deletePost } = usePostDeletion();
+  const { getPostReactions, getUserReaction, handleReaction } = usePostReactions();
   
   // Store the original global mute state when modal opens
   const originalGlobalMuteState = useRef<boolean | null>(null);
@@ -528,12 +531,16 @@ const FullscreenMediaModal = ({
             </button>
           )}
           
-          <button 
-            className="cursor-pointer hover:opacity-100 transition-opacity"
-            onClick={(e) => handleInteractionClick(e, 'like')}
-          >
-            <PiHandsClapping className="w-8 h-8" />
-          </button>
+          {/* Long Hold Like Button */}
+          {postId && (
+            <QuickReactionButton
+              postId={postId}
+              reactions={getPostReactions(postId)}
+              userReaction={getUserReaction(postId)}
+              onReact={handleReaction}
+              className="text-white"
+            />
+          )}
           <button 
             className="cursor-pointer hover:opacity-100 transition-opacity"
             onClick={(e) => handleInteractionClick(e, 'comment')}
