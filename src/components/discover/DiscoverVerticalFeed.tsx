@@ -611,7 +611,6 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                   reactions={getPostReactions(item.id)}
                   userReaction={getUserReaction(item.id)}
                   onReact={handleReaction}
-                  variant="modal"
                   className="text-white"
                 />
 
