@@ -215,6 +215,19 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
           </button>
         </div>
         
+        {/* Comment Button */}
+        <div className="w-14 flex justify-center">
+          <button 
+            onClick={() => onMediaClick(currentPost)}
+            className="flex flex-col items-center"
+          >
+            <div className="p-3 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70">
+              <MessageCircle className="w-5 h-5" />
+            </div>
+            <span className="text-white text-xs mt-1 font-medium" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>27</span>
+          </button>
+        </div>
+        
         {/* Share Button */}
         <div className="w-14 flex justify-center">
           <button className="p-3 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70">
@@ -269,21 +282,7 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
           </div>
         )}
 
-        {/* Action Buttons */}
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex-1"></div>
-          <div className="flex flex-col items-center gap-4 mr-4">
-            <button 
-              onClick={() => onMediaClick(currentPost)}
-              className="flex flex-col items-center text-white"
-            >
-              <div className="p-3 rounded-full bg-black/50 backdrop-blur-sm hover:bg-black/70">
-                <MessageCircle className="w-5 h-5" />
-              </div>
-              <span className="text-xs mt-1">24</span>
-            </button>
-          </div>
-        </div>
+        {/* Action Buttons - Removed duplicate comment button */}
 
         {/* Recent Comment */}
         {mockComments.length > 0 && (
