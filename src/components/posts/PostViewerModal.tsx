@@ -370,7 +370,6 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                 userReaction={getUserReaction(currentPost.id)}
                 onReact={handleReaction}
                 className="text-white"
-                compact={true}
               />
 
               {/* Comment Button */}
@@ -558,7 +557,6 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                         userReaction={getUserReaction(currentPost.id)}
                         onReact={handleReaction}
                         className="text-white"
-                        compact={true}
                       />
 
                       {/* Comment Button */}
