@@ -662,6 +662,13 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
 
               {/* Action Buttons - Bottom Right */}
               <div className="absolute bottom-24 right-4 z-10 flex flex-col space-y-6">
+                {/* Emoji Reaction Button - moved above mute toggle */}
+                <QuickReactionButton
+                  postId={item.id}
+                  userReaction={getUserReaction(item.id)}
+                  onReact={handleReaction}
+                />
+
                 {/* Mute/Unmute toggle button - only show for video posts */}
                 {currentMedia.media_type === 'video' && (
                   <button 
@@ -675,13 +682,6 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                     )}
                   </button>
                 )}
-
-                {/* Emoji Reaction Button */}
-                <QuickReactionButton
-                  postId={item.id}
-                  userReaction={getUserReaction(item.id)}
-                  onReact={handleReaction}
-                />
 
                 {/* Message Button */}
                 <button
