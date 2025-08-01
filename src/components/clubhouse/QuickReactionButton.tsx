@@ -90,8 +90,8 @@ export const QuickReactionButton: React.FC<QuickReactionButtonProps> = ({
   };
 
   return (
-    <div className={`relative flex flex-col items-center ${className}`}>
-      {/* Main Reaction Button - Fixed size to prevent column movement */}
+    <div className={`relative ${className}`}>
+      {/* Main Reaction Button - Fixed width container */}
       <div className="w-14 flex justify-center">
         <button
           ref={buttonRef}
@@ -145,11 +145,13 @@ export const QuickReactionButton: React.FC<QuickReactionButtonProps> = ({
         </button>
       </div>
 
-      {/* Reaction Count - Horizontally displayed below button */}
+      {/* Reaction Count - Absolutely positioned to not affect column layout */}
       {totalReactions > 0 && (
-        <div className="flex items-center gap-1 mt-1 text-white text-xs font-medium max-w-20 justify-center flex-wrap" 
-             style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
-          {getReactionDisplay()}
+        <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-1 pointer-events-none">
+          <div className="flex items-center gap-1 text-white text-xs font-medium whitespace-nowrap" 
+               style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
+            {getReactionDisplay()}
+          </div>
         </div>
       )}
 
