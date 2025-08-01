@@ -90,11 +90,11 @@ export const QuickReactionButton: React.FC<QuickReactionButtonProps> = ({
   };
 
   return (
-    <div className={`flex flex-col items-center ${className}`}>
+    <div className={`relative flex flex-col items-center ${className}`}>
       {/* Main Reaction Button */}
       <button
         ref={buttonRef}
-        className="cursor-pointer hover:opacity-100 transition-all duration-200 relative"
+        className="cursor-pointer hover:opacity-100 transition-all duration-200 relative p-3 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70"
         onTouchStart={handleLongPressStart}
         onTouchEnd={handleLongPressEnd}
         onMouseDown={handleLongPressStart}
@@ -110,17 +110,17 @@ export const QuickReactionButton: React.FC<QuickReactionButtonProps> = ({
         {/* Current User's Reaction or Default Heart */}
         <div className="relative">
           {userReaction && userReaction !== '❤️' ? (
-            <span className={`text-2xl transition-transform duration-200 ${
+            <span className={`text-xl transition-transform duration-200 ${
               showTray ? 'scale-110' : 'scale-100'
             }`}>
               {userReaction}
             </span>
           ) : userReaction === '❤️' ? (
-            <HeartSolidIcon className={`w-8 h-8 text-red-500 transition-transform duration-200 ${
+            <HeartSolidIcon className={`w-5 h-5 text-red-500 transition-transform duration-200 ${
               showTray ? 'scale-110' : 'scale-100'
             }`} />
           ) : (
-            <HeartIcon className={`w-8 h-8 text-white transition-transform duration-200 ${
+            <HeartIcon className={`w-5 h-5 text-white transition-transform duration-200 ${
               showTray ? 'scale-110' : 'scale-100'
             }`} />
           )}
@@ -134,20 +134,20 @@ export const QuickReactionButton: React.FC<QuickReactionButtonProps> = ({
               }}
             >
               {floatingEmoji === '❤️' ? (
-                <HeartSolidIcon className="w-6 h-6 text-red-500" />
+                <HeartSolidIcon className="w-4 h-4 text-red-500" />
               ) : (
-                <span className="text-2xl">{floatingEmoji}</span>
+                <span className="text-lg">{floatingEmoji}</span>
               )}
             </div>
           )}
         </div>
       </button>
 
-      {/* Reaction Count */}
+      {/* Reaction Count - Positioned Absolutely */}
       {totalReactions > 0 && (
-        <div className="flex flex-col items-center mt-1 text-white text-xs font-medium w-full max-w-[56px]" 
+        <div className="absolute -bottom-6 left-1/2 transform -translate-x-1/2 text-white text-xs font-medium whitespace-nowrap" 
              style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
-          <div className="flex flex-wrap items-center justify-center gap-1">
+          <div className="flex items-center justify-center gap-1">
             {getReactionDisplay()}
           </div>
         </div>
