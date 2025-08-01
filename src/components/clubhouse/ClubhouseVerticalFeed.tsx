@@ -674,34 +674,24 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                 )}
 
                 {/* Heart/Like Button */}
-                <div className="flex flex-col items-center">
-                  <button
-                    onClick={() => handleLike(item.id)}
-                    className="cursor-pointer hover:opacity-100 transition-opacity"
-                  >
-                    <HeartIcon 
-                      className={`h-8 w-8 ${
-                        likedPosts?.includes(item.id) ? 'text-red-500' : 'text-white'
-                      }`} 
-                    />
-                  </button>
-                  <span className="text-white text-sm font-medium mt-1" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
-                    {Math.floor(Math.random() * 200) + 50}
-                  </span>
-                </div>
+                <button
+                  onClick={() => handleLike(item.id)}
+                  className="cursor-pointer hover:opacity-100 transition-opacity"
+                >
+                  <HeartIcon 
+                    className={`h-8 w-8 ${
+                      likedPosts?.includes(item.id) ? 'text-red-500' : 'text-white'
+                    }`} 
+                  />
+                </button>
 
-                {/* Message Button with Comment Count */}
-                <div className="flex flex-col items-center">
-                  <button
-                    onClick={() => handleComment(item.id)}
-                    className="cursor-pointer hover:opacity-100 transition-opacity"
-                  >
-                    <ChatBubbleOvalLeftEllipsisIcon className="h-8 w-8 text-white" />
-                  </button>
-                  <span className="text-white text-sm font-medium mt-1" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
-                    {Math.floor(Math.random() * 50) + 5}
-                  </span>
-                </div>
+                {/* Message Button */}
+                <button
+                  onClick={() => handleComment(item.id)}
+                  className="cursor-pointer hover:opacity-100 transition-opacity"
+                >
+                  <ChatBubbleOvalLeftEllipsisIcon className="h-8 w-8 text-white" />
+                </button>
 
                 {/* Share Button */}
                 <button
