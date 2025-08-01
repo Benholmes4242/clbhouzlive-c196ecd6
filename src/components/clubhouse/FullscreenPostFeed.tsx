@@ -251,14 +251,19 @@ const FullscreenPostFeed: React.FC<FullscreenPostFeedProps> = ({
         )}
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-6 mb-4">
-          <button 
-            onClick={() => onMediaClick(currentPost)}
-            className="flex items-center gap-2 text-white"
-          >
-            <MessageCircle className="w-6 h-6" />
-            <span className="text-sm">24</span>
-          </button>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex-1"></div>
+          <div className="flex flex-col items-center gap-4 mr-4">
+            <button 
+              onClick={() => onMediaClick(currentPost)}
+              className="flex flex-col items-center text-white"
+            >
+              <div className="p-3 rounded-full bg-black/50 backdrop-blur-sm hover:bg-black/70">
+                <MessageCircle className="w-5 h-5" />
+              </div>
+              <span className="text-xs mt-1">24</span>
+            </button>
+          </div>
         </div>
 
         {/* Recent Comment */}
