@@ -84,11 +84,27 @@ export const QuickReactionButton: React.FC<QuickReactionButtonProps> = ({
       <button
         ref={buttonRef}
         className="w-12 h-12 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm hover:bg-black/70 transition-all duration-200 pointer-events-auto relative z-50"
-        onTouchStart={handleLongPressStart}
-        onTouchEnd={handleLongPressEnd}
-        onMouseDown={handleLongPressStart}
-        onMouseUp={handleLongPressEnd}
+        onTouchStart={(e) => {
+          console.log('🔥 TOUCH START EVENT');
+          handleLongPressStart(e);
+        }}
+        onTouchEnd={(e) => {
+          console.log('🔥 TOUCH END EVENT');
+          handleLongPressEnd();
+        }}
+        onMouseDown={(e) => {
+          console.log('🔥 MOUSE DOWN EVENT');
+          handleLongPressStart(e);
+        }}
+        onMouseUp={(e) => {
+          console.log('🔥 MOUSE UP EVENT');
+          handleLongPressEnd();
+        }}
+        onClick={() => {
+          console.log('🔥 CLICK EVENT - This should not fire if touch/mouse events work');
+        }}
         onMouseLeave={() => {
+          console.log('🔥 MOUSE LEAVE EVENT');
           if (longPressTimer.current) {
             clearTimeout(longPressTimer.current);
             longPressTimer.current = null;
