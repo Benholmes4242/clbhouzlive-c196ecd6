@@ -46,7 +46,7 @@ export const QuickReactionButton: React.FC<QuickReactionButtonProps> = ({
   }, []);
 
   const handleLongPressEnd = useCallback(() => {
-    console.log('Long press ended, showTray:', showTray);
+    console.log('🔥 BUTTON EVENT FIRED - Long press ended, showTray:', showTray);
     
     if (longPressTimer.current) {
       clearTimeout(longPressTimer.current);
