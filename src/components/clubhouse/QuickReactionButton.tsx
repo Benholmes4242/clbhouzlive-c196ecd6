@@ -13,6 +13,7 @@ interface QuickReactionButtonProps {
   userReaction?: string;
   onReact: (postId: string, emoji: string) => void;
   className?: string;
+  compact?: boolean; // For fullscreen modal integration
 }
 
 export const QuickReactionButton: React.FC<QuickReactionButtonProps> = ({
@@ -20,7 +21,8 @@ export const QuickReactionButton: React.FC<QuickReactionButtonProps> = ({
   reactions,
   userReaction,
   onReact,
-  className = ""
+  className = "",
+  compact = false
 }) => {
   const [showTray, setShowTray] = useState(false);
   const [trayPosition, setTrayPosition] = useState({ x: 0, y: 0 });
@@ -89,6 +91,94 @@ export const QuickReactionButton: React.FC<QuickReactionButtonProps> = ({
     ));
   };
 
+  // Compact layout for fullscreen modals
+  if (compact) {
+    return (
+      <div className="flex flex-col items-center space-y-1">
+        <button
+          ref={buttonRef}
+          className="flex items-center justify-center w-12 h-12 bg-black/50 rounded-full cursor-pointer hover:scale-110 transition-transform relative"
+          onTouchStart={handleLongPressStart}
+          onTouchEnd={handleLongPressEnd}
+          onMouseDown={handleLongPressStart}
+          onMouseUp={handleLongPressEnd}
+          onMouseLeave={() => {
+            if (longPressTimer.current) {
+              clearTimeout(longPressTimer.current);
+              longPressTimer.current = null;
+            }
+          }}
+          aria-label="React to post"
+        >
+          {/* Current User's Reaction or Default Heart */}
+          <div className="relative">
+            {userReaction && userReaction !== '❤️' ? (
+              <span className={`text-2xl transition-transform duration-200 ${
+                showTray ? 'scale-110' : 'scale-100'
+              }`}>
+                {userReaction}
+              </span>
+            ) : userReaction === '❤️' ? (
+              <HeartSolidIcon className={`w-8 h-8 text-red-500 transition-transform duration-200 ${
+                showTray ? 'scale-110' : 'scale-100'
+              }`} />
+            ) : (
+              <HeartIcon className={`w-8 h-8 text-white transition-transform duration-200 ${
+                showTray ? 'scale-110' : 'scale-100'
+              }`} />
+            )}
+            
+            {/* Floating Emoji Animation */}
+            {floatingEmoji && (
+              <div 
+                className="absolute inset-0 flex items-center justify-center pointer-events-none"
+                style={{
+                  animation: 'float-up 1s ease-out forwards'
+                }}
+              >
+                {floatingEmoji === '❤️' ? (
+                  <HeartSolidIcon className="w-6 h-6 text-red-500" />
+                ) : (
+                  <span className="text-2xl">{floatingEmoji}</span>
+                )}
+              </div>
+            )}
+          </div>
+        </button>
+        
+        {/* Reaction Count - Compact */}
+        <span className={`text-xs font-medium ${className}`} style={{ textShadow: '0 1px 3px rgba(0,0,0,0.7)' }}>
+          {totalReactions || 0}
+        </span>
+
+        {/* Emoji Reaction Tray */}
+        <EmojiReactionTray
+          isVisible={showTray}
+          onEmojiSelect={handleEmojiSelect}
+          onCancel={handleCancel}
+          position={trayPosition}
+        />
+
+        {/* Custom keyframes for floating animation */}
+        <style dangerouslySetInnerHTML={{
+          __html: `
+            @keyframes float-up {
+              0% { 
+                transform: translateY(0) scale(1); 
+                opacity: 1; 
+              }
+              100% { 
+                transform: translateY(-20px) scale(1.2); 
+                opacity: 0; 
+              }
+            }
+          `
+        }} />
+      </div>
+    );
+  }
+
+  // Regular layout (non-compact)
   return (
     <div className={`flex flex-col items-center ${className}`}>
       {/* Main Reaction Button */}

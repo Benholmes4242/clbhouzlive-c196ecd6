@@ -612,6 +612,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                   userReaction={getUserReaction(item.id)}
                   onReact={handleReaction}
                   className="text-white"
+                  compact={true}
                 />
 
                 {/* Message Button with Comment Count */}
