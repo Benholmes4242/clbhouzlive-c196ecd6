@@ -1,4 +1,6 @@
 import React, { useState, useRef, useCallback } from 'react';
+import { HeartIcon } from '@heroicons/react/24/outline';
+import { HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid';
 import { EmojiReactionTray } from './EmojiReactionTray';
 
 export interface PostReactions {
@@ -103,11 +105,21 @@ export const QuickReactionButton: React.FC<QuickReactionButtonProps> = ({
       >
         {/* Current User's Reaction or Default Heart */}
         <div className="relative">
-          <span className={`text-2xl transition-transform duration-200 ${
-            showTray ? 'scale-110' : 'scale-100'
-          }`}>
-            {userReaction || '❤️'}
-          </span>
+          {userReaction && userReaction !== '❤️' ? (
+            <span className={`text-2xl transition-transform duration-200 ${
+              showTray ? 'scale-110' : 'scale-100'
+            }`}>
+              {userReaction}
+            </span>
+          ) : userReaction === '❤️' ? (
+            <HeartSolidIcon className={`w-6 h-6 text-red-500 transition-transform duration-200 ${
+              showTray ? 'scale-110' : 'scale-100'
+            }`} />
+          ) : (
+            <HeartIcon className={`w-6 h-6 text-white transition-transform duration-200 ${
+              showTray ? 'scale-110' : 'scale-100'
+            }`} />
+          )}
           
           {/* Floating Emoji Animation */}
           {floatingEmoji && (
