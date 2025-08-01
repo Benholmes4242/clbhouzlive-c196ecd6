@@ -16,8 +16,6 @@ import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
 import CommentsModal from '@/components/posts/CommentsModal';
 import { useVideoManager } from '@/contexts/VideoManagerContext';
 import { AudioStrip } from './AudioStrip';
-import { QuickReactionButton } from './QuickReactionButton';
-import { usePostReactions } from '@/hooks/usePostReactions';
 
 interface ClubhouseVerticalFeedProps {
   posts: ExploreContentItem[];
@@ -162,7 +160,6 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   const isMobile = useIsMobile();
   const { isGloballyMuted, setGlobalMute } = useGlobalAudio();
   const { setActiveVideo } = useVideoManager();
-  const { getUserReaction, handleReaction } = usePostReactions();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [commentsModalOpen, setCommentsModalOpen] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string>('');
@@ -676,12 +673,20 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                   </button>
                 )}
 
-                {/* Emoji Reaction Button */}
-                <QuickReactionButton
-                  postId={item.id}
-                  userReaction={getUserReaction(item.id)}
-                  onReact={handleReaction}
-                />
+                {/* Heart/Like Button */}
+                <button
+                  onClick={() => {
+                    console.log('🔥 CLUBHOUSE HEART CLICKED!');
+                    handleLike(item.id);
+                  }}
+                  className="cursor-pointer hover:opacity-100 transition-opacity"
+                >
+                  <HeartIcon 
+                    className={`h-8 w-8 ${
+                      likedPosts?.includes(item.id) ? 'text-red-500' : 'text-white'
+                    }`} 
+                  />
+                </button>
 
                 {/* Message Button */}
                 <button

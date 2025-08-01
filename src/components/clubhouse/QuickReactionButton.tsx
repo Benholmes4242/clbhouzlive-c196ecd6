@@ -78,29 +78,39 @@ export const QuickReactionButton: React.FC<QuickReactionButtonProps> = ({
     setShowTray(false);
   }, []);
 
+  console.log('🔥 QuickReactionButton rendered with:', { postId, userReaction, showTray });
+  
   return (
-    <div className={`flex flex-col items-center ${className}`}>
+    <div className={`flex flex-col items-center ${className}`} style={{ border: '2px solid red' }}>
+      {/* Debug overlay to see where the button is */}
+      <div className="absolute inset-0 bg-yellow-500/30 pointer-events-none z-40 text-black text-xs p-1">
+        QuickReactionButton
+      </div>
       {/* Main Reaction Button */}
       <button
         ref={buttonRef}
         className="w-12 h-12 flex items-center justify-center rounded-full bg-black/50 backdrop-blur-sm hover:bg-black/70 transition-all duration-200 pointer-events-auto relative z-50"
         onTouchStart={(e) => {
-          console.log('🔥 EMOJI BUTTON TOUCH START');
+          console.log('🔥 TOUCH START EVENT');
           handleLongPressStart(e);
         }}
         onTouchEnd={(e) => {
-          console.log('🔥 EMOJI BUTTON TOUCH END');
+          console.log('🔥 TOUCH END EVENT');
           handleLongPressEnd();
         }}
         onMouseDown={(e) => {
-          console.log('🔥 EMOJI BUTTON MOUSE DOWN');
+          console.log('🔥 MOUSE DOWN EVENT');
           handleLongPressStart(e);
         }}
         onMouseUp={(e) => {
-          console.log('🔥 EMOJI BUTTON MOUSE UP');
+          console.log('🔥 MOUSE UP EVENT');
           handleLongPressEnd();
         }}
+        onClick={() => {
+          console.log('🔥 CLICK EVENT - This should not fire if touch/mouse events work');
+        }}
         onMouseLeave={() => {
+          console.log('🔥 MOUSE LEAVE EVENT');
           if (longPressTimer.current) {
             clearTimeout(longPressTimer.current);
             longPressTimer.current = null;
