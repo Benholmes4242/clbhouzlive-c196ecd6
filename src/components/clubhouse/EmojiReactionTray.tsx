@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { HeartIcon } from '@heroicons/react/24/solid';
 
 interface EmojiReactionTrayProps {
   isVisible: boolean;
@@ -78,9 +79,13 @@ export const EmojiReactionTray: React.FC<EmojiReactionTrayProps> = ({
             }}
             aria-label={`React with ${item.label}`}
           >
-            <span className="text-2xl select-none">
-              {item.emoji}
-            </span>
+            {item.emoji === '❤️' ? (
+              <HeartIcon className="w-6 h-6 text-red-500" />
+            ) : (
+              <span className="text-2xl select-none">
+                {item.emoji}
+              </span>
+            )}
           </button>
         ))}
       </div>
