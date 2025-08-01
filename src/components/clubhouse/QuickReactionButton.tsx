@@ -116,11 +116,11 @@ export const QuickReactionButton: React.FC<QuickReactionButtonProps> = ({
               {userReaction}
             </span>
           ) : userReaction === '❤️' ? (
-            <HeartSolidIcon className={`w-6 h-6 text-red-500 transition-transform duration-200 ${
+            <HeartSolidIcon className={`w-8 h-8 text-red-500 transition-transform duration-200 ${
               showTray ? 'scale-110' : 'scale-100'
             }`} />
           ) : (
-            <HeartIcon className={`w-6 h-6 text-white transition-transform duration-200 ${
+            <HeartIcon className={`w-8 h-8 text-white transition-transform duration-200 ${
               showTray ? 'scale-110' : 'scale-100'
             }`} />
           )}
