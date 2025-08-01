@@ -25,28 +25,36 @@ export const QuickReactionButton: React.FC<QuickReactionButtonProps> = ({
 
   const handleLongPressStart = useCallback((e: React.TouchEvent | React.MouseEvent) => {
     e.preventDefault();
+    console.log('Long press started');
     
     if (buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
-      setTrayPosition({
+      const newPosition = {
         x: rect.left + rect.width / 2,
         y: rect.top
-      });
+      };
+      console.log('Tray position calculated:', newPosition);
+      setTrayPosition(newPosition);
     }
 
     longPressTimer.current = setTimeout(() => {
+      console.log('Long press timer fired, showing tray');
       setShowTray(true);
     }, 300); // 300ms long press threshold
   }, []);
 
   const handleLongPressEnd = useCallback(() => {
+    console.log('Long press ended, showTray:', showTray);
+    
     if (longPressTimer.current) {
       clearTimeout(longPressTimer.current);
       longPressTimer.current = null;
+      console.log('Cleared long press timer');
     }
 
     if (!showTray) {
       // Quick tap - default heart reaction or remove if already selected
+      console.log('Quick tap detected, current reaction:', userReaction);
       if (userReaction === '❤️') {
         onReact(postId, ''); // Remove reaction
       } else {
