@@ -675,7 +675,10 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
 
                 {/* Heart/Like Button */}
                 <button
-                  onClick={() => handleLike(item.id)}
+                  onClick={() => {
+                    console.log('🔥 CLUBHOUSE HEART CLICKED!');
+                    handleLike(item.id);
+                  }}
                   className="cursor-pointer hover:opacity-100 transition-opacity"
                 >
                   <HeartIcon 
