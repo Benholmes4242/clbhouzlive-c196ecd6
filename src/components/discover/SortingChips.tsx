@@ -23,7 +23,7 @@ const sortingChips: SortingChip[] = [
 
 const SortingChips: React.FC<SortingChipsProps> = ({ selectedChip, onChipSelect }) => {
   return (
-    <div className="px-4 pt-3 pb-2">
+    <div className="px-4 pt-1 pb-2">
       <div className="flex overflow-x-auto scrollbar-hide gap-2">
         {sortingChips.map((chip) => {
           const isSelected = selectedChip === chip.id;
