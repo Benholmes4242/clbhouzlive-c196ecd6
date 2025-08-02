@@ -280,7 +280,7 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
       <div 
         className="absolute inset-x-0 top-0 bg-white/10 backdrop-blur-sm border border-white/20"
         style={{
-          height: '520px', // Adjust this to cover the progress ring, badges, tiles and first two cards
+          height: '800px', // Increased height to cover progress ring, badges, tiles and first two cards
           borderRadius: '16px',
           zIndex: 0
         }}
