@@ -431,15 +431,10 @@ const HeroProfileHeader = ({
             {/* Handicap Section - Only show when handicap section is active */}
             {activeSection === 'handicap' && (
               <div className="mt-8 px-0">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-3xl font-bold text-white">Handicap & Rounds</h2>
-                </div>
-                <div className="bg-white/20 backdrop-blur-sm border border-white/30 shadow-lg p-6" style={{ borderRadius: '8px' }}>
-                  <HandicapSection 
-                    userId={profile?.id || ''}
-                    profile={profile}
-                  />
-                </div>
+                <HandicapSection 
+                  userId={profile?.id || ''}
+                  profile={profile}
+                />
               </div>
             )}
             
