@@ -281,13 +281,6 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
         isOwnProfile={finalIsOwnProfile} 
       />
 
-      {/* Top 100 Progress Ring */}
-      <div className="flex justify-center py-4">
-        <Top100Progress 
-          completedCount={top100CompletedCount}
-          totalCount={100}
-        />
-      </div>
 
       {/* Achievement Badges */}
       <BadgeCollection 
