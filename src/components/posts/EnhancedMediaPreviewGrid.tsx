@@ -222,17 +222,6 @@ const EnhancedMediaPreviewGrid: React.FC<EnhancedMediaPreviewGridProps> = ({
                 }}
               >
                 <div className="aspect-square relative bg-gray-100">
-                  {/* Remove button - Top-right corner */}
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onRemoveFile(media.id);
-                    }}
-                    className="absolute top-2 right-2 z-20 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110"
-                    title="Remove from post"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
 
                   {/* Drag handle - Only show when reordering is enabled and not uploading */}
                   {onReorderFiles && mediaFiles.length > 1 && !media.isUploading && (
@@ -425,16 +414,29 @@ const EnhancedMediaPreviewGrid: React.FC<EnhancedMediaPreviewGridProps> = ({
                   <p className="text-xs text-gray-600 truncate flex-1" title={media.file.name}>
                     {media.file.name.split('.')[0]}.{media.file.name.split('.').pop()}
                   </p>
-                  {/* File size moved to white area */}
-                  {!isVideo || !videoDurations[media.id] ? (
-                    <span className="text-xs text-gray-500 ml-2 flex-shrink-0">
-                      {(media.file.size / 1024 / 1024).toFixed(1)}MB
-                    </span>
-                  ) : (
-                    <span className="text-xs text-gray-500 ml-2 flex-shrink-0">
-                      {videoDurations[media.id]}
-                    </span>
-                  )}
+                  <div className="flex items-center gap-2">
+                    {/* File size */}
+                    {!isVideo || !videoDurations[media.id] ? (
+                      <span className="text-xs text-gray-500 flex-shrink-0">
+                        {(media.file.size / 1024 / 1024).toFixed(1)}MB
+                      </span>
+                    ) : (
+                      <span className="text-xs text-gray-500 flex-shrink-0">
+                        {videoDurations[media.id]}
+                      </span>
+                    )}
+                    {/* Remove button */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onRemoveFile(media.id);
+                      }}
+                      className="w-4 h-4 flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors"
+                      title="Remove from post"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
                 </div>
               </Card>
             );
