@@ -39,7 +39,11 @@ const Top100AchievementCard: React.FC<Top100AchievementCardProps> = ({ achieveme
           )}
         >
         {achievement.id === '20-club' ? (
-          <MedalIcon size="sm" />
+          <img 
+            src="/lovable-uploads/8ad8aac5-8cbc-42dc-b993-39981f6f8f2c.png" 
+            alt="20 Club Trophy" 
+            className="w-6 h-6 object-contain"
+          />
         ) : (
           emoji
         )}
