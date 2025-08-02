@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { UserPlus, Check } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface SuggestedUser {
@@ -316,13 +316,8 @@ const SuggestedUsers: React.FC<SuggestedUsersProps> = ({ onUserFollow }) => {
               {/* Follow Button */}
               <button
                 onClick={() => handleFollow(user.id)}
-                className={cn(
-                  "w-full py-1.5 px-2 rounded-full text-xs font-medium transition-all duration-150",
-                  "bg-primary hover:bg-primary/90 text-primary-foreground",
-                  "flex items-center justify-center gap-1"
-                )}
+                className="text-black text-xs font-medium hover:text-gray-700 transition-colors duration-150"
               >
-                <UserPlus className="w-3 h-3" />
                 Follow
               </button>
             </div>
