@@ -304,24 +304,24 @@ const LiquidGlassCard: React.FC = () => {
                 <div className="flex items-center space-x-3">
                   {/* Achievement Icon */}
                    {achievement.id === '20-club' ? (
-                     <div className="w-10 h-10 flex items-center justify-center">
-                       <MedalIcon size="xl" type="20-club" className="!w-40 !h-40" />
+                     <div className="w-16 h-16 flex items-center justify-center">
+                       <MedalIcon size="xl" type="20-club" className="!w-16 !h-16" />
                      </div>
                    ) : achievement.id === '50-club' ? (
-                     <div className="w-10 h-10 flex items-center justify-center">
-                       <MedalIcon size="xl" type="50-club" className="!w-40 !h-40" />
+                     <div className="w-16 h-16 flex items-center justify-center">
+                       <MedalIcon size="xl" type="50-club" className="!w-16 !h-16" />
                      </div>
                    ) : achievement.id === '100-club' ? (
-                     <div className="w-10 h-10 flex items-center justify-center">
-                       <MedalIcon size="xl" type="100-club" className="!w-40 !h-40" />
+                     <div className="w-16 h-16 flex items-center justify-center">
+                       <MedalIcon size="xl" type="100-club" className="!w-16 !h-16" />
                      </div>
                    ) : achievement.id === '200-club' ? (
-                     <div className="w-10 h-10 flex items-center justify-center">
-                       <MedalIcon size="xl" type="200-club" className="!w-40 !h-40" />
+                     <div className="w-16 h-16 flex items-center justify-center">
+                       <MedalIcon size="xl" type="200-club" className="!w-16 !h-16" />
                      </div>
                    ) : achievement.id === '300-club' ? (
-                     <div className="w-10 h-10 flex items-center justify-center">
-                       <MedalIcon size="xl" type="300-club" className="!w-64 !h-64" />
+                     <div className="w-16 h-16 flex items-center justify-center">
+                       <MedalIcon size="xl" type="300-club" className="!w-16 !h-16" />
                      </div>
                   ) : (
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
