@@ -73,8 +73,8 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
           whitespace-nowrap flex-shrink-0 transition-none
           focus:outline-none border rounded-full text-black
           ${isActive 
-            ? 'bg-[hsl(var(--brand-orange))] border-[hsl(var(--brand-orange))]' 
-            : 'bg-white border-black hover:bg-[hsl(var(--brand-orange))] hover:border-[hsl(var(--brand-orange))] transition-all duration-200'
+            ? 'bg-[hsl(var(--brand-orange)_/_0.2)] border-[hsl(var(--brand-orange))]' 
+            : 'bg-white border-black hover:bg-[hsl(var(--brand-orange)_/_0.2)] hover:border-[hsl(var(--brand-orange))] transition-all duration-200'
           }
         `}
       >
