@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Hash, Play, Headphones, Volume2 } from 'lucide-react';
+import { Hash, X } from 'lucide-react';
 import { IoFlameOutline } from 'react-icons/io5';
 import { cn } from '@/lib/utils';
 
@@ -65,7 +65,7 @@ const trendingAudio: TrendingAudio[] = [
 ];
 
 const TrendingNow: React.FC<TrendingNowProps> = ({ onHashtagClick, onAudioClick }) => {
-  const [activeTab, setActiveTab] = useState<'hashtags' | 'audio'>('hashtags');
+  const [selectedHashtag, setSelectedHashtag] = useState<string | null>(null);
 
   const formatCount = (count: number) => {
     if (count >= 1000) {
@@ -74,8 +74,21 @@ const TrendingNow: React.FC<TrendingNowProps> = ({ onHashtagClick, onAudioClick 
     return count.toString();
   };
 
-  const formatDuration = (seconds: number) => {
-    return `${seconds}s`;
+  const handleHashtagClick = (tag: string) => {
+    if (selectedHashtag === tag) {
+      // Deselect if already selected
+      setSelectedHashtag(null);
+      onHashtagClick(''); // Clear filter
+    } else {
+      // Select new hashtag
+      setSelectedHashtag(tag);
+      onHashtagClick(tag);
+    }
+  };
+
+  const handleClearSelection = () => {
+    setSelectedHashtag(null);
+    onHashtagClick(''); // Clear filter
   };
 
   return (
@@ -89,27 +102,42 @@ const TrendingNow: React.FC<TrendingNowProps> = ({ onHashtagClick, onAudioClick 
 
         {/* Trending Hashtags - Always Show */}
         <div className="flex overflow-x-auto scrollbar-hide gap-2 pb-1">
-          {trendingHashtags.map((hashtag) => (
-            <button
-              key={hashtag.id}
-              onClick={() => onHashtagClick(hashtag.tag)}
-              className={cn(
-                "flex items-center gap-1.5 px-3 py-2 bg-gray-100 hover:bg-gray-200 active:bg-gray-300",
-                "rounded-full text-sm font-medium text-gray-700 transition-all duration-150",
-                "whitespace-nowrap flex-shrink-0 border border-gray-200",
-                hashtag.trending && "bg-gradient-to-r from-orange-50 to-orange-100 border-orange-200 text-orange-700"
-              )}
-            >
-              <Hash className="w-3 h-3" />
-              <span>{hashtag.tag.replace('#', '')}</span>
-              <span className="text-xs text-gray-500 ml-1">
-                {formatCount(hashtag.postCount)}
-              </span>
-              {hashtag.trending && (
-                <div className="w-1.5 h-1.5 bg-orange-400 rounded-full animate-pulse" />
-              )}
-            </button>
-          ))}
+          {trendingHashtags.map((hashtag) => {
+            const isSelected = selectedHashtag === hashtag.tag;
+            
+            return (
+              <button
+                key={hashtag.id}
+                onClick={() => handleHashtagClick(hashtag.tag)}
+                className={cn(
+                  "flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-medium transition-all duration-150",
+                  "whitespace-nowrap flex-shrink-0 border",
+                  isSelected
+                    ? "bg-gradient-to-r from-orange-50 to-orange-100 border-orange-200 text-orange-700"
+                    : "bg-gray-100 hover:bg-gray-200 active:bg-gray-300 border-gray-200 text-gray-700"
+                )}
+              >
+                <Hash className="w-3 h-3" />
+                <span>{hashtag.tag.replace('#', '')}</span>
+                <span className="text-xs text-gray-500 ml-1">
+                  {formatCount(hashtag.postCount)}
+                </span>
+                {isSelected ? (
+                  <X 
+                    className="w-3 h-3 ml-1 cursor-pointer hover:text-orange-900" 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleClearSelection();
+                    }}
+                  />
+                ) : (
+                  hashtag.trending && (
+                    <div className="w-1.5 h-1.5 bg-orange-400 rounded-full animate-pulse" />
+                  )
+                )}
+              </button>
+            );
+          })}
         </div>
 
       </div>
