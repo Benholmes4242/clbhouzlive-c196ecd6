@@ -543,7 +543,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                             : 'text-gray-600 hover:text-gray-800'
                         }`}
                         style={{
-                          backgroundColor: isPrivate ? '#6e9277' : 'transparent'
+                          backgroundColor: isPrivate ? '#9ca3af' : 'transparent'
                         }}
                         disabled={isSubmitting}
                       >
