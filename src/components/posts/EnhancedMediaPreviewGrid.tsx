@@ -222,13 +222,13 @@ const EnhancedMediaPreviewGrid: React.FC<EnhancedMediaPreviewGridProps> = ({
                 }}
               >
                 <div className="aspect-square relative bg-gray-100">
-                  {/* Remove button - Top-right corner, visible on hover */}
+                  {/* Remove button - Top-right corner */}
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       onRemoveFile(media.id);
                     }}
-                    className="absolute top-2 right-2 z-20 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110"
+                    className="absolute top-2 right-2 z-20 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-all duration-200 hover:scale-110"
                     title="Remove from post"
                   >
                     <X className="h-3 w-3" />
@@ -308,14 +308,6 @@ const EnhancedMediaPreviewGrid: React.FC<EnhancedMediaPreviewGridProps> = ({
                     </>
                   )}
 
-                  {/* Hover expand indicator */}
-                  {isHovered && !media.isUploading && (
-                    <div className="absolute top-2 right-8 z-10 animate-fade-in">
-                      <div className="bg-black/70 rounded p-1">
-                        <ArrowUpRight className="h-4 w-4 text-white" />
-                      </div>
-                    </div>
-                  )}
 
                   {/* Upload Progress Overlay */}
                   {media.isUploading && (
