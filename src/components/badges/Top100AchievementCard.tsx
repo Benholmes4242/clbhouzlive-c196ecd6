@@ -41,7 +41,7 @@ const Top100AchievementCard: React.FC<Top100AchievementCardProps> = ({ achieveme
         {achievement.id === '20-club' ? (
           <MedalIcon size="sm" />
         ) : (
-          emoji
+          <span>{emoji}</span>
         )}
       </div>
 
