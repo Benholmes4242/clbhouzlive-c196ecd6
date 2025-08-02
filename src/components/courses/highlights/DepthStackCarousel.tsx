@@ -300,21 +300,21 @@ const LiquidGlassCard: React.FC = () => {
                 </div>
               )}
 
-              <div className="flex items-center justify-between pr-16">
-                <div className="flex items-center space-x-3">
+              <div className="flex items-center w-full pr-16">
+                <div className="flex items-center space-x-3 flex-1">
                   {/* Achievement Icon */}
                    {achievement.id === '20-club' ? (
-                     <MedalIcon size="xl" type="20-club" className="!w-16 !h-16" />
+                     <MedalIcon size="xl" type="20-club" className="!w-16 !h-16 flex-shrink-0" />
                    ) : achievement.id === '50-club' ? (
-                     <MedalIcon size="xl" type="50-club" className="!w-16 !h-16" />
+                     <MedalIcon size="xl" type="50-club" className="!w-16 !h-16 flex-shrink-0" />
                    ) : achievement.id === '100-club' ? (
-                     <MedalIcon size="xl" type="100-club" className="!w-16 !h-16" />
+                     <MedalIcon size="xl" type="100-club" className="!w-16 !h-16 flex-shrink-0" />
                    ) : achievement.id === '200-club' ? (
-                     <MedalIcon size="xl" type="200-club" className="!w-16 !h-16" />
+                     <MedalIcon size="xl" type="200-club" className="!w-16 !h-16 flex-shrink-0" />
                    ) : achievement.id === '300-club' ? (
-                     <MedalIcon size="xl" type="300-club" className="!w-16 !h-16" />
+                     <MedalIcon size="xl" type="300-club" className="!w-16 !h-16 flex-shrink-0" />
                   ) : (
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
                       achievement.earned 
                         ? 'bg-green-500/20 border border-green-400/30' 
                         : 'bg-white/10 border border-white/20'
@@ -326,7 +326,7 @@ const LiquidGlassCard: React.FC = () => {
                   )}
                   
                   {/* Achievement Info */}
-                  <div>
+                  <div className="flex-1 min-w-0">
                     <h4 className="text-white font-medium text-sm">{achievement.name}</h4>
                     <p className="text-white/60 text-xs">{achievement.description}</p>
                   </div>
