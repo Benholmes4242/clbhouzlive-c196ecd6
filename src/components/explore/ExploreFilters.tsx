@@ -1,7 +1,7 @@
 
 import React, { useRef, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Camera, TvMinimalPlay, Zap, Brain, Users, TrendingUp } from 'lucide-react';
+import { Camera, TvMinimalPlay, Zap, Brain, Users, Flame } from 'lucide-react';
 import { MdOutlinePlayCircle } from 'react-icons/md';
 import { PiGolf } from 'react-icons/pi';
 import { filterOptions, FILTER_TYPES } from './types';
@@ -47,7 +47,7 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
       case FILTER_TYPES.PHOTOS:
         return <Camera {...iconProps} />;
       case FILTER_TYPES.TRENDING:
-        return <TrendingUp {...iconProps} />;
+        return <Flame {...iconProps} />;
       case FILTER_TYPES.VERIFIED_PROS:
         return <PiGolf className="w-5 h-5" />;
       case FILTER_TYPES.CHANNELS:
