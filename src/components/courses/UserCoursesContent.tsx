@@ -276,34 +276,49 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
 
   return (
     <div className="relative space-y-8">
-      
-      {/* Content with higher z-index */}
-      <div className="relative z-10">
-        <UserCoursesHeader
-          displayName={finalDisplayName} 
-          isOwnProfile={finalIsOwnProfile} 
-        />
+      <UserCoursesHeader
+        displayName={finalDisplayName} 
+        isOwnProfile={finalIsOwnProfile} 
+      />
 
-        {/* Top 100 Progress Ring */}
-        <div className="flex justify-center py-4">
-          <Top100Progress 
-            completedCount={top100CompletedCount}
-            totalCount={100}
-          />
-        </div>
-
-        {/* Achievement Badges */}
-        <BadgeCollection 
+      {/* Top 100 Progress Ring */}
+      <div className="flex justify-center py-4">
+        <Top100Progress 
           completedCount={top100CompletedCount}
-          collapsible={true}
-          defaultExpanded={false}
+          totalCount={100}
         />
+      </div>
 
-        <div className="flex flex-col gap-4">
-          {/* Mobile layout - stacked */}
-          {isMobile ? (
-            <>
-              {/* Regional tiles and sorting buttons */}
+      {/* Achievement Badges */}
+      <BadgeCollection 
+        completedCount={top100CompletedCount}
+        collapsible={true}
+        defaultExpanded={false}
+      />
+
+
+      <div className="flex flex-col gap-4">
+        {/* Mobile layout - stacked */}
+        {isMobile ? (
+          <>
+            {/* Regional tiles and sorting buttons */}
+            <UserCoursesRegionalTiles
+              regionProgress={regionProgress}
+              activeFilter={activeFilter}
+              onFilterChange={setActiveFilter}
+              isLoading={isLoadingProgress}
+              sortBy={sortBy}
+              onSortChange={setSortBy}
+              viewType={viewType}
+              onViewTypeChange={setViewType}
+              isOwnProfile={finalIsOwnProfile}
+              onAddCoursesClick={() => setIsCoursePickerOpen(true)}
+            />
+          </>
+        ) : (
+          /* Desktop layout - side by side */
+          <div className="flex items-center justify-between">
+            <div className="flex-1">
               <UserCoursesRegionalTiles
                 regionProgress={regionProgress}
                 activeFilter={activeFilter}
@@ -316,30 +331,12 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
                 isOwnProfile={finalIsOwnProfile}
                 onAddCoursesClick={() => setIsCoursePickerOpen(true)}
               />
-            </>
-          ) : (
-            /* Desktop layout - side by side */
-            <div className="flex items-center justify-between">
-              <div className="flex-1">
-                <UserCoursesRegionalTiles
-                  regionProgress={regionProgress}
-                  activeFilter={activeFilter}
-                  onFilterChange={setActiveFilter}
-                  isLoading={isLoadingProgress}
-                  sortBy={sortBy}
-                  onSortChange={setSortBy}
-                  viewType={viewType}
-                  onViewTypeChange={setViewType}
-                  isOwnProfile={finalIsOwnProfile}
-                  onAddCoursesClick={() => setIsCoursePickerOpen(true)}
-                />
-              </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
-      <div className="space-y-4 relative z-10">
+      <div className="space-y-4">
         {isLoadingTop100 || !isHydrated ? (
           <div className="text-center py-8">
             <div className="flex flex-col items-center gap-2">
