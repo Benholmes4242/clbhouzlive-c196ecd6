@@ -82,7 +82,7 @@ const Top100CoursesContent: React.FC<Top100CoursesContentProps> = ({
   }
 
   return (
-    <ScrollArea className="h-[60vh] pr-4">
+    <div className="pr-4">
       {/* Dynamic layout based on view type */}
       <div className={viewType === 'list' ? "space-y-3" : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"}>
         {filteredAndSortedCourses.map((course) => {
@@ -126,7 +126,7 @@ const Top100CoursesContent: React.FC<Top100CoursesContentProps> = ({
           No courses found for this region.
         </div>
       )}
-    </ScrollArea>
+    </div>
   );
 };
 
