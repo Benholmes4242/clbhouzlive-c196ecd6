@@ -365,7 +365,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                 {isMobile && (
                   <button
                     onClick={handleCaptureClick}
-                    className="w-full flex items-center gap-4 p-5 bg-[#f9f9f9] hover:bg-[#f0f0f0] active:bg-[#e8e8e8] text-[#222222] rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#6e9277] focus:ring-offset-2 cursor-pointer shadow-sm hover:shadow-md transform active:scale-[0.98]"
+                    className="w-full flex items-center gap-4 p-5 bg-[#f9f9f9] hover:bg-[#f0f0f0] active:bg-[#e8e8e8] text-[#222222] rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 cursor-pointer shadow-sm hover:shadow-md transform active:scale-[0.98]"
                     disabled={isSubmitting}
                     aria-label="Open camera to record in real-time"
                     tabIndex={0}
@@ -373,7 +373,6 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                     <Camera className="h-6 w-6 text-[#222222] flex-shrink-0" />
                     <div className="text-left flex-1">
                       <div className="text-base font-medium">Capture Photo or Video</div>
-                      <div className="text-xs text-[#666666] mt-1.5">Open camera to record in real-time</div>
                     </div>
                   </button>
                 )}
