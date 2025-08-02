@@ -300,7 +300,7 @@ const LiquidGlassCard: React.FC = () => {
                 </div>
               )}
 
-              <div className="flex items-center w-full pr-16">
+              <div className="flex items-center w-full pr-8">
                 <div className="flex items-center space-x-3 flex-1">
                   {/* Achievement Icon */}
                    {achievement.id === '20-club' ? (
