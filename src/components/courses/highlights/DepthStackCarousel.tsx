@@ -339,11 +339,6 @@ const LiquidGlassCard: React.FC = () => {
                   <div>
                     <h4 className="text-white font-medium text-sm">{achievement.name}</h4>
                     <p className="text-white/60 text-xs">{achievement.description}</p>
-                    {!achievement.earned && (
-                      <div className="text-white/40 text-xs mt-1">
-                        {userProgress.played}/{achievement.target}
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>
