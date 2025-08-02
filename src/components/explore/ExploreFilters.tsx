@@ -71,28 +71,20 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
         className={`
           flex items-center gap-2 px-4 py-2 group
           whitespace-nowrap flex-shrink-0 transition-none
-          focus:outline-none border rounded-full bg-white
+          focus:outline-none border rounded-full text-black
           ${isActive 
-            ? 'border-[hsl(var(--brand-orange))] text-[hsl(var(--brand-orange))]' 
-            : 'border-black text-black hover:border-[hsl(var(--brand-orange))] hover:text-[hsl(var(--brand-orange))] transition-all duration-200'
+            ? 'bg-[hsl(var(--brand-orange))] border-[hsl(var(--brand-orange))]' 
+            : 'bg-white border-black hover:bg-[hsl(var(--brand-orange))] hover:border-[hsl(var(--brand-orange))] transition-all duration-200'
           }
         `}
       >
         {/* Icon */}
-        <div className={`${
-          isActive 
-            ? 'text-[hsl(var(--brand-orange))]' 
-            : 'text-black group-hover:text-[hsl(var(--brand-orange))] transition-colors duration-200'
-        }`}>
+        <div className="text-black">
           {getFilterIcon(filter)}
         </div>
         
         {/* Label */}
-        <span className={`text-sm font-medium ${
-          isActive 
-            ? 'text-[hsl(var(--brand-orange))]' 
-            : 'text-black group-hover:text-[hsl(var(--brand-orange))] transition-colors duration-200'
-        }`}>
+        <span className="text-sm font-medium text-black">
           {filter}
         </span>
       </button>
