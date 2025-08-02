@@ -16,18 +16,25 @@ interface ExploreFiltersProps {
 
 const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterChange, excludeFilters = [] }) => {
   const isMobile = useIsMobile();
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [isAtStart, setIsAtStart] = useState(true);
+  const [isAtEnd, setIsAtEnd] = useState(false);
 
   // Filter out excluded filters
   const availableFilters = filterOptions.filter(filter => !excludeFilters.includes(filter));
 
-  // Split filters into two rows as evenly as possible
-  const midpoint = Math.ceil(availableFilters.length / 2);
-  const topRowFilters = availableFilters.slice(0, midpoint);
-  const bottomRowFilters = availableFilters.slice(midpoint);
+  // Check scroll position
+  const checkScrollPosition = () => {
+    if (!scrollContainerRef.current) return;
+    
+    const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+    setIsAtStart(scrollLeft <= 10);
+    setIsAtEnd(scrollLeft >= scrollWidth - clientWidth - 10);
+  };
 
-  // Carousel navigation hooks for each row
-  const topRowCarousel = useCarouselNavigation(topRowFilters.length);
-  const bottomRowCarousel = useCarouselNavigation(bottomRowFilters.length);
+  useEffect(() => {
+    checkScrollPosition();
+  }, []);
 
   const getFilterIcon = (filter: string) => {
     const iconProps = { className: "w-5 h-5", strokeWidth: 2 };
@@ -93,49 +100,54 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
     );
   };
 
-  const renderCarouselRow = (filters: string[], carouselRef: (node: HTMLDivElement | null) => void) => {
-    const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-      // Add bounce effect when reaching ends on mobile
-      if (isMobile) {
-        const container = e.currentTarget;
-        const { scrollLeft, scrollWidth, clientWidth } = container;
-        
-        if (scrollLeft <= 0 || scrollLeft >= scrollWidth - clientWidth) {
-          container.style.transform = scrollLeft <= 0 ? 'translateX(8px)' : 'translateX(-8px)';
-          setTimeout(() => {
-            container.style.transform = 'translateX(0)';
-          }, 150);
-        }
-      }
-    };
-
-    return (
-      <div 
-        ref={carouselRef}
-        className="flex space-x-3 overflow-x-auto scrollbar-hide transition-transform duration-150 ease-out px-1"
-        onScroll={handleScroll}
-        style={{
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
-          WebkitOverflowScrolling: 'touch'
-        }}
-      >
-        {filters.map(renderFilterButton)}
-      </div>
-    );
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    checkScrollPosition();
+    
+    // Add bounce effect when reaching ends
+    const container = e.currentTarget;
+    const { scrollLeft, scrollWidth, clientWidth } = container;
+    
+    if (scrollLeft <= 0 && isAtStart) {
+      container.style.transform = 'translateX(8px)';
+      container.style.transition = 'transform 150ms ease-out';
+      setTimeout(() => {
+        container.style.transform = 'translateX(0)';
+      }, 150);
+    } else if (scrollLeft >= scrollWidth - clientWidth && isAtEnd) {
+      container.style.transform = 'translateX(-8px)';
+      container.style.transition = 'transform 150ms ease-out';
+      setTimeout(() => {
+        container.style.transform = 'translateX(0)';
+      }, 150);
+    }
   };
 
   return (
     <div className="sticky top-16 z-10 bg-background/95 backdrop-blur-sm pb-3 mb-4">
-      <div className="space-y-3 md:px-4">
-        {/* Top Row */}
+      <div className="md:px-4">
+        {/* Single Row Horizontal Scroll */}
         <div className="relative">
-          {renderCarouselRow(topRowFilters, topRowCarousel.carouselRef)}
-        </div>
-        
-        {/* Bottom Row */}
-        <div className="relative">
-          {renderCarouselRow(bottomRowFilters, bottomRowCarousel.carouselRef)}
+          <div 
+            ref={scrollContainerRef}
+            className="flex space-x-3 overflow-x-auto scrollbar-hide px-1"
+            onScroll={handleScroll}
+            style={{
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+              WebkitOverflowScrolling: 'touch',
+              scrollBehavior: 'smooth'
+            }}
+          >
+            {availableFilters.map(renderFilterButton)}
+          </div>
+          
+          {/* Gradient overlays for visual scroll indication */}
+          {!isAtStart && (
+            <div className="absolute left-0 top-0 h-full w-8 bg-gradient-to-r from-background to-transparent pointer-events-none z-10" />
+          )}
+          {!isAtEnd && (
+            <div className="absolute right-0 top-0 h-full w-8 bg-gradient-to-l from-background to-transparent pointer-events-none z-10" />
+          )}
         </div>
       </div>
     </div>
