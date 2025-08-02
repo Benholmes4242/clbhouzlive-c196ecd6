@@ -74,7 +74,7 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
           focus:outline-none border rounded-full text-black
           ${isActive 
             ? 'bg-[hsl(var(--brand-orange)_/_0.2)] border-transparent' 
-            : 'bg-white border-black hover:bg-[hsl(var(--brand-orange)_/_0.2)] hover:border-transparent transition-all duration-200'
+            : 'bg-gray-500/20 border-transparent hover:bg-[hsl(var(--brand-orange)_/_0.2)] hover:border-transparent transition-all duration-200'
           }
         `}
       >
