@@ -381,7 +381,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                 {/* Select Photos */}
                 <button
                   onClick={handleSelectPhotos}
-                  className="w-full flex items-center gap-4 p-5 bg-[#f9f9f9] hover:bg-[#f0f0f0] active:bg-[#e8e8e8] text-[#222222] rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#6e9277] focus:ring-offset-2 cursor-pointer shadow-sm hover:shadow-md transform active:scale-[0.98]"
+                  className="w-full flex items-center gap-4 p-5 bg-[#f9f9f9] hover:bg-[#f0f0f0] active:bg-[#e8e8e8] text-[#222222] rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 cursor-pointer shadow-sm hover:shadow-md transform active:scale-[0.98]"
                   disabled={isSubmitting}
                   aria-label="Choose saved images from your gallery"
                   tabIndex={0}
@@ -395,7 +395,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                 {/* Select Videos */}
                 <button
                   onClick={handleSelectVideos}
-                  className="w-full flex items-center gap-4 p-5 bg-[#f9f9f9] hover:bg-[#f0f0f0] active:bg-[#e8e8e8] text-[#222222] rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[#6e9277] focus:ring-offset-2 cursor-pointer shadow-sm hover:shadow-md transform active:scale-[0.98]"
+                  className="w-full flex items-center gap-4 p-5 bg-[#f9f9f9] hover:bg-[#f0f0f0] active:bg-[#e8e8e8] text-[#222222] rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2 cursor-pointer shadow-sm hover:shadow-md transform active:scale-[0.98]"
                   disabled={isSubmitting}
                   aria-label="Upload pre-recorded golf clips"
                   tabIndex={0}
