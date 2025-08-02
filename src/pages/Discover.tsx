@@ -5,10 +5,10 @@ import ExploreFilters from '@/components/explore/ExploreFilters';
 import ExploreGrid from '@/components/explore/ExploreGrid';
 import DiscoverVerticalFeed from '@/components/discover/DiscoverVerticalFeed';
 import SortingChips from '@/components/discover/SortingChips';
-import FeaturedCreator from '@/components/discover/FeaturedCreator';
+import SuggestedUsers from '@/components/discover/SuggestedUsers';
 import TrendingNow from '@/components/discover/TrendingNow';
 import EngagementPrompts from '@/components/discover/EngagementPrompts';
-import type { FeaturedCreatorType } from '@/components/discover/FeaturedCreator';
+
 import { useInfiniteExploreContent } from '@/hooks/useInfiniteExploreContent';
 import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
 import { useUserEngagement } from '@/hooks/useUserEngagement';
@@ -56,10 +56,9 @@ const Discover = () => {
     openFeed(item);
   };
 
-  const handleCreatorClick = (creator: FeaturedCreatorType) => {
-    // Navigate to creator's profile - for now just log
-    console.log('Navigate to creator profile:', creator);
-    // In real app: navigate(`/profile/${creator.id}`)
+  const handleUserFollow = (userId: string) => {
+    console.log('User followed:', userId);
+    // In real app: API call to follow user
   };
 
   const handleHashtagClick = (tag: string) => {
@@ -195,9 +194,9 @@ const Discover = () => {
             />
           </div>
 
-          {/* Featured Creator */}
+          {/* Suggested Users */}
           <div className="md:container md:mx-auto md:px-0">
-            <FeaturedCreator onCreatorClick={handleCreatorClick} />
+            <SuggestedUsers onUserFollow={handleUserFollow} />
           </div>
 
           {/* Engagement Prompts */}
