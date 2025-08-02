@@ -69,33 +69,23 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
         key={filter}
         onClick={() => onFilterChange(filter)}
         className={`
-          flex flex-col items-center gap-1 px-3 py-2 min-w-[80px] 
+          flex items-center gap-2 px-4 py-2 
           whitespace-nowrap flex-shrink-0 transition-all duration-200 ease-in-out
-          focus:outline-none border rounded-xl bg-gradient-to-b relative
-          ${isActive 
-            ? 'from-emerald-50 to-emerald-100 border-emerald-300 shadow-sm' 
-            : 'from-white to-gray-50 border-gray-200 hover:from-gray-50 hover:to-gray-100 active:from-gray-100 active:to-gray-200'
-          }
+          focus:outline-none border rounded-full bg-white
+          text-black border-black
+          hover:border-[hsl(var(--brand-orange))] active:border-[hsl(var(--brand-orange))]
+          ${isActive ? 'border-[hsl(var(--brand-orange))]' : ''}
         `}
       >
         {/* Icon */}
-        <div className={`transition-colors duration-200 ${
-          isActive ? 'text-emerald-600' : 'text-gray-600'
-        }`}>
+        <div className="text-black">
           {getFilterIcon(filter)}
         </div>
         
         {/* Label */}
-        <span className={`text-xs font-medium transition-colors duration-200 ${
-          isActive ? 'text-emerald-700 font-semibold' : 'text-gray-700'
-        }`}>
+        <span className="text-sm font-medium text-black">
           {filter}
         </span>
-        
-        {/* Active indicator dot */}
-        {isActive && (
-          <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-emerald-500 rounded-full" />
-        )}
       </button>
     );
   };
