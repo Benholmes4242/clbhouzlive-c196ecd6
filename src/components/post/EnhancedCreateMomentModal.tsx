@@ -561,16 +561,6 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                   </div>
                 </div>
 
-                {/* 5. Tag Field (Placeholder for future implementation) */}
-                <div className="space-y-4 pt-6">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Add tags
-                    <span className="text-gray-400 text-xs ml-1">(Optional)</span>
-                  </label>
-                  <div className="p-3.5 w-full border border-gray-200 rounded-xl bg-gray-50 text-gray-400 text-sm">
-                    Tag functionality coming soon...
-                  </div>
-                </div>
 
                 {/* Divider Line before buttons */}
                 <div className="border-t border-gray-100 -mx-6 mt-8" />
