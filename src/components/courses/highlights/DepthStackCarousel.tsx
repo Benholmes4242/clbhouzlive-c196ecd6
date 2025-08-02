@@ -5,6 +5,7 @@ import { useThumbnailGenerator } from '@/components/posts/video/ThumbnailGenerat
 import { useVideoAutoplay } from '@/hooks/useVideoAutoplay';
 import { Button } from '@/components/ui/button';
 import CourseRankBadges from '../CourseRankBadges';
+import MedalIcon from '@/components/ui/medal-icon';
 import Hls from 'hls.js';
 
 // Session-based mute preference management
@@ -305,10 +306,14 @@ const LiquidGlassCard: React.FC = () => {
                     achievement.earned 
                       ? 'bg-green-500/20 border border-green-400/30' 
                       : 'bg-white/10 border border-white/20'
-                  }`}>
-                    <span className="text-lg font-bold text-white">
-                      {achievement.target}
-                    </span>
+                   }`}>
+                     {achievement.id === '20-club' ? (
+                       <MedalIcon size="sm" />
+                     ) : (
+                       <span className="text-lg font-bold text-white">
+                         {achievement.target}
+                       </span>
+                     )}
                   </div>
                   
                   {/* Achievement Info */}
