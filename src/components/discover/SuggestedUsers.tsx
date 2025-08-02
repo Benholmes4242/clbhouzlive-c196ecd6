@@ -301,11 +301,8 @@ const SuggestedUsers: React.FC<SuggestedUsersProps> = ({ onUserFollow }) => {
                 <h4 className="text-xs font-semibold text-gray-900 truncate mb-1">
                   {user.displayName}
                 </h4>
-                <p className="text-xs text-gray-500 truncate mb-1">
+                <p className="text-xs text-gray-500 truncate mb-2">
                   {user.username}
-                </p>
-                <p className="text-xs text-gray-400 leading-tight line-clamp-2 mb-1">
-                  {user.bio}
                 </p>
                 <span className="text-xs text-gray-400">
                   {formatFollowers(user.followersCount)} followers
