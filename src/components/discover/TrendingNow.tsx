@@ -117,7 +117,7 @@ const TrendingNow: React.FC<TrendingNowProps> = ({ onHashtagClick, onAudioClick 
                     : "bg-gray-100 hover:bg-gray-200 active:bg-gray-300 border-gray-200 text-gray-700"
                 )}
               >
-                <IoFlameOutline className="w-3 h-3" />
+                <IoFlameOutline className="w-4 h-4" />
                 <span>{hashtag.tag.replace('#', '')}</span>
                 <span className="text-xs text-gray-500 ml-1">
                   {formatCount(hashtag.postCount)}
