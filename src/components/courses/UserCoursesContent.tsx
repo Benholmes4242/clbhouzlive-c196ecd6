@@ -276,15 +276,6 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
 
   return (
     <div className="relative space-y-8">
-      {/* Backdrop blur overlay that extends down to cover first two cards */}
-      <div 
-        className="absolute inset-0 bg-white/10 backdrop-blur-sm border border-white/20 pointer-events-none"
-        style={{
-          height: '1000px', // Much larger height to ensure it covers the first two cards
-          borderRadius: '16px',
-          zIndex: 1
-        }}
-      />
       
       {/* Content with higher z-index */}
       <div className="relative z-10">

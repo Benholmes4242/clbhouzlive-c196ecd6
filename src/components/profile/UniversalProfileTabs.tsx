@@ -61,14 +61,13 @@ const UniversalProfileTabs: React.FC<UniversalProfileTabsProps> = ({
               <HandicapSection userId={userId} profile={profile} />
             </TabsContent>
 
-            <TabsContent value="top100" className="mt-0 relative">
-              {/* Backdrop blur overlay that extends down to cover first two cards */}
+            <TabsContent value="top100" className="mt-0 relative overflow-hidden">
+              {/* Backdrop blur overlay positioned to cover content */}
               <div 
-                className="absolute inset-0 bg-white/10 backdrop-blur-sm border border-white/20 pointer-events-none"
+                className="absolute top-0 left-0 right-0 bg-white/15 backdrop-blur-md pointer-events-none"
                 style={{
-                  height: '1000px',
-                  borderRadius: '16px',
-                  zIndex: 1
+                  height: '900px',
+                  zIndex: 0
                 }}
               />
               
