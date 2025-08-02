@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Hash, Play, Headphones, TrendingUp, Volume2 } from 'lucide-react';
+import { Hash, Play, Headphones, Volume2 } from 'lucide-react';
+import { IoFlameOutline } from 'react-icons/io5';
 import { cn } from '@/lib/utils';
 
 interface TrendingHashtag {
@@ -83,7 +84,7 @@ const TrendingNow: React.FC<TrendingNowProps> = ({ onHashtagClick, onAudioClick 
         {/* Section Header with Tabs */}
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-gray-600" />
+            <IoFlameOutline className="w-4 h-4 text-gray-600" />
             <h3 className="text-sm font-semibold text-gray-900">Trending Now</h3>
           </div>
           

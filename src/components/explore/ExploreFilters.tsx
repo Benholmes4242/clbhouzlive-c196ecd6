@@ -1,9 +1,10 @@
 
 import React, { useRef, useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Camera, TvMinimalPlay, Zap, Brain, Users, Flame } from 'lucide-react';
+import { Camera, TvMinimalPlay, Zap, Brain, Users } from 'lucide-react';
 import { MdOutlinePlayCircle } from 'react-icons/md';
 import { PiGolf } from 'react-icons/pi';
+import { IoFlameOutline } from 'react-icons/io5';
 import { filterOptions, FILTER_TYPES } from './types';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useCarouselNavigation } from '@/hooks/useCarouselNavigation';
@@ -47,7 +48,7 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
       case FILTER_TYPES.PHOTOS:
         return <Camera {...iconProps} />;
       case FILTER_TYPES.TRENDING:
-        return <Flame {...iconProps} />;
+        return <IoFlameOutline className="w-5 h-5" />;
       case FILTER_TYPES.VERIFIED_PROS:
         return <PiGolf className="w-5 h-5" />;
       case FILTER_TYPES.CHANNELS:
