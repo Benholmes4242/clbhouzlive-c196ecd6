@@ -276,49 +276,43 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
 
   return (
     <div className="relative space-y-8">
-      <UserCoursesHeader
-        displayName={finalDisplayName} 
-        isOwnProfile={finalIsOwnProfile} 
+      {/* Backdrop blur overlay that extends down to cover first two cards */}
+      <div 
+        className="absolute inset-x-0 top-0 bg-white/10 backdrop-blur-sm border border-white/20"
+        style={{
+          height: '520px', // Adjust this to cover the progress ring, badges, tiles and first two cards
+          borderRadius: '16px',
+          zIndex: 0
+        }}
       />
-
-      {/* Top 100 Progress Ring */}
-      <div className="flex justify-center py-4">
-        <Top100Progress 
-          completedCount={top100CompletedCount}
-          totalCount={100}
+      
+      {/* Content with higher z-index */}
+      <div className="relative z-10">
+        <UserCoursesHeader
+          displayName={finalDisplayName} 
+          isOwnProfile={finalIsOwnProfile} 
         />
-      </div>
 
-      {/* Achievement Badges */}
-      <BadgeCollection 
-        completedCount={top100CompletedCount}
-        collapsible={true}
-        defaultExpanded={false}
-      />
+        {/* Top 100 Progress Ring */}
+        <div className="flex justify-center py-4">
+          <Top100Progress 
+            completedCount={top100CompletedCount}
+            totalCount={100}
+          />
+        </div>
 
+        {/* Achievement Badges */}
+        <BadgeCollection 
+          completedCount={top100CompletedCount}
+          collapsible={true}
+          defaultExpanded={false}
+        />
 
-      <div className="flex flex-col gap-4">
-        {/* Mobile layout - stacked */}
-        {isMobile ? (
-          <>
-            {/* Regional tiles and sorting buttons */}
-            <UserCoursesRegionalTiles
-              regionProgress={regionProgress}
-              activeFilter={activeFilter}
-              onFilterChange={setActiveFilter}
-              isLoading={isLoadingProgress}
-              sortBy={sortBy}
-              onSortChange={setSortBy}
-              viewType={viewType}
-              onViewTypeChange={setViewType}
-              isOwnProfile={finalIsOwnProfile}
-              onAddCoursesClick={() => setIsCoursePickerOpen(true)}
-            />
-          </>
-        ) : (
-          /* Desktop layout - side by side */
-          <div className="flex items-center justify-between">
-            <div className="flex-1">
+        <div className="flex flex-col gap-4">
+          {/* Mobile layout - stacked */}
+          {isMobile ? (
+            <>
+              {/* Regional tiles and sorting buttons */}
               <UserCoursesRegionalTiles
                 regionProgress={regionProgress}
                 activeFilter={activeFilter}
@@ -331,12 +325,30 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
                 isOwnProfile={finalIsOwnProfile}
                 onAddCoursesClick={() => setIsCoursePickerOpen(true)}
               />
+            </>
+          ) : (
+            /* Desktop layout - side by side */
+            <div className="flex items-center justify-between">
+              <div className="flex-1">
+                <UserCoursesRegionalTiles
+                  regionProgress={regionProgress}
+                  activeFilter={activeFilter}
+                  onFilterChange={setActiveFilter}
+                  isLoading={isLoadingProgress}
+                  sortBy={sortBy}
+                  onSortChange={setSortBy}
+                  viewType={viewType}
+                  onViewTypeChange={setViewType}
+                  isOwnProfile={finalIsOwnProfile}
+                  onAddCoursesClick={() => setIsCoursePickerOpen(true)}
+                />
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-4 relative z-10">
         {isLoadingTop100 || !isHydrated ? (
           <div className="text-center py-8">
             <div className="flex flex-col items-center gap-2">
