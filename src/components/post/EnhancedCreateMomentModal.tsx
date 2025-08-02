@@ -594,7 +594,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                       aria-label="Post your moment"
                       className={`
                         px-6 py-3 text-sm font-medium rounded-xl
-                        bg-gray-500 hover:bg-gray-600 text-white
+                        bg-gray-400 hover:bg-gray-500 text-white
                         transition-all duration-200 ease-out
                         hover:scale-105 active:scale-95
                         disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100
@@ -603,7 +603,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                         ${isSubmitting ? 'animate-pulse' : ''}
                       `}
                       style={{
-                        background: isSubmitting ? '#6b7280' : undefined,
+                        background: isSubmitting ? '#9ca3af' : undefined,
                         minWidth: '140px' // Prevent button width changes
                       }}
                     >
