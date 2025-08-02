@@ -706,8 +706,8 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                   </div>
                 )}
 
-                {/* Audio Strip - Only show for video posts with audio */}
-                {currentMedia.media_type === 'video' && item.audioTrack && (
+                {/* Audio Strip - Only show for video posts with custom audio (not original) */}
+                {currentMedia.media_type === 'video' && item.audioTrack && !item.audioTrack.isOriginal && (
                   <div className="mt-3">
                     <AudioStrip audioTrack={item.audioTrack} />
                   </div>
