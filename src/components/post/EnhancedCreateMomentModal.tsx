@@ -415,7 +415,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                 <div className="mt-6 pt-4 border-t border-gray-100">
                   <button
                     onClick={onClose}
-                    className="w-full text-center py-3 text-[#6e9277] text-base font-medium hover:text-[#5a7c64] transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-[#6e9277] focus:ring-offset-2 rounded-lg"
+                    className="w-full text-center py-3 text-black text-base font-medium hover:text-gray-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-offset-2 rounded-lg"
                     tabIndex={0}
                     aria-label="Cancel and close modal"
                   >
