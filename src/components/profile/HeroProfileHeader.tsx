@@ -242,17 +242,7 @@ const HeroProfileHeader = ({
   const getBackgroundHeight = () => {
     switch (activeSection) {
       case 'activity': return '1000px';
-      case 'top100': {
-        // Calculate height to cover profile section + first two CourseCard components
-        const profileHeaderHeight = 600; // Approximate height of profile info section
-        const courseCardHeight = 256; // CourseCard has fixed h-64 class (256px)
-        const cardsGap = 24; // Gap between CourseCard components (gap-6 = 24px)
-        const gridPadding = 32; // Additional padding for the grid container
-        const headerAndProgressSections = 200; // Additional space for progress ring and badges
-        const twoCardsHeight = (courseCardHeight * 2) + cardsGap;
-        const extraPadding = 100; // Extra padding for smooth transition
-        return `${profileHeaderHeight + headerAndProgressSections + twoCardsHeight + gridPadding + extraPadding}px`;
-      }
+      case 'top100': return '2200px'; // Fixed height for both mobile and desktop
       case 'handicap': return '1000px';
       default: return '1300px';
     }
