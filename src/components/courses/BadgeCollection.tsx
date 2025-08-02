@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import Top100AchievementCard from '../badges/Top100AchievementCard';
+import AchievementBadge, { BadgeData } from './AchievementBadge';
 
 interface BadgeCollectionProps {
   completedCount: number;
@@ -12,25 +12,32 @@ interface BadgeCollectionProps {
 
 const BADGE_MILESTONES = [
   {
-    id: '20-club',
-    emoji: '🏌️',
-    title: 'Green Fee Rookie',
-    requirement: 'Play 20 Top 100 courses',
-    threshold: 20,
+    id: 'bronze-explorer',
+    name: 'Bronze Explorer',
+    description: 'Completed your first 10 courses from the prestigious Top 100 list.',
+    tier: 'bronze' as const,
+    requiredCount: 10,
   },
   {
-    id: '50-club',
-    emoji: '⛳',
-    title: 'The Turn',
-    requirement: 'Play 50 Top 100 courses',
-    threshold: 50,
+    id: 'silver-adventurer', 
+    name: 'Silver Adventurer',
+    description: 'Reached 25 courses - you\'re becoming a true golf connoisseur!',
+    tier: 'silver' as const,
+    requiredCount: 25,
   },
   {
-    id: '100-club',
-    emoji: '🏆',
-    title: 'Century Club',
-    requirement: 'Play 100 Top 100 courses',
-    threshold: 100,
+    id: 'gold-champion',
+    name: 'Gold Champion', 
+    description: 'Incredible! 50 courses completed. You\'ve experienced some of the world\'s finest golf.',
+    tier: 'gold' as const,
+    requiredCount: 50,
+  },
+  {
+    id: 'platinum-legend',
+    name: 'Platinum Legend',
+    description: 'Elite status achieved! 75+ courses puts you among the most dedicated golf enthusiasts.',
+    tier: 'platinum' as const,
+    requiredCount: 75,
   },
 ];
 
@@ -43,17 +50,18 @@ const BadgeCollection: React.FC<BadgeCollectionProps> = ({
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
 
   // Calculate badge statuses based on completed count
-  const badges = useMemo(() => {
+  const badges: BadgeData[] = useMemo(() => {
     return BADGE_MILESTONES.map((milestone) => ({
       ...milestone,
-      isEarned: completedCount >= milestone.threshold,
-      progress: completedCount,
-      isSpecial: milestone.id === '20-club',
+      isUnlocked: completedCount >= milestone.requiredCount,
+      earnedAt: completedCount >= milestone.requiredCount 
+        ? new Date() // In real app, this would come from user data
+        : undefined,
     }));
   }, [completedCount]);
 
-  const unlockedBadges = badges.filter(badge => badge.isEarned);
-  const nextBadge = badges.find(badge => !badge.isEarned);
+  const unlockedBadges = badges.filter(badge => badge.isUnlocked);
+  const nextBadge = badges.find(badge => !badge.isUnlocked);
 
   if (collapsible && !isExpanded) {
     return (
@@ -80,17 +88,17 @@ const BadgeCollection: React.FC<BadgeCollectionProps> = ({
         
         {/* Compact view - show only unlocked badges */}
         <div className="flex items-center gap-2">
-          {unlockedBadges.slice(0, 3).map((badge) => (
-            <div key={badge.id} className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-gradient-to-r from-orange-400 to-yellow-400 flex items-center justify-center text-white text-sm font-semibold">
-                {badge.emoji}
-              </div>
-              <span className="text-sm text-white font-medium">{badge.title}</span>
-            </div>
+          {unlockedBadges.slice(0, 4).map((badge) => (
+            <AchievementBadge
+              key={badge.id}
+              badge={badge}
+              size="sm"
+              showLabel={false}
+            />
           ))}
           {unlockedBadges.length === 0 && (
             <p className="text-sm text-white/50 italic">
-              Complete 20 courses to earn your first badge!
+              Complete 10 courses to earn your first badge!
             </p>
           )}
         </div>
@@ -126,18 +134,20 @@ const BadgeCollection: React.FC<BadgeCollectionProps> = ({
       {nextBadge && (
         <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-3">
           <p className="text-sm text-white/80">
-            <span className="font-medium">{nextBadge.threshold - completedCount} more courses</span> 
-            {' '}to unlock <span className="font-medium text-white">{nextBadge.title}</span>
+            <span className="font-medium">{nextBadge.requiredCount - completedCount} more courses</span> 
+            {' '}to unlock <span className="font-medium text-white">{nextBadge.name}</span>
           </p>
         </div>
       )}
       
       {/* Badge Grid */}
-      <div className="space-y-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {badges.map((badge) => (
-          <Top100AchievementCard
+          <AchievementBadge
             key={badge.id}
-            achievement={badge}
+            badge={badge}
+            size="md"
+            showLabel={true}
           />
         ))}
       </div>
