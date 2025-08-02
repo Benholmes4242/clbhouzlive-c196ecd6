@@ -256,19 +256,6 @@ const LiquidGlassCard: React.FC = () => {
           </p>
         </div>
 
-        {/* Progress Bar */}
-        <div className="mb-6">
-          <div className="flex justify-between text-white/70 text-xs mb-2">
-            <span>{userProgress.played}</span>
-            <span>{userProgress.total}</span>
-          </div>
-          <div className="w-full bg-white/20 rounded-full h-2 backdrop-blur-sm">
-            <div 
-              className="bg-green-400 h-2 rounded-full transition-all duration-300 ease-out"
-              style={{ width: `${progressPercentage}%` }}
-            />
-          </div>
-        </div>
 
         {/* Achievement List */}
         <div className="flex-1 overflow-y-auto scrollbar-hide space-y-3">
