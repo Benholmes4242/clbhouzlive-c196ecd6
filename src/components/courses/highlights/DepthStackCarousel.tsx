@@ -316,7 +316,7 @@ const LiquidGlassCard: React.FC = () => {
                     </div>
                   ) : achievement.id === '300-club' ? (
                     <div className="w-10 h-10 flex items-center justify-center">
-                      <MedalIcon size="xl" type="300-club" className="!w-28 !h-28" />
+                      <MedalIcon size="xl" type="300-club" className="!w-56 !h-56" />
                     </div>
                   ) : (
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
