@@ -288,6 +288,9 @@ const SuggestedUsers: React.FC<SuggestedUsersProps> = ({ onUserFollow }) => {
                   src={user.profileImage}
                   alt={user.displayName}
                   className="w-16 h-16 rounded-full mx-auto object-cover"
+                  onError={(e) => {
+                    e.currentTarget.src = 'https://images.unsplash.com/photo-1535268647677-300dbf3d78d1?w=100&h=100&fit=crop&crop=face';
+                  }}
                 />
                 {user.isVerified && (
                   <div className="absolute -top-1 -right-1 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
