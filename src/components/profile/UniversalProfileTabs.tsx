@@ -61,15 +61,28 @@ const UniversalProfileTabs: React.FC<UniversalProfileTabsProps> = ({
               <HandicapSection userId={userId} profile={profile} />
             </TabsContent>
 
-            <TabsContent value="top100" className="mt-0">
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-3xl font-bold text-white">Top 100 courses</h2>
-              </div>
-              <UserCoursesContent 
-                username={profile?.username} 
-                isOwnProfile={isOwnProfile}
-                displayName={profile?.display_name}
+            <TabsContent value="top100" className="mt-0 relative">
+              {/* Backdrop blur overlay that extends down to cover first two cards */}
+              <div 
+                className="absolute inset-0 bg-white/10 backdrop-blur-sm border border-white/20 pointer-events-none"
+                style={{
+                  height: '1000px',
+                  borderRadius: '16px',
+                  zIndex: 1
+                }}
               />
+              
+              {/* Content with higher z-index */}
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-3xl font-bold text-white">Top 100 courses</h2>
+                </div>
+                <UserCoursesContent 
+                  username={profile?.username} 
+                  isOwnProfile={isOwnProfile}
+                  displayName={profile?.display_name}
+                />
+              </div>
             </TabsContent>
           </>
         )}
