@@ -229,10 +229,11 @@ const LiquidGlassCard: React.FC = () => {
     played: 21,
     total: 300,
     achievements: [
-      { id: '20-club', name: '20 Club', description: 'Play 20 Top 100 courses', target: 20, earned: true },
-      { id: '50-club', name: '50 Club', description: 'Play 50 Top 100 courses', target: 50, earned: false },
-      { id: '100-club', name: '100 Club', description: 'Play 100 Top 100 courses', target: 100, earned: false },
-      { id: '300-club', name: '300 Club', description: 'Play 300 Top 100 courses', target: 300, earned: false },
+      { id: '20-club', name: 'Green Fee Rookie', description: "You've paid your dues - 20 down!", target: 20, earned: true },
+      { id: '50-club', name: 'The Turn', description: 'Halfway through your Top 100 journey', target: 50, earned: false },
+      { id: '100-club', name: 'The Century Club', description: "You're a member of the century club - a prestigious club", target: 100, earned: false },
+      { id: '200-club', name: 'Links Legend', description: 'Bunkers, winds, and triumphs - 200 conquered', target: 200, earned: false },
+      { id: '300-club', name: 'Course Collector', description: "All 300? That's a collector's dream come true", target: 300, earned: false },
     ]
   };
 
@@ -313,6 +314,10 @@ const LiquidGlassCard: React.FC = () => {
                   ) : achievement.id === '100-club' ? (
                     <div className="w-10 h-10 flex items-center justify-center">
                       <MedalIcon size="xl" type="100-club" className="!w-28 !h-28" />
+                    </div>
+                  ) : achievement.id === '200-club' ? (
+                    <div className="w-10 h-10 flex items-center justify-center">
+                      <MedalIcon size="xl" type="200-club" className="!w-28 !h-28" />
                     </div>
                   ) : achievement.id === '300-club' ? (
                     <div className="w-10 h-10 flex items-center justify-center">
