@@ -125,9 +125,6 @@ const SuggestedUsers: React.FC<SuggestedUsersProps> = ({ onUserFollow }) => {
                     <Check className="w-3 h-3 text-white" />
                   </div>
                 )}
-                {user.isReal && (
-                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
-                )}
               </div>
 
               {/* User Info */}
