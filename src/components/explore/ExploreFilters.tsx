@@ -79,7 +79,7 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
         key={filter}
         onClick={handleClick}
         className={`
-          flex flex-col items-center gap-1 px-4 py-3 min-w-[80px] 
+          flex flex-col items-center gap-1 px-4 py-1.5 min-w-[80px] 
           whitespace-nowrap flex-shrink-0 transition-all duration-200 ease-in-out
           focus:outline-none border rounded-full relative
           transform active:scale-95 hover:scale-105
