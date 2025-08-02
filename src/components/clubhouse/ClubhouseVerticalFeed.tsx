@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import ClubhouzLoading from '@/components/ClubhouzLoading';
 import { MapPin, UserPlus, UserCheck, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { HeartIcon, ChatBubbleOvalLeftEllipsisIcon, PaperAirplaneIcon, SpeakerXMarkIcon, SpeakerWaveIcon } from '@heroicons/react/24/solid';
+import { EmojiReactionTray } from './EmojiReactionTray';
+import { usePostReactions } from '@/hooks/usePostReactions';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ExploreContentItem } from '@/components/explore/types';
@@ -169,7 +171,12 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
   const [mediaIndices, setMediaIndices] = useState<{[key: string]: number}>({});
   const queryClient = useQueryClient();
   
-  // Post reactions removed for now
+  // Post reactions
+  const { getUserReaction, handleReaction } = usePostReactions();
+  const [showReactionTray, setShowReactionTray] = useState(false);
+  const [reactionTrayPosition, setReactionTrayPosition] = useState({ x: 0, y: 0 });
+  const [reactionPostId, setReactionPostId] = useState<string>('');
+  const longPressTimer = useRef<NodeJS.Timeout | null>(null);
 
   // Check if current user follows the displayed user
   const { data: isFollowing, isLoading: isFollowingLoading } = useQuery({
@@ -427,6 +434,57 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
     setCommentsModalOpen(true);
   };
 
+  // Long press handlers for reaction tray
+  const handleLongPressStart = useCallback((e: React.TouchEvent | React.MouseEvent, postId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    const target = e.currentTarget as HTMLElement;
+    const rect = target.getBoundingClientRect();
+    const newPosition = {
+      x: rect.left - 80, // Position to the left of the button
+      y: rect.top + rect.height / 2
+    };
+    
+    setReactionTrayPosition(newPosition);
+    setReactionPostId(postId);
+
+    longPressTimer.current = setTimeout(() => {
+      setShowReactionTray(true);
+    }, 500); // 500ms long press threshold
+  }, []);
+
+  const handleLongPressEnd = useCallback((postId: string) => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+
+    if (!showReactionTray) {
+      // Quick tap - toggle heart reaction
+      const currentReaction = getUserReaction(postId);
+      if (currentReaction === '❤️') {
+        handleReaction(postId, ''); // Remove reaction
+      } else {
+        handleReaction(postId, '❤️'); // Add heart reaction
+      }
+    }
+  }, [showReactionTray, getUserReaction, handleReaction]);
+
+  const handleEmojiSelect = useCallback((emoji: string) => {
+    const currentReaction = getUserReaction(reactionPostId);
+    if (currentReaction === emoji) {
+      handleReaction(reactionPostId, ''); // Remove reaction if same emoji selected
+    } else {
+      handleReaction(reactionPostId, emoji); // Set new reaction
+    }
+    setShowReactionTray(false);
+  }, [reactionPostId, getUserReaction, handleReaction]);
+
+  const handleReactionCancel = useCallback(() => {
+    setShowReactionTray(false);
+  }, []);
+
   if (posts.length === 0) {
     return <ClubhouzLoading />;
   }
@@ -673,19 +731,27 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                   </button>
                 )}
 
-                {/* Heart/Like Button */}
+                {/* Heart/Reaction Button */}
                 <button
-                  onClick={() => {
-                    console.log('🔥 CLUBHOUSE HEART CLICKED!');
-                    handleLike(item.id);
+                  onTouchStart={(e) => handleLongPressStart(e, item.id)}
+                  onTouchEnd={() => handleLongPressEnd(item.id)}
+                  onMouseDown={(e) => handleLongPressStart(e, item.id)}
+                  onMouseUp={() => handleLongPressEnd(item.id)}
+                  onMouseLeave={() => {
+                    if (longPressTimer.current) {
+                      clearTimeout(longPressTimer.current);
+                      longPressTimer.current = null;
+                    }
                   }}
                   className="cursor-pointer hover:opacity-100 transition-opacity"
                 >
-                  <HeartIcon 
-                    className={`h-8 w-8 ${
-                      likedPosts?.includes(item.id) ? 'text-red-500' : 'text-white'
-                    }`} 
-                  />
+                  {getUserReaction(item.id) ? (
+                    <span className="text-2xl">
+                      {getUserReaction(item.id)}
+                    </span>
+                  ) : (
+                    <HeartIcon className="h-8 w-8 text-white" />
+                  )}
                 </button>
 
                 {/* Message Button */}
@@ -721,6 +787,15 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
         isOpen={commentsModalOpen}
         onClose={() => setCommentsModalOpen(false)}
         postId={selectedPostId}
+      />
+
+      {/* Emoji Reaction Tray */}
+      <EmojiReactionTray
+        isVisible={showReactionTray}
+        onEmojiSelect={handleEmojiSelect}
+        onCancel={handleReactionCancel}
+        position={reactionTrayPosition}
+        selectedEmoji={getUserReaction(reactionPostId)}
       />
 
       <style>{`
