@@ -14,19 +14,13 @@ const MedalIcon: React.FC<MedalIconProps> = ({ className, size = 'md' }) => {
   };
 
   return (
-    <div className={`${sizeClasses[size]} flex items-center justify-center`} style={{ backgroundColor: 'transparent' }}>
-      <img 
-        src="/lovable-uploads/862498a8-378a-4818-b98e-b7fe150586b2.png"
-        alt="20 Club Trophy"
-        className={`${sizeClasses[size]} object-contain ${className || ''}`}
-        style={{ 
-          backgroundColor: 'transparent',
-          mixBlendMode: 'multiply'
-        }}
-        onError={(e) => console.log('Trophy image failed to load:', e)}
-        onLoad={() => console.log('Trophy image loaded successfully')}
-      />
-    </div>
+    <img 
+      src="/lovable-uploads/90b69592-f3ff-45b6-aa32-e911c380b987.png"
+      alt="20 Club Trophy"
+      className={`${sizeClasses[size]} object-contain ${className || ''}`}
+      onError={(e) => console.log('Trophy image failed to load:', e)}
+      onLoad={() => console.log('Trophy image loaded successfully')}
+    />
   );
 };
 
