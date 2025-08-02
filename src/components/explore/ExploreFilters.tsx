@@ -69,25 +69,28 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
         key={filter}
         onClick={() => onFilterChange(filter)}
         className={`
-          flex items-center gap-2 px-4 py-2 
+          flex items-center gap-2 px-4 py-2 group
           whitespace-nowrap flex-shrink-0 transition-all duration-200 ease-in-out
           focus:outline-none border rounded-full bg-white
-          text-black border-black
+          border-black text-black
           hover:border-[hsl(var(--brand-orange))] hover:text-[hsl(var(--brand-orange))]
-          active:border-[hsl(var(--brand-orange))] active:text-[hsl(var(--brand-orange))]
           ${isActive ? 'border-[hsl(var(--brand-orange))] text-[hsl(var(--brand-orange))]' : ''}
         `}
       >
         {/* Icon */}
         <div className={`transition-colors duration-200 ${
-          isActive ? 'text-[hsl(var(--brand-orange))]' : 'text-black hover:text-[hsl(var(--brand-orange))]'
+          isActive 
+            ? 'text-[hsl(var(--brand-orange))]' 
+            : 'text-black group-hover:text-[hsl(var(--brand-orange))]'
         }`}>
           {getFilterIcon(filter)}
         </div>
         
         {/* Label */}
         <span className={`text-sm font-medium transition-colors duration-200 ${
-          isActive ? 'text-[hsl(var(--brand-orange))]' : 'text-black'
+          isActive 
+            ? 'text-[hsl(var(--brand-orange))]' 
+            : 'text-black group-hover:text-[hsl(var(--brand-orange))]'
         }`}>
           {filter}
         </span>
