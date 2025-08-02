@@ -78,7 +78,7 @@ const TrendingNow: React.FC<TrendingNowProps> = ({ onHashtagClick, onAudioClick 
   };
 
   return (
-    <div className="px-4 py-3 bg-gradient-to-r from-gray-50 to-white border-b border-gray-100">
+    <div className="px-4 py-3">
       <div className="md:container md:mx-auto md:px-0">
         {/* Section Header with Tabs */}
         <div className="flex items-center justify-between mb-3">
