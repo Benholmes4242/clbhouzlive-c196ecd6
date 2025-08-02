@@ -391,14 +391,3 @@
 .animate-shake {
   animation: shake 0.6s ease-in-out;
 }
-
-/* Bounce animation for filter buttons */
-@keyframes bounce {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.015); }
-  100% { transform: scale(1); }
-}
-
-.animate-bounce-click {
-  animation: bounce 0.3s ease-out;
-}

@@ -1,10 +1,12 @@
 
 import React, { useRef, useState, useEffect } from 'react';
+import { Button } from '@/components/ui/button';
 import { Camera, TvMinimalPlay, Zap, Brain, Users, TrendingUp } from 'lucide-react';
 import { MdOutlinePlayCircle } from 'react-icons/md';
 import { PiGolf } from 'react-icons/pi';
 import { filterOptions, FILTER_TYPES } from './types';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useCarouselNavigation } from '@/hooks/useCarouselNavigation';
 
 interface ExploreFiltersProps {
   activeFilter: string;
@@ -17,7 +19,6 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [isAtStart, setIsAtStart] = useState(true);
   const [isAtEnd, setIsAtEnd] = useState(false);
-  
 
   // Filter out excluded filters
   const availableFilters = filterOptions.filter(filter => !excludeFilters.includes(filter));
@@ -68,29 +69,33 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
         key={filter}
         onClick={() => onFilterChange(filter)}
         className={`
-          flex flex-col items-center gap-1 px-4 py-1.5 min-w-[80px] 
+          flex flex-col items-center gap-1 px-3 py-2 min-w-[80px] 
           whitespace-nowrap flex-shrink-0 transition-all duration-200 ease-in-out
-          focus:outline-none border rounded-full relative
-          transform active:scale-95 hover:scale-105
-          ${isActive
-            ? 'bg-green-400 border-green-500 text-gray-800 shadow-md' 
-            : 'bg-white border-gray-300 text-gray-700 hover:bg-green-400 hover:border-green-500 hover:text-gray-800 shadow-sm'
+          focus:outline-none border rounded-xl bg-gradient-to-b relative
+          ${isActive 
+            ? 'from-emerald-50 to-emerald-100 border-emerald-300 shadow-sm' 
+            : 'from-white to-gray-50 border-gray-200 hover:from-gray-50 hover:to-gray-100 active:from-gray-100 active:to-gray-200'
           }
         `}
       >
         {/* Icon */}
         <div className={`transition-colors duration-200 ${
-          isActive ? 'text-gray-800' : 'text-gray-600'
+          isActive ? 'text-emerald-600' : 'text-gray-600'
         }`}>
           {getFilterIcon(filter)}
         </div>
         
         {/* Label */}
         <span className={`text-xs font-medium transition-colors duration-200 ${
-          isActive ? 'text-gray-800 font-semibold' : 'text-gray-700'
+          isActive ? 'text-emerald-700 font-semibold' : 'text-gray-700'
         }`}>
           {filter}
         </span>
+        
+        {/* Active indicator dot */}
+        {isActive && (
+          <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-emerald-500 rounded-full" />
+        )}
       </button>
     );
   };
