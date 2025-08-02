@@ -528,7 +528,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                             : 'text-gray-600 hover:text-gray-800'
                         }`}
                         style={{
-                          backgroundColor: !isPrivate ? '#6e9277' : 'transparent'
+                          backgroundColor: !isPrivate ? '#6b7280' : 'transparent'
                         }}
                         disabled={isSubmitting}
                       >
@@ -594,16 +594,16 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                       aria-label="Post your moment"
                       className={`
                         px-6 py-3 text-sm font-medium rounded-xl
-                        bg-[#6e9277] hover:bg-[#5a7c64] text-white
+                        bg-gray-600 hover:bg-gray-700 text-white
                         transition-all duration-200 ease-out
                         hover:scale-105 active:scale-95
                         disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100
-                        focus:outline-none focus:ring-2 focus:ring-[#6e9277] focus:ring-offset-2
+                        focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2
                         ${isButtonShaking ? 'animate-shake' : ''}
                         ${isSubmitting ? 'animate-pulse' : ''}
                       `}
                       style={{
-                        background: isSubmitting ? '#6e9277' : undefined,
+                        background: isSubmitting ? '#4b5563' : undefined,
                         minWidth: '140px' // Prevent button width changes
                       }}
                     >
