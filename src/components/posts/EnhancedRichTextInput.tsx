@@ -276,7 +276,7 @@ const EnhancedRichTextInput: React.FC<EnhancedRichTextInputProps> = ({
 
   return (
     <div className="relative">
-      <div className="relative rounded-xl border border-gray-200 bg-white focus-within:ring-2 focus-within:ring-[#6e9277] focus-within:border-[#6e9277] transition-all">
+      <div className="relative rounded-xl border border-gray-200 bg-white transition-all">
         <textarea
           ref={textareaRef}
           value={value}
@@ -298,7 +298,7 @@ const EnhancedRichTextInput: React.FC<EnhancedRichTextInputProps> = ({
             console.log('Emoji button clicked!');
             setShowEmojiPicker(!showEmojiPicker);
           }}
-          className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center rounded-full bg-orange-100 hover:bg-orange-200 border border-orange-300 transition-colors z-20 focus:outline-none focus:ring-2 focus:ring-[#6e9277] focus:ring-offset-2"
+          className="absolute top-2 right-2 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors z-20 focus:outline-none"
           disabled={disabled}
           title="Add emoji 😄"
           aria-label="Add emoji"

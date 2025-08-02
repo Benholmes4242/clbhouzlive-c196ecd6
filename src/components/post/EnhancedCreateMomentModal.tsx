@@ -468,7 +468,7 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                         selectedTags={selectedTags}
                         disabled={isSubmitting}
                         aria-label="Caption input for your moment"
-                        className="focus:ring-2 focus:ring-[#6e9277] focus:ring-offset-2"
+                        className=""
                       />
                     </div>
                   </div>
