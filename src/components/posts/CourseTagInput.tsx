@@ -102,7 +102,7 @@ const CourseTagInput = ({
             onFocus={handleInputFocus}
             onBlur={handleInputBlur}
             placeholder={placeholder}
-            className="w-full pl-10 pr-10 py-3 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-0 focus:border-gray-200 transition-all duration-200 bg-white"
+            className="w-full pl-10 pr-10 py-3 text-sm border border-gray-200 rounded-xl outline-none focus:outline-none focus:ring-0 focus:border-gray-200 focus:shadow-none hover:border-gray-200 active:border-gray-200 transition-none bg-white"
             disabled={!!selectedCourse}
           />
           {isLoading && searchQuery.length >= 2 && (
