@@ -251,9 +251,6 @@ const LiquidGlassCard: React.FC = () => {
         {/* Header */}
         <div className="mb-6">
           <h3 className="text-white font-bold text-2xl mb-2">Achievements</h3>
-          <p className="text-white/70 text-base">
-            You&apos;ve played {userProgress.played} of {userProgress.total} Top 100 courses
-          </p>
         </div>
 
 
