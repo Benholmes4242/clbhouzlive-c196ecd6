@@ -81,124 +81,37 @@ const TrendingNow: React.FC<TrendingNowProps> = ({ onHashtagClick, onAudioClick 
   return (
     <div className="px-4 py-3">
       <div className="md:container md:mx-auto md:px-0">
-        {/* Section Header with Tabs */}
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <IoFlameOutline className="w-6 h-6 text-gray-600" />
-            <h3 className="text-sm font-semibold text-gray-900">Trending Now</h3>
-          </div>
-          
-          {/* Tab Switcher */}
-          <div className="flex bg-gray-100 rounded-full p-1">
-            <button
-              onClick={() => setActiveTab('hashtags')}
-              className={cn(
-                "px-3 py-1 text-xs font-medium rounded-full transition-all duration-200",
-                activeTab === 'hashtags' 
-                  ? "bg-white text-gray-900 shadow-sm" 
-                  : "text-gray-600 hover:text-gray-900"
-              )}
-            >
-              <Hash className="w-3 h-3 inline mr-1" />
-              Tags
-            </button>
-            <button
-              onClick={() => setActiveTab('audio')}
-              className={cn(
-                "px-3 py-1 text-xs font-medium rounded-full transition-all duration-200",
-                activeTab === 'audio' 
-                  ? "bg-white text-gray-900 shadow-sm" 
-                  : "text-gray-600 hover:text-gray-900"
-              )}
-            >
-              <Headphones className="w-3 h-3 inline mr-1" />
-              Sounds
-            </button>
-          </div>
+        {/* Section Header */}
+        <div className="flex items-center gap-2 mb-3">
+          <IoFlameOutline className="w-6 h-6 text-gray-600" />
+          <h3 className="text-sm font-semibold text-gray-900">Trending Now</h3>
         </div>
 
-        {/* Trending Hashtags */}
-        {activeTab === 'hashtags' && (
-          <div className="flex overflow-x-auto scrollbar-hide gap-2 pb-1">
-            {trendingHashtags.map((hashtag) => (
-              <button
-                key={hashtag.id}
-                onClick={() => onHashtagClick(hashtag.tag)}
-                className={cn(
-                  "flex items-center gap-1.5 px-3 py-2 bg-gray-100 hover:bg-gray-200 active:bg-gray-300",
-                  "rounded-full text-sm font-medium text-gray-700 transition-all duration-150",
-                  "whitespace-nowrap flex-shrink-0 border border-gray-200",
-                  hashtag.trending && "bg-gradient-to-r from-orange-50 to-orange-100 border-orange-200 text-orange-700"
-                )}
-              >
-                <Hash className="w-3 h-3" />
-                <span>{hashtag.tag.replace('#', '')}</span>
-                <span className="text-xs text-gray-500 ml-1">
-                  {formatCount(hashtag.postCount)}
-                </span>
-                {hashtag.trending && (
-                  <div className="w-1.5 h-1.5 bg-orange-400 rounded-full animate-pulse" />
-                )}
-              </button>
-            ))}
-          </div>
-        )}
+        {/* Trending Hashtags - Always Show */}
+        <div className="flex overflow-x-auto scrollbar-hide gap-2 pb-1">
+          {trendingHashtags.map((hashtag) => (
+            <button
+              key={hashtag.id}
+              onClick={() => onHashtagClick(hashtag.tag)}
+              className={cn(
+                "flex items-center gap-1.5 px-3 py-2 bg-gray-100 hover:bg-gray-200 active:bg-gray-300",
+                "rounded-full text-sm font-medium text-gray-700 transition-all duration-150",
+                "whitespace-nowrap flex-shrink-0 border border-gray-200",
+                hashtag.trending && "bg-gradient-to-r from-orange-50 to-orange-100 border-orange-200 text-orange-700"
+              )}
+            >
+              <Hash className="w-3 h-3" />
+              <span>{hashtag.tag.replace('#', '')}</span>
+              <span className="text-xs text-gray-500 ml-1">
+                {formatCount(hashtag.postCount)}
+              </span>
+              {hashtag.trending && (
+                <div className="w-1.5 h-1.5 bg-orange-400 rounded-full animate-pulse" />
+              )}
+            </button>
+          ))}
+        </div>
 
-        {/* Trending Audio */}
-        {activeTab === 'audio' && (
-          <div className="flex overflow-x-auto scrollbar-hide gap-3 pb-1">
-            {trendingAudio.map((audio) => (
-              <button
-                key={audio.id}
-                onClick={() => onAudioClick(audio.id)}
-                className="flex items-center gap-3 px-3 py-2 bg-gradient-to-b from-white to-gray-50 border border-gray-200 rounded-xl hover:from-gray-50 hover:to-gray-100 transition-all duration-200 whitespace-nowrap flex-shrink-0 min-w-[200px]"
-              >
-                {/* Audio Thumbnail/Waveform */}
-                <div className="relative flex-shrink-0">
-                  {audio.thumbnail ? (
-                    <div className="w-10 h-10 rounded-lg overflow-hidden bg-gray-100">
-                      <img 
-                        src={audio.thumbnail} 
-                        alt={audio.title}
-                        className="w-full h-full object-cover"
-                      />
-                      <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-                        <Play className="w-4 h-4 text-white fill-current" />
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-400 to-purple-500 flex items-center justify-center">
-                      <Volume2 className="w-5 h-5 text-white" />
-                    </div>
-                  )}
-                </div>
-
-                {/* Audio Info */}
-                <div className="flex-1 text-left min-w-0">
-                  <p className="text-sm font-medium text-gray-900 truncate">
-                    {audio.title}
-                  </p>
-                  <div className="flex items-center gap-2 text-xs text-gray-500">
-                    {audio.artist && (
-                      <span className="truncate">{audio.artist}</span>
-                    )}
-                    <span>•</span>
-                    <span>{formatDuration(audio.duration)}</span>
-                    <span>•</span>
-                    <span>{formatCount(audio.usageCount)} posts</span>
-                  </div>
-                </div>
-
-                {/* Play Button */}
-                <div className="flex-shrink-0">
-                  <div className="w-8 h-8 rounded-full bg-gray-200 hover:bg-gray-300 flex items-center justify-center transition-colors">
-                    <Play className="w-4 h-4 text-gray-600 fill-current ml-0.5" />
-                  </div>
-                </div>
-              </button>
-            ))}
-          </div>
-        )}
       </div>
     </div>
   );
