@@ -178,13 +178,6 @@ const Discover = () => {
             />
           </div>
 
-          {/* Sorting Chips */}
-          <div className="md:container md:mx-auto md:px-0">
-            <SortingChips 
-              selectedChip={selectedChip}
-              onChipSelect={setSelectedChip}
-            />
-          </div>
 
           {/* Trending Now Section */}
           <div className="pt-2">
