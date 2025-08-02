@@ -171,7 +171,7 @@ const Discover = () => {
         
         <main className="pb-20">
           {/* Your Discover Section */}
-          <div className="md:container md:mx-auto md:px-0 pt-6 pb-2">
+          <div className="md:container md:mx-auto md:px-0 pt-6 pb-1">
             <ExploreFilters 
               activeFilter={activeFilter} 
               onFilterChange={setActiveFilter}
