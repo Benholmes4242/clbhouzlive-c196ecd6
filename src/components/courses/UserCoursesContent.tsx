@@ -278,11 +278,11 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
     <div className="relative space-y-8">
       {/* Backdrop blur overlay that extends down to cover first two cards */}
       <div 
-        className="absolute inset-x-0 top-0 bg-white/10 backdrop-blur-sm border border-white/20"
+        className="absolute inset-0 bg-white/10 backdrop-blur-sm border border-white/20 pointer-events-none"
         style={{
-          height: '800px', // Increased height to cover progress ring, badges, tiles and first two cards
+          height: '1000px', // Much larger height to ensure it covers the first two cards
           borderRadius: '16px',
-          zIndex: 0
+          zIndex: 1
         }}
       />
       
