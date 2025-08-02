@@ -243,20 +243,6 @@ const EnhancedMediaPreviewGrid: React.FC<EnhancedMediaPreviewGridProps> = ({
                     </div>
                   )}
 
-                  {/* Media Type Badge - Moved to avoid conflicts */}
-                  <div className="absolute top-8 left-2 z-10">
-                    <span 
-                      className="text-xs px-2 py-1 rounded font-bold text-white uppercase"
-                      style={{ 
-                        backgroundColor: '#6e9277',
-                        fontSize: '10px',
-                        padding: '4px 6px',
-                        borderRadius: '6px'
-                      }}
-                    >
-                      {isImage ? '📸 PHOTO' : '🎥 VIDEO'}
-                    </span>
-                  </div>
 
                   {/* Error State - Fallback Icon */}
                   {hasError && (
@@ -353,14 +339,6 @@ const EnhancedMediaPreviewGrid: React.FC<EnhancedMediaPreviewGridProps> = ({
                     </div>
                   )}
 
-                  {/* Success indicator with animated check */}
-                  {media.uploadUrl && !media.isUploading && (
-                    <div className="absolute top-2 right-8 z-10 animate-scale-in">
-                      <div className="bg-green-500 rounded-full p-1">
-                        <CheckCircle className="h-4 w-4 text-white" />
-                      </div>
-                    </div>
-                  )}
 
                   {/* Error indicator */}
                   {media.error && (
@@ -440,41 +418,31 @@ const EnhancedMediaPreviewGrid: React.FC<EnhancedMediaPreviewGridProps> = ({
                     </div>
                   )}
 
-                  {/* Uploaded indicator */}
+                  {/* Success indicator - just green checkmark */}
                   {media.uploadUrl && !media.isUploading && (
-                    <div className="absolute bottom-2 left-2 z-10 animate-fade-in">
-                      <div className="px-3 py-1 bg-green-500 text-white rounded text-xs font-medium">
-                        ✓ Uploaded
+                    <div className="absolute top-2 right-2 z-10 animate-fade-in">
+                      <div className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center">
+                        <CheckCircle className="h-4 w-4" />
                       </div>
                     </div>
                   )}
 
-                  {/* Video Duration Badge or File Size */}
-                  <div className="absolute bottom-2 right-2 z-10">
-                    {isVideo && videoDurations[media.id] ? (
-                      <span 
-                        className="text-xs px-2 py-1 rounded text-white font-medium"
-                        style={{
-                          backgroundColor: 'rgba(0, 0, 0, 0.7)',
-                          fontSize: '11px',
-                          borderRadius: '6px',
-                          padding: '2px 6px'
-                        }}
-                      >
-                        {videoDurations[media.id]}
-                      </span>
-                    ) : (
-                      <span className="text-xs px-2 py-1 rounded-full bg-black/70 text-white">
-                        {(media.file.size / 1024 / 1024).toFixed(1)}MB
-                      </span>
-                    )}
-                  </div>
                 </div>
 
-                <div className="p-2">
-                  <p className="text-xs text-gray-600 truncate" title={media.file.name}>
-                    {media.file.name}
+                <div className="p-2 flex items-center justify-between">
+                  <p className="text-xs text-gray-600 truncate flex-1" title={media.file.name}>
+                    {media.file.name.split('.')[0]}.{media.file.name.split('.').pop()}
                   </p>
+                  {/* File size moved to white area */}
+                  {!isVideo || !videoDurations[media.id] ? (
+                    <span className="text-xs text-gray-500 ml-2 flex-shrink-0">
+                      {(media.file.size / 1024 / 1024).toFixed(1)}MB
+                    </span>
+                  ) : (
+                    <span className="text-xs text-gray-500 ml-2 flex-shrink-0">
+                      {videoDurations[media.id]}
+                    </span>
+                  )}
                 </div>
               </Card>
             );
