@@ -243,7 +243,7 @@ const HeroProfileHeader = ({
     switch (activeSection) {
       case 'activity': return '1000px';
       case 'top100': return '2200px'; // Fixed height for both mobile and desktop
-      case 'handicap': return '1000px';
+      case 'handicap': return '2200px'; // Fixed height for both mobile and desktop
       default: return '1300px';
     }
   };
