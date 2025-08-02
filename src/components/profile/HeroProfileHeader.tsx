@@ -23,6 +23,7 @@ import HandicapSection from './HandicapSection';
 import ProfileSectionCarousel from './ProfileSectionCarousel';
 import { createDynamicBackgroundStyle } from '@/utils/backgroundGenerator';
 import { getOptimizedImageUrl } from '@/utils/imageOptimization';
+import ScrollbarDebugger from '../debug/ScrollbarDebugger';
 
 interface Course {
   id: string;
@@ -503,6 +504,9 @@ const HeroProfileHeader = ({
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Scrollbar Debugger - Press Ctrl+Shift+S to activate */}
+      <ScrollbarDebugger />
     </>
   );
 };
