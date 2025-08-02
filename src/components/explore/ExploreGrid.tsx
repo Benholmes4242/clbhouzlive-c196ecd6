@@ -388,12 +388,12 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
             layoutItem.type === 'large' ? (
               <div
                 key={`discover-large-${layoutItem.item.id}-${index}`}
-                className="col-span-2 row-span-2 relative bg-muted overflow-hidden cursor-pointer group aspect-square"
+                className="col-span-2 row-span-2 relative overflow-hidden cursor-pointer group aspect-square"
                 style={{ borderRadius: '8px' }}
                 onClick={() => onMediaClick?.(layoutItem.item)}
               >
                 {/* Shimmer loading placeholder */}
-                <div className="absolute inset-0 bg-gradient-to-r from-muted via-muted/50 to-muted animate-pulse z-0">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-pulse z-0">
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer"></div>
                 </div>
                 
@@ -485,12 +485,12 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
             ) : (
               <div
                 key={`discover-regular-${layoutItem.item.id}-${index}`}
-                className="relative bg-muted overflow-hidden cursor-pointer group aspect-square"
+                className="relative overflow-hidden cursor-pointer group aspect-square"
                 style={{ borderRadius: '8px' }}
                 onClick={() => onMediaClick?.(layoutItem.item)}
               >
                 {/* Shimmer loading placeholder */}
-                <div className="absolute inset-0 bg-gradient-to-r from-muted via-muted/50 to-muted animate-pulse z-0">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-pulse z-0">
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer"></div>
                 </div>
                 
