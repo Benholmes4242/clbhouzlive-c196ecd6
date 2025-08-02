@@ -188,10 +188,12 @@ const Discover = () => {
           </div>
 
           {/* Trending Now Section */}
-          <TrendingNow 
-            onHashtagClick={handleHashtagClick}
-            onAudioClick={handleAudioClick}
-          />
+          <div className="pt-2">
+            <TrendingNow 
+              onHashtagClick={handleHashtagClick}
+              onAudioClick={handleAudioClick}
+            />
+          </div>
 
           {/* Featured Creator */}
           <div className="md:container md:mx-auto md:px-0">
