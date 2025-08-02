@@ -71,7 +71,7 @@ const Top100AchievementCard: React.FC<Top100AchievementCardProps> = ({ achieveme
               </p>
             </div>
           </div>
-          {isEarned && (
+          {isEarned && achievement.id !== '20-club' && (
             <div className="flex items-center justify-center ml-2">
               <span className="text-xs font-medium text-orange-800 bg-orange-100 px-2 py-0.5 rounded-full">
                 ✓ Earned!
