@@ -273,7 +273,6 @@ const SuggestedUsers: React.FC<SuggestedUsersProps> = ({ onUserFollow }) => {
         {/* Section Header */}
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-sm font-semibold text-gray-900">Suggested for you</h3>
-          <span className="text-xs text-gray-500">{availableUsers.length} suggestions</span>
         </div>
 
         {/* Horizontal Scrollable User Cards */}
