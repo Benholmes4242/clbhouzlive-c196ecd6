@@ -63,7 +63,7 @@ const UniversalProfileTabs: React.FC<UniversalProfileTabsProps> = ({
 
             <TabsContent value="top100" className="mt-0 relative">
               {/* Background blur overlay */}
-              <div className="absolute inset-x-0 top-0 h-[1400px] bg-white/10 backdrop-blur-lg pointer-events-none z-10"></div>
+              <div className="absolute inset-x-0 top-0 h-[2000px] bg-white/10 backdrop-blur-lg pointer-events-none z-10"></div>
               
               <div className="relative z-20">
                 <div className="flex items-center justify-between mb-4">
