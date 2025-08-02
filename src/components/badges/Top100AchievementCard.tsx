@@ -19,6 +19,9 @@ interface Top100AchievementCardProps {
 
 const Top100AchievementCard: React.FC<Top100AchievementCardProps> = ({ achievement }) => {
   const { emoji, title, requirement, threshold, isEarned, progress, isSpecial } = achievement;
+  
+  // Debug logging
+  console.log('Achievement ID:', achievement.id, 'Is 20-club?', achievement.id === '20-club');
 
   return (
     <div
