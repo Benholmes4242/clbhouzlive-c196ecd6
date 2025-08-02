@@ -389,7 +389,6 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                   <Image className="h-6 w-6 text-[#222222] flex-shrink-0" />
                   <div className="text-left flex-1">
                     <div className="text-base font-medium">Select Photos from Gallery</div>
-                    <div className="text-xs text-[#666666] mt-1.5">Choose saved images from your gallery</div>
                   </div>
                 </button>
 
@@ -404,7 +403,6 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                   <Video className="h-6 w-6 text-[#222222] flex-shrink-0" />
                   <div className="text-left flex-1">
                     <div className="text-base font-medium">Select Videos from Gallery</div>
-                    <div className="text-xs text-[#666666] mt-1.5">Upload pre-recorded golf clips</div>
                   </div>
                 </button>
 
