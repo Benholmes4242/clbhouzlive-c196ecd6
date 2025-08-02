@@ -399,11 +399,11 @@ const EnhancedMediaPreviewGrid: React.FC<EnhancedMediaPreviewGridProps> = ({
                     </div>
                   )}
 
-                  {/* Success indicator - just green checkmark */}
+                  {/* Success indicator - small subtle green checkmark */}
                   {media.uploadUrl && !media.isUploading && (
                     <div className="absolute top-2 right-2 z-10 animate-fade-in">
-                      <div className="w-6 h-6 bg-green-500 text-white rounded-full flex items-center justify-center">
-                        <CheckCircle className="h-4 w-4" />
+                      <div className="w-4 h-4 bg-green-500 text-white rounded-full flex items-center justify-center">
+                        <CheckCircle className="h-2.5 w-2.5" />
                       </div>
                     </div>
                   )}
