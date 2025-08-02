@@ -7,7 +7,6 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Search, X, Plus } from 'lucide-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
@@ -195,7 +194,7 @@ const CoursePickerModal: React.FC<CoursePickerModalProps> = ({
         )}
 
         {/* Course list */}
-        <ScrollArea className="flex-1 -mx-6 px-6">
+        <div className="flex-1 -mx-6 px-6 overflow-y-auto">
           <div className="space-y-2">
             {filteredCourses.map((course) => {
               const isSelected = selectedCourses.has(course.id);
@@ -234,7 +233,7 @@ const CoursePickerModal: React.FC<CoursePickerModalProps> = ({
               );
             })}
           </div>
-        </ScrollArea>
+        </div>
 
         {/* Footer */}
         <div className="flex justify-between items-center pt-4 border-t">
