@@ -96,7 +96,7 @@ const TrendingNow: React.FC<TrendingNowProps> = ({ onHashtagClick, onAudioClick 
       <div className="md:container md:mx-auto md:px-0">
         {/* Section Header */}
         <div className="flex items-center gap-2 mb-3">
-          <IoFlameOutline className="w-6 h-6 text-gray-600" />
+          <IoFlameOutline className="w-6 h-6 text-orange-500" />
           <h3 className="text-sm font-semibold text-gray-900">Trending Now</h3>
         </div>
 
