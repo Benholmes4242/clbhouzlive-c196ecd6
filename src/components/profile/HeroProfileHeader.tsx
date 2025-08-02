@@ -238,9 +238,14 @@ const HeroProfileHeader = ({
     }
   };
 
-  // Dynamic height based on active section - remove height constraints to prevent overflow
+  // Dynamic height based on active section
   const getBackgroundHeight = () => {
-    return 'auto'; // Let content determine height naturally
+    switch (activeSection) {
+      case 'activity': return '1000px';
+      case 'top100': return '2200px'; // Fixed height for both mobile and desktop
+      case 'handicap': return '2200px'; // Fixed height for both mobile and desktop
+      default: return '1300px';
+    }
   };
 
   return (
