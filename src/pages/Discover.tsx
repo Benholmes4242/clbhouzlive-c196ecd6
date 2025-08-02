@@ -171,7 +171,7 @@ const Discover = () => {
         
         <main className="pb-20">
           {/* Your Discover Section */}
-          <div className="md:container md:mx-auto md:px-0 pt-6 pb-1">
+          <div className="md:container md:mx-auto md:px-0 pt-6">
             <ExploreFilters 
               activeFilter={activeFilter} 
               onFilterChange={setActiveFilter}
@@ -180,7 +180,7 @@ const Discover = () => {
 
 
           {/* Trending Now Section */}
-          <div className="pt-2">
+          <div>
             <TrendingNow 
               onHashtagClick={handleHashtagClick}
               onAudioClick={handleAudioClick}
