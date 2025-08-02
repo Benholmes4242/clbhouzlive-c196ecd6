@@ -122,7 +122,7 @@ const TrendingNow: React.FC<TrendingNowProps> = ({ onHashtagClick, onAudioClick 
                 <span className="text-xs text-gray-500 ml-1">
                   {formatCount(hashtag.postCount)}
                 </span>
-                {isSelected ? (
+                {isSelected && (
                   <X 
                     className="w-3 h-3 ml-1 cursor-pointer hover:text-orange-900" 
                     onClick={(e) => {
@@ -130,10 +130,6 @@ const TrendingNow: React.FC<TrendingNowProps> = ({ onHashtagClick, onAudioClick 
                       handleClearSelection();
                     }}
                   />
-                ) : (
-                  hashtag.trending && (
-                    <div className="w-1.5 h-1.5 bg-orange-400 rounded-full animate-pulse" />
-                  )
                 )}
               </button>
             );
