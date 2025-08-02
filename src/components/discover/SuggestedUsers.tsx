@@ -1,256 +1,60 @@
 import React, { useState } from 'react';
 import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-interface SuggestedUser {
-  id: string;
-  displayName: string;
-  username: string;
-  profileImage: string;
-  bio: string;
-  followersCount: number;
-  isVerified?: boolean;
-}
+import { useSuggestedUsers } from '@/hooks/useSuggestedUsers';
+import { supabase } from '@/integrations/supabase/client';
 
 interface SuggestedUsersProps {
   onUserFollow: (userId: string) => void;
 }
 
-// Mock suggested users data - at least 25 users
-const mockSuggestedUsers: SuggestedUser[] = [
-  {
-    id: '1',
-    displayName: 'Sarah Johnson',
-    username: '@sarahjgolf',
-    profileImage: 'https://images.unsplash.com/photo-1494790108755-2616b612d7c5?w=100&h=100&fit=crop&crop=face',
-    bio: 'Weekend warrior golfer',
-    followersCount: 1240,
-    isVerified: false
-  },
-  {
-    id: '2',
-    displayName: 'Mike Chen',
-    username: '@mikechengolf',
-    profileImage: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
-    bio: 'Scratch golfer & coach',
-    followersCount: 3420,
-    isVerified: true
-  },
-  {
-    id: '3',
-    displayName: 'Emma Wilson',
-    username: '@emmawgolf',
-    profileImage: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face',
-    bio: 'Golf fitness enthusiast',
-    followersCount: 890,
-    isVerified: false
-  },
-  {
-    id: '4',
-    displayName: 'David Rodriguez',
-    username: '@davidrgolf',
-    profileImage: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
-    bio: 'Course photographer',
-    followersCount: 2150,
-    isVerified: false
-  },
-  {
-    id: '5',
-    displayName: 'Lisa Park',
-    username: '@lisaparkgolf',
-    profileImage: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=face',
-    bio: 'Junior golf instructor',
-    followersCount: 1580,
-    isVerified: true
-  },
-  {
-    id: '6',
-    displayName: 'James Miller',
-    username: '@jamesmgolf',
-    profileImage: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face',
-    bio: 'Golf equipment reviewer',
-    followersCount: 4230,
-    isVerified: true
-  },
-  {
-    id: '7',
-    displayName: 'Rachel Green',
-    username: '@rachelggolf',
-    profileImage: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&h=100&fit=crop&crop=face',
-    bio: 'Golf course designer',
-    followersCount: 980,
-    isVerified: false
-  },
-  {
-    id: '8',
-    displayName: 'Alex Thompson',
-    username: '@alextgolf',
-    profileImage: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=100&h=100&fit=crop&crop=face',
-    bio: 'PGA Tour analyst',
-    followersCount: 6740,
-    isVerified: true
-  },
-  {
-    id: '9',
-    displayName: 'Nicole Davis',
-    username: '@nicoledgolf',
-    profileImage: 'https://images.unsplash.com/photo-1557296387-5358ad7997bb?w=100&h=100&fit=crop&crop=face',
-    bio: 'Golf mental coach',
-    followersCount: 1320,
-    isVerified: false
-  },
-  {
-    id: '10',
-    displayName: 'Ryan Kim',
-    username: '@ryankgolf',
-    profileImage: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=100&h=100&fit=crop&crop=face',
-    bio: 'Golf swing analyst',
-    followersCount: 2890,
-    isVerified: true
-  },
-  {
-    id: '11',
-    displayName: 'Ashley Brown',
-    username: '@ashleybgolf',
-    profileImage: 'https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=100&h=100&fit=crop&crop=face',
-    bio: 'College golf player',
-    followersCount: 750,
-    isVerified: false
-  },
-  {
-    id: '12',
-    displayName: 'Kevin Lee',
-    username: '@kevinlgolf',
-    profileImage: 'https://images.unsplash.com/photo-1507591064344-4c6ce005b128?w=100&h=100&fit=crop&crop=face',
-    bio: 'Golf travel blogger',
-    followersCount: 3560,
-    isVerified: false
-  },
-  {
-    id: '13',
-    displayName: 'Sophia Martinez',
-    username: '@sophiamgolf',
-    profileImage: 'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=100&h=100&fit=crop&crop=face',
-    bio: 'Golf fashion influencer',
-    followersCount: 4120,
-    isVerified: true
-  },
-  {
-    id: '14',
-    displayName: 'Tyler Jackson',
-    username: '@tylerjgolf',
-    profileImage: 'https://images.unsplash.com/photo-1463453091185-61582044d556?w=100&h=100&fit=crop&crop=face',
-    bio: 'Golf course vlogger',
-    followersCount: 2340,
-    isVerified: false
-  },
-  {
-    id: '15',
-    displayName: 'Megan White',
-    username: '@meganwgolf',
-    profileImage: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=100&h=100&fit=crop&crop=face',
-    bio: 'LPGA hopeful',
-    followersCount: 1890,
-    isVerified: false
-  },
-  {
-    id: '16',
-    displayName: 'Chris Garcia',
-    username: '@chrisggolf',
-    profileImage: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=100&h=100&fit=crop&crop=face',
-    bio: 'Golf course superintendent',
-    followersCount: 670,
-    isVerified: false
-  },
-  {
-    id: '17',
-    displayName: 'Hannah Clark',
-    username: '@hannahcgolf',
-    profileImage: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=100&h=100&fit=crop&crop=face',
-    bio: 'Golf academy owner',
-    followersCount: 2780,
-    isVerified: true
-  },
-  {
-    id: '18',
-    displayName: 'Mark Anderson',
-    username: '@markagolf',
-    profileImage: 'https://images.unsplash.com/photo-1520813792240-56fc4a3765a7?w=100&h=100&fit=crop&crop=face',
-    bio: 'Golf equipment tester',
-    followersCount: 1450,
-    isVerified: false
-  },
-  {
-    id: '19',
-    displayName: 'Jessica Taylor',
-    username: '@jessicatgolf',
-    profileImage: 'https://images.unsplash.com/photo-1526835746352-0b9da4054862?w=100&h=100&fit=crop&crop=face',
-    bio: 'Golf psychology expert',
-    followersCount: 3210,
-    isVerified: true
-  },
-  {
-    id: '20',
-    displayName: 'Brandon Smith',
-    username: '@brandonsgolf',
-    profileImage: 'https://images.unsplash.com/photo-1503593192-ca8d90d3bbff?w=100&h=100&fit=crop&crop=face',
-    bio: 'Golf course architect',
-    followersCount: 1120,
-    isVerified: false
-  },
-  {
-    id: '21',
-    displayName: 'Olivia Johnson',
-    username: '@oliviajgolf',
-    profileImage: 'https://images.unsplash.com/photo-1531123897727-8f129e1688ce?w=100&h=100&fit=crop&crop=face',
-    bio: 'Golf nutrition coach',
-    followersCount: 890,
-    isVerified: false
-  },
-  {
-    id: '22',
-    displayName: 'Daniel Lopez',
-    username: '@daniellgolf',
-    profileImage: 'https://images.unsplash.com/photo-1495603889488-42d1d66e5523?w=100&h=100&fit=crop&crop=face',
-    bio: 'Golf club fitter',
-    followersCount: 1560,
-    isVerified: false
-  },
-  {
-    id: '23',
-    displayName: 'Grace Wang',
-    username: '@gracewgolf',
-    profileImage: 'https://images.unsplash.com/photo-1552058544-f2b08422138a?w=100&h=100&fit=crop&crop=face',
-    bio: 'Golf rules official',
-    followersCount: 430,
-    isVerified: false
-  },
-  {
-    id: '24',
-    displayName: 'Jacob Wilson',
-    username: '@jacobwgolf',
-    profileImage: 'https://images.unsplash.com/photo-1544717297-fa95b6ee9643?w=100&h=100&fit=crop&crop=face',
-    bio: 'Golf statistician',
-    followersCount: 2130,
-    isVerified: false
-  },
-  {
-    id: '25',
-    displayName: 'Isabella Moore',
-    username: '@isabellamgolf',
-    profileImage: 'https://images.unsplash.com/photo-1541101767792-f9b2b1c4f127?w=100&h=100&fit=crop&crop=face',
-    bio: 'Golf content creator',
-    followersCount: 5240,
-    isVerified: true
-  }
-];
-
 const SuggestedUsers: React.FC<SuggestedUsersProps> = ({ onUserFollow }) => {
+  const { users, loading } = useSuggestedUsers();
   const [followedUsers, setFollowedUsers] = useState<Set<string>>(new Set());
+  const [followingInProgress, setFollowingInProgress] = useState<Set<string>>(new Set());
 
-  const handleFollow = (userId: string) => {
-    setFollowedUsers(prev => new Set([...prev, userId]));
-    onUserFollow(userId);
+  const handleFollow = async (userId: string) => {
+    // Don't allow multiple follow attempts for the same user
+    if (followingInProgress.has(userId)) return;
+    
+    setFollowingInProgress(prev => new Set([...prev, userId]));
+    
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        console.error('User not authenticated');
+        return;
+      }
+
+      // Only create follow relationship for real users (not mock users)
+      const targetUser = users.find(u => u.id === userId);
+      if (targetUser?.isReal) {
+        const { error } = await supabase
+          .from('user_follows')
+          .insert({
+            follower_id: user.id,
+            following_id: userId
+          });
+
+        if (error) {
+          console.error('Error following user:', error);
+          return;
+        }
+      }
+
+      // Update local state
+      setFollowedUsers(prev => new Set([...prev, userId]));
+      onUserFollow(userId);
+      
+    } catch (error) {
+      console.error('Error in handleFollow:', error);
+    } finally {
+      setFollowingInProgress(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(userId);
+        return newSet;
+      });
+    }
   };
 
   const formatFollowers = (count: number) => {
@@ -261,7 +65,31 @@ const SuggestedUsers: React.FC<SuggestedUsersProps> = ({ onUserFollow }) => {
   };
 
   // Filter out already followed users
-  const availableUsers = mockSuggestedUsers.filter(user => !followedUsers.has(user.id));
+  const availableUsers = users.filter(user => !followedUsers.has(user.id));
+
+  if (loading) {
+    return (
+      <div className="px-4 py-3">
+        <div className="md:container md:mx-auto md:px-0">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-semibold text-gray-900">Suggested for you</h3>
+          </div>
+          <div className="flex overflow-x-auto scrollbar-hide gap-3 pb-2">
+            {/* Loading skeletons */}
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="flex-shrink-0 w-28 bg-white rounded-lg border border-gray-200 p-3 text-center animate-pulse">
+                <div className="w-16 h-16 bg-gray-200 rounded-full mx-auto mb-2"></div>
+                <div className="h-3 bg-gray-200 rounded mb-1"></div>
+                <div className="h-3 bg-gray-200 rounded mb-2"></div>
+                <div className="h-3 bg-gray-200 rounded mb-3"></div>
+                <div className="h-4 bg-gray-200 rounded"></div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (availableUsers.length === 0) {
     return null; // Hide section when no more suggestions
@@ -297,6 +125,9 @@ const SuggestedUsers: React.FC<SuggestedUsersProps> = ({ onUserFollow }) => {
                     <Check className="w-3 h-3 text-white" />
                   </div>
                 )}
+                {user.isReal && (
+                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
+                )}
               </div>
 
               {/* User Info */}
@@ -315,9 +146,15 @@ const SuggestedUsers: React.FC<SuggestedUsersProps> = ({ onUserFollow }) => {
               {/* Follow Button */}
               <button
                 onClick={() => handleFollow(user.id)}
-                className="text-black text-xs font-medium hover:text-gray-700 transition-colors duration-150"
+                disabled={followingInProgress.has(user.id)}
+                className={cn(
+                  "text-black text-xs font-medium transition-colors duration-150",
+                  followingInProgress.has(user.id) 
+                    ? "text-gray-400 cursor-not-allowed" 
+                    : "hover:text-gray-700"
+                )}
               >
-                Follow
+                {followingInProgress.has(user.id) ? 'Following...' : 'Follow'}
               </button>
             </div>
           ))}
