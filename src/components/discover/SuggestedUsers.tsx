@@ -69,7 +69,7 @@ const SuggestedUsers: React.FC<SuggestedUsersProps> = ({ onUserFollow }) => {
 
   if (loading) {
     return (
-      <div className="px-4 pt-1 pb-8">
+      <div className="px-4 pt-1 pb-12">
         <div className="md:container md:mx-auto md:px-0">
           <div className="flex items-center justify-between mb-3">
             <h3 className="text-sm font-semibold text-gray-900">Suggested for you</h3>
@@ -96,7 +96,7 @@ const SuggestedUsers: React.FC<SuggestedUsersProps> = ({ onUserFollow }) => {
   }
 
   return (
-    <div className="px-4 pt-1 pb-8">
+    <div className="px-4 pt-1 pb-12">
       <div className="md:container md:mx-auto md:px-0">
         {/* Section Header */}
         <div className="flex items-center justify-between mb-3">
