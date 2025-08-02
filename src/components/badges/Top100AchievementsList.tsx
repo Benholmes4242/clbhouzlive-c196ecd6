@@ -184,7 +184,7 @@ const Top100AchievementsList: React.FC<Top100AchievementsListProps> = ({
   }
 
   return (
-    <div className="scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
+    <div className="max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-muted scrollbar-track-transparent">
       <div className="space-y-3">
         {achievements.map((achievement) => (
           <Top100AchievementCard

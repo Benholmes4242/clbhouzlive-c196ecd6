@@ -23,7 +23,6 @@ import HandicapSection from './HandicapSection';
 import ProfileSectionCarousel from './ProfileSectionCarousel';
 import { createDynamicBackgroundStyle } from '@/utils/backgroundGenerator';
 import { getOptimizedImageUrl } from '@/utils/imageOptimization';
-import ScrollbarDebugger from '../debug/ScrollbarDebugger';
 
 interface Course {
   id: string;
@@ -435,7 +434,7 @@ const HeroProfileHeader = ({
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-3xl font-bold text-white">Handicap & Rounds</h2>
                 </div>
-                <div className="p-6" style={{ borderRadius: '8px' }}>
+                <div className="bg-white/20 backdrop-blur-sm border border-white/30 shadow-lg p-6" style={{ borderRadius: '8px' }}>
                   <HandicapSection 
                     userId={profile?.id || ''}
                     profile={profile}
@@ -504,9 +503,6 @@ const HeroProfileHeader = ({
           </div>
         </DialogContent>
       </Dialog>
-
-      {/* Scrollbar Debugger - Press Ctrl+Shift+S to activate */}
-      <ScrollbarDebugger />
     </>
   );
 };

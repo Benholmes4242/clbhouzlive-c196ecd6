@@ -9,7 +9,7 @@
   html {
     scroll-behavior: auto; /* Disable smooth scrolling for instant positioning */
     -webkit-overflow-scrolling: touch;
-    /* Remove height constraint that causes secondary scrollbar */
+    height: -webkit-fill-available; /* iOS viewport fix */
   }
   
   body {
