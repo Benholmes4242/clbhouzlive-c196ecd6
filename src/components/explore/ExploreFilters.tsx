@@ -17,7 +17,7 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [isAtStart, setIsAtStart] = useState(true);
   const [isAtEnd, setIsAtEnd] = useState(false);
-  const [clickedFilter, setClickedFilter] = useState<string | null>(null);
+  
 
   // Filter out excluded filters
   const availableFilters = filterOptions.filter(filter => !excludeFilters.includes(filter));
@@ -62,29 +62,17 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
 
   const renderFilterButton = (filter: string) => {
     const isActive = activeFilter === filter;
-    const isClicked = clickedFilter === filter;
-    
-    const handleClick = () => {
-      setClickedFilter(filter);
-      onFilterChange(filter);
-      
-      // Remove click animation after it completes
-      setTimeout(() => {
-        setClickedFilter(null);
-      }, 300);
-    };
     
     return (
       <button
         key={filter}
-        onClick={handleClick}
+        onClick={() => onFilterChange(filter)}
         className={`
           flex flex-col items-center gap-1 px-4 py-1.5 min-w-[80px] 
           whitespace-nowrap flex-shrink-0 transition-all duration-200 ease-in-out
           focus:outline-none border rounded-full relative
           transform active:scale-95 hover:scale-105
-          ${isClicked ? 'animate-bounce-click' : ''}
-          ${isActive 
+          ${isActive
             ? 'bg-green-400 border-green-500 text-gray-800 shadow-md' 
             : 'bg-white border-gray-300 text-gray-700 hover:bg-green-400 hover:border-green-500 hover:text-gray-800 shadow-sm'
           }
