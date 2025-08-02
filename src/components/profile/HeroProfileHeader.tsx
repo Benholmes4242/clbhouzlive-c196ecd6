@@ -242,7 +242,15 @@ const HeroProfileHeader = ({
   const getBackgroundHeight = () => {
     switch (activeSection) {
       case 'activity': return '1000px';
-      case 'top100': return window.innerWidth <= 768 ? '2000px' : '1600px'; // Extended for mobile only
+      case 'top100': {
+        // Calculate height to cover profile section + first two course cards
+        const profileHeaderHeight = 600; // Approximate height of profile info section
+        const courseCardHeight = window.innerWidth <= 768 ? 280 : 320; // Mobile vs desktop card height
+        const cardsGap = 16; // Gap between cards
+        const twoCardsHeight = (courseCardHeight * 2) + cardsGap;
+        const padding = 100; // Extra padding for smooth transition
+        return `${profileHeaderHeight + twoCardsHeight + padding}px`;
+      }
       case 'handicap': return '1000px';
       default: return '1300px';
     }
