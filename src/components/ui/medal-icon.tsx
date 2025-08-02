@@ -34,7 +34,7 @@ const MedalIcon: React.FC<MedalIconProps> = ({ className, size = 'md', type = '2
     <img 
       src={trophyImages[type]}
       alt={altText[type]}
-      className={`${sizeClasses[size]} object-contain ${className || ''}`}
+      className={`${sizeClasses[size]} object-cover ${className || ''}`}
       onError={(e) => console.log('Trophy image failed to load:', e)}
       onLoad={() => console.log('Trophy image loaded successfully')}
     />
