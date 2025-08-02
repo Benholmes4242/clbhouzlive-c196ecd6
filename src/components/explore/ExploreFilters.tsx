@@ -73,17 +73,22 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
           whitespace-nowrap flex-shrink-0 transition-all duration-200 ease-in-out
           focus:outline-none border rounded-full bg-white
           text-black border-black
-          hover:border-[hsl(var(--brand-orange))] active:border-[hsl(var(--brand-orange))]
-          ${isActive ? 'border-[hsl(var(--brand-orange))]' : ''}
+          hover:border-[hsl(var(--brand-orange))] hover:text-[hsl(var(--brand-orange))]
+          active:border-[hsl(var(--brand-orange))] active:text-[hsl(var(--brand-orange))]
+          ${isActive ? 'border-[hsl(var(--brand-orange))] text-[hsl(var(--brand-orange))]' : ''}
         `}
       >
         {/* Icon */}
-        <div className="text-black">
+        <div className={`transition-colors duration-200 ${
+          isActive ? 'text-[hsl(var(--brand-orange))]' : 'text-black hover:text-[hsl(var(--brand-orange))]'
+        }`}>
           {getFilterIcon(filter)}
         </div>
         
         {/* Label */}
-        <span className="text-sm font-medium text-black">
+        <span className={`text-sm font-medium transition-colors duration-200 ${
+          isActive ? 'text-[hsl(var(--brand-orange))]' : 'text-black'
+        }`}>
           {filter}
         </span>
       </button>
