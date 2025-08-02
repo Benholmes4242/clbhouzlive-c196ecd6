@@ -302,19 +302,21 @@ const LiquidGlassCard: React.FC = () => {
               <div className="flex items-center justify-between pr-16">
                 <div className="flex items-center space-x-3">
                   {/* Achievement Icon */}
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    achievement.earned 
-                      ? 'bg-green-500/20 border border-green-400/30' 
-                      : 'bg-white/10 border border-white/20'
-                   }`}>
-                     {achievement.id === '20-club' ? (
-                       <MedalIcon size="sm" />
-                     ) : (
-                       <span className="text-lg font-bold text-white">
-                         {achievement.target}
-                       </span>
-                     )}
-                  </div>
+                  {achievement.id === '20-club' ? (
+                    <div className="w-10 h-10 flex items-center justify-center">
+                      <MedalIcon size="sm" />
+                    </div>
+                  ) : (
+                    <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                      achievement.earned 
+                        ? 'bg-green-500/20 border border-green-400/30' 
+                        : 'bg-white/10 border border-white/20'
+                    }`}>
+                      <span className="text-lg font-bold text-white">
+                        {achievement.target}
+                      </span>
+                    </div>
+                  )}
                   
                   {/* Achievement Info */}
                   <div>
