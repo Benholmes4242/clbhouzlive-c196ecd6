@@ -328,7 +328,7 @@ const LiquidGlassCard: React.FC = () => {
                   {/* Achievement Info */}
                   <div className="flex-1 min-w-0">
                     <h4 className="text-white font-medium text-sm whitespace-nowrap">{achievement.name}</h4>
-                    <p className="text-white/60 text-xs break-words max-w-[350px]">{achievement.description}</p>
+                    <p className="text-white/60 text-xs break-words">{achievement.description}</p>
                   </div>
                 </div>
               </div>
