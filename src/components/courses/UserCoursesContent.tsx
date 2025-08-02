@@ -276,10 +276,6 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
 
   return (
     <div className="relative space-y-8">
-      {/* Hero section background blur overlay */}
-      <div className="absolute inset-x-0 top-0 h-[2000px] bg-white/10 backdrop-blur-lg pointer-events-none z-10"></div>
-      
-      <div className="relative z-20">
       <UserCoursesHeader
         displayName={finalDisplayName} 
         isOwnProfile={finalIsOwnProfile} 
@@ -404,7 +400,6 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
           window.location.reload();
         }}
       />
-      </div>
     </div>
   );
 };
