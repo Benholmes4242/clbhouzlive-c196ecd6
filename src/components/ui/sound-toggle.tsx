@@ -1,5 +1,5 @@
 import React from 'react';
-import { Volume2, VolumeX } from 'lucide-react';
+import { SpeakerXMarkIcon, SpeakerWaveIcon } from '@heroicons/react/24/outline';
 import { Button } from '@/components/ui/button';
 
 interface SoundToggleProps {
@@ -48,9 +48,9 @@ const SoundToggle: React.FC<SoundToggleProps> = ({
       aria-label={isMuted ? 'Unmute video' : 'Mute video'}
     >
       {isMuted ? (
-        <VolumeX className={`${iconSizes[size]} text-white transition-transform duration-150`} />
+        <SpeakerXMarkIcon className={`${iconSizes[size]} text-white transition-transform duration-150`} />
       ) : (
-        <Volume2 className={`${iconSizes[size]} text-white transition-transform duration-150`} />
+        <SpeakerWaveIcon className={`${iconSizes[size]} text-white transition-transform duration-150`} />
       )}
     </div>
   );
