@@ -194,9 +194,6 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
             <h4 className="text-xl font-semibold text-white">
               Golf Journey Progress
             </h4>
-            <div className="text-base text-white/70">
-              {currentXP.toLocaleString()} XP
-            </div>
           </div>
 
           {/* Global XP Progress Bar */}
