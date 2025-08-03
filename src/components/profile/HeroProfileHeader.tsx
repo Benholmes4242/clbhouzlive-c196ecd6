@@ -405,22 +405,6 @@ const HeroProfileHeader = ({
               </div>
               <div className="text-center">
                 <div className="font-bold text-white text-lg">
-                  {followersCount}
-                </div>
-                <div className="text-white/70 text-xs">
-                  Followers
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="font-bold text-white text-lg">
-                  {followingCount}
-                </div>
-                <div className="text-white/70 text-xs">
-                  Following
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="font-bold text-white text-lg">
                   {ratedCoursesCount}
                 </div>
                 <div className="text-white/70 text-xs">
@@ -433,6 +417,22 @@ const HeroProfileHeader = ({
                 </div>
                 <div className="text-white/70 text-xs">
                   Avg. Rating
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="font-bold text-white text-lg">
+                  {followersCount}
+                </div>
+                <div className="text-white/70 text-xs">
+                  Followers
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="font-bold text-white text-lg">
+                  {followingCount}
+                </div>
+                <div className="text-white/70 text-xs">
+                  Following
                 </div>
               </div>
             </div>
