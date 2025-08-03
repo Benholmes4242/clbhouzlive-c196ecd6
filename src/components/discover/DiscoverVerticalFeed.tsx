@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
 import ClubhouzLoading from '@/components/ClubhouzLoading';
 import { MapPin, UserPlus, UserCheck, Loader2, Minimize2, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
-import { PaperAirplaneIcon, HeartIcon, SpeakerXMarkIcon, SpeakerWaveIcon, ChatBubbleOvalLeftEllipsisIcon } from '@heroicons/react/24/solid';
+import { PaperAirplaneIcon, HeartIcon, ChatBubbleOvalLeftEllipsisIcon } from '@heroicons/react/24/solid';
+import { VolumeX, Volume2 } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { ExploreContentItem } from '@/components/explore/types';
@@ -591,13 +592,13 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                 {/* Mute/Unmute toggle button - only show for video posts */}
                 {item.type === 'video' && (
                   <button 
-                    className="cursor-pointer hover:opacity-100 transition-opacity"
+                    className="cursor-pointer hover:opacity-100 transition-opacity bg-transparent border-0 p-0"
                     onClick={toggleGlobalMute}
                   >
                     {isGloballyMuted ? (
-                      <SpeakerXMarkIcon className="w-8 h-8 text-white" />
+                      <VolumeX className="w-8 h-8 text-white" />
                     ) : (
-                      <SpeakerWaveIcon className="w-8 h-8 text-white" />
+                      <Volume2 className="w-8 h-8 text-white" />
                     )}
                   </button>
                 )}
