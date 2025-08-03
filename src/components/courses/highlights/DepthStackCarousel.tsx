@@ -245,10 +245,8 @@ const LiquidGlassCard: React.FC = () => {
 
   return (
     <div 
-      className="relative h-[28rem] rounded-lg overflow-hidden bg-white/10 backdrop-blur-2xl border border-white/20"
-      style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
+      className="relative h-[28rem] rounded-lg overflow-hidden bg-black"
     >
-      <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" />
       
       {/* Achievement Content */}
       <div className="relative h-full p-6 flex flex-col">
