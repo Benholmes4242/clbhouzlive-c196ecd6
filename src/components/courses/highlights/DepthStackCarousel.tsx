@@ -8,6 +8,7 @@ import CourseRankBadges from '../CourseRankBadges';
 import MedalIcon from '@/components/ui/medal-icon';
 import Top100AchievementsList from '@/components/badges/Top100AchievementsList';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { useUserAchievements } from '@/hooks/useUserAchievements';
 import Hls from 'hls.js';
 // Links legend trophy now uses uploaded UK flag trophy
 // Continental swinger trophy now uses uploaded EU flag trophy
@@ -237,24 +238,92 @@ const VideoCard: React.FC<{
 
 const LiquidGlassCard: React.FC = () => {
   const { user } = useSupabaseSession();
+  const { data: achievements, isLoading } = useUserAchievements();
   
-  // Mock data - in real app this would come from user's progress
+  // Create achievement data with real progress
   const userProgress = {
-    played: 21,
+    played: achievements?.totalPlayed || 0,
     total: 300,
     achievements: [
-      { id: 'links-legend', name: 'Links Legend', description: "You've mastered the finest across the British Isles", target: 100, earned: true, progress: 100 },
-      { id: 'continental-swinger', name: 'The Continental Swinger', description: "Algarve to the Alps - Europe's elite courses, conquered", target: 100, earned: true, progress: 100 },
-      { id: 'stars-stripes', name: 'Stars & Stripes Tourer', description: "Coast to coast, you've played the American greats", target: 100, earned: true, progress: 100 },
-      { id: '20-club', name: 'Green Fee Rookie', description: "You've paid your dues - 20 down!", target: 20, earned: true, progress: 21 },
-      { id: '50-club', name: 'The Turn', description: 'Halfway through your Top 100 journey', target: 50, earned: false, progress: 21 },
-      { id: '100-club', name: 'The Century Club', description: "You're a member of the century club - a prestigious club", target: 100, earned: false, progress: 21 },
-      { id: '200-club', name: 'Clubhouse Elite', description: 'Bunkers, winds, and triumphs - 200 conquered', target: 200, earned: false, progress: 21 },
-      { id: '300-club', name: 'Course Collector', description: "All 300? That's a collector's dream come true", target: 300, earned: false, progress: 21 },
+      { 
+        id: 'links-legend', 
+        name: 'Links Legend', 
+        description: "You've mastered the finest across the British Isles", 
+        target: 100, 
+        earned: (achievements?.linksLegend || 0) >= 100, 
+        progress: achievements?.linksLegend || 0 
+      },
+      { 
+        id: 'continental-swinger', 
+        name: 'The Continental Swinger', 
+        description: "Algarve to the Alps - Europe's elite courses, conquered", 
+        target: 100, 
+        earned: (achievements?.continentalSwinger || 0) >= 100, 
+        progress: achievements?.continentalSwinger || 0 
+      },
+      { 
+        id: 'stars-stripes', 
+        name: 'Stars & Stripes Tourer', 
+        description: "Coast to coast, you've played the American greats", 
+        target: 100, 
+        earned: (achievements?.starsStripes || 0) >= 100, 
+        progress: achievements?.starsStripes || 0 
+      },
+      { 
+        id: '20-club', 
+        name: 'Green Fee Rookie', 
+        description: "You've paid your dues - 20 down!", 
+        target: 20, 
+        earned: (achievements?.totalPlayed || 0) >= 20, 
+        progress: achievements?.totalPlayed || 0 
+      },
+      { 
+        id: '50-club', 
+        name: 'The Turn', 
+        description: 'Halfway through your Top 100 journey', 
+        target: 50, 
+        earned: (achievements?.totalPlayed || 0) >= 50, 
+        progress: achievements?.totalPlayed || 0 
+      },
+      { 
+        id: '100-club', 
+        name: 'The Century Club', 
+        description: "You're a member of the century club - a prestigious club", 
+        target: 100, 
+        earned: (achievements?.totalPlayed || 0) >= 100, 
+        progress: achievements?.totalPlayed || 0 
+      },
+      { 
+        id: '200-club', 
+        name: 'Clubhouse Elite', 
+        description: 'Bunkers, winds, and triumphs - 200 conquered', 
+        target: 200, 
+        earned: (achievements?.totalPlayed || 0) >= 200, 
+        progress: achievements?.totalPlayed || 0 
+      },
+      { 
+        id: '300-club', 
+        name: 'Course Collector', 
+        description: "All 300? That's a collector's dream come true", 
+        target: 300, 
+        earned: (achievements?.totalPlayed || 0) >= 300, 
+        progress: achievements?.totalPlayed || 0 
+      },
     ]
   };
 
   const progressPercentage = (userProgress.played / userProgress.total) * 100;
+
+  if (isLoading) {
+    return (
+      <div className="relative h-[28rem] rounded-lg overflow-hidden bg-black">
+        <div className="relative h-full p-6 flex flex-col items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+          <p className="text-white/70 text-sm mt-4">Loading achievements...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div 
