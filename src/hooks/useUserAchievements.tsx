@@ -70,8 +70,8 @@ export const useUserAchievements = () => {
             linksLegend++;
           }
           
-          // Continental Swinger - Europe courses (excluding Britain & Ireland)
-          if (course.continent === 'Europe' && course.country !== 'Britain & Ireland') {
+          // Continental Swinger - Continental Europe courses with regional ranking
+          if (course.country === 'Continental Europe' && course.regional_rank) {
             continentalSwinger++;
           }
           
