@@ -10,7 +10,7 @@ import Top100AchievementsList from '@/components/badges/Top100AchievementsList';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import Hls from 'hls.js';
 import linksLegendTrophy from '@/assets/links-legend-trophy.png';
-import continentalSwingerTrophy from '@/assets/continental-swinger-trophy.png';
+// Continental swinger trophy now uses uploaded EU flag trophy
 import starsStripesTrophy from '@/assets/stars-stripes-trophy.png';
 
 // Session-based mute preference management
@@ -296,8 +296,8 @@ const LiquidGlassCard: React.FC = () => {
                      {/* Achievement Icon - Keep original trophy styling */}
                      {achievement.id === 'links-legend' ? (
                        <img src={linksLegendTrophy} alt="Links Legend Trophy" className="w-16 h-16 flex-shrink-0" />
-                     ) : achievement.id === 'continental-swinger' ? (
-                       <img src={continentalSwingerTrophy} alt="Continental Swinger Trophy" className="w-16 h-16 flex-shrink-0" />
+                      ) : achievement.id === 'continental-swinger' ? (
+                        <img src="/lovable-uploads/b2e2187e-2389-47a7-ab98-457f4ffca8ae.png" alt="Continental Swinger Trophy" className="w-16 h-16 flex-shrink-0" />
                      ) : achievement.id === 'stars-stripes' ? (
                        <img src={starsStripesTrophy} alt="Stars & Stripes Tourer Trophy" className="w-16 h-16 flex-shrink-0" />
                      ) : achievement.id === '20-club' ? (
