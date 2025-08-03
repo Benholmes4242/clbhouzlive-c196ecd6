@@ -283,19 +283,6 @@ const LiquidGlassCard: React.FC = () => {
                   boxShadow: '0 0 30px #22c55e, inset 0 0 20px rgba(34, 197, 94, 0.2)'
                 } : {}}
               >
-                {/* Completed Stamp */}
-                {achievement.earned && achievement.id !== '20-club' && (
-                  <div className="absolute -top-1 right-0 transform -rotate-12">
-                    <img 
-                      src="/lovable-uploads/e4e44275-1266-4a51-a3d2-1e02f989f7d8.png" 
-                      alt="Completed"
-                      className="w-16 h-16 drop-shadow-lg"
-                      style={{ 
-                        filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))'
-                      }}
-                    />
-                  </div>
-                )}
 
                 <div className="flex items-center w-full mb-3">
                   <div className="flex items-center space-x-3 flex-1">
