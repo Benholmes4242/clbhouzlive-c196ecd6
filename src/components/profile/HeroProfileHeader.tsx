@@ -72,6 +72,8 @@ const HeroProfileHeader = ({
   // Stats state
   const [ratedCoursesCount, setRatedCoursesCount] = useState(0);
   const [averageRating, setAverageRating] = useState(0);
+  const [followersCount, setFollowersCount] = useState(0);
+  const [followingCount, setFollowingCount] = useState(0);
   
   // Removed scroll compression logic
   
@@ -104,6 +106,30 @@ const HeroProfileHeader = ({
         } else {
           setRatedCoursesCount(0);
           setAverageRating(0);
+        }
+
+        // Fetch followers count
+        const { data: followersData, error: followersError } = await supabase
+          .from('user_follows')
+          .select('*', { count: 'exact', head: true })
+          .eq('following_id', profile.id);
+
+        if (followersError) {
+          console.error('Error fetching followers:', followersError);
+        } else {
+          setFollowersCount(followersData?.length || 0);
+        }
+
+        // Fetch following count
+        const { data: followingData, error: followingError } = await supabase
+          .from('user_follows')
+          .select('*', { count: 'exact', head: true })
+          .eq('follower_id', profile.id);
+
+        if (followingError) {
+          console.error('Error fetching following:', followingError);
+        } else {
+          setFollowingCount(followingData?.length || 0);
         }
       } catch (error) {
         console.error('Error fetching stats:', error);
@@ -360,7 +386,7 @@ const HeroProfileHeader = ({
             className="w-full bg-white/5 backdrop-blur-2xl border border-white/20 shadow-[0_0_20px_rgba(0,0,0,0.2)] rounded-lg max-w-md py-1" 
             style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
           >
-            <div className="flex items-center justify-around w-full px-6 space-x-4">
+            <div className="flex items-center justify-around w-full px-4 space-x-2">
               <div className="text-center">
                 <div className="font-bold text-white text-lg">
                   {profile?.eg_handicap_index ? profile.eg_handicap_index.toFixed(1) : '--'}
@@ -375,6 +401,22 @@ const HeroProfileHeader = ({
                 </div>
                 <div className="text-white/70 text-xs">
                   Posts
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="font-bold text-white text-lg">
+                  {followersCount}
+                </div>
+                <div className="text-white/70 text-xs">
+                  Followers
+                </div>
+              </div>
+              <div className="text-center">
+                <div className="font-bold text-white text-lg">
+                  {followingCount}
+                </div>
+                <div className="text-white/70 text-xs">
+                  Following
                 </div>
               </div>
               <div className="text-center">
