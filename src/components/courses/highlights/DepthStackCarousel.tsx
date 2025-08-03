@@ -336,11 +336,7 @@ const LiquidGlassCard: React.FC = () => {
                   </div>
                   <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
                     <div
-                      className={`h-2 rounded-full transition-all duration-500 ease-out ${
-                        achievement.earned 
-                          ? "bg-gradient-to-r from-green-400 to-green-500" 
-                          : "bg-gradient-to-r from-blue-400 to-blue-500"
-                      }`}
+                      className="h-2 rounded-full transition-all duration-500 ease-out bg-gradient-to-r from-green-400 to-green-500"
                       style={{ width: `${achievementProgressPercentage}%` }}
                     />
                   </div>
