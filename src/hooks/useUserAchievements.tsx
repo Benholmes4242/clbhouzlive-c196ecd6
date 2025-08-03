@@ -70,15 +70,15 @@ export const useUserAchievements = () => {
             linksLegend++;
           }
           
-          // Continental Swinger - Continental Europe courses with regional ranking
-          if (course.country === 'Continental Europe' && course.regional_rank) {
-            continentalSwinger++;
-          }
-          
           // Stars & Stripes Tourer - USA courses
           if (course.country === 'USA') {
             starsStripes++;
           }
+        }
+
+        // Continental Swinger - Continental Europe courses with regional ranking <= 100 (matches the tile logic exactly)
+        if (course.country === 'Continental Europe' && course.regional_rank && course.regional_rank <= 100) {
+          continentalSwinger++;
         }
       });
 
