@@ -129,18 +129,16 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
   worldwideCompleted = 0,
   worldwideTotal = 100,
 }) => {
-  // Calculate total completed courses from regional lists
-  const totalCompletedCourses = britainIrelandCompleted + europeCompleted + usaCompleted;
-  const currentXP = totalCompletedCourses * 110;
+  const currentXP = completedCount * 110;
   
-  // Calculate global trophy progress based on regional completions
+  // Calculate global trophy progress
   const globalTrophies = useMemo(() => {
     return GLOBAL_TROPHIES.map(trophy => ({
       ...trophy,
-      isUnlocked: totalCompletedCourses >= trophy.requiredCourses,
-      progress: Math.min((totalCompletedCourses / trophy.requiredCourses) * 100, 100),
+      isUnlocked: completedCount >= trophy.requiredCourses,
+      progress: Math.min((completedCount / trophy.requiredCourses) * 100, 100),
     }));
-  }, [totalCompletedCourses]);
+  }, [completedCount]);
 
   // Calculate regional list completion
   const regionalProgress = useMemo(() => {
@@ -202,7 +200,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
           <div className="space-y-4">
             <div className="flex items-center justify-between text-base">
               <span className="text-white/80">Global Milestones</span>
-              <span className="text-white/60">{totalCompletedCourses} courses played</span>
+              <span className="text-white/60">{completedCount} courses played</span>
             </div>
             
             {/* Trophy Timeline */}
@@ -213,7 +211,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                    className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-500"
                    style={{ 
                      width: nextGlobalTrophy 
-                       ? `${Math.min((totalCompletedCourses / nextGlobalTrophy.requiredCourses) * 100, 100)}%`
+                       ? `${Math.min((completedCount / nextGlobalTrophy.requiredCourses) * 100, 100)}%`
                        : '100%'
                    }}
                  />
@@ -256,7 +254,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
             {nextGlobalTrophy && (
               <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-3">
                 <p className="text-base text-white/80">
-                  <span className="font-medium">{nextGlobalTrophy.requiredCourses - totalCompletedCourses} more courses</span> 
+                  <span className="font-medium">{nextGlobalTrophy.requiredCourses - completedCount} more courses</span> 
                   {' '}to unlock <span className="font-medium text-white">{nextGlobalTrophy.name}</span>
                 </p>
               </div>
