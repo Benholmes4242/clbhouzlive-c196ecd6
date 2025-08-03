@@ -66,6 +66,7 @@ const HeroProfileHeader = ({
   const { user } = useSupabaseSession();
   const [uploading, setUploading] = useState(false);
   const [avatarKey, setAvatarKey] = useState(Date.now()); // Add cache-busting key
+  const [imageLoading, setImageLoading] = useState(true);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   
   // Stats state
@@ -301,6 +302,7 @@ const HeroProfileHeader = ({
                   size={256}
                   fallback={displayName.charAt(0)}
                   className="shadow-2xl group-hover:opacity-80 transition-opacity w-full h-full"
+                  priority={true}
                 />
                 {/* Hover overlay */}
                 <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
@@ -315,6 +317,7 @@ const HeroProfileHeader = ({
                 size={256}
                 fallback={displayName.charAt(0)}
                 className="shadow-2xl w-full h-full"
+                priority={true}
               />
             )}
           </div>

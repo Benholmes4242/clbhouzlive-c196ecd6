@@ -33,6 +33,16 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({
         priority={true}
       />
       
+      {/* Early preload of critical profile image for instant loading */}
+      {profile.profile_photo_url && (
+        <link 
+          rel="preload" 
+          as="image" 
+          href={profile.profile_photo_url}
+          fetchPriority="high"
+        />
+      )}
+      
       <div className="w-full px-4 md:px-8">
         <HeroProfileHeader 
           profile={profile}

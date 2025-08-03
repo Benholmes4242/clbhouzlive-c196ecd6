@@ -14,12 +14,13 @@ const ProfileImagePreloader: React.FC<ProfileImagePreloaderProps> = ({
 
     // Create optimized URLs for different sizes
     const sizes = [
-      { width: 256, height: 256, purpose: 'large-avatar' },
-      { width: 128, height: 128, purpose: 'medium-avatar' },
-      { width: 800, height: 600, purpose: 'background' }
+      { width: 256, height: 256, purpose: 'large-avatar', quality: 90 },
+      { width: 128, height: 128, purpose: 'medium-avatar', quality: 85 },
+      { width: 64, height: 64, purpose: 'small-avatar', quality: 80 },
+      { width: 800, height: 600, purpose: 'background', quality: 75 }
     ];
 
-    const preloadPromises = sizes.map(({ width, height, purpose }) => {
+    const preloadPromises = sizes.map(({ width, height, purpose, quality }) => {
       return new Promise((resolve, reject) => {
         const img = new Image();
         
@@ -28,7 +29,7 @@ const ProfileImagePreloader: React.FC<ProfileImagePreloaderProps> = ({
         optimizedUrl.searchParams.set('w', width.toString());
         optimizedUrl.searchParams.set('h', height.toString());
         optimizedUrl.searchParams.set('fit', 'cover');
-        optimizedUrl.searchParams.set('q', '85'); // Good quality, smaller size
+        optimizedUrl.searchParams.set('q', quality.toString());
         
         img.onload = () => {
           console.log(`✓ Preloaded ${purpose} image (${width}x${height})`);

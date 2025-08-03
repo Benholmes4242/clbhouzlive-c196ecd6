@@ -20,7 +20,7 @@ const OptimizedAvatarComponent: React.FC<OptimizedAvatarProps> = ({
   fallback,
   priority = false
 }) => {
-  const optimizedSrc = src ? getOptimizedImageUrl(src, size, size) : null;
+  const optimizedSrc = src ? getOptimizedImageUrl(src, size, size, priority ? 90 : 85) : null;
 
   return (
     <Avatar className={className} style={{ width: size, height: size }}>
