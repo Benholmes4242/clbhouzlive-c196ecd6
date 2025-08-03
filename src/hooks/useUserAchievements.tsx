@@ -31,6 +31,7 @@ export const useUserAchievements = () => {
           course_id,
           played,
           golf_courses (
+            name,
             country,
             continent,
             global_rank,
@@ -56,9 +57,13 @@ export const useUserAchievements = () => {
       let starsStripes = 0;
       let totalPlayed = 0;
 
+      console.log('useUserAchievements - All user courses:', userCourses);
+      
       userCourses?.forEach((userCourse) => {
         const course = userCourse.golf_courses;
         if (!course) return;
+
+        console.log('Processing course:', course.name, 'Country:', course.country, 'Regional rank:', course.regional_rank);
 
         // Count courses that are in any top 100 ranking
         const isTop100 = course.global_rank || course.regional_rank || course.usa_rank;
@@ -78,9 +83,12 @@ export const useUserAchievements = () => {
 
         // Continental Swinger - Continental Europe courses with regional ranking <= 100 (matches the tile logic exactly)
         if (course.country === 'Continental Europe' && course.regional_rank && course.regional_rank <= 100) {
+          console.log('Found Continental Europe course for achievements:', course.name, course.regional_rank);
           continentalSwinger++;
         }
       });
+
+      console.log('Final achievement counts:', { linksLegend, continentalSwinger, starsStripes, totalPlayed });
 
       return {
         linksLegend,
