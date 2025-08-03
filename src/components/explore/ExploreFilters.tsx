@@ -85,7 +85,7 @@ const ExploreFilters: React.FC<ExploreFiltersProps> = ({ activeFilter, onFilterC
         </div>
         
         {/* Label */}
-        <span className="text-sm font-medium text-black">
+        <span className="text-base font-medium text-black">
           {filter}
         </span>
       </button>
