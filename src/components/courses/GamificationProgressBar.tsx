@@ -270,9 +270,14 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
               )}
             >
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-medium text-white/90">
-                  {list.shortName}
-                </span>
+                <div className="flex items-center gap-2">
+                  {list.id === 'britain-ireland' && (
+                    <Trophy className="w-4 h-4 text-amber-400" />
+                  )}
+                  <span className="text-xs font-medium text-white/90">
+                    {list.shortName}
+                  </span>
+                </div>
                 {list.isCompleted ? (
                   <CheckCircle className="w-4 h-4 text-green-400" />
                 ) : (
