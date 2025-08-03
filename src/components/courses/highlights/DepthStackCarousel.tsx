@@ -228,11 +228,20 @@ const VideoCard: React.FC<{
 const LiquidGlassCard: React.FC = () => {
   const { user } = useSupabaseSession();
   
-  // Get mock data for display - real data is handled by Top100AchievementsList component
+  // Mock data - in real app this would come from user's progress
   const userProgress = {
     played: 21,
-    total: 300
+    total: 300,
+    achievements: [
+      { id: '20-club', name: 'Green Fee Rookie', description: "You've paid your dues - 20 down!", target: 20, earned: true, progress: 21 },
+      { id: '50-club', name: 'The Turn', description: 'Halfway through your Top 100 journey', target: 50, earned: false, progress: 21 },
+      { id: '100-club', name: 'The Century Club', description: "You're a member of the century club - a prestigious club", target: 100, earned: false, progress: 21 },
+      { id: '200-club', name: 'Links Legend', description: 'Bunkers, winds, and triumphs - 200 conquered', target: 200, earned: false, progress: 21 },
+      { id: '300-club', name: 'Course Collector', description: "All 300? That's a collector's dream come true", target: 300, earned: false, progress: 21 },
+    ]
   };
+
+  const progressPercentage = (userProgress.played / userProgress.total) * 100;
 
   return (
     <div 
@@ -251,14 +260,96 @@ const LiquidGlassCard: React.FC = () => {
           </p>
         </div>
 
-        {/* Achievement List - Use the actual component with progress bars */}
-        <div className="flex-1 overflow-y-auto scrollbar-hide">
-          {user && (
-            <Top100AchievementsList 
-              userId={user.id}
-              showAllInitially={true}
-            />
-          )}
+        {/* Achievement List */}
+        <div className="flex-1 overflow-y-auto scrollbar-hide space-y-3">
+          {userProgress.achievements.map((achievement) => {
+            const achievementProgressPercentage = Math.min((achievement.progress / achievement.target) * 100, 100);
+            
+            return (
+              <div 
+                key={achievement.id}
+                className={`relative backdrop-blur-sm rounded-lg p-4 border ${
+                  achievement.earned 
+                    ? achievement.id === '20-club'
+                      ? 'bg-green-500/20 border-green-400 shadow-2xl shadow-green-400/50'
+                      : 'bg-green-500/10 border-green-400/20' 
+                    : 'bg-white/10 border-white/10'
+                }`}
+                style={achievement.earned && achievement.id === '20-club' ? {
+                  boxShadow: '0 0 30px #22c55e, inset 0 0 20px rgba(34, 197, 94, 0.2)'
+                } : {}}
+              >
+                {/* Completed Stamp */}
+                {achievement.earned && achievement.id !== '20-club' && (
+                  <div className="absolute -top-1 right-0 transform -rotate-12">
+                    <img 
+                      src="/lovable-uploads/e4e44275-1266-4a51-a3d2-1e02f989f7d8.png" 
+                      alt="Completed"
+                      className="w-16 h-16 drop-shadow-lg"
+                      style={{ 
+                        filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.3))'
+                      }}
+                    />
+                  </div>
+                )}
+
+                <div className="flex items-center w-full mb-3">
+                  <div className="flex items-center space-x-3 flex-1">
+                    {/* Achievement Icon - Keep original trophy styling */}
+                     {achievement.id === '20-club' ? (
+                       <MedalIcon size="xl" type="20-club" className="!w-16 !h-16 flex-shrink-0" />
+                     ) : achievement.id === '50-club' ? (
+                       <MedalIcon size="xl" type="50-club" className="!w-16 !h-16 flex-shrink-0" />
+                     ) : achievement.id === '100-club' ? (
+                       <MedalIcon size="xl" type="100-club" className="!w-16 !h-16 flex-shrink-0" />
+                     ) : achievement.id === '200-club' ? (
+                       <MedalIcon size="xl" type="200-club" className="!w-16 !h-16 flex-shrink-0" />
+                     ) : achievement.id === '300-club' ? (
+                       <MedalIcon size="xl" type="300-club" className="!w-16 !h-16 flex-shrink-0" />
+                    ) : (
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
+                        achievement.earned 
+                          ? 'bg-green-500/20 border border-green-400/30' 
+                          : 'bg-white/10 border border-white/20'
+                      }`}>
+                        <span className="text-lg font-bold text-white">
+                          {achievement.target}
+                        </span>
+                      </div>
+                    )}
+                    
+                     {/* Achievement Info */}
+                     <div className="flex-1">
+                       <h4 className="text-white font-medium text-sm whitespace-nowrap">{achievement.name}</h4>
+                       <p className="text-white/60 text-xs">{achievement.description}</p>
+                     </div>
+                  </div>
+                </div>
+
+                {/* Progress Bar - New addition */}
+                <div className="w-full">
+                  <div className="flex items-center justify-between text-xs mb-2">
+                    <span className="text-white/70 font-medium">
+                      Progress: {achievementProgressPercentage.toFixed(0)}%
+                    </span>
+                    <span className="text-white/70 font-medium">
+                      {Math.min(achievement.progress, achievement.target)}/{achievement.target}
+                    </span>
+                  </div>
+                  <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
+                    <div
+                      className={`h-2 rounded-full transition-all duration-500 ease-out ${
+                        achievement.earned 
+                          ? "bg-gradient-to-r from-green-400 to-green-500" 
+                          : "bg-gradient-to-r from-blue-400 to-blue-500"
+                      }`}
+                      style={{ width: `${achievementProgressPercentage}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>
