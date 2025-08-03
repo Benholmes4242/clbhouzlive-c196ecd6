@@ -1,12 +1,13 @@
 
-import React from 'react';
+import React, { useRef } from 'react';
 import { Bell, CircleUserRound, Settings, Shield } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
 import { useNotifications } from "@/hooks/useNotifications";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useAdaptiveTextColor } from "@/hooks/useAdaptiveTextColor";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,8 +18,25 @@ import {
 
 const HeaderNavigation = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useSupabaseSession();
   const { unreadCount } = useNotifications();
+  
+  // Create refs for adaptive text color detection
+  const navigationRef = useRef<HTMLDivElement>(null);
+  const isDiscoverPage = location.pathname === '/discover';
+  const isProfilePage = location.pathname.includes('/profile');
+  
+  // Use adaptive text color for profile page, fallback to existing logic for other pages
+  const shouldUseDarkText = useAdaptiveTextColor(navigationRef);
+  
+  // Determine icon color based on page and adaptive detection
+  const getIconColorClass = () => {
+    if (isProfilePage) {
+      return shouldUseDarkText ? 'text-black' : 'text-white';
+    }
+    return isDiscoverPage ? 'text-black' : 'text-white';
+  };
 
   // Check if user is admin or limited admin
   const { data: adminStatus } = useQuery({
@@ -117,19 +135,19 @@ const HeaderNavigation = () => {
 
   if (!user) {
     return (
-      <>
+      <div ref={navigationRef} className="flex items-center space-x-1 md:space-x-4">
         <Button variant="ghost" className="p-2 md:p-3 flex-shrink-0 mt-3" onClick={handleNotificationsClick}>
-          <Bell className="h-14 w-14 text-black" style={{ minWidth: '20px', minHeight: '20px' }} />
+          <Bell className={`h-14 w-14 ${getIconColorClass()}`} style={{ minWidth: '20px', minHeight: '20px' }} />
         </Button>
 
         <Button variant="ghost" className="p-2 md:p-3 flex-shrink-0 mt-3" onClick={handleProfileClick}>
-          <CircleUserRound className="h-11 w-11 md:h-14 md:w-14 text-black" style={{ minWidth: '20px', minHeight: '20px' }} />
+          <CircleUserRound className={`h-11 w-11 md:h-14 md:w-14 ${getIconColorClass()}`} style={{ minWidth: '20px', minHeight: '20px' }} />
         </Button>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="p-2 md:p-3 flex-shrink-0 mt-3">
-              <Settings className="h-11 w-11 md:h-14 md:w-14 text-black" style={{ minWidth: '20px', minHeight: '20px' }} />
+              <Settings className={`h-11 w-11 md:h-14 md:w-14 ${getIconColorClass()}`} style={{ minWidth: '20px', minHeight: '20px' }} />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48 mr-2">
@@ -142,14 +160,14 @@ const HeaderNavigation = () => {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      </>
+      </div>
     );
   }
 
   return (
-    <>
+    <div ref={navigationRef} className="flex items-center space-x-1 md:space-x-4">
       <Button variant="ghost" className="relative p-2 md:p-3 flex-shrink-0 mt-3" onClick={handleNotificationsClick}>
-        <Bell className="h-14 w-14 text-black" style={{ minWidth: '20px', minHeight: '20px' }} />
+        <Bell className={`h-14 w-14 ${getIconColorClass()}`} style={{ minWidth: '20px', minHeight: '20px' }} />
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
             {unreadCount > 9 ? '9+' : unreadCount}
@@ -158,13 +176,13 @@ const HeaderNavigation = () => {
       </Button>
 
       <Button variant="ghost" className="p-2 md:p-3 flex-shrink-0 mt-3" onClick={handleProfileClick}>
-        <CircleUserRound className="h-11 w-11 md:h-14 md:w-14 text-black" style={{ minWidth: '20px', minHeight: '20px' }} />
+        <CircleUserRound className={`h-11 w-11 md:h-14 md:w-14 ${getIconColorClass()}`} style={{ minWidth: '20px', minHeight: '20px' }} />
       </Button>
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="p-2 md:p-3 flex-shrink-0 mt-3">
-            <Settings className="h-11 w-11 md:h-14 md:w-14 text-black" style={{ minWidth: '20px', minHeight: '20px' }} />
+            <Settings className={`h-11 w-11 md:h-14 md:w-14 ${getIconColorClass()}`} style={{ minWidth: '20px', minHeight: '20px' }} />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48 mr-2">
@@ -183,7 +201,7 @@ const HeaderNavigation = () => {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-    </>
+    </div>
   );
 };
 
