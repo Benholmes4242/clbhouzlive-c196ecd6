@@ -24,12 +24,11 @@ export const useUserAchievements = () => {
         };
       }
 
-      // Get all courses the user has played
-      const { data: userCourses, error } = await supabase
+      // Get courses from user_top100_courses table
+      const { data: top100Data, error: top100Error } = await supabase
         .from('user_top100_courses')
         .select(`
           course_id,
-          played,
           golf_courses (
             name,
             country,
@@ -42,15 +41,31 @@ export const useUserAchievements = () => {
         .eq('user_id', user.id)
         .eq('played', true);
 
-      if (error) {
-        console.error('Error fetching user achievements:', error);
-        return {
-          linksLegend: 0,
-          continentalSwinger: 0,
-          starsStripes: 0,
-          totalPlayed: 0
-        };
-      }
+      if (top100Error) throw top100Error;
+
+      // Get courses from course_ratings table (rated courses are considered played)
+      const { data: ratedData, error: ratedError } = await supabase
+        .from('course_ratings')
+        .select(`
+          course_id,
+          golf_courses (
+            name,
+            country,
+            continent,
+            global_rank,
+            regional_rank,
+            usa_rank
+          )
+        `)
+        .eq('user_id', user.id);
+
+      if (ratedError) throw ratedError;
+
+      // Combine both datasets and remove duplicates (same logic as useTop100CoursesData)
+      const allPlayedCourses = [...(top100Data || []), ...(ratedData || [])];
+      const userCourses = allPlayedCourses.filter((course, index, self) => 
+        index === self.findIndex(c => c.course_id === course.course_id)
+      );
 
       let linksLegend = 0;
       let continentalSwinger = 0;
