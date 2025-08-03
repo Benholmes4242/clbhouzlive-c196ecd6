@@ -212,7 +212,11 @@ const VideoCard: React.FC<{
         onClick={toggleMute}
         variant="ghost"
         size="icon"
-        className="absolute top-3 left-3 h-8 w-8 rounded-full bg-black/40 hover:bg-black/60 text-white hover:text-white backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity"
+        className="absolute top-3 right-3 h-8 w-8 rounded-full bg-white/10 hover:bg-white/20 text-white hover:text-white backdrop-blur-sm border border-white/20 opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+        style={{
+          background: 'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05))',
+          boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37), inset 0 0 0 1px rgba(255,255,255,0.18)'
+        }}
       >
         {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
       </Button>
@@ -427,7 +431,11 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
             disabled={!canScrollLeft}
             variant="ghost"
             size="icon"
-            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full bg-black/40 hover:bg-black/60 text-white hover:text-white backdrop-blur-sm disabled:opacity-30"
+            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full bg-white/10 hover:bg-white/20 text-white hover:text-white backdrop-blur-sm border border-white/20 disabled:opacity-30 shadow-lg"
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05))',
+              boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37), inset 0 0 0 1px rgba(255,255,255,0.18)'
+            }}
           >
             <ChevronLeft className="h-5 w-5" />
           </Button>
@@ -437,7 +445,11 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
             disabled={!canScrollRight}
             variant="ghost"
             size="icon"
-            className="absolute right-2 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full bg-black/40 hover:bg-black/60 text-white hover:text-white backdrop-blur-sm disabled:opacity-30"
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full bg-white/10 hover:bg-white/20 text-white hover:text-white backdrop-blur-sm border border-white/20 disabled:opacity-30 shadow-lg"
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05))',
+              boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.37), inset 0 0 0 1px rgba(255,255,255,0.18)'
+            }}
           >
             <ChevronRight className="h-5 w-5" />
           </Button>
