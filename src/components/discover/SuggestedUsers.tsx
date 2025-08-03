@@ -77,11 +77,11 @@ const SuggestedUsers: React.FC<SuggestedUsersProps> = ({ onUserFollow }) => {
           <div className="flex overflow-x-auto scrollbar-hide gap-3 pb-2">
             {/* Loading skeletons */}
             {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="flex-shrink-0 w-28 bg-white rounded-lg border border-gray-200 p-3 text-center animate-pulse">
+              <div key={i} className="flex-shrink-0 w-28 bg-white rounded-lg border border-gray-200 p-2 text-center animate-pulse">
                 <div className="w-16 h-16 bg-gray-200 rounded-full mx-auto mb-2"></div>
                 <div className="h-3 bg-gray-200 rounded mb-1"></div>
                 <div className="h-3 bg-gray-200 rounded mb-2"></div>
-                <div className="h-3 bg-gray-200 rounded mb-3"></div>
+                <div className="h-3 bg-gray-200 rounded mb-2"></div>
                 <div className="h-4 bg-gray-200 rounded"></div>
               </div>
             ))}
@@ -108,7 +108,7 @@ const SuggestedUsers: React.FC<SuggestedUsersProps> = ({ onUserFollow }) => {
           {availableUsers.map((user) => (
             <div
               key={user.id}
-              className="flex-shrink-0 w-28 bg-white rounded-lg border border-gray-200 p-3 text-center"
+              className="flex-shrink-0 w-28 bg-white rounded-lg border border-gray-200 p-2 text-center"
             >
               {/* Profile Image */}
               <div className="relative mb-2">
@@ -128,7 +128,7 @@ const SuggestedUsers: React.FC<SuggestedUsersProps> = ({ onUserFollow }) => {
               </div>
 
               {/* User Info */}
-              <div className="mb-3">
+              <div className="mb-2">
                 <h4 className="text-xs font-semibold text-gray-900 truncate mb-1">
                   {user.displayName}
                 </h4>
