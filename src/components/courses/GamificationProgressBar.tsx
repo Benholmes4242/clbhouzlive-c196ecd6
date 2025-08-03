@@ -263,50 +263,85 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
             <div
               key={list.id}
               className={cn(
-                'p-3 rounded-lg border transition-all',
+                'p-3 rounded-lg border transition-all h-24',
                 list.isCompleted
                   ? 'bg-green-500/20 border-green-400/30'
                   : 'bg-white/5 border-white/10'
               )}
             >
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-2">
-                  {list.id === 'britain-ireland' && (
-                    <img 
-                      src="/lovable-uploads/7df94753-adb7-43b1-8ea8-380234f3318f.png" 
-                      alt="British & Irish Trophy" 
-                      className="w-4 h-4 object-contain"
-                    />
-                  )}
-                  <span className="text-xs font-medium text-white/90">
-                    {list.shortName}
-                  </span>
-                </div>
-                {list.isCompleted ? (
-                  <CheckCircle className="w-4 h-4 text-green-400" />
-                ) : (
-                  <Lock className="w-4 h-4 text-gray-400" />
-                )}
-              </div>
-              
-              <div className="space-y-1">
-                <div className="text-xs text-white/70">
-                  {list.completed}/{list.total}
-                </div>
-                <div className="w-full bg-white/20 rounded-full h-1.5">
-                  <div 
-                    className={cn(
-                      'h-1.5 rounded-full transition-all duration-300',
-                      list.isCompleted 
-                        ? 'bg-green-400' 
-                        : 'bg-blue-400'
-                    )}
-                    style={{ 
-                      width: `${Math.min((list.completed / list.total) * 100, 100)}%` 
-                    }}
+              {list.id === 'britain-ireland' ? (
+                // Special layout for GB&I with trophy
+                <div className="flex items-center gap-3 h-full">
+                  <img 
+                    src="/lovable-uploads/7df94753-adb7-43b1-8ea8-380234f3318f.png" 
+                    alt="British & Irish Trophy" 
+                    className="h-16 w-auto object-contain flex-shrink-0"
                   />
+                  <div className="flex-1 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-medium text-white/90">
+                        {list.shortName}
+                      </span>
+                      {list.isCompleted ? (
+                        <CheckCircle className="w-4 h-4 text-green-400" />
+                      ) : (
+                        <Lock className="w-4 h-4 text-gray-400" />
+                      )}
+                    </div>
+                    <div className="space-y-1">
+                      <div className="text-xs text-white/70">
+                        {list.completed}/{list.total}
+                      </div>
+                      <div className="w-full bg-white/20 rounded-full h-1.5">
+                        <div 
+                          className={cn(
+                            'h-1.5 rounded-full transition-all duration-300',
+                            list.isCompleted 
+                              ? 'bg-green-400' 
+                              : 'bg-blue-400'
+                          )}
+                          style={{ 
+                            width: `${Math.min((list.completed / list.total) * 100, 100)}%` 
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                // Standard layout for other regions
+                <>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-medium text-white/90">
+                      {list.shortName}
+                    </span>
+                    {list.isCompleted ? (
+                      <CheckCircle className="w-4 h-4 text-green-400" />
+                    ) : (
+                      <Lock className="w-4 h-4 text-gray-400" />
+                    )}
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <div className="text-xs text-white/70">
+                      {list.completed}/{list.total}
+                    </div>
+                    <div className="w-full bg-white/20 rounded-full h-1.5">
+                      <div 
+                        className={cn(
+                          'h-1.5 rounded-full transition-all duration-300',
+                          list.isCompleted 
+                            ? 'bg-green-400' 
+                            : 'bg-blue-400'
+                        )}
+                        style={{ 
+                          width: `${Math.min((list.completed / list.total) * 100, 100)}%` 
+                        }}
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           ))}
         </div>
