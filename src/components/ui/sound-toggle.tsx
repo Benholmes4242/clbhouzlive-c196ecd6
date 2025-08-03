@@ -33,28 +33,26 @@ const SoundToggle: React.FC<SoundToggleProps> = ({
   };
 
   return (
-    <Button
-      variant="ghost"
-      size="icon"
-      onClick={handleToggle}
+    <div
       className={`
         ${sizeClasses[size]}
-        bg-black/40 hover:bg-black/60 
-        backdrop-blur-sm border border-white/20 
-        text-white hover:text-white
+        rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 
+        flex items-center justify-center cursor-pointer
         transition-all duration-200 ease-in-out
         transform hover:scale-110 active:scale-95
         shadow-lg
         ${className}
       `}
+      style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
+      onClick={handleToggle}
       aria-label={isMuted ? 'Unmute video' : 'Mute video'}
     >
       {isMuted ? (
-        <VolumeX className={`${iconSizes[size]} transition-transform duration-150`} />
+        <VolumeX className={`${iconSizes[size]} text-white transition-transform duration-150`} />
       ) : (
-        <Volume2 className={`${iconSizes[size]} transition-transform duration-150`} />
+        <Volume2 className={`${iconSizes[size]} text-white transition-transform duration-150`} />
       )}
-    </Button>
+    </div>
   );
 };
 
