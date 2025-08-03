@@ -206,16 +206,16 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
             {/* Trophy Timeline */}
             <div className="relative">
               {/* Progress Line */}
-              <div className="absolute top-4 left-4 right-4 h-1 bg-white/20 rounded-full">
-                <div 
-                  className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-500"
-                  style={{ 
-                    width: nextGlobalTrophy 
-                      ? `${(completedCount / nextGlobalTrophy.requiredCourses) * 100}%`
-                      : '100%'
-                  }}
-                />
-              </div>
+               <div className="absolute top-4 left-4 right-4 h-1 bg-white/20 rounded-full">
+                 <div 
+                   className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-500"
+                   style={{ 
+                     width: nextGlobalTrophy 
+                       ? `${Math.min((completedCount / nextGlobalTrophy.requiredCourses) * 100, 100)}%`
+                       : '100%'
+                   }}
+                 />
+               </div>
               
                {/* Trophy Points */}
                <div className="flex justify-between items-start relative z-10">
@@ -226,7 +226,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                          src="/lovable-uploads/f2f50b99-38e1-466b-8ac8-c32e428231cb.png" 
                          alt="Green Fee Rookie Trophy" 
                          className={cn(
-                           'h-16 w-auto object-contain -mt-6',
+                           'h-16 w-auto object-contain -mt-4',
                            trophy.isUnlocked ? 'opacity-100' : 'opacity-40 grayscale'
                          )}
                        />
