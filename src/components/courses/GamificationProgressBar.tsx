@@ -206,7 +206,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
             {/* Trophy Timeline */}
             <div className="relative">
               {/* Progress Line */}
-               <div className="absolute top-4 left-4 right-4 h-2 bg-white/20 rounded-full">
+               <div className="absolute top-4 left-8 right-4 h-2 bg-white/20 rounded-full">
                  {nextGlobalTrophy && (
                    <div 
                      className="h-full bg-green-400 rounded-full transition-all duration-500"
