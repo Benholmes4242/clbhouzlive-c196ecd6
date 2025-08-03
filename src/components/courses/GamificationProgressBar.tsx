@@ -21,8 +21,8 @@ const GLOBAL_TROPHIES = [
   {
     id: 'green-fee-rookie',
     name: 'The Green Fee Rookie',
-    requiredCourses: 10,
-    xp: 1100,
+    requiredCourses: 20,
+    xp: 2200,
     color: 'from-amber-500 to-yellow-600',
     tier: 'gold',
   },
@@ -217,26 +217,38 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                 />
               </div>
               
-              {/* Trophy Points */}
-              <div className="flex justify-between items-start relative z-10">
-                {globalTrophies.map((trophy, index) => (
-                  <div key={trophy.id} className="flex flex-col items-center space-y-2">
-                    <TrophyIcon 
-                      isUnlocked={trophy.isUnlocked}
-                      color={trophy.color}
-                      size="md"
-                    />
-                    <div className="text-center">
-                      <div className="text-sm font-medium text-white/90">
-                        {trophy.requiredCourses}
-                      </div>
-                      <div className="text-sm text-white/60 max-w-16 leading-tight">
-                        {trophy.name}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
+               {/* Trophy Points */}
+               <div className="flex justify-between items-start relative z-10">
+                 {globalTrophies.map((trophy, index) => (
+                   <div key={trophy.id} className="flex flex-col items-center space-y-2">
+                     {trophy.id === 'green-fee-rookie' ? (
+                       <img 
+                         src="/lovable-uploads/f2f50b99-38e1-466b-8ac8-c32e428231cb.png" 
+                         alt="Green Fee Rookie Trophy" 
+                         className={cn(
+                           'object-contain',
+                           trophy.isUnlocked ? 'opacity-100' : 'opacity-40 grayscale'
+                         )}
+                         style={{ width: '32px', height: '32px' }}
+                       />
+                     ) : (
+                       <TrophyIcon 
+                         isUnlocked={trophy.isUnlocked}
+                         color={trophy.color}
+                         size="md"
+                       />
+                     )}
+                     <div className="text-center">
+                       <div className="text-sm font-medium text-white/90">
+                         {trophy.requiredCourses}
+                       </div>
+                       <div className="text-sm text-white/60 max-w-16 leading-tight">
+                         {trophy.name}
+                       </div>
+                     </div>
+                   </div>
+                 ))}
+               </div>
             </div>
 
             {/* Next Milestone */}
