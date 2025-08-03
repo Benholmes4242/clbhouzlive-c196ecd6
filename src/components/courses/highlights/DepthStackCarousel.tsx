@@ -212,9 +212,17 @@ const VideoCard: React.FC<{
         onClick={toggleMute}
         variant="ghost"
         size="icon"
-        className="absolute top-3 right-3 h-8 w-8 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity"
+        className="absolute top-3 right-3 h-8 w-8 rounded-xl overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity shadow-lg shadow-black/10"
+        style={{ 
+          backdropFilter: 'blur(40px) saturate(180%)',
+          borderRadius: '8px'
+        }}
       >
-        {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+        <div className="absolute inset-0 bg-white/10 border border-white/20" style={{ borderRadius: '8px' }} />
+        <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" style={{ borderRadius: '8px' }} />
+        <div className="relative z-10 text-white">
+          {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+        </div>
       </Button>
 
       {/* Course rankings - removed for highlights section */}
@@ -427,9 +435,17 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
             disabled={!canScrollLeft}
             variant="ghost"
             size="icon"
-            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70 disabled:opacity-30"
+            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-xl overflow-hidden disabled:opacity-30 shadow-lg shadow-black/10"
+            style={{ 
+              backdropFilter: 'blur(40px) saturate(180%)',
+              borderRadius: '8px'
+            }}
           >
-            <ChevronLeft className="h-5 w-5" />
+            <div className="absolute inset-0 bg-white/10 border border-white/20" style={{ borderRadius: '8px' }} />
+            <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" style={{ borderRadius: '8px' }} />
+            <div className="relative z-10 text-white">
+              <ChevronLeft className="h-5 w-5" />
+            </div>
           </Button>
           
           <Button
@@ -437,9 +453,17 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
             disabled={!canScrollRight}
             variant="ghost"
             size="icon"
-            className="absolute right-2 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-full bg-black/50 backdrop-blur-sm text-white hover:bg-black/70 disabled:opacity-30"
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-10 h-10 w-10 rounded-xl overflow-hidden disabled:opacity-30 shadow-lg shadow-black/10"
+            style={{ 
+              backdropFilter: 'blur(40px) saturate(180%)',
+              borderRadius: '8px'
+            }}
           >
-            <ChevronRight className="h-5 w-5" />
+            <div className="absolute inset-0 bg-white/10 border border-white/20" style={{ borderRadius: '8px' }} />
+            <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" style={{ borderRadius: '8px' }} />
+            <div className="relative z-10 text-white">
+              <ChevronRight className="h-5 w-5" />
+            </div>
           </Button>
         </>
       )}
