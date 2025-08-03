@@ -65,6 +65,12 @@ export const useUserAchievements = () => {
         if (isTop100) {
           totalPlayed++;
 
+          console.log('Course data:', {
+            name: course.country,
+            continent: course.continent,
+            country: course.country
+          });
+
           // Links Legend - Britain & Ireland courses
           if (course.country === 'Britain & Ireland') {
             linksLegend++;
@@ -73,6 +79,7 @@ export const useUserAchievements = () => {
           // Continental Swinger - Europe courses (excluding Britain & Ireland)
           if (course.continent === 'Europe' && course.country !== 'Britain & Ireland') {
             continentalSwinger++;
+            console.log('Continental Swinger course found:', course.country);
           }
           
           // Stars & Stripes Tourer - USA courses
