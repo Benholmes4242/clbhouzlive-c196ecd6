@@ -226,7 +226,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                          src="/lovable-uploads/f2f50b99-38e1-466b-8ac8-c32e428231cb.png" 
                          alt="Green Fee Rookie Trophy" 
                          className={cn(
-                           'h-16 w-auto object-contain -mt-4',
+                           'h-16 w-auto object-contain -mt-6',
                            trophy.isUnlocked ? 'opacity-100' : 'opacity-40 grayscale'
                          )}
                        />
