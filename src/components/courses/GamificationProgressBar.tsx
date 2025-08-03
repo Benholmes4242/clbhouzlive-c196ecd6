@@ -182,6 +182,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
 
   const nextGlobalTrophy = globalTrophies.find(trophy => !trophy.isUnlocked);
   const unlockedGlobalTrophies = globalTrophies.filter(trophy => trophy.isUnlocked);
+  const lastUnlockedTrophy = unlockedGlobalTrophies[unlockedGlobalTrophies.length - 1];
 
   return (
     <div className={cn('space-y-6', className)}>
@@ -207,11 +208,19 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
             <div className="relative">
               {/* Progress Line */}
                <div className="absolute top-4 left-8 right-4 h-2 bg-white/20 rounded-full">
-                 {nextGlobalTrophy && (
+                 {nextGlobalTrophy && lastUnlockedTrophy && (
                    <div 
                      className="h-full bg-green-400 rounded-full transition-all duration-500"
                      style={{ 
-                       width: `${(completedCount / nextGlobalTrophy.requiredCourses) * 100}%`
+                       width: `${((completedCount - lastUnlockedTrophy.requiredCourses) / (nextGlobalTrophy.requiredCourses - lastUnlockedTrophy.requiredCourses)) * 100}%`
+                     }}
+                   />
+                 )}
+                 {nextGlobalTrophy && !lastUnlockedTrophy && completedCount < 20 && (
+                   <div 
+                     className="h-full bg-green-400 rounded-full transition-all duration-500"
+                     style={{ 
+                       width: `${(completedCount / nextGlobalTrophy.requiredCourses) * 20}%`
                      }}
                    />
                  )}
