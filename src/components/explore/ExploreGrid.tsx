@@ -20,6 +20,7 @@ interface ExploreGridProps {
   activeFilter?: string;
   isClubhousePage?: boolean;
   isDiscoverPage?: boolean;
+  hideBadges?: boolean;
 }
 
 const ExploreGrid: React.FC<ExploreGridProps> = ({ 
@@ -32,7 +33,8 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
   onLoadMore,
   activeFilter,
   isClubhousePage = false,
-  isDiscoverPage = false
+  isDiscoverPage = false,
+  hideBadges = false
 }) => {
   const [isMobile, setIsMobile] = useState(false);
 
@@ -415,33 +417,28 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                   hidePlayButton={true}
                 />
                 
-                {/* Gradient overlay for better text readability */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-black/40" />
-                
-                {/* Top gradient overlay for context label */}
-                <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-transparent pointer-events-none" 
-                     style={{ background: 'linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 25%, transparent 50%)' }} />
-                
                 {/* Context Label */}
-                <div className="absolute top-2 left-2 z-30">
-                  <div className="bg-black/50 backdrop-blur-sm px-2.5 py-1 rounded-md flex items-center gap-1.5">
-                    <span className="text-sm font-bold text-white">
-                      {(() => {
-                        const labels = [
-                          '🔥 Trending Now',
-                          '🎯 Shot of the Week', 
-                          '💡 From the Pros',
-                          '⭐ Featured',
-                          '🚀 Going Viral',
-                          '🏆 Top Pick'
-                        ];
-                        // Use item ID to consistently pick the same label for the same content
-                        const labelIndex = layoutItem.item.id.charCodeAt(0) % labels.length;
-                        return labels[labelIndex];
-                      })()}
-                    </span>
+                {!hideBadges && (
+                  <div className="absolute top-2 left-2 z-30">
+                    <div className="bg-black/50 backdrop-blur-sm px-2.5 py-1 rounded-md flex items-center gap-1.5">
+                      <span className="text-sm font-bold text-white">
+                        {(() => {
+                          const labels = [
+                            '🔥 Trending Now',
+                            '🎯 Shot of the Week', 
+                            '💡 From the Pros',
+                            '⭐ Featured',
+                            '🚀 Going Viral',
+                            '🏆 Top Pick'
+                          ];
+                          // Use item ID to consistently pick the same label for the same content
+                          const labelIndex = layoutItem.item.id.charCodeAt(0) % labels.length;
+                          return labels[labelIndex];
+                        })()}
+                      </span>
+                    </div>
                   </div>
-                </div>
+                )}
 
                 {/* Golf Club Tag for large cards - positioned to avoid context label */}
                 {layoutItem.item.golfCourse && (
