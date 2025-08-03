@@ -1,5 +1,5 @@
 import React from 'react';
-import { SpeakerXMarkIcon, SpeakerWaveIcon } from '@heroicons/react/24/outline';
+import { SpeakerXMarkIcon, SpeakerWaveIcon } from '@heroicons/react/24/solid';
 import { Button } from '@/components/ui/button';
 
 interface SoundToggleProps {
