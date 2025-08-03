@@ -15,7 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import CoursePickerModal from '@/components/profile/CoursePickerModal';
 import Top100Progress from './Top100Progress';
-import GamificationProgressBar from '@/components/profile/GamificationProgressBar';
+import BadgeCollection from './BadgeCollection';
 
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
@@ -282,10 +282,11 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
       />
 
 
-      {/* Gamification Progress Bar */}
-      <GamificationProgressBar 
-        userId={targetUserId || ''}
-        isOwnProfile={finalIsOwnProfile}
+      {/* Achievement Badges */}
+      <BadgeCollection 
+        completedCount={top100CompletedCount}
+        collapsible={true}
+        defaultExpanded={false}
       />
 
 
