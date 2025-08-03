@@ -452,10 +452,10 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                 {layoutItem.item.type === 'video' && (
                   <div className="absolute bottom-3 right-3 z-20">
                     <div 
-                      className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 flex items-center justify-center"
+                      className="w-8 h-8 rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 flex items-center justify-center"
                       style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
                     >
-                      <MdOutlinePlayCircle className="w-6 h-6 text-white drop-shadow-lg" />
+                      <MdOutlinePlayCircle className="w-5 h-5 text-white drop-shadow-lg" />
                     </div>
                   </div>
                 )}
@@ -518,10 +518,10 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                 {layoutItem.item.type === 'video' && (
                   <div className="absolute bottom-2 right-2 z-20">
                     <div 
-                      className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 flex items-center justify-center"
+                      className="w-8 h-8 rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 flex items-center justify-center"
                       style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
                     >
-                      <MdOutlinePlayCircle className="w-6 h-6 text-white drop-shadow-lg" />
+                      <MdOutlinePlayCircle className="w-5 h-5 text-white drop-shadow-lg" />
                     </div>
                   </div>
                 )}
