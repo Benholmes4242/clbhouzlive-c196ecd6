@@ -315,12 +315,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                           </div>
                           <div className="w-full bg-white/20 rounded-full h-1.5">
                             <div 
-                              className={cn(
-                                'h-1.5 rounded-full transition-all duration-300',
-                                list.isCompleted 
-                                  ? 'bg-green-400' 
-                                  : 'bg-blue-400'
-                              )}
+                              className="h-1.5 rounded-full transition-all duration-300 bg-green-400"
                               style={{ 
                                 width: `${Math.min((list.completed / list.total) * 100, 100)}%` 
                               }}
@@ -354,12 +349,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                           </div>
                           <div className="w-full bg-white/20 rounded-full h-1.5">
                             <div 
-                              className={cn(
-                                'h-1.5 rounded-full transition-all duration-300',
-                                list.isCompleted 
-                                  ? 'bg-green-400' 
-                                  : 'bg-blue-400'
-                              )}
+                              className="h-1.5 rounded-full transition-all duration-300 bg-green-400"
                               style={{ 
                                 width: `${Math.min((list.completed / list.total) * 100, 100)}%` 
                               }}
@@ -393,12 +383,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                           </div>
                           <div className="w-full bg-white/20 rounded-full h-1.5">
                             <div 
-                              className={cn(
-                                'h-1.5 rounded-full transition-all duration-300',
-                                list.isCompleted 
-                                  ? 'bg-green-400' 
-                                  : 'bg-blue-400'
-                              )}
+                              className="h-1.5 rounded-full transition-all duration-300 bg-green-400"
                               style={{ 
                                 width: `${Math.min((list.completed / list.total) * 100, 100)}%` 
                               }}
@@ -432,12 +417,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                           </div>
                           <div className="w-full bg-white/20 rounded-full h-1.5">
                             <div 
-                              className={cn(
-                                'h-1.5 rounded-full transition-all duration-300',
-                                list.isCompleted 
-                                  ? 'bg-green-400' 
-                                  : 'bg-blue-400'
-                              )}
+                              className="h-1.5 rounded-full transition-all duration-300 bg-green-400"
                               style={{ 
                                 width: `${Math.min((list.completed / list.total) * 100, 100)}%` 
                               }}
@@ -466,12 +446,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                         </div>
                         <div className="w-full bg-white/20 rounded-full h-1.5">
                           <div 
-                            className={cn(
-                              'h-1.5 rounded-full transition-all duration-300',
-                              list.isCompleted 
-                                ? 'bg-green-400' 
-                                : 'bg-blue-400'
-                            )}
+                            className="h-1.5 rounded-full transition-all duration-300 bg-green-400"
                             style={{ 
                               width: `${Math.min((list.completed / list.total) * 100, 100)}%` 
                             }}
