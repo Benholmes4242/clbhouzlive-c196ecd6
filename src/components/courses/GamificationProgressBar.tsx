@@ -272,7 +272,11 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   {list.id === 'britain-ireland' && (
-                    <Trophy className="w-4 h-4 text-amber-400" />
+                    <img 
+                      src="/lovable-uploads/7df94753-adb7-43b1-8ea8-380234f3318f.png" 
+                      alt="British & Irish Trophy" 
+                      className="w-4 h-4 object-contain"
+                    />
                   )}
                   <span className="text-xs font-medium text-white/90">
                     {list.shortName}
