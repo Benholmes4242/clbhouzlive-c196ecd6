@@ -6,9 +6,8 @@ import { useVideoAutoplay } from '@/hooks/useVideoAutoplay';
 import { Button } from '@/components/ui/button';
 import CourseRankBadges from '../CourseRankBadges';
 import MedalIcon from '@/components/ui/medal-icon';
-import Top100AchievementsList from '@/components/badges/Top100AchievementsList';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { useUserAchievements } from '@/hooks/useUserAchievements';
+import GamificationProgressBar from '@/components/profile/GamificationProgressBar';
 import Hls from 'hls.js';
 // Links legend trophy now uses uploaded UK flag trophy
 // Continental swinger trophy now uses uploaded EU flag trophy
@@ -239,189 +238,13 @@ const VideoCard: React.FC<{
 
 const LiquidGlassCard: React.FC<{ userId?: string }> = ({ userId }) => {
   const { user } = useSupabaseSession();
-  const { data: achievements, isLoading } = useUserAchievements(userId);
   
-  // Create achievement data with real progress
-  const userProgress = {
-    played: achievements?.totalPlayed || 0,
-    total: 300,
-    achievements: [
-      { 
-        id: 'links-legend', 
-        name: 'Links Legend', 
-        description: "You've mastered the finest across the British Isles", 
-        target: 100, 
-        earned: (achievements?.linksLegend || 0) >= 100, 
-        progress: achievements?.linksLegend || 0 
-      },
-      { 
-        id: 'continental-swinger', 
-        name: 'The Continental Swinger', 
-        description: "Algarve to the Alps - Europe's elite courses, conquered", 
-        target: 100, 
-        earned: (achievements?.continentalSwinger || 0) >= 100, 
-        progress: achievements?.continentalSwinger || 0 
-      },
-      { 
-        id: 'stars-stripes', 
-        name: 'Stars & Stripes Tourer', 
-        description: "Coast to coast, you've played the American greats", 
-        target: 100, 
-        earned: (achievements?.starsStripes || 0) >= 100, 
-        progress: achievements?.starsStripes || 0 
-      },
-      { 
-        id: '20-club', 
-        name: 'Green Fee Rookie', 
-        description: "You've paid your dues - 20 down!", 
-        target: 20, 
-        earned: (achievements?.totalPlayed || 0) >= 20, 
-        progress: achievements?.totalPlayed || 0 
-      },
-      { 
-        id: '50-club', 
-        name: 'The Turn', 
-        description: 'Halfway through your Top 100 journey', 
-        target: 50, 
-        earned: (achievements?.totalPlayed || 0) >= 50, 
-        progress: achievements?.totalPlayed || 0 
-      },
-      { 
-        id: '100-club', 
-        name: 'The Century Club', 
-        description: "You're a member of the century club - a prestigious club", 
-        target: 100, 
-        earned: (achievements?.totalPlayed || 0) >= 100, 
-        progress: achievements?.totalPlayed || 0 
-      },
-      { 
-        id: '200-club', 
-        name: 'Clubhouse Elite', 
-        description: 'Bunkers, winds, and triumphs - 200 conquered', 
-        target: 200, 
-        earned: (achievements?.totalPlayed || 0) >= 200, 
-        progress: achievements?.totalPlayed || 0 
-      },
-      { 
-        id: '300-club', 
-        name: 'Course Collector', 
-        description: "All 300? That's a collector's dream come true", 
-        target: 300, 
-        earned: (achievements?.totalPlayed || 0) >= 300, 
-        progress: achievements?.totalPlayed || 0 
-      },
-    ]
-  };
-
-  const progressPercentage = (userProgress.played / userProgress.total) * 100;
-
-  if (isLoading) {
-    return (
-      <div className="relative h-[28rem] rounded-lg overflow-hidden bg-black">
-        <div className="relative h-full p-6 flex flex-col items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
-          <p className="text-white/70 text-sm mt-4">Loading achievements...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div 
-      className="relative h-[28rem] rounded-lg overflow-hidden bg-black"
-    >
-      
-      {/* Achievement Content */}
-      <div className="relative h-full p-6 flex flex-col">
-        {/* Header */}
-        <div className="mb-6">
-          <h3 className="text-white font-bold text-2xl mb-2">Achievements</h3>
-          <p className="text-white/70 text-base">
-            You&apos;ve played {userProgress.played} of {userProgress.total} Top 100 courses
-          </p>
-        </div>
-
-        {/* Achievement List */}
-        <div className="flex-1 overflow-y-auto scrollbar-hide space-y-3">
-          {userProgress.achievements.map((achievement) => {
-            const achievementProgressPercentage = Math.min((achievement.progress / achievement.target) * 100, 100);
-            
-            return (
-              <div 
-                key={achievement.id}
-                className={`relative backdrop-blur-sm rounded-lg p-4 border ${
-                  achievement.earned 
-                    ? achievement.id === '20-club'
-                      ? 'bg-green-500/20 border-green-400 shadow-2xl shadow-green-400/50'
-                      : 'bg-green-500/10 border-green-400/20' 
-                    : 'bg-white/10 border-white/10'
-                }`}
-                style={achievement.earned && achievement.id === '20-club' ? {
-                  boxShadow: '0 0 30px #22c55e, inset 0 0 20px rgba(34, 197, 94, 0.2)'
-                } : {}}
-              >
-
-                <div className="flex items-center w-full mb-3">
-                  <div className="flex items-center space-x-3 flex-1">
-                     {/* Achievement Icon - Keep original trophy styling */}
-                     {achievement.id === 'links-legend' ? (
-                        <img src="/lovable-uploads/7c614e1e-b818-48f9-a393-eccb83041771.png" alt="Links Legend Trophy" className="w-16 h-16 flex-shrink-0" />
-                      ) : achievement.id === 'continental-swinger' ? (
-                        <img src="/lovable-uploads/b2e2187e-2389-47a7-ab98-457f4ffca8ae.png" alt="Continental Swinger Trophy" className="w-16 h-16 flex-shrink-0" />
-                     ) : achievement.id === 'stars-stripes' ? (
-                        <img src="/lovable-uploads/dc073264-8a78-419c-b478-6e8411589608.png" alt="Stars & Stripes Tourer Trophy" className="w-16 h-16 flex-shrink-0" />
-                     ) : achievement.id === '20-club' ? (
-                       <MedalIcon size="xl" type="20-club" className="!w-16 !h-16 flex-shrink-0" />
-                     ) : achievement.id === '50-club' ? (
-                       <MedalIcon size="xl" type="50-club" className="!w-16 !h-16 flex-shrink-0" />
-                     ) : achievement.id === '100-club' ? (
-                       <MedalIcon size="xl" type="100-club" className="!w-16 !h-16 flex-shrink-0" />
-                     ) : achievement.id === '200-club' ? (
-                       <img src="/lovable-uploads/b61d6231-d352-48ae-ae1e-03e347cbd07c.png" alt="Clubhouse Elite Trophy" className="w-16 h-16 flex-shrink-0" />
-                     ) : achievement.id === '300-club' ? (
-                       <MedalIcon size="xl" type="300-club" className="!w-16 !h-16 flex-shrink-0" />
-                    ) : (
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
-                        achievement.earned 
-                          ? 'bg-green-500/20 border border-green-400/30' 
-                          : 'bg-white/10 border border-white/20'
-                      }`}>
-                        <span className="text-lg font-bold text-white">
-                          {achievement.target}
-                        </span>
-                      </div>
-                    )}
-                    
-                     {/* Achievement Info */}
-                     <div className="flex-1">
-                       <h4 className="text-white font-medium text-base whitespace-nowrap">{achievement.name}</h4>
-                       <p className="text-white/60 text-sm">{achievement.description}</p>
-                     </div>
-                  </div>
-                </div>
-
-                {/* Progress Bar - New addition */}
-                <div className="w-full">
-                  <div className="flex items-center justify-between text-sm mb-2">
-                    <span className="text-white/70 font-medium">
-                      Progress: {achievementProgressPercentage.toFixed(0)}%
-                    </span>
-                    <span className="text-white/70 font-medium">
-                      {Math.min(achievement.progress, achievement.target)}/{achievement.target}
-                    </span>
-                  </div>
-                  <div className="w-full bg-white/10 rounded-full h-2 overflow-hidden">
-                    <div
-                      className="h-2 rounded-full transition-all duration-500 ease-out bg-gradient-to-r from-green-400 to-green-500"
-                      style={{ width: `${achievementProgressPercentage}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
+    <div className="relative h-[28rem] rounded-lg overflow-hidden bg-black">
+      <GamificationProgressBar 
+        userId={userId || user?.id || ''}
+        isOwnProfile={user?.id === userId}
+      />
     </div>
   );
 };
