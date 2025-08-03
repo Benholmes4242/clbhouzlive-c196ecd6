@@ -320,15 +320,15 @@ const LiquidGlassCard: React.FC = () => {
                     
                      {/* Achievement Info */}
                      <div className="flex-1">
-                       <h4 className="text-white font-medium text-sm whitespace-nowrap">{achievement.name}</h4>
-                       <p className="text-white/60 text-xs">{achievement.description}</p>
+                       <h4 className="text-white font-medium text-base whitespace-nowrap">{achievement.name}</h4>
+                       <p className="text-white/60 text-sm">{achievement.description}</p>
                      </div>
                   </div>
                 </div>
 
                 {/* Progress Bar - New addition */}
                 <div className="w-full">
-                  <div className="flex items-center justify-between text-xs mb-2">
+                  <div className="flex items-center justify-between text-sm mb-2">
                     <span className="text-white/70 font-medium">
                       Progress: {achievementProgressPercentage.toFixed(0)}%
                     </span>
