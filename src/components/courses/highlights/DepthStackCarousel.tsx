@@ -52,6 +52,7 @@ type CarouselItem = HighlightVideo | LiquidGlassCard;
 interface DepthStackCarouselProps {
   highlights: HighlightVideo[];
   onVideoPlay?: (videoId: string) => void;
+  userId?: string; // Add userId prop to support other user profiles
 }
 
 const VideoCard: React.FC<{ 
@@ -236,9 +237,9 @@ const VideoCard: React.FC<{
   );
 };
 
-const LiquidGlassCard: React.FC = () => {
+const LiquidGlassCard: React.FC<{ userId?: string }> = ({ userId }) => {
   const { user } = useSupabaseSession();
-  const { data: achievements, isLoading } = useUserAchievements();
+  const { data: achievements, isLoading } = useUserAchievements(userId);
   
   // Create achievement data with real progress
   const userProgress = {
@@ -427,7 +428,8 @@ const LiquidGlassCard: React.FC = () => {
 
 const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
   highlights,
-  onVideoPlay
+  onVideoPlay,
+  userId
 }) => {
   const [activeVideoIndex, setActiveVideoIndex] = useState(0);
   
@@ -558,7 +560,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
             style={{ scrollSnapAlign: 'start' }}
           >
             {'type' in item && item.type === 'glass' ? (
-              <LiquidGlassCard />
+              <LiquidGlassCard userId={userId} />
             ) : (
               <VideoCard
                 video={item as HighlightVideo}

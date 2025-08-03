@@ -234,6 +234,7 @@ const LatestHighlights: React.FC<LatestHighlightsProps> = ({
       <DepthStackCarousel 
         highlights={highlights}
         onVideoPlay={handleVideoPlay}
+        userId={userId}
       />
       
     </div>
