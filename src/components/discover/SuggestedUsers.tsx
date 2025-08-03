@@ -72,7 +72,7 @@ const SuggestedUsers: React.FC<SuggestedUsersProps> = ({ onUserFollow }) => {
       <div className="px-4 pt-1 pb-3">
         <div className="md:container md:mx-auto md:px-0">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold text-gray-900">Suggested for you</h3>
+            <h3 className="text-base font-semibold text-gray-900">Suggested for you</h3>
           </div>
           <div className="flex overflow-x-auto scrollbar-hide gap-3 pb-2">
             {/* Loading skeletons */}
@@ -100,7 +100,7 @@ const SuggestedUsers: React.FC<SuggestedUsersProps> = ({ onUserFollow }) => {
       <div className="md:container md:mx-auto md:px-0">
         {/* Section Header */}
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-sm font-semibold text-gray-900">Suggested for you</h3>
+          <h3 className="text-base font-semibold text-gray-900">Suggested for you</h3>
         </div>
 
         {/* Horizontal Scrollable User Cards */}

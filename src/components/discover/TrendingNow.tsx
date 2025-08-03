@@ -97,7 +97,7 @@ const TrendingNow: React.FC<TrendingNowProps> = ({ onHashtagClick, onAudioClick 
         {/* Section Header */}
         <div className="flex items-center gap-2 mb-3">
           <IoFlameOutline className="w-6 h-6 text-orange-500" />
-          <h3 className="text-sm font-semibold text-gray-900">Trending Now</h3>
+          <h3 className="text-base font-semibold text-gray-900">Trending Now</h3>
         </div>
 
         {/* Trending Hashtags - Always Show */}
