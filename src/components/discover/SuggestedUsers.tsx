@@ -145,7 +145,7 @@ const SuggestedUsers: React.FC<SuggestedUsersProps> = ({ onUserFollow }) => {
                 onClick={() => handleFollow(user.id)}
                 disabled={followingInProgress.has(user.id)}
                 className={cn(
-                  "text-black text-xs font-medium transition-colors duration-150",
+                  "text-black text-sm font-medium transition-colors duration-150",
                   followingInProgress.has(user.id) 
                     ? "text-gray-400 cursor-not-allowed" 
                     : "hover:text-gray-700"
