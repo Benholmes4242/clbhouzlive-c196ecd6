@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import CourseRankBadges from '../CourseRankBadges';
 import MedalIcon from '@/components/ui/medal-icon';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import GamificationProgressBar from '@/components/profile/GamificationProgressBar';
+
 import Hls from 'hls.js';
 // Links legend trophy now uses uploaded UK flag trophy
 // Continental swinger trophy now uses uploaded EU flag trophy
@@ -236,15 +236,18 @@ const VideoCard: React.FC<{
   );
 };
 
-const LiquidGlassCard: React.FC<{ userId?: string }> = ({ userId }) => {
-  const { user } = useSupabaseSession();
-  
+const LiquidGlassCard: React.FC<{ highlightedCourse?: any; isOwnProfile?: boolean }> = ({ highlightedCourse, isOwnProfile }) => {
   return (
-    <div className="relative h-[28rem] rounded-lg overflow-hidden bg-black">
-      <GamificationProgressBar 
-        userId={userId || user?.id || ''}
-        isOwnProfile={user?.id === userId}
-      />
+    <div className="relative h-[28rem] rounded-lg overflow-hidden">
+      {/* Glass card content - restored to original */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 via-purple-500/10 to-pink-500/20 backdrop-blur-sm border border-white/10">
+        <div className="flex items-center justify-center h-full">
+          <div className="text-center text-white">
+            <h3 className="text-xl font-semibold mb-2">Course Highlights</h3>
+            <p className="text-white/70">Discover amazing golf courses</p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
@@ -383,7 +386,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
             style={{ scrollSnapAlign: 'start' }}
           >
             {'type' in item && item.type === 'glass' ? (
-              <LiquidGlassCard userId={userId} />
+              <LiquidGlassCard highlightedCourse={undefined} isOwnProfile={false} />
             ) : (
               <VideoCard
                 video={item as HighlightVideo}
