@@ -111,10 +111,10 @@ const TrendingNow: React.FC<TrendingNowProps> = ({ onHashtagClick, onAudioClick 
                 onClick={() => handleHashtagClick(hashtag.tag)}
                 className={cn(
                   "flex items-center gap-1.5 px-3 py-2 rounded-full text-sm font-medium transition-all duration-150",
-                  "whitespace-nowrap flex-shrink-0 border",
+                  "whitespace-nowrap flex-shrink-0",
                   isSelected
-                    ? "bg-gradient-to-r from-orange-50 to-orange-100 border-orange-200 text-orange-700"
-                    : "bg-gray-100 hover:bg-gray-200 active:bg-gray-300 border-gray-200 text-gray-700"
+                    ? "bg-gradient-to-r from-orange-50 to-orange-100 text-orange-700"
+                    : "bg-gray-100 hover:bg-gray-200 active:bg-gray-300 text-gray-700"
                 )}
               >
                 <IoFlameOutline className="w-5 h-5 text-orange-500" />
