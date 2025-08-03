@@ -133,7 +133,7 @@ const SuggestedUsers = () => {
   if (loading) {
     return (
       <div className="sticky top-6">
-        <Card className="p-4">
+        <Card className="px-4 py-2">
           <div className="space-y-4">
             <div className="h-4 bg-muted rounded animate-pulse" />
             {[1, 2, 3].map(i => (
@@ -153,8 +153,8 @@ const SuggestedUsers = () => {
 
   return (
     <div className="sticky top-6">
-      <Card className="p-4">
-        <div className="flex items-center justify-between mb-4">
+      <Card className="px-4 py-2">
+        <div className="flex items-center justify-between mb-3">
           <h3 className="font-semibold text-muted-foreground">Suggested for you</h3>
           <Button variant="ghost" size="sm" className="text-xs">
             See All
