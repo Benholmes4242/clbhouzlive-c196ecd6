@@ -9,6 +9,9 @@ import MedalIcon from '@/components/ui/medal-icon';
 import Top100AchievementsList from '@/components/badges/Top100AchievementsList';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import Hls from 'hls.js';
+import linksLegendTrophy from '@/assets/links-legend-trophy.png';
+import continentalSwingerTrophy from '@/assets/continental-swinger-trophy.png';
+import starsStripesTrophy from '@/assets/stars-stripes-trophy.png';
 
 // Session-based mute preference management
 const MUTE_PREFERENCE_KEY = 'videoMutePreference';
@@ -233,6 +236,9 @@ const LiquidGlassCard: React.FC = () => {
     played: 21,
     total: 300,
     achievements: [
+      { id: 'links-legend', name: 'Links Legend', description: "You've mastered the finest across the British Isles", target: 100, earned: true, progress: 100 },
+      { id: 'continental-swinger', name: 'The Continental Swinger', description: "Algarve to the Alps - Europe's elite courses, conquered", target: 100, earned: true, progress: 100 },
+      { id: 'stars-stripes', name: 'Stars & Stripes Tourer', description: "Coast to coast, you've played the American greats", target: 100, earned: true, progress: 100 },
       { id: '20-club', name: 'Green Fee Rookie', description: "You've paid your dues - 20 down!", target: 20, earned: true, progress: 21 },
       { id: '50-club', name: 'The Turn', description: 'Halfway through your Top 100 journey', target: 50, earned: false, progress: 21 },
       { id: '100-club', name: 'The Century Club', description: "You're a member of the century club - a prestigious club", target: 100, earned: false, progress: 21 },
@@ -293,8 +299,14 @@ const LiquidGlassCard: React.FC = () => {
 
                 <div className="flex items-center w-full mb-3">
                   <div className="flex items-center space-x-3 flex-1">
-                    {/* Achievement Icon - Keep original trophy styling */}
-                     {achievement.id === '20-club' ? (
+                     {/* Achievement Icon - Keep original trophy styling */}
+                     {achievement.id === 'links-legend' ? (
+                       <img src={linksLegendTrophy} alt="Links Legend Trophy" className="w-16 h-16 flex-shrink-0" />
+                     ) : achievement.id === 'continental-swinger' ? (
+                       <img src={continentalSwingerTrophy} alt="Continental Swinger Trophy" className="w-16 h-16 flex-shrink-0" />
+                     ) : achievement.id === 'stars-stripes' ? (
+                       <img src={starsStripesTrophy} alt="Stars & Stripes Tourer Trophy" className="w-16 h-16 flex-shrink-0" />
+                     ) : achievement.id === '20-club' ? (
                        <MedalIcon size="xl" type="20-club" className="!w-16 !h-16 flex-shrink-0" />
                      ) : achievement.id === '50-club' ? (
                        <MedalIcon size="xl" type="50-club" className="!w-16 !h-16 flex-shrink-0" />
