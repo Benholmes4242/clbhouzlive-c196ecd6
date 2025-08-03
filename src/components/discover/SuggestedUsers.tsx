@@ -78,10 +78,10 @@ const SuggestedUsers: React.FC<SuggestedUsersProps> = ({ onUserFollow }) => {
             {/* Loading skeletons */}
             {[1, 2, 3, 4, 5].map((i) => (
               <div key={i} className="flex-shrink-0 w-28 bg-white rounded-lg border border-gray-200 p-2 text-center animate-pulse">
-                <div className="w-16 h-16 bg-gray-200 rounded-full mx-auto mb-2"></div>
+                <div className="w-12 h-12 bg-gray-200 rounded-full mx-auto mb-1"></div>
                 <div className="h-3 bg-gray-200 rounded mb-1"></div>
-                <div className="h-3 bg-gray-200 rounded mb-2"></div>
-                <div className="h-3 bg-gray-200 rounded mb-2"></div>
+                <div className="h-3 bg-gray-200 rounded mb-1"></div>
+                <div className="h-3 bg-gray-200 rounded mb-1"></div>
                 <div className="h-4 bg-gray-200 rounded"></div>
               </div>
             ))}
@@ -111,11 +111,11 @@ const SuggestedUsers: React.FC<SuggestedUsersProps> = ({ onUserFollow }) => {
               className="flex-shrink-0 w-28 bg-white rounded-lg border border-gray-200 p-2 text-center"
             >
               {/* Profile Image */}
-              <div className="relative mb-2">
+              <div className="relative mb-1">
                 <img
                   src={user.profileImage}
                   alt={user.displayName}
-                  className="w-16 h-16 rounded-full mx-auto object-cover"
+                  className="w-12 h-12 rounded-full mx-auto object-cover"
                   onError={(e) => {
                     e.currentTarget.src = 'https://images.unsplash.com/photo-1535268647677-300dbf3d78d1?w=100&h=100&fit=crop&crop=face';
                   }}
@@ -128,11 +128,11 @@ const SuggestedUsers: React.FC<SuggestedUsersProps> = ({ onUserFollow }) => {
               </div>
 
               {/* User Info */}
-              <div className="mb-2">
-                <h4 className="text-xs font-semibold text-gray-900 truncate mb-1">
+              <div className="mb-1">
+                <h4 className="text-xs font-semibold text-gray-900 truncate mb-0.5">
                   {user.displayName}
                 </h4>
-                <p className="text-xs text-gray-500 truncate mb-2">
+                <p className="text-xs text-gray-500 truncate mb-1">
                   {user.username}
                 </p>
                 <span className="text-xs text-gray-400">
