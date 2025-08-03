@@ -15,7 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import CoursePickerModal from '@/components/profile/CoursePickerModal';
 import Top100Progress from './Top100Progress';
-import BadgeCollection from './BadgeCollection';
+import GamificationProgressBar from './GamificationProgressBar';
 
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
@@ -282,11 +282,17 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
       />
 
 
-      {/* Achievement Badges */}
-      <BadgeCollection 
-        completedCount={top100CompletedCount}
-        collapsible={true}
-        defaultExpanded={false}
+      {/* Gamification Progress Bar */}
+      <GamificationProgressBar 
+        completedCount={allPlayedCourses.length}
+        britainIrelandCompleted={regionProgress?.['britain-ireland']?.played || 0}
+        britainIrelandTotal={regionProgress?.['britain-ireland']?.total || 100}
+        europeCompleted={regionProgress?.['europe']?.played || 0}
+        europeTotal={regionProgress?.['europe']?.total || 100}
+        usaCompleted={regionProgress?.['usa']?.played || 0}
+        usaTotal={regionProgress?.['usa']?.total || 100}
+        worldwideCompleted={regionProgress?.['global']?.played || 0}
+        worldwideTotal={regionProgress?.['global']?.total || 100}
       />
 
 
