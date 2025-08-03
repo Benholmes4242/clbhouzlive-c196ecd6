@@ -11,7 +11,7 @@ import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import Hls from 'hls.js';
 // Links legend trophy now uses uploaded UK flag trophy
 // Continental swinger trophy now uses uploaded EU flag trophy
-import starsStripesTrophy from '@/assets/stars-stripes-trophy.png';
+// Stars & Stripes trophy now uses uploaded US flag trophy
 
 // Session-based mute preference management
 const MUTE_PREFERENCE_KEY = 'videoMutePreference';
@@ -299,7 +299,7 @@ const LiquidGlassCard: React.FC = () => {
                       ) : achievement.id === 'continental-swinger' ? (
                         <img src="/lovable-uploads/b2e2187e-2389-47a7-ab98-457f4ffca8ae.png" alt="Continental Swinger Trophy" className="w-16 h-16 flex-shrink-0" />
                      ) : achievement.id === 'stars-stripes' ? (
-                       <img src={starsStripesTrophy} alt="Stars & Stripes Tourer Trophy" className="w-16 h-16 flex-shrink-0" />
+                        <img src="/lovable-uploads/dc073264-8a78-419c-b478-6e8411589608.png" alt="Stars & Stripes Tourer Trophy" className="w-16 h-16 flex-shrink-0" />
                      ) : achievement.id === '20-club' ? (
                        <MedalIcon size="xl" type="20-club" className="!w-16 !h-16 flex-shrink-0" />
                      ) : achievement.id === '50-club' ? (
