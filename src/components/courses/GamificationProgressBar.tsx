@@ -206,15 +206,15 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
             {/* Trophy Timeline */}
             <div className="relative">
               {/* Progress Line */}
-               <div className="absolute top-4 left-4 right-4 h-1 bg-white/20 rounded-full">
-                 <div 
-                   className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-500"
-                   style={{ 
-                     width: nextGlobalTrophy 
-                       ? `${Math.min((completedCount / nextGlobalTrophy.requiredCourses) * 100, 100)}%`
-                       : '100%'
-                   }}
-                 />
+               <div className="absolute top-4 left-4 right-4 h-2 bg-white/20 rounded-full">
+                 {nextGlobalTrophy && (
+                   <div 
+                     className="h-full bg-green-400 rounded-full transition-all duration-500"
+                     style={{ 
+                       width: `${(completedCount / nextGlobalTrophy.requiredCourses) * 100}%`
+                     }}
+                   />
+                 )}
                </div>
               
                {/* Trophy Points */}
