@@ -36,7 +36,7 @@ const GLOBAL_TROPHIES = [
   },
   {
     id: 'century-club',
-    name: 'The Century Club',
+    name: 'Century Club',
     requiredCourses: 100,
     xp: 11000,
     color: 'from-blue-500 to-indigo-600',
