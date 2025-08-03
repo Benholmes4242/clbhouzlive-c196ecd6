@@ -156,6 +156,7 @@ const SocialActivity: React.FC<SocialActivityProps> = ({
           onClose={closePostViewer}
           initialPost={currentPost}
           allUserPosts={viewerPosts}
+          hideCourseTag={true}
         />
       )}
     </div>

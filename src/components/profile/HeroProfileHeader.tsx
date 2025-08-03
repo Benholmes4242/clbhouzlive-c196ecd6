@@ -466,6 +466,7 @@ const HeroProfileHeader = ({
             onClose={closePostViewer}
             initialPost={currentPost}
             allUserPosts={viewerPosts}
+            hideCourseTag={true}
           />
         )}
         

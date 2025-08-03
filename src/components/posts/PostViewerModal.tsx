@@ -51,6 +51,7 @@ interface PostViewerModalProps {
   initialPost: PostData;
   allUserPosts: PostData[];
   onNavigate?: (direction: 'prev' | 'next') => void;
+  hideCourseTag?: boolean;
 }
 
 const PostViewerModal: React.FC<PostViewerModalProps> = ({
@@ -58,7 +59,8 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
   onClose,
   initialPost,
   allUserPosts,
-  onNavigate
+  onNavigate,
+  hideCourseTag = false
 }) => {
   const { user } = useSupabaseSession();
   const { updatePost, isUpdating } = usePostUpdate();
@@ -293,7 +295,7 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
             </div>
 
             {/* Golf Course Badge - Top Right */}
-            {golfCourse && (
+            {golfCourse && !hideCourseTag && (
               <div className="absolute top-4 right-4 z-10">
                 <CoursePostBadge 
                   course={golfCourse}
@@ -500,7 +502,7 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                     />
 
                     {/* Golf Course Badge */}
-                    {golfCourse && (
+                    {golfCourse && !hideCourseTag && (
                       <div className="absolute top-4 right-4 z-10">
                         <CoursePostBadge 
                           course={golfCourse}

@@ -20,6 +20,7 @@ interface ExploreGridProps {
   activeFilter?: string;
   isClubhousePage?: boolean;
   isDiscoverPage?: boolean;
+  hideBadges?: boolean;
 }
 
 const ExploreGrid: React.FC<ExploreGridProps> = ({ 
@@ -32,7 +33,8 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
   onLoadMore,
   activeFilter,
   isClubhousePage = false,
-  isDiscoverPage = false
+  isDiscoverPage = false,
+  hideBadges = false
 }) => {
   const [isMobile, setIsMobile] = useState(false);
 
