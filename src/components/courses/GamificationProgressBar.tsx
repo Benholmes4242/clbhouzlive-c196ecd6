@@ -191,17 +191,17 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
         <div className="relative p-6 space-y-6">
           {/* Header */}
           <div className="flex items-center justify-between">
-            <h4 className="text-lg font-semibold text-white">
+            <h4 className="text-xl font-semibold text-white">
               Golf Journey Progress
             </h4>
-            <div className="text-sm text-white/70">
+            <div className="text-base text-white/70">
               {currentXP.toLocaleString()} XP
             </div>
           </div>
 
           {/* Global XP Progress Bar */}
           <div className="space-y-4">
-            <div className="flex items-center justify-between text-sm">
+            <div className="flex items-center justify-between text-base">
               <span className="text-white/80">Global Milestones</span>
               <span className="text-white/60">{completedCount} courses played</span>
             </div>
@@ -230,10 +230,10 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                       size="md"
                     />
                     <div className="text-center">
-                      <div className="text-xs font-medium text-white/90">
+                      <div className="text-sm font-medium text-white/90">
                         {trophy.requiredCourses}
                       </div>
-                      <div className="text-xs text-white/60 max-w-16 leading-tight">
+                      <div className="text-sm text-white/60 max-w-16 leading-tight">
                         {trophy.name}
                       </div>
                     </div>
@@ -245,7 +245,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
             {/* Next Milestone */}
             {nextGlobalTrophy && (
               <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-3">
-                <p className="text-sm text-white/80">
+                <p className="text-base text-white/80">
                   <span className="font-medium">{nextGlobalTrophy.requiredCourses - completedCount} more courses</span> 
                   {' '}to unlock <span className="font-medium text-white">{nextGlobalTrophy.name}</span>
                 </p>
@@ -256,8 +256,8 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
           {/* Regional Lists Completion */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-white/80">Regional List Completion</span>
-              <span className="text-sm text-white/60">
+              <span className="text-base text-white/80">Regional List Completion</span>
+              <span className="text-base text-white/60">
                 {regionalProgress.completedLists}/4 lists completed
               </span>
             </div>
@@ -283,7 +283,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                       />
                       <div className="flex-1 space-y-2">
                         <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium text-white/90">
+                          <span className="text-base font-medium text-white/90">
                             Great Britain & Ireland
                           </span>
                           {list.isCompleted ? (
@@ -293,7 +293,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                           )}
                         </div>
                         <div className="space-y-1">
-                          <div className="text-sm text-white/70">
+                          <div className="text-base text-white/70">
                             {list.completed}/{list.total}
                           </div>
                           <div className="w-full bg-white/20 rounded-full h-1.5">
@@ -322,7 +322,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                       />
                       <div className="flex-1 space-y-2">
                         <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium text-white/90">
+                          <span className="text-base font-medium text-white/90">
                             Europe
                           </span>
                           {list.isCompleted ? (
@@ -332,7 +332,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                           )}
                         </div>
                         <div className="space-y-1">
-                          <div className="text-sm text-white/70">
+                          <div className="text-base text-white/70">
                             {list.completed}/{list.total}
                           </div>
                           <div className="w-full bg-white/20 rounded-full h-1.5">
@@ -361,7 +361,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                       />
                       <div className="flex-1 space-y-2">
                         <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium text-white/90">
+                          <span className="text-base font-medium text-white/90">
                             USA
                           </span>
                           {list.isCompleted ? (
@@ -371,7 +371,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                           )}
                         </div>
                         <div className="space-y-1">
-                          <div className="text-sm text-white/70">
+                          <div className="text-base text-white/70">
                             {list.completed}/{list.total}
                           </div>
                           <div className="w-full bg-white/20 rounded-full h-1.5">
@@ -394,7 +394,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                     // Standard layout for other regions
                     <>
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium text-white/90">
+                        <span className="text-base font-medium text-white/90">
                           {list.shortName}
                         </span>
                         {list.isCompleted ? (
@@ -405,7 +405,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                       </div>
                       
                       <div className="space-y-1">
-                        <div className="text-sm text-white/70">
+                        <div className="text-base text-white/70">
                           {list.completed}/{list.total}
                         </div>
                         <div className="w-full bg-white/20 rounded-full h-1.5">
@@ -432,7 +432,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
             {regionalProgress.isWorldConqueror && (
               <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-400/30 rounded-lg p-4 text-center">
                 <h5 className="font-bold text-white mb-1">🌍 World Conqueror!</h5>
-                <p className="text-sm text-white/80">
+                <p className="text-base text-white/80">
                   You've completed all regional lists. Truly legendary!
                 </p>
               </div>
@@ -440,7 +440,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
           </div>
 
           {/* Summary Stats */}
-          <div className="flex items-center justify-between text-sm pt-2 border-t border-white/10">
+          <div className="flex items-center justify-between text-base pt-2 border-t border-white/10">
             <div className="text-white/60">
               Global Trophies: {unlockedGlobalTrophies.length}/{globalTrophies.length}
             </div>
