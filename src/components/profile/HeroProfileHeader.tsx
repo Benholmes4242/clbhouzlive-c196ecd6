@@ -109,7 +109,7 @@ const HeroProfileHeader = ({
         }
 
         // Fetch followers count
-        const { data: followersData, error: followersError } = await supabase
+        const { count: followersCount, error: followersError } = await supabase
           .from('user_follows')
           .select('*', { count: 'exact', head: true })
           .eq('following_id', profile.id);
@@ -117,11 +117,11 @@ const HeroProfileHeader = ({
         if (followersError) {
           console.error('Error fetching followers:', followersError);
         } else {
-          setFollowersCount(followersData?.length || 0);
+          setFollowersCount(followersCount || 0);
         }
 
         // Fetch following count
-        const { data: followingData, error: followingError } = await supabase
+        const { count: followingCount, error: followingError } = await supabase
           .from('user_follows')
           .select('*', { count: 'exact', head: true })
           .eq('follower_id', profile.id);
@@ -129,7 +129,7 @@ const HeroProfileHeader = ({
         if (followingError) {
           console.error('Error fetching following:', followingError);
         } else {
-          setFollowingCount(followingData?.length || 0);
+          setFollowingCount(followingCount || 0);
         }
       } catch (error) {
         console.error('Error fetching stats:', error);
