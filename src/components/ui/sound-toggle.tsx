@@ -27,9 +27,9 @@ const SoundToggle: React.FC<SoundToggleProps> = ({
   };
 
   const iconSizes = {
-    sm: 'h-3 w-3',
-    md: 'h-4 w-4',
-    lg: 'h-5 w-5'
+    sm: 'h-6 w-6',
+    md: 'h-6 w-6',
+    lg: 'h-6 w-6'
   };
 
   return (
