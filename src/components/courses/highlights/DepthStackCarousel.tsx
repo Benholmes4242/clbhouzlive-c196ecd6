@@ -236,6 +236,7 @@ const LiquidGlassCard: React.FC = () => {
       { id: '20-club', name: 'Green Fee Rookie', description: "You've paid your dues - 20 down!", target: 20, earned: true, progress: 21 },
       { id: '50-club', name: 'The Turn', description: 'Halfway through your Top 100 journey', target: 50, earned: false, progress: 21 },
       { id: '100-club', name: 'The Century Club', description: "You're a member of the century club - a prestigious club", target: 100, earned: false, progress: 21 },
+      { id: '200-club', name: 'Links Legend', description: 'Bunkers, winds, and triumphs - 200 conquered', target: 200, earned: false, progress: 21 },
       { id: '300-club', name: 'Course Collector', description: "All 300? That's a collector's dream come true", target: 300, earned: false, progress: 21 },
     ]
   };
@@ -301,6 +302,8 @@ const LiquidGlassCard: React.FC = () => {
                        <MedalIcon size="xl" type="50-club" className="!w-16 !h-16 flex-shrink-0" />
                      ) : achievement.id === '100-club' ? (
                        <MedalIcon size="xl" type="100-club" className="!w-16 !h-16 flex-shrink-0" />
+                     ) : achievement.id === '200-club' ? (
+                       <MedalIcon size="xl" type="200-club" className="!w-16 !h-16 flex-shrink-0" />
                      ) : achievement.id === '300-club' ? (
                        <MedalIcon size="xl" type="300-club" className="!w-16 !h-16 flex-shrink-0" />
                     ) : (
