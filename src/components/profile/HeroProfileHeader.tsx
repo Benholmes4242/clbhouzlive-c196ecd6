@@ -492,11 +492,11 @@ const HeroProfileHeader = ({
           <div className="w-64 h-64 mb-6">
             <div 
               className={`relative rounded-full overflow-hidden transition-all duration-300 w-full h-full ${
-                achievementRing.ringClass === 'ring-gold' ? 'border-b-[8px] border-l-[8px] border-yellow-400 shadow-[0_0_20px_rgba(255,215,0,0.3)]' :
-                achievementRing.ringClass === 'ring-silver' ? 'border-b-[8px] border-l-[8px] border-gray-400 shadow-[0_0_20px_rgba(192,192,192,0.3)]' :
-                achievementRing.ringClass === 'ring-blue' ? 'border-b-[8px] border-l-[8px] border-blue-400 shadow-[0_0_20px_rgba(30,144,255,0.3)]' :
-                achievementRing.ringClass === 'ring-green' ? 'border-b-[8px] border-l-[8px] border-green-400 shadow-[0_0_20px_rgba(50,205,50,0.3)]' :
-                achievementRing.ringClass === 'ring-gradient' ? 'border-b-[8px] border-l-[8px] border-transparent bg-gradient-to-br from-yellow-400 to-green-400 shadow-[0_0_25px_rgba(255,215,0,0.4)]' :
+                achievementRing.ringClass === 'ring-gold' ? 'border-b-[5px] border-l-[5px] border-yellow-400/70 shadow-[0_0_15px_rgba(255,215,0,0.2)]' :
+                achievementRing.ringClass === 'ring-silver' ? 'border-b-[5px] border-l-[5px] border-gray-400/70 shadow-[0_0_15px_rgba(192,192,192,0.2)]' :
+                achievementRing.ringClass === 'ring-blue' ? 'border-b-[5px] border-l-[5px] border-blue-400/70 shadow-[0_0_15px_rgba(30,144,255,0.2)]' :
+                achievementRing.ringClass === 'ring-green' ? 'border-b-[5px] border-l-[5px] border-green-400/70 shadow-[0_0_15px_rgba(50,205,50,0.2)]' :
+                achievementRing.ringClass === 'ring-gradient' ? 'border-b-[5px] border-l-[5px] border-transparent bg-gradient-to-br from-yellow-400/70 to-green-400/70 shadow-[0_0_15px_rgba(255,215,0,0.25)]' :
                 ''
               }`}
               title={achievementRing.title}
