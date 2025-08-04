@@ -222,9 +222,9 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
           <div className="relative p-6 space-y-6">
             {/* Header with XP Counter */}
             <div className="flex items-center justify-between">
-              <h4 className="text-xl font-semibold text-white">
-                Golf Journey Progress
-              </h4>
+            <h4 className="text-xl font-semibold text-white">
+              You've played {completedCount} of 300 top 100 courses
+            </h4>
               <div className="text-lg font-bold text-white transition-all duration-500">
                 Total XP: {currentXP.toLocaleString()}
               </div>
