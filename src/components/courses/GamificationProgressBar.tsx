@@ -280,25 +280,14 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                              )}
                            />
                          ) : trophy.id === 'the-turn' ? (
-                           <div className="relative">
-                             <img 
-                               src="/lovable-uploads/43291ca4-d526-4b10-9585-6ea3488445cf.png" 
-                               alt="The Turn Trophy"
-                               className={cn(
-                                 'h-16 w-auto object-contain -mt-4 transition-all duration-300',
-                                 trophy.isUnlocked ? 'opacity-100' : 'opacity-40 grayscale'
-                               )}
-                             />
-                             {!trophy.isUnlocked && (
-                               <div className="absolute inset-0 flex items-center justify-center">
-                                 <img 
-                                   src="/lovable-uploads/2de7fb51-e144-486a-a32b-2913cac503cc.png" 
-                                   alt="Locked" 
-                                   className="w-8 h-8"
-                                 />
-                               </div>
+                           <img 
+                             src="/lovable-uploads/43291ca4-d526-4b10-9585-6ea3488445cf.png" 
+                             alt="The Turn Trophy"
+                             className={cn(
+                               'h-16 w-auto object-contain -mt-4 transition-all duration-300',
+                               trophy.isUnlocked ? 'opacity-100' : 'opacity-40 grayscale'
                              )}
-                           </div>
+                           />
                          ) : trophy.id === 'century-club' ? (
                            <img 
                              src="/lovable-uploads/0c126dc7-5509-40b9-862d-b054423ca7f6.png" 
@@ -317,15 +306,24 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                                trophy.isUnlocked ? 'opacity-100' : 'opacity-40 grayscale'
                              )}
                            />
-                         ) : (
-                           <div className={cn(
-                             'h-16 w-16 rounded-full flex items-center justify-center bg-gradient-to-br -mt-4 transition-all duration-300',
-                             trophy.color,
-                             trophy.isUnlocked ? 'opacity-100' : 'opacity-40 grayscale'
-                           )}>
-                             <Trophy className="w-8 h-8 text-white" />
-                           </div>
-                         )}
+                          ) : trophy.id === 'course-collector' ? (
+                            <img 
+                              src="/lovable-uploads/3c517cb5-203d-4ad8-b3b5-e5e7c33a24b0.png" 
+                              alt="Course Collector Trophy" 
+                              className={cn(
+                                'h-16 w-auto object-contain -mt-4 transition-all duration-300',
+                                trophy.isUnlocked ? 'opacity-100' : 'opacity-40 grayscale'
+                              )}
+                            />
+                          ) : (
+                            <div className={cn(
+                              'h-16 w-16 rounded-full flex items-center justify-center bg-gradient-to-br -mt-4 transition-all duration-300',
+                              trophy.color,
+                              trophy.isUnlocked ? 'opacity-100' : 'opacity-40 grayscale'
+                            )}>
+                              <Trophy className="w-8 h-8 text-white" />
+                            </div>
+                          )}
                          <div className="text-center">
                            <div className="text-sm font-medium text-white/90">
                              {trophy.requiredCourses}
@@ -566,12 +564,9 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
           </div>
 
           {/* Summary Stats */}
-          <div className="flex items-center justify-between text-base pt-2 border-t border-white/10">
+          <div className="flex items-center justify-center text-base pt-2 border-t border-white/10">
             <div className="text-white/60">
               Global Trophies: {unlockedGlobalTrophies.length}/{globalTrophies.length}
-            </div>
-            <div className="text-white/60">
-              Total XP: {currentXP.toLocaleString()}
             </div>
           </div>
         </div>
