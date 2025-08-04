@@ -63,10 +63,10 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
       
       {/* Center text */}
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <div className="text-sm font-bold text-white">
+        <div className="text-sm font-bold text-foreground">
           {completed}/{total}
         </div>
-        <div className="text-xs text-white">
+        <div className="text-xs text-muted-foreground">
           completed
         </div>
       </div>
