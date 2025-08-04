@@ -335,8 +335,8 @@ const LiquidGlassCard: React.FC<{ userId?: string }> = ({ userId }) => {
       <div className="relative h-full p-6 flex flex-col">
         {/* Header */}
         <div className="mb-6">
-          <h3 className="text-white font-bold text-2xl mb-2">Achievements</h3>
-          <p className="text-white/70 text-base">
+          <h3 className="text-foreground font-bold text-2xl mb-2">Achievements</h3>
+          <p className="text-muted-foreground text-base">
             You&apos;ve played {userProgress.played} of {userProgress.total} Top 100 courses
           </p>
         </div>
@@ -394,8 +394,8 @@ const LiquidGlassCard: React.FC<{ userId?: string }> = ({ userId }) => {
                     
                      {/* Achievement Info */}
                      <div className="flex-1">
-                       <h4 className="text-white font-medium text-base whitespace-nowrap">{achievement.name}</h4>
-                       <p className="text-white/60 text-sm">{achievement.description}</p>
+                        <h4 className="text-foreground font-medium text-base whitespace-nowrap">{achievement.name}</h4>
+                        <p className="text-muted-foreground text-sm">{achievement.description}</p>
                      </div>
                   </div>
                 </div>
