@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { Message } from './useMessages';
@@ -8,6 +7,22 @@ export function useConversation(friendId: string | null) {
   const { user } = useSupabaseSession();
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const fetchMessages = useCallback(async () => {
+    if (!user || !friendId) return;
+    
+    setLoading(true);
+    const { data, error } = await supabase
+      .from('messages')
+      .select('*')
+      .or(`and(sender_id.eq.${user.id},recipient_id.eq.${friendId}),and(sender_id.eq.${friendId},recipient_id.eq.${user.id})`)
+      .order('created_at', { ascending: true });
+
+    if (!error && data) {
+      setMessages(data as Message[]);
+    }
+    setLoading(false);
+  }, [user, friendId]);
 
   useEffect(() => {
     if (!user || !friendId) {
@@ -19,8 +34,9 @@ export function useConversation(friendId: string | null) {
     fetchMessages();
     
     // Set up real-time subscription for this conversation
+    const channelName = `conversation_${user.id}_${friendId}`;
     const channel = supabase
-      .channel(`conversation-${friendId}`)
+      .channel(channelName)
       .on(
         'postgres_changes',
         {
@@ -38,23 +54,7 @@ export function useConversation(friendId: string | null) {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user, friendId]);
-
-  const fetchMessages = async () => {
-    if (!user || !friendId) return;
-    
-    setLoading(true);
-    const { data, error } = await supabase
-      .from('messages')
-      .select('*')
-      .or(`and(sender_id.eq.${user.id},recipient_id.eq.${friendId}),and(sender_id.eq.${friendId},recipient_id.eq.${user.id})`)
-      .order('created_at', { ascending: true });
-
-    if (!error && data) {
-      setMessages(data as Message[]);
-    }
-    setLoading(false);
-  };
+  }, [user, friendId, fetchMessages]);
 
   return {
     messages,
