@@ -6,6 +6,10 @@ import * as Dialog from '@radix-ui/react-dialog';
 import CircularProgress from '@/components/ui/circular-progress';
 import { CourseListModal } from './CourseListModal';
 import { useUserAchievements } from '@/hooks/useUserAchievements';
+import { useFriendsLeaderboard } from '@/hooks/useFriendsLeaderboard';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import FriendsLeaderboard from './friends/FriendsLeaderboard';
+import CompareWithFriendsModal from './friends/CompareWithFriendsModal';
 
 interface GamificationProgressBarProps {
   completedCount: number;
@@ -145,9 +149,82 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCourseList, setSelectedCourseList] = useState<any>(null);
   const [isCourseListModalOpen, setIsCourseListModalOpen] = useState(false);
+  const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
 
   // Fetch real user achievements
   const { achievements, loading: achievementsLoading } = useUserAchievements(5);
+  
+  // Fetch friends data for progress markers
+  const { user } = useSupabaseSession();
+  const { data: friends = [] } = useFriendsLeaderboard(user?.id);
+
+  // Visual theme based on progress
+  const getProgressTheme = (courses: number) => {
+    if (courses >= 300) return 'aurora';
+    if (courses >= 200) return 'mountain';
+    if (courses >= 100) return 'twilight';
+    if (courses >= 50) return 'golden';
+    if (courses >= 10) return 'midday';
+    return 'morning';
+  };
+
+  const currentTheme = getProgressTheme(completedCount);
+  const [displayTheme, setDisplayTheme] = useState(currentTheme);
+  const [showMilestoneTooltip, setShowMilestoneTooltip] = useState(false);
+
+  // Handle theme transitions and milestone notifications
+  useEffect(() => {
+    if (currentTheme !== displayTheme) {
+      // Show milestone notification
+      setShowMilestoneTooltip(true);
+      
+      // Fade transition
+      setTimeout(() => {
+        setDisplayTheme(currentTheme);
+      }, 250);
+
+      // Hide tooltip after 3 seconds
+      setTimeout(() => {
+        setShowMilestoneTooltip(false);
+      }, 3000);
+    }
+  }, [currentTheme, displayTheme]);
+
+  const getThemeInfo = (theme: string) => {
+    const themes = {
+      morning: {
+        name: 'Dawn Breaker',
+        description: 'Your golf journey begins with the morning sun',
+        emoji: '☀️'
+      },
+      midday: {
+        name: 'Fairway Explorer',
+        description: 'Making your mark under the midday sun',
+        emoji: '🌤️'
+      },
+      golden: {
+        name: 'Golden Hour',
+        description: 'Reaching new heights in the golden light',
+        emoji: '🌅'
+      },
+      twilight: {
+        name: 'Twilight Master',
+        description: 'Playing among the stars and twilight skies',
+        emoji: '🌌'
+      },
+      mountain: {
+        name: 'Peak Performer',
+        description: 'Standing tall among the mountain ranges',
+        emoji: '⛰️'
+      },
+      aurora: {
+        name: 'Legend of the Links',
+        description: 'You\'ve achieved the ultimate golfing aurora',
+        emoji: '✨'
+      }
+    };
+    return themes[theme as keyof typeof themes] || themes.morning;
+  };
 
   // Trigger XP animation when completedCount increases
   useEffect(() => {
@@ -215,9 +292,29 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
   return (
     <Tooltip.Provider>
       <div className={cn('space-y-6', className)}>
-        {/* Liquid Glass Container */}
-        <div className="relative overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-md">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10" />
+        {/* Themed Background Container with Progress-Based Visuals */}
+        <div className={cn(
+          "relative overflow-hidden rounded-xl border border-white/10 backdrop-blur-md transition-all duration-500 ease-in-out",
+          // Base glassmorphism
+          "bg-gradient-to-br from-white/5 to-white/10",
+          // Progress-based themed backgrounds
+          displayTheme === 'morning' && "bg-gradient-to-br from-sky-400/20 via-blue-300/15 to-yellow-200/10",
+          displayTheme === 'midday' && "bg-gradient-to-br from-yellow-300/20 via-green-200/15 to-blue-200/10",
+          displayTheme === 'golden' && "bg-gradient-to-br from-orange-400/25 via-yellow-300/20 to-red-300/15",
+          displayTheme === 'twilight' && "bg-gradient-to-br from-purple-500/20 via-indigo-400/15 to-blue-600/10",
+          displayTheme === 'mountain' && "bg-gradient-to-br from-gray-600/20 via-slate-500/15 to-stone-400/10",
+          displayTheme === 'aurora' && "bg-gradient-to-br from-emerald-400/25 via-cyan-300/20 to-purple-400/15 aurora-theme"
+        )}>
+          {/* Dynamic themed overlay */}
+          <div className={cn(
+            "absolute inset-0 transition-all duration-500 ease-in-out",
+            displayTheme === 'morning' && "bg-gradient-to-br from-sky-500/10 via-yellow-400/8 to-transparent",
+            displayTheme === 'midday' && "bg-gradient-to-br from-yellow-400/12 via-green-300/8 to-transparent",
+            displayTheme === 'golden' && "bg-gradient-to-br from-orange-500/15 via-amber-400/10 to-red-400/8",
+            displayTheme === 'twilight' && "bg-gradient-to-br from-purple-600/15 via-indigo-500/10 to-blue-700/8",
+            displayTheme === 'mountain' && "bg-gradient-to-br from-gray-700/15 via-slate-600/10 to-stone-500/8",
+            displayTheme === 'aurora' && "bg-gradient-to-br from-emerald-500/20 via-cyan-400/15 to-purple-500/10"
+          )} />
           
           {/* Floating XP Animation */}
           {showXPFloat && (
@@ -230,6 +327,24 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
               >
                 <Plus className="w-4 h-4" />
                 <span>110 XP</span>
+              </div>
+            </div>
+          )}
+
+          {/* Milestone Achievement Notification */}
+          {showMilestoneTooltip && (
+            <div className="absolute top-4 left-4 z-20 animate-fade-in">
+              <div 
+                className="flex items-center gap-2 bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-purple-400/30 rounded-lg px-4 py-2 text-white font-medium backdrop-blur-sm"
+                style={{
+                  animation: 'slideDown 3s ease-out forwards'
+                }}
+              >
+                <span className="text-xl">{getThemeInfo(currentTheme).emoji}</span>
+                <div className="flex flex-col">
+                  <span className="text-sm font-semibold">New milestone reached!</span>
+                  <span className="text-xs text-white/80">{getThemeInfo(currentTheme).name}</span>
+                </div>
               </div>
             </div>
           )}
@@ -270,8 +385,29 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                        width: `${(completedCount / nextGlobalTrophy.requiredCourses) * 20}%`
                      }}
                    />
-                 )}
-                 </div>
+                  )}
+                  
+                  {/* Friend Progress Markers */}
+                  {friends.length > 0 && friends.map((friend, index) => {
+                    const friendProgress = (friend.coursesPlayed / 300) * 100;
+                    if (friendProgress <= 0 || friendProgress >= 95) return null;
+                    
+                    return (
+                      <div
+                        key={friend.id}
+                        className="absolute top-0 transform -translate-x-1/2 z-20"
+                        style={{ left: `${friendProgress}%` }}
+                      >
+                        <div className="flex flex-col items-center">
+                          <div className="w-3 h-3 rounded-full bg-blue-500 border-2 border-white shadow-lg mb-1" />
+                          <div className="bg-black/80 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+                            🏁 {friend.display_name || friend.username} ({friend.coursesPlayed})
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  </div>
                {/* Trophy Points */}
                 <div className="flex justify-between items-start relative z-10">
                  {globalTrophies.map((trophy, index) => (
@@ -506,6 +642,19 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
             </div>
           </div>
 
+          {/* Compare with Friends Button */}
+          {isCurrentUser && (
+            <div className="flex items-center justify-center pt-6 border-t border-white/10">
+              <button
+                onClick={() => setIsCompareModalOpen(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 rounded-lg text-blue-400 font-medium transition-colors"
+              >
+                <Target className="w-4 h-4" />
+                Compare with Friends
+              </button>
+            </div>
+          )}
+
           {/* Summary Stats */}
           <div className="flex items-center justify-center text-base pt-6 border-t border-white/10">
             <div className="text-white/60">
@@ -614,6 +763,35 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
             onClose={() => setIsCourseListModalOpen(false)}
             region={selectedCourseList}
           />
+        )}
+
+        {/* Compare with Friends Modal */}
+        <CompareWithFriendsModal
+          isOpen={isCompareModalOpen}
+          onClose={() => setIsCompareModalOpen(false)}
+          currentUserCourses={completedCount}
+          currentUserRegionalProgress={{
+            britainIrelandCompleted,
+            europeCompleted,
+            usaCompleted,
+            worldwideCompleted
+          }}
+        />
+
+        {/* Friends Leaderboard Section */}
+        {isCurrentUser && (
+          <div className="mt-6">
+            <FriendsLeaderboard
+              onInviteFriends={() => {
+                // TODO: Implement invite friends functionality
+                console.log('Invite friends clicked');
+              }}
+              onCompareWith={(friendId) => {
+                console.log('Compare with friend:', friendId);
+                setIsCompareModalOpen(true);
+              }}
+            />
+          </div>
         )}
       </div>
     </Tooltip.Provider>
