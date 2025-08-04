@@ -607,53 +607,6 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
             )}
           </div>
 
-          {/* Recent Achievements - Improved Cards with enhanced spacing */}
-          <div className="space-y-4 pt-8">
-            <div className="flex items-center justify-between">
-              <span className="text-lg font-semibold text-foreground">📣 Recent Achievements</span>
-              <span className="text-sm text-muted-foreground font-medium">Last 7 days</span>
-            </div>
-
-            <div className="space-y-3">
-              {/* Show loading state while fetching achievements */}
-              {achievementsLoading ? (
-                <div className="flex items-center gap-3 p-4 rounded-xl bg-background border border-border shadow-sm">
-                  <div className="w-6 h-6 rounded-full bg-muted animate-pulse"></div>
-                  <div className="flex-1">
-                    <div className="h-4 bg-muted rounded animate-pulse mb-2"></div>
-                    <div className="h-3 bg-muted/50 rounded animate-pulse w-20"></div>
-                  </div>
-                </div>
-              ) : achievements.length > 0 ? (
-                /* Render real achievements from database */
-                achievements.map((achievement, index) => (
-                  <div 
-                    key={achievement.id}
-                    className="animate-fade-in flex items-center gap-3 p-4 rounded-xl bg-background border border-border hover:shadow-lg transition-all duration-300 hover:scale-102"
-                    style={{ 
-                      animationDelay: `${index * 0.1}s`,
-                      boxShadow: '0 2px 6px rgba(0,0,0,0.04)'
-                    }}
-                  >
-                    <div className="text-2xl">{achievement.emoji}</div>
-                    <div className="flex-1">
-                      <p className="text-base text-foreground font-medium">{achievement.message}</p>
-                      <p className="text-sm text-muted-foreground">{achievement.timestamp}</p>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                /* Show empty state when no achievements */
-                <div className="flex items-center gap-3 p-4 rounded-xl bg-background border border-border shadow-sm">
-                  <div className="text-2xl">🎯</div>
-                  <div className="flex-1">
-                      <p className="text-base text-foreground font-medium">Start playing courses to earn achievements!</p>
-                      <p className="text-sm text-muted-foreground">Your journey begins here</p>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
 
           {/* Friends Progress Section - Improved Card with enhanced spacing */}
           {isCurrentUser && (
