@@ -112,7 +112,7 @@ const ProfileBadgeStrip: React.FC<ProfileBadgeStripProps> = ({
               <Badge 
                 variant="secondary" 
                 className={cn(
-                  'text-white border-0 bg-gradient-to-r cursor-help hover:scale-105 transition-transform duration-200',
+                  'text-foreground border-0 bg-gradient-to-r cursor-help hover:scale-105 transition-transform duration-200',
                   badge.color
                 )}
               >
@@ -122,7 +122,7 @@ const ProfileBadgeStrip: React.FC<ProfileBadgeStripProps> = ({
             </Tooltip.Trigger>
             <Tooltip.Portal>
               <Tooltip.Content
-                className="bg-black/90 text-white text-sm px-3 py-2 rounded-lg max-w-xs z-50"
+                className="bg-popover text-popover-foreground text-sm px-3 py-2 rounded-lg max-w-xs z-50"
                 sideOffset={4}
               >
                 {badge.tooltip}

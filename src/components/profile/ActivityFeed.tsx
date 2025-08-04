@@ -102,8 +102,8 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
       <div className="py-4">
         <div className="flex items-center justify-between mb-4 px-4 md:px-0">
           <div className="flex items-end gap-2">
-            <h3 className="text-3xl font-bold text-white">Activity</h3>
-            <span className="text-white/80 text-base">
+            <h3 className="text-3xl font-bold text-foreground">Activity</h3>
+            <span className="text-muted-foreground text-base">
               {activeFilter === 'all' ? `${posts.length} posts` : `${filteredPosts.length} of ${posts.length} posts`}
             </span>
           </div>
@@ -114,14 +114,14 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
               <Button
                 variant="ghost"
                 size="sm"
-                className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white transition-all duration-200"
+                className="bg-muted border border-border hover:bg-muted/80 text-foreground transition-all duration-200"
               >
                 <Filter className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent 
               align="end" 
-              className="bg-background/95 backdrop-blur-md border border-border/50 shadow-lg"
+              className="bg-background border border-border"
             >
               <DropdownMenuItem 
                 onClick={() => setActiveFilter('all')}

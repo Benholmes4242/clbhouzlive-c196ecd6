@@ -463,26 +463,7 @@ const HeroProfileHeader = ({
   return (
     <>
       {/* Dynamic Background - Auto-generated from profile photo */}
-      <div className="relative w-full">
-        {/* Apple Music Style Dynamic Background */}
-        <div 
-          className="absolute inset-0 w-full overflow-hidden transition-all duration-500"
-          style={{
-            height: getBackgroundHeight(),
-            backgroundImage: profile?.profile_photo_url 
-              ? `url(${getOptimizedImageUrl(profile.profile_photo_url, 800, 600, 75)})`
-              : 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--primary-foreground)) 100%)',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center top', // Focus on upper portion to avoid faces
-            backgroundRepeat: 'no-repeat',
-            filter: 'blur(40px) saturate(1.3) brightness(0.9)', // Heavy blur to obscure details
-            transform: 'scale(1.2)', // Larger scale to crop edges and hide recognizable features
-            maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 60%, rgba(0,0,0,0.8) 80%, rgba(0,0,0,0) 100%)',
-            WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 60%, rgba(0,0,0,0.8) 80%, rgba(0,0,0,0) 100%)',
-          }}
-        />
-        
-        
+      <div className="relative w-full bg-background">
         {/* Profile Content */}
         <div className="relative z-10 flex flex-col items-center text-center pt-20 pb-8">
           
@@ -542,7 +523,7 @@ const HeroProfileHeader = ({
                           };
                           input.click();
                         }}
-                        className="bg-white/5 backdrop-blur-2xl border border-white/20 shadow-[0_0_20px_rgba(0,0,0,0.2)] rounded-lg text-white font-medium hover:bg-white/10 transition-all duration-300 ease-in-out px-4 py-2 text-sm"
+                        className="bg-muted border border-border rounded-lg text-foreground font-medium hover:bg-muted/80 transition-all duration-300 ease-in-out px-4 py-2 text-sm"
                         style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
                         disabled={uploading}
                       >
@@ -553,7 +534,7 @@ const HeroProfileHeader = ({
                           e.stopPropagation();
                           setEditDialogOpen(true);
                         }}
-                        className="bg-white/5 backdrop-blur-2xl border border-white/20 shadow-[0_0_20px_rgba(0,0,0,0.2)] rounded-lg text-white font-medium hover:bg-white/10 transition-all duration-300 ease-in-out px-4 py-2 text-sm"
+                        className="bg-muted border border-border rounded-lg text-foreground font-medium hover:bg-muted/80 transition-all duration-300 ease-in-out px-4 py-2 text-sm"
                         style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
                         disabled={uploading}
                       >
@@ -580,14 +561,14 @@ const HeroProfileHeader = ({
           <div className="text-center mb-6">
             {/* User's Name with Edit Button */}
             <div className="flex items-center justify-center gap-3">
-              <h1 className="font-bold text-white text-4xl">
+              <h1 className="font-bold text-foreground text-4xl">
                 {displayName}
               </h1>
               
               {/* Edit Profile Button - Next to name for own profile */}
               {isOwnProfile && (
                 <button 
-                  className="bg-white/5 backdrop-blur-2xl border border-white/20 shadow-[0_0_20px_rgba(0,0,0,0.2)] rounded-full text-white font-medium hover:bg-white/10 transition-all duration-300 ease-in-out flex items-center justify-center py-1.5 px-3 text-xs pt-2 pb-1" 
+                  className="bg-muted border border-border rounded-full text-foreground font-medium hover:bg-muted/80 transition-all duration-300 ease-in-out flex items-center justify-center py-1.5 px-3 text-xs pt-2 pb-1" 
                   style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
                   onClick={() => setEditDialogOpen(true)}
                 >
@@ -598,7 +579,7 @@ const HeroProfileHeader = ({
             
             {/* Username */}
             {username && (
-              <p className="text-lg text-white mb-2">
+              <p className="text-lg text-muted-foreground mb-2">
                 @{username}
               </p>
             )}
@@ -616,7 +597,7 @@ const HeroProfileHeader = ({
             </div>
             
             {/* Home Golf Club */}
-            <p className="text-base text-white">
+            <p className="text-base text-muted-foreground">
               {homeClub}
             </p>
 
@@ -625,7 +606,7 @@ const HeroProfileHeader = ({
               <div className="mt-4">
                 <button
                   onClick={() => setIsCompareModalOpen(true)}
-                  className="bg-white/10 backdrop-blur-2xl border border-white/20 shadow-[0_0_20px_rgba(0,0,0,0.2)] rounded-lg text-white font-medium hover:bg-white/15 transition-all duration-300 ease-in-out flex items-center justify-center gap-2 py-2 px-4 text-sm"
+                  className="bg-muted border border-border rounded-lg text-foreground font-medium hover:bg-muted/80 transition-all duration-300 ease-in-out flex items-center justify-center gap-2 py-2 px-4 text-sm"
                   style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
                 >
                   <Swords className="w-4 h-4" />
@@ -637,55 +618,55 @@ const HeroProfileHeader = ({
 
           {/* Stats Bar */}
           <div 
-            className="w-full bg-white/5 backdrop-blur-2xl border border-white/20 shadow-[0_0_20px_rgba(0,0,0,0.2)] rounded-lg max-w-md py-1" 
+            className="w-full bg-muted border border-border rounded-lg max-w-md py-1" 
             style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
           >
             <div className="flex items-center justify-around w-full px-4 space-x-2">
               <div className="text-center">
-                <div className="font-bold text-white text-lg">
+                <div className="font-bold text-foreground text-lg">
                   {profile?.eg_handicap_index ? profile.eg_handicap_index.toFixed(1) : '--'}
                 </div>
-                <div className="text-white/70 text-xs">
+                <div className="text-muted-foreground text-xs">
                   Handicap
                 </div>
               </div>
               <div className="text-center">
-                <div className="font-bold text-white text-lg">
+                <div className="font-bold text-foreground text-lg">
                   {postsCount}
                 </div>
-                <div className="text-white/70 text-xs">
+                <div className="text-muted-foreground text-xs">
                   Posts
                 </div>
               </div>
               <div className="text-center">
-                <div className="font-bold text-white text-lg">
+                <div className="font-bold text-foreground text-lg">
                   {ratedCoursesCount}
                 </div>
-                <div className="text-white/70 text-xs">
+                <div className="text-muted-foreground text-xs">
                   Rated Courses
                 </div>
               </div>
               <div className="text-center">
-                <div className="font-bold text-white text-lg">
+                <div className="font-bold text-foreground text-lg">
                   {averageRating > 0 ? `${averageRating}/10` : '--'}
                 </div>
-                <div className="text-white/70 text-xs">
+                <div className="text-muted-foreground text-xs">
                   Avg. Rating
                 </div>
               </div>
               <div className="text-center">
-                <div className="font-bold text-white text-lg">
+                <div className="font-bold text-foreground text-lg">
                   {followersCount}
                 </div>
-                <div className="text-white/70 text-xs">
+                <div className="text-muted-foreground text-xs">
                   Followers
                 </div>
               </div>
               <div className="text-center">
-                <div className="font-bold text-white text-lg">
+                <div className="font-bold text-foreground text-lg">
                   {followingCount}
                 </div>
-                <div className="text-white/70 text-xs">
+                <div className="text-muted-foreground text-xs">
                   Following
                 </div>
               </div>
@@ -742,7 +723,7 @@ const HeroProfileHeader = ({
               <div className="mt-8 px-0">
                 <div className="p-4">
                   <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-3xl font-bold text-white">Top 100 courses</h2>
+                    <h2 className="text-3xl font-bold text-foreground">Top 100 courses</h2>
                   </div>
                 </div>
                 <LatestHighlights userId={profile?.id || ''} isOwnProfile={isOwnProfile} />

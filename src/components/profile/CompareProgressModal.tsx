@@ -70,7 +70,7 @@ const CompareProgressModal: React.FC<CompareProgressModalProps> = ({
               <h3 className="text-lg font-semibold mb-2">{currentUser.name}</h3>
               <Badge 
                 variant="secondary" 
-                className={cn('mb-4', currentUserTrophy.color, 'border-0 bg-white/10')}
+                className={cn('mb-4', currentUserTrophy.color, 'border-0 bg-muted')}
               >
                 {currentUserTrophy.emoji} {currentUserTrophy.name}
               </Badge>
@@ -87,7 +87,7 @@ const CompareProgressModal: React.FC<CompareProgressModalProps> = ({
               <h3 className="text-lg font-semibold mb-2">{otherUser.name}</h3>
               <Badge 
                 variant="secondary" 
-                className={cn('mb-4', otherUserTrophy.color, 'border-0 bg-white/10')}
+                className={cn('mb-4', otherUserTrophy.color, 'border-0 bg-muted')}
               >
                 {otherUserTrophy.emoji} {otherUserTrophy.name}
               </Badge>

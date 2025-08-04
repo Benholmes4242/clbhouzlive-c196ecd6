@@ -166,7 +166,7 @@ const HandicapSection: React.FC<HandicapSectionProps> = ({ userId, profile }) =>
     <div className="space-y-6">
       {/* Header with share button */}
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-white">Handicap & Performance</h2>
+        <h2 className="text-2xl font-bold text-foreground">Handicap & Performance</h2>
         {currentHandicap && (
           <ShareHandicap
             currentHandicap={currentHandicap}
@@ -188,13 +188,13 @@ const HandicapSection: React.FC<HandicapSectionProps> = ({ userId, profile }) =>
       />
 
       {/* Progress Chart */}
-      <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6">
+      <div className="bg-muted border border-border rounded-lg p-6">
         <div className="mb-6">
-          <h3 className="flex items-center gap-2 text-lg font-semibold text-white">
+          <h3 className="flex items-center gap-2 text-lg font-semibold text-foreground">
             <TrendingUp className="h-5 w-5 text-primary" />
             Handicap Progress
           </h3>
-          <p className="text-sm text-white/70 mt-1">
+          <p className="text-sm text-muted-foreground mt-1">
             Track your handicap changes over recent rounds
           </p>
         </div>
@@ -205,13 +205,13 @@ const HandicapSection: React.FC<HandicapSectionProps> = ({ userId, profile }) =>
       </div>
 
       {/* Recent Rounds */}
-      <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-6">
+      <div className="bg-muted border border-border rounded-lg p-6">
         <div className="mb-6">
-          <h3 className="flex items-center gap-2 text-lg font-semibold text-white">
+          <h3 className="flex items-center gap-2 text-lg font-semibold text-foreground">
             <Calendar className="h-5 w-5 text-primary" />
             Recent Rounds
           </h3>
-          <p className="text-sm text-white/70 mt-1">
+          <p className="text-sm text-muted-foreground mt-1">
             Your latest golf rounds and performance
           </p>
         </div>

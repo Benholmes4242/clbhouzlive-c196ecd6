@@ -59,7 +59,7 @@ const ProfileEditDialog: React.FC<ProfileEditDialogProps> = ({
           Edit Profile
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px] bg-black/80 backdrop-blur-sm border-black/20">
+      <DialogContent className="sm:max-w-[425px] bg-background border border-border">
         <DialogHeader>
           <DialogTitle>Edit Profile</DialogTitle>
         </DialogHeader>
