@@ -251,8 +251,12 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                         />
                         {!trophy.isUnlocked && (
                           <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="bg-gray-800/80 rounded-full p-1">
-                              <Lock className="w-4 h-4 text-gray-300" />
+                            <div className="bg-white/20 backdrop-blur-sm rounded-full p-1">
+                              <img 
+                                src="/lovable-uploads/3042c702-0d88-46f9-9b0f-13ab2ab2ef3b.png" 
+                                alt="Locked" 
+                                className="w-4 h-4"
+                              />
                             </div>
                           </div>
                         )}
