@@ -500,7 +500,7 @@ const HeroProfileHeader = ({
                 />
                 {/* Hover overlay */}
                 <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
-                  <span className="text-white text-sm font-medium">Edit Photo</span>
+                  <span className="text-white text-sm font-medium">Edit Photo/Video</span>
                 </div>
               </div>
             ) : (
