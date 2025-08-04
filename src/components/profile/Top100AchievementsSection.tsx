@@ -173,12 +173,12 @@ const Top100AchievementsSection: React.FC<Top100AchievementsSectionProps> = ({
   return (
     <div className="mb-6">
       {/* Achievements Stats Card with embedded achievements */}
-      <div className="bg-black/40 backdrop-blur-sm rounded-[8px] px-4 py-3 border border-black/20">
+      <div className="bg-muted border border-border rounded-lg px-4 py-3">
         <div className="space-y-4">
           <div>
-            <h3 className="font-bold text-lg text-white">Achievements</h3>
-            <p className="text-white">
-              You've played <span className="font-semibold text-white">{userProgress}</span> of 300 Top 100 courses
+            <h3 className="font-bold text-lg text-foreground">Achievements</h3>
+            <p className="text-foreground">
+              You've played <span className="font-semibold text-foreground">{userProgress}</span> of 300 Top 100 courses
             </p>
           </div>
           
