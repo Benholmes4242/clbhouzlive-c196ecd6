@@ -484,8 +484,8 @@ const HeroProfileHeader = ({
                   priority={true}
                 />
                 {/* Edit buttons overlay */}
-                <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
-                  <div className="flex flex-col gap-2">
+                <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full">
+                  <div className="flex flex-col gap-3 items-center">
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
@@ -501,7 +501,7 @@ const HeroProfileHeader = ({
                         };
                         input.click();
                       }}
-                      className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-full px-3 py-1.5 text-white text-sm font-medium hover:bg-white/30 transition-all duration-200"
+                      className="bg-white/30 backdrop-blur-md border-2 border-white/50 rounded-full px-4 py-2 text-white text-sm font-semibold hover:bg-white/40 hover:scale-105 transition-all duration-200 shadow-lg"
                       disabled={uploading}
                     >
                       📷 Edit Photo
@@ -511,7 +511,7 @@ const HeroProfileHeader = ({
                         e.stopPropagation();
                         setEditDialogOpen(true);
                       }}
-                      className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-full px-3 py-1.5 text-white text-sm font-medium hover:bg-white/30 transition-all duration-200"
+                      className="bg-white/30 backdrop-blur-md border-2 border-white/50 rounded-full px-4 py-2 text-white text-sm font-semibold hover:bg-white/40 hover:scale-105 transition-all duration-200 shadow-lg"
                       disabled={uploading}
                     >
                       🎥 Add Video
