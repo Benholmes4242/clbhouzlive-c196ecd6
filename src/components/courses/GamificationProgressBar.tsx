@@ -344,7 +344,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                      )}
                      <div className="text-center">
                        <div className="text-sm font-medium text-white">
-                         {trophy.requiredCourses}
+                         {trophy.id === 'course-collector' ? '' : trophy.requiredCourses}
                        </div>
                        <div className="text-sm text-white max-w-16 leading-tight">
                          {trophy.name}
