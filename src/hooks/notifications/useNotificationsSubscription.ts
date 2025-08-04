@@ -61,5 +61,5 @@ export const useNotificationsSubscription = (userId: string | undefined) => {
       console.log('Cleaning up notifications subscription');
       supabase.removeChannel(channel);
     };
-  }, [userId, queryClient]);
+  }, [userId]);
 };
