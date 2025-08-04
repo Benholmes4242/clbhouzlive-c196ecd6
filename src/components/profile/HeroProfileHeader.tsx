@@ -491,17 +491,16 @@ const HeroProfileHeader = ({
           {/* Profile Photo/Video */}
           <div className="w-64 h-64 mb-6">
             <div 
-              className={`relative rounded-full transition-all duration-300 ${
-                achievementRing.ringClass === 'ring-gold' ? 'ring-[5px] ring-yellow-400 shadow-[0_0_20px_rgba(255,215,0,0.3)]' :
-                achievementRing.ringClass === 'ring-silver' ? 'ring-[5px] ring-gray-400 shadow-[0_0_20px_rgba(192,192,192,0.3)]' :
-                achievementRing.ringClass === 'ring-blue' ? 'ring-[5px] ring-blue-400 shadow-[0_0_20px_rgba(30,144,255,0.3)]' :
-                achievementRing.ringClass === 'ring-green' ? 'ring-[5px] ring-green-400 shadow-[0_0_20px_rgba(50,205,50,0.3)]' :
-                achievementRing.ringClass === 'ring-gradient' ? 'ring-[5px] ring-transparent bg-gradient-to-r from-yellow-400 to-green-400 shadow-[0_0_25px_rgba(255,215,0,0.4)]' :
+              className={`relative rounded-full transition-all duration-300 w-full h-full ${
+                achievementRing.ringClass === 'ring-gold' ? 'border-[5px] border-yellow-400 shadow-[0_0_20px_rgba(255,215,0,0.3)]' :
+                achievementRing.ringClass === 'ring-silver' ? 'border-[5px] border-gray-400 shadow-[0_0_20px_rgba(192,192,192,0.3)]' :
+                achievementRing.ringClass === 'ring-blue' ? 'border-[5px] border-blue-400 shadow-[0_0_20px_rgba(30,144,255,0.3)]' :
+                achievementRing.ringClass === 'ring-green' ? 'border-[5px] border-green-400 shadow-[0_0_20px_rgba(50,205,50,0.3)]' :
+                achievementRing.ringClass === 'ring-gradient' ? 'border-[5px] border-transparent bg-gradient-to-r from-yellow-400 to-green-400 shadow-[0_0_25px_rgba(255,215,0,0.4)]' :
                 ''
-              } w-full h-full`}
+              }`}
               title={achievementRing.title}
             >
-              <div className={`w-full h-full rounded-full overflow-hidden ${achievementRing.ringClass === 'ring-gradient' ? 'bg-white p-[5px]' : ''}`}>
               {profile?.has_profile_video && profile?.profile_video_url ? (
                 <ProfileVideoDisplay
                   videoUrl={profile.profile_video_url}
@@ -574,7 +573,6 @@ const HeroProfileHeader = ({
                   priority={true}
                 />
               )}
-              </div>
             </div>
           </div>
           
