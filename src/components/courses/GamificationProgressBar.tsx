@@ -292,30 +292,8 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
   return (
     <Tooltip.Provider>
       <div className={cn('space-y-6', className)}>
-        {/* Themed Background Container with Progress-Based Visuals */}
-        <div className={cn(
-          "relative overflow-hidden rounded-xl transition-all duration-500 ease-in-out"
-        )}>
-          {/* Liquid glass background */}
-          <div 
-            className="absolute inset-0 bg-white/10 border border-white/20"
-            style={{ 
-              backdropFilter: 'blur(40px) saturate(180%)',
-              borderRadius: '12px'
-            }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" style={{ borderRadius: '12px' }} />
-          
-          {/* Progress-based themed overlay */}
-          <div className={cn(
-            "absolute inset-0 transition-all duration-500 ease-in-out rounded-xl",
-            displayTheme === 'morning' && "bg-gradient-to-br from-sky-500/10 via-yellow-400/8 to-transparent",
-            displayTheme === 'midday' && "bg-gradient-to-br from-yellow-400/12 via-green-300/8 to-transparent",
-            displayTheme === 'golden' && "bg-gradient-to-br from-orange-500/15 via-amber-400/10 to-red-400/8",
-            displayTheme === 'twilight' && "bg-gradient-to-br from-purple-600/15 via-indigo-500/10 to-blue-700/8",
-            displayTheme === 'mountain' && "bg-gradient-to-br from-gray-700/15 via-slate-600/10 to-stone-500/8",
-            displayTheme === 'aurora' && "bg-gradient-to-br from-emerald-500/20 via-cyan-400/15 to-purple-500/10"
-          )} />
+        {/* Background Container matching stats bar */}
+        <div className="bg-muted border border-border rounded-xl p-6 space-y-6 relative overflow-hidden">${'\n'}
           
           {/* Floating XP Animation */}
           {showXPFloat && (
@@ -335,7 +313,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
           {/* Milestone Achievement Notification */}
           {showMilestoneTooltip && (
             <div className="absolute top-4 left-4 z-20 animate-fade-in">
-                <div 
+              <div 
                 className="flex items-center gap-2 bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-purple-400/30 rounded-lg px-4 py-2 text-foreground font-medium backdrop-blur-sm"
                 style={{
                   animation: 'slideDown 3s ease-out forwards'
@@ -350,7 +328,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
             </div>
           )}
           
-          <div className="relative p-6 space-y-6">
+          <div className="relative">
             {/* Header with XP Counter */}
             <div className="flex items-center justify-between pb-6">
             <h4 className="text-xl font-semibold text-foreground">
