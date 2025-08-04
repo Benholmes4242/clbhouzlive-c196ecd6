@@ -740,6 +740,33 @@ export type Database = {
         }
         Relationships: []
       }
+      user_achievements: {
+        Row: {
+          achievement_data: Json
+          achievement_type: string
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          achievement_data: Json
+          achievement_type: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          achievement_data?: Json
+          achievement_type?: string
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_badges: {
         Row: {
           badge_id: string
@@ -1198,6 +1225,15 @@ export type Database = {
           role: Database["public"]["Enums"]["app_role"]
         }[]
       }
+      get_user_recent_achievements: {
+        Args: { user_id_param: string; limit_param?: number }
+        Returns: {
+          id: string
+          achievement_type: string
+          achievement_data: Json
+          created_at: string
+        }[]
+      }
       get_user_top100_courses_count: {
         Args: { user_id_param: string }
         Returns: number
@@ -1212,6 +1248,14 @@ export type Database = {
       is_admin: {
         Args: Record<PropertyKey, never>
         Returns: boolean
+      }
+      log_user_achievement: {
+        Args: {
+          user_id_param: string
+          achievement_type_param: string
+          achievement_data_param: Json
+        }
+        Returns: undefined
       }
       populate_taggable_entities: {
         Args: Record<PropertyKey, never>

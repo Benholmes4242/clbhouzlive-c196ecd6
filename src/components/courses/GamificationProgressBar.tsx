@@ -5,6 +5,7 @@ import * as Tooltip from '@radix-ui/react-tooltip';
 import * as Dialog from '@radix-ui/react-dialog';
 import CircularProgress from '@/components/ui/circular-progress';
 import { CourseListModal } from './CourseListModal';
+import { useUserAchievements } from '@/hooks/useUserAchievements';
 
 interface GamificationProgressBarProps {
   completedCount: number;
@@ -144,6 +145,9 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCourseList, setSelectedCourseList] = useState<any>(null);
   const [isCourseListModalOpen, setIsCourseListModalOpen] = useState(false);
+
+  // Fetch real user achievements
+  const { achievements, loading: achievementsLoading } = useUserAchievements(5);
 
   // Trigger XP animation when completedCount increases
   useEffect(() => {
@@ -465,46 +469,40 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
             </div>
 
             <div className="space-y-3">
-              {/* Achievement Items */}
-              <div className="animate-fade-in flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-300">
-                <div className="text-2xl">🟡</div>
-                <div className="flex-1">
-                  <p className="text-sm text-white font-medium">You unlocked The Green Fee Rookie</p>
-                  <p className="text-xs text-white/60">2 days ago</p>
+              {/* Show loading state while fetching achievements */}
+              {achievementsLoading ? (
+                <div className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10">
+                  <div className="w-6 h-6 rounded-full bg-white/20 animate-pulse"></div>
+                  <div className="flex-1">
+                    <div className="h-4 bg-white/20 rounded animate-pulse mb-2"></div>
+                    <div className="h-3 bg-white/10 rounded animate-pulse w-20"></div>
+                  </div>
                 </div>
-              </div>
-
-              <div className="animate-fade-in flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-300" style={{ animationDelay: '0.1s' }}>
-                <div className="text-2xl">🏴</div>
-                <div className="flex-1">
-                  <p className="text-sm text-white font-medium">Only 1 more course to finish the GB&I list!</p>
-                  <p className="text-xs text-white/60">3 days ago</p>
+              ) : achievements.length > 0 ? (
+                /* Render real achievements from database */
+                achievements.map((achievement, index) => (
+                  <div 
+                    key={achievement.id}
+                    className="animate-fade-in flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-300"
+                    style={{ animationDelay: `${index * 0.1}s` }}
+                  >
+                    <div className="text-2xl">{achievement.emoji}</div>
+                    <div className="flex-1">
+                      <p className="text-sm text-white font-medium">{achievement.message}</p>
+                      <p className="text-xs text-white/60">{achievement.timestamp}</p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                /* Show empty state when no achievements */
+                <div className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10">
+                  <div className="text-2xl">🎯</div>
+                  <div className="flex-1">
+                    <p className="text-sm text-white font-medium">Start playing courses to earn achievements!</p>
+                    <p className="text-xs text-white/60">Your journey begins here</p>
+                  </div>
                 </div>
-              </div>
-
-              <div className="animate-fade-in flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-300" style={{ animationDelay: '0.2s' }}>
-                <div className="text-2xl">✨</div>
-                <div className="flex-1">
-                  <p className="text-sm text-white font-medium">+110 XP – Played Sunningdale Old!</p>
-                  <p className="text-xs text-white/60">5 days ago</p>
-                </div>
-              </div>
-
-              <div className="animate-fade-in flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-300" style={{ animationDelay: '0.3s' }}>
-                <div className="text-2xl">🎉</div>
-                <div className="flex-1">
-                  <p className="text-sm text-white font-medium">Reached 2,000 total XP milestone!</p>
-                  <p className="text-xs text-white/60">1 week ago</p>
-                </div>
-              </div>
-
-              <div className="animate-fade-in flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-300" style={{ animationDelay: '0.4s' }}>
-                <div className="text-2xl">🏆</div>
-                <div className="flex-1">
-                  <p className="text-sm text-white font-medium">First European course completed!</p>
-                  <p className="text-xs text-white/60">1 week ago</p>
-                </div>
-              </div>
+              )}
             </div>
           </div>
 

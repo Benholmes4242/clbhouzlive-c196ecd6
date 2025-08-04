@@ -239,11 +239,11 @@ const VideoCard: React.FC<{
 
 const LiquidGlassCard: React.FC<{ userId?: string }> = ({ userId }) => {
   const { user } = useSupabaseSession();
-  const { data: achievements, isLoading } = useUserAchievements(userId);
+  const { achievements, loading } = useUserAchievements(5);
   
-  // Create achievement data with real progress
+  // Create mock achievement data (this component would need actual user data)
   const userProgress = {
-    played: achievements?.totalPlayed || 0,
+    played: 21, // This would come from real data
     total: 300,
     achievements: [
       { 
@@ -251,71 +251,71 @@ const LiquidGlassCard: React.FC<{ userId?: string }> = ({ userId }) => {
         name: 'Links Legend', 
         description: "You've mastered the finest across the British Isles", 
         target: 100, 
-        earned: (achievements?.linksLegend || 0) >= 100, 
-        progress: achievements?.linksLegend || 0 
+        earned: false, 
+        progress: 19 
       },
       { 
         id: 'continental-swinger', 
         name: 'The Continental Swinger', 
         description: "Algarve to the Alps - Europe's elite courses, conquered", 
         target: 100, 
-        earned: (achievements?.continentalSwinger || 0) >= 100, 
-        progress: achievements?.continentalSwinger || 0 
+        earned: false, 
+        progress: 2 
       },
       { 
         id: 'stars-stripes', 
         name: 'Stars & Stripes Tourer', 
         description: "Coast to coast, you've played the American greats", 
         target: 100, 
-        earned: (achievements?.starsStripes || 0) >= 100, 
-        progress: achievements?.starsStripes || 0 
+        earned: false, 
+        progress: 0 
       },
       { 
         id: '20-club', 
         name: 'Green Fee Rookie', 
         description: "You've paid your dues - 20 down!", 
         target: 20, 
-        earned: (achievements?.totalPlayed || 0) >= 20, 
-        progress: achievements?.totalPlayed || 0 
+        earned: true, 
+        progress: 21 
       },
       { 
         id: '50-club', 
         name: 'The Turn', 
         description: 'Halfway through your Top 100 journey', 
         target: 50, 
-        earned: (achievements?.totalPlayed || 0) >= 50, 
-        progress: achievements?.totalPlayed || 0 
+        earned: false, 
+        progress: 21 
       },
       { 
         id: '100-club', 
         name: 'The Century Club', 
         description: "You're a member of the century club - a prestigious club", 
         target: 100, 
-        earned: (achievements?.totalPlayed || 0) >= 100, 
-        progress: achievements?.totalPlayed || 0 
+        earned: false, 
+        progress: 21 
       },
       { 
         id: '200-club', 
         name: 'Clubhouse Elite', 
         description: 'Bunkers, winds, and triumphs - 200 conquered', 
         target: 200, 
-        earned: (achievements?.totalPlayed || 0) >= 200, 
-        progress: achievements?.totalPlayed || 0 
+        earned: false, 
+        progress: 21 
       },
       { 
         id: '300-club', 
         name: 'Course Collector', 
         description: "All 300? That's a collector's dream come true", 
         target: 300, 
-        earned: (achievements?.totalPlayed || 0) >= 300, 
-        progress: achievements?.totalPlayed || 0 
+        earned: false, 
+        progress: 21 
       },
     ]
   };
 
   const progressPercentage = (userProgress.played / userProgress.total) * 100;
 
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="relative h-[28rem] rounded-lg overflow-hidden bg-black">
         <div className="relative h-full p-6 flex flex-col items-center justify-center">
