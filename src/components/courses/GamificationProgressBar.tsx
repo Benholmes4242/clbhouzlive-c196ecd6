@@ -342,8 +342,8 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
               </div>
             </div>
 
-          {/* Global XP Progress Bar */}
-          <div className="space-y-4 mt-24">
+          {/* Global XP Progress Bar with improved spacing */}
+          <div className="space-y-4 mt-6 mb-8">
             
             {/* Trophy Timeline */}
             <div className="relative">
@@ -482,8 +482,8 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
 
           </div>
 
-          {/* Regional Lists Completion - Improved Cards */}
-          <div className="space-y-4 pt-4">
+          {/* Regional Lists Completion - Improved Cards with enhanced spacing */}
+          <div className="space-y-4 pt-8">
             <div className="flex items-center justify-between">
               <span className="text-lg font-semibold text-foreground">Regional List Completion</span>
               <span className="text-base font-medium text-foreground">
@@ -504,7 +504,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                 >
                   {/* Top Row: Trophy Left, Progress Ring Right */}
                   <div className="flex items-center justify-between w-full mb-3">
-                    {/* Trophy Icon - Left Side */}
+                    {/* Trophy Icon - Left Side with enhanced styling */}
                     <div className="flex-shrink-0">
                       <div className="relative">
                         {list.id === 'britain-ireland' ? (
@@ -513,8 +513,13 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                             alt="British & Irish Trophy" 
                             className={cn(
                               'h-16 w-auto object-contain transition-all duration-300',
-                              list.isCompleted ? 'opacity-100' : 'opacity-60 grayscale'
+                              list.isCompleted ? 'opacity-100 brightness-110' : 'opacity-60 grayscale'
                             )}
+                            style={{ 
+                              filter: list.isCompleted 
+                                ? 'drop-shadow(0 2px 4px rgba(0,0,0,0.08)) brightness(1.1)' 
+                                : 'drop-shadow(0 1px 2px rgba(0,0,0,0.04)) grayscale(1)'
+                            }}
                           />
                         ) : list.id === 'europe' ? (
                           <img 
@@ -522,8 +527,13 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                             alt="European Trophy" 
                             className={cn(
                               'h-16 w-auto object-contain transition-all duration-300',
-                              list.isCompleted ? 'opacity-100' : 'opacity-60 grayscale'
+                              list.isCompleted ? 'opacity-100 brightness-110' : 'opacity-60 grayscale'
                             )}
+                            style={{ 
+                              filter: list.isCompleted 
+                                ? 'drop-shadow(0 2px 4px rgba(0,0,0,0.08)) brightness(1.1)' 
+                                : 'drop-shadow(0 1px 2px rgba(0,0,0,0.04)) grayscale(1)'
+                            }}
                           />
                         ) : list.id === 'usa' ? (
                           <img 
@@ -531,8 +541,13 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                             alt="USA Trophy" 
                             className={cn(
                               'h-16 w-auto object-contain transition-all duration-300',
-                              list.isCompleted ? 'opacity-100' : 'opacity-60 grayscale'
+                              list.isCompleted ? 'opacity-100 brightness-110' : 'opacity-60 grayscale'
                             )}
+                            style={{ 
+                              filter: list.isCompleted 
+                                ? 'drop-shadow(0 2px 4px rgba(0,0,0,0.08)) brightness(1.1)' 
+                                : 'drop-shadow(0 1px 2px rgba(0,0,0,0.04)) grayscale(1)'
+                            }}
                           />
                         ) : list.id === 'worldwide' ? (
                           <img 
@@ -540,8 +555,13 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                             alt="Worldwide Trophy" 
                             className={cn(
                               'h-16 w-auto object-contain transition-all duration-300',
-                              list.isCompleted ? 'opacity-100' : 'opacity-60 grayscale'
+                              list.isCompleted ? 'opacity-100 brightness-110' : 'opacity-60 grayscale'
                             )}
+                            style={{ 
+                              filter: list.isCompleted 
+                                ? 'drop-shadow(0 2px 4px rgba(0,0,0,0.08)) brightness(1.1)' 
+                                : 'drop-shadow(0 1px 2px rgba(0,0,0,0.04)) grayscale(1)'
+                            }}
                           />
                         ) : null}
                       </div>
@@ -587,8 +607,8 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
             )}
           </div>
 
-          {/* Recent Achievements - Improved Cards */}
-          <div className="space-y-4 pt-6">
+          {/* Recent Achievements - Improved Cards with enhanced spacing */}
+          <div className="space-y-4 pt-8">
             <div className="flex items-center justify-between">
               <span className="text-lg font-semibold text-foreground">📣 Recent Achievements</span>
               <span className="text-sm text-muted-foreground font-medium">Last 7 days</span>
@@ -635,9 +655,9 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
             </div>
           </div>
 
-          {/* Friends Progress Section - Improved Card */}
+          {/* Friends Progress Section - Improved Card with enhanced spacing */}
           {isCurrentUser && (
-            <div className="pt-6 border-t border-border">
+            <div className="pt-8 border-t border-border">
               <Collapsible open={isFriendsOpen} onOpenChange={setIsFriendsOpen}>
                 <CollapsibleTrigger className="flex items-center justify-between w-full group hover:bg-muted/50 rounded-xl p-4 transition-colors">
                   <div className="flex items-center gap-3">
