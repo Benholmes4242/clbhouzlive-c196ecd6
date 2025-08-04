@@ -46,7 +46,7 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          stroke="hsl(var(--primary))"
+          stroke="#4ade80"
           strokeWidth={strokeWidth}
           fill="transparent"
           strokeDasharray={strokeDasharray}
@@ -56,7 +56,7 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
             showAnimation ? 'animate-in' : ''
           }`}
           style={{
-            filter: 'drop-shadow(0 2px 4px hsla(var(--primary), 0.3))'
+            filter: 'drop-shadow(0 2px 4px rgba(74, 222, 128, 0.3))'
           }}
         />
       </svg>
