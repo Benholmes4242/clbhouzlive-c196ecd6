@@ -343,10 +343,10 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                        </div>
                      )}
                      <div className="text-center">
-                       <div className="text-sm font-medium text-white/90">
+                       <div className="text-sm font-medium text-white">
                          {trophy.requiredCourses}
                        </div>
-                       <div className="text-sm text-white/60 max-w-16 leading-tight">
+                       <div className="text-sm text-white max-w-16 leading-tight">
                          {trophy.name}
                        </div>
                      </div>
