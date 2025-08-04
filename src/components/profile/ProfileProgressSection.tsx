@@ -185,7 +185,7 @@ const ProfileProgressSection: React.FC<ProfileProgressSectionProps> = ({
             </h4>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {/* Great Britain & Ireland */}
-              <div className="text-center p-3 bg-muted/50 rounded-lg">
+              <div className="text-center p-3 bg-background border border-border rounded-lg shadow-sm">
                 <div className="mb-2">
                   <CircularProgress 
                     completed={britainIrelandCompleted}
@@ -196,7 +196,7 @@ const ProfileProgressSection: React.FC<ProfileProgressSectionProps> = ({
                   />
                 </div>
                 <div className="space-y-1">
-                  <div className="text-xs font-medium">🇬🇧 GB&I</div>
+                  <div className="text-xs font-medium text-foreground">🇬🇧 GB&I</div>
                   <div className="text-xs text-muted-foreground">
                     {britainIrelandCompleted}/{britainIrelandTotal}
                   </div>
@@ -204,7 +204,7 @@ const ProfileProgressSection: React.FC<ProfileProgressSectionProps> = ({
               </div>
 
               {/* Continental Europe */}
-              <div className="text-center p-3 bg-muted/50 rounded-lg">
+              <div className="text-center p-3 bg-background border border-border rounded-lg shadow-sm">
                 <div className="mb-2">
                   <CircularProgress 
                     completed={europeCompleted}
@@ -215,7 +215,7 @@ const ProfileProgressSection: React.FC<ProfileProgressSectionProps> = ({
                   />
                 </div>
                 <div className="space-y-1">
-                  <div className="text-xs font-medium">🇪🇺 Europe</div>
+                  <div className="text-xs font-medium text-foreground">🇪🇺 Europe</div>
                   <div className="text-xs text-muted-foreground">
                     {europeCompleted}/{europeTotal}
                   </div>
@@ -223,7 +223,7 @@ const ProfileProgressSection: React.FC<ProfileProgressSectionProps> = ({
               </div>
 
               {/* USA */}
-              <div className="text-center p-3 bg-muted/50 rounded-lg">
+              <div className="text-center p-3 bg-background border border-border rounded-lg shadow-sm">
                 <div className="mb-2">
                   <CircularProgress 
                     completed={usaCompleted}
@@ -234,7 +234,7 @@ const ProfileProgressSection: React.FC<ProfileProgressSectionProps> = ({
                   />
                 </div>
                 <div className="space-y-1">
-                  <div className="text-xs font-medium">🇺🇸 USA</div>
+                  <div className="text-xs font-medium text-foreground">🇺🇸 USA</div>
                   <div className="text-xs text-muted-foreground">
                     {usaCompleted}/{usaTotal}
                   </div>
@@ -242,7 +242,7 @@ const ProfileProgressSection: React.FC<ProfileProgressSectionProps> = ({
               </div>
 
               {/* Worldwide */}
-              <div className="text-center p-3 bg-muted/50 rounded-lg">
+              <div className="text-center p-3 bg-background border border-border rounded-lg shadow-sm">
                 <div className="mb-2">
                   <CircularProgress 
                     completed={worldwideCompleted}
@@ -253,7 +253,7 @@ const ProfileProgressSection: React.FC<ProfileProgressSectionProps> = ({
                   />
                 </div>
                 <div className="space-y-1">
-                  <div className="text-xs font-medium">🌍 World</div>
+                  <div className="text-xs font-medium text-foreground">🌍 World</div>
                   <div className="text-xs text-muted-foreground">
                     {worldwideCompleted}/{worldwideTotal}
                   </div>
