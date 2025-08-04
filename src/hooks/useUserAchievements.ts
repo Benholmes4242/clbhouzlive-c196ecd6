@@ -142,8 +142,9 @@ export const useUserAchievements = (limit: number = 5) => {
   useEffect(() => {
     if (!user?.id) return;
 
+    const channelName = `user_achievements_${user.id}`;
     const channel = supabase
-      .channel('user_achievements')
+      .channel(channelName)
       .on(
         'postgres_changes',
         {
