@@ -188,8 +188,8 @@ const LatestHighlights: React.FC<LatestHighlightsProps> = ({
     return (
       <div className="py-4">
         <div className="mb-1 px-4">
-          <h2 className="text-2xl font-bold text-white mb-2">Highlights & Achievements</h2>
-          <p className="text-white/70">Loading your golf highlights...</p>
+          <h2 className="text-2xl font-bold text-foreground mb-2">Highlights & Achievements</h2>
+          <p className="text-muted-foreground">Loading your golf highlights...</p>
         </div>
       </div>
     );
@@ -199,8 +199,8 @@ const LatestHighlights: React.FC<LatestHighlightsProps> = ({
     return (
       <div className="py-4">
         <div className="mb-1 px-4">
-          <h2 className="text-2xl font-bold text-white mb-2">Highlights & Achievements</h2>
-          <p className="text-white/70">
+          <h2 className="text-2xl font-bold text-foreground mb-2">Highlights & Achievements</h2>
+          <p className="text-muted-foreground">
             {isOwnProfile 
               ? "Your most memorable moments from the world's greatest courses"
               : "Recent highlights from top golf courses"
@@ -222,8 +222,8 @@ const LatestHighlights: React.FC<LatestHighlightsProps> = ({
   return (
     <div className="py-4">
       <div className="mb-1 px-4">
-        <h2 className="text-2xl font-bold text-white mb-2">Highlights & Achievements</h2>
-        <p className="text-white/70">
+        <h2 className="text-2xl font-bold text-foreground mb-2">Highlights & Achievements</h2>
+        <p className="text-muted-foreground">
           {isOwnProfile 
             ? "Your most memorable moments from the world's greatest courses"
             : "Recent highlights from top golf courses"
