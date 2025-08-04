@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { Trophy, Lock, CheckCircle, Plus, Calendar, Target, Sparkles } from 'lucide-react';
+import { Trophy, Lock, CheckCircle, Plus, Calendar, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import * as Dialog from '@radix-ui/react-dialog';
@@ -434,16 +434,15 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                   </div>
                   
                   {/* Region Name */}
-                  <h4 className="text-sm font-semibold text-white text-center mb-1">
+                  <h4 className="text-base font-semibold text-white text-center mb-1">
                     {list.name}
                   </h4>
                   
                   {/* Subtle Tag with Course Count and XP */}
-                  <div className="flex items-center gap-2 text-xs text-white/60">
+                  <div className="flex items-center gap-2 text-sm text-white/60">
                     <span>Courses Played: {list.completed}</span>
                     <span>•</span>
                     <div className="flex items-center gap-1">
-                      <Sparkles className="w-3 h-3" />
                       <span>XP: {(list.completed * 110).toLocaleString()}</span>
                     </div>
                   </div>
