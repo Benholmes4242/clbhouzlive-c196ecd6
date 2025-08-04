@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
@@ -23,7 +23,7 @@ export const useUserAchievements = (limit: number = 5) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const formatAchievement = (achievement: Achievement): FormattedAchievement => {
+  const formatAchievement = useCallback((achievement: Achievement): FormattedAchievement => {
     const data = achievement.achievement_data;
     const timeAgo = getTimeAgo(achievement.created_at);
 
@@ -82,7 +82,7 @@ export const useUserAchievements = (limit: number = 5) => {
           type: 'general'
         };
     }
-  };
+  }, []);
 
   const getTimeAgo = (dateString: string): string => {
     const date = new Date(dateString);
@@ -105,7 +105,7 @@ export const useUserAchievements = (limit: number = 5) => {
     }
   };
 
-  const fetchAchievements = async () => {
+  const fetchAchievements = useCallback(async () => {
     if (!user?.id) return;
 
     try {
@@ -132,7 +132,7 @@ export const useUserAchievements = (limit: number = 5) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user?.id, limit, formatAchievement]);
 
   useEffect(() => {
     fetchAchievements();
