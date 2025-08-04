@@ -347,21 +347,23 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
             
             {/* Trophy Timeline */}
             <div className="relative">
-              {/* Progress Line */}
-               <div className="absolute top-4 left-8 right-4 h-2 bg-white/20 rounded-full overflow-hidden">
+              {/* Progress Line with improved visibility */}
+               <div className="absolute top-4 left-8 right-4 h-3 bg-gray-200 rounded-full overflow-hidden shadow-sm">
                  {nextGlobalTrophy && lastUnlockedTrophy && (
                    <div 
-                     className="h-full bg-gradient-to-r from-green-400 to-emerald-500 rounded-full transition-all duration-1000 ease-out"
+                     className="h-full bg-green-500 rounded-full transition-all duration-1000 ease-out shadow-sm"
                      style={{ 
-                       width: `${((completedCount - lastUnlockedTrophy.requiredCourses) / (nextGlobalTrophy.requiredCourses - lastUnlockedTrophy.requiredCourses)) * 100}%`
+                       width: `${((completedCount - lastUnlockedTrophy.requiredCourses) / (nextGlobalTrophy.requiredCourses - lastUnlockedTrophy.requiredCourses)) * 100}%`,
+                       boxShadow: '0 0 8px rgba(16, 185, 129, 0.4)'
                      }}
                    />
                  )}
                  {nextGlobalTrophy && !lastUnlockedTrophy && completedCount < 20 && (
                    <div 
-                     className="h-full bg-gradient-to-r from-green-400 to-emerald-500 rounded-full transition-all duration-1000 ease-out"
+                     className="h-full bg-green-500 rounded-full transition-all duration-1000 ease-out shadow-sm animate-pulse"
                      style={{ 
-                       width: `${(completedCount / nextGlobalTrophy.requiredCourses) * 20}%`
+                       width: `${(completedCount / nextGlobalTrophy.requiredCourses) * 20}%`,
+                       boxShadow: '0 0 8px rgba(16, 185, 129, 0.4)'
                      }}
                    />
                   )}
@@ -379,7 +381,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                       >
                         <div className="flex flex-col items-center">
                           <div className="w-3 h-3 rounded-full bg-blue-500 border-2 border-white shadow-lg mb-1" />
-                          <div className="bg-background/90 text-foreground text-xs px-2 py-1 rounded whitespace-nowrap border border-border">
+                          <div className="bg-background/90 text-foreground text-xs px-2 py-1 rounded whitespace-nowrap border border-border shadow-sm">
                             🏁 {friend.display_name || friend.username} ({friend.coursesPlayed})
                           </div>
                         </div>
@@ -387,12 +389,13 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                     );
                   })}
                   </div>
-               {/* Trophy Points */}
+               {/* Trophy Points with improved shadows */}
                 <div className="flex justify-between items-start relative z-10">
                  {globalTrophies.map((trophy, index) => (
                    <div 
                      key={trophy.id} 
-                     className="flex flex-col items-center space-y-2 cursor-pointer hover:scale-110 transition-transform duration-200"
+                     className="flex flex-col items-center space-y-2 cursor-pointer hover:scale-110 transition-all duration-300 hover:-translate-y-1"
+                     style={{ filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1))' }}
                      onClick={() => {
                        setSelectedTrophy({
                          ...trophy,
@@ -409,8 +412,9 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                          alt="Green Fee Rookie Trophy" 
                          className={cn(
                            'h-16 w-auto object-contain -mt-4 transition-all duration-300',
-                           trophy.isUnlocked ? 'opacity-100' : 'opacity-40 grayscale'
+                           trophy.isUnlocked ? 'opacity-100 animate-bounce' : 'opacity-40 grayscale'
                          )}
+                         style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(251, 191, 36, 0.6))' : 'none' }}
                        />
                      ) : trophy.id === 'the-turn' ? (
                        <img 
@@ -418,8 +422,9 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                          alt="The Turn Trophy"
                          className={cn(
                            'h-16 w-auto object-contain -mt-4 transition-all duration-300',
-                           trophy.isUnlocked ? 'opacity-100' : 'opacity-40 grayscale'
+                           trophy.isUnlocked ? 'opacity-100 animate-bounce' : 'opacity-40 grayscale'
                          )}
+                         style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(148, 163, 184, 0.6))' : 'none' }}
                        />
                      ) : trophy.id === 'century-club' ? (
                        <img 
@@ -427,8 +432,9 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                          alt="Century Club Trophy" 
                          className={cn(
                            'h-16 w-auto object-contain -mt-4 transition-all duration-300',
-                           trophy.isUnlocked ? 'opacity-100' : 'opacity-40 grayscale'
+                           trophy.isUnlocked ? 'opacity-100 animate-bounce' : 'opacity-40 grayscale'
                          )}
+                         style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(59, 130, 246, 0.6))' : 'none' }}
                        />
                      ) : trophy.id === 'clubhouse-elite' ? (
                        <img 
@@ -436,8 +442,9 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                          alt="Clubhouse Elite Trophy" 
                          className={cn(
                            'h-16 w-auto object-contain -mt-4 transition-all duration-300',
-                           trophy.isUnlocked ? 'opacity-100' : 'opacity-40 grayscale'
+                           trophy.isUnlocked ? 'opacity-100 animate-bounce' : 'opacity-40 grayscale'
                          )}
+                         style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(16, 185, 129, 0.6))' : 'none' }}
                        />
                      ) : trophy.id === 'course-collector' ? (
                        <img 
@@ -445,23 +452,26 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                          alt="Course Collector Trophy" 
                          className={cn(
                            'h-16 w-auto object-contain -mt-4 transition-all duration-300',
-                           trophy.isUnlocked ? 'opacity-100' : 'opacity-40 grayscale'
+                           trophy.isUnlocked ? 'opacity-100 animate-bounce' : 'opacity-40 grayscale'
                          )}
+                         style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(147, 51, 234, 0.6))' : 'none' }}
                        />
                      ) : (
                        <div className={cn(
                          'h-16 w-16 rounded-full flex items-center justify-center bg-gradient-to-br -mt-4 transition-all duration-300',
                          trophy.color,
-                         trophy.isUnlocked ? 'opacity-100' : 'opacity-40 grayscale'
-                       )}>
+                         trophy.isUnlocked ? 'opacity-100 animate-bounce' : 'opacity-40 grayscale'
+                       )}
+                       style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(0, 0, 0, 0.3))' : 'none' }}
+                       >
                           <Trophy className="w-8 h-8 text-foreground" />
                         </div>
                       )}
                       <div className="text-center">
-                        <div className="text-sm font-medium text-foreground">
+                        <div className="text-lg font-semibold text-foreground">
                           {trophy.requiredCourses}
                         </div>
-                        <div className="text-xs text-muted-foreground max-w-16 leading-tight">
+                        <div className="text-sm text-muted-foreground max-w-16 leading-tight font-medium">
                           {trophy.name}
                        </div>
                      </div>
@@ -472,11 +482,11 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
 
           </div>
 
-          {/* Regional Lists Completion - Circular Progress Rings */}
+          {/* Regional Lists Completion - Improved Cards */}
           <div className="space-y-4 pt-4">
             <div className="flex items-center justify-between">
-              <span className="text-base text-foreground">Regional List Completion</span>
-              <span className="text-base text-foreground">
+              <span className="text-lg font-semibold text-foreground">Regional List Completion</span>
+              <span className="text-base font-medium text-foreground">
                 {regionalProgress.completedLists}/4 lists completed
               </span>
             </div>
@@ -485,7 +495,8 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
               {regionalProgress.lists.map((list) => (
                 <div
                   key={list.id}
-                  className="flex flex-col items-center p-4 rounded-lg border transition-all cursor-pointer hover:scale-105 bg-white/5 border-white/10 hover:bg-white/10"
+                  className="flex flex-col items-center p-5 rounded-xl border transition-all cursor-pointer hover:scale-105 hover:-translate-y-1 bg-background border-border hover:shadow-lg duration-300"
+                  style={{ boxShadow: '0 2px 6px rgba(0,0,0,0.04)' }}
                   onClick={() => {
                     setSelectedCourseList(list);
                     setIsCourseListModalOpen(true);
@@ -549,16 +560,16 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                   </div>
                   
                   {/* Region Name */}
-                  <h4 className="text-base font-semibold text-foreground text-center mb-1">
+                  <h4 className="text-lg font-semibold text-foreground text-center mb-1">
                     {list.name}
                   </h4>
                   
                   {/* Subtle Tag with Course Count and XP */}
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <span>Courses Played: {list.completed}</span>
+                    <span className="font-medium">Courses Played: {list.completed}</span>
                     <span>•</span>
                     <div className="flex items-center gap-1">
-                      <span>XP: {(list.completed * 110).toLocaleString()}</span>
+                      <span className="font-medium">XP: {(list.completed * 110).toLocaleString()}</span>
                     </div>
                   </div>
                 </div>
@@ -567,8 +578,8 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
 
             {/* World Conqueror Achievement */}
             {regionalProgress.isWorldConqueror && (
-              <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-400/30 rounded-lg p-4 text-center">
-                <h5 className="font-bold text-foreground mb-1">🌍 World Conqueror!</h5>
+              <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-400/30 rounded-xl p-5 text-center shadow-lg">
+                <h5 className="font-bold text-foreground mb-1 text-lg">🌍 World Conqueror!</h5>
                 <p className="text-base text-muted-foreground">
                   You've completed all regional lists. Truly legendary!
                 </p>
@@ -576,21 +587,21 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
             )}
           </div>
 
-          {/* Dynamic Achievements Feed */}
+          {/* Recent Achievements - Improved Cards */}
           <div className="space-y-4 pt-6">
             <div className="flex items-center justify-between">
-              <span className="text-base text-foreground">📣 Recent Achievements</span>
-              <span className="text-sm text-muted-foreground">Last 7 days</span>
+              <span className="text-lg font-semibold text-foreground">📣 Recent Achievements</span>
+              <span className="text-sm text-muted-foreground font-medium">Last 7 days</span>
             </div>
 
             <div className="space-y-3">
               {/* Show loading state while fetching achievements */}
               {achievementsLoading ? (
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10">
-                  <div className="w-6 h-6 rounded-full bg-white/20 animate-pulse"></div>
+                <div className="flex items-center gap-3 p-4 rounded-xl bg-background border border-border shadow-sm">
+                  <div className="w-6 h-6 rounded-full bg-muted animate-pulse"></div>
                   <div className="flex-1">
-                    <div className="h-4 bg-white/20 rounded animate-pulse mb-2"></div>
-                    <div className="h-3 bg-white/10 rounded animate-pulse w-20"></div>
+                    <div className="h-4 bg-muted rounded animate-pulse mb-2"></div>
+                    <div className="h-3 bg-muted/50 rounded animate-pulse w-20"></div>
                   </div>
                 </div>
               ) : achievements.length > 0 ? (
@@ -598,34 +609,37 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                 achievements.map((achievement, index) => (
                   <div 
                     key={achievement.id}
-                    className="animate-fade-in flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-300"
-                    style={{ animationDelay: `${index * 0.1}s` }}
+                    className="animate-fade-in flex items-center gap-3 p-4 rounded-xl bg-background border border-border hover:shadow-lg transition-all duration-300 hover:scale-102"
+                    style={{ 
+                      animationDelay: `${index * 0.1}s`,
+                      boxShadow: '0 2px 6px rgba(0,0,0,0.04)'
+                    }}
                   >
                     <div className="text-2xl">{achievement.emoji}</div>
                     <div className="flex-1">
-                      <p className="text-sm text-foreground font-medium">{achievement.message}</p>
-                      <p className="text-xs text-muted-foreground">{achievement.timestamp}</p>
+                      <p className="text-base text-foreground font-medium">{achievement.message}</p>
+                      <p className="text-sm text-muted-foreground">{achievement.timestamp}</p>
                     </div>
                   </div>
                 ))
               ) : (
                 /* Show empty state when no achievements */
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10">
+                <div className="flex items-center gap-3 p-4 rounded-xl bg-background border border-border shadow-sm">
                   <div className="text-2xl">🎯</div>
                   <div className="flex-1">
-                      <p className="text-sm text-foreground font-medium">Start playing courses to earn achievements!</p>
-                      <p className="text-xs text-muted-foreground">Your journey begins here</p>
+                      <p className="text-base text-foreground font-medium">Start playing courses to earn achievements!</p>
+                      <p className="text-sm text-muted-foreground">Your journey begins here</p>
                   </div>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Friends Progress Section */}
+          {/* Friends Progress Section - Improved Card */}
           {isCurrentUser && (
-            <div className="pt-6 border-t border-white/10">
+            <div className="pt-6 border-t border-border">
               <Collapsible open={isFriendsOpen} onOpenChange={setIsFriendsOpen}>
-                <CollapsibleTrigger className="flex items-center justify-between w-full group hover:bg-white/5 rounded-lg p-3 transition-colors">
+                <CollapsibleTrigger className="flex items-center justify-between w-full group hover:bg-muted/50 rounded-xl p-4 transition-colors">
                   <div className="flex items-center gap-3">
                     <Users className="w-5 h-5 text-muted-foreground" />
                     <div className="text-left">
@@ -639,7 +653,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                   )} />
                 </CollapsibleTrigger>
                 <CollapsibleContent className="pt-4">
-                  <div className="bg-white/5 border border-white/10 rounded-lg p-4">
+                  <div className="bg-background border border-border rounded-xl p-5 shadow-sm">
                     <FriendsLeaderboard
                       onInviteFriends={() => {
                         // TODO: Implement invite friends functionality
