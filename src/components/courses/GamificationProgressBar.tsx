@@ -786,9 +786,10 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
         <Dialog.Root open={isModalOpen} onOpenChange={setIsModalOpen}>
           <Dialog.Portal>
             <Dialog.Overlay className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50" />
-            <Dialog.Content className="fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-full max-w-md bg-gray-900 border border-white/10 rounded-xl p-6 z-50">
+            <Dialog.Content className="fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-full max-w-md bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-md border border-white/10 rounded-xl p-6 z-50">
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10 rounded-xl" />
               {selectedTrophy && (
-                <div className="space-y-4">
+                <div className="relative space-y-4 z-10">
                   <div className="flex items-center gap-4">
                     <div className={cn(
                       'p-3 rounded-lg border',
