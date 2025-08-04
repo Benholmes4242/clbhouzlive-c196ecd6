@@ -439,7 +439,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                   </h4>
                   
                   {/* Subtle Tag with Course Count and XP */}
-                  <div className="flex items-center gap-2 text-sm text-white/60">
+                  <div className="flex items-center gap-2 text-sm text-white">
                     <span>Courses Played: {list.completed}</span>
                     <span>•</span>
                     <div className="flex items-center gap-1">
