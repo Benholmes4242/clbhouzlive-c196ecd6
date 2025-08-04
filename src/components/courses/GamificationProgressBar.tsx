@@ -6,6 +6,10 @@ import * as Dialog from '@radix-ui/react-dialog';
 import CircularProgress from '@/components/ui/circular-progress';
 import { CourseListModal } from './CourseListModal';
 import { useUserAchievements } from '@/hooks/useUserAchievements';
+import { useFriendsLeaderboard } from '@/hooks/useFriendsLeaderboard';
+import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import FriendsLeaderboard from './friends/FriendsLeaderboard';
+import CompareWithFriendsModal from './friends/CompareWithFriendsModal';
 
 interface GamificationProgressBarProps {
   completedCount: number;
@@ -145,9 +149,14 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCourseList, setSelectedCourseList] = useState<any>(null);
   const [isCourseListModalOpen, setIsCourseListModalOpen] = useState(false);
+  const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
 
   // Fetch real user achievements
   const { achievements, loading: achievementsLoading } = useUserAchievements(5);
+  
+  // Fetch friends data for progress markers
+  const { user } = useSupabaseSession();
+  const { data: friends = [] } = useFriendsLeaderboard(user?.id);
 
   // Visual theme based on progress
   const getProgressTheme = (courses: number) => {
@@ -376,8 +385,29 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                        width: `${(completedCount / nextGlobalTrophy.requiredCourses) * 20}%`
                      }}
                    />
-                 )}
-                 </div>
+                  )}
+                  
+                  {/* Friend Progress Markers */}
+                  {friends.length > 0 && friends.map((friend, index) => {
+                    const friendProgress = (friend.coursesPlayed / 300) * 100;
+                    if (friendProgress <= 0 || friendProgress >= 95) return null;
+                    
+                    return (
+                      <div
+                        key={friend.id}
+                        className="absolute top-0 transform -translate-x-1/2 z-20"
+                        style={{ left: `${friendProgress}%` }}
+                      >
+                        <div className="flex flex-col items-center">
+                          <div className="w-3 h-3 rounded-full bg-blue-500 border-2 border-white shadow-lg mb-1" />
+                          <div className="bg-black/80 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+                            🏁 {friend.display_name || friend.username} ({friend.coursesPlayed})
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  </div>
                {/* Trophy Points */}
                 <div className="flex justify-between items-start relative z-10">
                  {globalTrophies.map((trophy, index) => (
@@ -612,6 +642,19 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
             </div>
           </div>
 
+          {/* Compare with Friends Button */}
+          {isCurrentUser && (
+            <div className="flex items-center justify-center pt-6 border-t border-white/10">
+              <button
+                onClick={() => setIsCompareModalOpen(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-400/30 rounded-lg text-blue-400 font-medium transition-colors"
+              >
+                <Target className="w-4 h-4" />
+                Compare with Friends
+              </button>
+            </div>
+          )}
+
           {/* Summary Stats */}
           <div className="flex items-center justify-center text-base pt-6 border-t border-white/10">
             <div className="text-white/60">
@@ -720,6 +763,35 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
             onClose={() => setIsCourseListModalOpen(false)}
             region={selectedCourseList}
           />
+        )}
+
+        {/* Compare with Friends Modal */}
+        <CompareWithFriendsModal
+          isOpen={isCompareModalOpen}
+          onClose={() => setIsCompareModalOpen(false)}
+          currentUserCourses={completedCount}
+          currentUserRegionalProgress={{
+            britainIrelandCompleted,
+            europeCompleted,
+            usaCompleted,
+            worldwideCompleted
+          }}
+        />
+
+        {/* Friends Leaderboard Section */}
+        {isCurrentUser && (
+          <div className="mt-6">
+            <FriendsLeaderboard
+              onInviteFriends={() => {
+                // TODO: Implement invite friends functionality
+                console.log('Invite friends clicked');
+              }}
+              onCompareWith={(friendId) => {
+                console.log('Compare with friend:', friendId);
+                setIsCompareModalOpen(true);
+              }}
+            />
+          </div>
         )}
       </div>
     </Tooltip.Provider>
