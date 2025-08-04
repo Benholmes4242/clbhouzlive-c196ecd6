@@ -243,22 +243,25 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                       <div className="relative">
                         <img 
                           src="/lovable-uploads/43291ca4-d526-4b10-9585-6ea3488445cf.png" 
-                          alt="The Turn Trophy"
+                          alt="The Turn Trophy" 
                           className={cn(
                             'h-16 w-auto object-contain -mt-4',
                             trophy.isUnlocked ? 'opacity-100' : 'opacity-70'
                           )}
                         />
                         {!trophy.isUnlocked && (
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="bg-white/20 backdrop-blur-sm rounded-full p-1">
-                              <img 
-                                src="/lovable-uploads/3042c702-0d88-46f9-9b0f-13ab2ab2ef3b.png" 
-                                alt="Locked" 
-                                className="w-4 h-4"
-                              />
+                          <>
+                            <div className="absolute inset-0 bg-gradient-to-b from-gray-900/50 via-gray-800/60 to-gray-900/70 rounded-lg -mt-4" />
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <div className="bg-white/20 backdrop-blur-sm rounded-full p-1">
+                                <img 
+                                  src="/lovable-uploads/3042c702-0d88-46f9-9b0f-13ab2ab2ef3b.png" 
+                                  alt="Locked" 
+                                  className="w-4 h-4"
+                                />
+                              </div>
                             </div>
-                          </div>
+                          </>
                         )}
                       </div>
                     ) : (
