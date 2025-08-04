@@ -254,7 +254,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                             <img 
                               src="/lovable-uploads/3042c702-0d88-46f9-9b0f-13ab2ab2ef3b.png" 
                               alt="Locked" 
-                              className="w-6 h-6"
+                              className="w-8 h-8"
                             />
                           </div>
                         )}
