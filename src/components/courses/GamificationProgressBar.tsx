@@ -113,7 +113,7 @@ const TrophyIcon: React.FC<{
         color,
         sizeClasses[size]
       )}>
-        <Trophy className="w-4 h-4 text-white" />
+        <Trophy className="w-4 h-4 text-foreground" />
       </div>
     );
   }
@@ -476,15 +476,15 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                          trophy.color,
                          trophy.isUnlocked ? 'opacity-100' : 'opacity-40 grayscale'
                        )}>
-                         <Trophy className="w-8 h-8 text-white" />
-                       </div>
-                     )}
-                     <div className="text-center">
-                       <div className="text-sm font-medium text-white">
-                         {trophy.requiredCourses}
-                       </div>
-                       <div className="text-sm text-white max-w-16 leading-tight">
-                         {trophy.name}
+                          <Trophy className="w-8 h-8 text-foreground" />
+                        </div>
+                      )}
+                      <div className="text-center">
+                        <div className="text-sm font-medium text-foreground">
+                          {trophy.requiredCourses}
+                        </div>
+                        <div className="text-sm text-foreground max-w-16 leading-tight">
+                          {trophy.name}
                        </div>
                      </div>
                    </div>
@@ -497,8 +497,8 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
           {/* Regional Lists Completion - Circular Progress Rings */}
           <div className="space-y-4 pt-4">
             <div className="flex items-center justify-between">
-              <span className="text-base text-white">Regional List Completion</span>
-              <span className="text-base text-white">
+              <span className="text-base text-foreground">Regional List Completion</span>
+              <span className="text-base text-foreground">
                 {regionalProgress.completedLists}/4 lists completed
               </span>
             </div>
@@ -571,12 +571,12 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                   </div>
                   
                   {/* Region Name */}
-                  <h4 className="text-base font-semibold text-white text-center mb-1">
+                  <h4 className="text-base font-semibold text-foreground text-center mb-1">
                     {list.name}
                   </h4>
                   
                   {/* Subtle Tag with Course Count and XP */}
-                  <div className="flex items-center gap-2 text-sm text-white">
+                  <div className="flex items-center gap-2 text-sm text-foreground">
                     <span>Courses Played: {list.completed}</span>
                     <span>•</span>
                     <div className="flex items-center gap-1">
@@ -590,8 +590,8 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
             {/* World Conqueror Achievement */}
             {regionalProgress.isWorldConqueror && (
               <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-400/30 rounded-lg p-4 text-center">
-                <h5 className="font-bold text-white mb-1">🌍 World Conqueror!</h5>
-                <p className="text-base text-white/80">
+                <h5 className="font-bold text-foreground mb-1">🌍 World Conqueror!</h5>
+                <p className="text-base text-muted-foreground">
                   You've completed all regional lists. Truly legendary!
                 </p>
               </div>
@@ -649,14 +649,14 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
               <Collapsible open={isFriendsOpen} onOpenChange={setIsFriendsOpen}>
                 <CollapsibleTrigger className="flex items-center justify-between w-full group hover:bg-white/5 rounded-lg p-3 transition-colors">
                   <div className="flex items-center gap-3">
-                    <Users className="w-5 h-5 text-white/80" />
+                    <Users className="w-5 h-5 text-muted-foreground" />
                     <div className="text-left">
-                      <h3 className="text-lg font-semibold text-white">Friends' Progress</h3>
-                      <p className="text-sm text-white/60">See how you compare with your golf friends</p>
+                      <h3 className="text-lg font-semibold text-foreground">Friends' Progress</h3>
+                      <p className="text-sm text-muted-foreground">See how you compare with your golf friends</p>
                     </div>
                   </div>
                   <ChevronDown className={cn(
-                    "w-5 h-5 text-white/60 transition-transform duration-200",
+                    "w-5 h-5 text-muted-foreground transition-transform duration-200",
                     isFriendsOpen && "rotate-180"
                   )} />
                 </CollapsibleTrigger>
@@ -703,7 +703,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                           <img src="/lovable-uploads/3c517cb5-203d-4ad8-b3b5-e5e7c33a24b0.png" alt="Trophy" className="h-16 w-auto" />
                         ) : (
                           <div className={cn('h-16 w-16 rounded-full flex items-center justify-center bg-gradient-to-br', selectedTrophy.color)}>
-                            <Trophy className="w-8 h-8 text-white" />
+                            <Trophy className="w-8 h-8 text-foreground" />
                           </div>
                         )
                       ) : (
@@ -719,7 +719,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                       )}
                     </div>
                     <div className="flex-1">
-                      <Dialog.Title className="text-xl font-bold text-white mb-1">
+                      <Dialog.Title className="text-xl font-bold text-foreground mb-1">
                         {selectedTrophy.name}
                       </Dialog.Title>
                       <div className={cn(
@@ -734,7 +734,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                   </div>
                   
                   <div className="space-y-3">
-                    <div className="flex items-center gap-2 text-white/80">
+                    <div className="flex items-center gap-2 text-muted-foreground">
                       <Target className="w-4 h-4" />
                       <span className="text-sm">{selectedTrophy.description}</span>
                     </div>
@@ -748,7 +748,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                     
                     {!selectedTrophy.isUnlocked && !selectedTrophy.isCompleted && (
                       <div className="bg-white/5 border border-white/10 rounded-lg p-3">
-                        <p className="text-sm text-white/70">
+                        <p className="text-sm text-muted-foreground">
                           {selectedTrophy.type === 'global' 
                             ? `Play ${selectedTrophy.requiredCourses - completedCount} more courses to unlock this trophy`
                             : `Complete ${selectedTrophy.requiredCourses - (selectedTrophy.completed || 0)} more courses in ${selectedTrophy.name} to unlock this trophy`
@@ -760,7 +760,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                 </div>
               )}
               <Dialog.Close asChild>
-                <button className="absolute top-4 right-4 text-white/60 hover:text-white transition-colors">
+                <button className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors">
                   ✕
                 </button>
               </Dialog.Close>
