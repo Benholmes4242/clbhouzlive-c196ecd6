@@ -98,8 +98,8 @@ const REGIONAL_LISTS = [
     id: 'worldwide',
     name: 'Worldwide Top 100',
     shortName: 'World',
-    tag: 'World Conqueror',
-    description: 'The ultimate achievement. Every continent. Every legend.',
+    tag: 'Legends Club',
+    description: 'From Seve to Tiger to Jack, legends have walked where you now stand. You\'ve joined golf\'s most elite circle. Welcome.',
   },
 ];
 
