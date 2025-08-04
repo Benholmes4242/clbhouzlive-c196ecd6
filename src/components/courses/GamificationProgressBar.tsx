@@ -376,25 +376,17 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                     setIsCourseListModalOpen(true);
                   }}
                 >
-                  {/* Circular Progress Ring */}
-                  <div className="relative mb-3">
-                    <CircularProgress
-                      completed={list.completed}
-                      total={list.total}
-                      size={80}
-                      strokeWidth={6}
-                      showAnimation={true}
-                    />
-                    
-                    {/* Trophy Icon Overlay */}
-                    <div className="absolute top-1 right-1">
+                  {/* Top Row: Trophy Left, Progress Ring Right */}
+                  <div className="flex items-center justify-between w-full mb-3">
+                    {/* Trophy Icon - Left Side */}
+                    <div className="flex-shrink-0">
                       <div className="relative">
                         {list.id === 'britain-ireland' ? (
                           <img 
                             src="/lovable-uploads/7df94753-adb7-43b1-8ea8-380234f3318f.png" 
                             alt="British & Irish Trophy" 
                             className={cn(
-                              'h-8 w-auto object-contain transition-all duration-300',
+                              'h-10 w-auto object-contain transition-all duration-300',
                               list.isCompleted ? 'opacity-100' : 'opacity-60 grayscale'
                             )}
                           />
@@ -403,7 +395,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                             src="/lovable-uploads/fa5756cb-1a89-478b-b8ad-8d26168c1f4f.png" 
                             alt="European Trophy" 
                             className={cn(
-                              'h-8 w-auto object-contain transition-all duration-300',
+                              'h-10 w-auto object-contain transition-all duration-300',
                               list.isCompleted ? 'opacity-100' : 'opacity-60 grayscale'
                             )}
                           />
@@ -412,7 +404,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                             src="/lovable-uploads/7ae756b6-b8e6-4d03-a6ee-f8c336eec047.png" 
                             alt="USA Trophy" 
                             className={cn(
-                              'h-8 w-auto object-contain transition-all duration-300',
+                              'h-10 w-auto object-contain transition-all duration-300',
                               list.isCompleted ? 'opacity-100' : 'opacity-60 grayscale'
                             )}
                           />
@@ -421,7 +413,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                             src="/lovable-uploads/ab0f852c-4e2f-408d-a13c-ef3a595470e8.png" 
                             alt="Worldwide Trophy" 
                             className={cn(
-                              'h-8 w-auto object-contain transition-all duration-300',
+                              'h-10 w-auto object-contain transition-all duration-300',
                               list.isCompleted ? 'opacity-100' : 'opacity-60 grayscale'
                             )}
                           />
@@ -436,6 +428,17 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                           </div>
                         )}
                       </div>
+                    </div>
+                    
+                    {/* Circular Progress Ring - Right Side */}
+                    <div className="flex-shrink-0">
+                      <CircularProgress
+                        completed={list.completed}
+                        total={list.total}
+                        size={60}
+                        strokeWidth={5}
+                        showAnimation={true}
+                      />
                     </div>
                   </div>
                   
