@@ -228,24 +228,42 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
               
                {/* Trophy Points */}
                <div className="flex justify-between items-start relative z-10">
-                 {globalTrophies.map((trophy, index) => (
-                   <div key={trophy.id} className="flex flex-col items-center space-y-2">
-                     {trophy.id === 'green-fee-rookie' ? (
-                       <img 
-                         src="/lovable-uploads/f2f50b99-38e1-466b-8ac8-c32e428231cb.png" 
-                         alt="Green Fee Rookie Trophy" 
-                         className={cn(
-                           'h-16 w-auto object-contain -mt-4',
-                           trophy.isUnlocked ? 'opacity-100' : 'opacity-40 grayscale'
-                         )}
-                       />
-                     ) : (
-                       <TrophyIcon 
-                         isUnlocked={trophy.isUnlocked}
-                         color={trophy.color}
-                         size="md"
-                       />
-                     )}
+                {globalTrophies.map((trophy, index) => (
+                  <div key={trophy.id} className="flex flex-col items-center space-y-2">
+                    {trophy.id === 'green-fee-rookie' ? (
+                      <img 
+                        src="/lovable-uploads/f2f50b99-38e1-466b-8ac8-c32e428231cb.png" 
+                        alt="Green Fee Rookie Trophy" 
+                        className={cn(
+                          'h-16 w-auto object-contain -mt-4',
+                          trophy.isUnlocked ? 'opacity-100' : 'opacity-40 grayscale'
+                        )}
+                      />
+                    ) : trophy.id === 'the-turn' ? (
+                      <div className="relative">
+                        <img 
+                          src="/lovable-uploads/43291ca4-d526-4b10-9585-6ea3488445cf.png" 
+                          alt="The Turn Trophy"
+                          className={cn(
+                            'h-16 w-auto object-contain -mt-4',
+                            trophy.isUnlocked ? 'opacity-100' : 'opacity-70'
+                          )}
+                        />
+                        {!trophy.isUnlocked && (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="bg-gray-800/80 rounded-full p-1">
+                              <Lock className="w-4 h-4 text-gray-300" />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <TrophyIcon 
+                        isUnlocked={trophy.isUnlocked}
+                        color={trophy.color}
+                        size="md"
+                      />
+                    )}
                      <div className="text-center">
                        <div className="text-sm font-medium text-white/90">
                          {trophy.requiredCourses}
