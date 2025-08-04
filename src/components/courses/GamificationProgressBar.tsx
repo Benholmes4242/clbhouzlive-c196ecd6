@@ -294,20 +294,21 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
       <div className={cn('space-y-6', className)}>
         {/* Themed Background Container with Progress-Based Visuals */}
         <div className={cn(
-          "relative overflow-hidden rounded-xl border border-white/10 backdrop-blur-md transition-all duration-500 ease-in-out",
-          // Base glassmorphism
-          "bg-gradient-to-br from-white/5 to-white/10",
-          // Progress-based themed backgrounds
-          displayTheme === 'morning' && "bg-gradient-to-br from-sky-400/20 via-blue-300/15 to-yellow-200/10",
-          displayTheme === 'midday' && "bg-gradient-to-br from-yellow-300/20 via-green-200/15 to-blue-200/10",
-          displayTheme === 'golden' && "bg-gradient-to-br from-orange-400/25 via-yellow-300/20 to-red-300/15",
-          displayTheme === 'twilight' && "bg-gradient-to-br from-purple-500/20 via-indigo-400/15 to-blue-600/10",
-          displayTheme === 'mountain' && "bg-gradient-to-br from-gray-600/20 via-slate-500/15 to-stone-400/10",
-          displayTheme === 'aurora' && "bg-gradient-to-br from-emerald-400/25 via-cyan-300/20 to-purple-400/15 aurora-theme"
+          "relative overflow-hidden rounded-xl transition-all duration-500 ease-in-out"
         )}>
-          {/* Dynamic themed overlay */}
+          {/* Liquid glass background */}
+          <div 
+            className="absolute inset-0 bg-white/10 border border-white/20"
+            style={{ 
+              backdropFilter: 'blur(40px) saturate(180%)',
+              borderRadius: '12px'
+            }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" style={{ borderRadius: '12px' }} />
+          
+          {/* Progress-based themed overlay */}
           <div className={cn(
-            "absolute inset-0 transition-all duration-500 ease-in-out",
+            "absolute inset-0 transition-all duration-500 ease-in-out rounded-xl",
             displayTheme === 'morning' && "bg-gradient-to-br from-sky-500/10 via-yellow-400/8 to-transparent",
             displayTheme === 'midday' && "bg-gradient-to-br from-yellow-400/12 via-green-300/8 to-transparent",
             displayTheme === 'golden' && "bg-gradient-to-br from-orange-500/15 via-amber-400/10 to-red-400/8",
