@@ -77,21 +77,29 @@ const REGIONAL_LISTS = [
     id: 'britain-ireland',
     name: 'Great Britain & Ireland',
     shortName: 'GB&I',
+    tag: 'Links Legend',
+    description: "You've mastered the finest across the British Isles.",
   },
   {
     id: 'europe',
-    name: 'Europe',
+    name: 'Continental Europe',
     shortName: 'EUR',
+    tag: 'The Continental Swinger',
+    description: 'From Algarve to the Alps. Europe\'s elite courses. Conquered.',
   },
   {
     id: 'usa',
     name: 'USA',
     shortName: 'USA',
+    tag: 'Stars and Stripes Tourer',
+    description: 'Coast to coast, you\'ve played the American greats.',
   },
   {
     id: 'worldwide',
     name: 'Worldwide Top 100',
     shortName: 'World',
+    tag: 'World Conqueror',
+    description: 'The ultimate achievement. Every continent. Every legend.',
   },
 ];
 
@@ -583,6 +591,16 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                   <h4 className="text-lg font-semibold text-foreground text-center mb-1">
                     {list.name}
                   </h4>
+                  
+                  {/* Achievement Tag */}
+                  <div className="text-sm font-medium text-primary text-center mb-2">
+                    {list.tag}
+                  </div>
+                  
+                  {/* Description */}
+                  <p className="text-xs text-muted-foreground text-center mb-3 leading-relaxed">
+                    {list.description}
+                  </p>
                   
                   {/* Subtle Tag with Course Count and XP */}
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
