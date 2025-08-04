@@ -457,8 +457,59 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
             )}
           </div>
 
+          {/* Dynamic Achievements Feed */}
+          <div className="space-y-4 pt-6">
+            <div className="flex items-center justify-between">
+              <span className="text-base text-white">📣 Recent Achievements</span>
+              <span className="text-sm text-white/60">Last 7 days</span>
+            </div>
+
+            <div className="space-y-3">
+              {/* Achievement Items */}
+              <div className="animate-fade-in flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-300">
+                <div className="text-2xl">🟡</div>
+                <div className="flex-1">
+                  <p className="text-sm text-white font-medium">You unlocked The Green Fee Rookie</p>
+                  <p className="text-xs text-white/60">2 days ago</p>
+                </div>
+              </div>
+
+              <div className="animate-fade-in flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-300" style={{ animationDelay: '0.1s' }}>
+                <div className="text-2xl">🏴</div>
+                <div className="flex-1">
+                  <p className="text-sm text-white font-medium">Only 1 more course to finish the GB&I list!</p>
+                  <p className="text-xs text-white/60">3 days ago</p>
+                </div>
+              </div>
+
+              <div className="animate-fade-in flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-300" style={{ animationDelay: '0.2s' }}>
+                <div className="text-2xl">✨</div>
+                <div className="flex-1">
+                  <p className="text-sm text-white font-medium">+110 XP – Played Sunningdale Old!</p>
+                  <p className="text-xs text-white/60">5 days ago</p>
+                </div>
+              </div>
+
+              <div className="animate-fade-in flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-300" style={{ animationDelay: '0.3s' }}>
+                <div className="text-2xl">🎉</div>
+                <div className="flex-1">
+                  <p className="text-sm text-white font-medium">Reached 2,000 total XP milestone!</p>
+                  <p className="text-xs text-white/60">1 week ago</p>
+                </div>
+              </div>
+
+              <div className="animate-fade-in flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all duration-300" style={{ animationDelay: '0.4s' }}>
+                <div className="text-2xl">🏆</div>
+                <div className="flex-1">
+                  <p className="text-sm text-white font-medium">First European course completed!</p>
+                  <p className="text-xs text-white/60">1 week ago</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Summary Stats */}
-          <div className="flex items-center justify-center text-base pt-2 border-t border-white/10">
+          <div className="flex items-center justify-center text-base pt-6 border-t border-white/10">
             <div className="text-white/60">
               Global Trophies: {unlockedGlobalTrophies.length}/{globalTrophies.length}
             </div>
