@@ -503,7 +503,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
               {regionalProgress.lists.map((list) => (
                 <div
                   key={list.id}
-                  className="flex flex-col items-center p-5 rounded-xl border transition-all cursor-pointer hover:scale-105 hover:-translate-y-1 bg-background border-border hover:shadow-lg duration-300"
+                  className="flex flex-col items-center p-3 rounded-xl border transition-all cursor-pointer hover:scale-105 hover:-translate-y-1 bg-background border-border hover:shadow-lg duration-300"
                   style={{ boxShadow: '0 2px 6px rgba(0,0,0,0.04)' }}
                   onClick={() => {
                     setSelectedCourseList(list);
@@ -511,12 +511,12 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                   }}
                 >
                   {/* Region Name at Top */}
-                  <h4 className="text-lg font-semibold text-foreground text-center mb-4 w-full">
+                  <h4 className="text-lg font-semibold text-foreground text-center mb-3 w-full">
                     {list.name}
                   </h4>
 
                   {/* Top Row: Trophy Left, Progress Ring Right */}
-                  <div className="flex items-center justify-between w-full mb-3">
+                  <div className="flex items-center justify-between w-full mb-2">
                     {/* Trophy Icon - Left Side with enhanced styling */}
                     <div className="flex-shrink-0">
                       <div className="relative">
@@ -594,12 +594,12 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                   </div>
                   
                   {/* Achievement Tag - Black Text */}
-                  <div className="text-sm font-medium text-black text-center mb-2">
+                  <div className="text-sm font-medium text-black text-center mb-1">
                     {list.tag}
                   </div>
                   
                   {/* Description */}
-                  <p className="text-xs text-black text-center mb-4 leading-relaxed">
+                  <p className="text-xs text-black text-center mb-2 leading-relaxed">
                     {list.description}
                   </p>
                   
