@@ -559,29 +559,30 @@ const HeroProfileHeader = ({
           
           {/* User Information */}
           <div className="text-center mb-6">
-            {/* User's Name with Edit Button */}
-            <div className="flex items-center justify-center gap-3">
+            {/* User's Name */}
+            <div className="flex items-center justify-center">
               <h1 className="font-bold text-foreground text-4xl">
                 {displayName}
               </h1>
-              
-              {/* Edit Profile Button - Next to name for own profile */}
-              {isOwnProfile && (
-                <button 
-                  className="bg-muted border border-border rounded-full text-foreground font-medium hover:bg-muted/80 transition-all duration-300 ease-in-out flex items-center justify-center py-1.5 px-3 text-xs pt-2 pb-1" 
-                  style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
-                  onClick={() => setEditDialogOpen(true)}
-                >
-                  Edit Profile
-                </button>
-              )}
             </div>
             
-            {/* Username */}
+            {/* Username with Edit Button */}
             {username && (
-              <p className="text-lg text-muted-foreground mb-2">
-                @{username}
-              </p>
+              <div className="flex items-center justify-center gap-3 mb-2">
+                <p className="text-lg text-muted-foreground">
+                  @{username}
+                </p>
+                
+                {/* Edit Profile Button - Next to username for own profile */}
+                {isOwnProfile && (
+                  <button 
+                    className="bg-muted border border-border rounded-full text-foreground font-medium hover:bg-muted/80 transition-all duration-300 ease-in-out flex items-center justify-center py-1.5 px-3 text-xs" 
+                    onClick={() => setEditDialogOpen(true)}
+                  >
+                    Edit Profile
+                  </button>
+                )}
+              </div>
             )}
 
             {/* Badge Strip */}
