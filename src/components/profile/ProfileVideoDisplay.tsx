@@ -3,6 +3,14 @@ import { OptimizedAvatar } from '@/components/ui/optimized-avatar';
 import ProfileVideoPlayer from './ProfileVideoPlayer';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 
+interface AchievementRing {
+  level: number;
+  title: string;
+  ringClass: string;
+  color: string;
+  courses: number;
+}
+
 interface ProfileVideoDisplayProps {
   videoUrl: string;
   fallbackPhotoUrl?: string;
@@ -12,6 +20,7 @@ interface ProfileVideoDisplayProps {
   onEditClick: () => void;
   onPhotoUpload: (file: File) => void;
   onVideoUpload: () => void;
+  achievementRing?: AchievementRing;
 }
 
 const ProfileVideoDisplay: React.FC<ProfileVideoDisplayProps> = ({
@@ -22,7 +31,8 @@ const ProfileVideoDisplay: React.FC<ProfileVideoDisplayProps> = ({
   uploading,
   onEditClick,
   onPhotoUpload,
-  onVideoUpload
+  onVideoUpload,
+  achievementRing
 }) => {
   const [videoEnded, setVideoEnded] = useState(false);
   const [showFallback, setShowFallback] = useState(false);
