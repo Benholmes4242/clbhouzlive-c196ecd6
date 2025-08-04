@@ -426,8 +426,8 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                       <CircularProgress
                         completed={list.completed}
                         total={list.total}
-                        size={60}
-                        strokeWidth={5}
+                        size={80}
+                        strokeWidth={6}
                         showAnimation={true}
                       />
                     </div>
