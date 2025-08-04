@@ -605,13 +605,9 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                   {/* Spacer for separation */}
                   <div className="flex-1"></div>
                   
-                  {/* Courses Played and XP at Bottom - Black Text */}
-                  <div className="flex items-center gap-2 text-sm text-black mt-auto">
-                    <span className="font-medium">Courses Played: {list.completed}</span>
-                    <span>•</span>
-                    <div className="flex items-center gap-1">
-                      <span className="font-medium">XP: {(list.completed * 110).toLocaleString()}</span>
-                    </div>
+                  {/* XP at Bottom - Black Text */}
+                  <div className="flex items-center justify-center text-sm text-black mt-auto">
+                    <span className="font-medium">XP: {(list.completed * 110).toLocaleString()}</span>
                   </div>
                 </div>
               ))}
