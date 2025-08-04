@@ -7,6 +7,7 @@ import GolfCoursePin from '../posts/GolfCoursePin';
 import EnhancedMediaUpload from '../posts/EnhancedMediaUpload';
 import EnhancedRichTextInput from '../posts/EnhancedRichTextInput';
 import SmartCompilation from '../posts/SmartCompilation';
+import BackgroundMusicSelector from '../posts/BackgroundMusicSelector';
 import { useTaggableEntities } from '@/hooks/useTaggableEntities';
 import { useToast } from '@/hooks/use-toast';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -35,6 +36,11 @@ interface EnhancedCreateMomentModalProps {
     tags: TaggableEntity[];
     course?: GolfCourse | null;
     isPrivate?: boolean;
+    backgroundMusic?: {
+      track: string;
+      audioUrl: string;
+      replaceOriginalAudio: boolean;
+    } | null;
   }) => void;
   isSubmitting: boolean;
   initialFiles?: File[];
@@ -66,6 +72,11 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
   const [files, setFiles] = useState<File[]>([]);
   const [selectedTags, setSelectedTags] = useState<TaggableEntity[]>([]);
   const [isPrivate, setIsPrivate] = useState(false);
+  const [backgroundMusic, setBackgroundMusic] = useState<{
+    track: string;
+    audioUrl: string;
+    replaceOriginalAudio: boolean;
+  } | null>(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const { entities, searchEntities } = useTaggableEntities();
   const { toast } = useToast();
@@ -178,7 +189,8 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
         files,
         tags: selectedTags,
         course: selectedCourse,
-        isPrivate
+        isPrivate,
+        backgroundMusic
       });
       
     } catch (error) {
@@ -528,6 +540,13 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                     }
                   }}
                   disabled={isSubmitting}
+                />
+
+                {/* 3.7. Background Music Selector */}
+                <BackgroundMusicSelector
+                  onMusicSelect={setBackgroundMusic}
+                  disabled={isSubmitting}
+                  hasVideo={files.some(file => file.type.startsWith('video/'))}
                 />
 
                 {/* 4. Post Visibility Toggle */}
