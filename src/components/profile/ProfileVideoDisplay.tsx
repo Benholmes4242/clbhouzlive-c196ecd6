@@ -11,6 +11,7 @@ interface ProfileVideoDisplayProps {
   uploading: boolean;
   onEditClick: () => void;
   onPhotoUpload: (file: File) => void;
+  onVideoUpload: () => void;
 }
 
 const ProfileVideoDisplay: React.FC<ProfileVideoDisplayProps> = ({
@@ -20,7 +21,8 @@ const ProfileVideoDisplay: React.FC<ProfileVideoDisplayProps> = ({
   isOwnProfile,
   uploading,
   onEditClick,
-  onPhotoUpload
+  onPhotoUpload,
+  onVideoUpload
 }) => {
   const [videoEnded, setVideoEnded] = useState(false);
   const [showFallback, setShowFallback] = useState(false);
@@ -69,8 +71,7 @@ const ProfileVideoDisplay: React.FC<ProfileVideoDisplayProps> = ({
   return (
     <div 
       ref={swipeRef}
-      className={`relative w-full h-full ${isOwnProfile ? 'cursor-pointer group' : ''}`}
-      onClick={handleClick}
+      className={`relative w-full h-full ${isOwnProfile ? 'group' : ''}`}
     >
       {showFallback && fallbackPhotoUrl ? (
         <OptimizedAvatar
@@ -78,7 +79,7 @@ const ProfileVideoDisplay: React.FC<ProfileVideoDisplayProps> = ({
           alt={displayName}
           size={256}
           fallback={displayName.charAt(0)}
-          className="shadow-2xl w-full h-full group-hover:opacity-80 transition-opacity"
+          className="shadow-2xl w-full h-full"
           priority={true}
         />
       ) : (
@@ -90,12 +91,41 @@ const ProfileVideoDisplay: React.FC<ProfileVideoDisplayProps> = ({
         />
       )}
 
-      {/* Edit overlay for own profile */}
+      {/* Edit buttons overlay for own profile */}
       {isOwnProfile && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
-          <span className="text-white text-sm font-medium">
-            {videoEnded ? 'Edit Photo' : 'Edit Profile'}
-          </span>
+          <div className="flex flex-col gap-2">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (uploading) return;
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                input.onchange = (e) => {
+                  const file = (e.target as HTMLInputElement).files?.[0];
+                  if (file) {
+                    onPhotoUpload(file);
+                  }
+                };
+                input.click();
+              }}
+              className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-full px-3 py-1.5 text-white text-sm font-medium hover:bg-white/30 transition-all duration-200"
+              disabled={uploading}
+            >
+              📷 Edit Photo
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onVideoUpload();
+              }}
+              className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-full px-3 py-1.5 text-white text-sm font-medium hover:bg-white/30 transition-all duration-200"
+              disabled={uploading}
+            >
+              🎥 Edit Video
+            </button>
+          </div>
         </div>
       )}
 
@@ -112,6 +142,5 @@ const ProfileVideoDisplay: React.FC<ProfileVideoDisplayProps> = ({
       )}
     </div>
   );
-};
 
 export default ProfileVideoDisplay;

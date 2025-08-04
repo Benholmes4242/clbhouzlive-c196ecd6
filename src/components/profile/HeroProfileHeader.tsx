@@ -470,37 +470,53 @@ const HeroProfileHeader = ({
                 uploading={uploading}
                 onEditClick={() => setEditDialogOpen(true)}
                 onPhotoUpload={handlePhotoUpload}
+                onVideoUpload={() => setEditDialogOpen(true)}
               />
             ) : isOwnProfile ? (
-              <div 
-                className="relative cursor-pointer group w-full h-full"
-                onClick={() => {
-                  if (uploading) return;
-                  const input = document.createElement('input');
-                  input.type = 'file';
-                  input.accept = 'image/*';
-                  input.onchange = (e) => {
-                    const file = (e.target as HTMLInputElement).files?.[0];
-                    if (file) {
-                      console.log('Photo selected for upload:', file);
-                      handlePhotoUpload(file);
-                    }
-                  };
-                  input.click();
-                }}
-              >
+              <div className="relative w-full h-full group">
                 <OptimizedAvatar
                   key={avatarKey}
                   src={profile?.profile_photo_url ? `${profile.profile_photo_url}?t=${avatarKey}` : undefined}
                   alt={displayName}
                   size={256}
                   fallback={displayName.charAt(0)}
-                  className="shadow-2xl group-hover:opacity-80 transition-opacity w-full h-full"
+                  className="shadow-2xl w-full h-full"
                   priority={true}
                 />
-                {/* Hover overlay */}
+                {/* Edit buttons overlay */}
                 <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-full">
-                  <span className="text-white text-sm font-medium">Edit Photo/Video</span>
+                  <div className="flex flex-col gap-2">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (uploading) return;
+                        const input = document.createElement('input');
+                        input.type = 'file';
+                        input.accept = 'image/*';
+                        input.onchange = (e) => {
+                          const file = (e.target as HTMLInputElement).files?.[0];
+                          if (file) {
+                            handlePhotoUpload(file);
+                          }
+                        };
+                        input.click();
+                      }}
+                      className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-full px-3 py-1.5 text-white text-sm font-medium hover:bg-white/30 transition-all duration-200"
+                      disabled={uploading}
+                    >
+                      📷 Edit Photo
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditDialogOpen(true);
+                      }}
+                      className="bg-white/20 backdrop-blur-sm border border-white/30 rounded-full px-3 py-1.5 text-white text-sm font-medium hover:bg-white/30 transition-all duration-200"
+                      disabled={uploading}
+                    >
+                      🎥 Add Video
+                    </button>
+                  </div>
                 </div>
               </div>
             ) : (
