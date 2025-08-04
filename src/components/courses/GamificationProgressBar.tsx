@@ -225,13 +225,8 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
               <h4 className="text-xl font-semibold text-white">
                 Golf Journey Progress
               </h4>
-              <div className="text-right">
-                <div className="text-lg font-bold text-white transition-all duration-500">
-                  {currentXP.toLocaleString()} XP
-                </div>
-                <div className="text-sm text-white/60">
-                  Total Experience
-                </div>
+              <div className="text-lg font-bold text-white transition-all duration-500">
+                Total XP: {currentXP.toLocaleString()}
               </div>
             </div>
 
@@ -293,7 +288,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                              src="/lovable-uploads/0c126dc7-5509-40b9-862d-b054423ca7f6.png" 
                              alt="Century Club Trophy" 
                              className={cn(
-                               'h-16 w-auto object-contain -mt-4 transition-all duration-300',
+                               'h-12 w-auto object-contain -mt-4 transition-all duration-300',
                                trophy.isUnlocked ? 'opacity-100' : 'opacity-40 grayscale'
                              )}
                            />
@@ -302,19 +297,19 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                              src="/lovable-uploads/a9672498-b79d-4a47-9e6a-1128770700c9.png" 
                              alt="Clubhouse Elite Trophy" 
                              className={cn(
-                               'h-16 w-auto object-contain -mt-4 transition-all duration-300',
+                               'h-12 w-auto object-contain -mt-4 transition-all duration-300',
                                trophy.isUnlocked ? 'opacity-100' : 'opacity-40 grayscale'
                              )}
                            />
-                          ) : trophy.id === 'course-collector' ? (
-                            <img 
-                              src="/lovable-uploads/3c517cb5-203d-4ad8-b3b5-e5e7c33a24b0.png" 
-                              alt="Course Collector Trophy" 
-                              className={cn(
-                                'h-16 w-auto object-contain -mt-4 transition-all duration-300',
-                                trophy.isUnlocked ? 'opacity-100' : 'opacity-40 grayscale'
-                              )}
-                            />
+                           ) : trophy.id === 'course-collector' ? (
+                             <img 
+                               src="/lovable-uploads/3c517cb5-203d-4ad8-b3b5-e5e7c33a24b0.png" 
+                               alt="Course Collector Trophy" 
+                               className={cn(
+                                 'h-12 w-auto object-contain -mt-4 transition-all duration-300',
+                                 trophy.isUnlocked ? 'opacity-100' : 'opacity-40 grayscale'
+                               )}
+                             />
                           ) : (
                             <div className={cn(
                               'h-16 w-16 rounded-full flex items-center justify-center bg-gradient-to-br -mt-4 transition-all duration-300',
