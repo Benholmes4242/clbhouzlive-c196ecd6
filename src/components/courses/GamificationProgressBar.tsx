@@ -335,16 +335,16 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
           {/* Milestone Achievement Notification */}
           {showMilestoneTooltip && (
             <div className="absolute top-4 left-4 z-20 animate-fade-in">
-              <div 
-                className="flex items-center gap-2 bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-purple-400/30 rounded-lg px-4 py-2 text-white font-medium backdrop-blur-sm"
+                <div 
+                className="flex items-center gap-2 bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-purple-400/30 rounded-lg px-4 py-2 text-foreground font-medium backdrop-blur-sm"
                 style={{
                   animation: 'slideDown 3s ease-out forwards'
                 }}
               >
                 <span className="text-xl">{getThemeInfo(currentTheme).emoji}</span>
                 <div className="flex flex-col">
-                  <span className="text-sm font-semibold">New milestone reached!</span>
-                  <span className="text-xs text-white/80">{getThemeInfo(currentTheme).name}</span>
+                  <span className="text-sm font-semibold text-foreground">New milestone reached!</span>
+                  <span className="text-xs text-muted-foreground">{getThemeInfo(currentTheme).name}</span>
                 </div>
               </div>
             </div>
@@ -401,7 +401,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                       >
                         <div className="flex flex-col items-center">
                           <div className="w-3 h-3 rounded-full bg-blue-500 border-2 border-white shadow-lg mb-1" />
-                          <div className="bg-black/80 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
+                          <div className="bg-background/90 text-foreground text-xs px-2 py-1 rounded whitespace-nowrap border border-border">
                             🏁 {friend.display_name || friend.username} ({friend.coursesPlayed})
                           </div>
                         </div>
@@ -483,7 +483,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                         <div className="text-sm font-medium text-foreground">
                           {trophy.requiredCourses}
                         </div>
-                        <div className="text-sm text-foreground max-w-16 leading-tight">
+                        <div className="text-xs text-muted-foreground max-w-16 leading-tight">
                           {trophy.name}
                        </div>
                      </div>
