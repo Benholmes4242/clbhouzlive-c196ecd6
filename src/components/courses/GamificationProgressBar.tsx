@@ -360,8 +360,8 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
           {/* Regional Lists Completion - Circular Progress Rings */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <span className="text-base text-white/80">Regional List Completion</span>
-              <span className="text-base text-white/60">
+              <span className="text-base text-white">Regional List Completion</span>
+              <span className="text-base text-white">
                 {regionalProgress.completedLists}/4 lists completed
               </span>
             </div>
