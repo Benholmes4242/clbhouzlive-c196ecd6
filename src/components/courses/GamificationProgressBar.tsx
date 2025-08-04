@@ -1,7 +1,8 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { Trophy, Lock, CheckCircle, Plus } from 'lucide-react';
+import { Trophy, Lock, CheckCircle, Plus, Calendar, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import * as Tooltip from '@radix-ui/react-tooltip';
+import * as Dialog from '@radix-ui/react-dialog';
 
 interface GamificationProgressBarProps {
   completedCount: number;
@@ -137,6 +138,8 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
   const currentXP = completedCount * 110;
   const [showXPFloat, setShowXPFloat] = useState(false);
   const [prevCompletedCount, setPrevCompletedCount] = useState(completedCount);
+  const [selectedTrophy, setSelectedTrophy] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Trigger XP animation when completedCount increases
   useEffect(() => {
@@ -564,6 +567,308 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
           </div>
         </div>
       </div>
+
+        {/* Trophy Cabinet Section */}
+        <div className="relative overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-md">
+          <div className="absolute inset-0 bg-gradient-to-br from-amber-500/10 via-orange-500/10 to-yellow-500/10" />
+          <div className="relative p-6 space-y-6">
+            <h4 className="text-xl font-semibold text-white">🏆 Trophy Cabinet</h4>
+            
+            {/* Global Trophies Row */}
+            <div className="space-y-4">
+              <h5 className="text-lg font-medium text-white/90">Global Milestones</h5>
+              <div className="grid grid-cols-5 gap-4">
+                {globalTrophies.map((trophy) => (
+                  <div
+                    key={trophy.id}
+                    className="flex flex-col items-center space-y-2 cursor-pointer hover:scale-105 transition-all duration-200"
+                    onClick={() => {
+                      setSelectedTrophy({
+                        ...trophy,
+                        type: 'global',
+                        dateEarned: trophy.isUnlocked ? 'July 2025' : null,
+                        description: `Complete ${trophy.requiredCourses} courses to earn ${trophy.xp.toLocaleString()} XP`
+                      });
+                      setIsModalOpen(true);
+                    }}
+                  >
+                    <div className={cn(
+                      'relative p-2 rounded-lg border transition-all',
+                      trophy.isUnlocked 
+                        ? 'bg-gradient-to-br from-amber-500/20 to-yellow-500/20 border-amber-400/30' 
+                        : 'bg-white/5 border-white/10'
+                    )}>
+                      {trophy.id === 'green-fee-rookie' ? (
+                        <img 
+                          src="/lovable-uploads/f2f50b99-38e1-466b-8ac8-c32e428231cb.png" 
+                          alt="Green Fee Rookie Trophy" 
+                          className={cn(
+                            'h-12 w-auto object-contain transition-all duration-300',
+                            trophy.isUnlocked ? 'opacity-100' : 'opacity-40 grayscale blur-sm'
+                          )}
+                        />
+                      ) : trophy.id === 'the-turn' ? (
+                        <div className="relative">
+                          <img 
+                            src="/lovable-uploads/43291ca4-d526-4b10-9585-6ea3488445cf.png" 
+                            alt="The Turn Trophy"
+                            className={cn(
+                              'h-12 w-auto object-contain transition-all duration-300',
+                              trophy.isUnlocked ? 'opacity-100' : 'opacity-40 grayscale blur-sm'
+                            )}
+                          />
+                          {!trophy.isUnlocked && (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <Lock className="w-4 h-4 text-white/60" />
+                            </div>
+                          )}
+                        </div>
+                      ) : trophy.id === 'century-club' ? (
+                        <div className="relative">
+                          <img 
+                            src="/lovable-uploads/0c126dc7-5509-40b9-862d-b054423ca7f6.png" 
+                            alt="Century Club Trophy" 
+                            className={cn(
+                              'h-12 w-auto object-contain transition-all duration-300',
+                              trophy.isUnlocked ? 'opacity-100' : 'opacity-40 grayscale blur-sm'
+                            )}
+                          />
+                          {!trophy.isUnlocked && (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <Lock className="w-4 h-4 text-white/60" />
+                            </div>
+                          )}
+                        </div>
+                      ) : trophy.id === 'clubhouse-elite' ? (
+                        <div className="relative">
+                          <img 
+                            src="/lovable-uploads/a9672498-b79d-4a47-9e6a-1128770700c9.png" 
+                            alt="Clubhouse Elite Trophy" 
+                            className={cn(
+                              'h-12 w-auto object-contain transition-all duration-300',
+                              trophy.isUnlocked ? 'opacity-100' : 'opacity-40 grayscale blur-sm'
+                            )}
+                          />
+                          {!trophy.isUnlocked && (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <Lock className="w-4 h-4 text-white/60" />
+                            </div>
+                          )}
+                        </div>
+                      ) : trophy.id === 'course-collector' ? (
+                        <div className="relative">
+                          <img 
+                            src="/lovable-uploads/3c517cb5-203d-4ad8-b3b5-e5e7c33a24b0.png" 
+                            alt="Course Collector Trophy" 
+                            className={cn(
+                              'h-12 w-auto object-contain transition-all duration-300',
+                              trophy.isUnlocked ? 'opacity-100' : 'opacity-40 grayscale blur-sm'
+                            )}
+                          />
+                          {!trophy.isUnlocked && (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <Lock className="w-4 h-4 text-white/60" />
+                            </div>
+                          )}
+                        </div>
+                      ) : (
+                        <div className="relative">
+                          <div className={cn(
+                            'h-12 w-12 rounded-full flex items-center justify-center bg-gradient-to-br transition-all duration-300',
+                            trophy.color,
+                            trophy.isUnlocked ? 'opacity-100' : 'opacity-40 grayscale blur-sm'
+                          )}>
+                            <Trophy className="w-6 h-6 text-white" />
+                          </div>
+                          {!trophy.isUnlocked && (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <Lock className="w-4 h-4 text-white/60" />
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                    <div className="text-center">
+                      <div className="text-xs font-medium text-white/90">{trophy.name}</div>
+                      <div className="text-xs text-white/60">{trophy.requiredCourses} courses</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Regional Trophies Row */}
+            <div className="space-y-4">
+              <h5 className="text-lg font-medium text-white/90">Regional Lists</h5>
+              <div className="grid grid-cols-4 gap-4">
+                {regionalProgress.lists.map((list) => (
+                  <div
+                    key={list.id}
+                    className="flex flex-col items-center space-y-2 cursor-pointer hover:scale-105 transition-all duration-200"
+                    onClick={() => {
+                      setSelectedTrophy({
+                        ...list,
+                        type: 'regional',
+                        dateEarned: list.isCompleted ? 'July 2025' : null,
+                        description: `Complete all courses in the ${list.name} list`,
+                        requiredCourses: list.total
+                      });
+                      setIsModalOpen(true);
+                    }}
+                  >
+                    <div className={cn(
+                      'relative p-2 rounded-lg border transition-all',
+                      list.isCompleted 
+                        ? 'bg-gradient-to-br from-green-500/20 to-emerald-500/20 border-green-400/30' 
+                        : 'bg-white/5 border-white/10'
+                    )}>
+                      <div className="relative">
+                        {list.id === 'britain-ireland' ? (
+                          <img 
+                            src="/lovable-uploads/7df94753-adb7-43b1-8ea8-380234f3318f.png" 
+                            alt="British & Irish Trophy" 
+                            className={cn(
+                              'h-12 w-auto object-contain transition-all duration-300',
+                              list.isCompleted ? 'opacity-100' : 'opacity-40 grayscale blur-sm'
+                            )}
+                          />
+                        ) : list.id === 'europe' ? (
+                          <img 
+                            src="/lovable-uploads/fa5756cb-1a89-478b-b8ad-8d26168c1f4f.png" 
+                            alt="European Trophy" 
+                            className={cn(
+                              'h-12 w-auto object-contain transition-all duration-300',
+                              list.isCompleted ? 'opacity-100' : 'opacity-40 grayscale blur-sm'
+                            )}
+                          />
+                        ) : list.id === 'usa' ? (
+                          <img 
+                            src="/lovable-uploads/7ae756b6-b8e6-4d03-a6ee-f8c336eec047.png" 
+                            alt="USA Trophy" 
+                            className={cn(
+                              'h-12 w-auto object-contain transition-all duration-300',
+                              list.isCompleted ? 'opacity-100' : 'opacity-40 grayscale blur-sm'
+                            )}
+                          />
+                        ) : list.id === 'worldwide' ? (
+                          <img 
+                            src="/lovable-uploads/ab0f852c-4e2f-408d-a13c-ef3a595470e8.png" 
+                            alt="Worldwide Trophy" 
+                            className={cn(
+                              'h-12 w-auto object-contain transition-all duration-300',
+                              list.isCompleted ? 'opacity-100' : 'opacity-40 grayscale blur-sm'
+                            )}
+                          />
+                        ) : null}
+                        {!list.isCompleted && (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <Lock className="w-4 h-4 text-white/60" />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-xs font-medium text-white/90">{list.shortName}</div>
+                      <div className="text-xs text-white/60">{list.completed}/{list.total}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Trophy Detail Modal */}
+        <Dialog.Root open={isModalOpen} onOpenChange={setIsModalOpen}>
+          <Dialog.Portal>
+            <Dialog.Overlay className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50" />
+            <Dialog.Content className="fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] w-full max-w-md bg-gray-900 border border-white/10 rounded-xl p-6 z-50">
+              {selectedTrophy && (
+                <div className="space-y-4">
+                  <div className="flex items-center gap-4">
+                    <div className={cn(
+                      'p-3 rounded-lg border',
+                      selectedTrophy.isUnlocked || selectedTrophy.isCompleted
+                        ? 'bg-gradient-to-br from-amber-500/20 to-yellow-500/20 border-amber-400/30'
+                        : 'bg-white/5 border-white/10'
+                    )}>
+                      {selectedTrophy.type === 'global' ? (
+                        selectedTrophy.id === 'green-fee-rookie' ? (
+                          <img src="/lovable-uploads/f2f50b99-38e1-466b-8ac8-c32e428231cb.png" alt="Trophy" className="h-16 w-auto" />
+                        ) : selectedTrophy.id === 'the-turn' ? (
+                          <img src="/lovable-uploads/43291ca4-d526-4b10-9585-6ea3488445cf.png" alt="Trophy" className="h-16 w-auto" />
+                        ) : selectedTrophy.id === 'century-club' ? (
+                          <img src="/lovable-uploads/0c126dc7-5509-40b9-862d-b054423ca7f6.png" alt="Trophy" className="h-16 w-auto" />
+                        ) : selectedTrophy.id === 'clubhouse-elite' ? (
+                          <img src="/lovable-uploads/a9672498-b79d-4a47-9e6a-1128770700c9.png" alt="Trophy" className="h-16 w-auto" />
+                        ) : selectedTrophy.id === 'course-collector' ? (
+                          <img src="/lovable-uploads/3c517cb5-203d-4ad8-b3b5-e5e7c33a24b0.png" alt="Trophy" className="h-16 w-auto" />
+                        ) : (
+                          <div className={cn('h-16 w-16 rounded-full flex items-center justify-center bg-gradient-to-br', selectedTrophy.color)}>
+                            <Trophy className="w-8 h-8 text-white" />
+                          </div>
+                        )
+                      ) : (
+                        selectedTrophy.id === 'britain-ireland' ? (
+                          <img src="/lovable-uploads/7df94753-adb7-43b1-8ea8-380234f3318f.png" alt="Trophy" className="h-16 w-auto" />
+                        ) : selectedTrophy.id === 'europe' ? (
+                          <img src="/lovable-uploads/fa5756cb-1a89-478b-b8ad-8d26168c1f4f.png" alt="Trophy" className="h-16 w-auto" />
+                        ) : selectedTrophy.id === 'usa' ? (
+                          <img src="/lovable-uploads/7ae756b6-b8e6-4d03-a6ee-f8c336eec047.png" alt="Trophy" className="h-16 w-auto" />
+                        ) : selectedTrophy.id === 'worldwide' ? (
+                          <img src="/lovable-uploads/ab0f852c-4e2f-408d-a13c-ef3a595470e8.png" alt="Trophy" className="h-16 w-auto" />
+                        ) : null
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <Dialog.Title className="text-xl font-bold text-white mb-1">
+                        {selectedTrophy.name}
+                      </Dialog.Title>
+                      <div className={cn(
+                        'inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium',
+                        selectedTrophy.isUnlocked || selectedTrophy.isCompleted
+                          ? 'bg-green-500/20 text-green-400'
+                          : 'bg-red-500/20 text-red-400'
+                      )}>
+                        {selectedTrophy.isUnlocked || selectedTrophy.isCompleted ? '🏆 Unlocked' : '🔒 Locked'}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-white/80">
+                      <Target className="w-4 h-4" />
+                      <span className="text-sm">{selectedTrophy.description}</span>
+                    </div>
+                    
+                    {selectedTrophy.dateEarned && (
+                      <div className="flex items-center gap-2 text-green-400">
+                        <Calendar className="w-4 h-4" />
+                        <span className="text-sm">Earned {selectedTrophy.dateEarned}</span>
+                      </div>
+                    )}
+                    
+                    {!selectedTrophy.isUnlocked && !selectedTrophy.isCompleted && (
+                      <div className="bg-white/5 border border-white/10 rounded-lg p-3">
+                        <p className="text-sm text-white/70">
+                          {selectedTrophy.type === 'global' 
+                            ? `Play ${selectedTrophy.requiredCourses - completedCount} more courses to unlock this trophy`
+                            : `Complete ${selectedTrophy.requiredCourses - (selectedTrophy.completed || 0)} more courses in ${selectedTrophy.name} to unlock this trophy`
+                          }
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+              <Dialog.Close asChild>
+                <button className="absolute top-4 right-4 text-white/60 hover:text-white transition-colors">
+                  ✕
+                </button>
+              </Dialog.Close>
+            </Dialog.Content>
+          </Dialog.Portal>
+        </Dialog.Root>
       </div>
     </Tooltip.Provider>
   );
