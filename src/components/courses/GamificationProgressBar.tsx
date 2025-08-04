@@ -510,6 +510,11 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                     setIsCourseListModalOpen(true);
                   }}
                 >
+                  {/* Region Name at Top */}
+                  <h4 className="text-lg font-semibold text-foreground text-center mb-4 w-full">
+                    {list.name}
+                  </h4>
+
                   {/* Top Row: Trophy Left, Progress Ring Right */}
                   <div className="flex items-center justify-between w-full mb-3">
                     {/* Trophy Icon - Left Side with enhanced styling */}
@@ -587,13 +592,8 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                     </div>
                   </div>
                   
-                  {/* Region Name */}
-                  <h4 className="text-lg font-semibold text-foreground text-center mb-1">
-                    {list.name}
-                  </h4>
-                  
-                  {/* Achievement Tag */}
-                  <div className="text-sm font-medium text-primary text-center mb-2">
+                  {/* Achievement Tag - Black Text */}
+                  <div className="text-sm font-medium text-black text-center mb-2">
                     {list.tag}
                   </div>
                   
@@ -602,8 +602,8 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                     {list.description}
                   </p>
                   
-                  {/* Subtle Tag with Course Count and XP */}
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  {/* Subtle Tag with Course Count and XP - Black Text */}
+                  <div className="flex items-center gap-2 text-sm text-black">
                     <span className="font-medium">Courses Played: {list.completed}</span>
                     <span>•</span>
                     <div className="flex items-center gap-1">
