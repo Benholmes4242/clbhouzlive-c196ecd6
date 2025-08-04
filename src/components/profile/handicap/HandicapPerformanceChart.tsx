@@ -30,22 +30,22 @@ const mockPerformanceData = [
 const HandicapPerformanceChart: React.FC = () => {
   return (
     <div className="w-full">
-      <h3 className="text-lg font-semibold mb-4 text-white">My Handicap Performance</h3>
+      <h3 className="text-lg font-semibold mb-4 text-foreground">My Handicap Performance</h3>
       <div className="h-64 w-full">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={mockPerformanceData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.2)" />
+            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
             <XAxis 
               dataKey="round" 
               axisLine={false}
               tickLine={false}
-              tick={{ fontSize: 12, fill: '#ffffff' }}
+              tick={{ fontSize: 12, fill: 'hsl(var(--foreground))' }}
             />
             <YAxis 
               domain={[0, 14]}
               axisLine={false}
               tickLine={false}
-              tick={{ fontSize: 12, fill: '#ffffff' }}
+              tick={{ fontSize: 12, fill: 'hsl(var(--foreground))' }}
             />
             <Line 
               type="monotone" 
@@ -79,23 +79,23 @@ const HandicapPerformanceChart: React.FC = () => {
       <div className="flex items-center gap-6 mt-4 text-sm">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full bg-green-500"></div>
-          <span className="text-white">Handicap Index®</span>
+          <span className="text-foreground">Handicap Index®</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-          <span className="text-white">Counting</span>
+          <span className="text-foreground">Counting</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full bg-red-500"></div>
-          <span className="text-white">Non-Counting</span>
+          <span className="text-foreground">Non-Counting</span>
         </div>
       </div>
 
       {/* Score filters */}
       <div className="flex gap-2 mt-4">
-        <Badge variant="destructive" className="text-xs text-white">Last 20 Scores</Badge>
-        <Badge variant="secondary" className="text-xs text-white bg-white/20 border-white/20">Last 50 Scores</Badge>
-        <Badge variant="secondary" className="text-xs text-white bg-white/20 border-white/20">Last 100 Scores</Badge>
+        <Badge variant="destructive" className="text-xs">Last 20 Scores</Badge>
+        <Badge variant="secondary" className="text-xs">Last 50 Scores</Badge>
+        <Badge variant="secondary" className="text-xs">Last 100 Scores</Badge>
       </div>
     </div>
   );

@@ -38,21 +38,21 @@ const StatCard: React.FC<StatCardProps> = ({
   };
 
   return (
-    <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-4 min-h-[100px] flex flex-col justify-center">
+    <div className="bg-muted border border-border rounded-lg p-4 min-h-[100px] flex flex-col justify-center">
       <div className="flex items-center gap-2 mb-2">
         <div className="text-primary/80">
           {icon}
         </div>
-        <span className="text-xs font-medium text-white/70 uppercase tracking-wide">
+        <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
           {label}
         </span>
       </div>
       
       <div className="flex items-baseline gap-2">
         {isLoading ? (
-          <div className="w-8 h-6 bg-white/20 animate-pulse rounded"></div>
+          <div className="w-8 h-6 bg-muted-foreground/20 animate-pulse rounded"></div>
         ) : (
-          <span className="text-2xl font-bold text-white">
+          <span className="text-2xl font-bold text-foreground">
             {value}
           </span>
         )}
@@ -60,7 +60,7 @@ const StatCard: React.FC<StatCardProps> = ({
       </div>
       
       {subtitle && (
-        <span className="text-xs text-white/50 mt-1">
+        <span className="text-xs text-muted-foreground mt-1">
           {subtitle}
         </span>
       )}

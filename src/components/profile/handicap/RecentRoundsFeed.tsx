@@ -59,34 +59,34 @@ const RoundCard: React.FC<{
   
   return (
     <div 
-      className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg p-4 hover:bg-white/15 transition-all duration-200 cursor-pointer group"
+      className="bg-muted border border-border rounded-lg p-4 hover:bg-muted/80 transition-all duration-200 cursor-pointer group"
       onClick={() => onClick?.(round)}
     >
       <div className="flex items-center justify-between">
         <div className="flex-1">
           {/* Course and Date */}
           <div className="flex items-center gap-2 mb-2">
-            <MapPin className="h-4 w-4 text-white/60" />
-            <span className="font-medium text-white">{round.courseName}</span>
-            <span className="text-xs text-white/50">•</span>
-            <span className="text-sm text-white/70">{round.date}</span>
+            <MapPin className="h-4 w-4 text-muted-foreground" />
+            <span className="font-medium text-foreground">{round.courseName}</span>
+            <span className="text-xs text-muted-foreground">•</span>
+            <span className="text-sm text-muted-foreground">{round.date}</span>
           </div>
           
           {/* Score and Performance */}
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <Trophy className="h-4 w-4 text-white/60" />
-              <span className="text-white font-medium">
+              <Trophy className="h-4 w-4 text-muted-foreground" />
+              <span className="text-foreground font-medium">
                 {round.score}
               </span>
-              <span className="text-white/50 text-sm">
+              <span className="text-muted-foreground text-sm">
                 ({scoreToPar > 0 ? '+' : ''}{scoreToPar})
               </span>
             </div>
             
             <div className="flex items-center gap-1 text-sm">
-              <span className="text-white/60">Diff:</span>
-              <span className="text-white">{round.differential.toFixed(1)}</span>
+              <span className="text-muted-foreground">Diff:</span>
+              <span className="text-foreground">{round.differential.toFixed(1)}</span>
             </div>
           </div>
         </div>
@@ -112,7 +112,7 @@ const RoundCard: React.FC<{
             </div>
           )}
           
-          <ChevronRight className="h-4 w-4 text-white/40 group-hover:text-white/70 transition-colors" />
+          <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
         </div>
       </div>
     </div>
@@ -242,9 +242,9 @@ const RecentRoundsFeed: React.FC<RecentRoundsFeedProps> = ({
   if (rounds.length === 0) {
     return (
       <div className="text-center py-8">
-        <Calendar className="h-12 w-12 mx-auto mb-4 text-white/50" />
-        <p className="text-white/70 mb-2">No rounds recorded yet</p>
-        <p className="text-sm text-white/50">
+        <Calendar className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+        <p className="text-muted-foreground mb-2">No rounds recorded yet</p>
+        <p className="text-sm text-muted-foreground">
           Start tracking your golf rounds to see them here
         </p>
       </div>
@@ -256,7 +256,7 @@ const RecentRoundsFeed: React.FC<RecentRoundsFeedProps> = ({
       <div className="space-y-4">
         {/* Sort controls */}
         <div className="flex items-center gap-2">
-          <span className="text-sm text-white/70">Sort by:</span>
+          <span className="text-sm text-muted-foreground">Sort by:</span>
           <Button
             variant={sortBy === 'recent' ? 'default' : 'ghost'}
             size="sm"

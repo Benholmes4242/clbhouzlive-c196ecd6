@@ -28,17 +28,17 @@ const CustomTooltip: React.FC<any> = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     const data = payload[0].payload;
     return (
-      <div className="bg-black/80 backdrop-blur-sm border border-white/20 rounded-lg p-3 shadow-lg">
-        <p className="text-white font-medium">Round #{data.round}</p>
-        <p className="text-white/70 text-sm">{data.date}</p>
+      <div className="bg-popover border border-border rounded-lg p-3 shadow-lg">
+        <p className="text-foreground font-medium">Round #{data.round}</p>
+        <p className="text-muted-foreground text-sm">{data.date}</p>
         <div className="flex items-center gap-2 mt-1">
           <div className="w-2 h-2 rounded-full bg-primary"></div>
-          <span className="text-white">
+          <span className="text-foreground">
             Handicap: <span className="font-bold">{data.handicap.toFixed(1)}</span>
           </span>
         </div>
         {data.courseName && (
-          <p className="text-white/60 text-xs mt-1">{data.courseName}</p>
+          <p className="text-muted-foreground text-xs mt-1">{data.courseName}</p>
         )}
       </div>
     );
@@ -52,10 +52,10 @@ const HandicapProgressChart: React.FC<HandicapProgressChartProps> = ({
 }) => {
   if (isLoading) {
     return (
-      <div className="h-64 w-full bg-white/5 rounded-lg flex items-center justify-center">
+      <div className="h-64 w-full bg-muted rounded-lg flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 border-2 border-gray-300 border-t-transparent rounded-full animate-spin"></div>
-          <span className="text-white/70 text-sm">Loading chart...</span>
+          <span className="text-muted-foreground text-sm">Loading chart...</span>
         </div>
       </div>
     );
@@ -63,11 +63,11 @@ const HandicapProgressChart: React.FC<HandicapProgressChartProps> = ({
 
   if (!data || data.length === 0) {
     return (
-      <div className="h-64 w-full bg-white/5 rounded-lg flex items-center justify-center">
+      <div className="h-64 w-full bg-muted rounded-lg flex items-center justify-center">
         <div className="text-center">
-          <div className="text-white/50 mb-2">📈</div>
-          <p className="text-white/70">No handicap data available</p>
-          <p className="text-white/50 text-sm">Start recording rounds to see your progress</p>
+          <div className="text-muted-foreground mb-2">📈</div>
+          <p className="text-muted-foreground">No handicap data available</p>
+          <p className="text-muted-foreground text-sm">Start recording rounds to see your progress</p>
         </div>
       </div>
     );
@@ -106,7 +106,7 @@ const HandicapProgressChart: React.FC<HandicapProgressChartProps> = ({
               dataKey="round"
               axisLine={false}
               tickLine={false}
-              tick={{ fontSize: 12, fill: 'rgba(255,255,255,0.7)' }}
+              tick={{ fontSize: 12, fill: 'hsl(var(--foreground))' }}
               tickFormatter={(value) => `R${value}`}
             />
             
@@ -114,7 +114,7 @@ const HandicapProgressChart: React.FC<HandicapProgressChartProps> = ({
               domain={yDomain}
               axisLine={false}
               tickLine={false}
-              tick={{ fontSize: 12, fill: 'rgba(255,255,255,0.7)' }}
+              tick={{ fontSize: 12, fill: 'hsl(var(--foreground))' }}
               tickFormatter={(value) => value.toFixed(1)}
             />
             
@@ -151,10 +151,10 @@ const HandicapProgressChart: React.FC<HandicapProgressChartProps> = ({
       <div className="flex items-center justify-between mt-4 text-sm">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full bg-primary"></div>
-          <span className="text-white/70">Handicap Index</span>
+          <span className="text-foreground">Handicap Index</span>
         </div>
         
-        <div className="text-white/50 text-xs">
+        <div className="text-muted-foreground text-xs">
           Last {data.length} rounds
         </div>
       </div>

@@ -14,24 +14,24 @@ const ConnectHandicapPrompt: React.FC<ConnectHandicapPromptProps> = ({
   className = ''
 }) => {
   return (
-    <div className={`bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-sm border border-white/20 rounded-lg p-8 text-center ${className}`}>
+    <div className={`bg-muted border border-border rounded-lg p-8 text-center ${className}`}>
       {/* Icon */}
       <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
         <TrendingUp className="h-8 w-8 text-primary" />
       </div>
       
       {/* Heading */}
-      <h3 className="text-xl font-bold text-white mb-2">
+      <h3 className="text-xl font-bold text-foreground mb-2">
         Track Your Handicap Progress
       </h3>
       
       {/* Description */}
-      <p className="text-white/70 mb-6 max-w-md mx-auto">
+      <p className="text-muted-foreground mb-6 max-w-md mx-auto">
         Connect your England Golf account or manually enter rounds to track your handicap history and see detailed progress analytics.
       </p>
       
       {/* Benefits list */}
-      <div className="space-y-2 mb-6 text-sm text-white/60">
+      <div className="space-y-2 mb-6 text-sm text-muted-foreground">
         <div className="flex items-center justify-center gap-2">
           <Trophy className="h-4 w-4 text-primary" />
           <span>Automatic handicap calculation</span>
@@ -50,7 +50,6 @@ const ConnectHandicapPrompt: React.FC<ConnectHandicapPromptProps> = ({
       <div className="flex flex-col sm:flex-row gap-3 justify-center">
         <Button 
           onClick={onConnectClick}
-          className="bg-primary hover:bg-primary/90 text-white font-medium"
         >
           <Link className="h-4 w-4 mr-2" />
           Connect England Golf
@@ -59,14 +58,13 @@ const ConnectHandicapPrompt: React.FC<ConnectHandicapPromptProps> = ({
         <Button 
           variant="outline" 
           onClick={onManualEntryClick}
-          className="border-white/30 text-white hover:bg-white/10"
         >
           Enter Rounds Manually
         </Button>
       </div>
       
       {/* Footer note */}
-      <p className="text-xs text-white/40 mt-4">
+      <p className="text-xs text-muted-foreground mt-4">
         Your handicap data is kept private and secure
       </p>
     </div>
