@@ -25,13 +25,13 @@ const ProfileBadgeStrip: React.FC<ProfileBadgeStripProps> = ({
 }) => {
   const badges = [];
 
-  // Trophy Level Badge
+  // Trophy Level Badge - Skip rookie since it's shown in profile ring
   const getTrophyBadge = () => {
     if (coursesPlayed >= 300) return { emoji: '👑', name: 'Legend', color: 'from-purple-500 to-violet-600' };
     if (coursesPlayed >= 200) return { emoji: '🏆', name: 'Elite', color: 'from-emerald-500 to-green-600' };
     if (coursesPlayed >= 100) return { emoji: '🥇', name: 'Century', color: 'from-blue-500 to-indigo-600' };
     if (coursesPlayed >= 50) return { emoji: '🥈', name: 'Turn', color: 'from-gray-400 to-slate-500' };
-    if (coursesPlayed >= 20) return { emoji: '🥉', name: 'Rookie', color: 'from-amber-500 to-yellow-600' };
+    // Skip rookie badge since it's now shown as profile ring
     return null;
   };
 
