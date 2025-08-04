@@ -491,17 +491,17 @@ const HeroProfileHeader = ({
           {/* Profile Photo/Video */}
           <div className="w-64 h-64 mb-6">
             <div 
-              className={`relative rounded-full p-1 transition-all duration-300 ${
-                achievementRing.ringClass === 'ring-gold' ? 'ring-4 ring-yellow-400 shadow-[0_0_20px_rgba(255,215,0,0.3)]' :
-                achievementRing.ringClass === 'ring-silver' ? 'ring-4 ring-gray-400 shadow-[0_0_20px_rgba(192,192,192,0.3)]' :
-                achievementRing.ringClass === 'ring-blue' ? 'ring-4 ring-blue-400 shadow-[0_0_20px_rgba(30,144,255,0.3)]' :
-                achievementRing.ringClass === 'ring-green' ? 'ring-4 ring-green-400 shadow-[0_0_20px_rgba(50,205,50,0.3)]' :
-                achievementRing.ringClass === 'ring-gradient' ? 'bg-gradient-to-r from-yellow-400 to-green-400 p-1.5 shadow-[0_0_25px_rgba(255,215,0,0.4)]' :
+              className={`relative rounded-full transition-all duration-300 ${
+                achievementRing.ringClass === 'ring-gold' ? 'ring-[5px] ring-yellow-400 shadow-[0_0_20px_rgba(255,215,0,0.3)]' :
+                achievementRing.ringClass === 'ring-silver' ? 'ring-[5px] ring-gray-400 shadow-[0_0_20px_rgba(192,192,192,0.3)]' :
+                achievementRing.ringClass === 'ring-blue' ? 'ring-[5px] ring-blue-400 shadow-[0_0_20px_rgba(30,144,255,0.3)]' :
+                achievementRing.ringClass === 'ring-green' ? 'ring-[5px] ring-green-400 shadow-[0_0_20px_rgba(50,205,50,0.3)]' :
+                achievementRing.ringClass === 'ring-gradient' ? 'ring-[5px] ring-transparent bg-gradient-to-r from-yellow-400 to-green-400 shadow-[0_0_25px_rgba(255,215,0,0.4)]' :
                 ''
               } w-full h-full`}
               title={achievementRing.title}
             >
-              <div className={achievementRing.ringClass === 'ring-gradient' ? 'rounded-full overflow-hidden' : 'w-full h-full'}>
+              <div className={`w-full h-full rounded-full overflow-hidden ${achievementRing.ringClass === 'ring-gradient' ? 'bg-white p-[5px]' : ''}`}>
               {profile?.has_profile_video && profile?.profile_video_url ? (
                 <ProfileVideoDisplay
                   videoUrl={profile.profile_video_url}
