@@ -367,11 +367,21 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                 <div
                   key={list.id}
                   className={cn(
-                    'p-3 rounded-lg border transition-all h-24',
+                    'p-3 rounded-lg border transition-all h-24 cursor-pointer hover:scale-105',
                     list.isCompleted
                       ? 'bg-green-500/20 border-green-400/30'
                       : 'bg-white/5 border-white/10'
                   )}
+                  onClick={() => {
+                    setSelectedTrophy({
+                      ...list,
+                      type: 'regional',
+                      dateEarned: list.isCompleted ? 'July 2025' : null,
+                      description: `Complete all courses in the ${list.name} list`,
+                      requiredCourses: list.total
+                    });
+                    setIsModalOpen(true);
+                  }}
                 >
                   {list.id === 'britain-ireland' ? (
                     // Special layout for GB&I with trophy
