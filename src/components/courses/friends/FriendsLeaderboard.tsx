@@ -65,52 +65,82 @@ const FriendsLeaderboard: React.FC<FriendsLeaderboardProps> = ({
 
   if (isLoading) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5" />
-            Friends' Progress
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-3">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="flex items-center gap-3 animate-pulse">
-                <div className="w-10 h-10 bg-muted rounded-full" />
-                <div className="flex-1 space-y-1">
-                  <div className="h-4 bg-muted rounded w-24" />
-                  <div className="h-3 bg-muted rounded w-16" />
+      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+        <Card>
+          <CollapsibleTrigger asChild>
+            <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Users className="h-5 w-5" />
+                  Friends' Progress
                 </div>
-                <div className="h-4 bg-muted rounded w-12" />
+                <ChevronDown 
+                  className={cn(
+                    "h-4 w-4 transition-transform duration-200",
+                    isOpen && "rotate-180"
+                  )}
+                />
+              </CardTitle>
+            </CardHeader>
+          </CollapsibleTrigger>
+          
+          <CollapsibleContent>
+            <CardContent>
+              <div className="space-y-3">
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="flex items-center gap-3 animate-pulse">
+                    <div className="w-10 h-10 bg-muted rounded-full" />
+                    <div className="flex-1 space-y-1">
+                      <div className="h-4 bg-muted rounded w-24" />
+                      <div className="h-3 bg-muted rounded w-16" />
+                    </div>
+                    <div className="h-4 bg-muted rounded w-12" />
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </CollapsibleContent>
+        </Card>
+      </Collapsible>
     );
   }
 
   if (friends.length === 0) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Users className="h-5 w-5" />
-            Friends' Progress
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="text-center py-8">
-          <UserPlus className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-          <h3 className="text-lg font-semibold mb-2">Invite your golf friends!</h3>
-          <p className="text-muted-foreground mb-4">
-            Compare your golfing journeys and see who's conquered the most legendary courses.
-          </p>
-          <Button onClick={onInviteFriends} className="gap-2">
-            <UserPlus className="h-4 w-4" />
-            Invite Friends to Clbhouz
-          </Button>
-        </CardContent>
-      </Card>
+      <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+        <Card>
+          <CollapsibleTrigger asChild>
+            <CardHeader className="cursor-pointer hover:bg-muted/50 transition-colors">
+              <CardTitle className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Users className="h-5 w-5" />
+                  Friends' Progress
+                </div>
+                <ChevronDown 
+                  className={cn(
+                    "h-4 w-4 transition-transform duration-200",
+                    isOpen && "rotate-180"
+                  )}
+                />
+              </CardTitle>
+            </CardHeader>
+          </CollapsibleTrigger>
+          
+          <CollapsibleContent>
+            <CardContent className="text-center py-8">
+              <UserPlus className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+              <h3 className="text-lg font-semibold mb-2">Invite your golf friends!</h3>
+              <p className="text-muted-foreground mb-4">
+                Compare your golfing journeys and see who's conquered the most legendary courses.
+              </p>
+              <Button onClick={onInviteFriends} className="gap-2">
+                <UserPlus className="h-4 w-4" />
+                Invite Friends to Clbhouz
+              </Button>
+            </CardContent>
+          </CollapsibleContent>
+        </Card>
+      </Collapsible>
     );
   }
 
