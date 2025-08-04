@@ -147,22 +147,21 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
                     <TooltipTrigger asChild>
                       <button
                         onClick={() => onFilterChange(activeFilter === tile.key ? null : tile.key)}
-                        className={`flex items-center justify-center gap-2 cursor-pointer transition-colors whitespace-nowrap px-6 py-2 text-base font-medium rounded-lg ${
+                        className={`flex items-center gap-2 text-base font-medium whitespace-nowrap px-6 py-2 transition-colors ${
                           activeFilter === tile.key 
                             ? 'bg-primary text-white shadow-md' 
                             : 'bg-muted border border-border text-foreground hover:bg-muted/80'
                         }`}
+                        style={{ borderRadius: '8px' }}
                       >
-                        <div className="flex items-center justify-center gap-2">
-                          {tile.flag === 'earth' ? (
-                            <Earth className="w-5 h-5 flex-shrink-0" />
-                          ) : (
-                            <CountryFlag country={tile.country} size="md" className="flex-shrink-0" />
-                          )}
-                          <span className="text-sm font-medium">
-                            {tile.progress.played}/{tile.progress.total}
-                          </span>
-                        </div>
+                        {tile.flag === 'earth' ? (
+                          <Earth className="w-5 h-5 flex-shrink-0" />
+                        ) : (
+                          <CountryFlag country={tile.country} size="md" className="flex-shrink-0" />
+                        )}
+                        <span className="text-base font-medium">
+                          {tile.progress.played}/{tile.progress.total}
+                        </span>
                       </button>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -181,22 +180,21 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
                     <TooltipTrigger asChild>
                       <button
                         onClick={() => onFilterChange(activeFilter === tile.key ? null : tile.key)}
-                        className={`flex items-center justify-center gap-1 cursor-pointer transition-colors px-4 py-2 text-sm font-medium rounded-lg ${
+                        className={`flex items-center gap-2 text-base font-medium whitespace-nowrap px-4 py-2 transition-colors ${
                           activeFilter === tile.key 
                             ? 'bg-primary text-white shadow-md' 
                             : 'bg-muted border border-border text-foreground hover:bg-muted/80'
                         }`}
+                        style={{ borderRadius: '8px' }}
                       >
-                        <div className="flex flex-col items-center justify-center gap-0.5">
-                          {tile.flag === 'earth' ? (
-                            <Earth className="w-4 h-4 flex-shrink-0" />
-                          ) : (
-                            <CountryFlag country={tile.country} size="sm" className="flex-shrink-0" />
-                          )}
-                          <span className="text-xs font-medium">
-                            {tile.progress.played}/{tile.progress.total}
-                          </span>
-                        </div>
+                        {tile.flag === 'earth' ? (
+                          <Earth className="w-5 h-5 flex-shrink-0" />
+                        ) : (
+                          <CountryFlag country={tile.country} size="md" className="flex-shrink-0" />
+                        )}
+                        <span className="text-sm font-medium">
+                          {tile.progress.played}/{tile.progress.total}
+                        </span>
                       </button>
                     </TooltipTrigger>
                     <TooltipContent>
