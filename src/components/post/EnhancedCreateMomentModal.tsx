@@ -6,6 +6,7 @@ import CourseTagInput from '../posts/CourseTagInput';
 import GolfCoursePin from '../posts/GolfCoursePin';
 import EnhancedMediaUpload from '../posts/EnhancedMediaUpload';
 import EnhancedRichTextInput from '../posts/EnhancedRichTextInput';
+import SmartCompilation from '../posts/SmartCompilation';
 import { useTaggableEntities } from '@/hooks/useTaggableEntities';
 import { useToast } from '@/hooks/use-toast';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -510,6 +511,24 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                     </div>
                   </div>
                 )}
+
+                {/* 3.5. Smart Compilation - AI Video Editor */}
+                <SmartCompilation
+                  files={files}
+                  onCompilationComplete={(compiledFile, suggestedCaption) => {
+                    // Replace existing files with the compilation
+                    setFiles([compiledFile]);
+                    
+                    // Update caption with AI suggestion if it's empty
+                    if (!caption.trim()) {
+                      setCaption(suggestedCaption);
+                    } else {
+                      // Append to existing caption if there's already content
+                      setCaption(prev => prev + '\n\n' + suggestedCaption);
+                    }
+                  }}
+                  disabled={isSubmitting}
+                />
 
                 {/* 4. Post Visibility Toggle */}
                 <div className="space-y-4 pt-6">
