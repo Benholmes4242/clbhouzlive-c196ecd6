@@ -3,7 +3,6 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Globe, MapPin, Crown, Star } from 'lucide-react';
 import { useSwipeable } from 'react-swipeable';
 import GBITestModal from '@/components/courses/GBITestModal';
-import gbiGolfCourse from '@/assets/gbi-golf-course.jpg';
 
 const courseListData = [
   {
@@ -18,8 +17,8 @@ const courseListData = [
     id: 'gbi',
     title: 'GB&I Top 100',
     description: 'Great Britain & Ireland\'s finest',
-    color: '',
-    backgroundImage: gbiGolfCourse
+    color: 'bg-gradient-to-br from-green-500 to-green-600',
+    backgroundImage: 'https://images.unsplash.com/photo-1587174486073-ae5e5cff23aa?w=600&h=400&fit=crop'
   },
   {
     id: 'europe',
