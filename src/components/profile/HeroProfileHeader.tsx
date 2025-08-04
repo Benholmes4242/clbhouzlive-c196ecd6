@@ -501,7 +501,8 @@ const HeroProfileHeader = ({
                         };
                         input.click();
                       }}
-                      className="bg-white/30 backdrop-blur-md border-2 border-white/50 rounded-full px-4 py-2 text-white text-sm font-semibold hover:bg-white/40 hover:scale-105 transition-all duration-200 shadow-lg"
+                      className="bg-white/5 backdrop-blur-2xl border border-white/20 shadow-[0_0_20px_rgba(0,0,0,0.2)] rounded-lg text-white font-medium hover:bg-white/10 transition-all duration-300 ease-in-out px-4 py-2 text-sm"
+                      style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
                       disabled={uploading}
                     >
                       📷 Edit Photo
@@ -511,7 +512,8 @@ const HeroProfileHeader = ({
                         e.stopPropagation();
                         setEditDialogOpen(true);
                       }}
-                      className="bg-white/30 backdrop-blur-md border-2 border-white/50 rounded-full px-4 py-2 text-white text-sm font-semibold hover:bg-white/40 hover:scale-105 transition-all duration-200 shadow-lg"
+                      className="bg-white/5 backdrop-blur-2xl border border-white/20 shadow-[0_0_20px_rgba(0,0,0,0.2)] rounded-lg text-white font-medium hover:bg-white/10 transition-all duration-300 ease-in-out px-4 py-2 text-sm"
+                      style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
                       disabled={uploading}
                     >
                       🎥 Add Video
