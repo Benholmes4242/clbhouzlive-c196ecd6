@@ -6,6 +6,8 @@ import * as Tooltip from '@radix-ui/react-tooltip';
 interface GamificationProgressBarProps {
   completedCount: number;
   className?: string;
+  userFirstName?: string; // For displaying other users' progress
+  isCurrentUser?: boolean; // To determine if showing current user or another user
   // Regional completion data
   britainIrelandCompleted?: number;
   britainIrelandTotal?: number;
@@ -121,6 +123,8 @@ const TrophyIcon: React.FC<{
 const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
   completedCount,
   className = '',
+  userFirstName,
+  isCurrentUser = true,
   britainIrelandCompleted = 0,
   britainIrelandTotal = 100,
   europeCompleted = 0,
@@ -223,7 +227,10 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
             {/* Header with XP Counter */}
             <div className="flex items-center justify-between">
             <h4 className="text-xl font-semibold text-white">
-              You've played {completedCount} of 300 top 100 courses
+              {isCurrentUser 
+                ? `You've played ${completedCount} of 300 top 100 courses`
+                : `${userFirstName || 'User'} has played ${completedCount} of 300 top 100 courses`
+              }
             </h4>
               <div className="text-lg font-bold text-white transition-all duration-500">
                 Total XP: {currentXP.toLocaleString()}
