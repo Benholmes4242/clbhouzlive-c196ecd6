@@ -31,7 +31,7 @@ interface GamificationProgressBarProps {
 const GLOBAL_TROPHIES = [
   {
     id: 'green-fee-rookie',
-    name: 'The Green Fee Rookie',
+    name: 'The 20 Club',
     requiredCourses: 20,
     xp: 2200,
     color: 'from-amber-500 to-yellow-600',
@@ -39,7 +39,7 @@ const GLOBAL_TROPHIES = [
   },
   {
     id: 'the-turn',
-    name: 'The Turn',
+    name: 'The 50 Club',
     requiredCourses: 50,
     xp: 5500,
     color: 'from-gray-400 to-slate-500',
@@ -47,7 +47,7 @@ const GLOBAL_TROPHIES = [
   },
   {
     id: 'century-club',
-    name: 'Century Club',
+    name: 'The Century Club',
     requiredCourses: 100,
     xp: 11000,
     color: 'from-blue-500 to-indigo-600',
@@ -63,7 +63,7 @@ const GLOBAL_TROPHIES = [
   },
   {
     id: 'course-collector',
-    name: 'Course Collector',
+    name: 'Club Collector',
     requiredCourses: 300,
     xp: 33000,
     color: 'from-purple-500 to-violet-600',

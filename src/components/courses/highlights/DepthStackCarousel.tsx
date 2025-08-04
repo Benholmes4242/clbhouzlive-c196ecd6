@@ -248,7 +248,7 @@ const LiquidGlassCard: React.FC<{ userId?: string }> = ({ userId }) => {
     achievements: [
       { 
         id: 'links-legend', 
-        name: 'Links Legend', 
+        name: 'Clubhouse Elite', 
         description: "You've mastered the finest across the British Isles", 
         target: 100, 
         earned: false, 
@@ -272,7 +272,7 @@ const LiquidGlassCard: React.FC<{ userId?: string }> = ({ userId }) => {
       },
       { 
         id: '20-club', 
-        name: 'Green Fee Rookie', 
+        name: 'The 20 Club', 
         description: "You've paid your dues - 20 down!", 
         target: 20, 
         earned: true, 
@@ -280,7 +280,7 @@ const LiquidGlassCard: React.FC<{ userId?: string }> = ({ userId }) => {
       },
       { 
         id: '50-club', 
-        name: 'The Turn', 
+        name: 'The 50 Club', 
         description: 'Halfway through your Top 100 journey', 
         target: 50, 
         earned: false, 
@@ -304,7 +304,7 @@ const LiquidGlassCard: React.FC<{ userId?: string }> = ({ userId }) => {
       },
       { 
         id: '300-club', 
-        name: 'Course Collector', 
+        name: 'Club Collector', 
         description: "All 300? That's a collector's dream come true", 
         target: 300, 
         earned: false, 

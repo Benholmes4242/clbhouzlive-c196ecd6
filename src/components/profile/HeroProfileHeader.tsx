@@ -273,15 +273,15 @@ const HeroProfileHeader = ({
   // Achievement ring calculation
   const getAchievementRing = (coursesPlayed: number): AchievementRing => {
     if (coursesPlayed >= 300) {
-      return { level: 5, title: "🌈 Course Collector", ringClass: "ring-gradient", color: "gradient", courses: 300 };
+      return { level: 5, title: "🌈 Club Collector", ringClass: "ring-gradient", color: "gradient", courses: 300 };
     } else if (coursesPlayed >= 200) {
       return { level: 4, title: "🟢 Clubhouse Elite", ringClass: "ring-green", color: "#32CD32", courses: 200 };
     } else if (coursesPlayed >= 100) {
       return { level: 3, title: "💙 Century Club", ringClass: "ring-blue", color: "#1E90FF", courses: 100 };
     } else if (coursesPlayed >= 50) {
-      return { level: 2, title: "🥈 The Turn", ringClass: "ring-silver", color: "#C0C0C0", courses: 50 };
+      return { level: 2, title: "🥈 The 50 Club", ringClass: "ring-silver", color: "#C0C0C0", courses: 50 };
     } else if (coursesPlayed >= 20) {
-      return { level: 1, title: "🟡 Rookie", ringClass: "ring-gold", color: "#FFD700", courses: 20 };
+      return { level: 1, title: "🟡 The 20 Club", ringClass: "ring-gold", color: "#FFD700", courses: 20 };
     } else {
       return { level: 0, title: "", ringClass: "ring-none", color: "transparent", courses: 0 };
     }

@@ -58,14 +58,14 @@ const ProfileProgressSection: React.FC<ProfileProgressSectionProps> = ({
   const displayTrophies = [
     {
       id: 'green-fee-rookie',
-      name: 'Rookie',
+      name: 'The 20 Club',
       emoji: '🥉',
       isUnlocked: coursesPlayed >= 20,
       requiredCourses: 20,
     },
     {
       id: 'the-turn',
-      name: 'The Turn',
+      name: 'The 50 Club',
       emoji: '🥈',
       isUnlocked: coursesPlayed >= 50,
       requiredCourses: 50,

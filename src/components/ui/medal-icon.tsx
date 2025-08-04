@@ -23,11 +23,11 @@ const MedalIcon: React.FC<MedalIconProps> = ({ className, size = 'md', type = '2
   };
 
   const altText = {
-    '20-club': 'Green Fee Rookie Trophy',
-    '50-club': 'The Turn Trophy',
-    '100-club': 'Century Club Trophy',
-    '200-club': 'Links Legend Trophy',
-    '300-club': 'Course Collector Badge'
+    '20-club': 'The 20 Club Trophy',
+    '50-club': 'The 50 Club Trophy',
+    '100-club': 'The Century Club Trophy',
+    '200-club': 'Clubhouse Elite Trophy',
+    '300-club': 'Club Collector Badge'
   };
 
   return (
