@@ -386,7 +386,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                             src="/lovable-uploads/7df94753-adb7-43b1-8ea8-380234f3318f.png" 
                             alt="British & Irish Trophy" 
                             className={cn(
-                              'h-10 w-auto object-contain transition-all duration-300',
+                              'h-16 w-auto object-contain transition-all duration-300',
                               list.isCompleted ? 'opacity-100' : 'opacity-60 grayscale'
                             )}
                           />
@@ -395,7 +395,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                             src="/lovable-uploads/fa5756cb-1a89-478b-b8ad-8d26168c1f4f.png" 
                             alt="European Trophy" 
                             className={cn(
-                              'h-10 w-auto object-contain transition-all duration-300',
+                              'h-16 w-auto object-contain transition-all duration-300',
                               list.isCompleted ? 'opacity-100' : 'opacity-60 grayscale'
                             )}
                           />
@@ -404,7 +404,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                             src="/lovable-uploads/7ae756b6-b8e6-4d03-a6ee-f8c336eec047.png" 
                             alt="USA Trophy" 
                             className={cn(
-                              'h-10 w-auto object-contain transition-all duration-300',
+                              'h-16 w-auto object-contain transition-all duration-300',
                               list.isCompleted ? 'opacity-100' : 'opacity-60 grayscale'
                             )}
                           />
@@ -413,20 +413,11 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                             src="/lovable-uploads/ab0f852c-4e2f-408d-a13c-ef3a595470e8.png" 
                             alt="Worldwide Trophy" 
                             className={cn(
-                              'h-10 w-auto object-contain transition-all duration-300',
+                              'h-16 w-auto object-contain transition-all duration-300',
                               list.isCompleted ? 'opacity-100' : 'opacity-60 grayscale'
                             )}
                           />
                         ) : null}
-                        
-                        {/* Padlock overlay for locked trophies */}
-                        {!list.isCompleted && (
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="bg-black/60 rounded-full p-0.5">
-                              <Lock className="w-3 h-3 text-white" />
-                            </div>
-                          </div>
-                        )}
                       </div>
                     </div>
                     
