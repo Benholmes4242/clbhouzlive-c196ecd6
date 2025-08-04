@@ -513,12 +513,12 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                             alt="British & Irish Trophy" 
                             className={cn(
                               'h-16 w-auto object-contain transition-all duration-300',
-                              list.isCompleted ? 'opacity-100 brightness-110' : 'opacity-60 grayscale'
+                              list.isCompleted ? 'opacity-100 brightness-110' : 'opacity-60'
                             )}
                             style={{ 
                               filter: list.isCompleted 
                                 ? 'drop-shadow(0 2px 4px rgba(0,0,0,0.08)) brightness(1.1)' 
-                                : 'drop-shadow(0 1px 2px rgba(0,0,0,0.04)) grayscale(1)'
+                                : 'drop-shadow(0 1px 2px rgba(0,0,0,0.04))'
                             }}
                           />
                         ) : list.id === 'europe' ? (
@@ -527,12 +527,12 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                             alt="European Trophy" 
                             className={cn(
                               'h-16 w-auto object-contain transition-all duration-300',
-                              list.isCompleted ? 'opacity-100 brightness-110' : 'opacity-60 grayscale'
+                              list.isCompleted ? 'opacity-100 brightness-110' : 'opacity-60'
                             )}
                             style={{ 
                               filter: list.isCompleted 
                                 ? 'drop-shadow(0 2px 4px rgba(0,0,0,0.08)) brightness(1.1)' 
-                                : 'drop-shadow(0 1px 2px rgba(0,0,0,0.04)) grayscale(1)'
+                                : 'drop-shadow(0 1px 2px rgba(0,0,0,0.04))'
                             }}
                           />
                         ) : list.id === 'usa' ? (
@@ -541,12 +541,12 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                             alt="USA Trophy" 
                             className={cn(
                               'h-16 w-auto object-contain transition-all duration-300',
-                              list.isCompleted ? 'opacity-100 brightness-110' : 'opacity-60 grayscale'
+                              list.isCompleted ? 'opacity-100 brightness-110' : 'opacity-60'
                             )}
                             style={{ 
                               filter: list.isCompleted 
                                 ? 'drop-shadow(0 2px 4px rgba(0,0,0,0.08)) brightness(1.1)' 
-                                : 'drop-shadow(0 1px 2px rgba(0,0,0,0.04)) grayscale(1)'
+                                : 'drop-shadow(0 1px 2px rgba(0,0,0,0.04))'
                             }}
                           />
                         ) : list.id === 'worldwide' ? (
@@ -555,12 +555,12 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                             alt="Worldwide Trophy" 
                             className={cn(
                               'h-16 w-auto object-contain transition-all duration-300',
-                              list.isCompleted ? 'opacity-100 brightness-110' : 'opacity-60 grayscale'
+                              list.isCompleted ? 'opacity-100 brightness-110' : 'opacity-60'
                             )}
                             style={{ 
                               filter: list.isCompleted 
                                 ? 'drop-shadow(0 2px 4px rgba(0,0,0,0.08)) brightness(1.1)' 
-                                : 'drop-shadow(0 1px 2px rgba(0,0,0,0.04)) grayscale(1)'
+                                : 'drop-shadow(0 1px 2px rgba(0,0,0,0.04))'
                             }}
                           />
                         ) : null}
