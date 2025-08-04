@@ -66,7 +66,7 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
         <div className="text-sm font-bold text-white">
           {completed}/{total}
         </div>
-        <div className="text-xs text-white/50">
+        <div className="text-xs text-white">
           completed
         </div>
       </div>
