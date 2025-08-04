@@ -147,31 +147,17 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
                     <TooltipTrigger asChild>
                       <button
                         onClick={() => onFilterChange(activeFilter === tile.key ? null : tile.key)}
-                        className={`relative flex items-center justify-center gap-1 cursor-pointer transition-colors whitespace-nowrap px-4 py-1 shadow-lg shadow-black/10 text-base font-medium overflow-hidden h-10 ${
+                        className={`relative flex items-center justify-center gap-1 cursor-pointer transition-colors whitespace-nowrap px-4 py-1 text-base font-medium overflow-hidden h-10 ${
                           activeFilter === tile.key 
-                            ? 'text-white' 
-                            : 'text-white hover:bg-white/20'
+                            ? 'bg-primary text-white shadow-lg' 
+                            : 'bg-muted border border-border text-foreground hover:bg-muted/80'
                         }`}
                         style={{ borderRadius: '8px' }}
                       >
-                        {/* Liquid glass background */}
-                        <div 
-                          className={`absolute inset-0 ${
-                            activeFilter === tile.key 
-                              ? 'bg-white/20 border border-white/30' 
-                              : 'bg-white/10 border border-white/20'
-                          }`}
-                          style={{ 
-                            backdropFilter: 'blur(40px) saturate(180%)',
-                            borderRadius: '8px'
-                          }}
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" style={{ borderRadius: '8px' }} />
-                        
                         {/* Content */}
-                        <div className="relative flex items-center justify-center gap-1">
+                        <div className="flex items-center justify-center gap-1">
                           {tile.flag === 'earth' ? (
-                            <Earth className="w-7 h-6 text-white flex-shrink-0" />
+                            <Earth className="w-7 h-6 flex-shrink-0" />
                           ) : (
                             <CountryFlag country={tile.country} size="lg" className="flex-shrink-0" />
                           )}
@@ -197,31 +183,17 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
                     <TooltipTrigger asChild>
                       <button
                         onClick={() => onFilterChange(activeFilter === tile.key ? null : tile.key)}
-                        className={`relative flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors px-2 py-0.5 shadow-lg shadow-black/10 text-sm font-medium overflow-hidden ${
+                        className={`relative flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors px-2 py-0.5 text-sm font-medium overflow-hidden ${
                           activeFilter === tile.key 
-                            ? 'text-white' 
-                            : 'text-white hover:bg-white/20'
+                            ? 'bg-primary text-white shadow-lg' 
+                            : 'bg-muted border border-border text-foreground hover:bg-muted/80'
                         }`}
                         style={{ borderRadius: '8px' }}
                       >
-                        {/* Liquid glass background */}
-                        <div 
-                          className={`absolute inset-0 ${
-                            activeFilter === tile.key 
-                              ? 'bg-white/20 border border-white/30' 
-                              : 'bg-white/10 border border-white/20'
-                          }`}
-                          style={{ 
-                            backdropFilter: 'blur(40px) saturate(180%)',
-                            borderRadius: '8px'
-                          }}
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" style={{ borderRadius: '8px' }} />
-                        
                         {/* Content */}
-                        <div className="relative flex flex-col items-center justify-center gap-1">
+                        <div className="flex flex-col items-center justify-center gap-1">
                           {tile.flag === 'earth' ? (
-                            <Earth className="w-6 h-6 text-white flex-shrink-0" />
+                            <Earth className="w-6 h-6 flex-shrink-0" />
                           ) : (
                             <CountryFlag country={tile.country} size="lg" className="flex-shrink-0" />
                           )}
@@ -245,21 +217,10 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
         <div className="flex justify-center gap-3">
           <button
             onClick={() => setIsSortViewModalOpen(true)}
-            className="relative flex items-center gap-2 text-base font-medium whitespace-nowrap px-6 py-2 shadow-lg shadow-black/10 transition-colors overflow-hidden text-white hover:bg-white/20"
+            className="flex items-center gap-2 text-base font-medium whitespace-nowrap px-6 py-2 transition-colors bg-muted border border-border text-foreground hover:bg-muted/80"
             style={{ borderRadius: '8px' }}
           >
-            {/* Liquid glass background */}
-            <div 
-              className="absolute inset-0 bg-white/10 border border-white/20"
-              style={{ 
-                backdropFilter: 'blur(40px) saturate(180%)',
-                borderRadius: '8px'
-              }}
-            />
-            <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" style={{ borderRadius: '8px' }} />
-            
-            {/* Content */}
-            <div className="relative flex items-center gap-2">
+            <div className="flex items-center gap-2">
               Sort & View
               <ChevronRight className="ml-2 h-4 w-4" />
             </div>
@@ -269,21 +230,10 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
           {isOwnProfile && onAddCoursesClick && (
             <button
               onClick={onAddCoursesClick}
-              className="relative flex items-center gap-2 text-base font-medium whitespace-nowrap px-6 py-2 shadow-lg shadow-black/10 transition-colors overflow-hidden text-white hover:bg-white/20"
+              className="flex items-center gap-2 text-base font-medium whitespace-nowrap px-6 py-2 transition-colors bg-muted border border-border text-foreground hover:bg-muted/80"
               style={{ borderRadius: '8px' }}
             >
-              {/* Liquid glass background */}
-              <div 
-                className="absolute inset-0 bg-white/10 border border-white/20"
-                style={{ 
-                  backdropFilter: 'blur(40px) saturate(180%)',
-                  borderRadius: '8px'
-                }}
-              />
-              <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" style={{ borderRadius: '8px' }} />
-              
-              {/* Content */}
-              <div className="relative flex items-center gap-2">
+              <div className="flex items-center gap-2">
                 📍 <Plus className="h-4 w-4" />
                 Add Courses
               </div>
@@ -294,7 +244,7 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
 
       {/* Active Filter Indicator */}
       {activeFilter && (
-        <div className="flex items-center justify-center gap-2 text-sm text-white">
+        <div className="flex items-center justify-center gap-2 text-sm text-foreground">
           <span>
             Showing {tiles.find(t => t.key === activeFilter)?.label.replace(' Played', '')} courses
           </span>
