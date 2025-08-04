@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
@@ -105,7 +105,7 @@ export const useUserAchievements = (limit: number = 5) => {
     }
   };
 
-  const fetchAchievements = async () => {
+  const fetchAchievements = useCallback(async () => {
     if (!user?.id) return;
 
     try {
@@ -132,7 +132,7 @@ export const useUserAchievements = (limit: number = 5) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user?.id, limit]);
 
   useEffect(() => {
     fetchAchievements();
@@ -142,8 +142,9 @@ export const useUserAchievements = (limit: number = 5) => {
   useEffect(() => {
     if (!user?.id) return;
 
+    const channelName = `user_achievements_${user.id}_${Date.now()}`;
     const channel = supabase
-      .channel('user_achievements')
+      .channel(channelName)
       .on(
         'postgres_changes',
         {
@@ -162,7 +163,7 @@ export const useUserAchievements = (limit: number = 5) => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user?.id]);
+  }, [user?.id, fetchAchievements]);
 
   return {
     achievements,
