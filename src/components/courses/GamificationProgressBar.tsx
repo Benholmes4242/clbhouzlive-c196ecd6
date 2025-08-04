@@ -245,7 +245,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
             </div>
 
           {/* Global XP Progress Bar */}
-          <div className="space-y-4">
+          <div className="space-y-4 mt-8">
             
             {/* Trophy Timeline */}
             <div className="relative">
