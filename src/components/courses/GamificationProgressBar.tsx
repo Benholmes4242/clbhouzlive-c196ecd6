@@ -354,15 +354,6 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                 </div>
             </div>
 
-            {/* Next Milestone */}
-            {nextGlobalTrophy && (
-              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-3">
-                <p className="text-base text-white/80">
-                  <span className="font-medium">{nextGlobalTrophy.requiredCourses - completedCount} more courses</span> 
-                  {' '}to unlock <span className="font-medium text-white">{nextGlobalTrophy.name}</span>
-                </p>
-              </div>
-            )}
           </div>
 
           {/* Regional Lists Completion */}
