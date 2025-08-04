@@ -353,13 +353,13 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
           <div className="relative p-6 space-y-6">
             {/* Header with XP Counter */}
             <div className="flex items-center justify-between pb-6">
-            <h4 className="text-xl font-semibold text-white">
+            <h4 className="text-xl font-semibold text-foreground">
               {isCurrentUser 
                 ? `You've played ${completedCount} of 300 top 100 courses`
                 : `${userFirstName || 'User'} has played ${completedCount} of 300 top 100 courses`
               }
             </h4>
-              <div className="text-lg font-bold text-white transition-all duration-500">
+              <div className="text-lg font-bold text-foreground transition-all duration-500">
                 Total XP: {currentXP.toLocaleString()}
               </div>
             </div>
@@ -601,8 +601,8 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
           {/* Dynamic Achievements Feed */}
           <div className="space-y-4 pt-6">
             <div className="flex items-center justify-between">
-              <span className="text-base text-white">📣 Recent Achievements</span>
-              <span className="text-sm text-white/60">Last 7 days</span>
+              <span className="text-base text-foreground">📣 Recent Achievements</span>
+              <span className="text-sm text-muted-foreground">Last 7 days</span>
             </div>
 
             <div className="space-y-3">
@@ -625,8 +625,8 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                   >
                     <div className="text-2xl">{achievement.emoji}</div>
                     <div className="flex-1">
-                      <p className="text-sm text-white font-medium">{achievement.message}</p>
-                      <p className="text-xs text-white/60">{achievement.timestamp}</p>
+                      <p className="text-sm text-foreground font-medium">{achievement.message}</p>
+                      <p className="text-xs text-muted-foreground">{achievement.timestamp}</p>
                     </div>
                   </div>
                 ))
@@ -635,8 +635,8 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                 <div className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10">
                   <div className="text-2xl">🎯</div>
                   <div className="flex-1">
-                    <p className="text-sm text-white font-medium">Start playing courses to earn achievements!</p>
-                    <p className="text-xs text-white/60">Your journey begins here</p>
+                      <p className="text-sm text-foreground font-medium">Start playing courses to earn achievements!</p>
+                      <p className="text-xs text-muted-foreground">Your journey begins here</p>
                   </div>
                 </div>
               )}
