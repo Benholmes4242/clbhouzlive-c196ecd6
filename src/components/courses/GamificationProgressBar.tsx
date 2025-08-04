@@ -293,7 +293,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
     <Tooltip.Provider>
       <div className={cn('space-y-6', className)}>
         {/* Background Container matching stats bar */}
-        <div className="bg-muted border border-border rounded-xl p-6 space-y-6 relative overflow-hidden">${'\n'}
+        <div className="bg-muted border border-border rounded-xl p-6 space-y-6 relative overflow-hidden">
           
           {/* Floating XP Animation */}
           {showXPFloat && (
