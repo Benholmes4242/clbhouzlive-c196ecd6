@@ -7,6 +7,7 @@ interface CircularProgressProps {
   strokeWidth?: number;
   className?: string;
   showAnimation?: boolean;
+  bottomText?: string;
 }
 
 const CircularProgress: React.FC<CircularProgressProps> = ({
@@ -15,7 +16,8 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
   size = 120,
   strokeWidth = 8,
   className = '',
-  showAnimation = true
+  showAnimation = true,
+  bottomText = 'completed'
 }) => {
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
@@ -67,7 +69,7 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
           {completed}/{total}
         </div>
         <div className="text-xs text-muted-foreground">
-          completed
+          {bottomText}
         </div>
       </div>
     </div>

@@ -588,6 +588,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                         size={80}
                         strokeWidth={6}
                         showAnimation={true}
+                        bottomText={`${(list.completed * 110).toLocaleString()} XP`}
                       />
                     </div>
                   </div>
@@ -605,10 +606,6 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                   {/* Spacer for separation */}
                   <div className="flex-1"></div>
                   
-                  {/* XP at Bottom - Black Text */}
-                  <div className="flex items-center justify-center text-sm text-black mt-auto">
-                    <span className="font-medium">XP: {(list.completed * 110).toLocaleString()}</span>
-                  </div>
                 </div>
               ))}
             </div>
