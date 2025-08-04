@@ -1,93 +1,64 @@
 import { useRef, useEffect } from 'react';
 
-interface SwipeHandlers {
+interface SwipeGestureOptions {
   onSwipeLeft?: () => void;
   onSwipeRight?: () => void;
   threshold?: number;
+  preventDefaultTouchMove?: boolean;
 }
 
-export const useSwipeGesture = ({ 
-  onSwipeLeft, 
-  onSwipeRight, 
-  threshold = 50 
-}: SwipeHandlers) => {
+export const useSwipeGesture = ({
+  onSwipeLeft,
+  onSwipeRight,
+  threshold = 50,
+  preventDefaultTouchMove = false
+}: SwipeGestureOptions) => {
+  const touchStartX = useRef<number>(0);
+  const touchEndX = useRef<number>(0);
   const elementRef = useRef<HTMLDivElement>(null);
-  const startX = useRef<number>(0);
-  const startY = useRef<number>(0);
+
+  const handleTouchStart = (e: TouchEvent) => {
+    touchStartX.current = e.targetTouches[0].clientX;
+  };
+
+  const handleTouchMove = (e: TouchEvent) => {
+    if (preventDefaultTouchMove) {
+      e.preventDefault();
+    }
+  };
+
+  const handleTouchEnd = (e: TouchEvent) => {
+    touchEndX.current = e.changedTouches[0].clientX;
+    checkDirection();
+  };
+
+  const checkDirection = () => {
+    const distance = touchStartX.current - touchEndX.current;
+    const isLeftSwipe = distance > threshold;
+    const isRightSwipe = distance < -threshold;
+
+    if (isLeftSwipe && onSwipeLeft) {
+      onSwipeLeft();
+    }
+    if (isRightSwipe && onSwipeRight) {
+      onSwipeRight();
+    }
+  };
 
   useEffect(() => {
     const element = elementRef.current;
     if (!element) return;
 
-    const handleTouchStart = (e: TouchEvent) => {
-      startX.current = e.touches[0].clientX;
-      startY.current = e.touches[0].clientY;
-    };
-
-    const handleTouchEnd = (e: TouchEvent) => {
-      if (!startX.current || !startY.current) return;
-
-      const endX = e.changedTouches[0].clientX;
-      const endY = e.changedTouches[0].clientY;
-
-      const deltaX = startX.current - endX;
-      const deltaY = startY.current - endY;
-
-      // Only trigger horizontal swipes if horizontal movement is greater than vertical
-      if (Math.abs(deltaX) > Math.abs(deltaY)) {
-        if (Math.abs(deltaX) > threshold) {
-          // Prevent default behavior and stop propagation when handling swipe
-          e.preventDefault();
-          e.stopPropagation();
-          
-          if (deltaX > 0) {
-            onSwipeLeft?.();
-          } else {
-            onSwipeRight?.();
-          }
-        }
-      }
-
-      startX.current = 0;
-      startY.current = 0;
-    };
-
-    // Mouse events for desktop testing
-    let mouseStartX = 0;
-    let isMouseDown = false;
-
-    const handleMouseDown = (e: MouseEvent) => {
-      isMouseDown = true;
-      mouseStartX = e.clientX;
-    };
-
-    const handleMouseUp = (e: MouseEvent) => {
-      if (!isMouseDown) return;
-      isMouseDown = false;
-
-      const deltaX = mouseStartX - e.clientX;
-      
-      if (Math.abs(deltaX) > threshold) {
-        if (deltaX > 0) {
-          onSwipeLeft?.();
-        } else {
-          onSwipeRight?.();
-        }
-      }
-    };
-
     element.addEventListener('touchstart', handleTouchStart, { passive: true });
-    element.addEventListener('touchend', handleTouchEnd, { passive: false });
-    element.addEventListener('mousedown', handleMouseDown);
-    element.addEventListener('mouseup', handleMouseUp);
+    element.addEventListener('touchmove', handleTouchMove, { passive: !preventDefaultTouchMove });
+    element.addEventListener('touchend', handleTouchEnd, { passive: true });
 
     return () => {
       element.removeEventListener('touchstart', handleTouchStart);
+      element.removeEventListener('touchmove', handleTouchMove);
       element.removeEventListener('touchend', handleTouchEnd);
-      element.removeEventListener('mousedown', handleMouseDown);
-      element.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [onSwipeLeft, onSwipeRight, threshold]);
+  }, [onSwipeLeft, onSwipeRight, threshold, preventDefaultTouchMove]);
 
   return elementRef;
 };

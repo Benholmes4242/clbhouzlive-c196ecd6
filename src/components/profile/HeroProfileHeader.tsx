@@ -28,6 +28,8 @@ import ProfileProgressSection from './ProfileProgressSection';
 import CompareProgressModal from './CompareProgressModal';
 import { useUserAchievements } from '@/hooks/useUserAchievements';
 import { Swords } from 'lucide-react';
+import ProfileVideoDisplay from './ProfileVideoDisplay';
+import ProfileVideoUpload from './ProfileVideoUpload';
 
 interface Course {
   id: string;
@@ -44,6 +46,10 @@ interface UserProfile {
   username?: string;
   home_club?: string;
   profile_photo_url?: string;
+  profile_video_url?: string;
+  profile_video_thumbnail_url?: string;
+  has_profile_video?: boolean;
+  profile_video_visibility?: string;
   background_image_url?: string;
   cover_photo_url?: string;
   bio?: string;
@@ -335,6 +341,70 @@ const HeroProfileHeader = ({
     }
   };
 
+  const handleVideoUpload = async (videoUrl: string, thumbnailUrl: string) => {
+    if (!user) return;
+
+    try {
+      const { error: updateError } = await supabase
+        .from('user_profiles')
+        .update({ 
+          profile_video_url: videoUrl,
+          profile_video_thumbnail_url: thumbnailUrl,
+          has_profile_video: true,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user.id);
+
+      if (updateError) {
+        console.error('Profile video update error:', updateError);
+        throw updateError;
+      }
+
+      // Refresh the profile data
+      onProfileUpdate();
+      
+    } catch (error) {
+      console.error('Profile video update error:', error);
+      toast({
+        title: "Update Failed", 
+        description: "Failed to update profile video: " + (error as Error).message,
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleVideoRemove = async () => {
+    if (!user) return;
+
+    try {
+      const { error: updateError } = await supabase
+        .from('user_profiles')
+        .update({ 
+          profile_video_url: null,
+          profile_video_thumbnail_url: null,
+          has_profile_video: false,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user.id);
+
+      if (updateError) {
+        console.error('Profile video remove error:', updateError);
+        throw updateError;
+      }
+
+      // Refresh the profile data
+      onProfileUpdate();
+      
+    } catch (error) {
+      console.error('Profile video remove error:', error);
+      toast({
+        title: "Remove Failed", 
+        description: "Failed to remove profile video: " + (error as Error).message,
+        variant: "destructive",
+      });
+    }
+  };
+
 
   // Simple refs for animation (removed complex animation hooks)
   const activityRef = React.useRef<HTMLDivElement>(null);
@@ -389,9 +459,19 @@ const HeroProfileHeader = ({
         {/* Profile Content */}
         <div className="relative z-10 flex flex-col items-center text-center pt-20 pb-8">
           
-          {/* Profile Photo */}
+          {/* Profile Photo/Video */}
           <div className="w-64 h-64 mb-6">
-            {isOwnProfile ? (
+            {profile?.has_profile_video && profile?.profile_video_url ? (
+              <ProfileVideoDisplay
+                videoUrl={profile.profile_video_url}
+                fallbackPhotoUrl={profile.profile_photo_url}
+                displayName={displayName}
+                isOwnProfile={isOwnProfile}
+                uploading={uploading}
+                onEditClick={() => setEditDialogOpen(true)}
+                onPhotoUpload={handlePhotoUpload}
+              />
+            ) : isOwnProfile ? (
               <div 
                 className="relative cursor-pointer group w-full h-full"
                 onClick={() => {
@@ -631,10 +711,22 @@ const HeroProfileHeader = ({
       
       {/* Custom Edit Profile Dialog with glass effect trigger */}
       <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="sm:max-w-md max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Edit Profile</DialogTitle>
           </DialogHeader>
+          
+          {/* Profile Video Upload Section */}
+          <div className="border-b pb-4 mb-4">
+            <ProfileVideoUpload
+              currentVideoUrl={profile?.profile_video_url}
+              currentThumbnailUrl={profile?.profile_video_thumbnail_url}
+              onVideoUpload={handleVideoUpload}
+              onVideoRemove={handleVideoRemove}
+              disabled={saving}
+            />
+          </div>
+          
           <ProfileFormFields
             formData={formData}
             isUsernameSet={isUsernameSet}
@@ -647,12 +739,12 @@ const HeroProfileHeader = ({
             onPublicToggle={handlePublicToggle}
             onProfileUpdate={onProfileUpdate}
           />
-          <div className="flex justify-end gap-2">
+          <div className="flex justify-end gap-2 mt-4">
             <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
               Cancel
             </Button>
             <Button onClick={handleSave} disabled={saving}>
-              {saving ? "Saving..." : "Save"}
+              {saving ? 'Saving...' : 'Save Changes'}
             </Button>
           </div>
         </DialogContent>

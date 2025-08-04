@@ -1008,6 +1008,7 @@ export type Database = {
           email_change_count: number | null
           email_change_requested_at: string | null
           email_change_token: string | null
+          has_profile_video: boolean | null
           home_club: string | null
           id: string
           is_public: boolean | null
@@ -1017,6 +1018,9 @@ export type Database = {
           pending_email: string | null
           phone: string | null
           profile_photo_url: string | null
+          profile_video_thumbnail_url: string | null
+          profile_video_url: string | null
+          profile_video_visibility: string | null
           social_links: Json | null
           top100_visible: boolean | null
           tracker_visible: boolean | null
@@ -1043,6 +1047,7 @@ export type Database = {
           email_change_count?: number | null
           email_change_requested_at?: string | null
           email_change_token?: string | null
+          has_profile_video?: boolean | null
           home_club?: string | null
           id: string
           is_public?: boolean | null
@@ -1052,6 +1057,9 @@ export type Database = {
           pending_email?: string | null
           phone?: string | null
           profile_photo_url?: string | null
+          profile_video_thumbnail_url?: string | null
+          profile_video_url?: string | null
+          profile_video_visibility?: string | null
           social_links?: Json | null
           top100_visible?: boolean | null
           tracker_visible?: boolean | null
@@ -1078,6 +1086,7 @@ export type Database = {
           email_change_count?: number | null
           email_change_requested_at?: string | null
           email_change_token?: string | null
+          has_profile_video?: boolean | null
           home_club?: string | null
           id?: string
           is_public?: boolean | null
@@ -1087,6 +1096,9 @@ export type Database = {
           pending_email?: string | null
           phone?: string | null
           profile_photo_url?: string | null
+          profile_video_thumbnail_url?: string | null
+          profile_video_url?: string | null
+          profile_video_visibility?: string | null
           social_links?: Json | null
           top100_visible?: boolean | null
           tracker_visible?: boolean | null
