@@ -163,7 +163,7 @@ export const useUserAchievements = (limit: number = 5) => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user?.id]);
+  }, [user?.id, fetchAchievements]);
 
   return {
     achievements,
