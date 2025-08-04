@@ -140,29 +140,27 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
         <div className="relative w-full">
           {/* Desktop: Spread across full width */}
           {!isMobile ? (
-            <div className="grid grid-cols-4 gap-3">
+            <div className="flex justify-center gap-2">
               <TooltipProvider>
                 {tiles.map((tile) => (
                   <Tooltip key={tile.key}>
                     <TooltipTrigger asChild>
                       <button
                         onClick={() => onFilterChange(activeFilter === tile.key ? null : tile.key)}
-                        className={`relative flex items-center justify-center gap-1 cursor-pointer transition-colors whitespace-nowrap px-4 py-1 text-base font-medium overflow-hidden h-10 ${
+                        className={`flex items-center justify-center gap-1 cursor-pointer transition-colors whitespace-nowrap px-3 py-1.5 text-sm font-medium rounded-lg ${
                           activeFilter === tile.key 
-                            ? 'bg-primary text-white shadow-lg' 
+                            ? 'bg-primary text-white shadow-md' 
                             : 'bg-muted border border-border text-foreground hover:bg-muted/80'
                         }`}
-                        style={{ borderRadius: '8px' }}
                       >
-                        {/* Content */}
                         <div className="flex items-center justify-center gap-1">
                           {tile.flag === 'earth' ? (
-                            <Earth className="w-7 h-6 flex-shrink-0" />
+                            <Earth className="w-4 h-4 flex-shrink-0" />
                           ) : (
-                            <CountryFlag country={tile.country} size="lg" className="flex-shrink-0" />
+                            <CountryFlag country={tile.country} size="sm" className="flex-shrink-0" />
                           )}
-                          <span className="text-sm font-semibold">
-                            {tile.progress.played} / {tile.progress.total}
+                          <span className="text-xs font-medium">
+                            {tile.progress.played}/{tile.progress.total}
                           </span>
                         </div>
                       </button>
@@ -176,29 +174,27 @@ const UserCoursesRegionalTiles: React.FC<UserCoursesRegionalTilesProps> = ({
             </div>
           ) : (
             /* Mobile: Full width grid */
-            <div className="grid grid-cols-4 gap-2">
+            <div className="flex justify-center gap-1">
               <TooltipProvider>
                 {tiles.map((tile) => (
                   <Tooltip key={tile.key}>
                     <TooltipTrigger asChild>
                       <button
                         onClick={() => onFilterChange(activeFilter === tile.key ? null : tile.key)}
-                        className={`relative flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors px-2 py-0.5 text-sm font-medium overflow-hidden ${
+                        className={`flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors px-2 py-1.5 text-sm font-medium rounded-lg ${
                           activeFilter === tile.key 
-                            ? 'bg-primary text-white shadow-lg' 
+                            ? 'bg-primary text-white shadow-md' 
                             : 'bg-muted border border-border text-foreground hover:bg-muted/80'
                         }`}
-                        style={{ borderRadius: '8px' }}
                       >
-                        {/* Content */}
-                        <div className="flex flex-col items-center justify-center gap-1">
+                        <div className="flex flex-col items-center justify-center gap-0.5">
                           {tile.flag === 'earth' ? (
-                            <Earth className="w-6 h-6 flex-shrink-0" />
+                            <Earth className="w-4 h-4 flex-shrink-0" />
                           ) : (
-                            <CountryFlag country={tile.country} size="lg" className="flex-shrink-0" />
+                            <CountryFlag country={tile.country} size="sm" className="flex-shrink-0" />
                           )}
-                          <span className="text-xs font-semibold">
-                            {tile.progress.played} / {tile.progress.total}
+                          <span className="text-xs font-medium">
+                            {tile.progress.played}/{tile.progress.total}
                           </span>
                         </div>
                       </button>
