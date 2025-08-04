@@ -1,6 +1,7 @@
-import React, { useMemo } from 'react';
-import { Trophy, Lock, CheckCircle } from 'lucide-react';
+import React, { useMemo, useState, useEffect } from 'react';
+import { Trophy, Lock, CheckCircle, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import * as Tooltip from '@radix-ui/react-tooltip';
 
 interface GamificationProgressBarProps {
   completedCount: number;
@@ -130,6 +131,18 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
   worldwideTotal = 100,
 }) => {
   const currentXP = completedCount * 110;
+  const [showXPFloat, setShowXPFloat] = useState(false);
+  const [prevCompletedCount, setPrevCompletedCount] = useState(completedCount);
+
+  // Trigger XP animation when completedCount increases
+  useEffect(() => {
+    if (completedCount > prevCompletedCount) {
+      setShowXPFloat(true);
+      const timer = setTimeout(() => setShowXPFloat(false), 2000);
+      setPrevCompletedCount(completedCount);
+      return () => clearTimeout(timer);
+    }
+  }, [completedCount, prevCompletedCount]);
   
   // Calculate global trophy progress
   const globalTrophies = useMemo(() => {
@@ -185,17 +198,42 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
   const lastUnlockedTrophy = unlockedGlobalTrophies[unlockedGlobalTrophies.length - 1];
 
   return (
-    <div className={cn('space-y-6', className)}>
-      {/* Liquid Glass Container */}
-      <div className="relative overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-md">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10" />
-        <div className="relative p-6 space-y-6">
-          {/* Header */}
-          <div className="flex items-center justify-between">
-            <h4 className="text-xl font-semibold text-white">
-              Golf Journey Progress
-            </h4>
-          </div>
+    <Tooltip.Provider>
+      <div className={cn('space-y-6', className)}>
+        {/* Liquid Glass Container */}
+        <div className="relative overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-white/5 to-white/10 backdrop-blur-md">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-purple-500/10 to-pink-500/10" />
+          
+          {/* Floating XP Animation */}
+          {showXPFloat && (
+            <div className="absolute top-4 right-4 z-20 animate-fade-in">
+              <div 
+                className="flex items-center gap-1 bg-green-500/20 border border-green-400/30 rounded-lg px-3 py-1 text-green-400 font-medium"
+                style={{
+                  animation: 'slideUp 2s ease-out forwards'
+                }}
+              >
+                <Plus className="w-4 h-4" />
+                <span>110 XP</span>
+              </div>
+            </div>
+          )}
+          
+          <div className="relative p-6 space-y-6">
+            {/* Header with XP Counter */}
+            <div className="flex items-center justify-between">
+              <h4 className="text-xl font-semibold text-white">
+                Golf Journey Progress
+              </h4>
+              <div className="text-right">
+                <div className="text-lg font-bold text-white transition-all duration-500">
+                  {currentXP.toLocaleString()} XP
+                </div>
+                <div className="text-sm text-white/60">
+                  Total Experience
+                </div>
+              </div>
+            </div>
 
           {/* Global XP Progress Bar */}
           <div className="space-y-4">
@@ -207,10 +245,10 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
             {/* Trophy Timeline */}
             <div className="relative">
               {/* Progress Line */}
-               <div className="absolute top-4 left-8 right-4 h-2 bg-white/20 rounded-full">
+               <div className="absolute top-4 left-8 right-4 h-2 bg-white/20 rounded-full overflow-hidden">
                  {nextGlobalTrophy && lastUnlockedTrophy && (
                    <div 
-                     className="h-full bg-green-400 rounded-full transition-all duration-500"
+                     className="h-full bg-gradient-to-r from-green-400 to-emerald-500 rounded-full transition-all duration-1000 ease-out"
                      style={{ 
                        width: `${((completedCount - lastUnlockedTrophy.requiredCourses) / (nextGlobalTrophy.requiredCourses - lastUnlockedTrophy.requiredCourses)) * 100}%`
                      }}
@@ -218,7 +256,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                  )}
                  {nextGlobalTrophy && !lastUnlockedTrophy && completedCount < 20 && (
                    <div 
-                     className="h-full bg-green-400 rounded-full transition-all duration-500"
+                     className="h-full bg-gradient-to-r from-green-400 to-emerald-500 rounded-full transition-all duration-1000 ease-out"
                      style={{ 
                        width: `${(completedCount / nextGlobalTrophy.requiredCourses) * 20}%`
                      }}
@@ -227,56 +265,93 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                </div>
               
                {/* Trophy Points */}
-               <div className="flex justify-between items-start relative z-10">
-                {globalTrophies.map((trophy, index) => (
-                  <div key={trophy.id} className="flex flex-col items-center space-y-2">
-                    {trophy.id === 'green-fee-rookie' ? (
-                      <img 
-                        src="/lovable-uploads/f2f50b99-38e1-466b-8ac8-c32e428231cb.png" 
-                        alt="Green Fee Rookie Trophy" 
-                        className={cn(
-                          'h-16 w-auto object-contain -mt-4',
-                          trophy.isUnlocked ? 'opacity-100' : 'opacity-40 grayscale'
-                        )}
-                      />
-                    ) : trophy.id === 'the-turn' ? (
-                      <div className="relative">
-                        <img 
-                          src="/lovable-uploads/43291ca4-d526-4b10-9585-6ea3488445cf.png" 
-                          alt="The Turn Trophy"
-                          className={cn(
-                            'h-16 w-auto object-contain -mt-4',
-                            trophy.isUnlocked ? 'opacity-100' : 'opacity-70'
-                          )}
-                        />
-                        {!trophy.isUnlocked && (
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <img 
-                              src="/lovable-uploads/2de7fb51-e144-486a-a32b-2913cac503cc.png" 
-                              alt="Locked" 
-                              className="w-8 h-8"
-                            />
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <TrophyIcon 
-                        isUnlocked={trophy.isUnlocked}
-                        color={trophy.color}
-                        size="md"
-                      />
-                    )}
-                     <div className="text-center">
-                       <div className="text-sm font-medium text-white/90">
-                         {trophy.requiredCourses}
+                <div className="flex justify-between items-start relative z-10">
+                 {globalTrophies.map((trophy, index) => (
+                   <Tooltip.Root key={trophy.id}>
+                     <Tooltip.Trigger asChild>
+                       <div className="flex flex-col items-center space-y-2 cursor-help hover:scale-110 transition-transform duration-200">
+                         {trophy.id === 'green-fee-rookie' ? (
+                           <img 
+                             src="/lovable-uploads/f2f50b99-38e1-466b-8ac8-c32e428231cb.png" 
+                             alt="Green Fee Rookie Trophy" 
+                             className={cn(
+                               'h-16 w-auto object-contain -mt-4 transition-all duration-300',
+                               trophy.isUnlocked ? 'opacity-100' : 'opacity-40 grayscale'
+                             )}
+                           />
+                         ) : trophy.id === 'the-turn' ? (
+                           <div className="relative">
+                             <img 
+                               src="/lovable-uploads/43291ca4-d526-4b10-9585-6ea3488445cf.png" 
+                               alt="The Turn Trophy"
+                               className={cn(
+                                 'h-16 w-auto object-contain -mt-4 transition-all duration-300',
+                                 trophy.isUnlocked ? 'opacity-100' : 'opacity-40 grayscale'
+                               )}
+                             />
+                             {!trophy.isUnlocked && (
+                               <div className="absolute inset-0 flex items-center justify-center">
+                                 <img 
+                                   src="/lovable-uploads/2de7fb51-e144-486a-a32b-2913cac503cc.png" 
+                                   alt="Locked" 
+                                   className="w-8 h-8"
+                                 />
+                               </div>
+                             )}
+                           </div>
+                         ) : trophy.id === 'century-club' ? (
+                           <img 
+                             src="/lovable-uploads/0c126dc7-5509-40b9-862d-b054423ca7f6.png" 
+                             alt="Century Club Trophy" 
+                             className={cn(
+                               'h-16 w-auto object-contain -mt-4 transition-all duration-300',
+                               trophy.isUnlocked ? 'opacity-100' : 'opacity-40 grayscale'
+                             )}
+                           />
+                         ) : trophy.id === 'clubhouse-elite' ? (
+                           <img 
+                             src="/lovable-uploads/a9672498-b79d-4a47-9e6a-1128770700c9.png" 
+                             alt="Clubhouse Elite Trophy" 
+                             className={cn(
+                               'h-16 w-auto object-contain -mt-4 transition-all duration-300',
+                               trophy.isUnlocked ? 'opacity-100' : 'opacity-40 grayscale'
+                             )}
+                           />
+                         ) : (
+                           <div className={cn(
+                             'h-16 w-16 rounded-full flex items-center justify-center bg-gradient-to-br -mt-4 transition-all duration-300',
+                             trophy.color,
+                             trophy.isUnlocked ? 'opacity-100' : 'opacity-40 grayscale'
+                           )}>
+                             <Trophy className="w-8 h-8 text-white" />
+                           </div>
+                         )}
+                         <div className="text-center">
+                           <div className="text-sm font-medium text-white/90">
+                             {trophy.requiredCourses}
+                           </div>
+                           <div className="text-sm text-white/60 max-w-16 leading-tight">
+                             {trophy.name}
+                           </div>
+                         </div>
                        </div>
-                       <div className="text-sm text-white/60 max-w-16 leading-tight">
-                         {trophy.name}
-                       </div>
-                     </div>
-                   </div>
-                 ))}
-               </div>
+                     </Tooltip.Trigger>
+                     <Tooltip.Portal>
+                       <Tooltip.Content 
+                         className="bg-gray-900 text-white text-sm px-3 py-2 rounded-lg border border-white/10 backdrop-blur-sm z-50"
+                         sideOffset={5}
+                       >
+                         {trophy.isUnlocked ? (
+                           `🏆 Unlocked! You've achieved ${trophy.name}`
+                         ) : (
+                           `Unlock ${trophy.name} by playing ${trophy.requiredCourses} courses`
+                         )}
+                         <Tooltip.Arrow className="fill-gray-900" />
+                       </Tooltip.Content>
+                     </Tooltip.Portal>
+                   </Tooltip.Root>
+                  ))}
+                </div>
             </div>
 
             {/* Next Milestone */}
@@ -501,7 +576,8 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </Tooltip.Provider>
   );
 };
 
