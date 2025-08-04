@@ -64,12 +64,12 @@ const FriendsLeaderboard: React.FC<FriendsLeaderboardProps> = ({
       <div className="space-y-3">
         {[1, 2, 3].map((i) => (
           <div key={i} className="flex items-center gap-3 animate-pulse">
-            <div className="w-10 h-10 bg-white/10 rounded-full" />
+            <div className="w-10 h-10 bg-muted rounded-full" />
             <div className="flex-1 space-y-1">
-              <div className="h-4 bg-white/10 rounded w-24" />
-              <div className="h-3 bg-white/10 rounded w-16" />
+              <div className="h-4 bg-muted rounded w-24" />
+              <div className="h-3 bg-muted/50 rounded w-16" />
             </div>
-            <div className="h-4 bg-white/10 rounded w-12" />
+            <div className="h-4 bg-muted rounded w-12" />
           </div>
         ))}
       </div>
@@ -79,9 +79,9 @@ const FriendsLeaderboard: React.FC<FriendsLeaderboardProps> = ({
   if (friends.length === 0) {
     return (
       <div className="text-center py-8">
-        <UserPlus className="h-12 w-12 mx-auto mb-4 text-white/60" />
-        <h3 className="text-lg font-semibold mb-2 text-white">Invite your golf friends!</h3>
-        <p className="text-white/60 mb-4">
+        <UserPlus className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+        <h3 className="text-lg font-semibold mb-2 text-foreground">Invite your golf friends!</h3>
+        <p className="text-muted-foreground mb-4">
           Compare your golfing journeys and see who's conquered the most legendary courses.
         </p>
         <Button 
@@ -105,7 +105,7 @@ const FriendsLeaderboard: React.FC<FriendsLeaderboardProps> = ({
           variant={sortBy === 'courses' ? 'default' : 'outline'}
           size="sm"
           onClick={() => setSortBy('courses')}
-          className="gap-1 bg-white/10 border-white/20 text-white hover:bg-white/20"
+          className="gap-1 bg-muted border-border text-foreground hover:bg-muted/80"
         >
           <Trophy className="h-3 w-3" />
           Most Courses
@@ -114,7 +114,7 @@ const FriendsLeaderboard: React.FC<FriendsLeaderboardProps> = ({
           variant={sortBy === 'xp' ? 'default' : 'outline'}
           size="sm"
           onClick={() => setSortBy('xp')}
-          className="gap-1 bg-white/10 border-white/20 text-white hover:bg-white/20"
+          className="gap-1 bg-muted border-border text-foreground hover:bg-muted/80"
         >
           <TrendingUp className="h-3 w-3" />
           Highest XP
@@ -123,7 +123,7 @@ const FriendsLeaderboard: React.FC<FriendsLeaderboardProps> = ({
           variant={sortBy === 'recent' ? 'default' : 'outline'}
           size="sm"
           onClick={() => setSortBy('recent')}
-          className="gap-1 bg-white/10 border-white/20 text-white hover:bg-white/20"
+          className="gap-1 bg-muted border-border text-foreground hover:bg-muted/80"
         >
           <Calendar className="h-3 w-3" />
           Most Recent
@@ -140,7 +140,7 @@ const FriendsLeaderboard: React.FC<FriendsLeaderboardProps> = ({
             <div
               key={friend.id}
               className={cn(
-                "flex items-center gap-3 p-3 rounded-lg border border-white/20 bg-white/5",
+                "flex items-center gap-3 p-3 rounded-lg border border-border bg-muted",
                 isTopThree && "bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border-yellow-500/20"
               )}
             >
@@ -151,7 +151,7 @@ const FriendsLeaderboard: React.FC<FriendsLeaderboardProps> = ({
                     {index === 0 ? '🥇' : index === 1 ? '🥈' : '🥉'}
                   </span>
                 ) : (
-                  <span className="text-sm font-medium text-white/60">
+                  <span className="text-sm font-medium text-muted-foreground">
                     {index + 1}
                   </span>
                 )}
@@ -160,7 +160,7 @@ const FriendsLeaderboard: React.FC<FriendsLeaderboardProps> = ({
               {/* Avatar */}
               <Avatar className="h-10 w-10">
                 <AvatarImage src={friend.profile_photo_url || ''} />
-                <AvatarFallback className="text-sm bg-white/10 text-white">
+                <AvatarFallback className="text-sm bg-muted text-foreground">
                   {getInitials(friend)}
                 </AvatarFallback>
               </Avatar>
@@ -168,7 +168,7 @@ const FriendsLeaderboard: React.FC<FriendsLeaderboardProps> = ({
               {/* Friend Info */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <p className="font-medium truncate text-white">
+                  <p className="font-medium truncate text-foreground">
                     {getDisplayName(friend)}
                   </p>
                   <Badge 
@@ -181,7 +181,7 @@ const FriendsLeaderboard: React.FC<FriendsLeaderboardProps> = ({
                     {trophy.emoji} {trophy.name}
                   </Badge>
                 </div>
-                <div className="flex items-center gap-4 text-sm text-white/60">
+                <div className="flex items-center gap-4 text-sm text-muted-foreground">
                   <span>{friend.coursesPlayed} courses</span>
                   <span>{friend.totalXP.toLocaleString()} XP</span>
                   {friend.lastPlayedDate && (
@@ -192,19 +192,19 @@ const FriendsLeaderboard: React.FC<FriendsLeaderboardProps> = ({
                 </div>
               </div>
 
-              {/* Regional Progress */}
+              {/* Regional Progress - Flag Buttons */}
               <div className="hidden md:flex items-center gap-2 text-xs">
-                <div className="text-center">
-                  <div className="font-medium text-white">{friend.britainIrelandCompleted}</div>
-                  <div className="text-white/60">GB&I</div>
+                <div className="text-center bg-muted border border-border rounded px-2 py-1">
+                  <div className="font-medium text-foreground">{friend.britainIrelandCompleted}</div>
+                  <div className="text-muted-foreground">🇬🇧</div>
                 </div>
-                <div className="text-center">
-                  <div className="font-medium text-white">{friend.europeCompleted}</div>
-                  <div className="text-white/60">EUR</div>
+                <div className="text-center bg-muted border border-border rounded px-2 py-1">
+                  <div className="font-medium text-foreground">{friend.europeCompleted}</div>
+                  <div className="text-muted-foreground">🇪🇺</div>
                 </div>
-                <div className="text-center">
-                  <div className="font-medium text-white">{friend.usaCompleted}</div>
-                  <div className="text-white/60">USA</div>
+                <div className="text-center bg-muted border border-border rounded px-2 py-1">
+                  <div className="font-medium text-foreground">{friend.usaCompleted}</div>
+                  <div className="text-muted-foreground">🇺🇸</div>
                 </div>
               </div>
 
