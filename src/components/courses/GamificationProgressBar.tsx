@@ -598,7 +598,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                   </div>
                   
                   {/* Description */}
-                  <p className="text-xs text-muted-foreground text-center mb-4 leading-relaxed">
+                  <p className="text-xs text-black text-center mb-4 leading-relaxed">
                     {list.description}
                   </p>
                   
