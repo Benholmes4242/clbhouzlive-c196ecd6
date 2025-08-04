@@ -19,9 +19,8 @@ export function useConversation(friendId: string | null) {
     fetchMessages();
     
     // Set up real-time subscription for this conversation
-    const channelName = `conversation_${user.id}_${friendId}`;
     const channel = supabase
-      .channel(channelName)
+      .channel(`conversation-${friendId}`)
       .on(
         'postgres_changes',
         {

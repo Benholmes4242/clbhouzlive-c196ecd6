@@ -39,9 +39,8 @@ export function useMessages() {
     fetchConversations();
     
     // Set up real-time subscription for new messages
-    const channelName = `messages_${user.id}`;
     const channel = supabase
-      .channel(channelName)
+      .channel('messages-changes')
       .on(
         'postgres_changes',
         {

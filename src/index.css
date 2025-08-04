@@ -1,6 +1,5 @@
 
 @import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@100;200;300;400;500;600;700;800;900&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -404,54 +403,4 @@
     opacity: 0;
     transform: translateY(-50px);
   }
-}
-
-/* Progress Theme Transitions and Milestone Animations */
-@keyframes slideDown {
-  0% {
-    opacity: 0;
-    transform: translateY(-20px) scale(0.9);
-  }
-  20% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-  80% {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(-10px) scale(0.95);
-  }
-}
-
-@keyframes themeTransition {
-  0% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.7;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-/* Aurora glow animation for the highest tier */
-@keyframes aurora-glow {
-  0% {
-    filter: brightness(1) saturate(1);
-  }
-  50% {
-    filter: brightness(1.1) saturate(1.2);
-  }
-  100% {
-    filter: brightness(1) saturate(1);
-  }
-}
-
-/* Enhanced aurora animation for 300+ courses */
-.aurora-theme {
-  animation: aurora-glow 4s ease-in-out infinite alternate;
 }

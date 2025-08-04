@@ -73,29 +73,25 @@ export const useStoryData = () => {
     fetchStoriesData();
 
     // Set up real-time subscription for follow changes
-    if (user?.id) {
-      const channelName = `story_follows_${user.id}`;
-      const channel = supabase
-        .channel(channelName)
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'user_follows',
-            filter: `follower_id=eq.${user.id}`,
-          },
-          () => {
-            fetchStoriesData();
-          }
-        )
-        .subscribe();
+    const channel = supabase
+      .channel('story-follows')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'user_follows',
+          filter: `follower_id=eq.${user?.id}`,
+        },
+        () => {
+          fetchStoriesData();
+        }
+      )
+      .subscribe();
 
-      return () => {
-        supabase.removeChannel(channel);
-      };
-    }
-
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [user]);
 
   return { stories, loading };

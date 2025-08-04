@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 
@@ -23,7 +23,7 @@ export const useUserAchievements = (limit: number = 5) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const formatAchievement = useCallback((achievement: Achievement): FormattedAchievement => {
+  const formatAchievement = (achievement: Achievement): FormattedAchievement => {
     const data = achievement.achievement_data;
     const timeAgo = getTimeAgo(achievement.created_at);
 
@@ -82,7 +82,7 @@ export const useUserAchievements = (limit: number = 5) => {
           type: 'general'
         };
     }
-  }, []);
+  };
 
   const getTimeAgo = (dateString: string): string => {
     const date = new Date(dateString);
@@ -105,7 +105,7 @@ export const useUserAchievements = (limit: number = 5) => {
     }
   };
 
-  const fetchAchievements = useCallback(async () => {
+  const fetchAchievements = async () => {
     if (!user?.id) return;
 
     try {
@@ -132,7 +132,7 @@ export const useUserAchievements = (limit: number = 5) => {
     } finally {
       setLoading(false);
     }
-  }, [user?.id, limit, formatAchievement]);
+  };
 
   useEffect(() => {
     fetchAchievements();
@@ -142,9 +142,8 @@ export const useUserAchievements = (limit: number = 5) => {
   useEffect(() => {
     if (!user?.id) return;
 
-    const channelName = `user_achievements_${user.id}`;
     const channel = supabase
-      .channel(channelName)
+      .channel('user_achievements')
       .on(
         'postgres_changes',
         {
@@ -163,7 +162,7 @@ export const useUserAchievements = (limit: number = 5) => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user?.id, fetchAchievements]);
+  }, [user?.id]);
 
   return {
     achievements,

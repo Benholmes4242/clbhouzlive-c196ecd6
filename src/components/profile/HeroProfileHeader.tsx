@@ -23,11 +23,6 @@ import HandicapSection from './HandicapSection';
 import ProfileSectionCarousel from './ProfileSectionCarousel';
 import { createDynamicBackgroundStyle } from '@/utils/backgroundGenerator';
 import { getOptimizedImageUrl } from '@/utils/imageOptimization';
-import ProfileBadgeStrip from './ProfileBadgeStrip';
-import ProfileProgressSection from './ProfileProgressSection';
-import CompareProgressModal from './CompareProgressModal';
-import { useUserAchievements } from '@/hooks/useUserAchievements';
-import { Swords } from 'lucide-react';
 
 interface Course {
   id: string;
@@ -79,17 +74,6 @@ const HeroProfileHeader = ({
   const [averageRating, setAverageRating] = useState(0);
   const [followersCount, setFollowersCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
-  const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
-  const [userProgressData, setUserProgressData] = useState({
-    coursesPlayed: 0,
-    britainIrelandCompleted: 0,
-    europeCompleted: 0,
-    usaCompleted: 0,
-    worldwideCompleted: 0
-  });
-  
-  // Fetch user achievements for current user
-  const { achievements } = useUserAchievements();
   
   // Removed scroll compression logic
   
@@ -98,7 +82,7 @@ const HeroProfileHeader = ({
   const { isOpen, currentPost, allUserPosts: viewerPosts, openPostViewer, closePostViewer } = usePostViewer({ source: 'profile' });
   const [selectedPost, setSelectedPost] = useState<ActivityPost | null>(null);
   
-  // Fetch stats data including progress
+  // Fetch stats data
   useEffect(() => {
     const fetchStats = async () => {
       if (!profile?.id) return;
@@ -147,78 +131,6 @@ const HeroProfileHeader = ({
         } else {
           setFollowingCount(followingCount || 0);
         }
-
-        // Fetch progress data for course counts
-        const { data: top100Data } = await supabase
-          .from('user_top100_courses')
-          .select(`
-            course_id,
-            golf_courses (
-              country,
-              continent,
-              global_rank,
-              regional_rank,
-              usa_rank
-            )
-          `)
-          .eq('user_id', profile.id)
-          .eq('played', true);
-
-        const { data: ratedCoursesData } = await supabase
-          .from('course_ratings')
-          .select(`
-            course_id,
-            golf_courses (
-              country,
-              continent,
-              global_rank,
-              regional_rank,
-              usa_rank
-            )
-          `)
-          .eq('user_id', profile.id);
-
-        // Combine and deduplicate courses
-        const allCourses = [...(top100Data || []), ...(ratedCoursesData || [])];
-        const uniqueCourses = allCourses.filter((course, index, self) => 
-          index === self.findIndex(c => c.course_id === course.course_id)
-        );
-
-        let britainIrelandCompleted = 0;
-        let europeCompleted = 0;
-        let usaCompleted = 0;
-        let worldwideCompleted = 0;
-
-        uniqueCourses.forEach((courseData) => {
-          const course = courseData.golf_courses;
-          if (!course) return;
-
-          const isTop100 = course.global_rank || course.regional_rank || course.usa_rank;
-          if (isTop100) {
-            worldwideCompleted++;
-
-            if (course.country === 'Britain & Ireland') {
-              britainIrelandCompleted++;
-            }
-            
-            if (course.country === 'USA') {
-              usaCompleted++;
-            }
-          }
-
-          if (course.country === 'Continental Europe' && course.regional_rank && course.regional_rank <= 100) {
-            europeCompleted++;
-          }
-        });
-
-        setUserProgressData({
-          coursesPlayed: worldwideCompleted,
-          britainIrelandCompleted,
-          europeCompleted,
-          usaCompleted,
-          worldwideCompleted
-        });
-
       } catch (error) {
         console.error('Error fetching stats:', error);
       }
@@ -462,37 +374,11 @@ const HeroProfileHeader = ({
                 @{username}
               </p>
             )}
-
-            {/* Badge Strip */}
-            <div className="mb-3">
-              <ProfileBadgeStrip
-                coursesPlayed={userProgressData.coursesPlayed}
-                totalXP={userProgressData.coursesPlayed * 110}
-                britainIrelandCompleted={userProgressData.britainIrelandCompleted}
-                europeCompleted={userProgressData.europeCompleted}
-                usaCompleted={userProgressData.usaCompleted}
-                worldwideCompleted={userProgressData.worldwideCompleted}
-              />
-            </div>
             
             {/* Home Golf Club */}
             <p className="text-base text-white">
               {homeClub}
             </p>
-
-            {/* Compare Progress Button for other profiles */}
-            {!isOwnProfile && user && (
-              <div className="mt-4">
-                <button
-                  onClick={() => setIsCompareModalOpen(true)}
-                  className="bg-white/10 backdrop-blur-2xl border border-white/20 shadow-[0_0_20px_rgba(0,0,0,0.2)] rounded-lg text-white font-medium hover:bg-white/15 transition-all duration-300 ease-in-out flex items-center justify-center gap-2 py-2 px-4 text-sm"
-                  style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
-                >
-                  <Swords className="w-4 h-4" />
-                  ⚔️ Compare Golf Journey
-                </button>
-              </div>
-            )}
           </div>
 
           {/* Stats Bar */}
