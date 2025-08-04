@@ -1,8 +1,10 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { Trophy, Lock, CheckCircle, Plus, Calendar, Target } from 'lucide-react';
+import { Trophy, Lock, CheckCircle, Plus, Calendar, Target, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import * as Dialog from '@radix-ui/react-dialog';
+import CircularProgress from '@/components/ui/circular-progress';
+import { CourseListModal } from './CourseListModal';
 
 interface GamificationProgressBarProps {
   completedCount: number;
@@ -140,6 +142,8 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
   const [prevCompletedCount, setPrevCompletedCount] = useState(completedCount);
   const [selectedTrophy, setSelectedTrophy] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedCourseList, setSelectedCourseList] = useState<any>(null);
+  const [isCourseListModalOpen, setIsCourseListModalOpen] = useState(false);
 
   // Trigger XP animation when completedCount increases
   useEffect(() => {
@@ -353,7 +357,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
 
           </div>
 
-          {/* Regional Lists Completion */}
+          {/* Regional Lists Completion - Circular Progress Rings */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <span className="text-base text-white/80">Regional List Completion</span>
@@ -362,192 +366,93 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
               </span>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {regionalProgress.lists.map((list) => (
                 <div
                   key={list.id}
-                  className={cn(
-                    'p-3 rounded-lg border transition-all h-24 cursor-pointer hover:scale-105',
-                    list.isCompleted
-                      ? 'bg-green-500/20 border-green-400/30'
-                      : 'bg-white/5 border-white/10'
-                  )}
+                  className="flex flex-col items-center p-4 rounded-lg border transition-all cursor-pointer hover:scale-105 bg-white/5 border-white/10 hover:bg-white/10"
                   onClick={() => {
-                    setSelectedTrophy({
-                      ...list,
-                      type: 'regional',
-                      dateEarned: list.isCompleted ? 'July 2025' : null,
-                      description: `Complete all courses in the ${list.name} list`,
-                      requiredCourses: list.total
-                    });
-                    setIsModalOpen(true);
+                    setSelectedCourseList(list);
+                    setIsCourseListModalOpen(true);
                   }}
                 >
-                  {list.id === 'britain-ireland' ? (
-                    // Special layout for GB&I with trophy
-                    <div className="flex items-center gap-3 h-full">
-                      <img 
-                        src="/lovable-uploads/7df94753-adb7-43b1-8ea8-380234f3318f.png" 
-                        alt="British & Irish Trophy" 
-                        className="h-16 w-auto object-contain flex-shrink-0"
-                      />
-                      <div className="flex-1 space-y-2">
-                        <div className="flex items-center justify-between">
-                          <span className="text-base font-medium text-white/90">
-                            Great Britain & Ireland
-                          </span>
-                          {list.isCompleted ? (
-                            <CheckCircle className="w-4 h-4 text-green-400" />
-                          ) : (
-                            <Lock className="w-4 h-4 text-gray-400" />
-                          )}
-                        </div>
-                        <div className="space-y-1">
-                          <div className="text-base text-white/70">
-                            {list.completed}/{list.total}
+                  {/* Circular Progress Ring */}
+                  <div className="relative mb-3">
+                    <CircularProgress
+                      completed={list.completed}
+                      total={list.total}
+                      size={80}
+                      strokeWidth={6}
+                      showAnimation={true}
+                    />
+                    
+                    {/* Trophy Icon Overlay */}
+                    <div className="absolute top-1 right-1">
+                      <div className="relative">
+                        {list.id === 'britain-ireland' ? (
+                          <img 
+                            src="/lovable-uploads/7df94753-adb7-43b1-8ea8-380234f3318f.png" 
+                            alt="British & Irish Trophy" 
+                            className={cn(
+                              'h-8 w-auto object-contain transition-all duration-300',
+                              list.isCompleted ? 'opacity-100' : 'opacity-60 grayscale'
+                            )}
+                          />
+                        ) : list.id === 'europe' ? (
+                          <img 
+                            src="/lovable-uploads/fa5756cb-1a89-478b-b8ad-8d26168c1f4f.png" 
+                            alt="European Trophy" 
+                            className={cn(
+                              'h-8 w-auto object-contain transition-all duration-300',
+                              list.isCompleted ? 'opacity-100' : 'opacity-60 grayscale'
+                            )}
+                          />
+                        ) : list.id === 'usa' ? (
+                          <img 
+                            src="/lovable-uploads/7ae756b6-b8e6-4d03-a6ee-f8c336eec047.png" 
+                            alt="USA Trophy" 
+                            className={cn(
+                              'h-8 w-auto object-contain transition-all duration-300',
+                              list.isCompleted ? 'opacity-100' : 'opacity-60 grayscale'
+                            )}
+                          />
+                        ) : list.id === 'worldwide' ? (
+                          <img 
+                            src="/lovable-uploads/ab0f852c-4e2f-408d-a13c-ef3a595470e8.png" 
+                            alt="Worldwide Trophy" 
+                            className={cn(
+                              'h-8 w-auto object-contain transition-all duration-300',
+                              list.isCompleted ? 'opacity-100' : 'opacity-60 grayscale'
+                            )}
+                          />
+                        ) : null}
+                        
+                        {/* Padlock overlay for locked trophies */}
+                        {!list.isCompleted && (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="bg-black/60 rounded-full p-0.5">
+                              <Lock className="w-3 h-3 text-white" />
+                            </div>
                           </div>
-                          <div className="w-full bg-white/20 rounded-full h-1.5">
-                            <div 
-                              className="h-1.5 rounded-full transition-all duration-300 bg-green-400"
-                              style={{ 
-                                width: `${Math.min((list.completed / list.total) * 100, 100)}%` 
-                              }}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ) : list.id === 'europe' ? (
-                    // Special layout for Europe with trophy
-                    <div className="flex items-center gap-3 h-full">
-                      <img 
-                        src="/lovable-uploads/fa5756cb-1a89-478b-b8ad-8d26168c1f4f.png" 
-                        alt="European Trophy" 
-                        className="h-16 w-auto object-contain flex-shrink-0"
-                      />
-                      <div className="flex-1 space-y-2">
-                        <div className="flex items-center justify-between">
-                          <span className="text-base font-medium text-white/90">
-                            Europe
-                          </span>
-                          {list.isCompleted ? (
-                            <CheckCircle className="w-4 h-4 text-green-400" />
-                          ) : (
-                            <Lock className="w-4 h-4 text-gray-400" />
-                          )}
-                        </div>
-                        <div className="space-y-1">
-                          <div className="text-base text-white/70">
-                            {list.completed}/{list.total}
-                          </div>
-                          <div className="w-full bg-white/20 rounded-full h-1.5">
-                            <div 
-                              className="h-1.5 rounded-full transition-all duration-300 bg-green-400"
-                              style={{ 
-                                width: `${Math.min((list.completed / list.total) * 100, 100)}%` 
-                              }}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ) : list.id === 'usa' ? (
-                    // Special layout for USA with trophy
-                    <div className="flex items-center gap-3 h-full">
-                      <img 
-                        src="/lovable-uploads/7ae756b6-b8e6-4d03-a6ee-f8c336eec047.png" 
-                        alt="USA Trophy" 
-                        className="h-16 w-auto object-contain flex-shrink-0"
-                      />
-                      <div className="flex-1 space-y-2">
-                        <div className="flex items-center justify-between">
-                          <span className="text-base font-medium text-white/90">
-                            USA
-                          </span>
-                          {list.isCompleted ? (
-                            <CheckCircle className="w-4 h-4 text-green-400" />
-                          ) : (
-                            <Lock className="w-4 h-4 text-gray-400" />
-                          )}
-                        </div>
-                        <div className="space-y-1">
-                          <div className="text-base text-white/70">
-                            {list.completed}/{list.total}
-                          </div>
-                          <div className="w-full bg-white/20 rounded-full h-1.5">
-                            <div 
-                              className="h-1.5 rounded-full transition-all duration-300 bg-green-400"
-                              style={{ 
-                                width: `${Math.min((list.completed / list.total) * 100, 100)}%` 
-                              }}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ) : list.id === 'worldwide' ? (
-                    // Special layout for Worldwide with trophy
-                    <div className="flex items-center gap-3 h-full">
-                      <img 
-                        src="/lovable-uploads/ab0f852c-4e2f-408d-a13c-ef3a595470e8.png" 
-                        alt="Worldwide Trophy" 
-                        className="h-16 w-auto object-contain flex-shrink-0"
-                      />
-                      <div className="flex-1 space-y-2">
-                        <div className="flex items-center justify-between">
-                          <span className="text-base font-medium text-white/90">
-                            World
-                          </span>
-                          {list.isCompleted ? (
-                            <CheckCircle className="w-4 h-4 text-green-400" />
-                          ) : (
-                            <Lock className="w-4 h-4 text-gray-400" />
-                          )}
-                        </div>
-                        <div className="space-y-1">
-                          <div className="text-base text-white/70">
-                            {list.completed}/{list.total}
-                          </div>
-                          <div className="w-full bg-white/20 rounded-full h-1.5">
-                            <div 
-                              className="h-1.5 rounded-full transition-all duration-300 bg-green-400"
-                              style={{ 
-                                width: `${Math.min((list.completed / list.total) * 100, 100)}%` 
-                              }}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ) : (
-                    // Standard layout for other regions
-                    <>
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-base font-medium text-white/90">
-                          {list.shortName}
-                        </span>
-                        {list.isCompleted ? (
-                          <CheckCircle className="w-4 h-4 text-green-400" />
-                        ) : (
-                          <Lock className="w-4 h-4 text-gray-400" />
                         )}
                       </div>
-                      
-                      <div className="space-y-1">
-                        <div className="text-base text-white/70">
-                          {list.completed}/{list.total}
-                        </div>
-                        <div className="w-full bg-white/20 rounded-full h-1.5">
-                          <div 
-                            className="h-1.5 rounded-full transition-all duration-300 bg-green-400"
-                            style={{ 
-                              width: `${Math.min((list.completed / list.total) * 100, 100)}%` 
-                            }}
-                          />
-                        </div>
-                      </div>
-                    </>
-                  )}
+                    </div>
+                  </div>
+                  
+                  {/* Region Name */}
+                  <h4 className="text-sm font-semibold text-white text-center mb-1">
+                    {list.name}
+                  </h4>
+                  
+                  {/* Subtle Tag with Course Count and XP */}
+                  <div className="flex items-center gap-2 text-xs text-white/60">
+                    <span>Courses Played: {list.completed}</span>
+                    <span>•</span>
+                    <div className="flex items-center gap-1">
+                      <Sparkles className="w-3 h-3" />
+                      <span>XP: {(list.completed * 110).toLocaleString()}</span>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -874,6 +779,15 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
             </Dialog.Content>
           </Dialog.Portal>
         </Dialog.Root>
+
+        {/* Course List Modal */}
+        {selectedCourseList && (
+          <CourseListModal
+            isOpen={isCourseListModalOpen}
+            onClose={() => setIsCourseListModalOpen(false)}
+            region={selectedCourseList}
+          />
+        )}
       </div>
     </Tooltip.Provider>
   );
