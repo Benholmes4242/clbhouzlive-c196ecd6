@@ -491,7 +491,7 @@ const HeroProfileHeader = ({
           {/* Profile Photo/Video */}
           <div className="w-64 h-64 mb-6">
             <div 
-              className={`relative rounded-full transition-all duration-300 w-full h-full ${
+              className={`relative rounded-full overflow-hidden transition-all duration-300 w-full h-full ${
                 achievementRing.ringClass === 'ring-gold' ? 'border-[5px] border-yellow-400 shadow-[0_0_20px_rgba(255,215,0,0.3)]' :
                 achievementRing.ringClass === 'ring-silver' ? 'border-[5px] border-gray-400 shadow-[0_0_20px_rgba(192,192,192,0.3)]' :
                 achievementRing.ringClass === 'ring-blue' ? 'border-[5px] border-blue-400 shadow-[0_0_20px_rgba(30,144,255,0.3)]' :
