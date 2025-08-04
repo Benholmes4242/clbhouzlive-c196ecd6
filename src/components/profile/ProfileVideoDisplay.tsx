@@ -142,5 +142,6 @@ const ProfileVideoDisplay: React.FC<ProfileVideoDisplayProps> = ({
       )}
     </div>
   );
+};
 
 export default ProfileVideoDisplay;
