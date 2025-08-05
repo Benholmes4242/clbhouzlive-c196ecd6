@@ -412,18 +412,18 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
               )}
                {/* Trophy Points - Mobile: Horizontal Slider, Desktop: Grid */}
                 {isMobile ? (
-                  /* Mobile: Horizontal Scrollable Slider showing 2 trophies at a time */
-                  <div className="relative">
-                    <div 
-                      ref={carouselRef}
-                      className="flex overflow-x-auto scrollbar-hide gap-4 px-2 pb-4 snap-x snap-mandatory"
-                      style={{ scrollPaddingLeft: '8px', scrollPaddingRight: '8px' }}
-                    >
-                      {globalTrophies.map((trophy, index) => (
-                         <div 
-                           key={trophy.id} 
-                           className="relative flex-none w-[calc(50%-8px)] flex flex-col items-center space-y-3 cursor-pointer hover:scale-105 transition-all duration-300 snap-start p-4 rounded-xl bg-background/50 border border-border/50 pb-6"
-                           style={{ filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1))' }}
+                   /* Mobile: Horizontal Scrollable Slider showing 2 trophies + peek of 3rd */
+                   <div className="relative">
+                     <div 
+                       ref={carouselRef}
+                       className="flex overflow-x-auto scrollbar-hide gap-4 px-2 pb-4 snap-x snap-mandatory"
+                       style={{ scrollPaddingLeft: '8px', scrollPaddingRight: '8px' }}
+                     >
+                       {globalTrophies.map((trophy, index) => (
+                          <div 
+                            key={trophy.id} 
+                            className="relative flex-none w-[calc(42%-8px)] flex flex-col items-center space-y-3 cursor-pointer hover:scale-105 transition-all duration-300 snap-start p-4 rounded-xl bg-background/50 border border-border/50 pb-6"
+                            style={{ filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1))' }}
                           onClick={() => {
                             setSelectedTrophy({
                               ...trophy,
