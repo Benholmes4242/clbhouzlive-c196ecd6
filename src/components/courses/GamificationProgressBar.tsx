@@ -152,7 +152,6 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
   worldwideCompleted = 0,
   worldwideTotal = 100,
 }) => {
-  console.log('GamificationProgressBar - completedCount:', completedCount);
   const currentXP = completedCount * 110;
   const [showXPFloat, setShowXPFloat] = useState(false);
   const [prevCompletedCount, setPrevCompletedCount] = useState(completedCount);
@@ -517,7 +516,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                                      borderBottomLeftRadius: '12px',
                                      borderBottomRightRadius: '12px'
                                    }}
-                                   data-progress={`${completedCount}/${trophy.requiredCourses} = ${Math.min((completedCount / trophy.requiredCourses) * 100, 100)}%`}
+                                   
                                  />
                                </div>
                            </div>
