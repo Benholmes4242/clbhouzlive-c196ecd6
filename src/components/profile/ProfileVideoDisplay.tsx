@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { OptimizedAvatar } from '@/components/ui/optimized-avatar';
 import ProfileVideoPlayer from './ProfileVideoPlayer';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
@@ -37,6 +37,14 @@ const ProfileVideoDisplay: React.FC<ProfileVideoDisplayProps> = ({
   const [videoEnded, setVideoEnded] = useState(false);
   const [showFallback, setShowFallback] = useState(false);
   const [videoError, setVideoError] = useState(false);
+
+  // Reset states when videoUrl changes
+  useEffect(() => {
+    console.log('🎬 ProfileVideoDisplay - Video URL changed, resetting states');
+    setVideoEnded(false);
+    setShowFallback(false);
+    setVideoError(false);
+  }, [videoUrl]);
 
   console.log('🎬 ProfileVideoDisplay state:', {
     videoUrl,
