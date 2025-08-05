@@ -224,37 +224,14 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
   };
 
   return (
-    <>
-      {/* Fullscreen Immersive Background Layer */}
-      {videoUrl && showVideo && isPlaying && (
-        <div className="fixed inset-0 z-[-1] pointer-events-none">
-          {/* Blurred Video Background */}
-          <div className="absolute inset-0 overflow-hidden">
-            <video
-              src={videoUrl}
-              className="absolute inset-0 w-full h-full object-cover scale-110 blur-3xl opacity-30"
-              muted
-              playsInline
-              autoPlay
-              loop
-            />
-            {/* Radial Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-radial from-transparent via-black/30 to-black/60" />
-            {/* iOS Control Center Style Blur */}
-            <div className="absolute inset-0 backdrop-blur-sm bg-black/20" />
-          </div>
-        </div>
-      )}
-      
-      <div 
-        className={`relative w-full h-full rounded-full overflow-hidden group ${className} ${
-          (!showVideo && profilePhotoUrl) || (!isOwnProfile && hasPlayed && !isPlaying) ? 'cursor-pointer' : ''
-        } ${isPlaying && showVideo ? 'ring-4 ring-white/40 shadow-2xl shadow-white/20' : ''} 
-        ${isPlaying && showVideo ? 'animate-pulse-glow shimmer-effect' : ''} transition-all duration-1000`}
-        onMouseEnter={() => setShowControls(true)}
-        onMouseLeave={() => setShowControls(false)}
-        onClick={handleCircleClick}
-      >
+    <div 
+      className={`relative w-full h-full rounded-full overflow-hidden group ${className} ${
+        (!showVideo && profilePhotoUrl) || (!isOwnProfile && hasPlayed && !isPlaying) ? 'cursor-pointer' : ''
+      }`}
+      onMouseEnter={() => setShowControls(true)}
+      onMouseLeave={() => setShowControls(false)}
+      onClick={handleCircleClick}
+    >
       {videoUrl ? (
         <>
           {/* Video Element with smooth fade transition */}
@@ -313,17 +290,9 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
                       replayVideo();
                     }}
                     className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full p-2 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
-                    title="Replay Golf Intro"
                   >
                     <Play className="w-4 h-4" />
                   </Button>
-                )}
-                
-                {/* Playing Status Tooltip */}
-                {isPlaying && showVideo && (
-                  <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 bg-black/70 backdrop-blur-md text-white text-xs px-3 py-1 rounded-full whitespace-nowrap animate-fade-in">
-                    Playing Golf Intro
-                  </div>
                 )}
                 
                 {/* Owner Controls - Change Video and Photo buttons */}
@@ -421,7 +390,6 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
         </div>
       )}
     </div>
-    </>
   );
 };
 
