@@ -601,7 +601,7 @@ const HeroProfileHeader = ({
                         Rated Courses
                       </div>
                     </div>
-                    <div className="text-center">
+                    <div className="text-center pr-4">
                       <div className="font-bold text-foreground text-lg">
                         {averageRating > 0 ? `${averageRating}/10` : '--'}
                       </div>
@@ -609,7 +609,7 @@ const HeroProfileHeader = ({
                         Avg. Rating
                       </div>
                     </div>
-                    <div className="text-center">
+                    <div className="text-center pr-4">
                       <div className="font-bold text-foreground text-lg">
                         {followingCount}
                       </div>
