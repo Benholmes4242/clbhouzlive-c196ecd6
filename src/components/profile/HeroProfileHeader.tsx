@@ -30,6 +30,7 @@ import { useUserAchievements } from '@/hooks/useUserAchievements';
 import { Swords } from 'lucide-react';
 import ProfileVideoCircle from './ProfileVideoCircle';
 import { useCloudflareStream } from '@/hooks/useCloudflareStream';
+import { useR2Upload } from '@/hooks/useR2Upload';
 
 interface Course {
   id: string;
@@ -84,6 +85,7 @@ const HeroProfileHeader = ({
   const { user } = useSupabaseSession();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const { uploadVideo, uploading: videoUploading } = useCloudflareStream();
+  const { uploadImage, uploading: photoUploading } = useR2Upload();
   
   // Stats state
   const [ratedCoursesCount, setRatedCoursesCount] = useState(0);
@@ -360,6 +362,49 @@ const HeroProfileHeader = ({
     }
   };
 
+  const handlePhotoUpload = async (file: File) => {
+    try {
+      const result = await uploadImage(file);
+      
+      if (!result.success) {
+        toast({
+          title: "Upload Failed",
+          description: result.error || "Failed to upload photo",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Update profile with photo URL
+      const { error } = await supabase
+        .from('user_profiles')
+        .update({
+          profile_photo_url: result.imageUrl,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user?.id);
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: "Success",
+        description: "Profile photo uploaded successfully!",
+        variant: "default"
+      });
+
+      onProfileUpdate();
+    } catch (error) {
+      console.error('Error updating profile photo:', error);
+      toast({
+        title: "Update Failed",
+        description: "Failed to save photo to profile",
+        variant: "destructive"
+      });
+    }
+  };
+
 
 
 
@@ -419,9 +464,9 @@ const HeroProfileHeader = ({
                 displayName={displayName}
                 isOwnProfile={isOwnProfile}
                 onVideoUpload={handleVideoUpload}
-                onPhotoUpload={() => {}} // TODO: Implement photo upload
+                onPhotoUpload={handlePhotoUpload}
                 onVideoRemove={handleVideoRemove}
-                uploading={videoUploading}
+                uploading={videoUploading || photoUploading}
                 className="w-full h-full"
               />
             </div>
