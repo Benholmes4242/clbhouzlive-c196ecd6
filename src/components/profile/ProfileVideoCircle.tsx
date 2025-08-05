@@ -182,6 +182,20 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
                   </Button>
                 )}
                 
+                {/* Edit Video Button - Only for own profile */}
+                {isOwnProfile && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={handleFileSelect}
+                    disabled={uploading}
+                    className="bg-black/50 hover:bg-black/70 text-white border-0"
+                    title="Change video"
+                  >
+                    <Upload className="w-4 h-4" />
+                  </Button>
+                )}
+                
                 {/* Mute Toggle */}
                 <Button
                   size="sm"
