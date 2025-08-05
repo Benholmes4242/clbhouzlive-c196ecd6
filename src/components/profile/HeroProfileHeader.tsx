@@ -587,7 +587,7 @@ const HeroProfileHeader = ({
               isStatsDrawerOpen ? 'max-h-20 opacity-100' : 'max-h-0 opacity-0'
             }`}>
                 <div 
-                  className="w-full bg-muted border border-border border-t-0 rounded-b-lg py-1 pl-0 pr-2"
+                  className="w-full bg-muted border border-border border-t-0 rounded-b-lg py-1 pl-1 pr-2"
                   style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
                 >
                   <div className="flex items-center justify-between w-full">
