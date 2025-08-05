@@ -27,6 +27,16 @@ const ProfileVideoPlayer: React.FC<ProfileVideoPlayerProps> = ({
   
   const { isMuted, toggleMute, isActive } = useExclusiveVideoAudio(`profile-video-${videoUrl}`);
 
+  console.log('🎥 ProfileVideoPlayer state:', {
+    videoUrl,
+    autoPlay,
+    hasPlayed,
+    isPlaying,
+    showReplayButton,
+    isMuted,
+    isActive
+  });
+
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -34,15 +44,19 @@ const ProfileVideoPlayer: React.FC<ProfileVideoPlayerProps> = ({
     console.log('ProfileVideoPlayer - Loading video:', videoUrl);
 
     const handleLoadedData = () => {
-      console.log('ProfileVideoPlayer - Video loaded successfully');
+      console.log('🎥 ProfileVideoPlayer - Video loaded successfully');
       if (autoPlay && !hasPlayed) {
+        console.log('🎥 ProfileVideoPlayer - Attempting autoplay...');
         video.play().then(() => {
           setIsPlaying(true);
           setHasPlayed(true);
-          console.log('ProfileVideoPlayer - Video playing');
+          console.log('🎥 ProfileVideoPlayer - Video playing successfully');
         }).catch((error) => {
-          console.error('ProfileVideoPlayer - Play failed:', error);
+          console.error('🎥 ProfileVideoPlayer - Play failed:', error);
+          // Don't call onVideoError here, just log the issue
         });
+      } else {
+        console.log('🎥 ProfileVideoPlayer - Skipping autoplay', { autoPlay, hasPlayed });
       }
     };
 
@@ -64,8 +78,10 @@ const ProfileVideoPlayer: React.FC<ProfileVideoPlayerProps> = ({
     };
 
     const handleError = (e: any) => {
-      console.error('ProfileVideoPlayer - Video error:', e);
-      console.error('ProfileVideoPlayer - Video error details:', video.error);
+      console.error('🎥 ProfileVideoPlayer - Video error:', e);
+      console.error('🎥 ProfileVideoPlayer - Video error details:', video.error);
+      console.error('🎥 ProfileVideoPlayer - Video networkState:', video.networkState);
+      console.error('🎥 ProfileVideoPlayer - Video readyState:', video.readyState);
       onVideoError?.();
     };
 

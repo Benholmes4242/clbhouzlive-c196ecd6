@@ -38,13 +38,24 @@ const ProfileVideoDisplay: React.FC<ProfileVideoDisplayProps> = ({
   const [showFallback, setShowFallback] = useState(false);
   const [videoError, setVideoError] = useState(false);
 
+  console.log('🎬 ProfileVideoDisplay state:', {
+    videoUrl,
+    fallbackPhotoUrl,
+    videoEnded,
+    showFallback,
+    videoError,
+    willShowVideo: !showFallback,
+    willShowFallback: showFallback && fallbackPhotoUrl
+  });
+
   const handleVideoEnd = () => {
+    console.log('🎬 ProfileVideoDisplay - Video ended, showing fallback');
     setVideoEnded(true);
     setShowFallback(true);
   };
 
   const handleVideoError = () => {
-    console.error('ProfileVideoDisplay - Video failed to load, showing fallback');
+    console.error('🎬 ProfileVideoDisplay - Video failed to load, showing fallback');
     setVideoError(true);
     setShowFallback(true);
   };
@@ -91,24 +102,39 @@ const ProfileVideoDisplay: React.FC<ProfileVideoDisplayProps> = ({
       ref={swipeRef}
       className={`relative w-full h-full ${isOwnProfile ? 'group' : ''}`}
     >
-      {showFallback && fallbackPhotoUrl ? (
-        <OptimizedAvatar
-          src={fallbackPhotoUrl}
-          alt={displayName}
-          size={256}
-          fallback={displayName.charAt(0)}
-          className="shadow-2xl w-full h-full"
-          priority={true}
-        />
-      ) : (
-        <ProfileVideoPlayer
-          videoUrl={videoUrl}
-          className="w-full h-full shadow-2xl"
-          onVideoEnd={handleVideoEnd}
-          onVideoError={handleVideoError}
-          autoPlay={true}
-        />
-      )}
+      {(() => {
+        console.log('🎬 ProfileVideoDisplay render decision:', {
+          showFallback,
+          fallbackPhotoUrl: !!fallbackPhotoUrl,
+          willRenderFallback: showFallback && fallbackPhotoUrl,
+          willRenderVideo: !showFallback || !fallbackPhotoUrl
+        });
+        
+        if (showFallback && fallbackPhotoUrl) {
+          console.log('🎬 Rendering fallback photo');
+          return (
+            <OptimizedAvatar
+              src={fallbackPhotoUrl}
+              alt={displayName}
+              size={256}
+              fallback={displayName.charAt(0)}
+              className="shadow-2xl w-full h-full"
+              priority={true}
+            />
+          );
+        } else {
+          console.log('🎬 Rendering video player');
+          return (
+            <ProfileVideoPlayer
+              videoUrl={videoUrl}
+              className="w-full h-full shadow-2xl"
+              onVideoEnd={handleVideoEnd}
+              onVideoError={handleVideoError}
+              autoPlay={true}
+            />
+          );
+        }
+      })()}
 
       {/* Edit buttons overlay for own profile */}
       {isOwnProfile && (
