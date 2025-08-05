@@ -504,11 +504,11 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                              </div>
                            </div>
                            
-                           {/* Full-width progress bar at bottom of card */}
-                           <div className="absolute bottom-0 left-0 right-0 p-4 pt-0">
-                             <div className="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
+                           {/* Full-width progress bar connected to bottom of card */}
+                           <div className="absolute bottom-0 left-0 right-0">
+                             <div className="w-full bg-gray-200 h-1.5 overflow-hidden rounded-b-xl">
                                <div
-                                 className="h-1.5 rounded-full transition-all duration-500 ease-out"
+                                 className="h-1.5 transition-all duration-500 ease-out rounded-b-xl"
                                  style={{ 
                                    width: `${Math.min((completedCount / trophy.requiredCourses) * 100, 100)}%`,
                                    backgroundColor: '#22c55e',
