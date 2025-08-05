@@ -37,6 +37,7 @@ const ProfileVideoDisplay: React.FC<ProfileVideoDisplayProps> = ({
   const [videoEnded, setVideoEnded] = useState(false);
   const [showFallback, setShowFallback] = useState(false);
   const [videoError, setVideoError] = useState(false);
+  const [isVideoLoading, setIsVideoLoading] = useState(true);
 
   // Reset states when videoUrl changes
   useEffect(() => {
@@ -44,6 +45,7 @@ const ProfileVideoDisplay: React.FC<ProfileVideoDisplayProps> = ({
     setVideoEnded(false);
     setShowFallback(false);
     setVideoError(false);
+    setIsVideoLoading(true);
   }, [videoUrl]);
 
   console.log('🎬 ProfileVideoDisplay state:', {
@@ -66,12 +68,19 @@ const ProfileVideoDisplay: React.FC<ProfileVideoDisplayProps> = ({
     console.error('🎬 ProfileVideoDisplay - Video failed to load, showing fallback');
     setVideoError(true);
     setShowFallback(true);
+    setIsVideoLoading(false);
+  };
+
+  const handleVideoLoaded = () => {
+    console.log('🎬 ProfileVideoDisplay - Video loaded successfully');
+    setIsVideoLoading(false);
   };
 
   const handleReplayVideo = () => {
     setVideoEnded(false);
     setShowFallback(false);
     setVideoError(false);
+    setIsVideoLoading(true);
   };
 
   // Swipe gesture for video replay
@@ -114,11 +123,14 @@ const ProfileVideoDisplay: React.FC<ProfileVideoDisplayProps> = ({
         console.log('🎬 ProfileVideoDisplay render decision:', {
           showFallback,
           fallbackPhotoUrl: !!fallbackPhotoUrl,
+          isVideoLoading,
+          videoError,
           willRenderFallback: showFallback && fallbackPhotoUrl,
-          willRenderVideo: !showFallback || !fallbackPhotoUrl
+          willRenderVideo: !showFallback || isVideoLoading
         });
         
-        if (showFallback && fallbackPhotoUrl) {
+        // Show video player unless we explicitly need to show fallback AND video is not loading
+        if (showFallback && fallbackPhotoUrl && !isVideoLoading) {
           console.log('🎬 Rendering fallback photo');
           return (
             <OptimizedAvatar
@@ -138,6 +150,7 @@ const ProfileVideoDisplay: React.FC<ProfileVideoDisplayProps> = ({
               className="w-full h-full shadow-2xl"
               onVideoEnd={handleVideoEnd}
               onVideoError={handleVideoError}
+              onVideoLoaded={handleVideoLoaded}
               autoPlay={true}
             />
           );

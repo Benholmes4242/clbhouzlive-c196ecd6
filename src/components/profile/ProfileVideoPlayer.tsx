@@ -9,6 +9,7 @@ interface ProfileVideoPlayerProps {
   className?: string;
   onVideoEnd?: () => void;
   onVideoError?: () => void;
+  onVideoLoaded?: () => void;
   autoPlay?: boolean;
 }
 
@@ -18,6 +19,7 @@ const ProfileVideoPlayer: React.FC<ProfileVideoPlayerProps> = ({
   className = '',
   onVideoEnd,
   onVideoError,
+  onVideoLoaded,
   autoPlay = true
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -45,6 +47,8 @@ const ProfileVideoPlayer: React.FC<ProfileVideoPlayerProps> = ({
 
     const handleLoadedData = () => {
       console.log('🎥 ProfileVideoPlayer - Video loaded successfully');
+      onVideoLoaded?.(); // Notify parent that video has loaded
+      
       if (autoPlay && !hasPlayed) {
         console.log('🎥 ProfileVideoPlayer - Attempting autoplay...');
         video.play().then(() => {
