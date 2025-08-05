@@ -6,10 +6,18 @@ import HeroProfileHeader from '@/components/profile/HeroProfileHeader';
 import HandicapSection from '@/components/profile/HandicapSection';
 import UserCoursesContent from '@/components/courses/UserCoursesContent';
 import { useProfileData } from '@/hooks/useProfileData';
+import { useQueryClient } from '@tanstack/react-query';
 
 const ProfilePage = () => {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState('activity');
+  const queryClient = useQueryClient();
+  
+  // Force invalidate profile cache on page load to ensure fresh data
+  useEffect(() => {
+    console.log('ProfilePage mounted - invalidating profile cache');
+    queryClient.invalidateQueries({ queryKey: ['profile'] });
+  }, [queryClient]);
   
   // Debug log for activeSection changes
   useEffect(() => {
