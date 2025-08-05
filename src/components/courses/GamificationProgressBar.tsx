@@ -501,7 +501,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                    setSelectedCourseList(list);
                    setIsCourseListModalOpen(true);
                  }}
-               />
+                />
 
           </div>
 
