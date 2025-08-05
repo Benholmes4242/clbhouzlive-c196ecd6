@@ -188,13 +188,13 @@ function createCompilationPlan(
 
   for (let i = 0; i < videoOrder.length; i++) {
     const videoIndex = videoOrder[i]
-    const analysis = analyses[videoIndex]
+    const analysis = analyses[videoIndex] // This might be undefined if no analyses provided
     const originalDuration = originalDurations[videoIndex]
     
     let clipStart = 0
     let clipEnd = Math.min(6, originalDuration) // Default: first 6 seconds
 
-    if (useAiAssist && analysis.bestMoments.length > 0) {
+    if (useAiAssist && analysis && analysis.bestMoments && analysis.bestMoments.length > 0) {
       // Use AI-detected best moment
       const bestMoment = analysis.bestMoments[0]
       clipStart = bestMoment.start
