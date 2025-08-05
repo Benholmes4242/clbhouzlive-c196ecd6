@@ -591,38 +591,36 @@ const HeroProfileHeader = ({
                 style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
               >
                 <div className="flex items-center justify-between w-full">
-                  {/* Group B - Hidden Stats with exact same structure as top row */}
-                  <div className="text-center">
-                    <div className="font-bold text-foreground text-lg">
-                      {ratedCoursesCount}
+                  {/* Group B - Hidden Stats with same spacing as top row */}
+                  <div className="flex items-center justify-around flex-1 space-x-2">
+                    <div className="text-center">
+                      <div className="font-bold text-foreground text-lg">
+                        {ratedCoursesCount}
+                      </div>
+                      <div className="text-muted-foreground text-xs">
+                        Rated Courses
+                      </div>
                     </div>
-                    <div className="text-muted-foreground text-xs">
-                      Rated Courses
+                    <div className="text-center">
+                      <div className="font-bold text-foreground text-lg">
+                        {averageRating > 0 ? `${averageRating}/10` : '--'}
+                      </div>
+                      <div className="text-muted-foreground text-xs">
+                        Avg. Rating
+                      </div>
                     </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="font-bold text-foreground text-lg">
-                      {averageRating > 0 ? `${averageRating}/10` : '--'}
-                    </div>
-                    <div className="text-muted-foreground text-xs">
-                      Avg. Rating
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="font-bold text-foreground text-lg">
-                      {followingCount}
-                    </div>
-                    <div className="text-muted-foreground text-xs">
-                      Following
+                    <div className="text-center">
+                      <div className="font-bold text-foreground text-lg">
+                        {followingCount}
+                      </div>
+                      <div className="text-muted-foreground text-xs">
+                        Following
+                      </div>
                     </div>
                   </div>
                   
                   {/* Invisible spacer to match three-dot button width */}
-                  <div className="ml-2 p-2">
-                    <div className="h-4 w-4 opacity-0">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </div>
-                  </div>
+                  <div className="ml-2 w-8 h-8"></div>
                 </div>
               </div>
             </div>
