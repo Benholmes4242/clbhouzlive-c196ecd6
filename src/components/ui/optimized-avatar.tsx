@@ -34,7 +34,6 @@ const OptimizedAvatarComponent: React.FC<OptimizedAvatarProps> = ({
             objectFit: 'cover'
           }}
           loading={priority ? 'eager' : 'lazy'}
-          fetchPriority={priority ? 'high' : 'auto'}
           decoding="async"
           crossOrigin="anonymous"
           onLoad={() => {
