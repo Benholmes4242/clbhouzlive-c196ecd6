@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { subscriptionManager } from '@/utils/subscriptionManager';
 
 export interface Achievement {
   id: string;
@@ -146,42 +145,42 @@ export const useUserAchievements = (limit: number = 5) => {
     console.log('Setting up user achievements subscription for user:', user.id);
     const channelName = `user_achievements_${user.id}`;
     
-    subscriptionManager.createSubscription(channelName, [
-      {
-        event: 'postgres_changes',
-        options: {
+    // Simple approach: create channel directly with static name
+    const channel = supabase
+      .channel(channelName)
+      .on(
+        'postgres_changes',
+        {
           event: 'INSERT',
           schema: 'public',
           table: 'user_achievements',
           filter: `user_id=eq.${user.id}`
         },
-        callback: () => {
+        () => {
           console.log('New user achievement detected, refetching...');
-          // Use the callback directly instead of depending on it
-          if (user?.id) {
-            supabase
-              .rpc('get_user_recent_achievements', {
-                user_id_param: user.id,
-                limit_param: limit
-              })
-              .then(({ data, error: fetchError }) => {
-                if (fetchError) {
-                  console.error('Error fetching achievements:', fetchError);
-                  return;
-                }
-                const formattedAchievements = (data || []).map(formatAchievement);
-                setAchievements(formattedAchievements);
-              });
-          }
+          // Inline the fetch logic to avoid dependency issues
+          supabase
+            .rpc('get_user_recent_achievements', {
+              user_id_param: user.id,
+              limit_param: limit
+            })
+            .then(({ data, error: fetchError }) => {
+              if (fetchError) {
+                console.error('Error fetching achievements:', fetchError);
+                return;
+              }
+              const formattedAchievements = (data || []).map(formatAchievement);
+              setAchievements(formattedAchievements);
+            });
         }
-      }
-    ]);
+      )
+      .subscribe();
 
     return () => {
       console.log('Cleaning up user achievements subscription');
-      subscriptionManager.removeSubscription(channelName);
+      supabase.removeChannel(channel);
     };
-  }, [user?.id, limit]);
+  }, [user?.id]); // Remove limit from dependencies to prevent re-subscriptions
 
   return {
     achievements,

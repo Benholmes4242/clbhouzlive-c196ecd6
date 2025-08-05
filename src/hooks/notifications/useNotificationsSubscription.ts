@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { subscriptionManager } from '@/utils/subscriptionManager';
 
 export const useNotificationsSubscription = (userId: string | undefined) => {
   const queryClient = useQueryClient();
@@ -12,51 +11,52 @@ export const useNotificationsSubscription = (userId: string | undefined) => {
     console.log('Setting up notifications subscription for user:', userId);
     const channelName = `notifications-${userId}`;
     
-    subscriptionManager.createSubscription(channelName, [
-      {
-        event: 'postgres_changes',
-        options: {
+    const channel = supabase
+      .channel(channelName)
+      .on(
+        'postgres_changes',
+        {
           event: 'INSERT',
           schema: 'public',
           table: 'notifications',
           filter: `user_id=eq.${userId}`
         },
-        callback: (payload: any) => {
+        (payload) => {
           console.log('New notification received:', payload);
           queryClient.invalidateQueries({ queryKey: ['notifications'] });
         }
-      },
-      {
-        event: 'postgres_changes',
-        options: {
+      )
+      .on(
+        'postgres_changes',
+        {
           event: 'UPDATE',
           schema: 'public',
           table: 'notifications',
           filter: `user_id=eq.${userId}`
         },
-        callback: (payload: any) => {
+        (payload) => {
           console.log('Notification updated:', payload);
           queryClient.invalidateQueries({ queryKey: ['notifications'] });
         }
-      },
-      {
-        event: 'postgres_changes',
-        options: {
+      )
+      .on(
+        'postgres_changes',
+        {
           event: 'DELETE',
           schema: 'public',
           table: 'notifications',
           filter: `user_id=eq.${userId}`
         },
-        callback: (payload: any) => {
+        (payload) => {
           console.log('Notification deleted:', payload);
           queryClient.invalidateQueries({ queryKey: ['notifications'] });
         }
-      }
-    ]);
+      )
+      .subscribe();
 
     return () => {
       console.log('Cleaning up notifications subscription');
-      subscriptionManager.removeSubscription(channelName);
+      supabase.removeChannel(channel);
     };
   }, [userId]);
 };
