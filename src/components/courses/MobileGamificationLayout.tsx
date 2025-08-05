@@ -137,7 +137,7 @@ const MobileGamificationLayout: React.FC<MobileGamificationLayoutProps> = ({
                   />
                 ) : trophy.id === 'clubhouse-elite' ? (
                   <img 
-                    src="/lovable-uploads/a9672498-b79d-4a47-9e6a-1128770700c9.png" 
+                    src="/lovable-uploads/76e2f192-0d3a-4d19-87ec-49850b4d5e82.png" 
                     alt="Clubhouse Elite Trophy" 
                     className={cn(
                       'h-20 w-auto object-contain transition-all duration-300',
