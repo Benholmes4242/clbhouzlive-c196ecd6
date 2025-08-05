@@ -110,7 +110,7 @@ const MobileGamificationLayout: React.FC<MobileGamificationLayoutProps> = ({
                     src="/lovable-uploads/f2f50b99-38e1-466b-8ac8-c32e428231cb.png" 
                     alt="Green Fee Rookie Trophy" 
                     className={cn(
-                      'h-20 w-auto object-contain -mt-4 transition-all duration-300',
+                       'h-20 w-auto object-contain transition-all duration-300',
                       trophy.isUnlocked ? 'opacity-100 animate-bounce' : 'opacity-40 grayscale'
                     )}
                     style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(251, 191, 36, 0.6))' : 'none' }}
@@ -120,7 +120,7 @@ const MobileGamificationLayout: React.FC<MobileGamificationLayoutProps> = ({
                     src="/lovable-uploads/43291ca4-d526-4b10-9585-6ea3488445cf.png" 
                     alt="The Turn Trophy"
                     className={cn(
-                      'h-20 w-auto object-contain -mt-4 transition-all duration-300',
+                       'h-20 w-auto object-contain transition-all duration-300',
                       trophy.isUnlocked ? 'opacity-100 animate-bounce' : 'opacity-40 grayscale'
                     )}
                     style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(148, 163, 184, 0.6))' : 'none' }}
@@ -130,7 +130,7 @@ const MobileGamificationLayout: React.FC<MobileGamificationLayoutProps> = ({
                     src="/lovable-uploads/0c126dc7-5509-40b9-862d-b054423ca7f6.png" 
                     alt="Century Club Trophy" 
                     className={cn(
-                      'h-20 w-auto object-contain -mt-4 transition-all duration-300',
+                       'h-20 w-auto object-contain transition-all duration-300',
                       trophy.isUnlocked ? 'opacity-100 animate-bounce' : 'opacity-40 grayscale'
                     )}
                     style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(59, 130, 246, 0.6))' : 'none' }}
@@ -140,7 +140,7 @@ const MobileGamificationLayout: React.FC<MobileGamificationLayoutProps> = ({
                     src="/lovable-uploads/a9672498-b79d-4a47-9e6a-1128770700c9.png" 
                     alt="Clubhouse Elite Trophy" 
                     className={cn(
-                      'h-20 w-auto object-contain -mt-4 transition-all duration-300',
+                      'h-20 w-auto object-contain transition-all duration-300',
                       trophy.isUnlocked ? 'opacity-100 animate-bounce' : 'opacity-40 grayscale'
                     )}
                     style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(34, 197, 94, 0.6))' : 'none' }}
