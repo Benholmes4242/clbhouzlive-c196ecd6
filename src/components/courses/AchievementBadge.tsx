@@ -134,7 +134,7 @@ const AchievementBadge: React.FC<AchievementBadgeProps> = ({
             border-2 rounded-full p-2
             transition-all duration-300 ease-in-out
             hover:scale-110 active:scale-95
-            ${badge.isUnlocked ? 'cursor-pointer animate-subtle-bounce' : 'cursor-default'}
+            ${badge.isUnlocked ? 'cursor-pointer animate-bounce' : 'cursor-default'}
             ${badge.isUnlocked ? 'hover:bg-opacity-30' : ''}
           `}
         >

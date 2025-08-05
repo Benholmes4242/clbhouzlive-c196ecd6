@@ -5,23 +5,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom subtle bounce animation for achievements */
-@keyframes subtle-bounce {
-  0%, 20%, 53%, 80%, 100% {
-    transform: translateY(0);
-  }
-  40%, 43% {
-    transform: translateY(-2px);
-  }
-  70% {
-    transform: translateY(-1px);
-  }
-}
-
-.animate-subtle-bounce {
-  animation: subtle-bounce 2s ease-in-out infinite;
-}
-
 @layer base {
   /* Mobile scroll behavior fixes and safe area support */
   html {
