@@ -38,6 +38,7 @@ const ProfileVideoDisplay: React.FC<ProfileVideoDisplayProps> = ({
   const [showFallback, setShowFallback] = useState(false);
   const [videoError, setVideoError] = useState(false);
   const [isVideoLoading, setIsVideoLoading] = useState(true);
+  const [retryKey, setRetryKey] = useState(0);
 
   // Reset states when videoUrl changes
   useEffect(() => {
@@ -65,7 +66,18 @@ const ProfileVideoDisplay: React.FC<ProfileVideoDisplayProps> = ({
   };
 
   const handleVideoError = () => {
-    console.error('🎬 ProfileVideoDisplay - Video failed to load, showing fallback');
+    console.error('🎬 ProfileVideoDisplay - Video failed to load, might still be processing');
+    
+    // If it's a 404, the video might still be processing
+    // Set a timeout to retry after a few seconds
+    setTimeout(() => {
+      console.log('🎬 ProfileVideoDisplay - Retrying video load after delay');
+      setRetryKey(prev => prev + 1); // Force video player to remount
+      setVideoError(false);
+      setShowFallback(false);
+      setIsVideoLoading(true);
+    }, 5000); // Wait 5 seconds then retry
+    
     setVideoError(true);
     setShowFallback(true);
     setIsVideoLoading(false);
@@ -74,6 +86,8 @@ const ProfileVideoDisplay: React.FC<ProfileVideoDisplayProps> = ({
   const handleVideoLoaded = () => {
     console.log('🎬 ProfileVideoDisplay - Video loaded successfully');
     setIsVideoLoading(false);
+    setVideoError(false);
+    setShowFallback(false);
   };
 
   const handleReplayVideo = () => {
@@ -144,16 +158,17 @@ const ProfileVideoDisplay: React.FC<ProfileVideoDisplayProps> = ({
           );
         } else {
           console.log('🎬 Rendering video player');
-          return (
-            <ProfileVideoPlayer
-              videoUrl={videoUrl}
-              className="w-full h-full shadow-2xl"
-              onVideoEnd={handleVideoEnd}
-              onVideoError={handleVideoError}
-              onVideoLoaded={handleVideoLoaded}
-              autoPlay={true}
-            />
-          );
+           return (
+             <ProfileVideoPlayer
+               key={retryKey} // Force remount when retrying
+               videoUrl={videoUrl}
+               className="w-full h-full shadow-2xl"
+               onVideoEnd={handleVideoEnd}
+               onVideoError={handleVideoError}
+               onVideoLoaded={handleVideoLoaded}
+               autoPlay={true}
+             />
+           );
         }
       })()}
 
