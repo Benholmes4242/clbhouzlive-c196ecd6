@@ -20,12 +20,14 @@ export const useR2Upload = () => {
     setUploading(true);
 
     try {
-      // Create form data for the file
+      // Create form data for the existing R2 upload function
       const formData = new FormData();
       formData.append('file', file);
+      formData.append('fileName', file.name);
+      formData.append('bucketType', 'profile-photos'); // Organize profile photos separately
 
-      // Call the R2 upload edge function
-      const { data, error } = await supabase.functions.invoke('r2-upload', {
+      // Call the existing cloudflare-r2-upload edge function
+      const { data, error } = await supabase.functions.invoke('cloudflare-r2-upload', {
         body: formData,
       });
 
@@ -39,12 +41,12 @@ export const useR2Upload = () => {
         return { success: false, error: error.message };
       }
 
-      if (data?.success && data?.imageUrl) {
+      if (data?.success && data?.url) {
         toast({
           title: "Upload successful",
-          description: "Image uploaded successfully!",
+          description: "Profile photo uploaded successfully!",
         });
-        return { success: true, imageUrl: data.imageUrl };
+        return { success: true, imageUrl: data.url };
       } else {
         const errorMsg = data?.error || 'Unknown upload error';
         toast({
