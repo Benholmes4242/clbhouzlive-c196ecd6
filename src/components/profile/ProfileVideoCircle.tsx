@@ -195,45 +195,54 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
             </div>
           )}
           
-          {/* Owner Controls */}
-          {isOwnProfile && showControls && (
-            <div className="absolute top-2 right-2">
-              <div className="flex gap-1">
+          {/* Owner Controls - Always visible edit button */}
+          {isOwnProfile && (
+            <>
+              {/* Always visible edit button */}
+              <div className="absolute top-2 right-2">
                 <Button
                   size="sm"
                   variant="ghost"
                   onClick={handleFileSelect}
                   disabled={uploading}
                   className="bg-black/50 hover:bg-black/70 text-white border-0 p-2"
+                  title="Change video"
                 >
                   <Upload className="w-3 h-3" />
                 </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={onVideoRemove}
-                  disabled={uploading}
-                  className="bg-black/50 hover:bg-black/70 text-white border-0 p-2"
-                >
-                  <Trash2 className="w-3 h-3" />
-                </Button>
               </div>
-            </div>
+              
+              {/* Hover controls */}
+              {showControls && (
+                <div className="absolute top-2 left-2">
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={onVideoRemove}
+                    disabled={uploading}
+                    className="bg-black/50 hover:bg-black/70 text-white border-0 p-2"
+                    title="Remove video"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                  </Button>
+                </div>
+              )}
+            </>
           )}
         </>
       ) : (
         /* No Video - Show Upload Area */
         <div className="w-full h-full bg-muted/30 flex flex-col items-center justify-center">
-          <div className="text-6xl text-muted-foreground/50 mb-2">
+          <div className="text-6xl text-muted-foreground/50 mb-4">
             {displayName.charAt(0)}
           </div>
           
           {isOwnProfile && !uploading && (
             <Button
               size="sm"
-              variant="ghost"
+              variant="secondary"
               onClick={handleFileSelect}
-              className="text-xs text-muted-foreground hover:text-foreground"
+              className="text-xs"
             >
               <Upload className="w-3 h-3 mr-1" />
               Add Video
@@ -259,7 +268,7 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
       
       {/* Loading Overlay */}
       {uploading && (
-        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+        <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-full">
           <div className="flex flex-col items-center gap-2">
             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
             <span className="text-white text-xs">Uploading...</span>
