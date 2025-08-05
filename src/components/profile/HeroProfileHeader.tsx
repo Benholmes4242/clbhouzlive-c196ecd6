@@ -395,8 +395,6 @@ const HeroProfileHeader = ({
       });
 
       onProfileUpdate();
-      
-      console.log('Profile photo updated successfully:', result.imageUrl);
     } catch (error) {
       console.error('Error updating profile photo:', error);
       toast({
