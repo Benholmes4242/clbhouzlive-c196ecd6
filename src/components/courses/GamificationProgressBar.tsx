@@ -740,7 +740,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                       }}
                     >
                       <div
-                        className="flex flex-col items-center p-4 rounded-xl border transition-all cursor-pointer hover:scale-105 hover:-translate-y-1 bg-background border-border hover:shadow-lg duration-300 h-[200px]"
+                        className="aspect-square flex flex-col items-center p-4 rounded-xl border transition-all cursor-pointer hover:scale-105 hover:-translate-y-1 bg-background border-border hover:shadow-lg duration-300"
                         style={{ boxShadow: '0 2px 6px rgba(0,0,0,0.04)' }}
                         onClick={() => {
                           setSelectedCourseList(list);
