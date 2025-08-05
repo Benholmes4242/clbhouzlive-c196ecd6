@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
+import { subscriptionManager } from '@/utils/subscriptionManager';
 
 export interface Achievement {
   id: string;
@@ -145,17 +146,16 @@ export const useUserAchievements = (limit: number = 5) => {
     console.log('Setting up user achievements subscription for user:', user.id);
     const channelName = `user_achievements_${user.id}`;
     
-    const channel = supabase
-      .channel(channelName)
-      .on(
-        'postgres_changes',
-        {
+    subscriptionManager.createSubscription(channelName, [
+      {
+        event: 'postgres_changes',
+        options: {
           event: 'INSERT',
           schema: 'public',
           table: 'user_achievements',
           filter: `user_id=eq.${user.id}`
         },
-        () => {
+        callback: () => {
           console.log('New user achievement detected, refetching...');
           // Use the callback directly instead of depending on it
           if (user?.id) {
@@ -174,14 +174,14 @@ export const useUserAchievements = (limit: number = 5) => {
               });
           }
         }
-      )
-      .subscribe();
+      }
+    ]);
 
     return () => {
       console.log('Cleaning up user achievements subscription');
-      supabase.removeChannel(channel);
+      subscriptionManager.removeSubscription(channelName);
     };
-  }, [user?.id, limit]); // Remove fetchAchievements from dependencies
+  }, [user?.id, limit]);
 
   return {
     achievements,
