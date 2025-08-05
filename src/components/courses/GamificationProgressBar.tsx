@@ -505,11 +505,8 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
 
           </div>
 
-          {/* Divider Line */}
-          <div className="mx-16 border-t border-gray-300/60"></div>
-
           {/* Regional Lists Completion - Improved Cards with enhanced spacing */}
-          <div className="space-y-4 pt-8">
+          <div className="space-y-4 pt-4">
             <div className="hidden md:flex items-center justify-between">
               <span className="text-lg font-semibold text-foreground">Regional List Completion</span>
               <span className="text-base font-medium text-foreground">
