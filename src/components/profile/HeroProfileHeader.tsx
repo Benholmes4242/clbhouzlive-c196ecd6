@@ -590,30 +590,38 @@ const HeroProfileHeader = ({
                 className="w-full bg-muted border border-border border-t-0 rounded-b-lg py-1 mt-0" 
                 style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
               >
-                <div className="flex items-center justify-around w-full px-4 space-x-2">
-                  <div className="text-center">
-                    <div className="font-bold text-foreground text-lg">
-                      {ratedCoursesCount}
+                <div className="flex items-center justify-between w-full px-4">
+                  {/* Additional Stats - aligned with top stats */}
+                  <div className="flex items-center justify-around flex-1 space-x-2">
+                    <div className="text-center">
+                      <div className="font-bold text-foreground text-lg">
+                        {ratedCoursesCount}
+                      </div>
+                      <div className="text-muted-foreground text-xs">
+                        Rated Courses
+                      </div>
                     </div>
-                    <div className="text-muted-foreground text-xs">
-                      Rated Courses
+                    <div className="text-center">
+                      <div className="font-bold text-foreground text-lg">
+                        {averageRating > 0 ? `${averageRating}/10` : '--'}
+                      </div>
+                      <div className="text-muted-foreground text-xs">
+                        Avg. Rating
+                      </div>
+                    </div>
+                    <div className="text-center">
+                      <div className="font-bold text-foreground text-lg">
+                        {followingCount}
+                      </div>
+                      <div className="text-muted-foreground text-xs">
+                        Following
+                      </div>
                     </div>
                   </div>
-                  <div className="text-center">
-                    <div className="font-bold text-foreground text-lg">
-                      {averageRating > 0 ? `${averageRating}/10` : '--'}
-                    </div>
-                    <div className="text-muted-foreground text-xs">
-                      Avg. Rating
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <div className="font-bold text-foreground text-lg">
-                      {followingCount}
-                    </div>
-                    <div className="text-muted-foreground text-xs">
-                      Following
-                    </div>
+                  
+                  {/* Empty space to match three-dot button width */}
+                  <div className="flex items-center justify-center p-2 opacity-0">
+                    <span className="text-lg font-bold">⋯</span>
                   </div>
                 </div>
               </div>
