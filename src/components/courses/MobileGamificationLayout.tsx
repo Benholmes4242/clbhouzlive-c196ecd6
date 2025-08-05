@@ -44,7 +44,7 @@ const MobileGamificationLayout: React.FC<MobileGamificationLayoutProps> = ({
   return (
     <>
       {/* Mobile Trophy Carousel with Progress Bar - Show only 2 trophies at a time */}
-      <div className="md:hidden relative z-10 pt-8 pb-4">
+      <div className="md:hidden relative z-10 pt-2.5 pb-4">
         {/* Progress Line positioned in the middle of trophies */}
         <div className="absolute top-12 left-8 right-8 h-3 bg-gray-200 rounded-full overflow-hidden shadow-sm z-0">
           {nextGlobalTrophy && lastUnlockedTrophy && (
