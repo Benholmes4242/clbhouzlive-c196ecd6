@@ -13,11 +13,29 @@ export const useUserProfileQueries = () => {
 
   // Fetch the user profile by username or ID with aggressive optimization
   const { data: profile, isLoading, error } = useQuery({
-    queryKey: ['userProfile', username],
+    queryKey: ['userProfile', username, currentUser?.id],
     queryFn: async () => {
+      // If no username provided, load current user's profile
       if (!username) {
-        console.log('No username provided');
-        return null;
+        if (!currentUser?.id) {
+          console.log('No username and no current user');
+          return null;
+        }
+        
+        console.log('Loading current user profile for ID:', currentUser.id);
+        const { data, error } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('id', currentUser.id)
+          .maybeSingle();
+        
+        if (error) {
+          console.error('Current user profile query error:', error);
+          throw error;
+        }
+        
+        console.log('Current user profile data:', data);
+        return data;
       }
       
       console.log('Fetching profile for username:', username);
@@ -55,7 +73,7 @@ export const useUserProfileQueries = () => {
       console.log('Final profile data:', data);
       return data;
     },
-    enabled: !!username,
+    enabled: !!username || !!currentUser?.id,
     retry: 2, // Reduced retries for faster failure
     staleTime: 1000 * 30, // 30 seconds - much shorter cache for profile updates
     gcTime: 1000 * 60 * 5, // 5 minutes - shorter memory cache
