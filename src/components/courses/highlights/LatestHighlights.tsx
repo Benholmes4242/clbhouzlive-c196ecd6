@@ -221,7 +221,7 @@ const LatestHighlights: React.FC<LatestHighlightsProps> = ({
 
   return (
     <div className="py-4">
-      <div className="mb-1 px-4">
+      <div className="mb-6 px-4">
         <h2 className="text-2xl font-bold text-foreground mb-2">Highlights & Achievements</h2>
         <p className="text-muted-foreground">
           {isOwnProfile 
