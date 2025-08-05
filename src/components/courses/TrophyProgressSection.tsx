@@ -328,8 +328,8 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
                          >
                            {trophy.id === 'green-fee-rookie' ? (
                              <img 
-                               src="/lovable-uploads/f2f50b99-38e1-466b-8ac8-c32e428231cb.png" 
-                               alt="Green Fee Rookie Trophy" 
+                               src="/lovable-uploads/5a091ad9-4617-497e-ba13-9da6506fe989.png" 
+                               alt="20 Club Trophy" 
                                className={cn(
                              'h-24 w-auto object-contain transition-all duration-300',
                              trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
@@ -376,8 +376,8 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
                       <div key={trophy.id} className="relative flex flex-col items-center space-y-3 cursor-pointer hover:scale-105 transition-all duration-300">
                         {trophy.id === 'green-fee-rookie' ? (
                           <img 
-                            src="/lovable-uploads/f2f50b99-38e1-466b-8ac8-c32e428231cb.png" 
-                            alt="Green Fee Rookie Trophy" 
+                            src="/lovable-uploads/5a091ad9-4617-497e-ba13-9da6506fe989.png" 
+                            alt="20 Club Trophy" 
                             className={cn(
                           'h-32 w-auto object-contain transition-all duration-300',
                           trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
