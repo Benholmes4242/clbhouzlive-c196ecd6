@@ -55,7 +55,10 @@ const VideoCard: React.FC<{
   isActive: boolean; 
   onVideoPlay?: (videoId: string) => void;
   isMobile: boolean;
-}> = ({ video, isActive, onVideoPlay, isMobile }) => {
+  isHovered?: boolean;
+  isFirstCard?: boolean;
+  shouldAutoPlay?: boolean;
+}> = ({ video, isActive, onVideoPlay, isMobile, isHovered = false, isFirstCard = false, shouldAutoPlay = false }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -116,14 +119,17 @@ const VideoCard: React.FC<{
     return () => videoElement.removeEventListener('loadeddata', handleLoadedData);
   }, [video.videoUrl]);
 
-  // Handle autoplay based on intersection observer
+  // Handle autoplay and hover logic
   useEffect(() => {
     const videoElement = videoRef.current;
     if (!videoElement) return;
 
     videoElement.muted = isMuted;
 
-    if (isActive && shouldAutoplay && isInView) {
+    // Play logic: first card auto-plays when shouldAutoPlay is true, other cards play on hover
+    const shouldPlay = isFirstCard ? shouldAutoPlay : isHovered;
+
+    if (shouldPlay && isInView) {
       videoElement.play().catch(() => {});
       setIsPlaying(true);
     } else {
@@ -132,7 +138,7 @@ const VideoCard: React.FC<{
       videoElement.currentTime = 0; // Reset to first frame
       setIsPlaying(false);
     }
-  }, [isActive, shouldAutoplay, isInView, isMuted]);
+  }, [isHovered, isFirstCard, shouldAutoPlay, isInView, isMuted]);
 
   // Update video mute state when session preference changes
   useEffect(() => {
@@ -240,6 +246,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
   userId
 }) => {
   const [activeVideoIndex, setActiveVideoIndex] = useState(0);
+  const [hoveredCardIndex, setHoveredCardIndex] = useState<number | null>(null);
   
   // Use only highlight videos (up to 8 total)
   const carouselItems = highlights.slice(0, 8);
@@ -362,12 +369,17 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
               isMobile ? 'w-[calc(100vw-6rem)]' : 'w-80'
             }`}
             style={{ scrollSnapAlign: 'start' }}
+            onMouseEnter={() => !isMobile && setHoveredCardIndex(index)}
+            onMouseLeave={() => !isMobile && setHoveredCardIndex(null)}
           >
             <VideoCard
               video={item}
               isActive={index === activeVideoIndex}
               onVideoPlay={onVideoPlay}
               isMobile={isMobile}
+              isHovered={hoveredCardIndex === index}
+              isFirstCard={index === 0}
+              shouldAutoPlay={hoveredCardIndex === null || hoveredCardIndex === 0}
             />
           </div>
         ))}
