@@ -236,37 +236,25 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
           {/* Controls Overlay - Show for both video and photo states */}
           {showControls && (
             <div className="absolute inset-0 bg-black/30 flex items-center justify-center transition-opacity">
-              <div className="flex flex-col gap-2">
-                <div className="flex gap-2">
-                  {/* Replay Button - Only when video has played and stopped */}
-                  {hasPlayed && !isPlaying && showVideo && (
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={replayVideo}
-                      className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full p-2 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
-                    >
-                      <Play className="w-4 h-4" />
-                    </Button>
-                  )}
-                  
-                  {/* Play Button - Only when showing photo and video exists */}
-                  {!showVideo && videoUrl && (
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => {
+              <div className="flex flex-col gap-2 items-center">
+                {/* Play/Replay Button - Centered */}
+                {((hasPlayed && !isPlaying && showVideo) || (!showVideo && videoUrl)) && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => {
+                      if (!showVideo) {
                         setShowVideo(true);
-                        replayVideo();
-                      }}
-                      className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full p-2 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
-                    >
-                      <Play className="w-4 h-4" />
-                    </Button>
-                  )}
-                </div>
+                      }
+                      replayVideo();
+                    }}
+                    className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full p-2 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
+                  >
+                    <Play className="w-4 h-4" />
+                  </Button>
+                )}
                 
-                {/* Owner Controls - Always show both buttons for profile owners */}
+                {/* Owner Controls - Change Video and Photo buttons */}
                 {isOwnProfile && (
                   <div className="flex flex-col gap-2">
                     <Button
