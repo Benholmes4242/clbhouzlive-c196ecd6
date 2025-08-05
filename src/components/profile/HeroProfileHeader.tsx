@@ -27,7 +27,7 @@ import ProfileBadgeStrip from './ProfileBadgeStrip';
 import ProfileProgressSection from './ProfileProgressSection';
 import CompareProgressModal from './CompareProgressModal';
 import { useUserAchievements } from '@/hooks/useUserAchievements';
-import { Swords } from 'lucide-react';
+import { Swords, MoreHorizontal } from 'lucide-react';
 import ProfileVideoCircle from './ProfileVideoCircle';
 import { useCloudflareStream } from '@/hooks/useCloudflareStream';
 import { useR2Upload } from '@/hooks/useR2Upload';
@@ -93,6 +93,7 @@ const HeroProfileHeader = ({
   const [followersCount, setFollowersCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
   const [isCompareModalOpen, setIsCompareModalOpen] = useState(false);
+  const [isStatsDrawerOpen, setIsStatsDrawerOpen] = useState(false);
   const [userProgressData, setUserProgressData] = useState({
     coursesPlayed: 0,
     britainIrelandCompleted: 0,
@@ -534,58 +535,86 @@ const HeroProfileHeader = ({
             )}
           </div>
 
-          {/* Stats Bar */}
-          <div 
-            className="w-full bg-muted border border-border rounded-lg max-w-md py-1" 
-            style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
-          >
-            <div className="flex items-center justify-around w-full px-4 space-x-2">
-              <div className="text-center">
-                <div className="font-bold text-foreground text-lg">
-                  {profile?.eg_handicap_index ? profile.eg_handicap_index.toFixed(1) : '--'}
+          {/* Stats Bar Container */}
+          <div className="w-full max-w-md">
+            {/* Main Stats Bar - Always Visible */}
+            <div 
+              className="w-full bg-muted border border-border rounded-lg py-1" 
+              style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
+            >
+              <div className="flex items-center justify-between w-full px-4">
+                {/* Group A - Always Visible Stats */}
+                <div className="flex items-center justify-around flex-1 space-x-2">
+                  <div className="text-center">
+                    <div className="font-bold text-foreground text-lg">
+                      {profile?.eg_handicap_index ? profile.eg_handicap_index.toFixed(1) : '--'}
+                    </div>
+                    <div className="text-muted-foreground text-xs">
+                      Handicap
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="font-bold text-foreground text-lg">
+                      {postsCount}
+                    </div>
+                    <div className="text-muted-foreground text-xs">
+                      Posts
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="font-bold text-foreground text-lg">
+                      {followersCount}
+                    </div>
+                    <div className="text-muted-foreground text-xs">
+                      Followers
+                    </div>
+                  </div>
                 </div>
-                <div className="text-muted-foreground text-xs">
-                  Handicap
-                </div>
+                
+                {/* Three-dot trigger button */}
+                <button
+                  onClick={() => setIsStatsDrawerOpen(!isStatsDrawerOpen)}
+                  className="ml-2 p-2 hover:bg-muted-foreground/10 rounded-full transition-colors"
+                  aria-label="Show all stats"
+                >
+                  <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
+                </button>
               </div>
-              <div className="text-center">
-                <div className="font-bold text-foreground text-lg">
-                  {postsCount}
-                </div>
-                <div className="text-muted-foreground text-xs">
-                  Posts
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="font-bold text-foreground text-lg">
-                  {ratedCoursesCount}
-                </div>
-                <div className="text-muted-foreground text-xs">
-                  Rated Courses
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="font-bold text-foreground text-lg">
-                  {averageRating > 0 ? `${averageRating}/10` : '--'}
-                </div>
-                <div className="text-muted-foreground text-xs">
-                  Avg. Rating
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="font-bold text-foreground text-lg">
-                  {followersCount}
-                </div>
-                <div className="text-muted-foreground text-xs">
-                  Followers
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="font-bold text-foreground text-lg">
-                  {followingCount}
-                </div>
-                <div className="text-muted-foreground text-xs">
-                  Following
+            </div>
+
+            {/* Expandable Drawer - Group B Stats */}
+            <div className={`overflow-hidden transition-all duration-300 ease-in-out ${
+              isStatsDrawerOpen ? 'max-h-20 opacity-100' : 'max-h-0 opacity-0'
+            }`}>
+              <div 
+                className="w-full bg-muted border border-border border-t-0 rounded-b-lg py-3 px-4"
+                style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
+              >
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="text-center">
+                    <div className="font-bold text-foreground text-lg">
+                      {ratedCoursesCount}
+                    </div>
+                    <div className="text-muted-foreground text-xs">
+                      Rated Courses
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="font-bold text-foreground text-lg">
+                      {averageRating > 0 ? `${averageRating}/10` : '--'}
+                    </div>
+                    <div className="text-muted-foreground text-xs">
+                      Avg. Rating
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="font-bold text-foreground text-lg">
+                      {followingCount}
+                    </div>
+                    <div className="text-muted-foreground text-xs">
+                      Following
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
