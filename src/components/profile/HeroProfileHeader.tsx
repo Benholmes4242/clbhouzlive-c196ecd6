@@ -100,6 +100,7 @@ const HeroProfileHeader = ({
     usaCompleted: 0,
     worldwideCompleted: 0
   });
+  const [isStatsExpanded, setIsStatsExpanded] = useState(false);
   
   // Fetch user achievements for current user
   const { achievements } = useUserAchievements();
@@ -535,57 +536,85 @@ const HeroProfileHeader = ({
           </div>
 
           {/* Stats Bar */}
-          <div 
-            className="w-full bg-muted border border-border rounded-lg max-w-md py-1" 
-            style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
-          >
-            <div className="flex items-center justify-around w-full px-4 space-x-2">
-              <div className="text-center">
-                <div className="font-bold text-foreground text-lg">
-                  {profile?.eg_handicap_index ? profile.eg_handicap_index.toFixed(1) : '--'}
+          <div className="w-full max-w-md">
+            {/* Top Stats Bar - Always Visible */}
+            <div 
+              className="w-full bg-muted border border-border rounded-lg py-1" 
+              style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
+            >
+              <div className="flex items-center justify-between w-full px-4">
+                {/* Core Stats */}
+                <div className="flex items-center justify-around flex-1 space-x-2">
+                  <div className="text-center">
+                    <div className="font-bold text-foreground text-lg">
+                      {profile?.eg_handicap_index ? profile.eg_handicap_index.toFixed(1) : '--'}
+                    </div>
+                    <div className="text-muted-foreground text-xs">
+                      Handicap
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="font-bold text-foreground text-lg">
+                      {postsCount}
+                    </div>
+                    <div className="text-muted-foreground text-xs">
+                      Posts
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="font-bold text-foreground text-lg">
+                      {followersCount}
+                    </div>
+                    <div className="text-muted-foreground text-xs">
+                      Followers
+                    </div>
+                  </div>
                 </div>
-                <div className="text-muted-foreground text-xs">
-                  Handicap
-                </div>
+                
+                {/* Three-dot trigger */}
+                <button
+                  onClick={() => setIsStatsExpanded(!isStatsExpanded)}
+                  className="flex items-center justify-center p-2 text-muted-foreground hover:text-foreground transition-colors duration-200"
+                  aria-label="See all stats"
+                >
+                  <span className="text-lg font-bold">⋯</span>
+                </button>
               </div>
-              <div className="text-center">
-                <div className="font-bold text-foreground text-lg">
-                  {postsCount}
-                </div>
-                <div className="text-muted-foreground text-xs">
-                  Posts
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="font-bold text-foreground text-lg">
-                  {ratedCoursesCount}
-                </div>
-                <div className="text-muted-foreground text-xs">
-                  Rated Courses
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="font-bold text-foreground text-lg">
-                  {averageRating > 0 ? `${averageRating}/10` : '--'}
-                </div>
-                <div className="text-muted-foreground text-xs">
-                  Avg. Rating
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="font-bold text-foreground text-lg">
-                  {followersCount}
-                </div>
-                <div className="text-muted-foreground text-xs">
-                  Followers
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="font-bold text-foreground text-lg">
-                  {followingCount}
-                </div>
-                <div className="text-muted-foreground text-xs">
-                  Following
+            </div>
+
+            {/* Expandable Drawer - Additional Stats */}
+            <div className={`overflow-hidden transition-all duration-300 ease-in-out ${
+              isStatsExpanded ? 'max-h-20 opacity-100' : 'max-h-0 opacity-0'
+            }`}>
+              <div 
+                className="w-full bg-muted border border-border border-t-0 rounded-b-lg py-1 mt-0" 
+                style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
+              >
+                <div className="flex items-center justify-around w-full px-4 space-x-2">
+                  <div className="text-center">
+                    <div className="font-bold text-foreground text-lg">
+                      {ratedCoursesCount}
+                    </div>
+                    <div className="text-muted-foreground text-xs">
+                      Rated Courses
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="font-bold text-foreground text-lg">
+                      {averageRating > 0 ? `${averageRating}/10` : '--'}
+                    </div>
+                    <div className="text-muted-foreground text-xs">
+                      Avg. Rating
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="font-bold text-foreground text-lg">
+                      {followingCount}
+                    </div>
+                    <div className="text-muted-foreground text-xs">
+                      Following
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
