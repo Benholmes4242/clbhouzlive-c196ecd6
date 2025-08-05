@@ -195,16 +195,6 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
                     <Upload className="w-4 h-4" />
                   </Button>
                 )}
-                
-                {/* Mute Toggle */}
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={toggleMute}
-                  className="bg-black/50 hover:bg-black/70 text-white border-0"
-                >
-                  {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-                </Button>
               </div>
             </div>
           )}
