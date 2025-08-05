@@ -114,136 +114,118 @@ const MobileGamificationLayout: React.FC<MobileGamificationLayoutProps> = ({
 
       {/* Mobile Regional Lists - Single Card Carousel */}
       <div className="md:hidden pt-8">
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <span className="text-lg font-semibold text-foreground">Regional List Completion</span>
-            <span className="text-base font-medium text-foreground">
-              {regionalProgress.lists.filter(list => list.completed >= list.total).length}/4 lists completed
-            </span>
-          </div>
-          
-          <div className="overflow-x-auto scrollbar-hide">
-            <div className="flex gap-4 snap-x snap-mandatory px-2 pb-2" style={{ scrollSnapType: 'x mandatory' }}>
-              {regionalProgress.lists.map((list, index) => (
-                <div
-                  key={list.id}
-                  className="flex flex-col items-center p-4 rounded-xl border transition-all cursor-pointer hover:scale-105 hover:-translate-y-1 bg-background border-border hover:shadow-lg duration-300 snap-center flex-shrink-0"
-                  style={{ 
-                    boxShadow: '0 2px 6px rgba(0,0,0,0.04)',
-                    minWidth: 'calc(100% - 32px)', // Show 1 card fully with peek of next
-                    marginRight: index === regionalProgress.lists.length - 1 ? '0' : '8px'
-                  }}
-                  onClick={() => onRegionalCardClick(list)}
-                >
-                  {/* Region Name at Top */}
-                  <h4 className="text-lg font-semibold text-foreground text-center mb-4 w-full">
-                    {list.name}
-                  </h4>
+        <div className="overflow-x-auto scrollbar-hide">
+          <div className="flex gap-4 snap-x snap-mandatory px-2 pb-2" style={{ scrollSnapType: 'x mandatory' }}>
+            {regionalProgress.lists.map((list, index) => (
+              <div
+                key={list.id}
+                className="flex flex-col items-center p-4 rounded-xl border transition-all cursor-pointer hover:scale-105 hover:-translate-y-1 bg-background border-border hover:shadow-lg duration-300 snap-center flex-shrink-0"
+                style={{ 
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.04)',
+                  minWidth: 'calc(100% - 32px)', // Show 1 card fully with peek of next
+                  marginRight: index === regionalProgress.lists.length - 1 ? '0' : '8px'
+                }}
+                onClick={() => onRegionalCardClick(list)}
+              >
+                {/* Region Name at Top */}
+                <h4 className="text-lg font-semibold text-foreground text-center mb-4 w-full">
+                  {list.name}
+                </h4>
 
-                  {/* Center Content: Trophy and Progress Ring */}
-                  <div className="flex items-center justify-center gap-6 mb-4">
-                    {/* Trophy Icon */}
-                    <div className="flex-shrink-0">
-                      <div className="relative">
-                        {list.id === 'britain-ireland' ? (
-                          <img 
-                            src="/lovable-uploads/7df94753-adb7-43b1-8ea8-380234f3318f.png" 
-                            alt="British & Irish Trophy" 
-                            className={cn(
-                              'h-12 w-auto object-contain transition-all duration-300',
-                              list.completed >= list.total ? 'opacity-100 animate-pulse' : 'opacity-70'
-                            )}
-                            style={{ 
-                              filter: list.completed >= list.total 
-                                ? 'drop-shadow(0 0 8px rgba(251, 191, 36, 0.6))' 
-                                : 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
-                            }}
-                          />
-                        ) : list.id === 'europe' ? (
-                          <img 
-                            src="/lovable-uploads/1a1f3f8d-5f91-4e65-8f64-6a516cd2ea20.png" 
-                            alt="European Trophy" 
-                            className={cn(
-                              'h-12 w-auto object-contain transition-all duration-300',
-                              list.completed >= list.total ? 'opacity-100 animate-pulse' : 'opacity-70'
-                            )}
-                            style={{ 
-                              filter: list.completed >= list.total 
-                                ? 'drop-shadow(0 0 8px rgba(59, 130, 246, 0.6))' 
-                                : 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
-                            }}
-                          />
-                        ) : list.id === 'usa' ? (
-                          <img 
-                            src="/lovable-uploads/b6d15b83-cd17-41b5-9af1-a066d6d0c6ac.png" 
-                            alt="USA Trophy" 
-                            className={cn(
-                              'h-12 w-auto object-contain transition-all duration-300',
-                              list.completed >= list.total ? 'opacity-100 animate-pulse' : 'opacity-70'
-                            )}
-                            style={{ 
-                              filter: list.completed >= list.total 
-                                ? 'drop-shadow(0 0 8px rgba(239, 68, 68, 0.6))' 
-                                : 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
-                            }}
-                          />
-                        ) : (
-                          <img 
-                            src="/lovable-uploads/a9672498-b79d-4a47-9e6a-1128770700c9.png" 
-                            alt="Worldwide Trophy" 
-                            className={cn(
-                              'h-12 w-auto object-contain transition-all duration-300',
-                              list.completed >= list.total ? 'opacity-100 animate-pulse' : 'opacity-70'
-                            )}
-                            style={{ 
-                              filter: list.completed >= list.total 
-                                ? 'drop-shadow(0 0 8px rgba(34, 197, 94, 0.6))' 
-                                : 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
-                            }}
-                          />
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Circular Progress Ring */}
-                    <div className="flex-shrink-0">
-                      <CircularProgress 
-                        completed={list.completed}
-                        total={list.total}
-                        size={64}
-                        strokeWidth={6}
-                        className="transition-transform duration-300"
-                      />
+                {/* Center Content: Trophy and Progress Ring */}
+                <div className="flex items-center justify-center gap-6 mb-4">
+                  {/* Trophy Icon */}
+                  <div className="flex-shrink-0">
+                    <div className="relative">
+                      {list.id === 'britain-ireland' ? (
+                        <img 
+                          src="/lovable-uploads/7df94753-adb7-43b1-8ea8-380234f3318f.png" 
+                          alt="British & Irish Trophy" 
+                          className={cn(
+                            'h-12 w-auto object-contain transition-all duration-300',
+                            list.completed >= list.total ? 'opacity-100 animate-pulse' : 'opacity-70'
+                          )}
+                          style={{ 
+                            filter: list.completed >= list.total 
+                              ? 'drop-shadow(0 0 8px rgba(251, 191, 36, 0.6))' 
+                              : 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
+                          }}
+                        />
+                      ) : list.id === 'europe' ? (
+                        <img 
+                          src="/lovable-uploads/1a1f3f8d-5f91-4e65-8f64-6a516cd2ea20.png" 
+                          alt="European Trophy" 
+                          className={cn(
+                            'h-12 w-auto object-contain transition-all duration-300',
+                            list.completed >= list.total ? 'opacity-100 animate-pulse' : 'opacity-70'
+                          )}
+                          style={{ 
+                            filter: list.completed >= list.total 
+                              ? 'drop-shadow(0 0 8px rgba(59, 130, 246, 0.6))' 
+                              : 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
+                          }}
+                        />
+                      ) : list.id === 'usa' ? (
+                        <img 
+                          src="/lovable-uploads/b6d15b83-cd17-41b5-9af1-a066d6d0c6ac.png" 
+                          alt="USA Trophy" 
+                          className={cn(
+                            'h-12 w-auto object-contain transition-all duration-300',
+                            list.completed >= list.total ? 'opacity-100 animate-pulse' : 'opacity-70'
+                          )}
+                          style={{ 
+                            filter: list.completed >= list.total 
+                              ? 'drop-shadow(0 0 8px rgba(239, 68, 68, 0.6))' 
+                              : 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
+                          }}
+                        />
+                      ) : (
+                        <img 
+                          src="/lovable-uploads/a9672498-b79d-4a47-9e6a-1128770700c9.png" 
+                          alt="Worldwide Trophy" 
+                          className={cn(
+                            'h-12 w-auto object-contain transition-all duration-300',
+                            list.completed >= list.total ? 'opacity-100 animate-pulse' : 'opacity-70'
+                          )}
+                          style={{ 
+                            filter: list.completed >= list.total 
+                              ? 'drop-shadow(0 0 8px rgba(34, 197, 94, 0.6))' 
+                              : 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
+                          }}
+                        />
+                      )}
                     </div>
                   </div>
 
-                  {/* Bottom: XP Count and Description */}
-                  <div className="text-center w-full">
-                    <div className="text-lg font-bold text-foreground mb-1">
-                      {list.completed}/{list.total}
-                    </div>
-                    <div className="text-sm text-muted-foreground mb-2">
-                      {(list.completed * 110).toLocaleString()} XP
-                    </div>
-                    <div className="text-xs text-muted-foreground leading-tight">
-                      {list.completed >= list.total 
-                        ? "Complete! All courses played." 
-                        : `${list.total - list.completed} courses remaining`
-                      }
-                    </div>
+                  {/* Circular Progress Ring */}
+                  <div className="flex-shrink-0">
+                    <CircularProgress 
+                      completed={list.completed}
+                      total={list.total}
+                      size={64}
+                      strokeWidth={6}
+                      className="transition-transform duration-300"
+                    />
                   </div>
                 </div>
-              ))}
-            </div>
-            {/* Peek indicator for next card */}
-            <div className="flex justify-center mt-2 gap-1">
-              {regionalProgress.lists.map((_, index) => (
-                <div 
-                  key={index} 
-                  className="w-2 h-2 rounded-full bg-muted-foreground/30"
-                />
-              ))}
-            </div>
+
+                {/* Bottom: XP Count and Description */}
+                <div className="text-center w-full">
+                  <div className="text-lg font-bold text-foreground mb-1">
+                    {list.completed}/{list.total}
+                  </div>
+                  <div className="text-sm text-muted-foreground mb-2">
+                    {(list.completed * 110).toLocaleString()} XP
+                  </div>
+                  <div className="text-xs text-muted-foreground leading-tight">
+                    {list.completed >= list.total 
+                      ? "Complete! All courses played." 
+                      : `${list.total - list.completed} courses remaining`
+                    }
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
