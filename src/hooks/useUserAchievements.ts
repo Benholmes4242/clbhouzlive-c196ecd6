@@ -142,15 +142,8 @@ export const useUserAchievements = (limit: number = 5) => {
   useEffect(() => {
     if (!user?.id) return;
 
+    console.log('Setting up user achievements subscription for user:', user.id);
     const channelName = `user_achievements_${user.id}`;
-    
-    // First, try to remove any existing channel with the same name
-    const existingChannels = supabase.getChannels();
-    const existingChannel = existingChannels.find(ch => ch.topic === channelName);
-    if (existingChannel) {
-      console.log('Removing existing user achievements channel:', channelName);
-      supabase.removeChannel(existingChannel);
-    }
     
     const channel = supabase
       .channel(channelName)
@@ -163,16 +156,32 @@ export const useUserAchievements = (limit: number = 5) => {
           filter: `user_id=eq.${user.id}`
         },
         () => {
-          // Refresh achievements when new ones are added
-          fetchAchievements();
+          console.log('New user achievement detected, refetching...');
+          // Use the callback directly instead of depending on it
+          if (user?.id) {
+            supabase
+              .rpc('get_user_recent_achievements', {
+                user_id_param: user.id,
+                limit_param: limit
+              })
+              .then(({ data, error: fetchError }) => {
+                if (fetchError) {
+                  console.error('Error fetching achievements:', fetchError);
+                  return;
+                }
+                const formattedAchievements = (data || []).map(formatAchievement);
+                setAchievements(formattedAchievements);
+              });
+          }
         }
       )
       .subscribe();
 
     return () => {
+      console.log('Cleaning up user achievements subscription');
       supabase.removeChannel(channel);
     };
-  }, [user?.id, fetchAchievements]);
+  }, [user?.id, limit]); // Remove fetchAchievements from dependencies
 
   return {
     achievements,
