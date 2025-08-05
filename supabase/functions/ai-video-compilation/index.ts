@@ -281,7 +281,7 @@ function createCompilationPlan(
   }
 }
 
-// Simulate video compilation
+// Simulate video compilation - for now, return the first video as the "compilation"
 async function compileVideos(
   videoData: Uint8Array[], 
   compilationPlan: any
@@ -292,35 +292,22 @@ async function compileVideos(
   // 3. Add intro/outro if specified
   // 4. Compress and optimize the final video
   
-  console.log('AI Video Compilation: Simulating video compilation process')
+  console.log('AI Video Compilation: Processing video compilation')
   
-  // For now, simulate processing time and return a dummy video
-  await new Promise(resolve => setTimeout(resolve, 2000)) // Simulate processing
+  // Simulate processing time
+  await new Promise(resolve => setTimeout(resolve, 2000))
   
-  // Create a minimal MP4 file structure (this is a placeholder)
-  // In reality, you'd use a proper video processing library
-  const dummyMp4Header = new Uint8Array([
-    0x00, 0x00, 0x00, 0x20, 0x66, 0x74, 0x79, 0x70, // ftyp box
-    0x69, 0x73, 0x6F, 0x6D, 0x00, 0x00, 0x02, 0x00,
-    0x69, 0x73, 0x6F, 0x6D, 0x69, 0x73, 0x6F, 0x32,
-    0x61, 0x76, 0x63, 0x31, 0x6D, 0x70, 0x34, 0x31
-  ])
+  // For now, return the first video as the "compiled" result
+  // This ensures we have a valid video file that can actually be played
+  const primaryVideo = videoData[0]
   
-  // In a real implementation, this would be the actual compiled video
-  const compiledSize = Math.min(5000000, videoData.reduce((sum, data) => sum + data.length, 0)) // Max 5MB
-  const compiledVideo = new Uint8Array(compiledSize)
-  
-  // Copy header
-  compiledVideo.set(dummyMp4Header, 0)
-  
-  // Simulate compiled content (in reality, this would be the processed video)
-  for (let i = dummyMp4Header.length; i < compiledSize; i++) {
-    compiledVideo[i] = Math.floor(Math.random() * 256)
+  if (!primaryVideo || primaryVideo.length === 0) {
+    throw new Error('No valid video data to compile')
   }
   
-  console.log('AI Video Compilation: Video compilation complete, size:', compiledVideo.length)
+  console.log('AI Video Compilation: Using first video as compilation result, size:', primaryVideo.length)
   
-  return compiledVideo
+  return primaryVideo
 }
 
 // Generate AI-powered caption suggestion
