@@ -31,27 +31,20 @@ const Auth: React.FC = () => {
   }
 
   useEffect(() => {
-    // Listen for auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event: AuthChangeEvent, session) => {
-        if (session?.user) {
-          // After login/signup, check if profile exists
-          const hasProfile = await checkProfileExists(session.user.id);
-          if (hasProfile) {
-            // Redirect to homepage feed instead of profile
-            navigate("/", { replace: true });
-          } else {
-            // Always direct new users to profile creation flow
-            navigate("/create-profile", { replace: true });
-          }
+    // Only redirect if user is already authenticated when component mounts
+    if (user) {
+      const redirectUser = async () => {
+        const hasProfile = await checkProfileExists(user.id);
+        if (hasProfile) {
+          navigate("/", { replace: true });
+        } else {
+          navigate("/create-profile", { replace: true });
         }
-      }
-    );
-    
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [navigate]);
+      };
+      
+      redirectUser();
+    }
+  }, [user, navigate]);
 
   return (
     <>
