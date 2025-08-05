@@ -107,52 +107,86 @@ serve(async (req) => {
       useAiAssist
     })
 
-    // Upload each video to Cloudflare Stream individually
-    console.log('AI Video Compilation: Uploading videos to Cloudflare Stream')
-    const uploadedVideos = []
+    // Upload and clip videos using Cloudflare Stream
+    console.log('AI Video Compilation: Processing videos with Cloudflare Stream clipping')
+    const compiledClips = []
     
     for (let i = 0; i < videoUrls.length; i++) {
       const videoUrl = videoUrls[i]
+      const clipPlan = compilationPlan.clips[i]
       console.log(`AI Video Compilation: Processing video ${i + 1}/${videoUrls.length}: ${videoUrl}`)
       
       try {
-        // Download the video from Supabase storage
+        // Step 1: Download and upload the full video to Cloudflare Stream
         const videoResponse = await fetch(videoUrl)
         if (!videoResponse.ok) {
           throw new Error(`Failed to fetch video: ${videoResponse.statusText}`)
         }
         
         const videoBlob = await videoResponse.blob()
-        const fileName = `ai_compilation_clip_${user.id}_${Date.now()}_${i}.mp4`
+        const fileName = `full_video_${user.id}_${Date.now()}_${i}.mp4`
         
-        // Create form data for Cloudflare Stream upload
+        // Upload full video to Cloudflare Stream
         const formData = new FormData()
         const videoFile = new File([videoBlob], fileName, { type: 'video/mp4' })
         formData.append('file', videoFile)
         formData.append('metadata', JSON.stringify({
-          title: `AI Golf Compilation Clip ${i + 1} - ${new Date().toLocaleDateString()}`,
-          description: `AI-generated golf compilation clip ${i + 1}`
+          title: `Source Video ${i + 1} - ${new Date().toLocaleDateString()}`,
+          description: `Source video for AI compilation clip ${i + 1}`
         }))
         
-        // Upload via Cloudflare Stream function
-        const { data: streamData, error: streamError } = await supabase.functions.invoke('cloudflare-stream-upload', {
+        const { data: uploadData, error: uploadError } = await supabase.functions.invoke('cloudflare-stream-upload', {
           body: formData,
         })
         
-        if (streamError || !streamData?.success) {
-          console.error(`AI Video Compilation: Cloudflare Stream upload error for video ${i + 1}:`, streamError || streamData)
-          throw new Error(`Failed to upload video ${i + 1} to Cloudflare Stream: ${streamError?.message || streamData?.error}`)
+        if (uploadError || !uploadData?.success) {
+          console.error(`AI Video Compilation: Upload error for video ${i + 1}:`, uploadError || uploadData)
+          throw new Error(`Failed to upload video ${i + 1}: ${uploadError?.message || uploadData?.error}`)
         }
         
-        uploadedVideos.push({
-          videoId: streamData.videoId,
-          hlsUrl: streamData.urls?.hls,
-          thumbnailUrl: streamData.urls?.thumbnail,
+        console.log(`AI Video Compilation: Uploaded full video ${i + 1}, creating clip...`)
+        
+        // Step 2: Create a clip from the uploaded video using Cloudflare Stream API
+        const apiToken = Deno.env.get('CLOUDFLARE_STREAM_API_TOKEN')
+        const accountId = Deno.env.get('CLOUDFLARE_ACCOUNT_ID')
+        
+        const clipResponse = await fetch(
+          `https://api.cloudflare.com/client/v4/accounts/${accountId}/stream/clip`,
+          {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${apiToken}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              clippedFromVideoUID: uploadData.videoId,
+              startTimeSeconds: clipPlan.start,
+              endTimeSeconds: clipPlan.end,
+              allowedOrigins: ['*'],
+              requireSignedURLs: false
+            })
+          }
+        )
+        
+        const clipResult = await clipResponse.json()
+        
+        if (!clipResult.success) {
+          console.error(`AI Video Compilation: Clip creation failed for video ${i + 1}:`, clipResult.errors)
+          throw new Error(`Failed to create clip from video ${i + 1}: ${clipResult.errors?.[0]?.message || 'Unknown error'}`)
+        }
+        
+        compiledClips.push({
+          videoId: clipResult.result.uid,
+          hlsUrl: clipResult.result.playback?.hls,
+          thumbnailUrl: clipResult.result.thumbnail,
           originalOrder: i,
-          clipPlan: compilationPlan.clips[i]
+          clipDuration: clipPlan.end - clipPlan.start,
+          startTime: clipPlan.start,
+          endTime: clipPlan.end,
+          originalVideoId: uploadData.videoId
         })
         
-        console.log(`AI Video Compilation: Successfully uploaded video ${i + 1} with ID: ${streamData.videoId}`)
+        console.log(`AI Video Compilation: Successfully created clip ${i + 1} with ID: ${clipResult.result.uid}`)
         
       } catch (error) {
         console.error(`AI Video Compilation: Error processing video ${i + 1}:`, error)
@@ -160,8 +194,8 @@ serve(async (req) => {
       }
     }
     
-    // Use the first video's HLS URL as the main compilation URL for now
-    const publicUrl = uploadedVideos[0]?.hlsUrl
+    // Use the first clip's HLS URL as the main compilation URL
+    const publicUrl = compiledClips[0]?.hlsUrl
     
     console.log('AI Video Compilation: All videos uploaded successfully to Cloudflare Stream')
 
@@ -172,13 +206,13 @@ serve(async (req) => {
       JSON.stringify({
         success: true,
         compiledVideoUrl: publicUrl,
-        uploadedVideos, // Include all uploaded videos with their analysis
+        compiledClips, // Include all the clipped videos
         suggestedCaption,
         stats: {
           originalClips: videoUrls.length,
           totalOriginalDuration: clipDurations.reduce((sum, duration) => sum + duration, 0),
-          compiledDuration: compilationPlan.totalDuration,
-          compressionRatio: Math.round((compilationPlan.totalDuration / clipDurations.reduce((sum, duration) => sum + duration, 0)) * 100)
+          compiledDuration: compiledClips.reduce((sum, clip) => sum + clip.clipDuration, 0),
+          compressionRatio: Math.round((compiledClips.reduce((sum, clip) => sum + clip.clipDuration, 0) / clipDurations.reduce((sum, duration) => sum + duration, 0)) * 100)
         }
       }),
       { 
