@@ -704,18 +704,21 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                     </div>
                   </div>
                   
-                  {/* Achievement Tag - Black Text */}
-                  <div className="text-sm font-medium text-black text-center mb-1">
-                    {list.tag}
-                  </div>
-                  
-                  {/* Description */}
-                  <p className="text-xs text-black text-center mb-2 leading-relaxed">
-                    {list.description}
-                  </p>
-                  
                   {/* Spacer for separation */}
                   <div className="flex-1"></div>
+                  
+                  {/* Text content moved to bottom */}
+                  <div className="mt-auto w-full">
+                    {/* Achievement Tag - Black Text */}
+                    <div className="text-sm font-medium text-black text-center mb-1">
+                      {list.tag}
+                    </div>
+                    
+                    {/* Description */}
+                    <p className="text-xs text-black text-center mb-1 leading-relaxed">
+                      {list.description}
+                    </p>
+                  </div>
                   
                 </div>
               ))}
@@ -831,14 +834,14 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                         </div>
                         
                         {/* Text content moved to bottom */}
-                        <div className="mt-auto pt-2 w-full">
+                        <div className="mt-auto pt-1 w-full">
                           {/* Achievement Tag - Black Text */}
                           <div className="text-xs font-medium text-black text-center mb-1">
                             {list.tag}
                           </div>
                           
                           {/* Description - Truncated for mobile */}
-                          <p className="text-xs text-black text-center mb-2 leading-relaxed line-clamp-2">
+                          <p className="text-xs text-black text-center mb-1 leading-relaxed line-clamp-2">
                             {list.description}
                           </p>
                         </div>
