@@ -194,8 +194,8 @@ const SwipeableCarousel: React.FC<SwipeableCarouselProps> = ({
               className={cn(
                 'w-2 h-2 rounded-full transition-colors duration-200',
                 index === currentIndex 
-                  ? 'bg-primary' 
-                  : 'bg-muted-foreground/30'
+                  ? 'bg-black' 
+                  : 'bg-black/30'
               )}
             />
           ))}
