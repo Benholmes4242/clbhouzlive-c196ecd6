@@ -107,37 +107,63 @@ serve(async (req) => {
       useAiAssist
     })
 
-    // Create the actual video compilation using FFmpeg
-    console.log('AI Video Compilation: Starting video compilation process')
-    const compiledVideoData = await compileVideos(videoUrls, compilationPlan)
+    // Upload each video to Cloudflare Stream individually
+    console.log('AI Video Compilation: Uploading videos to Cloudflare Stream')
+    const uploadedVideos = []
     
-    // Upload compiled video to Cloudflare Stream
-    console.log('AI Video Compilation: Uploading to Cloudflare Stream')
-    const fileName = `ai_compilation_${user.id}_${Date.now()}.mp4`
-    
-    // Create form data for Cloudflare Stream upload
-    const formData = new FormData()
-    const videoBlob = new Blob([compiledVideoData], { type: 'video/mp4' })
-    const videoFile = new File([videoBlob], fileName, { type: 'video/mp4' })
-    formData.append('file', videoFile)
-    formData.append('metadata', JSON.stringify({
-      title: `AI Golf Compilation - ${new Date().toLocaleDateString()}`,
-      description: `AI-generated golf compilation with ${videoUrls.length} clips`
-    }))
-    
-    // Upload via Cloudflare Stream function
-    const { data: streamData, error: streamError } = await supabase.functions.invoke('cloudflare-stream-upload', {
-      body: formData,
-    })
-    
-    if (streamError || !streamData?.success) {
-      console.error('AI Video Compilation: Cloudflare Stream upload error:', streamError || streamData)
-      throw new Error(`Failed to upload to Cloudflare Stream: ${streamError?.message || streamData?.error}`)
+    for (let i = 0; i < videoUrls.length; i++) {
+      const videoUrl = videoUrls[i]
+      console.log(`AI Video Compilation: Processing video ${i + 1}/${videoUrls.length}: ${videoUrl}`)
+      
+      try {
+        // Download the video from Supabase storage
+        const videoResponse = await fetch(videoUrl)
+        if (!videoResponse.ok) {
+          throw new Error(`Failed to fetch video: ${videoResponse.statusText}`)
+        }
+        
+        const videoBlob = await videoResponse.blob()
+        const fileName = `ai_compilation_clip_${user.id}_${Date.now()}_${i}.mp4`
+        
+        // Create form data for Cloudflare Stream upload
+        const formData = new FormData()
+        const videoFile = new File([videoBlob], fileName, { type: 'video/mp4' })
+        formData.append('file', videoFile)
+        formData.append('metadata', JSON.stringify({
+          title: `AI Golf Compilation Clip ${i + 1} - ${new Date().toLocaleDateString()}`,
+          description: `AI-generated golf compilation clip ${i + 1}`
+        }))
+        
+        // Upload via Cloudflare Stream function
+        const { data: streamData, error: streamError } = await supabase.functions.invoke('cloudflare-stream-upload', {
+          body: formData,
+        })
+        
+        if (streamError || !streamData?.success) {
+          console.error(`AI Video Compilation: Cloudflare Stream upload error for video ${i + 1}:`, streamError || streamData)
+          throw new Error(`Failed to upload video ${i + 1} to Cloudflare Stream: ${streamError?.message || streamData?.error}`)
+        }
+        
+        uploadedVideos.push({
+          videoId: streamData.videoId,
+          hlsUrl: streamData.urls?.hls,
+          thumbnailUrl: streamData.urls?.thumbnail,
+          originalOrder: i,
+          clipPlan: compilationPlan.clips[i]
+        })
+        
+        console.log(`AI Video Compilation: Successfully uploaded video ${i + 1} with ID: ${streamData.videoId}`)
+        
+      } catch (error) {
+        console.error(`AI Video Compilation: Error processing video ${i + 1}:`, error)
+        throw new Error(`Failed to process video ${i + 1}: ${error.message}`)
+      }
     }
     
-    const publicUrl = streamData.urls?.hls || streamData.videoId
+    // Use the first video's HLS URL as the main compilation URL for now
+    const publicUrl = uploadedVideos[0]?.hlsUrl
     
-    console.log('AI Video Compilation: Compiled video uploaded successfully:', publicUrl)
+    console.log('AI Video Compilation: All videos uploaded successfully to Cloudflare Stream')
 
     // Generate suggested caption
     const suggestedCaption = generateSuggestedCaption(videoUrls.length, useAiAssist)
@@ -146,6 +172,7 @@ serve(async (req) => {
       JSON.stringify({
         success: true,
         compiledVideoUrl: publicUrl,
+        uploadedVideos, // Include all uploaded videos with their analysis
         suggestedCaption,
         stats: {
           originalClips: videoUrls.length,
@@ -466,119 +493,6 @@ function createCompilationPlan(
   }
 }
 
-// Real video compilation using FFmpeg
-async function compileVideos(
-  videoUrls: string[], 
-  compilationPlan: any
-): Promise<Uint8Array> {
-  console.log('AI Video Compilation: Starting real video compilation with FFmpeg')
-  
-  try {
-    // Create temporary directory for processing
-    const tempDir = await Deno.makeTempDir({ prefix: 'video_compilation_' })
-    console.log('AI Video Compilation: Created temp directory:', tempDir)
-    
-    const segmentFiles: string[] = []
-    
-    // Process each clip in the compilation plan
-    for (let i = 0; i < compilationPlan.clips.length; i++) {
-      const clip = compilationPlan.clips[i]
-      const videoUrl = videoUrls[clip.videoIndex]
-      const outputPath = `${tempDir}/segment_${i}.mp4`
-      
-      console.log(`AI Video Compilation: Processing clip ${i + 1}/${compilationPlan.clips.length}`)
-      console.log(`AI Video Compilation: Extracting ${clip.start}s to ${clip.end}s from video ${clip.videoIndex}`)
-      
-      // Download and extract segment using FFmpeg
-      const ffmpegCmd = [
-        'ffmpeg',
-        '-y', // Overwrite output files
-        '-i', videoUrl, // Input video URL
-        '-ss', clip.start.toString(), // Start time
-        '-t', (clip.end - clip.start).toString(), // Duration
-        '-c:v', 'libx264', // Video codec
-        '-c:a', 'aac', // Audio codec
-        '-preset', 'fast', // Encoding preset for speed
-        '-crf', '23', // Quality setting
-        outputPath
-      ]
-      
-      const process = new Deno.Command('ffmpeg', {
-        args: ffmpegCmd.slice(1),
-        stdout: 'piped',
-        stderr: 'piped'
-      })
-      
-      const { code, stderr } = await process.output()
-      
-      if (code !== 0) {
-        const errorText = new TextDecoder().decode(stderr)
-        console.error(`AI Video Compilation: FFmpeg error for clip ${i}:`, errorText)
-        throw new Error(`Failed to extract clip ${i}: ${errorText}`)
-      }
-      
-      segmentFiles.push(outputPath)
-      console.log(`AI Video Compilation: Successfully extracted clip ${i} to ${outputPath}`)
-    }
-    
-    // Create concat file for FFmpeg
-    const concatFilePath = `${tempDir}/concat.txt`
-    const concatContent = segmentFiles
-      .map(file => `file '${file}'`)
-      .join('\n')
-    
-    await Deno.writeTextFile(concatFilePath, concatContent)
-    console.log('AI Video Compilation: Created concat file with', segmentFiles.length, 'segments')
-    
-    // Merge all segments into final compilation
-    const finalOutputPath = `${tempDir}/compilation.mp4`
-    const mergeCmd = [
-      'ffmpeg',
-      '-y',
-      '-f', 'concat',
-      '-safe', '0',
-      '-i', concatFilePath,
-      '-c:v', 'libx264',
-      '-c:a', 'aac',
-      '-preset', 'fast',
-      '-crf', '23',
-      finalOutputPath
-    ]
-    
-    console.log('AI Video Compilation: Merging segments into final compilation')
-    const mergeProcess = new Deno.Command('ffmpeg', {
-      args: mergeCmd.slice(1),
-      stdout: 'piped',
-      stderr: 'piped'
-    })
-    
-    const { code: mergeCode, stderr: mergeStderr } = await mergeProcess.output()
-    
-    if (mergeCode !== 0) {
-      const errorText = new TextDecoder().decode(mergeStderr)
-      console.error('AI Video Compilation: FFmpeg merge error:', errorText)
-      throw new Error(`Failed to merge segments: ${errorText}`)
-    }
-    
-    // Read the final compiled video
-    const compiledVideo = await Deno.readFile(finalOutputPath)
-    console.log('AI Video Compilation: Successfully created compilation, size:', compiledVideo.length)
-    
-    // Clean up temporary files
-    try {
-      await Deno.remove(tempDir, { recursive: true })
-      console.log('AI Video Compilation: Cleaned up temporary files')
-    } catch (cleanupError) {
-      console.warn('AI Video Compilation: Failed to cleanup temp files:', cleanupError)
-    }
-    
-    return compiledVideo
-    
-  } catch (error) {
-    console.error('AI Video Compilation: Compilation failed:', error)
-    throw new Error(`Video compilation failed: ${error.message}`)
-  }
-}
 
 // Generate AI-powered caption suggestion
 function generateSuggestedCaption(videoCount: number, useAiAssist: boolean): string {
