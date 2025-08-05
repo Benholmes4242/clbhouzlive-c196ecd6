@@ -89,7 +89,7 @@ export const createDynamicBackgroundStyle = (
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     backgroundRepeat: 'no-repeat',
-    filter: 'blur(20px) saturate(1.2)',
+    filter: 'blur(60px) saturate(1.4)',
     transform: 'scale(1.1)', // Prevent edge artifacts
   };
 };
