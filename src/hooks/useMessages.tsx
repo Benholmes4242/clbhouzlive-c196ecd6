@@ -99,24 +99,30 @@ export function useMessages() {
     
     // Set up real-time subscription for new messages
     const channelName = `messages_${user.id}`;
-    const channel = supabase
-      .channel(channelName)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'messages',
-          filter: `recipient_id=eq.${user.id}`
-        },
-        () => {
-          fetchConversations();
-        }
-      )
-      .subscribe();
+    
+    import('@/utils/supabaseChannelManager').then(({ channelManager }) => {
+      const channel = channelManager.createChannel(channelName);
+      
+      channel
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'messages',
+            filter: `recipient_id=eq.${user.id}`
+          },
+          () => {
+            fetchConversations();
+          }
+        )
+        .subscribe();
+    });
 
     return () => {
-      supabase.removeChannel(channel);
+      import('@/utils/supabaseChannelManager').then(({ channelManager }) => {
+        channelManager.removeChannel(channelName);
+      });
     };
   }, [user, fetchConversations]);
 

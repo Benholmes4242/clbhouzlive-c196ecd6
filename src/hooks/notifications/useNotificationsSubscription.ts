@@ -11,52 +11,57 @@ export const useNotificationsSubscription = (userId: string | undefined) => {
     console.log('Setting up notifications subscription for user:', userId);
     const channelName = `notifications-${userId}`;
     
-    const channel = supabase
-      .channel(channelName)
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'notifications',
-          filter: `user_id=eq.${userId}`
-        },
-        (payload) => {
-          console.log('New notification received:', payload);
-          queryClient.invalidateQueries({ queryKey: ['notifications'] });
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'notifications',
-          filter: `user_id=eq.${userId}`
-        },
-        (payload) => {
-          console.log('Notification updated:', payload);
-          queryClient.invalidateQueries({ queryKey: ['notifications'] });
-        }
-      )
-      .on(
-        'postgres_changes',
-        {
-          event: 'DELETE',
-          schema: 'public',
-          table: 'notifications',
-          filter: `user_id=eq.${userId}`
-        },
-        (payload) => {
-          console.log('Notification deleted:', payload);
-          queryClient.invalidateQueries({ queryKey: ['notifications'] });
-        }
-      )
-      .subscribe();
+    import('@/utils/supabaseChannelManager').then(({ channelManager }) => {
+      const channel = channelManager.createChannel(channelName);
+      
+      channel
+        .on(
+          'postgres_changes',
+          {
+            event: 'INSERT',
+            schema: 'public',
+            table: 'notifications',
+            filter: `user_id=eq.${userId}`
+          },
+          (payload) => {
+            console.log('New notification received:', payload);
+            queryClient.invalidateQueries({ queryKey: ['notifications'] });
+          }
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'notifications',
+            filter: `user_id=eq.${userId}`
+          },
+          (payload) => {
+            console.log('Notification updated:', payload);
+            queryClient.invalidateQueries({ queryKey: ['notifications'] });
+          }
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: 'DELETE',
+            schema: 'public',
+            table: 'notifications',
+            filter: `user_id=eq.${userId}`
+          },
+          (payload) => {
+            console.log('Notification deleted:', payload);
+            queryClient.invalidateQueries({ queryKey: ['notifications'] });
+          }
+        )
+        .subscribe();
+    });
 
     return () => {
       console.log('Cleaning up notifications subscription');
-      supabase.removeChannel(channel);
+      import('@/utils/supabaseChannelManager').then(({ channelManager }) => {
+        channelManager.removeChannel(channelName);
+      });
     };
   }, [userId]);
 };

@@ -75,24 +75,30 @@ export const useStoryData = () => {
     // Set up real-time subscription for follow changes
     if (user?.id) {
       const channelName = `story_follows_${user.id}`;
-      const channel = supabase
-        .channel(channelName)
-        .on(
-          'postgres_changes',
-          {
-            event: '*',
-            schema: 'public',
-            table: 'user_follows',
-            filter: `follower_id=eq.${user.id}`,
-          },
-          () => {
-            fetchStoriesData();
-          }
-        )
-        .subscribe();
+      
+      import('@/utils/supabaseChannelManager').then(({ channelManager }) => {
+        const channel = channelManager.createChannel(channelName);
+        
+        channel
+          .on(
+            'postgres_changes',
+            {
+              event: '*',
+              schema: 'public',
+              table: 'user_follows',
+              filter: `follower_id=eq.${user.id}`,
+            },
+            () => {
+              fetchStoriesData();
+            }
+          )
+          .subscribe();
+      });
 
       return () => {
-        supabase.removeChannel(channel);
+        import('@/utils/supabaseChannelManager').then(({ channelManager }) => {
+          channelManager.removeChannel(channelName);
+        });
       };
     }
   }, [user, fetchStoriesData]);

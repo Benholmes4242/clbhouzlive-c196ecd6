@@ -35,24 +35,30 @@ export function useConversation(friendId: string | null) {
     
     // Set up real-time subscription for this conversation
     const channelName = `conversation_${user.id}_${friendId}`;
-    const channel = supabase
-      .channel(channelName)
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'messages',
-          filter: `or(and(sender_id.eq.${user.id},recipient_id.eq.${friendId}),and(sender_id.eq.${friendId},recipient_id.eq.${user.id}))`
-        },
-        () => {
-          fetchMessages();
-        }
-      )
-      .subscribe();
+    
+    import('@/utils/supabaseChannelManager').then(({ channelManager }) => {
+      const channel = channelManager.createChannel(channelName);
+      
+      channel
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'messages',
+            filter: `or(and(sender_id.eq.${user.id},recipient_id.eq.${friendId}),and(sender_id.eq.${friendId},recipient_id.eq.${user.id}))`
+          },
+          () => {
+            fetchMessages();
+          }
+        )
+        .subscribe();
+    });
 
     return () => {
-      supabase.removeChannel(channel);
+      import('@/utils/supabaseChannelManager').then(({ channelManager }) => {
+        channelManager.removeChannel(channelName);
+      });
     };
   }, [user, friendId, fetchMessages]);
 
