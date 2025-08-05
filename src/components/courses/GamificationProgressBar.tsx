@@ -433,91 +433,91 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                             });
                             setIsModalOpen(true);
                           }}
-                        >
-                          {trophy.id === 'green-fee-rookie' ? (
-                            <img 
-                              src="/lovable-uploads/f2f50b99-38e1-466b-8ac8-c32e428231cb.png" 
-                              alt="Green Fee Rookie Trophy" 
-                              className={cn(
-                            'h-24 w-auto object-contain transition-all duration-300',
-                            trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
-                          )}
-                              style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(251, 191, 36, 0.6))' : 'none' }}
-                            />
-                          ) : trophy.id === 'the-turn' ? (
-                            <img 
-                              src="/lovable-uploads/43291ca4-d526-4b10-9585-6ea3488445cf.png" 
-                              alt="The Turn Trophy"
-                              className={cn(
-                            'h-24 w-auto object-contain transition-all duration-300',
-                            trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
-                          )}
-                              style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(148, 163, 184, 0.6))' : 'none' }}
-                            />
-                          ) : trophy.id === 'century-club' ? (
-                            <img 
-                              src="/lovable-uploads/0c126dc7-5509-40b9-862d-b054423ca7f6.png" 
-                              alt="Century Club Trophy" 
-                              className={cn(
-                            'h-24 w-auto object-contain transition-all duration-300',
-                            trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
-                          )}
-                              style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(59, 130, 246, 0.6))' : 'none' }}
-                            />
-                          ) : trophy.id === 'clubhouse-elite' ? (
-                            <img 
-                              src="/lovable-uploads/a9672498-b79d-4a47-9e6a-1128770700c9.png" 
-                              alt="Clubhouse Elite Trophy" 
-                              className={cn(
-                            'h-24 w-auto object-contain transition-all duration-300',
-                            trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
-                          )}
-                              style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(16, 185, 129, 0.6))' : 'none' }}
-                            />
-                          ) : trophy.id === 'course-collector' ? (
-                            <img 
-                              src="/lovable-uploads/3c517cb5-203d-4ad8-b3b5-e5e7c33a24b0.png" 
-                              alt="Course Collector Trophy" 
-                              className={cn(
-                            'h-24 w-auto object-contain transition-all duration-300',
-                            trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
-                          )}
-                              style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(147, 51, 234, 0.6))' : 'none' }}
-                            />
-                          ) : (
-                            <div className={cn(
-                            'h-24 w-24 rounded-full flex items-center justify-center bg-gradient-to-br transition-all duration-300',
-                            trophy.color,
-                            trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
-                          )}
-                            style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(0, 0, 0, 0.3))' : 'none' }}
-                            >
-                               <Trophy className="w-12 h-12 text-foreground" />
-                             </div>
+                         >
+                           {trophy.id === 'green-fee-rookie' ? (
+                             <img 
+                               src="/lovable-uploads/f2f50b99-38e1-466b-8ac8-c32e428231cb.png" 
+                               alt="Green Fee Rookie Trophy" 
+                               className={cn(
+                             'h-24 w-auto object-contain transition-all duration-300',
+                             trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
                            )}
-                           <div className="text-center">
-                             <div className="text-xl font-bold text-foreground mb-1">
-                               {trophy.requiredCourses}
-                             </div>
-                             <div className="text-sm text-muted-foreground leading-tight font-medium">
-                               {trophy.name}
-                            </div>
-                            
-                            {/* Individual progress bar for mobile */}
-                            <div className="mt-3 w-full">
-                              <div className="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
-                                <div
-                                  className="h-1.5 rounded-full transition-all duration-500 ease-out"
-                                  style={{ 
-                                    width: `${Math.min((completedCount / trophy.requiredCourses) * 100, 100)}%`,
-                                    backgroundColor: '#22c55e',
-                                    filter: 'drop-shadow(0 0 4px rgba(34, 197, 94, 0.4))'
-                                  }}
-                                />
+                               style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(251, 191, 36, 0.6))' : 'none' }}
+                             />
+                           ) : trophy.id === 'the-turn' ? (
+                             <img 
+                               src="/lovable-uploads/43291ca4-d526-4b10-9585-6ea3488445cf.png" 
+                               alt="The Turn Trophy"
+                               className={cn(
+                             'h-24 w-auto object-contain transition-all duration-300',
+                             trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
+                           )}
+                               style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(148, 163, 184, 0.6))' : 'none' }}
+                             />
+                           ) : trophy.id === 'century-club' ? (
+                             <img 
+                               src="/lovable-uploads/0c126dc7-5509-40b9-862d-b054423ca7f6.png" 
+                               alt="Century Club Trophy" 
+                               className={cn(
+                             'h-24 w-auto object-contain transition-all duration-300',
+                             trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
+                           )}
+                               style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(59, 130, 246, 0.6))' : 'none' }}
+                             />
+                           ) : trophy.id === 'clubhouse-elite' ? (
+                             <img 
+                               src="/lovable-uploads/a9672498-b79d-4a47-9e6a-1128770700c9.png" 
+                               alt="Clubhouse Elite Trophy" 
+                               className={cn(
+                             'h-24 w-auto object-contain transition-all duration-300',
+                             trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
+                           )}
+                               style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(16, 185, 129, 0.6))' : 'none' }}
+                             />
+                           ) : trophy.id === 'course-collector' ? (
+                             <img 
+                               src="/lovable-uploads/3c517cb5-203d-4ad8-b3b5-e5e7c33a24b0.png" 
+                               alt="Course Collector Trophy" 
+                               className={cn(
+                             'h-24 w-auto object-contain transition-all duration-300',
+                             trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
+                           )}
+                               style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(147, 51, 234, 0.6))' : 'none' }}
+                             />
+                           ) : (
+                             <div className={cn(
+                             'h-24 w-24 rounded-full flex items-center justify-center bg-gradient-to-br transition-all duration-300',
+                             trophy.color,
+                             trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
+                           )}
+                             style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(0, 0, 0, 0.3))' : 'none' }}
+                             >
+                                <Trophy className="w-12 h-12 text-foreground" />
                               </div>
-                            </div>
-                          </div>
-                        </div>
+                            )}
+                            <div className="text-center">
+                              <div className="text-xl font-bold text-foreground mb-1">
+                                {trophy.requiredCourses}
+                              </div>
+                              <div className="text-sm text-muted-foreground leading-tight font-medium">
+                                {trophy.name}
+                             </div>
+                           </div>
+                           
+                           {/* Full-width progress bar at bottom of card */}
+                           <div className="absolute bottom-0 left-0 right-0 p-4 pt-0">
+                             <div className="w-full bg-gray-200 rounded-full h-1.5 overflow-hidden">
+                               <div
+                                 className="h-1.5 rounded-full transition-all duration-500 ease-out"
+                                 style={{ 
+                                   width: `${Math.min((completedCount / trophy.requiredCourses) * 100, 100)}%`,
+                                   backgroundColor: '#22c55e',
+                                   filter: 'drop-shadow(0 0 4px rgba(34, 197, 94, 0.4))'
+                                 }}
+                               />
+                             </div>
+                           </div>
+                         </div>
                       ))}
                     </div>
                   </div>
