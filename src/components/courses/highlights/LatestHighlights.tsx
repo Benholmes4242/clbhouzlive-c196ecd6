@@ -38,7 +38,7 @@ const LatestHighlights: React.FC<LatestHighlightsProps> = ({
       try {
         setLoading(true);
         
-        // First get the posts with video media
+        // Get all posts with video media (no limit for infinite carousel)
         const { data: posts, error: postsError } = await supabase
           .from('posts')
           .select(`
@@ -53,8 +53,7 @@ const LatestHighlights: React.FC<LatestHighlightsProps> = ({
           `)
           .eq('user_id', userId)
           .eq('post_media.media_type', 'video')
-          .order('created_at', { ascending: false })
-          .limit(8);
+          .order('created_at', { ascending: false });
 
         if (postsError) {
           console.error('Error fetching posts:', postsError);
@@ -106,7 +105,8 @@ const LatestHighlights: React.FC<LatestHighlightsProps> = ({
             usa_rank,
             thumbnail_image
           `)
-          .in('id', courseIds);
+          .in('id', courseIds)
+          .or('global_rank.not.is.null,regional_rank.not.is.null,usa_rank.not.is.null'); // Only top 100 courses
 
         if (coursesError) {
           console.error('Error fetching courses:', coursesError);

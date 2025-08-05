@@ -248,8 +248,8 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
   const [activeVideoIndex, setActiveVideoIndex] = useState(0);
   const [hoveredCardIndex, setHoveredCardIndex] = useState<number | null>(null);
   
-  // Use only highlight videos (up to 8 total)
-  const carouselItems = highlights.slice(0, 8);
+  // Use all highlight videos for infinite carousel
+  const carouselItems = highlights;
 
   const {
     carouselRef,
