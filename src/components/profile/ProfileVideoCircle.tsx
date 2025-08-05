@@ -237,8 +237,23 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
             <img
               src={profilePhotoUrl}
               alt={`${displayName} profile`}
-              className="w-full h-full object-cover transition-opacity duration-500"
+              className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
+              onLoad={() => console.log('Profile photo loaded successfully:', profilePhotoUrl)}
+              onError={(e) => {
+                console.error('Profile photo failed to load:', profilePhotoUrl, e);
+                // Fallback to showing initials
+                e.currentTarget.style.display = 'none';
+              }}
             />
+          )}
+          
+          {/* Fallback when photo fails to load or no photo */}
+          {!showVideo && (!profilePhotoUrl || !profilePhotoUrl.trim()) && (
+            <div className="absolute inset-0 w-full h-full bg-muted/30 flex items-center justify-center">
+              <div className="text-6xl text-muted-foreground/50">
+                {displayName.charAt(0)}
+              </div>
+            </div>
           )}
           
           {/* Controls Overlay - Show for both video and photo states */}
