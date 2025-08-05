@@ -127,7 +127,7 @@ const MobileGamificationLayout: React.FC<MobileGamificationLayoutProps> = ({
                   />
                 ) : trophy.id === 'century-club' ? (
                   <img 
-                    src="/lovable-uploads/0c126dc7-5509-40b9-862d-b054423ca7f6.png" 
+                    src="/lovable-uploads/76e2f192-0d3a-4d19-87ec-49850b4d5e82.png" 
                     alt="Century Club Trophy" 
                     className={cn(
                        'h-20 w-auto object-contain transition-all duration-300',
