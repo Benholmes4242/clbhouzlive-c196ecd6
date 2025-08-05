@@ -1237,6 +1237,10 @@ export type Database = {
           role: Database["public"]["Enums"]["app_role"]
         }[]
       }
+      get_cloudflare_secrets: {
+        Args: Record<PropertyKey, never>
+        Returns: Json
+      }
       get_user_recent_achievements: {
         Args: { user_id_param: string; limit_param?: number }
         Returns: {
