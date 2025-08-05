@@ -1,7 +1,6 @@
 
 import React, { useMemo } from 'react';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { useIsMobile } from '@/hooks/use-mobile';
 import Top100CourseCard from './Top100CourseCard';
 
 interface Top100CoursesContentProps {
@@ -29,7 +28,6 @@ const Top100CoursesContent: React.FC<Top100CoursesContentProps> = ({
   viewType = 'cards',
   sortType = 'rank-asc'
 }) => {
-  const isMobile = useIsMobile();
   // Filter and sort courses based on search term and sort preference
   const filteredAndSortedCourses = useMemo(() => {
     let filtered = courses;
@@ -85,83 +83,37 @@ const Top100CoursesContent: React.FC<Top100CoursesContentProps> = ({
 
   return (
     <ScrollArea className="h-[60vh] pr-4">
-      {/* Dynamic layout based on view type and device */}
-      {viewType === 'list' ? (
-        <div className="space-y-3">
-          {filteredAndSortedCourses.map((course) => {
-            const isPlayed = playedCourses.has(course.id);
-            const userRating = getUserRating(course.id);
-            
-            return (
-              <Top100CourseCard
-                key={course.id}
-                course={course}
-                isPlayed={isPlayed}
-                region={region}
-                isOwnProfile={isOwnProfile}
-                onToggle={isOwnProfile ? () => toggleCourse(course.id) : undefined}
-                userRating={userRating}
-                viewType={viewType}
-              />
-            );
-          })}
-        </div>
-      ) : (
-        // Cards view with carousel-style peek effect
-        <div className={
-          isMobile 
-            ? "overflow-x-auto scrollbar-hide -mx-4 px-4" 
-            : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
-        }>
-          <div className={
-            isMobile 
-              ? "flex gap-4 pb-2" 
-              : "contents"
-          }>
-            {filteredAndSortedCourses.map((course, index) => {
-              const isPlayed = playedCourses.has(course.id);
-              const userRating = getUserRating(course.id);
-              
-              // Debug logging
-              if (course.name === "Trump Turnberry Resort - Ailsa") {
-                console.log('Top100CourseCard debug:', {
-                  courseName: course.name,
-                  courseId: course.id,
-                  userRating,
-                  isPlayed,
-                  showUserRating: !!userRating
-                });
-              }
-              
-              return (
-                <div
-                  key={course.id}
-                  className={
-                    isMobile 
-                      ? "flex-shrink-0 w-[280px]" 
-                      : ""
-                  }
-                  style={
-                    isMobile && index === filteredAndSortedCourses.length - 1 
-                      ? { marginRight: '16px' } 
-                      : {}
-                  }
-                >
-                  <Top100CourseCard
-                    course={course}
-                    isPlayed={isPlayed}
-                    region={region}
-                    isOwnProfile={isOwnProfile}
-                    onToggle={isOwnProfile ? () => toggleCourse(course.id) : undefined}
-                    userRating={userRating}
-                    viewType={viewType}
-                  />
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
+      {/* Dynamic layout based on view type */}
+      <div className={viewType === 'list' ? "space-y-3" : "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"}>
+        {filteredAndSortedCourses.map((course) => {
+          const isPlayed = playedCourses.has(course.id);
+          const userRating = getUserRating(course.id);
+          
+          // Debug logging
+          if (course.name === "Trump Turnberry Resort - Ailsa") {
+            console.log('Top100CourseCard debug:', {
+              courseName: course.name,
+              courseId: course.id,
+              userRating,
+              isPlayed,
+              showUserRating: !!userRating
+            });
+          }
+          
+          return (
+            <Top100CourseCard
+              key={course.id}
+              course={course}
+              isPlayed={isPlayed}
+              region={region}
+              isOwnProfile={isOwnProfile}
+              onToggle={isOwnProfile ? () => toggleCourse(course.id) : undefined}
+              userRating={userRating}
+              viewType={viewType}
+            />
+          );
+        })}
+      </div>
       
       {filteredAndSortedCourses.length === 0 && courses.length > 0 && (
         <div className="text-center py-8 text-muted-foreground">

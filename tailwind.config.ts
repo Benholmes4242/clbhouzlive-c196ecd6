@@ -144,14 +144,6 @@ export default {
 					'100%': {
 						transform: 'translateX(100%)'
 					}
-				},
-				'subtle-bounce': {
-					'0%, 100%': {
-						transform: 'translateY(0)'
-					},
-					'50%': {
-						transform: 'translateY(-1px)'
-					}
 				}
 			},
 			animation: {
@@ -161,8 +153,7 @@ export default {
 				'slide-in-right': 'slide-in-right 0.3s ease-out',
 				'fade-in': 'fade-in 0.3s ease-out',
 				'shake': 'shake 0.6s ease-in-out',
-				'shimmer': 'shimmer 2s infinite',
-				'subtle-bounce': 'subtle-bounce 2s ease-in-out infinite'
+				'shimmer': 'shimmer 2s infinite'
 			}
 		}
 	},

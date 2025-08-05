@@ -115,16 +115,7 @@
     max-width: 100%;
     position: relative;
   }
-  }
-
-  /* Hide scrollbars for mobile carousels */
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
+}
 
 @layer utilities {
   .scrollbar-hide {

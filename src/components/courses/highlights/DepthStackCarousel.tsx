@@ -354,7 +354,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
           containerRef.current = node;
         }}
         className={`flex gap-4 overflow-x-auto scrollbar-hide ${
-          isMobile ? 'pl-8 pr-4' : ''
+          isMobile ? 'px-4 -mx-4' : ''
         }`}
         style={{
           scrollSnapType: 'x mandatory',
@@ -366,12 +366,9 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
           <div
             key={item.id}
             className={`flex-shrink-0 ${
-              isMobile ? 'w-[280px]' : 'w-80'
+              isMobile ? 'w-[calc(100vw-6rem)]' : 'w-80'
             }`}
-            style={{ 
-              scrollSnapAlign: 'start',
-              ...(isMobile && index === carouselItems.length - 1 ? { marginRight: '16px' } : {})
-            }}
+            style={{ scrollSnapAlign: 'start' }}
             onMouseEnter={() => !isMobile && setHoveredCardIndex(index)}
             onMouseLeave={() => !isMobile && setHoveredCardIndex(null)}
           >

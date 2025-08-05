@@ -102,13 +102,6 @@ const ProfilePage = () => {
         />
         
         {/* Render section content based on active section */}
-        {activeSection === 'handicap' && user && (
-          <HandicapSection userId={user.id} profile={profile} />
-        )}
-        
-        {activeSection === 'courses' && (
-          <UserCoursesContent />
-        )}
         
       </div>
       
