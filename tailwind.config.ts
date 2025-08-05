@@ -150,7 +150,7 @@ export default {
 						transform: 'translateY(0)'
 					},
 					'50%': {
-						transform: 'translateY(-2px)'
+						transform: 'translateY(-1px)'
 					}
 				}
 			},
@@ -162,7 +162,7 @@ export default {
 				'fade-in': 'fade-in 0.3s ease-out',
 				'shake': 'shake 0.6s ease-in-out',
 				'shimmer': 'shimmer 2s infinite',
-				'subtle-bounce': 'subtle-bounce 1s ease-in-out infinite'
+				'subtle-bounce': 'subtle-bounce 2s ease-in-out infinite'
 			}
 		}
 	},

@@ -149,7 +149,7 @@ const MobileGamificationLayout: React.FC<MobileGamificationLayoutProps> = ({
                   <div 
                     className={cn(
                       'text-6xl transition-all duration-300',
-                      trophy.isUnlocked ? 'opacity-100 animate-bounce' : 'opacity-40 grayscale'
+                      trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
                     )}
                     style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(251, 191, 36, 0.6))' : 'none' }}
                   >
