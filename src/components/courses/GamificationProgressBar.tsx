@@ -748,12 +748,12 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                         }}
                       >
                         {/* Region Name at Top */}
-                        <h4 className="text-base font-semibold text-foreground text-center mb-2 w-full">
+                        <h4 className="text-base font-semibold text-foreground text-center mb-3 w-full">
                           {list.name}
                         </h4>
 
                         {/* Top Row: Trophy Left, Progress Ring Right */}
-                        <div className="flex items-center justify-between w-full mb-2">
+                        <div className="flex items-center justify-between w-full mb-auto">
                           {/* Trophy Icon - Left Side with enhanced styling */}
                           <div className="flex-shrink-0">
                             <div className="relative">
@@ -762,7 +762,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                                   src="/lovable-uploads/7df94753-adb7-43b1-8ea8-380234f3318f.png" 
                                   alt="British & Irish Trophy" 
                                   className={cn(
-                                    'h-12 w-auto object-contain transition-all duration-300',
+                                    'h-24 w-auto object-contain transition-all duration-300',
                                     list.isCompleted ? 'opacity-100 brightness-110' : 'opacity-60'
                                   )}
                                   style={{ 
@@ -776,7 +776,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                                   src="/lovable-uploads/fa5756cb-1a89-478b-b8ad-8d26168c1f4f.png" 
                                   alt="European Trophy" 
                                   className={cn(
-                                    'h-12 w-auto object-contain transition-all duration-300',
+                                    'h-24 w-auto object-contain transition-all duration-300',
                                     list.isCompleted ? 'opacity-100 brightness-110' : 'opacity-60'
                                   )}
                                   style={{ 
@@ -790,7 +790,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                                   src="/lovable-uploads/7ae756b6-b8e6-4d03-a6ee-f8c336eec047.png" 
                                   alt="USA Trophy" 
                                   className={cn(
-                                    'h-12 w-auto object-contain transition-all duration-300',
+                                    'h-24 w-auto object-contain transition-all duration-300',
                                     list.isCompleted ? 'opacity-100 brightness-110' : 'opacity-60'
                                   )}
                                   style={{ 
@@ -804,7 +804,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                                   src="/lovable-uploads/ab0f852c-4e2f-408d-a13c-ef3a595470e8.png" 
                                   alt="Worldwide Trophy" 
                                   className={cn(
-                                    'h-12 w-auto object-contain transition-all duration-300',
+                                    'h-24 w-auto object-contain transition-all duration-300',
                                     list.isCompleted ? 'opacity-100 brightness-110' : 'opacity-60'
                                   )}
                                   style={{ 
@@ -822,26 +822,26 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                             <CircularProgress
                               completed={list.completed}
                               total={list.total}
-                              size={60}
-                              strokeWidth={4}
+                              size={80}
+                              strokeWidth={6}
                               showAnimation={true}
                               bottomText={`${(list.completed * 110).toLocaleString()} XP`}
                             />
                           </div>
                         </div>
                         
-                        {/* Achievement Tag - Black Text */}
-                        <div className="text-xs font-medium text-black text-center mb-1">
-                          {list.tag}
+                        {/* Text content moved to bottom */}
+                        <div className="mt-auto pt-2 w-full">
+                          {/* Achievement Tag - Black Text */}
+                          <div className="text-xs font-medium text-black text-center mb-1">
+                            {list.tag}
+                          </div>
+                          
+                          {/* Description - Truncated for mobile */}
+                          <p className="text-xs text-black text-center mb-2 leading-relaxed line-clamp-2">
+                            {list.description}
+                          </p>
                         </div>
-                        
-                        {/* Description - Truncated for mobile */}
-                        <p className="text-xs text-black text-center mb-2 leading-relaxed line-clamp-2">
-                          {list.description}
-                        </p>
-                        
-                        {/* Spacer for separation */}
-                        <div className="flex-1"></div>
                         
                       </div>
                     </div>
