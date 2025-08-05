@@ -175,7 +175,7 @@ const VideoCard: React.FC<{
   return (
     <div 
       ref={autoplayRef}
-      className="relative aspect-[9/16] rounded-lg overflow-hidden bg-black cursor-pointer group" 
+      className="relative aspect-[4/3] rounded-lg overflow-hidden bg-black cursor-pointer group" 
       onClick={handleVideoClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -183,7 +183,7 @@ const VideoCard: React.FC<{
       {video.videoUrl ? (
         <video
           ref={videoRef}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-contain bg-black"
           muted={isMuted}
           loop
           playsInline
@@ -203,7 +203,7 @@ const VideoCard: React.FC<{
         <img 
           src={thumbnailReady ? thumbnailSrc : video.thumbnail}
           alt={video.courseName}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-contain bg-black"
         />
       )}
       
