@@ -114,6 +114,12 @@ const MobileGamificationLayout: React.FC<MobileGamificationLayoutProps> = ({
 
       {/* Mobile Regional Lists - Single Card Carousel */}
       <div className="md:hidden pt-8">
+        <div className="flex items-center justify-between mb-4">
+          <span className="text-lg font-semibold text-foreground">Regional List Completion</span>
+          <span className="text-base font-medium text-foreground">
+            {regionalProgress.lists.filter(list => list.completed >= list.total).length}/4 lists completed
+          </span>
+        </div>
         <div className="overflow-x-auto scrollbar-hide">
           <div className="flex gap-4 snap-x snap-mandatory px-2 pb-2" style={{ scrollSnapType: 'x mandatory' }}>
             {regionalProgress.lists.map((list, index) => (
