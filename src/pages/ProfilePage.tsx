@@ -102,7 +102,18 @@ const ProfilePage = () => {
         />
         
         {/* Render section content based on active section */}
+        {activeSection === 'activity' && (
+          <UserCoursesContent 
+            isOwnProfile={true}
+          />
+        )}
         
+        {activeSection === 'handicap' && (
+          <HandicapSection 
+            userId={user.id}
+            profile={profile}
+          />
+        )}
       </div>
       
       <BottomNavigation />
