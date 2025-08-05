@@ -38,6 +38,14 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
   const [showVideo, setShowVideo] = useState(true); // true = show video, false = show photo
   const { toast } = useToast();
 
+  console.log('ProfileVideoCircle - Debug props:', {
+    videoUrl,
+    profilePhotoUrl,
+    showVideo,
+    hasPlayed,
+    displayName
+  });
+
   // Auto-play video once when component mounts and video is available
   useEffect(() => {
     const video = videoRef.current;
