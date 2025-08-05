@@ -27,21 +27,28 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({
 
   return (
     <>
-      {/* Preload profile images for better performance */}
+      {/* Critical profile image preload - highest priority for instant loading */}
+      {profile.profile_photo_url && (
+        <>
+          <link 
+            rel="preload" 
+            as="image" 
+            href={profile.profile_photo_url}
+            fetchPriority="high"
+          />
+          <link 
+            rel="prefetch" 
+            as="image" 
+            href={profile.profile_photo_url}
+          />
+        </>
+      )}
+      
+      {/* Secondary preloader for fallback */}
       <ProfileImagePreloader 
         profilePhotoUrl={profile.profile_photo_url}
         priority={true}
       />
-      
-      {/* Early preload of critical profile image for instant loading */}
-      {profile.profile_photo_url && (
-        <link 
-          rel="preload" 
-          as="image" 
-          href={profile.profile_photo_url}
-          fetchPriority="high"
-        />
-      )}
       
       <div className="w-full px-4 md:px-8">
         <HeroProfileHeader 

@@ -25,6 +25,23 @@ const UserProfilePage = () => {
 
   return (
     <div className="min-h-screen bg-background pb-28 relative">
+      {/* Critical profile photo preload at page level for immediate loading */}
+      {profile?.profile_photo_url && (
+        <>
+          <link 
+            rel="preload" 
+            as="image" 
+            href={profile.profile_photo_url}
+            fetchPriority="high"
+          />
+          <link 
+            rel="prefetch" 
+            as="image" 
+            href={profile.profile_photo_url}
+          />
+        </>
+      )}
+      
       {/* Header */}
       <Header />
       
