@@ -609,7 +609,8 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
               </span>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {/* Desktop Layout */}
+            <div className="hidden md:grid md:grid-cols-4 gap-4">
               {regionalProgress.lists.map((list) => (
                 <div
                   key={list.id}
@@ -718,6 +719,135 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                   
                 </div>
               ))}
+            </div>
+
+            {/* Mobile Swipeable Layout */}
+            <div className="md:hidden">
+              <div className="relative overflow-hidden">
+                <div 
+                  className="flex gap-4 overflow-x-auto scroll-smooth snap-x snap-mandatory scrollbar-hide"
+                  style={{ 
+                    scrollSnapType: 'x mandatory',
+                    WebkitOverflowScrolling: 'touch'
+                  }}
+                >
+                  {regionalProgress.lists.map((list, index) => (
+                    <div
+                      key={list.id}
+                      className="flex-shrink-0 w-[calc(100vw-5rem)] max-w-[280px] snap-center"
+                      style={{
+                        marginRight: index === regionalProgress.lists.length - 1 ? '0' : '1rem'
+                      }}
+                    >
+                      <div
+                        className="flex flex-col items-center p-4 rounded-xl border transition-all cursor-pointer hover:scale-105 hover:-translate-y-1 bg-background border-border hover:shadow-lg duration-300 h-[200px]"
+                        style={{ boxShadow: '0 2px 6px rgba(0,0,0,0.04)' }}
+                        onClick={() => {
+                          setSelectedCourseList(list);
+                          setIsCourseListModalOpen(true);
+                        }}
+                      >
+                        {/* Region Name at Top */}
+                        <h4 className="text-base font-semibold text-foreground text-center mb-2 w-full">
+                          {list.name}
+                        </h4>
+
+                        {/* Top Row: Trophy Left, Progress Ring Right */}
+                        <div className="flex items-center justify-between w-full mb-2">
+                          {/* Trophy Icon - Left Side with enhanced styling */}
+                          <div className="flex-shrink-0">
+                            <div className="relative">
+                              {list.id === 'britain-ireland' ? (
+                                <img 
+                                  src="/lovable-uploads/7df94753-adb7-43b1-8ea8-380234f3318f.png" 
+                                  alt="British & Irish Trophy" 
+                                  className={cn(
+                                    'h-12 w-auto object-contain transition-all duration-300',
+                                    list.isCompleted ? 'opacity-100 brightness-110' : 'opacity-60'
+                                  )}
+                                  style={{ 
+                                    filter: list.isCompleted 
+                                      ? 'drop-shadow(0 2px 4px rgba(0,0,0,0.08)) brightness(1.1)' 
+                                      : 'drop-shadow(0 1px 2px rgba(0,0,0,0.04))'
+                                  }}
+                                />
+                              ) : list.id === 'europe' ? (
+                                <img 
+                                  src="/lovable-uploads/fa5756cb-1a89-478b-b8ad-8d26168c1f4f.png" 
+                                  alt="European Trophy" 
+                                  className={cn(
+                                    'h-12 w-auto object-contain transition-all duration-300',
+                                    list.isCompleted ? 'opacity-100 brightness-110' : 'opacity-60'
+                                  )}
+                                  style={{ 
+                                    filter: list.isCompleted 
+                                      ? 'drop-shadow(0 2px 4px rgba(0,0,0,0.08)) brightness(1.1)' 
+                                      : 'drop-shadow(0 1px 2px rgba(0,0,0,0.04))'
+                                  }}
+                                />
+                              ) : list.id === 'usa' ? (
+                                <img 
+                                  src="/lovable-uploads/7ae756b6-b8e6-4d03-a6ee-f8c336eec047.png" 
+                                  alt="USA Trophy" 
+                                  className={cn(
+                                    'h-12 w-auto object-contain transition-all duration-300',
+                                    list.isCompleted ? 'opacity-100 brightness-110' : 'opacity-60'
+                                  )}
+                                  style={{ 
+                                    filter: list.isCompleted 
+                                      ? 'drop-shadow(0 2px 4px rgba(0,0,0,0.08)) brightness(1.1)' 
+                                      : 'drop-shadow(0 1px 2px rgba(0,0,0,0.04))'
+                                  }}
+                                />
+                              ) : list.id === 'worldwide' ? (
+                                <img 
+                                  src="/lovable-uploads/ab0f852c-4e2f-408d-a13c-ef3a595470e8.png" 
+                                  alt="Worldwide Trophy" 
+                                  className={cn(
+                                    'h-12 w-auto object-contain transition-all duration-300',
+                                    list.isCompleted ? 'opacity-100 brightness-110' : 'opacity-60'
+                                  )}
+                                  style={{ 
+                                    filter: list.isCompleted 
+                                      ? 'drop-shadow(0 2px 4px rgba(0,0,0,0.08)) brightness(1.1)' 
+                                      : 'drop-shadow(0 1px 2px rgba(0,0,0,0.04))'
+                                  }}
+                                />
+                              ) : null}
+                            </div>
+                          </div>
+                          
+                          {/* Circular Progress Ring - Right Side */}
+                          <div className="flex-shrink-0">
+                            <CircularProgress
+                              completed={list.completed}
+                              total={list.total}
+                              size={60}
+                              strokeWidth={4}
+                              showAnimation={true}
+                              bottomText={`${(list.completed * 110).toLocaleString()} XP`}
+                            />
+                          </div>
+                        </div>
+                        
+                        {/* Achievement Tag - Black Text */}
+                        <div className="text-xs font-medium text-black text-center mb-1">
+                          {list.tag}
+                        </div>
+                        
+                        {/* Description - Truncated for mobile */}
+                        <p className="text-xs text-black text-center mb-2 leading-relaxed line-clamp-2">
+                          {list.description}
+                        </p>
+                        
+                        {/* Spacer for separation */}
+                        <div className="flex-1"></div>
+                        
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
 
             {/* World Conqueror Achievement */}
