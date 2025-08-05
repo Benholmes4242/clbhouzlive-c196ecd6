@@ -26,12 +26,12 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
   }
 
   // If user is not authenticated and not on auth page, redirect to auth
-  if (!user && location.pathname !== '/auth') {
+  if (!user && !loading && location.pathname !== '/auth') {
     return <Navigate to="/auth" replace />;
   }
 
   // If user is authenticated and on auth page, redirect to main site
-  if (user && location.pathname === '/auth') {
+  if (user && !loading && location.pathname === '/auth') {
     return <Navigate to="/" replace />;
   }
 

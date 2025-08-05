@@ -6,7 +6,7 @@ import GalleryPicker from '@/components/post/GalleryPicker';
 import SnapToast from '@/components/snap/SnapToast';
 import NavigationBar from './bottom-navigation/NavigationBar';
 import PostSubmissionHandler from './bottom-navigation/PostSubmissionHandler';
-import { useNavigationHandlers } from '@/hooks/useNavigationHandlers';
+import { useNavigationHandlers } from './bottom-navigation/useNavigationHandlers';
 import { usePostSubmissionHandlers } from './bottom-navigation/usePostSubmissionHandlers';
 
 interface BottomNavigationProps {
