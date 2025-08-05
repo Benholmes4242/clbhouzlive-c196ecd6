@@ -404,8 +404,8 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
               }}
               className={`w-2 h-2 rounded-full transition-all duration-300 ${
                 index === activeVideoIndex 
-                  ? 'bg-white scale-125' 
-                  : 'bg-white/50 hover:bg-white/70'
+                  ? 'bg-foreground scale-125' 
+                  : 'bg-muted-foreground/50 hover:bg-muted-foreground/70'
               }`}
               aria-label={`Go to slide ${index + 1}`}
             />
