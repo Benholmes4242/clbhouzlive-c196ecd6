@@ -270,53 +270,6 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
             
             {/* Trophy Timeline */}
             <div className="relative">
-              {/* Desktop only progress line */}
-              {!isMobile && (
-                <>
-                  {/* Progress Line with improved visibility */}
-                   <div className="absolute top-4 left-8 right-4 h-3 bg-gray-200 rounded-full overflow-hidden shadow-sm">
-                     {nextGlobalTrophy && lastUnlockedTrophy && (
-                       <div 
-                         className="h-full bg-green-500 rounded-full transition-all duration-1000 ease-out shadow-sm"
-                         style={{ 
-                           width: `${((completedCount - lastUnlockedTrophy.requiredCourses) / (nextGlobalTrophy.requiredCourses - lastUnlockedTrophy.requiredCourses)) * 100}%`,
-                           boxShadow: '0 0 8px rgba(16, 185, 129, 0.4)'
-                         }}
-                       />
-                     )}
-                     {nextGlobalTrophy && !lastUnlockedTrophy && completedCount < 20 && (
-                       <div 
-                         className="h-full bg-green-500 rounded-full transition-all duration-1000 ease-out shadow-sm animate-pulse"
-                         style={{ 
-                           width: `${(completedCount / nextGlobalTrophy.requiredCourses) * 20}%`,
-                           boxShadow: '0 0 8px rgba(16, 185, 129, 0.4)'
-                         }}
-                       />
-                      )}
-                      
-                      {/* Friend Progress Markers */}
-                      {friends.length > 0 && friends.map((friend, index) => {
-                        const friendProgress = (friend.coursesPlayed / 300) * 100;
-                        if (friendProgress <= 0 || friendProgress >= 95) return null;
-                        
-                        return (
-                          <div
-                            key={friend.id}
-                            className="absolute top-0 transform -translate-x-1/2 z-20"
-                            style={{ left: `${friendProgress}%` }}
-                          >
-                            <div className="flex flex-col items-center">
-                              <div className="w-3 h-3 rounded-full bg-blue-500 border-2 border-white shadow-lg mb-1" />
-                              <div className="bg-background/90 text-foreground text-xs px-2 py-1 rounded whitespace-nowrap border border-border shadow-sm">
-                                🏁 {friend.display_name || friend.username} ({friend.coursesPlayed})
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                      </div>
-                </>
-              )}
                {/* Trophy Points - Mobile: Horizontal Slider, Desktop: Grid */}
                 {isMobile ? (
                    /* Mobile: Horizontal Scrollable Slider showing 2 trophies + peek of 3rd */
