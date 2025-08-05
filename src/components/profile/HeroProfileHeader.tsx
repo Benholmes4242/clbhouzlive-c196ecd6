@@ -522,18 +522,6 @@ const HeroProfileHeader = ({
             </p>
 
             {/* Compare Progress Button for other profiles */}
-            {!isOwnProfile && user && (
-              <div className="mt-4">
-                <button
-                  onClick={() => setIsCompareModalOpen(true)}
-                  className="bg-muted border border-border rounded-lg text-foreground font-medium hover:bg-muted/80 transition-all duration-300 ease-in-out flex items-center justify-center gap-2 py-2 px-4 text-sm"
-                  style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
-                >
-                  <Swords className="w-4 h-4" />
-                  ⚔️ Compare Golf Journey
-                </button>
-              </div>
-            )}
           </div>
 
           {/* Stats Bar */}
