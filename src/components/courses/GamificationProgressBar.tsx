@@ -491,7 +491,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
           </div>
 
           {/* Divider Line */}
-          <div className="mx-8 border-t border-gray-300/40"></div>
+          <div className="mx-16 border-t border-gray-300/60"></div>
 
           {/* Regional Lists Completion - Improved Cards with enhanced spacing */}
           <div className="space-y-4 pt-8">
@@ -625,7 +625,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
           </div>
 
           {/* Divider Line */}
-          <div className="mx-8 border-t border-gray-300/40"></div>
+          <div className="mx-16 border-t border-gray-300/60"></div>
 
           {/* Friends Progress Section - Improved Card with enhanced spacing */}
           {isCurrentUser && (
