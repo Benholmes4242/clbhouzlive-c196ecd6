@@ -24,6 +24,7 @@ const GLOBAL_TROPHIES = [
     xp: 2200,
     color: 'from-amber-500 to-yellow-600',
     tier: 'gold',
+    description: 'Awarded for completing 20 Top 100 Courses. Welcome to the club!',
   },
   {
     id: 'the-turn',
@@ -32,6 +33,7 @@ const GLOBAL_TROPHIES = [
     xp: 5500,
     color: 'from-gray-400 to-slate-500',
     tier: 'silver',
+    description: 'Awarded for completing 50 Top 100 Courses. You\'re making the turn!',
   },
   {
     id: 'century-club',
@@ -40,6 +42,7 @@ const GLOBAL_TROPHIES = [
     xp: 11000,
     color: 'from-blue-500 to-indigo-600',
     tier: 'blue',
+    description: 'Awarded for completing 100 Top 100 Courses. Century achievement unlocked!',
   },
   {
     id: 'clubhouse-elite',
@@ -48,6 +51,7 @@ const GLOBAL_TROPHIES = [
     xp: 22000,
     color: 'from-emerald-500 to-green-600',
     tier: 'green',
+    description: 'Awarded for completing 200 Top 100 Courses. Elite status achieved!',
   },
   {
     id: 'course-collector',
@@ -56,6 +60,7 @@ const GLOBAL_TROPHIES = [
     xp: 33000,
     color: 'from-purple-500 to-violet-600',
     tier: 'purple',
+    description: 'Awarded for completing 300 Top 100 Courses. Ultimate collector status!',
   },
 ];
 
@@ -196,6 +201,7 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
       ...trophy,
       isUnlocked: completedCount >= trophy.requiredCourses,
       progress: Math.min((completedCount / trophy.requiredCourses) * 100, 100),
+      unlockedDate: completedCount >= trophy.requiredCourses ? 'December 2024' : null, // Mock unlock date
     }));
   }, [completedCount]);
 
@@ -321,51 +327,70 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
                        style={{ scrollPaddingLeft: '8px', scrollPaddingRight: '8px' }}
                      >
                        {globalTrophies.map((trophy, index) => (
-                          <div 
-                            key={trophy.id} 
-                            className="relative flex-none w-[calc(42%-8px)] flex flex-col items-center space-y-3 cursor-pointer hover:scale-105 transition-all duration-300 snap-start p-4 rounded-xl bg-background/50 border border-border/50 pb-6"
-                            style={{ filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1))' }}
-                         >
-                           {trophy.id === 'green-fee-rookie' ? (
-                             <img 
-                               src="/lovable-uploads/5a091ad9-4617-497e-ba13-9da6506fe989.png" 
-                               alt="20 Club Trophy" 
-                               className={cn(
-                             'h-24 w-auto object-contain transition-all duration-300',
-                             trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
-                           )}
-                               style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(251, 191, 36, 0.6))' : 'none' }}
-                             />
-                           ) : trophy.id === 'the-turn' ? (
-                             <img 
-                               src="/lovable-uploads/43291ca4-d526-4b10-9585-6ea3488445cf.png" 
-                               alt="The Turn Trophy"
-                               className={cn(
-                             'h-24 w-auto object-contain transition-all duration-300',
-                             trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
-                           )}
-                               style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(148, 163, 184, 0.6))' : 'none' }}
-                             />
-                           ) : (
-                             <TrophyIcon 
-                               isUnlocked={trophy.isUnlocked} 
-                               color={trophy.color} 
-                               size="lg" 
-                             />
-                           )}
-                           
-                           <div className="text-center space-y-1 w-full">
-                             <h6 className="font-semibold text-sm text-foreground">
-                               {trophy.name}
-                             </h6>
-                             <p className="text-xs text-muted-foreground">
-                               {trophy.requiredCourses} courses
-                             </p>
-                             <div className="text-xs font-medium text-primary">
-                               {trophy.xp.toLocaleString()} XP
+                          <Tooltip.Root key={trophy.id} delayDuration={200}>
+                            <Tooltip.Trigger asChild>
+                              <div 
+                                className="relative flex-none w-[calc(42%-8px)] flex flex-col items-center space-y-3 cursor-pointer hover:scale-105 transition-all duration-300 snap-start p-4 rounded-xl bg-background/50 border border-border/50 pb-6"
+                                style={{ filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1))' }}
+                             >
+                               {trophy.id === 'green-fee-rookie' ? (
+                                 <img 
+                                   src="/lovable-uploads/5a091ad9-4617-497e-ba13-9da6506fe989.png" 
+                                   alt="20 Club Trophy" 
+                                   className={cn(
+                                 'h-24 w-auto object-contain transition-all duration-300',
+                                 trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
+                               )}
+                                   style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(251, 191, 36, 0.6))' : 'none' }}
+                                 />
+                               ) : trophy.id === 'the-turn' ? (
+                                 <img 
+                                   src="/lovable-uploads/43291ca4-d526-4b10-9585-6ea3488445cf.png" 
+                                   alt="The Turn Trophy"
+                                   className={cn(
+                                 'h-24 w-auto object-contain transition-all duration-300',
+                                 trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
+                               )}
+                                   style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(148, 163, 184, 0.6))' : 'none' }}
+                                 />
+                               ) : (
+                                 <TrophyIcon 
+                                   isUnlocked={trophy.isUnlocked} 
+                                   color={trophy.color} 
+                                   size="lg" 
+                                 />
+                               )}
+                               
+                               <div className="text-center space-y-1 w-full">
+                                 <h6 className="font-semibold text-sm text-foreground">
+                                   {trophy.name}
+                                 </h6>
+                                 <p className="text-xs text-muted-foreground">
+                                   {trophy.requiredCourses} courses
+                                 </p>
+                                 <div className="text-xs font-medium text-primary">
+                                   {trophy.xp.toLocaleString()} XP
+                                 </div>
+                               </div>
                              </div>
-                           </div>
-                         </div>
+                            </Tooltip.Trigger>
+                            <Tooltip.Portal>
+                              <Tooltip.Content 
+                                className="bg-background border border-border rounded-lg p-3 shadow-lg z-50 max-w-[200px] animate-fade-in"
+                                sideOffset={8}
+                                side="bottom"
+                              >
+                                <div className="text-center space-y-1">
+                                  <h4 className="font-semibold text-sm text-foreground">{trophy.name}</h4>
+                                  <p className="text-xs text-muted-foreground leading-relaxed">{trophy.description}</p>
+                                  {trophy.isUnlocked && trophy.unlockedDate && (
+                                    <p className="text-xs text-primary font-medium">Unlocked: {trophy.unlockedDate}</p>
+                                  )}
+                                </div>
+                                <Tooltip.Arrow className="fill-border" />
+                              </Tooltip.Content>
+                            </Tooltip.Portal>
+                          </Tooltip.Root>
                        ))}
                      </div>
                    </div>
@@ -373,47 +398,67 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
                   /* Desktop: Full Grid with Spacing */
                   <div className="grid grid-cols-5 gap-8 pt-8 pb-4">
                     {globalTrophies.map((trophy, index) => (
-                      <div key={trophy.id} className="relative flex flex-col items-center space-y-3 cursor-pointer hover:scale-105 transition-all duration-300">
-                        {trophy.id === 'green-fee-rookie' ? (
-                          <img 
-                            src="/lovable-uploads/5a091ad9-4617-497e-ba13-9da6506fe989.png" 
-                            alt="20 Club Trophy" 
-                            className={cn(
-                          'h-32 w-auto object-contain transition-all duration-300',
-                          trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
-                        )}
-                            style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(251, 191, 36, 0.6))' : 'none' }}
-                          />
-                        ) : trophy.id === 'the-turn' ? (
-                          <img 
-                            src="/lovable-uploads/43291ca4-d526-4b10-9585-6ea3488445cf.png" 
-                            alt="The Turn Trophy"
-                            className={cn(
-                          'h-32 w-auto object-contain transition-all duration-300',
-                          trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
-                        )}
-                            style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(148, 163, 184, 0.6))' : 'none' }}
-                          />
-                        ) : (
-                          <TrophyIcon 
-                            isUnlocked={trophy.isUnlocked} 
-                            color={trophy.color} 
-                            size="lg" 
-                          />
-                        )}
-                        
-                        <div className="text-center space-y-1">
-                          <h6 className="font-semibold text-sm text-foreground">
-                            {trophy.name}
-                          </h6>
-                          <p className="text-xs text-muted-foreground">
-                            {trophy.requiredCourses} courses
-                          </p>
-                          <div className="text-xs font-medium text-primary">
-                            {trophy.xp.toLocaleString()} XP
+                      <Tooltip.Root key={trophy.id} delayDuration={200}>
+                        <Tooltip.Trigger asChild>
+                          <div className="relative flex flex-col items-center space-y-3 cursor-pointer hover:scale-105 transition-all duration-300">
+                            {trophy.id === 'green-fee-rookie' ? (
+                              <img 
+                                src="/lovable-uploads/5a091ad9-4617-497e-ba13-9da6506fe989.png" 
+                                alt="20 Club Trophy" 
+                                className={cn(
+                              'h-32 w-auto object-contain transition-all duration-300',
+                              trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
+                            )}
+                                style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(251, 191, 36, 0.6))' : 'none' }}
+                              />
+                            ) : trophy.id === 'the-turn' ? (
+                              <img 
+                                src="/lovable-uploads/43291ca4-d526-4b10-9585-6ea3488445cf.png" 
+                                alt="The Turn Trophy"
+                                className={cn(
+                              'h-32 w-auto object-contain transition-all duration-300',
+                              trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
+                            )}
+                                style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(148, 163, 184, 0.6))' : 'none' }}
+                              />
+                            ) : (
+                              <TrophyIcon 
+                                isUnlocked={trophy.isUnlocked} 
+                                color={trophy.color} 
+                                size="lg" 
+                              />
+                            )}
+                            
+                            <div className="text-center space-y-1">
+                              <h6 className="font-semibold text-sm text-foreground">
+                                {trophy.name}
+                              </h6>
+                              <p className="text-xs text-muted-foreground">
+                                {trophy.requiredCourses} courses
+                              </p>
+                              <div className="text-xs font-medium text-primary">
+                                {trophy.xp.toLocaleString()} XP
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      </div>
+                        </Tooltip.Trigger>
+                        <Tooltip.Portal>
+                          <Tooltip.Content 
+                            className="bg-background border border-border rounded-lg p-3 shadow-lg z-50 max-w-[200px] animate-fade-in"
+                            sideOffset={8}
+                            side="bottom"
+                          >
+                            <div className="text-center space-y-1">
+                              <h4 className="font-semibold text-sm text-foreground">{trophy.name}</h4>
+                              <p className="text-xs text-muted-foreground leading-relaxed">{trophy.description}</p>
+                              {trophy.isUnlocked && trophy.unlockedDate && (
+                                <p className="text-xs text-primary font-medium">Unlocked: {trophy.unlockedDate}</p>
+                              )}
+                            </div>
+                            <Tooltip.Arrow className="fill-border" />
+                          </Tooltip.Content>
+                        </Tooltip.Portal>
+                      </Tooltip.Root>
                     ))}
                   </div>
                 )}
