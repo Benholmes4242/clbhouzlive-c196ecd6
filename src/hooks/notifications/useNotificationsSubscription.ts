@@ -12,7 +12,15 @@ export const useNotificationsSubscription = (userId: string | undefined) => {
     console.log('Setting up notifications subscription for user:', userId);
 
     // Create a unique channel name to avoid conflicts
-    const channelName = `notifications-${userId}-${Date.now()}`;
+    const channelName = `notifications-${userId}`;
+    
+    // First, try to remove any existing channel with the same name
+    const existingChannels = supabase.getChannels();
+    const existingChannel = existingChannels.find(ch => ch.topic === channelName);
+    if (existingChannel) {
+      console.log('Removing existing channel:', channelName);
+      supabase.removeChannel(existingChannel);
+    }
     
     const channel = supabase
       .channel(channelName)
@@ -61,5 +69,5 @@ export const useNotificationsSubscription = (userId: string | undefined) => {
       console.log('Cleaning up notifications subscription');
       supabase.removeChannel(channel);
     };
-  }, [userId]);
+  }, [userId, queryClient]);
 };
