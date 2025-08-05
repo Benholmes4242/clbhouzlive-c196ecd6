@@ -8,6 +8,7 @@ interface ProfileVideoPlayerProps {
   thumbnailUrl?: string;
   className?: string;
   onVideoEnd?: () => void;
+  onVideoError?: () => void;
   autoPlay?: boolean;
 }
 
@@ -16,6 +17,7 @@ const ProfileVideoPlayer: React.FC<ProfileVideoPlayerProps> = ({
   thumbnailUrl,
   className = '',
   onVideoEnd,
+  onVideoError,
   autoPlay = true
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -64,6 +66,7 @@ const ProfileVideoPlayer: React.FC<ProfileVideoPlayerProps> = ({
     const handleError = (e: any) => {
       console.error('ProfileVideoPlayer - Video error:', e);
       console.error('ProfileVideoPlayer - Video error details:', video.error);
+      onVideoError?.();
     };
 
     const handleLoadStart = () => {

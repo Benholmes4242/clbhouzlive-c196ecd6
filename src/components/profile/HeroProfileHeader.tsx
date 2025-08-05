@@ -490,25 +490,47 @@ const HeroProfileHeader = ({
                   isOwnProfile
                 });
                 
-                // Always show photo as fallback for now to debug
-                return (
-                  <div className="relative w-full h-full">
-                    <OptimizedAvatar
-                      key={avatarKey}
-                      src={profile?.profile_photo_url ? `${profile.profile_photo_url}?t=${avatarKey}` : undefined}
-                      alt={displayName}
-                      size={256}
-                      fallback={displayName.charAt(0)}
-                      className="shadow-2xl w-full h-full"
-                      priority={true}
-                    />
-                    
-                    {/* Debug overlay to confirm this is rendering */}
-                    <div className="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded">
-                      DEBUG: Profile Circle
+                if (profile?.has_profile_video && profile?.profile_video_url) {
+                  return (
+                    <div className="relative w-full h-full">
+                      <ProfileVideoDisplay
+                        videoUrl={profile.profile_video_url}
+                        fallbackPhotoUrl={profile.profile_photo_url}
+                        displayName={displayName}
+                        isOwnProfile={isOwnProfile}
+                        uploading={uploading}
+                        onEditClick={() => setEditDialogOpen(true)}
+                        onPhotoUpload={handlePhotoUpload}
+                        onVideoUpload={() => setEditDialogOpen(true)}
+                        achievementRing={achievementRing}
+                      />
+                      {/* Fallback avatar in case video fails to load */}
+                      <div className="absolute inset-0 opacity-0 pointer-events-none" id="video-fallback">
+                        <OptimizedAvatar
+                          key={`${avatarKey}-fallback`}
+                          src={profile?.profile_photo_url ? `${profile.profile_photo_url}?t=${avatarKey}` : undefined}
+                          alt={displayName}
+                          size={256}
+                          fallback={displayName.charAt(0)}
+                          className="shadow-2xl w-full h-full"
+                          priority={true}
+                        />
+                      </div>
                     </div>
-                    
-                    {isOwnProfile && (
+                  );
+                } else if (isOwnProfile) {
+                  return (
+                    <div className="relative w-full h-full group">
+                      <OptimizedAvatar
+                        key={avatarKey}
+                        src={profile?.profile_photo_url ? `${profile.profile_photo_url}?t=${avatarKey}` : undefined}
+                        alt={displayName}
+                        size={256}
+                        fallback={displayName.charAt(0)}
+                        className="shadow-2xl w-full h-full"
+                        priority={true}
+                      />
+                      {/* Edit buttons overlay */}
                       <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full">
                         <div className="flex flex-col gap-3 items-center">
                           <button
@@ -545,9 +567,21 @@ const HeroProfileHeader = ({
                           </button>
                         </div>
                       </div>
-                    )}
-                  </div>
-                );
+                    </div>
+                  );
+                } else {
+                  return (
+                    <OptimizedAvatar
+                      key={avatarKey}
+                      src={profile?.profile_photo_url ? `${profile.profile_photo_url}?t=${avatarKey}` : undefined}
+                      alt={displayName}
+                      size={256}
+                      fallback={displayName.charAt(0)}
+                      className="shadow-2xl w-full h-full"
+                      priority={true}
+                    />
+                  );
+                }
               })()}
             </div>
           </div>

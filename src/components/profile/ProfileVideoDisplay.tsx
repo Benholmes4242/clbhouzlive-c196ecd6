@@ -36,15 +36,23 @@ const ProfileVideoDisplay: React.FC<ProfileVideoDisplayProps> = ({
 }) => {
   const [videoEnded, setVideoEnded] = useState(false);
   const [showFallback, setShowFallback] = useState(false);
+  const [videoError, setVideoError] = useState(false);
 
   const handleVideoEnd = () => {
     setVideoEnded(true);
     setShowFallback(true);
   };
 
+  const handleVideoError = () => {
+    console.error('ProfileVideoDisplay - Video failed to load, showing fallback');
+    setVideoError(true);
+    setShowFallback(true);
+  };
+
   const handleReplayVideo = () => {
     setVideoEnded(false);
     setShowFallback(false);
+    setVideoError(false);
   };
 
   // Swipe gesture for video replay
@@ -97,6 +105,7 @@ const ProfileVideoDisplay: React.FC<ProfileVideoDisplayProps> = ({
           videoUrl={videoUrl}
           className="w-full h-full shadow-2xl"
           onVideoEnd={handleVideoEnd}
+          onVideoError={handleVideoError}
           autoPlay={true}
         />
       )}
