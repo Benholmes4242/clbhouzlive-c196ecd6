@@ -590,7 +590,7 @@ const HeroProfileHeader = ({
                 className="w-full bg-muted border border-border border-t-0 rounded-b-lg py-1 px-2"
                 style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
               >
-                <div className="grid grid-cols-3 gap-4">
+                <div className="flex items-center justify-around w-full">
                   <div className="text-center">
                     <div className="font-bold text-foreground text-lg">
                       {ratedCoursesCount}
