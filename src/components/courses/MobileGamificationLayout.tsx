@@ -234,15 +234,6 @@ const MobileGamificationLayout: React.FC<MobileGamificationLayoutProps> = ({
                 </div>
               ))}
             </div>
-            {/* Peek indicator for next card */}
-            <div className="flex justify-center mt-2 gap-1">
-              {regionalProgress.lists.map((_, index) => (
-                <div 
-                  key={index} 
-                  className="w-2 h-2 rounded-full bg-muted-foreground/30"
-                />
-              ))}
-            </div>
           </div>
         </div>
       </div>
