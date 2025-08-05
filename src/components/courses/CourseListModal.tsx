@@ -67,6 +67,11 @@ export const CourseListModal: React.FC<CourseListModalProps> = ({
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState<'name' | 'location' | 'difficulty'>('name');
   
+  // Early return if region is null to prevent crashes
+  if (!region) {
+    return null;
+  }
+  
   const courses = useMemo(() => 
     generateMockCourses(region.id, region.total, region.completed),
     [region.id, region.total, region.completed]
