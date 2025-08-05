@@ -6,6 +6,7 @@ import BottomNavigation from '@/components/BottomNavigation';
 import UserProfileLoader from '@/components/profile/UserProfileLoader';
 import UserProfileContent from '@/components/profile/UserProfileContent';
 import { useUserProfileQueries } from '@/hooks/useUserProfileQueries';
+import { createDynamicBackgroundStyle } from '@/utils/backgroundGenerator';
 
 const UserProfilePage = () => {
   const { username } = useParams<{ username: string }>();
@@ -40,6 +41,14 @@ const UserProfilePage = () => {
             href={profile.profile_photo_url}
           />
         </>
+      )}
+      
+      {/* Blurred Background from Profile Photo */}
+      {profile?.profile_photo_url && (
+        <div 
+          className="fixed top-0 left-0 w-full h-[200px] z-0"
+          style={createDynamicBackgroundStyle(profile.profile_photo_url)}
+        />
       )}
       
       {/* Header */}
