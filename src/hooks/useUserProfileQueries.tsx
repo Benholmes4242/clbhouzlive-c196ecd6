@@ -57,10 +57,10 @@ export const useUserProfileQueries = () => {
     },
     enabled: !!username,
     retry: 2, // Reduced retries for faster failure
-    staleTime: 1000 * 60 * 10, // 10 minutes - longer cache
-    gcTime: 1000 * 60 * 15, // 15 minutes - keep in memory longer
-    refetchOnWindowFocus: false, // Don't refetch on focus
-    refetchOnMount: false, // Don't refetch on mount if data exists
+    staleTime: 1000 * 30, // 30 seconds - much shorter cache for profile updates
+    gcTime: 1000 * 60 * 5, // 5 minutes - shorter memory cache
+    refetchOnWindowFocus: true, // Refetch when user focuses window
+    refetchOnMount: true, // Always refetch on mount to get latest data
   });
 
   // Fetch current user profile to get user_type - only if needed
