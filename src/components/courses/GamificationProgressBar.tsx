@@ -420,10 +420,10 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                       style={{ scrollPaddingLeft: '8px', scrollPaddingRight: '8px' }}
                     >
                       {globalTrophies.map((trophy, index) => (
-                        <div 
-                          key={trophy.id} 
-                          className="flex-none w-[calc(50%-8px)] flex flex-col items-center space-y-3 cursor-pointer hover:scale-105 transition-all duration-300 snap-start p-4 rounded-xl bg-background/50 border border-border/50"
-                          style={{ filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1))' }}
+                         <div 
+                           key={trophy.id} 
+                           className="relative flex-none w-[calc(50%-8px)] flex flex-col items-center space-y-3 cursor-pointer hover:scale-105 transition-all duration-300 snap-start p-4 rounded-xl bg-background/50 border border-border/50 pb-6"
+                           style={{ filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1))' }}
                           onClick={() => {
                             setSelectedTrophy({
                               ...trophy,
