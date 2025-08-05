@@ -100,26 +100,34 @@ serve(async (req) => {
     // Generate video compilation (simulated for now)
     const compiledVideo = await compileVideos(downloadedVideos, compilationPlan)
     
-    // Upload compiled video
+    // Upload compiled video to Cloudflare Stream
     const fileName = `compilation-${user.id}-${Date.now()}.mp4`
-    console.log('AI Video Compilation: Uploading compiled video:', fileName)
+    console.log('AI Video Compilation: Uploading compiled video to Cloudflare Stream:', fileName)
     
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from('post-media')
-      .upload(fileName, compiledVideo, {
-        contentType: 'video/mp4',
-        upsert: false
-      })
+    // Create a File object from the video data for Cloudflare Stream upload
+    const videoFile = new File([compiledVideo], fileName, { type: 'video/mp4' })
+    const formData = new FormData()
+    formData.append('file', videoFile)
+    formData.append('metadata', JSON.stringify({
+      name: `AI Golf Compilation - ${Date.now()}`,
+      requireSignedURLs: false,
+      allowedOrigins: ['*']
+    }))
 
-    if (uploadError) {
-      console.error('AI Video Compilation: Upload error:', uploadError)
-      throw new Error(`Failed to upload compiled video: ${uploadError.message}`)
+    // Call Cloudflare Stream upload function
+    const { data: streamData, error: streamError } = await supabase.functions.invoke('cloudflare-stream-upload', {
+      body: formData,
+      headers: {
+        'Authorization': `Bearer ${authHeader.replace('Bearer ', '')}`,
+      },
+    })
+
+    if (streamError || !streamData?.success) {
+      console.error('AI Video Compilation: Cloudflare Stream upload error:', streamError)
+      throw new Error(`Failed to upload compiled video to Cloudflare Stream: ${streamError?.message || streamData?.error}`)
     }
 
-    // Get public URL
-    const { data: { publicUrl } } = supabase.storage
-      .from('post-media')
-      .getPublicUrl(uploadData.path)
+    const publicUrl = streamData.playbackUrl || streamData.hlsUrl
 
     console.log('AI Video Compilation: Video uploaded successfully:', publicUrl)
 
