@@ -142,7 +142,16 @@ export const useUserAchievements = (limit: number = 5) => {
   useEffect(() => {
     if (!user?.id) return;
 
-    const channelName = `user_achievements_${user.id}_${Date.now()}`;
+    const channelName = `user_achievements_${user.id}`;
+    
+    // First, try to remove any existing channel with the same name
+    const existingChannels = supabase.getChannels();
+    const existingChannel = existingChannels.find(ch => ch.topic === channelName);
+    if (existingChannel) {
+      console.log('Removing existing user achievements channel:', channelName);
+      supabase.removeChannel(existingChannel);
+    }
+    
     const channel = supabase
       .channel(channelName)
       .on(
