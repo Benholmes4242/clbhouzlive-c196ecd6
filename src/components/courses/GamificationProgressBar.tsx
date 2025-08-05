@@ -301,8 +301,12 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
   return (
     <Tooltip.Provider>
       <div className={cn('space-y-6', className)}>
-        {/* Background Container matching stats bar */}
-        <div className="bg-muted border border-border rounded-xl p-6 space-y-6 relative overflow-hidden">
+        {/* Container that prevents trophy clipping on mobile */}
+        <div className={cn(
+          'space-y-6 relative',
+          'md:bg-muted md:border md:border-border md:rounded-xl md:p-6 md:overflow-hidden',
+          'px-4' // Mobile padding only
+        )}>
           
           {/* Floating XP Animation */}
           {showXPFloat && (
