@@ -111,7 +111,7 @@ const MobileGamificationLayout: React.FC<MobileGamificationLayoutProps> = ({
                     alt="Green Fee Rookie Trophy" 
                     className={cn(
                        'h-20 w-auto object-contain transition-all duration-300',
-                      trophy.isUnlocked ? 'opacity-100 animate-bounce' : 'opacity-40 grayscale'
+                       trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
                     )}
                     style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(251, 191, 36, 0.6))' : 'none' }}
                   />
@@ -121,7 +121,7 @@ const MobileGamificationLayout: React.FC<MobileGamificationLayoutProps> = ({
                     alt="The Turn Trophy"
                     className={cn(
                        'h-20 w-auto object-contain transition-all duration-300',
-                      trophy.isUnlocked ? 'opacity-100 animate-bounce' : 'opacity-40 grayscale'
+                       trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
                     )}
                     style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(148, 163, 184, 0.6))' : 'none' }}
                   />
@@ -131,7 +131,7 @@ const MobileGamificationLayout: React.FC<MobileGamificationLayoutProps> = ({
                     alt="Century Club Trophy" 
                     className={cn(
                        'h-20 w-auto object-contain transition-all duration-300',
-                      trophy.isUnlocked ? 'opacity-100 animate-bounce' : 'opacity-40 grayscale'
+                       trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
                     )}
                     style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(59, 130, 246, 0.6))' : 'none' }}
                   />
@@ -141,7 +141,7 @@ const MobileGamificationLayout: React.FC<MobileGamificationLayoutProps> = ({
                     alt="Clubhouse Elite Trophy" 
                     className={cn(
                       'h-20 w-auto object-contain transition-all duration-300',
-                      trophy.isUnlocked ? 'opacity-100 animate-bounce' : 'opacity-40 grayscale'
+                       trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
                     )}
                     style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(34, 197, 94, 0.6))' : 'none' }}
                   />

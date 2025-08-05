@@ -421,7 +421,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                          alt="Green Fee Rookie Trophy" 
                          className={cn(
                             'h-16 w-auto object-contain transition-all duration-300',
-                           trophy.isUnlocked ? 'opacity-100 animate-bounce' : 'opacity-40 grayscale'
+                            trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
                          )}
                          style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(251, 191, 36, 0.6))' : 'none' }}
                        />
@@ -431,7 +431,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                          alt="The Turn Trophy"
                          className={cn(
                             'h-16 w-auto object-contain transition-all duration-300',
-                           trophy.isUnlocked ? 'opacity-100 animate-bounce' : 'opacity-40 grayscale'
+                            trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
                          )}
                          style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(148, 163, 184, 0.6))' : 'none' }}
                        />
@@ -441,7 +441,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                          alt="Century Club Trophy" 
                          className={cn(
                             'h-16 w-auto object-contain transition-all duration-300',
-                           trophy.isUnlocked ? 'opacity-100 animate-bounce' : 'opacity-40 grayscale'
+                            trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
                          )}
                          style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(59, 130, 246, 0.6))' : 'none' }}
                        />
@@ -451,7 +451,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                          alt="Clubhouse Elite Trophy" 
                          className={cn(
                             'h-16 w-auto object-contain transition-all duration-300',
-                           trophy.isUnlocked ? 'opacity-100 animate-bounce' : 'opacity-40 grayscale'
+                            trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
                          )}
                          style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(16, 185, 129, 0.6))' : 'none' }}
                        />
@@ -461,7 +461,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                          alt="Course Collector Trophy" 
                          className={cn(
                            'h-16 w-auto object-contain transition-all duration-300',
-                           trophy.isUnlocked ? 'opacity-100 animate-bounce' : 'opacity-40 grayscale'
+                            trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
                          )}
                          style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(147, 51, 234, 0.6))' : 'none' }}
                        />
@@ -469,7 +469,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                        <div className={cn(
                          'h-16 w-16 rounded-full flex items-center justify-center bg-gradient-to-br transition-all duration-300',
                          trophy.color,
-                         trophy.isUnlocked ? 'opacity-100 animate-bounce' : 'opacity-40 grayscale'
+                         trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
                        )}
                        style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(0, 0, 0, 0.3))' : 'none' }}
                        >
