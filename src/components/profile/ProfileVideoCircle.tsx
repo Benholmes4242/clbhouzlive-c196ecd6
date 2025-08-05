@@ -37,28 +37,36 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
     const video = videoRef.current;
     if (!video || !videoUrl || hasPlayed) return;
 
-    const playVideo = async () => {
+    const handleCanPlayThrough = async () => {
       try {
         video.muted = true; // Ensure muted for autoplay
+        video.currentTime = 0; // Start from beginning
         await video.play();
         setIsPlaying(true);
         setHasPlayed(true);
+        console.log('Profile video auto-play successful');
         
-        // After video ends, show thumbnail
-        video.addEventListener('ended', () => {
+        // Set up ended listener
+        const handleEnded = () => {
           setIsPlaying(false);
           video.currentTime = 0; // Reset to first frame
           video.pause();
-        });
+        };
+        
+        video.addEventListener('ended', handleEnded);
+        return () => video.removeEventListener('ended', handleEnded);
       } catch (error) {
         console.error('Auto-play failed:', error);
         setHasPlayed(true); // Mark as played even if failed to prevent retry
       }
     };
 
-    // Add a small delay to ensure video is loaded
-    const timer = setTimeout(playVideo, 500);
-    return () => clearTimeout(timer);
+    video.addEventListener('canplaythrough', handleCanPlayThrough);
+    video.load(); // Ensure video starts loading
+
+    return () => {
+      video.removeEventListener('canplaythrough', handleCanPlayThrough);
+    };
   }, [videoUrl, hasPlayed]);
 
   const handleFileSelect = () => {
@@ -124,13 +132,17 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
     }
   };
 
-  const replayVideo = () => {
+  const replayVideo = async () => {
     const video = videoRef.current;
     if (video && videoUrl) {
-      video.currentTime = 0;
-      video.muted = isMuted;
-      video.play();
-      setIsPlaying(true);
+      try {
+        video.currentTime = 0;
+        video.muted = isMuted;
+        await video.play();
+        setIsPlaying(true);
+      } catch (error) {
+        console.error('Replay failed:', error);
+      }
     }
   };
 
@@ -150,7 +162,8 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
             className="w-full h-full object-cover"
             playsInline
             muted={isMuted}
-            preload="metadata"
+            preload="auto"
+            crossOrigin="anonymous"
           />
           
           {/* Video Controls Overlay */}

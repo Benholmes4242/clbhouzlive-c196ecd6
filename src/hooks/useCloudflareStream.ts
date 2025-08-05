@@ -50,17 +50,34 @@ export const useCloudflareStream = () => {
         maxDurationSeconds: 20
       }));
 
-      // For now, we'll use a simplified approach where we return mock data
-      // In production, this would be handled by an edge function with proper API tokens
+      // For now, let's upload to Supabase storage as a fallback
+      // This will allow videos to play while we set up proper Cloudflare Stream integration
       
-      // Simulate successful upload
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const fileExt = file.name.split('.').pop() || 'mp4';
+      const fileName = `profile-video-${Date.now()}.${fileExt}`;
+      const filePath = `profile-videos/${fileName}`;
+
+      // Upload to Supabase storage
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('post-media')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+      // Get public URL
+      const { data: urlData } = supabase.storage
+        .from('post-media')
+        .getPublicUrl(filePath);
+
+      const videoUrl = urlData.publicUrl;
       
-      // Generate mock URLs (these should be replaced with actual Cloudflare Stream URLs)
-      const videoId = `mock-${Date.now()}`;
-      const accountId = accountData.CLOUDFLARE_ACCOUNT_ID.toLowerCase();
-      const videoUrl = `https://customer-${accountId}.cloudflarestream.com/${videoId}/manifest/video.m3u8`;
-      const thumbnailUrl = `https://customer-${accountId}.cloudflarestream.com/${videoId}/thumbnails/thumbnail.jpg`;
+      // For thumbnail, we'll use the video URL itself (browsers can generate thumbnails)
+      const thumbnailUrl = videoUrl;
 
       return {
         success: true,
