@@ -189,10 +189,10 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
                     variant="ghost"
                     onClick={handleFileSelect}
                     disabled={uploading}
-                    className="bg-black/50 hover:bg-black/70 text-white border-0"
+                    className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full px-3 py-1 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
                     title="Change video"
                   >
-                    <Upload className="w-4 h-4" />
+                    <span className="text-xs font-medium">Change Video</span>
                   </Button>
                 )}
               </div>
