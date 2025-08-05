@@ -504,18 +504,20 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                              </div>
                            </div>
                            
-                           {/* Full-width progress bar connected to bottom of card */}
-                           <div className="absolute bottom-0 left-0 right-0">
-                             <div className="w-full bg-gray-200 h-1.5 overflow-hidden rounded-b-xl">
-                               <div
-                                 className="h-1.5 transition-all duration-500 ease-out rounded-b-xl"
-                                 style={{ 
-                                   width: `${Math.min((completedCount / trophy.requiredCourses) * 100, 100)}%`,
-                                   backgroundColor: '#22c55e',
-                                   filter: 'drop-shadow(0 0 4px rgba(34, 197, 94, 0.4))'
-                                 }}
-                               />
-                             </div>
+                            {/* Full-width progress bar connected to bottom of card */}
+                            <div className="absolute bottom-0 left-0 right-0 z-10">
+                              <div className="w-full bg-gray-200 h-1.5 overflow-hidden" style={{ borderBottomLeftRadius: '12px', borderBottomRightRadius: '12px' }}>
+                                <div
+                                  className="h-1.5 transition-all duration-500 ease-out"
+                                  style={{ 
+                                    width: `${Math.min((completedCount / trophy.requiredCourses) * 100, 100)}%`,
+                                    backgroundColor: '#22c55e',
+                                    filter: 'drop-shadow(0 0 4px rgba(34, 197, 94, 0.4))',
+                                    borderBottomLeftRadius: '12px',
+                                    borderBottomRightRadius: '12px'
+                                  }}
+                                />
+                              </div>
                            </div>
                          </div>
                       ))}
