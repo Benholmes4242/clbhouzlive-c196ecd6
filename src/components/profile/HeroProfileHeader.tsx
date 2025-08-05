@@ -31,6 +31,7 @@ import { Swords } from 'lucide-react';
 import ProfileVideoCircle from './ProfileVideoCircle';
 import { useCloudflareStream } from '@/hooks/useCloudflareStream';
 import { useR2Upload } from '@/hooks/useR2Upload';
+import { BsThreeDotsVertical } from 'react-icons/bs';
 
 interface Course {
   id: string;
@@ -581,7 +582,7 @@ const HeroProfileHeader = ({
                   className="flex items-center justify-center p-2 text-muted-foreground hover:text-foreground transition-colors duration-200 flex-shrink-0"
                   aria-label="See all stats"
                 >
-                  <span className="text-lg font-bold">⋯</span>
+                  <BsThreeDotsVertical className="w-4 h-4" />
                 </button>
               </div>
             </div>
@@ -629,7 +630,7 @@ const HeroProfileHeader = ({
                   
                   {/* Empty space to match three-dot button width */}
                   <div className="flex items-center justify-center p-2 opacity-0 flex-shrink-0">
-                    <span className="text-lg font-bold">⋯</span>
+                    <BsThreeDotsVertical className="w-4 h-4" />
                   </div>
                 </div>
               </div>
