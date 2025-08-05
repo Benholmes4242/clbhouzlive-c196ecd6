@@ -107,26 +107,30 @@ serve(async (req) => {
       useAiAssist
     })
 
-    // For now, return the best analyzed video as the compilation
-    // In the future, this would be a real compilation based on the plan
-    let bestVideoIndex = 0
-    let highestScore = 0
+    // Create the actual video compilation using FFmpeg
+    console.log('AI Video Compilation: Starting video compilation process')
+    const compiledVideoData = await compileVideos(videoUrls, compilationPlan)
     
-    // Find the video with the highest scoring moment
-    videoAnalyses.forEach((analysis, index) => {
-      if (analysis.bestMoments && analysis.bestMoments.length > 0) {
-        const topScore = analysis.bestMoments[0].score
-        if (topScore > highestScore) {
-          highestScore = topScore
-          bestVideoIndex = index
-        }
-      }
-    })
+    // Upload compiled video to Supabase storage
+    const fileName = `compilation_${user.id}_${Date.now()}.mp4`
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('post-media')
+      .upload(fileName, compiledVideoData, {
+        contentType: 'video/mp4',
+        upsert: false
+      })
     
-    const publicUrl = videoUrls[bestVideoIndex]
-    console.log('AI Video Compilation: Selected best video (index', bestVideoIndex, ') with score', highestScore)
-
-    console.log('AI Video Compilation: Video uploaded successfully:', publicUrl)
+    if (uploadError) {
+      console.error('AI Video Compilation: Upload error:', uploadError)
+      throw new Error(`Failed to upload compiled video: ${uploadError.message}`)
+    }
+    
+    // Get public URL for the compiled video
+    const { data: { publicUrl } } = supabase.storage
+      .from('post-media')
+      .getPublicUrl(fileName)
+    
+    console.log('AI Video Compilation: Compiled video uploaded successfully:', publicUrl)
 
     // Generate suggested caption
     const suggestedCaption = generateSuggestedCaption(videoUrls.length, useAiAssist)
@@ -455,33 +459,118 @@ function createCompilationPlan(
   }
 }
 
-// Simulate video compilation - for now, return the first video as the "compilation"
+// Real video compilation using FFmpeg
 async function compileVideos(
-  videoData: Uint8Array[], 
+  videoUrls: string[], 
   compilationPlan: any
 ): Promise<Uint8Array> {
-  // In a real implementation, this would use FFmpeg or similar to:
-  // 1. Extract specified segments from each video
-  // 2. Apply transitions between clips
-  // 3. Add intro/outro if specified
-  // 4. Compress and optimize the final video
+  console.log('AI Video Compilation: Starting real video compilation with FFmpeg')
   
-  console.log('AI Video Compilation: Processing video compilation')
-  
-  // Simulate processing time
-  await new Promise(resolve => setTimeout(resolve, 2000))
-  
-  // For now, return the first video as the "compiled" result
-  // This ensures we have a valid video file that can actually be played
-  const primaryVideo = videoData[0]
-  
-  if (!primaryVideo || primaryVideo.length === 0) {
-    throw new Error('No valid video data to compile')
+  try {
+    // Create temporary directory for processing
+    const tempDir = await Deno.makeTempDir({ prefix: 'video_compilation_' })
+    console.log('AI Video Compilation: Created temp directory:', tempDir)
+    
+    const segmentFiles: string[] = []
+    
+    // Process each clip in the compilation plan
+    for (let i = 0; i < compilationPlan.clips.length; i++) {
+      const clip = compilationPlan.clips[i]
+      const videoUrl = videoUrls[clip.videoIndex]
+      const outputPath = `${tempDir}/segment_${i}.mp4`
+      
+      console.log(`AI Video Compilation: Processing clip ${i + 1}/${compilationPlan.clips.length}`)
+      console.log(`AI Video Compilation: Extracting ${clip.start}s to ${clip.end}s from video ${clip.videoIndex}`)
+      
+      // Download and extract segment using FFmpeg
+      const ffmpegCmd = [
+        'ffmpeg',
+        '-y', // Overwrite output files
+        '-i', videoUrl, // Input video URL
+        '-ss', clip.start.toString(), // Start time
+        '-t', (clip.end - clip.start).toString(), // Duration
+        '-c:v', 'libx264', // Video codec
+        '-c:a', 'aac', // Audio codec
+        '-preset', 'fast', // Encoding preset for speed
+        '-crf', '23', // Quality setting
+        outputPath
+      ]
+      
+      const process = new Deno.Command('ffmpeg', {
+        args: ffmpegCmd.slice(1),
+        stdout: 'piped',
+        stderr: 'piped'
+      })
+      
+      const { code, stderr } = await process.output()
+      
+      if (code !== 0) {
+        const errorText = new TextDecoder().decode(stderr)
+        console.error(`AI Video Compilation: FFmpeg error for clip ${i}:`, errorText)
+        throw new Error(`Failed to extract clip ${i}: ${errorText}`)
+      }
+      
+      segmentFiles.push(outputPath)
+      console.log(`AI Video Compilation: Successfully extracted clip ${i} to ${outputPath}`)
+    }
+    
+    // Create concat file for FFmpeg
+    const concatFilePath = `${tempDir}/concat.txt`
+    const concatContent = segmentFiles
+      .map(file => `file '${file}'`)
+      .join('\n')
+    
+    await Deno.writeTextFile(concatFilePath, concatContent)
+    console.log('AI Video Compilation: Created concat file with', segmentFiles.length, 'segments')
+    
+    // Merge all segments into final compilation
+    const finalOutputPath = `${tempDir}/compilation.mp4`
+    const mergeCmd = [
+      'ffmpeg',
+      '-y',
+      '-f', 'concat',
+      '-safe', '0',
+      '-i', concatFilePath,
+      '-c:v', 'libx264',
+      '-c:a', 'aac',
+      '-preset', 'fast',
+      '-crf', '23',
+      finalOutputPath
+    ]
+    
+    console.log('AI Video Compilation: Merging segments into final compilation')
+    const mergeProcess = new Deno.Command('ffmpeg', {
+      args: mergeCmd.slice(1),
+      stdout: 'piped',
+      stderr: 'piped'
+    })
+    
+    const { code: mergeCode, stderr: mergeStderr } = await mergeProcess.output()
+    
+    if (mergeCode !== 0) {
+      const errorText = new TextDecoder().decode(mergeStderr)
+      console.error('AI Video Compilation: FFmpeg merge error:', errorText)
+      throw new Error(`Failed to merge segments: ${errorText}`)
+    }
+    
+    // Read the final compiled video
+    const compiledVideo = await Deno.readFile(finalOutputPath)
+    console.log('AI Video Compilation: Successfully created compilation, size:', compiledVideo.length)
+    
+    // Clean up temporary files
+    try {
+      await Deno.remove(tempDir, { recursive: true })
+      console.log('AI Video Compilation: Cleaned up temporary files')
+    } catch (cleanupError) {
+      console.warn('AI Video Compilation: Failed to cleanup temp files:', cleanupError)
+    }
+    
+    return compiledVideo
+    
+  } catch (error) {
+    console.error('AI Video Compilation: Compilation failed:', error)
+    throw new Error(`Video compilation failed: ${error.message}`)
   }
-  
-  console.log('AI Video Compilation: Using first video as compilation result, size:', primaryVideo.length)
-  
-  return primaryVideo
 }
 
 // Generate AI-powered caption suggestion
