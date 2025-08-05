@@ -145,11 +145,21 @@ const MobileGamificationLayout: React.FC<MobileGamificationLayoutProps> = ({
                     )}
                     style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(34, 197, 94, 0.6))' : 'none' }}
                   />
+                ) : trophy.id === 'club-collector' ? (
+                  <img 
+                    src="/lovable-uploads/76e2f192-0d3a-4d19-87ec-49850b4d5e82.png" 
+                    alt="Club Collector Trophy" 
+                    className={cn(
+                      'h-20 w-auto object-contain transition-all duration-300',
+                       trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
+                    )}
+                    style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(251, 191, 36, 0.6))' : 'none' }}
+                  />
                 ) : (
                   <div 
                     className={cn(
                       'text-6xl transition-all duration-300',
-                      trophy.isUnlocked ? 'opacity-100 animate-bounce' : 'opacity-40 grayscale'
+                      trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
                     )}
                     style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(251, 191, 36, 0.6))' : 'none' }}
                   >
