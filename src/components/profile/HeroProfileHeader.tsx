@@ -543,8 +543,8 @@ const HeroProfileHeader = ({
               style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
             >
               <div className="flex items-center justify-between w-full px-4">
-                {/* Core Stats */}
-                <div className="flex items-center justify-around flex-1 space-x-2">
+                {/* Core Stats - Fixed width columns */}
+                <div className="flex items-center justify-center flex-1">
                   <div className="text-center">
                     <div className="font-bold text-foreground text-lg">
                       {profile?.eg_handicap_index ? profile.eg_handicap_index.toFixed(1) : '--'}
@@ -553,6 +553,8 @@ const HeroProfileHeader = ({
                       Handicap
                     </div>
                   </div>
+                </div>
+                <div className="flex items-center justify-center flex-1">
                   <div className="text-center">
                     <div className="font-bold text-foreground text-lg">
                       {postsCount}
@@ -561,6 +563,8 @@ const HeroProfileHeader = ({
                       Posts
                     </div>
                   </div>
+                </div>
+                <div className="flex items-center justify-center flex-1">
                   <div className="text-center">
                     <div className="font-bold text-foreground text-lg">
                       {followersCount}
@@ -574,7 +578,7 @@ const HeroProfileHeader = ({
                 {/* Three-dot trigger */}
                 <button
                   onClick={() => setIsStatsExpanded(!isStatsExpanded)}
-                  className="flex items-center justify-center p-2 text-muted-foreground hover:text-foreground transition-colors duration-200"
+                  className="flex items-center justify-center p-2 text-muted-foreground hover:text-foreground transition-colors duration-200 flex-shrink-0"
                   aria-label="See all stats"
                 >
                   <span className="text-lg font-bold">⋯</span>
@@ -591,8 +595,8 @@ const HeroProfileHeader = ({
                 style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
               >
                 <div className="flex items-center justify-between w-full px-4">
-                  {/* Additional Stats - aligned with top stats */}
-                  <div className="flex items-center justify-around flex-1 space-x-2">
+                  {/* Additional Stats - Exact same column widths */}
+                  <div className="flex items-center justify-center flex-1">
                     <div className="text-center">
                       <div className="font-bold text-foreground text-lg">
                         {ratedCoursesCount}
@@ -601,6 +605,8 @@ const HeroProfileHeader = ({
                         Rated Courses
                       </div>
                     </div>
+                  </div>
+                  <div className="flex items-center justify-center flex-1">
                     <div className="text-center">
                       <div className="font-bold text-foreground text-lg">
                         {averageRating > 0 ? `${averageRating}/10` : '--'}
@@ -609,6 +615,8 @@ const HeroProfileHeader = ({
                         Avg. Rating
                       </div>
                     </div>
+                  </div>
+                  <div className="flex items-center justify-center flex-1">
                     <div className="text-center">
                       <div className="font-bold text-foreground text-lg">
                         {followingCount}
@@ -620,7 +628,7 @@ const HeroProfileHeader = ({
                   </div>
                   
                   {/* Empty space to match three-dot button width */}
-                  <div className="flex items-center justify-center p-2 opacity-0">
+                  <div className="flex items-center justify-center p-2 opacity-0 flex-shrink-0">
                     <span className="text-lg font-bold">⋯</span>
                   </div>
                 </div>
