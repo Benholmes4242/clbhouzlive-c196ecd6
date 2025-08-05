@@ -360,18 +360,6 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
                                    size="lg" 
                                  />
                                )}
-                               
-                               <div className="text-center space-y-1 w-full">
-                                 <h6 className="font-semibold text-sm text-foreground">
-                                   {trophy.name}
-                                 </h6>
-                                 <p className="text-xs text-muted-foreground">
-                                   {trophy.requiredCourses} courses
-                                 </p>
-                                 <div className="text-xs font-medium text-primary">
-                                   {trophy.xp.toLocaleString()} XP
-                                 </div>
-                               </div>
                              </div>
                             </Tooltip.Trigger>
                             <Tooltip.Portal>
@@ -428,18 +416,6 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
                                 size="lg" 
                               />
                             )}
-                            
-                            <div className="text-center space-y-1">
-                              <h6 className="font-semibold text-sm text-foreground">
-                                {trophy.name}
-                              </h6>
-                              <p className="text-xs text-muted-foreground">
-                                {trophy.requiredCourses} courses
-                              </p>
-                              <div className="text-xs font-medium text-primary">
-                                {trophy.xp.toLocaleString()} XP
-                              </div>
-                            </div>
                           </div>
                         </Tooltip.Trigger>
                         <Tooltip.Portal>
