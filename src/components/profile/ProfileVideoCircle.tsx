@@ -38,14 +38,6 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
   const [showVideo, setShowVideo] = useState(true); // true = show video, false = show photo
   const { toast } = useToast();
 
-  console.log('ProfileVideoCircle - Debug props:', {
-    videoUrl,
-    profilePhotoUrl,
-    showVideo,
-    hasPlayed,
-    displayName
-  });
-
   // Auto-play video once when component mounts and video is available
   useEffect(() => {
     const video = videoRef.current;
@@ -59,7 +51,6 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
         setIsPlaying(true);
         setHasPlayed(true);
         setShowVideo(true); // Ensure video is visible when playing
-        console.log('Profile video auto-play successful');
         
         // Set up time update listener for smooth transition
         const handleTimeUpdate = () => {
@@ -256,9 +247,7 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
               className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
                 !showVideo ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
               }`}
-              onLoad={() => console.log('4K Profile photo loaded successfully:', profilePhotoUrl)}
               onError={(e) => {
-                console.error('Profile photo failed to load:', profilePhotoUrl, e);
                 // Fallback to original URL without optimization
                 e.currentTarget.src = profilePhotoUrl;
               }}
