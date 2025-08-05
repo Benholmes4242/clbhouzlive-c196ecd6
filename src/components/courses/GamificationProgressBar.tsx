@@ -10,6 +10,7 @@ import { useUserAchievements } from '@/hooks/useUserAchievements';
 import { useFriendsLeaderboard } from '@/hooks/useFriendsLeaderboard';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import FriendsLeaderboard from './friends/FriendsLeaderboard';
+import MobileGamificationLayout from './MobileGamificationLayout';
 
 interface GamificationProgressBarProps {
   completedCount: number;
@@ -397,8 +398,8 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                     );
                   })}
                   </div>
-               {/* Trophy Points with improved shadows */}
-                <div className="flex justify-between items-start relative z-10">
+               {/* Desktop Trophy Points with improved shadows */}
+                <div className="hidden md:flex justify-between items-start relative z-10">
                  {globalTrophies.map((trophy, index) => (
                    <div 
                      key={trophy.id} 
@@ -486,7 +487,21 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                    </div>
                   ))}
                  </div>
-             </div>
+               </div>
+
+               {/* Mobile Gamification Layout */}
+               <MobileGamificationLayout
+                 globalTrophies={globalTrophies}
+                 regionalProgress={regionalProgress}
+                 onTrophyClick={(trophy) => {
+                   setSelectedTrophy(trophy);
+                   setIsModalOpen(true);
+                 }}
+                 onRegionalCardClick={(list) => {
+                   setSelectedCourseList(list);
+                   setIsCourseListModalOpen(true);
+                 }}
+               />
 
           </div>
 
@@ -502,7 +517,8 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
               </span>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {/* Desktop Regional Lists - Grid Layout */}
+            <div className="hidden md:grid grid-cols-2 md:grid-cols-4 gap-4">
               {regionalProgress.lists.map((list) => (
                 <div
                   key={list.id}
