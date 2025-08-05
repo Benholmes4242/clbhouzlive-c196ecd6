@@ -135,15 +135,15 @@ const MobileGamificationLayout: React.FC<MobileGamificationLayoutProps> = ({
                     )}
                     style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(59, 130, 246, 0.6))' : 'none' }}
                   />
-                ) : trophy.id === 'clubhouse-elite' ? (
+                ) : trophy.id === 'club-collector' ? (
                   <img 
-                    src="/lovable-uploads/a9672498-b79d-4a47-9e6a-1128770700c9.png" 
-                    alt="Clubhouse Elite Trophy" 
+                    src="/lovable-uploads/76e2f192-0d3a-4d19-87ec-49850b4d5e82.png" 
+                    alt="Club Collector Trophy" 
                     className={cn(
                       'h-20 w-auto object-contain transition-all duration-300',
                        trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
                     )}
-                    style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(34, 197, 94, 0.6))' : 'none' }}
+                    style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(251, 191, 36, 0.6))' : 'none' }}
                   />
                 ) : (
                   <div 
@@ -244,7 +244,7 @@ const MobileGamificationLayout: React.FC<MobileGamificationLayoutProps> = ({
                               : 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
                           }}
                         />
-                      ) : (
+                      ) : list.id === 'worldwide' ? (
                         <img 
                           src="/lovable-uploads/a9672498-b79d-4a47-9e6a-1128770700c9.png" 
                           alt="Worldwide Trophy" 
@@ -258,6 +258,8 @@ const MobileGamificationLayout: React.FC<MobileGamificationLayoutProps> = ({
                               : 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1))'
                           }}
                         />
+                      ) : (
+                        <div className="text-6xl">🏆</div>
                       )}
                     </div>
                   </div>
