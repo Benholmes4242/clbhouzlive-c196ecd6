@@ -639,7 +639,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
 
           {/* Friends Progress Section - Improved Card with enhanced spacing */}
           {isCurrentUser && (
-            <div className="pt-10">
+            <div className="pt-4 md:pt-10">
               {/* Divider Line */}
               <div className="mx-16 border-t border-gray-300/60 mb-2"></div>
               
