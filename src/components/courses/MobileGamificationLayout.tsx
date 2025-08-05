@@ -115,7 +115,8 @@ const MobileGamificationLayout: React.FC<MobileGamificationLayoutProps> = ({
       {/* Mobile Regional Lists - Single Card Carousel */}
       <div className="md:hidden pt-8">
         <div className="space-y-4">
-          <div className="flex items-center justify-end">
+          <div className="flex items-center justify-between">
+            <span className="text-lg font-semibold text-foreground">Regional List Completion</span>
             <span className="text-base font-medium text-foreground">
               {regionalProgress.lists.filter(list => list.completed >= list.total).length}/4 lists completed
             </span>
@@ -232,6 +233,15 @@ const MobileGamificationLayout: React.FC<MobileGamificationLayoutProps> = ({
                     </div>
                   </div>
                 </div>
+              ))}
+            </div>
+            {/* Peek indicator for next card */}
+            <div className="flex justify-center mt-2 gap-1">
+              {regionalProgress.lists.map((_, index) => (
+                <div 
+                  key={index} 
+                  className="w-2 h-2 rounded-full bg-muted-foreground/30"
+                />
               ))}
             </div>
           </div>
