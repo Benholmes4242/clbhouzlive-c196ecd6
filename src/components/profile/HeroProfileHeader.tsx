@@ -586,13 +586,13 @@ const HeroProfileHeader = ({
             <div className={`overflow-hidden transition-all duration-300 ease-in-out ${
               isStatsDrawerOpen ? 'max-h-20 opacity-100' : 'max-h-0 opacity-0'
             }`}>
-              <div 
-                className="w-full bg-muted border border-border border-t-0 rounded-b-lg py-1 px-2"
-                style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
-              >
-                <div className="flex items-center justify-between w-full">
-                  {/* Group B - Hidden Stats with same spacing as top row */}
-                  <div className="flex items-center justify-around flex-1 space-x-2">
+                <div 
+                  className="w-full bg-muted border border-border border-t-0 rounded-b-lg py-1 pl-1 pr-2"
+                  style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
+                >
+                  <div className="flex items-center justify-between w-full">
+                    {/* Group B - Hidden Stats with same spacing as top row */}
+                    <div className="flex items-center justify-around flex-1 space-x-2">
                     <div className="text-center">
                       <div className="font-bold text-foreground text-lg">
                         {ratedCoursesCount}
