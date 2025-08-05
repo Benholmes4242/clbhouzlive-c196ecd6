@@ -146,11 +146,21 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
     }
   };
 
+  const handleCircleClick = () => {
+    // Only allow click-to-replay for other users' profiles when video has ended
+    if (!isOwnProfile && hasPlayed && !isPlaying) {
+      replayVideo();
+    }
+  };
+
   return (
     <div 
-      className={`relative w-full h-full rounded-full overflow-hidden group ${className}`}
+      className={`relative w-full h-full rounded-full overflow-hidden group ${className} ${
+        !isOwnProfile && hasPlayed && !isPlaying ? 'cursor-pointer' : ''
+      }`}
       onMouseEnter={() => setShowControls(true)}
       onMouseLeave={() => setShowControls(false)}
+      onClick={handleCircleClick}
     >
       {videoUrl ? (
         <>
