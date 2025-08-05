@@ -15,8 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import CoursePickerModal from '@/components/profile/CoursePickerModal';
 import Top100Progress from './Top100Progress';
-import TrophyProgressSection from './TrophyProgressSection';
-import RegionalCompletionSection from './RegionalCompletionSection';
+import GamificationProgressBar from './GamificationProgressBar';
 
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
@@ -283,17 +282,9 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
       />
 
 
-      {/* Trophy Progress Section */}
-      <TrophyProgressSection 
+      {/* Gamification Progress Bar */}
+      <GamificationProgressBar 
         completedCount={allPlayedCourses.length}
-        userFirstName={finalDisplayName}
-        isCurrentUser={finalIsOwnProfile}
-      />
-
-      {/* Regional Completion Section */}
-      <RegionalCompletionSection 
-        userFirstName={finalDisplayName}
-        isCurrentUser={finalIsOwnProfile}
         britainIrelandCompleted={regionProgress?.['britain-ireland']?.played || 0}
         britainIrelandTotal={regionProgress?.['britain-ireland']?.total || 100}
         europeCompleted={regionProgress?.['europe']?.played || 0}
