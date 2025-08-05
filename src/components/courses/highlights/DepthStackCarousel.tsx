@@ -366,9 +366,12 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
           <div
             key={item.id}
             className={`flex-shrink-0 ${
-              isMobile ? 'w-[calc(100vw-6rem)]' : 'w-80'
+              isMobile ? 'w-[280px]' : 'w-80'
             }`}
-            style={{ scrollSnapAlign: 'start' }}
+            style={{ 
+              scrollSnapAlign: 'start',
+              ...(isMobile && index === carouselItems.length - 1 ? { marginRight: '16px' } : {})
+            }}
             onMouseEnter={() => !isMobile && setHoveredCardIndex(index)}
             onMouseLeave={() => !isMobile && setHoveredCardIndex(null)}
           >
