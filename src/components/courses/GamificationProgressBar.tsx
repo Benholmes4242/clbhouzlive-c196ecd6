@@ -489,19 +489,21 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                  </div>
                </div>
 
-               {/* Mobile Gamification Layout */}
-               <MobileGamificationLayout
-                 globalTrophies={globalTrophies}
-                 regionalProgress={regionalProgress}
-                 onTrophyClick={(trophy) => {
-                   setSelectedTrophy(trophy);
-                   setIsModalOpen(true);
-                 }}
-                 onRegionalCardClick={(list) => {
-                   setSelectedCourseList(list);
-                   setIsCourseListModalOpen(true);
-                 }}
-               />
+                {/* Mobile Gamification Layout */}
+                <MobileGamificationLayout
+                  globalTrophies={globalTrophies}
+                  regionalProgress={regionalProgress}
+                  completedCount={completedCount}
+                  friends={friends}
+                  onTrophyClick={(trophy) => {
+                    setSelectedTrophy(trophy);
+                    setIsModalOpen(true);
+                  }}
+                  onRegionalCardClick={(list) => {
+                    setSelectedCourseList(list);
+                    setIsCourseListModalOpen(true);
+                  }}
+                />
 
           </div>
 

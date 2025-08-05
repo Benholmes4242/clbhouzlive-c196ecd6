@@ -20,20 +20,76 @@ interface MobileGamificationLayoutProps {
   };
   onTrophyClick: (trophy: any) => void;
   onRegionalCardClick: (list: any) => void;
+  completedCount: number;
+  friends?: Array<{
+    id: string;
+    display_name?: string;
+    username?: string;
+    coursesPlayed: number;
+  }>;
 }
 
 const MobileGamificationLayout: React.FC<MobileGamificationLayoutProps> = ({
   globalTrophies,
   regionalProgress,
   onTrophyClick,
-  onRegionalCardClick
+  onRegionalCardClick,
+  completedCount,
+  friends = []
 }) => {
+  // Calculate progress for progress bar
+  const unlockedGlobalTrophies = globalTrophies.filter(trophy => trophy.isUnlocked);
+  const lastUnlockedTrophy = unlockedGlobalTrophies[unlockedGlobalTrophies.length - 1];
+  const nextGlobalTrophy = globalTrophies.find(trophy => !trophy.isUnlocked);
   return (
     <>
-      {/* Mobile Trophy Carousel - Show only 2 trophies at a time */}
+      {/* Mobile Trophy Carousel with Progress Bar - Show only 2 trophies at a time */}
       <div className="md:hidden relative z-10 py-4">
+        {/* Progress Line positioned in the middle of trophies */}
+        <div className="absolute top-12 left-8 right-8 h-3 bg-gray-200 rounded-full overflow-hidden shadow-sm z-0">
+          {nextGlobalTrophy && lastUnlockedTrophy && (
+            <div 
+              className="h-full bg-green-500 rounded-full transition-all duration-1000 ease-out shadow-sm"
+              style={{ 
+                width: `${((completedCount - lastUnlockedTrophy.requiredCourses) / (nextGlobalTrophy.requiredCourses - lastUnlockedTrophy.requiredCourses)) * 100}%`,
+                boxShadow: '0 0 8px rgba(16, 185, 129, 0.4)'
+              }}
+            />
+          )}
+          {nextGlobalTrophy && !lastUnlockedTrophy && completedCount < 20 && (
+            <div 
+              className="h-full bg-green-500 rounded-full transition-all duration-1000 ease-out shadow-sm animate-pulse"
+              style={{ 
+                width: `${(completedCount / nextGlobalTrophy.requiredCourses) * 20}%`,
+                boxShadow: '0 0 8px rgba(16, 185, 129, 0.4)'
+              }}
+            />
+          )}
+          
+          {/* Friend Progress Markers */}
+          {friends.length > 0 && friends.map((friend, index) => {
+            const friendProgress = (friend.coursesPlayed / 300) * 100;
+            if (friendProgress <= 0 || friendProgress >= 95) return null;
+            
+            return (
+              <div
+                key={friend.id}
+                className="absolute top-0 transform -translate-x-1/2 z-20"
+                style={{ left: `${friendProgress}%` }}
+              >
+                <div className="flex flex-col items-center">
+                  <div className="w-3 h-3 rounded-full bg-blue-500 border-2 border-white shadow-lg mb-1" />
+                  <div className="bg-background/90 text-foreground text-xs px-2 py-1 rounded whitespace-nowrap border border-border shadow-sm">
+                    🏁 {friend.display_name || friend.username} ({friend.coursesPlayed})
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        
         <div className="overflow-x-auto scrollbar-hide">
-          <div className="flex gap-8 snap-x snap-mandatory px-4 pb-4 pt-2" style={{ scrollSnapType: 'x mandatory' }}>
+          <div className="flex gap-8 snap-x snap-mandatory px-4 pb-4 pt-2 relative z-10" style={{ scrollSnapType: 'x mandatory' }}>
             {globalTrophies.map((trophy, index) => (
               <div 
                 key={trophy.id} 
