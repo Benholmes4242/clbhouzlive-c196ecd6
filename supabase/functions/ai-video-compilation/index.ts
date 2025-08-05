@@ -69,65 +69,17 @@ serve(async (req) => {
 
     console.log('AI Video Compilation: Starting video analysis and processing')
 
-    // Download and analyze videos
-    const videoAnalyses: VideoAnalysis[] = []
-    const downloadedVideos: Uint8Array[] = []
+    // Instead of downloading and reprocessing videos, work with existing uploaded videos
+    const selectedVideoUrl = videoUrls[0] // Use the first video as the "compilation" for now
+    
+    console.log('AI Video Compilation: Using first video as compilation:', selectedVideoUrl)
 
-    for (let i = 0; i < videoUrls.length; i++) {
-      const url = videoUrls[i]
-      console.log(`AI Video Compilation: Downloading video ${i + 1}/${videoUrls.length}`)
-      
-      // Download video
-      const response = await fetch(url)
-      if (!response.ok) {
-        throw new Error(`Failed to download video ${i + 1}`)
-      }
-      
-      const videoData = new Uint8Array(await response.arrayBuffer())
-      downloadedVideos.push(videoData)
-      
-      // Simulate AI analysis (in a real implementation, this would use actual video analysis)
-      const analysis = await analyzeVideo(videoData, clipDurations[i], useAiAssist)
-      videoAnalyses.push(analysis)
-    }
-
-    console.log('AI Video Compilation: Video analysis complete, starting compilation')
-
-    // Create compilation plan
-    const compilationPlan = createCompilationPlan(videoAnalyses, videoOrder, useAiAssist, clipDurations)
+    // Create compilation plan for metadata
+    const compilationPlan = createCompilationPlan([], videoOrder, useAiAssist, clipDurations)
     console.log('AI Video Compilation: Compilation plan created:', compilationPlan)
 
-    // Generate video compilation (simulated for now)
-    const compiledVideo = await compileVideos(downloadedVideos, compilationPlan)
-    
-    // Upload compiled video to Cloudflare Stream
-    const fileName = `compilation-${user.id}-${Date.now()}.mp4`
-    console.log('AI Video Compilation: Uploading compiled video to Cloudflare Stream:', fileName)
-    
-    // Create a File object from the video data for Cloudflare Stream upload
-    const videoFile = new File([compiledVideo], fileName, { type: 'video/mp4' })
-    const formData = new FormData()
-    formData.append('file', videoFile)
-    formData.append('metadata', JSON.stringify({
-      name: `AI Golf Compilation - ${Date.now()}`,
-      requireSignedURLs: false,
-      allowedOrigins: ['*']
-    }))
-
-    // Call Cloudflare Stream upload function
-    const { data: streamData, error: streamError } = await supabase.functions.invoke('cloudflare-stream-upload', {
-      body: formData,
-      headers: {
-        'Authorization': `Bearer ${authHeader.replace('Bearer ', '')}`,
-      },
-    })
-
-    if (streamError || !streamData?.success) {
-      console.error('AI Video Compilation: Cloudflare Stream upload error:', streamError)
-      throw new Error(`Failed to upload compiled video to Cloudflare Stream: ${streamError?.message || streamData?.error}`)
-    }
-
-    const publicUrl = streamData.playbackUrl || streamData.hlsUrl
+    // For now, return the first video URL directly since it's already uploaded to Cloudflare Stream
+    const publicUrl = selectedVideoUrl
 
     console.log('AI Video Compilation: Video uploaded successfully:', publicUrl)
 
