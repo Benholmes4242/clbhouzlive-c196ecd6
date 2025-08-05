@@ -347,14 +347,14 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
         </>
       )}
 
-      {/* Carousel container */}
+      {/* Carousel container with peek effect */}
       <div
         ref={(node) => {
           carouselRef(node);
           containerRef.current = node;
         }}
         className={`flex gap-4 overflow-x-auto scrollbar-hide ${
-          isMobile ? 'px-4 -mx-4' : ''
+          isMobile ? 'px-4 -mx-4' : 'px-16'
         }`}
         style={{
           scrollSnapType: 'x mandatory',
@@ -365,8 +365,10 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
         {carouselItems.map((item, index) => (
           <div
             key={item.id}
-            className={`flex-shrink-0 ${
-              isMobile ? 'w-[calc(100vw-6rem)]' : 'w-80'
+            className={`flex-shrink-0 transition-all duration-300 ${
+              isMobile 
+                ? 'w-[calc(100vw-8rem)]' // Smaller width on mobile to show peek of next card
+                : 'w-80'
             }`}
             style={{ scrollSnapAlign: 'start' }}
             onMouseEnter={() => !isMobile && setHoveredCardIndex(index)}
