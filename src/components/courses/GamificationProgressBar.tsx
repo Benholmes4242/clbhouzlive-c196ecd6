@@ -636,7 +636,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                             src="/lovable-uploads/7df94753-adb7-43b1-8ea8-380234f3318f.png" 
                             alt="British & Irish Trophy" 
                             className={cn(
-                              'h-16 w-auto object-contain transition-all duration-300',
+                              'h-20 w-auto object-contain transition-all duration-300',
                               list.isCompleted ? 'opacity-100 brightness-110' : 'opacity-60'
                             )}
                             style={{ 
@@ -650,7 +650,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                             src="/lovable-uploads/fa5756cb-1a89-478b-b8ad-8d26168c1f4f.png" 
                             alt="European Trophy" 
                             className={cn(
-                              'h-16 w-auto object-contain transition-all duration-300',
+                              'h-20 w-auto object-contain transition-all duration-300',
                               list.isCompleted ? 'opacity-100 brightness-110' : 'opacity-60'
                             )}
                             style={{ 
@@ -664,7 +664,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                             src="/lovable-uploads/7ae756b6-b8e6-4d03-a6ee-f8c336eec047.png" 
                             alt="USA Trophy" 
                             className={cn(
-                              'h-16 w-auto object-contain transition-all duration-300',
+                              'h-20 w-auto object-contain transition-all duration-300',
                               list.isCompleted ? 'opacity-100 brightness-110' : 'opacity-60'
                             )}
                             style={{ 
@@ -678,7 +678,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                             src="/lovable-uploads/ab0f852c-4e2f-408d-a13c-ef3a595470e8.png" 
                             alt="Worldwide Trophy" 
                             className={cn(
-                              'h-16 w-auto object-contain transition-all duration-300',
+                              'h-20 w-auto object-contain transition-all duration-300',
                               list.isCompleted ? 'opacity-100 brightness-110' : 'opacity-60'
                             )}
                             style={{ 
