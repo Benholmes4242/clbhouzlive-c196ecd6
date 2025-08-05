@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import HeroProfileHeader from './HeroProfileHeader';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import ProfileImagePreloader from '@/components/ui/profile-image-preloader';
+
 
 interface UserProfileContentProps {
   profile: any;
@@ -27,28 +27,6 @@ const UserProfileContent: React.FC<UserProfileContentProps> = ({
 
   return (
     <>
-      {/* Critical profile image preload - highest priority for instant loading */}
-      {profile.profile_photo_url && (
-        <>
-          <link 
-            rel="preload" 
-            as="image" 
-            href={profile.profile_photo_url}
-            fetchPriority="high"
-          />
-          <link 
-            rel="prefetch" 
-            as="image" 
-            href={profile.profile_photo_url}
-          />
-        </>
-      )}
-      
-      {/* Secondary preloader for fallback */}
-      <ProfileImagePreloader 
-        profilePhotoUrl={profile.profile_photo_url}
-        priority={true}
-      />
       
       <div className="w-full px-4 md:px-8">
         <HeroProfileHeader 

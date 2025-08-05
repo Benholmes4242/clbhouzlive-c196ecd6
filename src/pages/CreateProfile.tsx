@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useSupabaseSession } from "@/hooks/useSupabaseSession";
 import { supabase } from "@/integrations/supabase/client";
-import ProfilePhotoUploader from "@/components/profile/ProfilePhotoUploader";
+
 import BasicInfoForm from "@/components/profile/BasicInfoForm";
 import GolfInfoForm from "@/components/profile/GolfInfoForm";
 import UserTypeSelector from "@/components/profile/UserTypeSelector";
@@ -43,10 +43,6 @@ const CreateProfile = () => {
   const navigate = useNavigate();
   const [submitting, setSubmitting] = useState(false);
 
-  // Profile photo state
-  const [profilePhotoFile, setProfilePhotoFile] = useState<File | null>(null);
-  const [profilePhotoPreview, setProfilePhotoPreview] = useState<string | null>(null);
-  const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
   // Set username from auth metadata on component mount
   useEffect(() => {
@@ -80,10 +76,6 @@ const CreateProfile = () => {
     setSocialLinks(prev => ({ ...prev, [platform]: value }));
   };
 
-  const handlePhotoChange = (file: File | null) => {
-    setProfilePhotoFile(file);
-    setProfilePhotoPreview(file ? URL.createObjectURL(file) : null);
-  };
 
   const handleNext = () => {
     setStep(step + 1);
@@ -103,30 +95,12 @@ const CreateProfile = () => {
       return;
     }
 
-    let uploadedPhotoUrl: string | null = null;
-    if (profilePhotoFile) {
-      setUploadingPhoto(true);
-      
-      // Upload to Cloudflare R2 instead of Supabase storage
-      const { uploadToCloudflareR2 } = await import('@/utils/cloudflareUpload');
-      const uploadResult = await uploadToCloudflareR2(profilePhotoFile, 'avatars', `avatar.${profilePhotoFile.name.split('.').pop()}`);
-      
-      if (!uploadResult.success || !uploadResult.publicUrl) {
-        alert(uploadResult.error || "Failed to upload profile photo.");
-        setUploadingPhoto(false);
-        setSubmitting(false);
-        return;
-      }
-      
-      uploadedPhotoUrl = uploadResult.publicUrl;
-      setUploadingPhoto(false);
-    }
 
     // Prepare profile data based on user type
     const profileData: any = {
       id: user.id,
       user_type: userType === 'individual' ? 'individual' : 'club',
-      profile_photo_url: uploadedPhotoUrl,
+      
       bio: formData.bio,
       location: formData.location,
     };
@@ -170,15 +144,6 @@ const CreateProfile = () => {
           />
         );
       case 2:
-        return (
-          <ProfilePhotoUploader
-            profilePhotoPreview={profilePhotoPreview}
-            uploadingPhoto={uploadingPhoto}
-            submitting={submitting}
-            onPhotoChange={handlePhotoChange}
-          />
-        );
-      case 3:
         return userType === 'individual' ? (
           <div className="space-y-4">
             <h2 className="text-xl font-semibold">Basic Information</h2>
@@ -203,7 +168,7 @@ const CreateProfile = () => {
             onSelectChange={handleSelectChange}
           />
         );
-      case 4:
+      case 3:
         return userType === 'individual' ? (
           <GolfInfoForm
             formData={{
@@ -227,19 +192,18 @@ const CreateProfile = () => {
   const getStepTitle = () => {
     switch (step) {
       case 1: return 'Account Type';
-      case 2: return 'Profile Photo';
-      case 3: return userType === 'individual' ? 'Basic Information' : 'Business Information';
-      case 4: return userType === 'individual' ? 'Golf Information' : 'Social Links';
+      
+      case 2: return userType === 'individual' ? 'Basic Information' : 'Business Information';
+      case 3: return userType === 'individual' ? 'Golf Information' : 'Social Links';
       default: return 'Create Profile';
     }
   };
 
-  const isLastStep = step === 4;
+  const isLastStep = step === 3;
   const canProceed = () => {
     switch (step) {
       case 1: return true;
-      case 2: return true;
-      case 3:
+      case 2:
         if (userType === 'individual') {
           return formData.name.trim() !== '';
         } else {
@@ -247,7 +211,7 @@ const CreateProfile = () => {
                  formData.businessType !== '' && 
                  formData.contactPersonName.trim() !== '';
         }
-      case 4: return true;
+      case 3: return true;
       default: return false;
     }
   };
@@ -282,13 +246,13 @@ const CreateProfile = () => {
         {/* Progress indicator */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-muted-foreground">Step {step} of 4</span>
+            <span className="text-sm text-muted-foreground">Step {step} of 3</span>
             <span className="text-sm font-medium">{getStepTitle()}</span>
           </div>
           <div className="w-full bg-secondary rounded-full h-2">
             <div 
               className="bg-primary h-2 rounded-full transition-all duration-300" 
-              style={{ width: `${(step / 4) * 100}%` }}
+              style={{ width: `${(step / 3) * 100}%` }}
             />
           </div>
         </div>
