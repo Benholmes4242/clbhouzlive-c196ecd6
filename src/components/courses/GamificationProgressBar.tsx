@@ -501,15 +501,12 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                    setSelectedCourseList(list);
                    setIsCourseListModalOpen(true);
                  }}
-                />
+               />
 
           </div>
 
-          {/* Divider Line */}
-          <div className="mx-16 border-t border-gray-300/60"></div>
-
           {/* Regional Lists Completion - Improved Cards with enhanced spacing */}
-          <div className="space-y-4 pt-8">
+          <div className="space-y-4 pt-4">
             <div className="hidden md:flex items-center justify-between">
               <span className="text-lg font-semibold text-foreground">Regional List Completion</span>
               <span className="text-base font-medium text-foreground">
@@ -642,7 +639,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
 
           {/* Friends Progress Section - Improved Card with enhanced spacing */}
           {isCurrentUser && (
-            <div className="pt-4">
+            <div className="pt-10">
               {/* Divider Line */}
               <div className="mx-16 border-t border-gray-300/60 mb-2"></div>
               
