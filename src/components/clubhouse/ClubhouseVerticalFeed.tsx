@@ -644,7 +644,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
               
               {/* Golf Course Tag - Top Right */}
               {item.golfCourse && (
-                <div className={`absolute ${isMobile ? (index === 0 ? 'top-20' : 'top-4') : 'top-1/2 -translate-y-[26rem]'} right-4 z-30`}>
+                <div className={`absolute ${isMobile ? (index === 0 ? 'top-32' : 'top-4') : 'top-1/2 -translate-y-[26rem]'} right-4 z-30`}>
                   <CoursePostBadge 
                     course={{
                       id: item.golfCourse.id,
