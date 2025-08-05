@@ -233,13 +233,13 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
             />
           )}
           
-          {/* Video Controls Overlay - Only show when video is visible */}
-          {showControls && showVideo && (
+          {/* Controls Overlay - Show for both video and photo states */}
+          {showControls && (
             <div className="absolute inset-0 bg-black/30 flex items-center justify-center transition-opacity">
               <div className="flex flex-col gap-2">
                 <div className="flex gap-2">
-                  {/* Replay Button */}
-                  {hasPlayed && !isPlaying && (
+                  {/* Replay Button - Only when video has played and stopped */}
+                  {hasPlayed && !isPlaying && showVideo && (
                     <Button
                       size="sm"
                       variant="ghost"
@@ -250,8 +250,25 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
                     </Button>
                   )}
                   
-                  {/* Edit Video Button - Only for own profile */}
-                  {isOwnProfile && (
+                  {/* Play Button - Only when showing photo and video exists */}
+                  {!showVideo && videoUrl && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => {
+                        setShowVideo(true);
+                        replayVideo();
+                      }}
+                      className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full p-2 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
+                    >
+                      <Play className="w-4 h-4" />
+                    </Button>
+                  )}
+                </div>
+                
+                {/* Owner Controls - Always show both buttons for profile owners */}
+                {isOwnProfile && (
+                  <div className="flex flex-col gap-2">
                     <Button
                       size="sm"
                       variant="ghost"
@@ -262,39 +279,20 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
                     >
                       <span className="text-xs font-medium">Change Video</span>
                     </Button>
-                  )}
-                </div>
-                
-                {/* Change Photo Button - Only for own profile */}
-                {isOwnProfile && (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={handlePhotoSelect}
-                    disabled={uploading}
-                    className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full px-3 py-1 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
-                    title="Change profile photo"
-                  >
-                    <span className="text-xs font-medium">Change Photo</span>
-                  </Button>
+                    
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={handlePhotoSelect}
+                      disabled={uploading}
+                      className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full px-3 py-1 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
+                      title="Change profile photo"
+                    >
+                      <span className="text-xs font-medium">Change Photo</span>
+                    </Button>
+                  </div>
                 )}
               </div>
-            </div>
-          )}
-          
-          {/* Photo Controls Overlay - Only show when photo is visible */}
-          {showControls && !showVideo && profilePhotoUrl && isOwnProfile && (
-            <div className="absolute inset-0 bg-black/30 flex items-center justify-center transition-opacity">
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={handlePhotoSelect}
-                disabled={uploading}
-                className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full px-3 py-1 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
-                title="Change profile photo"
-              >
-                <span className="text-xs font-medium">Change Photo</span>
-              </Button>
             </div>
           )}
         </>
