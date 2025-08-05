@@ -8,6 +8,7 @@ interface ProfileVideoPlayerProps {
   thumbnailUrl?: string;
   className?: string;
   onVideoEnd?: () => void;
+  onVideoError?: () => void;
   autoPlay?: boolean;
 }
 
@@ -16,6 +17,7 @@ const ProfileVideoPlayer: React.FC<ProfileVideoPlayerProps> = ({
   thumbnailUrl,
   className = '',
   onVideoEnd,
+  onVideoError,
   autoPlay = true
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -29,34 +31,62 @@ const ProfileVideoPlayer: React.FC<ProfileVideoPlayerProps> = ({
     const video = videoRef.current;
     if (!video) return;
 
+    console.log('ProfileVideoPlayer - Loading video:', videoUrl);
+
     const handleLoadedData = () => {
+      console.log('ProfileVideoPlayer - Video loaded successfully');
       if (autoPlay && !hasPlayed) {
         video.play().then(() => {
           setIsPlaying(true);
           setHasPlayed(true);
-        }).catch(console.error);
+          console.log('ProfileVideoPlayer - Video playing');
+        }).catch((error) => {
+          console.error('ProfileVideoPlayer - Play failed:', error);
+        });
       }
     };
 
     const handleEnded = () => {
+      console.log('ProfileVideoPlayer - Video ended');
       setIsPlaying(false);
       setShowReplayButton(true);
       onVideoEnd?.();
     };
 
-    const handlePlay = () => setIsPlaying(true);
-    const handlePause = () => setIsPlaying(false);
+    const handlePlay = () => {
+      console.log('ProfileVideoPlayer - Video play event');
+      setIsPlaying(true);
+    };
+    
+    const handlePause = () => {
+      console.log('ProfileVideoPlayer - Video pause event');
+      setIsPlaying(false);
+    };
+
+    const handleError = (e: any) => {
+      console.error('ProfileVideoPlayer - Video error:', e);
+      console.error('ProfileVideoPlayer - Video error details:', video.error);
+      onVideoError?.();
+    };
+
+    const handleLoadStart = () => {
+      console.log('ProfileVideoPlayer - Video load started');
+    };
 
     video.addEventListener('loadeddata', handleLoadedData);
     video.addEventListener('ended', handleEnded);
     video.addEventListener('play', handlePlay);
     video.addEventListener('pause', handlePause);
+    video.addEventListener('error', handleError);
+    video.addEventListener('loadstart', handleLoadStart);
 
     return () => {
       video.removeEventListener('loadeddata', handleLoadedData);
       video.removeEventListener('ended', handleEnded);
       video.removeEventListener('play', handlePlay);
       video.removeEventListener('pause', handlePause);
+      video.removeEventListener('error', handleError);
+      video.removeEventListener('loadstart', handleLoadStart);
     };
   }, [autoPlay, hasPlayed, onVideoEnd]);
 

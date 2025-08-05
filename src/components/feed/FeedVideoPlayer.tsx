@@ -44,23 +44,38 @@ const FeedVideoPlayer = forwardRef<HTMLVideoElement, FeedVideoPlayerProps>(({
     // Check if HLS is needed
     const isHLS = src.includes('.m3u8') || src.includes('cloudflarestream.com');
     
+    console.log('FeedVideoPlayer - Video src:', src);
+    console.log('FeedVideoPlayer - Is HLS:', isHLS);
+    
     if (isHLS) {
       // Load HLS.js if not already loaded
       if (!window.Hls) {
+        console.log('FeedVideoPlayer - Loading HLS.js library');
         const script = document.createElement('script');
         script.src = 'https://cdn.jsdelivr.net/npm/hls.js@latest';
-        script.onload = () => initializeHLS();
+        script.onload = () => {
+          console.log('FeedVideoPlayer - HLS.js loaded');
+          initializeHLS();
+        };
+        script.onerror = () => {
+          console.error('FeedVideoPlayer - Failed to load HLS.js');
+          video.src = src; // Fallback to direct src
+        };
         document.head.appendChild(script);
       } else {
+        console.log('FeedVideoPlayer - HLS.js already available');
         initializeHLS();
       }
     } else {
       // Regular video
+      console.log('FeedVideoPlayer - Using regular video');
       video.src = src;
     }
 
     function initializeHLS() {
+      console.log('FeedVideoPlayer - Initializing HLS');
       if (window.Hls && window.Hls.isSupported()) {
+        console.log('FeedVideoPlayer - HLS is supported');
         const hls = new window.Hls({
           enableWorker: true,
           lowLatencyMode: true,
@@ -69,20 +84,30 @@ const FeedVideoPlayer = forwardRef<HTMLVideoElement, FeedVideoPlayerProps>(({
           maxMaxBufferLength: 60,
         });
 
+        console.log('FeedVideoPlayer - Loading HLS source:', src);
         hls.loadSource(src);
         hls.attachMedia(video);
         hlsRef.current = hls;
 
+        hls.on(window.Hls.Events.MANIFEST_LOADED, () => {
+          console.log('FeedVideoPlayer - HLS manifest loaded');
+        });
+
         hls.on(window.Hls.Events.ERROR, (event: any, data: any) => {
+          console.error('FeedVideoPlayer - HLS Error:', event, data);
           if (data.fatal) {
-            console.error('HLS Error:', data);
+            console.error('FeedVideoPlayer - Fatal HLS Error, trying fallback');
+            // Fallback to direct video src
+            video.src = src;
           }
         });
       } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
         // Native HLS support (Safari)
+        console.log('FeedVideoPlayer - Using native HLS support');
         video.src = src;
       } else {
         // Fallback to regular video
+        console.log('FeedVideoPlayer - HLS not supported, using fallback');
         video.src = src;
       }
     }

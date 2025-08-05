@@ -482,78 +482,107 @@ const HeroProfileHeader = ({
               }`}
               title={achievementRing.title}
             >
-              {profile?.has_profile_video && profile?.profile_video_url ? (
-                <ProfileVideoDisplay
-                  videoUrl={profile.profile_video_url}
-                  fallbackPhotoUrl={profile.profile_photo_url}
-                  displayName={displayName}
-                  isOwnProfile={isOwnProfile}
-                  uploading={uploading}
-                  onEditClick={() => setEditDialogOpen(true)}
-                  onPhotoUpload={handlePhotoUpload}
-                  onVideoUpload={() => setEditDialogOpen(true)}
-                  achievementRing={achievementRing}
-                />
-              ) : isOwnProfile ? (
-                <div className="relative w-full h-full group">
-                  <OptimizedAvatar
-                    key={avatarKey}
-                    src={profile?.profile_photo_url ? `${profile.profile_photo_url}?t=${avatarKey}` : undefined}
-                    alt={displayName}
-                    size={256}
-                    fallback={displayName.charAt(0)}
-                    className="shadow-2xl w-full h-full"
-                    priority={true}
-                  />
-                  {/* Edit buttons overlay */}
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full">
-                    <div className="flex flex-col gap-3 items-center">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (uploading) return;
-                          const input = document.createElement('input');
-                          input.type = 'file';
-                          input.accept = 'image/*';
-                          input.onchange = (e) => {
-                            const file = (e.target as HTMLInputElement).files?.[0];
-                            if (file) {
-                              handlePhotoUpload(file);
-                            }
-                          };
-                          input.click();
-                        }}
-                        className="bg-muted border border-border rounded-lg text-foreground font-medium hover:bg-muted/80 transition-all duration-300 ease-in-out px-4 py-2 text-sm"
-                        style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
-                        disabled={uploading}
-                      >
-                        📷 Edit Photo
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setEditDialogOpen(true);
-                        }}
-                        className="bg-muted border border-border rounded-lg text-foreground font-medium hover:bg-muted/80 transition-all duration-300 ease-in-out px-4 py-2 text-sm"
-                        style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
-                        disabled={uploading}
-                      >
-                        🎥 Add Video
-                      </button>
+              {(() => {
+                console.log('Profile rendering check:', {
+                  hasProfileVideo: profile?.has_profile_video,
+                  profileVideoUrl: profile?.profile_video_url,
+                  profilePhotoUrl: profile?.profile_photo_url,
+                  isOwnProfile
+                });
+                
+                if (profile?.has_profile_video && profile?.profile_video_url) {
+                  return (
+                    <div className="relative w-full h-full">
+                      <ProfileVideoDisplay
+                        videoUrl={profile.profile_video_url}
+                        fallbackPhotoUrl={profile.profile_photo_url}
+                        displayName={displayName}
+                        isOwnProfile={isOwnProfile}
+                        uploading={uploading}
+                        onEditClick={() => setEditDialogOpen(true)}
+                        onPhotoUpload={handlePhotoUpload}
+                        onVideoUpload={() => setEditDialogOpen(true)}
+                        achievementRing={achievementRing}
+                      />
+                      {/* Fallback avatar in case video fails to load */}
+                      <div className="absolute inset-0 opacity-0 pointer-events-none" id="video-fallback">
+                        <OptimizedAvatar
+                          key={`${avatarKey}-fallback`}
+                          src={profile?.profile_photo_url ? `${profile.profile_photo_url}?t=${avatarKey}` : undefined}
+                          alt={displayName}
+                          size={256}
+                          fallback={displayName.charAt(0)}
+                          className="shadow-2xl w-full h-full"
+                          priority={true}
+                        />
+                      </div>
                     </div>
-                  </div>
-                </div>
-              ) : (
-                <OptimizedAvatar
-                  key={avatarKey}
-                  src={profile?.profile_photo_url ? `${profile.profile_photo_url}?t=${avatarKey}` : undefined}
-                  alt={displayName}
-                  size={256}
-                  fallback={displayName.charAt(0)}
-                  className="shadow-2xl w-full h-full"
-                  priority={true}
-                />
-              )}
+                  );
+                } else if (isOwnProfile) {
+                  return (
+                    <div className="relative w-full h-full group">
+                      <OptimizedAvatar
+                        key={avatarKey}
+                        src={profile?.profile_photo_url ? `${profile.profile_photo_url}?t=${avatarKey}` : undefined}
+                        alt={displayName}
+                        size={256}
+                        fallback={displayName.charAt(0)}
+                        className="shadow-2xl w-full h-full"
+                        priority={true}
+                      />
+                      {/* Edit buttons overlay */}
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-full">
+                        <div className="flex flex-col gap-3 items-center">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (uploading) return;
+                              const input = document.createElement('input');
+                              input.type = 'file';
+                              input.accept = 'image/*';
+                              input.onchange = (e) => {
+                                const file = (e.target as HTMLInputElement).files?.[0];
+                                if (file) {
+                                  handlePhotoUpload(file);
+                                }
+                              };
+                              input.click();
+                            }}
+                            className="bg-muted border border-border rounded-lg text-foreground font-medium hover:bg-muted/80 transition-all duration-300 ease-in-out px-4 py-2 text-sm"
+                            style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
+                            disabled={uploading}
+                          >
+                            📷 Edit Photo
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setEditDialogOpen(true);
+                            }}
+                            className="bg-muted border border-border rounded-lg text-foreground font-medium hover:bg-muted/80 transition-all duration-300 ease-in-out px-4 py-2 text-sm"
+                            style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
+                            disabled={uploading}
+                          >
+                            🎥 Add Video
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                } else {
+                  return (
+                    <OptimizedAvatar
+                      key={avatarKey}
+                      src={profile?.profile_photo_url ? `${profile.profile_photo_url}?t=${avatarKey}` : undefined}
+                      alt={displayName}
+                      size={256}
+                      fallback={displayName.charAt(0)}
+                      className="shadow-2xl w-full h-full"
+                      priority={true}
+                    />
+                  );
+                }
+              })()}
             </div>
           </div>
           
