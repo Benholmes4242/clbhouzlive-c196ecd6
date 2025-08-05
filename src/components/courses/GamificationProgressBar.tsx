@@ -485,10 +485,13 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                      </div>
                    </div>
                   ))}
-                </div>
-            </div>
+                 </div>
+             </div>
 
           </div>
+
+          {/* Divider Line */}
+          <div className="border-t border-gray-300/30"></div>
 
           {/* Regional Lists Completion - Improved Cards with enhanced spacing */}
           <div className="space-y-4 pt-8">
@@ -621,10 +624,12 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
             )}
           </div>
 
+          {/* Divider Line */}
+          <div className="border-t border-gray-300/30"></div>
 
           {/* Friends Progress Section - Improved Card with enhanced spacing */}
           {isCurrentUser && (
-            <div className="pt-12 border-t border-border">
+            <div className="pt-12">
               <Collapsible open={isFriendsOpen} onOpenChange={setIsFriendsOpen}>
                 <CollapsibleTrigger className="flex items-center justify-between w-full group hover:bg-muted/50 rounded-xl p-4 transition-colors">
                   <div className="flex items-center gap-3">
