@@ -24,7 +24,7 @@ export const useBackgroundUpload = () => {
   const { toast } = useToast();
   const { shouldCompress, triggerCompression } = useVideoCompression();
   const { uploadFileInChunks } = useChunkedUpload();
-  const { uploadVideo, isVideoFile } = useCloudflareStream();
+  const cloudflareStream = useCloudflareStream();
   const { uploadToR2 } = useCloudflareR2();
   const [uploads, setUploads] = useState<Map<string, UploadProgress>>(new Map());
 
@@ -81,17 +81,14 @@ export const useBackgroundUpload = () => {
         let mediaType = file.type.startsWith('image/') ? 'image' : 'video';
         
         // Use Cloudflare Stream for video files
-        if (isVideoFile(file)) {
+        if (file.type.startsWith('video/')) {
           console.log(`Uploading video to Cloudflare Stream: ${file.name}`);
           try {
-            const streamResult = await uploadVideo(file, {
-              title: file.name,
-              description: `Video uploaded from post ${postId}`
-            });
+            const streamResult = await cloudflareStream.uploadVideo(file);
             
-            if (streamResult.success && streamResult.urls) {
+            if (streamResult.success && streamResult.videoUrl) {
               // Use HLS URL for video playback
-              publicUrl = streamResult.urls.hls;
+              publicUrl = streamResult.videoUrl;
               console.log(`Successfully uploaded ${file.name} to Cloudflare Stream:`, publicUrl);
             } else {
               throw new Error(streamResult.error || 'Cloudflare Stream upload failed');
@@ -199,7 +196,7 @@ export const useBackgroundUpload = () => {
         }
 
         // Skip compression for Cloudflare Stream videos (already optimized)
-        if (!isVideoFile(file) && shouldCompress(file)) {
+        if (!file.type.startsWith('video/') && shouldCompress(file)) {
           console.log(`Video ${file.name} needs compression (${(file.size / 1024 / 1024).toFixed(2)}MB > 40MB)`);
           
           // Trigger compression in background
@@ -215,7 +212,7 @@ export const useBackgroundUpload = () => {
           } else {
             console.warn(`Failed to trigger compression for ${file.name}:`, compressionResult.error);
           }
-        } else if (isVideoFile(file)) {
+        } else if (file.type.startsWith('video/')) {
           console.log(`Video ${file.name} uploaded to Cloudflare Stream - no additional compression needed`);
         }
 
@@ -284,7 +281,7 @@ export const useBackgroundUpload = () => {
     }
 
     console.log(`Background upload completed for post ${postId}`);
-  }, [toast]);
+  }, [toast, shouldCompress, triggerCompression, uploadFileInChunks, cloudflareStream, uploadToR2]);
 
   return {
     startBackgroundUpload,

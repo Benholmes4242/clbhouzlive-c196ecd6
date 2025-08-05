@@ -1,0 +1,260 @@
+import React, { useRef, useEffect, useState } from 'react';
+import { Play, Upload, Trash2, Volume2, VolumeX } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
+
+interface ProfileVideoCircleProps {
+  videoUrl?: string;
+  thumbnailUrl?: string;
+  displayName: string;
+  isOwnProfile: boolean;
+  onVideoUpload: (file: File) => void;
+  onVideoRemove: () => void;
+  uploading?: boolean;
+  className?: string;
+}
+
+const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
+  videoUrl,
+  thumbnailUrl,
+  displayName,
+  isOwnProfile,
+  onVideoUpload,
+  onVideoRemove,
+  uploading = false,
+  className = ''
+}) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [hasPlayed, setHasPlayed] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
+  const [showControls, setShowControls] = useState(false);
+  const { toast } = useToast();
+
+  // Auto-play video once when component mounts and video is available
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !videoUrl || hasPlayed) return;
+
+    const playVideo = async () => {
+      try {
+        video.muted = true; // Ensure muted for autoplay
+        await video.play();
+        setIsPlaying(true);
+        setHasPlayed(true);
+        
+        // After video ends, show thumbnail
+        video.addEventListener('ended', () => {
+          setIsPlaying(false);
+          video.currentTime = 0; // Reset to first frame
+          video.pause();
+        });
+      } catch (error) {
+        console.error('Auto-play failed:', error);
+        setHasPlayed(true); // Mark as played even if failed to prevent retry
+      }
+    };
+
+    // Add a small delay to ensure video is loaded
+    const timer = setTimeout(playVideo, 500);
+    return () => clearTimeout(timer);
+  }, [videoUrl, hasPlayed]);
+
+  const handleFileSelect = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('video/')) {
+      toast({
+        title: "Invalid file type",
+        description: "Please select a video file.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Validate file size (100MB max)
+    if (file.size > 100 * 1024 * 1024) {
+      toast({
+        title: "File too large",
+        description: "Video file must be less than 100MB.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Check video duration
+    const video = document.createElement('video');
+    video.preload = 'metadata';
+    
+    video.onloadedmetadata = () => {
+      if (video.duration > 20) {
+        toast({
+          title: "Video too long",
+          description: "Video must be 20 seconds or less.",
+          variant: "destructive"
+        });
+        return;
+      }
+      
+      onVideoUpload(file);
+    };
+
+    video.onerror = () => {
+      toast({
+        title: "Invalid video",
+        description: "Could not read video file.",
+        variant: "destructive"
+      });
+    };
+
+    video.src = URL.createObjectURL(file);
+  };
+
+  const toggleMute = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !isMuted;
+      setIsMuted(!isMuted);
+    }
+  };
+
+  const replayVideo = () => {
+    const video = videoRef.current;
+    if (video && videoUrl) {
+      video.currentTime = 0;
+      video.muted = isMuted;
+      video.play();
+      setIsPlaying(true);
+    }
+  };
+
+  return (
+    <div 
+      className={`relative w-full h-full rounded-full overflow-hidden group ${className}`}
+      onMouseEnter={() => setShowControls(true)}
+      onMouseLeave={() => setShowControls(false)}
+    >
+      {videoUrl ? (
+        <>
+          {/* Video Element */}
+          <video
+            ref={videoRef}
+            src={videoUrl}
+            poster={thumbnailUrl}
+            className="w-full h-full object-cover"
+            playsInline
+            muted={isMuted}
+            preload="metadata"
+          />
+          
+          {/* Video Controls Overlay */}
+          {showControls && (
+            <div className="absolute inset-0 bg-black/30 flex items-center justify-center transition-opacity">
+              <div className="flex gap-2">
+                {/* Replay Button */}
+                {hasPlayed && !isPlaying && (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={replayVideo}
+                    className="bg-black/50 hover:bg-black/70 text-white border-0"
+                  >
+                    <Play className="w-4 h-4" />
+                  </Button>
+                )}
+                
+                {/* Mute Toggle */}
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={toggleMute}
+                  className="bg-black/50 hover:bg-black/70 text-white border-0"
+                >
+                  {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+                </Button>
+              </div>
+            </div>
+          )}
+          
+          {/* Owner Controls */}
+          {isOwnProfile && showControls && (
+            <div className="absolute top-2 right-2">
+              <div className="flex gap-1">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={handleFileSelect}
+                  disabled={uploading}
+                  className="bg-black/50 hover:bg-black/70 text-white border-0 p-2"
+                >
+                  <Upload className="w-3 h-3" />
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={onVideoRemove}
+                  disabled={uploading}
+                  className="bg-black/50 hover:bg-black/70 text-white border-0 p-2"
+                >
+                  <Trash2 className="w-3 h-3" />
+                </Button>
+              </div>
+            </div>
+          )}
+        </>
+      ) : (
+        /* No Video - Show Upload Area */
+        <div className="w-full h-full bg-muted/30 flex flex-col items-center justify-center">
+          <div className="text-6xl text-muted-foreground/50 mb-2">
+            {displayName.charAt(0)}
+          </div>
+          
+          {isOwnProfile && !uploading && (
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={handleFileSelect}
+              className="text-xs text-muted-foreground hover:text-foreground"
+            >
+              <Upload className="w-3 h-3 mr-1" />
+              Add Video
+            </Button>
+          )}
+          
+          {uploading && (
+            <div className="text-xs text-muted-foreground mt-2">
+              Uploading...
+            </div>
+          )}
+        </div>
+      )}
+      
+      {/* Hidden File Input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="video/*"
+        onChange={handleFileChange}
+        className="hidden"
+      />
+      
+      {/* Loading Overlay */}
+      {uploading && (
+        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+          <div className="flex flex-col items-center gap-2">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
+            <span className="text-white text-xs">Uploading...</span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default ProfileVideoCircle;

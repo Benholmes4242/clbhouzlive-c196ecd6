@@ -28,6 +28,8 @@ import ProfileProgressSection from './ProfileProgressSection';
 import CompareProgressModal from './CompareProgressModal';
 import { useUserAchievements } from '@/hooks/useUserAchievements';
 import { Swords } from 'lucide-react';
+import ProfileVideoCircle from './ProfileVideoCircle';
+import { useCloudflareStream } from '@/hooks/useCloudflareStream';
 
 interface Course {
   id: string;
@@ -43,6 +45,10 @@ interface UserProfile {
   display_name?: string;
   username?: string;
   home_club?: string;
+  profile_photo_url?: string;
+  profile_video_url?: string;
+  profile_video_thumbnail_url?: string;
+  has_profile_video?: boolean;
   background_image_url?: string;
   cover_photo_url?: string;
   bio?: string;
@@ -77,6 +83,7 @@ const HeroProfileHeader = ({
 }: HeroProfileHeaderProps) => {
   const { user } = useSupabaseSession();
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const { uploadVideo, uploading: videoUploading } = useCloudflareStream();
   
   // Stats state
   const [ratedCoursesCount, setRatedCoursesCount] = useState(0);
@@ -275,6 +282,84 @@ const HeroProfileHeader = ({
 
   const achievementRing = getAchievementRing(userProgressData.coursesPlayed);
 
+  const handleVideoUpload = async (file: File) => {
+    try {
+      const result = await uploadVideo(file);
+      
+      if (!result.success) {
+        toast({
+          title: "Upload Failed",
+          description: result.error || "Failed to upload video",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Update profile with video URLs
+      const { error } = await supabase
+        .from('user_profiles')
+        .update({
+          profile_video_url: result.videoUrl,
+          profile_video_thumbnail_url: result.thumbnailUrl,
+          has_profile_video: true,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user?.id);
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: "Success",
+        description: "Profile video uploaded successfully!",
+        variant: "default"
+      });
+
+      onProfileUpdate();
+    } catch (error) {
+      console.error('Error updating profile video:', error);
+      toast({
+        title: "Update Failed",
+        description: "Failed to save video to profile",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleVideoRemove = async () => {
+    try {
+      const { error } = await supabase
+        .from('user_profiles')
+        .update({
+          profile_video_url: null,
+          profile_video_thumbnail_url: null,
+          has_profile_video: false,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', user?.id);
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: "Success",
+        description: "Profile video removed successfully!",
+        variant: "default"
+      });
+
+      onProfileUpdate();
+    } catch (error) {
+      console.error('Error removing profile video:', error);
+      toast({
+        title: "Remove Failed",
+        description: "Failed to remove video from profile",
+        variant: "destructive"
+      });
+    }
+  };
+
 
 
 
@@ -327,12 +412,16 @@ const HeroProfileHeader = ({
               }`}
               title={achievementRing.title}
             >
-              {/* Empty circular frame - placeholder for future profile media */}
-              <div className="w-full h-full bg-muted/30 rounded-full flex items-center justify-center">
-                <div className="text-6xl text-muted-foreground/50">
-                  {displayName.charAt(0)}
-                </div>
-              </div>
+              <ProfileVideoCircle
+                videoUrl={profile?.profile_video_url}
+                thumbnailUrl={profile?.profile_video_thumbnail_url}
+                displayName={displayName}
+                isOwnProfile={isOwnProfile}
+                onVideoUpload={handleVideoUpload}
+                onVideoRemove={handleVideoRemove}
+                uploading={videoUploading}
+                className="w-full h-full"
+              />
             </div>
           </div>
           
