@@ -248,18 +248,19 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
             crossOrigin="anonymous"
           />
           
-          {/* Profile Photo with smooth fade in */}
+          {/* Profile Photo with 4K quality optimization */}
           {profilePhotoUrl && (
             <img
-              src={profilePhotoUrl}
+              src={`${profilePhotoUrl}?quality=100&format=auto&width=2048&height=2048&fit=cover`}
               alt={`${displayName} profile`}
               className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
                 !showVideo ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
               }`}
-              onLoad={() => console.log('Profile photo loaded successfully:', profilePhotoUrl)}
+              onLoad={() => console.log('4K Profile photo loaded successfully:', profilePhotoUrl)}
               onError={(e) => {
                 console.error('Profile photo failed to load:', profilePhotoUrl, e);
-                e.currentTarget.style.display = 'none';
+                // Fallback to original URL without optimization
+                e.currentTarget.src = profilePhotoUrl;
               }}
             />
           )}

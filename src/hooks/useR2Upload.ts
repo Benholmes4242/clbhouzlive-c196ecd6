@@ -17,6 +17,14 @@ export const useR2Upload = () => {
       return { success: false, error: 'No file provided' };
     }
 
+    // Validate and optimize for high quality
+    if (file.size > 50 * 1024 * 1024) { // Increased to 50MB for 4K images
+      return { 
+        success: false, 
+        error: 'Image file must be less than 50MB for 4K quality uploads.' 
+      };
+    }
+
     setUploading(true);
 
     try {

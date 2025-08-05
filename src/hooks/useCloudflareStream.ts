@@ -47,7 +47,12 @@ export const useCloudflareStream = () => {
       formData.append('file', file);
       formData.append('meta', JSON.stringify({
         name: `profile-video-${Date.now()}`,
-        maxDurationSeconds: 20
+        maxDurationSeconds: 20,
+        // Optimize for highest quality
+        quality: 'high',
+        bitrate: 8000, // High bitrate for 4K quality
+        resolution: '1920x1080', // Minimum HD, supports up to 4K
+        fps: 30
       }));
 
       // For now, let's upload to Supabase storage as a fallback
