@@ -176,7 +176,7 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
                     size="sm"
                     variant="ghost"
                     onClick={replayVideo}
-                    className="bg-black/50 hover:bg-black/70 text-white border-0"
+                    className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full p-2 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
                   >
                     <Play className="w-4 h-4" />
                   </Button>
