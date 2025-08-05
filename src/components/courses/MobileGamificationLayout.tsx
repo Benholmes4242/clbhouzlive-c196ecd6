@@ -31,9 +31,9 @@ const MobileGamificationLayout: React.FC<MobileGamificationLayoutProps> = ({
   return (
     <>
       {/* Mobile Trophy Carousel - Show only 2 trophies at a time */}
-      <div className="md:hidden relative z-10">
+      <div className="md:hidden relative z-10 py-4">
         <div className="overflow-x-auto scrollbar-hide">
-          <div className="flex gap-8 snap-x snap-mandatory px-4 pb-2" style={{ scrollSnapType: 'x mandatory' }}>
+          <div className="flex gap-8 snap-x snap-mandatory px-4 pb-4 pt-2" style={{ scrollSnapType: 'x mandatory' }}>
             {globalTrophies.map((trophy, index) => (
               <div 
                 key={trophy.id} 
@@ -137,7 +137,7 @@ const MobileGamificationLayout: React.FC<MobileGamificationLayoutProps> = ({
                 onClick={() => onRegionalCardClick(list)}
               >
                 {/* Region Name at Top */}
-                <h4 className="text-lg font-semibold text-foreground text-center mb-4 w-full">
+                <h4 className="text-xl font-semibold text-foreground text-center mb-4 w-full">
                   {list.name}
                 </h4>
 
@@ -151,7 +151,7 @@ const MobileGamificationLayout: React.FC<MobileGamificationLayoutProps> = ({
                           src="/lovable-uploads/7df94753-adb7-43b1-8ea8-380234f3318f.png" 
                           alt="British & Irish Trophy" 
                           className={cn(
-                            'h-12 w-auto object-contain transition-all duration-300',
+                            'h-20 w-auto object-contain transition-all duration-300',
                             list.completed >= list.total ? 'opacity-100 animate-pulse' : 'opacity-70'
                           )}
                           style={{ 
@@ -165,7 +165,7 @@ const MobileGamificationLayout: React.FC<MobileGamificationLayoutProps> = ({
                           src="/lovable-uploads/1a1f3f8d-5f91-4e65-8f64-6a516cd2ea20.png" 
                           alt="European Trophy" 
                           className={cn(
-                            'h-12 w-auto object-contain transition-all duration-300',
+                            'h-20 w-auto object-contain transition-all duration-300',
                             list.completed >= list.total ? 'opacity-100 animate-pulse' : 'opacity-70'
                           )}
                           style={{ 
@@ -179,7 +179,7 @@ const MobileGamificationLayout: React.FC<MobileGamificationLayoutProps> = ({
                           src="/lovable-uploads/b6d15b83-cd17-41b5-9af1-a066d6d0c6ac.png" 
                           alt="USA Trophy" 
                           className={cn(
-                            'h-12 w-auto object-contain transition-all duration-300',
+                            'h-20 w-auto object-contain transition-all duration-300',
                             list.completed >= list.total ? 'opacity-100 animate-pulse' : 'opacity-70'
                           )}
                           style={{ 
@@ -193,7 +193,7 @@ const MobileGamificationLayout: React.FC<MobileGamificationLayoutProps> = ({
                           src="/lovable-uploads/a9672498-b79d-4a47-9e6a-1128770700c9.png" 
                           alt="Worldwide Trophy" 
                           className={cn(
-                            'h-12 w-auto object-contain transition-all duration-300',
+                            'h-20 w-auto object-contain transition-all duration-300',
                             list.completed >= list.total ? 'opacity-100 animate-pulse' : 'opacity-70'
                           )}
                           style={{ 
@@ -211,7 +211,7 @@ const MobileGamificationLayout: React.FC<MobileGamificationLayoutProps> = ({
                     <CircularProgress 
                       completed={list.completed}
                       total={list.total}
-                      size={64}
+                      size={80}
                       strokeWidth={6}
                       className="transition-transform duration-300"
                     />
@@ -220,7 +220,7 @@ const MobileGamificationLayout: React.FC<MobileGamificationLayoutProps> = ({
 
                 {/* Bottom: XP Count and Description */}
                 <div className="text-center w-full">
-                  <div className="text-lg font-bold text-foreground mb-1">
+                  <div className="text-xl font-bold text-foreground mb-1">
                     {list.completed}/{list.total}
                   </div>
                   <div className="text-sm text-muted-foreground mb-2">
