@@ -415,9 +415,11 @@ const HeroProfileHeader = ({
               <ProfileVideoCircle
                 videoUrl={profile?.profile_video_url}
                 thumbnailUrl={profile?.profile_video_thumbnail_url}
+                profilePhotoUrl={profile?.profile_photo_url}
                 displayName={displayName}
                 isOwnProfile={isOwnProfile}
                 onVideoUpload={handleVideoUpload}
+                onPhotoUpload={() => {}} // TODO: Implement photo upload
                 onVideoRemove={handleVideoRemove}
                 uploading={videoUploading}
                 className="w-full h-full"

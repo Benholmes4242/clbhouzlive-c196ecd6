@@ -6,9 +6,11 @@ import { useToast } from '@/hooks/use-toast';
 interface ProfileVideoCircleProps {
   videoUrl?: string;
   thumbnailUrl?: string;
+  profilePhotoUrl?: string;
   displayName: string;
   isOwnProfile: boolean;
   onVideoUpload: (file: File) => void;
+  onPhotoUpload: (file: File) => void;
   onVideoRemove: () => void;
   uploading?: boolean;
   className?: string;
@@ -17,19 +19,23 @@ interface ProfileVideoCircleProps {
 const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
   videoUrl,
   thumbnailUrl,
+  profilePhotoUrl,
   displayName,
   isOwnProfile,
   onVideoUpload,
+  onPhotoUpload,
   onVideoRemove,
   uploading = false,
   className = ''
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const photoInputRef = useRef<HTMLInputElement>(null);
   const [hasPlayed, setHasPlayed] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(true);
   const [showControls, setShowControls] = useState(false);
+  const [showVideo, setShowVideo] = useState(true); // true = show video, false = show photo
   const { toast } = useToast();
 
   // Auto-play video once when component mounts and video is available
@@ -44,6 +50,7 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
         await video.play();
         setIsPlaying(true);
         setHasPlayed(true);
+        setShowVideo(true); // Ensure video is visible when playing
         console.log('Profile video auto-play successful');
         
         // Set up ended listener
@@ -51,6 +58,13 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
           setIsPlaying(false);
           video.currentTime = 0; // Reset to first frame
           video.pause();
+          
+          // Transition to photo after video ends (only if profile photo exists)
+          if (profilePhotoUrl) {
+            setTimeout(() => {
+              setShowVideo(false);
+            }, 500); // Small delay for smooth transition
+          }
         };
         
         video.addEventListener('ended', handleEnded);
@@ -67,10 +81,14 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
     return () => {
       video.removeEventListener('canplaythrough', handleCanPlayThrough);
     };
-  }, [videoUrl, hasPlayed]);
+  }, [videoUrl, hasPlayed, profilePhotoUrl]);
 
   const handleFileSelect = () => {
     fileInputRef.current?.click();
+  };
+
+  const handlePhotoSelect = () => {
+    photoInputRef.current?.click();
   };
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -125,6 +143,33 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
     video.src = URL.createObjectURL(file);
   };
 
+  const handlePhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        title: "Invalid file type",
+        description: "Please select an image file.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Validate file size (10MB max)
+    if (file.size > 10 * 1024 * 1024) {
+      toast({
+        title: "File too large",
+        description: "Image file must be less than 10MB.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    onPhotoUpload(file);
+  };
+
   const toggleMute = () => {
     if (videoRef.current) {
       videoRef.current.muted = !isMuted;
@@ -147,8 +192,11 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
   };
 
   const handleCircleClick = () => {
-    // Only allow click-to-replay for other users' profiles when video has ended
-    if (!isOwnProfile && hasPlayed && !isPlaying) {
+    // Allow click-to-replay when:
+    // 1. For other users: when video has ended and showing photo
+    // 2. For own profile: when showing photo (not when showing video to avoid conflicts)
+    if ((!isOwnProfile && hasPlayed && !isPlaying) || (!showVideo && profilePhotoUrl)) {
+      setShowVideo(true);
       replayVideo();
     }
   };
@@ -156,7 +204,7 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
   return (
     <div 
       className={`relative w-full h-full rounded-full overflow-hidden group ${className} ${
-        !isOwnProfile && hasPlayed && !isPlaying ? 'cursor-pointer' : ''
+        (!showVideo && profilePhotoUrl) || (!isOwnProfile && hasPlayed && !isPlaying) ? 'cursor-pointer' : ''
       }`}
       onMouseEnter={() => setShowControls(true)}
       onMouseLeave={() => setShowControls(false)}
@@ -164,48 +212,89 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
     >
       {videoUrl ? (
         <>
-          {/* Video Element */}
+          {/* Video Element - Show/Hide based on showVideo state */}
           <video
             ref={videoRef}
             src={videoUrl}
             poster={thumbnailUrl}
-            className="w-full h-full object-cover"
+            className={`w-full h-full object-cover transition-opacity duration-500 ${showVideo ? 'opacity-100' : 'opacity-0'}`}
             playsInline
             muted={isMuted}
             preload="auto"
             crossOrigin="anonymous"
           />
           
-          {/* Video Controls Overlay */}
-          {showControls && (
+          {/* Profile Photo - Show when video is not showing */}
+          {!showVideo && profilePhotoUrl && (
+            <img
+              src={profilePhotoUrl}
+              alt={`${displayName} profile`}
+              className="w-full h-full object-cover transition-opacity duration-500"
+            />
+          )}
+          
+          {/* Video Controls Overlay - Only show when video is visible */}
+          {showControls && showVideo && (
             <div className="absolute inset-0 bg-black/30 flex items-center justify-center transition-opacity">
-              <div className="flex gap-2">
-                {/* Replay Button */}
-                {hasPlayed && !isPlaying && (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={replayVideo}
-                    className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full p-2 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
-                  >
-                    <Play className="w-4 h-4" />
-                  </Button>
-                )}
+              <div className="flex flex-col gap-2">
+                <div className="flex gap-2">
+                  {/* Replay Button */}
+                  {hasPlayed && !isPlaying && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={replayVideo}
+                      className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full p-2 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
+                    >
+                      <Play className="w-4 h-4" />
+                    </Button>
+                  )}
+                  
+                  {/* Edit Video Button - Only for own profile */}
+                  {isOwnProfile && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={handleFileSelect}
+                      disabled={uploading}
+                      className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full px-3 py-1 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
+                      title="Change video"
+                    >
+                      <span className="text-xs font-medium">Change Video</span>
+                    </Button>
+                  )}
+                </div>
                 
-                {/* Edit Video Button - Only for own profile */}
+                {/* Change Photo Button - Only for own profile */}
                 {isOwnProfile && (
                   <Button
                     size="sm"
                     variant="ghost"
-                    onClick={handleFileSelect}
+                    onClick={handlePhotoSelect}
                     disabled={uploading}
                     className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full px-3 py-1 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
-                    title="Change video"
+                    title="Change profile photo"
                   >
-                    <span className="text-xs font-medium">Change Video</span>
+                    <span className="text-xs font-medium">Change Photo</span>
                   </Button>
                 )}
               </div>
+            </div>
+          )}
+          
+          {/* Photo Controls Overlay - Only show when photo is visible */}
+          {showControls && !showVideo && profilePhotoUrl && isOwnProfile && (
+            <div className="absolute inset-0 bg-black/30 flex items-center justify-center transition-opacity">
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={handlePhotoSelect}
+                disabled={uploading}
+                className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full px-3 py-1 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
+                title="Change profile photo"
+              >
+                <span className="text-xs font-medium">Change Photo</span>
+              </Button>
             </div>
           )}
         </>
@@ -217,15 +306,26 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
           </div>
           
           {isOwnProfile && !uploading && (
-            <Button
-              size="sm"
-              variant="secondary"
-              onClick={handleFileSelect}
-              className="text-xs"
-            >
-              <Upload className="w-3 h-3 mr-1" />
-              Add Video
-            </Button>
+            <div className="flex flex-col gap-2">
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={handleFileSelect}
+                className="text-xs"
+              >
+                <Upload className="w-3 h-3 mr-1" />
+                Add Video
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handlePhotoSelect}
+                className="text-xs"
+              >
+                <Upload className="w-3 h-3 mr-1" />
+                Add Photo
+              </Button>
+            </div>
           )}
           
           {uploading && (
@@ -236,12 +336,20 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
         </div>
       )}
       
-      {/* Hidden File Input */}
+      {/* Hidden File Inputs */}
       <input
         ref={fileInputRef}
         type="file"
         accept="video/*"
         onChange={handleFileChange}
+        className="hidden"
+      />
+      
+      <input
+        ref={photoInputRef}
+        type="file"
+        accept="image/*"
+        onChange={handlePhotoChange}
         className="hidden"
       />
       
