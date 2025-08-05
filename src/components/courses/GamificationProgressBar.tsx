@@ -525,7 +525,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                            src="/lovable-uploads/f2f50b99-38e1-466b-8ac8-c32e428231cb.png" 
                            alt="Green Fee Rookie Trophy" 
                            className={cn(
-                         'h-16 w-auto object-contain -mt-4 transition-all duration-300',
+                          'h-20 w-auto object-contain -mt-4 transition-all duration-300',
                          trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
                        )}
                            style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(251, 191, 36, 0.6))' : 'none' }}
@@ -535,7 +535,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                            src="/lovable-uploads/43291ca4-d526-4b10-9585-6ea3488445cf.png" 
                            alt="The Turn Trophy"
                            className={cn(
-                         'h-16 w-auto object-contain -mt-4 transition-all duration-300',
+                          'h-20 w-auto object-contain -mt-4 transition-all duration-300',
                          trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
                        )}
                            style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(148, 163, 184, 0.6))' : 'none' }}
@@ -545,7 +545,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                            src="/lovable-uploads/0c126dc7-5509-40b9-862d-b054423ca7f6.png" 
                            alt="Century Club Trophy" 
                            className={cn(
-                         'h-16 w-auto object-contain -mt-4 transition-all duration-300',
+                          'h-20 w-auto object-contain -mt-4 transition-all duration-300',
                          trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
                        )}
                            style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(59, 130, 246, 0.6))' : 'none' }}
@@ -555,7 +555,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                            src="/lovable-uploads/a9672498-b79d-4a47-9e6a-1128770700c9.png" 
                            alt="Clubhouse Elite Trophy" 
                            className={cn(
-                         'h-16 w-auto object-contain -mt-4 transition-all duration-300',
+                          'h-20 w-auto object-contain -mt-4 transition-all duration-300',
                          trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
                        )}
                            style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(16, 185, 129, 0.6))' : 'none' }}
@@ -565,20 +565,20 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
                            src="/lovable-uploads/3c517cb5-203d-4ad8-b3b5-e5e7c33a24b0.png" 
                            alt="Course Collector Trophy" 
                            className={cn(
-                         'h-16 w-auto object-contain -mt-4 transition-all duration-300',
+                         'h-20 w-auto object-contain -mt-4 transition-all duration-300',
                          trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
                        )}
                            style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(147, 51, 234, 0.6))' : 'none' }}
                          />
                        ) : (
                          <div className={cn(
-                         'h-16 w-16 rounded-full flex items-center justify-center bg-gradient-to-br -mt-4 transition-all duration-300',
+                         'h-20 w-20 rounded-full flex items-center justify-center bg-gradient-to-br -mt-4 transition-all duration-300',
                          trophy.color,
                          trophy.isUnlocked ? 'opacity-100 animate-bounce' : 'opacity-40 grayscale'
                        )}
                          style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(0, 0, 0, 0.3))' : 'none' }}
                          >
-                            <Trophy className="w-8 h-8 text-foreground" />
+                             <Trophy className="w-10 h-10 text-foreground" />
                           </div>
                         )}
                         <div className="text-center">
