@@ -443,6 +443,14 @@ const HeroProfileHeader = ({
     <>
       {/* Dynamic Background - Auto-generated from profile photo */}
       <div className="relative w-full bg-background">
+        {/* Blurred Background Layer */}
+        {profile?.profile_photo_url && (
+          <div 
+            className="absolute top-0 left-0 w-full h-[200px] z-0"
+            style={createDynamicBackgroundStyle(profile.profile_photo_url)}
+          />
+        )}
+        
         {/* Profile Content */}
         <div className="relative z-10 flex flex-col items-center text-center pt-20 pb-8">
           
