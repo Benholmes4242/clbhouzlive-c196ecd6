@@ -61,22 +61,36 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
         setShowVideo(true); // Ensure video is visible when playing
         console.log('Profile video auto-play successful');
         
-        // Set up ended listener
+        // Set up time update listener for smooth transition
+        const handleTimeUpdate = () => {
+          const currentTime = video.currentTime;
+          const duration = video.duration;
+          
+          // Start fade transition 1 second before video ends (only if profile photo exists)
+          if (profilePhotoUrl && duration && currentTime >= duration - 1 && showVideo) {
+            setShowVideo(false);
+          }
+        };
+        
+        // Set up ended listener for cleanup
         const handleEnded = () => {
           setIsPlaying(false);
           video.currentTime = 0; // Reset to first frame
           video.pause();
           
-          // Smooth transition to photo after video ends (only if profile photo exists)
+          // Ensure we've transitioned to photo if it exists
           if (profilePhotoUrl) {
-            setTimeout(() => {
-              setShowVideo(false);
-            }, 800); // Longer delay for smoother crossfade
+            setShowVideo(false);
           }
         };
         
+        video.addEventListener('timeupdate', handleTimeUpdate);
         video.addEventListener('ended', handleEnded);
-        return () => video.removeEventListener('ended', handleEnded);
+        
+        return () => {
+          video.removeEventListener('timeupdate', handleTimeUpdate);
+          video.removeEventListener('ended', handleEnded);
+        };
       } catch (error) {
         console.error('Auto-play failed:', error);
         setHasPlayed(true); // Mark as played even if failed to prevent retry
