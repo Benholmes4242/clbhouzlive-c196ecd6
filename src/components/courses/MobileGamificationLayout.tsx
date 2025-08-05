@@ -31,9 +31,9 @@ const MobileGamificationLayout: React.FC<MobileGamificationLayoutProps> = ({
   return (
     <>
       {/* Mobile Trophy Carousel - Show only 2 trophies at a time */}
-      <div className="md:hidden relative z-10 py-4">
-        <div className="overflow-x-auto scrollbar-hide">
-          <div className="flex gap-8 snap-x snap-mandatory px-4 pb-4 pt-2" style={{ scrollSnapType: 'x mandatory' }}>
+      <div className="md:hidden relative z-10 py-8">
+        <div className="scrollbar-hide">
+          <div className="flex gap-8 snap-x snap-mandatory px-4 pb-8 pt-4" style={{ scrollSnapType: 'x mandatory' }}>
             {globalTrophies.map((trophy, index) => (
               <div 
                 key={trophy.id} 
