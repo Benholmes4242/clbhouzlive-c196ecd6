@@ -357,7 +357,7 @@ const GamificationProgressBar: React.FC<GamificationProgressBarProps> = ({
             {/* Trophy Timeline */}
             <div className="relative">
               {/* Progress Line with improved visibility */}
-               <div className="absolute top-4 left-8 right-4 h-3 bg-gray-200 rounded-full overflow-hidden shadow-sm">
+               <div className="absolute top-4 left-8 right-4 h-3 bg-gray-200 rounded-full overflow-hidden shadow-sm hidden md:block">
                  {nextGlobalTrophy && lastUnlockedTrophy && (
                    <div 
                      className="h-full bg-green-500 rounded-full transition-all duration-1000 ease-out shadow-sm"
