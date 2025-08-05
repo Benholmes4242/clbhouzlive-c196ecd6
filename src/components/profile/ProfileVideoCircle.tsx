@@ -67,11 +67,11 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
           video.currentTime = 0; // Reset to first frame
           video.pause();
           
-          // Transition to photo after video ends (only if profile photo exists)
+          // Smooth transition to photo after video ends (only if profile photo exists)
           if (profilePhotoUrl) {
             setTimeout(() => {
               setShowVideo(false);
-            }, 500); // Small delay for smooth transition
+            }, 800); // Longer delay for smoother crossfade
           }
         };
         
@@ -220,28 +220,31 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
     >
       {videoUrl ? (
         <>
-          {/* Video Element - Show/Hide based on showVideo state */}
+          {/* Video Element with smooth fade transition */}
           <video
             ref={videoRef}
             src={videoUrl}
             poster={thumbnailUrl}
-            className={`w-full h-full object-cover transition-opacity duration-500 ${showVideo ? 'opacity-100' : 'opacity-0'}`}
+            className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
+              showVideo ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
+            }`}
             playsInline
             muted={isMuted}
             preload="auto"
             crossOrigin="anonymous"
           />
           
-          {/* Profile Photo - Show when video is not showing */}
-          {!showVideo && profilePhotoUrl && (
+          {/* Profile Photo with smooth fade in */}
+          {profilePhotoUrl && (
             <img
               src={profilePhotoUrl}
               alt={`${displayName} profile`}
-              className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
+              className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
+                !showVideo ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+              }`}
               onLoad={() => console.log('Profile photo loaded successfully:', profilePhotoUrl)}
               onError={(e) => {
                 console.error('Profile photo failed to load:', profilePhotoUrl, e);
-                // Fallback to showing initials
                 e.currentTarget.style.display = 'none';
               }}
             />
