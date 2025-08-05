@@ -198,41 +198,6 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
               </div>
             </div>
           )}
-          
-          {/* Owner Controls - Always visible edit button */}
-          {isOwnProfile && (
-            <>
-              {/* Always visible edit button */}
-              <div className="absolute top-2 right-2">
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={handleFileSelect}
-                  disabled={uploading}
-                  className="bg-black/50 hover:bg-black/70 text-white border-0 p-2"
-                  title="Change video"
-                >
-                  <Upload className="w-3 h-3" />
-                </Button>
-              </div>
-              
-              {/* Hover controls */}
-              {showControls && (
-                <div className="absolute top-2 left-2">
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={onVideoRemove}
-                    disabled={uploading}
-                    className="bg-black/50 hover:bg-black/70 text-white border-0 p-2"
-                    title="Remove video"
-                  >
-                    <Trash2 className="w-3 h-3" />
-                  </Button>
-                </div>
-              )}
-            </>
-          )}
         </>
       ) : (
         /* No Video - Show Upload Area */
