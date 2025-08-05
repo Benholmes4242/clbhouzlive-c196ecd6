@@ -13,6 +13,7 @@ interface TrophyProgressSectionProps {
   className?: string;
   userFirstName?: string;
   isCurrentUser?: boolean;
+  milestoneUnlockDates?: Record<number, string>; // e.g., { 20: '2024-09-15', 50: '2024-11-20' }
 }
 
 // Global XP-Based Trophies
@@ -102,6 +103,7 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
   className = '',
   userFirstName,
   isCurrentUser = true,
+  milestoneUnlockDates = {},
 }) => {
   const currentXP = completedCount * 110;
   const [showXPFloat, setShowXPFloat] = useState(false);
@@ -201,14 +203,11 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
       const isUnlocked = completedCount >= trophy.requiredCourses;
       const currentProgress = Math.min(completedCount, trophy.requiredCourses);
       
-      // Calculate realistic unlock date based on completion
+      // Use actual milestone unlock date if available
       let unlockedDate = null;
-      if (isUnlocked) {
-        // Estimate unlock date based on when they would have reached this milestone
-        const monthsAgo = Math.floor(Math.random() * 12) + 1; // Random between 1-12 months ago
-        const unlockDate = new Date();
-        unlockDate.setMonth(unlockDate.getMonth() - monthsAgo);
-        unlockedDate = unlockDate.toLocaleDateString('en-US', { 
+      if (isUnlocked && milestoneUnlockDates[trophy.requiredCourses]) {
+        const date = new Date(milestoneUnlockDates[trophy.requiredCourses]);
+        unlockedDate = date.toLocaleDateString('en-US', { 
           month: 'long', 
           year: 'numeric' 
         });
@@ -222,7 +221,7 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
         unlockedDate,
       };
     });
-  }, [completedCount]);
+  }, [completedCount, milestoneUnlockDates]);
 
    const nextGlobalTrophy = globalTrophies.find(trophy => !trophy.isUnlocked);
    const unlockedGlobalTrophies = globalTrophies.filter(trophy => trophy.isUnlocked);

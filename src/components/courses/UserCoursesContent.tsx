@@ -2,6 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { useUserCoursesData } from './user/useUserCoursesData';
 import { useTop100CoursesData } from '@/hooks/useTop100CoursesData';
+import { useMilestoneUnlockDates } from '@/hooks/useMilestoneUnlockDates';
 import UserCoursesHeader from './user/UserCoursesHeader';
 import UserCoursesRegionalTiles from './user/UserCoursesRegionalTiles';
 import CourseCard from './CourseCard';
@@ -127,6 +128,9 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
     targetUserId || '',
     finalIsOwnProfile
   );
+
+  // Fetch milestone unlock dates
+  const { data: milestoneUnlockDates = {} } = useMilestoneUnlockDates(targetUserId);
 
   // Query to get all played courses (from both tables) for filtering
   const { data: allPlayedCourses = [] } = useQuery({
@@ -288,6 +292,7 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
         completedCount={allPlayedCourses.length}
         userFirstName={finalDisplayName}
         isCurrentUser={finalIsOwnProfile}
+        milestoneUnlockDates={milestoneUnlockDates}
       />
 
       {/* Regional Completion Section */}
