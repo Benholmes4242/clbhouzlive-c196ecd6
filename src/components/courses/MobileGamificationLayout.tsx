@@ -112,8 +112,11 @@ const MobileGamificationLayout: React.FC<MobileGamificationLayoutProps> = ({
         </div>
       </div>
 
+      {/* Divider Line */}
+      <div className="mx-16 border-t border-gray-300/60 mt-6 mb-6"></div>
+
       {/* Mobile Regional Lists - Single Card Carousel */}
-      <div className="md:hidden pt-8">
+      <div className="md:hidden">
         <div className="flex items-center justify-between mb-4">
           <span className="text-lg font-semibold text-foreground">Regional List Completion</span>
           <span className="text-base font-medium text-foreground">
