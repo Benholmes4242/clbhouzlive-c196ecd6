@@ -33,9 +33,10 @@ const GLOBAL_TROPHIES = [
     name: 'The 50 Club',
     requiredCourses: 50,
     xp: 5500,
-    color: 'from-gray-400 to-slate-500',
-    tier: 'silver',
+    color: 'from-green-600 to-green-800',
+    tier: 'green',
     description: 'Awarded for completing 50 Top 100 Courses. You\'re making the turn!',
+    customBadge: '/lovable-uploads/b9a07b6a-a2ef-4f59-acea-76f2b67faa8d.png',
   },
   {
     id: 'century-club',
@@ -317,7 +318,7 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
                                  />
                                ) : trophy.id === 'the-turn' ? (
                                  <img 
-                                   src="/lovable-uploads/43291ca4-d526-4b10-9585-6ea3488445cf.png" 
+                                    src="/lovable-uploads/b9a07b6a-a2ef-4f59-acea-76f2b67faa8d.png"
                                    alt="The Turn Trophy"
                                    className={cn(
                                  'h-24 w-auto object-contain transition-all duration-300',
@@ -376,7 +377,7 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
                               />
                             ) : trophy.id === 'the-turn' ? (
                               <img 
-                                src="/lovable-uploads/43291ca4-d526-4b10-9585-6ea3488445cf.png" 
+                                src="/lovable-uploads/b9a07b6a-a2ef-4f59-acea-76f2b67faa8d.png" 
                                 alt="The Turn Trophy"
                                 className={cn(
                               'h-32 w-auto object-contain transition-all duration-300',
