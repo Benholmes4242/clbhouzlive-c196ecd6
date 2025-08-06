@@ -9,6 +9,7 @@ import { usePostData } from '@/hooks/usePostData';
 import { ExploreContentItem } from './types';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useSwipeable } from 'react-swipeable';
 
 import CoursePostBadge from '../posts/CoursePostBadge';
 // import CreateMomentModal from '../post/CreateMomentModal'; // Temporarily removed
@@ -422,39 +423,58 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
           
           const currentMediaIndex = mediaIndices[item.id] || 0;
           const currentMedia = mediaItems[currentMediaIndex] || mediaItems[0];
-          const hasMultipleMedia = mediaItems.length > 1;
+           const hasMultipleMedia = mediaItems.length > 1;
 
-          // Navigation handlers for this specific item
-          const handlePrevMedia = (e: React.MouseEvent) => {
-            e.stopPropagation();
-            setMediaIndices(prev => ({
-              ...prev,
-              [item.id]: currentMediaIndex > 0 ? currentMediaIndex - 1 : mediaItems.length - 1
-            }));
-          };
+           // Navigation handlers for this specific item
+           const handlePrevMedia = (e?: React.MouseEvent) => {
+             e?.stopPropagation();
+             setMediaIndices(prev => ({
+               ...prev,
+               [item.id]: currentMediaIndex > 0 ? currentMediaIndex - 1 : mediaItems.length - 1
+             }));
+           };
 
-          const handleNextMedia = (e: React.MouseEvent) => {
-            e.stopPropagation();
-            setMediaIndices(prev => ({
-              ...prev,
-              [item.id]: currentMediaIndex < mediaItems.length - 1 ? currentMediaIndex + 1 : 0
-            }));
-          };
+           const handleNextMedia = (e?: React.MouseEvent) => {
+             e?.stopPropagation();
+             setMediaIndices(prev => ({
+               ...prev,
+               [item.id]: currentMediaIndex < mediaItems.length - 1 ? currentMediaIndex + 1 : 0
+             }));
+           };
 
-          return (
-            <div
-              key={`${item.id}-${index}`}
-              ref={(el) => {
-                if (el) itemRefs.current[index] = el;
-              }}
-              className="relative w-full h-screen snap-start snap-always flex items-center justify-center"
-              style={{ 
-                minHeight: '100vh', 
-                maxHeight: '100vh',
-                scrollSnapAlign: 'start',
-                scrollSnapStop: 'always'
-              }}
-            >
+           // Swipe handlers for media navigation
+           const swipeHandlers = useSwipeable({
+             onSwipedLeft: () => {
+               if (hasMultipleMedia) {
+                 handleNextMedia();
+               }
+             },
+             onSwipedRight: () => {
+               if (hasMultipleMedia) {
+                 handlePrevMedia();
+               }
+             },
+             trackMouse: false,
+             trackTouch: true,
+             preventScrollOnSwipe: false,
+             delta: 50
+           });
+
+           return (
+             <div
+               key={`${item.id}-${index}`}
+               ref={(el) => {
+                 if (el) itemRefs.current[index] = el;
+               }}
+               className="relative w-full h-screen snap-start snap-always flex items-center justify-center"
+               style={{ 
+                 minHeight: '100vh', 
+                 maxHeight: '100vh',
+                 scrollSnapAlign: 'start',
+                 scrollSnapStop: 'always'
+               }}
+               {...(hasMultipleMedia ? swipeHandlers : {})}
+             >
               {/* Media Content */}
               <div 
                 className="relative w-full h-full flex items-center justify-center"

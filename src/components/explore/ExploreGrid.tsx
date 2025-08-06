@@ -8,6 +8,7 @@ import ExploreContentCard from './ExploreContentCard';
 import MediaDisplay from './MediaDisplay';
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
 import { FILTER_TYPES } from './types';
+import { useSwipeable } from 'react-swipeable';
 // import { useAutoplayManager } from '@/hooks/useAutoplayManager';
 
 interface ExploreGridProps {
@@ -38,6 +39,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
   hideBadges = false
 }) => {
   const [isMobile, setIsMobile] = useState(false);
+  const [mediaIndices, setMediaIndices] = useState<{[key: string]: number}>({});
 
   // Check if mobile for TrendingVideos-style layout
   useEffect(() => {
@@ -383,17 +385,57 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
     
     const layoutItems = createDiscoverLayout();
     
+    // Helper functions for media navigation
+    const handlePrevMedia = (itemId: string, mediaLength: number) => {
+      setMediaIndices(prev => ({
+        ...prev,
+        [itemId]: prev[itemId] > 0 ? prev[itemId] - 1 : mediaLength - 1
+      }));
+    };
+
+    const handleNextMedia = (itemId: string, mediaLength: number) => {
+      setMediaIndices(prev => ({
+        ...prev,
+        [itemId]: prev[itemId] < mediaLength - 1 ? prev[itemId] + 1 : 0
+      }));
+    };
+    
     return (
       <>
         {/* Discover Page Layout - Grid with large video cards */}
         <div className="grid grid-cols-3 md:grid-cols-4 gap-0.5 auto-rows-fr">
-          {layoutItems.map((layoutItem, index) => (
-            layoutItem.type === 'large' ? (
+          {layoutItems.map((layoutItem, index) => {
+            const hasMultipleMedia = layoutItem.item.media && layoutItem.item.media.length > 1;
+            const currentMediaIndex = mediaIndices[layoutItem.item.id] || 0;
+            const currentMedia = hasMultipleMedia ? layoutItem.item.media![currentMediaIndex] : null;
+            
+            // Create swipe handlers for items with multiple media
+            const swipeHandlers = useSwipeable({
+              onSwipedLeft: (e) => {
+                e.event.stopPropagation();
+                if (hasMultipleMedia) {
+                  handleNextMedia(layoutItem.item.id, layoutItem.item.media!.length);
+                }
+              },
+              onSwipedRight: (e) => {
+                e.event.stopPropagation();
+                if (hasMultipleMedia) {
+                  handlePrevMedia(layoutItem.item.id, layoutItem.item.media!.length);
+                }
+              },
+              trackMouse: false,
+              trackTouch: true,
+              preventScrollOnSwipe: false,
+              delta: 50
+            });
+
+            return layoutItem.type === 'large' ? (
               <div
                 key={`discover-large-${layoutItem.item.id}-${index}`}
                 className="col-span-2 row-span-2 relative overflow-hidden cursor-pointer group aspect-square"
                 style={{ borderRadius: '8px' }}
                 onClick={() => onMediaClick?.(layoutItem.item)}
+                {...(hasMultipleMedia ? swipeHandlers : {})}
               >
                 {/* Shimmer loading placeholder */}
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-pulse z-0">
@@ -402,7 +444,11 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                 
                 {/* Large Video Card - Always Autoplay */}
                 <MediaDisplay
-                  media={{
+                  media={hasMultipleMedia && currentMedia ? {
+                    id: currentMedia.id,
+                    media_type: currentMedia.media_type,
+                    media_url: currentMedia.media_url
+                  } : {
                     id: layoutItem.item.id,
                     media_type: layoutItem.item.type as 'video' | 'image',
                     media_url: layoutItem.item.src
@@ -462,10 +508,10 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                 )}
                 
                 {/* Media navigation dots for multiple media */}
-                {layoutItem.item.media && layoutItem.item.media.length > 1 && (
+                {hasMultipleMedia && (
                   <MediaNavigationDots
-                    mediaCount={layoutItem.item.media.length}
-                    currentIndex={0}
+                    mediaCount={layoutItem.item.media!.length}
+                    currentIndex={currentMediaIndex}
                   />
                 )}
                 
@@ -499,6 +545,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                 className="relative overflow-hidden cursor-pointer group aspect-square"
                 style={{ borderRadius: '8px' }}
                 onClick={() => onMediaClick?.(layoutItem.item)}
+                {...(hasMultipleMedia ? swipeHandlers : {})}
               >
                 {/* Shimmer loading placeholder */}
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-pulse z-0">
@@ -507,7 +554,11 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                 
                 {/* Regular Card */}
                 <MediaDisplay
-                  media={{
+                  media={hasMultipleMedia && currentMedia ? {
+                    id: currentMedia.id,
+                    media_type: currentMedia.media_type,
+                    media_url: currentMedia.media_url
+                  } : {
                     id: layoutItem.item.id,
                     media_type: layoutItem.item.type as 'video' | 'image',
                     media_url: layoutItem.item.src
@@ -536,15 +587,15 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                 )}
                 
                 {/* Media navigation dots for multiple media */}
-                {layoutItem.item.media && layoutItem.item.media.length > 1 && (
+                {hasMultipleMedia && (
                   <MediaNavigationDots
-                    mediaCount={layoutItem.item.media.length}
-                    currentIndex={0}
+                    mediaCount={layoutItem.item.media!.length}
+                    currentIndex={currentMediaIndex}
                   />
                 )}
               </div>
-            )
-          ))}
+            );
+          })}
         </div>
         
         {/* Infinite scroll sentinel */}

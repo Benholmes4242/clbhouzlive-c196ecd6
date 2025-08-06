@@ -16,6 +16,7 @@ import CommentsModal from '@/components/posts/CommentsModal';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
+import { useSwipeable } from 'react-swipeable';
 
 interface DiscoverVerticalFeedProps {
   isOpen: boolean;
@@ -499,6 +500,24 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
           const currentMedia = mediaItems[currentMediaIndex] || mediaItems[0];
           const hasMultipleMedia = mediaItems.length > 1;
 
+          // Swipe handlers for media navigation
+          const swipeHandlers = useSwipeable({
+            onSwipedLeft: () => {
+              if (hasMultipleMedia) {
+                handleNextMedia(item.id, mediaItems.length);
+              }
+            },
+            onSwipedRight: () => {
+              if (hasMultipleMedia) {
+                handlePrevMedia(item.id, mediaItems.length);
+              }
+            },
+            trackMouse: false,
+            trackTouch: true,
+            preventScrollOnSwipe: false,
+            delta: 50
+          });
+
           return (
             <div 
               key={`${item.id}-${index}`}
@@ -511,6 +530,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                 minHeight: '100vh',
                 maxHeight: '100vh'
               }}
+              {...(hasMultipleMedia ? swipeHandlers : {})}
             >
               {/* Close Button - Top Left */}
               <button
