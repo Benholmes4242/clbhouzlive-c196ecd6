@@ -686,7 +686,7 @@ const HeroProfileHeader = ({
               <div className="mt-8 px-0">
                 <div className="p-4">
                   <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-3xl font-bold text-foreground">Top 100 courses</h2>
+                    <h2 className="text-3xl font-bold text-foreground">The World's Greatest Courses</h2>
                   </div>
                 </div>
                 <LatestHighlights userId={profile?.id || ''} isOwnProfile={isOwnProfile} />
