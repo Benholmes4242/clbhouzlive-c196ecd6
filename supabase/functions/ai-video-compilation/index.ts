@@ -158,6 +158,7 @@ serve(async (req) => {
     const publicUrl = compiledClips[0]?.hlsUrl
     
     console.log('AI Video Compilation: All videos uploaded successfully to Cloudflare Stream')
+    console.log('AI Video Compilation: Returning first video URL as compilation result:', publicUrl)
 
     // Generate suggested caption
     const suggestedCaption = generateSuggestedCaption(videoUrls.length, useAiAssist)
@@ -166,7 +167,7 @@ serve(async (req) => {
       JSON.stringify({
         success: true,
         compiledVideoUrl: publicUrl,
-        compiledClips, // Include all the clipped videos
+        compiledClips, // Include all the uploaded videos
         suggestedCaption,
         stats: {
           originalClips: videoUrls.length,

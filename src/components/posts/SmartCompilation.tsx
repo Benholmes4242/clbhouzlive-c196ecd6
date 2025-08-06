@@ -79,22 +79,39 @@ const SmartCompilation: React.FC<SmartCompilationProps> = ({
 
   // Generate video thumbnail
   const generateVideoThumbnail = async (file: File): Promise<string> => {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       const video = document.createElement('video');
       video.preload = 'metadata';
+      video.crossOrigin = 'anonymous';
+      video.muted = true; // Important for autoplay policies
       
       video.onloadedmetadata = () => {
-        video.currentTime = Math.min(2, video.duration / 2); // Seek to 2 seconds or middle
+        // Try multiple time points if first fails
+        const timeToSeek = Math.min(2, video.duration / 2);
+        video.currentTime = timeToSeek;
       };
       
       video.onseeked = () => {
-        const canvas = document.createElement('canvas');
-        canvas.width = 120;
-        canvas.height = 80;
-        const ctx = canvas.getContext('2d')!;
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const thumbnailUrl = canvas.toDataURL('image/jpeg', 0.8);
-        resolve(thumbnailUrl);
+        try {
+          const canvas = document.createElement('canvas');
+          canvas.width = 120;
+          canvas.height = 80;
+          const ctx = canvas.getContext('2d')!;
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          const thumbnailUrl = canvas.toDataURL('image/jpeg', 0.8);
+          URL.revokeObjectURL(video.src); // Clean up
+          resolve(thumbnailUrl);
+        } catch (error) {
+          console.error('Error generating thumbnail:', error);
+          // Fallback to a default thumbnail
+          resolve('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjgwIiB2aWV3Qm94PSIwIDAgMTIwIDgwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjOTk5OTk5Ii8+Cjx0ZXh0IHg9IjYwIiB5PSI0NSIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTIiPkVycm9yPC90ZXh0Pgo8L3N2Zz4K');
+        }
+      };
+      
+      video.onerror = () => {
+        console.error('Video loading error for thumbnail generation');
+        // Fallback to a default thumbnail
+        resolve('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjgwIiB2aWV3Qm94PSIwIDAgMTIwIDgwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjOTk5OTk5Ii8+Cjx0ZXh0IHg9IjYwIiB5PSI0NSIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTIiPlZpZGVvPC90ZXh0Pgo8L3N2Zz4K');
       };
       
       video.src = URL.createObjectURL(file);
