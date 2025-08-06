@@ -307,7 +307,7 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
                      >
                        {globalTrophies.map((trophy, index) => {
                          return (
-                           <React.Fragment key={`trophy-progress-mobile-${trophy.id}`}>
+                           <div key={`trophy-progress-mobile-${trophy.id}`} className="contents">
                              {/* Trophy */}
                              <div className="flex justify-center flex-shrink-0">
                                <Tooltip.Root delayDuration={200}>
@@ -414,7 +414,7 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
                                  </div>
                                </div>
                              )}
-                           </React.Fragment>
+                            </div>
                          );
                        })}
                      </div>
@@ -430,7 +430,7 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
                       const segmentProgress = (progressInSegment / segmentSize) * 100;
                       
                       return (
-                        <React.Fragment key={`trophy-progress-${trophy.id}`}>
+                        <div key={`trophy-progress-${trophy.id}`} className="contents">
                           {/* Trophy */}
                           <div className="flex justify-center">
                             <Tooltip.Root delayDuration={200}>
@@ -537,7 +537,7 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
                               </div>
                             </div>
                           )}
-                        </React.Fragment>
+                        </div>
                       );
                     })}
                   </div>
