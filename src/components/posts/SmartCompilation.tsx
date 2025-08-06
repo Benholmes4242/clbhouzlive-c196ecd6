@@ -417,61 +417,68 @@ const SmartCompilation: React.FC<SmartCompilationProps> = ({
             <div className="space-y-3">
               <p className="text-sm font-medium text-gray-700">Clip Order</p>
               
-              <DragDropContext onDragEnd={handleDragEnd}>
-                <Droppable droppableId="video-clips-droppable" direction="horizontal">
-                  {(provided, snapshot) => (
-                    <div
-                      {...provided.droppableProps}
-                      ref={provided.innerRef}
-                      className={`flex gap-3 overflow-x-auto pb-2 min-h-[4rem] ${
-                        snapshot.isDraggingOver ? 'bg-purple-50 rounded-lg' : ''
-                      }`}
-                    >
-                      {videoClips.map((clip, index) => (
-                        <Draggable 
-                          key={`video-clip-${clip.id}`} 
-                          draggableId={`video-clip-${clip.id}`} 
-                          index={index}
-                        >
-                          {(provided, snapshot) => (
-                            <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                              className={`flex-shrink-0 relative cursor-grab active:cursor-grabbing transition-all duration-200 ${
-                                snapshot.isDragging ? 'opacity-90 transform rotate-2 scale-105 z-50 shadow-2xl' : ''
-                              }`}
-                            >
-                              <div className={`w-24 h-16 rounded-lg overflow-hidden relative transition-all duration-200 ${
-                                snapshot.isDragging 
-                                  ? 'border-2 border-purple-500 shadow-lg' 
-                                  : 'border-2 border-gray-200 hover:border-purple-300'
-                              }`}>
-                                <img
-                                  src={clip.thumbnailUrl}
-                                  alt={`Clip ${index + 1}`}
-                                  className="w-full h-full object-cover bg-gray-100"
-                                  onError={(e) => {
-                                    console.error('Thumbnail failed to load for clip:', clip.id);
-                                    e.currentTarget.style.display = 'none';
-                                  }}
-                                />
-                                <div className="absolute bottom-1 left-1 bg-black/70 text-white text-xs px-1 rounded">
-                                  {formatDuration(clip.duration)}
-                                </div>
-                                <div className="absolute top-1 left-1 bg-purple-600 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center font-bold">
-                                  {index + 1}
+              {videoClips.length > 0 ? (
+                <DragDropContext onDragEnd={handleDragEnd}>
+                  <Droppable droppableId="clips-container">
+                    {(provided, snapshot) => (
+                      <div
+                        {...provided.droppableProps}
+                        ref={provided.innerRef}
+                        className={`flex gap-3 overflow-x-auto pb-2 min-h-[4rem] p-2 rounded-lg transition-colors ${
+                          snapshot.isDraggingOver ? 'bg-purple-50' : 'bg-gray-50'
+                        }`}
+                      >
+                        {videoClips.map((clip, index) => (
+                          <Draggable 
+                            key={`clip-draggable-${index}`} 
+                            draggableId={`clip-draggable-${index}`} 
+                            index={index}
+                          >
+                            {(provided, snapshot) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                                className={`flex-shrink-0 relative transition-all duration-200 ${
+                                  snapshot.isDragging 
+                                    ? 'opacity-90 scale-105 z-50 shadow-2xl transform rotate-2' 
+                                    : 'cursor-grab hover:scale-105'
+                                }`}
+                              >
+                                <div className={`w-24 h-16 rounded-lg overflow-hidden relative border-2 transition-all ${
+                                  snapshot.isDragging 
+                                    ? 'border-purple-500 shadow-lg' 
+                                    : 'border-gray-200 hover:border-purple-300'
+                                }`}>
+                                  <img
+                                    src={clip.thumbnailUrl}
+                                    alt={`Clip ${index + 1}`}
+                                    className="w-full h-full object-cover"
+                                    loading="lazy"
+                                  />
+                                  <div className="absolute bottom-1 left-1 bg-black/70 text-white text-xs px-1 rounded">
+                                    {formatDuration(clip.duration)}
+                                  </div>
+                                  <div className="absolute top-1 left-1 bg-purple-600 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center font-bold">
+                                    {index + 1}
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          )}
-                        </Draggable>
-                      ))}
-                      {provided.placeholder}
-                    </div>
-                  )}
-                </Droppable>
-              </DragDropContext>
+                            )}
+                          </Draggable>
+                        ))}
+                        {provided.placeholder}
+                      </div>
+                    )}
+                  </Droppable>
+                </DragDropContext>
+              ) : (
+                <div className="flex gap-3 overflow-x-auto pb-2 min-h-[4rem] p-2 rounded-lg bg-gray-50">
+                  <div className="flex items-center justify-center text-gray-500 text-sm">
+                    Processing video clips...
+                  </div>
+                </div>
+              )}
               
               <p className="text-xs text-gray-500">
                 Drag to reorder clips • AI will auto-trim to ~3-6 seconds each
