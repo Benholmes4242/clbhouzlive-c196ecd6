@@ -295,100 +295,125 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
             <div className="relative">
                {/* Trophy Points - Mobile: Horizontal Slider, Desktop: Grid with Progress Bars */}
                 {isMobile ? (
-                   /* Mobile: Horizontal Scrollable Slider showing 2 trophies + peek of 3rd */
+                   /* Mobile: Horizontal Scrollable version of desktop layout */
                    <div className="relative">
                      <div 
                        ref={carouselRef}
-                       className="flex overflow-x-auto scrollbar-hide gap-4 px-2 pb-4 snap-x snap-mandatory"
+                       className="flex overflow-x-auto scrollbar-hide gap-2 px-2 pb-4 snap-x snap-mandatory items-center pt-2 pb-1"
                        style={{ scrollPaddingLeft: '8px', scrollPaddingRight: '8px' }}
                      >
-                       {globalTrophies.map((trophy, index) => (
-                          <Tooltip.Root key={trophy.id} delayDuration={200}>
-                            <Tooltip.Trigger asChild>
-                              <div 
-                                className="relative flex-none w-[calc(42%-8px)] flex flex-col items-center space-y-3 cursor-pointer hover:scale-105 transition-all duration-300 snap-start p-4 rounded-xl bg-background/50 border border-border/50 pb-6 z-10"
-                                style={{ filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1))' }}
-                             >
-                               {trophy.id === 'green-fee-rookie' ? (
-                                 <img 
-                                    src="/lovable-uploads/9a5af57b-72fa-4986-bcbb-9c3ce337584c.png"
-                                   alt="20 Club Trophy" 
-                                   className={cn(
-                                 'h-28 w-auto object-contain transition-all duration-300',
-                                 trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
-                               )}
-                                   style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(34, 197, 94, 0.6))' : 'none' }}
-                                 />
-                               ) : trophy.id === 'the-turn' ? (
-                                 <img 
-                                    src="/lovable-uploads/b9a07b6a-a2ef-4f59-acea-76f2b67faa8d.png"
-                                   alt="The Turn Trophy"
-                                   className={cn(
-                                 'h-28 w-auto object-contain transition-all duration-300',
-                                 trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
-                               )}
-                                    style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(34, 197, 94, 0.6))' : 'none' }}
-                                  />
-                                ) : trophy.id === 'century-club' ? (
-                                  <img 
-                                     src="/lovable-uploads/f6339399-b23a-457b-b65e-8c2f7322a12b.png"
-                                    alt="Century Club Trophy"
-                                    className={cn(
-                                  'h-28 w-auto object-contain transition-all duration-300',
-                                  trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
-                                )}
-                                    style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(251, 191, 36, 0.6))' : 'none' }}
-                                  />
-                                ) : trophy.id === 'clubhouse-elite' ? (
-                                  <img 
-                                     src="/lovable-uploads/3fad8a43-f0de-42f5-b709-ae685b2cd173.png"
-                                    alt="Clubhouse Elite Trophy"
-                                    className={cn(
-                                  'h-28 w-auto object-contain transition-all duration-300',
-                                  trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
-                                )}
-                                    style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(148, 163, 184, 0.6))' : 'none' }}
-                                  />
-                                ) : trophy.id === 'course-collector' ? (
-                                  <img 
-                                     src="/lovable-uploads/5e67194f-43f3-4c9d-a5a2-8c0b335c0a09.png"
-                                    alt="Club Champion Trophy"
-                                    className={cn(
-                                  'h-28 w-auto object-contain transition-all duration-300',
-                                  trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
-                                )}
-                                    style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(251, 191, 36, 0.6))' : 'none' }}
-                                  />
-                                ) : (
-                                 <TrophyIcon 
-                                   isUnlocked={trophy.isUnlocked} 
-                                   color={trophy.color} 
-                                   size="lg" 
-                                 />
-                               )}
+                       {globalTrophies.map((trophy, index) => {
+                         return (
+                           <React.Fragment key={`trophy-progress-mobile-${trophy.id}`}>
+                             {/* Trophy */}
+                             <div className="flex justify-center flex-shrink-0">
+                               <Tooltip.Root delayDuration={200}>
+                                 <Tooltip.Trigger asChild>
+                                   <div className="relative flex flex-col items-center space-y-3 cursor-pointer hover:scale-105 transition-all duration-300 z-10">
+                                     {trophy.id === 'green-fee-rookie' ? (
+                                       <img 
+                                         src="/lovable-uploads/9a5af57b-72fa-4986-bcbb-9c3ce337584c.png"
+                                         alt="20 Club Trophy" 
+                                         className={cn(
+                                       'h-36 w-auto object-contain transition-all duration-300',
+                                       trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
+                                     )}
+                                         style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(34, 197, 94, 0.6))' : 'none' }}
+                                       />
+                                     ) : trophy.id === 'the-turn' ? (
+                                       <img 
+                                         src="/lovable-uploads/b9a07b6a-a2ef-4f59-acea-76f2b67faa8d.png"
+                                         alt="The Turn Trophy"
+                                         className={cn(
+                                       'h-36 w-auto object-contain transition-all duration-300',
+                                       trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
+                                     )}
+                                          style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(34, 197, 94, 0.6))' : 'none' }}
+                                        />
+                                      ) : trophy.id === 'century-club' ? (
+                                        <img 
+                                          src="/lovable-uploads/f6339399-b23a-457b-b65e-8c2f7322a12b.png"
+                                          alt="Century Club Trophy"
+                                          className={cn(
+                                        'h-36 w-auto object-contain transition-all duration-300',
+                                        trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
+                                      )}
+                                          style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(251, 191, 36, 0.6))' : 'none' }}
+                                        />
+                                      ) : trophy.id === 'clubhouse-elite' ? (
+                                        <img 
+                                          src="/lovable-uploads/3fad8a43-f0de-42f5-b709-ae685b2cd173.png"
+                                          alt="Clubhouse Elite Trophy"
+                                          className={cn(
+                                        'h-36 w-auto object-contain transition-all duration-300',
+                                        trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
+                                      )}
+                                          style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(148, 163, 184, 0.6))' : 'none' }}
+                                        />
+                                      ) : trophy.id === 'course-collector' ? (
+                                        <img 
+                                          src="/lovable-uploads/5e67194f-43f3-4c9d-a5a2-8c0b335c0a09.png"
+                                          alt="Club Champion Trophy"
+                                          className={cn(
+                                        'h-36 w-auto object-contain transition-all duration-300',
+                                        trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
+                                      )}
+                                          style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(251, 191, 36, 0.6))' : 'none' }}
+                                        />
+                                      ) : (
+                                       <TrophyIcon 
+                                         isUnlocked={trophy.isUnlocked} 
+                                         color={trophy.color} 
+                                         size="lg" 
+                                       />
+                                     )}
+                                   </div>
+                                 </Tooltip.Trigger>
+                                 <Tooltip.Portal>
+                                   <Tooltip.Content 
+                                     className="bg-background border border-border rounded-lg p-3 shadow-lg z-50 max-w-[200px] animate-fade-in"
+                                     sideOffset={8}
+                                     side="bottom"
+                                   >
+                                     <div className="text-center space-y-1">
+                                       <h4 className="font-semibold text-sm text-foreground">{trophy.name}</h4>
+                                       <p className="text-xs text-muted-foreground leading-relaxed">{trophy.description}</p>
+                                       <p className="text-xs font-medium text-primary">
+                                         Progress: {trophy.currentProgress}/{trophy.requiredCourses}
+                                       </p>
+                                       {trophy.isUnlocked && trophy.unlockedDate && (
+                                         <p className="text-xs text-green-600 font-medium">Unlocked: {trophy.unlockedDate}</p>
+                                       )}
+                                     </div>
+                                     <Tooltip.Arrow className="fill-border" />
+                                   </Tooltip.Content>
+                                 </Tooltip.Portal>
+                               </Tooltip.Root>
                              </div>
-                            </Tooltip.Trigger>
-                            <Tooltip.Portal>
-                              <Tooltip.Content 
-                                className="bg-background border border-border rounded-lg p-3 shadow-lg z-50 max-w-[200px] animate-fade-in"
-                                sideOffset={8}
-                                side="bottom"
-                              >
-                                <div className="text-center space-y-1">
-                                  <h4 className="font-semibold text-sm text-foreground">{trophy.name}</h4>
-                                  <p className="text-xs text-muted-foreground leading-relaxed">{trophy.description}</p>
-                                  <p className="text-xs font-medium text-primary">
-                                    Progress: {trophy.currentProgress}/{trophy.requiredCourses}
-                                  </p>
-                                  {trophy.isUnlocked && trophy.unlockedDate && (
-                                    <p className="text-xs text-green-600 font-medium">Unlocked: {trophy.unlockedDate}</p>
-                                  )}
-                                </div>
-                                <Tooltip.Arrow className="fill-border" />
-                              </Tooltip.Content>
-                            </Tooltip.Portal>
-                          </Tooltip.Root>
-                       ))}
+                             
+                             {/* Progress Bar (except after last trophy) */}
+                             {index < globalTrophies.length - 1 && (
+                               <div className="flex items-center justify-center w-16 flex-shrink-0">
+                                 <div className="w-full h-2 bg-gray-300 rounded-full overflow-hidden">
+                                   <div 
+                                     className="h-full bg-green-700 transition-all duration-500 ease-out"
+                                     style={{ 
+                                       width: `${(() => {
+                                         const nextTrophy = globalTrophies[index + 1];
+                                         const currentMilestone = trophy.requiredCourses;
+                                         const nextMilestone = nextTrophy.requiredCourses;
+                                         const segmentSize = nextMilestone - currentMilestone;
+                                         const progressInSegment = Math.max(0, Math.min(completedCount - currentMilestone, segmentSize));
+                                         return (progressInSegment / segmentSize) * 100;
+                                       })()}%` 
+                                     }}
+                                   />
+                                 </div>
+                               </div>
+                             )}
+                           </React.Fragment>
+                         );
+                       })}
                      </div>
                    </div>
                 ) : (
