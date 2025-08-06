@@ -8,7 +8,7 @@ import ExploreContentCard from './ExploreContentCard';
 import MediaDisplay from './MediaDisplay';
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
 import { FILTER_TYPES } from './types';
-import { useSwipeable } from 'react-swipeable';
+
 // import { useAutoplayManager } from '@/hooks/useAutoplayManager';
 
 interface ExploreGridProps {
@@ -399,35 +399,51 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
         [itemId]: prev[itemId] < mediaLength - 1 ? prev[itemId] + 1 : 0
       }));
     };
+
+    // Create touch handlers for swipe detection
+    const createTouchHandlers = (itemId: string, mediaLength: number) => {
+      let startX = 0;
+      let startY = 0;
+      
+      return {
+        onTouchStart: (e: any) => {
+          startX = e.touches[0].clientX;
+          startY = e.touches[0].clientY;
+        },
+        onTouchEnd: (e: any) => {
+          if (!startX || !startY) return;
+          
+          const endX = e.changedTouches[0].clientX;
+          const endY = e.changedTouches[0].clientY;
+          const diffX = startX - endX;
+          const diffY = startY - endY;
+          
+          // Only handle horizontal swipes (ignore vertical scrolling)
+          if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+            e.preventDefault();
+            if (diffX > 0) {
+              // Swiped left - next media
+              handleNextMedia(itemId, mediaLength);
+            } else {
+              // Swiped right - previous media
+              handlePrevMedia(itemId, mediaLength);
+            }
+          }
+          
+          startX = 0;
+          startY = 0;
+        }
+      };
+    };
     
     return (
       <>
         {/* Discover Page Layout - Grid with large video cards */}
         <div className="grid grid-cols-3 md:grid-cols-4 gap-0.5 auto-rows-fr">
-          {layoutItems.map((layoutItem, index) => {
-            const hasMultipleMedia = layoutItem.item.media && layoutItem.item.media.length > 1;
-            const currentMediaIndex = mediaIndices[layoutItem.item.id] || 0;
-            const currentMedia = hasMultipleMedia ? layoutItem.item.media![currentMediaIndex] : null;
-            
-            // Create swipe handlers for items with multiple media
-            const swipeHandlers = useSwipeable({
-              onSwipedLeft: (e) => {
-                e.event.stopPropagation();
-                if (hasMultipleMedia) {
-                  handleNextMedia(layoutItem.item.id, layoutItem.item.media!.length);
-                }
-              },
-              onSwipedRight: (e) => {
-                e.event.stopPropagation();
-                if (hasMultipleMedia) {
-                  handlePrevMedia(layoutItem.item.id, layoutItem.item.media!.length);
-                }
-              },
-              trackMouse: false,
-              trackTouch: true,
-              preventScrollOnSwipe: false,
-              delta: 50
-            });
+        {layoutItems.map((layoutItem, index) => {
+          const hasMultipleMedia = layoutItem.item.media && layoutItem.item.media.length > 1;
+          const currentMediaIndex = mediaIndices[layoutItem.item.id] || 0;
+          const currentMedia = hasMultipleMedia ? layoutItem.item.media![currentMediaIndex] : null;
 
             return layoutItem.type === 'large' ? (
               <div
@@ -435,7 +451,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                 className="col-span-2 row-span-2 relative overflow-hidden cursor-pointer group aspect-square"
                 style={{ borderRadius: '8px' }}
                 onClick={() => onMediaClick?.(layoutItem.item)}
-                {...(hasMultipleMedia ? swipeHandlers : {})}
+                {...(hasMultipleMedia ? createTouchHandlers(layoutItem.item.id, layoutItem.item.media!.length) : {})}
               >
                 {/* Shimmer loading placeholder */}
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-pulse z-0">
@@ -545,7 +561,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                 className="relative overflow-hidden cursor-pointer group aspect-square"
                 style={{ borderRadius: '8px' }}
                 onClick={() => onMediaClick?.(layoutItem.item)}
-                {...(hasMultipleMedia ? swipeHandlers : {})}
+                {...(hasMultipleMedia ? createTouchHandlers(layoutItem.item.id, layoutItem.item.media!.length) : {})}
               >
                 {/* Shimmer loading placeholder */}
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-pulse z-0">
