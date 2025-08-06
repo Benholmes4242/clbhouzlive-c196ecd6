@@ -36,8 +36,8 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
   const nextMilestone = 5000;
   // XP Ring level will be calculated by the XP Ring System component
 
-  // Real achievements data
-  const achievements: Achievement[] = [
+  // Skill & Performance Achievements
+  const skillAchievements: Achievement[] = [
     {
       title: "Single-Figure Handicap",
       emoji: "🏆",
@@ -175,6 +175,93 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
     }
   ];
 
+  // Experience & Exploration Achievements
+  const explorationAchievements: Achievement[] = [
+    // Top 100 Courses Played
+    {
+      title: "20 Club",
+      emoji: "🥉",
+      isEarned: false,
+      description: "Play 20 Top 100 Courses. Beginning your journey through golf's elite venues.",
+      xp: 200,
+      isRepeatable: false,
+      progress: "3 / 20 courses"
+    },
+    {
+      title: "50 Club",
+      emoji: "🥈",
+      isEarned: false,
+      description: "Play 50 Top 100 Courses. Serious commitment to experiencing golf's finest.",
+      xp: 500,
+      isRepeatable: false,
+      progress: "3 / 50 courses"
+    },
+    {
+      title: "100 Century Club",
+      emoji: "🥇",
+      isEarned: false,
+      description: "Play 100 Top 100 Courses. A monumental achievement in golf exploration.",
+      xp: 1000,
+      isRepeatable: false,
+      progress: "3 / 100 courses"
+    },
+    {
+      title: "200 Clubhouse Elite",
+      emoji: "💎",
+      isEarned: false,
+      description: "Play 200 Top Golf Courses. Among the world's most accomplished golfers.",
+      xp: 1500,
+      isRepeatable: false,
+      progress: "3 / 200 courses"
+    },
+    {
+      title: "300 Club Champion",
+      emoji: "👑",
+      isEarned: false,
+      description: "Play 300 Top Courses Worldwide. Ultimate golf exploration mastery.",
+      xp: 2000,
+      isRepeatable: false,
+      progress: "3 / 300 courses"
+    },
+    // Regional Top 100 Achievements
+    {
+      title: "GB & Ireland Top 100",
+      emoji: "🇬🇧",
+      isEarned: false,
+      description: "Complete all GB & Ireland Top 100 courses. Master the home of golf.",
+      xp: 750,
+      isRepeatable: false,
+      progress: "8 / 50 courses"
+    },
+    {
+      title: "Continental Europe Top 100",
+      emoji: "🇪🇺",
+      isEarned: false,
+      description: "Complete all Continental Europe Top 100 courses. European golf excellence.",
+      xp: 750,
+      isRepeatable: false,
+      progress: "2 / 30 courses"
+    },
+    {
+      title: "USA Top 100",
+      emoji: "🇺🇸",
+      isEarned: false,
+      description: "Complete all USA Top 100 courses. American golf at its finest.",
+      xp: 1000,
+      isRepeatable: false,
+      progress: "0 / 50 courses"
+    },
+    {
+      title: "Worldwide Top 100",
+      emoji: "🌍",
+      isEarned: false,
+      description: "Complete all Global Top 100 courses. The ultimate golf pilgrimage.",
+      xp: 2500,
+      isRepeatable: false,
+      progress: "3 / 100 courses"
+    }
+  ];
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[85vh] overflow-hidden p-0 flex flex-col">
@@ -222,11 +309,12 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
             </div>
           </div>
 
-          {/* Achievements Grid */}
+          {/* Skill & Performance Achievements */}
           <div className="px-6 pb-6">
+            <h3 className="text-lg font-semibold mb-4 text-center">Skill & Performance Achievements</h3>
             <TooltipProvider>
               <div className="grid grid-cols-3 gap-4">
-                {achievements.map((achievement) => (
+                {skillAchievements.map((achievement) => (
                   <Tooltip key={achievement.title}>
                     <TooltipTrigger asChild>
                       <div
@@ -245,6 +333,54 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                           {achievement.title}
                         </h4>
                         <p className={`text-xs ${achievement.isEarned ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}`}>
+                          +{achievement.xp} XP {achievement.isRepeatable ? "(R)" : ""}
+                        </p>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-sm">
+                      <div className="text-center">
+                        <h4 className="font-semibold mb-1">{achievement.title}</h4>
+                        <p className="text-sm text-muted-foreground mb-2">
+                          {achievement.description}
+                        </p>
+                        <p className="text-xs font-medium mb-1">
+                          +{achievement.xp} XP {achievement.isRepeatable ? "(Repeatable)" : "(One-time)"}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Progress: {achievement.progress}
+                        </p>
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
+                ))}
+              </div>
+            </TooltipProvider>
+          </div>
+
+          {/* Experience & Exploration Achievements */}
+          <div className="px-6 pb-6">
+            <h3 className="text-lg font-semibold mb-4 text-center">Experience & Exploration Achievements</h3>
+            <TooltipProvider>
+              <div className="grid grid-cols-3 gap-4">
+                {explorationAchievements.map((achievement) => (
+                  <Tooltip key={achievement.title}>
+                    <TooltipTrigger asChild>
+                      <div
+                        className={`
+                          border rounded-lg p-4 text-center transition-all duration-200 hover:scale-105 cursor-pointer
+                          ${achievement.isEarned 
+                            ? 'bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800' 
+                            : 'bg-muted/30 border-border opacity-70'
+                          }
+                        `}
+                      >
+                        <div className="text-2xl mb-2">
+                          {achievement.isEarned ? achievement.emoji : '🔒'}
+                        </div>
+                        <h4 className="font-medium text-sm mb-1">
+                          {achievement.title}
+                        </h4>
+                        <p className={`text-xs ${achievement.isEarned ? 'text-blue-600 dark:text-blue-400' : 'text-muted-foreground'}`}>
                           +{achievement.xp} XP {achievement.isRepeatable ? "(R)" : ""}
                         </p>
                       </div>
