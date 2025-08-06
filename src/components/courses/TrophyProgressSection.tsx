@@ -299,7 +299,7 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
                    <div className="relative">
                      <div 
                        ref={carouselRef}
-                       className="flex overflow-x-auto scrollbar-hide gap-1 px-2 pb-4 snap-x snap-mandatory items-center pt-2 pb-1"
+                       className="flex overflow-x-auto scrollbar-hide gap-0 px-2 pb-4 snap-x snap-mandatory items-center pt-2 pb-1"
                        style={{ scrollPaddingLeft: '8px', scrollPaddingRight: '8px' }}
                      >
                        {globalTrophies.map((trophy, index) => {
@@ -418,7 +418,7 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
                    </div>
                 ) : (
                   /* Desktop: Grid with Progress Bars Between Trophies */
-                  <div className="grid grid-cols-9 gap-2 pt-2 pb-1 items-center">
+                  <div className="grid grid-cols-9 gap-0 pt-2 pb-1 items-center">
                     {globalTrophies.map((trophy, index) => {
                       const prevMilestone = index === 0 ? 0 : globalTrophies[index - 1].requiredCourses;
                       const currentMilestone = trophy.requiredCourses;
