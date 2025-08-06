@@ -293,6 +293,35 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
             
             {/* Trophy Timeline */}
             <div className="relative">
+               {/* Progress Bar - runs through center of trophies */}
+               <div className="absolute top-1/2 left-0 right-0 transform -translate-y-1/2 z-0 px-8">
+                 <div className="flex items-center gap-0">
+                   {globalTrophies.map((trophy, index) => {
+                     const prevMilestone = index === 0 ? 0 : globalTrophies[index - 1].requiredCourses;
+                     const currentMilestone = trophy.requiredCourses;
+                     const segmentSize = currentMilestone - prevMilestone;
+                     const progressInSegment = Math.max(0, Math.min(completedCount - prevMilestone, segmentSize));
+                     const segmentProgress = (progressInSegment / segmentSize) * 100;
+                     
+                     return (
+                       <div key={`segment-${trophy.id}`} className="flex-1 flex items-center">
+                         {/* Progress segment */}
+                         <div className="flex-1 h-2 bg-gray-300 rounded-full overflow-hidden">
+                           <div 
+                             className="h-full bg-green-700 transition-all duration-500 ease-out"
+                             style={{ width: `${segmentProgress}%` }}
+                           />
+                         </div>
+                         
+                         {/* Trophy marker (except for last one) */}
+                         {index < globalTrophies.length - 1 && (
+                           <div className="w-4 h-4 rounded-full bg-background border-2 border-gray-400 mx-2 flex-shrink-0" />
+                         )}
+                       </div>
+                     );
+                   })}
+                 </div>
+               </div>
                {/* Trophy Points - Mobile: Horizontal Slider, Desktop: Grid */}
                 {isMobile ? (
                    /* Mobile: Horizontal Scrollable Slider showing 2 trophies + peek of 3rd */
@@ -305,8 +334,8 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
                        {globalTrophies.map((trophy, index) => (
                           <Tooltip.Root key={trophy.id} delayDuration={200}>
                             <Tooltip.Trigger asChild>
-                              <div 
-                                className="relative flex-none w-[calc(42%-8px)] flex flex-col items-center space-y-3 cursor-pointer hover:scale-105 transition-all duration-300 snap-start p-4 rounded-xl bg-background/50 border border-border/50 pb-6"
+                               <div 
+                                 className="relative flex-none w-[calc(42%-8px)] flex flex-col items-center space-y-3 cursor-pointer hover:scale-105 transition-all duration-300 snap-start p-4 rounded-xl bg-background/50 border border-border/50 pb-6 z-10"
                                 style={{ filter: 'drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1))' }}
                              >
                                {trophy.id === 'green-fee-rookie' ? (
@@ -397,7 +426,7 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
                     {globalTrophies.map((trophy, index) => (
                       <Tooltip.Root key={trophy.id} delayDuration={200}>
                         <Tooltip.Trigger asChild>
-                          <div className="relative flex flex-col items-center space-y-3 cursor-pointer hover:scale-105 transition-all duration-300">
+                          <div className="relative flex flex-col items-center space-y-3 cursor-pointer hover:scale-105 transition-all duration-300 z-10">
                             {trophy.id === 'green-fee-rookie' ? (
                              <img 
                                src="/lovable-uploads/9a5af57b-72fa-4986-bcbb-9c3ce337584c.png" 
@@ -480,36 +509,6 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
                     ))}
                   </div>
                  )}
-               
-               {/* Progress Bar */}
-               <div className="mt-4 px-2">
-                 <div className="flex items-center gap-0">
-                   {globalTrophies.map((trophy, index) => {
-                     const prevMilestone = index === 0 ? 0 : globalTrophies[index - 1].requiredCourses;
-                     const currentMilestone = trophy.requiredCourses;
-                     const segmentSize = currentMilestone - prevMilestone;
-                     const progressInSegment = Math.max(0, Math.min(completedCount - prevMilestone, segmentSize));
-                     const segmentProgress = (progressInSegment / segmentSize) * 100;
-                     
-                     return (
-                       <div key={`segment-${trophy.id}`} className="flex-1 flex items-center">
-                         {/* Progress segment */}
-                         <div className="flex-1 h-2 bg-gray-300 rounded-full overflow-hidden">
-                           <div 
-                             className="h-full bg-green-700 transition-all duration-500 ease-out"
-                             style={{ width: `${segmentProgress}%` }}
-                           />
-                         </div>
-                         
-                         {/* Trophy marker (except for last one) */}
-                         {index < globalTrophies.length - 1 && (
-                           <div className="w-4 h-4 rounded-full bg-background border-2 border-gray-400 mx-1 flex-shrink-0" />
-                         )}
-                       </div>
-                     );
-                   })}
-                 </div>
-               </div>
              </div>
           </div>
           </div>
