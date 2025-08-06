@@ -176,8 +176,8 @@ serve(async (req) => {
           console.log(`AI Video Compilation: Using full video ${i + 1} instead of clip`)
           compiledClips.push({
             videoId: uploadData.videoId,
-            hlsUrl: uploadData.playbackUrl,
-            thumbnailUrl: uploadData.thumbnailUrl,
+            hlsUrl: `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${uploadData.videoId}/manifest/video.m3u8`,
+            thumbnailUrl: `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${uploadData.videoId}/thumbnails/thumbnail.jpg`,
             originalOrder: i,
             clipDuration: clipDurations[i],
             startTime: 0,
@@ -189,8 +189,8 @@ serve(async (req) => {
         
         compiledClips.push({
           videoId: clipResult.result.uid,
-          hlsUrl: clipResult.result.playback?.hls,
-          thumbnailUrl: clipResult.result.thumbnail,
+          hlsUrl: `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${clipResult.result.uid}/manifest/video.m3u8`,
+          thumbnailUrl: `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${clipResult.result.uid}/thumbnails/thumbnail.jpg`,
           originalOrder: i,
           clipDuration: clipPlan.end - clipPlan.start,
           startTime: clipPlan.start,
