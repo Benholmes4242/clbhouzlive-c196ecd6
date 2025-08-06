@@ -276,7 +276,7 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
           
           <div className="relative">
             {/* Header with XP Counter */}
-            <div className="flex items-center justify-between pb-0 px-4">
+            <div className="flex items-center justify-between pb-0 px-4 pt-2">
             <h4 className="text-xl font-semibold text-foreground">
               {isCurrentUser 
                 ? `${completedCount} of 300 courses played`
