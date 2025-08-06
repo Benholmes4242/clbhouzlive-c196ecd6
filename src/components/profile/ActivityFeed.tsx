@@ -68,7 +68,13 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
       username: post.user.username || undefined,
       avatar: post.user.profile_photo_url || '/placeholder.svg',
       verified: false
-    }
+    },
+    // Add the full media array for multiple media navigation
+    media: post.post_media?.map(media => ({
+      id: media.id,
+      media_type: media.media_type,
+      media_url: media.media_url
+    })) || []
   }));
 
   const handleLike = useCallback((contentId: string) => {
