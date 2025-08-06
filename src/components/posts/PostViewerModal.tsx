@@ -263,6 +263,9 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
             >
               {currentMedia && (
                 <>
+                  {/* DEBUG: Big red circle to verify component */}
+                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-32 h-32 bg-red-500 rounded-full"></div>
+                  
                   {currentMedia.media_type === 'video' ? (
                      <EnhancedVideoPlayer
                        src={currentMedia.media_url}
