@@ -33,7 +33,8 @@ const VideoWithAutoplay: React.FC<{
   src: string;
   muted: boolean;
   className: string;
-}> = React.memo(({ src, muted, className }) => {
+  isMobile?: boolean;
+}> = React.memo(({ src, muted, className, isMobile: isMobileProp = false }) => {
   const { ref, isInView } = useIntersectionObserver({
     threshold: 0.8, // Video must be 80% visible to autoplay (more restrictive)
     rootMargin: '0px' // No margin to prevent multiple videos triggering
@@ -142,7 +143,7 @@ const VideoWithAutoplay: React.FC<{
         className="w-full h-full"
         enableHLS={true}
         hideControls={true}
-        objectFit="smart"
+        objectFit={isMobileProp ? "smart" : "contain"}
       />
     </div>
   );
@@ -594,6 +595,7 @@ const ClubhouseVerticalFeed: React.FC<ClubhouseVerticalFeedProps> = ({
                     src={currentMedia.media_url}
                     muted={isGloballyMuted}
                     className="w-full h-full"
+                    isMobile={isMobile}
                   />
                 ) : (
                   <div className="relative w-full h-full bg-black">
