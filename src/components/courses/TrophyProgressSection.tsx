@@ -43,27 +43,30 @@ const GLOBAL_TROPHIES = [
     name: 'The Century Club',
     requiredCourses: 100,
     xp: 11000,
-    color: 'from-blue-500 to-indigo-600',
-    tier: 'blue',
+    color: 'from-yellow-500 to-amber-600',
+    tier: 'gold',
     description: 'Awarded for completing 100 Top 100 Courses. Century achievement unlocked!',
+    customBadge: '/lovable-uploads/f6339399-b23a-457b-b65e-8c2f7322a12b.png',
   },
   {
     id: 'clubhouse-elite',
     name: 'Clubhouse Elite',
     requiredCourses: 200,
     xp: 22000,
-    color: 'from-emerald-500 to-green-600',
-    tier: 'green',
+    color: 'from-gray-400 to-slate-500',
+    tier: 'silver',
     description: 'Awarded for completing 200 Top 100 Courses. Elite status achieved!',
+    customBadge: '/lovable-uploads/3fad8a43-f0de-42f5-b709-ae685b2cd173.png',
   },
   {
     id: 'course-collector',
-    name: 'Club Collector',
+    name: 'Club Champion',
     requiredCourses: 300,
     xp: 33000,
-    color: 'from-purple-500 to-violet-600',
-    tier: 'purple',
-    description: 'Awarded for completing 300 Top 100 Courses. Ultimate collector status!',
+    color: 'from-yellow-500 to-amber-600',
+    tier: 'gold',
+    description: 'Awarded for completing 300 Top 100 Courses. Ultimate champion status!',
+    customBadge: '/lovable-uploads/5e67194f-43f3-4c9d-a5a2-8c0b335c0a09.png',
   },
 ];
 
@@ -324,9 +327,39 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
                                  'h-24 w-auto object-contain transition-all duration-300',
                                  trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
                                )}
-                                   style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(148, 163, 184, 0.6))' : 'none' }}
-                                 />
-                               ) : (
+                                    style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(148, 163, 184, 0.6))' : 'none' }}
+                                  />
+                                ) : trophy.id === 'century-club' ? (
+                                  <img 
+                                     src="/lovable-uploads/f6339399-b23a-457b-b65e-8c2f7322a12b.png"
+                                    alt="Century Club Trophy"
+                                    className={cn(
+                                  'h-24 w-auto object-contain transition-all duration-300',
+                                  trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
+                                )}
+                                    style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(251, 191, 36, 0.6))' : 'none' }}
+                                  />
+                                ) : trophy.id === 'clubhouse-elite' ? (
+                                  <img 
+                                     src="/lovable-uploads/3fad8a43-f0de-42f5-b709-ae685b2cd173.png"
+                                    alt="Clubhouse Elite Trophy"
+                                    className={cn(
+                                  'h-24 w-auto object-contain transition-all duration-300',
+                                  trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
+                                )}
+                                    style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(148, 163, 184, 0.6))' : 'none' }}
+                                  />
+                                ) : trophy.id === 'course-collector' ? (
+                                  <img 
+                                     src="/lovable-uploads/5e67194f-43f3-4c9d-a5a2-8c0b335c0a09.png"
+                                    alt="Club Champion Trophy"
+                                    className={cn(
+                                  'h-24 w-auto object-contain transition-all duration-300',
+                                  trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
+                                )}
+                                    style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(251, 191, 36, 0.6))' : 'none' }}
+                                  />
+                                ) : (
                                  <TrophyIcon 
                                    isUnlocked={trophy.isUnlocked} 
                                    color={trophy.color} 
@@ -383,9 +416,39 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
                               'h-32 w-auto object-contain transition-all duration-300',
                               trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
                             )}
-                                style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(148, 163, 184, 0.6))' : 'none' }}
-                              />
-                            ) : (
+                                 style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(148, 163, 184, 0.6))' : 'none' }}
+                               />
+                             ) : trophy.id === 'century-club' ? (
+                               <img 
+                                 src="/lovable-uploads/f6339399-b23a-457b-b65e-8c2f7322a12b.png" 
+                                 alt="Century Club Trophy"
+                                 className={cn(
+                               'h-32 w-auto object-contain transition-all duration-300',
+                               trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
+                             )}
+                                 style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(251, 191, 36, 0.6))' : 'none' }}
+                               />
+                             ) : trophy.id === 'clubhouse-elite' ? (
+                               <img 
+                                 src="/lovable-uploads/3fad8a43-f0de-42f5-b709-ae685b2cd173.png" 
+                                 alt="Clubhouse Elite Trophy"
+                                 className={cn(
+                               'h-32 w-auto object-contain transition-all duration-300',
+                               trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
+                             )}
+                                 style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(148, 163, 184, 0.6))' : 'none' }}
+                               />
+                             ) : trophy.id === 'course-collector' ? (
+                               <img 
+                                 src="/lovable-uploads/5e67194f-43f3-4c9d-a5a2-8c0b335c0a09.png" 
+                                 alt="Club Champion Trophy"
+                                 className={cn(
+                               'h-32 w-auto object-contain transition-all duration-300',
+                               trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
+                             )}
+                                 style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(251, 191, 36, 0.6))' : 'none' }}
+                               />
+                             ) : (
                               <TrophyIcon 
                                 isUnlocked={trophy.isUnlocked} 
                                 color={trophy.color} 
