@@ -209,6 +209,12 @@ const SmartCompilation: React.FC<SmartCompilationProps> = ({
       return;
     }
     
+    // Ensure we have a valid source and destination
+    if (result.source.index === result.destination.index) {
+      console.log('SmartCompilation: Same position, no change needed');
+      return;
+    }
+    
     const items = Array.from(videoClips);
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
@@ -294,13 +300,14 @@ const SmartCompilation: React.FC<SmartCompilationProps> = ({
         message: 'Finalizing your highlight reel...'
       }));
 
-      // For HLS streams, we'll create a mock file and pass the URL
-      // The parent component will handle the HLS stream URL directly
-      const compiledFile = new File([''], 'highlight-compilation.m3u8', {
-        type: 'application/vnd.apple.mpegurl'
+      // Create a proper MP4 file for the compilation result
+      // We'll use a placeholder since we can't download HLS streams directly
+      const compiledFile = new File([''], 'ai-highlight-compilation.mp4', {
+        type: 'video/mp4'
       });
       
-      // Store the actual stream URL on the file object for parent component
+      // Store the actual stream URL as metadata for the parent component
+      (compiledFile as any).isHlsStream = true;
       (compiledFile as any).streamUrl = compilationResult.compiledVideoUrl;
 
       setCompilationStatus({
@@ -411,29 +418,29 @@ const SmartCompilation: React.FC<SmartCompilationProps> = ({
               <p className="text-sm font-medium text-gray-700">Clip Order</p>
               
               <DragDropContext onDragEnd={handleDragEnd}>
-                <Droppable droppableId="video-clips" direction="horizontal">
-                  {(provided) => (
+                <Droppable droppableId="video-clips-droppable" direction="horizontal">
+                  {(provided, snapshot) => (
                     <div
                       {...provided.droppableProps}
                       ref={provided.innerRef}
-                      className="flex gap-3 overflow-x-auto pb-2"
+                      className={`flex gap-3 overflow-x-auto pb-2 min-h-[4rem] ${
+                        snapshot.isDraggingOver ? 'bg-purple-50 rounded-lg' : ''
+                      }`}
                     >
                       {videoClips.map((clip, index) => (
-                        <Draggable key={`${clip.id}-${clip.file.name}`} draggableId={`${clip.id}-${clip.file.name}`} index={index}>
+                        <Draggable 
+                          key={`video-clip-${clip.id}`} 
+                          draggableId={`video-clip-${clip.id}`} 
+                          index={index}
+                        >
                           {(provided, snapshot) => (
                             <div
                               ref={provided.innerRef}
                               {...provided.draggableProps}
                               {...provided.dragHandleProps}
-                              className={`flex-shrink-0 relative cursor-grab active:cursor-grabbing ${
-                                snapshot.isDragging ? 'opacity-75 transform rotate-3 scale-105 z-50' : ''
+                              className={`flex-shrink-0 relative cursor-grab active:cursor-grabbing transition-all duration-200 ${
+                                snapshot.isDragging ? 'opacity-90 transform rotate-2 scale-105 z-50 shadow-2xl' : ''
                               }`}
-                              style={{
-                                ...provided.draggableProps.style,
-                                transform: snapshot.isDragging 
-                                  ? `${provided.draggableProps.style?.transform} rotate(3deg) scale(1.05)`
-                                  : provided.draggableProps.style?.transform
-                              }}
                             >
                               <div className={`w-24 h-16 rounded-lg overflow-hidden relative transition-all duration-200 ${
                                 snapshot.isDragging 
