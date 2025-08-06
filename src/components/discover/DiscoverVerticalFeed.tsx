@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback, memo } from 'react';
 import ClubhouzLoading from '@/components/ClubhouzLoading';
-import { MapPin, UserPlus, UserCheck, Loader2, Minimize2, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
+import { MapPin, UserPlus, UserCheck, Loader2, Minimize2, MoreHorizontal, Edit, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { PaperAirplaneIcon, HeartIcon, SpeakerXMarkIcon, SpeakerWaveIcon, ChatBubbleOvalLeftEllipsisIcon } from '@heroicons/react/24/solid';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -172,6 +172,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [commentsModalOpen, setCommentsModalOpen] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string>('');
+  const [currentMediaIndices, setCurrentMediaIndices] = useState<{ [postId: string]: number }>({});
   const scrollViewRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<{ [key: number]: HTMLDivElement }>({});
   const queryClient = useQueryClient();
@@ -377,6 +378,23 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
     onClose();
   };
 
+  // Handle media navigation for posts with multiple media
+  const handlePrevMedia = (postId: string, mediaLength: number, e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setCurrentMediaIndices(prev => ({
+      ...prev,
+      [postId]: prev[postId] > 0 ? prev[postId] - 1 : mediaLength - 1
+    }));
+  };
+
+  const handleNextMedia = (postId: string, mediaLength: number, e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setCurrentMediaIndices(prev => ({
+      ...prev,
+      [postId]: prev[postId] < mediaLength - 1 ? prev[postId] + 1 : 0
+    }));
+  };
+
   // Function to truncate words properly
   const truncateToWords = (text: string, wordLimit: number) => {
     const words = text.split(' ');
@@ -470,6 +488,17 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
         {posts.map((item, index) => {
+          // Get media items for this post
+          const mediaItems = item.media && item.media.length > 0 ? item.media : [{
+            id: `${item.id}-single`,
+            media_type: item.type as 'video' | 'image',
+            media_url: item.src
+          }];
+          
+          const currentMediaIndex = currentMediaIndices[item.id] || 0;
+          const currentMedia = mediaItems[currentMediaIndex] || mediaItems[0];
+          const hasMultipleMedia = mediaItems.length > 1;
+
           return (
             <div 
               key={`${item.id}-${index}`}
@@ -506,14 +535,13 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                 </div>
               )}
 
-
               {/* Media Content */}
               <div 
                 className="relative w-full h-full flex items-center justify-center"
               >
-                {item.type === 'video' ? (
+                {currentMedia.media_type === 'video' ? (
                   <VideoWithAutoplay
-                    src={item.src}
+                    src={currentMedia.media_url}
                     muted={isGloballyMuted}
                     className="w-full h-full"
                     objectFit="contain"
@@ -521,7 +549,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                 ) : (
                   <div className="relative w-full h-full bg-black">
                     <img
-                      src={item.src}
+                      src={currentMedia.media_url}
                       alt={item.title}
                       className="w-full h-full object-contain"
                       loading="eager" // Always load media to prevent grey placeholders
@@ -532,18 +560,37 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                   </div>
                 )}
                 
+                {/* Navigation arrows for multiple media */}
+                {hasMultipleMedia && (
+                  <>
+                    {/* Left Arrow */}
+                    <button
+                      onClick={(e) => handlePrevMedia(item.id, mediaItems.length, e)}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 bg-black/60 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-black/80 transition-all border border-white/30"
+                    >
+                      <ChevronLeft className="w-5 h-5 stroke-[2.5]" />
+                    </button>
+
+                    {/* Right Arrow */}
+                    <button
+                      onClick={(e) => handleNextMedia(item.id, mediaItems.length, e)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 bg-black/60 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-black/80 transition-all border border-white/30"
+                    >
+                      <ChevronRight className="w-5 h-5 stroke-[2.5]" />
+                    </button>
+                  </>
+                )}
+                
                 {/* Media navigation dots for multiple media */}
-                {item.media && item.media.length > 1 && (
+                {hasMultipleMedia && (
                   <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20">
                     <MediaNavigationDots
-                      mediaCount={item.media.length}
-                      currentIndex={0}
+                      mediaCount={mediaItems.length}
+                      currentIndex={currentMediaIndex}
                     />
                   </div>
                 )}
               </div>
-
-              {/* Golf Course Tag - REMOVED - Now shown below username like clubhouse */}
 
               {/* User Profile and Caption - Bottom Left */}
               <div className="absolute bottom-24 left-3 right-20 z-20">
@@ -594,13 +641,12 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                     </span>
                   </div>
                 )}
-
               </div>
 
               {/* Action Buttons - Bottom Right */}
               <div className="absolute bottom-24 right-4 z-10 flex flex-col space-y-6">
                 {/* Mute/Unmute toggle button - only show for video posts */}
-                {item.type === 'video' && (
+                {currentMedia.media_type === 'video' && (
                   <button 
                     className="cursor-pointer hover:opacity-100 transition-opacity"
                     onClick={toggleGlobalMute}
