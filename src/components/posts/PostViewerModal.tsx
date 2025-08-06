@@ -431,25 +431,27 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
               )}
             </div>
 
-            {/* Post Navigation - Bottom Edge (for multiple posts) */}
-            {hasMultiplePosts && (
-              <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-4 z-10">
-                <button
-                  onClick={() => navigatePost('prev')}
-                  disabled={currentPostIndex === 0}
-                  className="flex items-center justify-center w-8 h-8 bg-black/50 rounded-full text-white disabled:opacity-50"
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </button>
-                <button
-                  onClick={() => navigatePost('next')}
-                  disabled={currentPostIndex === allUserPosts.length - 1}
-                  className="flex items-center justify-center w-8 h-8 bg-black/50 rounded-full text-white disabled:opacity-50"
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </button>
-              </div>
-            )}
+             {/* Post Navigation - Mobile */}
+             {hasMultiplePosts && (
+               <>
+                 <button
+                   onClick={() => navigatePost('prev')}
+                   disabled={currentPostIndex === 0}
+                   className="absolute left-4 bottom-20 z-30 p-1 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white disabled:opacity-30 hover:bg-white/20 transition-all"
+                   aria-label="Previous post"
+                 >
+                   <ChevronLeft className="h-6 w-6" />
+                 </button>
+                 <button
+                   onClick={() => navigatePost('next')}
+                   disabled={currentPostIndex === allUserPosts.length - 1}
+                   className="absolute right-4 bottom-20 z-30 p-1 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white disabled:opacity-30 hover:bg-white/20 transition-all"
+                   aria-label="Next post"
+                 >
+                   <ChevronRight className="h-6 w-6" />
+                 </button>
+               </>
+             )}
 
             {/* End of posts indicator */}
             {isAtEnd && (
@@ -578,23 +580,22 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                 {/* Post Navigation */}
                 {hasMultiplePosts && (
                   <>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="absolute left-4 bottom-4 bg-black/50 hover:bg-muted text-white hover:text-foreground"
+                    <button
                       onClick={() => navigatePost('prev')}
                       disabled={currentPostIndex === 0}
+                      className="absolute left-4 top-1/2 transform -translate-y-1/2 z-30 p-1 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white disabled:opacity-30 hover:bg-white/20 transition-all"
+                      aria-label="Previous post"
                     >
-                      <ChevronLeft className="h-5 w-5" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="absolute right-4 bottom-4 bg-black/50 hover:bg-muted text-white hover:text-foreground"
+                      <ChevronLeft className="h-6 w-6" />
+                    </button>
+                    <button
                       onClick={() => navigatePost('next')}
+                      disabled={currentPostIndex === allUserPosts.length - 1}
+                      className="absolute right-4 top-1/2 transform -translate-y-1/2 z-30 p-1 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white disabled:opacity-30 hover:bg-white/20 transition-all"
+                      aria-label="Next post"
                     >
-                      <ChevronRight className="h-5 w-5" />
-                    </Button>
+                      <ChevronRight className="h-6 w-6" />
+                    </button>
                   </>
                 )}
               </div>
