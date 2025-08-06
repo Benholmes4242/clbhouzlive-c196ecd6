@@ -4,6 +4,7 @@ import { ActivityPost } from '../types/ActivityTypes';
 
 import CourseTag from '@/components/posts/CourseTag';
 import { Camera, Play, ChevronLeft, ChevronRight } from 'lucide-react';
+import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
 import { MdOutlinePlayCircle } from 'react-icons/md';
 import HighQualityImage from '@/components/ui/high-quality-image';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
@@ -190,16 +191,10 @@ const ActivityPostCard = ({ post, attributionText, onClick, isFirstVideo }: Acti
 
           {/* Media Navigation Dots */}
           {hasMultipleMedia && (
-            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex space-x-1 z-30">
-              {post.post_media.map((_, index) => (
-                <div
-                  key={index}
-                  className={`w-2 h-2 rounded-full border border-white/20 transition-all ${
-                    index === currentMediaIndex ? 'bg-white' : 'bg-white/40'
-                  }`}
-                />
-              ))}
-            </div>
+            <MediaNavigationDots
+              mediaCount={post.post_media.length}
+              currentIndex={currentMediaIndex}
+            />
           )}
         </>
       ) : (
