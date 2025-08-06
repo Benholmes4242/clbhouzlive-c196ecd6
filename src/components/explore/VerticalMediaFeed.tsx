@@ -9,7 +9,7 @@ import { usePostData } from '@/hooks/usePostData';
 import { ExploreContentItem } from './types';
 import { supabase } from '@/integrations/supabase/client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useSwipeable } from 'react-swipeable';
+
 
 import CoursePostBadge from '../posts/CoursePostBadge';
 // import CreateMomentModal from '../post/CreateMomentModal'; // Temporarily removed
@@ -442,23 +442,43 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
              }));
            };
 
-           // Swipe handlers for media navigation
-           const swipeHandlers = useSwipeable({
-             onSwipedLeft: () => {
-               if (hasMultipleMedia) {
-                 handleNextMedia();
-               }
-             },
-             onSwipedRight: () => {
-               if (hasMultipleMedia) {
-                 handlePrevMedia();
-               }
-             },
-             trackMouse: false,
-             trackTouch: true,
-             preventScrollOnSwipe: false,
-             delta: 50
-           });
+            // Touch handlers for media navigation
+            const createTouchHandlers = () => {
+              let startX = 0;
+              let startY = 0;
+              
+              return {
+                onTouchStart: (e: any) => {
+                  startX = e.touches[0].clientX;
+                  startY = e.touches[0].clientY;
+                },
+                onTouchEnd: (e: any) => {
+                  if (!startX || !startY) return;
+                  
+                  const endX = e.changedTouches[0].clientX;
+                  const endY = e.changedTouches[0].clientY;
+                  const diffX = startX - endX;
+                  const diffY = startY - endY;
+                  
+                  // Only handle horizontal swipes (ignore vertical scrolling)
+                  if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+                    e.preventDefault();
+                    if (diffX > 0 && hasMultipleMedia) {
+                      // Swiped left - next media
+                      handleNextMedia();
+                    } else if (diffX < 0 && hasMultipleMedia) {
+                      // Swiped right - previous media
+                      handlePrevMedia();
+                    }
+                  }
+                  
+                  startX = 0;
+                  startY = 0;
+                }
+              };
+            };
+
+            const touchHandlers = hasMultipleMedia ? createTouchHandlers() : {};
 
            return (
              <div
@@ -473,7 +493,7 @@ const VerticalMediaFeed: React.FC<VerticalMediaFeedProps> = ({
                  scrollSnapAlign: 'start',
                  scrollSnapStop: 'always'
                }}
-               {...(hasMultipleMedia ? swipeHandlers : {})}
+               {...touchHandlers}
              >
               {/* Media Content */}
               <div 

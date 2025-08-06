@@ -16,7 +16,7 @@ import CommentsModal from '@/components/posts/CommentsModal';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
-import { useSwipeable } from 'react-swipeable';
+
 
 interface DiscoverVerticalFeedProps {
   isOpen: boolean;
@@ -500,23 +500,43 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
           const currentMedia = mediaItems[currentMediaIndex] || mediaItems[0];
           const hasMultipleMedia = mediaItems.length > 1;
 
-          // Swipe handlers for media navigation
-          const swipeHandlers = useSwipeable({
-            onSwipedLeft: () => {
-              if (hasMultipleMedia) {
-                handleNextMedia(item.id, mediaItems.length);
+          // Touch handlers for media navigation
+          const createTouchHandlers = () => {
+            let startX = 0;
+            let startY = 0;
+            
+            return {
+              onTouchStart: (e: any) => {
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+              },
+              onTouchEnd: (e: any) => {
+                if (!startX || !startY) return;
+                
+                const endX = e.changedTouches[0].clientX;
+                const endY = e.changedTouches[0].clientY;
+                const diffX = startX - endX;
+                const diffY = startY - endY;
+                
+                // Only handle horizontal swipes (ignore vertical scrolling)
+                if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+                  e.preventDefault();
+                  if (diffX > 0 && hasMultipleMedia) {
+                    // Swiped left - next media
+                    handleNextMedia(item.id, mediaItems.length);
+                  } else if (diffX < 0 && hasMultipleMedia) {
+                    // Swiped right - previous media
+                    handlePrevMedia(item.id, mediaItems.length);
+                  }
+                }
+                
+                startX = 0;
+                startY = 0;
               }
-            },
-            onSwipedRight: () => {
-              if (hasMultipleMedia) {
-                handlePrevMedia(item.id, mediaItems.length);
-              }
-            },
-            trackMouse: false,
-            trackTouch: true,
-            preventScrollOnSwipe: false,
-            delta: 50
-          });
+            };
+          };
+
+          const touchHandlers = hasMultipleMedia ? createTouchHandlers() : {};
 
           return (
             <div 
@@ -530,7 +550,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                 minHeight: '100vh',
                 maxHeight: '100vh'
               }}
-              {...(hasMultipleMedia ? swipeHandlers : {})}
+              {...touchHandlers}
             >
               {/* Close Button - Top Left */}
               <button
