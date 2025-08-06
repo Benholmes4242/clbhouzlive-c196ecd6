@@ -2,6 +2,7 @@ import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { XPRingSystem } from "@/components/profile/XPRingSystem";
 
 interface ClbhouzAchievementsModalProps {
   isOpen: boolean;
@@ -120,20 +121,15 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
             </div>
           </div>
 
-          {/* XP Progress Section */}
+          {/* XP Ring System Section */}
           <div className="px-6 pb-4">
-            <div className="bg-blue-50 dark:bg-blue-950/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
-              <div className="text-center">
-                <p className="font-semibold text-blue-900 dark:text-blue-100">
-                  Total XP: {totalXP.toLocaleString()} | Next: Gold Ring at {nextMilestone.toLocaleString()} XP
-                </p>
-                <div className="w-full bg-blue-200 dark:bg-blue-800 rounded-full h-2 mt-2">
-                  <div 
-                    className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                    style={{ width: `${Math.min((totalXP / nextMilestone) * 100, 100)}%` }}
-                  />
-                </div>
-              </div>
+            <div className="bg-blue-50 dark:bg-blue-950/20 rounded-lg p-6 border border-blue-200 dark:border-blue-800">
+              <XPRingSystem 
+                currentXP={totalXP} 
+                size="large"
+                showMiniRings={true}
+                className="w-full"
+              />
             </div>
           </div>
 

@@ -1,0 +1,195 @@
+import React from 'react';
+import { cn } from '@/lib/utils';
+
+interface XPRingTier {
+  name: string;
+  color: string;
+  minXP: number;
+  maxXP: number;
+  ringGradient: string;
+}
+
+const XP_RING_TIERS: XPRingTier[] = [
+  {
+    name: "Bronze Ring",
+    color: "#CD7F32",
+    minXP: 0,
+    maxXP: 9999,
+    ringGradient: "conic-gradient(from 0deg, #CD7F32, #B8860B, #CD7F32)"
+  },
+  {
+    name: "Blue Ring", 
+    color: "#4682B4",
+    minXP: 10000,
+    maxXP: 19999,
+    ringGradient: "conic-gradient(from 0deg, #4682B4, #5F9EA0, #4682B4)"
+  },
+  {
+    name: "Green Ring",
+    color: "#228B22", 
+    minXP: 20000,
+    maxXP: 29999,
+    ringGradient: "conic-gradient(from 0deg, #228B22, #32CD32, #228B22)"
+  },
+  {
+    name: "Silver Ring",
+    color: "#C0C0C0",
+    minXP: 30000,
+    maxXP: 39999,
+    ringGradient: "conic-gradient(from 0deg, #C0C0C0, #E5E5E5, #C0C0C0)"
+  },
+  {
+    name: "Gold Ring",
+    color: "#FFD700",
+    minXP: 40000,
+    maxXP: 49999,
+    ringGradient: "conic-gradient(from 0deg, #FFD700, #FFA500, #FFD700)"
+  }
+];
+
+interface XPRingSystemProps {
+  currentXP: number;
+  className?: string;
+  showMiniRings?: boolean;
+  size?: 'small' | 'medium' | 'large';
+}
+
+export const XPRingSystem: React.FC<XPRingSystemProps> = ({ 
+  currentXP, 
+  className,
+  showMiniRings = false,
+  size = 'medium' 
+}) => {
+  const getCurrentTier = (xp: number): XPRingTier => {
+    return XP_RING_TIERS.find(tier => xp >= tier.minXP && xp <= tier.maxXP) || XP_RING_TIERS[0];
+  };
+
+  const getNextTier = (currentTier: XPRingTier): XPRingTier | null => {
+    const currentIndex = XP_RING_TIERS.findIndex(tier => tier.name === currentTier.name);
+    return currentIndex < XP_RING_TIERS.length - 1 ? XP_RING_TIERS[currentIndex + 1] : null;
+  };
+
+  const calculateProgress = (xp: number, tier: XPRingTier): number => {
+    const tierRange = tier.maxXP - tier.minXP + 1;
+    const progressInTier = xp - tier.minXP;
+    return Math.min((progressInTier / tierRange) * 100, 100);
+  };
+
+  const currentTier = getCurrentTier(currentXP);
+  const nextTier = getNextTier(currentTier);
+  const progress = calculateProgress(currentXP, currentTier);
+
+  const sizeClasses = {
+    small: 'w-16 h-16',
+    medium: 'w-24 h-24', 
+    large: 'w-32 h-32'
+  };
+
+  const strokeWidth = {
+    small: 4,
+    medium: 6,
+    large: 8
+  };
+
+  return (
+    <div className={cn('flex flex-col items-center space-y-4', className)}>
+      {/* Main Ring Display */}
+      <div className="relative">
+        <div 
+          className={cn('relative rounded-full flex items-center justify-center', sizeClasses[size])}
+          style={{
+            background: currentTier.ringGradient,
+            padding: '4px'
+          }}
+        >
+          {/* Inner circle with progress */}
+          <div className="w-full h-full bg-white dark:bg-gray-900 rounded-full flex items-center justify-center relative overflow-hidden">
+            {/* Progress fill */}
+            <div 
+              className="absolute inset-0 rounded-full"
+              style={{
+                background: `conic-gradient(from 0deg, ${currentTier.color} 0%, ${currentTier.color} ${progress}%, transparent ${progress}%, transparent 100%)`,
+                opacity: 0.2
+              }}
+            />
+            
+            {/* Center icon/text */}
+            <div className="relative z-10 text-center">
+              <div className="w-4 h-4 bg-current rounded-sm opacity-60" />
+            </div>
+          </div>
+        </div>
+        
+        {/* XP Amount overlay */}
+        <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2">
+          <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-2 py-1">
+            <span className="text-xs font-medium">{currentXP.toLocaleString()}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Tier Information */}
+      <div className="text-center space-y-1">
+        <h3 className="font-semibold text-sm" style={{ color: currentTier.color }}>
+          {currentTier.name}
+        </h3>
+        <p className="text-xs text-muted-foreground">
+          {currentTier.minXP.toLocaleString()} - {currentTier.maxXP.toLocaleString()} XP
+        </p>
+        {nextTier && (
+          <p className="text-xs text-muted-foreground">
+            Next: {nextTier.name} at {nextTier.minXP.toLocaleString()} XP
+          </p>
+        )}
+      </div>
+
+      {/* Progress Bar */}
+      <div className="w-full space-y-2">
+        <div className="flex justify-between text-xs text-muted-foreground">
+          <span>{currentTier.minXP.toLocaleString()}</span>
+          <span>{Math.round(progress)}%</span>
+          <span>{currentTier.maxXP.toLocaleString()}</span>
+        </div>
+        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+          <div 
+            className="h-2 rounded-full transition-all duration-500"
+            style={{ 
+              width: `${progress}%`,
+              background: currentTier.ringGradient
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Mini Rings Display (All Tiers) */}
+      {showMiniRings && (
+        <div className="flex space-x-2 mt-4">
+          {XP_RING_TIERS.map((tier, index) => {
+            const isActive = currentXP >= tier.minXP;
+            const isCurrent = tier.name === currentTier.name;
+            
+            return (
+              <div 
+                key={tier.name}
+                className={cn(
+                  'w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all',
+                  isCurrent ? 'scale-110' : 'scale-100',
+                  isActive ? 'opacity-100' : 'opacity-40'
+                )}
+                style={{
+                  borderColor: tier.color,
+                  backgroundColor: isActive ? tier.color + '20' : 'transparent'
+                }}
+                title={`${tier.name}: ${tier.minXP.toLocaleString()} - ${tier.maxXP.toLocaleString()} XP`}
+              >
+                <div className="w-2 h-2 rounded-sm" style={{ backgroundColor: tier.color }} />
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default XPRingSystem;
