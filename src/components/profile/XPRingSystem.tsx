@@ -11,13 +11,6 @@ interface XPRingTier {
 
 const XP_RING_TIERS: XPRingTier[] = [
   {
-    name: "Bronze Ring",
-    color: "#CD7F32",
-    minXP: 0,
-    maxXP: 9999,
-    ringGradient: "conic-gradient(from 0deg, #CD7F32, #B8860B, #CD7F32)"
-  },
-  {
     name: "Blue Ring", 
     color: "#4682B4",
     minXP: 10000,
@@ -60,16 +53,21 @@ export const XPRingSystem: React.FC<XPRingSystemProps> = ({
   showMiniRings = false,
   size = 'medium' 
 }) => {
-  const getCurrentTier = (xp: number): XPRingTier => {
-    return XP_RING_TIERS.find(tier => xp >= tier.minXP && xp <= tier.maxXP) || XP_RING_TIERS[0];
+  const getCurrentTier = (xp: number): XPRingTier | null => {
+    return XP_RING_TIERS.find(tier => xp >= tier.minXP && xp <= tier.maxXP) || null;
   };
 
-  const getNextTier = (currentTier: XPRingTier): XPRingTier | null => {
+  const getNextTier = (currentTier: XPRingTier | null): XPRingTier | null => {
+    if (!currentTier) return XP_RING_TIERS[0]; // First achievable ring is Blue Ring
     const currentIndex = XP_RING_TIERS.findIndex(tier => tier.name === currentTier.name);
     return currentIndex < XP_RING_TIERS.length - 1 ? XP_RING_TIERS[currentIndex + 1] : null;
   };
 
-  const calculateProgress = (xp: number, tier: XPRingTier): number => {
+  const calculateProgress = (xp: number, tier: XPRingTier | null): number => {
+    if (!tier) {
+      // Progress towards first ring (Blue Ring at 10,000 XP)
+      return Math.min((xp / 10000) * 100, 100);
+    }
     const tierRange = tier.maxXP - tier.minXP + 1;
     const progressInTier = xp - tier.minXP;
     return Math.min((progressInTier / tierRange) * 100, 100);
@@ -95,30 +93,54 @@ export const XPRingSystem: React.FC<XPRingSystemProps> = ({
     <div className={cn('flex flex-col items-center space-y-4', className)}>
       {/* Main Ring Display */}
       <div className="relative">
-        <div 
-          className={cn('relative rounded-full flex items-center justify-center', sizeClasses[size])}
-          style={{
-            background: currentTier.ringGradient,
-            padding: '4px'
-          }}
-        >
-          {/* Inner circle with progress */}
-          <div className="w-full h-full bg-white dark:bg-gray-900 rounded-full flex items-center justify-center relative overflow-hidden">
-            {/* Progress fill */}
-            <div 
-              className="absolute inset-0 rounded-full"
-              style={{
-                background: `conic-gradient(from 0deg, ${currentTier.color} 0%, ${currentTier.color} ${progress}%, transparent ${progress}%, transparent 100%)`,
-                opacity: 0.2
-              }}
-            />
-            
-            {/* Center icon/text */}
-            <div className="relative z-10 text-center">
-              <div className="w-4 h-4 bg-current rounded-sm opacity-60" />
+        {currentTier ? (
+          // User has achieved a ring
+          <div 
+            className={cn('relative rounded-full flex items-center justify-center', sizeClasses[size])}
+            style={{
+              background: currentTier.ringGradient,
+              padding: '4px'
+            }}
+          >
+            {/* Inner circle with progress */}
+            <div className="w-full h-full bg-white dark:bg-gray-900 rounded-full flex items-center justify-center relative overflow-hidden">
+              {/* Progress fill */}
+              <div 
+                className="absolute inset-0 rounded-full"
+                style={{
+                  background: `conic-gradient(from 0deg, ${currentTier.color} 0%, ${currentTier.color} ${progress}%, transparent ${progress}%, transparent 100%)`,
+                  opacity: 0.2
+                }}
+              />
+              
+              {/* Center icon/text */}
+              <div className="relative z-10 text-center">
+                <div className="w-4 h-4 bg-current rounded-sm opacity-60" />
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          // User hasn't achieved any ring yet
+          <div 
+            className={cn('relative rounded-full flex items-center justify-center border-4 border-gray-300 dark:border-gray-600', sizeClasses[size])}
+          >
+            <div className="w-full h-full bg-white dark:bg-gray-900 rounded-full flex items-center justify-center relative overflow-hidden">
+              {/* Progress fill towards first ring */}
+              <div 
+                className="absolute inset-0 rounded-full"
+                style={{
+                  background: `conic-gradient(from 0deg, #4682B4 0%, #4682B4 ${progress}%, transparent ${progress}%, transparent 100%)`,
+                  opacity: 0.1
+                }}
+              />
+              
+              {/* Center icon/text */}
+              <div className="relative z-10 text-center">
+                <div className="w-4 h-4 bg-gray-400 rounded-sm opacity-60" />
+              </div>
+            </div>
+          </div>
+        )}
         
         {/* XP Amount overlay */}
         <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2">
@@ -130,12 +152,25 @@ export const XPRingSystem: React.FC<XPRingSystemProps> = ({
 
       {/* Tier Information */}
       <div className="text-center space-y-1">
-        <h3 className="font-semibold text-sm" style={{ color: currentTier.color }}>
-          {currentTier.name}
-        </h3>
-        <p className="text-xs text-muted-foreground">
-          {currentTier.minXP.toLocaleString()} - {currentTier.maxXP.toLocaleString()} XP
-        </p>
+        {currentTier ? (
+          <>
+            <h3 className="font-semibold text-sm" style={{ color: currentTier.color }}>
+              {currentTier.name}
+            </h3>
+            <p className="text-xs text-muted-foreground">
+              {currentTier.minXP.toLocaleString()} - {currentTier.maxXP.toLocaleString()} XP
+            </p>
+          </>
+        ) : (
+          <>
+            <h3 className="font-semibold text-sm text-gray-500">
+              No Ring Achieved
+            </h3>
+            <p className="text-xs text-muted-foreground">
+              Reach 10,000 XP to unlock your first ring
+            </p>
+          </>
+        )}
         {nextTier && (
           <p className="text-xs text-muted-foreground">
             Next: {nextTier.name} at {nextTier.minXP.toLocaleString()} XP
@@ -146,16 +181,26 @@ export const XPRingSystem: React.FC<XPRingSystemProps> = ({
       {/* Progress Bar */}
       <div className="w-full space-y-2">
         <div className="flex justify-between text-xs text-muted-foreground">
-          <span>{currentTier.minXP.toLocaleString()}</span>
-          <span>{Math.round(progress)}%</span>
-          <span>{currentTier.maxXP.toLocaleString()}</span>
+          {currentTier ? (
+            <>
+              <span>{currentTier.minXP.toLocaleString()}</span>
+              <span>{Math.round(progress)}%</span>
+              <span>{currentTier.maxXP.toLocaleString()}</span>
+            </>
+          ) : (
+            <>
+              <span>0</span>
+              <span>{Math.round(progress)}%</span>
+              <span>10,000</span>
+            </>
+          )}
         </div>
         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
           <div 
             className="h-2 rounded-full transition-all duration-500"
             style={{ 
               width: `${progress}%`,
-              background: currentTier.ringGradient
+              background: currentTier ? currentTier.ringGradient : 'linear-gradient(to right, #4682B4, #5F9EA0)'
             }}
           />
         </div>
@@ -166,7 +211,7 @@ export const XPRingSystem: React.FC<XPRingSystemProps> = ({
         <div className="flex space-x-2 mt-4">
           {XP_RING_TIERS.map((tier, index) => {
             const isActive = currentXP >= tier.minXP;
-            const isCurrent = tier.name === currentTier.name;
+            const isCurrent = currentTier && tier.name === currentTier.name;
             
             return (
               <div 
