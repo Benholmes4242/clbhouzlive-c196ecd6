@@ -658,6 +658,7 @@ const HeroProfileHeader = ({
                     userId={profile?.id || ''}
                     isOwnProfile={isOwnProfile}
                     profileDisplayName={profile?.display_name}
+                    userHandicap={profile?.eg_handicap_index}
                   />
                 </div>
                 {/* Desktop version with normal container */}
@@ -666,6 +667,7 @@ const HeroProfileHeader = ({
                     userId={profile?.id || ''}
                     isOwnProfile={isOwnProfile}
                     profileDisplayName={profile?.display_name}
+                    userHandicap={profile?.eg_handicap_index}
                   />
                 </div>
               </>

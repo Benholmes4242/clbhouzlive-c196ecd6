@@ -8,7 +8,8 @@ import {
   DropdownMenuItem, 
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
-import { Filter, Video, Image, MapPin } from 'lucide-react';
+import { Filter, Video, Image, MapPin, Trophy } from 'lucide-react';
+import ClbhouzAchievementsModal from '@/components/achievements/ClbhouzAchievementsModal';
 import { useActivityPosts } from './hooks/useActivityPosts';
 import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
 import ExploreGrid from '@/components/explore/ExploreGrid';
@@ -22,16 +23,19 @@ interface ActivityFeedProps {
   userId: string;
   isOwnProfile: boolean;
   profileDisplayName?: string;
+  userHandicap?: number;
 }
 
 const ActivityFeed: React.FC<ActivityFeedProps> = ({
   userId,
   isOwnProfile,
-  profileDisplayName
+  profileDisplayName,
+  userHandicap
 }) => {
   const { posts, loading, fetchUserPosts } = useActivityPosts(userId);
   const { isOpen, initialItem, openFeed, closeFeed } = useVerticalMediaFeed();
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
+  const [achievementsModalOpen, setAchievementsModalOpen] = useState(false);
 
   // Filter posts based on active filter
   const filteredPosts = useMemo(() => {
@@ -106,6 +110,19 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   return (
     <>
       <div className="py-4">
+        {/* Achievements Button */}
+        <div className="flex items-center justify-between mb-4 px-4 md:px-0">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setAchievementsModalOpen(true)}
+            className="bg-primary/10 hover:bg-primary/20 border-primary/20 text-primary transition-all duration-200"
+          >
+            <Trophy className="h-4 w-4 mr-2" />
+            Achievements
+          </Button>
+        </div>
+
         <div className="flex items-center justify-between mb-4 px-4 md:px-0">
           <div className="flex items-end gap-2">
             <h3 className="text-3xl font-bold text-foreground">Activity</h3>
@@ -199,6 +216,15 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
           initialItem={initialItem}
         />
       )}
+
+      {/* Achievements Modal */}
+      <ClbhouzAchievementsModal
+        isOpen={achievementsModalOpen}
+        onClose={() => setAchievementsModalOpen(false)}
+        userId={userId}
+        userDisplayName={profileDisplayName}
+        userHandicap={userHandicap}
+      />
     </>
   );
 };
