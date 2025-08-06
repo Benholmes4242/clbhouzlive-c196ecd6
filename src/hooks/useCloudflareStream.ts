@@ -30,59 +30,28 @@ export const useCloudflareStream = () => {
     setUploading(true);
     
     try {
-      // Get Cloudflare account ID from our database function
-      const { data: accountInfo, error: infoError } = await supabase.rpc('get_cloudflare_secrets');
-      
-      if (infoError || !accountInfo || typeof accountInfo !== 'object') {
-        throw new Error('Cloudflare configuration not available');
-      }
-      
-      const accountData = accountInfo as { CLOUDFLARE_ACCOUNT_ID: string };
-      if (!accountData.CLOUDFLARE_ACCOUNT_ID) {
-        throw new Error('Cloudflare account ID not found');
-      }
-
-      // Create form data for Cloudflare Stream upload
+      // Upload to Cloudflare Stream using edge function
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('meta', JSON.stringify({
-        name: `profile-video-${Date.now()}`,
-        maxDurationSeconds: 20,
-        // Optimize for highest quality
-        quality: 'high',
-        bitrate: 8000, // High bitrate for 4K quality
-        resolution: '1920x1080', // Minimum HD, supports up to 4K
-        fps: 30
-      }));
 
-      // For now, let's upload to Supabase storage as a fallback
-      // This will allow videos to play while we set up proper Cloudflare Stream integration
-      
-      const fileExt = file.name.split('.').pop() || 'mp4';
-      const fileName = `profile-video-${Date.now()}.${fileExt}`;
-      const filePath = `profile-videos/${fileName}`;
+      const { data, error } = await supabase.functions.invoke('cloudflare-stream-upload', {
+        body: formData,
+      });
 
-      // Upload to Supabase storage
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('post-media')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false
-        });
-
-      if (uploadError) {
-        throw uploadError;
+      if (error) {
+        console.error('Cloudflare Stream upload error:', error);
+        throw new Error(error.message || 'Upload failed');
       }
 
-      // Get public URL
-      const { data: urlData } = supabase.storage
-        .from('post-media')
-        .getPublicUrl(filePath);
+      if (!data?.success || !data?.result) {
+        console.error('Cloudflare Stream upload failed:', data);
+        throw new Error(data?.errors?.[0]?.message || 'Upload failed');
+      }
 
-      const videoUrl = urlData.publicUrl;
-      
-      // For thumbnail, we'll use the video URL itself (browsers can generate thumbnails)
-      const thumbnailUrl = videoUrl;
+      // Get the video URLs from Cloudflare Stream
+      const videoId = data.result.uid;
+      const videoUrl = data.result.playback?.hls || `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${videoId}/manifest/video.m3u8`;
+      const thumbnailUrl = data.result.thumbnail || `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${videoId}/thumbnails/thumbnail.jpg`;
 
       return {
         success: true,
