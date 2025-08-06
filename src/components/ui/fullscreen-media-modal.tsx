@@ -178,16 +178,30 @@ const FullscreenMediaModal = ({
     setTimeout(() => setIsTransitioning(false), 300);
   };
 
-  // Swipe handlers for mobile - horizontal for media, vertical for posts
+  // Swipe handlers for mobile - horizontal for media navigation, vertical for post navigation
   const swipeHandlers = useSwipeable({
     onSwipedLeft: (eventData) => {
-      if (isMobile && hasMultipleMedia && currentIndex < mediaUrls.length - 1) {
-        goToNext();
+      if (isMobile) {
+        // For multiple media items, navigate to next media
+        if (hasMultipleMedia && currentIndex < mediaUrls.length - 1) {
+          goToNext();
+        }
+        // For single video in post navigation mode, go to next post
+        else if (canNavigatePosts && canGoNext && onNextPost) {
+          onNextPost();
+        }
       }
     },
     onSwipedRight: (eventData) => {
-      if (isMobile && hasMultipleMedia && currentIndex > 0) {
-        goToPrevious();
+      if (isMobile) {
+        // For multiple media items, navigate to previous media
+        if (hasMultipleMedia && currentIndex > 0) {
+          goToPrevious();
+        }
+        // For single video in post navigation mode, go to previous post
+        else if (canNavigatePosts && canGoPrevious && onPreviousPost) {
+          onPreviousPost();
+        }
       }
     },
     onSwipedDown: (eventData) => {
@@ -202,9 +216,9 @@ const FullscreenMediaModal = ({
     },
     trackMouse: false,
     trackTouch: true,
-    preventScrollOnSwipe: false,
+    preventScrollOnSwipe: true,
     delta: 50,
-    touchEventOptions: { passive: true }
+    touchEventOptions: { passive: false }
   });
 
   // Store original mute state and video positions when modal opens
