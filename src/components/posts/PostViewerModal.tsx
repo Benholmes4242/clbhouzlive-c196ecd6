@@ -263,9 +263,6 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
             >
               {currentMedia && (
                 <>
-                  {/* DEBUG: Big red circle to verify component */}
-                  <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-32 h-32 bg-red-500 rounded-full"></div>
-                  
                   {currentMedia.media_type === 'video' ? (
                      <EnhancedVideoPlayer
                        src={currentMedia.media_url}
@@ -284,6 +281,9 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                   )}
                 </>
               )}
+              
+              {/* DEBUG: Big red circle for MOBILE */}
+              <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-32 h-32 bg-red-500 rounded-full border-4 border-white"></div>
               
               {/* User Info Overlay - Top Left */}
               <div className="absolute top-12 left-4 z-25">
@@ -496,6 +496,9 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                         className="w-full h-full object-contain"
                       />
                     )}
+                    
+                    {/* DEBUG: Big red circle for DESKTOP */}
+                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 w-32 h-32 bg-red-500 rounded-full border-4 border-white"></div>
 
                     {/* User Info Overlay - Top Left */}
                     <UserInfoOverlay
