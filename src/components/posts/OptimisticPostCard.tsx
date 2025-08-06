@@ -1,10 +1,10 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import HighQualityImage from '@/components/ui/high-quality-image';
 import { Card } from '@/components/ui/card';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { Progress } from '@/components/ui/progress';
-import { AlertCircle, RotateCcw } from 'lucide-react';
+import { AlertCircle, RotateCcw, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface OptimisticPost {
@@ -34,6 +34,7 @@ interface OptimisticPostCardProps {
 }
 
 const OptimisticPostCard = ({ post, onRetry }: OptimisticPostCardProps) => {
+  const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   const hasVideos = post.post_media.some(media => media.media_type === 'video');
   
   return (
@@ -73,19 +74,60 @@ const OptimisticPostCard = ({ post, onRetry }: OptimisticPostCardProps) => {
         {/* Media Preview */}
         {post.post_media.length > 0 && (
           <div className="relative mb-3">
-            {post.post_media[0].media_type === 'video' ? (
+            {post.post_media[currentMediaIndex].media_type === 'video' ? (
               <video
-                src={post.post_media[0].media_url}
+                src={post.post_media[currentMediaIndex].media_url}
                 className="w-full aspect-video object-cover"
                 muted
                 controls={false}
               />
             ) : (
               <img
-                src={post.post_media[0].media_url}
+                src={post.post_media[currentMediaIndex].media_url}
                 alt="Post content"
                 className="w-full aspect-square object-cover"
               />
+            )}
+
+            {/* Media Navigation Arrows */}
+            {post.post_media.length > 1 && (
+              <>
+                {/* Left Arrow */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrentMediaIndex(prev => prev > 0 ? prev - 1 : post.post_media.length - 1);
+                  }}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 bg-black/40 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-black/60 transition-all"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+
+                {/* Right Arrow */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrentMediaIndex(prev => prev < post.post_media.length - 1 ? prev + 1 : 0);
+                  }}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 bg-black/40 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-black/60 transition-all"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </>
+            )}
+
+            {/* Media Navigation Dots */}
+            {post.post_media.length > 1 && (
+              <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex space-x-1 z-20">
+                {post.post_media.map((_, index) => (
+                  <div
+                    key={index}
+                    className={`w-1.5 h-1.5 rounded-full transition-all ${
+                      index === currentMediaIndex ? 'bg-white' : 'bg-white/40'
+                    }`}
+                  />
+                ))}
+              </div>
             )}
             
             {/* Overlay for uploading state */}
