@@ -23,9 +23,10 @@ const GLOBAL_TROPHIES = [
     name: 'The 20 Club',
     requiredCourses: 20,
     xp: 2200,
-    color: 'from-amber-500 to-yellow-600',
-    tier: 'gold',
+    color: 'from-green-600 to-green-800',
+    tier: 'green',
     description: 'Awarded for completing 20 Top 100 Courses. Welcome to the club!',
+    customBadge: '/lovable-uploads/9a5af57b-72fa-4986-bcbb-9c3ce337584c.png',
   },
   {
     id: 'the-turn',
@@ -306,7 +307,7 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
                              >
                                {trophy.id === 'green-fee-rookie' ? (
                                  <img 
-                                   src="/lovable-uploads/5a091ad9-4617-497e-ba13-9da6506fe989.png" 
+                                    src="/lovable-uploads/9a5af57b-72fa-4986-bcbb-9c3ce337584c.png"
                                    alt="20 Club Trophy" 
                                    className={cn(
                                  'h-24 w-auto object-contain transition-all duration-300',
@@ -365,7 +366,7 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
                           <div className="relative flex flex-col items-center space-y-3 cursor-pointer hover:scale-105 transition-all duration-300">
                             {trophy.id === 'green-fee-rookie' ? (
                               <img 
-                                src="/lovable-uploads/5a091ad9-4617-497e-ba13-9da6506fe989.png" 
+                                src="/lovable-uploads/9a5af57b-72fa-4986-bcbb-9c3ce337584c.png" 
                                 alt="20 Club Trophy" 
                                 className={cn(
                               'h-32 w-auto object-contain transition-all duration-300',
