@@ -1,8 +1,6 @@
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { useBadges } from '@/hooks/useBadges';
-import { Badge } from '@/types/badges';
 
 interface ClbhouzAchievementsModalProps {
   isOpen: boolean;
@@ -19,28 +17,33 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
   userDisplayName = "User",
   userHandicap
 }) => {
-  const { badgeProgress, getEarnedBadges, isLoading } = useBadges(userId);
-
-  // Calculate total XP from earned badges
-  const earnedBadges = getEarnedBadges();
-  const totalXP = earnedBadges.reduce((sum, bp) => sum + (bp.badge.criteria_value * 250), 0);
+  // Mock data for now - replace with actual badge system later
+  const totalXP = 2500;
   
   // Find next milestone (this is simplified - you can enhance based on your XP system)
   const nextMilestone = 5000;
   const currentLevel = "Green XP Ring"; // This would be calculated based on your ring system
 
-  // Create a grid of achievements (some earned, some not)
+  // Create a grid of achievements (mock data for now)
   const achievementGrid = Array.from({ length: 15 }, (_, index) => {
-    const badgeIndex = index < badgeProgress.length ? index : null;
-    const badge = badgeIndex !== null ? badgeProgress[badgeIndex] : null;
+    const mockAchievements = [
+      { title: "First Post", emoji: "📸", isEarned: true },
+      { title: "Course Explorer", emoji: "⛳", isEarned: true },
+      { title: "Video Master", emoji: "🎥", isEarned: false },
+      { title: "Social Butterfly", emoji: "🦋", isEarned: false },
+      { title: "Eagle Eye", emoji: "🦅", isEarned: true },
+      { title: "Birdie Collector", emoji: "🐦", isEarned: false },
+    ];
+    
+    const achievement = mockAchievements[index % mockAchievements.length];
     
     return {
       id: `achievement-${index}`,
-      title: badge?.badge.display_name || "Achievement Title",
-      xp: badge?.badge.criteria_value ? badge.badge.criteria_value * 250 : 250,
-      emoji: badge?.badge.emoji || "🏆",
-      isEarned: badge?.is_earned || false,
-      description: badge?.badge.description || "Complete this challenge to earn XP"
+      title: achievement.title,
+      xp: 250,
+      emoji: achievement.emoji,
+      isEarned: achievement.isEarned,
+      description: "Complete this challenge to earn XP"
     };
   });
 
