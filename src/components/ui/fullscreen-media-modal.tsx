@@ -428,7 +428,7 @@ const FullscreenMediaModal = ({
             <button
               onClick={goToPrevious}
               disabled={currentIndex === 0 || isTransitioning}
-              className={`absolute left-4 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center text-white bg-black/60 backdrop-blur-sm rounded-full transition-all duration-200 border border-white/30 hover:bg-black/80 hover:border-white/50 disabled:opacity-30 disabled:cursor-not-allowed ${
+              className={`absolute left-4 top-1/2 -translate-y-1/2 z-50 flex items-center justify-center text-white bg-black/60 backdrop-blur-sm rounded-full transition-all duration-200 border border-white/30 hover:bg-black/80 hover:border-white/50 disabled:opacity-30 disabled:cursor-not-allowed ${
                 isMobile ? 'w-12 h-12' : 'w-14 h-14'
               }`}
             >
@@ -437,7 +437,7 @@ const FullscreenMediaModal = ({
             <button
               onClick={goToNext}
               disabled={currentIndex === mediaUrls.length - 1 || isTransitioning}
-              className={`absolute right-4 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center text-white bg-black/60 backdrop-blur-sm rounded-full transition-all duration-200 border border-white/30 hover:bg-black/80 hover:border-white/50 disabled:opacity-30 disabled:cursor-not-allowed ${
+              className={`absolute right-4 top-1/2 -translate-y-1/2 z-50 flex items-center justify-center text-white bg-black/60 backdrop-blur-sm rounded-full transition-all duration-200 border border-white/30 hover:bg-black/80 hover:border-white/50 disabled:opacity-30 disabled:cursor-not-allowed ${
                 isMobile ? 'w-12 h-12' : 'w-14 h-14'
               }`}
             >
