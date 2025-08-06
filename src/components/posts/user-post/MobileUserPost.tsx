@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Heart, MessageCircle, Share } from 'lucide-react';
+import { Heart, MessageCircle, Share, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useSwipeable } from 'react-swipeable';
 import { useIntersectionObserver } from '@/hooks/useIntersectionObserver';
@@ -225,6 +225,32 @@ export const MobileUserPost: React.FC<MobileUserPostProps> = ({
           </div>
         </div>
 
+        {/* Media Navigation Arrows */}
+        {post.post_media.length > 1 && (
+          <>
+            {/* Left Arrow */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setCurrentMediaIndex(prev => prev > 0 ? prev - 1 : post.post_media.length - 1);
+              }}
+              className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-black/40 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-black/60 transition-all"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+
+            {/* Right Arrow */}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setCurrentMediaIndex(prev => prev < post.post_media.length - 1 ? prev + 1 : 0);
+              }}
+              className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-black/40 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-black/60 transition-all"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </>
+        )}
 
         {/* Media Navigation Dots */}
         {post.post_media.length > 1 && (

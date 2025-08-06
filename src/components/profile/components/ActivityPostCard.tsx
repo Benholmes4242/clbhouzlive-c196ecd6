@@ -1,9 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { ActivityPost } from '../types/ActivityTypes';
 
 import CourseTag from '@/components/posts/CourseTag';
-import { Camera, Play } from 'lucide-react';
+import { Camera, Play, ChevronLeft, ChevronRight } from 'lucide-react';
 import { MdOutlinePlayCircle } from 'react-icons/md';
 import HighQualityImage from '@/components/ui/high-quality-image';
 import EnhancedVideoPlayer from '@/components/ui/enhanced-video-player';
@@ -18,6 +18,7 @@ interface ActivityPostCardProps {
 }
 
 const ActivityPostCard = ({ post, attributionText, onClick, isFirstVideo }: ActivityPostCardProps) => {
+  const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   const { ref: autoplayRef, shouldAutoplay, handleMouseEnter, handleMouseLeave } = useVideoAutoplay();
   
   const handleClick = () => {
@@ -49,8 +50,9 @@ const ActivityPostCard = ({ post, attributionText, onClick, isFirstVideo }: Acti
 
   // Check if we have media
   const hasMedia = post.post_media && post.post_media.length > 0;
-  const firstMedia = hasMedia ? post.post_media[0] : null;
-  const isVideo = firstMedia?.media_type === 'video';
+  const hasMultipleMedia = hasMedia && post.post_media.length > 1;
+  const currentMedia = hasMedia ? post.post_media[currentMediaIndex] : null;
+  const isVideo = currentMedia?.media_type === 'video';
   
   // Only autoplay if this is the first video and shouldAutoplay is true
   const allowAutoplay = isVideo && isFirstVideo && shouldAutoplay;
@@ -64,12 +66,12 @@ const ActivityPostCard = ({ post, attributionText, onClick, isFirstVideo }: Acti
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      {hasMedia && firstMedia ? (
+      {hasMedia && currentMedia ? (
         <>
-          {firstMedia.media_type === 'video' ? (
+          {currentMedia.media_type === 'video' ? (
             allowAutoplay ? (
               <EnhancedVideoPlayer
-                src={firstMedia.media_url}
+                src={currentMedia.media_url}
                 autoplay={true}
                 muted={true}
                 loop={true}
@@ -81,7 +83,7 @@ const ActivityPostCard = ({ post, attributionText, onClick, isFirstVideo }: Acti
               // Show thumbnail for non-autoplay videos
               <div className="relative w-full h-full">
                 <HighQualityImage
-                  src={getVideoThumbnail(firstMedia.media_url) || firstMedia.media_url}
+                  src={getVideoThumbnail(currentMedia.media_url) || currentMedia.media_url}
                   alt="Video thumbnail"
                   className="w-full h-full"
                   width={300}
@@ -119,7 +121,7 @@ const ActivityPostCard = ({ post, attributionText, onClick, isFirstVideo }: Acti
             )
           ) : (
             <HighQualityImage
-              src={firstMedia.media_url}
+              src={currentMedia.media_url}
               alt="Post media"
               className="w-full h-full"
               width={300}
@@ -157,6 +159,47 @@ const ActivityPostCard = ({ post, attributionText, onClick, isFirstVideo }: Acti
                 }
               }}
             />
+          )}
+
+          {/* Media Navigation Arrows */}
+          {hasMultipleMedia && (
+            <>
+              {/* Left Arrow */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCurrentMediaIndex(prev => prev > 0 ? prev - 1 : post.post_media.length - 1);
+                }}
+                className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 bg-black/40 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-black/60 transition-all"
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+
+              {/* Right Arrow */}
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCurrentMediaIndex(prev => prev < post.post_media.length - 1 ? prev + 1 : 0);
+                }}
+                className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-8 h-8 bg-black/40 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-black/60 transition-all"
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            </>
+          )}
+
+          {/* Media Navigation Dots */}
+          {hasMultipleMedia && (
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex space-x-1 z-20">
+              {post.post_media.map((_, index) => (
+                <div
+                  key={index}
+                  className={`w-1.5 h-1.5 rounded-full transition-all ${
+                    index === currentMediaIndex ? 'bg-white' : 'bg-white/40'
+                  }`}
+                />
+              ))}
+            </div>
           )}
         </>
       ) : (
