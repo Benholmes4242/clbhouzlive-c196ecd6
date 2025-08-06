@@ -279,8 +279,8 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
             <div className="flex items-center justify-between pb-6">
             <h4 className="text-xl font-semibold text-foreground">
               {isCurrentUser 
-                ? `${completedCount} of 300 courses within the list played`
-                : `${completedCount} of 300 courses within the list played`
+                ? `${completedCount} of 300 courses played`
+                : `${completedCount} of 300 courses played`
               }
             </h4>
               <div className="text-lg font-bold text-foreground transition-all duration-500">
