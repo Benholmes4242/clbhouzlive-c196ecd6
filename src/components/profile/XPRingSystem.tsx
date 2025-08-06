@@ -19,10 +19,10 @@ const XP_RING_TIERS: XPRingTier[] = [
   },
   {
     name: "Green Ring",
-    color: "#228B22", 
+    color: "#6e9277", 
     minXP: 20000,
     maxXP: 29999,
-    ringGradient: "conic-gradient(from 0deg, #228B22, #32CD32, #228B22)"
+    ringGradient: "conic-gradient(from 0deg, #6e9277, #8bb485, #6e9277)"
   },
   {
     name: "Silver Ring",
