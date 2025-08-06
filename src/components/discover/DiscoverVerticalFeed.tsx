@@ -15,6 +15,7 @@ import { useVideoManager } from '@/contexts/VideoManagerContext';
 import CommentsModal from '@/components/posts/CommentsModal';
 import { usePostDeletion } from '@/hooks/usePostDeletion';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
 
 interface DiscoverVerticalFeedProps {
   isOpen: boolean;
@@ -527,6 +528,16 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                       onError={(e) => {
                         e.currentTarget.src = '/placeholder.svg';
                       }}
+                    />
+                  </div>
+                )}
+                
+                {/* Media navigation dots for multiple media */}
+                {item.media && item.media.length > 1 && (
+                  <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20">
+                    <MediaNavigationDots
+                      mediaCount={item.media.length}
+                      currentIndex={0}
                     />
                   </div>
                 )}
