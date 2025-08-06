@@ -275,6 +275,9 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
           )}
           
           <div className="relative">
+            {/* Title */}
+            <h2 className="text-3xl font-bold text-foreground mb-4">Achievements</h2>
+            
             {/* Header with XP Counter */}
             <div className="flex items-center justify-between pb-0 px-0 pt-2">
             <h4 className="text-lg font-semibold text-foreground">
