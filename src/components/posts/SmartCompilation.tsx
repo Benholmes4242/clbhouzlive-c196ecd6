@@ -48,24 +48,35 @@ const SmartCompilation: React.FC<SmartCompilationProps> = ({
   // Filter and process video files
   useEffect(() => {
     const videoFiles = files.filter(file => file.type.startsWith('video/'));
+    console.log('SmartCompilation: Processing video files:', videoFiles.length);
     
     const processVideoFiles = async () => {
       const clips: VideoClipData[] = [];
       
       for (let i = 0; i < videoFiles.length; i++) {
         const file = videoFiles[i];
-        const thumbnailUrl = await generateVideoThumbnail(file);
-        const duration = await getVideoDuration(file);
+        console.log(`SmartCompilation: Processing file ${i + 1}:`, file.name);
         
-        clips.push({
-          id: `clip-${i}`,
-          file,
-          thumbnailUrl,
-          duration,
-          order: i
-        });
+        try {
+          const thumbnailUrl = await generateVideoThumbnail(file);
+          const duration = await getVideoDuration(file);
+          
+          const clipData = {
+            id: `clip-${i}`, // Simple stable ID
+            file,
+            thumbnailUrl,
+            duration,
+            order: i
+          };
+          
+          console.log(`SmartCompilation: Created clip:`, clipData.id);
+          clips.push(clipData);
+        } catch (error) {
+          console.error(`SmartCompilation: Error processing file ${i + 1}:`, error);
+        }
       }
       
+      console.log('SmartCompilation: All clips processed:', clips.map(c => c.id));
       setVideoClips(clips);
     };
 
@@ -134,7 +145,13 @@ const SmartCompilation: React.FC<SmartCompilationProps> = ({
 
   // Handle drag and drop reordering
   const handleDragEnd = (result: DropResult) => {
-    if (!result.destination) return;
+    console.log('SmartCompilation: Drag end:', result);
+    console.log('SmartCompilation: Current videoClips:', videoClips.map(c => c.id));
+    
+    if (!result.destination) {
+      console.log('SmartCompilation: No destination, canceling drag');
+      return;
+    }
     
     const items = Array.from(videoClips);
     const [reorderedItem] = items.splice(result.source.index, 1);
@@ -146,6 +163,7 @@ const SmartCompilation: React.FC<SmartCompilationProps> = ({
       order: index
     }));
     
+    console.log('SmartCompilation: Reordered items:', reorderedItems.map(c => c.id));
     setVideoClips(reorderedItems);
   };
 
