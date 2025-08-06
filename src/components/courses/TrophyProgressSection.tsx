@@ -315,7 +315,7 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
                                          src="/lovable-uploads/9a5af57b-72fa-4986-bcbb-9c3ce337584c.png"
                                          alt="20 Club Trophy" 
                                          className={cn(
-                                       'h-32 w-auto object-contain transition-all duration-300',
+                                       'h-28 w-auto object-contain transition-all duration-300',
                                        trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
                                      )}
                                          style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(34, 197, 94, 0.6))' : 'none' }}
@@ -325,7 +325,7 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
                                          src="/lovable-uploads/b9a07b6a-a2ef-4f59-acea-76f2b67faa8d.png"
                                          alt="The Turn Trophy"
                                          className={cn(
-                                       'h-32 w-auto object-contain transition-all duration-300',
+                                       'h-28 w-auto object-contain transition-all duration-300',
                                        trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
                                      )}
                                           style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(34, 197, 94, 0.6))' : 'none' }}
@@ -335,7 +335,7 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
                                           src="/lovable-uploads/f6339399-b23a-457b-b65e-8c2f7322a12b.png"
                                           alt="Century Club Trophy"
                                           className={cn(
-                                        'h-32 w-auto object-contain transition-all duration-300',
+                                        'h-28 w-auto object-contain transition-all duration-300',
                                         trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
                                       )}
                                           style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(251, 191, 36, 0.6))' : 'none' }}
@@ -345,7 +345,7 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
                                           src="/lovable-uploads/3fad8a43-f0de-42f5-b709-ae685b2cd173.png"
                                           alt="Clubhouse Elite Trophy"
                                           className={cn(
-                                        'h-32 w-auto object-contain transition-all duration-300',
+                                        'h-28 w-auto object-contain transition-all duration-300',
                                         trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
                                       )}
                                           style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(148, 163, 184, 0.6))' : 'none' }}
@@ -355,7 +355,7 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
                                           src="/lovable-uploads/5e67194f-43f3-4c9d-a5a2-8c0b335c0a09.png"
                                           alt="Club Champion Trophy"
                                           className={cn(
-                                        'h-32 w-auto object-contain transition-all duration-300',
+                                        'h-28 w-auto object-contain transition-all duration-300',
                                         trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
                                       )}
                                           style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(251, 191, 36, 0.6))' : 'none' }}
@@ -438,7 +438,7 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
                                       src="/lovable-uploads/9a5af57b-72fa-4986-bcbb-9c3ce337584c.png" 
                                       alt="20 Club Trophy" 
                                       className={cn(
-                                    'h-32 w-auto object-contain transition-all duration-300',
+                                    'h-36 w-auto object-contain transition-all duration-300',
                                     trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
                                   )}
                                       style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(34, 197, 94, 0.6))' : 'none' }}
@@ -448,7 +448,7 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
                                       src="/lovable-uploads/b9a07b6a-a2ef-4f59-acea-76f2b67faa8d.png" 
                                       alt="The Turn Trophy"
                                       className={cn(
-                                    'h-32 w-auto object-contain transition-all duration-300',
+                                    'h-36 w-auto object-contain transition-all duration-300',
                                     trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
                                   )}
                                        style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(34, 197, 94, 0.6))' : 'none' }}
@@ -458,7 +458,7 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
                                        src="/lovable-uploads/f6339399-b23a-457b-b65e-8c2f7322a12b.png" 
                                        alt="Century Club Trophy"
                                        className={cn(
-                                     'h-32 w-auto object-contain transition-all duration-300',
+                                     'h-36 w-auto object-contain transition-all duration-300',
                                      trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
                                    )}
                                        style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(251, 191, 36, 0.6))' : 'none' }}
@@ -468,7 +468,7 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
                                        src="/lovable-uploads/3fad8a43-f0de-42f5-b709-ae685b2cd173.png" 
                                        alt="Clubhouse Elite Trophy"
                                        className={cn(
-                                     'h-32 w-auto object-contain transition-all duration-300',
+                                     'h-36 w-auto object-contain transition-all duration-300',
                                      trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
                                    )}
                                        style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(148, 163, 184, 0.6))' : 'none' }}
@@ -478,7 +478,7 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
                                        src="/lovable-uploads/5e67194f-43f3-4c9d-a5a2-8c0b335c0a09.png" 
                                        alt="Club Champion Trophy"
                                        className={cn(
-                                     'h-32 w-auto object-contain transition-all duration-300',
+                                     'h-36 w-auto object-contain transition-all duration-300',
                                      trophy.isUnlocked ? 'opacity-100 animate-subtle-bounce' : 'opacity-40 grayscale'
                                    )}
                                        style={{ filter: trophy.isUnlocked ? 'drop-shadow(0 0 12px rgba(251, 191, 36, 0.6))' : 'none' }}
