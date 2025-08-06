@@ -304,13 +304,13 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
 
             {/* Media Navigation Dots - Bottom Center */}
             {hasMultipleMedia && (
-              <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 flex space-x-2 z-10">
+              <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-30">
                 {currentPost.post_media.map((_, index) => (
                   <button
                     key={index}
                     onClick={() => setCurrentMediaIndex(index)}
-                    className={`w-2 h-2 rounded-full transition-colors ${
-                      index === currentMediaIndex ? 'bg-white' : 'bg-white/50'
+                    className={`w-2 h-2 rounded-full border border-white/20 transition-colors ${
+                      index === currentMediaIndex ? 'bg-white' : 'bg-white/40'
                     }`}
                   />
                 ))}
@@ -530,13 +530,13 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                         </button>
 
                         {/* Media Navigation Dots - Desktop */}
-                        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-10">
+                        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-30">
                           {currentPost.post_media.map((_, index) => (
                             <button
                               key={index}
                               onClick={() => setCurrentMediaIndex(index)}
-                              className={`w-2 h-2 rounded-full transition-colors ${
-                                index === currentMediaIndex ? 'bg-white' : 'bg-white/50'
+                              className={`w-2 h-2 rounded-full border border-white/20 transition-colors ${
+                                index === currentMediaIndex ? 'bg-white' : 'bg-white/40'
                               }`}
                             />
                           ))}
