@@ -1,6 +1,7 @@
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface ClbhouzAchievementsModalProps {
   isOpen: boolean;
@@ -27,12 +28,48 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
   // Create a grid of achievements (mock data for now)
   const achievementGrid = Array.from({ length: 15 }, (_, index) => {
     const mockAchievements = [
-      { title: "First Post", emoji: "📸", isEarned: true },
-      { title: "Course Explorer", emoji: "⛳", isEarned: true },
-      { title: "Video Master", emoji: "🎥", isEarned: false },
-      { title: "Social Butterfly", emoji: "🦋", isEarned: false },
-      { title: "Eagle Eye", emoji: "🦅", isEarned: true },
-      { title: "Birdie Collector", emoji: "🐦", isEarned: false },
+      { 
+        title: "First Post", 
+        emoji: "📸", 
+        isEarned: true, 
+        description: "Share your first golf course experience with the community. Welcome to Clbhouz!",
+        progress: "1/1"
+      },
+      { 
+        title: "Course Explorer", 
+        emoji: "⛳", 
+        isEarned: true, 
+        description: "Visit and explore 5 different golf courses. Discover new favorites!",
+        progress: "5/5"
+      },
+      { 
+        title: "Video Master", 
+        emoji: "🎥", 
+        isEarned: false, 
+        description: "Upload and share 10 course videos. Show off those perfect swings!",
+        progress: "3/10"
+      },
+      { 
+        title: "Social Butterfly", 
+        emoji: "🦋", 
+        isEarned: false, 
+        description: "Connect with 25 fellow golfers in the community. Build your network!",
+        progress: "12/25"
+      },
+      { 
+        title: "Eagle Eye", 
+        emoji: "🦅", 
+        isEarned: true, 
+        description: "Score an eagle on any course. Exceptional shot making!",
+        progress: "1/1"
+      },
+      { 
+        title: "Birdie Collector", 
+        emoji: "🐦", 
+        isEarned: false, 
+        description: "Score 50 birdies across all your rounds. Keep up the great play!",
+        progress: "23/50"
+      },
     ];
     
     const achievement = mockAchievements[index % mockAchievements.length];
@@ -43,7 +80,8 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       xp: 250,
       emoji: achievement.emoji,
       isEarned: achievement.isEarned,
-      description: "Complete this challenge to earn XP"
+      description: achievement.description,
+      progress: achievement.progress
     };
   });
 
@@ -94,30 +132,46 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
 
           {/* Achievements Grid */}
           <div className="px-6 pb-4">
-            <div className="grid grid-cols-3 gap-4">
-              {achievementGrid.map((achievement) => (
-                <div
-                  key={achievement.id}
-                  className={`
-                    border rounded-lg p-4 text-center transition-all duration-200 hover:scale-105
-                    ${achievement.isEarned 
-                      ? 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800' 
-                      : 'bg-muted/30 border-border opacity-70'
-                    }
-                  `}
-                >
-                  <div className="text-2xl mb-2">
-                    {achievement.isEarned ? achievement.emoji : '🔒'}
-                  </div>
-                  <h4 className="font-medium text-sm mb-1">
-                    {achievement.title}
-                  </h4>
-                  <p className={`text-xs ${achievement.isEarned ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}`}>
-                    +{achievement.xp} XP
-                  </p>
-                </div>
-              ))}
-            </div>
+            <TooltipProvider>
+              <div className="grid grid-cols-3 gap-4">
+                {achievementGrid.map((achievement) => (
+                  <Tooltip key={achievement.id}>
+                    <TooltipTrigger asChild>
+                      <div
+                        className={`
+                          border rounded-lg p-4 text-center transition-all duration-200 hover:scale-105 cursor-pointer
+                          ${achievement.isEarned 
+                            ? 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800' 
+                            : 'bg-muted/30 border-border opacity-70'
+                          }
+                        `}
+                      >
+                        <div className="text-2xl mb-2">
+                          {achievement.isEarned ? achievement.emoji : '🔒'}
+                        </div>
+                        <h4 className="font-medium text-sm mb-1">
+                          {achievement.title}
+                        </h4>
+                        <p className={`text-xs ${achievement.isEarned ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}`}>
+                          +{achievement.xp} XP
+                        </p>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-sm">
+                      <div className="text-center">
+                        <h4 className="font-semibold mb-1">{achievement.title}</h4>
+                        <p className="text-sm text-muted-foreground mb-2">
+                          {achievement.description}
+                        </p>
+                        <p className="text-xs font-medium">
+                          Progress: {achievement.progress}
+                        </p>
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
+                ))}
+              </div>
+            </TooltipProvider>
           </div>
 
           {/* Leaderboard Section */}
