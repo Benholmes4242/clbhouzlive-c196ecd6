@@ -90,40 +90,96 @@ const SmartCompilation: React.FC<SmartCompilationProps> = ({
 
   // Generate video thumbnail
   const generateVideoThumbnail = async (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       const video = document.createElement('video');
       video.preload = 'metadata';
       video.crossOrigin = 'anonymous';
-      video.muted = true; // Important for autoplay policies
+      video.muted = true;
+      video.playsInline = true;
       
-      video.onloadedmetadata = () => {
-        // Try multiple time points if first fails
-        const timeToSeek = Math.min(2, video.duration / 2);
-        video.currentTime = timeToSeek;
+      let timeoutId: NodeJS.Timeout;
+      let hasResolved = false;
+      
+      const resolveWithThumbnail = (url: string) => {
+        if (hasResolved) return;
+        hasResolved = true;
+        clearTimeout(timeoutId);
+        URL.revokeObjectURL(video.src);
+        resolve(url);
       };
       
-      video.onseeked = () => {
+      const generateThumbnail = () => {
         try {
           const canvas = document.createElement('canvas');
           canvas.width = 120;
           canvas.height = 80;
           const ctx = canvas.getContext('2d')!;
-          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-          const thumbnailUrl = canvas.toDataURL('image/jpeg', 0.8);
-          URL.revokeObjectURL(video.src); // Clean up
-          resolve(thumbnailUrl);
+          
+          // Ensure video has loaded properly
+          if (video.videoWidth > 0 && video.videoHeight > 0) {
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const thumbnailUrl = canvas.toDataURL('image/jpeg', 0.8);
+            resolveWithThumbnail(thumbnailUrl);
+          } else {
+            throw new Error('Video dimensions not available');
+          }
         } catch (error) {
-          console.error('Error generating thumbnail:', error);
-          // Fallback to a default thumbnail
-          resolve('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjgwIiB2aWV3Qm94PSIwIDAgMTIwIDgwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjOTk5OTk5Ii8+Cjx0ZXh0IHg9IjYwIiB5PSI0NSIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTIiPkVycm9yPC90ZXh0Pgo8L3N2Zz4K');
+          console.error('Error generating thumbnail for', file.name, ':', error);
+          resolveWithThumbnail(getDefaultThumbnail());
+        }
+      };
+      
+      const getDefaultThumbnail = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = 120;
+        canvas.height = 80;
+        const ctx = canvas.getContext('2d')!;
+        
+        // Create a simple gradient background
+        const gradient = ctx.createLinearGradient(0, 0, 120, 80);
+        gradient.addColorStop(0, '#6366f1');
+        gradient.addColorStop(1, '#8b5cf6');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, 120, 80);
+        
+        // Add play icon
+        ctx.fillStyle = 'white';
+        ctx.beginPath();
+        ctx.moveTo(45, 25);
+        ctx.lineTo(45, 55);
+        ctx.lineTo(75, 40);
+        ctx.closePath();
+        ctx.fill();
+        
+        return canvas.toDataURL('image/jpeg', 0.8);
+      };
+      
+      video.onloadedmetadata = () => {
+        if (video.duration > 0) {
+          const seekTime = Math.min(1, video.duration * 0.1);
+          video.currentTime = seekTime;
+        } else {
+          generateThumbnail();
+        }
+      };
+      
+      video.onseeked = generateThumbnail;
+      video.oncanplay = () => {
+        if (!hasResolved && video.currentTime === 0) {
+          generateThumbnail();
         }
       };
       
       video.onerror = () => {
-        console.error('Video loading error for thumbnail generation');
-        // Fallback to a default thumbnail
-        resolve('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwIiBoZWlnaHQ9IjgwIiB2aWV3Qm94PSIwIDAgMTIwIDgwIiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPgo8cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjOTk5OTk5Ii8+Cjx0ZXh0IHg9IjYwIiB5PSI0NSIgZmlsbD0id2hpdGUiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTIiPlZpZGVvPC90ZXh0Pgo8L3N2Zz4K');
+        console.error('Video loading error for thumbnail generation:', file.name);
+        resolveWithThumbnail(getDefaultThumbnail());
       };
+      
+      // Timeout fallback
+      timeoutId = setTimeout(() => {
+        console.warn('Thumbnail generation timeout for:', file.name);
+        resolveWithThumbnail(getDefaultThumbnail());
+      }, 5000);
       
       video.src = URL.createObjectURL(file);
     });
@@ -238,14 +294,14 @@ const SmartCompilation: React.FC<SmartCompilationProps> = ({
         message: 'Finalizing your highlight reel...'
       }));
 
-      // Download the compiled video
-      const response = await fetch(compilationResult.compiledVideoUrl);
-      const blob = await response.blob();
-      
-      // Create a File object from the blob
-      const compiledFile = new File([blob], 'highlight-compilation.mp4', {
-        type: 'video/mp4'
+      // For HLS streams, we'll create a mock file and pass the URL
+      // The parent component will handle the HLS stream URL directly
+      const compiledFile = new File([''], 'highlight-compilation.m3u8', {
+        type: 'application/vnd.apple.mpegurl'
       });
+      
+      // Store the actual stream URL on the file object for parent component
+      (compiledFile as any).streamUrl = compilationResult.compiledVideoUrl;
 
       setCompilationStatus({
         status: 'complete',
@@ -363,26 +419,40 @@ const SmartCompilation: React.FC<SmartCompilationProps> = ({
                       className="flex gap-3 overflow-x-auto pb-2"
                     >
                       {videoClips.map((clip, index) => (
-                        <Draggable key={clip.id} draggableId={clip.id} index={index}>
+                        <Draggable key={`${clip.id}-${clip.file.name}`} draggableId={`${clip.id}-${clip.file.name}`} index={index}>
                           {(provided, snapshot) => (
                             <div
                               ref={provided.innerRef}
                               {...provided.draggableProps}
                               {...provided.dragHandleProps}
-                              className={`flex-shrink-0 relative ${
-                                snapshot.isDragging ? 'opacity-75' : ''
+                              className={`flex-shrink-0 relative cursor-grab active:cursor-grabbing ${
+                                snapshot.isDragging ? 'opacity-75 transform rotate-3 scale-105 z-50' : ''
                               }`}
+                              style={{
+                                ...provided.draggableProps.style,
+                                transform: snapshot.isDragging 
+                                  ? `${provided.draggableProps.style?.transform} rotate(3deg) scale(1.05)`
+                                  : provided.draggableProps.style?.transform
+                              }}
                             >
-                              <div className="w-24 h-16 rounded-lg overflow-hidden bg-gray-100 border-2 border-dashed border-gray-300 relative">
+                              <div className={`w-24 h-16 rounded-lg overflow-hidden relative transition-all duration-200 ${
+                                snapshot.isDragging 
+                                  ? 'border-2 border-purple-500 shadow-lg' 
+                                  : 'border-2 border-gray-200 hover:border-purple-300'
+                              }`}>
                                 <img
                                   src={clip.thumbnailUrl}
                                   alt={`Clip ${index + 1}`}
-                                  className="w-full h-full object-cover"
+                                  className="w-full h-full object-cover bg-gray-100"
+                                  onError={(e) => {
+                                    console.error('Thumbnail failed to load for clip:', clip.id);
+                                    e.currentTarget.style.display = 'none';
+                                  }}
                                 />
                                 <div className="absolute bottom-1 left-1 bg-black/70 text-white text-xs px-1 rounded">
                                   {formatDuration(clip.duration)}
                                 </div>
-                                <div className="absolute top-1 left-1 bg-blue-600 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center font-bold">
+                                <div className="absolute top-1 left-1 bg-purple-600 text-white text-xs w-4 h-4 rounded-full flex items-center justify-center font-bold">
                                   {index + 1}
                                 </div>
                               </div>
