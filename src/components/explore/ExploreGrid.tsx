@@ -6,6 +6,7 @@ import { HiTrendingUp } from 'react-icons/hi';
 import { ExploreContentItem } from './types';
 import ExploreContentCard from './ExploreContentCard';
 import MediaDisplay from './MediaDisplay';
+import { MediaNavigationDots } from '@/components/posts/user-post/overlays/MediaNavigationDots';
 import { FILTER_TYPES } from './types';
 // import { useAutoplayManager } from '@/hooks/useAutoplayManager';
 
@@ -460,6 +461,14 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                   </div>
                 )}
                 
+                {/* Media navigation dots for multiple media */}
+                {layoutItem.item.media && layoutItem.item.media.length > 1 && (
+                  <MediaNavigationDots
+                    mediaCount={layoutItem.item.media.length}
+                    currentIndex={0}
+                  />
+                )}
+                
                 {/* User info for large cards */}
                 <div className="absolute bottom-3 left-3 right-12">
                   <div className="flex items-center gap-2">
@@ -524,6 +533,14 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
                       <MdOutlinePlayCircle className="w-6 h-6 text-white drop-shadow-lg" />
                     </div>
                   </div>
+                )}
+                
+                {/* Media navigation dots for multiple media */}
+                {layoutItem.item.media && layoutItem.item.media.length > 1 && (
+                  <MediaNavigationDots
+                    mediaCount={layoutItem.item.media.length}
+                    currentIndex={0}
+                  />
                 )}
               </div>
             )
