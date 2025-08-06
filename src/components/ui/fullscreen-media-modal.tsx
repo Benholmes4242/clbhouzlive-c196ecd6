@@ -422,22 +422,30 @@ const FullscreenMediaModal = ({
           )}
         </div>
 
-        {/* Desktop Navigation Arrows - Only show if multiple media and not mobile */}
-        {hasMultipleMedia && !isMobile && (
+        {/* Navigation Arrows - Show for both desktop and mobile */}
+        {hasMultipleMedia && (
           <>
             <button
               onClick={goToPrevious}
               disabled={currentIndex === 0 || isTransitioning}
-              className="absolute left-4 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center w-12 h-12 text-white hover:bg-white/10 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className={`absolute left-4 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center text-white rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                isMobile 
+                  ? 'w-10 h-10 bg-black/40 backdrop-blur-sm hover:bg-black/60'
+                  : 'w-12 h-12 hover:bg-white/10'
+              }`}
             >
-              <ChevronLeft className="w-6 h-6" />
+              <ChevronLeft className={isMobile ? "w-5 h-5" : "w-6 h-6"} />
             </button>
             <button
               onClick={goToNext}
               disabled={currentIndex === mediaUrls.length - 1 || isTransitioning}
-              className="absolute right-4 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center w-12 h-12 text-white hover:bg-white/10 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className={`absolute right-4 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center text-white rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+                isMobile 
+                  ? 'w-10 h-10 bg-black/40 backdrop-blur-sm hover:bg-black/60'
+                  : 'w-12 h-12 hover:bg-white/10'
+              }`}
             >
-              <ChevronRight className="w-6 h-6" />
+              <ChevronRight className={isMobile ? "w-5 h-5" : "w-6 h-6"} />
             </button>
           </>
         )}
