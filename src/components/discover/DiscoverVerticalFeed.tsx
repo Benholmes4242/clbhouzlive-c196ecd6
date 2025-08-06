@@ -566,7 +566,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                     {/* Left Arrow */}
                     <button
                       onClick={(e) => handlePrevMedia(item.id, mediaItems.length, e)}
-                      className="absolute left-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 bg-black/60 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-black/80 transition-all border border-white/30"
+                      className="absolute left-4 top-1/2 -translate-y-1/2 z-30 p-1 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all"
                     >
                       <ChevronLeft className="w-5 h-5 stroke-[2.5]" />
                     </button>
@@ -574,7 +574,7 @@ const DiscoverVerticalFeed: React.FC<DiscoverVerticalFeedProps> = ({
                     {/* Right Arrow */}
                     <button
                       onClick={(e) => handleNextMedia(item.id, mediaItems.length, e)}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 bg-black/60 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-black/80 transition-all border border-white/30"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 z-30 p-1 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all"
                     >
                       <ChevronRight className="w-5 h-5 stroke-[2.5]" />
                     </button>
