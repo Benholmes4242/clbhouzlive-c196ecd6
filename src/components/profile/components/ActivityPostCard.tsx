@@ -170,7 +170,7 @@ const ActivityPostCard = ({ post, attributionText, onClick, isFirstVideo }: Acti
                   e.stopPropagation();
                   setCurrentMediaIndex(prev => prev > 0 ? prev - 1 : post.post_media.length - 1);
                 }}
-                className="absolute left-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-black/60 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-black/80 transition-all border border-white/30"
+                className="absolute left-2 top-1/2 -translate-y-1/2 z-20 p-1 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all"
               >
                 <ChevronLeft className="w-5 h-5 stroke-[2.5]" />
               </button>
@@ -181,7 +181,7 @@ const ActivityPostCard = ({ post, attributionText, onClick, isFirstVideo }: Acti
                   e.stopPropagation();
                   setCurrentMediaIndex(prev => prev < post.post_media.length - 1 ? prev + 1 : 0);
                 }}
-                className="absolute right-2 top-1/2 -translate-y-1/2 z-20 w-10 h-10 bg-black/60 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-black/80 transition-all border border-white/30"
+                className="absolute right-2 top-1/2 -translate-y-1/2 z-20 p-1 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white hover:bg-white/20 transition-all"
               >
                 <ChevronRight className="w-5 h-5 stroke-[2.5]" />
               </button>

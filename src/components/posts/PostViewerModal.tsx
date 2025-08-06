@@ -323,18 +323,18 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                 <button
                   onClick={() => navigateMedia('prev')}
                   disabled={currentMediaIndex === 0}
-                  className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 text-white disabled:opacity-30 hover:scale-110 transition-all duration-200"
+                  className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 p-1 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white disabled:opacity-30 hover:bg-white/20 transition-all"
                   aria-label="Previous media"
                 >
-                  <ChevronLeft className="h-8 w-8 drop-shadow-lg" />
+                  <ChevronLeft className="h-6 w-6" />
                 </button>
                 <button
                   onClick={() => navigateMedia('next')}
                   disabled={currentMediaIndex === (currentPost.post_media?.length || 1) - 1}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 text-white disabled:opacity-30 hover:scale-110 transition-all duration-200"
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 p-1 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white disabled:opacity-30 hover:bg-white/20 transition-all"
                   aria-label="Next media"
                 >
-                  <ChevronRight className="h-8 w-8 drop-shadow-lg" />
+                  <ChevronRight className="h-6 w-6" />
                 </button>
               </>
             )}
@@ -515,18 +515,18 @@ const PostViewerModal: React.FC<PostViewerModalProps> = ({
                         <button
                           onClick={() => navigateMedia('prev')}
                           disabled={currentMediaIndex === 0}
-                          className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 text-white disabled:opacity-30 hover:scale-110 transition-all duration-200"
+                          className="absolute left-4 top-1/2 transform -translate-y-1/2 z-20 p-1 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white disabled:opacity-30 hover:bg-white/20 transition-all"
                           aria-label="Previous media"
                         >
-                          <ChevronLeft className="h-8 w-8 drop-shadow-lg" />
+                          <ChevronLeft className="h-6 w-6" />
                         </button>
                         <button
                           onClick={() => navigateMedia('next')}
                           disabled={currentMediaIndex === (currentPost.post_media?.length || 1) - 1}
-                          className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 text-white disabled:opacity-30 hover:scale-110 transition-all duration-200"
+                          className="absolute right-4 top-1/2 transform -translate-y-1/2 z-20 p-1 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center text-white disabled:opacity-30 hover:bg-white/20 transition-all"
                           aria-label="Next media"
                         >
-                          <ChevronRight className="h-8 w-8 drop-shadow-lg" />
+                          <ChevronRight className="h-6 w-6" />
                         </button>
 
                         {/* Media Navigation Dots - Desktop */}
