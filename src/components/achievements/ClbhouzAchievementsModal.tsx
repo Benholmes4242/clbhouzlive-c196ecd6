@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
@@ -29,6 +29,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
   userDisplayName = "User",
   userHandicap
 }) => {
+  const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
   // Mock data for now - replace with actual badge system later
   const totalXP = 2500;
   
@@ -325,6 +326,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                             : 'bg-muted/30 border-border opacity-70'
                           }
                         `}
+                        onClick={() => setSelectedAchievement(achievement)}
                       >
                         <div className="text-2xl mb-2">
                           {achievement.isEarned ? achievement.emoji : '🔒'}
@@ -373,6 +375,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                             : 'bg-muted/30 border-border opacity-70'
                           }
                         `}
+                        onClick={() => setSelectedAchievement(achievement)}
                       >
                         <div className="text-2xl mb-2">
                           {achievement.isEarned ? achievement.emoji : '🔒'}
@@ -405,6 +408,35 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
             </TooltipProvider>
           </div>
         </div>
+
+        {/* Mobile Achievement Details Dialog */}
+        {selectedAchievement && (
+          <Dialog open={!!selectedAchievement} onOpenChange={() => setSelectedAchievement(null)}>
+            <DialogContent className="max-w-sm mx-auto">
+              <DialogHeader>
+                <DialogTitle className="text-center flex items-center justify-center gap-2">
+                  <span className="text-2xl">
+                    {selectedAchievement.isEarned ? selectedAchievement.emoji : '🔒'}
+                  </span>
+                  {selectedAchievement.title}
+                </DialogTitle>
+              </DialogHeader>
+              <div className="text-center py-4">
+                <p className="text-sm text-muted-foreground mb-4">
+                  {selectedAchievement.description}
+                </p>
+                <div className="space-y-2">
+                  <p className="text-sm font-medium">
+                    +{selectedAchievement.xp} XP {selectedAchievement.isRepeatable ? "(Repeatable)" : "(One-time)"}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    Progress: {selectedAchievement.progress}
+                  </p>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
       </DialogContent>
     </Dialog>
   );
