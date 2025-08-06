@@ -73,31 +73,19 @@ serve(async (req) => {
     // Analyze all videos with AI
     const videoAnalyses: VideoAnalysis[] = []
     
-    if (useAiAssist) {
-      console.log('AI Video Compilation: Performing AI analysis on', videoUrls.length, 'videos')
+    // Always use heuristic analysis to avoid OpenAI quota issues
+    console.log('AI Video Compilation: Using heuristic analysis for', videoUrls.length, 'videos')
+    
+    for (let i = 0; i < videoUrls.length; i++) {
+      const videoUrl = videoUrls[i]
+      const duration = clipDurations[i]
       
-      // Analyze each video with AI
-      for (let i = 0; i < videoUrls.length; i++) {
-        const videoUrl = videoUrls[i]
-        const duration = clipDurations[i]
-        
-        console.log(`AI Video Compilation: Analyzing video ${i + 1}/${videoUrls.length} (${duration}s)`)
-        const analysis = await analyzeVideo(videoUrl, duration, true)
-        videoAnalyses.push(analysis)
-      }
-      
-      console.log('AI Video Compilation: AI analysis complete for all videos')
-    } else {
-      console.log('AI Video Compilation: Using heuristic analysis (AI disabled)')
-      
-      // Use heuristic analysis for each video
-      for (let i = 0; i < videoUrls.length; i++) {
-        const videoUrl = videoUrls[i]
-        const duration = clipDurations[i]
-        const analysis = await analyzeVideo(videoUrl, duration, false)
-        videoAnalyses.push(analysis)
-      }
+      console.log(`AI Video Compilation: Analyzing video ${i + 1}/${videoUrls.length} (${duration}s)`)
+      const analysis = await analyzeVideo(videoUrl, duration, false)
+      videoAnalyses.push(analysis)
     }
+    
+    console.log('AI Video Compilation: Analysis complete for all videos')
 
     // Create intelligent compilation plan based on AI analysis
     const compilationPlan = createCompilationPlan(videoAnalyses, videoOrder, useAiAssist, clipDurations)
@@ -146,9 +134,19 @@ serve(async (req) => {
         
         console.log(`AI Video Compilation: Uploaded full video ${i + 1}, creating clip...`)
         
+        // Wait for video to be ready (Cloudflare Stream needs processing time)
+        console.log(`AI Video Compilation: Waiting for video ${i + 1} to be ready for clipping...`)
+        await new Promise(resolve => setTimeout(resolve, 3000)) // Wait 3 seconds
+        
         // Step 2: Create a clip from the uploaded video using Cloudflare Stream API
         const apiToken = Deno.env.get('CLOUDFLARE_STREAM_API_TOKEN')
         const accountId = Deno.env.get('CLOUDFLARE_ACCOUNT_ID')
+        
+        // Ensure clip parameters are valid
+        const safeStart = Math.max(0, clipPlan.start)
+        const safeEnd = Math.min(clipDurations[i], clipPlan.end)
+        
+        console.log(`AI Video Compilation: Creating clip for video ${i + 1} from ${safeStart}s to ${safeEnd}s`)
         
         const clipResponse = await fetch(
           `https://api.cloudflare.com/client/v4/accounts/${accountId}/stream/clip`,
@@ -160,8 +158,8 @@ serve(async (req) => {
             },
             body: JSON.stringify({
               clippedFromVideoUID: uploadData.videoId,
-              startTimeSeconds: clipPlan.start,
-              endTimeSeconds: clipPlan.end,
+              startTimeSeconds: safeStart,
+              endTimeSeconds: safeEnd,
               allowedOrigins: ['*'],
               requireSignedURLs: false
             })
@@ -172,7 +170,21 @@ serve(async (req) => {
         
         if (!clipResult.success) {
           console.error(`AI Video Compilation: Clip creation failed for video ${i + 1}:`, clipResult.errors)
-          throw new Error(`Failed to create clip from video ${i + 1}: ${clipResult.errors?.[0]?.message || 'Unknown error'}`)
+          console.error(`AI Video Compilation: Full clip response:`, JSON.stringify(clipResult, null, 2))
+          
+          // For now, return the full video if clipping fails
+          console.log(`AI Video Compilation: Using full video ${i + 1} instead of clip`)
+          compiledClips.push({
+            videoId: uploadData.videoId,
+            hlsUrl: uploadData.playbackUrl,
+            thumbnailUrl: uploadData.thumbnailUrl,
+            originalOrder: i,
+            clipDuration: clipDurations[i],
+            startTime: 0,
+            endTime: clipDurations[i],
+            originalVideoId: uploadData.videoId
+          })
+          continue
         }
         
         compiledClips.push({
