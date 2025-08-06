@@ -24,7 +24,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
   
   // Find next milestone (this is simplified - you can enhance based on your XP system)
   const nextMilestone = 5000;
-  const currentLevel = "Green XP Ring"; // This would be calculated based on your ring system
+  // XP Ring level will be calculated by the XP Ring System component
 
   // Create a grid of achievements (mock data for now)
   const achievementGrid = Array.from({ length: 15 }, (_, index) => {
@@ -110,9 +110,9 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                 </div>
                 <div>
                   <h3 className="font-semibold">{userDisplayName}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {userHandicap ? `Handicap: ${userHandicap}` : 'No handicap set'} | {currentLevel}
-                  </p>
+                   <p className="text-sm text-muted-foreground">
+                     {userHandicap ? `Handicap: ${userHandicap}` : 'No handicap set'}
+                   </p>
                 </div>
               </div>
               <Button variant="outline" size="sm">
