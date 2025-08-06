@@ -190,11 +190,11 @@ const ActivityPostCard = ({ post, attributionText, onClick, isFirstVideo }: Acti
 
           {/* Media Navigation Dots */}
           {hasMultipleMedia && (
-            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex space-x-1 z-20">
+            <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex space-x-1 z-30">
               {post.post_media.map((_, index) => (
                 <div
                   key={index}
-                  className={`w-1.5 h-1.5 rounded-full transition-all ${
+                  className={`w-2 h-2 rounded-full border border-white/20 transition-all ${
                     index === currentMediaIndex ? 'bg-white' : 'bg-white/40'
                   }`}
                 />
