@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import Header from "@/components/Header";
 import BottomNavigation from '@/components/BottomNavigation';
 import HeroProfileHeader from '@/components/profile/HeroProfileHeader';
-import HandicapSection from '@/components/profile/HandicapSection';
 import UserCoursesContent from '@/components/courses/UserCoursesContent';
 import { useProfileData } from '@/hooks/useProfileData';
 import { useQueryClient } from '@tanstack/react-query';
@@ -105,13 +104,6 @@ const ProfilePage = () => {
         {activeSection === 'activity' && (
           <UserCoursesContent 
             isOwnProfile={true}
-          />
-        )}
-        
-        {activeSection === 'handicap' && (
-          <HandicapSection 
-            userId={user.id}
-            profile={profile}
           />
         )}
       </div>
