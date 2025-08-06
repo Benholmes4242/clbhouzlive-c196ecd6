@@ -78,10 +78,17 @@ const FeedVideoPlayer = forwardRef<HTMLVideoElement, FeedVideoPlayerProps>(({
         console.log('FeedVideoPlayer - HLS is supported');
         const hls = new window.Hls({
           enableWorker: true,
-          lowLatencyMode: true,
-          backBufferLength: 90,
-          maxBufferLength: 30,
-          maxMaxBufferLength: 60,
+          lowLatencyMode: false,
+          backBufferLength: 30,
+          maxBufferLength: 20,
+          maxMaxBufferLength: 40,
+          startLevel: -1, // Let HLS.js choose the best quality
+          capLevelToPlayerSize: true,
+          debug: false,
+          progressive: true,
+          liveSyncDurationCount: 3,
+          liveMaxLatencyDurationCount: 10,
+          enableSoftwareAES: false
         });
 
         console.log('FeedVideoPlayer - Loading HLS source:', src);
@@ -127,7 +134,8 @@ const FeedVideoPlayer = forwardRef<HTMLVideoElement, FeedVideoPlayerProps>(({
       muted={muted}
       loop={loop}
       playsInline={playsInline}
-      preload={preload}
+      preload="metadata"
+      crossOrigin="anonymous"
       onClick={onClick}
     />
   );

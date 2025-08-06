@@ -87,12 +87,19 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden p-0">
-        <DialogHeader className="p-6 pb-4">
+      <DialogContent className="max-w-4xl max-h-[85vh] overflow-hidden p-0 flex flex-col">
+        <DialogHeader className="p-6 pb-4 flex-shrink-0">
           <DialogTitle className="text-2xl font-bold">Clbhouz Achievements Tray</DialogTitle>
         </DialogHeader>
         
-        <div className="flex-1 overflow-y-auto">
+        <div 
+          className="flex-1 overflow-y-auto overscroll-contain touch-pan-y"
+          style={{ 
+            scrollbarWidth: 'thin',
+            scrollBehavior: 'smooth',
+            WebkitOverflowScrolling: 'touch'
+          }}
+        >
           {/* User Profile Section */}
           <div className="px-6 pb-4">
             <div className="flex items-center justify-between bg-muted/50 rounded-lg p-4">
