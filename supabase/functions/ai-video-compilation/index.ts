@@ -132,73 +132,21 @@ serve(async (req) => {
           throw new Error(`Failed to upload video ${i + 1}: ${uploadError?.message || uploadData?.error}`)
         }
         
-        console.log(`AI Video Compilation: Uploaded full video ${i + 1}, creating clip...`)
+        console.log(`AI Video Compilation: Successfully uploaded video ${i + 1} with ID: ${uploadData.videoId}`)
         
-        // Wait for video to be ready (Cloudflare Stream needs processing time)
-        console.log(`AI Video Compilation: Waiting for video ${i + 1} to be ready for clipping...`)
-        await new Promise(resolve => setTimeout(resolve, 3000)) // Wait 3 seconds
-        
-        // Step 2: Create a clip from the uploaded video using Cloudflare Stream API
-        const apiToken = Deno.env.get('CLOUDFLARE_STREAM_API_TOKEN')
-        const accountId = Deno.env.get('CLOUDFLARE_ACCOUNT_ID')
-        
-        // Ensure clip parameters are valid
-        const safeStart = Math.max(0, clipPlan.start)
-        const safeEnd = Math.min(clipDurations[i], clipPlan.end)
-        
-        console.log(`AI Video Compilation: Creating clip for video ${i + 1} from ${safeStart}s to ${safeEnd}s`)
-        
-        const clipResponse = await fetch(
-          `https://api.cloudflare.com/client/v4/accounts/${accountId}/stream/clip`,
-          {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${apiToken}`,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              clippedFromVideoUID: uploadData.videoId,
-              startTimeSeconds: safeStart,
-              endTimeSeconds: safeEnd,
-              allowedOrigins: ['*'],
-              requireSignedURLs: false
-            })
-          }
-        )
-        
-        const clipResult = await clipResponse.json()
-        
-        if (!clipResult.success) {
-          console.error(`AI Video Compilation: Clip creation failed for video ${i + 1}:`, clipResult.errors)
-          console.error(`AI Video Compilation: Full clip response:`, JSON.stringify(clipResult, null, 2))
-          
-          // For now, return the full video if clipping fails
-          console.log(`AI Video Compilation: Using full video ${i + 1} instead of clip`)
-          compiledClips.push({
-            videoId: uploadData.videoId,
-            hlsUrl: `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${uploadData.videoId}/manifest/video.m3u8`,
-            thumbnailUrl: `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${uploadData.videoId}/thumbnails/thumbnail.jpg`,
-            originalOrder: i,
-            clipDuration: clipDurations[i],
-            startTime: 0,
-            endTime: clipDurations[i],
-            originalVideoId: uploadData.videoId
-          })
-          continue
-        }
-        
+        // For now, just return the full videos since clipping is having issues
+        // We'll add individual clips as separate videos in sequence
         compiledClips.push({
-          videoId: clipResult.result.uid,
-          hlsUrl: `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${clipResult.result.uid}/manifest/video.m3u8`,
-          thumbnailUrl: `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${clipResult.result.uid}/thumbnails/thumbnail.jpg`,
+          videoId: uploadData.videoId,
+          hlsUrl: uploadData.hlsUrl || `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${uploadData.videoId}/manifest/video.m3u8`,
+          thumbnailUrl: uploadData.thumbnailUrl || `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${uploadData.videoId}/thumbnails/thumbnail.jpg`,
           originalOrder: i,
-          clipDuration: clipPlan.end - clipPlan.start,
-          startTime: clipPlan.start,
-          endTime: clipPlan.end,
+          clipDuration: clipDurations[i],
+          startTime: 0,
+          endTime: clipDurations[i],
           originalVideoId: uploadData.videoId
         })
         
-        console.log(`AI Video Compilation: Successfully created clip ${i + 1} with ID: ${clipResult.result.uid}`)
         
       } catch (error) {
         console.error(`AI Video Compilation: Error processing video ${i + 1}:`, error)
