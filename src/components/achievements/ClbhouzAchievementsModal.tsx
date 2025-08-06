@@ -7,9 +7,19 @@ import { XPRingSystem } from "@/components/profile/XPRingSystem";
 interface ClbhouzAchievementsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  userId: string;
+  userId?: string;
   userDisplayName?: string;
-  userHandicap?: number;
+  userHandicap?: string | number;
+}
+
+interface Achievement {
+  title: string;
+  emoji: string;
+  isEarned: boolean;
+  description: string;
+  xp: number;
+  isRepeatable: boolean;
+  progress?: string;
 }
 
 const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
@@ -26,65 +36,144 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
   const nextMilestone = 5000;
   // XP Ring level will be calculated by the XP Ring System component
 
-  // Create a grid of achievements (mock data for now)
-  const achievementGrid = Array.from({ length: 15 }, (_, index) => {
-    const mockAchievements = [
-      { 
-        title: "First Post", 
-        emoji: "📸", 
-        isEarned: true, 
-        description: "Share your first golf course experience with the community. Welcome to Clbhouz!",
-        progress: "1/1"
-      },
-      { 
-        title: "Course Explorer", 
-        emoji: "⛳", 
-        isEarned: true, 
-        description: "Visit and explore 5 different golf courses. Discover new favorites!",
-        progress: "5/5"
-      },
-      { 
-        title: "Video Master", 
-        emoji: "🎥", 
-        isEarned: false, 
-        description: "Upload and share 10 course videos. Show off those perfect swings!",
-        progress: "3/10"
-      },
-      { 
-        title: "Social Butterfly", 
-        emoji: "🦋", 
-        isEarned: false, 
-        description: "Connect with 25 fellow golfers in the community. Build your network!",
-        progress: "12/25"
-      },
-      { 
-        title: "Eagle Eye", 
-        emoji: "🦅", 
-        isEarned: true, 
-        description: "Score an eagle on any course. Exceptional shot making!",
-        progress: "1/1"
-      },
-      { 
-        title: "Birdie Collector", 
-        emoji: "🐦", 
-        isEarned: false, 
-        description: "Score 50 birdies across all your rounds. Keep up the great play!",
-        progress: "23/50"
-      },
-    ];
-    
-    const achievement = mockAchievements[index % mockAchievements.length];
-    
-    return {
-      id: `achievement-${index}`,
-      title: achievement.title,
+  // Real achievements data
+  const achievements: Achievement[] = [
+    {
+      title: "Single-Figure Handicap",
+      emoji: "🏆",
+      isEarned: false,
+      description: "Achieve a single-digit handicap (0-9). A mark of consistent, skilled play.",
       xp: 250,
-      emoji: achievement.emoji,
-      isEarned: achievement.isEarned,
-      description: achievement.description,
-      progress: achievement.progress
-    };
-  });
+      isRepeatable: false,
+      progress: "Current: 12.3"
+    },
+    {
+      title: "Plus Handicap Player",
+      emoji: "⭐",
+      isEarned: false,
+      description: "Reach plus handicap status. Elite level golf achievement.",
+      xp: 500,
+      isRepeatable: false,
+      progress: "Target: +0.0"
+    },
+    {
+      title: "Personal Best Round",
+      emoji: "📈",
+      isEarned: true,
+      description: "Shoot your lowest score ever. Keep pushing your limits!",
+      xp: 100,
+      isRepeatable: true,
+      progress: "Best: 78"
+    },
+    {
+      title: "Under Par Round",
+      emoji: "🎯",
+      isEarned: true,
+      description: "Complete a round under par. Exceptional performance!",
+      xp: 150,
+      isRepeatable: true,
+      progress: "Achieved: 2 times"
+    },
+    {
+      title: "First Eagle",
+      emoji: "🦅",
+      isEarned: true,
+      description: "Score your first eagle (2 under par). A memorable milestone!",
+      xp: 100,
+      isRepeatable: false,
+      progress: "Completed"
+    },
+    {
+      title: "Birdie Blitz",
+      emoji: "🐦",
+      isEarned: false,
+      description: "Score 3 or more birdies in a single round. On fire!",
+      xp: 75,
+      isRepeatable: true,
+      progress: "Best: 2 birdies"
+    },
+    {
+      title: "Eagle Collector",
+      emoji: "🦅",
+      isEarned: false,
+      description: "Accumulate 5 total eagles throughout your golf journey.",
+      xp: 250,
+      isRepeatable: false,
+      progress: "2 / 5 eagles"
+    },
+    {
+      title: "Hole-in-One",
+      emoji: "🕳️",
+      isEarned: false,
+      description: "The ultimate golf achievement - ace a hole! Each one counts.",
+      xp: 500,
+      isRepeatable: true,
+      progress: "0 aces"
+    },
+    {
+      title: "Back-to-Back Birdies",
+      emoji: "🎪",
+      isEarned: false,
+      description: "Score consecutive birdies. Momentum is everything!",
+      xp: 100,
+      isRepeatable: false,
+      progress: "Not achieved"
+    },
+    {
+      title: "No Bogey Round",
+      emoji: "💯",
+      isEarned: false,
+      description: "Complete a round without any bogeys. Consistency at its finest.",
+      xp: 200,
+      isRepeatable: false,
+      progress: "Best: 2 bogeys"
+    },
+    {
+      title: "Top 100 Conqueror",
+      emoji: "🌟",
+      isEarned: false,
+      description: "Play 10 of the world's Top 100 golf courses. Elite course collection!",
+      xp: 400,
+      isRepeatable: false,
+      progress: "3 / 10 courses"
+    },
+    {
+      title: "Regional Master",
+      emoji: "🗺️",
+      isEarned: false,
+      description: "Complete all courses in a selected region. Local expertise achieved!",
+      xp: 300,
+      isRepeatable: false,
+      progress: "Scotland: 8/12"
+    },
+    {
+      title: "International Golfer",
+      emoji: "✈️",
+      isEarned: true,
+      description: "Play golf in 3 or more countries. Global golf adventurer!",
+      xp: 150,
+      isRepeatable: false,
+      progress: "4 countries"
+    },
+    {
+      title: "Sunrise to Sunset",
+      emoji: "☀️",
+      isEarned: false,
+      description: "Play 2 rounds in a single day. True dedication to the game!",
+      xp: 125,
+      isRepeatable: true,
+      progress: "Not achieved"
+    },
+    {
+      title: "Club Loyalist",
+      emoji: "🏠",
+      isEarned: false,
+      description: "Play 50 rounds at your home club. True club spirit and loyalty!",
+      xp: 350,
+      isRepeatable: false,
+      progress: "23 / 50 rounds"
+    }
+  ];
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -110,7 +199,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                 </div>
                 <div>
                   <h3 className="font-semibold">{userDisplayName}</h3>
-                   <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-muted-foreground">
                      {userHandicap ? `Handicap: ${userHandicap}` : 'No handicap set'}
                    </p>
                 </div>
@@ -134,11 +223,11 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
           </div>
 
           {/* Achievements Grid */}
-          <div className="px-6 pb-4">
+          <div className="px-6 pb-6">
             <TooltipProvider>
               <div className="grid grid-cols-3 gap-4">
-                {achievementGrid.map((achievement) => (
-                  <Tooltip key={achievement.id}>
+                {achievements.map((achievement) => (
+                  <Tooltip key={achievement.title}>
                     <TooltipTrigger asChild>
                       <div
                         className={`
@@ -156,7 +245,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                           {achievement.title}
                         </h4>
                         <p className={`text-xs ${achievement.isEarned ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}`}>
-                          +{achievement.xp} XP
+                          +{achievement.xp} XP {achievement.isRepeatable ? "(R)" : ""}
                         </p>
                       </div>
                     </TooltipTrigger>
@@ -166,7 +255,10 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                         <p className="text-sm text-muted-foreground mb-2">
                           {achievement.description}
                         </p>
-                        <p className="text-xs font-medium">
+                        <p className="text-xs font-medium mb-1">
+                          +{achievement.xp} XP {achievement.isRepeatable ? "(Repeatable)" : "(One-time)"}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
                           Progress: {achievement.progress}
                         </p>
                       </div>
@@ -175,17 +267,6 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                 ))}
               </div>
             </TooltipProvider>
-          </div>
-
-          {/* Leaderboard Section */}
-          <div className="px-6 pb-6">
-            <div className="bg-yellow-50 dark:bg-yellow-950/20 rounded-lg p-4 border border-yellow-200 dark:border-yellow-800">
-              <div className="text-center">
-                <p className="font-medium text-yellow-900 dark:text-yellow-100">
-                  Leaderboard: Top Achievers This Month | All-Time | Friends
-                </p>
-              </div>
-            </div>
           </div>
         </div>
       </DialogContent>
