@@ -393,7 +393,7 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
                              
                              {/* Progress Bar (except after last trophy) */}
                              {index < globalTrophies.length - 1 && (
-                               <div className="flex items-center justify-center w-12 flex-shrink-0 px-1">
+                               <div className="flex items-center justify-center w-16 flex-shrink-0">
                                  <div className="w-full h-2 bg-gray-300 rounded-full overflow-hidden">
                                    <div 
                                      className="h-full bg-green-700 transition-all duration-500 ease-out"
@@ -418,7 +418,7 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
                    </div>
                 ) : (
                   /* Desktop: Grid with Progress Bars Between Trophies */
-                  <div className="grid grid-cols-9 gap-1 pt-2 pb-1 items-center">
+                  <div className="grid grid-cols-9 gap-2 pt-2 pb-1 items-center">
                     {globalTrophies.map((trophy, index) => {
                       const prevMilestone = index === 0 ? 0 : globalTrophies[index - 1].requiredCourses;
                       const currentMilestone = trophy.requiredCourses;
@@ -516,7 +516,7 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
                           
                           {/* Progress Bar (except after last trophy) */}
                           {index < globalTrophies.length - 1 && (
-                            <div className="flex items-center justify-center px-1">
+                            <div className="flex items-center justify-center">
                               <div className="w-full h-2 bg-gray-300 rounded-full overflow-hidden">
                                 <div 
                                   className="h-full bg-green-700 transition-all duration-500 ease-out"
