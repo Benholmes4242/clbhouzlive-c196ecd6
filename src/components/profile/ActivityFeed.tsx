@@ -189,65 +189,17 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-4 px-4 md:px-0">
-            {filteredPosts.map((post) => (
-              <div 
-                key={post.id} 
-                className="bg-card border border-border rounded-lg p-4 shadow-sm"
-              >
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center">
-                    <span className="text-sm font-medium">{post.user.display_name?.charAt(0) || 'U'}</span>
-                  </div>
-                  <div>
-                    <p className="font-medium text-sm">{post.user.display_name || 'User'}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {new Date(post.created_at).toLocaleDateString()}
-                    </p>
-                  </div>
-                </div>
-                
-                {post.content && (
-                  <p className="text-sm mb-3">{post.content}</p>
-                )}
-                
-                {post.post_media && post.post_media.length > 0 && (
-                  <div className="grid grid-cols-2 gap-2">
-                    {post.post_media.slice(0, 4).map((media, index) => (
-                      <div key={index} className="aspect-square bg-muted rounded-lg overflow-hidden">
-                        {media.media_type === 'image' ? (
-                          <img 
-                            src={media.media_url} 
-                            alt=""
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <video 
-                            src={media.media_url}
-                            className="w-full h-full object-cover"
-                            muted
-                          />
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-                
-                {post.post_tags && post.post_tags.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mt-3">
-                    {post.post_tags.map((tag, index) => (
-                      <span 
-                        key={index}
-                        className="text-xs bg-primary/10 text-primary px-2 py-1 rounded-full"
-                      >
-                        #{tag.name || 'tag'}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
+          <ExploreGrid
+            content={exploreContent}
+            onLike={handleLike}
+            onFollow={handleFollow}
+            onMediaClick={handleMediaClick}
+            isLoading={false}
+            hasMore={false}
+            onLoadMore={handleLoadMore}
+            isDiscoverPage={true}
+            hideBadges={true}
+          />
         )}
       </div>
 
