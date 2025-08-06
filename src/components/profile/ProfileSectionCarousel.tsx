@@ -19,7 +19,7 @@ const ProfileSectionCarousel: React.FC<ProfileSectionCarouselProps> = ({ onSecti
     },
     {
       id: 'top100',
-      title: 'Top 100 Courses',
+      title: 'The World\'s Greatest Courses',
       description: 'Discover and track the world\'s greatest golf courses.',
       className: 'relative overflow-hidden flex flex-col justify-end text-white h-[200px] cursor-pointer group !rounded-lg'
     },
