@@ -100,12 +100,7 @@ const ProfilePage = () => {
           onSectionChange={setActiveSection}
         />
         
-        {/* Render section content based on active section */}
-        {activeSection === 'activity' && (
-          <UserCoursesContent 
-            isOwnProfile={true}
-          />
-        )}
+        {/* Activity content is now handled by ActivityFeed within HeroProfileHeader */}
       </div>
       
       <BottomNavigation />
