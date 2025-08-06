@@ -238,8 +238,8 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
   return (
     <Tooltip.Provider>
       <div className={cn('space-y-6', className)}>
-        {/* Background Container matching stats bar */}
-        <div className="bg-muted border border-border rounded-xl p-1 space-y-0 relative overflow-hidden">
+        {/* Content without background container */}
+        <div className="space-y-0 relative overflow-hidden">
           
           {/* Floating XP Animation */}
           {showXPFloat && (
@@ -276,7 +276,7 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
           
           <div className="relative">
             {/* Header with XP Counter */}
-            <div className="flex items-center justify-between pb-0 px-4 pt-2">
+            <div className="flex items-center justify-between pb-0 px-0 pt-2">
             <h4 className="text-lg font-semibold text-foreground">
               {isCurrentUser 
                 ? `${completedCount} of 300 courses played`
