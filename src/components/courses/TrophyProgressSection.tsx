@@ -280,15 +280,15 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
             
             {/* Header with XP Counter */}
             <div className="flex items-center justify-between pb-0 px-0 pt-2">
-            <h4 className="text-lg font-semibold text-foreground">
+            <p className="text-muted-foreground">
               {isCurrentUser 
                 ? `${completedCount} of 300 courses played`
                 : `${completedCount} of 300 courses played`
               }
-            </h4>
-              <div className="text-base font-bold text-foreground transition-all duration-500">
+            </p>
+              <p className="text-muted-foreground">
                 Course XP: {currentXP.toLocaleString()}
-              </div>
+              </p>
             </div>
 
           {/* Global XP Progress Bar with improved spacing */}
