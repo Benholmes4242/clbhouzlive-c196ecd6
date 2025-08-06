@@ -239,7 +239,7 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
     <Tooltip.Provider>
       <div className={cn('space-y-6', className)}>
         {/* Background Container matching stats bar */}
-        <div className="bg-muted border border-border rounded-xl p-2 space-y-1 relative overflow-hidden">
+        <div className="bg-muted border border-border rounded-xl p-1 space-y-0 relative overflow-hidden">
           
           {/* Floating XP Animation */}
           {showXPFloat && (
@@ -276,7 +276,7 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
           
           <div className="relative">
             {/* Header with XP Counter */}
-            <div className="flex items-center justify-between pb-1">
+            <div className="flex items-center justify-between pb-0">
             <h4 className="text-xl font-semibold text-foreground">
               {isCurrentUser 
                 ? `${completedCount} of 300 courses played`
@@ -289,7 +289,7 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
             </div>
 
           {/* Global XP Progress Bar with improved spacing */}
-          <div className="space-y-1 mt-1 mb-1">
+          <div className="space-y-0 mt-0 mb-0">
             
             {/* Trophy Timeline */}
             <div className="relative">
@@ -393,7 +393,7 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
                    </div>
                 ) : (
                   /* Desktop: Grid with Progress Bars Between Trophies */
-                  <div className="grid grid-cols-9 gap-2 pt-4 pb-2 items-center">
+                  <div className="grid grid-cols-9 gap-2 pt-2 pb-1 items-center">
                     {globalTrophies.map((trophy, index) => {
                       const prevMilestone = index === 0 ? 0 : globalTrophies[index - 1].requiredCourses;
                       const currentMilestone = trophy.requiredCourses;
