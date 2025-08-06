@@ -279,12 +279,12 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
             <div className="flex items-center justify-between pb-6">
             <h4 className="text-xl font-semibold text-foreground">
               {isCurrentUser 
-                ? `You've played ${completedCount} of 300 top 100 courses`
-                : `${userFirstName || 'User'} has played ${completedCount} of 300 top 100 courses`
+                ? `${completedCount} of 300 courses within the list played`
+                : `${completedCount} of 300 courses within the list played`
               }
             </h4>
               <div className="text-lg font-bold text-foreground transition-all duration-500">
-                Total XP: {currentXP.toLocaleString()}
+                Course XP: {currentXP.toLocaleString()}
               </div>
             </div>
 
