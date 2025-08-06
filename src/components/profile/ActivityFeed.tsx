@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { 
@@ -11,10 +11,6 @@ import {
 import { Filter, Video, Image, MapPin, Trophy } from 'lucide-react';
 import ClbhouzAchievementsModal from '@/components/achievements/ClbhouzAchievementsModal';
 import { useActivityPosts } from './hooks/useActivityPosts';
-import { useVerticalMediaFeed } from '@/hooks/useVerticalMediaFeed';
-import ExploreGrid from '@/components/explore/ExploreGrid';
-import DiscoverVerticalFeed from '@/components/discover/DiscoverVerticalFeed';
-import { ExploreContentItem } from '@/components/explore/types';
 import { ActivityPost } from './types/ActivityTypes';
 
 type FilterType = 'all' | 'videos' | 'photos' | 'golf-courses';
@@ -33,7 +29,6 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   userHandicap
 }) => {
   const { posts, loading, fetchUserPosts } = useActivityPosts(userId);
-  const { isOpen, initialItem, openFeed, closeFeed } = useVerticalMediaFeed();
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [achievementsModalOpen, setAchievementsModalOpen] = useState(false);
 
@@ -56,46 +51,6 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
         return posts;
     }
   }, [posts, activeFilter]);
-
-  // Convert filtered activity posts to ExploreContentItem format
-  const exploreContent: ExploreContentItem[] = filteredPosts.map(post => ({
-    id: post.id,
-    type: post.post_media?.[0]?.media_type === 'video' ? 'video' : 'image',
-    src: post.post_media?.[0]?.media_url || '/placeholder.svg',
-    title: post.content || '',
-    likes: 0,
-    comments: 0,
-    shares: 0,
-    user: {
-      id: post.user.id,
-      name: post.user.display_name || post.user.username || 'Anonymous',
-      username: post.user.username || undefined,
-      avatar: post.user.profile_photo_url || '/placeholder.svg',
-      verified: false
-    },
-    // Add the full media array for multiple media navigation
-    media: post.post_media?.map(media => ({
-      id: media.id,
-      media_type: media.media_type,
-      media_url: media.media_url
-    })) || []
-  }));
-
-  const handleLike = useCallback((contentId: string) => {
-    console.log('Like:', contentId);
-  }, []);
-
-  const handleFollow = useCallback((contentId: string) => {
-    console.log('Follow:', contentId);
-  }, []);
-
-  const handleMediaClick = useCallback((item: ExploreContentItem) => {
-    openFeed(item);
-  }, [openFeed]);
-
-  const handleLoadMore = useCallback(() => {
-    // No pagination for profile posts currently
-  }, []);
 
   if (loading) {
     return (
@@ -189,33 +144,67 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
             </p>
           </div>
         ) : (
-          <ExploreGrid
-            content={exploreContent}
-            onLike={handleLike}
-            onFollow={handleFollow}
-            onMediaClick={handleMediaClick}
-            isLoading={false}
-            hasMore={false}
-            onLoadMore={handleLoadMore}
-            isDiscoverPage={true}
-            hideBadges={true}
-          />
+          <div className="grid gap-4 px-4 md:px-0">
+            {filteredPosts.map((post) => (
+              <div key={post.id} className="bg-card rounded-lg border p-4">
+                <div className="flex items-start gap-3">
+                  <img 
+                    src={post.user.profile_photo_url || '/placeholder.svg'} 
+                    alt={post.user.display_name || 'User'} 
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="font-semibold text-foreground">
+                        {post.user.display_name || post.user.username || 'Anonymous'}
+                      </span>
+                      <span className="text-sm text-muted-foreground">
+                        {new Date(post.created_at).toLocaleDateString()}
+                      </span>
+                    </div>
+                    
+                    {post.content && (
+                      <p className="text-foreground mb-3">{post.content}</p>
+                    )}
+                    
+                    {post.post_media && post.post_media.length > 0 && (
+                      <div className="grid grid-cols-2 gap-2 mb-3">
+                        {post.post_media.slice(0, 4).map((media) => (
+                          <div key={media.id} className="aspect-square rounded-lg overflow-hidden">
+                            {media.media_type === 'video' ? (
+                              <video 
+                                src={media.media_url} 
+                                className="w-full h-full object-cover"
+                                muted
+                              />
+                            ) : (
+                              <img 
+                                src={media.media_url} 
+                                alt="Post media" 
+                                className="w-full h-full object-cover"
+                              />
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {post.post_tags && post.post_tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1">
+                        {post.post_tags.map((tag, index) => (
+                          <Badge key={index} variant="secondary" className="text-xs">
+                            {tag.entity_type === 'golf_club' ? '🏌️' : '📍'} {tag.name}
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         )}
       </div>
-
-      {/* Vertical Media Feed Modal */}
-      {isOpen && initialItem && (
-        <DiscoverVerticalFeed
-          isOpen={isOpen}
-          onClose={closeFeed}
-          posts={exploreContent}
-          onLike={handleLike}
-          onLoadMore={handleLoadMore}
-          hasMore={false}
-          isLoadingMore={false}
-          initialItem={initialItem}
-        />
-      )}
 
       {/* Achievements Modal */}
       <ClbhouzAchievementsModal
