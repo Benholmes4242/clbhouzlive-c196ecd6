@@ -293,9 +293,10 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
             
             {/* Trophy Timeline */}
             <div className="relative">
-               {/* Progress Bar - runs through center of trophies */}
-               <div className="absolute top-1/2 left-0 right-0 transform -translate-y-1/2 z-0 px-8">
-                 <div className="flex items-center gap-0">
+               {/* Progress Bar - flows between achievements */}
+               <div className="absolute top-1/2 left-0 right-0 transform -translate-y-1/2 z-0">
+                 <div className="flex items-center justify-between px-4">
+                   {/* Progress segments between badges */}
                    {globalTrophies.map((trophy, index) => {
                      const prevMilestone = index === 0 ? 0 : globalTrophies[index - 1].requiredCourses;
                      const currentMilestone = trophy.requiredCourses;
@@ -304,20 +305,22 @@ const TrophyProgressSection: React.FC<TrophyProgressSectionProps> = ({
                      const segmentProgress = (progressInSegment / segmentSize) * 100;
                      
                      return (
-                       <div key={`segment-${trophy.id}`} className="flex-1 flex items-center">
+                       <React.Fragment key={`progress-${trophy.id}`}>
                          {/* Progress segment */}
-                         <div className="flex-1 h-2 bg-gray-300 rounded-full overflow-hidden">
-                           <div 
-                             className="h-full bg-green-700 transition-all duration-500 ease-out"
-                             style={{ width: `${segmentProgress}%` }}
-                           />
+                         <div className="flex-1 mx-8">
+                           <div className="h-2 bg-gray-300 rounded-full overflow-hidden">
+                             <div 
+                               className="h-full bg-green-700 transition-all duration-500 ease-out"
+                               style={{ width: `${segmentProgress}%` }}
+                             />
+                           </div>
                          </div>
                          
-                         {/* Trophy marker (except for last one) */}
+                         {/* Badge space (invisible placeholder) */}
                          {index < globalTrophies.length - 1 && (
-                           <div className="w-4 h-4 rounded-full bg-background border-2 border-gray-400 mx-2 flex-shrink-0" />
+                           <div className="w-12 flex-shrink-0" />
                          )}
-                       </div>
+                       </React.Fragment>
                      );
                    })}
                  </div>
