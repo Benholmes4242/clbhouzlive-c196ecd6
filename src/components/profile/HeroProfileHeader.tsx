@@ -652,6 +652,7 @@ const HeroProfileHeader = ({
                     isOwnProfile={isOwnProfile}
                     profileDisplayName={profile?.display_name}
                     userHandicap={profile?.eg_handicap_index}
+                    userProfilePhotoUrl={profile?.profile_photo_url}
                   />
                 </div>
                 {/* Desktop version with normal container */}
@@ -661,6 +662,7 @@ const HeroProfileHeader = ({
                     isOwnProfile={isOwnProfile}
                     profileDisplayName={profile?.display_name}
                     userHandicap={profile?.eg_handicap_index}
+                    userProfilePhotoUrl={profile?.profile_photo_url}
                   />
                 </div>
               </>

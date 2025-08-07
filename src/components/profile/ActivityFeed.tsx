@@ -24,13 +24,15 @@ interface ActivityFeedProps {
   isOwnProfile: boolean;
   profileDisplayName?: string;
   userHandicap?: number;
+  userProfilePhotoUrl?: string;
 }
 
 const ActivityFeed: React.FC<ActivityFeedProps> = ({
   userId,
   isOwnProfile,
   profileDisplayName,
-  userHandicap
+  userHandicap,
+  userProfilePhotoUrl
 }) => {
   const { posts, loading, fetchUserPosts } = useActivityPosts(userId);
   const { isOpen, initialItem, openFeed, closeFeed } = useVerticalMediaFeed();
@@ -224,6 +226,8 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
         userId={userId}
         userDisplayName={profileDisplayName}
         userHandicap={userHandicap}
+        userProfilePhotoUrl={userProfilePhotoUrl}
+        isCurrentUser={isOwnProfile}
       />
     </>
   );

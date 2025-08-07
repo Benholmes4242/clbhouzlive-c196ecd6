@@ -201,6 +201,52 @@ export const XPRingSystem: React.FC<XPRingSystemProps> = ({
               />
             </div>
           </div>
+
+          {/* Mini Rings Display (All Tiers) for horizontal layout */}
+          {showMiniRings && (
+            <div className="w-full mt-4">
+              <div className="flex justify-between items-start gap-2">
+                {XP_RING_TIERS.map((tier, index) => {
+                  const isActive = currentXP >= tier.minXP;
+                  const isCurrent = currentTier && tier.name === currentTier.name;
+                  
+                  return (
+                    <div key={tier.name} className="flex flex-col items-center flex-1">
+                      <div 
+                        className={cn(
+                          'w-12 h-12 rounded-full border-4 flex items-center justify-center transition-all mb-2',
+                          isCurrent ? 'scale-110' : 'scale-100',
+                          isActive ? 'opacity-100' : 'opacity-40'
+                        )}
+                        style={{
+                          borderColor: tier.color,
+                          backgroundColor: isActive ? tier.color + '20' : 'transparent'
+                        }}
+                        title={`${tier.name}: ${tier.minXP.toLocaleString()} - ${tier.maxXP.toLocaleString()} XP`}
+                      >
+                        {/* Remove the inner dot/square */}
+                      </div>
+                      
+                      {/* Ring information text */}
+                      <div className="text-center">
+                        <h4 className="font-semibold text-xs" style={{ color: isActive ? tier.color : '#9CA3AF' }}>
+                          {tier.name}
+                        </h4>
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {tier.minXP.toLocaleString()}-{tier.maxXP.toLocaleString()} XP
+                        </p>
+                        {isCurrent && (
+                          <p className="text-xs font-medium mt-1" style={{ color: tier.color }}>
+                            {currentXP.toLocaleString()} XP
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );
