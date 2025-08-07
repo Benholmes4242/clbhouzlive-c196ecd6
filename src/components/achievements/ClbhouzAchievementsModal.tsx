@@ -284,9 +284,9 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       case "100 Century Club":
         return <img src="/lovable-uploads/91e26115-098d-4b21-9b29-7e1800fe52bd.png" alt="100 Century Club Badge" className="w-28 h-28" />;
       case "200 Clubhouse Elite":
-        return <img src="/lovable-uploads/b566e805-826b-4005-b9d1-c5bdc87786b1.png" alt="200 Clubhouse Elite Badge" className="w-28 h-28" />;
+        return <img src="/lovable-uploads/b566e805-826b-4005-b9d1-c5bdc87786b1.png" alt="200 Clubhouse Elite Badge" className="w-32 h-32" />;
       case "300 Club Champion":
-        return <img src="/lovable-uploads/dd19d0ff-5931-4ef4-9e00-38e1db6d69a5.png" alt="300 Club Champion Badge" className="w-28 h-28" />;
+        return <img src="/lovable-uploads/dd19d0ff-5931-4ef4-9e00-38e1db6d69a5.png" alt="300 Club Champion Badge" className="w-32 h-32" />;
       // Regional achievement badges with flag images
       case "Lynx Legend":
         return <img src="/lovable-uploads/5971ec53-bcfe-46df-aa24-78df46eaa170.png" alt="Britain & Ireland Flag" className="w-28 h-28 rounded-lg" />;
@@ -911,7 +911,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                             <div className="relative">
                               <div
                                 className={`
-                                  border rounded-xl p-4 transition-all duration-200 hover:scale-105 cursor-pointer flex items-center gap-3 
+                                  border rounded-xl p-2 transition-all duration-200 hover:scale-105 cursor-pointer flex items-center gap-2 
                                   bg-white/80 dark:bg-gray-900/40 backdrop-blur-sm
                                   shadow-lg hover:shadow-xl
                                   ${achievement.isEarned 
@@ -1049,7 +1049,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                             <div className="relative">
                               <div
                                 className={`
-                                  border rounded-xl p-4 transition-all duration-200 hover:scale-105 cursor-pointer flex items-center gap-3 
+                                  border rounded-xl p-2 transition-all duration-200 hover:scale-105 cursor-pointer flex items-center gap-2 
                                   bg-white/80 dark:bg-gray-900/40 backdrop-blur-sm
                                   shadow-lg hover:shadow-xl
                                   ${achievement.isEarned 
