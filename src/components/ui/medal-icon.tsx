@@ -18,7 +18,7 @@ const MedalIcon: React.FC<MedalIconProps> = ({ className, size = 'md', type = '2
     '20-club': '/lovable-uploads/a33df9b4-0089-43ca-913d-132fc5b11cc3.png',
     '50-club': '/lovable-uploads/c1ba04e8-7aed-40e6-948b-0b65fdc932b2.png',
     '100-club': '/lovable-uploads/91e26115-098d-4b21-9b29-7e1800fe52bd.png',
-    '200-club': '/lovable-uploads/393019eb-611a-4e4e-8661-9fac00b24ecc.png',
+    '200-club': '/lovable-uploads/04ae4807-845e-412c-9233-d90ed7ed0a9e.png',
     '300-club': '/lovable-uploads/bc2bb48a-2505-442f-8d02-2623c7b391ad.png',
     'eu-explorer': '/lovable-uploads/24422ab1-3322-4f51-801b-8ae8e80c95d7.png',
     'uk-ireland-explorer': '/lovable-uploads/54fecf12-83df-48be-b433-d227be70278d.png',

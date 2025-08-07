@@ -305,7 +305,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       case "100 Century Club":
         return <img src="/lovable-uploads/91e26115-098d-4b21-9b29-7e1800fe52bd.png" alt="100 Century Club Badge" className="w-28 h-28" />;
       case "200 Clubhouse Elite":
-        return <img src="/lovable-uploads/393019eb-611a-4e4e-8661-9fac00b24ecc.png" alt="200 Clubhouse Elite Badge" className={isMobile ? "w-16 h-16" : "w-32 h-32"} />;
+        return <img src="/lovable-uploads/04ae4807-845e-412c-9233-d90ed7ed0a9e.png" alt="200 Clubhouse Elite Badge" className={isMobile ? "w-16 h-16" : "w-32 h-32"} />;
       case "300 Club Champion":
         return <img src="/lovable-uploads/bc2bb48a-2505-442f-8d02-2623c7b391ad.png" alt="300 Club Champion Badge" className={isMobile ? "w-16 h-16" : "w-32 h-32"} />;
       // Regional achievement badges with flag images
