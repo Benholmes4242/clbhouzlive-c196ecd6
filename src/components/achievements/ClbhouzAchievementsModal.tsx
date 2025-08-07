@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { XPRingSystem } from "@/components/profile/XPRingSystem";
 import { Sparkles, Trophy, ChevronDown, ChevronUp } from "lucide-react";
+import { useSwipeGesture } from "@/hooks/useSwipeGesture";
 
 // Achievement badge imports - using user's uploaded image
 // import club300Badge from '@/assets/achievements/300-club-champion.png';
@@ -79,7 +80,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
     }
   }, [isOpen]);
 
-  // Smart scroll detection with direction threshold and debouncing
+  // Smart scroll detection with direction threshold and debouncing - mobile optimized
   useEffect(() => {
     if (!isOpen) return;
     
@@ -93,34 +94,37 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
         const scrollDelta = currentScrollTop - lastScrollTop.current;
         const absScrollDelta = Math.abs(scrollDelta);
         
-        // Process any scroll movement for immediate feedback
-        if (absScrollDelta < 1) {
-          return;
-        }
-        
-        // Determine scroll direction
-        const newDirection = scrollDelta > 0 ? 'down' : scrollDelta < 0 ? 'up' : 'idle';
-        
         // Clear existing timers
         if (scrollDebounceTimer.current) {
           clearTimeout(scrollDebounceTimer.current);
         }
         
-        // Update direction and handle state changes
-        if (newDirection !== 'idle') {
-          scrollDirection.current = newDirection;
+        // Add debounce for mobile touch events
+        scrollDebounceTimer.current = setTimeout(() => {
+          // Process any scroll movement for immediate feedback
+          if (absScrollDelta < 1) {
+            return;
+          }
           
-          // Immediate collapse/expand based on scroll position and direction
-          if (!isManuallyCollapsed) {
-            if (newDirection === 'down' && currentScrollTop > 50) {
-              setIsCollapsed(true);
-            } else if (newDirection === 'up' && currentScrollTop < 100) {
-              setIsCollapsed(false);
+          // Determine scroll direction
+          const newDirection = scrollDelta > 0 ? 'down' : scrollDelta < 0 ? 'up' : 'idle';
+          
+          // Update direction and handle state changes
+          if (newDirection !== 'idle') {
+            scrollDirection.current = newDirection;
+            
+            // Immediate collapse/expand based on scroll position and direction
+            if (!isManuallyCollapsed) {
+              if (newDirection === 'down' && currentScrollTop > 50) {
+                setIsCollapsed(true);
+              } else if (newDirection === 'up' && currentScrollTop < 100) {
+                setIsCollapsed(false);
+              }
             }
           }
-        }
-        
-        lastScrollTop.current = currentScrollTop;
+          
+          lastScrollTop.current = currentScrollTop;
+        }, 150); // 150ms debounce for mobile
       };
 
       scrollElement.addEventListener('scroll', handleScroll, { passive: true });
@@ -278,29 +282,29 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
     // Use custom badges for specific achievements regardless of earned status
     switch (achievement.title) {
       case "20 Club":
-        return <img src="/lovable-uploads/a33df9b4-0089-43ca-913d-132fc5b11cc3.png" alt="20 Club Badge" className="w-28 h-28" />;
+        return <img src="/lovable-uploads/a33df9b4-0089-43ca-913d-132fc5b11cc3.png" alt="20 Club Badge" className="w-16 h-16 md:w-20 md:h-20" />;
       case "50 Club":
-        return <img src="/lovable-uploads/c1ba04e8-7aed-40e6-948b-0b65fdc932b2.png" alt="50 Club Badge" className="w-28 h-28" />;
+        return <img src="/lovable-uploads/c1ba04e8-7aed-40e6-948b-0b65fdc932b2.png" alt="50 Club Badge" className="w-16 h-16 md:w-20 md:h-20" />;
       case "100 Century Club":
-        return <img src="/lovable-uploads/91e26115-098d-4b21-9b29-7e1800fe52bd.png" alt="100 Century Club Badge" className="w-28 h-28" />;
+        return <img src="/lovable-uploads/91e26115-098d-4b21-9b29-7e1800fe52bd.png" alt="100 Century Club Badge" className="w-16 h-16 md:w-20 md:h-20" />;
       case "200 Clubhouse Elite":
-        return <img src="/lovable-uploads/b566e805-826b-4005-b9d1-c5bdc87786b1.png" alt="200 Clubhouse Elite Badge" className="w-32 h-32" />;
+        return <img src="/lovable-uploads/b566e805-826b-4005-b9d1-c5bdc87786b1.png" alt="200 Clubhouse Elite Badge" className="w-16 h-16 md:w-20 md:h-20" />;
       case "300 Club Champion":
-        return <img src="/lovable-uploads/dd19d0ff-5931-4ef4-9e00-38e1db6d69a5.png" alt="300 Club Champion Badge" className="w-32 h-32" />;
+        return <img src="/lovable-uploads/dd19d0ff-5931-4ef4-9e00-38e1db6d69a5.png" alt="300 Club Champion Badge" className="w-16 h-16 md:w-20 md:h-20" />;
       // Regional achievement badges with flag images
       case "Lynx Legend":
-        return <img src="/lovable-uploads/5971ec53-bcfe-46df-aa24-78df46eaa170.png" alt="Britain & Ireland Flag" className="w-28 h-28 rounded-lg" />;
+        return <img src="/lovable-uploads/5971ec53-bcfe-46df-aa24-78df46eaa170.png" alt="Britain & Ireland Flag" className="w-16 h-16 md:w-20 md:h-20 rounded-lg" />;
       case "The Continental Swinger":
-        return <img src="/lovable-uploads/27ad4524-d8d9-4750-a4da-21d43d77fb0e.png" alt="European Union Flag" className="w-28 h-28 rounded-lg" />;
+        return <img src="/lovable-uploads/27ad4524-d8d9-4750-a4da-21d43d77fb0e.png" alt="European Union Flag" className="w-16 h-16 md:w-20 md:h-20 rounded-lg" />;
       case "Stars and Stripes Tourer":
-        return <img src="/lovable-uploads/a8ab2ea7-a98d-4558-bfbc-8a04e60cad37.png" alt="USA Flag" className="w-28 h-28 rounded-lg" />;
+        return <img src="/lovable-uploads/a8ab2ea7-a98d-4558-bfbc-8a04e60cad37.png" alt="USA Flag" className="w-16 h-16 md:w-20 md:h-20 rounded-lg" />;
       case "Legends Club":
-        return <img src="/lovable-uploads/e158428b-772e-4396-859e-1e3d51f2e9b3.png" alt="World Globe" className="w-28 h-28 rounded-lg" />;
+        return <img src="/lovable-uploads/e158428b-772e-4396-859e-1e3d51f2e9b3.png" alt="World Globe" className="w-16 h-16 md:w-20 md:h-20 rounded-lg" />;
       default:
         // Enhanced emoji display with conditional styling
         return (
           <div className={`
-            text-4xl transition-all duration-200 
+            text-2xl md:text-3xl transition-all duration-200 
             ${achievement.isEarned 
               ? 'grayscale-0 opacity-100 drop-shadow-lg' 
               : 'grayscale opacity-60'
@@ -472,61 +476,41 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       title: "Eagle Collector",
       emoji: "🦅",
       isEarned: false,
-      description: "Accumulate 5 total eagles throughout your golf journey.",
-      xp: 250,
+      description: "Score 5 eagles total. Elite shot making ability!",
+      xp: 200,
       isRepeatable: false,
-      progress: "2 / 5 eagles",
-      unlockHint: "Look for eagle opportunities on par 5s and short par 4s. Aggressive play when the situation is right."
+      progress: "1 / 5 eagles",
+      unlockHint: "Look for reachable par 5s and short par 4s. Practice your long game for more eagle opportunities."
     },
     {
       title: "Hole-in-One",
       emoji: "🕳️",
       isEarned: false,
-      description: "The ultimate golf achievement - ace a hole! Each one counts.",
+      description: "Achieve the ultimate golf shot - a hole-in-one. Pure golf magic!",
       xp: 500,
       isRepeatable: true,
-      progress: "0 aces",
-      unlockHint: "Play more par 3s and focus on accuracy. Sometimes luck plays a part, but skill increases your chances."
-    },
-    {
-      title: "Back-to-Back Birdies",
-      emoji: "🎪",
-      isEarned: false,
-      description: "Score consecutive birdies. Momentum is everything!",
-      xp: 100,
-      isRepeatable: false,
       progress: "Not achieved",
-      unlockHint: "Maintain focus and positive momentum after making your first birdie. Stay aggressive but smart."
+      unlockHint: "Keep playing par 3s and take aim at the flag. Every golfer dreams of this moment!"
     },
     {
       title: "No Bogey Round",
-      emoji: "💯",
+      emoji: "🎯",
       isEarned: false,
-      description: "Complete a round without any bogeys. Consistency at its finest.",
+      description: "Complete a full round without any bogeys. Perfect course management!",
       xp: 200,
-      isRepeatable: false,
+      isRepeatable: true,
       progress: "Best: 2 bogeys",
-      unlockHint: "Focus on course management over aggressive play. Avoid double bogeys and play within your abilities."
+      unlockHint: "Focus on course management and conservative play. Sometimes par is your best friend."
     },
     {
-      title: "Top 100 Conqueror",
-      emoji: "🌟",
+      title: "Breaking 80",
+      emoji: "🔥",
       isEarned: false,
-      description: "Play 10 of the world's Top 100 golf courses. Elite course collection!",
-      xp: 400,
+      description: "Shoot 79 or better. A significant scoring milestone for most golfers!",
+      xp: 150,
       isRepeatable: false,
-      progress: "3 / 10 courses",
-      unlockHint: "Plan golf trips to destinations with multiple Top 100 courses. Research and book tee times in advance."
-    },
-    {
-      title: "Regional Master",
-      emoji: "🗺️",
-      isEarned: false,
-      description: "Complete all courses in a selected region. Local expertise achieved!",
-      xp: 300,
-      isRepeatable: false,
-      progress: "Scotland: 8/12",
-      unlockHint: "Continue exploring Scottish courses. Focus on completing the remaining 4 courses in your selected region."
+      progress: "Best: 78",
+      unlockHint: "You've already achieved this! Make sure to log your rounds to unlock this achievement."
     },
     {
       title: "International Golfer",
@@ -560,609 +544,463 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
     }
   ];
 
+  // Add swipe gesture support for mobile navigation
+  const swipeRef = useSwipeGesture({
+    onSwipeLeft: () => {
+      // Could implement tab switching here if needed
+    },
+    onSwipeRight: () => {
+      // Could implement tab switching here if needed
+    },
+    threshold: 50
+  });
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[85vh] overflow-hidden p-0 flex flex-col bg-gradient-to-br from-green-50/30 via-blue-50/20 to-green-50/30 dark:from-green-950/10 dark:via-blue-950/10 dark:to-green-950/10"
-        style={{
-          backgroundImage: `
-            radial-gradient(circle at 20% 50%, rgba(34, 197, 94, 0.03) 0%, transparent 50%),
-            radial-gradient(circle at 80% 20%, rgba(59, 130, 246, 0.03) 0%, transparent 50%),
-            radial-gradient(circle at 40% 80%, rgba(16, 185, 129, 0.02) 0%, transparent 50%)
-          `
-        }}
-      >
-        <DialogHeader className="p-6 pb-4 flex-shrink-0">
-          <DialogTitle className="text-2xl font-bold">
-            {isCurrentUser ? "Your clbhouz achievements" : `${userDisplayName}'s clbhouz achievements`}
-          </DialogTitle>
-          <DialogDescription className="text-sm text-muted-foreground mt-1">
-            See how far your game can take you
-          </DialogDescription>
-        </DialogHeader>
-        
-        <div 
-          ref={scrollRef}
-          className="flex-1 overflow-y-auto overscroll-contain touch-pan-y"
-          style={{ 
-            scrollbarWidth: 'thin',
-            scrollBehavior: 'smooth',
-            WebkitOverflowScrolling: 'touch'
-          }}
-        >
-          {/* User Profile Section */}
-          <div className="px-6 pb-4">
-            <div className="flex items-center justify-between bg-muted/50 rounded-lg p-4">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-white font-bold text-lg">
-                  {userProfilePhotoUrl ? (
-                    <img 
-                      src={userProfilePhotoUrl} 
-                      alt={userDisplayName} 
-                      className="w-12 h-12 rounded-full object-cover"
-                    />
-                  ) : (
-                    userDisplayName.charAt(0).toUpperCase()
-                  )}
-                </div>
-                <div>
-                  <h3 className="font-semibold">{userDisplayName}</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {userHandicap ? `Handicap: ${userHandicap}` : 'No handicap set'}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Collapsible XP Progress Header with Smooth Animations */}
-          <div className={`sticky top-0 z-10 bg-background/95 backdrop-blur-sm transition-all duration-400 ease-in-out ${
-            isCollapsed ? 'px-6 py-3' : 'px-6 pb-4'
-          }`}>
+      <DialogContent className="max-w-4xl h-[90vh] p-0 gap-0 overflow-hidden">
+        <div className="h-full flex flex-col" ref={swipeRef}>
+          
+          {/* Header Section with XP Progress - Mobile Optimized */}
+          <div className={`
+            bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 
+            dark:from-gray-900 dark:via-gray-800 dark:to-gray-900
+            border-b border-amber-200/50 dark:border-gray-700/50
+            transition-all duration-300 ease-in-out
+            ${isCollapsed ? 'py-2 px-3 h-[52px]' : 'py-3 px-3 md:p-6'}
+            ${showCelebration ? 'animate-pulse' : ''}
+            relative overflow-hidden shadow-md
+          `}>
+            
+            {/* Celebration Background Effect */}
+            {showCelebration && (
+              <div className="absolute inset-0 bg-gradient-to-r from-yellow-200/20 via-orange-200/20 to-amber-200/20 animate-pulse pointer-events-none" />
+            )}
+            
+            {/* Condensed Header for Collapsed State */}
             {isCollapsed ? (
-              /* Collapsed Mini View */
-              <div className="flex items-center justify-between bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-lg p-3 border border-blue-200/50 dark:border-blue-800/50">
-                <div className="flex items-center gap-3">
-                  <div className="relative w-8 h-8">
-                    <svg className="w-8 h-8 transform -rotate-90" viewBox="0 0 32 32">
-                      <circle
-                        cx="16"
-                        cy="16"
-                        r="14"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        fill="transparent"
-                        className="text-gray-300 dark:text-gray-600"
-                      />
-                      <circle
-                        cx="16"
-                        cy="16"
-                        r="14"
-                        stroke={nextTier.color}
-                        strokeWidth="2"
-                        fill="transparent"
-                        strokeDasharray={`${14 * 2 * Math.PI}`}
-                        strokeDashoffset={`${14 * 2 * Math.PI * (1 - progressPercentage / 100)}`}
-                        strokeLinecap="round"
-                        className="transition-all duration-700"
-                      />
-                    </svg>
-                    <Trophy className="absolute inset-0 w-4 h-4 m-auto text-muted-foreground" />
+              <div className="flex items-center justify-between h-full">
+                <div className="flex items-center gap-2 w-full">
+                  <div className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                    {totalXP.toLocaleString()} XP
                   </div>
-                  <div className="text-sm font-medium">{totalXP.toLocaleString()} XP | {progressPercentage.toFixed(0)}% to {nextTier.name}</div>
-                </div>
-                <div className="flex-1 mx-4 bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
-                  <div 
-                    className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-1000 ease-out"
-                    style={{ 
-                      width: animateProgress ? `${progressPercentage}%` : '0%',
-                      boxShadow: '0 0 10px rgba(59, 130, 246, 0.5)'
-                    }}
-                  />
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="text-xs text-muted-foreground">
-                    Next: {nextTier.name} at {nextTier.minXP.toLocaleString()} XP
+                  <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 min-w-[100px]">
+                    <div 
+                      className="bg-gradient-to-r from-amber-400 to-orange-500 h-1.5 rounded-full transition-all duration-700 ease-out"
+                      style={{ 
+                        width: animateProgress ? `${progressPercentage}%` : '0%' 
+                      }}
+                    />
                   </div>
+                  <div className="text-xs text-gray-600 dark:text-gray-400">
+                    {nextTier.name}
+                  </div>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleToggleCollapse}
+                  className="h-8 w-8 p-0 hover:bg-white/50 dark:hover:bg-gray-800/50 ml-2 flex-shrink-0"
+                >
+                  <ChevronDown className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              /* Expanded Header - Mobile Optimized */
+              <div className="space-y-2 md:space-y-4">
+                <div className="flex items-center justify-between">
+                  <DialogHeader className="text-left p-0">
+                    <DialogTitle className="text-lg md:text-2xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent flex items-center gap-2">
+                      <Trophy className="h-4 w-4 md:h-6 md:w-6 text-amber-600" />
+                      Achievements
+                    </DialogTitle>
+                    <DialogDescription className="text-xs md:text-base text-gray-600 dark:text-gray-400 mt-1">
+                      Track your golf journey milestones and unlock rewards
+                    </DialogDescription>
+                  </DialogHeader>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={handleToggleCollapse}
-                    className="p-1 h-6 w-6"
+                    className="h-8 w-8 p-0 hover:bg-white/50 dark:hover:bg-gray-800/50"
                   >
-                    <ChevronDown className="h-3 w-3" />
+                    <ChevronUp className="h-4 w-4" />
                   </Button>
                 </div>
-              </div>
-            ) : (
-              /* Full XP Ring Section */
-              <div className="bg-gradient-to-br from-blue-50 via-purple-50 to-blue-50 dark:from-blue-950/20 dark:via-purple-950/20 dark:to-blue-950/20 rounded-xl p-6 border border-blue-200 dark:border-blue-800 relative overflow-hidden">
-                {/* Celebration Animation Overlay */}
-                {showCelebration && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-r from-yellow-400/20 to-orange-400/20 rounded-xl animate-pulse">
-                    <div className="text-6xl animate-bounce">🎉</div>
-                  </div>
-                )}
                 
-                {/* Header with XP and Collapse Button */}
-                <div className="flex justify-between items-start mb-6">
-                  <div>
-                    <h3 className="text-lg font-bold text-foreground mb-1">XP Progress</h3>
-                    <p className="text-sm text-muted-foreground">Keep playing to unlock new rings!</p>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-foreground flex items-center gap-2">
-                        <Sparkles className={`w-5 h-5 ${nextTier ? 'text-yellow-500 animate-pulse' : 'text-muted-foreground'}`} />
-                        {totalXP.toLocaleString()} XP
+                {/* XP Ring Display - Mobile Optimized Vertical Stack */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 md:gap-4">
+                  {/* Mobile: Stack vertically, Desktop: side by side */}
+                  <div className="flex-1 text-center md:text-left">
+                    <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3 mb-2">
+                      <div className="text-xl md:text-3xl font-bold text-gray-800 dark:text-gray-200">
+                        {totalXP.toLocaleString()}
                       </div>
-                      <div className="text-xs text-muted-foreground">Current Progress</div>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={handleToggleCollapse}
-                      className="p-1 h-8 w-8"
-                    >
-                      <ChevronUp className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-                
-                {/* Main Progress Ring and Info */}
-                <div className="flex justify-center mb-6">
-                  <div className="flex items-center gap-12">
-                    {/* Enhanced Progress Ring */}
-                    <div className="relative flex-shrink-0">
-                      <div className="relative w-40 h-40">
-                        {/* Glow effect for next goal */}
-                        <div className={`absolute inset-0 rounded-full ${nextTier ? 'animate-pulse' : ''}`} 
-                             style={{ 
-                               boxShadow: nextTier ? `0 0 30px ${nextTier.color}40` : 'none'
-                             }} />
-                        
-                        <svg className="w-40 h-40 transform -rotate-90" viewBox="0 0 160 160">
-                          {/* Background circle */}
-                          <circle
-                            cx="80"
-                            cy="80"
-                            r="70"
-                            stroke="currentColor"
-                            strokeWidth="12"
-                            fill="transparent"
-                            className="text-gray-300 dark:text-gray-600"
-                          />
-                          {/* Animated progress circle */}
-                          <circle
-                            cx="80"
-                            cy="80"
-                            r="70"
-                            stroke={`url(#progressGradient)`}
-                            strokeWidth="12"
-                            fill="transparent"
-                            strokeDasharray={`${70 * 2 * Math.PI}`}
-                            strokeDashoffset={animateProgress ? 
-                              `${70 * 2 * Math.PI * (1 - progressPercentage / 100)}` : 
-                              `${70 * 2 * Math.PI}`
-                            }
-                            strokeLinecap="round"
-                            className="transition-all duration-1000 ease-out"
-                            style={{
-                              filter: 'drop-shadow(0 0 12px rgba(59, 130, 246, 0.6))'
-                            }}
-                          />
-                          {/* Gradient definition */}
-                          <defs>
-                            <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                              <stop offset="0%" stopColor="#3B82F6" />
-                              <stop offset="50%" stopColor="#8B5CF6" />
-                              <stop offset="100%" stopColor="#06B6D4" />
-                            </linearGradient>
-                          </defs>
-                        </svg>
-                        
-                        {/* Center content */}
-                        <div className="absolute inset-0 flex flex-col items-center justify-center">
-                          <div className="text-2xl font-bold text-foreground mb-1">
-                            {(nextTier.minXP - totalXP).toLocaleString()}
-                          </div>
-                          <div className="text-xs text-muted-foreground text-center mb-2">
-                            XP to next ring
-                          </div>
-                          <div className="text-xs font-medium" style={{ color: nextTier.color }}>
-                            {Math.round(progressPercentage)}% Complete
-                          </div>
-                        </div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">
+                        XP {currentTier ? `• ${currentTier.name}` : '• No Ring'}
                       </div>
                     </div>
                     
-                    {/* Ring Info */}
-                    <div className="w-64 space-y-4">
-                      <div className="space-y-2">
-                        <h3 className="font-semibold text-xl text-muted-foreground">
-                          {currentTier ? currentTier.name : 'No Ring Achieved'}
-                        </h3>
-                        <p className="text-sm text-muted-foreground">
-                          {currentTier ? 
-                            `Congratulations! You've earned the ${currentTier.name}!` :
-                            `Reach ${nextTier.minXP.toLocaleString()} XP to unlock your first ring`
-                          }
-                        </p>
-                        <div className="flex items-center gap-2 text-sm font-medium" style={{ color: nextTier.color }}>
-                          <Trophy className="w-4 h-4" />
-                          Next: {nextTier.name} at {nextTier.minXP.toLocaleString()} XP
-                        </div>
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600 dark:text-gray-400">Progress to {nextTier.name}</span>
+                        <span className="font-medium text-gray-700 dark:text-gray-300">
+                          {progressPercentage.toFixed(1)}%
+                        </span>
+                      </div>
+                      {/* Mobile: 6px height, Desktop: 8px height */}
+                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 md:h-2">
+                        <div 
+                          className="bg-gradient-to-r from-amber-400 to-orange-500 h-1.5 md:h-2 rounded-full transition-all duration-700 ease-out"
+                          style={{ 
+                            width: animateProgress ? `${progressPercentage}%` : '0%' 
+                          }}
+                        />
+                      </div>
+                      <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
+                        <span>{currentTier?.minXP?.toLocaleString() || '0'} XP</span>
+                        <span>{nextTier.minXP.toLocaleString()} XP</span>
                       </div>
                     </div>
                   </div>
-                </div>
-
-                {/* Horizontal Progress Bar */}
-                <div className="mb-6">
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="text-muted-foreground">Progress to {nextTier.name}</span>
-                    <span className="font-medium">{Math.round(progressPercentage)}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
-                    <div 
-                      className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 rounded-full transition-all duration-1000 ease-out relative"
-                      style={{ 
-                        width: animateProgress ? `${progressPercentage}%` : '0%',
-                        boxShadow: '0 0 15px rgba(59, 130, 246, 0.6)'
-                      }}
-                    >
-                      <div className="absolute inset-0 bg-white/20 animate-pulse" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Ring Tier Display */}
-                <div className="w-full">
-                  <h4 className="text-sm font-medium text-muted-foreground mb-3 text-center">Ring Progression</h4>
-                  <div className="flex justify-between items-center gap-2">
-                    {xpTiers.map((tier, index) => {
-                      const isActive = totalXP >= tier.minXP;
-                      const isCurrent = currentTier?.name === tier.name;
-                      const isNext = nextTier?.name === tier.name;
-                      
-                      return (
-                        <div key={tier.name} className="flex-1 text-center">
-                          <div className={`
-                            w-16 h-16 mx-auto mb-2 rounded-full border-4 transition-all duration-500 flex items-center justify-center
-                            ${isActive 
-                              ? `bg-gradient-to-br from-${tier.color}/20 to-${tier.color}/40 border-current shadow-lg` 
-                              : isNext 
-                                ? 'border-gray-400 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 animate-pulse'
-                                : 'border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900'
-                            }
-                          `}
-                          style={{ 
-                            color: isActive ? tier.color : '#9CA3AF',
-                            borderColor: isActive ? tier.color : undefined
-                          }}
-                          >
-                            <Trophy className={`w-6 h-6 ${isActive ? 'animate-pulse' : ''}`} />
-                          </div>
-                          <div className="text-xs font-medium mb-1" style={{ color: isActive ? tier.color : '#6B7280' }}>
-                            {tier.name}
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            {tier.minXP.toLocaleString()} XP
-                          </div>
-                        </div>
-                      );
-                    })}
+                  
+                  <div className="flex justify-center md:justify-end">
+                    <XPRingSystem 
+                      xp={totalXP} 
+                      size="medium"
+                      showLevel={false}
+                      animate={animateProgress}
+                    />
                   </div>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Filter Buttons */}
-          <div className="px-6 pb-6">
-            <div className="flex flex-wrap gap-2 justify-center">
-              {['all', 'unlocked', 'locked', 'exploration', 'skill'].map((filter) => (
+          {/* Filter Buttons - Mobile Optimized 2 Rows */}
+          <div className="p-3 md:p-4 border-b border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm">
+            <div className="grid grid-cols-3 md:flex md:flex-wrap gap-1.5 md:gap-2">
+              {/* First row on mobile */}
+              {[
+                { key: 'all', label: 'All', fullLabel: 'All Achievements', icon: '🏆' },
+                { key: 'unlocked', label: 'Unlocked', fullLabel: 'Unlocked', icon: '✅' },
+                { key: 'locked', label: 'Locked', fullLabel: 'Locked', icon: '🔒' }
+              ].map((filter) => (
                 <Button
-                  key={filter}
-                  variant={activeFilter === filter ? "default" : "outline"}
+                  key={filter.key}
+                  variant={activeFilter === filter.key ? "default" : "outline"}
                   size="sm"
-                  onClick={() => setActiveFilter(filter as typeof activeFilter)}
+                  onClick={() => setActiveFilter(filter.key as any)}
                   className={`
-                    capitalize transition-all duration-200 hover:scale-105
-                    ${activeFilter === filter 
-                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg' 
-                      : 'hover:bg-muted/80'
+                    text-xs font-medium transition-all h-8 md:h-auto
+                    ${activeFilter === filter.key 
+                      ? 'bg-amber-500 hover:bg-amber-600 text-white border-amber-500' 
+                      : 'hover:bg-amber-50 hover:border-amber-300 dark:hover:bg-gray-800'
                     }
                   `}
                 >
-                  {filter === 'all' ? 'All Achievements' : 
-                   filter === 'unlocked' ? 'Unlocked Only' :
-                   filter === 'locked' ? 'Locked Only' :
-                   filter === 'exploration' ? 'Experience & Exploration' :
-                   'Skill-Based'}
+                  <span className="mr-1 md:mr-2">{filter.icon}</span>
+                  <span className="md:hidden">{filter.label}</span>
+                  <span className="hidden md:inline">{filter.fullLabel}</span>
+                </Button>
+              ))}
+              {/* Second row on mobile - spans remaining columns */}
+              {[
+                { key: 'exploration', label: 'Exploration', icon: '🗺️' },
+                { key: 'skill', label: 'Skill-Based', icon: '🎯' }
+              ].map((filter) => (
+                <Button
+                  key={filter.key}
+                  variant={activeFilter === filter.key ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setActiveFilter(filter.key as any)}
+                  className={`
+                    text-xs font-medium transition-all h-8 md:h-auto col-span-1
+                    ${activeFilter === filter.key 
+                      ? 'bg-amber-500 hover:bg-amber-600 text-white border-amber-500' 
+                      : 'hover:bg-amber-50 hover:border-amber-300 dark:hover:bg-gray-800'
+                    }
+                  `}
+                >
+                  <span className="mr-1 md:mr-2">{filter.icon}</span>
+                  {filter.label}
                 </Button>
               ))}
             </div>
           </div>
 
-          {/* Experience & Exploration Achievements Section */}
-          {(activeFilter === 'all' || activeFilter === 'exploration') && getFilteredAchievements(explorationAchievements, 'exploration').length > 0 && (
-            <div className="px-6 pb-8">
-              {/* Card Container with Visual Grouping */}
-              <div className="bg-gradient-to-br from-blue-50/80 to-cyan-50/60 dark:from-blue-950/20 dark:to-cyan-950/15 rounded-2xl p-6 border border-blue-200/40 dark:border-blue-800/40 shadow-xl backdrop-blur-sm">
-                {/* Section Header with Icon */}
-                <div className="flex items-center justify-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
-                    <span className="text-xl">🧭</span>
-                  </div>
-                  <h3 className="text-xl font-bold text-blue-800 dark:text-blue-200">
-                    Experience & Exploration Achievements
+          {/* Scrollable Content - Mobile Optimized */}
+          <div 
+            ref={scrollRef}
+            className="flex-1 overflow-y-auto p-3 md:p-4 space-y-3 md:space-y-6 scrollbar-hide max-w-[95vw] mx-auto"
+          >
+            
+            {/* Exploration & Travel Achievements */}
+            {(activeFilter === 'all' || activeFilter === 'exploration') && (
+              <div className="space-y-3 md:space-y-4">
+                <div className="flex items-center gap-2 text-center justify-center py-2 md:py-3">
+                  <div className="text-lg md:text-xl">🗺️</div>
+                  <h3 className="text-base md:text-lg font-semibold text-gray-800 dark:text-gray-200">
+                    Exploration & Travel Achievements
                   </h3>
                 </div>
                 
-                <TooltipProvider>
-                  <div className="grid grid-cols-3 gap-4">
-                    {getFilteredAchievements(explorationAchievements, 'exploration').map((achievement) => {
-                      const { percentage, nudgeText } = getAchievementProgress(achievement);
-                      const isNearUnlock = percentage >= 80 && percentage < 100;
-                      
-                      return (
-                        <Tooltip key={achievement.title}>
+                {/* Mobile: 2 badges per row, Desktop: 2-3 badges per row */}
+                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+                  {getFilteredAchievements(explorationAchievements, 'exploration').map((achievement, index) => {
+                    const { percentage, nudgeText } = getAchievementProgress(achievement);
+                    
+                    return (
+                      <TooltipProvider key={index}>
+                        <Tooltip delayDuration={300}>
                           <TooltipTrigger asChild>
                             <div className="relative">
                               <div
                                 className={`
-                                  border rounded-xl p-2 transition-all duration-200 hover:scale-105 cursor-pointer flex items-center gap-2 
+                                  border rounded-xl p-3 transition-all duration-200 hover:scale-105 cursor-pointer 
                                   bg-white/80 dark:bg-gray-900/40 backdrop-blur-sm
                                   shadow-lg hover:shadow-xl
                                   ${achievement.isEarned 
-                                    ? 'border-blue-300 dark:border-blue-700 shadow-blue-100/50 dark:shadow-blue-900/20' 
-                                    : isNearUnlock
-                                      ? 'border-orange-400 dark:border-orange-600 shadow-orange-100/50 dark:shadow-orange-900/20 animate-pulse'
-                                      : 'border-blue-200/50 dark:border-blue-800/50 hover:border-blue-300 dark:hover:border-blue-700'
+                                    ? 'border-green-300 dark:border-green-600 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20' 
+                                    : 'border-gray-200 dark:border-gray-700 hover:border-amber-300 dark:hover:border-amber-600'
                                   }
                                 `}
                               >
-                                <div className="flex-shrink-0 flex justify-center items-center min-w-0">
+                                {/* Achievement Badge/Icon - Centered */}
+                                <div className="flex justify-center mb-2">
                                   {getAchievementIcon(achievement)}
                                 </div>
-                                <div className="flex-1 text-center">
-                                  <h4 className="font-medium text-sm mb-1">
+                                
+                                {/* Achievement Details - Centered */}
+                                <div className="text-center space-y-1">
+                                  <h4 className="font-semibold text-xs md:text-sm text-gray-800 dark:text-gray-200 leading-tight">
                                     {achievement.title}
                                   </h4>
-                                  <p className={`text-xs ${achievement.isEarned ? 'text-blue-600 dark:text-blue-400' : 'text-muted-foreground'}`}>
-                                    <span className="inline-flex items-center gap-1">
-                                      <span className="text-amber-500">✨</span>
-                                      +{achievement.xp} XP 
-                                      {achievement.isRepeatable ? " 🔄" : " 🏆"}
-                                    </span>
-                                  </p>
                                   
-                                  {/* Smart Nudge Label */}
-                                  {nudgeText && (
-                                    <div className="mt-2 px-2 py-1 bg-orange-100 dark:bg-orange-900/30 rounded-full border border-orange-300 dark:border-orange-700">
-                                      <p className="text-xs font-medium text-orange-700 dark:text-orange-300 leading-tight">
-                                        🎯 {nudgeText}
-                                      </p>
+                                  {achievement.isEarned ? (
+                                    <div className="text-xs text-green-600 dark:text-green-400">
+                                      <span>✅ Unlocked</span>
+                                      {achievement.dateEarned && (
+                                        <div className="text-gray-500 dark:text-gray-400 text-xs mt-1">
+                                          {achievement.dateEarned}
+                                        </div>
+                                      )}
+                                    </div>
+                                  ) : (
+                                    <div className="space-y-1">
+                                      {/* Progress Bar for Unearned Achievements */}
+                                      {percentage > 0 && (
+                                        <div className="space-y-1">
+                                          <div className="text-xs text-gray-600 dark:text-gray-400">
+                                            {achievement.progress}
+                                          </div>
+                                          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
+                                            <div 
+                                              className="bg-gradient-to-r from-amber-400 to-orange-500 h-1.5 rounded-full transition-all duration-700"
+                                              style={{ width: `${Math.min(percentage, 95)}%` }}
+                                            />
+                                          </div>
+                                          <div className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                                            {percentage.toFixed(0)}%
+                                          </div>
+                                        </div>
+                                      )}
+                                      
+                                      {/* Smart Nudge Text */}
+                                      {nudgeText && (
+                                        <div className="text-xs text-amber-600 dark:text-amber-400 font-medium flex items-center justify-center gap-1">
+                                          <Sparkles className="h-3 w-3" />
+                                          <span className="text-center">{nudgeText}</span>
+                                        </div>
+                                      )}
+                                      
+                                      {/* Regular Progress Text */}
+                                      {!nudgeText && achievement.progress && !percentage && (
+                                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                                          {achievement.progress}
+                                        </div>
+                                      )}
                                     </div>
                                   )}
+                                  
+                                  {/* XP Badge */}
+                                  <div className="flex justify-center mt-2">
+                                    <div className={`
+                                      px-2 py-1 rounded-full text-xs font-bold
+                                      ${achievement.isEarned 
+                                        ? 'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300' 
+                                        : 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300'
+                                      }
+                                    `}>
+                                      +{achievement.xp} XP
+                                    </div>
+                                  </div>
                                 </div>
                               </div>
                               
-                              {/* Progress indicator for near-unlock achievements */}
-                              {isNearUnlock && (
-                                <div className="absolute -top-1 -right-1 w-3 h-3 bg-orange-500 rounded-full animate-ping"></div>
+                              {/* Repeatable Badge */}
+                              {achievement.isRepeatable && (
+                                <div className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs px-1.5 py-0.5 rounded-full font-bold">
+                                  ♻️
+                                </div>
                               )}
                             </div>
                           </TooltipTrigger>
-                          <TooltipContent className="max-w-xs z-50 bg-background border shadow-lg">
-                            <div className="p-2">
-                              {/* Status Badge */}
-                              <div className="flex items-center justify-between mb-3">
-                                <h4 className="font-semibold text-sm">{achievement.title}</h4>
-                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                  achievement.isEarned 
-                                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
-                                    : 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
-                                }`}>
-                                  {achievement.isEarned ? 'Unlocked' : 'Locked'}
-                                </span>
-                              </div>
-                              
-                              {/* Description */}
-                              <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
-                                {achievement.description}
-                              </p>
-                              
-                              {/* XP Value */}
-                              <div className="flex items-center justify-between mb-2">
-                                <span className="text-xs font-medium text-primary inline-flex items-center gap-1">
-                                  <span className="text-amber-500">✨</span>
-                                  +{achievement.xp} XP
-                                </span>
-                                <span className="text-xs text-muted-foreground inline-flex items-center gap-1">
-                                  {achievement.isRepeatable ? "🔄 Repeatable" : "🏆 One-time"}
-                                </span>
-                              </div>
-                              
-                              {/* Date Earned (if unlocked) */}
-                              {achievement.isEarned && achievement.dateEarned && (
-                                <div className="mb-2">
-                                  <span className="text-xs text-green-600 dark:text-green-400 font-medium">
-                                    ✅ Earned: {achievement.dateEarned}
-                                  </span>
+                          <TooltipContent side="bottom" className="max-w-xs">
+                            <div className="space-y-2">
+                              <p className="font-semibold">{achievement.title}</p>
+                              <p className="text-sm">{achievement.description}</p>
+                              {achievement.unlockHint && !achievement.isEarned && (
+                                <div className="text-xs text-amber-300 bg-amber-900/20 p-2 rounded border-l-2 border-amber-400">
+                                  <strong>Hint:</strong> {achievement.unlockHint}
                                 </div>
                               )}
-                              
-                              {/* Progress */}
-                              <div className="mb-2">
-                                <span className="text-xs text-muted-foreground">
-                                  Progress: {achievement.progress}
-                                </span>
+                              <div className="text-xs text-gray-400">
+                                Reward: +{achievement.xp} XP {achievement.isRepeatable && '(Repeatable)'}
                               </div>
-                              
-                              {/* Unlock Hint (if locked) */}
-                              {!achievement.isEarned && achievement.unlockHint && (
-                                <div className="mt-3 p-2 bg-blue-50 dark:bg-blue-950/20 rounded border border-blue-200 dark:border-blue-800">
-                                  <div className="flex items-start gap-2">
-                                    <span className="text-blue-500 text-xs">💡</span>
-                                    <span className="text-xs text-blue-700 dark:text-blue-300 leading-relaxed">
-                                      <strong>How to unlock:</strong> {achievement.unlockHint}
-                                    </span>
-                                  </div>
-                                </div>
-                              )}
                             </div>
                           </TooltipContent>
                         </Tooltip>
-                      );
-                    })}
-                  </div>
-                </TooltipProvider>
+                      </TooltipProvider>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* Skill & Performance Achievements Section */}
-          {(activeFilter === 'all' || activeFilter === 'skill') && getFilteredAchievements(skillAchievements, 'skill').length > 0 && (
-            <div className="px-6 pb-8">
-              {/* Card Container with Visual Grouping */}
-              <div className="bg-gradient-to-br from-green-50/80 to-emerald-50/60 dark:from-green-950/20 dark:to-emerald-950/15 rounded-2xl p-6 border border-green-200/40 dark:border-green-800/40 shadow-xl backdrop-blur-sm">
-                {/* Section Header with Icon */}
-                <div className="flex items-center justify-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/50 flex items-center justify-center">
-                    <span className="text-xl">💪</span>
-                  </div>
-                  <h3 className="text-xl font-bold text-green-800 dark:text-green-200">
+            {/* Skill & Performance Achievements */}
+            {(activeFilter === 'all' || activeFilter === 'skill') && (
+              <div className="space-y-3 md:space-y-4">
+                <div className="flex items-center gap-2 text-center justify-center py-2 md:py-3">
+                  <div className="text-lg md:text-xl">🎯</div>
+                  <h3 className="text-base md:text-lg font-semibold text-gray-800 dark:text-gray-200">
                     Skill & Performance Achievements
                   </h3>
                 </div>
                 
-                <TooltipProvider>
-                  <div className="grid grid-cols-3 gap-4">
-                    {getFilteredAchievements(skillAchievements, 'skill').map((achievement) => {
-                      const { percentage, nudgeText } = getAchievementProgress(achievement);
-                      const isNearUnlock = percentage >= 80 && percentage < 100;
-                      
-                      return (
-                        <Tooltip key={achievement.title}>
+                {/* Mobile: 2 badges per row, Desktop: 2-3 badges per row */}
+                <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+                  {getFilteredAchievements(skillAchievements, 'skill').map((achievement, index) => {
+                    const { percentage, nudgeText } = getAchievementProgress(achievement);
+                    
+                    return (
+                      <TooltipProvider key={index}>
+                        <Tooltip delayDuration={300}>
                           <TooltipTrigger asChild>
                             <div className="relative">
                               <div
                                 className={`
-                                  border rounded-xl p-2 transition-all duration-200 hover:scale-105 cursor-pointer flex items-center gap-2 
+                                  border rounded-xl p-3 transition-all duration-200 hover:scale-105 cursor-pointer 
                                   bg-white/80 dark:bg-gray-900/40 backdrop-blur-sm
                                   shadow-lg hover:shadow-xl
                                   ${achievement.isEarned 
-                                    ? 'border-green-300 dark:border-green-700 shadow-green-100/50 dark:shadow-green-900/20' 
-                                    : isNearUnlock
-                                      ? 'border-orange-400 dark:border-orange-600 shadow-orange-100/50 dark:shadow-orange-900/20 animate-pulse'
-                                      : 'border-green-200/50 dark:border-green-800/50 hover:border-green-300 dark:hover:border-green-700'
+                                    ? 'border-green-300 dark:border-green-600 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20' 
+                                    : 'border-gray-200 dark:border-gray-700 hover:border-amber-300 dark:hover:border-amber-600'
                                   }
                                 `}
-                                
                               >
-                                <div className="flex-shrink-0 flex justify-center items-center min-w-0">
+                                {/* Achievement Badge/Icon - Centered */}
+                                <div className="flex justify-center mb-2">
                                   {getAchievementIcon(achievement)}
                                 </div>
-                                <div className="flex-1 text-center">
-                                  <h4 className="font-medium text-sm mb-1">
+                                
+                                {/* Achievement Details - Centered */}
+                                <div className="text-center space-y-1">
+                                  <h4 className="font-semibold text-xs md:text-sm text-gray-800 dark:text-gray-200 leading-tight">
                                     {achievement.title}
                                   </h4>
-                                  <p className={`text-xs ${achievement.isEarned ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}`}>
-                                    <span className="inline-flex items-center gap-1">
-                                      <span className="text-amber-500">✨</span>
-                                      +{achievement.xp} XP 
-                                      {achievement.isRepeatable ? " 🔄" : " 🏆"}
-                                    </span>
-                                  </p>
                                   
-                                  {/* Smart Nudge Label */}
-                                  {nudgeText && (
-                                    <div className="mt-2 px-2 py-1 bg-orange-100 dark:bg-orange-900/30 rounded-full border border-orange-300 dark:border-orange-700">
-                                      <p className="text-xs font-medium text-orange-700 dark:text-orange-300 leading-tight">
-                                        🎯 {nudgeText}
-                                      </p>
+                                  {achievement.isEarned ? (
+                                    <div className="text-xs text-green-600 dark:text-green-400">
+                                      <span>✅ Unlocked</span>
+                                      {achievement.dateEarned && (
+                                        <div className="text-gray-500 dark:text-gray-400 text-xs mt-1">
+                                          {achievement.dateEarned}
+                                        </div>
+                                      )}
+                                    </div>
+                                  ) : (
+                                    <div className="space-y-1">
+                                      {/* Progress Bar for Unearned Achievements */}
+                                      {percentage > 0 && (
+                                        <div className="space-y-1">
+                                          <div className="text-xs text-gray-600 dark:text-gray-400">
+                                            {achievement.progress}
+                                          </div>
+                                          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
+                                            <div 
+                                              className="bg-gradient-to-r from-amber-400 to-orange-500 h-1.5 rounded-full transition-all duration-700"
+                                              style={{ width: `${Math.min(percentage, 95)}%` }}
+                                            />
+                                          </div>
+                                          <div className="text-xs font-medium text-gray-700 dark:text-gray-300">
+                                            {percentage.toFixed(0)}%
+                                          </div>
+                                        </div>
+                                      )}
+                                      
+                                      {/* Smart Nudge Text */}
+                                      {nudgeText && (
+                                        <div className="text-xs text-amber-600 dark:text-amber-400 font-medium flex items-center justify-center gap-1">
+                                          <Sparkles className="h-3 w-3" />
+                                          <span className="text-center">{nudgeText}</span>
+                                        </div>
+                                      )}
+                                      
+                                      {/* Regular Progress Text */}
+                                      {!nudgeText && achievement.progress && !percentage && (
+                                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                                          {achievement.progress}
+                                        </div>
+                                      )}
                                     </div>
                                   )}
+                                  
+                                  {/* XP Badge */}
+                                  <div className="flex justify-center mt-2">
+                                    <div className={`
+                                      px-2 py-1 rounded-full text-xs font-bold
+                                      ${achievement.isEarned 
+                                        ? 'bg-green-100 text-green-700 dark:bg-green-900/50 dark:text-green-300' 
+                                        : 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300'
+                                      }
+                                    `}>
+                                      +{achievement.xp} XP
+                                    </div>
+                                  </div>
                                 </div>
                               </div>
                               
-                              {/* Progress indicator for near-unlock achievements */}
-                              {isNearUnlock && (
-                                <div className="absolute -top-1 -right-1 w-3 h-3 bg-orange-500 rounded-full animate-ping"></div>
+                              {/* Repeatable Badge */}
+                              {achievement.isRepeatable && (
+                                <div className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs px-1.5 py-0.5 rounded-full font-bold">
+                                  ♻️
+                                </div>
                               )}
                             </div>
                           </TooltipTrigger>
-                          <TooltipContent className="max-w-xs z-50 bg-background border shadow-lg">
-                            <div className="p-2">
-                              {/* Status Badge */}
-                              <div className="flex items-center justify-between mb-3">
-                                <h4 className="font-semibold text-sm">{achievement.title}</h4>
-                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                  achievement.isEarned 
-                                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
-                                    : 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
-                                }`}>
-                                  {achievement.isEarned ? 'Unlocked' : 'Locked'}
-                                </span>
-                              </div>
-                              
-                              {/* Description */}
-                              <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
-                                {achievement.description}
-                              </p>
-                              
-                              {/* XP Value */}
-                              <div className="flex items-center justify-between mb-2">
-                                <span className="text-xs font-medium text-primary inline-flex items-center gap-1">
-                                  <span className="text-amber-500">✨</span>
-                                  +{achievement.xp} XP
-                                </span>
-                                <span className="text-xs text-muted-foreground inline-flex items-center gap-1">
-                                  {achievement.isRepeatable ? "🔄 Repeatable" : "🏆 One-time"}
-                                </span>
-                              </div>
-                              
-                              {/* Date Earned (if unlocked) */}
-                              {achievement.isEarned && achievement.dateEarned && (
-                                <div className="mb-2">
-                                  <span className="text-xs text-green-600 dark:text-green-400 font-medium">
-                                    ✅ Earned: {achievement.dateEarned}
-                                  </span>
+                          <TooltipContent side="bottom" className="max-w-xs">
+                            <div className="space-y-2">
+                              <p className="font-semibold">{achievement.title}</p>
+                              <p className="text-sm">{achievement.description}</p>
+                              {achievement.unlockHint && !achievement.isEarned && (
+                                <div className="text-xs text-amber-300 bg-amber-900/20 p-2 rounded border-l-2 border-amber-400">
+                                  <strong>Hint:</strong> {achievement.unlockHint}
                                 </div>
                               )}
-                              
-                              {/* Progress */}
-                              <div className="mb-2">
-                                <span className="text-xs text-muted-foreground">
-                                  Progress: {achievement.progress}
-                                </span>
+                              <div className="text-xs text-gray-400">
+                                Reward: +{achievement.xp} XP {achievement.isRepeatable && '(Repeatable)'}
                               </div>
-                              
-                              {/* Unlock Hint (if locked) */}
-                              {!achievement.isEarned && achievement.unlockHint && (
-                                <div className="mt-3 p-2 bg-blue-50 dark:bg-blue-950/20 rounded border border-blue-200 dark:border-blue-800">
-                                  <div className="flex items-start gap-2">
-                                    <span className="text-blue-500 text-xs">💡</span>
-                                    <span className="text-xs text-blue-700 dark:text-blue-300 leading-relaxed">
-                                      <strong>How to unlock:</strong> {achievement.unlockHint}
-                                    </span>
-                                  </div>
-                                </div>
-                              )}
                             </div>
                           </TooltipContent>
                         </Tooltip>
-                      );
-                    })}
-                  </div>
-                </TooltipProvider>
+                      </TooltipProvider>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          )}
-
+            )}
+          </div>
         </div>
-
       </DialogContent>
     </Dialog>
   );
