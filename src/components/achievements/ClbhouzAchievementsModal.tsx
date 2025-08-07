@@ -80,6 +80,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
 
     const handleScroll = () => {
       const scrollTop = scrollElement.scrollTop;
+      console.log('Scroll position:', scrollTop, 'isManuallyCollapsed:', isManuallyCollapsed);
       // Auto-collapse at 150px scroll, but respect manual state
       if (!isManuallyCollapsed) {
         setIsCollapsed(scrollTop > 150);
@@ -95,6 +96,14 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
     setIsManuallyCollapsed(!isManuallyCollapsed);
     setIsCollapsed(!isCollapsed);
   };
+
+  // Reset manual state when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setIsManuallyCollapsed(false);
+      setIsCollapsed(false);
+    }
+  }, [isOpen]);
 
   // Trigger celebration on level up (mock for now)
   useEffect(() => {
