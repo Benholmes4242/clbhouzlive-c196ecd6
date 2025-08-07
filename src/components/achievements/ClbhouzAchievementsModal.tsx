@@ -345,7 +345,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                   onClick={() => setShowAllAchievements(true)}
                   className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
                     showAllAchievements 
-                      ? 'bg-primary text-primary-foreground shadow-sm' 
+                      ? 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 shadow-sm' 
                       : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
@@ -355,7 +355,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                   onClick={() => setShowAllAchievements(false)}
                   className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
                     !showAllAchievements 
-                      ? 'bg-primary text-primary-foreground shadow-sm' 
+                      ? 'bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 shadow-sm' 
                       : 'text-muted-foreground hover:text-foreground'
                   }`}
                 >
