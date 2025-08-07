@@ -80,7 +80,6 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
 
     const handleScroll = () => {
       const scrollTop = scrollElement.scrollTop;
-      console.log('Scroll position:', scrollTop, 'isManuallyCollapsed:', isManuallyCollapsed);
       // Auto-collapse at 150px scroll, but respect manual state
       if (!isManuallyCollapsed) {
         setIsCollapsed(scrollTop > 150);
