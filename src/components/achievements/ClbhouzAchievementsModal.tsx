@@ -356,6 +356,26 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       unlockHint: "The ultimate goal for golf course enthusiasts. Continue your incredible journey!"
     },
     {
+      title: "Britain & Ireland Explorer",
+      emoji: "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
+      isEarned: false,
+      description: "Complete the Great Britain & Ireland top golf courses list",
+      xp: 3000,
+      isRepeatable: false,
+      progress: "12 / 20 courses",
+      unlockHint: "Explore the historic golf courses across England, Scotland, Wales, and Ireland. You're making great progress!"
+    },
+    {
+      title: "European Explorer",
+      emoji: "🇪🇺",
+      isEarned: false,
+      description: "Play courses across 8 different European countries",
+      xp: 3000,
+      isRepeatable: false,
+      progress: "3 / 8 countries",
+      unlockHint: "Plan golf trips across Europe. Consider France, Spain, Portugal, Germany, and other European golf destinations."
+    },
+    {
       title: "Worldwide Explorer",
       emoji: "🌎",
       isEarned: false,
