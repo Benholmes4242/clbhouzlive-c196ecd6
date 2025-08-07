@@ -494,7 +494,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                           border rounded-lg p-4 text-center transition-all duration-200 hover:scale-105 cursor-pointer
                           ${achievement.isEarned 
                             ? 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800' 
-                            : 'bg-muted/30 border-border opacity-70'
+                            : 'bg-background border-border'
                           }
                         `}
                         onClick={() => setSelectedAchievement(achievement)}
@@ -545,7 +545,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                           border rounded-lg p-4 text-center transition-all duration-200 hover:scale-105 cursor-pointer
                           ${achievement.isEarned 
                             ? 'bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800' 
-                            : 'bg-muted/30 border-border opacity-70'
+                            : 'bg-background border-border'
                           }
                         `}
                         onClick={() => setSelectedAchievement(achievement)}
