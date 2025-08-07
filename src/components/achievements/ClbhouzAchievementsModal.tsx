@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { XPRingSystem } from "@/components/profile/XPRingSystem";
 import { Sparkles, Trophy, ChevronDown, ChevronUp } from "lucide-react";
+import { useIsMobile } from '@/hooks/use-mobile';
 
 // Achievement badge imports - using user's uploaded image
 // import club300Badge from '@/assets/achievements/300-club-champion.png';
@@ -40,6 +41,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
   isCurrentUser = true
 }) => {
   
+  const isMobile = useIsMobile();
   const [activeFilter, setActiveFilter] = useState<'all' | 'unlocked' | 'locked' | 'exploration' | 'skill'>('all');
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isManuallyCollapsed, setIsManuallyCollapsed] = useState(false);
@@ -106,19 +108,24 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
           clearTimeout(scrollDebounceTimer.current);
         }
         
-        // Update direction and handle state changes
-        if (newDirection !== 'idle') {
-          scrollDirection.current = newDirection;
-          
-          // Immediate collapse/expand based on scroll position and direction
-          if (!isManuallyCollapsed) {
-            if (newDirection === 'down' && currentScrollTop > 50) {
-              setIsCollapsed(true);
-            } else if (newDirection === 'up' && currentScrollTop < 100) {
-              setIsCollapsed(false);
+        // Add mobile-specific debounce
+        const debounceDelay = isMobile ? 150 : 50;
+        
+        scrollDebounceTimer.current = setTimeout(() => {
+          // Update direction and handle state changes
+          if (newDirection !== 'idle') {
+            scrollDirection.current = newDirection;
+            
+            // Immediate collapse/expand based on scroll position and direction
+            if (!isManuallyCollapsed) {
+              if (newDirection === 'down' && currentScrollTop > 50) {
+                setIsCollapsed(true);
+              } else if (newDirection === 'up' && currentScrollTop < 100) {
+                setIsCollapsed(false);
+              }
             }
           }
-        }
+        }, debounceDelay);
         
         lastScrollTop.current = currentScrollTop;
       };
@@ -560,9 +567,33 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
     }
   ];
 
+  // Body scroll lock effect for mobile
+  useEffect(() => {
+    if (isOpen && isMobile) {
+      const originalStyle = window.getComputedStyle(document.body).overflow;
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+      document.body.style.top = `-${window.scrollY}px`;
+      
+      return () => {
+        document.body.style.overflow = originalStyle;
+        document.body.style.position = '';
+        document.body.style.width = '';
+        document.body.style.top = '';
+        window.scrollTo(0, parseInt(document.body.style.top || '0') * -1);
+      };
+    }
+  }, [isOpen, isMobile]);
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[85vh] overflow-hidden p-0 flex flex-col bg-gradient-to-br from-green-50/30 via-blue-50/20 to-green-50/30 dark:from-green-950/10 dark:via-blue-950/10 dark:to-green-950/10"
+      <DialogContent className={`
+        ${isMobile ? 'max-w-[95vw] max-h-[90vh] p-0' : 'max-w-4xl max-h-[85vh] p-0'} 
+        overflow-hidden flex flex-col 
+        bg-gradient-to-br from-green-50/30 via-blue-50/20 to-green-50/30 
+        dark:from-green-950/10 dark:via-blue-950/10 dark:to-green-950/10
+      `}
         style={{
           backgroundImage: `
             radial-gradient(circle at 20% 50%, rgba(34, 197, 94, 0.03) 0%, transparent 50%),
@@ -571,11 +602,11 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
           `
         }}
       >
-        <DialogHeader className="p-6 pb-4 flex-shrink-0">
-          <DialogTitle className="text-2xl font-bold">
+        <DialogHeader className={`${isMobile ? 'p-4 pb-2' : 'p-6 pb-4'} flex-shrink-0`}>
+          <DialogTitle className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold`}>
             {isCurrentUser ? "Your clbhouz achievements" : `${userDisplayName}'s clbhouz achievements`}
           </DialogTitle>
-          <DialogDescription className="text-sm text-muted-foreground mt-1">
+          <DialogDescription className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground mt-1`}>
             See how far your game can take you
           </DialogDescription>
         </DialogHeader>
@@ -586,27 +617,29 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
           style={{ 
             scrollbarWidth: 'thin',
             scrollBehavior: 'smooth',
-            WebkitOverflowScrolling: 'touch'
+            WebkitOverflowScrolling: 'touch',
+            touchAction: 'pan-y',
+            overscrollBehaviorY: 'contain'
           }}
         >
           {/* User Profile Section */}
-          <div className="px-6 pb-4">
-            <div className="flex items-center justify-between bg-muted/50 rounded-lg p-4">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-white font-bold text-lg">
+          <div className={`${isMobile ? 'px-4 pb-2' : 'px-6 pb-4'}`}>
+            <div className={`flex items-center justify-between bg-muted/50 rounded-lg ${isMobile ? 'p-3' : 'p-4'}`}>
+              <div className="flex items-center gap-3">
+                <div className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-white font-bold ${isMobile ? 'text-sm' : 'text-lg'}`}>
                   {userProfilePhotoUrl ? (
                     <img 
                       src={userProfilePhotoUrl} 
                       alt={userDisplayName} 
-                      className="w-12 h-12 rounded-full object-cover"
+                      className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} rounded-full object-cover`}
                     />
                   ) : (
                     userDisplayName.charAt(0).toUpperCase()
                   )}
                 </div>
                 <div>
-                  <h3 className="font-semibold">{userDisplayName}</h3>
-                  <p className="text-sm text-muted-foreground">
+                  <h3 className={`${isMobile ? 'text-sm' : 'text-base'} font-semibold`}>{userDisplayName}</h3>
+                  <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
                     {userHandicap ? `Handicap: ${userHandicap}` : 'No handicap set'}
                   </p>
                 </div>
@@ -616,14 +649,18 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
 
           {/* Collapsible XP Progress Header with Smooth Animations */}
           <div className={`sticky top-0 z-10 bg-background/95 backdrop-blur-sm transition-all duration-400 ease-in-out ${
-            isCollapsed ? 'px-6 py-3' : 'px-6 pb-4'
+            isCollapsed 
+              ? isMobile ? 'px-4 py-2' : 'px-6 py-3' 
+              : isMobile ? 'px-4 pb-3' : 'px-6 pb-4'
           }`}>
             {isCollapsed ? (
               /* Collapsed Mini View */
-              <div className="flex items-center justify-between bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-lg p-3 border border-blue-200/50 dark:border-blue-800/50">
-                <div className="flex items-center gap-3">
-                  <div className="relative w-8 h-8">
-                    <svg className="w-8 h-8 transform -rotate-90" viewBox="0 0 32 32">
+              <div className={`flex items-center justify-between bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-lg border border-blue-200/50 dark:border-blue-800/50 shadow-md ${
+                isMobile ? 'p-2 max-h-[52px]' : 'p-3'
+              }`}>
+                <div className="flex items-center gap-2">
+                  <div className={`relative ${isMobile ? 'w-6 h-6' : 'w-8 h-8'}`}>
+                    <svg className={`${isMobile ? 'w-6 h-6' : 'w-8 h-8'} transform -rotate-90`} viewBox="0 0 32 32">
                       <circle
                         cx="16"
                         cy="16"
@@ -646,11 +683,13 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                         className="transition-all duration-700"
                       />
                     </svg>
-                    <Trophy className="absolute inset-0 w-4 h-4 m-auto text-muted-foreground" />
+                    <Trophy className={`absolute inset-0 m-auto text-muted-foreground ${isMobile ? 'w-3 h-3' : 'w-4 h-4'}`} />
                   </div>
-                  <div className="text-sm font-medium">{totalXP.toLocaleString()} XP | {progressPercentage.toFixed(0)}% to {nextTier.name}</div>
+                  <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium`}>
+                    {totalXP.toLocaleString()} XP | {progressPercentage.toFixed(0)}% to {nextTier.name}
+                  </div>
                 </div>
-                <div className="flex-1 mx-4 bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+                <div className={`flex-1 mx-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden ${isMobile ? 'h-1.5' : 'h-2'}`}>
                   <div 
                     className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-1000 ease-out"
                     style={{ 
@@ -659,161 +698,219 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                     }}
                   />
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="text-xs text-muted-foreground">
-                    Next: {nextTier.name} at {nextTier.minXP.toLocaleString()} XP
-                  </div>
+                <div className="flex items-center gap-1">
+                  {!isMobile && (
+                    <div className="text-xs text-muted-foreground">
+                      Next: {nextTier.name} at {nextTier.minXP.toLocaleString()} XP
+                    </div>
+                  )}
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={handleToggleCollapse}
-                    className="p-1 h-6 w-6"
+                    className={`p-1 ${isMobile ? 'h-5 w-5' : 'h-6 w-6'}`}
                   >
-                    <ChevronDown className="h-3 w-3" />
+                    <ChevronDown className={`${isMobile ? 'h-2.5 w-2.5' : 'h-3 w-3'}`} />
                   </Button>
                 </div>
               </div>
             ) : (
-              /* Full XP Ring Section */
-              <div className="bg-gradient-to-br from-blue-50 via-purple-50 to-blue-50 dark:from-blue-950/20 dark:via-purple-950/20 dark:to-blue-950/20 rounded-xl p-6 border border-blue-200 dark:border-blue-800 relative overflow-hidden">
+              /* Full XP Ring Section - Mobile Optimized */
+              <div className={`bg-gradient-to-br from-blue-50 via-purple-50 to-blue-50 dark:from-blue-950/20 dark:via-purple-950/20 dark:to-blue-950/20 rounded-xl border border-blue-200 dark:border-blue-800 relative overflow-hidden ${
+                isMobile ? 'p-3' : 'p-6'
+              }`}>
                 {/* Celebration Animation Overlay */}
                 {showCelebration && (
                   <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-r from-yellow-400/20 to-orange-400/20 rounded-xl animate-pulse">
-                    <div className="text-6xl animate-bounce">🎉</div>
+                    <div className={`${isMobile ? 'text-4xl' : 'text-6xl'} animate-bounce`}>🎉</div>
                   </div>
                 )}
                 
-                {/* Header with XP and Collapse Button */}
-                <div className="flex justify-between items-start mb-6">
-                  <div>
-                    <h3 className="text-lg font-bold text-foreground mb-1">XP Progress</h3>
-                    <p className="text-sm text-muted-foreground">Keep playing to unlock new rings!</p>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-foreground flex items-center gap-2">
-                        <Sparkles className={`w-5 h-5 ${nextTier ? 'text-yellow-500 animate-pulse' : 'text-muted-foreground'}`} />
-                        {totalXP.toLocaleString()} XP
+                {/* Mobile Stacked Layout */}
+                {isMobile ? (
+                  <div className="space-y-3">
+                    {/* Header with collapse button */}
+                    <div className="flex justify-between items-center">
+                      <div className="text-center flex-1">
+                        <div className="text-xl font-bold text-foreground flex items-center justify-center gap-2 mb-1">
+                          <Sparkles className={`w-4 h-4 ${nextTier ? 'text-yellow-500 animate-pulse' : 'text-muted-foreground'}`} />
+                          {totalXP.toLocaleString()} XP
+                        </div>
+                        <div className="text-xs text-muted-foreground">Current Progress</div>
                       </div>
-                      <div className="text-xs text-muted-foreground">Current Progress</div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleToggleCollapse}
+                        className="p-1 h-6 w-6"
+                      >
+                        <ChevronUp className="h-3 w-3" />
+                      </Button>
                     </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={handleToggleCollapse}
-                      className="p-1 h-8 w-8"
-                    >
-                      <ChevronUp className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-                
-                {/* Main Progress Ring and Info */}
-                <div className="flex justify-center mb-6">
-                  <div className="flex items-center gap-12">
-                    {/* Enhanced Progress Ring */}
-                    <div className="relative flex-shrink-0">
-                      <div className="relative w-40 h-40">
-                        {/* Glow effect for next goal */}
-                        <div className={`absolute inset-0 rounded-full ${nextTier ? 'animate-pulse' : ''}`} 
-                             style={{ 
-                               boxShadow: nextTier ? `0 0 30px ${nextTier.color}40` : 'none'
-                             }} />
-                        
-                        <svg className="w-40 h-40 transform -rotate-90" viewBox="0 0 160 160">
-                          {/* Background circle */}
-                          <circle
-                            cx="80"
-                            cy="80"
-                            r="70"
-                            stroke="currentColor"
-                            strokeWidth="12"
-                            fill="transparent"
-                            className="text-gray-300 dark:text-gray-600"
-                          />
-                          {/* Animated progress circle */}
-                          <circle
-                            cx="80"
-                            cy="80"
-                            r="70"
-                            stroke={`url(#progressGradient)`}
-                            strokeWidth="12"
-                            fill="transparent"
-                            strokeDasharray={`${70 * 2 * Math.PI}`}
-                            strokeDashoffset={animateProgress ? 
-                              `${70 * 2 * Math.PI * (1 - progressPercentage / 100)}` : 
-                              `${70 * 2 * Math.PI}`
-                            }
-                            strokeLinecap="round"
-                            className="transition-all duration-1000 ease-out"
-                            style={{
-                              filter: 'drop-shadow(0 0 12px rgba(59, 130, 246, 0.6))'
-                            }}
-                          />
-                          {/* Gradient definition */}
-                          <defs>
-                            <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                              <stop offset="0%" stopColor="#3B82F6" />
-                              <stop offset="50%" stopColor="#8B5CF6" />
-                              <stop offset="100%" stopColor="#06B6D4" />
-                            </linearGradient>
-                          </defs>
-                        </svg>
-                        
-                        {/* Center content */}
-                        <div className="absolute inset-0 flex flex-col items-center justify-center">
-                          <div className="text-2xl font-bold text-foreground mb-1">
-                            {(nextTier.minXP - totalXP).toLocaleString()}
-                          </div>
-                          <div className="text-xs text-muted-foreground text-center mb-2">
-                            XP to next ring
-                          </div>
-                          <div className="text-xs font-medium" style={{ color: nextTier.color }}>
-                            {Math.round(progressPercentage)}% Complete
-                          </div>
+                    
+                    {/* Progress Bar */}
+                    <div className="space-y-1">
+                      <div className="flex justify-between text-xs text-muted-foreground">
+                        <span>Progress to {nextTier.name}</span>
+                        <span className="font-medium">{Math.round(progressPercentage)}%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden">
+                        <div 
+                          className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 rounded-full transition-all duration-1000 ease-out relative"
+                          style={{ 
+                            width: animateProgress ? `${progressPercentage}%` : '0%',
+                            boxShadow: '0 0 15px rgba(59, 130, 246, 0.6)'
+                          }}
+                        >
+                          <div className="absolute inset-0 bg-white/20 animate-pulse" />
                         </div>
                       </div>
                     </div>
                     
-                    {/* Ring Info */}
-                    <div className="w-64 space-y-4">
-                      <div className="space-y-2">
-                        <h3 className="font-semibold text-xl text-muted-foreground">
-                          {currentTier ? currentTier.name : 'No Ring Achieved'}
-                        </h3>
-                        <p className="text-sm text-muted-foreground">
-                          {currentTier ? 
-                            `Congratulations! You've earned the ${currentTier.name}!` :
-                            `Reach ${nextTier.minXP.toLocaleString()} XP to unlock your first ring`
-                          }
-                        </p>
-                        <div className="flex items-center gap-2 text-sm font-medium" style={{ color: nextTier.color }}>
-                          <Trophy className="w-4 h-4" />
-                          Next: {nextTier.name} at {nextTier.minXP.toLocaleString()} XP
+                    {/* Next ring text and toggle */}
+                    <div className="text-center text-xs text-muted-foreground">
+                      Next: {nextTier.name} at {nextTier.minXP.toLocaleString()} XP
+                    </div>
+                  </div>
+                ) : (
+                  /* Desktop Header Layout */
+                  <div>
+                    <div className="flex justify-between items-start mb-6">
+                      <div>
+                        <h3 className="text-lg font-bold text-foreground mb-1">XP Progress</h3>
+                        <p className="text-sm text-muted-foreground">Keep playing to unlock new rings!</p>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <div className="text-right">
+                          <div className="text-2xl font-bold text-foreground flex items-center gap-2">
+                            <Sparkles className={`w-5 h-5 ${nextTier ? 'text-yellow-500 animate-pulse' : 'text-muted-foreground'}`} />
+                            {totalXP.toLocaleString()} XP
+                          </div>
+                          <div className="text-xs text-muted-foreground">Current Progress</div>
                         </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={handleToggleCollapse}
+                          className="p-1 h-8 w-8"
+                        >
+                          <ChevronUp className="h-4 w-4" />
+                        </Button>
                       </div>
                     </div>
                   </div>
-                </div>
-
-                {/* Horizontal Progress Bar */}
-                <div className="mb-6">
-                  <div className="flex justify-between text-sm mb-2">
-                    <span className="text-muted-foreground">Progress to {nextTier.name}</span>
-                    <span className="font-medium">{Math.round(progressPercentage)}%</span>
-                  </div>
-                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
-                    <div 
-                      className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 rounded-full transition-all duration-1000 ease-out relative"
-                      style={{ 
-                        width: animateProgress ? `${progressPercentage}%` : '0%',
-                        boxShadow: '0 0 15px rgba(59, 130, 246, 0.6)'
-                      }}
-                    >
-                      <div className="absolute inset-0 bg-white/20 animate-pulse" />
+                )}
+                
+                {/* Main Progress Ring and Info - Desktop Only */}
+                {!isMobile && (
+                  <>
+                    <div className="flex justify-center mb-6">
+                      <div className="flex items-center gap-12">
+                        {/* Enhanced Progress Ring */}
+                        <div className="relative flex-shrink-0">
+                          <div className="relative w-40 h-40">
+                            {/* Glow effect for next goal */}
+                            <div className={`absolute inset-0 rounded-full ${nextTier ? 'animate-pulse' : ''}`} 
+                                 style={{ 
+                                   boxShadow: nextTier ? `0 0 30px ${nextTier.color}40` : 'none'
+                                 }} />
+                            
+                            <svg className="w-40 h-40 transform -rotate-90" viewBox="0 0 160 160">
+                              {/* Background circle */}
+                              <circle
+                                cx="80"
+                                cy="80"
+                                r="70"
+                                stroke="currentColor"
+                                strokeWidth="12"
+                                fill="transparent"
+                                className="text-gray-300 dark:text-gray-600"
+                              />
+                              {/* Animated progress circle */}
+                              <circle
+                                cx="80"
+                                cy="80"
+                                r="70"
+                                stroke={`url(#progressGradient)`}
+                                strokeWidth="12"
+                                fill="transparent"
+                                strokeDasharray={`${70 * 2 * Math.PI}`}
+                                strokeDashoffset={animateProgress ? 
+                                  `${70 * 2 * Math.PI * (1 - progressPercentage / 100)}` : 
+                                  `${70 * 2 * Math.PI}`
+                                }
+                                strokeLinecap="round"
+                                className="transition-all duration-1000 ease-out"
+                                style={{
+                                  filter: 'drop-shadow(0 0 12px rgba(59, 130, 246, 0.6))'
+                                }}
+                              />
+                              {/* Gradient definition */}
+                              <defs>
+                                <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                  <stop offset="0%" stopColor="#3B82F6" />
+                                  <stop offset="50%" stopColor="#8B5CF6" />
+                                  <stop offset="100%" stopColor="#06B6D4" />
+                                </linearGradient>
+                              </defs>
+                            </svg>
+                            
+                            {/* Center content */}
+                            <div className="absolute inset-0 flex flex-col items-center justify-center">
+                              <div className="text-2xl font-bold text-foreground mb-1">
+                                {(nextTier.minXP - totalXP).toLocaleString()}
+                              </div>
+                              <div className="text-xs text-muted-foreground text-center mb-2">
+                                XP to next ring
+                              </div>
+                              <div className="text-xs font-medium" style={{ color: nextTier.color }}>
+                                {Math.round(progressPercentage)}% Complete
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Ring Info */}
+                        <div className="w-64 space-y-4">
+                          <div className="space-y-2">
+                            <h3 className="font-semibold text-xl text-muted-foreground">
+                              {currentTier ? currentTier.name : 'No Ring Achieved'}
+                            </h3>
+                            <p className="text-sm text-muted-foreground">
+                              {currentTier ? 
+                                `Congratulations! You've earned the ${currentTier.name}!` :
+                                `Reach ${nextTier.minXP.toLocaleString()} XP to unlock your first ring`
+                              }
+                            </p>
+                            <div className="flex items-center gap-2 text-sm font-medium" style={{ color: nextTier.color }}>
+                              <Trophy className="w-4 h-4" />
+                              Next: {nextTier.name} at {nextTier.minXP.toLocaleString()} XP
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
+
+                    {/* Horizontal Progress Bar */}
+                    <div className="mb-6">
+                      <div className="flex justify-between text-sm mb-2">
+                        <span className="text-muted-foreground">Progress to {nextTier.name}</span>
+                        <span className="font-medium">{Math.round(progressPercentage)}%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
+                        <div 
+                          className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 rounded-full transition-all duration-1000 ease-out relative"
+                          style={{ 
+                            width: animateProgress ? `${progressPercentage}%` : '0%',
+                            boxShadow: '0 0 15px rgba(59, 130, 246, 0.6)'
+                          }}
+                        >
+                          <div className="absolute inset-0 bg-white/20 animate-pulse" />
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
 
                 {/* Ring Tier Display */}
                 <div className="w-full">
@@ -857,31 +954,78 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
             )}
           </div>
 
-          {/* Filter Buttons */}
-          <div className="px-6 pb-6">
-            <div className="flex flex-wrap gap-2 justify-center">
-              {['all', 'unlocked', 'locked', 'exploration', 'skill'].map((filter) => (
-                <Button
-                  key={filter}
-                  variant={activeFilter === filter ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setActiveFilter(filter as typeof activeFilter)}
-                  className={`
-                    capitalize transition-all duration-200 hover:scale-105
-                    ${activeFilter === filter 
-                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg' 
-                      : 'hover:bg-muted/80'
-                    }
-                  `}
-                >
-                  {filter === 'all' ? 'All Achievements' : 
-                   filter === 'unlocked' ? 'Unlocked Only' :
-                   filter === 'locked' ? 'Locked Only' :
-                   filter === 'exploration' ? 'Experience & Exploration' :
-                   'Skill-Based'}
-                </Button>
-              ))}
-            </div>
+          {/* Filter Buttons - Mobile Optimized */}
+          <div className={`${isMobile ? 'px-4 pb-4' : 'px-6 pb-6'}`}>
+            {isMobile ? (
+              /* Mobile: 2 rows layout */
+              <div className="space-y-2">
+                <div className="flex gap-1.5 justify-center">
+                  {['all', 'unlocked', 'locked'].map((filter) => (
+                    <Button
+                      key={filter}
+                      variant={activeFilter === filter ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setActiveFilter(filter as typeof activeFilter)}
+                      className={`
+                        capitalize transition-all duration-200 text-xs h-8 px-3
+                        ${activeFilter === filter 
+                          ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg' 
+                          : 'hover:bg-muted/80'
+                        }
+                      `}
+                    >
+                      {filter === 'all' ? 'All' : 
+                       filter === 'unlocked' ? 'Unlocked' :
+                       'Locked'}
+                    </Button>
+                  ))}
+                </div>
+                <div className="flex gap-1.5 justify-center">
+                  {['exploration', 'skill'].map((filter) => (
+                    <Button
+                      key={filter}
+                      variant={activeFilter === filter ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setActiveFilter(filter as typeof activeFilter)}
+                      className={`
+                        capitalize transition-all duration-200 text-xs h-8 px-3
+                        ${activeFilter === filter 
+                          ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg' 
+                          : 'hover:bg-muted/80'
+                        }
+                      `}
+                    >
+                      {filter === 'exploration' ? 'Exploration' : 'Skill-Based'}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              /* Desktop: single row layout */
+              <div className="flex flex-wrap gap-2 justify-center">
+                {['all', 'unlocked', 'locked', 'exploration', 'skill'].map((filter) => (
+                  <Button
+                    key={filter}
+                    variant={activeFilter === filter ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setActiveFilter(filter as typeof activeFilter)}
+                    className={`
+                      capitalize transition-all duration-200 hover:scale-105
+                      ${activeFilter === filter 
+                        ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg' 
+                        : 'hover:bg-muted/80'
+                      }
+                    `}
+                  >
+                    {filter === 'all' ? 'All Achievements' : 
+                     filter === 'unlocked' ? 'Unlocked Only' :
+                     filter === 'locked' ? 'Locked Only' :
+                     filter === 'exploration' ? 'Experience & Exploration' :
+                     'Skill-Based'}
+                  </Button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Experience & Exploration Achievements Section */}
@@ -890,17 +1034,17 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
               {/* Card Container with Visual Grouping */}
               <div className="bg-gradient-to-br from-blue-50/80 to-cyan-50/60 dark:from-blue-950/20 dark:to-cyan-950/15 rounded-2xl p-6 border border-blue-200/40 dark:border-blue-800/40 shadow-xl backdrop-blur-sm">
                 {/* Section Header with Icon */}
-                <div className="flex items-center justify-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
-                    <span className="text-xl">🧭</span>
+                  <div className={`flex items-center justify-center gap-3 ${isMobile ? 'mb-3' : 'mb-6'}`}>
+                    <div className={`${isMobile ? 'w-8 h-8' : 'w-10 h-10'} rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center`}>
+                      <span className={`${isMobile ? 'text-lg' : 'text-xl'}`}>🧭</span>
+                    </div>
+                    <h3 className={`${isMobile ? 'text-base' : 'text-xl'} font-bold text-blue-800 dark:text-blue-200`}>
+                      Experience & Exploration Achievements
+                    </h3>
                   </div>
-                  <h3 className="text-xl font-bold text-blue-800 dark:text-blue-200">
-                    Experience & Exploration Achievements
-                  </h3>
-                </div>
                 
                 <TooltipProvider>
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className={`grid grid-cols-3 ${isMobile ? 'gap-2' : 'gap-4'}`}>
                     {getFilteredAchievements(explorationAchievements, 'exploration').map((achievement) => {
                       const { percentage, nudgeText } = getAchievementProgress(achievement);
                       const isNearUnlock = percentage >= 80 && percentage < 100;
@@ -909,33 +1053,36 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                         <Tooltip key={achievement.title}>
                           <TooltipTrigger asChild>
                             <div className="relative">
-                              <div
-                                className={`
-                                  border rounded-xl p-2 transition-all duration-200 hover:scale-105 cursor-pointer flex items-center gap-2 
-                                  bg-white/80 dark:bg-gray-900/40 backdrop-blur-sm
-                                  shadow-lg hover:shadow-xl
-                                  ${achievement.isEarned 
-                                    ? 'border-blue-300 dark:border-blue-700 shadow-blue-100/50 dark:shadow-blue-900/20' 
-                                    : isNearUnlock
-                                      ? 'border-orange-400 dark:border-orange-600 shadow-orange-100/50 dark:shadow-orange-900/20 animate-pulse'
-                                      : 'border-blue-200/50 dark:border-blue-800/50 hover:border-blue-300 dark:hover:border-blue-700'
-                                  }
-                                `}
-                              >
-                                <div className="flex-shrink-0 flex justify-center items-center min-w-0">
-                                  {getAchievementIcon(achievement)}
-                                </div>
-                                <div className="flex-1 text-center">
-                                  <h4 className="font-medium text-sm mb-1">
-                                    {achievement.title}
-                                  </h4>
-                                  <p className={`text-xs ${achievement.isEarned ? 'text-blue-600 dark:text-blue-400' : 'text-muted-foreground'}`}>
-                                    <span className="inline-flex items-center gap-1">
-                                      <span className="text-amber-500">✨</span>
-                                      +{achievement.xp} XP 
-                                      {achievement.isRepeatable ? " 🔄" : " 🏆"}
-                                    </span>
-                                  </p>
+                                <div
+                                  className={`
+                                    border rounded-xl transition-all duration-200 hover:scale-105 cursor-pointer 
+                                    bg-white/80 dark:bg-gray-900/40 backdrop-blur-sm
+                                    shadow-lg hover:shadow-xl
+                                    ${isMobile ? 'p-1.5 flex flex-col items-center text-center space-y-1' : 'p-2 flex items-center gap-2'}
+                                    ${achievement.isEarned 
+                                      ? 'border-blue-300 dark:border-blue-700 shadow-blue-100/50 dark:shadow-blue-900/20' 
+                                      : isNearUnlock
+                                        ? 'border-orange-400 dark:border-orange-600 shadow-orange-100/50 dark:shadow-orange-900/20 animate-pulse'
+                                        : 'border-blue-200/50 dark:border-blue-800/50 hover:border-blue-300 dark:hover:border-blue-700'
+                                    }
+                                  `}
+                                >
+                                  <div className={`flex justify-center items-center ${isMobile ? 'mb-1' : 'flex-shrink-0 min-w-0'}`}>
+                                    <div className={isMobile ? 'scale-75' : ''}>
+                                      {getAchievementIcon(achievement)}
+                                    </div>
+                                  </div>
+                                  <div className={`text-center ${isMobile ? '' : 'flex-1'}`}>
+                                    <h4 className={`font-medium mb-1 ${isMobile ? 'text-xs leading-tight' : 'text-sm'}`}>
+                                      {achievement.title}
+                                    </h4>
+                                    <p className={`${isMobile ? 'text-xs' : 'text-xs'} ${achievement.isEarned ? 'text-blue-600 dark:text-blue-400' : 'text-muted-foreground'}`}>
+                                      <span className="inline-flex items-center gap-1">
+                                        <span className="text-amber-500">✨</span>
+                                        +{achievement.xp} XP 
+                                        {achievement.isRepeatable ? " 🔄" : " 🏆"}
+                                      </span>
+                                    </p>
                                   
                                   {/* Smart Nudge Label */}
                                   {nudgeText && (
@@ -1028,17 +1175,17 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
               {/* Card Container with Visual Grouping */}
               <div className="bg-gradient-to-br from-green-50/80 to-emerald-50/60 dark:from-green-950/20 dark:to-emerald-950/15 rounded-2xl p-6 border border-green-200/40 dark:border-green-800/40 shadow-xl backdrop-blur-sm">
                 {/* Section Header with Icon */}
-                <div className="flex items-center justify-center gap-3 mb-6">
-                  <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/50 flex items-center justify-center">
-                    <span className="text-xl">💪</span>
+                  <div className={`flex items-center justify-center gap-3 ${isMobile ? 'mb-3' : 'mb-6'}`}>
+                    <div className={`${isMobile ? 'w-8 h-8' : 'w-10 h-10'} rounded-full bg-green-100 dark:bg-green-900/50 flex items-center justify-center`}>
+                      <span className={`${isMobile ? 'text-lg' : 'text-xl'}`}>💪</span>
+                    </div>
+                    <h3 className={`${isMobile ? 'text-base' : 'text-xl'} font-bold text-green-800 dark:text-green-200`}>
+                      Skill & Performance Achievements
+                    </h3>
                   </div>
-                  <h3 className="text-xl font-bold text-green-800 dark:text-green-200">
-                    Skill & Performance Achievements
-                  </h3>
-                </div>
                 
                 <TooltipProvider>
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className={`grid grid-cols-3 ${isMobile ? 'gap-2' : 'gap-4'}`}>
                     {getFilteredAchievements(skillAchievements, 'skill').map((achievement) => {
                       const { percentage, nudgeText } = getAchievementProgress(achievement);
                       const isNearUnlock = percentage >= 80 && percentage < 100;
@@ -1047,34 +1194,36 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                         <Tooltip key={achievement.title}>
                           <TooltipTrigger asChild>
                             <div className="relative">
-                              <div
-                                className={`
-                                  border rounded-xl p-2 transition-all duration-200 hover:scale-105 cursor-pointer flex items-center gap-2 
-                                  bg-white/80 dark:bg-gray-900/40 backdrop-blur-sm
-                                  shadow-lg hover:shadow-xl
-                                  ${achievement.isEarned 
-                                    ? 'border-green-300 dark:border-green-700 shadow-green-100/50 dark:shadow-green-900/20' 
-                                    : isNearUnlock
-                                      ? 'border-orange-400 dark:border-orange-600 shadow-orange-100/50 dark:shadow-orange-900/20 animate-pulse'
-                                      : 'border-green-200/50 dark:border-green-800/50 hover:border-green-300 dark:hover:border-green-700'
-                                  }
-                                `}
-                                
-                              >
-                                <div className="flex-shrink-0 flex justify-center items-center min-w-0">
-                                  {getAchievementIcon(achievement)}
-                                </div>
-                                <div className="flex-1 text-center">
-                                  <h4 className="font-medium text-sm mb-1">
-                                    {achievement.title}
-                                  </h4>
-                                  <p className={`text-xs ${achievement.isEarned ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}`}>
-                                    <span className="inline-flex items-center gap-1">
-                                      <span className="text-amber-500">✨</span>
-                                      +{achievement.xp} XP 
-                                      {achievement.isRepeatable ? " 🔄" : " 🏆"}
-                                    </span>
-                                  </p>
+                                <div
+                                  className={`
+                                    border rounded-xl transition-all duration-200 hover:scale-105 cursor-pointer 
+                                    bg-white/80 dark:bg-gray-900/40 backdrop-blur-sm
+                                    shadow-lg hover:shadow-xl
+                                    ${isMobile ? 'p-1.5 flex flex-col items-center text-center space-y-1' : 'p-2 flex items-center gap-2'}
+                                    ${achievement.isEarned 
+                                      ? 'border-green-300 dark:border-green-700 shadow-green-100/50 dark:shadow-green-900/20' 
+                                      : isNearUnlock
+                                        ? 'border-orange-400 dark:border-orange-600 shadow-orange-100/50 dark:shadow-orange-900/20 animate-pulse'
+                                        : 'border-green-200/50 dark:border-green-800/50 hover:border-green-300 dark:hover:border-green-700'
+                                    }
+                                  `}
+                                >
+                                  <div className={`flex justify-center items-center ${isMobile ? 'mb-1' : 'flex-shrink-0 min-w-0'}`}>
+                                    <div className={isMobile ? 'scale-75' : ''}>
+                                      {getAchievementIcon(achievement)}
+                                    </div>
+                                  </div>
+                                  <div className={`text-center ${isMobile ? '' : 'flex-1'}`}>
+                                    <h4 className={`font-medium mb-1 ${isMobile ? 'text-xs leading-tight' : 'text-sm'}`}>
+                                      {achievement.title}
+                                    </h4>
+                                    <p className={`${isMobile ? 'text-xs' : 'text-xs'} ${achievement.isEarned ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}`}>
+                                      <span className="inline-flex items-center gap-1">
+                                        <span className="text-amber-500">✨</span>
+                                        +{achievement.xp} XP 
+                                        {achievement.isRepeatable ? " 🔄" : " 🏆"}
+                                      </span>
+                                    </p>
                                   
                                   {/* Smart Nudge Label */}
                                   {nudgeText && (
