@@ -351,9 +351,9 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
               </div>
               
               {/* Progress Ring and Info */}
-              <div className="flex items-center justify-center gap-8 mb-6">
+              <div className="flex items-center justify-center gap-12 mb-6">
                 {/* Progress Ring - Left */}
-                <div className="relative">
+                <div className="relative flex-shrink-0">
                   <div className="relative w-32 h-32">
                     <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 120 120">
                       {/* Background circle */}
@@ -396,7 +396,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                 </div>
                 
                 {/* Ring Info - Right */}
-                <div className="flex-1 max-w-xs">
+                <div className="flex-1 min-w-0">
                   <div className="space-y-2">
                     <h3 className="font-semibold text-lg text-gray-500">
                       No Ring Achieved
