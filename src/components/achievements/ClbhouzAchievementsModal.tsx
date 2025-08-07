@@ -1039,7 +1039,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
 
           {/* Experience & Exploration Achievements Section */}
           {(activeFilter === 'all' || activeFilter === 'exploration') && getFilteredAchievements(explorationAchievements, 'exploration').length > 0 && (
-            <div className={`${isMobile ? 'px-4 pb-4' : 'px-6 pb-8'}`}>
+            <div className={`${isMobile ? 'px-4 pb-4' : 'px-6 pb-6'}`}>
               {/* Card Container with Visual Grouping */}
               <div className={`bg-gradient-to-br from-blue-50/80 to-cyan-50/60 dark:from-blue-950/20 dark:to-cyan-950/15 rounded-2xl ${isMobile ? 'p-3' : 'p-6'} border border-blue-200/40 dark:border-blue-800/40 shadow-xl backdrop-blur-sm`}>
                 {/* Section Header with Icon */}
@@ -1182,7 +1182,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
 
           {/* Skill & Performance Achievements Section */}
           {(activeFilter === 'all' || activeFilter === 'skill') && getFilteredAchievements(skillAchievements, 'skill').length > 0 && (
-            <div className={`${isMobile ? 'px-4 pb-4' : 'px-6 pb-8'}`}>
+            <div className={`${isMobile ? 'px-4 pb-4' : 'px-6 pb-6'}`}>
               {/* Card Container with Visual Grouping */}
               <div className={`bg-gradient-to-br from-green-50/80 to-emerald-50/60 dark:from-green-950/20 dark:to-emerald-950/15 rounded-2xl ${isMobile ? 'p-3' : 'p-6'} border border-green-200/40 dark:border-green-800/40 shadow-xl backdrop-blur-sm`}>
                 {/* Section Header with Icon */}
