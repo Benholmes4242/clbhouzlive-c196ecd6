@@ -976,11 +976,12 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                               
                               {/* XP Value */}
                               <div className="flex items-center justify-between mb-2">
-                                <span className="text-xs font-medium text-primary">
+                                <span className="text-xs font-medium text-primary inline-flex items-center gap-1">
+                                  <span className="text-amber-500">✨</span>
                                   +{achievement.xp} XP
                                 </span>
-                                <span className="text-xs text-muted-foreground">
-                                  {achievement.isRepeatable ? "Repeatable" : "One-time"}
+                                <span className="text-xs text-muted-foreground inline-flex items-center gap-1">
+                                  {achievement.isRepeatable ? "🔄 Repeatable" : "🏆 One-time"}
                                 </span>
                               </div>
                               
@@ -1114,11 +1115,12 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                               
                               {/* XP Value */}
                               <div className="flex items-center justify-between mb-2">
-                                <span className="text-xs font-medium text-primary">
+                                <span className="text-xs font-medium text-primary inline-flex items-center gap-1">
+                                  <span className="text-amber-500">✨</span>
                                   +{achievement.xp} XP
                                 </span>
-                                <span className="text-xs text-muted-foreground">
-                                  {achievement.isRepeatable ? "Repeatable" : "One-time"}
+                                <span className="text-xs text-muted-foreground inline-flex items-center gap-1">
+                                  {achievement.isRepeatable ? "🔄 Repeatable" : "🏆 One-time"}
                                 </span>
                               </div>
                               
