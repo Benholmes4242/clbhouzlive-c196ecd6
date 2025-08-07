@@ -4,8 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { XPRingSystem } from "@/components/profile/XPRingSystem";
 
-// Achievement badge imports
-import club20Badge from '@/assets/achievements/20-club.png';
+// Achievement badge imports will be added when badges are provided
 
 interface ClbhouzAchievementsModalProps {
   isOpen: boolean;
@@ -54,7 +53,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
     // Use custom badges for club achievements instead of padlocks
     switch (achievement.title) {
       case "20 Club":
-        return <img src={club20Badge} alt="20 Club Badge" className="w-16 h-16" />;
+        return '🔒';
       case "50 Club":
         return '🔒';
       case "100 Century Club":
