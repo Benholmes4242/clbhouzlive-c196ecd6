@@ -50,11 +50,11 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
     // Use custom badges for specific achievements regardless of earned status
     switch (achievement.title) {
       case "20 Club":
-        return <img src="/lovable-uploads/a33df9b4-0089-43ca-913d-132fc5b11cc3.png" alt="20 Club Badge" className="w-28 h-28" />;
+        return <img src="/lovable-uploads/a33df9b4-0089-43ca-913d-132fc5b11cc3.png" alt="20 Club Badge" className="w-24 h-24" />;
       case "50 Club":
-        return <img src="/lovable-uploads/c1ba04e8-7aed-40e6-948b-0b65fdc932b2.png" alt="50 Club Badge" className="w-28 h-28" />;
+        return <img src="/lovable-uploads/c1ba04e8-7aed-40e6-948b-0b65fdc932b2.png" alt="50 Club Badge" className="w-24 h-24" />;
       case "100 Century Club":
-        return <img src="/lovable-uploads/91e26115-098d-4b21-9b29-7e1800fe52bd.png" alt="100 Century Club Badge" className="w-28 h-28" />;
+        return <img src="/lovable-uploads/91e26115-098d-4b21-9b29-7e1800fe52bd.png" alt="100 Century Club Badge" className="w-24 h-24" />;
       case "200 Clubhouse Elite":
         return <img src="/lovable-uploads/b566e805-826b-4005-b9d1-c5bdc87786b1.png" alt="200 Clubhouse Elite Badge" className="w-28 h-28" />;
       case "300 Club Champion":
