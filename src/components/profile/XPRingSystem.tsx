@@ -237,7 +237,7 @@ export const XPRingSystem: React.FC<XPRingSystemProps> = ({
                         </p>
                         {isCurrent && (
                           <p className="text-xs font-medium mt-1" style={{ color: tier.color }}>
-                            {currentXP?.toLocaleString() || '0'} XP
+                            {currentXP.toLocaleString()} XP
                           </p>
                         )}
                       </div>
@@ -308,7 +308,7 @@ export const XPRingSystem: React.FC<XPRingSystemProps> = ({
         {/* XP Amount overlay */}
         <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2">
           <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded px-2 py-1">
-            <span className="text-xs font-medium">{currentXP?.toLocaleString() || '0'}</span>
+            <span className="text-xs font-medium">{currentXP.toLocaleString()}</span>
           </div>
         </div>
       </div>
@@ -404,7 +404,7 @@ export const XPRingSystem: React.FC<XPRingSystemProps> = ({
                     </p>
                     {isCurrent && (
                       <p className="text-xs font-medium mt-1" style={{ color: tier.color }}>
-                        {currentXP?.toLocaleString() || '0'} XP
+                        {currentXP.toLocaleString()} XP
                       </p>
                     )}
                   </div>
