@@ -79,72 +79,75 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
 
   // Smart scroll detection with direction threshold and debouncing
   useEffect(() => {
-    const scrollElement = scrollRef.current;
-    if (!scrollElement) {
-      console.log('🔍 Scroll element not found');
-      return;
-    }
-
-    console.log('📜 Setting up enhanced scroll listener');
-
-    const handleScroll = () => {
-      const currentScrollTop = scrollElement.scrollTop;
-      const scrollDelta = currentScrollTop - lastScrollTop.current;
-      const absScrollDelta = Math.abs(scrollDelta);
-      
-      console.log('📍 Scroll - position:', currentScrollTop, 'delta:', scrollDelta, 'isManuallyCollapsed:', isManuallyCollapsed, 'current isCollapsed:', isCollapsed);
-      
-      // Only process significant scroll movements (minimum 5px)
-      if (absScrollDelta < 5) {
-        console.log('⏭️ Skipping small movement:', absScrollDelta);
+    if (!isOpen) return;
+    
+    // Add a small delay to ensure the modal is fully rendered
+    const timeoutId = setTimeout(() => {
+      const scrollElement = scrollRef.current;
+      if (!scrollElement) {
+        console.log('🔍 Scroll element still not found after delay');
         return;
       }
-      
-      // Determine scroll direction
-      const newDirection = scrollDelta > 0 ? 'down' : scrollDelta < 0 ? 'up' : 'idle';
-      console.log('🧭 Direction:', newDirection, 'previous:', scrollDirection.current);
-      
-      // Clear existing timers
-      if (scrollDebounceTimer.current) {
-        clearTimeout(scrollDebounceTimer.current);
-      }
-      if (directionChangeTimer.current) {
-        clearTimeout(directionChangeTimer.current);
-      }
-      
-      // Only update direction if it's a significant change
-      if (newDirection !== scrollDirection.current && newDirection !== 'idle') {
-        scrollDirection.current = newDirection;
-        console.log('🔄 Direction changed to:', newDirection);
+
+      console.log('📜 Setting up enhanced scroll listener on element:', scrollElement);
+
+      const handleScroll = () => {
+        const currentScrollTop = scrollElement.scrollTop;
+        const scrollDelta = currentScrollTop - lastScrollTop.current;
+        const absScrollDelta = Math.abs(scrollDelta);
         
-        // Debounced state change to prevent flicker
-        scrollDebounceTimer.current = setTimeout(() => {
+        console.log('📍 Scroll - position:', currentScrollTop, 'delta:', scrollDelta, 'isManuallyCollapsed:', isManuallyCollapsed, 'current isCollapsed:', isCollapsed);
+        
+        // Process any scroll movement for immediate feedback
+        if (absScrollDelta < 1) {
+          return;
+        }
+        
+        // Determine scroll direction
+        const newDirection = scrollDelta > 0 ? 'down' : scrollDelta < 0 ? 'up' : 'idle';
+        console.log('🧭 Direction:', newDirection, 'previous:', scrollDirection.current);
+        
+        // Clear existing timers
+        if (scrollDebounceTimer.current) {
+          clearTimeout(scrollDebounceTimer.current);
+        }
+        
+        // Update direction and handle state changes
+        if (newDirection !== 'idle') {
+          scrollDirection.current = newDirection;
+          console.log('🔄 Direction changed to:', newDirection);
+          
+          // Immediate collapse/expand based on scroll position and direction
           if (!isManuallyCollapsed) {
-            if (newDirection === 'down' && currentScrollTop > 80) {
-              console.log('⬇️ Collapsing header');
+            if (newDirection === 'down' && currentScrollTop > 50) {
+              console.log('⬇️ Collapsing header at position:', currentScrollTop);
               setIsCollapsed(true);
-            } else if (newDirection === 'up' && currentScrollTop < 150) {
-              console.log('⬆️ Expanding header');
+            } else if (newDirection === 'up' && currentScrollTop < 100) {
+              console.log('⬆️ Expanding header at position:', currentScrollTop);
               setIsCollapsed(false);
             }
           } else {
             console.log('✋ Manual override active - not auto-collapsing');
           }
-        }, 150); // 150ms debounce to prevent flicker
-      }
-      
-      lastScrollTop.current = currentScrollTop;
-    };
+        }
+        
+        lastScrollTop.current = currentScrollTop;
+      };
 
-    scrollElement.addEventListener('scroll', handleScroll, { passive: true });
+      scrollElement.addEventListener('scroll', handleScroll, { passive: true });
+      
+      return () => {
+        console.log('🧹 Cleaning up enhanced scroll listener');
+        scrollElement.removeEventListener('scroll', handleScroll);
+      };
+    }, 100); // 100ms delay to ensure modal is rendered
     
     return () => {
-      console.log('🧹 Cleaning up enhanced scroll listener');
-      scrollElement.removeEventListener('scroll', handleScroll);
+      clearTimeout(timeoutId);
       if (scrollDebounceTimer.current) clearTimeout(scrollDebounceTimer.current);
       if (directionChangeTimer.current) clearTimeout(directionChangeTimer.current);
     };
-  }, [isManuallyCollapsed]); // Removed isCollapsed to prevent listener recreation
+  }, [isOpen, isManuallyCollapsed]); // Added isOpen dependency
 
   // Handle manual toggle with override
   const handleToggleCollapse = () => {
