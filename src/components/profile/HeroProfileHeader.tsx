@@ -532,7 +532,7 @@ const HeroProfileHeader = ({
           <div className="w-full max-w-md">
             {/* Top Stats Bar - Always Visible */}
             <div 
-              className="w-full bg-muted border border-border rounded-lg py-1" 
+              className="w-full bg-muted border border-border rounded-full py-1" 
               style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
             >
               <div className="flex items-center justify-between w-full px-4">
@@ -584,7 +584,7 @@ const HeroProfileHeader = ({
               isStatsExpanded ? 'max-h-20 opacity-100' : 'max-h-0 opacity-0'
             }`}>
               <div 
-                className="w-full bg-muted border border-border border-t-0 rounded-b-lg py-1 mt-0" 
+                className="w-full bg-muted border border-border border-t-0 rounded-b-full py-1 mt-0" 
                 style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
               >
                 <div className="flex items-center justify-between w-full px-4">
@@ -612,10 +612,10 @@ const HeroProfileHeader = ({
                   <div className="flex items-center justify-center flex-1">
                     <div className="text-center">
                       <div className="font-bold text-foreground text-lg">
-                        {followingCount}
+                        {achievements.length}
                       </div>
                       <div className="text-muted-foreground text-xs">
-                        Following
+                        Achievements
                       </div>
                     </div>
                   </div>
