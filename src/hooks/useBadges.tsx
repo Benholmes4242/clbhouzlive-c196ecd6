@@ -4,9 +4,19 @@ import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { Badge, UserBadge, BadgeProgress } from '@/types/badges';
 
+// Import the new badge unlock modal
+let BadgeUnlockModal: any = null;
+if (typeof window !== 'undefined') {
+  import('@/components/badges/BadgeUnlockModal').then(module => {
+    BadgeUnlockModal = module.BadgeUnlockModal;
+  });
+}
+
 export const useBadges = (userId?: string) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [unlockedBadge, setUnlockedBadge] = useState<Badge | null>(null);
+  const [showUnlockModal, setShowUnlockModal] = useState(false);
 
   // Fetch all available badges
   const { data: allBadges, isLoading: loadingBadges } = useQuery({
@@ -72,14 +82,21 @@ export const useBadges = (userId?: string) => {
     },
     onSuccess: (newBadges) => {
       if (newBadges && newBadges.length > 0) {
-        // Show notification for new badges
-        newBadges.forEach((badge: any) => {
+        // Show the unlock modal for the first new badge
+        const firstBadge = newBadges[0];
+        if (firstBadge) {
+          setUnlockedBadge(firstBadge);
+          setShowUnlockModal(true);
+        }
+        
+        // Show toast for additional badges if more than one
+        if (newBadges.length > 1) {
           toast({
-            title: "🏅 New Badge Earned!",
-            description: `Congratulations! You unlocked "${badge.display_name}" ${badge.emoji}`,
+            title: `🏅 ${newBadges.length} New Badges Earned!`,
+            description: "Check your achievements to see all unlocked badges!",
             duration: 5000,
           });
-        });
+        }
         
         // Refresh badge data
         queryClient.invalidateQueries({ queryKey: ['user-badges', userId] });
@@ -135,6 +152,11 @@ export const useBadges = (userId?: string) => {
     getBadgesByCategory,
     getEarnedBadges,
     getNextBadgeTarget,
-    getTierColor
+    getTierColor,
+    // Badge unlock modal state
+    unlockedBadge,
+    showUnlockModal,
+    setShowUnlockModal,
+    BadgeUnlockModal
   };
 };
