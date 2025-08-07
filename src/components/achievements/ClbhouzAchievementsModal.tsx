@@ -3,7 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { XPRingSystem } from "@/components/profile/XPRingSystem";
-import { Sparkles, Trophy } from "lucide-react";
+import { Sparkles, Trophy, ChevronDown, ChevronUp } from "lucide-react";
 
 // Achievement badge imports - using user's uploaded image
 // import club300Badge from '@/assets/achievements/300-club-champion.png';
@@ -40,6 +40,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
   const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
   const [activeFilter, setActiveFilter] = useState<'all' | 'unlocked' | 'locked' | 'exploration' | 'skill'>('all');
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isManuallyCollapsed, setIsManuallyCollapsed] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
   const [animateProgress, setAnimateProgress] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -72,20 +73,28 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
     }
   }, [isOpen]);
 
-  // Handle scroll for sticky behavior
+  // Handle scroll for sticky behavior with manual override
   useEffect(() => {
     const scrollElement = scrollRef.current;
     if (!scrollElement) return;
 
     const handleScroll = () => {
       const scrollTop = scrollElement.scrollTop;
-      // More aggressive collapsing - collapse at 50px instead of 100px
-      setIsCollapsed(scrollTop > 50);
+      // Auto-collapse at 150px scroll, but respect manual state
+      if (!isManuallyCollapsed) {
+        setIsCollapsed(scrollTop > 150);
+      }
     };
 
     scrollElement.addEventListener('scroll', handleScroll);
     return () => scrollElement.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [isManuallyCollapsed]);
+
+  // Handle manual toggle
+  const handleToggleCollapse = () => {
+    setIsManuallyCollapsed(!isManuallyCollapsed);
+    setIsCollapsed(!isCollapsed);
+  };
 
   // Trigger celebration on level up (mock for now)
   useEffect(() => {
@@ -455,7 +464,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                     </svg>
                     <Trophy className="absolute inset-0 w-4 h-4 m-auto text-muted-foreground" />
                   </div>
-                  <div className="text-sm font-medium">{totalXP.toLocaleString()} XP</div>
+                  <div className="text-sm font-medium">{totalXP.toLocaleString()} XP | {progressPercentage.toFixed(0)}% to {nextTier.name}</div>
                 </div>
                 <div className="flex-1 mx-4 bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
                   <div 
@@ -466,8 +475,18 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                     }}
                   />
                 </div>
-                <div className="text-sm text-muted-foreground">
-                  {(nextMilestone - totalXP).toLocaleString()} to {nextTier.name}
+                <div className="flex items-center gap-2">
+                  <div className="text-xs text-muted-foreground">
+                    Next: {nextTier.name} at {nextMilestone.toLocaleString()} XP
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleToggleCollapse}
+                    className="p-1 h-6 w-6"
+                  >
+                    <ChevronDown className="h-3 w-3" />
+                  </Button>
                 </div>
               </div>
             ) : (
@@ -480,18 +499,28 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                   </div>
                 )}
                 
-                {/* Header with XP */}
+                {/* Header with XP and Collapse Button */}
                 <div className="flex justify-between items-start mb-6">
                   <div>
                     <h3 className="text-lg font-bold text-foreground mb-1">XP Progress</h3>
                     <p className="text-sm text-muted-foreground">Keep playing to unlock new rings!</p>
                   </div>
-                  <div className="text-right">
-                    <div className="text-2xl font-bold text-foreground flex items-center gap-2">
-                      <Sparkles className={`w-5 h-5 ${nextTier ? 'text-yellow-500 animate-pulse' : 'text-muted-foreground'}`} />
-                      {totalXP.toLocaleString()} XP
+                  <div className="flex items-center gap-4">
+                    <div className="text-right">
+                      <div className="text-2xl font-bold text-foreground flex items-center gap-2">
+                        <Sparkles className={`w-5 h-5 ${nextTier ? 'text-yellow-500 animate-pulse' : 'text-muted-foreground'}`} />
+                        {totalXP.toLocaleString()} XP
+                      </div>
+                      <div className="text-xs text-muted-foreground">Current Progress</div>
                     </div>
-                    <div className="text-xs text-muted-foreground">Current Progress</div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleToggleCollapse}
+                      className="p-1 h-8 w-8"
+                    >
+                      <ChevronUp className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
                 
