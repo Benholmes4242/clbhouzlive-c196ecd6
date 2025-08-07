@@ -310,24 +310,50 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                    </p>
                 </div>
               </div>
-              <Button 
-                variant={showAllAchievements ? "default" : "outline"} 
-                size="sm"
-                onClick={() => setShowAllAchievements(!showAllAchievements)}
-                className="rounded-full px-4"
-              >
-                {showAllAchievements ? "See All" : "See Unlocked"}
-              </Button>
+              <div className="flex rounded-full border border-border bg-background p-1">
+                <button
+                  onClick={() => setShowAllAchievements(true)}
+                  className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                    showAllAchievements 
+                      ? 'bg-primary text-primary-foreground shadow-sm' 
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  See All
+                </button>
+                <button
+                  onClick={() => setShowAllAchievements(false)}
+                  className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                    !showAllAchievements 
+                      ? 'bg-primary text-primary-foreground shadow-sm' 
+                      : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  See Unlocked
+                </button>
+              </div>
             </div>
           </div>
 
           {/* Progress Ring Section */}
           <div className="px-6 pb-4">
             <div className="bg-blue-50 dark:bg-blue-950/20 rounded-lg p-6 border border-blue-200 dark:border-blue-800">
-              {/* Progress Ring - Centered */}
-              <div className="flex justify-center mb-6">
+              {/* Current Progress XP - Top Right */}
+              <div className="flex justify-end mb-4">
+                <div className="text-right">
+                  <div className="text-lg font-bold text-foreground">
+                    {totalXP.toLocaleString()} XP
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    Current Progress
+                  </div>
+                </div>
+              </div>
+              
+              {/* Progress Ring and Info */}
+              <div className="flex items-center justify-center gap-8 mb-6">
+                {/* Progress Ring - Left */}
                 <div className="relative">
-                  {/* Ring Progress Display */}
                   <div className="relative w-32 h-32">
                     <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 120 120">
                       {/* Background circle */}
@@ -368,29 +394,19 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                     </div>
                   </div>
                 </div>
-              </div>
-              
-              {/* XP System Info on the right */}
-              <div className="flex justify-between items-start">
-                <div className="flex-1">
-                  <div className="space-y-1">
-                    <h3 className="font-semibold text-sm text-gray-500">
+                
+                {/* Ring Info - Right */}
+                <div className="flex-1 max-w-xs">
+                  <div className="space-y-2">
+                    <h3 className="font-semibold text-lg text-gray-500">
                       No Ring Achieved
                     </h3>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-sm text-muted-foreground">
                       Reach 10,000 XP to unlock your first ring
                     </p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="text-sm text-muted-foreground font-medium">
                       Next: Blue Ring at 10,000 XP
                     </p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-sm font-semibold">
-                    {totalXP.toLocaleString()} XP
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    Current Progress
                   </div>
                 </div>
               </div>
