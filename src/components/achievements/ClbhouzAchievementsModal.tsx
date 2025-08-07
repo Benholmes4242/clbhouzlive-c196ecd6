@@ -6,10 +6,6 @@ import { XPRingSystem } from "@/components/profile/XPRingSystem";
 
 // Achievement badge imports
 import club20Badge from '@/assets/achievements/20-club.png';
-import club50Badge from '@/assets/achievements/50-club.png';
-import club100Badge from '@/assets/achievements/100-century-club.png';
-import club200Badge from '@/assets/achievements/200-clubhouse-elite.png';
-import club300Badge from '@/assets/achievements/300-club-champion.png';
 
 interface ClbhouzAchievementsModalProps {
   isOpen: boolean;
@@ -60,13 +56,13 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       case "20 Club":
         return <img src={club20Badge} alt="20 Club Badge" className="w-16 h-16" />;
       case "50 Club":
-        return <img src={club50Badge} alt="50 Club Badge" className="w-8 h-8 opacity-50" />;
+        return '🔒';
       case "100 Century Club":
-        return <img src={club100Badge} alt="100 Century Club Badge" className="w-8 h-8 opacity-50" />;
+        return '🔒';
       case "200 Clubhouse Elite":
-        return <img src={club200Badge} alt="200 Clubhouse Elite Badge" className="w-8 h-8 opacity-50" />;
+        return '🔒';
       case "300 Club Champion":
-        return <img src={club300Badge} alt="300 Club Champion Badge" className="w-8 h-8 opacity-50" />;
+        return '🔒';
       default:
         return '🔒';
     }
