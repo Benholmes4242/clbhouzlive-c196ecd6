@@ -80,18 +80,29 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
   // Smart scroll detection with direction threshold and debouncing
   useEffect(() => {
     const scrollElement = scrollRef.current;
-    if (!scrollElement) return;
+    if (!scrollElement) {
+      console.log('🔍 Scroll element not found');
+      return;
+    }
+
+    console.log('📜 Setting up enhanced scroll listener');
 
     const handleScroll = () => {
       const currentScrollTop = scrollElement.scrollTop;
       const scrollDelta = currentScrollTop - lastScrollTop.current;
       const absScrollDelta = Math.abs(scrollDelta);
       
+      console.log('📍 Scroll - position:', currentScrollTop, 'delta:', scrollDelta, 'isManuallyCollapsed:', isManuallyCollapsed, 'current isCollapsed:', isCollapsed);
+      
       // Only process significant scroll movements (minimum 5px)
-      if (absScrollDelta < 5) return;
+      if (absScrollDelta < 5) {
+        console.log('⏭️ Skipping small movement:', absScrollDelta);
+        return;
+      }
       
       // Determine scroll direction
       const newDirection = scrollDelta > 0 ? 'down' : scrollDelta < 0 ? 'up' : 'idle';
+      console.log('🧭 Direction:', newDirection, 'previous:', scrollDirection.current);
       
       // Clear existing timers
       if (scrollDebounceTimer.current) {
@@ -104,17 +115,20 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       // Only update direction if it's a significant change
       if (newDirection !== scrollDirection.current && newDirection !== 'idle') {
         scrollDirection.current = newDirection;
+        console.log('🔄 Direction changed to:', newDirection);
         
         // Debounced state change to prevent flicker
         scrollDebounceTimer.current = setTimeout(() => {
           if (!isManuallyCollapsed) {
             if (newDirection === 'down' && currentScrollTop > 80) {
-              // Collapse when scrolling down past 80px
+              console.log('⬇️ Collapsing header');
               setIsCollapsed(true);
             } else if (newDirection === 'up' && currentScrollTop < 150) {
-              // Expand when scrolling up and above 150px threshold
+              console.log('⬆️ Expanding header');
               setIsCollapsed(false);
             }
+          } else {
+            console.log('✋ Manual override active - not auto-collapsing');
           }
         }, 150); // 150ms debounce to prevent flicker
       }
@@ -125,11 +139,12 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
     scrollElement.addEventListener('scroll', handleScroll, { passive: true });
     
     return () => {
+      console.log('🧹 Cleaning up enhanced scroll listener');
       scrollElement.removeEventListener('scroll', handleScroll);
       if (scrollDebounceTimer.current) clearTimeout(scrollDebounceTimer.current);
       if (directionChangeTimer.current) clearTimeout(directionChangeTimer.current);
     };
-  }, [isManuallyCollapsed]);
+  }, [isManuallyCollapsed, isCollapsed]);
 
   // Handle manual toggle with override
   const handleToggleCollapse = () => {
