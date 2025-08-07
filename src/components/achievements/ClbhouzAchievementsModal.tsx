@@ -47,6 +47,8 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
   const [isManuallyCollapsed, setIsManuallyCollapsed] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
   const [animateProgress, setAnimateProgress] = useState(false);
+  const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
+  const [showAchievementModal, setShowAchievementModal] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const lastScrollTop = useRef(0);
   const scrollDirection = useRef<'up' | 'down' | 'idle'>('idle');
@@ -58,7 +60,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
   // Mock data for now - replace with actual badge system later
   const totalXP = 2500;
   const nextMilestone = 10000;
-  const progressPercentage = (totalXP / nextMilestone) * 100;
+  const progressPercentage = isMobile ? 100 : (totalXP / nextMilestone) * 100;
   
   // XP Tier System
   const xpTiers = [
@@ -108,24 +110,36 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
           clearTimeout(scrollDebounceTimer.current);
         }
         
-        // Add mobile-specific debounce
-        const debounceDelay = isMobile ? 150 : 50;
-        
-        scrollDebounceTimer.current = setTimeout(() => {
-          // Update direction and handle state changes
-          if (newDirection !== 'idle') {
-            scrollDirection.current = newDirection;
-            
-            // Immediate collapse/expand based on scroll position and direction
-            if (!isManuallyCollapsed) {
-              if (newDirection === 'down' && currentScrollTop > 50) {
-                setIsCollapsed(true);
-              } else if (newDirection === 'up' && currentScrollTop < 100) {
-                setIsCollapsed(false);
-              }
+        // Immediate collapse/expand for mobile with less debounce
+        if (isMobile) {
+          // Immediate response for mobile
+          if (!isManuallyCollapsed) {
+            if (newDirection === 'down' && currentScrollTop > 10) {
+              setIsCollapsed(true);
+            } else if (newDirection === 'up' && currentScrollTop < 50) {
+              setIsCollapsed(false);
             }
           }
-        }, debounceDelay);
+        } else {
+          // Desktop behavior with debounce
+          const debounceDelay = 50;
+          
+          scrollDebounceTimer.current = setTimeout(() => {
+            // Update direction and handle state changes
+            if (newDirection !== 'idle') {
+              scrollDirection.current = newDirection;
+              
+              // Immediate collapse/expand based on scroll position and direction
+              if (!isManuallyCollapsed) {
+                if (newDirection === 'down' && currentScrollTop > 50) {
+                  setIsCollapsed(true);
+                } else if (newDirection === 'up' && currentScrollTop < 100) {
+                  setIsCollapsed(false);
+                }
+              }
+            }
+          }, debounceDelay);
+        }
         
         lastScrollTop.current = currentScrollTop;
       };
@@ -291,9 +305,9 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       case "100 Century Club":
         return <img src="/lovable-uploads/91e26115-098d-4b21-9b29-7e1800fe52bd.png" alt="100 Century Club Badge" className="w-28 h-28" />;
       case "200 Clubhouse Elite":
-        return <img src="/lovable-uploads/b566e805-826b-4005-b9d1-c5bdc87786b1.png" alt="200 Clubhouse Elite Badge" className="w-32 h-32" />;
+        return <img src="/lovable-uploads/393019eb-611a-4e4e-8661-9fac00b24ecc.png" alt="200 Clubhouse Elite Badge" className={isMobile ? "w-16 h-16" : "w-32 h-32"} />;
       case "300 Club Champion":
-        return <img src="/lovable-uploads/dd19d0ff-5931-4ef4-9e00-38e1db6d69a5.png" alt="300 Club Champion Badge" className="w-32 h-32" />;
+        return <img src="/lovable-uploads/bc2bb48a-2505-442f-8d02-2623c7b391ad.png" alt="300 Club Champion Badge" className={isMobile ? "w-16 h-16" : "w-32 h-32"} />;
       // Regional achievement badges with flag images
       case "Lynx Legend":
         return <img src="/lovable-uploads/5971ec53-bcfe-46df-aa24-78df46eaa170.png" alt="Britain & Ireland Flag" className="w-28 h-28 rounded-lg" />;
@@ -304,7 +318,14 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       case "Legends Club":
         return <img src="/lovable-uploads/e158428b-772e-4396-859e-1e3d51f2e9b3.png" alt="World Globe" className="w-28 h-28 rounded-lg" />;
       default:
-        // Enhanced emoji display with conditional styling
+        // Enhanced emoji display with conditional styling - hide emojis on mobile for Experience/Exploration section
+        if (isMobile && (achievement.title.includes('Club') || ['Lynx Legend', 'The Continental Swinger', 'Stars and Stripes Tourer', 'Legends Club'].includes(achievement.title))) {
+          return (
+            <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center">
+              <span className="text-xs font-semibold text-gray-600 dark:text-gray-300">Badge</span>
+            </div>
+          );
+        }
         return (
           <div className={`
             text-4xl transition-all duration-200 
@@ -957,9 +978,9 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
           {/* Filter Buttons - Mobile Optimized */}
           <div className={`${isMobile ? 'px-4 pb-4' : 'px-6 pb-6'}`}>
             {isMobile ? (
-              /* Mobile: 2 rows layout */
+              /* Mobile: Full width layout */
               <div className="space-y-2">
-                <div className="flex gap-1.5 justify-center">
+                <div className="flex gap-1 w-full">
                   {['all', 'unlocked', 'locked'].map((filter) => (
                     <Button
                       key={filter}
@@ -967,7 +988,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                       size="sm"
                       onClick={() => setActiveFilter(filter as typeof activeFilter)}
                       className={`
-                        capitalize transition-all duration-200 text-xs h-8 px-3
+                        capitalize transition-all duration-200 text-xs h-8 flex-1
                         ${activeFilter === filter 
                           ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg' 
                           : 'hover:bg-muted/80'
@@ -980,7 +1001,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                     </Button>
                   ))}
                 </div>
-                <div className="flex gap-1.5 justify-center">
+                <div className="flex gap-1 w-full">
                   {['exploration', 'skill'].map((filter) => (
                     <Button
                       key={filter}
@@ -988,7 +1009,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                       size="sm"
                       onClick={() => setActiveFilter(filter as typeof activeFilter)}
                       className={`
-                        capitalize transition-all duration-200 text-xs h-8 px-3
+                        capitalize transition-all duration-200 text-xs h-8 flex-1
                         ${activeFilter === filter 
                           ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg' 
                           : 'hover:bg-muted/80'
@@ -1030,14 +1051,16 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
 
           {/* Experience & Exploration Achievements Section */}
           {(activeFilter === 'all' || activeFilter === 'exploration') && getFilteredAchievements(explorationAchievements, 'exploration').length > 0 && (
-            <div className="px-6 pb-8">
+            <div className={`${isMobile ? 'px-4 pb-6' : 'px-6 pb-8'}`}>
               {/* Card Container with Visual Grouping */}
               <div className="bg-gradient-to-br from-blue-50/80 to-cyan-50/60 dark:from-blue-950/20 dark:to-cyan-950/15 rounded-2xl p-6 border border-blue-200/40 dark:border-blue-800/40 shadow-xl backdrop-blur-sm">
                 {/* Section Header with Icon */}
                   <div className={`flex items-center justify-center gap-3 ${isMobile ? 'mb-3' : 'mb-6'}`}>
-                    <div className={`${isMobile ? 'w-8 h-8' : 'w-10 h-10'} rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center`}>
-                      <span className={`${isMobile ? 'text-lg' : 'text-xl'}`}>🧭</span>
-                    </div>
+                    {!isMobile && (
+                      <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
+                        <span className="text-xl">🧭</span>
+                      </div>
+                    )}
                     <h3 className={`${isMobile ? 'text-base' : 'text-xl'} font-bold text-blue-800 dark:text-blue-200`}>
                       Experience & Exploration Achievements
                     </h3>
@@ -1050,25 +1073,29 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                       const isNearUnlock = percentage >= 80 && percentage < 100;
                       
                       return (
-                        <Tooltip key={achievement.title}>
-                          <TooltipTrigger asChild>
-                            <div className="relative">
-                                <div
-                                  className={`
-                                    border rounded-xl transition-all duration-200 hover:scale-105 cursor-pointer 
-                                    bg-white/80 dark:bg-gray-900/40 backdrop-blur-sm
-                                    shadow-lg hover:shadow-xl
-                                    ${isMobile ? 'p-1.5 flex flex-col items-center text-center space-y-1' : 'p-2 flex items-center gap-2'}
-                                    ${achievement.isEarned 
-                                      ? 'border-blue-300 dark:border-blue-700 shadow-blue-100/50 dark:shadow-blue-900/20' 
-                                      : isNearUnlock
-                                        ? 'border-orange-400 dark:border-orange-600 shadow-orange-100/50 dark:shadow-orange-900/20 animate-pulse'
-                                        : 'border-blue-200/50 dark:border-blue-800/50 hover:border-blue-300 dark:hover:border-blue-700'
-                                    }
-                                  `}
-                                >
+                         <Tooltip key={achievement.title}>
+                           <TooltipTrigger asChild>
+                             <div className="relative">
+                                 <div
+                                   className={`
+                                     border rounded-xl transition-all duration-200 hover:scale-105 cursor-pointer 
+                                     bg-white/80 dark:bg-gray-900/40 backdrop-blur-sm
+                                     shadow-lg hover:shadow-xl
+                                     ${isMobile ? 'p-1.5 flex flex-col items-center text-center space-y-1' : 'p-2 flex items-center gap-2'}
+                                     ${achievement.isEarned 
+                                       ? 'border-blue-300 dark:border-blue-700 shadow-blue-100/50 dark:shadow-blue-900/20' 
+                                       : isNearUnlock
+                                         ? 'border-orange-400 dark:border-orange-600 shadow-orange-100/50 dark:shadow-orange-900/20 animate-pulse'
+                                         : 'border-blue-200/50 dark:border-blue-800/50 hover:border-blue-300 dark:hover:border-blue-700'
+                                     }
+                                   `}
+                                   onClick={isMobile ? () => {
+                                     setSelectedAchievement(achievement);
+                                     setShowAchievementModal(true);
+                                   } : undefined}
+                                 >
                                   <div className={`flex justify-center items-center ${isMobile ? 'mb-1' : 'flex-shrink-0 min-w-0'}`}>
-                                    <div className={isMobile ? 'scale-75' : ''}>
+                                    <div>
                                       {getAchievementIcon(achievement)}
                                     </div>
                                   </div>
@@ -1171,14 +1198,16 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
 
           {/* Skill & Performance Achievements Section */}
           {(activeFilter === 'all' || activeFilter === 'skill') && getFilteredAchievements(skillAchievements, 'skill').length > 0 && (
-            <div className="px-6 pb-8">
+            <div className={`${isMobile ? 'px-4 pb-6' : 'px-6 pb-8'}`}>
               {/* Card Container with Visual Grouping */}
               <div className="bg-gradient-to-br from-green-50/80 to-emerald-50/60 dark:from-green-950/20 dark:to-emerald-950/15 rounded-2xl p-6 border border-green-200/40 dark:border-green-800/40 shadow-xl backdrop-blur-sm">
                 {/* Section Header with Icon */}
                   <div className={`flex items-center justify-center gap-3 ${isMobile ? 'mb-3' : 'mb-6'}`}>
-                    <div className={`${isMobile ? 'w-8 h-8' : 'w-10 h-10'} rounded-full bg-green-100 dark:bg-green-900/50 flex items-center justify-center`}>
-                      <span className={`${isMobile ? 'text-lg' : 'text-xl'}`}>💪</span>
-                    </div>
+                    {!isMobile && (
+                      <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/50 flex items-center justify-center">
+                        <span className="text-xl">💪</span>
+                      </div>
+                    )}
                     <h3 className={`${isMobile ? 'text-base' : 'text-xl'} font-bold text-green-800 dark:text-green-200`}>
                       Skill & Performance Achievements
                     </h3>
@@ -1191,25 +1220,29 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                       const isNearUnlock = percentage >= 80 && percentage < 100;
                       
                       return (
-                        <Tooltip key={achievement.title}>
-                          <TooltipTrigger asChild>
-                            <div className="relative">
-                                <div
-                                  className={`
-                                    border rounded-xl transition-all duration-200 hover:scale-105 cursor-pointer 
-                                    bg-white/80 dark:bg-gray-900/40 backdrop-blur-sm
-                                    shadow-lg hover:shadow-xl
-                                    ${isMobile ? 'p-1.5 flex flex-col items-center text-center space-y-1' : 'p-2 flex items-center gap-2'}
-                                    ${achievement.isEarned 
-                                      ? 'border-green-300 dark:border-green-700 shadow-green-100/50 dark:shadow-green-900/20' 
-                                      : isNearUnlock
-                                        ? 'border-orange-400 dark:border-orange-600 shadow-orange-100/50 dark:shadow-orange-900/20 animate-pulse'
-                                        : 'border-green-200/50 dark:border-green-800/50 hover:border-green-300 dark:hover:border-green-700'
-                                    }
-                                  `}
-                                >
+                         <Tooltip key={achievement.title}>
+                           <TooltipTrigger asChild>
+                             <div className="relative">
+                                 <div
+                                   className={`
+                                     border rounded-xl transition-all duration-200 hover:scale-105 cursor-pointer 
+                                     bg-white/80 dark:bg-gray-900/40 backdrop-blur-sm
+                                     shadow-lg hover:shadow-xl
+                                     ${isMobile ? 'p-1.5 flex flex-col items-center text-center space-y-1' : 'p-2 flex items-center gap-2'}
+                                     ${achievement.isEarned 
+                                       ? 'border-green-300 dark:border-green-700 shadow-green-100/50 dark:shadow-green-900/20' 
+                                       : isNearUnlock
+                                         ? 'border-orange-400 dark:border-orange-600 shadow-orange-100/50 dark:shadow-orange-900/20 animate-pulse'
+                                         : 'border-green-200/50 dark:border-green-800/50 hover:border-green-300 dark:hover:border-green-700'
+                                     }
+                                   `}
+                                   onClick={isMobile ? () => {
+                                     setSelectedAchievement(achievement);
+                                     setShowAchievementModal(true);
+                                   } : undefined}
+                                 >
                                   <div className={`flex justify-center items-center ${isMobile ? 'mb-1' : 'flex-shrink-0 min-w-0'}`}>
-                                    <div className={isMobile ? 'scale-75' : ''}>
+                                    <div>
                                       {getAchievementIcon(achievement)}
                                     </div>
                                   </div>
@@ -1313,6 +1346,71 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
         </div>
 
       </DialogContent>
+      
+      {/* Achievement Detail Modal for Mobile */}
+      {selectedAchievement && (
+        <Dialog open={showAchievementModal} onOpenChange={setShowAchievementModal}>
+          <DialogContent className="max-w-[90vw] max-h-[70vh] p-4">
+            <DialogHeader>
+              <DialogTitle className="text-lg font-bold">{selectedAchievement.title}</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="flex justify-center">
+                {getAchievementIcon(selectedAchievement)}
+              </div>
+              
+              <div className="text-center">
+                <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                  selectedAchievement.isEarned 
+                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
+                    : 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
+                }`}>
+                  {selectedAchievement.isEarned ? 'Unlocked' : 'Locked'}
+                </span>
+              </div>
+              
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {selectedAchievement.description}
+              </p>
+              
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-primary inline-flex items-center gap-1">
+                  <span className="text-amber-500">✨</span>
+                  +{selectedAchievement.xp} XP
+                </span>
+                <span className="text-sm text-muted-foreground inline-flex items-center gap-1">
+                  {selectedAchievement.isRepeatable ? "🔄 Repeatable" : "🏆 One-time"}
+                </span>
+              </div>
+              
+              {selectedAchievement.isEarned && selectedAchievement.dateEarned && (
+                <div>
+                  <span className="text-sm text-green-600 dark:text-green-400 font-medium">
+                    ✅ Earned: {selectedAchievement.dateEarned}
+                  </span>
+                </div>
+              )}
+              
+              <div>
+                <span className="text-sm text-muted-foreground">
+                  Progress: {selectedAchievement.progress}
+                </span>
+              </div>
+              
+              {!selectedAchievement.isEarned && selectedAchievement.unlockHint && (
+                <div className="p-3 bg-blue-50 dark:bg-blue-950/20 rounded border border-blue-200 dark:border-blue-800">
+                  <div className="flex items-start gap-2">
+                    <span className="text-blue-500 text-sm">💡</span>
+                    <span className="text-sm text-blue-700 dark:text-blue-300 leading-relaxed">
+                      <strong>How to unlock:</strong> {selectedAchievement.unlockHint}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </Dialog>
   );
 };
