@@ -44,6 +44,10 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
   const [showCelebration, setShowCelebration] = useState(false);
   const [animateProgress, setAnimateProgress] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const lastScrollTop = useRef(0);
+  const scrollDirection = useRef<'up' | 'down' | 'idle'>('idle');
+  const scrollDebounceTimer = useRef<NodeJS.Timeout | null>(null);
+  const directionChangeTimer = useRef<NodeJS.Timeout | null>(null);
   
   // Clear any cached references by forcing recompilation
   
@@ -73,46 +77,87 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
     }
   }, [isOpen]);
 
-  // Handle scroll for sticky behavior with manual override
+  // Smart scroll detection with direction threshold and debouncing
   useEffect(() => {
     const scrollElement = scrollRef.current;
-    if (!scrollElement) {
-      console.log('🔍 Scroll element not found');
-      return;
-    }
-
-    console.log('📜 Setting up scroll listener');
+    if (!scrollElement) return;
 
     const handleScroll = () => {
-      const scrollTop = scrollElement.scrollTop;
-      console.log('📍 Scroll position:', scrollTop, 'isManuallyCollapsed:', isManuallyCollapsed, 'current isCollapsed:', isCollapsed);
+      const currentScrollTop = scrollElement.scrollTop;
+      const scrollDelta = currentScrollTop - lastScrollTop.current;
+      const absScrollDelta = Math.abs(scrollDelta);
       
-      // Auto-collapse at 150px scroll, but respect manual state
-      if (!isManuallyCollapsed) {
-        const shouldCollapse = scrollTop > 150;
-        console.log('🔄 Should collapse:', shouldCollapse);
-        setIsCollapsed(shouldCollapse);
+      // Only process significant scroll movements (minimum 5px)
+      if (absScrollDelta < 5) return;
+      
+      // Determine scroll direction
+      const newDirection = scrollDelta > 0 ? 'down' : scrollDelta < 0 ? 'up' : 'idle';
+      
+      // Clear existing timers
+      if (scrollDebounceTimer.current) {
+        clearTimeout(scrollDebounceTimer.current);
       }
+      if (directionChangeTimer.current) {
+        clearTimeout(directionChangeTimer.current);
+      }
+      
+      // Only update direction if it's a significant change
+      if (newDirection !== scrollDirection.current && newDirection !== 'idle') {
+        scrollDirection.current = newDirection;
+        
+        // Debounced state change to prevent flicker
+        scrollDebounceTimer.current = setTimeout(() => {
+          if (!isManuallyCollapsed) {
+            if (newDirection === 'down' && currentScrollTop > 80) {
+              // Collapse when scrolling down past 80px
+              setIsCollapsed(true);
+            } else if (newDirection === 'up' && currentScrollTop < 150) {
+              // Expand when scrolling up and above 150px threshold
+              setIsCollapsed(false);
+            }
+          }
+        }, 150); // 150ms debounce to prevent flicker
+      }
+      
+      lastScrollTop.current = currentScrollTop;
     };
 
-    scrollElement.addEventListener('scroll', handleScroll);
+    scrollElement.addEventListener('scroll', handleScroll, { passive: true });
+    
     return () => {
-      console.log('🧹 Cleaning up scroll listener');
       scrollElement.removeEventListener('scroll', handleScroll);
+      if (scrollDebounceTimer.current) clearTimeout(scrollDebounceTimer.current);
+      if (directionChangeTimer.current) clearTimeout(directionChangeTimer.current);
     };
-  }, [isManuallyCollapsed, isCollapsed]);
+  }, [isManuallyCollapsed]);
 
-  // Handle manual toggle
+  // Handle manual toggle with override
   const handleToggleCollapse = () => {
-    setIsManuallyCollapsed(!isManuallyCollapsed);
-    setIsCollapsed(!isCollapsed);
+    const newManualState = !isManuallyCollapsed;
+    const newCollapseState = !isCollapsed;
+    
+    setIsManuallyCollapsed(newManualState);
+    setIsCollapsed(newCollapseState);
+    
+    // If manually expanded, clear direction timer to prevent auto-collapse for a bit
+    if (!newCollapseState && newManualState) {
+      directionChangeTimer.current = setTimeout(() => {
+        setIsManuallyCollapsed(false);
+      }, 2000); // Allow 2 seconds of manual control before re-enabling auto
+    }
   };
 
-  // Reset manual state when modal opens
+  // Reset state when modal opens
   useEffect(() => {
     if (isOpen) {
       setIsManuallyCollapsed(false);
       setIsCollapsed(false);
+      lastScrollTop.current = 0;
+      scrollDirection.current = 'idle';
+      
+      // Clear timers
+      if (scrollDebounceTimer.current) clearTimeout(scrollDebounceTimer.current);
+      if (directionChangeTimer.current) clearTimeout(directionChangeTimer.current);
     }
   }, [isOpen]);
 
@@ -450,8 +495,8 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
             </div>
           </div>
 
-          {/* Collapsible XP Progress Header */}
-          <div className={`sticky top-0 z-10 bg-background/95 backdrop-blur-sm transition-all duration-300 ${
+          {/* Collapsible XP Progress Header with Smooth Animations */}
+          <div className={`sticky top-0 z-10 bg-background/95 backdrop-blur-sm transition-all duration-400 ease-in-out ${
             isCollapsed ? 'px-6 py-3' : 'px-6 pb-4'
           }`}>
             {isCollapsed ? (
