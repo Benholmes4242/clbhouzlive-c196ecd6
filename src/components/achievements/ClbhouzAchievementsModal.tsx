@@ -54,15 +54,23 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
     // Use custom badges for club achievements instead of padlocks
     switch (achievement.title) {
       case "20 Club":
-        return '🔒';
+        return <img src="/lovable-uploads/a33df9b4-0089-43ca-913d-132fc5b11cc3.png" alt="20 Club Badge" className="w-16 h-16" />;
       case "50 Club":
-        return '🔒';
+        return <img src="/lovable-uploads/c1ba04e8-7aed-40e6-948b-0b65fdc932b2.png" alt="50 Club Badge" className="w-16 h-16" />;
       case "100 Century Club":
-        return '🔒';
+        return <img src="/lovable-uploads/91e26115-098d-4b21-9b29-7e1800fe52bd.png" alt="100 Century Club Badge" className="w-16 h-16" />;
       case "200 Clubhouse Elite":
-        return '🔒';
+        return <img src="/lovable-uploads/3f4eaa9f-25be-41e0-acca-0f97bc858390.png" alt="200 Clubhouse Elite Badge" className="w-16 h-16" />;
       case "300 Club Champion":
         return <img src="/lovable-uploads/227db9bc-e1f0-487e-8568-fd06f20b15ee.png" alt="300 Club Champion Badge" className="w-16 h-16" />;
+      case "European Explorer":
+        return <img src="/lovable-uploads/24422ab1-3322-4f51-801b-8ae8e80c95d7.png" alt="European Explorer Badge" className="w-16 h-16" />;
+      case "UK & Ireland Explorer":
+        return <img src="/lovable-uploads/254454ee-ea49-4f4a-b4f0-397e45efd43c.png" alt="UK & Ireland Explorer Badge" className="w-16 h-16" />;
+      case "USA Explorer":
+        return <img src="/lovable-uploads/ad7f9c0b-b395-4b96-b059-63ebab11bd4f.png" alt="USA Explorer Badge" className="w-16 h-16" />;
+      case "World Explorer":
+        return <img src="/lovable-uploads/5b02f0bf-9891-4439-971c-4d3cb7a37355.png" alt="World Explorer Badge" className="w-16 h-16" />;
       default:
         return '🔒';
     }
@@ -254,6 +262,42 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       xp: 2000,
       isRepeatable: false,
       progress: "3 / 300 courses"
+    },
+    {
+      title: "European Explorer",
+      emoji: "🇪🇺",
+      isEarned: false,
+      description: "Play courses across 5 different European countries",
+      xp: 2500,
+      isRepeatable: false,
+      progress: "2 / 5 countries"
+    },
+    {
+      title: "UK & Ireland Explorer",
+      emoji: "🇬🇧",
+      isEarned: true,
+      description: "Play courses in both the UK and Ireland",
+      xp: 2000,
+      isRepeatable: false,
+      progress: "2 / 2 countries"
+    },
+    {
+      title: "USA Explorer",
+      emoji: "🇺🇸",
+      isEarned: false,
+      description: "Play courses across 10 different US states",
+      xp: 3000,
+      isRepeatable: false,
+      progress: "1 / 10 states"
+    },
+    {
+      title: "World Explorer",
+      emoji: "🌍",
+      isEarned: false,
+      description: "Play courses on 4 different continents",
+      xp: 5000,
+      isRepeatable: false,
+      progress: "1 / 4 continents"
     },
     // Regional Top 100 Achievements
     {
