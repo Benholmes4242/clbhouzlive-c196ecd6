@@ -39,7 +39,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
   userProfilePhotoUrl,
   isCurrentUser = true
 }) => {
-  const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
+  
   const [activeFilter, setActiveFilter] = useState<'all' | 'unlocked' | 'locked' | 'exploration' | 'skill'>('all');
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isManuallyCollapsed, setIsManuallyCollapsed] = useState(false);
@@ -286,7 +286,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       case "200 Clubhouse Elite":
         return <img src="/lovable-uploads/b566e805-826b-4005-b9d1-c5bdc87786b1.png" alt="200 Clubhouse Elite Badge" className="w-32 h-32" />;
       case "300 Club Champion":
-        return <img src="/lovable-uploads/3fd34e71-ce84-4f30-b424-3f67637eab11.png" alt="300 Club Champion Badge" className="w-32 h-32" />;
+        return <img src="/lovable-uploads/dd19d0ff-5931-4ef4-9e00-38e1db6d69a5.png" alt="300 Club Champion Badge" className="w-32 h-32" />;
       // Regional achievement badges with flag images
       case "Lynx Legend":
         return <img src="/lovable-uploads/5971ec53-bcfe-46df-aa24-78df46eaa170.png" alt="Britain & Ireland Flag" className="w-28 h-28 rounded-lg" />;
@@ -921,7 +921,6 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                                       : 'border-blue-200/50 dark:border-blue-800/50 hover:border-blue-300 dark:hover:border-blue-700'
                                   }
                                 `}
-                                onClick={() => setSelectedAchievement(achievement)}
                               >
                                 <div className="flex-shrink-0 flex justify-center items-center min-w-0">
                                   {getAchievementIcon(achievement)}
@@ -1060,7 +1059,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                                       : 'border-green-200/50 dark:border-green-800/50 hover:border-green-300 dark:hover:border-green-700'
                                   }
                                 `}
-                                onClick={() => setSelectedAchievement(achievement)}
+                                
                               >
                                 <div className="flex-shrink-0 flex justify-center items-center min-w-0">
                                   {getAchievementIcon(achievement)}
@@ -1164,54 +1163,6 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
 
         </div>
 
-        {/* Mobile Achievement Details Dialog */}
-        {selectedAchievement && (
-          <Dialog open={!!selectedAchievement} onOpenChange={() => setSelectedAchievement(null)}>
-            <DialogContent className="max-w-md">
-              <DialogHeader>
-                <DialogTitle className="flex items-center gap-3">
-                  <span className="text-3xl">{selectedAchievement.emoji}</span>
-                  {selectedAchievement.title}
-                </DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <p className="text-sm text-muted-foreground">
-                  {selectedAchievement.description}
-                </p>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">
-                    +{selectedAchievement.xp} XP
-                  </span>
-                  <span className={`px-2 py-1 rounded text-xs font-medium ${
-                    selectedAchievement.isEarned 
-                      ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' 
-                      : 'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300'
-                  }`}>
-                    {selectedAchievement.isEarned ? 'Unlocked' : 'Locked'}
-                  </span>
-                </div>
-                {selectedAchievement.progress && (
-                  <div className="text-sm">
-                    <span className="text-muted-foreground">Progress: </span>
-                    <span className="font-medium">{selectedAchievement.progress}</span>
-                  </div>
-                )}
-                {selectedAchievement.isEarned && selectedAchievement.dateEarned && (
-                  <div className="text-sm text-green-600 dark:text-green-400">
-                    ✅ Earned: {selectedAchievement.dateEarned}
-                  </div>
-                )}
-                {!selectedAchievement.isEarned && selectedAchievement.unlockHint && (
-                  <div className="p-3 bg-blue-50 dark:bg-blue-950/20 rounded border border-blue-200 dark:border-blue-800">
-                    <p className="text-sm text-blue-700 dark:text-blue-300">
-                      <strong>💡 How to unlock:</strong> {selectedAchievement.unlockHint}
-                    </p>
-                  </div>
-                )}
-              </div>
-            </DialogContent>
-          </Dialog>
-        )}
       </DialogContent>
     </Dialog>
   );
