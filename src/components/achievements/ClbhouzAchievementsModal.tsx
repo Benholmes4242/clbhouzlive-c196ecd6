@@ -26,6 +26,8 @@ interface Achievement {
   xp: number;
   isRepeatable: boolean;
   progress?: string;
+  dateEarned?: string;
+  unlockHint?: string;
 }
 
 const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
@@ -251,7 +253,8 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       description: "Achieve a single-digit handicap (0-9). A mark of consistent, skilled play.",
       xp: 250,
       isRepeatable: false,
-      progress: "Current: 12.3"
+      progress: "Current: 12.3",
+      unlockHint: "Keep improving your scoring consistency. Play more rounds and work on course management."
     },
     {
       title: "Plus Handicap Player",
@@ -260,7 +263,8 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       description: "Reach plus handicap status. Elite level golf achievement.",
       xp: 500,
       isRepeatable: false,
-      progress: "Target: +0.0"
+      progress: "Target: +0.0",
+      unlockHint: "Master all aspects of your game and consistently shoot under par. This requires dedication and practice."
     },
     {
       title: "Personal Best Round",
@@ -269,7 +273,8 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       description: "Shoot your lowest score ever. Keep pushing your limits!",
       xp: 100,
       isRepeatable: true,
-      progress: "Best: 78"
+      progress: "Best: 78",
+      dateEarned: "March 15, 2024"
     },
     {
       title: "Under Par Round",
@@ -278,7 +283,8 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       description: "Complete a round under par. Exceptional performance!",
       xp: 150,
       isRepeatable: true,
-      progress: "Achieved: 2 times"
+      progress: "Achieved: 2 times",
+      dateEarned: "February 8, 2024"
     },
     {
       title: "First Eagle",
@@ -287,7 +293,8 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       description: "Score your first eagle (2 under par). A memorable milestone!",
       xp: 100,
       isRepeatable: false,
-      progress: "Completed"
+      progress: "Completed",
+      dateEarned: "January 22, 2024"
     },
     {
       title: "Birdie Blitz",
@@ -296,7 +303,8 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       description: "Score 3 or more birdies in a single round. On fire!",
       xp: 75,
       isRepeatable: true,
-      progress: "Best: 2 birdies"
+      progress: "Best: 2 birdies",
+      unlockHint: "Focus on approach shots and putting. Target par 4s and 5s where birdies are most achievable."
     },
     {
       title: "Eagle Collector",
@@ -305,7 +313,8 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       description: "Accumulate 5 total eagles throughout your golf journey.",
       xp: 250,
       isRepeatable: false,
-      progress: "2 / 5 eagles"
+      progress: "2 / 5 eagles",
+      unlockHint: "Look for eagle opportunities on par 5s and short par 4s. Aggressive play when the situation is right."
     },
     {
       title: "Hole-in-One",
@@ -314,7 +323,8 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       description: "The ultimate golf achievement - ace a hole! Each one counts.",
       xp: 500,
       isRepeatable: true,
-      progress: "0 aces"
+      progress: "0 aces",
+      unlockHint: "Play more par 3s and focus on accuracy. Sometimes luck plays a part, but skill increases your chances."
     },
     {
       title: "Back-to-Back Birdies",
@@ -323,7 +333,8 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       description: "Score consecutive birdies. Momentum is everything!",
       xp: 100,
       isRepeatable: false,
-      progress: "Not achieved"
+      progress: "Not achieved",
+      unlockHint: "Maintain focus and positive momentum after making your first birdie. Stay aggressive but smart."
     },
     {
       title: "No Bogey Round",
@@ -332,7 +343,8 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       description: "Complete a round without any bogeys. Consistency at its finest.",
       xp: 200,
       isRepeatable: false,
-      progress: "Best: 2 bogeys"
+      progress: "Best: 2 bogeys",
+      unlockHint: "Focus on course management over aggressive play. Avoid double bogeys and play within your abilities."
     },
     {
       title: "Top 100 Conqueror",
@@ -341,7 +353,8 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       description: "Play 10 of the world's Top 100 golf courses. Elite course collection!",
       xp: 400,
       isRepeatable: false,
-      progress: "3 / 10 courses"
+      progress: "3 / 10 courses",
+      unlockHint: "Plan golf trips to destinations with multiple Top 100 courses. Research and book tee times in advance."
     },
     {
       title: "Regional Master",
@@ -350,7 +363,8 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       description: "Complete all courses in a selected region. Local expertise achieved!",
       xp: 300,
       isRepeatable: false,
-      progress: "Scotland: 8/12"
+      progress: "Scotland: 8/12",
+      unlockHint: "Continue exploring Scottish courses. Focus on completing the remaining 4 courses in your selected region."
     },
     {
       title: "International Golfer",
@@ -359,7 +373,8 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       description: "Play golf in 3 or more countries. Global golf adventurer!",
       xp: 150,
       isRepeatable: false,
-      progress: "4 countries"
+      progress: "4 countries",
+      dateEarned: "December 10, 2023"
     },
     {
       title: "Sunrise to Sunset",
@@ -368,7 +383,8 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       description: "Play 2 rounds in a single day. True dedication to the game!",
       xp: 125,
       isRepeatable: true,
-      progress: "Not achieved"
+      progress: "Not achieved",
+      unlockHint: "Book morning and afternoon tee times at the same course. Make sure to stay hydrated and energized."
     },
     {
       title: "Club Loyalist",
@@ -377,7 +393,8 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       description: "Play 50 rounds at your home club. True club spirit and loyalty!",
       xp: 350,
       isRepeatable: false,
-      progress: "23 / 50 rounds"
+      progress: "23 / 50 rounds",
+      unlockHint: "Continue playing regularly at your home club. Join club events and competitions to reach this milestone faster."
     }
   ];
 
@@ -858,18 +875,62 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                             </div>
                           </div>
                         </TooltipTrigger>
-                        <TooltipContent className="max-w-sm">
-                          <div className="text-center">
-                            <h4 className="font-semibold mb-1">{achievement.title}</h4>
-                            <p className="text-sm text-muted-foreground mb-2">
+                        <TooltipContent className="max-w-xs z-50 bg-background border shadow-lg">
+                          <div className="p-2">
+                            {/* Status Badge */}
+                            <div className="flex items-center justify-between mb-3">
+                              <h4 className="font-semibold text-sm">{achievement.title}</h4>
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                achievement.isEarned 
+                                  ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
+                                  : 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
+                              }`}>
+                                {achievement.isEarned ? 'Unlocked' : 'Locked'}
+                              </span>
+                            </div>
+                            
+                            {/* Description */}
+                            <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
                               {achievement.description}
                             </p>
-                            <p className="text-xs font-medium mb-1">
-                              +{achievement.xp} XP {achievement.isRepeatable ? "(Repeatable)" : "(One-time)"}
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              Progress: {achievement.progress}
-                            </p>
+                            
+                            {/* XP Value */}
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-xs font-medium text-primary">
+                                +{achievement.xp} XP
+                              </span>
+                              <span className="text-xs text-muted-foreground">
+                                {achievement.isRepeatable ? "(Repeatable)" : "(One-time)"}
+                              </span>
+                            </div>
+                            
+                            {/* Date Earned (if unlocked) */}
+                            {achievement.isEarned && achievement.dateEarned && (
+                              <div className="mb-2">
+                                <span className="text-xs text-green-600 dark:text-green-400 font-medium">
+                                  ✅ Earned: {achievement.dateEarned}
+                                </span>
+                              </div>
+                            )}
+                            
+                            {/* Progress */}
+                            <div className="mb-2">
+                              <span className="text-xs text-muted-foreground">
+                                Progress: {achievement.progress}
+                              </span>
+                            </div>
+                            
+                            {/* Unlock Hint (if locked) */}
+                            {!achievement.isEarned && achievement.unlockHint && (
+                              <div className="mt-3 p-2 bg-blue-50 dark:bg-blue-950/20 rounded border border-blue-200 dark:border-blue-800">
+                                <div className="flex items-start gap-2">
+                                  <span className="text-blue-500 text-xs">💡</span>
+                                  <span className="text-xs text-blue-700 dark:text-blue-300 leading-relaxed">
+                                    <strong>How to unlock:</strong> {achievement.unlockHint}
+                                  </span>
+                                </div>
+                              </div>
+                            )}
                           </div>
                         </TooltipContent>
                       </Tooltip>
@@ -923,18 +984,62 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                             </div>
                           </div>
                         </TooltipTrigger>
-                        <TooltipContent className="max-w-sm">
-                          <div className="text-center">
-                            <h4 className="font-semibold mb-1">{achievement.title}</h4>
-                            <p className="text-sm text-muted-foreground mb-2">
+                        <TooltipContent className="max-w-xs z-50 bg-background border shadow-lg">
+                          <div className="p-2">
+                            {/* Status Badge */}
+                            <div className="flex items-center justify-between mb-3">
+                              <h4 className="font-semibold text-sm">{achievement.title}</h4>
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                achievement.isEarned 
+                                  ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
+                                  : 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
+                              }`}>
+                                {achievement.isEarned ? 'Unlocked' : 'Locked'}
+                              </span>
+                            </div>
+                            
+                            {/* Description */}
+                            <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
                               {achievement.description}
                             </p>
-                            <p className="text-xs font-medium mb-1">
-                              +{achievement.xp} XP {achievement.isRepeatable ? "(Repeatable)" : "(One-time)"}
-                            </p>
-                            <p className="text-xs text-muted-foreground">
-                              Progress: {achievement.progress}
-                            </p>
+                            
+                            {/* XP Value */}
+                            <div className="flex items-center justify-between mb-2">
+                              <span className="text-xs font-medium text-primary">
+                                +{achievement.xp} XP
+                              </span>
+                              <span className="text-xs text-muted-foreground">
+                                {achievement.isRepeatable ? "(Repeatable)" : "(One-time)"}
+                              </span>
+                            </div>
+                            
+                            {/* Date Earned (if unlocked) */}
+                            {achievement.isEarned && achievement.dateEarned && (
+                              <div className="mb-2">
+                                <span className="text-xs text-green-600 dark:text-green-400 font-medium">
+                                  ✅ Earned: {achievement.dateEarned}
+                                </span>
+                              </div>
+                            )}
+                            
+                            {/* Progress */}
+                            <div className="mb-2">
+                              <span className="text-xs text-muted-foreground">
+                                Progress: {achievement.progress}
+                              </span>
+                            </div>
+                            
+                            {/* Unlock Hint (if locked) */}
+                            {!achievement.isEarned && achievement.unlockHint && (
+                              <div className="mt-3 p-2 bg-blue-50 dark:bg-blue-950/20 rounded border border-blue-200 dark:border-blue-800">
+                                <div className="flex items-start gap-2">
+                                  <span className="text-blue-500 text-xs">💡</span>
+                                  <span className="text-xs text-blue-700 dark:text-blue-300 leading-relaxed">
+                                    <strong>How to unlock:</strong> {achievement.unlockHint}
+                                  </span>
+                                </div>
+                              </div>
+                            )}
                           </div>
                         </TooltipContent>
                       </Tooltip>
