@@ -1,5 +1,6 @@
 import React from 'react';
-import { TrendingUp, TrendingDown, Target, BarChart3 } from 'lucide-react';
+import { TrendingUp, TrendingDown, Target, BarChart3, Trophy } from 'lucide-react';
+import { useUserAchievements } from '@/hooks/useUserAchievements';
 
 interface HandicapSummaryStatsProps {
   currentHandicap: number | null;
@@ -7,6 +8,7 @@ interface HandicapSummaryStatsProps {
   threeRoundAverage?: number | null;
   totalRounds?: number;
   isLoading?: boolean;
+  onAchievementsClick?: () => void;
 }
 
 interface StatCardProps {
@@ -16,6 +18,8 @@ interface StatCardProps {
   trend?: 'up' | 'down' | 'neutral';
   subtitle?: string;
   isLoading?: boolean;
+  onClick?: () => void;
+  isClickable?: boolean;
 }
 
 const StatCard: React.FC<StatCardProps> = ({ 
@@ -24,7 +28,9 @@ const StatCard: React.FC<StatCardProps> = ({
   value, 
   trend, 
   subtitle, 
-  isLoading = false 
+  isLoading = false,
+  onClick,
+  isClickable = false
 }) => {
   const getTrendIcon = () => {
     switch (trend) {
@@ -38,7 +44,12 @@ const StatCard: React.FC<StatCardProps> = ({
   };
 
   return (
-    <div className="bg-muted border border-border rounded-lg p-4 min-h-[100px] flex flex-col justify-center">
+    <div 
+      className={`bg-muted border border-border rounded-full px-6 py-4 min-h-[100px] flex flex-col justify-center transition-all ${
+        isClickable ? 'cursor-pointer hover:bg-muted/80 hover:scale-105' : ''
+      }`}
+      onClick={isClickable ? onClick : undefined}
+    >
       <div className="flex items-center gap-2 mb-2">
         <div className="text-primary/80">
           {icon}
@@ -73,40 +84,60 @@ const HandicapSummaryStats: React.FC<HandicapSummaryStatsProps> = ({
   bestHandicap,
   threeRoundAverage,
   totalRounds = 0,
-  isLoading = false
+  isLoading = false,
+  onAchievementsClick
 }) => {
+  const { achievements } = useUserAchievements();
+  const achievementsCount = achievements.length;
+
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-      <StatCard
-        icon={<Target className="h-4 w-4" />}
-        label="Current Handicap"
-        value={currentHandicap !== null ? currentHandicap.toFixed(1) : '--'}
-        isLoading={isLoading}
-      />
-      
-      <StatCard
-        icon={<TrendingDown className="h-4 w-4" />}
-        label="Best Handicap"
-        value={bestHandicap !== null ? bestHandicap.toFixed(1) : '--'}
-        subtitle="Personal best"
-        isLoading={isLoading}
-      />
-      
-      <StatCard
-        icon={<BarChart3 className="h-4 w-4" />}
-        label="3-Round Average"
-        value={threeRoundAverage !== null ? threeRoundAverage.toFixed(1) : '--'}
-        subtitle="Recent form"
-        isLoading={isLoading}
-      />
-      
-      <StatCard
-        icon={<TrendingUp className="h-4 w-4" />}
-        label="Total Rounds"
-        value={totalRounds}
-        subtitle="Recorded rounds"
-        isLoading={isLoading}
-      />
+    <div className="space-y-4">
+      {/* Top row - 4 stats */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard
+          icon={<Target className="h-4 w-4" />}
+          label="Current Handicap"
+          value={currentHandicap !== null ? currentHandicap.toFixed(1) : '--'}
+          isLoading={isLoading}
+        />
+        
+        <StatCard
+          icon={<TrendingDown className="h-4 w-4" />}
+          label="Best Handicap"
+          value={bestHandicap !== null ? bestHandicap.toFixed(1) : '--'}
+          subtitle="Personal best"
+          isLoading={isLoading}
+        />
+        
+        <StatCard
+          icon={<BarChart3 className="h-4 w-4" />}
+          label="3-Round Average"
+          value={threeRoundAverage !== null ? threeRoundAverage.toFixed(1) : '--'}
+          subtitle="Recent form"
+          isLoading={isLoading}
+        />
+        
+        <StatCard
+          icon={<TrendingUp className="h-4 w-4" />}
+          label="Total Rounds"
+          value={totalRounds}
+          subtitle="Recorded rounds"
+          isLoading={isLoading}
+        />
+      </div>
+
+      {/* Bottom row - Achievements */}
+      <div className="grid grid-cols-1 gap-4">
+        <StatCard
+          icon={<Trophy className="h-4 w-4" />}
+          label="Achievements"
+          value={achievementsCount}
+          subtitle="Unlocked achievements"
+          isLoading={isLoading}
+          onClick={onAchievementsClick}
+          isClickable={!!onAchievementsClick}
+        />
+      </div>
     </div>
   );
 };
