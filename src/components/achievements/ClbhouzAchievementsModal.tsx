@@ -295,43 +295,6 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       xp: 5000,
       isRepeatable: false,
       progress: "1 / 4 continents"
-    },
-    // Regional Top 100 Achievements
-    {
-      title: "GB & Ireland Top 100",
-      emoji: "🇬🇧",
-      isEarned: false,
-      description: "Complete all GB & Ireland Top 100 courses. Master the home of golf.",
-      xp: 750,
-      isRepeatable: false,
-      progress: "8 / 50 courses"
-    },
-    {
-      title: "Continental Europe Top 100",
-      emoji: "🇪🇺",
-      isEarned: false,
-      description: "Complete all Continental Europe Top 100 courses. European golf excellence.",
-      xp: 750,
-      isRepeatable: false,
-      progress: "2 / 30 courses"
-    },
-    {
-      title: "USA Top 100",
-      emoji: "🇺🇸",
-      isEarned: false,
-      description: "Complete all USA Top 100 courses. American golf at its finest.",
-      xp: 1000,
-      isRepeatable: false,
-      progress: "0 / 50 courses"
-    },
-    {
-      title: "Worldwide Top 100",
-      emoji: "🌍",
-      isEarned: false,
-      description: "Complete all Global Top 100 courses. The ultimate golf pilgrimage.",
-      xp: 2500,
-      isRepeatable: false,
-      progress: "3 / 100 courses"
     }
   ];
 
