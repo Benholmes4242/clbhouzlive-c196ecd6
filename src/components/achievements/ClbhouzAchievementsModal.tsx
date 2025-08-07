@@ -144,7 +144,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       if (scrollDebounceTimer.current) clearTimeout(scrollDebounceTimer.current);
       if (directionChangeTimer.current) clearTimeout(directionChangeTimer.current);
     };
-  }, [isManuallyCollapsed, isCollapsed]);
+  }, [isManuallyCollapsed]); // Removed isCollapsed to prevent listener recreation
 
   // Handle manual toggle with override
   const handleToggleCollapse = () => {
