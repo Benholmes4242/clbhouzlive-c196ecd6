@@ -81,7 +81,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
     }
   }, [isOpen]);
 
-  // Smart scroll detection with direction threshold and debouncing
+          // Smart scroll detection with direction threshold and debouncing
   useEffect(() => {
     if (!isOpen) return;
     
@@ -108,24 +108,33 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
           clearTimeout(scrollDebounceTimer.current);
         }
         
-        // Add mobile-specific debounce
-        const debounceDelay = isMobile ? 150 : 50;
-        
-        scrollDebounceTimer.current = setTimeout(() => {
-          // Update direction and handle state changes
-          if (newDirection !== 'idle') {
-            scrollDirection.current = newDirection;
-            
-            // Immediate collapse/expand based on scroll position and direction
-            if (!isManuallyCollapsed) {
-              if (newDirection === 'down' && currentScrollTop > 50) {
-                setIsCollapsed(true);
-              } else if (newDirection === 'up' && currentScrollTop < 100) {
-                setIsCollapsed(false);
+        // Mobile: Immediate collapse on any downward scroll, no debounce
+        if (isMobile) {
+          if (newDirection === 'down' && currentScrollTop > 10 && !isManuallyCollapsed) {
+            setIsCollapsed(true);
+          } else if (newDirection === 'up' && currentScrollTop < 50) {
+            setIsCollapsed(false);
+          }
+        } else {
+          // Desktop: Use debounced scroll
+          const debounceDelay = 50;
+          
+          scrollDebounceTimer.current = setTimeout(() => {
+            // Update direction and handle state changes
+            if (newDirection !== 'idle') {
+              scrollDirection.current = newDirection;
+              
+              // Immediate collapse/expand based on scroll position and direction
+              if (!isManuallyCollapsed) {
+                if (newDirection === 'down' && currentScrollTop > 50) {
+                  setIsCollapsed(true);
+                } else if (newDirection === 'up' && currentScrollTop < 100) {
+                  setIsCollapsed(false);
+                }
               }
             }
-          }
-        }, debounceDelay);
+          }, debounceDelay);
+        }
         
         lastScrollTop.current = currentScrollTop;
       };
@@ -142,7 +151,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       if (scrollDebounceTimer.current) clearTimeout(scrollDebounceTimer.current);
       if (directionChangeTimer.current) clearTimeout(directionChangeTimer.current);
     };
-  }, [isOpen, isManuallyCollapsed]);
+  }, [isOpen, isManuallyCollapsed, isMobile]);
 
   // Handle manual toggle with override
   const handleToggleCollapse = () => {
@@ -626,12 +635,12 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
           <div className={`${isMobile ? 'px-4 pb-2' : 'px-6 pb-4'}`}>
             <div className={`flex items-center justify-between bg-muted/50 rounded-lg ${isMobile ? 'p-3' : 'p-4'}`}>
               <div className="flex items-center gap-3">
-                <div className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-white font-bold ${isMobile ? 'text-sm' : 'text-lg'}`}>
+                <div className={`${isMobile ? 'w-14 h-14' : 'w-12 h-12'} rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-white font-bold ${isMobile ? 'text-base' : 'text-lg'}`}>
                   {userProfilePhotoUrl ? (
                     <img 
                       src={userProfilePhotoUrl} 
                       alt={userDisplayName} 
-                      className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} rounded-full object-cover`}
+                      className={`${isMobile ? 'w-14 h-14' : 'w-12 h-12'} rounded-full object-cover`}
                     />
                   ) : (
                     userDisplayName.charAt(0).toUpperCase()
@@ -752,7 +761,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                     <div className="space-y-1">
                       <div className="flex justify-between text-xs text-muted-foreground">
                         <span>Progress to {nextTier.name}</span>
-                        <span className="font-medium">{Math.round(progressPercentage)}%</span>
+                        <span className="font-medium">100%</span>
                       </div>
                       <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden">
                         <div 
@@ -957,9 +966,9 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
           {/* Filter Buttons - Mobile Optimized */}
           <div className={`${isMobile ? 'px-4 pb-4' : 'px-6 pb-6'}`}>
             {isMobile ? (
-              /* Mobile: 2 rows layout */
+              /* Mobile: 2 rows layout - full width */
               <div className="space-y-2">
-                <div className="flex gap-1.5 justify-center">
+                <div className="grid grid-cols-3 gap-1.5">
                   {['all', 'unlocked', 'locked'].map((filter) => (
                     <Button
                       key={filter}
@@ -967,7 +976,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                       size="sm"
                       onClick={() => setActiveFilter(filter as typeof activeFilter)}
                       className={`
-                        capitalize transition-all duration-200 text-xs h-8 px-3
+                        capitalize transition-all duration-200 text-xs h-8 px-2
                         ${activeFilter === filter 
                           ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg' 
                           : 'hover:bg-muted/80'
@@ -980,7 +989,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                     </Button>
                   ))}
                 </div>
-                <div className="flex gap-1.5 justify-center">
+                <div className="grid grid-cols-2 gap-1.5">
                   {['exploration', 'skill'].map((filter) => (
                     <Button
                       key={filter}
@@ -988,7 +997,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                       size="sm"
                       onClick={() => setActiveFilter(filter as typeof activeFilter)}
                       className={`
-                        capitalize transition-all duration-200 text-xs h-8 px-3
+                        capitalize transition-all duration-200 text-xs h-8 px-2
                         ${activeFilter === filter 
                           ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg' 
                           : 'hover:bg-muted/80'
@@ -1035,16 +1044,13 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
               <div className="bg-gradient-to-br from-blue-50/80 to-cyan-50/60 dark:from-blue-950/20 dark:to-cyan-950/15 rounded-2xl p-6 border border-blue-200/40 dark:border-blue-800/40 shadow-xl backdrop-blur-sm">
                 {/* Section Header with Icon */}
                   <div className={`flex items-center justify-center gap-3 ${isMobile ? 'mb-3' : 'mb-6'}`}>
-                    <div className={`${isMobile ? 'w-8 h-8' : 'w-10 h-10'} rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center`}>
-                      <span className={`${isMobile ? 'text-lg' : 'text-xl'}`}>🧭</span>
-                    </div>
                     <h3 className={`${isMobile ? 'text-base' : 'text-xl'} font-bold text-blue-800 dark:text-blue-200`}>
                       Experience & Exploration Achievements
                     </h3>
                   </div>
                 
                 <TooltipProvider>
-                  <div className={`grid grid-cols-3 ${isMobile ? 'gap-2' : 'gap-4'}`}>
+                  <div className={`grid grid-cols-3 ${isMobile ? 'gap-1' : 'gap-4'}`}>
                     {getFilteredAchievements(explorationAchievements, 'exploration').map((achievement) => {
                       const { percentage, nudgeText } = getAchievementProgress(achievement);
                       const isNearUnlock = percentage >= 80 && percentage < 100;
@@ -1052,13 +1058,19 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                       return (
                         <Tooltip key={achievement.title}>
                           <TooltipTrigger asChild>
-                            <div className="relative">
+                            <div 
+                              className="relative cursor-pointer"
+                              onClick={() => {
+                                // Show achievement details modal
+                                console.log('Achievement clicked:', achievement.title);
+                              }}
+                            >
                                 <div
                                   className={`
                                     border rounded-xl transition-all duration-200 hover:scale-105 cursor-pointer 
                                     bg-white/80 dark:bg-gray-900/40 backdrop-blur-sm
                                     shadow-lg hover:shadow-xl
-                                    ${isMobile ? 'p-1.5 flex flex-col items-center text-center space-y-1' : 'p-2 flex items-center gap-2'}
+                                    ${isMobile ? 'p-0 flex flex-col items-center text-center' : 'p-2 flex items-center gap-2'}
                                     ${achievement.isEarned 
                                       ? 'border-blue-300 dark:border-blue-700 shadow-blue-100/50 dark:shadow-blue-900/20' 
                                       : isNearUnlock
@@ -1067,18 +1079,17 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                                     }
                                   `}
                                 >
-                                  <div className={`flex justify-center items-center ${isMobile ? 'mb-1' : 'flex-shrink-0 min-w-0'}`}>
+                                  <div className={`flex justify-center items-center w-full ${isMobile ? 'mb-1 px-0' : 'flex-shrink-0 min-w-0'}`}>
                                     <div className={isMobile ? 'scale-75' : ''}>
                                       {getAchievementIcon(achievement)}
                                     </div>
                                   </div>
-                                  <div className={`text-center ${isMobile ? '' : 'flex-1'}`}>
+                                  <div className={`text-center w-full ${isMobile ? 'px-1 pb-1' : 'flex-1'}`}>
                                     <h4 className={`font-medium mb-1 ${isMobile ? 'text-xs leading-tight' : 'text-sm'}`}>
                                       {achievement.title}
                                     </h4>
                                     <p className={`${isMobile ? 'text-xs' : 'text-xs'} ${achievement.isEarned ? 'text-blue-600 dark:text-blue-400' : 'text-muted-foreground'}`}>
                                       <span className="inline-flex items-center gap-1">
-                                        <span className="text-amber-500">✨</span>
                                         +{achievement.xp} XP 
                                         {achievement.isRepeatable ? " 🔄" : " 🏆"}
                                       </span>
@@ -1176,16 +1187,13 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
               <div className="bg-gradient-to-br from-green-50/80 to-emerald-50/60 dark:from-green-950/20 dark:to-emerald-950/15 rounded-2xl p-6 border border-green-200/40 dark:border-green-800/40 shadow-xl backdrop-blur-sm">
                 {/* Section Header with Icon */}
                   <div className={`flex items-center justify-center gap-3 ${isMobile ? 'mb-3' : 'mb-6'}`}>
-                    <div className={`${isMobile ? 'w-8 h-8' : 'w-10 h-10'} rounded-full bg-green-100 dark:bg-green-900/50 flex items-center justify-center`}>
-                      <span className={`${isMobile ? 'text-lg' : 'text-xl'}`}>💪</span>
-                    </div>
                     <h3 className={`${isMobile ? 'text-base' : 'text-xl'} font-bold text-green-800 dark:text-green-200`}>
                       Skill & Performance Achievements
                     </h3>
                   </div>
                 
                 <TooltipProvider>
-                  <div className={`grid grid-cols-3 ${isMobile ? 'gap-2' : 'gap-4'}`}>
+                  <div className={`grid grid-cols-3 ${isMobile ? 'gap-1' : 'gap-4'}`}>
                     {getFilteredAchievements(skillAchievements, 'skill').map((achievement) => {
                       const { percentage, nudgeText } = getAchievementProgress(achievement);
                       const isNearUnlock = percentage >= 80 && percentage < 100;
@@ -1193,13 +1201,19 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                       return (
                         <Tooltip key={achievement.title}>
                           <TooltipTrigger asChild>
-                            <div className="relative">
+                            <div 
+                              className="relative cursor-pointer"
+                              onClick={() => {
+                                // Show achievement details modal
+                                console.log('Achievement clicked:', achievement.title);
+                              }}
+                            >
                                 <div
                                   className={`
                                     border rounded-xl transition-all duration-200 hover:scale-105 cursor-pointer 
                                     bg-white/80 dark:bg-gray-900/40 backdrop-blur-sm
                                     shadow-lg hover:shadow-xl
-                                    ${isMobile ? 'p-1.5 flex flex-col items-center text-center space-y-1' : 'p-2 flex items-center gap-2'}
+                                    ${isMobile ? 'p-0 flex flex-col items-center text-center' : 'p-2 flex items-center gap-2'}
                                     ${achievement.isEarned 
                                       ? 'border-green-300 dark:border-green-700 shadow-green-100/50 dark:shadow-green-900/20' 
                                       : isNearUnlock
@@ -1208,18 +1222,17 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                                     }
                                   `}
                                 >
-                                  <div className={`flex justify-center items-center ${isMobile ? 'mb-1' : 'flex-shrink-0 min-w-0'}`}>
+                                  <div className={`flex justify-center items-center w-full ${isMobile ? 'mb-1 px-0' : 'flex-shrink-0 min-w-0'}`}>
                                     <div className={isMobile ? 'scale-75' : ''}>
                                       {getAchievementIcon(achievement)}
                                     </div>
                                   </div>
-                                  <div className={`text-center ${isMobile ? '' : 'flex-1'}`}>
+                                  <div className={`text-center w-full ${isMobile ? 'px-1 pb-1' : 'flex-1'}`}>
                                     <h4 className={`font-medium mb-1 ${isMobile ? 'text-xs leading-tight' : 'text-sm'}`}>
                                       {achievement.title}
                                     </h4>
                                     <p className={`${isMobile ? 'text-xs' : 'text-xs'} ${achievement.isEarned ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}`}>
                                       <span className="inline-flex items-center gap-1">
-                                        <span className="text-amber-500">✨</span>
                                         +{achievement.xp} XP 
                                         {achievement.isRepeatable ? " 🔄" : " 🏆"}
                                       </span>
