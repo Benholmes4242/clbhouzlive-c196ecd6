@@ -80,6 +80,31 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
     }
   }, [isOpen]);
 
+  // Body scroll lock for mobile
+  useEffect(() => {
+    if (isOpen) {
+      // Prevent background scrolling on mobile
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+      document.body.style.top = '0';
+    } else {
+      // Restore scrolling
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.body.style.top = '';
+    }
+
+    return () => {
+      // Cleanup on unmount
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.body.style.top = '';
+    };
+  }, [isOpen]);
+
   // Smart scroll detection with direction threshold and debouncing - mobile optimized
   useEffect(() => {
     if (!isOpen) return;
@@ -557,10 +582,14 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl h-[90vh] p-0 gap-0 overflow-hidden">
-        <div className="h-full flex flex-col" ref={swipeRef}>
+      <DialogContent className="max-w-4xl h-[90vh] p-0 gap-0 overflow-hidden" onOpenAutoFocus={(e) => e.preventDefault()}>
+        <div className="h-full flex flex-col"
+             style={{ 
+               touchAction: 'pan-y',
+               overscrollBehavior: 'contain'
+             }}>
           
-          {/* Header Section with XP Progress - Mobile Optimized */}
+          {/* Header Section with XP Progress - Consistent Colors */}
           <div className={`
             bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 
             dark:from-gray-900 dark:via-gray-800 dark:to-gray-900
@@ -674,7 +703,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
             )}
           </div>
 
-          {/* Filter Buttons - Mobile Optimized 2 Rows */}
+          {/* Filter Buttons - Consistent Colors */}
           <div className="p-3 md:p-4 border-b border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm">
             <div className="grid grid-cols-3 md:flex md:flex-wrap gap-1.5 md:gap-2">
               {/* First row on mobile */}
@@ -726,10 +755,15 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
             </div>
           </div>
 
-          {/* Scrollable Content - Mobile Optimized */}
+          {/* Scrollable Content - Mobile Scroll Fixed */}
           <div 
             ref={scrollRef}
-            className="flex-1 overflow-y-auto p-3 md:p-4 space-y-3 md:space-y-6 scrollbar-hide max-w-[95vw] mx-auto"
+            className="flex-1 overflow-y-auto p-3 md:p-4 space-y-3 md:space-y-6 scrollbar-hide"
+            style={{
+              touchAction: 'pan-y',
+              overscrollBehavior: 'contain',
+              WebkitOverflowScrolling: 'touch'
+            }}
           >
             
             {/* Exploration & Travel Achievements */}
