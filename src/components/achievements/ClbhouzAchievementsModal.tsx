@@ -665,10 +665,8 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                   
                   <div className="flex justify-center md:justify-end">
                     <XPRingSystem 
-                      xp={totalXP} 
+                      currentXP={totalXP} 
                       size="medium"
-                      showLevel={false}
-                      animate={animateProgress}
                     />
                   </div>
                 </div>
