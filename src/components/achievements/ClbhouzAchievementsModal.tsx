@@ -58,7 +58,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
     // Use custom badges for club achievements instead of padlocks
     switch (achievement.title) {
       case "20 Club":
-        return <img src={club20Badge} alt="20 Club Badge" className="w-8 h-8 opacity-50" />;
+        return <img src={club20Badge} alt="20 Club Badge" className="w-16 h-16" />;
       case "50 Club":
         return <img src={club50Badge} alt="50 Club Badge" className="w-8 h-8 opacity-50" />;
       case "100 Century Club":
