@@ -10,6 +10,8 @@ interface ClbhouzAchievementsModalProps {
   userId?: string;
   userDisplayName?: string;
   userHandicap?: string | number;
+  userProfilePhotoUrl?: string;
+  isCurrentUser?: boolean;
 }
 
 interface Achievement {
@@ -27,7 +29,9 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
   onClose,
   userId,
   userDisplayName = "User",
-  userHandicap
+  userHandicap,
+  userProfilePhotoUrl,
+  isCurrentUser = true
 }) => {
   const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
   // Mock data for now - replace with actual badge system later
@@ -267,7 +271,12 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl max-h-[85vh] overflow-hidden p-0 flex flex-col">
         <DialogHeader className="p-6 pb-4 flex-shrink-0">
-          <DialogTitle className="text-2xl font-bold">Clbhouz Achievements Tray</DialogTitle>
+          <DialogTitle className="text-2xl font-bold">
+            {isCurrentUser ? "Your clbhouz achievements" : `${userDisplayName}'s clbhouz achievements`}
+          </DialogTitle>
+          <p className="text-sm text-muted-foreground mt-1">
+            See how far your game can take you
+          </p>
         </DialogHeader>
         
         <div 
@@ -282,9 +291,17 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
           <div className="px-6 pb-4">
             <div className="flex items-center justify-between bg-muted/50 rounded-lg p-4">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
-                  <span className="text-lg">{userDisplayName.charAt(0)}</span>
-                </div>
+                {userProfilePhotoUrl ? (
+                  <img 
+                    src={userProfilePhotoUrl} 
+                    alt={`${userDisplayName}'s profile`}
+                    className="w-12 h-12 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
+                    <span className="text-lg">{userDisplayName.charAt(0)}</span>
+                  </div>
+                )}
                 <div>
                   <h3 className="font-semibold">{userDisplayName}</h3>
                   <p className="text-sm text-muted-foreground">
@@ -300,12 +317,13 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
 
           {/* XP Ring System Section */}
           <div className="px-6 pb-4">
-            <div className="bg-blue-50 dark:bg-blue-950/20 rounded-lg p-6 border border-blue-200 dark:border-blue-800">
+            <div className="bg-blue-50 dark:bg-blue-950/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
               <XPRingSystem 
                 currentXP={totalXP} 
                 size="large"
                 showMiniRings={true}
                 className="w-full"
+                layout="horizontal"
               />
             </div>
           </div>
