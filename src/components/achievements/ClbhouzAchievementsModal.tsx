@@ -44,6 +44,8 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
   const [animateProgress, setAnimateProgress] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   
+  // Clear any cached references by forcing recompilation
+  
   // Mock data for now - replace with actual badge system later
   const totalXP = 2500;
   const nextMilestone = 10000;
