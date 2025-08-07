@@ -62,7 +62,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       case "200 Clubhouse Elite":
         return '🔒';
       case "300 Club Champion":
-        return <img src="/lovable-uploads/48fd5991-4bc3-4ce3-b90a-36644db48c0f.png" alt="300 Club Champion Badge" className="w-16 h-16" />;
+        return <img src="/lovable-uploads/227db9bc-e1f0-487e-8568-fd06f20b15ee.png" alt="300 Club Champion Badge" className="w-16 h-16" />;
       default:
         return '🔒';
     }
