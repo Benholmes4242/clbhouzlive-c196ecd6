@@ -66,7 +66,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       case "European Explorer":
         return <img src="/lovable-uploads/24422ab1-3322-4f51-801b-8ae8e80c95d7.png" alt="European Explorer Badge" className="w-16 h-16" />;
       case "UK & Ireland Explorer":
-        return <img src="/lovable-uploads/254454ee-ea49-4f4a-b4f0-397e45efd43c.png" alt="UK & Ireland Explorer Badge" className="w-16 h-16" />;
+        return <img src="/lovable-uploads/54fecf12-83df-48be-b433-d227be70278d.png" alt="UK & Ireland Explorer Badge" className="w-16 h-16" />;
       case "USA Explorer":
         return <img src="/lovable-uploads/ad7f9c0b-b395-4b96-b059-63ebab11bd4f.png" alt="USA Explorer Badge" className="w-16 h-16" />;
       case "World Explorer":
