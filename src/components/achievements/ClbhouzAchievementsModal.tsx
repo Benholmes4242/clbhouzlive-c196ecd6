@@ -350,63 +350,65 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                 </div>
               </div>
               
-              {/* Progress Ring and Info */}
-              <div className="flex items-center justify-center gap-12 mb-6">
-                {/* Progress Ring - Left */}
-                <div className="relative flex-shrink-0">
-                  <div className="relative w-32 h-32">
-                    <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 120 120">
-                      {/* Background circle */}
-                      <circle
-                        cx="60"
-                        cy="60"
-                        r="54"
-                        stroke="currentColor"
-                        strokeWidth="8"
-                        fill="transparent"
-                        className="text-gray-300 dark:text-gray-600"
-                      />
-                      {/* Progress circle */}
-                      <circle
-                        cx="60"
-                        cy="60"
-                        r="54"
-                        stroke="#4682B4"
-                        strokeWidth="8"
-                        fill="transparent"
-                        strokeDasharray={`${54 * 2 * Math.PI}`}
-                        strokeDashoffset={`${54 * 2 * Math.PI * (1 - (totalXP / 10000))}`}
-                        strokeLinecap="round"
-                        className="transition-all duration-700 ease-in-out"
-                        style={{
-                          filter: 'drop-shadow(0 0 8px rgba(70, 130, 180, 0.4))'
-                        }}
-                      />
-                    </svg>
-                    {/* Center XP to next ring */}
-                    <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <div className="text-lg font-bold text-foreground">
-                        {(10000 - totalXP).toLocaleString()}
-                      </div>
-                      <div className="text-xs text-muted-foreground text-center">
-                        XP to next ring
+              {/* Progress Ring and Info - Centered as a unit */}
+              <div className="flex justify-center mb-6">
+                <div className="flex items-center gap-12">
+                  {/* Progress Ring - Left */}
+                  <div className="relative flex-shrink-0">
+                    <div className="relative w-32 h-32">
+                      <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 120 120">
+                        {/* Background circle */}
+                        <circle
+                          cx="60"
+                          cy="60"
+                          r="54"
+                          stroke="currentColor"
+                          strokeWidth="8"
+                          fill="transparent"
+                          className="text-gray-300 dark:text-gray-600"
+                        />
+                        {/* Progress circle */}
+                        <circle
+                          cx="60"
+                          cy="60"
+                          r="54"
+                          stroke="#4682B4"
+                          strokeWidth="8"
+                          fill="transparent"
+                          strokeDasharray={`${54 * 2 * Math.PI}`}
+                          strokeDashoffset={`${54 * 2 * Math.PI * (1 - (totalXP / 10000))}`}
+                          strokeLinecap="round"
+                          className="transition-all duration-700 ease-in-out"
+                          style={{
+                            filter: 'drop-shadow(0 0 8px rgba(70, 130, 180, 0.4))'
+                          }}
+                        />
+                      </svg>
+                      {/* Center XP to next ring */}
+                      <div className="absolute inset-0 flex flex-col items-center justify-center">
+                        <div className="text-lg font-bold text-foreground">
+                          {(10000 - totalXP).toLocaleString()}
+                        </div>
+                        <div className="text-xs text-muted-foreground text-center">
+                          XP to next ring
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-                
-                {/* Ring Info - Right */}
-                <div className="flex-1 min-w-0">
-                  <div className="space-y-2">
-                    <h3 className="font-semibold text-lg text-gray-500">
-                      No Ring Achieved
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      Reach 10,000 XP to unlock your first ring
-                    </p>
-                    <p className="text-sm text-muted-foreground font-medium">
-                      Next: Blue Ring at 10,000 XP
-                    </p>
+                  
+                  {/* Ring Info - Right */}
+                  <div className="w-64">
+                    <div className="space-y-2">
+                      <h3 className="font-semibold text-lg text-gray-500">
+                        No Ring Achieved
+                      </h3>
+                      <p className="text-sm text-muted-foreground">
+                        Reach 10,000 XP to unlock your first ring
+                      </p>
+                      <p className="text-sm text-muted-foreground font-medium">
+                        Next: Blue Ring at 10,000 XP
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
