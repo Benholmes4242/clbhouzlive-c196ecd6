@@ -495,7 +495,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                     <TooltipTrigger asChild>
                       <div
                         className={`
-                          border rounded-lg px-4 py-2 transition-all duration-200 hover:scale-105 cursor-pointer flex flex-col items-center gap-3
+                          border rounded-lg p-4 transition-all duration-200 hover:scale-105 cursor-pointer flex items-center gap-3
                           ${achievement.isEarned 
                             ? 'bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800' 
                             : 'bg-background border-border'
@@ -503,10 +503,10 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                         `}
                         onClick={() => setSelectedAchievement(achievement)}
                       >
-                        <div className="flex justify-center">
+                        <div className="flex-shrink-0">
                           {getAchievementIcon(achievement)}
                         </div>
-                        <div className="text-center">
+                        <div className="flex-1 text-center">
                           <h4 className="font-medium text-sm mb-1">
                             {achievement.title}
                           </h4>
@@ -548,7 +548,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                     <TooltipTrigger asChild>
                       <div
                         className={`
-                          border rounded-lg px-4 py-2 transition-all duration-200 hover:scale-105 cursor-pointer flex flex-col items-center gap-3
+                          border rounded-lg p-4 transition-all duration-200 hover:scale-105 cursor-pointer flex items-center gap-3
                           ${achievement.isEarned 
                             ? 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800' 
                             : 'bg-background border-border'
@@ -556,10 +556,10 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                         `}
                         onClick={() => setSelectedAchievement(achievement)}
                       >
-                        <div className="flex justify-center">
+                        <div className="flex-shrink-0">
                           {getAchievementIcon(achievement)}
                         </div>
-                        <div className="text-center">
+                        <div className="flex-1 text-center">
                           <h4 className="font-medium text-sm mb-1">
                             {achievement.title}
                           </h4>
