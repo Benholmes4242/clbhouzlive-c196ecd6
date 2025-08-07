@@ -58,7 +58,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       case "200 Clubhouse Elite":
         return <img src="/lovable-uploads/3f4eaa9f-25be-41e0-acca-0f97bc858390.png" alt="200 Clubhouse Elite Badge" className="w-16 h-16" />;
       case "300 Club Champion":
-        return <img src="/lovable-uploads/227db9bc-e1f0-487e-8568-fd06f20b15ee.png" alt="300 Club Champion Badge" className="w-16 h-16" />;
+        return <img src="/lovable-uploads/03c915d7-c037-4b15-92c3-745a709da230.png" alt="300 Club Champion Badge" className="w-16 h-16" />;
       case "European Explorer":
         return <img src="/lovable-uploads/24422ab1-3322-4f51-801b-8ae8e80c95d7.png" alt="European Explorer Badge" className="w-16 h-16" />;
       case "UK & Ireland Explorer":
