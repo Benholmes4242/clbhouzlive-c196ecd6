@@ -76,19 +76,31 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
   // Handle scroll for sticky behavior with manual override
   useEffect(() => {
     const scrollElement = scrollRef.current;
-    if (!scrollElement) return;
+    if (!scrollElement) {
+      console.log('🔍 Scroll element not found');
+      return;
+    }
+
+    console.log('📜 Setting up scroll listener');
 
     const handleScroll = () => {
       const scrollTop = scrollElement.scrollTop;
+      console.log('📍 Scroll position:', scrollTop, 'isManuallyCollapsed:', isManuallyCollapsed, 'current isCollapsed:', isCollapsed);
+      
       // Auto-collapse at 150px scroll, but respect manual state
       if (!isManuallyCollapsed) {
-        setIsCollapsed(scrollTop > 150);
+        const shouldCollapse = scrollTop > 150;
+        console.log('🔄 Should collapse:', shouldCollapse);
+        setIsCollapsed(shouldCollapse);
       }
     };
 
     scrollElement.addEventListener('scroll', handleScroll);
-    return () => scrollElement.removeEventListener('scroll', handleScroll);
-  }, [isManuallyCollapsed]);
+    return () => {
+      console.log('🧹 Cleaning up scroll listener');
+      scrollElement.removeEventListener('scroll', handleScroll);
+    };
+  }, [isManuallyCollapsed, isCollapsed]);
 
   // Handle manual toggle
   const handleToggleCollapse = () => {
