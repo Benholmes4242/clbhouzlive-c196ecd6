@@ -503,7 +503,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                         `}
                         onClick={() => setSelectedAchievement(achievement)}
                       >
-                        <div className="w-16 flex-shrink-0 flex justify-center">
+                        <div className="flex-shrink-0 flex justify-center items-center min-w-0">
                           {getAchievementIcon(achievement)}
                         </div>
                         <div className="flex-1 text-center">
@@ -556,7 +556,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                         `}
                         onClick={() => setSelectedAchievement(achievement)}
                       >
-                        <div className="w-16 flex-shrink-0 flex justify-center">
+                        <div className="flex-shrink-0 flex justify-center items-center min-w-0">
                           {getAchievementIcon(achievement)}
                         </div>
                         <div className="flex-1 text-center">
