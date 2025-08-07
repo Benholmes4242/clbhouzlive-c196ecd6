@@ -356,27 +356,47 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       unlockHint: "The ultimate goal for golf course enthusiasts. Continue your incredible journey!"
     },
     {
-      title: "Britain & Ireland Explorer",
+      title: "Lynx Legend",
       emoji: "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
       isEarned: false,
-      description: "Complete the Great Britain & Ireland top golf courses list",
+      description: "Great Britain and Ireland, You've Mastered the Finest Across the British Isles",
       xp: 3000,
       isRepeatable: false,
       progress: "12 / 20 courses",
       unlockHint: "Explore the historic golf courses across England, Scotland, Wales, and Ireland. You're making great progress!"
     },
     {
-      title: "European Explorer",
+      title: "The Continental Swinger",
       emoji: "🇪🇺",
       isEarned: false,
-      description: "Play courses across 8 different European countries",
+      description: "Continental Europe, From Algarve to the Alps, Europe's Elite Courses, Conquered",
       xp: 3000,
       isRepeatable: false,
       progress: "3 / 8 countries",
       unlockHint: "Plan golf trips across Europe. Consider France, Spain, Portugal, Germany, and other European golf destinations."
     },
     {
-      title: "Worldwide Explorer",
+      title: "Stars and Stripes Torah",
+      emoji: "🇺🇸",
+      isEarned: false,
+      description: "USA. Coast to Coast you've played the American Greats",
+      xp: 3000,
+      isRepeatable: false,
+      progress: "1 / 10 states",
+      unlockHint: "Plan golf trips to different US states. Consider popular golf destinations like Florida, California, or Arizona."
+    },
+    {
+      title: "Legends Club",
+      emoji: "🌍",
+      isEarned: false,
+      description: "World Wide Top 100. From Seve, to Tiger, to Jack, Legends have walked where you now stand. You've joined Golf's most elite circle. Welcome.",
+      xp: 5000,
+      isRepeatable: false,
+      progress: "1 / 4 continents",
+      unlockHint: "Expand your golf travels internationally. Each continent offers unique golf experiences and challenges."
+    },
+    {
+      title: "World Explorer",
       emoji: "🌎",
       isEarned: false,
       description: "Play courses on 4 different continents",
@@ -384,26 +404,6 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       isRepeatable: false,
       progress: "1 / 4 continents",
       unlockHint: "Plan international golf trips to reach different continents. Consider Europe, Asia, or Australia for your next golf adventure."
-    },
-    {
-      title: "USA Explorer",
-      emoji: "🇺🇸",
-      isEarned: false,
-      description: "Play courses across 10 different US states",
-      xp: 3000,
-      isRepeatable: false,
-      progress: "1 / 10 states",
-      unlockHint: "Plan golf trips to different US states. Consider popular golf destinations like Florida, California, or Arizona."
-    },
-    {
-      title: "World Explorer",
-      emoji: "🌍",
-      isEarned: false,
-      description: "Play courses on 4 different continents",
-      xp: 5000,
-      isRepeatable: false,
-      progress: "1 / 4 continents",
-      unlockHint: "Expand your golf travels internationally. Each continent offers unique golf experiences and challenges."
     }
   ];
 
