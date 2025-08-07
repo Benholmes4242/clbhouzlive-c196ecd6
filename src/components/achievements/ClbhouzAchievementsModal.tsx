@@ -582,186 +582,224 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl h-[90vh] p-0 gap-0 overflow-hidden" onOpenAutoFocus={(e) => e.preventDefault()}>
+      <DialogContent className="max-w-4xl max-h-[85vh] overflow-hidden p-0 flex flex-col bg-gradient-to-br from-green-50/30 via-blue-50/20 to-green-50/30 dark:from-green-950/10 dark:via-blue-950/10 dark:to-green-950/10"
+        style={{
+          backgroundImage: `
+            radial-gradient(circle at 20% 50%, rgba(34, 197, 94, 0.03) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(59, 130, 246, 0.03) 0%, transparent 50%),
+            radial-gradient(circle at 40% 80%, rgba(16, 185, 129, 0.02) 0%, transparent 50%)
+          `
+        }}
+      >
         <div className="h-full flex flex-col"
              style={{ 
                touchAction: 'pan-y',
                overscrollBehavior: 'contain'
              }}>
           
-          {/* Header Section with XP Progress - Consistent Colors */}
-          <div className={`
-            bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 
-            dark:from-gray-900 dark:via-gray-800 dark:to-gray-900
-            border-b border-amber-200/50 dark:border-gray-700/50
-            transition-all duration-300 ease-in-out
-            ${isCollapsed ? 'py-2 px-3 h-[52px]' : 'py-3 px-3 md:p-6'}
-            ${showCelebration ? 'animate-pulse' : ''}
-            relative overflow-hidden shadow-md
-          `}>
+          {/* Header Section with XP Progress - Desktop Colors */}
+          <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm transition-all duration-400 ease-in-out px-3 md:px-6 py-3 md:py-4">
+            <div className="flex items-center justify-between bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-lg p-3 border border-blue-200/50 dark:border-blue-800/50">
             
-            {/* Celebration Background Effect */}
-            {showCelebration && (
-              <div className="absolute inset-0 bg-gradient-to-r from-yellow-200/20 via-orange-200/20 to-amber-200/20 animate-pulse pointer-events-none" />
-            )}
-            
-            {/* Condensed Header for Collapsed State */}
+            {/* Collapsible XP Progress Header with Smooth Animations */}
             {isCollapsed ? (
-              <div className="flex items-center justify-between h-full">
-                <div className="flex items-center gap-2 w-full">
-                  <div className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                    {totalXP.toLocaleString()} XP
+              /* Collapsed Mini View */
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="relative w-8 h-8">
+                    <svg className="w-8 h-8 transform -rotate-90" viewBox="0 0 32 32">
+                      <circle
+                        cx="16"
+                        cy="16"
+                        r="14"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        fill="transparent"
+                        className="text-gray-300 dark:text-gray-600"
+                      />
+                      <circle
+                        cx="16"
+                        cy="16"
+                        r="14"
+                        stroke={nextTier.color}
+                        strokeWidth="2"
+                        fill="transparent"
+                        strokeDasharray={`${14 * 2 * Math.PI}`}
+                        strokeDashoffset={`${14 * 2 * Math.PI * (1 - progressPercentage / 100)}`}
+                        strokeLinecap="round"
+                        className="transition-all duration-700"
+                      />
+                    </svg>
+                    <Trophy className="absolute inset-0 w-4 h-4 m-auto text-muted-foreground" />
                   </div>
-                  <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 min-w-[100px]">
-                    <div 
-                      className="bg-gradient-to-r from-amber-400 to-orange-500 h-1.5 rounded-full transition-all duration-700 ease-out"
-                      style={{ 
-                        width: animateProgress ? `${progressPercentage}%` : '0%' 
-                      }}
-                    />
-                  </div>
-                  <div className="text-xs text-gray-600 dark:text-gray-400">
-                    {nextTier.name}
-                  </div>
+                  <div className="text-sm font-medium">{totalXP.toLocaleString()} XP | {progressPercentage.toFixed(0)}% to {nextTier.name}</div>
                 </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleToggleCollapse}
-                  className="h-8 w-8 p-0 hover:bg-white/50 dark:hover:bg-gray-800/50 ml-2 flex-shrink-0"
-                >
-                  <ChevronDown className="h-4 w-4" />
-                </Button>
-              </div>
-            ) : (
-              /* Expanded Header - Mobile Optimized */
-              <div className="space-y-2 md:space-y-4">
-                <div className="flex items-center justify-between">
-                  <DialogHeader className="text-left p-0">
-                    <DialogTitle className="text-lg md:text-2xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent flex items-center gap-2">
-                      <Trophy className="h-4 w-4 md:h-6 md:w-6 text-amber-600" />
-                      Achievements
-                    </DialogTitle>
-                    <DialogDescription className="text-xs md:text-base text-gray-600 dark:text-gray-400 mt-1">
-                      Track your golf journey milestones and unlock rewards
-                    </DialogDescription>
-                  </DialogHeader>
+                <div className="flex-1 mx-4 bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-1000 ease-out"
+                    style={{ 
+                      width: animateProgress ? `${progressPercentage}%` : '0%',
+                      boxShadow: '0 0 10px rgba(59, 130, 246, 0.5)'
+                    }}
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="text-xs text-muted-foreground">
+                    Next: {nextTier.name} at {nextTier.minXP.toLocaleString()} XP
+                  </div>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={handleToggleCollapse}
-                    className="h-8 w-8 p-0 hover:bg-white/50 dark:hover:bg-gray-800/50"
+                    className="p-1 h-6 w-6"
                   >
-                    <ChevronUp className="h-4 w-4" />
+                    <ChevronDown className="h-3 w-3" />
                   </Button>
                 </div>
-                
-                {/* XP Ring Display - Mobile Optimized Vertical Stack */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 md:gap-4">
-                  {/* Mobile: Stack vertically, Desktop: side by side */}
-                  <div className="flex-1 text-center md:text-left">
-                    <div className="flex flex-col md:flex-row md:items-center gap-1 md:gap-3 mb-2">
-                      <div className="text-xl md:text-3xl font-bold text-gray-800 dark:text-gray-200">
-                        {totalXP.toLocaleString()}
-                      </div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400">
-                        XP {currentTier ? `• ${currentTier.name}` : '• No Ring'}
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-1">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-gray-600 dark:text-gray-400">Progress to {nextTier.name}</span>
-                        <span className="font-medium text-gray-700 dark:text-gray-300">
-                          {progressPercentage.toFixed(1)}%
-                        </span>
-                      </div>
-                      {/* Mobile: 6px height, Desktop: 8px height */}
-                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 md:h-2">
-                        <div 
-                          className="bg-gradient-to-r from-amber-400 to-orange-500 h-1.5 md:h-2 rounded-full transition-all duration-700 ease-out"
-                          style={{ 
-                            width: animateProgress ? `${progressPercentage}%` : '0%' 
-                          }}
-                        />
-                      </div>
-                      <div className="flex justify-between text-xs text-gray-500 dark:text-gray-400">
-                        <span>{currentTier?.minXP?.toLocaleString() || '0'} XP</span>
-                        <span>{nextTier.minXP.toLocaleString()} XP</span>
-                      </div>
-                    </div>
+              </div>
+            ) : (
+              /* Full XP Ring Section */
+              <div className="bg-gradient-to-br from-blue-50 via-purple-50 to-blue-50 dark:from-blue-950/20 dark:via-purple-950/20 dark:to-blue-950/20 rounded-xl p-6 border border-blue-200 dark:border-blue-800 relative overflow-hidden">
+                {/* Celebration Animation Overlay */}
+                {showCelebration && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-r from-yellow-400/20 to-orange-400/20 rounded-xl animate-pulse">
+                    <div className="text-6xl animate-bounce">🎉</div>
                   </div>
-                  
-                  <div className="flex justify-center md:justify-end">
+                )}
+                
+                {/* Header with XP and Collapse Button */}
+                <div className="flex justify-between items-start mb-6">
+                  <div>
+                    <h3 className="text-lg font-bold text-foreground mb-1">XP Progress</h3>
+                    <p className="text-sm text-muted-foreground">Keep playing to unlock new rings!</p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="text-right">
+                      <div className="text-2xl font-bold text-foreground flex items-center gap-2">
+                        <Sparkles className={`w-5 h-5 ${nextTier ? 'text-yellow-500 animate-pulse' : 'text-muted-foreground'}`} />
+                        {totalXP.toLocaleString()} XP
+                      </div>
+                      <div className="text-xs text-muted-foreground">Current Progress</div>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleToggleCollapse}
+                      className="p-1 h-6 w-6"
+                    >
+                      <ChevronUp className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </div>
+
+                {/* XP Ring System */}
+                <div className="flex items-center justify-between gap-4 mb-6">
+                  <div className="flex-1">
                     <XPRingSystem 
                       currentXP={totalXP} 
                       size="medium"
+                      layout="horizontal"
+                      showMiniRings={false}
                     />
+                  </div>
+                </div>
+
+                {/* Progress Bar */}
+                <div className="mb-6">
+                  <div className="flex justify-between text-sm mb-2">
+                    <span className="text-muted-foreground">Progress to {nextTier.name}</span>
+                    <span className="font-medium">{Math.round(progressPercentage)}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
+                    <div 
+                      className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 rounded-full transition-all duration-1000 ease-out relative"
+                      style={{ 
+                        width: animateProgress ? `${progressPercentage}%` : '0%',
+                        boxShadow: '0 0 15px rgba(59, 130, 246, 0.6)'
+                      }}
+                    >
+                      <div className="absolute inset-0 bg-white/20 animate-pulse" />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Ring Tier Display */}
+                <div className="w-full">
+                  <h4 className="text-sm font-medium text-muted-foreground mb-3 text-center">Ring Progression</h4>
+                  <div className="flex justify-between items-center gap-2">
+                    {xpTiers.map((tier, index) => {
+                      const isActive = totalXP >= tier.minXP;
+                      const isCurrent = currentTier?.name === tier.name;
+                      const isNext = nextTier?.name === tier.name;
+                      
+                      return (
+                        <div key={tier.name} className="flex-1 text-center">
+                          <div className={`
+                            w-16 h-16 mx-auto mb-2 rounded-full border-4 transition-all duration-500 flex items-center justify-center
+                            ${isActive 
+                              ? `bg-gradient-to-br from-${tier.color}/20 to-${tier.color}/40 border-current shadow-lg` 
+                              : isNext 
+                                ? 'border-gray-400 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 animate-pulse'
+                                : 'border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900'
+                            }
+                          `}
+                          style={{ 
+                            color: isActive ? tier.color : '#9CA3AF',
+                            borderColor: isActive ? tier.color : undefined
+                          }}
+                          >
+                            <Trophy className={`w-6 h-6 ${isActive ? 'animate-pulse' : ''}`} />
+                          </div>
+                          <div className="text-xs font-medium mb-1" style={{ color: isActive ? tier.color : '#6B7280' }}>
+                            {tier.name}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {tier.minXP.toLocaleString()} XP
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
             )}
+            </div>
           </div>
 
-          {/* Filter Buttons - Consistent Colors */}
-          <div className="p-3 md:p-4 border-b border-gray-200 dark:border-gray-700 bg-white/50 dark:bg-gray-900/50 backdrop-blur-sm">
-            <div className="grid grid-cols-3 md:flex md:flex-wrap gap-1.5 md:gap-2">
-              {/* First row on mobile */}
-              {[
-                { key: 'all', label: 'All', fullLabel: 'All Achievements', icon: '🏆' },
-                { key: 'unlocked', label: 'Unlocked', fullLabel: 'Unlocked', icon: '✅' },
-                { key: 'locked', label: 'Locked', fullLabel: 'Locked', icon: '🔒' }
-              ].map((filter) => (
+          {/* Filter Buttons */}
+          <div className="px-6 pb-6">
+            <div className="flex flex-wrap gap-2 justify-center">
+              {['all', 'unlocked', 'locked', 'exploration', 'skill'].map((filter) => (
                 <Button
-                  key={filter.key}
-                  variant={activeFilter === filter.key ? "default" : "outline"}
+                  key={filter}
+                  variant={activeFilter === filter ? "default" : "outline"}
                   size="sm"
-                  onClick={() => setActiveFilter(filter.key as any)}
+                  onClick={() => setActiveFilter(filter as typeof activeFilter)}
                   className={`
-                    text-xs font-medium transition-all h-8 md:h-auto
-                    ${activeFilter === filter.key 
-                      ? 'bg-amber-500 hover:bg-amber-600 text-white border-amber-500' 
-                      : 'hover:bg-amber-50 hover:border-amber-300 dark:hover:bg-gray-800'
+                    capitalize transition-all duration-200 hover:scale-105
+                    ${activeFilter === filter 
+                      ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg' 
+                      : 'hover:bg-muted/80'
                     }
                   `}
                 >
-                  <span className="mr-1 md:mr-2">{filter.icon}</span>
-                  <span className="md:hidden">{filter.label}</span>
-                  <span className="hidden md:inline">{filter.fullLabel}</span>
-                </Button>
-              ))}
-              {/* Second row on mobile - spans remaining columns */}
-              {[
-                { key: 'exploration', label: 'Exploration', icon: '🗺️' },
-                { key: 'skill', label: 'Skill-Based', icon: '🎯' }
-              ].map((filter) => (
-                <Button
-                  key={filter.key}
-                  variant={activeFilter === filter.key ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setActiveFilter(filter.key as any)}
-                  className={`
-                    text-xs font-medium transition-all h-8 md:h-auto col-span-1
-                    ${activeFilter === filter.key 
-                      ? 'bg-amber-500 hover:bg-amber-600 text-white border-amber-500' 
-                      : 'hover:bg-amber-50 hover:border-amber-300 dark:hover:bg-gray-800'
-                    }
-                  `}
-                >
-                  <span className="mr-1 md:mr-2">{filter.icon}</span>
-                  {filter.label}
+                  {filter === 'all' ? 'All Achievements' : 
+                   filter === 'unlocked' ? 'Unlocked Only' :
+                   filter === 'locked' ? 'Locked Only' :
+                   filter === 'exploration' ? 'Experience & Exploration' :
+                   'Skill-Based'}
                 </Button>
               ))}
             </div>
           </div>
 
-          {/* Scrollable Content - Mobile Scroll Fixed */}
+          {/* Scrollable Content - Fixed Mobile Scroll */}
           <div 
             ref={scrollRef}
-            className="flex-1 overflow-y-auto p-3 md:p-4 space-y-3 md:space-y-6 scrollbar-hide"
+            className="flex-1 overflow-y-auto overscroll-contain touch-pan-y p-3 md:p-4 space-y-3 md:space-y-6"
             style={{
-              touchAction: 'pan-y',
-              overscrollBehavior: 'contain',
+              scrollbarWidth: 'thin',
+              scrollBehavior: 'smooth',
               WebkitOverflowScrolling: 'touch'
             }}
           >
