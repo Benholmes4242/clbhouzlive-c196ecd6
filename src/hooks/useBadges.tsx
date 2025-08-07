@@ -85,8 +85,8 @@ export const useBadges = (userId?: string) => {
       if (newBadges && Array.isArray(newBadges) && newBadges.length > 0) {
         // Show the unlock modal for the first new badge
         const firstBadge = newBadges[0];
-        if (firstBadge) {
-          setUnlockedBadge(firstBadge as Badge);
+        if (firstBadge && typeof firstBadge === 'object') {
+          setUnlockedBadge(firstBadge as unknown as Badge);
           setShowUnlockModal(true);
         }
         

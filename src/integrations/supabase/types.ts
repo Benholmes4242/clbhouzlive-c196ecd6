@@ -1234,6 +1234,10 @@ export type Database = {
           newly_awarded_badges: Json
         }[]
       }
+      execute_sql: {
+        Args: { query: string; params?: Json }
+        Returns: Json
+      }
       fetch_social_feed_posts: {
         Args: {
           followed_user_ids: string[]
