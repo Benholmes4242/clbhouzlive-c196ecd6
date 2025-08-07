@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { XPRingSystem } from "@/components/profile/XPRingSystem";
 
-// Achievement badge imports will be added when badges are provided
+// Achievement badge imports
+import club300Badge from '@/assets/achievements/300-club-champion.png';
 
 interface ClbhouzAchievementsModalProps {
   isOpen: boolean;
@@ -61,7 +62,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       case "200 Clubhouse Elite":
         return '🔒';
       case "300 Club Champion":
-        return '🔒';
+        return <img src={club300Badge} alt="300 Club Champion Badge" className="w-16 h-16" />;
       default:
         return '🔒';
     }
