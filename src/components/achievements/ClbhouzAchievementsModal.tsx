@@ -4,6 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { XPRingSystem } from "@/components/profile/XPRingSystem";
 
+// Achievement badge imports
+import club20Badge from '@/assets/achievements/20-club.png';
+import club50Badge from '@/assets/achievements/50-club.png';
+import club100Badge from '@/assets/achievements/100-century-club.png';
+import club200Badge from '@/assets/achievements/200-clubhouse-elite.png';
+import club300Badge from '@/assets/achievements/300-club-champion.png';
+
 interface ClbhouzAchievementsModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -41,6 +48,29 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
   // Find next milestone (this is simplified - you can enhance based on your XP system)
   const nextMilestone = 5000;
   // XP Ring level will be calculated by the XP Ring System component
+
+  // Helper function to get achievement badge image
+  const getAchievementIcon = (achievement: Achievement) => {
+    if (achievement.isEarned) {
+      return achievement.emoji;
+    }
+    
+    // Use custom badges for club achievements instead of padlocks
+    switch (achievement.title) {
+      case "20 Club":
+        return <img src={club20Badge} alt="20 Club Badge" className="w-8 h-8 opacity-50" />;
+      case "50 Club":
+        return <img src={club50Badge} alt="50 Club Badge" className="w-8 h-8 opacity-50" />;
+      case "100 Century Club":
+        return <img src={club100Badge} alt="100 Century Club Badge" className="w-8 h-8 opacity-50" />;
+      case "200 Clubhouse Elite":
+        return <img src={club200Badge} alt="200 Clubhouse Elite Badge" className="w-8 h-8 opacity-50" />;
+      case "300 Club Champion":
+        return <img src={club300Badge} alt="300 Club Champion Badge" className="w-8 h-8 opacity-50" />;
+      default:
+        return '🔒';
+    }
+  };
 
   // Skill & Performance Achievements
   const skillAchievements: Achievement[] = [
@@ -473,8 +503,8 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                         `}
                         onClick={() => setSelectedAchievement(achievement)}
                       >
-                        <div className="text-2xl mb-2">
-                          {achievement.isEarned ? achievement.emoji : '🔒'}
+                        <div className="text-2xl mb-2 flex justify-center items-center">
+                          {getAchievementIcon(achievement)}
                         </div>
                         <h4 className="font-medium text-sm mb-1">
                           {achievement.title}
@@ -524,8 +554,8 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                         `}
                         onClick={() => setSelectedAchievement(achievement)}
                       >
-                        <div className="text-2xl mb-2">
-                          {achievement.isEarned ? achievement.emoji : '🔒'}
+                        <div className="text-2xl mb-2 flex justify-center items-center">
+                          {getAchievementIcon(achievement)}
                         </div>
                         <h4 className="font-medium text-sm mb-1">
                           {achievement.title}
@@ -562,8 +592,8 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
             <DialogContent className="max-w-sm mx-auto">
               <DialogHeader>
                 <DialogTitle className="text-center flex items-center justify-center gap-2">
-                  <span className="text-2xl">
-                    {selectedAchievement.isEarned ? selectedAchievement.emoji : '🔒'}
+                  <span className="text-2xl flex items-center">
+                    {getAchievementIcon(selectedAchievement)}
                   </span>
                   {selectedAchievement.title}
                 </DialogTitle>
