@@ -79,7 +79,8 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
 
     const handleScroll = () => {
       const scrollTop = scrollElement.scrollTop;
-      setIsCollapsed(scrollTop > 100);
+      // More aggressive collapsing - collapse at 50px instead of 100px
+      setIsCollapsed(scrollTop > 50);
     };
 
     scrollElement.addEventListener('scroll', handleScroll);
@@ -702,109 +703,133 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
             </div>
           </div>
 
-          {/* Achievements Sections */}
+          {/* Experience & Exploration Achievements Section */}
           {(activeFilter === 'all' || activeFilter === 'exploration') && getFilteredAchievements(explorationAchievements, 'exploration').length > 0 && (
-            <div className="px-6 pb-6">
-              <h3 className="text-lg font-semibold mb-4 text-center">Experience & Exploration Achievements</h3>
-              <TooltipProvider>
-                <div className="grid grid-cols-3 gap-4">
-                  {getFilteredAchievements(explorationAchievements, 'exploration').map((achievement) => (
-                    <Tooltip key={achievement.title}>
-                      <TooltipTrigger asChild>
-                        <div
-                          className={`
-                            border rounded-lg p-4 transition-all duration-200 hover:scale-105 cursor-pointer flex items-center gap-3
-                            ${achievement.isEarned 
-                              ? 'bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800' 
-                              : 'bg-background border-border'
-                            }
-                          `}
-                          onClick={() => setSelectedAchievement(achievement)}
-                        >
-                          <div className="flex-shrink-0 flex justify-center items-center min-w-0">
-                            {getAchievementIcon(achievement)}
+            <div className="px-6 pb-8">
+              {/* Card Container with Visual Grouping */}
+              <div className="bg-gradient-to-br from-blue-50/50 to-cyan-50/50 dark:from-blue-950/10 dark:to-cyan-950/10 rounded-xl p-6 border border-blue-200/30 dark:border-blue-800/30 shadow-sm">
+                {/* Section Header with Icon */}
+                <div className="flex items-center justify-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
+                    <span className="text-xl">🏞️</span>
+                  </div>
+                  <h3 className="text-xl font-bold text-blue-800 dark:text-blue-200">
+                    Experience & Exploration Achievements
+                  </h3>
+                </div>
+                
+                <TooltipProvider>
+                  <div className="grid grid-cols-3 gap-4">
+                    {getFilteredAchievements(explorationAchievements, 'exploration').map((achievement) => (
+                      <Tooltip key={achievement.title}>
+                        <TooltipTrigger asChild>
+                          <div
+                            className={`
+                              border rounded-lg p-4 transition-all duration-200 hover:scale-105 cursor-pointer flex items-center gap-3 bg-white/60 dark:bg-gray-900/30
+                              ${achievement.isEarned 
+                                ? 'border-blue-300 dark:border-blue-700 shadow-md shadow-blue-100 dark:shadow-blue-900/20' 
+                                : 'border-blue-200/50 dark:border-blue-800/50 hover:border-blue-300 dark:hover:border-blue-700'
+                              }
+                            `}
+                            onClick={() => setSelectedAchievement(achievement)}
+                          >
+                            <div className="flex-shrink-0 flex justify-center items-center min-w-0">
+                              {getAchievementIcon(achievement)}
+                            </div>
+                            <div className="flex-1 text-center">
+                              <h4 className="font-medium text-sm mb-1">
+                                {achievement.title}
+                              </h4>
+                              <p className={`text-xs ${achievement.isEarned ? 'text-blue-600 dark:text-blue-400' : 'text-muted-foreground'}`}>
+                                +{achievement.xp} XP {achievement.isRepeatable ? "(R)" : ""}
+                              </p>
+                            </div>
                           </div>
-                          <div className="flex-1 text-center">
-                            <h4 className="font-medium text-sm mb-1">
-                              {achievement.title}
-                            </h4>
-                            <p className={`text-xs ${achievement.isEarned ? 'text-blue-600 dark:text-blue-400' : 'text-muted-foreground'}`}>
-                              +{achievement.xp} XP {achievement.isRepeatable ? "(R)" : ""}
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-sm">
+                          <div className="text-center">
+                            <h4 className="font-semibold mb-1">{achievement.title}</h4>
+                            <p className="text-sm text-muted-foreground mb-2">
+                              {achievement.description}
+                            </p>
+                            <p className="text-xs font-medium mb-1">
+                              +{achievement.xp} XP {achievement.isRepeatable ? "(Repeatable)" : "(One-time)"}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              Progress: {achievement.progress}
                             </p>
                           </div>
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent className="max-w-sm">
-                        <div className="text-center">
-                          <h4 className="font-semibold mb-1">{achievement.title}</h4>
-                          <p className="text-sm text-muted-foreground mb-2">
-                            {achievement.description}
-                          </p>
-                          <p className="text-xs font-medium mb-1">
-                            +{achievement.xp} XP {achievement.isRepeatable ? "(Repeatable)" : "(One-time)"}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            Progress: {achievement.progress}
-                          </p>
-                        </div>
-                      </TooltipContent>
-                    </Tooltip>
-                  ))}
-                </div>
-              </TooltipProvider>
+                        </TooltipContent>
+                      </Tooltip>
+                    ))}
+                  </div>
+                </TooltipProvider>
+              </div>
             </div>
           )}
 
-          {/* Skill & Performance Achievements */}
+          {/* Skill & Performance Achievements Section */}
           {(activeFilter === 'all' || activeFilter === 'skill') && getFilteredAchievements(skillAchievements, 'skill').length > 0 && (
-            <div className="px-6 pb-6">
-              <h3 className="text-lg font-semibold mb-4 text-center">Skill & Performance Achievements</h3>
-              <TooltipProvider>
-                <div className="grid grid-cols-3 gap-4">
-                  {getFilteredAchievements(skillAchievements, 'skill').map((achievement) => (
-                    <Tooltip key={achievement.title}>
-                      <TooltipTrigger asChild>
-                        <div
-                          className={`
-                            border rounded-lg p-4 transition-all duration-200 hover:scale-105 cursor-pointer flex items-center gap-3
-                            ${achievement.isEarned 
-                              ? 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800' 
-                              : 'bg-background border-border'
-                            }
-                          `}
-                          onClick={() => setSelectedAchievement(achievement)}
-                        >
-                          <div className="flex-shrink-0 flex justify-center items-center min-w-0">
-                            {getAchievementIcon(achievement)}
+            <div className="px-6 pb-8">
+              {/* Card Container with Visual Grouping */}
+              <div className="bg-gradient-to-br from-green-50/50 to-emerald-50/50 dark:from-green-950/10 dark:to-emerald-950/10 rounded-xl p-6 border border-green-200/30 dark:border-green-800/30 shadow-sm">
+                {/* Section Header with Icon */}
+                <div className="flex items-center justify-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/50 flex items-center justify-center">
+                    <span className="text-xl">💪</span>
+                  </div>
+                  <h3 className="text-xl font-bold text-green-800 dark:text-green-200">
+                    Skill & Performance Achievements
+                  </h3>
+                </div>
+                
+                <TooltipProvider>
+                  <div className="grid grid-cols-3 gap-4">
+                    {getFilteredAchievements(skillAchievements, 'skill').map((achievement) => (
+                      <Tooltip key={achievement.title}>
+                        <TooltipTrigger asChild>
+                          <div
+                            className={`
+                              border rounded-lg p-4 transition-all duration-200 hover:scale-105 cursor-pointer flex items-center gap-3 bg-white/60 dark:bg-gray-900/30
+                              ${achievement.isEarned 
+                                ? 'border-green-300 dark:border-green-700 shadow-md shadow-green-100 dark:shadow-green-900/20' 
+                                : 'border-green-200/50 dark:border-green-800/50 hover:border-green-300 dark:hover:border-green-700'
+                              }
+                            `}
+                            onClick={() => setSelectedAchievement(achievement)}
+                          >
+                            <div className="flex-shrink-0 flex justify-center items-center min-w-0">
+                              {getAchievementIcon(achievement)}
+                            </div>
+                            <div className="flex-1 text-center">
+                              <h4 className="font-medium text-sm mb-1">
+                                {achievement.title}
+                              </h4>
+                              <p className={`text-xs ${achievement.isEarned ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}`}>
+                                +{achievement.xp} XP {achievement.isRepeatable ? "(R)" : ""}
+                              </p>
+                            </div>
                           </div>
-                          <div className="flex-1 text-center">
-                            <h4 className="font-medium text-sm mb-1">
-                              {achievement.title}
-                            </h4>
-                            <p className={`text-xs ${achievement.isEarned ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}`}>
-                              +{achievement.xp} XP {achievement.isRepeatable ? "(R)" : ""}
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-sm">
+                          <div className="text-center">
+                            <h4 className="font-semibold mb-1">{achievement.title}</h4>
+                            <p className="text-sm text-muted-foreground mb-2">
+                              {achievement.description}
+                            </p>
+                            <p className="text-xs font-medium mb-1">
+                              +{achievement.xp} XP {achievement.isRepeatable ? "(Repeatable)" : "(One-time)"}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              Progress: {achievement.progress}
                             </p>
                           </div>
-                        </div>
-                      </TooltipTrigger>
-                      <TooltipContent className="max-w-sm">
-                        <div className="text-center">
-                          <h4 className="font-semibold mb-1">{achievement.title}</h4>
-                          <p className="text-sm text-muted-foreground mb-2">
-                            {achievement.description}
-                          </p>
-                          <p className="text-xs font-medium mb-1">
-                            +{achievement.xp} XP {achievement.isRepeatable ? "(Repeatable)" : "(One-time)"}
-                          </p>
-                          <p className="text-xs text-muted-foreground">
-                            Progress: {achievement.progress}
-                          </p>
-                        </div>
-                      </TooltipContent>
-                    </Tooltip>
-                  ))}
-                </div>
-              </TooltipProvider>
+                        </TooltipContent>
+                      </Tooltip>
+                    ))}
+                  </div>
+                </TooltipProvider>
+              </div>
             </div>
           )}
 
