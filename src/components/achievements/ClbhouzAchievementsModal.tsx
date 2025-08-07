@@ -543,7 +543,15 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[85vh] overflow-hidden p-0 flex flex-col">
+      <DialogContent className="max-w-4xl max-h-[85vh] overflow-hidden p-0 flex flex-col bg-gradient-to-br from-green-50/30 via-blue-50/20 to-green-50/30 dark:from-green-950/10 dark:via-blue-950/10 dark:to-green-950/10"
+        style={{
+          backgroundImage: `
+            radial-gradient(circle at 20% 50%, rgba(34, 197, 94, 0.03) 0%, transparent 50%),
+            radial-gradient(circle at 80% 20%, rgba(59, 130, 246, 0.03) 0%, transparent 50%),
+            radial-gradient(circle at 40% 80%, rgba(16, 185, 129, 0.02) 0%, transparent 50%)
+          `
+        }}
+      >
         <DialogHeader className="p-6 pb-4 flex-shrink-0">
           <DialogTitle className="text-2xl font-bold">
             {isCurrentUser ? "Your clbhouz achievements" : `${userDisplayName}'s clbhouz achievements`}
@@ -861,7 +869,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
           {(activeFilter === 'all' || activeFilter === 'exploration') && getFilteredAchievements(explorationAchievements, 'exploration').length > 0 && (
             <div className="px-6 pb-8">
               {/* Card Container with Visual Grouping */}
-              <div className="bg-gradient-to-br from-blue-50/50 to-cyan-50/50 dark:from-blue-950/10 dark:to-cyan-950/10 rounded-xl p-6 border border-blue-200/30 dark:border-blue-800/30 shadow-sm">
+              <div className="bg-gradient-to-br from-blue-50/80 to-cyan-50/60 dark:from-blue-950/20 dark:to-cyan-950/15 rounded-2xl p-6 border border-blue-200/40 dark:border-blue-800/40 shadow-xl backdrop-blur-sm">
                 {/* Section Header with Icon */}
                 <div className="flex items-center justify-center gap-3 mb-6">
                   <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
@@ -884,11 +892,13 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                             <div className="relative">
                               <div
                                 className={`
-                                  border rounded-lg p-4 transition-all duration-200 hover:scale-105 cursor-pointer flex items-center gap-3 bg-white/60 dark:bg-gray-900/30
+                                  border rounded-xl p-4 transition-all duration-200 hover:scale-105 cursor-pointer flex items-center gap-3 
+                                  bg-white/80 dark:bg-gray-900/40 backdrop-blur-sm
+                                  shadow-lg hover:shadow-xl
                                   ${achievement.isEarned 
-                                    ? 'border-blue-300 dark:border-blue-700 shadow-md shadow-blue-100 dark:shadow-blue-900/20' 
+                                    ? 'border-blue-300 dark:border-blue-700 shadow-blue-100/50 dark:shadow-blue-900/20' 
                                     : isNearUnlock
-                                      ? 'border-orange-400 dark:border-orange-600 shadow-md shadow-orange-100 dark:shadow-orange-900/20 animate-pulse'
+                                      ? 'border-orange-400 dark:border-orange-600 shadow-orange-100/50 dark:shadow-orange-900/20 animate-pulse'
                                       : 'border-blue-200/50 dark:border-blue-800/50 hover:border-blue-300 dark:hover:border-blue-700'
                                   }
                                 `}
@@ -902,7 +912,11 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                                     {achievement.title}
                                   </h4>
                                   <p className={`text-xs ${achievement.isEarned ? 'text-blue-600 dark:text-blue-400' : 'text-muted-foreground'}`}>
-                                    +{achievement.xp} XP {achievement.isRepeatable ? "(R)" : ""}
+                                    <span className="inline-flex items-center gap-1">
+                                      <span className="text-amber-500">✨</span>
+                                      +{achievement.xp} XP 
+                                      {achievement.isRepeatable ? " 🔄" : " 🏆"}
+                                    </span>
                                   </p>
                                   
                                   {/* Smart Nudge Label */}
@@ -943,11 +957,12 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                               
                               {/* XP Value */}
                               <div className="flex items-center justify-between mb-2">
-                                <span className="text-xs font-medium text-primary">
+                                <span className="text-xs font-medium text-primary inline-flex items-center gap-1">
+                                  <span className="text-amber-500">✨</span>
                                   +{achievement.xp} XP
                                 </span>
-                                <span className="text-xs text-muted-foreground">
-                                  {achievement.isRepeatable ? "(Repeatable)" : "(One-time)"}
+                                <span className="text-xs text-muted-foreground inline-flex items-center gap-1">
+                                  {achievement.isRepeatable ? "🔄 Repeatable" : "🏆 One-time"}
                                 </span>
                               </div>
                               
@@ -993,7 +1008,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
           {(activeFilter === 'all' || activeFilter === 'skill') && getFilteredAchievements(skillAchievements, 'skill').length > 0 && (
             <div className="px-6 pb-8">
               {/* Card Container with Visual Grouping */}
-              <div className="bg-gradient-to-br from-green-50/50 to-emerald-50/50 dark:from-green-950/10 dark:to-emerald-950/10 rounded-xl p-6 border border-green-200/30 dark:border-green-800/30 shadow-sm">
+              <div className="bg-gradient-to-br from-green-50/80 to-emerald-50/60 dark:from-green-950/20 dark:to-emerald-950/15 rounded-2xl p-6 border border-green-200/40 dark:border-green-800/40 shadow-xl backdrop-blur-sm">
                 {/* Section Header with Icon */}
                 <div className="flex items-center justify-center gap-3 mb-6">
                   <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/50 flex items-center justify-center">
@@ -1016,11 +1031,13 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                             <div className="relative">
                               <div
                                 className={`
-                                  border rounded-lg p-4 transition-all duration-200 hover:scale-105 cursor-pointer flex items-center gap-3 bg-white/60 dark:bg-gray-900/30
+                                  border rounded-xl p-4 transition-all duration-200 hover:scale-105 cursor-pointer flex items-center gap-3 
+                                  bg-white/80 dark:bg-gray-900/40 backdrop-blur-sm
+                                  shadow-lg hover:shadow-xl
                                   ${achievement.isEarned 
-                                    ? 'border-green-300 dark:border-green-700 shadow-md shadow-green-100 dark:shadow-green-900/20' 
+                                    ? 'border-green-300 dark:border-green-700 shadow-green-100/50 dark:shadow-green-900/20' 
                                     : isNearUnlock
-                                      ? 'border-orange-400 dark:border-orange-600 shadow-md shadow-orange-100 dark:shadow-orange-900/20 animate-pulse'
+                                      ? 'border-orange-400 dark:border-orange-600 shadow-orange-100/50 dark:shadow-orange-900/20 animate-pulse'
                                       : 'border-green-200/50 dark:border-green-800/50 hover:border-green-300 dark:hover:border-green-700'
                                   }
                                 `}
@@ -1034,7 +1051,11 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                                     {achievement.title}
                                   </h4>
                                   <p className={`text-xs ${achievement.isEarned ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}`}>
-                                    +{achievement.xp} XP {achievement.isRepeatable ? "(R)" : ""}
+                                    <span className="inline-flex items-center gap-1">
+                                      <span className="text-amber-500">✨</span>
+                                      +{achievement.xp} XP 
+                                      {achievement.isRepeatable ? " 🔄" : " 🏆"}
+                                    </span>
                                   </p>
                                   
                                   {/* Smart Nudge Label */}
@@ -1075,11 +1096,12 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                               
                               {/* XP Value */}
                               <div className="flex items-center justify-between mb-2">
-                                <span className="text-xs font-medium text-primary">
+                                <span className="text-xs font-medium text-primary inline-flex items-center gap-1">
+                                  <span className="text-amber-500">✨</span>
                                   +{achievement.xp} XP
                                 </span>
-                                <span className="text-xs text-muted-foreground">
-                                  {achievement.isRepeatable ? "(Repeatable)" : "(One-time)"}
+                                <span className="text-xs text-muted-foreground inline-flex items-center gap-1">
+                                  {achievement.isRepeatable ? "🔄 Repeatable" : "🏆 One-time"}
                                 </span>
                               </div>
                               
