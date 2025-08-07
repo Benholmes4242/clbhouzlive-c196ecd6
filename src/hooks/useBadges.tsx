@@ -80,12 +80,13 @@ export const useBadges = (userId?: string) => {
       if (error) throw error;
       return data;
     },
-    onSuccess: (newBadges) => {
-      if (newBadges && newBadges.length > 0) {
+    onSuccess: (result) => {
+      const newBadges = result?.[0]?.newly_awarded_badges;
+      if (newBadges && Array.isArray(newBadges) && newBadges.length > 0) {
         // Show the unlock modal for the first new badge
         const firstBadge = newBadges[0];
         if (firstBadge) {
-          setUnlockedBadge(firstBadge);
+          setUnlockedBadge(firstBadge as Badge);
           setShowUnlockModal(true);
         }
         

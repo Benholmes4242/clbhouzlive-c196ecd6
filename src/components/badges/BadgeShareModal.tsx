@@ -74,15 +74,17 @@ export const BadgeShareModal: React.FC<BadgeShareModalProps> = ({
     
     setIsPinning(true);
     try {
-      // Check current pinned badges count
+      // Check current pinned badges count (using direct SQL since table isn't in types yet)
       const { data: pinnedBadges, error: fetchError } = await supabase
-        .from('user_badge_pins')
-        .select('id')
-        .eq('user_id', user.id);
+        .rpc('execute_sql', { 
+          query: `SELECT COUNT(*) as count FROM user_badge_pins WHERE user_id = $1`,
+          params: [user.id]
+        });
 
       if (fetchError) throw fetchError;
 
-      if (pinnedBadges.length >= 3) {
+      const currentCount = pinnedBadges?.[0]?.count || 0;
+      if (currentCount >= 3) {
         toast({
           title: "📌 Pin Limit Reached",
           description: "You can only pin up to 3 badges. Remove one first!",
@@ -91,12 +93,12 @@ export const BadgeShareModal: React.FC<BadgeShareModalProps> = ({
         return;
       }
 
-      // Pin the badge
-      const { error } = await supabase.from('user_badge_pins').insert({
-        user_id: user.id,
-        badge_id: badge.id,
-        pinned_at: new Date().toISOString()
-      });
+      // Pin the badge (using direct SQL)
+      const { error } = await supabase
+        .rpc('execute_sql', {
+          query: `INSERT INTO user_badge_pins (user_id, badge_id, pinned_at) VALUES ($1, $2, $3)`,
+          params: [user.id, badge.id, new Date().toISOString()]
+        });
 
       if (error) throw error;
 
