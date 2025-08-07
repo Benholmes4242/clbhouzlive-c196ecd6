@@ -458,11 +458,11 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                         <div key={tier.name} className="flex flex-col items-center flex-1">
                           <div 
                             className={`w-12 h-12 rounded-full border-4 flex items-center justify-center transition-all mb-2 ${
-                              isActive ? 'opacity-100' : 'opacity-60'
+                              isActive ? 'opacity-100' : 'opacity-80'
                             }`}
                             style={{
                               borderColor: tier.color,
-                              backgroundColor: isActive ? tier.color + '30' : 'transparent'
+                              backgroundColor: isActive ? tier.color + '50' : tier.color + '20'
                             }}
                             title={`${tier.name}: ${tier.minXP.toLocaleString()} - ${tier.maxXP.toLocaleString()} XP`}
                           />
