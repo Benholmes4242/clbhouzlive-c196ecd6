@@ -287,6 +287,15 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
         return <img src="/lovable-uploads/b566e805-826b-4005-b9d1-c5bdc87786b1.png" alt="200 Clubhouse Elite Badge" className="w-32 h-32" />;
       case "300 Club Champion":
         return <img src="/lovable-uploads/3fd34e71-ce84-4f30-b424-3f67637eab11.png" alt="300 Club Champion Badge" className="w-32 h-32" />;
+      // Regional achievement badges with flag images
+      case "Lynx Legend":
+        return <img src="/lovable-uploads/5971ec53-bcfe-46df-aa24-78df46eaa170.png" alt="Britain & Ireland Flag" className="w-28 h-28 rounded-lg" />;
+      case "The Continental Swinger":
+        return <img src="/lovable-uploads/27ad4524-d8d9-4750-a4da-21d43d77fb0e.png" alt="European Union Flag" className="w-28 h-28 rounded-lg" />;
+      case "Stars and Stripes Tourer":
+        return <img src="/lovable-uploads/a8ab2ea7-a98d-4558-bfbc-8a04e60cad37.png" alt="USA Flag" className="w-28 h-28 rounded-lg" />;
+      case "Legends Club":
+        return <img src="/lovable-uploads/e158428b-772e-4396-859e-1e3d51f2e9b3.png" alt="World Globe" className="w-28 h-28 rounded-lg" />;
       default:
         // Enhanced emoji display with conditional styling
         return (
@@ -376,7 +385,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       unlockHint: "Plan golf trips across Europe. Consider France, Spain, Portugal, Germany, and other European golf destinations."
     },
     {
-      title: "Stars and Stripes Torah",
+      title: "Stars and Stripes Tourer",
       emoji: "🇺🇸",
       isEarned: false,
       description: "USA. Coast to Coast you've played the American Greats",
@@ -394,16 +403,6 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       isRepeatable: false,
       progress: "1 / 4 continents",
       unlockHint: "Expand your golf travels internationally. Each continent offers unique golf experiences and challenges."
-    },
-    {
-      title: "World Explorer",
-      emoji: "🌎",
-      isEarned: false,
-      description: "Play courses on 4 different continents",
-      xp: 5000,
-      isRepeatable: false,
-      progress: "1 / 4 continents",
-      unlockHint: "Plan international golf trips to reach different continents. Consider Europe, Asia, or Australia for your next golf adventure."
     }
   ];
 
