@@ -47,11 +47,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
 
   // Helper function to get achievement badge image
   const getAchievementIcon = (achievement: Achievement) => {
-    if (achievement.isEarned) {
-      return achievement.emoji;
-    }
-    
-    // Use custom badges for club achievements instead of padlocks
+    // Use custom badges for specific achievements regardless of earned status
     switch (achievement.title) {
       case "20 Club":
         return <img src="/lovable-uploads/a33df9b4-0089-43ca-913d-132fc5b11cc3.png" alt="20 Club Badge" className="w-16 h-16" />;
@@ -72,7 +68,8 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       case "World Explorer":
         return <img src="/lovable-uploads/5b02f0bf-9891-4439-971c-4d3cb7a37355.png" alt="World Explorer Badge" className="w-16 h-16" />;
       default:
-        return '🔒';
+        // For other achievements, show emoji if earned, lock if not
+        return achievement.isEarned ? achievement.emoji : '🔒';
     }
   };
 
