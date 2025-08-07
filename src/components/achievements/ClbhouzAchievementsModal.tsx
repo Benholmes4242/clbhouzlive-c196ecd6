@@ -34,6 +34,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
   isCurrentUser = true
 }) => {
   const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
+  const [showAllAchievements, setShowAllAchievements] = useState(true);
   // Mock data for now - replace with actual badge system later
   const totalXP = 2500;
   
@@ -295,11 +296,11 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                   <img 
                     src={userProfilePhotoUrl} 
                     alt={`${userDisplayName}'s profile`}
-                    className="w-12 h-12 rounded-full object-cover"
+                    className="w-16 h-16 rounded-full object-cover"
                   />
                 ) : (
-                  <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center">
-                    <span className="text-lg">{userDisplayName.charAt(0)}</span>
+                  <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center">
+                    <span className="text-xl font-semibold">{userDisplayName.charAt(0)}</span>
                   </div>
                 )}
                 <div>
@@ -309,22 +310,128 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                    </p>
                 </div>
               </div>
-              <Button variant="outline" size="sm">
-                See All
+              <Button 
+                variant={showAllAchievements ? "default" : "outline"} 
+                size="sm"
+                onClick={() => setShowAllAchievements(!showAllAchievements)}
+                className="rounded-full px-4"
+              >
+                {showAllAchievements ? "See All" : "See Unlocked"}
               </Button>
             </div>
           </div>
 
-          {/* XP Ring System Section */}
+          {/* Progress Ring Section */}
           <div className="px-6 pb-4">
-            <div className="bg-blue-50 dark:bg-blue-950/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
-              <XPRingSystem 
-                currentXP={totalXP} 
-                size="large"
-                showMiniRings={true}
-                className="w-full"
-                layout="horizontal"
-              />
+            <div className="bg-blue-50 dark:bg-blue-950/20 rounded-lg p-6 border border-blue-200 dark:border-blue-800">
+              {/* Progress Ring - Centered */}
+              <div className="flex justify-center mb-6">
+                <div className="relative">
+                  {/* Ring Progress Display */}
+                  <div className="relative w-32 h-32">
+                    <svg className="w-32 h-32 transform -rotate-90" viewBox="0 0 120 120">
+                      {/* Background circle */}
+                      <circle
+                        cx="60"
+                        cy="60"
+                        r="54"
+                        stroke="currentColor"
+                        strokeWidth="8"
+                        fill="transparent"
+                        className="text-gray-300 dark:text-gray-600"
+                      />
+                      {/* Progress circle */}
+                      <circle
+                        cx="60"
+                        cy="60"
+                        r="54"
+                        stroke="#4682B4"
+                        strokeWidth="8"
+                        fill="transparent"
+                        strokeDasharray={`${54 * 2 * Math.PI}`}
+                        strokeDashoffset={`${54 * 2 * Math.PI * (1 - (totalXP / 10000))}`}
+                        strokeLinecap="round"
+                        className="transition-all duration-700 ease-in-out"
+                        style={{
+                          filter: 'drop-shadow(0 0 8px rgba(70, 130, 180, 0.4))'
+                        }}
+                      />
+                    </svg>
+                    {/* Center XP to next ring */}
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <div className="text-lg font-bold text-foreground">
+                        {(10000 - totalXP).toLocaleString()}
+                      </div>
+                      <div className="text-xs text-muted-foreground text-center">
+                        XP to next ring
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* XP System Info on the right */}
+              <div className="flex justify-between items-start">
+                <div className="flex-1">
+                  <div className="space-y-1">
+                    <h3 className="font-semibold text-sm text-gray-500">
+                      No Ring Achieved
+                    </h3>
+                    <p className="text-xs text-muted-foreground">
+                      Reach 10,000 XP to unlock your first ring
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      Next: Blue Ring at 10,000 XP
+                    </p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-sm font-semibold">
+                    {totalXP.toLocaleString()} XP
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    Current Progress
+                  </div>
+                </div>
+              </div>
+
+              {/* Mini Rings Display */}
+              <div className="w-full mt-6">
+                <div className="flex justify-between items-start gap-2">
+                  {[
+                    { name: "Blue Ring", color: "#4682B4", minXP: 10000, maxXP: 19999 },
+                    { name: "Green Ring", color: "#6e9277", minXP: 20000, maxXP: 29999 },
+                    { name: "Silver Ring", color: "#C0C0C0", minXP: 30000, maxXP: 39999 },
+                    { name: "Gold Ring", color: "#FFD700", minXP: 40000, maxXP: 49999 }
+                  ].map((tier) => {
+                    const isActive = totalXP >= tier.minXP;
+                    
+                    return (
+                      <div key={tier.name} className="flex flex-col items-center flex-1">
+                        <div 
+                          className={`w-12 h-12 rounded-full border-4 flex items-center justify-center transition-all mb-2 ${
+                            isActive ? 'opacity-100' : 'opacity-40'
+                          }`}
+                          style={{
+                            borderColor: tier.color,
+                            backgroundColor: isActive ? tier.color + '20' : 'transparent'
+                          }}
+                          title={`${tier.name}: ${tier.minXP.toLocaleString()} - ${tier.maxXP.toLocaleString()} XP`}
+                        />
+                        
+                        <div className="text-center">
+                          <h4 className="font-semibold text-xs" style={{ color: isActive ? tier.color : '#9CA3AF' }}>
+                            {tier.name}
+                          </h4>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {tier.minXP.toLocaleString()}-{tier.maxXP.toLocaleString()} XP
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
           </div>
 
@@ -333,7 +440,9 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
             <h3 className="text-lg font-semibold mb-4 text-center">Skill & Performance Achievements</h3>
             <TooltipProvider>
               <div className="grid grid-cols-3 gap-4">
-                {skillAchievements.map((achievement) => (
+                {skillAchievements
+                  .filter(achievement => showAllAchievements || achievement.isEarned)
+                  .map((achievement) => (
                   <Tooltip key={achievement.title}>
                     <TooltipTrigger asChild>
                       <div
@@ -382,7 +491,9 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
             <h3 className="text-lg font-semibold mb-4 text-center">Experience & Exploration Achievements</h3>
             <TooltipProvider>
               <div className="grid grid-cols-3 gap-4">
-                {explorationAchievements.map((achievement) => (
+                {explorationAchievements
+                  .filter(achievement => showAllAchievements || achievement.isEarned)
+                  .map((achievement) => (
                   <Tooltip key={achievement.title}>
                     <TooltipTrigger asChild>
                       <div
