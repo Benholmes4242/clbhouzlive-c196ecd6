@@ -495,7 +495,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                     <TooltipTrigger asChild>
                       <div
                         className={`
-                          border rounded-lg p-4 text-center transition-all duration-200 hover:scale-105 cursor-pointer
+                          border rounded-lg p-4 transition-all duration-200 hover:scale-105 cursor-pointer flex items-center gap-3
                           ${achievement.isEarned 
                             ? 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800' 
                             : 'bg-background border-border'
@@ -503,15 +503,17 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                         `}
                         onClick={() => setSelectedAchievement(achievement)}
                       >
-                        <div className="text-2xl mb-2 flex justify-center items-center">
+                        <div className="flex-shrink-0">
                           {getAchievementIcon(achievement)}
                         </div>
-                        <h4 className="font-medium text-sm mb-1">
-                          {achievement.title}
-                        </h4>
-                        <p className={`text-xs ${achievement.isEarned ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}`}>
-                          +{achievement.xp} XP {achievement.isRepeatable ? "(R)" : ""}
-                        </p>
+                        <div className="flex-1 text-left">
+                          <h4 className="font-medium text-sm mb-1">
+                            {achievement.title}
+                          </h4>
+                          <p className={`text-xs ${achievement.isEarned ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}`}>
+                            +{achievement.xp} XP {achievement.isRepeatable ? "(R)" : ""}
+                          </p>
+                        </div>
                       </div>
                     </TooltipTrigger>
                     <TooltipContent className="max-w-sm">
@@ -546,7 +548,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                     <TooltipTrigger asChild>
                       <div
                         className={`
-                          border rounded-lg p-4 text-center transition-all duration-200 hover:scale-105 cursor-pointer
+                          border rounded-lg p-4 transition-all duration-200 hover:scale-105 cursor-pointer flex items-center gap-3
                           ${achievement.isEarned 
                             ? 'bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800' 
                             : 'bg-background border-border'
@@ -554,15 +556,17 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                         `}
                         onClick={() => setSelectedAchievement(achievement)}
                       >
-                        <div className="text-2xl mb-2 flex justify-center items-center">
+                        <div className="flex-shrink-0">
                           {getAchievementIcon(achievement)}
                         </div>
-                        <h4 className="font-medium text-sm mb-1">
-                          {achievement.title}
-                        </h4>
-                        <p className={`text-xs ${achievement.isEarned ? 'text-blue-600 dark:text-blue-400' : 'text-muted-foreground'}`}>
-                          +{achievement.xp} XP {achievement.isRepeatable ? "(R)" : ""}
-                        </p>
+                        <div className="flex-1 text-left">
+                          <h4 className="font-medium text-sm mb-1">
+                            {achievement.title}
+                          </h4>
+                          <p className={`text-xs ${achievement.isEarned ? 'text-blue-600 dark:text-blue-400' : 'text-muted-foreground'}`}>
+                            +{achievement.xp} XP {achievement.isRepeatable ? "(R)" : ""}
+                          </p>
+                        </div>
                       </div>
                     </TooltipTrigger>
                     <TooltipContent className="max-w-sm">
