@@ -438,9 +438,9 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
             </div>
           </div>
 
-          {/* XP Ring Section */}
-          <div className={`transition-all duration-300 ${
-            isCollapsed ? 'px-6 py-2' : 'px-6 pb-4'
+          {/* Collapsible XP Progress Header */}
+          <div className={`sticky top-0 z-10 bg-background/95 backdrop-blur-sm transition-all duration-300 ${
+            isCollapsed ? 'px-6 py-3' : 'px-6 pb-4'
           }`}>
             {isCollapsed ? (
               /* Collapsed Mini View */
