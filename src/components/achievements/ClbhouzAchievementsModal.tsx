@@ -438,8 +438,8 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
             </div>
           </div>
 
-          {/* Sticky/Collapsible XP Ring Section */}
-          <div className={`sticky top-0 z-10 bg-background/95 backdrop-blur-sm transition-all duration-300 ${
+          {/* XP Ring Section */}
+          <div className={`transition-all duration-300 ${
             isCollapsed ? 'px-6 py-2' : 'px-6 pb-4'
           }`}>
             {isCollapsed ? (
