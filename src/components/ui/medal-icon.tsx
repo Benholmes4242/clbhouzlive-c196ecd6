@@ -1,4 +1,5 @@
 import React from 'react';
+import { getAchievementBadgeUrl } from '@/utils/achievementBadgeUpload';
 
 interface MedalIconProps {
   className?: string;

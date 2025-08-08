@@ -1,4 +1,5 @@
 import { uploadToCloudflareR2 } from '@/utils/cloudflareUpload';
+import { uploadAchievementBadge } from '@/utils/achievementBadgeUpload';
 
 interface BadgeImage {
   localPath: string;
