@@ -15,15 +15,15 @@ const MedalIcon: React.FC<MedalIconProps> = ({ className, size = 'md', type = '2
   };
 
   const trophyImages = {
-    '20-club': '/lovable-uploads/a33df9b4-0089-43ca-913d-132fc5b11cc3.png',
-    '50-club': '/lovable-uploads/c1ba04e8-7aed-40e6-948b-0b65fdc932b2.png',
-    '100-club': '/lovable-uploads/91e26115-098d-4b21-9b29-7e1800fe52bd.png',
-    '200-club': '/lovable-uploads/04ae4807-845e-412c-9233-d90ed7ed0a9e.png',
-    '300-club': '/lovable-uploads/bc2bb48a-2505-442f-8d02-2623c7b391ad.png',
-    'eu-explorer': '/lovable-uploads/24422ab1-3322-4f51-801b-8ae8e80c95d7.png',
-    'uk-ireland-explorer': '/lovable-uploads/54fecf12-83df-48be-b433-d227be70278d.png',
-    'usa-explorer': '/lovable-uploads/ad7f9c0b-b395-4b96-b059-63ebab11bd4f.png',
-    'world-explorer': '/lovable-uploads/5b02f0bf-9891-4439-971c-4d3cb7a37355.png'
+    '20-club': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/20-club-badge.png',
+    '50-club': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/50-club-badge.png',
+    '100-club': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/100-club-badge.png',
+    '200-club': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/200-club-badge.png',
+    '300-club': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/300-club-badge.png',
+    'eu-explorer': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/eu-explorer-badge.png',
+    'uk-ireland-explorer': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/uk-ireland-explorer-badge.png',
+    'usa-explorer': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/usa-explorer-badge.png',
+    'world-explorer': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/world-explorer-badge.png'
   };
 
   const altText = {

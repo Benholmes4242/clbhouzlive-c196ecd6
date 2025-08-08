@@ -299,15 +299,15 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
     // Use custom badges for specific achievements regardless of earned status
     switch (achievement.title) {
       case "20 Club":
-        return <img src="/lovable-uploads/a33df9b4-0089-43ca-913d-132fc5b11cc3.png" alt="20 Club Badge" className="w-28 h-28" />;
+        return <img src="https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/20-club-badge.png" alt="20 Club Badge" className="w-28 h-28" />;
       case "50 Club":
-        return <img src="/lovable-uploads/c1ba04e8-7aed-40e6-948b-0b65fdc932b2.png" alt="50 Club Badge" className="w-28 h-28" />;
+        return <img src="https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/50-club-badge.png" alt="50 Club Badge" className="w-28 h-28" />;
       case "100 Century Club":
-        return <img src="/lovable-uploads/91e26115-098d-4b21-9b29-7e1800fe52bd.png" alt="100 Century Club Badge" className="w-28 h-28" />;
+        return <img src="https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/100-club-badge.png" alt="100 Century Club Badge" className="w-28 h-28" />;
       case "200 Clubhouse Elite":
-        return <img src="/lovable-uploads/04ae4807-845e-412c-9233-d90ed7ed0a9e.png" alt="200 Clubhouse Elite Badge" className={isMobile ? "w-16 h-16" : "w-32 h-32"} />;
+        return <img src="https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/200-club-badge.png" alt="200 Clubhouse Elite Badge" className={isMobile ? "w-16 h-16" : "w-32 h-32"} />;
       case "300 Club Champion":
-        return <img src="/lovable-uploads/bc2bb48a-2505-442f-8d02-2623c7b391ad.png" alt="300 Club Champion Badge" className={isMobile ? "w-16 h-16" : "w-32 h-32"} />;
+        return <img src="https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/300-club-badge.png" alt="300 Club Champion Badge" className={isMobile ? "w-16 h-16" : "w-32 h-32"} />;
       // Regional achievement badges with flag images
       case "Lynx Legend":
         return <img src="/lovable-uploads/5971ec53-bcfe-46df-aa24-78df46eaa170.png" alt="Britain & Ireland Flag" className="w-28 h-28 rounded-lg" />;
