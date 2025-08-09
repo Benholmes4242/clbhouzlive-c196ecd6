@@ -96,28 +96,26 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
       )}
       
       {media.media_type === 'video' && !isInvalidSrc ? (
-        <div className="relative w-full h-full">
-          {shouldAutoplay && (
-            // Smooth loading overlay for video transition
-            videoTransitioning && (
+        shouldAutoplay ? (
+          <div className="relative w-full h-full">
+            {/* Smooth loading overlay for video transition */}
+            {videoTransitioning && (
               <div className="absolute inset-0 bg-muted/60 backdrop-blur-sm flex items-center justify-center z-20 transition-opacity duration-300">
                 <Loader2 className="w-6 h-6 text-muted-foreground animate-spin" />
               </div>
-            )
-          )}
-          <EnhancedVideoPlayer
-            src={media.media_url}
-            autoplay={shouldAutoplay}
-            muted={videoIsMuted} // Use exclusive video audio state
-            loop={loop}
-            className="w-full h-full pointer-events-none"
-            preloadLevel="metadata"
-            enableHLS={true}
-            quality="auto"
-          />
-          
-          {/* Sound Toggle for autoplaying videos */}
-          {shouldAutoplay && (
+            )}
+            <EnhancedVideoPlayer
+              src={media.media_url}
+              autoplay={shouldAutoplay}
+              muted={videoIsMuted} // Use exclusive video audio state
+              loop={loop}
+              className="w-full h-full pointer-events-none"
+              preloadLevel="metadata"
+              enableHLS={true}
+              quality="auto"
+            />
+            
+            {/* Sound Toggle for autoplaying videos */}
             <div className="absolute top-3 right-3 z-30">
               <SoundToggle
                 isMuted={videoIsMuted}
@@ -126,15 +124,35 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
                 className="rounded-full"
               />
             </div>
-          )}
-          
-          {/* Play icon for non-autoplaying videos */}
-          {!shouldAutoplay && !hidePlayButton && (
-            <div className="absolute bottom-3 right-3 z-20">
-              <MdOutlinePlayCircle className="h-6 w-6 text-white drop-shadow-lg" />
-            </div>
-          )}
-        </div>
+          </div>
+        ) : (
+          /* Static thumbnail for non-autoplaying videos */
+          <div className="relative w-full h-full">
+            <img
+              src={thumbnailUrl || fallbackImage}
+              alt={itemTitle || 'Video thumbnail'}
+              className="w-full h-full object-cover"
+              onLoad={() => {
+                setImageLoading(false);
+                setMediaLoaded(true);
+                onImageLoad();
+              }}
+              onError={() => {
+                setImageLoading(false);
+                setMediaLoaded(true);
+                onImageError();
+              }}
+              loading={currentIndex <= 5 ? 'eager' : 'lazy'}
+            />
+            
+            {/* Play icon for non-autoplaying videos */}
+            {!hidePlayButton && (
+              <div className="absolute bottom-3 right-3 z-20">
+                <MdOutlinePlayCircle className="h-6 w-6 text-white drop-shadow-lg" />
+              </div>
+            )}
+          </div>
+        )
       ) : (
         <div className="relative w-full h-full">
           <img
