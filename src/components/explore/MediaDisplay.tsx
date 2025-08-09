@@ -69,10 +69,13 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
         return `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${videoId}/thumbnails/thumbnail.jpg`;
       }
     }
+    // For non-Cloudflare videos, we'll show the video element with preload="metadata" 
+    // which will display the first frame as thumbnail
     return null;
   };
 
   const thumbnailUrl = media.media_type === 'video' ? getVideoThumbnail(media.media_url) : null;
+  const hasCloudflareThumb = thumbnailUrl !== null;
 
   // Handle smooth transition for autoplay videos
   React.useEffect(() => {
@@ -126,24 +129,44 @@ const MediaDisplay: React.FC<MediaDisplayProps> = ({
             </div>
           </div>
         ) : (
-          /* Static thumbnail for non-autoplaying videos */
+          /* Video thumbnail - use Cloudflare thumbnail or video element with first frame */
           <div className="relative w-full h-full">
-            <img
-              src={thumbnailUrl || fallbackImage}
-              alt={itemTitle || 'Video thumbnail'}
-              className="w-full h-full object-cover"
-              onLoad={() => {
-                setImageLoading(false);
-                setMediaLoaded(true);
-                onImageLoad();
-              }}
-              onError={() => {
-                setImageLoading(false);
-                setMediaLoaded(true);
-                onImageError();
-              }}
-              loading={currentIndex <= 5 ? 'eager' : 'lazy'}
-            />
+            {hasCloudflareThumb ? (
+              <img
+                src={thumbnailUrl}
+                alt={itemTitle || 'Video thumbnail'}
+                className="w-full h-full object-cover"
+                onLoad={() => {
+                  setImageLoading(false);
+                  setMediaLoaded(true);
+                  onImageLoad();
+                }}
+                onError={() => {
+                  setImageLoading(false);
+                  setMediaLoaded(true);
+                  onImageError();
+                }}
+                loading={currentIndex <= 5 ? 'eager' : 'lazy'}
+              />
+            ) : (
+              /* For non-Cloudflare videos, show video element with preload="metadata" to display first frame */
+              <video
+                src={media.media_url}
+                className="w-full h-full object-cover"
+                preload="metadata"
+                muted
+                onLoadedMetadata={() => {
+                  setImageLoading(false);
+                  setMediaLoaded(true);
+                  onImageLoad();
+                }}
+                onError={() => {
+                  setImageLoading(false);
+                  setMediaLoaded(true);
+                  onImageError();
+                }}
+              />
+            )}
             
             {/* Play icon for non-autoplaying videos */}
             {!hidePlayButton && (
