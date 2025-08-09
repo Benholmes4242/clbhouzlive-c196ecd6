@@ -192,17 +192,6 @@ const Discover = () => {
             <SuggestedUsers onUserFollow={handleUserFollow} />
           </div>
 
-          {/* Engagement Prompts */}
-          <div className="md:container md:mx-auto md:px-0">
-            <EngagementPrompts
-              isNewUser={isNewUser}
-              isInactiveUser={isInactiveUser}
-              onCreatePost={handleCreatePost}
-              onTagCourse={handleTagCourse}
-              onCompleteProfile={handleCompleteProfile}
-              onFollowCreators={handleFollowCreators}
-            />
-          </div>
 
           {/* Main Grid with Container */}
           <div className="md:container md:mx-auto md:px-0">
