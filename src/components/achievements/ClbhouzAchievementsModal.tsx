@@ -527,26 +527,6 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       unlockHint: "Focus on course management over aggressive play. Avoid double bogeys and play within your abilities."
     },
     {
-      title: "Top 100 Conqueror",
-      emoji: "🌟",
-      isEarned: false,
-      description: "Play 10 of the world's Top 100 golf courses. Elite course collection!",
-      xp: 400,
-      isRepeatable: false,
-      progress: "3 / 10 courses",
-      unlockHint: "Plan golf trips to destinations with multiple Top 100 courses. Research and book tee times in advance."
-    },
-    {
-      title: "Regional Master",
-      emoji: "🗺️",
-      isEarned: false,
-      description: "Complete all courses in a selected region. Local expertise achieved!",
-      xp: 300,
-      isRepeatable: false,
-      progress: "Scotland: 8/12",
-      unlockHint: "Continue exploring Scottish courses. Focus on completing the remaining 4 courses in your selected region."
-    },
-    {
       title: "International Golfer",
       emoji: "✈️",
       isEarned: true,
