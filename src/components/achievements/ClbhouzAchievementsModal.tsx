@@ -1097,7 +1097,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                   </div>
                 
                 <TooltipProvider>
-                  <div className={`grid grid-cols-3 ${isMobile ? 'gap-2' : 'gap-4'}`}>
+                  <div className={`grid grid-cols-3 ${isMobile ? 'gap-3' : 'gap-6'}`}>
                     {getFilteredAchievements(explorationAchievements, 'exploration').map((achievement) => {
                       const { percentage, nudgeText } = getAchievementProgress(achievement);
                       const isNearUnlock = percentage >= 80 && percentage < 100;
@@ -1108,38 +1108,30 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                              <div className="relative">
                                  <div
                                    className={`
-                                     border rounded-xl transition-all duration-200 hover:scale-105 cursor-pointer 
-                                     bg-white/80 dark:bg-gray-900/40 backdrop-blur-sm
-                                     shadow-lg hover:shadow-xl
-                                     ${isMobile ? 'p-1.5 flex flex-col items-center text-center space-y-1' : 'p-2 flex items-center gap-2'}
-                                     ${achievement.isEarned 
-                                       ? 'border-blue-300 dark:border-blue-700 shadow-blue-100/50 dark:shadow-blue-900/20' 
-                                       : isNearUnlock
-                                         ? 'border-orange-400 dark:border-orange-600 shadow-orange-100/50 dark:shadow-orange-900/20 animate-pulse'
-                                         : 'border-blue-200/50 dark:border-blue-800/50 hover:border-blue-300 dark:hover:border-blue-700'
-                                     }
+                                     transition-all duration-200 hover:scale-105 cursor-pointer 
+                                     ${isMobile ? 'p-2 flex flex-col items-center text-center space-y-2' : 'p-4 flex flex-col items-center text-center space-y-3'}
                                    `}
                                    onClick={isMobile ? () => {
                                      setSelectedAchievement(achievement);
                                      setShowAchievementModal(true);
                                    } : undefined}
                                  >
-                                  <div className={`flex justify-center items-center ${isMobile ? 'mb-1' : 'flex-shrink-0 min-w-0'}`}>
-                                    <div>
+                                  {/* Icon directly on background - no container */}
+                                  <div className="flex justify-center items-center">
+                                    <div className={`transition-all duration-200 ${achievement.isEarned ? 'drop-shadow-lg' : 'opacity-60 grayscale'}`}>
                                       {getAchievementIcon(achievement)}
                                     </div>
                                   </div>
-                                  <div className={`text-center ${isMobile ? '' : 'flex-1'}`}>
-                                    <h4 className={`font-medium mb-1 ${isMobile ? 'text-xs leading-tight' : 'text-sm'}`}>
-                                      {achievement.title}
+                                  
+                                  {/* Text stacked underneath */}
+                                  <div className="text-center">
+                                    <h4 className={`font-semibold mb-1 ${isMobile ? 'text-xs leading-tight' : 'text-sm'} ${achievement.isEarned ? 'text-blue-700 dark:text-blue-300' : 'text-muted-foreground'}`}>
+                                      {achievement.title.toUpperCase()}
                                     </h4>
-                                    <p className={`${isMobile ? 'text-xs' : 'text-xs'} ${achievement.isEarned ? 'text-blue-600 dark:text-blue-400' : 'text-muted-foreground'}`}>
-                                      <span className="inline-flex items-center gap-1">
-                                        <span className="text-amber-500">✨</span>
-                                        +{achievement.xp} XP 
-                                        {achievement.isRepeatable ? " 🔄" : " 🏆"}
-                                      </span>
+                                    <p className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium ${achievement.isEarned ? 'text-blue-600 dark:text-blue-400' : 'text-muted-foreground'}`}>
+                                      +{achievement.xp} XP
                                     </p>
+                                  </div>
                                   
                                   {/* Smart Nudge Label */}
                                   {nudgeText && (
@@ -1150,7 +1142,6 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                                     </div>
                                   )}
                                 </div>
-                              </div>
                               
                               {/* Progress indicator for near-unlock achievements */}
                               {isNearUnlock && (
@@ -1244,7 +1235,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                   </div>
                 
                 <TooltipProvider>
-                  <div className={`grid grid-cols-3 ${isMobile ? 'gap-2' : 'gap-4'}`}>
+                  <div className={`grid grid-cols-3 ${isMobile ? 'gap-3' : 'gap-6'}`}>
                     {getFilteredAchievements(skillAchievements, 'skill').map((achievement) => {
                       const { percentage, nudgeText } = getAchievementProgress(achievement);
                       const isNearUnlock = percentage >= 80 && percentage < 100;
@@ -1255,38 +1246,30 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                              <div className="relative">
                                  <div
                                    className={`
-                                     border rounded-xl transition-all duration-200 hover:scale-105 cursor-pointer 
-                                     bg-white/80 dark:bg-gray-900/40 backdrop-blur-sm
-                                     shadow-lg hover:shadow-xl
-                                     ${isMobile ? 'p-1.5 flex flex-col items-center text-center space-y-1' : 'p-2 flex items-center gap-2'}
-                                     ${achievement.isEarned 
-                                       ? 'border-green-300 dark:border-green-700 shadow-green-100/50 dark:shadow-green-900/20' 
-                                       : isNearUnlock
-                                         ? 'border-orange-400 dark:border-orange-600 shadow-orange-100/50 dark:shadow-orange-900/20 animate-pulse'
-                                         : 'border-green-200/50 dark:border-green-800/50 hover:border-green-300 dark:hover:border-green-700'
-                                     }
+                                     transition-all duration-200 hover:scale-105 cursor-pointer 
+                                     ${isMobile ? 'p-2 flex flex-col items-center text-center space-y-2' : 'p-4 flex flex-col items-center text-center space-y-3'}
                                    `}
                                    onClick={isMobile ? () => {
                                      setSelectedAchievement(achievement);
                                      setShowAchievementModal(true);
                                    } : undefined}
                                  >
-                                  <div className={`flex justify-center items-center ${isMobile ? 'mb-1' : 'flex-shrink-0 min-w-0'}`}>
-                                    <div>
+                                  {/* Icon directly on background - no container */}
+                                  <div className="flex justify-center items-center">
+                                    <div className={`transition-all duration-200 ${achievement.isEarned ? 'drop-shadow-lg' : 'opacity-60 grayscale'}`}>
                                       {getAchievementIcon(achievement)}
                                     </div>
                                   </div>
-                                  <div className={`text-center ${isMobile ? '' : 'flex-1'}`}>
-                                    <h4 className={`font-medium mb-1 ${isMobile ? 'text-xs leading-tight' : 'text-sm'}`}>
-                                      {achievement.title}
+                                  
+                                  {/* Text stacked underneath */}
+                                  <div className="text-center">
+                                    <h4 className={`font-semibold mb-1 ${isMobile ? 'text-xs leading-tight' : 'text-sm'} ${achievement.isEarned ? 'text-green-700 dark:text-green-300' : 'text-muted-foreground'}`}>
+                                      {achievement.title.toUpperCase()}
                                     </h4>
-                                    <p className={`${isMobile ? 'text-xs' : 'text-xs'} ${achievement.isEarned ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}`}>
-                                      <span className="inline-flex items-center gap-1">
-                                        <span className="text-amber-500">✨</span>
-                                        +{achievement.xp} XP 
-                                        {achievement.isRepeatable ? " 🔄" : " 🏆"}
-                                      </span>
+                                    <p className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium ${achievement.isEarned ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}`}>
+                                      +{achievement.xp} XP
                                     </p>
+                                  </div>
                                   
                                   {/* Smart Nudge Label */}
                                   {nudgeText && (
@@ -1297,7 +1280,6 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                                     </div>
                                   )}
                                 </div>
-                              </div>
                               
                               {/* Progress indicator for near-unlock achievements */}
                               {isNearUnlock && (
