@@ -457,16 +457,6 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       unlockHint: "Master all aspects of your game and consistently shoot under par. This requires dedication and practice."
     },
     {
-      title: "Personal Best Round",
-      emoji: "📈",
-      isEarned: true,
-      description: "Shoot your lowest score ever. Keep pushing your limits!",
-      xp: 100,
-      isRepeatable: true,
-      progress: "Best: 78",
-      dateEarned: "March 15, 2024"
-    },
-    {
       title: "Under Par Round",
       emoji: "🎯",
       isEarned: true,
