@@ -431,6 +431,46 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       isRepeatable: false,
       progress: "1 / 4 continents",
       unlockHint: "Expand your golf travels internationally. Each continent offers unique golf experiences and challenges."
+    },
+    {
+      title: "Marathon Golfer",
+      emoji: "🏃",
+      isEarned: false,
+      description: "Ten days, ten courses, one epic streak.",
+      xp: 400,
+      isRepeatable: false,
+      progress: "0 / 10 consecutive days",
+      unlockHint: "Plan a golf trip with multiple courses or play daily at different local courses for 10 days straight."
+    },
+    {
+      title: "Globetrotter Golfer",
+      emoji: "🌐",
+      isEarned: false,
+      description: "Tee it up on three continents and own the world.",
+      xp: 600,
+      isRepeatable: false,
+      progress: "1 / 3 continents",
+      unlockHint: "Plan international golf trips to expand your global golf experience across different continents."
+    },
+    {
+      title: "One Day, Two Courses",
+      emoji: "⚡",
+      isEarned: false,
+      description: "36 holes, two courses, all in a day's work.",
+      xp: 200,
+      isRepeatable: true,
+      progress: "Not achieved",
+      unlockHint: "Book tee times at two different courses in the same day. Start early and plan your travel time between courses."
+    },
+    {
+      title: "Cross-Border Swinger",
+      emoji: "🗺️",
+      isEarned: false,
+      description: "Play across borders in the same day.",
+      xp: 250,
+      isRepeatable: true,
+      progress: "Not achieved",
+      unlockHint: "Find courses near international borders and plan a cross-border golf adventure in a single day."
     }
   ];
 
@@ -555,6 +595,26 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       isRepeatable: false,
       progress: "23 / 50 rounds",
       unlockHint: "Continue playing regularly at your home club. Join club events and competitions to reach this milestone faster."
+    },
+    {
+      title: "Par Machine",
+      emoji: "🤖",
+      isEarned: false,
+      description: "Eighteen holes, eighteen pars. Flawless.",
+      xp: 300,
+      isRepeatable: false,
+      progress: "Best: 16 pars",
+      unlockHint: "Focus on consistency and course management. Avoid risky shots and play to the center of greens."
+    },
+    {
+      title: "Birdie Every Par",
+      emoji: "🎯",
+      isEarned: false,
+      description: "Conquer a par 3, 4, and 5 in one round.",
+      xp: 150,
+      isRepeatable: true,
+      progress: "Not achieved",
+      unlockHint: "Target different par holes strategically. Look for opportunities on shorter par 4s and reachable par 5s."
     }
   ];
 
