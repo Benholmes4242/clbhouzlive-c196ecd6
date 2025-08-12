@@ -148,16 +148,15 @@ export const useOptimisticPostSubmission = () => {
       // Start background upload for media files (don't wait for it)
       if (mediaFiles.length > 0) {
         console.log('Starting background upload for', mediaFiles.length, 'files');
-        try {
-          await startBackgroundUpload({
-            postId: postData.id,
-            mediaFiles,
-            userId: user.id
-          });
-        } catch (uploadError) {
+        // Don't await - let it run in background
+        startBackgroundUpload({
+          postId: postData.id,
+          mediaFiles,
+          userId: user.id
+        }).catch(uploadError => {
           console.error('Background upload failed:', uploadError);
           // Don't fail the whole post submission for upload errors
-        }
+        });
       } else {
         console.warn('No media files to upload');
       }
