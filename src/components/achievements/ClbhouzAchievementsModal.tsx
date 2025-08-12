@@ -320,8 +320,6 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
         return <img src="/lovable-uploads/684002ed-a5a9-46e9-a1fc-384da5a7c686.png" alt="Globetrotter Golfer Badge" className="w-28 h-28" />;
       case "Marathon Golfer":
         return <img src="/lovable-uploads/02a84f2b-af4f-4064-a7d6-bdd88575b69e.png" alt="Marathon Golfer Badge" className="w-28 h-28" />;
-      case "Cross-Border Swinger":
-        return <img src="/lovable-uploads/6622cbb8-6a4c-45d2-acc3-7cf1e312b655.png" alt="Cross-Border Swinger Badge" className="w-28 h-28" />;
       case "Single-Figure Handicap":
         return <img src="/lovable-uploads/066c5dd6-9e79-49f2-8e4b-935a5242850a.png" alt="Single-Figure Handicap Badge" className="w-28 h-28" />;
       case "Plus Handicap Player":
@@ -496,16 +494,6 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       progress: "Not achieved",
       unlockHint: "Book tee times at two different courses in the same day. Start early and plan your travel time between courses."
     },
-    {
-      title: "Cross-Border Swinger",
-      emoji: "🗺️",
-      isEarned: false,
-      description: "Play across borders in the same day.",
-      xp: 250,
-      isRepeatable: true,
-      progress: "Not achieved",
-      unlockHint: "Find courses near international borders and plan a cross-border golf adventure in a single day."
-    }
   ];
 
   // Skill & Performance Achievements
