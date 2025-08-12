@@ -99,7 +99,7 @@ export const useBackgroundUpload = () => {
               console.warn(`Cloudflare Stream upload failed for ${file.name}:`, error);
             });
             
-            console.log(`Successfully uploaded ${file.name} to Cloudflare Stream:`, publicUrl);
+            console.log(`Successfully uploaded ${file.name}:`, publicUrl);
           } catch (error) {
             console.error(`Upload failed for ${file.name}:`, error);
             throw error;
