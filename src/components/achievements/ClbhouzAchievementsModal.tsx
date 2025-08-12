@@ -347,6 +347,8 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
         return <img src="/lovable-uploads/a8ab2ea7-a98d-4558-bfbc-8a04e60cad37.png" alt="USA Flag" className="w-28 h-28 rounded-lg" />;
       case "Legends Club":
         return <img src="/lovable-uploads/e158428b-772e-4396-859e-1e3d51f2e9b3.png" alt="World Globe" className="w-28 h-28 rounded-lg" />;
+      case "Albatross Ace":
+        return <img src="/lovable-uploads/2fc5fb62-90a5-4424-b85f-9e6b08a774d8.png" alt="Albatross Ace Badge" className="w-28 h-28" />;
       default:
         // Enhanced emoji display with conditional styling - hide emojis on mobile for Experience/Exploration section
         if (isMobile && (achievement.title.includes('Club') || ['Lynx Legend', 'The Continental Swinger', 'Stars and Stripes Tourer', 'Legends Club'].includes(achievement.title))) {
@@ -545,6 +547,16 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       isRepeatable: false,
       progress: "Completed",
       dateEarned: "January 22, 2024"
+    },
+    {
+      title: "Albatross Ace",
+      emoji: "🦅",
+      isEarned: false,
+      description: "Score the rarest shot in golf — In the hole for 2 on a par 5.",
+      xp: 1000,
+      isRepeatable: true,
+      progress: "0 albatrosses",
+      unlockHint: "Look for reachable par 5s and take calculated risks when the conditions are right. This is golf's rarest achievement."
     },
     {
       title: "Birdie Blitz",
