@@ -299,15 +299,25 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
     // Use custom badges for specific achievements regardless of earned status
     switch (achievement.title) {
       case "20 Club":
-        return <img src="https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/20-club-badge.png" alt="20 Club Badge" className="w-28 h-28" />;
+        return <img src="/lovable-uploads/20198e55-c649-4394-984a-3fda3a3c8981.png" alt="20 Club Badge" className="w-28 h-28" />;
       case "50 Club":
-        return <img src="https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/50-club-badge.png" alt="50 Club Badge" className="w-28 h-28" />;
+        return <img src="/lovable-uploads/e262bb44-197f-4aac-9823-abf51a3f29ae.png" alt="50 Club Badge" className="w-28 h-28" />;
       case "100 Century Club":
-        return <img src="https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/100-club-badge.png" alt="100 Century Club Badge" className="w-28 h-28" />;
+        return <img src="/lovable-uploads/c1d8b74c-57b4-4adc-9b6b-bbccc045e03a.png" alt="100 Century Club Badge" className="w-28 h-28" />;
       case "200 Clubhouse Elite":
-        return <img src="https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/200-club-badge.png" alt="200 Clubhouse Elite Badge" className={isMobile ? "w-16 h-16" : "w-32 h-32"} />;
+        return <img src="/lovable-uploads/88ba82c3-999c-40b9-885e-313869a7e795.png" alt="200 Clubhouse Elite Badge" className={isMobile ? "w-16 h-16" : "w-32 h-32"} />;
       case "300 Club Champion":
-        return <img src="https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/300-club-badge.png" alt="300 Club Champion Badge" className={isMobile ? "w-16 h-16" : "w-32 h-32"} />;
+        return <img src="/lovable-uploads/0088ccbe-6198-4f2c-ada2-e2bf642abec3.png" alt="300 Club Champion Badge" className={isMobile ? "w-16 h-16" : "w-32 h-32"} />;
+      case "Eagle Collector":
+        return <img src="/lovable-uploads/b02e131a-7905-4b36-bf9e-fd85c97abc98.png" alt="Eagle Badge" className="w-28 h-28" />;
+      case "Birdie Blitz":
+        return <img src="/lovable-uploads/5928ca86-f5a8-4ac1-8e15-f13ff748746a.png" alt="Birdie Badge" className="w-28 h-28" />;
+      case "Birdie Every Par":
+        return <img src="/lovable-uploads/164a0671-f0ff-4f1e-8780-4bba8a8fe7f4.png" alt="Birdie Every Par Badge" className="w-28 h-28" />;
+      case "One Day, Two Courses":
+        return <img src="/lovable-uploads/82a1c67a-8bf4-4be7-9fee-24d7d7448072.png" alt="One Day Two Courses Badge" className="w-28 h-28" />;
+      case "Globetrotter Golfer":
+        return <img src="/lovable-uploads/5d4b4b39-237b-4b0d-83e5-d2797f4cbd67.png" alt="Globetrotter Golfer Badge" className="w-28 h-28" />;
       // Regional achievement badges with flag images
       case "Lynx Legend":
         return <img src="/lovable-uploads/5971ec53-bcfe-46df-aa24-78df46eaa170.png" alt="Britain & Ireland Flag" className="w-28 h-28 rounded-lg" />;
