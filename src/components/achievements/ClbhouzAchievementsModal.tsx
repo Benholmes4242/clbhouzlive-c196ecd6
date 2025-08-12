@@ -317,7 +317,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       case "One Day, Two Courses":
         return <img src="/lovable-uploads/f8900d31-7d35-4e4e-9352-99f6198da121.png" alt="One Day Two Courses Badge" className="w-28 h-28" />;
       case "Globetrotter Golfer":
-        return <img src="/lovable-uploads/3d1d3937-fc9b-40bf-abc5-c792464ed99c.png" alt="Globetrotter Golfer Badge" className="w-28 h-28" />;
+        return <img src="/lovable-uploads/684002ed-a5a9-46e9-a1fc-384da5a7c686.png" alt="Globetrotter Golfer Badge" className="w-28 h-28" />;
       case "Marathon Golfer":
         return <img src="/lovable-uploads/02a84f2b-af4f-4064-a7d6-bdd88575b69e.png" alt="Marathon Golfer Badge" className="w-28 h-28" />;
       case "Cross-Border Swinger":
