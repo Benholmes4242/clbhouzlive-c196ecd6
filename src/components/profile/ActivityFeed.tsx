@@ -112,18 +112,6 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   return (
     <>
       <div className="py-4">
-        {/* Achievements Button */}
-        <div className="flex items-center justify-between mb-4 px-4 md:px-0">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setAchievementsModalOpen(true)}
-            className="bg-primary/10 hover:bg-primary/20 border-primary/20 text-primary transition-all duration-200"
-          >
-            <Trophy className="h-4 w-4 mr-2" />
-            Achievements
-          </Button>
-        </div>
 
         <div className="flex items-center justify-between mb-4 px-4 md:px-0">
           <div className="flex items-end gap-2">
