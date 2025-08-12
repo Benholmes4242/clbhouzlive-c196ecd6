@@ -29,7 +29,7 @@ const MedalIcon: React.FC<MedalIconProps> = ({ className, size = 'md', type = '2
     'albatross': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/albatross-badge.png',
     'birdie-blitz': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/birdie-blitz-badge.png',
     'birdie-every-par': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/birdie-every-par-badge.png',
-    'eagle-collector': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/eagle-collector-badge.png'
+    'eagle-collector': '/lovable-uploads/4ec4bfcd-f19c-4e11-b6a9-b81c1eaab19d.png'
   };
 
   const altText = {
