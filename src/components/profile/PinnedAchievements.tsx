@@ -3,7 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Switch } from '@/components/ui/switch';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Lock, Settings, Trophy } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Lock, Settings, Trophy, MoreVertical, Medal, Award, Star } from 'lucide-react';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { supabase } from '@/integrations/supabase/client';
 import { useUserAchievements } from '@/hooks/useUserAchievements';
@@ -184,6 +185,25 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
     setIsManagePinsOpen(true);
   };
 
+  // Get badge icon based on achievement type
+  const getBadgeIcon = (achievementId: string, size = 'w-8 h-8') => {
+    switch (achievementId) {
+      case '20-club':
+      case '50-club':
+        return <Medal className={`${size} text-amber-600`} />;
+      case '100-club':
+        return <Trophy className={`${size} text-yellow-500`} />;
+      case 'eagle-collector':
+        return <Award className={`${size} text-blue-500`} />;
+      case 'birdie-blitz':
+        return <Star className={`${size} text-green-500`} />;
+      case 'hole-in-one':
+        return <Trophy className={`${size} text-purple-500`} />;
+      default:
+        return <Trophy className={`${size} text-primary`} />;
+    }
+  };
+
   // Render achievement badge
   const renderAchievementBadge = (achievement: Achievement, isPlaceholder = false) => {
     const content = (
@@ -204,7 +224,9 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
             <Lock className="w-8 h-8 text-muted-foreground" />
           ) : (
             <div className="text-center">
-              <div className="text-3xl mb-1">🏆</div>
+              <div className="mb-1">
+                {getBadgeIcon(achievement.id)}
+              </div>
               <div className="text-xs font-medium text-foreground px-1 leading-tight">
                 {achievement.name}
               </div>
@@ -254,87 +276,80 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
   return (
     <>
       <div className="w-full max-w-2xl mx-auto mb-8">
-        <div className="bg-card rounded-2xl border border-border shadow-lg p-6">
-          {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-2">
-              <Trophy className="w-5 h-5 text-primary" />
-              <h3 className="text-xl font-bold text-foreground">Pinned Achievements</h3>
-            </div>
-            
-            {isOwnProfile && (
-              <div className="flex items-center gap-3">
-                {/* Public toggle */}
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-muted-foreground">Show badges to others</span>
-                  <Switch
-                    checked={showAchievementsPublic}
-                    onCheckedChange={handleToggleChange}
-                  />
-                </div>
-                
-                {/* Manage pins button */}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={openManagePins}
-                  className="flex items-center gap-2"
-                >
-                  <Settings className="w-4 h-4" />
-                  Manage Pins
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-2">
+            <Trophy className="w-5 h-5 text-primary" />
+            <h3 className="text-xl font-bold text-foreground">Pinned Achievements</h3>
+          </div>
+          
+          {isOwnProfile && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                  <MoreVertical className="h-4 w-4" />
                 </Button>
-              </div>
-            )}
-          </div>
-
-          {/* Visibility warning for owner */}
-          {isOwnProfile && !showAchievementsPublic && (
-            <div className="mb-4 p-3 bg-muted rounded-lg border border-border">
-              <p className="text-sm text-muted-foreground">Hidden from others</p>
-            </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => handleToggleChange(!showAchievementsPublic)}>
+                  {showAchievementsPublic ? 'Hide from others' : 'Show to others'}
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={openManagePins}>
+                  <Settings className="w-4 h-4 mr-2" />
+                  Manage Pins
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
+        </div>
 
-          {/* Achievement badges grid */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            {Array.from({ length: 4 }, (_, index) => {
-              const achievement = displayAchievements[index];
-              
-              if (!achievement && unlockedCount === 0 && isOwnProfile) {
-                // Show placeholder for empty state
-                return renderAchievementBadge(
-                  { id: `placeholder-${index}`, name: '', xp: 0, unlocked: false },
-                  true
-                );
-              }
-              
-              if (achievement) {
-                return renderAchievementBadge(achievement);
-              }
-              
-              return null;
-            }).filter(Boolean)}
+        {/* Visibility warning for owner */}
+        {isOwnProfile && !showAchievementsPublic && (
+          <div className="mb-4 p-3 bg-muted rounded-lg border border-border">
+            <p className="text-sm text-muted-foreground">Hidden from others</p>
           </div>
+        )}
 
-          {/* Empty state message for owner */}
-          {unlockedCount === 0 && isOwnProfile && (
-            <div className="text-center py-4">
-              <p className="text-muted-foreground">
-                Achievements you earn will appear here.
-              </p>
-            </div>
-          )}
+        {/* Achievement badges grid */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          {Array.from({ length: 4 }, (_, index) => {
+            const achievement = displayAchievements[index];
+            
+            if (!achievement && unlockedCount === 0 && isOwnProfile) {
+              // Show placeholder for empty state
+              return renderAchievementBadge(
+                { id: `placeholder-${index}`, name: '', xp: 0, unlocked: false },
+                true
+              );
+            }
+            
+            if (achievement) {
+              return renderAchievementBadge(achievement);
+            }
+            
+            return null;
+          }).filter(Boolean)}
+        </div>
 
-          {/* See All button */}
-          <div className="flex justify-end">
-            <Button
-              variant="outline"
-              onClick={() => setIsAchievementsModalOpen(true)}
-              className="flex items-center gap-2"
-            >
-              <Trophy className="w-4 h-4" />
-              See All Achievements
-            </Button>
+        {/* Empty state message for owner */}
+        {unlockedCount === 0 && isOwnProfile && (
+          <div className="text-center py-4">
+            <p className="text-muted-foreground">
+              Achievements you earn will appear here.
+            </p>
           </div>
+        )}
+
+        {/* See All button */}
+        <div className="flex justify-end">
+          <Button
+            variant="outline"
+            onClick={() => setIsAchievementsModalOpen(true)}
+            className="flex items-center gap-2"
+          >
+            <Trophy className="w-4 h-4" />
+            See All Achievements
+          </Button>
         </div>
       </div>
 
