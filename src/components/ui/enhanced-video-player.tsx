@@ -119,6 +119,13 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
     const isCloudflareStream = src.includes('videodelivery.net') || src.includes('iframe.videodelivery.net') || src.includes('cloudflarestream.com');
     const isM3U8 = src.includes('.m3u8');
     
+    // Handle incomplete URLs (like '/manifest/video.m3u8')
+    if (src.startsWith('/manifest/video.m3u8')) {
+      setError('Invalid video URL - video not found');
+      setIsLoading(false);
+      return;
+    }
+    
     console.log('Video player initializing:', { src, isCloudflareStream, isM3U8, enableHLS });
     
     if (enableHLS && (isM3U8 || isCloudflareStream)) {
