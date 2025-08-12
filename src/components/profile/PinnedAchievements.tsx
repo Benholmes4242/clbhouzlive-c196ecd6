@@ -185,22 +185,23 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
     setIsManagePinsOpen(true);
   };
 
-  // Get badge icon based on achievement type
-  const getBadgeIcon = (achievementId: string, size = 'w-8 h-8') => {
-    switch (achievementId) {
-      case '20-club':
-      case '50-club':
-        return <Medal className={`${size} text-amber-600`} />;
-      case '100-club':
-        return <Trophy className={`${size} text-yellow-500`} />;
-      case 'eagle-collector':
-        return <Award className={`${size} text-blue-500`} />;
-      case 'birdie-blitz':
-        return <Star className={`${size} text-green-500`} />;
-      case 'hole-in-one':
-        return <Trophy className={`${size} text-purple-500`} />;
+  // Get real badge image based on achievement name
+  const getAchievementBadge = (achievementName: string) => {
+    switch (achievementName) {
+      case '20 Club':
+        return <img src="/lovable-uploads/20198e55-c649-4394-984a-3fda3a3c8981.png" alt="20 Club Badge" className="w-12 h-12" />;
+      case '50 Club':
+        return <img src="/lovable-uploads/e262bb44-197f-4aac-9823-abf51a3f29ae.png" alt="50 Club Badge" className="w-12 h-12" />;
+      case 'Century Club':
+        return <img src="/lovable-uploads/c1d8b74c-57b4-4adc-9b6b-bbccc045e03a.png" alt="100 Century Club Badge" className="w-12 h-12" />;
+      case 'Eagle Collector':
+        return <img src="/lovable-uploads/4ec4bfcd-f19c-4e11-b6a9-b81c1eaab19d.png" alt="Eagle Collector Badge" className="w-12 h-12" />;
+      case 'Birdie Blitz':
+        return <img src="/lovable-uploads/5928ca86-f5a8-4ac1-8e15-f13ff748746a.png" alt="Birdie Badge" className="w-12 h-12" />;
+      case 'Hole-in-One':
+        return <img src="/lovable-uploads/68aa3b6e-7c54-41e7-80f6-75b4bf6e8b63.png" alt="Hole-in-One Badge" className="w-12 h-12" />;
       default:
-        return <Trophy className={`${size} text-primary`} />;
+        return <Trophy className="w-8 h-8 text-primary" />;
     }
   };
 
@@ -223,14 +224,14 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
           {isPlaceholder ? (
             <Lock className="w-8 h-8 text-muted-foreground" />
           ) : (
-            <div className="text-center">
-              <div className="mb-1">
-                {getBadgeIcon(achievement.id)}
-              </div>
-              <div className="text-xs font-medium text-foreground px-1 leading-tight">
-                {achievement.name}
-              </div>
-            </div>
+             <div className="text-center">
+               <div className="mb-1">
+                 {getAchievementBadge(achievement.name)}
+               </div>
+               <div className="text-xs font-medium text-foreground px-1 leading-tight">
+                 {achievement.name}
+               </div>
+             </div>
           )}
         </div>
         
@@ -281,26 +282,25 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
           <div className="flex items-center gap-2">
             <Trophy className="w-5 h-5 text-primary" />
             <h3 className="text-xl font-bold text-foreground">Pinned Achievements</h3>
+            {isOwnProfile && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="sm" className="h-8 w-8 p-0 ml-2">
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="bg-background border border-border shadow-lg z-50">
+                  <DropdownMenuItem onClick={() => handleToggleChange(!showAchievementsPublic)}>
+                    {showAchievementsPublic ? 'Hide from others' : 'Show to others'}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={openManagePins}>
+                    <Settings className="w-4 h-4 mr-2" />
+                    Manage Pins
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
-          
-          {isOwnProfile && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => handleToggleChange(!showAchievementsPublic)}>
-                  {showAchievementsPublic ? 'Hide from others' : 'Show to others'}
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={openManagePins}>
-                  <Settings className="w-4 h-4 mr-2" />
-                  Manage Pins
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
         </div>
 
         {/* Visibility warning for owner */}
