@@ -185,21 +185,21 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
     setIsManagePinsOpen(true);
   };
 
-  // Get real badge image based on achievement name
+  // Get real badge image based on achievement name (match ClbhouzAchievementsModal sizing)
   const getAchievementBadge = (achievementName: string) => {
     switch (achievementName) {
       case '20 Club':
-        return <img src="/lovable-uploads/20198e55-c649-4394-984a-3fda3a3c8981.png" alt="20 Club Badge" className="w-12 h-12" />;
+        return <img src="/lovable-uploads/20198e55-c649-4394-984a-3fda3a3c8981.png" alt="20 Club Badge" className="w-40 h-40" />;
       case '50 Club':
-        return <img src="/lovable-uploads/e262bb44-197f-4aac-9823-abf51a3f29ae.png" alt="50 Club Badge" className="w-12 h-12" />;
+        return <img src="/lovable-uploads/e262bb44-197f-4aac-9823-abf51a3f29ae.png" alt="50 Club Badge" className="w-40 h-40" />;
       case 'Century Club':
-        return <img src="/lovable-uploads/c1d8b74c-57b4-4adc-9b6b-bbccc045e03a.png" alt="100 Century Club Badge" className="w-12 h-12" />;
+        return <img src="/lovable-uploads/c1d8b74c-57b4-4adc-9b6b-bbccc045e03a.png" alt="100 Century Club Badge" className="w-40 h-40" />;
       case 'Eagle Collector':
-        return <img src="/lovable-uploads/4ec4bfcd-f19c-4e11-b6a9-b81c1eaab19d.png" alt="Eagle Collector Badge" className="w-12 h-12" />;
+        return <img src="/lovable-uploads/4ec4bfcd-f19c-4e11-b6a9-b81c1eaab19d.png" alt="Eagle Collector Badge" className="w-40 h-40" />;
       case 'Birdie Blitz':
-        return <img src="/lovable-uploads/5928ca86-f5a8-4ac1-8e15-f13ff748746a.png" alt="Birdie Badge" className="w-12 h-12" />;
+        return <img src="/lovable-uploads/5928ca86-f5a8-4ac1-8e15-f13ff748746a.png" alt="Birdie Badge" className="w-40 h-40" />;
       case 'Hole-in-One':
-        return <img src="/lovable-uploads/68aa3b6e-7c54-41e7-80f6-75b4bf6e8b63.png" alt="Hole-in-One Badge" className="w-12 h-12" />;
+        return <img src="/lovable-uploads/68aa3b6e-7c54-41e7-80f6-75b4bf6e8b63.png" alt="Hole-in-One Badge" className="w-40 h-40" />;
       default:
         return <Trophy className="w-8 h-8 text-primary" />;
     }
@@ -210,8 +210,8 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
     const badgeContent = (
       <div 
         className={`
-          achv-badge-size relative flex flex-col items-center justify-center gap-2 
-          border border-black/10 rounded-lg transition-all duration-200 cursor-pointer
+          achv-badge-size relative flex flex-col items-center justify-center
+          rounded-lg transition-all duration-200 cursor-pointer
           ${isPlaceholder 
             ? 'opacity-60' 
             : achievement.unlocked
@@ -224,7 +224,7 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
         {/* Badge Image */}
         <div className="flex-shrink-0">
           {isPlaceholder ? (
-            <Lock className="w-12 h-12 text-muted-foreground" />
+            <Lock className="w-40 h-40 text-muted-foreground" />
           ) : (
             getAchievementBadge(achievement.name)
           )}
@@ -265,14 +265,19 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
           <TooltipTrigger asChild>
             {fullContent}
           </TooltipTrigger>
-          <TooltipContent>
-            <div className="text-center">
-              <div className="font-semibold">{achievement.name}</div>
-              <div className="text-sm text-muted-foreground">
-                +{achievement.xp} XP • {achievement.unlocked ? 'Unlocked' : 'Locked'}
+          <TooltipContent className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-lg p-4 max-w-xs">
+            <div className="text-center space-y-2">
+              <div className="font-semibold text-gray-900 dark:text-white">{achievement.name}</div>
+              <div className="text-sm text-gray-600 dark:text-gray-300">
+                <span className="text-yellow-600 dark:text-yellow-400">+{achievement.xp} XP</span>
+                {achievement.unlocked ? (
+                  <span className="ml-2 text-green-600 dark:text-green-400">✓ Unlocked</span>
+                ) : (
+                  <span className="ml-2 text-red-500 dark:text-red-400">🔒 Locked</span>
+                )}
               </div>
               {achievement.description && (
-                <div className="text-xs text-muted-foreground mt-1 max-w-48">
+                <div className="text-xs text-gray-500 dark:text-gray-400 mt-2 leading-relaxed">
                   {achievement.description}
                 </div>
               )}
