@@ -323,11 +323,11 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       case "Cross-Border Swinger":
         return <img src="/lovable-uploads/6622cbb8-6a4c-45d2-acc3-7cf1e312b655.png" alt="Cross-Border Swinger Badge" className="w-28 h-28" />;
       case "Single-Figure Handicap":
-        return <img src="/lovable-uploads/fdc27a41-4e6e-4c1d-b46f-6cfc32b73bc4.png" alt="Single-Figure Handicap Badge" className="w-28 h-28" />;
+        return <img src="/lovable-uploads/066c5dd6-9e79-49f2-8e4b-935a5242850a.png" alt="Single-Figure Handicap Badge" className="w-28 h-28" />;
       case "Plus Handicap Player":
         return <img src="/lovable-uploads/1779738a-184b-4a0d-85d0-b964641019d9.png" alt="Plus Handicap Player Badge" className="w-28 h-28" />;
       case "Under Par Round":
-        return <img src="/lovable-uploads/00b52bcc-e5a5-4067-888e-04bc93b5bb24.png" alt="Under Par Round Badge" className="w-28 h-28" />;
+        return <img src="/lovable-uploads/d7d44dea-f5cc-416d-9a01-985d48262fc6.png" alt="Under Par Round Badge" className="w-28 h-28" />;
       case "First Eagle":
         return <img src="/lovable-uploads/6b62e9b3-33d7-4825-b1d7-aac6f86e4ad7.png" alt="First Eagle Badge" className="w-28 h-28" />;
       case "Hole-in-One":
@@ -344,11 +344,11 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       case "Lynx Legend":
         return <img src="/lovable-uploads/f2714e7f-418b-4c4c-ae28-e4a1b1ea8033.png" alt="Britain & Ireland Flag" className="w-28 h-28 rounded-lg" />;
       case "The Continental Swinger":
-        return <img src="/lovable-uploads/27ad4524-d8d9-4750-a4da-21d43d77fb0e.png" alt="European Union Flag" className="w-28 h-28 rounded-lg" />;
+        return <img src="/lovable-uploads/2fd872c8-aee1-4f0d-a3b9-fcfe49dbad20.png" alt="Continental Swinger Badge" className="w-28 h-28 rounded-lg" />;
       case "Stars and Stripes Tourer":
         return <img src="/lovable-uploads/2b2ee6a8-e8c4-49d9-bfdf-86403c3a47b7.png" alt="USA Flag" className="w-28 h-28 rounded-lg" />;
       case "Legends Club":
-        return <img src="/lovable-uploads/e158428b-772e-4396-859e-1e3d51f2e9b3.png" alt="World Globe" className="w-28 h-28 rounded-lg" />;
+        return <img src="/lovable-uploads/3d5aac7d-1c4d-4b41-b450-35a0d7d4d5aa.png" alt="Legends Club Badge" className="w-28 h-28 rounded-lg" />;
       case "Albatross Ace":
         return <img src="/lovable-uploads/2fc5fb62-90a5-4424-b85f-9e6b08a774d8.png" alt="Albatross Ace Badge" className="w-28 h-28" />;
       default:
