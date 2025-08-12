@@ -118,6 +118,7 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
     // Check if HLS is needed and supported
     const isCloudflareStream = src.includes('videodelivery.net') || src.includes('iframe.videodelivery.net') || src.includes('cloudflarestream.com');
     const isM3U8 = src.includes('.m3u8');
+    const isSupabaseStorage = src.includes('supabase.co/storage');
     
     // Handle incomplete URLs (like '/manifest/video.m3u8')
     if (src.startsWith('/manifest/video.m3u8')) {
@@ -126,9 +127,9 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
       return;
     }
     
-    console.log('Video player initializing:', { src, isCloudflareStream, isM3U8, enableHLS });
+    console.log('Video player initializing:', { src, isCloudflareStream, isM3U8, enableHLS, isSupabaseStorage });
     
-    if (enableHLS && (isM3U8 || isCloudflareStream)) {
+    if (enableHLS && (isM3U8 || isCloudflareStream) && !isSupabaseStorage) {
       if (window.Hls && window.Hls.isSupported()) {
         const hls = new window.Hls({
           enableWorker: true,
@@ -195,6 +196,12 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
               clearTimeout(loadingTimeoutRef.current);
             }
             setIsLoading(false);
+          } else {
+            // Non-fatal errors, try to recover
+            console.warn('Non-fatal HLS error, attempting recovery:', data);
+            if (data.type === window.Hls.ErrorTypes.MEDIA_ERROR) {
+              hls.recoverMediaError();
+            }
           }
         });
 
@@ -209,7 +216,7 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
         }
         setIsLoading(false);
       } else {
-        console.log('HLS not supported, using direct video');
+        console.log('HLS not supported or Supabase storage video, using direct video');
         video.src = src;
         if (loadingTimeoutRef.current) {
           clearTimeout(loadingTimeoutRef.current);
@@ -217,7 +224,8 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
         setIsLoading(false);
       }
     } else {
-      // Standard video
+      // Standard video or Supabase storage video
+      console.log('Using standard video playback for:', src);
       video.src = src;
       if (loadingTimeoutRef.current) {
         clearTimeout(loadingTimeoutRef.current);
