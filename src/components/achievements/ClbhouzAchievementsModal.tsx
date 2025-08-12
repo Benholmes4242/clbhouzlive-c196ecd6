@@ -121,24 +121,14 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
             }
           }
         } else {
-          // Desktop behavior with hysteresis to prevent flicker
-          const debounceDelay = 100; // Increased debounce for desktop
-          
-          scrollDebounceTimer.current = setTimeout(() => {
-            // Update direction and handle state changes
-            if (newDirection !== 'idle') {
-              scrollDirection.current = newDirection;
-              
-              // Hysteresis: Use two different thresholds to prevent oscillation
-              if (!isManuallyCollapsed) {
-                if (newDirection === 'down' && currentScrollTop > 80) { // Higher threshold for collapse
-                  setIsCollapsed(true);
-                } else if (newDirection === 'up' && currentScrollTop < 40) { // Lower threshold for expand
-                  setIsCollapsed(false);
-                }
-              }
+          // Desktop behavior - immediate collapse on any scroll down
+          if (!isManuallyCollapsed) {
+            if (newDirection === 'down' && currentScrollTop > 5) { // Immediate collapse threshold
+              setIsCollapsed(true);
+            } else if (newDirection === 'up' && currentScrollTop < 20) { // Lower threshold for expand
+              setIsCollapsed(false);
             }
-          }, debounceDelay);
+          }
         }
         
         lastScrollTop.current = currentScrollTop;
@@ -686,11 +676,11 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
         }}
       >
         <DialogHeader className={`${isMobile ? 'p-4 pb-2' : 'p-6 pb-4'} flex-shrink-0`}>
-          <DialogTitle className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold`}>
-            {isCurrentUser ? "Your clbhouz achievements" : `${userDisplayName}'s clbhouz achievements`}
+          <DialogTitle className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold text-black dark:text-white`}>
+            Trophies & Milestones
           </DialogTitle>
-          <DialogDescription className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground mt-1`}>
-            See how far your game can take you
+          <DialogDescription className={`${isMobile ? 'text-sm' : 'text-base'} text-muted-foreground mt-1`}>
+            Track your progress. Treasure your triumphs.
           </DialogDescription>
         </DialogHeader>
         
@@ -709,12 +699,12 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
           <div className={`${isMobile ? 'px-4 pb-2' : 'px-6 pb-4'}`}>
             <div className={`flex items-center justify-between bg-muted/50 rounded-lg ${isMobile ? 'p-3' : 'p-4'}`}>
               <div className="flex items-center gap-3">
-                <div className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-white font-bold ${isMobile ? 'text-sm' : 'text-lg'}`}>
+                <div className={`${isMobile ? 'w-14 h-14' : 'w-16 h-16'} rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-white font-bold ${isMobile ? 'text-sm' : 'text-lg'}`}>
                   {userProfilePhotoUrl ? (
                     <img 
                       src={userProfilePhotoUrl} 
                       alt={userDisplayName} 
-                      className={`${isMobile ? 'w-10 h-10' : 'w-12 h-12'} rounded-full object-cover`}
+                      className={`${isMobile ? 'w-14 h-14' : 'w-16 h-16'} rounded-full object-cover`}
                     />
                   ) : (
                     userDisplayName.charAt(0).toUpperCase()
@@ -1118,12 +1108,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
               <div className="rounded-2xl p-6 border border-gray-200/40 dark:border-gray-800/40 shadow-xl backdrop-blur-sm">
                 {/* Section Header with Icon */}
                   <div className={`flex items-center justify-center gap-3 ${isMobile ? 'mb-3' : 'mb-6'}`}>
-                    {!isMobile && (
-                      <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center">
-                        <span className="text-xl">🧭</span>
-                      </div>
-                    )}
-                    <h3 className={`${isMobile ? 'text-base' : 'text-xl'} font-bold text-blue-800 dark:text-blue-200`}>
+                    <h3 className={`${isMobile ? 'text-base' : 'text-xl'} font-bold text-gray-800 dark:text-gray-200`}>
                       Experience & Exploration Achievements
                     </h3>
                   </div>
@@ -1256,12 +1241,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
               <div className="rounded-2xl p-6 border border-gray-200/40 dark:border-gray-800/40 shadow-xl backdrop-blur-sm">
                 {/* Section Header with Icon */}
                   <div className={`flex items-center justify-center gap-3 ${isMobile ? 'mb-3' : 'mb-6'}`}>
-                    {!isMobile && (
-                      <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900/50 flex items-center justify-center">
-                        <span className="text-xl">💪</span>
-                      </div>
-                    )}
-                    <h3 className={`${isMobile ? 'text-base' : 'text-xl'} font-bold text-green-800 dark:text-green-200`}>
+                    <h3 className={`${isMobile ? 'text-base' : 'text-xl'} font-bold text-gray-800 dark:text-gray-200`}>
                       Skill & Performance Achievements
                     </h3>
                   </div>
