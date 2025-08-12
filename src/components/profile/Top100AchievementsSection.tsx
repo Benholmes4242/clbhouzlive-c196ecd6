@@ -3,6 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import MedalIcon from '@/components/ui/medal-icon';
+import ClubhouseAchievementsTray from '@/components/achievements/ClubhouseAchievementsTray';
 
 interface Top100AchievementsSectionProps {
   userId: string;
@@ -172,96 +173,12 @@ const Top100AchievementsSection: React.FC<Top100AchievementsSectionProps> = ({
 
   return (
     <div className="mb-6">
-      {/* Achievements Stats Card with embedded achievements */}
-      <div className="bg-muted border border-border rounded-lg px-4 py-3">
-        <div className="space-y-4">
-          <div>
-            <h3 className="font-bold text-lg text-foreground">Achievements</h3>
-            <p className="text-foreground">
-              You've played <span className="font-semibold text-foreground">{userProgress}</span> of 300 Top 100 courses
-            </p>
-          </div>
-          
-          {/* Achievement Cards - Limited height with scroll */}
-          <div className="relative">
-            <div 
-              className="max-h-48 overflow-y-auto scroll-smooth scrollbar-thin scrollbar-thumb-white/20 scrollbar-track-transparent space-y-2"
-              style={{
-                WebkitOverflowScrolling: 'touch',
-                scrollbarWidth: 'thin'
-              }}
-            >
-              {achievements.map((achievement, index) => {
-                const is20Club = achievement.id === '20-club';
-                const isEarned = achievement.isEarned;
-                
-                return (
-                  <div
-                    key={achievement.id}
-                    className={`relative flex items-center gap-3 p-3 rounded-lg border-2 transition-all duration-300 ${
-                      isEarned
-                        ? "bg-green-500/10 border-green-400/30"
-                        : "bg-white/5 border-white/20 opacity-60"
-                    }`}
-                    style={is20Club ? {
-                      backgroundColor: '#22c55e33',
-                      borderColor: '#22c55e',
-                      borderWidth: '3px',
-                      boxShadow: '0 0 25px #22c55e'
-                    } : {}}
-                  >
-                    {/* Debug text for 20 Club always - moved outside blur area */}
-                    {is20Club && (
-                      <div className="absolute -top-4 -right-4 bg-red-600 text-white text-sm px-2 py-1 rounded-lg shadow-lg z-50 border-2 border-white">
-                        DEBUG: {userProgress >= 20 ? 'EARNED' : 'NOT EARNED'} - {userProgress}/20
-                      </div>
-                    )}
-                    
-                    {/* Achievement Icon */}
-                    <div className="flex items-center justify-center w-8 h-8 rounded-full text-3xl">
-                      {achievement.id === '20-club' ? (
-                        <MedalIcon size="xl" />
-                      ) : (
-                        <span className="text-3xl">{achievement.emoji}</span>
-                      )}
-                    </div>
-
-                  {/* Achievement Content */}
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h4 className="font-medium text-white text-sm leading-tight">
-                          {achievement.title}
-                        </h4>
-                        <p className="text-xs text-white/70">
-                          {achievement.description}
-                        </p>
-                      </div>
-                      
-                      {/* Progress/Status */}
-                      <div className="text-right">
-                        {achievement.isEarned ? (
-                          <span className="text-xs font-medium text-green-300">
-                            ✓ Earned!
-                          </span>
-                        ) : (
-                          <span className="text-xs text-white/60">
-                            {Math.min(userProgress, achievement.threshold)}/{achievement.threshold}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  </div>
-                );
-              })}
-            </div>
-            
-            {/* Scroll indicator gradient */}
-            <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-white/10 to-transparent pointer-events-none rounded-b-lg"></div>
-          </div>
-        </div>
-      </div>
+      {/* Use the new Clubhouse Achievements Tray */}
+      <ClubhouseAchievementsTray 
+        userId={userId}
+        isOwnProfile={isOwnProfile}
+        userDisplayName={userDisplayName}
+      />
     </div>
   );
 };

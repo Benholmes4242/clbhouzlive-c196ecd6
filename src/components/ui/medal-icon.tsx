@@ -4,7 +4,7 @@ import { getAchievementBadgeUrl } from '@/utils/achievementBadgeUpload';
 interface MedalIconProps {
   className?: string;
   size?: 'sm' | 'md' | 'lg' | 'xl';
-  type?: '20-club' | '50-club' | '100-club' | '200-club' | '300-club' | 'eu-explorer' | 'uk-ireland-explorer' | 'usa-explorer' | 'world-explorer';
+  type?: '20-club' | '50-club' | '100-club' | '200-club' | '300-club' | 'eu-explorer' | 'uk-ireland-explorer' | 'usa-explorer' | 'world-explorer' | 'globe-trotter' | 'albatross' | 'birdie-blitz' | 'birdie-every-par' | 'eagle-collector';
 }
 
 const MedalIcon: React.FC<MedalIconProps> = ({ className, size = 'md', type = '20-club' }) => {
@@ -24,7 +24,12 @@ const MedalIcon: React.FC<MedalIconProps> = ({ className, size = 'md', type = '2
     'eu-explorer': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/eu-explorer-badge.png',
     'uk-ireland-explorer': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/uk-ireland-explorer-badge.png',
     'usa-explorer': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/usa-explorer-badge.png',
-    'world-explorer': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/world-explorer-badge.png'
+    'world-explorer': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/world-explorer-badge.png',
+    'globe-trotter': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/globe-trotter-badge.png',
+    'albatross': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/albatross-badge.png',
+    'birdie-blitz': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/birdie-blitz-badge.png',
+    'birdie-every-par': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/birdie-every-par-badge.png',
+    'eagle-collector': 'https://pub-73469fa1cd444caea8cb50c8c84a8b84.r2.dev/logos/eagle-collector-badge.png'
   };
 
   const altText = {
@@ -36,7 +41,12 @@ const MedalIcon: React.FC<MedalIconProps> = ({ className, size = 'md', type = '2
     'eu-explorer': 'European Explorer Badge',
     'uk-ireland-explorer': 'UK & Ireland Explorer Badge',
     'usa-explorer': 'USA Explorer Badge',
-    'world-explorer': 'World Explorer Badge'
+    'world-explorer': 'World Explorer Badge',
+    'globe-trotter': 'Globe Trotter Golfer Badge',
+    'albatross': 'Albatross Ace Badge',
+    'birdie-blitz': 'Birdie Blitz Badge',
+    'birdie-every-par': 'Birdie Every Par Badge',
+    'eagle-collector': 'Eagle Collector Badge'
   };
 
   return (
