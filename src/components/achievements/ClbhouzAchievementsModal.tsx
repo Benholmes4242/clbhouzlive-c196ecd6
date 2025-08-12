@@ -318,6 +318,26 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
         return <img src="/lovable-uploads/82a1c67a-8bf4-4be7-9fee-24d7d7448072.png" alt="One Day Two Courses Badge" className="w-28 h-28" />;
       case "Globetrotter Golfer":
         return <img src="/lovable-uploads/5d4b4b39-237b-4b0d-83e5-d2797f4cbd67.png" alt="Globetrotter Golfer Badge" className="w-28 h-28" />;
+      case "Marathon Golfer":
+        return <img src="/lovable-uploads/beeb4eb8-b2b5-4e10-9e56-6d7e3e39cce7.png" alt="Marathon Golfer Badge" className="w-28 h-28" />;
+      case "Cross-Border Swinger":
+        return <img src="/lovable-uploads/fe62bb01-d4e0-493c-b83a-1334a6b72d63.png" alt="Cross-Border Swinger Badge" className="w-28 h-28" />;
+      case "Single-Figure Handicap":
+        return <img src="/lovable-uploads/fdc27a41-4e6e-4c1d-b46f-6cfc32b73bc4.png" alt="Single-Figure Handicap Badge" className="w-28 h-28" />;
+      case "Plus Handicap Player":
+        return <img src="/lovable-uploads/81f4ad5a-0064-4ac1-8fb9-c17b46d32ceb.png" alt="Plus Handicap Player Badge" className="w-28 h-28" />;
+      case "Under Par Round":
+        return <img src="/lovable-uploads/00b52bcc-e5a5-4067-888e-04bc93b5bb24.png" alt="Under Par Round Badge" className="w-28 h-28" />;
+      case "First Eagle":
+        return <img src="/lovable-uploads/6b62e9b3-33d7-4825-b1d7-aac6f86e4ad7.png" alt="First Eagle Badge" className="w-28 h-28" />;
+      case "Hole-in-One":
+        return <img src="/lovable-uploads/68aa3b6e-7c54-41e7-80f6-75b4bf6e8b63.png" alt="Hole-in-One Badge" className="w-28 h-28" />;
+      case "Back-to-Back Birdies":
+        return <img src="/lovable-uploads/7e98fdc5-ab55-44e0-87ec-8b93e493b7e4.png" alt="Back-to-Back Birdies Badge" className="w-28 h-28" />;
+      case "No Bogey Round":
+        return <img src="/lovable-uploads/1a37c1e5-56c0-4e02-a95a-cbfa8ce3a1b6.png" alt="No Bogey Round Badge" className="w-28 h-28" />;
+      case "Par Machine":
+        return <img src="/lovable-uploads/4b4e9c58-8e31-4a5e-b2d8-f9b5d2a68e0f.png" alt="Par Machine Badge" className="w-28 h-28" />;
       // Regional achievement badges with flag images
       case "Lynx Legend":
         return <img src="/lovable-uploads/5971ec53-bcfe-46df-aa24-78df46eaa170.png" alt="Britain & Ireland Flag" className="w-28 h-28 rounded-lg" />;
