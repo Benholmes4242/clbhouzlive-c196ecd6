@@ -119,6 +119,8 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
     const isCloudflareStream = src.includes('videodelivery.net') || src.includes('iframe.videodelivery.net') || src.includes('cloudflarestream.com');
     const isM3U8 = src.includes('.m3u8');
     
+    console.log('Video player initializing:', { src, isCloudflareStream, isM3U8, enableHLS });
+    
     if (enableHLS && (isM3U8 || isCloudflareStream)) {
       if (window.Hls && window.Hls.isSupported()) {
         const hls = new window.Hls({
@@ -143,22 +145,45 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
           abrBandWidthUpFactor: 0.7,
         });
 
+        console.log('Loading HLS source:', src);
         hls.loadSource(src);
         hls.attachMedia(video);
         
+        // Add timeout for manifest loading
+        const manifestTimeout = setTimeout(() => {
+          console.error('HLS manifest load timeout for:', src);
+          setError('Video loading timeout - please try again');
+          setIsLoading(false);
+        }, 10000);
+        
         hls.on(window.Hls.Events.MANIFEST_PARSED, () => {
+          clearTimeout(manifestTimeout);
           if (loadingTimeoutRef.current) {
             clearTimeout(loadingTimeoutRef.current);
           }
           setIsLoading(false);
+          console.log('HLS manifest parsed successfully for:', src);
           if (autoplay) {
             video.play().catch(console.error);
           }
         });
 
         hls.on(window.Hls.Events.ERROR, (event: any, data: any) => {
+          console.error('HLS Error:', { event, data, src });
           if (data.fatal) {
-            setError('Video playback error');
+            console.error('Fatal HLS error:', data.type, data.details);
+            
+            // Provide more specific error messages
+            let errorMessage = 'Video playback error';
+            if (data.type === window.Hls.ErrorTypes.NETWORK_ERROR) {
+              errorMessage = 'Network error - please check your connection';
+            } else if (data.type === window.Hls.ErrorTypes.MEDIA_ERROR) {
+              errorMessage = 'Media error - video format not supported';
+            } else if (data.details === window.Hls.ErrorDetails.MANIFEST_LOAD_ERROR) {
+              errorMessage = 'Video not found or inaccessible';
+            }
+            
+            setError(errorMessage);
             if (loadingTimeoutRef.current) {
               clearTimeout(loadingTimeoutRef.current);
             }
@@ -166,15 +191,18 @@ const EnhancedVideoPlayer = React.forwardRef<HTMLVideoElement, EnhancedVideoPlay
           }
         });
 
+
         hlsRef.current = hls;
       } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
         // Native HLS support (Safari)
+        console.log('Using native HLS support');
         video.src = src;
         if (loadingTimeoutRef.current) {
           clearTimeout(loadingTimeoutRef.current);
         }
         setIsLoading(false);
       } else {
+        console.log('HLS not supported, using direct video');
         video.src = src;
         if (loadingTimeoutRef.current) {
           clearTimeout(loadingTimeoutRef.current);
