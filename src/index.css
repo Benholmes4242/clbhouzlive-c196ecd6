@@ -89,6 +89,7 @@
     --brand-orange: 32 93% 54%;
     --media-loading: 0 0% 0%;
     --media-loading-dark: 0 0% 0%;
+    --achv-badge-size: 8rem;
   }
 
   .dark {
@@ -157,6 +158,12 @@
       padding-top: env(safe-area-inset-top, 0);
       margin-top: calc(-1 * env(safe-area-inset-top, 0));
     }
+  }
+
+  /* Achievement badge size token */
+  .achv-badge-size {
+    width: var(--achv-badge-size, 8rem);
+    height: var(--achv-badge-size, 8rem);
   }
   
 .container {

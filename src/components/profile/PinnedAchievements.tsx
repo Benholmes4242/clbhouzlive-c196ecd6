@@ -207,52 +207,63 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
 
   // Render achievement badge
   const renderAchievementBadge = (achievement: Achievement, isPlaceholder = false) => {
-    const content = (
+    const badgeContent = (
       <div 
         className={`
-          relative aspect-square rounded-2xl border-2 transition-all duration-200 cursor-pointer
+          achv-badge-size relative flex flex-col items-center justify-center gap-2 
+          border border-black/10 rounded-lg transition-all duration-200 cursor-pointer
           ${isPlaceholder 
-            ? 'bg-muted border-border opacity-60' 
+            ? 'opacity-60' 
             : achievement.unlocked
-              ? 'bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20 hover:scale-105 hover:border-primary/40'
-              : 'bg-muted border-border opacity-40'
+              ? 'hover:scale-[1.03] hover:shadow-sm'
+              : 'opacity-55'
           }
         `}
         onClick={() => !isPlaceholder && setIsAchievementsModalOpen(true)}
       >
-        <div className="absolute inset-0 flex items-center justify-center">
+        {/* Badge Image */}
+        <div className="flex-shrink-0">
           {isPlaceholder ? (
-            <Lock className="w-8 h-8 text-muted-foreground" />
+            <Lock className="w-12 h-12 text-muted-foreground" />
           ) : (
-             <div className="text-center">
-               <div className="mb-1">
-                 {getAchievementBadge(achievement.name)}
-               </div>
-               <div className="text-xs font-medium text-foreground px-1 leading-tight">
-                 {achievement.name}
-               </div>
-             </div>
+            getAchievementBadge(achievement.name)
           )}
         </div>
         
         {/* Lock overlay for locked achievements */}
         {!isPlaceholder && !achievement.unlocked && (
-          <div className="absolute top-1 right-1">
+          <div className="absolute top-2 right-2">
             <Lock className="w-4 h-4 text-muted-foreground" />
           </div>
         )}
       </div>
     );
 
+    // Achievement title under badge
+    const titleContent = !isPlaceholder && (
+      <div className="text-center mt-2">
+        <div className="text-sm font-medium text-foreground truncate max-w-[8rem]">
+          {achievement.name}
+        </div>
+      </div>
+    );
+
+    const fullContent = (
+      <div className="flex flex-col items-center">
+        {badgeContent}
+        {titleContent}
+      </div>
+    );
+
     if (isPlaceholder) {
-      return content;
+      return fullContent;
     }
 
     return (
       <TooltipProvider key={achievement.id}>
         <Tooltip>
           <TooltipTrigger asChild>
-            {content}
+            {fullContent}
           </TooltipTrigger>
           <TooltipContent>
             <div className="text-center">
@@ -260,6 +271,11 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
               <div className="text-sm text-muted-foreground">
                 +{achievement.xp} XP • {achievement.unlocked ? 'Unlocked' : 'Locked'}
               </div>
+              {achievement.description && (
+                <div className="text-xs text-muted-foreground mt-1 max-w-48">
+                  {achievement.description}
+                </div>
+              )}
             </div>
           </TooltipContent>
         </Tooltip>
@@ -280,8 +296,8 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
-            <Trophy className="w-5 h-5 text-primary" />
-            <h3 className="text-xl font-bold text-foreground">Pinned Achievements</h3>
+            <Trophy className="w-6 h-6 text-foreground" />
+            <h3 className="text-3xl font-bold text-foreground">Achievements</h3>
             {isOwnProfile && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -311,20 +327,28 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
         )}
 
         {/* Achievement badges grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-3 lg:grid-cols-4 gap-6 mb-6 justify-items-center">
           {Array.from({ length: 4 }, (_, index) => {
             const achievement = displayAchievements[index];
             
             if (!achievement && unlockedCount === 0 && isOwnProfile) {
               // Show placeholder for empty state
-              return renderAchievementBadge(
-                { id: `placeholder-${index}`, name: '', xp: 0, unlocked: false },
-                true
+              return (
+                <div key={`placeholder-${index}`}>
+                  {renderAchievementBadge(
+                    { id: `placeholder-${index}`, name: '', xp: 0, unlocked: false },
+                    true
+                  )}
+                </div>
               );
             }
             
             if (achievement) {
-              return renderAchievementBadge(achievement);
+              return (
+                <div key={achievement.id}>
+                  {renderAchievementBadge(achievement)}
+                </div>
+              );
             }
             
             return null;
