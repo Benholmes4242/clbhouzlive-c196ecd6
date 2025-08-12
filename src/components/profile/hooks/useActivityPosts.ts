@@ -42,6 +42,7 @@ export const useActivityPosts = (userId?: string) => {
       }
 
       console.log('ActivityPosts - Raw posts data:', postsData);
+      console.log('ActivityPosts - Detailed posts data:', JSON.stringify(postsData, null, 2));
 
       if (!postsData || postsData.length === 0) {
         console.log('ActivityPosts - No posts found for user');
@@ -68,6 +69,12 @@ export const useActivityPosts = (userId?: string) => {
 
       const formattedPosts = postsData.map(post => {
         const tags = postTags?.filter((t: any) => t.post_id === post.id) || [];
+        
+        console.log('ActivityPosts - Processing post:', {
+          id: post.id,
+          mediaCount: post.post_media?.length || 0,
+          mediaData: post.post_media
+        });
         
         return {
           id: post.id,
