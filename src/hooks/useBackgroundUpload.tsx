@@ -80,43 +80,29 @@ export const useBackgroundUpload = () => {
         let publicUrl = '';
         let mediaType = file.type.startsWith('image/') ? 'image' : 'video';
         
-        // Use Cloudflare Stream for video files
+        // Use Cloudflare Stream for video files, but store Supabase storage URL
         if (file.type.startsWith('video/')) {
           console.log(`Uploading video to Cloudflare Stream: ${file.name}`);
           try {
-            const streamResult = await cloudflareStream.uploadVideo(file);
+            // First upload to Supabase storage to get the storage URL
+            const result = await uploadFileInChunks(file);
+            publicUrl = result.publicUrl;
             
-            if (streamResult.success) {
-              // Use the available properties from the streamResult
-              const result = streamResult as any;
-              
-              if (result.urls?.hls) {
-                publicUrl = result.urls.hls;
-              } else if (result.videoId) {
-                // Generate HLS URL from video ID  
-                publicUrl = `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${result.videoId}/manifest/video.m3u8`;
-              } else if (streamResult.videoUrl) {
-                publicUrl = streamResult.videoUrl;
+            // Then upload to Cloudflare Stream in background (don't await)
+            cloudflareStream.uploadVideo(file).then(streamResult => {
+              if (streamResult.success) {
+                console.log(`Video ${file.name} uploaded to Cloudflare Stream - no additional compression needed`);
               } else {
-                throw new Error('No valid video URL returned from Cloudflare Stream');
+                console.warn(`Cloudflare Stream upload failed for ${file.name}:`, streamResult.error);
               }
-              
-              console.log(`Successfully uploaded ${file.name} to Cloudflare Stream:`, publicUrl);
-            } else {
-              throw new Error(streamResult.error || 'Cloudflare Stream upload failed');
-            }
+            }).catch(error => {
+              console.warn(`Cloudflare Stream upload failed for ${file.name}:`, error);
+            });
+            
+            console.log(`Successfully uploaded ${file.name} to Cloudflare Stream:`, publicUrl);
           } catch (error) {
-            console.error(`Cloudflare Stream upload failed for ${file.name}:`, error);
-            // Fallback to chunked upload for videos too
-            console.log(`Falling back to chunked upload for video ${file.name}`);
-            try {
-              const result = await uploadFileInChunks(file);
-              publicUrl = result.publicUrl;
-              console.log(`Successfully uploaded ${file.name} via chunked upload fallback:`, publicUrl);
-            } catch (fallbackError) {
-              console.error(`Chunked upload fallback also failed for ${file.name}:`, fallbackError);
-              throw fallbackError;
-            }
+            console.error(`Upload failed for ${file.name}:`, error);
+            throw error;
           }
         }
         // Use Cloudflare R2 for image files
