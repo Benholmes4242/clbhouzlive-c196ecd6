@@ -876,6 +876,13 @@ export type Database = {
             foreignKeyName: "user_bag_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_bag_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
             referencedRelation: "user_profiles"
             referencedColumns: ["id"]
           },
@@ -915,6 +922,13 @@ export type Database = {
             columns: ["course_id"]
             isOneToOne: false
             referencedRelation: "golf_courses"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_course_tracker_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
             referencedColumns: ["id"]
           },
           {
@@ -1221,6 +1235,72 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      public_profiles: {
+        Row: {
+          background_image_url: string | null
+          bag_visible: boolean | null
+          bio: string | null
+          business_name: string | null
+          business_type: Database["public"]["Enums"]["business_type"] | null
+          cover_photo_url: string | null
+          created_at: string | null
+          display_name: string | null
+          eg_visible: boolean | null
+          id: string | null
+          is_public: boolean | null
+          location: string | null
+          profile_photo_url: string | null
+          social_links: Json | null
+          top100_visible: boolean | null
+          tracker_visible: boolean | null
+          user_type: Database["public"]["Enums"]["user_type"] | null
+          username: string | null
+          website_url: string | null
+        }
+        Insert: {
+          background_image_url?: string | null
+          bag_visible?: boolean | null
+          bio?: string | null
+          business_name?: string | null
+          business_type?: Database["public"]["Enums"]["business_type"] | null
+          cover_photo_url?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          eg_visible?: boolean | null
+          id?: string | null
+          is_public?: boolean | null
+          location?: never
+          profile_photo_url?: string | null
+          social_links?: Json | null
+          top100_visible?: boolean | null
+          tracker_visible?: boolean | null
+          user_type?: Database["public"]["Enums"]["user_type"] | null
+          username?: string | null
+          website_url?: string | null
+        }
+        Update: {
+          background_image_url?: string | null
+          bag_visible?: boolean | null
+          bio?: string | null
+          business_name?: string | null
+          business_type?: Database["public"]["Enums"]["business_type"] | null
+          cover_photo_url?: string | null
+          created_at?: string | null
+          display_name?: string | null
+          eg_visible?: boolean | null
+          id?: string | null
+          is_public?: boolean | null
+          location?: never
+          profile_photo_url?: string | null
+          social_links?: Json | null
+          top100_visible?: boolean | null
+          tracker_visible?: boolean | null
+          user_type?: Database["public"]["Enums"]["user_type"] | null
+          username?: string | null
+          website_url?: string | null
+        }
+        Relationships: []
       }
     }
     Functions: {

@@ -28,8 +28,8 @@ export const SecurityHeaders = () => {
     // X-Content-Type-Options
     setMetaTag('x-content-type-options', 'nosniff');
     
-    // X-Frame-Options
-    setMetaTag('x-frame-options', 'DENY');
+    // X-Frame-Options - Use SAMEORIGIN for Lovable compatibility
+    setMetaTag('x-frame-options', 'SAMEORIGIN');
     
     // Strict Transport Security (HSTS) - note in meta for reference
     setMetaTag('security-note', 'HSTS should be configured at server level');
@@ -41,10 +41,10 @@ export const SecurityHeaders = () => {
   return null;
 };
 
-// Recommended CSP for production (configure at hosting level)
+// Recommended CSP for production (configure at hosting/server level)
 export const RECOMMENDED_CSP = `
   default-src 'self';
-  script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://esm.sh;
+  script-src 'self' https://cdn.jsdelivr.net https://esm.sh;
   style-src 'self' 'unsafe-inline';
   img-src 'self' data: https: blob:;
   font-src 'self' data:;
@@ -53,6 +53,6 @@ export const RECOMMENDED_CSP = `
   object-src 'none';
   base-uri 'self';
   form-action 'self';
-  frame-ancestors 'none';
+  frame-ancestors 'sameorigin';
   upgrade-insecure-requests;
 `.replace(/\s+/g, ' ').trim();

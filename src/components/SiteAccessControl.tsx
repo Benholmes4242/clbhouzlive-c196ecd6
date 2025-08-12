@@ -34,27 +34,31 @@ const SiteAccessControl: React.FC<SiteAccessControlProps> = ({ children }) => {
           }
         }
 
-        // Check local storage for valid access
-        const storedAccess = localStorage.getItem('siteAccess');
-        const accessTimestamp = localStorage.getItem('siteAccessTimestamp');
-        const currentDomain = window.location.hostname;
-        const storedDomain = localStorage.getItem('siteAccessDomain');
+        // Check local storage for valid secure access
+        const storedAccessStr = localStorage.getItem('siteAccess');
         
-        if (storedAccess === 'granted' && 
-            storedDomain === currentDomain && 
-            accessTimestamp) {
-          const timestamp = parseInt(accessTimestamp);
-          const now = Date.now();
-          const oneWeek = 7 * 24 * 60 * 60 * 1000; // 1 week in milliseconds
-          
-          // Access is valid for one week
-          if (now - timestamp < oneWeek) {
-            setHasAccess(true);
-          } else {
-            // Clear expired access
+        if (storedAccessStr) {
+          try {
+            const accessData = JSON.parse(storedAccessStr);
+            const currentDomain = window.location.hostname;
+            
+            if (accessData.granted && 
+                accessData.domain === currentDomain && 
+                accessData.expiresAt) {
+              const expiryDate = new Date(accessData.expiresAt);
+              const now = new Date();
+              
+              // Check if access is still valid
+              if (now < expiryDate) {
+                setHasAccess(true);
+              } else {
+                // Clear expired access
+                localStorage.removeItem('siteAccess');
+              }
+            }
+          } catch (error) {
+            console.error('Error parsing stored access data:', error);
             localStorage.removeItem('siteAccess');
-            localStorage.removeItem('siteAccessTimestamp');
-            localStorage.removeItem('siteAccessDomain');
           }
         }
       } catch (error) {
@@ -73,45 +77,42 @@ const SiteAccessControl: React.FC<SiteAccessControlProps> = ({ children }) => {
     setError('');
     
     try {
-      // Validate access code against environment or secure configuration
-      // This should be moved to a secure edge function in production
-      const validAccessCodes = [
-        'CLBHOUZ2024', // Main access code
-        'DEV-ACCESS-2024', // Development access
-        'ADMIN-OVERRIDE' // Admin override
-      ];
-      
-      if (validAccessCodes.includes(accessCode.toUpperCase())) {
-        const currentDomain = window.location.hostname;
-        const timestamp = Date.now().toString();
+      // Validate access code using secure backend function
+      const { data, error } = await supabase.functions.invoke('secure-site-access', {
+        body: {
+          accessCode: accessCode,
+          domain: window.location.hostname
+        }
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      if (data.success) {
+        // Store secure session data
+        const accessData = {
+          granted: true,
+          timestamp: Date.now(),
+          domain: window.location.hostname,
+          sessionToken: data.sessionToken,
+          expiresAt: data.expiresAt
+        };
         
-        // Store access grant with timestamp and domain
-        localStorage.setItem('siteAccess', 'granted');
-        localStorage.setItem('siteAccessTimestamp', timestamp);
-        localStorage.setItem('siteAccessDomain', currentDomain);
-        
+        localStorage.setItem('siteAccess', JSON.stringify(accessData));
         setHasAccess(true);
+        
         toast({
           title: 'Access Granted',
           description: 'Welcome to clubhouz!',
         });
-        
-        // Log successful access for security monitoring
-        console.log('Site access granted for domain:', currentDomain);
       } else {
-        setError('Invalid access code. Please check your code and try again.');
+        setError(data.message || 'Invalid access code. Please check your code and try again.');
         setAccessCode('');
-        
-        // Log failed attempt for security monitoring
-        console.warn('Failed site access attempt:', {
-          domain: window.location.hostname,
-          timestamp: new Date().toISOString(),
-          userAgent: navigator.userAgent.slice(0, 100) // Truncated for privacy
-        });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error validating access code:', error);
-      setError('An error occurred. Please try again.');
+      setError('Unable to validate access code. Please try again.');
     } finally {
       setSubmitting(false);
     }
