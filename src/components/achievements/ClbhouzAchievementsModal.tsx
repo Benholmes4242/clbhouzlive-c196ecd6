@@ -121,19 +121,19 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
             }
           }
         } else {
-          // Desktop behavior with debounce
-          const debounceDelay = 50;
+          // Desktop behavior with hysteresis to prevent flicker
+          const debounceDelay = 100; // Increased debounce for desktop
           
           scrollDebounceTimer.current = setTimeout(() => {
             // Update direction and handle state changes
             if (newDirection !== 'idle') {
               scrollDirection.current = newDirection;
               
-              // Immediate collapse/expand based on scroll position and direction
+              // Hysteresis: Use two different thresholds to prevent oscillation
               if (!isManuallyCollapsed) {
-                if (newDirection === 'down' && currentScrollTop > 50) {
+                if (newDirection === 'down' && currentScrollTop > 80) { // Higher threshold for collapse
                   setIsCollapsed(true);
-                } else if (newDirection === 'up' && currentScrollTop < 100) {
+                } else if (newDirection === 'up' && currentScrollTop < 40) { // Lower threshold for expand
                   setIsCollapsed(false);
                 }
               }
@@ -1115,7 +1115,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
           {(activeFilter === 'all' || activeFilter === 'exploration') && getFilteredAchievements(explorationAchievements, 'exploration').length > 0 && (
             <div className={`${isMobile ? 'px-4 pb-6' : 'px-6 pb-8'}`}>
               {/* Card Container with Visual Grouping */}
-              <div className="bg-gradient-to-br from-blue-50/80 to-cyan-50/60 dark:from-blue-950/20 dark:to-cyan-950/15 rounded-2xl p-6 border border-blue-200/40 dark:border-blue-800/40 shadow-xl backdrop-blur-sm">
+              <div className="rounded-2xl p-6 border border-gray-200/40 dark:border-gray-800/40 shadow-xl backdrop-blur-sm">
                 {/* Section Header with Icon */}
                   <div className={`flex items-center justify-center gap-3 ${isMobile ? 'mb-3' : 'mb-6'}`}>
                     {!isMobile && (
@@ -1253,7 +1253,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
           {(activeFilter === 'all' || activeFilter === 'skill') && getFilteredAchievements(skillAchievements, 'skill').length > 0 && (
             <div className={`${isMobile ? 'px-4 pb-6' : 'px-6 pb-8'}`}>
               {/* Card Container with Visual Grouping */}
-              <div className="bg-gradient-to-br from-green-50/80 to-emerald-50/60 dark:from-green-950/20 dark:to-emerald-950/15 rounded-2xl p-6 border border-green-200/40 dark:border-green-800/40 shadow-xl backdrop-blur-sm">
+              <div className="rounded-2xl p-6 border border-gray-200/40 dark:border-gray-800/40 shadow-xl backdrop-blur-sm">
                 {/* Section Header with Icon */}
                   <div className={`flex items-center justify-center gap-3 ${isMobile ? 'mb-3' : 'mb-6'}`}>
                     {!isMobile && (
