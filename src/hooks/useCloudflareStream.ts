@@ -25,6 +25,7 @@ export const useCloudflareStream = () => {
     success: boolean; 
     videoUrl?: string; 
     thumbnailUrl?: string; 
+    videoId?: string;
     error?: string 
   }> => {
     setUploading(true);
@@ -43,20 +44,35 @@ export const useCloudflareStream = () => {
         throw new Error(error.message || 'Upload failed');
       }
 
-      if (!data?.success || !data?.result) {
+      // Handle different response structures from Cloudflare Stream
+      if (!data?.success) {
         console.error('Cloudflare Stream upload failed:', data);
         throw new Error(data?.errors?.[0]?.message || 'Upload failed');
       }
 
-      // Get the video URLs from Cloudflare Stream
-      const videoId = data.result.uid;
-      const videoUrl = data.result.playback?.hls || `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${videoId}/manifest/video.m3u8`;
-      const thumbnailUrl = data.result.thumbnail || `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${videoId}/thumbnails/thumbnail.jpg`;
+      // Get the video URLs from Cloudflare Stream - handle different response structures
+      let videoId, videoUrl, thumbnailUrl;
+      
+      if (data.result?.uid) {
+        // Standard Cloudflare Stream response
+        videoId = data.result.uid;
+        videoUrl = data.result.playback?.hls || `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${videoId}/manifest/video.m3u8`;
+        thumbnailUrl = data.result.thumbnail || `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${videoId}/thumbnails/thumbnail.jpg`;
+      } else if (data.videoId) {
+        // Direct response format
+        videoId = data.videoId;
+        videoUrl = data.playback?.hls || `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${videoId}/manifest/video.m3u8`;
+        thumbnailUrl = data.thumbnail || `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${videoId}/thumbnails/thumbnail.jpg`;
+      } else {
+        console.error('Invalid Cloudflare Stream response structure:', data);
+        throw new Error('Invalid response from Cloudflare Stream');
+      }
 
       return {
         success: true,
         videoUrl,
-        thumbnailUrl
+        thumbnailUrl,
+        videoId
       };
 
     } catch (error) {
