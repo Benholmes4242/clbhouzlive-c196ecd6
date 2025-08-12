@@ -315,17 +315,17 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       case "Birdie Every Par":
         return <img src="/lovable-uploads/164a0671-f0ff-4f1e-8780-4bba8a8fe7f4.png" alt="Birdie Every Par Badge" className="w-28 h-28" />;
       case "One Day, Two Courses":
-        return <img src="/lovable-uploads/82a1c67a-8bf4-4be7-9fee-24d7d7448072.png" alt="One Day Two Courses Badge" className="w-28 h-28" />;
+        return <img src="/lovable-uploads/f8900d31-7d35-4e4e-9352-99f6198da121.png" alt="One Day Two Courses Badge" className="w-28 h-28" />;
       case "Globetrotter Golfer":
-        return <img src="/lovable-uploads/5d4b4b39-237b-4b0d-83e5-d2797f4cbd67.png" alt="Globetrotter Golfer Badge" className="w-28 h-28" />;
+        return <img src="/lovable-uploads/3d1d3937-fc9b-40bf-abc5-c792464ed99c.png" alt="Globetrotter Golfer Badge" className="w-28 h-28" />;
       case "Marathon Golfer":
-        return <img src="/lovable-uploads/beeb4eb8-b2b5-4e10-9e56-6d7e3e39cce7.png" alt="Marathon Golfer Badge" className="w-28 h-28" />;
+        return <img src="/lovable-uploads/02a84f2b-af4f-4064-a7d6-bdd88575b69e.png" alt="Marathon Golfer Badge" className="w-28 h-28" />;
       case "Cross-Border Swinger":
-        return <img src="/lovable-uploads/fe62bb01-d4e0-493c-b83a-1334a6b72d63.png" alt="Cross-Border Swinger Badge" className="w-28 h-28" />;
+        return <img src="/lovable-uploads/6622cbb8-6a4c-45d2-acc3-7cf1e312b655.png" alt="Cross-Border Swinger Badge" className="w-28 h-28" />;
       case "Single-Figure Handicap":
         return <img src="/lovable-uploads/fdc27a41-4e6e-4c1d-b46f-6cfc32b73bc4.png" alt="Single-Figure Handicap Badge" className="w-28 h-28" />;
       case "Plus Handicap Player":
-        return <img src="/lovable-uploads/81f4ad5a-0064-4ac1-8fb9-c17b46d32ceb.png" alt="Plus Handicap Player Badge" className="w-28 h-28" />;
+        return <img src="/lovable-uploads/1779738a-184b-4a0d-85d0-b964641019d9.png" alt="Plus Handicap Player Badge" className="w-28 h-28" />;
       case "Under Par Round":
         return <img src="/lovable-uploads/00b52bcc-e5a5-4067-888e-04bc93b5bb24.png" alt="Under Par Round Badge" className="w-28 h-28" />;
       case "First Eagle":
@@ -337,14 +337,16 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       case "No Bogey Round":
         return <img src="/lovable-uploads/1a37c1e5-56c0-4e02-a95a-cbfa8ce3a1b6.png" alt="No Bogey Round Badge" className="w-28 h-28" />;
       case "Par Machine":
-        return <img src="/lovable-uploads/4b4e9c58-8e31-4a5e-b2d8-f9b5d2a68e0f.png" alt="Par Machine Badge" className="w-28 h-28" />;
+        return <img src="/lovable-uploads/51973f3e-599d-4110-bcf6-8eac43b963f8.png" alt="Par Machine Badge" className="w-28 h-28" />;
+      case "International Golfer":
+        return <img src="/lovable-uploads/3c0146da-b965-42cc-b130-ef9c25727aad.png" alt="International Golfer Badge" className="w-28 h-28" />;
       // Regional achievement badges with flag images
       case "Lynx Legend":
-        return <img src="/lovable-uploads/5971ec53-bcfe-46df-aa24-78df46eaa170.png" alt="Britain & Ireland Flag" className="w-28 h-28 rounded-lg" />;
+        return <img src="/lovable-uploads/f2714e7f-418b-4c4c-ae28-e4a1b1ea8033.png" alt="Britain & Ireland Flag" className="w-28 h-28 rounded-lg" />;
       case "The Continental Swinger":
         return <img src="/lovable-uploads/27ad4524-d8d9-4750-a4da-21d43d77fb0e.png" alt="European Union Flag" className="w-28 h-28 rounded-lg" />;
       case "Stars and Stripes Tourer":
-        return <img src="/lovable-uploads/a8ab2ea7-a98d-4558-bfbc-8a04e60cad37.png" alt="USA Flag" className="w-28 h-28 rounded-lg" />;
+        return <img src="/lovable-uploads/2b2ee6a8-e8c4-49d9-bfdf-86403c3a47b7.png" alt="USA Flag" className="w-28 h-28 rounded-lg" />;
       case "Legends Club":
         return <img src="/lovable-uploads/e158428b-772e-4396-859e-1e3d51f2e9b3.png" alt="World Globe" className="w-28 h-28 rounded-lg" />;
       case "Albatross Ace":
