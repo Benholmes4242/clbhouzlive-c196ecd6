@@ -10,6 +10,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useUserAchievements } from '@/hooks/useUserAchievements';
 import ClbhouzAchievementsModal from '@/components/achievements/ClbhouzAchievementsModal';
 import { toast } from '@/hooks/use-toast';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface Achievement {
   id: string;
@@ -37,6 +38,7 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
 }) => {
   const { user } = useSupabaseSession();
   const { achievements } = useUserAchievements();
+  const isMobile = useIsMobile();
   
   // State for pinned achievements settings
   const [showAchievementsPublic, setShowAchievementsPublic] = useState(true);
@@ -44,6 +46,8 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
   const [isManagePinsOpen, setIsManagePinsOpen] = useState(false);
   const [isAchievementsModalOpen, setIsAchievementsModalOpen] = useState(false);
   const [tempPinnedIds, setTempPinnedIds] = useState<string[]>([]);
+  const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
+  const [showAchievementModal, setShowAchievementModal] = useState(false);
 
   // Mock achievement data (replace with real data later)
   const mockAchievements: Achievement[] = [
@@ -205,7 +209,7 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
     }
   };
 
-  // Render achievement badge
+  // Render achievement badge with proper tooltip system
   const renderAchievementBadge = (achievement: Achievement, isPlaceholder = false) => {
     const badgeContent = (
       <div 
@@ -215,18 +219,23 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
           ${isPlaceholder 
             ? 'opacity-60' 
             : achievement.unlocked
-              ? 'hover:scale-[1.03] hover:shadow-sm'
-              : 'opacity-55'
+              ? 'hover:scale-105'
+              : 'opacity-60 grayscale'
           }
         `}
-        onClick={() => !isPlaceholder && setIsAchievementsModalOpen(true)}
+        onClick={isMobile && !isPlaceholder ? () => {
+          setSelectedAchievement(achievement);
+          setShowAchievementModal(true);
+        } : () => !isPlaceholder && setIsAchievementsModalOpen(true)}
       >
         {/* Badge Image */}
         <div className="flex-shrink-0">
           {isPlaceholder ? (
             <Lock className="w-40 h-40 text-muted-foreground" />
           ) : (
-            getAchievementBadge(achievement.name)
+            <div className={`transition-all duration-200 ${achievement.unlocked ? 'drop-shadow-lg' : 'opacity-60 grayscale'}`}>
+              {getAchievementBadge(achievement.name)}
+            </div>
           )}
         </div>
         
@@ -241,9 +250,12 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
 
     // Achievement title under badge
     const titleContent = !isPlaceholder && (
-      <div className="text-center mt-2">
-        <div className="text-sm font-medium text-foreground truncate max-w-[8rem]">
-          {achievement.name}
+      <div className="text-center mt-3">
+        <div className={`text-sm font-semibold mb-1 ${achievement.unlocked ? 'text-blue-700 dark:text-blue-300' : 'text-muted-foreground'}`}>
+          {achievement.name.toUpperCase()}
+        </div>
+        <div className={`text-sm font-medium ${achievement.unlocked ? 'text-blue-600 dark:text-blue-400' : 'text-muted-foreground'}`}>
+          +{achievement.xp} XP
         </div>
       </div>
     );
@@ -259,28 +271,47 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
       return fullContent;
     }
 
+    // Mobile: Click opens detail modal
+    if (isMobile) {
+      return fullContent;
+    }
+
+    // Desktop: Hover shows rich tooltip
     return (
       <TooltipProvider key={achievement.id}>
         <Tooltip>
           <TooltipTrigger asChild>
             {fullContent}
           </TooltipTrigger>
-          <TooltipContent className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 shadow-lg p-4 max-w-xs">
-            <div className="text-center space-y-2">
-              <div className="font-semibold text-gray-900 dark:text-white">{achievement.name}</div>
-              <div className="text-sm text-gray-600 dark:text-gray-300">
-                <span className="text-yellow-600 dark:text-yellow-400">+{achievement.xp} XP</span>
-                {achievement.unlocked ? (
-                  <span className="ml-2 text-green-600 dark:text-green-400">✓ Unlocked</span>
-                ) : (
-                  <span className="ml-2 text-red-500 dark:text-red-400">🔒 Locked</span>
-                )}
+          <TooltipContent className="max-w-xs z-50 bg-background border shadow-lg">
+            <div className="p-2">
+              {/* Status Badge */}
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="font-semibold text-sm">{achievement.name}</h4>
+                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                  achievement.unlocked 
+                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
+                    : 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
+                }`}>
+                  {achievement.unlocked ? 'Unlocked' : 'Locked'}
+                </span>
               </div>
-              {achievement.description && (
-                <div className="text-xs text-gray-500 dark:text-gray-400 mt-2 leading-relaxed">
-                  {achievement.description}
-                </div>
-              )}
+              
+              {/* Description */}
+              <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
+                {achievement.description}
+              </p>
+              
+              {/* XP Value */}
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-medium text-primary inline-flex items-center gap-1">
+                  <span className="text-amber-500">✨</span>
+                  +{achievement.xp} XP
+                </span>
+                <span className="text-xs text-muted-foreground inline-flex items-center gap-1">
+                  🏆 One-time
+                </span>
+              </div>
             </div>
           </TooltipContent>
         </Tooltip>
@@ -480,6 +511,46 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
         userProfilePhotoUrl={userProfilePhotoUrl}
         isCurrentUser={isOwnProfile}
       />
+
+      {/* Achievement Detail Modal for Mobile */}
+      {selectedAchievement && (
+        <Dialog open={showAchievementModal} onOpenChange={setShowAchievementModal}>
+          <DialogContent className="max-w-[90vw] max-h-[70vh] p-4">
+            <DialogHeader>
+              <DialogTitle className="text-lg font-bold">{selectedAchievement.name}</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="flex justify-center">
+                {getAchievementBadge(selectedAchievement.name)}
+              </div>
+              
+              <div className="text-center">
+                <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                  selectedAchievement.unlocked 
+                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
+                    : 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
+                }`}>
+                  {selectedAchievement.unlocked ? 'Unlocked' : 'Locked'}
+                </span>
+              </div>
+              
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                {selectedAchievement.description}
+              </p>
+              
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-primary inline-flex items-center gap-1">
+                  <span className="text-amber-500">✨</span>
+                  +{selectedAchievement.xp} XP
+                </span>
+                <span className="text-sm text-muted-foreground inline-flex items-center gap-1">
+                  🏆 One-time
+                </span>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </>
   );
 };
