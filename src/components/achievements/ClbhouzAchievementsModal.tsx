@@ -309,7 +309,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       case "300 Club Champion":
         return <img src="/lovable-uploads/0088ccbe-6198-4f2c-ada2-e2bf642abec3.png" alt="300 Club Champion Badge" className={isMobile ? "w-16 h-16" : "w-32 h-32"} />;
       case "Eagle Collector":
-        return <img src="/lovable-uploads/b02e131a-7905-4b36-bf9e-fd85c97abc98.png" alt="Eagle Badge" className="w-28 h-28" />;
+        return <img src="/lovable-uploads/4ec4bfcd-f19c-4e11-b6a9-b81c1eaab19d.png" alt="Eagle Collector Badge" className="w-28 h-28" />;
       case "Birdie Blitz":
         return <img src="/lovable-uploads/5928ca86-f5a8-4ac1-8e15-f13ff748746a.png" alt="Birdie Badge" className="w-28 h-28" />;
       case "Birdie Every Par":
