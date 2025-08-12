@@ -86,16 +86,37 @@ export const useBackgroundUpload = () => {
           try {
             const streamResult = await cloudflareStream.uploadVideo(file);
             
-            if (streamResult.success && streamResult.videoUrl) {
-              // Use HLS URL for video playback
-              publicUrl = streamResult.videoUrl;
+            if (streamResult.success) {
+              // Use the available properties from the streamResult
+              const result = streamResult as any;
+              
+              if (result.urls?.hls) {
+                publicUrl = result.urls.hls;
+              } else if (result.videoId) {
+                // Generate HLS URL from video ID  
+                publicUrl = `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${result.videoId}/manifest/video.m3u8`;
+              } else if (streamResult.videoUrl) {
+                publicUrl = streamResult.videoUrl;
+              } else {
+                throw new Error('No valid video URL returned from Cloudflare Stream');
+              }
+              
               console.log(`Successfully uploaded ${file.name} to Cloudflare Stream:`, publicUrl);
             } else {
               throw new Error(streamResult.error || 'Cloudflare Stream upload failed');
             }
           } catch (error) {
             console.error(`Cloudflare Stream upload failed for ${file.name}:`, error);
-            throw error;
+            // Fallback to chunked upload for videos too
+            console.log(`Falling back to chunked upload for video ${file.name}`);
+            try {
+              const result = await uploadFileInChunks(file);
+              publicUrl = result.publicUrl;
+              console.log(`Successfully uploaded ${file.name} via chunked upload fallback:`, publicUrl);
+            } catch (fallbackError) {
+              console.error(`Chunked upload fallback also failed for ${file.name}:`, fallbackError);
+              throw fallbackError;
+            }
           }
         }
         // Use Cloudflare R2 for image files
