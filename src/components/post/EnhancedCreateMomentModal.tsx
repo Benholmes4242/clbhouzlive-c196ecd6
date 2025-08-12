@@ -6,7 +6,7 @@ import CourseTagInput from '../posts/CourseTagInput';
 import GolfCoursePin from '../posts/GolfCoursePin';
 import EnhancedMediaUpload from '../posts/EnhancedMediaUpload';
 import EnhancedRichTextInput from '../posts/EnhancedRichTextInput';
-import SmartCompilation from '../posts/SmartCompilation';
+
 import BackgroundMusicSelector from '../posts/BackgroundMusicSelector';
 import { useTaggableEntities } from '@/hooks/useTaggableEntities';
 import { useToast } from '@/hooks/use-toast';
@@ -523,24 +523,6 @@ const EnhancedCreateMomentModal: React.FC<EnhancedCreateMomentModalProps> = ({
                     </div>
                   </div>
                 )}
-
-                {/* 3.5. Smart Compilation - AI Video Editor */}
-                <SmartCompilation
-                  files={files}
-                  onCompilationComplete={(compiledFile, suggestedCaption) => {
-                    // Replace existing files with the compilation
-                    setFiles([compiledFile]);
-                    
-                    // Update caption with AI suggestion if it's empty
-                    if (!caption.trim()) {
-                      setCaption(suggestedCaption);
-                    } else {
-                      // Append to existing caption if there's already content
-                      setCaption(prev => prev + '\n\n' + suggestedCaption);
-                    }
-                  }}
-                  disabled={isSubmitting}
-                />
 
                 {/* 3.7. Background Music Selector */}
                 <BackgroundMusicSelector
