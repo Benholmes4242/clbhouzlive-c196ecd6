@@ -1063,10 +1063,12 @@ export type Database = {
           notification_preferences: Json | null
           pending_email: string | null
           phone: string | null
+          pinned_achievement_ids: string[] | null
           profile_photo_url: string | null
           profile_video_thumbnail_url: string | null
           profile_video_url: string | null
           profile_video_visibility: string | null
+          show_achievements_public: boolean | null
           social_links: Json | null
           top100_visible: boolean | null
           tracker_visible: boolean | null
@@ -1102,10 +1104,12 @@ export type Database = {
           notification_preferences?: Json | null
           pending_email?: string | null
           phone?: string | null
+          pinned_achievement_ids?: string[] | null
           profile_photo_url?: string | null
           profile_video_thumbnail_url?: string | null
           profile_video_url?: string | null
           profile_video_visibility?: string | null
+          show_achievements_public?: boolean | null
           social_links?: Json | null
           top100_visible?: boolean | null
           tracker_visible?: boolean | null
@@ -1141,10 +1145,12 @@ export type Database = {
           notification_preferences?: Json | null
           pending_email?: string | null
           phone?: string | null
+          pinned_achievement_ids?: string[] | null
           profile_photo_url?: string | null
           profile_video_thumbnail_url?: string | null
           profile_video_url?: string | null
           profile_video_visibility?: string | null
+          show_achievements_public?: boolean | null
           social_links?: Json | null
           top100_visible?: boolean | null
           tracker_visible?: boolean | null

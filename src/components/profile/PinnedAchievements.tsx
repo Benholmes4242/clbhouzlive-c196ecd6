@@ -64,7 +64,7 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
           .from('user_profiles')
           .select('show_achievements_public, pinned_achievement_ids')
           .eq('id', userId)
-          .single();
+          .maybeSingle();
 
         if (error) {
           console.error('Error loading achievement settings:', error);
@@ -73,7 +73,7 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
 
         if (data) {
           setShowAchievementsPublic(data.show_achievements_public ?? true);
-          setPinnedAchievementIds(data.pinned_achievement_ids || []);
+          setPinnedAchievementIds((data.pinned_achievement_ids as string[]) || []);
         }
       } catch (error) {
         console.error('Error loading achievement settings:', error);
@@ -117,7 +117,7 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
     try {
       const { error } = await supabase
         .from('user_profiles')
-        .update({ show_achievements_public: newValue })
+        .update({ show_achievements_public: newValue } as any)
         .eq('id', user.id);
 
       if (error) throw error;
@@ -157,7 +157,7 @@ const PinnedAchievements: React.FC<PinnedAchievementsProps> = ({
     try {
       const { error } = await supabase
         .from('user_profiles')
-        .update({ pinned_achievement_ids: tempPinnedIds })
+        .update({ pinned_achievement_ids: tempPinnedIds } as any)
         .eq('id', user.id);
 
       if (error) throw error;

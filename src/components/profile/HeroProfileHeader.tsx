@@ -32,6 +32,7 @@ import ProfileVideoCircle from './ProfileVideoCircle';
 import { useCloudflareStream } from '@/hooks/useCloudflareStream';
 import { useR2Upload } from '@/hooks/useR2Upload';
 import { BsThreeDotsVertical } from 'react-icons/bs';
+import PinnedAchievements from './PinnedAchievements';
 
 interface Course {
   id: string;
@@ -629,6 +630,17 @@ const HeroProfileHeader = ({
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Pinned Achievements Section */}
+      <div className="relative w-full px-4 md:px-0">
+        <PinnedAchievements
+          userId={profile?.id || ''}
+          isOwnProfile={isOwnProfile}
+          displayName={profile?.display_name}
+          userHandicap={profile?.eg_handicap_index}
+          userProfilePhotoUrl={profile?.profile_photo_url}
+        />
       </div>
 
       {/* Content container - transparent to show blur behind */}
