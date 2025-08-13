@@ -569,6 +569,8 @@ const HeroProfileHeader = ({
       <ProfileTabs
         activeTab={activeSection}
         onTabChange={onSectionChange}
+        userId={profile?.id || ''}
+        isOwnProfile={isOwnProfile}
       >
         {{
           activity: (
@@ -581,14 +583,11 @@ const HeroProfileHeader = ({
             />
           ),
           courses: (
-            <>
-              <LatestHighlights userId={profile?.id || ''} isOwnProfile={isOwnProfile} />
-              <UserCoursesContent 
-                username={profile?.username || ''}
-                isOwnProfile={isOwnProfile}
-                displayName={profile?.display_name || 'User'}
-              />
-            </>
+            <UserCoursesContent 
+              username={profile?.username || ''}
+              isOwnProfile={isOwnProfile}
+              displayName={profile?.display_name || 'User'}
+            />
           ),
           stats: (
             <HandicapSection 
