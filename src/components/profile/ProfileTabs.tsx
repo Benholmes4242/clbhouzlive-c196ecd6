@@ -81,13 +81,12 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
                   <button
                     key={tab.id}
                     onClick={() => onTabChange(tab.id)}
-                    className={`flex-shrink-0 flex items-center gap-2 px-4 py-4 transition-all duration-200 text-base relative ${
+                    className={`flex-shrink-0 flex items-center px-4 py-4 transition-all duration-200 text-base relative ${
                       isActive 
                         ? 'text-black font-bold' 
                         : 'text-muted-foreground hover:text-foreground'
                     }`}
                   >
-                    <IconComponent className="h-4 w-4 md:h-5 md:w-5" />
                     <span className="whitespace-nowrap font-medium text-base md:text-lg">{tab.label}</span>
                     {/* Underline only under text label */}
                     {isActive && (
