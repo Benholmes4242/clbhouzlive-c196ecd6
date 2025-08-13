@@ -1,4 +1,5 @@
 
+// ProfileTabs component with sliding animations
 import React, { useRef, useEffect, useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { User, Trophy, Camera, BarChart3, MapPin } from 'lucide-react';
