@@ -1127,7 +1127,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                     </h3>
                   </div>
                 
-                  <div className={`grid grid-cols-3 ${isMobile ? 'gap-3' : 'gap-6'}`}>
+                  <div className={`grid grid-cols-3 ${isMobile ? 'gap-2' : 'gap-6'}`}>
                     {getFilteredAchievements(explorationAchievements, 'exploration').map((achievement) => {
                       const { percentage, nudgeText } = getAchievementProgress(achievement);
                       const isNearUnlock = percentage >= 80 && percentage < 100;
@@ -1137,7 +1137,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                           <div
                             className={`
                               transition-all duration-200 hover:scale-105 cursor-pointer 
-                              ${isMobile ? 'p-2 flex flex-col items-center text-center space-y-2' : 'p-4 flex flex-col items-center text-center space-y-3'}
+                              ${isMobile ? 'p-1 flex flex-col items-center text-center space-y-1' : 'p-4 flex flex-col items-center text-center space-y-3'}
                             `}
                             onClick={() => {
                               setSelectedAchievement({
@@ -1219,7 +1219,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                     </h3>
                   </div>
                 
-                  <div className={`grid grid-cols-3 ${isMobile ? 'gap-3' : 'gap-6'}`}>
+                  <div className={`grid grid-cols-3 ${isMobile ? 'gap-2' : 'gap-6'}`}>
                     {getFilteredAchievements(skillAchievements, 'skill').map((achievement) => {
                       const { percentage, nudgeText } = getAchievementProgress(achievement);
                       const isNearUnlock = percentage >= 80 && percentage < 100;
@@ -1229,7 +1229,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                           <div
                             className={`
                               transition-all duration-200 hover:scale-105 cursor-pointer 
-                              ${isMobile ? 'p-2 flex flex-col items-center text-center space-y-2' : 'p-4 flex flex-col items-center text-center space-y-3'}
+                              ${isMobile ? 'p-1 flex flex-col items-center text-center space-y-1' : 'p-4 flex flex-col items-center text-center space-y-3'}
                             `}
                             onClick={() => {
                               setSelectedAchievement({
