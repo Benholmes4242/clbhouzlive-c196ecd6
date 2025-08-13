@@ -1,4 +1,5 @@
 import React from 'react';
+import { Trophy } from 'lucide-react';
 
 interface CoursesJourneyProps {
   className?: string;
@@ -44,31 +45,9 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({ className = '' }) => {
   return (
     <div className={`w-full mb-6 md:mb-8 py-6 md:py-0 ${className}`}>
       <div className="md:max-w-[1150px] md:mx-auto">
-        <div className="flex items-center justify-between mb-4 md:mb-6 md:py-6 md:pt-8 px-4 md:px-0">
-          <h3 className="text-xl md:text-2xl text-foreground">Courses Played</h3>
-          
-          <div className="flex items-center gap-2">
-            <select className="px-3 py-1 text-sm border border-border rounded-md bg-background text-foreground">
-              <option>Region</option>
-              <option>🇬🇧 Top 100 GB&I Played</option>
-              <option>🇪🇺 Top 100 Continental Europe Played</option>
-              <option>🇺🇸 Top 100 USA Played</option>
-              <option>🌍 Top 100 Worldwide Played</option>
-            </select>
-            
-            <select className="px-3 py-1 text-sm border border-border rounded-md bg-background text-foreground">
-              <option>Sort & View</option>
-              <option>Recently Played</option>
-              <option>Rating High to Low</option>
-              <option>Rating Low to High</option>
-              <option>Alphabetical A-Z</option>
-              <option>Alphabetical Z-A</option>
-            </select>
-            
-            <button className="px-3 py-1 text-sm border border-border rounded-md bg-background text-foreground hover:bg-muted">
-              Card View
-            </button>
-          </div>
+        <div className="flex items-center gap-2 mb-4 md:mb-6 md:py-6 md:pt-8 px-4 md:px-0">
+          <Trophy className="w-5 h-5 text-foreground" />
+          <h3 className="text-xl md:text-2xl text-foreground">Courses Journey</h3>
         </div>
 
         <div className="relative">
@@ -81,11 +60,6 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({ className = '' }) => {
             {journeyRings.map((ring, index) => (
               <div key={ring.id} className="flex-shrink-0 flex flex-col items-center cursor-pointer w-28 md:w-36">
                 <div className="w-28 h-28 md:w-32 md:h-32 relative transition-all duration-300 hover:scale-105">
-                  {/* Liquid Glass Badge */}
-                  <div className="absolute top-1 left-1 z-10 bg-white/20 backdrop-blur-sm border border-white/30 rounded-full px-2 py-0.5">
-                    <span className="text-xs font-medium text-black">My Highlights</span>
-                  </div>
-                  
                   {/* Progress Ring */}
                   <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                     {/* Background circle */}
