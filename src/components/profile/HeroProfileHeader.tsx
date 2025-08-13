@@ -547,24 +547,6 @@ const HeroProfileHeader = ({
         </div>
       </div>
 
-      {/* Achievements Carousel Section */}
-      <div className="relative w-full">
-        <AchievementsCarousel
-          achievements={achievements.map(a => ({
-            id: a.id || `achievement-${Math.random()}`,
-            name: a.type || 'Achievement',
-            xp: 100,
-            unlocked: true,
-            description: a.message || 'Achievement unlocked!'
-          }))}
-          userId={profile?.id || ''}
-          userDisplayName={profile?.display_name}
-          userHandicap={profile?.eg_handicap_index}
-          userProfilePhotoUrl={profile?.profile_photo_url}
-          isCurrentUser={isOwnProfile}
-        />
-      </div>
-
       {/* Tab Navigation and Content */}
       <ProfileTabs
         activeTab={activeSection}
