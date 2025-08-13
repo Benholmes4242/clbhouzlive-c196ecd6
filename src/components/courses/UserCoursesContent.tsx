@@ -287,28 +287,7 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
       />
 
 
-      {/* Trophy Progress Section */}
-      <TrophyProgressSection 
-        completedCount={allPlayedCourses.length}
-        userFirstName={finalDisplayName}
-        isCurrentUser={finalIsOwnProfile}
-        milestoneUnlockDates={milestoneUnlockDates}
-      />
-
-      {/* Regional Completion Section */}
-      <RegionalCompletionSection 
-        userFirstName={finalDisplayName}
-        isCurrentUser={finalIsOwnProfile}
-        britainIrelandCompleted={regionProgress?.['britain-ireland']?.played || 0}
-        britainIrelandTotal={regionProgress?.['britain-ireland']?.total || 100}
-        europeCompleted={regionProgress?.['europe']?.played || 0}
-        europeTotal={regionProgress?.['europe']?.total || 100}
-        usaCompleted={regionProgress?.['usa']?.played || 0}
-        usaTotal={regionProgress?.['usa']?.total || 100}
-        worldwideCompleted={regionProgress?.['global']?.played || 0}
-        worldwideTotal={regionProgress?.['global']?.total || 100}
-      />
-
+      {/* Trophy Progress Section and Regional Completion Section removed */}
 
       <div className="flex flex-col gap-4">
         {/* Mobile layout - stacked */}
