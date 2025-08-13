@@ -23,7 +23,8 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
       title: 'Legends Club',
       subtitle: 'Top 100 Worldwide Courses',
       region: 'global',
-      color: '#FFD700', // Gold for worldwide
+      color: '#FFD83B', // Yellow for worldwide
+      colorLight: '#FFF8DC', // Light yellow for remaining
       gradient: 'from-yellow-400 to-yellow-600'
     },
     {
@@ -31,15 +32,17 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
       title: 'Stars and Stripes Tourer',
       subtitle: 'Top 100 USA Courses',
       region: 'usa',
-      color: '#1E40AF', // Blue for USA
-      gradient: 'from-blue-500 to-blue-700'
+      color: '#FF4D4F', // Red for USA
+      colorLight: '#FFE6E6', // Light red for remaining
+      gradient: 'from-red-500 to-red-700'
     },
     {
       id: 'links-legend',
       title: 'Links Legend',
       subtitle: 'Top 100 Great Britain & Ireland Courses',
       region: 'britain-ireland',
-      color: '#059669', // Green for Britain & Ireland
+      color: '#4CAF50', // Green for Britain & Ireland
+      colorLight: '#E8F5E8', // Light green for remaining
       gradient: 'from-green-500 to-green-700'
     },
     {
@@ -47,8 +50,9 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
       title: 'Continental Swinger',
       subtitle: 'Top 100 Continental Europe Courses',
       region: 'europe',
-      color: '#DC2626', // Red for Continental Europe
-      gradient: 'from-red-500 to-red-700'
+      color: '#3F8CFF', // Blue for Continental Europe
+      colorLight: '#E6F0FF', // Light blue for remaining
+      gradient: 'from-blue-500 to-blue-700'
     }
   ];
 
@@ -80,25 +84,27 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
         {/* Progress Rings Section */}
         <div className="relative py-8">
           {/* Desktop: Single row */}
-          <div className="hidden md:flex gap-12 justify-center">
+          <div className="hidden md:flex gap-16 justify-center">
             {achievementRings.map((achievement, index) => {
               const progress = getProgressData(achievement.region);
               const animationDelay = index * 0.2;
+              const completedAngle = (progress.percentage / 100) * 283; // 283 is circumference for strokeDasharray
+              const remainingAngle = 283 - completedAngle;
               
               return (
                 <div key={achievement.id} className="flex flex-col items-center cursor-pointer group">
-                  <div className="w-40 h-40 relative transition-all duration-300 group-hover:scale-105">
-                    {/* Progress Ring with Gradients */}
+                  <div className="w-44 h-44 relative transition-all duration-300 group-hover:scale-105">
+                    {/* Progress Ring with Full Circle */}
                     <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
                       {/* Gradient Definitions */}
                       <defs>
                         <linearGradient id={`gradient-${achievement.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
-                          <stop offset="0%" stopColor={achievement.color} stopOpacity="0.8" />
-                          <stop offset="100%" stopColor={achievement.color} stopOpacity="0.6" />
+                          <stop offset="0%" stopColor={achievement.color} stopOpacity="0.9" />
+                          <stop offset="100%" stopColor={achievement.color} stopOpacity="0.7" />
                         </linearGradient>
                         <linearGradient id={`bg-gradient-${achievement.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
-                          <stop offset="0%" stopColor={achievement.color} stopOpacity="0.1" />
-                          <stop offset="100%" stopColor={achievement.color} stopOpacity="0.05" />
+                          <stop offset="0%" stopColor={achievement.color} stopOpacity="0.08" />
+                          <stop offset="100%" stopColor={achievement.color} stopOpacity="0.04" />
                         </linearGradient>
                       </defs>
                       
@@ -106,38 +112,38 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                       <circle
                         cx="60"
                         cy="60"
-                        r="50"
+                        r="52"
                         fill={`url(#bg-gradient-${achievement.id})`}
                         stroke="hsl(var(--border))"
-                        strokeWidth="2"
-                        opacity="0.3"
+                        strokeWidth="1"
+                        opacity="0.4"
                       />
                       
-                      {/* Full ring outline */}
+                      {/* Remaining portion (full ring) */}
                       <circle
                         cx="60"
                         cy="60"
                         r="45"
                         fill="none"
-                        stroke="hsl(var(--muted))"
-                        strokeWidth="8"
-                        opacity="0.2"
+                        stroke={achievement.colorLight}
+                        strokeWidth="10"
+                        strokeLinecap="round"
                       />
                       
-                      {/* Progress circle with animated sweep */}
+                      {/* Completed portion with animated sweep */}
                       <circle
                         cx="60"
                         cy="60"
                         r="45"
                         fill="none"
-                        stroke={`url(#gradient-${achievement.id})`}
-                        strokeWidth="8"
+                        stroke={achievement.color}
+                        strokeWidth="10"
                         strokeLinecap="round"
                         strokeDasharray="283"
-                        strokeDashoffset={283 - (progress.percentage * 2.83)}
+                        strokeDashoffset={283 - completedAngle}
                         className="transition-all duration-1000 ease-out"
                         style={{
-                          filter: `drop-shadow(0 0 12px ${achievement.color}60)`,
+                          filter: `drop-shadow(0 0 15px ${achievement.color}50)`,
                           animationDelay: `${animationDelay}s`
                         }}
                       />
@@ -145,11 +151,9 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                     
                     {/* Center content */}
                     <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                      <div className="text-2xl font-bold text-foreground mb-1">
-                        {progress.played}
-                      </div>
-                      <div className="text-lg text-muted-foreground font-medium">
-                        / {progress.total}
+                      <div className="text-2xl font-bold text-foreground leading-none">
+                        <span className="font-bold">{progress.played}</span>
+                        <span className="font-normal text-muted-foreground"> / {progress.total}</span>
                       </div>
                       <div className="text-xs text-muted-foreground font-medium mt-1">
                         Courses
@@ -158,7 +162,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                   </div>
                   
                   {/* Achievement info below ring - single line */}
-                  <div className="mt-4 text-center min-w-[160px]">
+                  <div className="mt-4 text-center min-w-[180px]">
                     <div className="text-sm font-semibold text-foreground mb-2 whitespace-nowrap">
                       {achievement.title}
                     </div>
@@ -176,7 +180,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
 
           {/* Mobile: Swipeable carousel */}
           <div className="md:hidden">
-            <div className="flex gap-6 overflow-x-auto scrollbar-hide pb-4 px-4"
+            <div className="flex gap-8 overflow-x-auto scrollbar-hide pb-4 px-4"
                  style={{
                    scrollbarWidth: 'none',
                    msOverflowStyle: 'none',
@@ -187,6 +191,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                 const progress = getProgressData(achievement.region);
                 const isLast = index === achievementRings.length - 1;
                 const animationDelay = index * 0.15;
+                const completedAngle = (progress.percentage / 100) * 283;
                 
                 return (
                   <div 
@@ -194,18 +199,18 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                     className={`flex-shrink-0 flex flex-col items-center cursor-pointer ${isLast ? 'pr-4' : ''}`}
                     style={{ scrollSnapAlign: 'start' }}
                   >
-                    <div className="w-32 h-32 relative transition-all duration-300">
-                      {/* Progress Ring with Gradients */}
+                    <div className="w-36 h-36 relative transition-all duration-300">
+                      {/* Progress Ring with Full Circle */}
                       <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
                         {/* Gradient Definitions */}
                         <defs>
                           <linearGradient id={`mobile-gradient-${achievement.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stopColor={achievement.color} stopOpacity="0.8" />
-                            <stop offset="100%" stopColor={achievement.color} stopOpacity="0.6" />
+                            <stop offset="0%" stopColor={achievement.color} stopOpacity="0.9" />
+                            <stop offset="100%" stopColor={achievement.color} stopOpacity="0.7" />
                           </linearGradient>
                           <linearGradient id={`mobile-bg-gradient-${achievement.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
-                            <stop offset="0%" stopColor={achievement.color} stopOpacity="0.1" />
-                            <stop offset="100%" stopColor={achievement.color} stopOpacity="0.05" />
+                            <stop offset="0%" stopColor={achievement.color} stopOpacity="0.08" />
+                            <stop offset="100%" stopColor={achievement.color} stopOpacity="0.04" />
                           </linearGradient>
                         </defs>
                         
@@ -213,38 +218,38 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                         <circle
                           cx="60"
                           cy="60"
-                          r="50"
+                          r="52"
                           fill={`url(#mobile-bg-gradient-${achievement.id})`}
                           stroke="hsl(var(--border))"
-                          strokeWidth="2"
-                          opacity="0.3"
+                          strokeWidth="1"
+                          opacity="0.4"
                         />
                         
-                        {/* Full ring outline */}
+                        {/* Remaining portion (full ring) */}
                         <circle
                           cx="60"
                           cy="60"
                           r="45"
                           fill="none"
-                          stroke="hsl(var(--muted))"
-                          strokeWidth="6"
-                          opacity="0.2"
+                          stroke={achievement.colorLight}
+                          strokeWidth="8"
+                          strokeLinecap="round"
                         />
                         
-                        {/* Progress circle with animated sweep */}
+                        {/* Completed portion with animated sweep */}
                         <circle
                           cx="60"
                           cy="60"
                           r="45"
                           fill="none"
-                          stroke={`url(#mobile-gradient-${achievement.id})`}
-                          strokeWidth="6"
+                          stroke={achievement.color}
+                          strokeWidth="8"
                           strokeLinecap="round"
                           strokeDasharray="283"
-                          strokeDashoffset={283 - (progress.percentage * 2.83)}
+                          strokeDashoffset={283 - completedAngle}
                           className="transition-all duration-1000 ease-out"
                           style={{
-                            filter: `drop-shadow(0 0 8px ${achievement.color}60)`,
+                            filter: `drop-shadow(0 0 10px ${achievement.color}50)`,
                             animationDelay: `${animationDelay}s`
                           }}
                         />
@@ -252,20 +257,18 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                       
                       {/* Center content */}
                       <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                        <div className="text-lg font-bold text-foreground">
-                          {progress.played}
+                        <div className="text-lg font-bold text-foreground leading-none">
+                          <span className="font-bold">{progress.played}</span>
+                          <span className="font-normal text-muted-foreground"> / {progress.total}</span>
                         </div>
-                        <div className="text-sm text-muted-foreground font-medium">
-                          / {progress.total}
-                        </div>
-                        <div className="text-xs text-muted-foreground font-medium">
+                        <div className="text-xs text-muted-foreground font-medium mt-1">
                           Courses
                         </div>
                       </div>
                     </div>
                     
                     {/* Achievement info below ring - single line */}
-                    <div className="mt-3 text-center w-32">
+                    <div className="mt-3 text-center w-36">
                       <div className="text-xs font-semibold text-foreground mb-1 whitespace-nowrap overflow-hidden text-ellipsis">
                         {achievement.title}
                       </div>
