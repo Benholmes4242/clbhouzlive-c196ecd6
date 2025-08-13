@@ -67,19 +67,21 @@ export const filterCoursesByRegion = (
     console.log('Admin Search - Before filtering:', filtered.length, 'courses');
     console.log('Admin Search - Search term:', searchTerm);
     
+    // Debug: Show all courses with "royal" in name when searching for "royal"
+    if (searchTerm.toLowerCase() === 'royal') {
+      const royalCourses = filtered.filter(course => 
+        course.name.toLowerCase().includes('royal')
+      );
+      console.log('ALL courses with "royal" in name:', royalCourses.map(c => c.name));
+    }
+    
     filtered = filtered.filter(course => {
       const nameMatch = course.name.toLowerCase().includes(searchTerm.toLowerCase());
       const countryMatch = course.country.toLowerCase().includes(searchTerm.toLowerCase());
       const subCountryMatch = course.sub_country && course.sub_country.toLowerCase().includes(searchTerm.toLowerCase());
       const regionMatch = course.region && course.region.toLowerCase().includes(searchTerm.toLowerCase());
       
-      const isMatch = nameMatch || countryMatch || subCountryMatch || regionMatch;
-      
-      if (searchTerm.toLowerCase() === 'royal' && course.name.toLowerCase().includes('royal')) {
-        console.log('Found Royal course:', course.name, 'Match:', isMatch);
-      }
-      
-      return isMatch;
+      return nameMatch || countryMatch || subCountryMatch || regionMatch;
     });
     
     console.log('Admin Search - After filtering:', filtered.length, 'courses');
