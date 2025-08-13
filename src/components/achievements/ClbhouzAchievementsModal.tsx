@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { XPRingSystem } from "@/components/profile/XPRingSystem";
 import { Sparkles, Trophy, ChevronDown, ChevronUp } from "lucide-react";
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -32,6 +31,19 @@ interface Achievement {
   unlockHint?: string;
 }
 
+interface AchievementModalData {
+  id: string;
+  name: string;
+  xp: number;
+  unlocked: boolean;
+  iconURL?: string;
+  description?: string;
+  unlockHint?: string;
+  progress?: string;
+  dateEarned?: string;
+  isRepeatable?: boolean;
+}
+
 const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
   isOpen,
   onClose,
@@ -48,7 +60,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
   const [isManuallyCollapsed, setIsManuallyCollapsed] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
   const [animateProgress, setAnimateProgress] = useState(false);
-  const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
+  const [selectedAchievement, setSelectedAchievement] = useState<AchievementModalData | null>(null);
   const [showAchievementDetailModal, setShowAchievementDetailModal] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const lastScrollTop = useRef(0);
@@ -1114,25 +1126,46 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                     </h3>
                   </div>
                 
-                <TooltipProvider>
                   <div className={`grid grid-cols-3 ${isMobile ? 'gap-3' : 'gap-6'}`}>
                     {getFilteredAchievements(explorationAchievements, 'exploration').map((achievement) => {
                       const { percentage, nudgeText } = getAchievementProgress(achievement);
                       const isNearUnlock = percentage >= 80 && percentage < 100;
                       
                       return (
-                         <Tooltip key={achievement.title}>
-                           <TooltipTrigger asChild>
-                             <div className="relative">
-                                 <div
-                                   className={`
-                                     transition-all duration-200 hover:scale-105 cursor-pointer 
-                                     ${isMobile ? 'p-2 flex flex-col items-center text-center space-y-2' : 'p-4 flex flex-col items-center text-center space-y-3'}
-                                   `}
-                                    onClick={isMobile ? () => {
-                                      setSelectedAchievement(achievement);
-                                      setShowAchievementDetailModal(true);
-                                    } : undefined}
+                        <div key={achievement.title} className="relative">
+                          <div
+                            className={`
+                              transition-all duration-200 hover:scale-105 cursor-pointer 
+                              ${isMobile ? 'p-2 flex flex-col items-center text-center space-y-2' : 'p-4 flex flex-col items-center text-center space-y-3'}
+                            `}
+                            onClick={() => {
+                              setSelectedAchievement({
+                                id: achievement.title,
+                                name: achievement.title,
+                                xp: achievement.xp,
+                                unlocked: achievement.isEarned,
+                                description: achievement.description,
+                                unlockHint: achievement.unlockHint,
+                                progress: achievement.progress,
+                                dateEarned: achievement.dateEarned,
+                                isRepeatable: achievement.isRepeatable
+                              });
+                              setShowAchievementDetailModal(true);
+                            }}
+                            onMouseEnter={!isMobile ? () => {
+                              setSelectedAchievement({
+                                id: achievement.title,
+                                name: achievement.title,
+                                xp: achievement.xp,
+                                unlocked: achievement.isEarned,
+                                description: achievement.description,
+                                unlockHint: achievement.unlockHint,
+                                progress: achievement.progress,
+                                dateEarned: achievement.dateEarned,
+                                isRepeatable: achievement.isRepeatable
+                              });
+                              setShowAchievementDetailModal(true);
+                            } : undefined}
                                  >
                                   {/* Icon directly on background - no container */}
                                   <div className="flex justify-center items-center">
@@ -1151,87 +1184,25 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                                     </p>
                                   </div>
                                   
-                                  {/* Smart Nudge Label */}
-                                  {nudgeText && (
-                                    <div className="mt-2 px-2 py-1 bg-orange-100 dark:bg-orange-900/30 rounded-full border border-orange-300 dark:border-orange-700">
-                                      <p className="text-xs font-medium text-orange-700 dark:text-orange-300 leading-tight">
-                                        🎯 {nudgeText}
-                                      </p>
-                                    </div>
-                                  )}
-                                </div>
-                              
-                              {/* Progress indicator for near-unlock achievements */}
-                              {isNearUnlock && (
-                                <div className="absolute -top-1 -right-1 w-3 h-3 bg-orange-500 rounded-full animate-ping"></div>
-                              )}
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent className="max-w-xs z-50 bg-background border shadow-lg">
-                            <div className="p-2">
-                              {/* Status Badge */}
-                              <div className="flex items-center justify-between mb-3">
-                                <h4 className="font-semibold text-sm">{achievement.title}</h4>
-                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                  achievement.isEarned 
-                                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
-                                    : 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
-                                }`}>
-                                  {achievement.isEarned ? 'Unlocked' : 'Locked'}
-                                </span>
-                              </div>
-                              
-                              {/* Description */}
-                              <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
-                                {achievement.description}
-                              </p>
-                              
-                              {/* XP Value */}
-                              <div className="flex items-center justify-between mb-2">
-                                <span className="text-xs font-medium text-primary inline-flex items-center gap-1">
-                                  <span className="text-amber-500">✨</span>
-                                  +{achievement.xp} XP
-                                </span>
-                                <span className="text-xs text-muted-foreground inline-flex items-center gap-1">
-                                  {achievement.isRepeatable ? "🔄 Repeatable" : "🏆 One-time"}
-                                </span>
-                              </div>
-                              
-                              {/* Date Earned (if unlocked) */}
-                              {achievement.isEarned && achievement.dateEarned && (
-                                <div className="mb-2">
-                                  <span className="text-xs text-green-600 dark:text-green-400 font-medium">
-                                    ✅ Earned: {achievement.dateEarned}
-                                  </span>
-                                </div>
-                              )}
-                              
-                              {/* Progress */}
-                              <div className="mb-2">
-                                <span className="text-xs text-muted-foreground">
-                                  Progress: {achievement.progress}
-                                </span>
-                              </div>
-                              
-                              {/* Unlock Hint (if locked) */}
-                              {!achievement.isEarned && achievement.unlockHint && (
-                                <div className="mt-3 p-2 bg-blue-50 dark:bg-blue-950/20 rounded border border-blue-200 dark:border-blue-800">
-                                  <div className="flex items-start gap-2">
-                                    <span className="text-blue-500 text-xs">💡</span>
-                                    <span className="text-xs text-blue-700 dark:text-blue-300 leading-relaxed">
-                                      <strong>How to unlock:</strong> {achievement.unlockHint}
-                                    </span>
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          </TooltipContent>
-                        </Tooltip>
+                                   {/* Smart Nudge Label */}
+                                   {nudgeText && (
+                                     <div className="mt-2 px-2 py-1 bg-orange-100 dark:bg-orange-900/30 rounded-full border border-orange-300 dark:border-orange-700">
+                                       <p className="text-xs font-medium text-orange-700 dark:text-orange-300 leading-tight">
+                                         🎯 {nudgeText}
+                                       </p>
+                                     </div>
+                                   )}
+                                 </div>
+                               
+                               {/* Progress indicator for near-unlock achievements */}
+                               {isNearUnlock && (
+                                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-orange-500 rounded-full animate-ping"></div>
+                               )}
+                             </div>
                       );
                     })}
-                  </div>
-                </TooltipProvider>
-              </div>
+                   </div>
+               </div>
             </div>
           )}
 
@@ -1247,25 +1218,46 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                     </h3>
                   </div>
                 
-                <TooltipProvider>
                   <div className={`grid grid-cols-3 ${isMobile ? 'gap-3' : 'gap-6'}`}>
                     {getFilteredAchievements(skillAchievements, 'skill').map((achievement) => {
                       const { percentage, nudgeText } = getAchievementProgress(achievement);
                       const isNearUnlock = percentage >= 80 && percentage < 100;
                       
                       return (
-                         <Tooltip key={achievement.title}>
-                           <TooltipTrigger asChild>
-                             <div className="relative">
-                                 <div
-                                   className={`
-                                     transition-all duration-200 hover:scale-105 cursor-pointer 
-                                     ${isMobile ? 'p-2 flex flex-col items-center text-center space-y-2' : 'p-4 flex flex-col items-center text-center space-y-3'}
-                                   `}
-                                    onClick={isMobile ? () => {
-                                      setSelectedAchievement(achievement);
-                                      setShowAchievementDetailModal(true);
-                                    } : undefined}
+                        <div key={achievement.title} className="relative">
+                          <div
+                            className={`
+                              transition-all duration-200 hover:scale-105 cursor-pointer 
+                              ${isMobile ? 'p-2 flex flex-col items-center text-center space-y-2' : 'p-4 flex flex-col items-center text-center space-y-3'}
+                            `}
+                            onClick={() => {
+                              setSelectedAchievement({
+                                id: achievement.title,
+                                name: achievement.title,
+                                xp: achievement.xp,
+                                unlocked: achievement.isEarned,
+                                description: achievement.description,
+                                unlockHint: achievement.unlockHint,
+                                progress: achievement.progress,
+                                dateEarned: achievement.dateEarned,
+                                isRepeatable: achievement.isRepeatable
+                              });
+                              setShowAchievementDetailModal(true);
+                            }}
+                            onMouseEnter={!isMobile ? () => {
+                              setSelectedAchievement({
+                                id: achievement.title,
+                                name: achievement.title,
+                                xp: achievement.xp,
+                                unlocked: achievement.isEarned,
+                                description: achievement.description,
+                                unlockHint: achievement.unlockHint,
+                                progress: achievement.progress,
+                                dateEarned: achievement.dateEarned,
+                                isRepeatable: achievement.isRepeatable
+                              });
+                              setShowAchievementDetailModal(true);
+                            } : undefined}
                                  >
                                   {/* Icon directly on background - no container */}
                                   <div className="flex justify-center items-center">
@@ -1294,79 +1286,17 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                                   )}
                                 </div>
                               
-                              {/* Progress indicator for near-unlock achievements */}
-                              {isNearUnlock && (
-                                <div className="absolute -top-1 -right-1 w-3 h-3 bg-orange-500 rounded-full animate-ping"></div>
-                              )}
-                            </div>
-                          </TooltipTrigger>
-                          <TooltipContent className="max-w-xs z-50 bg-background border shadow-lg">
-                            <div className="p-2">
-                              {/* Status Badge */}
-                              <div className="flex items-center justify-between mb-3">
-                                <h4 className="font-semibold text-sm">{achievement.title}</h4>
-                                <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                  achievement.isEarned 
-                                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
-                                    : 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
-                                }`}>
-                                  {achievement.isEarned ? 'Unlocked' : 'Locked'}
-                                </span>
-                              </div>
-                              
-                              {/* Description */}
-                              <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
-                                {achievement.description}
-                              </p>
-                              
-                              {/* XP Value */}
-                              <div className="flex items-center justify-between mb-2">
-                                <span className="text-xs font-medium text-primary inline-flex items-center gap-1">
-                                  <span className="text-amber-500">✨</span>
-                                  +{achievement.xp} XP
-                                </span>
-                                <span className="text-xs text-muted-foreground inline-flex items-center gap-1">
-                                  {achievement.isRepeatable ? "🔄 Repeatable" : "🏆 One-time"}
-                                </span>
-                              </div>
-                              
-                              {/* Date Earned (if unlocked) */}
-                              {achievement.isEarned && achievement.dateEarned && (
-                                <div className="mb-2">
-                                  <span className="text-xs text-green-600 dark:text-green-400 font-medium">
-                                    ✅ Earned: {achievement.dateEarned}
-                                  </span>
-                                </div>
-                              )}
-                              
-                              {/* Progress */}
-                              <div className="mb-2">
-                                <span className="text-xs text-muted-foreground">
-                                  Progress: {achievement.progress}
-                                </span>
-                              </div>
-                              
-                              {/* Unlock Hint (if locked) */}
-                              {!achievement.isEarned && achievement.unlockHint && (
-                                <div className="mt-3 p-2 bg-blue-50 dark:bg-blue-950/20 rounded border border-blue-200 dark:border-blue-800">
-                                  <div className="flex items-start gap-2">
-                                    <span className="text-blue-500 text-xs">💡</span>
-                                    <span className="text-xs text-blue-700 dark:text-blue-300 leading-relaxed">
-                                      <strong>How to unlock:</strong> {achievement.unlockHint}
-                                    </span>
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          </TooltipContent>
-                        </Tooltip>
+                               {/* Progress indicator for near-unlock achievements */}
+                               {isNearUnlock && (
+                                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-orange-500 rounded-full animate-ping"></div>
+                               )}
+                             </div>
                       );
                     })}
-                  </div>
-                </TooltipProvider>
-              </div>
-            </div>
-          )}
+                   </div>
+               </div>
+             </div>
+           )}
 
         </div>
 
@@ -1376,17 +1306,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       <AchievementDetailModal
         isOpen={showAchievementDetailModal}
         onClose={() => setShowAchievementDetailModal(false)}
-        achievement={selectedAchievement ? {
-          id: selectedAchievement.title,
-          name: selectedAchievement.title,
-          xp: selectedAchievement.xp,
-          unlocked: selectedAchievement.isEarned,
-          description: selectedAchievement.description,
-          unlockHint: selectedAchievement.unlockHint,
-          progress: selectedAchievement.progress,
-          dateEarned: selectedAchievement.dateEarned,
-          isRepeatable: selectedAchievement.isRepeatable
-        } : null}
+        achievement={selectedAchievement}
       />
     </Dialog>
   );
