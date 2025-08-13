@@ -22,11 +22,13 @@ interface HighlightVideo {
 interface LatestHighlightsProps {
   userId: string;
   isOwnProfile?: boolean;
+  userFirstName?: string;
 }
 
 const LatestHighlights: React.FC<LatestHighlightsProps> = ({
   userId,
-  isOwnProfile
+  isOwnProfile,
+  userFirstName
 }) => {
   const [highlights, setHighlights] = useState<HighlightVideo[]>([]);
   const [loading, setLoading] = useState(true);
@@ -221,6 +223,8 @@ const LatestHighlights: React.FC<LatestHighlightsProps> = ({
         highlights={highlights}
         onVideoPlay={handleVideoPlay}
         userId={userId}
+        userFirstName={userFirstName}
+        isOwnProfile={isOwnProfile}
       />
       
     </div>
