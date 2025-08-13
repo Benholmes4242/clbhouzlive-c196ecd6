@@ -155,9 +155,9 @@ const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({
               <TooltipProvider key={achievement.id}>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <div className="flex-shrink-0 text-center cursor-pointer">
+                    <div className="flex-shrink-0 text-center cursor-pointer w-20">
                       <div 
-                        className={`w-20 h-20 shadow-lg transition-all duration-300 hover:scale-105 overflow-hidden ${
+                        className={`w-20 h-20 transition-all duration-300 hover:scale-105 overflow-hidden ${
                           !achievement.unlocked ? 'grayscale opacity-60' : ''
                         }`}
                         onClick={() => {
@@ -169,7 +169,7 @@ const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({
                       >
                         {getAchievementBadge(achievement)}
                       </div>
-                      <div className="text-xs text-muted-foreground font-medium mt-1">
+                      <div className="text-xs text-muted-foreground font-medium mt-1 break-words">
                         {achievement.unlocked ? (
                           `+${achievement.xp} XP`
                         ) : (
