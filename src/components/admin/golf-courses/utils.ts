@@ -63,12 +63,25 @@ export const filterCoursesByRegion = (
 
   // Filter by search term
   if (searchTerm) {
-    filtered = filtered.filter(course =>
-      course.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      course.country.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (course.sub_country && course.sub_country.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (course.region && course.region.toLowerCase().includes(searchTerm.toLowerCase()))
-    );
+    console.log('Admin Search - Before filtering:', filtered.length, 'courses');
+    console.log('Admin Search - Search term:', searchTerm);
+    
+    filtered = filtered.filter(course => {
+      const nameMatch = course.name.toLowerCase().includes(searchTerm.toLowerCase());
+      const countryMatch = course.country.toLowerCase().includes(searchTerm.toLowerCase());
+      const subCountryMatch = course.sub_country && course.sub_country.toLowerCase().includes(searchTerm.toLowerCase());
+      const regionMatch = course.region && course.region.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      const isMatch = nameMatch || countryMatch || subCountryMatch || regionMatch;
+      
+      if (searchTerm.toLowerCase() === 'royal' && course.name.toLowerCase().includes('royal')) {
+        console.log('Found Royal course:', course.name, 'Match:', isMatch);
+      }
+      
+      return isMatch;
+    });
+    
+    console.log('Admin Search - After filtering:', filtered.length, 'courses');
   }
 
   // Apply sorting based on selected sort option
