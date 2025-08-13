@@ -54,6 +54,11 @@ export const usePostSubmission = () => {
         fileDetails: mediaFiles.map(f => ({ name: f.name, size: f.size, type: f.type }))
       });
 
+      // Don't create empty posts - require either content or media
+      if (!content?.trim() && mediaFiles.length === 0) {
+        throw new Error('Post must have either content or media');
+      }
+
       // Create the post
       const { data: postData, error: postError } = await supabase
         .from('posts')

@@ -67,7 +67,14 @@ export const useActivityPosts = (userId?: string) => {
         console.error('ActivityPosts - Error fetching user profile:', profileError);
       }
 
-      const formattedPosts = postsData.map(post => {
+      const formattedPosts = postsData
+        .filter(post => {
+          // Filter out empty posts with no content and no media
+          const hasContent = post.content && post.content.trim().length > 0;
+          const hasMedia = post.post_media && post.post_media.length > 0;
+          return hasContent || hasMedia;
+        })
+        .map(post => {
         const tags = postTags?.filter((t: any) => t.post_id === post.id) || [];
         
         console.log('ActivityPosts - Processing post:', {
