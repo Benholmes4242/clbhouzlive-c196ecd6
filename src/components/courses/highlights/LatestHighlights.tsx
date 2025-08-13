@@ -199,13 +199,6 @@ const LatestHighlights: React.FC<LatestHighlightsProps> = ({
     return (
       <div className="py-4">
         <div className="mb-1 px-4">
-          <h2 className="text-2xl font-bold text-foreground mb-2">Highlights</h2>
-          <p className="text-muted-foreground">
-            {isOwnProfile 
-              ? "Your most memorable moments from the world's greatest courses"
-              : "Recent highlights from top golf courses"
-            }
-          </p>
         </div>
         <div className="bg-white/5 backdrop-blur-2xl border border-white/20 rounded-xl p-8 text-center mt-4 mx-4">
           <p className="text-white/60">No video highlights available yet.</p>
@@ -222,13 +215,6 @@ const LatestHighlights: React.FC<LatestHighlightsProps> = ({
   return (
     <div className="py-4">
       <div className="mb-6 px-4">
-        <h2 className="text-2xl font-bold text-foreground mb-2">Highlights</h2>
-        <p className="text-muted-foreground">
-          {isOwnProfile 
-            ? "Your most memorable moments from the world's greatest courses"
-            : "Recent highlights from top golf courses"
-          }
-        </p>
       </div>
       
       <DepthStackCarousel 
