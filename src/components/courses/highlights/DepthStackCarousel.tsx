@@ -369,7 +369,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
               isMobile 
                 ? 'w-[calc(100vw-8rem)]' // Smaller width on mobile to show peek of next card
                 : 'w-80'
-            }`}
+            } ${index === 0 ? 'ring-4 ring-red-500' : ''}`}
             style={{ scrollSnapAlign: 'start' }}
             onMouseEnter={() => !isMobile && setHoveredCardIndex(index)}
             onMouseLeave={() => !isMobile && setHoveredCardIndex(null)}
