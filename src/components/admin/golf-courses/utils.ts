@@ -71,11 +71,8 @@ export const filterCoursesByRegion = (
     );
   }
 
-  // Sort by rank when Top 100 filter is active (move to the very end)
+  // Sort by rank when Top 100 filter is active
   if (regionalFilter.top100List && regionalFilter.top100List !== 'all') {
-    console.log('Sorting courses by Top 100 filter:', regionalFilter.top100List);
-    console.log('Courses before sorting:', filtered.map(c => ({ name: c.name, global_rank: c.global_rank, usa_rank: c.usa_rank, regional_rank: c.regional_rank })));
-    
     filtered = [...filtered].sort((a, b) => {
       let rankA: number | null = null;
       let rankB: number | null = null;
@@ -104,8 +101,6 @@ export const filterCoursesByRegion = (
       // Sort ascending (rank 1 first, rank 100 last)
       return rankA - rankB;
     });
-    
-    console.log('Courses after sorting:', filtered.map(c => ({ name: c.name, global_rank: c.global_rank, usa_rank: c.usa_rank, regional_rank: c.regional_rank })));
   }
 
   return filtered;
