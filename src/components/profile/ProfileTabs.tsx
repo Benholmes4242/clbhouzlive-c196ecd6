@@ -54,7 +54,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
       <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm">
         <div className="relative">
           {/* Desktop: max-width container matching achievements */}
-          <div className="md:max-w-[1150px] md:mx-auto px-4 md:px-0">
+          <div className="md:max-w-[1150px] md:mx-auto md:px-0">
             {/* Left fade gradient */}
             {canScrollLeft && (
               <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background/95 to-transparent z-10 pointer-events-none md:hidden" />
@@ -67,7 +67,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
             
             <div 
               ref={tabsRef}
-              className="flex overflow-x-auto scrollbar-hide md:justify-center md:gap-8"
+              className="flex overflow-x-auto scrollbar-hide px-4 md:px-0 md:justify-center md:gap-8"
               style={{
                 scrollbarWidth: 'none',
                 msOverflowStyle: 'none',
