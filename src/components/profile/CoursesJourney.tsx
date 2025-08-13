@@ -78,60 +78,91 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
         {/* Controls Section moved - now appears above depth stack carousel */}
 
         {/* Progress Rings Section */}
-        <div className="relative">
+        <div className="relative py-8">
           {/* Desktop: Single row */}
-          <div className="hidden md:flex gap-6 justify-center">
-            {achievementRings.map((achievement) => {
+          <div className="hidden md:flex gap-12 justify-center">
+            {achievementRings.map((achievement, index) => {
               const progress = getProgressData(achievement.region);
+              const animationDelay = index * 0.2;
+              
               return (
                 <div key={achievement.id} className="flex flex-col items-center cursor-pointer group">
-                  <div className="w-36 h-36 relative transition-all duration-300 group-hover:scale-105">
-                    {/* Progress Ring */}
-                    <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                      {/* Background circle */}
+                  <div className="w-40 h-40 relative transition-all duration-300 group-hover:scale-105">
+                    {/* Progress Ring with Gradients */}
+                    <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
+                      {/* Gradient Definitions */}
+                      <defs>
+                        <linearGradient id={`gradient-${achievement.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stopColor={achievement.color} stopOpacity="0.8" />
+                          <stop offset="100%" stopColor={achievement.color} stopOpacity="0.6" />
+                        </linearGradient>
+                        <linearGradient id={`bg-gradient-${achievement.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                          <stop offset="0%" stopColor={achievement.color} stopOpacity="0.1" />
+                          <stop offset="100%" stopColor={achievement.color} stopOpacity="0.05" />
+                        </linearGradient>
+                      </defs>
+                      
+                      {/* Background full circle with light gradient */}
                       <circle
-                        cx="50"
-                        cy="50"
-                        r="42"
+                        cx="60"
+                        cy="60"
+                        r="50"
+                        fill={`url(#bg-gradient-${achievement.id})`}
+                        stroke="hsl(var(--border))"
+                        strokeWidth="2"
+                        opacity="0.3"
+                      />
+                      
+                      {/* Full ring outline */}
+                      <circle
+                        cx="60"
+                        cy="60"
+                        r="45"
                         fill="none"
                         stroke="hsl(var(--muted))"
-                        strokeWidth="4"
+                        strokeWidth="8"
                         opacity="0.2"
                       />
-                      {/* Progress circle with gradient */}
+                      
+                      {/* Progress circle with animated sweep */}
                       <circle
-                        cx="50"
-                        cy="50"
-                        r="42"
+                        cx="60"
+                        cy="60"
+                        r="45"
                         fill="none"
-                        stroke={achievement.color}
-                        strokeWidth="6"
+                        stroke={`url(#gradient-${achievement.id})`}
+                        strokeWidth="8"
                         strokeLinecap="round"
-                        strokeDasharray={`${progress.percentage * 2.64} 264`}
-                        className="transition-all duration-700 ease-out"
+                        strokeDasharray="283"
+                        strokeDashoffset={283 - (progress.percentage * 2.83)}
+                        className="transition-all duration-1000 ease-out"
                         style={{
-                          filter: `drop-shadow(0 0 8px ${achievement.color}40)`
+                          filter: `drop-shadow(0 0 12px ${achievement.color}60)`,
+                          animationDelay: `${animationDelay}s`
                         }}
                       />
                     </svg>
                     
                     {/* Center content */}
                     <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                      <div className="text-2xl font-bold text-foreground">
-                        {progress.played} / {progress.total}
+                      <div className="text-2xl font-bold text-foreground mb-1">
+                        {progress.played}
                       </div>
-                      <div className="text-xs text-muted-foreground font-medium">
+                      <div className="text-lg text-muted-foreground font-medium">
+                        / {progress.total}
+                      </div>
+                      <div className="text-xs text-muted-foreground font-medium mt-1">
                         Courses
                       </div>
                     </div>
                   </div>
                   
-                  {/* Achievement info below ring */}
-                  <div className="mt-3 text-center max-w-32">
-                    <div className="text-sm font-semibold text-foreground mb-1">
+                  {/* Achievement info below ring - single line */}
+                  <div className="mt-4 text-center min-w-[160px]">
+                    <div className="text-sm font-semibold text-foreground mb-2 whitespace-nowrap">
                       {achievement.title}
                     </div>
-                    <div className="text-xs text-muted-foreground">
+                    <div className="text-xs text-muted-foreground whitespace-nowrap">
                       {progress.remaining > 0 
                         ? `${progress.remaining} courses to go to unlock`
                         : 'Achievement unlocked!'
@@ -145,7 +176,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
 
           {/* Mobile: Swipeable carousel */}
           <div className="md:hidden">
-            <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-2 px-4"
+            <div className="flex gap-6 overflow-x-auto scrollbar-hide pb-4 px-4"
                  style={{
                    scrollbarWidth: 'none',
                    msOverflowStyle: 'none',
@@ -155,6 +186,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
               {achievementRings.map((achievement, index) => {
                 const progress = getProgressData(achievement.region);
                 const isLast = index === achievementRings.length - 1;
+                const animationDelay = index * 0.15;
                 
                 return (
                   <div 
@@ -162,32 +194,58 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                     className={`flex-shrink-0 flex flex-col items-center cursor-pointer ${isLast ? 'pr-4' : ''}`}
                     style={{ scrollSnapAlign: 'start' }}
                   >
-                    <div className="w-28 h-28 relative transition-all duration-300">
-                      {/* Progress Ring */}
-                      <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                        {/* Background circle */}
+                    <div className="w-32 h-32 relative transition-all duration-300">
+                      {/* Progress Ring with Gradients */}
+                      <svg className="w-full h-full transform -rotate-90" viewBox="0 0 120 120">
+                        {/* Gradient Definitions */}
+                        <defs>
+                          <linearGradient id={`mobile-gradient-${achievement.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stopColor={achievement.color} stopOpacity="0.8" />
+                            <stop offset="100%" stopColor={achievement.color} stopOpacity="0.6" />
+                          </linearGradient>
+                          <linearGradient id={`mobile-bg-gradient-${achievement.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stopColor={achievement.color} stopOpacity="0.1" />
+                            <stop offset="100%" stopColor={achievement.color} stopOpacity="0.05" />
+                          </linearGradient>
+                        </defs>
+                        
+                        {/* Background full circle with light gradient */}
                         <circle
-                          cx="50"
-                          cy="50"
-                          r="42"
+                          cx="60"
+                          cy="60"
+                          r="50"
+                          fill={`url(#mobile-bg-gradient-${achievement.id})`}
+                          stroke="hsl(var(--border))"
+                          strokeWidth="2"
+                          opacity="0.3"
+                        />
+                        
+                        {/* Full ring outline */}
+                        <circle
+                          cx="60"
+                          cy="60"
+                          r="45"
                           fill="none"
                           stroke="hsl(var(--muted))"
-                          strokeWidth="4"
+                          strokeWidth="6"
                           opacity="0.2"
                         />
-                        {/* Progress circle */}
+                        
+                        {/* Progress circle with animated sweep */}
                         <circle
-                          cx="50"
-                          cy="50"
-                          r="42"
+                          cx="60"
+                          cy="60"
+                          r="45"
                           fill="none"
-                          stroke={achievement.color}
-                          strokeWidth="5"
+                          stroke={`url(#mobile-gradient-${achievement.id})`}
+                          strokeWidth="6"
                           strokeLinecap="round"
-                          strokeDasharray={`${progress.percentage * 2.64} 264`}
-                          className="transition-all duration-700 ease-out"
+                          strokeDasharray="283"
+                          strokeDashoffset={283 - (progress.percentage * 2.83)}
+                          className="transition-all duration-1000 ease-out"
                           style={{
-                            filter: `drop-shadow(0 0 6px ${achievement.color}40)`
+                            filter: `drop-shadow(0 0 8px ${achievement.color}60)`,
+                            animationDelay: `${animationDelay}s`
                           }}
                         />
                       </svg>
@@ -195,7 +253,10 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                       {/* Center content */}
                       <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
                         <div className="text-lg font-bold text-foreground">
-                          {progress.played} / {progress.total}
+                          {progress.played}
+                        </div>
+                        <div className="text-sm text-muted-foreground font-medium">
+                          / {progress.total}
                         </div>
                         <div className="text-xs text-muted-foreground font-medium">
                           Courses
@@ -203,12 +264,12 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                       </div>
                     </div>
                     
-                    {/* Achievement info below ring */}
-                    <div className="mt-2 text-center w-28">
-                      <div className="text-xs font-semibold text-foreground mb-1 line-clamp-2">
+                    {/* Achievement info below ring - single line */}
+                    <div className="mt-3 text-center w-32">
+                      <div className="text-xs font-semibold text-foreground mb-1 whitespace-nowrap overflow-hidden text-ellipsis">
                         {achievement.title}
                       </div>
-                      <div className="text-xs text-muted-foreground line-clamp-2">
+                      <div className="text-xs text-muted-foreground whitespace-nowrap overflow-hidden text-ellipsis">
                         {progress.remaining > 0 
                           ? `${progress.remaining} to unlock`
                           : 'Unlocked!'
