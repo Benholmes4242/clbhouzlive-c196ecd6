@@ -167,10 +167,8 @@ const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({
                           !achievement.unlocked ? 'grayscale opacity-60' : ''
                         }`}
                         onClick={() => {
-                          if (isMobile) {
-                            setSelectedAchievement(achievement);
-                            setShowAchievementDetailModal(true);
-                          }
+                          setSelectedAchievement(achievement);
+                          setShowAchievementDetailModal(true);
                         }}
                       >
                         {getAchievementBadge(achievement)}
