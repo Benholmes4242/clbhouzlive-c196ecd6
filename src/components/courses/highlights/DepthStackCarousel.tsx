@@ -214,16 +214,6 @@ const VideoCard: React.FC<{
       {/* Dark overlay for text readability */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/30" />
       
-      {/* Golf Club Tag - Top Right */}
-      <div className="absolute top-3 right-3 z-10">
-        <div className="bg-white/20 backdrop-blur-sm rounded-full px-3 py-1 flex items-center gap-2 max-w-[70%]">
-          <MapPin className="w-4 h-4 text-white flex-shrink-0" />
-          <span className="text-white text-sm font-medium truncate">
-            {video.courseName}
-          </span>
-        </div>
-      </div>
-      
       {/* My Highlights Badge - Top Left */}
       <div className="absolute top-3 left-3 z-10">
         <div className="bg-white/10 backdrop-blur-2xl border border-white/20 rounded-full px-3 py-1 shadow-lg">
@@ -233,12 +223,12 @@ const VideoCard: React.FC<{
         </div>
       </div>
       
-      {/* Mute button - positioned below golf club tag */}
+      {/* Mute button */}
       <Button
         onClick={toggleMute}
         variant="ghost"
         size="icon"
-        className="absolute top-16 right-3 h-8 w-8 rounded-full overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity shadow-lg shadow-black/10"
+        className="absolute top-3 right-3 h-8 w-8 rounded-full overflow-hidden opacity-0 group-hover:opacity-100 transition-opacity shadow-lg shadow-black/10"
         style={{ 
           backdropFilter: 'blur(40px) saturate(180%)'
         }}
