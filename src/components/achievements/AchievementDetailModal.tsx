@@ -83,7 +83,7 @@ const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
         <div className="px-6 pb-6 space-y-6">
           {/* Badge */}
           <div className="flex justify-center">
-            <div className={`w-24 h-24 rounded-full overflow-hidden shadow-lg ${
+            <div className={`w-24 h-24 overflow-hidden ${
               !achievement.unlocked ? 'grayscale opacity-60' : ''
             }`}>
               {getAchievementBadge(achievement)}
