@@ -115,7 +115,7 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
 
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-end gap-2">
-            <h3 className="text-3xl font-bold text-foreground">Activity</h3>
+            <h3 className="text-xl md:text-2xl text-foreground">Activity</h3>
             <span className="text-muted-foreground text-base">
               {activeFilter === 'all' ? `${posts.length} posts` : `${filteredPosts.length} of ${posts.length} posts`}
             </span>
