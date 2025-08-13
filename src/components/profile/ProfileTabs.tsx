@@ -87,7 +87,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
                         : 'text-muted-foreground hover:text-foreground'
                     }`}
                   >
-                    <span className="whitespace-nowrap text-base md:text-lg">{tab.label}</span>
+                    <span className="whitespace-nowrap text-xl md:text-2xl">{tab.label}</span>
                     {/* Underline only under text label */}
                     {isActive && (
                       <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-black" style={{ width: 'calc(100% - 2rem)' }} />

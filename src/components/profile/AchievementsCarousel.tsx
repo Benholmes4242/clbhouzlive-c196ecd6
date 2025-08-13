@@ -123,7 +123,7 @@ const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({
         <div className="md:max-w-[1150px] md:mx-auto md:px-0 px-4">
           <div className="flex items-center justify-between mb-4 md:mb-6 md:py-6 md:pt-8">
             <div className="flex items-center gap-2">
-              <h3 className="text-base md:text-lg text-foreground">Achievements</h3>
+              <h3 className="text-xl md:text-2xl text-foreground">Achievements</h3>
             </div>
             <Button
               variant="ghost"
