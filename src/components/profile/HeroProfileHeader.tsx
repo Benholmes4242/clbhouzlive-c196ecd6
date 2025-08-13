@@ -31,8 +31,10 @@ import { Swords } from 'lucide-react';
 import ProfileVideoCircle from './ProfileVideoCircle';
 import { useCloudflareStream } from '@/hooks/useCloudflareStream';
 import { useR2Upload } from '@/hooks/useR2Upload';
-import { BsThreeDotsVertical } from 'react-icons/bs';
 import PinnedAchievements from './PinnedAchievements';
+import ProfileStatsBar from './ProfileStatsBar';
+import AchievementsCarousel from './AchievementsCarousel';
+import ProfileTabs from './ProfileTabs';
 
 interface Course {
   id: string;
@@ -102,12 +104,9 @@ const HeroProfileHeader = ({
     usaCompleted: 0,
     worldwideCompleted: 0
   });
-  const [isStatsExpanded, setIsStatsExpanded] = useState(false);
   
   // Fetch user achievements for current user
   const { achievements } = useUserAchievements();
-  
-  // Removed scroll compression logic
   
   // Activity posts logic
   const { posts, loading: postsLoading, fetchUserPosts } = useActivityPosts(profile?.id);
@@ -509,216 +508,106 @@ const HeroProfileHeader = ({
               </div>
             )}
 
-            {/* Badge Strip */}
-            <div className="mb-3">
-              <ProfileBadgeStrip
-                coursesPlayed={userProgressData.coursesPlayed}
-                totalXP={userProgressData.coursesPlayed * 110}
-                britainIrelandCompleted={userProgressData.britainIrelandCompleted}
-                europeCompleted={userProgressData.europeCompleted}
-                usaCompleted={userProgressData.usaCompleted}
-                worldwideCompleted={userProgressData.worldwideCompleted}
-              />
-            </div>
             
             {/* Home Golf Club */}
-            <p className="text-base text-muted-foreground">
+            <p className="text-base text-muted-foreground mb-4">
               {homeClub}
             </p>
-
-            {/* Compare Progress Button for other profiles */}
           </div>
 
-          {/* Stats Bar */}
-          <div className="w-full max-w-md">
-            {/* Top Stats Bar - Always Visible */}
-            <div 
-              className="w-full bg-muted border border-border rounded-full py-1" 
-              style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
-            >
-              <div className="flex items-center justify-between w-full px-4">
-                {/* Core Stats - Fixed width columns */}
-                <div className="flex items-center justify-center flex-1">
-                  <div className="text-center">
-                    <div className="font-bold text-foreground text-lg">
-                      {profile?.eg_handicap_index ? profile.eg_handicap_index.toFixed(1) : '--'}
-                    </div>
-                    <div className="text-muted-foreground text-xs">
-                      Handicap
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center justify-center flex-1">
-                  <div className="text-center">
-                    <div className="font-bold text-foreground text-lg">
-                      {postsCount}
-                    </div>
-                    <div className="text-muted-foreground text-xs">
-                      Posts
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center justify-center flex-1">
-                  <div className="text-center">
-                    <div className="font-bold text-foreground text-lg">
-                      {followersCount}
-                    </div>
-                    <div className="text-muted-foreground text-xs">
-                      Followers
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Three-dot trigger */}
-                <button
-                  onClick={() => setIsStatsExpanded(!isStatsExpanded)}
-                  className="flex items-center justify-center p-2 text-muted-foreground hover:text-foreground transition-colors duration-200 flex-shrink-0"
-                  aria-label="See all stats"
-                >
-                  <BsThreeDotsVertical className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-
-            {/* Expandable Drawer - Additional Stats */}
-            <div className={`overflow-hidden transition-all duration-300 ease-in-out ${
-              isStatsExpanded ? 'max-h-20 opacity-100 mt-2' : 'max-h-0 opacity-0'
-            }`}>
-              <div 
-                className="w-full bg-muted border border-border rounded-full py-1" 
-                style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
-              >
-                <div className="flex items-center justify-between w-full px-4">
-                  {/* Additional Stats - Exact same column widths */}
-                  <div className="flex items-center justify-center flex-1">
-                    <div className="text-center">
-                      <div className="font-bold text-foreground text-lg">
-                        {ratedCoursesCount}
-                      </div>
-                      <div className="text-muted-foreground text-xs">
-                        Rated Courses
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-center flex-1">
-                    <div className="text-center">
-                      <div className="font-bold text-foreground text-lg">
-                        {averageRating > 0 ? `${averageRating}/10` : '--'}
-                      </div>
-                      <div className="text-muted-foreground text-xs">
-                        Avg. Rating
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-center flex-1">
-                    <div className="text-center">
-                      <div className="font-bold text-foreground text-lg">
-                        {achievements.length}
-                      </div>
-                      <div className="text-muted-foreground text-xs">
-                        Achievements
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Empty space to match three-dot button width */}
-                  <div className="flex items-center justify-center p-2 opacity-0 flex-shrink-0">
-                    <BsThreeDotsVertical className="w-4 h-4" />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+          {/* Stats Bar - New Horizontal Scrollable Design */}
+          <ProfileStatsBar 
+            stats={[
+              { 
+                value: profile?.eg_handicap_index ? profile.eg_handicap_index.toFixed(1) : '--',
+                label: 'Handicap'
+              },
+              { 
+                value: postsCount,
+                label: 'Posts'
+              },
+              { 
+                value: followersCount,
+                label: 'Followers'
+              },
+              { 
+                value: userProgressData.coursesPlayed || '24',
+                label: 'Level'
+              },
+              { 
+                value: ratedCoursesCount,
+                label: 'Rated Courses'
+              },
+              { 
+                value: averageRating > 0 ? `${averageRating}/10` : '--',
+                label: 'Avg. Rating'
+              }
+            ]}
+          />
         </div>
       </div>
 
-      {/* Pinned Achievements Section */}
-      <div className="relative w-full px-4 md:px-0">
-        <PinnedAchievements
+      {/* Achievements Carousel Section */}
+      <div className="relative w-full px-4 md:px-8">
+        <AchievementsCarousel
+          achievements={achievements.map(a => ({
+            id: a.id || `achievement-${Math.random()}`,
+            name: a.type || 'Achievement',
+            xp: 100,
+            unlocked: true,
+            description: a.message || 'Achievement unlocked!'
+          }))}
           userId={profile?.id || ''}
-          isOwnProfile={isOwnProfile}
-          displayName={profile?.display_name}
+          userDisplayName={profile?.display_name}
           userHandicap={profile?.eg_handicap_index}
           userProfilePhotoUrl={profile?.profile_photo_url}
+          isCurrentUser={isOwnProfile}
         />
       </div>
 
-      {/* Content container - transparent to show blur behind */}
-      <div className="relative w-full">
-        
-        {/* Activity Section - directly after stats bar */}
-        <div 
-          id="activity"
-          className=""
-          ref={activityRef}
-        >
-            <ProfileSectionCarousel onSectionChange={onSectionChange} />
-            
-            {/* Activity Posts Section - Only show when activity section is active */}
-            {activeSection === 'activity' && (
-              <>
-                {/* Break out of container on mobile for edge-to-edge activity feed */}
-                <div className="block md:hidden mt-8 -mx-4">
-                  <ActivityFeed
-                    userId={profile?.id || ''}
-                    isOwnProfile={isOwnProfile}
-                    profileDisplayName={profile?.display_name}
-                    userHandicap={profile?.eg_handicap_index}
-                    userProfilePhotoUrl={profile?.profile_photo_url}
-                  />
-                </div>
-                {/* Desktop version with normal container */}
-                <div className="hidden md:block mt-8 px-4">
-                  <ActivityFeed
-                    userId={profile?.id || ''}
-                    isOwnProfile={isOwnProfile}
-                    profileDisplayName={profile?.display_name}
-                    userHandicap={profile?.eg_handicap_index}
-                    userProfilePhotoUrl={profile?.profile_photo_url}
-                  />
-                </div>
-              </>
-            )}
-            
-            {/* Handicap Section - Only show when handicap section is active */}
-            {activeSection === 'handicap' && (
-              <div className="mt-8 px-0">
-                <HandicapSection 
-                  userId={profile?.id || ''}
-                  profile={profile}
-                />
-              </div>
-            )}
-            
-            {/* Top 100 Section - Only show when top100 section is active */}
-            {activeSection === 'top100' && (
-              <div className="mt-8 px-0">
-                <div className="p-4">
-                  <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-3xl font-bold text-foreground">The World's Greatest Courses</h2>
-                  </div>
-                </div>
-                <LatestHighlights userId={profile?.id || ''} isOwnProfile={isOwnProfile} />
-                <UserCoursesContent 
-                  username={profile?.username || ''}
-                  isOwnProfile={isOwnProfile}
-                  displayName={profile?.display_name || 'User'}
-                />
-              </div>
-            )}
-        </div>
-        
-        {/* Post Viewer Modal */}
-        {currentPost && (
-          <PostViewerModal
-            isOpen={isOpen}
-            onClose={closePostViewer}
-            initialPost={currentPost}
-            allUserPosts={viewerPosts}
-          />
-        )}
-        
-        </div>
+      {/* Tab Navigation and Content */}
+      <ProfileTabs
+        activeTab={activeSection}
+        onTabChange={onSectionChange}
+      >
+        {{
+          activity: (
+            <ActivityFeed
+              userId={profile?.id || ''}
+              isOwnProfile={isOwnProfile}
+              profileDisplayName={profile?.display_name}
+              userHandicap={profile?.eg_handicap_index}
+              userProfilePhotoUrl={profile?.profile_photo_url}
+            />
+          ),
+          courses: (
+            <>
+              <LatestHighlights userId={profile?.id || ''} isOwnProfile={isOwnProfile} />
+              <UserCoursesContent 
+                username={profile?.username || ''}
+                isOwnProfile={isOwnProfile}
+                displayName={profile?.display_name || 'User'}
+              />
+            </>
+          ),
+          stats: (
+            <HandicapSection 
+              userId={profile?.id || ''}
+              profile={profile}
+            />
+          )
+        }}
+      </ProfileTabs>
+      
+      {/* Post Viewer Modal */}
+      {currentPost && (
+        <PostViewerModal
+          isOpen={isOpen}
+          onClose={closePostViewer}
+          initialPost={currentPost}
+          allUserPosts={viewerPosts}
+        />
+      )}
 
       {/* Rest of content sections would continue here... */}
       

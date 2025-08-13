@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { User, Trophy, Camera, BarChart3, MapPin } from 'lucide-react';
 
@@ -7,11 +7,9 @@ interface ProfileTabsProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
   children: {
-    overview: React.ReactNode;
-    top100: React.ReactNode;
     activity: React.ReactNode;
-    stats: React.ReactNode;
     courses: React.ReactNode;
+    stats: React.ReactNode;
   };
 }
 
@@ -20,56 +18,91 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
   onTabChange,
   children
 }) => {
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+  const tabsRef = useRef<HTMLDivElement>(null);
+
   const tabs = [
-    { id: 'overview', label: 'Overview', icon: User },
-    { id: 'top100', label: 'Top 100', icon: Trophy },
     { id: 'activity', label: 'Activity', icon: Camera },
-    { id: 'stats', label: 'Stats', icon: BarChart3 },
-    { id: 'courses', label: 'Courses', icon: MapPin }
+    { id: 'courses', label: 'Courses Played', icon: MapPin },
+    { id: 'stats', label: 'Handicap & Rounds', icon: BarChart3 },
+    { id: 'gear', label: 'Gear & Bag', icon: User }
   ];
 
-  return (
-    <Tabs value={activeTab} onValueChange={onTabChange} className="w-full mt-6">
-      <TabsList className="grid w-full grid-cols-5 h-auto p-1 bg-gray-100">
-        {tabs.map((tab) => {
-          const IconComponent = tab.icon;
-          return (
-            <TabsTrigger 
-              key={tab.id}
-              value={tab.id}
-              className="flex flex-col gap-1 py-3 px-2 relative data-[state=active]:bg-transparent data-[state=active]:text-foreground text-gray-600 hover:text-[#b66b41] transition-colors data-[state=active]:shadow-none"
-            >
-              <IconComponent className="h-4 w-4" />
-              <span className="text-xs font-medium">{tab.label}</span>
-              {activeTab === tab.id && (
-                <div 
-                  className="w-1.5 h-1.5 rounded-full bg-[#b66b41] animate-fade-in"
-                  style={{ marginTop: '4px' }}
-                />
-              )}
-            </TabsTrigger>
-          );
-        })}
-      </TabsList>
+  const updateScrollState = () => {
+    const container = tabsRef.current;
+    if (container) {
+      setCanScrollLeft(container.scrollLeft > 2);
+      setCanScrollRight(
+        container.scrollLeft < container.scrollWidth - container.clientWidth - 2
+      );
+    }
+  };
 
-      <div className="mt-6">
-        <TabsContent value="overview" className="mt-0">
-          {children.overview}
-        </TabsContent>
-        <TabsContent value="top100" className="mt-0">
-          {children.top100}
-        </TabsContent>
-        <TabsContent value="activity" className="mt-0">
-          {children.activity}
-        </TabsContent>
-        <TabsContent value="stats" className="mt-0">
-          {children.stats}
-        </TabsContent>
-        <TabsContent value="courses" className="mt-0">
-          {children.courses}
-        </TabsContent>
+  useEffect(() => {
+    updateScrollState();
+    const container = tabsRef.current;
+    if (container) {
+      container.addEventListener('scroll', updateScrollState);
+      return () => container.removeEventListener('scroll', updateScrollState);
+    }
+  }, []);
+
+  return (
+    <div className="w-full">
+      {/* Sticky Tab Bar */}
+      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm border-b border-border">
+        <div className="relative">
+          {/* Left fade gradient */}
+          {canScrollLeft && (
+            <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background/95 to-transparent z-10 pointer-events-none" />
+          )}
+          
+          {/* Right fade gradient */}
+          {canScrollRight && (
+            <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background/95 to-transparent z-10 pointer-events-none" />
+          )}
+          
+          <div 
+            ref={tabsRef}
+            className="flex overflow-x-auto scrollbar-hide px-4 md:px-8"
+            style={{
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+              WebkitOverflowScrolling: 'touch'
+            }}
+          >
+            {tabs.map((tab) => {
+              const IconComponent = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => onTabChange(tab.id)}
+                  className={`flex-shrink-0 flex items-center gap-2 px-4 py-4 border-b-2 transition-all duration-200 ${
+                    isActive 
+                      ? 'border-primary text-primary font-medium' 
+                      : 'border-transparent text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  <IconComponent className="h-4 w-4" />
+                  <span className="text-sm whitespace-nowrap">{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </div>
-    </Tabs>
+
+      {/* Tab Content */}
+      <div className="px-4 md:px-8 py-6">
+        {activeTab === 'activity' && children.activity}
+        {activeTab === 'courses' && children.courses}
+        {activeTab === 'stats' && children.stats}
+        {activeTab === 'gear' && <div className="text-center py-8 text-muted-foreground">Gear & Bag coming soon...</div>}
+      </div>
+    </div>
+
   );
 };
 
