@@ -83,11 +83,11 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
                     onClick={() => onTabChange(tab.id)}
                     className={`flex-shrink-0 flex items-center px-4 py-4 transition-all duration-200 text-base relative ${
                       isActive 
-                        ? 'text-black font-bold' 
+                        ? 'text-black' 
                         : 'text-muted-foreground hover:text-foreground'
                     }`}
                   >
-                    <span className="whitespace-nowrap font-medium text-base md:text-lg">{tab.label}</span>
+                    <span className="whitespace-nowrap text-base md:text-lg">{tab.label}</span>
                     {/* Underline only under text label */}
                     {isActive && (
                       <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-black" style={{ width: 'calc(100% - 2rem)' }} />
