@@ -116,6 +116,74 @@ export default {
 						opacity: '1'
 					}
 				},
+				'slide-out-left': {
+					'0%': {
+						transform: 'translateX(0)',
+						opacity: '1'
+					},
+					'100%': {
+						transform: 'translateX(-100%)',
+						opacity: '0.5'
+					}
+				},
+				'slide-in-from-right': {
+					'0%': {
+						transform: 'translateX(100%)',
+						opacity: '0'
+					},
+					'100%': {
+						transform: 'translateX(0)',
+						opacity: '1'
+					}
+				},
+				'slide-out-right': {
+					'0%': {
+						transform: 'translateX(0)',
+						opacity: '1'
+					},
+					'100%': {
+						transform: 'translateX(100%)',
+						opacity: '0.5'
+					}
+				},
+				'slide-in-from-left': {
+					'0%': {
+						transform: 'translateX(-100%)',
+						opacity: '0'
+					},
+					'100%': {
+						transform: 'translateX(0)',
+						opacity: '1'
+					}
+				},
+				'slide-in-from-right-bounce': {
+					'0%': {
+						transform: 'translateX(100%)',
+						opacity: '0'
+					},
+					'80%': {
+						transform: 'translateX(-2%)',
+						opacity: '1'
+					},
+					'100%': {
+						transform: 'translateX(0)',
+						opacity: '1'
+					}
+				},
+				'slide-in-from-left-bounce': {
+					'0%': {
+						transform: 'translateX(-100%)',
+						opacity: '0'
+					},
+					'80%': {
+						transform: 'translateX(2%)',
+						opacity: '1'
+					},
+					'100%': {
+						transform: 'translateX(0)',
+						opacity: '1'
+					}
+				},
 				'fade-in': {
 					'0%': {
 						opacity: '0',
@@ -151,6 +219,12 @@ export default {
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'slide-in-up': 'slide-in-up 0.3s ease-out',
 				'slide-in-right': 'slide-in-right 0.3s ease-out',
+				'slide-out-left': 'slide-out-left 280ms cubic-bezier(0.4, 0, 0.2, 1)',
+				'slide-in-from-right': 'slide-in-from-right 280ms cubic-bezier(0.4, 0, 0.2, 1)',
+				'slide-out-right': 'slide-out-right 280ms cubic-bezier(0.4, 0, 0.2, 1)',
+				'slide-in-from-left': 'slide-in-from-left 280ms cubic-bezier(0.4, 0, 0.2, 1)',
+				'slide-in-from-right-bounce': 'slide-in-from-right-bounce 300ms cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+				'slide-in-from-left-bounce': 'slide-in-from-left-bounce 300ms cubic-bezier(0.68, -0.55, 0.265, 1.55)',
 				'fade-in': 'fade-in 0.3s ease-out',
 				'shake': 'shake 0.6s ease-in-out',
 				'shimmer': 'shimmer 2s infinite'

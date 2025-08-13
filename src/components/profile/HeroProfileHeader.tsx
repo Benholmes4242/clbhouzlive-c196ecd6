@@ -569,6 +569,11 @@ const HeroProfileHeader = ({
       <ProfileTabs
         activeTab={activeSection}
         onTabChange={onSectionChange}
+        userId={profile?.id || ''}
+        userDisplayName={profile?.display_name}
+        userHandicap={profile?.eg_handicap_index}
+        userProfilePhotoUrl={profile?.profile_photo_url}
+        isCurrentUser={isOwnProfile}
       >
         {{
           activity: (

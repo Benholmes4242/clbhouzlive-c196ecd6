@@ -26,6 +26,7 @@ interface AchievementsCarouselProps {
   userHandicap?: number;
   userProfilePhotoUrl?: string;
   isCurrentUser: boolean;
+  className?: string;
 }
 
 const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({
@@ -34,7 +35,8 @@ const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({
   userDisplayName,
   userHandicap,
   userProfilePhotoUrl,
-  isCurrentUser
+  isCurrentUser,
+  className = ''
 }) => {
   const isMobile = useIsMobile();
   const isDesktop = useIsDesktop();
@@ -118,7 +120,7 @@ const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({
 
   return (
     <>
-      <div className="w-full mb-6 md:mb-8 py-6 md:py-0">
+      <div className={`w-full mb-6 md:mb-8 py-6 md:py-0 ${className}`}>
         {/* Desktop: max-width container with centered content */}
         <div className="md:max-w-[1150px] md:mx-auto">
           <div className="flex items-center justify-between mb-4 md:mb-6 md:py-6 md:pt-8 px-4 md:px-0">
