@@ -123,22 +123,19 @@ const HeroProfileHeader = ({
   };
 
   // Get transition classes for hero section (achievements/courses journey)
-  const getHeroTransitionClass = () => {
+  const getHeroTransitionClass = (isOutgoing: boolean = false) => {
     if (transitionState === 'idle') return '';
     
-    const isMovingToCourses = activeSection === 'courses';
-    const isMovingFromCourses = activeSection !== 'courses';
-    
-    if (transitionDirection === 'right') {
-      // Moving to courses
-      return isMovingToCourses 
-        ? (isMobile ? 'animate-slide-in-from-right-bounce' : 'animate-slide-in-from-right')
-        : 'animate-slide-out-left';
-    } else {
-      // Moving away from courses
-      return isMovingFromCourses
-        ? (isMobile ? 'animate-slide-in-from-left-bounce' : 'animate-slide-in-from-left')
+    if (isOutgoing) {
+      // Element sliding out
+      return transitionDirection === 'right' 
+        ? 'animate-slide-out-left' 
         : 'animate-slide-out-right';
+    } else {
+      // Element sliding in
+      return transitionDirection === 'right'
+        ? (isMobile ? 'animate-slide-in-from-right-bounce' : 'animate-slide-in-from-right')
+        : (isMobile ? 'animate-slide-in-from-left-bounce' : 'animate-slide-in-from-left');
     }
   };
   
@@ -568,32 +565,80 @@ const HeroProfileHeader = ({
 
       {/* Hero Section - Achievements or Courses Journey */}
       <div className="relative">
-        {/* Courses Journey */}
-        <div className={`${activeSection === 'courses' ? 'block' : 'hidden'} ${
-          transitionState === 'transitioning' && activeSection === 'courses' ? getHeroTransitionClass() : ''
-        }`}>
-          <CoursesJourney />
-        </div>
-        
-        {/* Achievements */}
-        <div className={`${activeSection !== 'courses' ? 'block' : 'hidden'} ${
-          transitionState === 'transitioning' && activeSection !== 'courses' ? getHeroTransitionClass() : ''
-        }`}>
-          <AchievementsCarousel
-            achievements={achievements.map(a => ({
-              id: a.id || `achievement-${Math.random()}`,
-              name: a.type || 'Achievement',
-              xp: 100,
-              unlocked: true,
-              description: a.message || 'Achievement unlocked!'
-            }))}
-            userId={profile?.id || ''}
-            userDisplayName={profile?.display_name}
-            userHandicap={profile?.eg_handicap_index}
-            userProfilePhotoUrl={profile?.profile_photo_url}
-            isCurrentUser={isOwnProfile}
-          />
-        </div>
+        {/* During transition, both sections are visible with absolute positioning */}
+        {transitionState === 'transitioning' ? (
+          <>
+            {/* Outgoing section */}
+            <div className={`absolute inset-0 w-full ${getHeroTransitionClass(true)}`}>
+              {transitionDirection === 'right' ? (
+                /* Moving to courses, so achievements are sliding out */
+                <AchievementsCarousel
+                  achievements={achievements.map(a => ({
+                    id: a.id || `achievement-${Math.random()}`,
+                    name: a.type || 'Achievement',
+                    xp: 100,
+                    unlocked: true,
+                    description: a.message || 'Achievement unlocked!'
+                  }))}
+                  userId={profile?.id || ''}
+                  userDisplayName={profile?.display_name}
+                  userHandicap={profile?.eg_handicap_index}
+                  userProfilePhotoUrl={profile?.profile_photo_url}
+                  isCurrentUser={isOwnProfile}
+                />
+              ) : (
+                /* Moving away from courses, so courses journey is sliding out */
+                <CoursesJourney />
+              )}
+            </div>
+            
+            {/* Incoming section */}
+            <div className={`relative w-full ${getHeroTransitionClass(false)}`}>
+              {transitionDirection === 'right' ? (
+                /* Moving to courses, so courses journey is sliding in */
+                <CoursesJourney />
+              ) : (
+                /* Moving away from courses, so achievements are sliding in */
+                <AchievementsCarousel
+                  achievements={achievements.map(a => ({
+                    id: a.id || `achievement-${Math.random()}`,
+                    name: a.type || 'Achievement',
+                    xp: 100,
+                    unlocked: true,
+                    description: a.message || 'Achievement unlocked!'
+                  }))}
+                  userId={profile?.id || ''}
+                  userDisplayName={profile?.display_name}
+                  userHandicap={profile?.eg_handicap_index}
+                  userProfilePhotoUrl={profile?.profile_photo_url}
+                  isCurrentUser={isOwnProfile}
+                />
+              )}
+            </div>
+          </>
+        ) : (
+          /* Normal state - only show active section */
+          <>
+            {activeSection === 'courses' ? (
+              <CoursesJourney />
+            ) : (
+              <AchievementsCarousel
+                achievements={achievements.map(a => ({
+                  id: a.id || `achievement-${Math.random()}`,
+                  name: a.type || 'Achievement',
+                  xp: 100,
+                  unlocked: true,
+                  description: a.message || 'Achievement unlocked!'
+                }))}
+                userId={profile?.id || ''}
+                userDisplayName={profile?.display_name}
+                userHandicap={profile?.eg_handicap_index}
+                userProfilePhotoUrl={profile?.profile_photo_url}
+                isCurrentUser={isOwnProfile}
+              />
+            )}
+          </>
+        )}
       </div>
 
       {/* Tab Navigation and Content */}
