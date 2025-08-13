@@ -48,6 +48,8 @@ interface DepthStackCarouselProps {
   highlights: HighlightVideo[];
   onVideoPlay?: (videoId: string) => void;
   userId?: string; // Add userId prop to support other user profiles
+  userFirstName?: string;
+  isOwnProfile?: boolean;
 }
 
 const VideoCard: React.FC<{ 
@@ -58,7 +60,9 @@ const VideoCard: React.FC<{
   isHovered?: boolean;
   isFirstCard?: boolean;
   shouldAutoPlay?: boolean;
-}> = ({ video, isActive, onVideoPlay, isMobile, isHovered = false, isFirstCard = false, shouldAutoPlay = false }) => {
+  userFirstName?: string;
+  isOwnProfile?: boolean;
+}> = ({ video, isActive, onVideoPlay, isMobile, isHovered = false, isFirstCard = false, shouldAutoPlay = false, userFirstName = 'User', isOwnProfile = false }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const hlsRef = useRef<Hls | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -210,6 +214,15 @@ const VideoCard: React.FC<{
       {/* Dark overlay for text readability */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/30" />
       
+      {/* My Highlights Badge - Top Left */}
+      <div className="absolute top-3 left-3 z-10">
+        <div className="bg-white/10 backdrop-blur-2xl border border-white/20 rounded-full px-3 py-1.5 shadow-lg">
+          <span className="text-white text-xs font-medium">
+            {isOwnProfile ? "My Highlights" : `${userFirstName}'s Highlights`}
+          </span>
+        </div>
+      </div>
+      
       {/* Mute button */}
       <Button
         onClick={toggleMute}
@@ -243,7 +256,9 @@ const VideoCard: React.FC<{
 const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
   highlights,
   onVideoPlay,
-  userId
+  userId,
+  userFirstName = 'User',
+  isOwnProfile = false
 }) => {
   const [activeVideoIndex, setActiveVideoIndex] = useState(0);
   const [hoveredCardIndex, setHoveredCardIndex] = useState<number | null>(null);
@@ -369,7 +384,7 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
               isMobile 
                 ? 'w-[calc(100vw-8rem)]' // Smaller width on mobile to show peek of next card
                 : 'w-80'
-            } ${index === 0 ? 'ring-4 ring-red-500' : ''}`}
+            }`}
             style={{ scrollSnapAlign: 'start' }}
             onMouseEnter={() => !isMobile && setHoveredCardIndex(index)}
             onMouseLeave={() => !isMobile && setHoveredCardIndex(null)}
@@ -382,6 +397,8 @@ const DepthStackCarousel: React.FC<DepthStackCarouselProps> = ({
               isHovered={hoveredCardIndex === index}
               isFirstCard={index === 0}
               shouldAutoPlay={hoveredCardIndex === null || hoveredCardIndex === 0}
+              userFirstName={userFirstName}
+              isOwnProfile={isOwnProfile}
             />
           </div>
         ))}
