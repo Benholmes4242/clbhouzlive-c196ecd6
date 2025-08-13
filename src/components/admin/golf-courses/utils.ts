@@ -71,5 +71,37 @@ export const filterCoursesByRegion = (
     );
   }
 
+  // Sort by rank when Top 100 filter is active
+  if (regionalFilter.top100List && regionalFilter.top100List !== 'all') {
+    filtered = filtered.sort((a, b) => {
+      let rankA: number | null = null;
+      let rankB: number | null = null;
+      
+      switch (regionalFilter.top100List) {
+        case 'worldwide':
+          rankA = a.global_rank;
+          rankB = b.global_rank;
+          break;
+        case 'usa':
+          rankA = a.usa_rank;
+          rankB = b.usa_rank;
+          break;
+        case 'britain-ireland':
+        case 'europe':
+          rankA = a.regional_rank;
+          rankB = b.regional_rank;
+          break;
+      }
+      
+      // Handle null ranks (courses without ranks go to the end)
+      if (rankA === null && rankB === null) return 0;
+      if (rankA === null) return 1;
+      if (rankB === null) return -1;
+      
+      // Sort ascending (rank 1 first, rank 100 last)
+      return rankA - rankB;
+    });
+  }
+
   return filtered;
 };
