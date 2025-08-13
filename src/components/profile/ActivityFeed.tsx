@@ -59,29 +59,39 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
     }
   }, [posts, activeFilter]);
 
-  // Convert filtered activity posts to ExploreContentItem format
-  const exploreContent: ExploreContentItem[] = filteredPosts.map(post => ({
-    id: post.id,
-    type: post.post_media?.[0]?.media_type === 'video' ? 'video' : 'image',
-    src: post.post_media?.[0]?.media_url || '/placeholder.svg',
-    title: post.content || '',
-    likes: 0,
-    comments: 0,
-    shares: 0,
-    user: {
-      id: post.user.id,
-      name: post.user.display_name || post.user.username || 'Anonymous',
-      username: post.user.username || undefined,
-      avatar: post.user.profile_photo_url || '/placeholder.svg',
-      verified: false
-    },
-    // Add the full media array for multiple media navigation
-    media: post.post_media?.map(media => ({
-      id: media.id,
-      media_type: media.media_type,
-      media_url: media.media_url
-    })) || []
-  }));
+  // Convert filtered activity posts to ExploreContentItem format - only include posts with media
+  const exploreContent: ExploreContentItem[] = filteredPosts
+    .filter(post => post.post_media && post.post_media.length > 0) // Only include posts with media
+    .map(post => ({
+      id: post.id,
+      type: post.post_media[0].media_type === 'video' ? 'video' : 'image',
+      src: post.post_media[0].media_url,
+      title: post.content || '',
+      likes: 0,
+      comments: 0,
+      shares: 0,
+      user: {
+        id: post.user.id,
+        name: post.user.display_name || post.user.username || 'Anonymous',
+        username: post.user.username || undefined,
+        avatar: post.user.profile_photo_url || '/placeholder.svg',
+        verified: false
+      },
+      // Add the full media array for multiple media navigation
+      media: post.post_media.map(media => ({
+        id: media.id,
+        media_type: media.media_type,
+        media_url: media.media_url
+      }))
+    }));
+
+  console.log('ActivityFeed - Debug info:', {
+    totalPosts: posts.length,
+    filteredPosts: filteredPosts.length,
+    exploreContent: exploreContent.length,
+    firstPost: posts[0],
+    firstExploreItem: exploreContent[0]
+  });
 
   const handleLike = useCallback((contentId: string) => {
     console.log('Like:', contentId);
