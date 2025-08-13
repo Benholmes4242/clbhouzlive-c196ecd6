@@ -8,7 +8,6 @@ export const filterCoursesByRegion = (
 ): GolfCourse[] => {
   if (!courses) return [];
   
-  console.log('Admin Filter - Starting with:', courses.length, 'total courses');
   let filtered = courses;
 
   // Filter by Top 100 Lists first (this is the main new filter)
@@ -64,24 +63,6 @@ export const filterCoursesByRegion = (
 
   // Filter by search term
   if (searchTerm) {
-    console.log('Admin Search - Before filtering:', filtered.length, 'courses');
-    console.log('Admin Search - Search term:', searchTerm);
-    
-    // Debug: Show all courses with specific terms when searching
-    if (searchTerm.toLowerCase() === 'royal') {
-      const royalCourses = filtered.filter(course => 
-        course.name.toLowerCase().includes('royal')
-      );
-      console.log('ALL courses with "royal" in name:', royalCourses.map(c => c.name));
-    }
-    
-    if (searchTerm.toLowerCase() === 'county') {
-      const countyCourses = filtered.filter(course => 
-        course.name.toLowerCase().includes('county')
-      );
-      console.log('ALL courses with "county" in name:', countyCourses.map(c => c.name));
-    }
-    
     filtered = filtered.filter(course => {
       const nameMatch = course.name.toLowerCase().includes(searchTerm.toLowerCase());
       const countryMatch = course.country.toLowerCase().includes(searchTerm.toLowerCase());
@@ -90,8 +71,6 @@ export const filterCoursesByRegion = (
       
       return nameMatch || countryMatch || subCountryMatch || regionMatch;
     });
-    
-    console.log('Admin Search - After filtering:', filtered.length, 'courses');
   }
 
   // Apply sorting based on selected sort option
