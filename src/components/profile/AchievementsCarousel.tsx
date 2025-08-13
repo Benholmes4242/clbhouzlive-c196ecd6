@@ -114,44 +114,46 @@ const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({
 
   return (
     <>
-      <div className="w-full mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <Trophy className="h-5 w-5 text-foreground" />
-            <h3 className="text-xl font-semibold text-foreground">Achievements</h3>
+      <div className="w-full mb-6 md:mb-8">
+        {/* Desktop: max-width container with centered content */}
+        <div className="md:max-w-[1150px] md:mx-auto md:px-0 px-4">
+          <div className="flex items-center justify-between mb-4 md:mb-6 md:py-6 md:pt-8">
+            <div className="flex items-center gap-2">
+              <Trophy className="h-5 w-5 text-foreground" />
+              <h3 className="text-xl font-semibold text-foreground">Achievements</h3>
+            </div>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setAchievementsModalOpen(true)}
+              className="text-black hover:text-black/80"
+            >
+              See All
+            </Button>
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setAchievementsModalOpen(true)}
-            className="text-black hover:text-black/80"
-          >
-            See All
-          </Button>
-        </div>
 
-        <div className="relative">
-          {/* Left fade gradient */}
-          {canScrollLeft && (
-            <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
-          )}
-          
-          {/* Right fade gradient */}
-          {canScrollRight && (
-            <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
-          )}
-          
-          {/* Achievements container */}
-          <div 
-            ref={containerRef}
-            className="flex gap-4 overflow-x-auto scrollbar-hide pb-2"
-            style={{
-              scrollbarWidth: 'none',
-              msOverflowStyle: 'none',
-              WebkitOverflowScrolling: 'touch'
-            }}
-          >
-            {displayAchievements.slice(0, 6).map((achievement, index) => (
+          <div className="relative">
+            {/* Left fade gradient */}
+            {canScrollLeft && (
+              <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
+            )}
+            
+            {/* Right fade gradient */}
+            {canScrollRight && (
+              <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
+            )}
+            
+            {/* Achievements container */}
+            <div 
+              ref={containerRef}
+              className="flex gap-4 overflow-x-auto scrollbar-hide pb-2 md:justify-center"
+              style={{
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none',
+                WebkitOverflowScrolling: 'touch'
+              }}
+            >
+              {displayAchievements.slice(0, 6).map((achievement, index) => (
               <TooltipProvider key={achievement.id}>
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -208,7 +210,8 @@ const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({
                   </TooltipContent>
                 </Tooltip>
               </TooltipProvider>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </div>

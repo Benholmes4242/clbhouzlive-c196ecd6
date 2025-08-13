@@ -53,53 +53,62 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
       {/* Sticky Tab Bar */}
       <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm border-b border-border">
         <div className="relative">
-          {/* Left fade gradient */}
-          {canScrollLeft && (
-            <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background/95 to-transparent z-10 pointer-events-none" />
-          )}
-          
-          {/* Right fade gradient */}
-          {canScrollRight && (
-            <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background/95 to-transparent z-10 pointer-events-none" />
-          )}
-          
-          <div 
-            ref={tabsRef}
-            className="flex overflow-x-auto scrollbar-hide px-4 md:px-8"
-            style={{
-              scrollbarWidth: 'none',
-              msOverflowStyle: 'none',
-              WebkitOverflowScrolling: 'touch'
-            }}
-          >
-            {tabs.map((tab) => {
-              const IconComponent = tab.icon;
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => onTabChange(tab.id)}
-                  className={`flex-shrink-0 flex items-center gap-2 px-4 py-4 border-b-2 transition-all duration-200 ${
-                    isActive 
-                      ? 'border-black text-black font-bold' 
-                      : 'border-transparent text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  <IconComponent className="h-4 w-4" />
-                  <span className="whitespace-nowrap font-medium">{tab.label}</span>
-                </button>
-              );
-            })}
+          {/* Desktop: max-width container matching achievements */}
+          <div className="md:max-w-[1150px] md:mx-auto">
+            {/* Left fade gradient */}
+            {canScrollLeft && (
+              <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background/95 to-transparent z-10 pointer-events-none md:hidden" />
+            )}
+            
+            {/* Right fade gradient */}
+            {canScrollRight && (
+              <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background/95 to-transparent z-10 pointer-events-none md:hidden" />
+            )}
+            
+            <div 
+              ref={tabsRef}
+              className="flex overflow-x-auto scrollbar-hide px-4 md:px-0 md:justify-center md:gap-8"
+              style={{
+                scrollbarWidth: 'none',
+                msOverflowStyle: 'none',
+                WebkitOverflowScrolling: 'touch'
+              }}
+            >
+              {tabs.map((tab) => {
+                const IconComponent = tab.icon;
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => onTabChange(tab.id)}
+                    className={`flex-shrink-0 flex items-center gap-2 px-4 py-4 transition-all duration-200 text-base relative ${
+                      isActive 
+                        ? 'text-black font-bold' 
+                        : 'text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    <IconComponent className="h-4 w-4" />
+                    <span className="whitespace-nowrap font-medium">{tab.label}</span>
+                    {/* Desktop: underline only under text */}
+                    {isActive && (
+                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-black md:left-1/2 md:right-1/2 md:transform md:-translate-x-1/2 md:w-[calc(100%-2rem)]" />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>
 
       {/* Tab Content */}
-      <div className="px-4 md:px-8 py-6">
-        {activeTab === 'activity' && children.activity}
-        {activeTab === 'courses' && children.courses}
-        {activeTab === 'stats' && children.stats}
-        {activeTab === 'gear' && <div className="text-center py-8 text-muted-foreground">Gear & Bag coming soon...</div>}
+      <div className="px-4 md:px-0 py-6 md:py-8">
+        <div className="md:max-w-[1150px] md:mx-auto">
+          {activeTab === 'activity' && children.activity}
+          {activeTab === 'courses' && children.courses}
+          {activeTab === 'stats' && children.stats}
+          {activeTab === 'gear' && <div className="text-center py-8 text-muted-foreground">Gear & Bag coming soon...</div>}
+        </div>
       </div>
     </div>
 
