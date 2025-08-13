@@ -20,23 +20,21 @@ interface Achievement {
 }
 
 interface AchievementsCarouselProps {
-  achievements?: Achievement[];
+  achievements: Achievement[];
   userId: string;
   userDisplayName?: string;
   userHandicap?: number;
   userProfilePhotoUrl?: string;
-  isCurrentUser?: boolean;
-  isOwnProfile?: boolean;
+  isCurrentUser: boolean;
 }
 
 const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({
-  achievements = [],
+  achievements,
   userId,
   userDisplayName,
   userHandicap,
   userProfilePhotoUrl,
-  isCurrentUser,
-  isOwnProfile = false
+  isCurrentUser
 }) => {
   const isMobile = useIsMobile();
   const isDesktop = useIsDesktop();

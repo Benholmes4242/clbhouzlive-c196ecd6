@@ -33,7 +33,7 @@ import { useCloudflareStream } from '@/hooks/useCloudflareStream';
 import { useR2Upload } from '@/hooks/useR2Upload';
 import PinnedAchievements from './PinnedAchievements';
 import ProfileStatsBar from './ProfileStatsBar';
-
+import AchievementsCarousel from './AchievementsCarousel';
 import ProfileTabs from './ProfileTabs';
 
 interface Course {
@@ -547,12 +547,28 @@ const HeroProfileHeader = ({
         </div>
       </div>
 
-      {/* Profile Tabs - All Content Below */}
+      {/* Achievements Carousel Section */}
+      <div className="relative w-full">
+        <AchievementsCarousel
+          achievements={achievements.map(a => ({
+            id: a.id || `achievement-${Math.random()}`,
+            name: a.type || 'Achievement',
+            xp: 100,
+            unlocked: true,
+            description: a.message || 'Achievement unlocked!'
+          }))}
+          userId={profile?.id || ''}
+          userDisplayName={profile?.display_name}
+          userHandicap={profile?.eg_handicap_index}
+          userProfilePhotoUrl={profile?.profile_photo_url}
+          isCurrentUser={isOwnProfile}
+        />
+      </div>
+
+      {/* Tab Navigation and Content */}
       <ProfileTabs
         activeTab={activeSection}
-        onTabChange={onSectionChange || (() => {})}
-        userId={profile?.id}
-        isOwnProfile={isOwnProfile}
+        onTabChange={onSectionChange}
       >
         {{
           activity: (
@@ -565,11 +581,14 @@ const HeroProfileHeader = ({
             />
           ),
           courses: (
-            <UserCoursesContent 
-              username={profile?.username || ''}
-              isOwnProfile={isOwnProfile}
-              displayName={profile?.display_name || 'User'}
-            />
+            <>
+              <LatestHighlights userId={profile?.id || ''} isOwnProfile={isOwnProfile} />
+              <UserCoursesContent 
+                username={profile?.username || ''}
+                isOwnProfile={isOwnProfile}
+                displayName={profile?.display_name || 'User'}
+              />
+            </>
           ),
           stats: (
             <HandicapSection 
