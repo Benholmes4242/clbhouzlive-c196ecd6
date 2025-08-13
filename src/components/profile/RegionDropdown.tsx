@@ -14,6 +14,7 @@ interface RegionDropdownProps {
 
 const RegionDropdown: React.FC<RegionDropdownProps> = ({ selectedRegion, onRegionChange }) => {
   const regions = [
+    { value: 'all', label: 'All Courses' },
     { value: 'global', label: 'Global Top 100' },
     { value: 'britain-ireland', label: 'Britain & Ireland Top 100' },
     { value: 'usa', label: 'USA Top 100' },
