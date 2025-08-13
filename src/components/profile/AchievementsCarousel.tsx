@@ -159,7 +159,7 @@ const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({
             >
               {/* Mobile: show 5, Desktop: show 5 */}
               {displayAchievements.slice(0, 5).map((achievement, index) => (
-                <div key={achievement.id} className="flex-shrink-0 text-center cursor-pointer w-20 md:w-36">
+                <div key={achievement.id} className="flex-shrink-0 flex flex-col items-center cursor-pointer w-20 md:w-36">
                   <div 
                     className={`w-20 h-20 md:w-32 md:h-32 transition-all duration-300 hover:scale-105 overflow-hidden ${
                       !achievement.unlocked ? 'grayscale opacity-60' : ''
@@ -171,7 +171,7 @@ const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({
                   >
                     {getAchievementBadge(achievement)}
                   </div>
-                  <div className="w-20 md:w-36 text-xs text-muted-foreground font-medium mt-1 overflow-hidden line-clamp-1 md:line-clamp-none text-center mx-auto">
+                  <div className="text-xs text-muted-foreground font-medium mt-1 overflow-hidden line-clamp-1 md:line-clamp-none text-center">
                     {achievement.name}
                   </div>
                 </div>
