@@ -36,7 +36,7 @@ const UniversalProfileTabs: React.FC<UniversalProfileTabsProps> = ({
           {showIndividualTabs && (
             <>
               <TabsTrigger value="handicap" className="text-sm font-medium">
-                Handicap & Rounds
+                Handicap
               </TabsTrigger>
               <TabsTrigger value="top100" className="text-sm font-medium">
                 Top 100
