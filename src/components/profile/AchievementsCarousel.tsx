@@ -137,32 +137,15 @@ const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({
             </Button>
           </div>
 
-          <div className="relative">
-            {/* Left fade gradient */}
-            {canScrollLeft && (
-              <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
-            )}
-            
-            {/* Right fade gradient */}
-            {canScrollRight && (
-              <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
-            )}
-            
-            {/* Achievements container */}
-            <div 
-              ref={containerRef}
-              className="flex gap-3 md:gap-4 overflow-x-auto scrollbar-hide pb-2 md:justify-center px-4 md:px-0"
-              style={{
-                scrollbarWidth: 'none',
-                msOverflowStyle: 'none',
-                WebkitOverflowScrolling: 'touch'
-              }}
-            >
-              {/* Mobile: show 5, Desktop: show 5 */}
-              {displayAchievements.slice(0, 5).map((achievement, index) => (
-                <div key={achievement.id} className="flex-shrink-0 flex flex-col items-center cursor-pointer w-28 md:w-36">
+          {/* Static Grid Layout - No carousel */}
+          <div className="px-4 md:px-0">
+            {/* Desktop: 4x2 grid (8 achievements), Mobile: 3x2 grid (6 achievements) */}
+            <div className="grid grid-cols-3 md:grid-cols-4 gap-3 md:gap-4">
+              {/* Show first 6 achievements on mobile, 8 on desktop */}
+              {displayAchievements.slice(0, isMobile ? 6 : 8).map((achievement, index) => (
+                <div key={achievement.id} className="flex flex-col items-center cursor-pointer">
                   <div 
-                    className={`w-28 h-28 md:w-32 md:h-32 transition-all duration-300 hover:scale-105 overflow-hidden ${
+                    className={`w-20 h-20 md:w-24 md:h-24 transition-all duration-300 hover:scale-105 overflow-hidden ${
                       !achievement.unlocked ? 'grayscale opacity-60' : ''
                     }`}
                     onClick={() => {
@@ -172,7 +155,7 @@ const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({
                   >
                     {getAchievementBadge(achievement)}
                   </div>
-                  <div className="text-xs text-muted-foreground font-medium mt-1 overflow-hidden line-clamp-1 md:line-clamp-none text-center">
+                  <div className="text-xs text-muted-foreground font-medium mt-1 text-center line-clamp-2 leading-tight">
                     {achievement.name}
                   </div>
                 </div>

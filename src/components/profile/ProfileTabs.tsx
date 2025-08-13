@@ -37,8 +37,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
   const tabs = [
     { id: 'activity', label: 'Activity', icon: Camera },
     { id: 'courses', label: 'Courses Played', icon: MapPin },
-    { id: 'stats', label: 'Handicap & Rounds', icon: BarChart3 },
-    { id: 'gear', label: 'Gear & Bag', icon: User }
+    { id: 'stats', label: 'Handicap & Rounds', icon: BarChart3 }
   ];
 
   const updateScrollState = () => {
@@ -79,12 +78,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
             
             <div 
               ref={tabsRef}
-              className="flex overflow-x-auto scrollbar-hide px-4 md:px-0 md:justify-center md:gap-8"
-              style={{
-                scrollbarWidth: 'none',
-                msOverflowStyle: 'none',
-                WebkitOverflowScrolling: 'touch'
-              }}
+              className="flex md:justify-center md:gap-8 px-4 md:px-0"
             >
               {tabs.map((tab) => {
                 const IconComponent = tab.icon;
@@ -119,7 +113,6 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
           {activeTab === 'activity' && children.activity}
           {activeTab === 'courses' && children.courses}
           {activeTab === 'stats' && children.stats}
-          {activeTab === 'gear' && <div className="text-center py-8 text-muted-foreground">Gear & Bag coming soon...</div>}
         </div>
       </div>
     </div>
