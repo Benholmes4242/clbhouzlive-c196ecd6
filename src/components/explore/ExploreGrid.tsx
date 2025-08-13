@@ -629,7 +629,7 @@ const ExploreGrid: React.FC<ExploreGridProps> = ({
   return (
     <>
       {/* Instagram-style Grid Layout with Featured Cards */}
-      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-0 md:gap-1 auto-rows-fr">
+      <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-0 md:gap-1 auto-rows-fr -mx-0 md:mx-0">
         {gridItems.map((gridItem) => (
           gridItem.type === 'featured' ? (
             <div key={gridItem.key} className="col-span-2 row-span-2 aspect-square">
