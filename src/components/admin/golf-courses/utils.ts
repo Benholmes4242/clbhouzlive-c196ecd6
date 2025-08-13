@@ -8,6 +8,7 @@ export const filterCoursesByRegion = (
 ): GolfCourse[] => {
   if (!courses) return [];
   
+  console.log('Admin Filter - Starting with:', courses.length, 'total courses');
   let filtered = courses;
 
   // Filter by Top 100 Lists first (this is the main new filter)
