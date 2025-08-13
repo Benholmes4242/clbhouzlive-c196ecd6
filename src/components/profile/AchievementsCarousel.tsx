@@ -53,7 +53,10 @@ const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({
     { id: '2', name: '50 Club', xp: 300, unlocked: true, description: 'Reach the milestone of 50 courses played. You\'re getting serious!', progress: '50 / 50 courses', isRepeatable: false },
     { id: '3', name: 'Eagle Collector', xp: 250, unlocked: false, description: 'Accumulate 5 total eagles throughout your golf journey.', unlockHint: 'Look for eagle opportunities on par 5s and short par 4s. Aggressive play when the situation is right.', progress: '2 / 5 eagles', isRepeatable: false },
     { id: '4', name: '100 Century Club', xp: 500, unlocked: false, description: 'Join the exclusive 100 courses club. True dedication to the game!', unlockHint: '22 more courses to unlock', progress: '78 / 100 courses', isRepeatable: false },
-    { id: '5', name: 'Birdie Blitz', xp: 75, unlocked: false, description: 'Master the art of consistent birdie scoring. Show your precision!', unlockHint: '5 more birdies to unlock', progress: '12 / 15 birdies', isRepeatable: false }
+    { id: '5', name: 'Birdie Blitz', xp: 75, unlocked: false, description: 'Master the art of consistent birdie scoring. Show your precision!', unlockHint: '5 more birdies to unlock', progress: '12 / 15 birdies', isRepeatable: false },
+    { id: '6', name: 'Hole-in-One', xp: 400, unlocked: false, description: 'Achieve the ultimate golf moment - a hole-in-one!', unlockHint: 'Keep playing and one day it will happen', progress: '0 / 1 hole-in-one', isRepeatable: false },
+    { id: '7', name: 'Lynx Legend', xp: 350, unlocked: false, description: 'Master the links courses of Britain & Ireland.', unlockHint: 'Play more courses in Britain & Ireland', progress: '8 / 20 courses', isRepeatable: false },
+    { id: '8', name: 'Stars and Stripes Tourer', xp: 350, unlocked: false, description: 'Conquer the golf courses across the United States.', unlockHint: 'Play more courses in the USA', progress: '5 / 15 courses', isRepeatable: false }
   ];
 
   // Use sample achievements if no achievements provided, or merge with provided ones
