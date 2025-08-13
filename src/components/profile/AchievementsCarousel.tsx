@@ -110,17 +110,9 @@ const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({
       case "Hole-in-One":
         return <img src="/lovable-uploads/68aa3b6e-7c54-41e7-80f6-75b4bf6e8b63.png" alt="Hole-in-One Badge" className="w-full h-full object-cover" />;
       case "Par Machine":
-        return (
-          <div className="w-full h-full flex items-center justify-center rounded-lg bg-gradient-to-br from-green-400 to-green-600 text-white">
-            <Trophy className="w-8 h-8" />
-          </div>
-        );
+        return <img src="/lovable-uploads/51973f3e-599d-4110-bcf6-8eac43b963f8.png" alt="Par Machine Badge" className="w-full h-full object-cover" />;
       case "Globetrotter Golfer":
-        return (
-          <div className="w-full h-full flex items-center justify-center rounded-lg bg-gradient-to-br from-blue-400 to-purple-600 text-white">
-            <Trophy className="w-8 h-8" />
-          </div>
-        );
+        return <img src="/lovable-uploads/684002ed-a5a9-46e9-a1fc-384da5a7c686.png" alt="Globetrotter Golfer Badge" className="w-full h-full object-cover" />;
       default:
         // For locked or unknown achievements, use a placeholder
         return (
