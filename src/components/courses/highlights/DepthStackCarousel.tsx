@@ -214,8 +214,8 @@ const VideoCard: React.FC<{
       {/* Dark overlay for text readability */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/30" />
       
-      {/* My Highlights Badge - Top Right */}
-      <div className="absolute top-3 right-3 z-10">
+      {/* My Highlights Badge - Top Left */}
+      <div className="absolute top-3 left-3 z-10">
         <div className="bg-white/10 backdrop-blur-2xl border border-white/20 rounded-full px-3 py-1.5 shadow-lg">
           <span className="text-white text-sm font-medium">
             {isOwnProfile ? "My Highlights" : `${userFirstName}'s Highlights`}
