@@ -117,7 +117,7 @@ const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({
 
   return (
     <>
-      <div className="w-full mb-6 md:mb-8">
+      <div className="w-full mb-6 md:mb-8 py-6 md:py-0">
         {/* Desktop: max-width container with centered content */}
         <div className="md:max-w-[1150px] md:mx-auto md:px-0 px-4">
           <div className="flex items-center justify-between mb-4 md:mb-6 md:py-6 md:pt-8">
@@ -156,8 +156,8 @@ const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({
                 WebkitOverflowScrolling: 'touch'
               }}
             >
-              {/* Mobile: show 4, Desktop: show 5 */}
-              {displayAchievements.slice(0, isDesktop ? 5 : 4).map((achievement, index) => (
+              {/* Mobile: show 5, Desktop: show 5 */}
+              {displayAchievements.slice(0, 5).map((achievement, index) => (
               <TooltipProvider key={achievement.id}>
                 <Tooltip>
                   <TooltipTrigger asChild>
