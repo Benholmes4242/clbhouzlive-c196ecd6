@@ -17,9 +17,10 @@ interface VideoHighlight {
 
 interface Top100VideoHighlightsProps {
   userId?: string;
+  badgeText?: string;
 }
 
-const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId }) => {
+const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId, badgeText = 'My Highlights' }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isMuted, setIsMuted] = useState(true);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
@@ -203,10 +204,7 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId })
 
   return (
     <div className="space-y-4">
-      <div>
-        <h3 className="font-bold text-lg text-foreground">Highlights & Achievements</h3>
-        <p className="text-muted-foreground text-sm">Recent videos from Top 100 courses</p>
-      </div>
+      {/* Removed title section as it's now handled by parent component */}
       
       {videoHighlights.length > 0 ? (
         <div className="space-y-6">
@@ -247,6 +245,15 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId })
                   onClick={() => setCurrentIndex(index)}
                 >
                   <div className="relative w-full h-full bg-black rounded-lg overflow-hidden shadow-2xl">
+                    {/* Badge in top left corner */}
+                    <div className="absolute top-3 left-3 z-10">
+                      <div 
+                        className="bg-white/10 backdrop-blur-2xl border border-white/20 px-3 py-1.5 text-black shadow-lg rounded-full"
+                        style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
+                      >
+                        <span className="text-xs font-medium">{badgeText}</span>
+                      </div>
+                    </div>
                     <video
                       ref={(el) => {
                         if (el) videoRefs.current[index] = el;

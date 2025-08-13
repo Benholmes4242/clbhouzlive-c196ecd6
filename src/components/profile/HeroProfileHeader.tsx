@@ -588,7 +588,11 @@ const HeroProfileHeader = ({
                 />
               ) : (
                 /* Moving away from courses, so courses journey is sliding out */
-                <CoursesJourney />
+                <CoursesJourney 
+                  userId={profile?.id}
+                  userDisplayName={profile?.display_name || 'User'}
+                  isOwnProfile={isOwnProfile}
+                />
               )}
             </div>
             
@@ -596,7 +600,11 @@ const HeroProfileHeader = ({
             <div className={`relative w-full ${getHeroTransitionClass(false)}`}>
               {transitionDirection === 'right' ? (
                 /* Moving to courses, so courses journey is sliding in */
-                <CoursesJourney />
+                <CoursesJourney 
+                  userId={profile?.id}
+                  userDisplayName={profile?.display_name || 'User'}
+                  isOwnProfile={isOwnProfile}
+                />
               ) : (
                 /* Moving away from courses, so achievements are sliding in */
                 <AchievementsCarousel
@@ -620,7 +628,11 @@ const HeroProfileHeader = ({
           /* Normal state - only show active section */
           <>
             {activeSection === 'courses' ? (
-              <CoursesJourney />
+              <CoursesJourney 
+                userId={profile?.id}
+                userDisplayName={profile?.display_name || 'User'}
+                isOwnProfile={isOwnProfile}
+              />
             ) : (
               <AchievementsCarousel
                 achievements={achievements.map(a => ({
