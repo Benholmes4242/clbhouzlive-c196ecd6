@@ -106,7 +106,7 @@ const HeroProfileHeader = ({
   const tabs = [
     { id: 'activity', label: 'Activity' },
     { id: 'courses', label: 'Courses Played' },
-    { id: 'stats', label: 'Handicap & Rounds' },
+    { id: 'stats', label: 'Handicap' },
     { id: 'gear', label: 'Gear & Bag' }
   ];
 

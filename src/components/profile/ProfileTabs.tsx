@@ -37,7 +37,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
   const tabs = [
     { id: 'activity', label: 'Activity', icon: Camera },
     { id: 'courses', label: 'Courses Played', icon: MapPin },
-    { id: 'stats', label: 'Handicap & Rounds', icon: BarChart3 }
+    { id: 'stats', label: 'Handicap', icon: BarChart3 }
   ];
 
   const updateScrollState = () => {
@@ -78,7 +78,8 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
             
             <div 
               ref={tabsRef}
-              className="flex md:justify-center md:gap-8 px-4 md:px-0"
+              className="flex md:justify-center md:gap-8 px-4 md:px-0 overflow-x-auto scrollbar-hide"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
               {tabs.map((tab) => {
                 const IconComponent = tab.icon;
@@ -88,16 +89,16 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
                     key={tab.id}
                     onClick={() => onTabChange(tab.id)}
                     disabled={transitionState !== 'idle'}
-                    className={`flex-shrink-0 flex items-center px-4 py-4 transition-all duration-200 text-base relative ${
+                    className={`flex-shrink-0 flex items-center px-3 py-4 transition-all duration-200 text-base relative ${
                       isActive 
                         ? 'text-black' 
                         : 'text-muted-foreground hover:text-foreground'
                     } ${transitionState !== 'idle' ? 'pointer-events-none' : ''}`}
                   >
-                    <span className="whitespace-nowrap text-xl md:text-2xl">{tab.label}</span>
+                    <span className="whitespace-nowrap text-lg md:text-2xl">{tab.label}</span>
                     {/* Underline only under text label */}
                     {isActive && (
-                      <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-black" style={{ width: 'calc(100% - 2rem)' }} />
+                      <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-black" style={{ width: 'calc(100% - 1.5rem)' }} />
                     )}
                   </button>
                 );
