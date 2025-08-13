@@ -171,7 +171,7 @@ const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({
                   >
                     {getAchievementBadge(achievement)}
                   </div>
-                  <div className="text-xs text-muted-foreground font-medium mt-1 overflow-hidden line-clamp-1 md:line-clamp-none text-center">
+                  <div className="w-20 md:w-36 text-xs text-muted-foreground font-medium mt-1 overflow-hidden line-clamp-1 md:line-clamp-none text-center mx-auto">
                     {achievement.name}
                   </div>
                 </div>
