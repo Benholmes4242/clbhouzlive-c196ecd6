@@ -74,14 +74,6 @@ const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
       <DialogContent className="max-w-sm mx-auto p-0 overflow-hidden bg-background border shadow-lg">
         {/* Header */}
         <DialogHeader className="relative bg-gradient-to-b from-background to-muted p-6 pb-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onClose}
-            className="absolute right-4 top-4 h-8 w-8 rounded-full bg-background/80 hover:bg-background"
-          >
-            <X className="h-4 w-4" />
-          </Button>
           <DialogTitle className="text-center text-lg font-semibold text-foreground pt-2">
             {achievement.name}
           </DialogTitle>
