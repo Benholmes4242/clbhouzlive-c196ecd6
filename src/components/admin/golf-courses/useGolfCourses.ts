@@ -11,7 +11,8 @@ export const useGolfCourses = () => {
       const { data, error } = await supabase
         .from('golf_courses')
         .select('*')
-        .order('name', { ascending: true });
+        .order('name', { ascending: true })
+        .limit(10000); // Set high limit to get all courses
 
       console.log('Admin: Loaded', data?.length, 'courses');
       if (data?.length) {
