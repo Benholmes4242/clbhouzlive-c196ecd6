@@ -19,7 +19,8 @@ const GolfCoursesManagement = () => {
   const [regionalFilter, setRegionalFilter] = useState<RegionalFilter>({
     region: 'all',
     subCountry: null,
-    county: null
+    county: null,
+    top100List: 'all'
   });
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCourse, setSelectedCourse] = useState<GolfCourse | null>(null);

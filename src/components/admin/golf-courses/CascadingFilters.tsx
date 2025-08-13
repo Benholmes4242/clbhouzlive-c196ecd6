@@ -11,7 +11,9 @@ import {
   britainIrelandCounties,
   usStates,
   continentalEuropeCountries,
-  worldwideCountries
+  worldwideCountries,
+  top100ListMapping,
+  Top100ListKey
 } from './types';
 
 interface CascadingFiltersProps {
@@ -58,7 +60,8 @@ const CascadingFilters: React.FC<CascadingFiltersProps> = ({
       onRegionalFilterChange({
         region: 'all',
         subCountry: null,
-        county: null
+        county: null,
+        top100List: regionalFilter.top100List
       });
     } else {
       onRegionalFilterChange({
@@ -92,7 +95,8 @@ const CascadingFilters: React.FC<CascadingFiltersProps> = ({
     onRegionalFilterChange({
       region: value,
       subCountry: null,
-      county: null
+      county: null,
+      top100List: regionalFilter.top100List
     });
   };
 
@@ -111,15 +115,23 @@ const CascadingFilters: React.FC<CascadingFiltersProps> = ({
     });
   };
 
+  const handleTop100ListChange = (value: Top100ListKey) => {
+    onRegionalFilterChange({
+      ...regionalFilter,
+      top100List: value
+    });
+  };
+
   const clearFilters = () => {
     onRegionalFilterChange({
       region: 'all',
       subCountry: null,
-      county: null
+      county: null,
+      top100List: 'all'
     });
   };
 
-  const hasActiveFilters = regionalFilter.region !== 'all' || regionalFilter.subCountry || regionalFilter.county;
+  const hasActiveFilters = regionalFilter.region !== 'all' || regionalFilter.subCountry || regionalFilter.county || (regionalFilter.top100List && regionalFilter.top100List !== 'all');
 
   return (
     <div className="space-y-4">
@@ -138,6 +150,23 @@ const CascadingFilters: React.FC<CascadingFiltersProps> = ({
 
       {/* Cascading Dropdowns */}
       <div className="flex flex-col sm:flex-row gap-4">
+        {/* Top 100 Lists Filter */}
+        <Select 
+          value={regionalFilter.top100List || 'all'} 
+          onValueChange={handleTop100ListChange}
+        >
+          <SelectTrigger className="w-full sm:w-56 focus:ring-[#b66b41] focus:border-[#b66b41] bg-background border-border">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent className="bg-popover border-border z-50">
+            {Object.entries(top100ListMapping).map(([value, label]) => (
+              <SelectItem key={value} value={value} className="hover:bg-accent">
+                {label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
         {/* Primary Region Selector */}
         <Select value={regionalFilter.region} onValueChange={handleRegionChange}>
           <SelectTrigger className="w-full sm:w-48 focus:ring-[#b66b41] focus:border-[#b66b41] bg-background border-border">
@@ -212,6 +241,11 @@ const CascadingFilters: React.FC<CascadingFiltersProps> = ({
       {hasActiveFilters && (
         <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
           <span>Active filters:</span>
+          {regionalFilter.top100List && regionalFilter.top100List !== 'all' && (
+            <span className="bg-secondary px-2 py-1 rounded text-secondary-foreground">
+              {top100ListMapping[regionalFilter.top100List]}
+            </span>
+          )}
           {regionalFilter.region !== 'all' && (
             <span className="bg-secondary px-2 py-1 rounded text-secondary-foreground">
               {regionMapping[regionalFilter.region]}

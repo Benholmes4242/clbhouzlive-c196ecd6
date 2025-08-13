@@ -10,6 +10,24 @@ export const filterCoursesByRegion = (
   
   let filtered = courses;
 
+  // Filter by Top 100 Lists first (this is the main new filter)
+  if (regionalFilter.top100List && regionalFilter.top100List !== 'all') {
+    filtered = filtered.filter(course => {
+      switch (regionalFilter.top100List) {
+        case 'worldwide':
+          return course.global_rank !== null && course.global_rank <= 100;
+        case 'usa':
+          return course.usa_rank !== null && course.usa_rank <= 100;
+        case 'britain-ireland':
+          return course.regional_rank !== null && course.regional_rank <= 100 && course.country === 'Britain & Ireland';
+        case 'europe':
+          return course.regional_rank !== null && course.regional_rank <= 100 && course.country === 'Continental Europe';
+        default:
+          return true;
+      }
+    });
+  }
+
   // Filter by region
   if (regionalFilter.region !== 'all') {
     filtered = filtered.filter(course => {

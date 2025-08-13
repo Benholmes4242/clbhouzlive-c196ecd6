@@ -50,7 +50,19 @@ export interface RegionalFilter {
   region: RegionKey;
   subCountry: string | null;
   county: string | null;
+  top100List: Top100ListKey | null;
 }
+
+// Top 100 List filter type
+export type Top100ListKey = 'all' | 'worldwide' | 'usa' | 'britain-ireland' | 'europe';
+
+export const top100ListMapping: Record<Top100ListKey, string> = {
+  all: 'All Courses',
+  worldwide: 'Top 100 Worldwide',
+  usa: 'Top 100 USA',
+  'britain-ireland': 'Top 100 Great Britain & Ireland',
+  europe: 'Top 100 Continental Europe'
+};
 
 // Country/Sub-country mapping for Britain & Ireland
 export const britainIrelandCountries = [
