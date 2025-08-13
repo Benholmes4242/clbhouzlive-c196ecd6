@@ -95,16 +95,10 @@ const HeroProfileHeader = ({
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const { uploadVideo, uploading: videoUploading } = useCloudflareStream();
   const { uploadImage, uploading: photoUploading } = useR2Upload();
-  const [pendingTab, setPendingTab] = useState<string | null>(null);
   const isMobile = useIsMobile();
 
   const { transitionState, transitionDirection, startTransition } = useTabSlideTransition({
-    onTransitionComplete: () => {
-      if (pendingTab) {
-        onSectionChange?.(pendingTab);
-        setPendingTab(null);
-      }
-    }
+    duration: 300
   });
 
   const tabs = [
@@ -122,32 +116,30 @@ const HeroProfileHeader = ({
     const newIndex = tabs.findIndex(tab => tab.id === newTab);
     const direction: TransitionDirection = newIndex > currentIndex ? 'right' : 'left';
     
-    setPendingTab(newTab);
-    startTransition(direction);
+    // Start transition and immediately change the tab
+    startTransition(direction, () => {
+      onSectionChange?.(newTab);
+    });
   };
 
   // Get transition classes for hero section (achievements/courses journey)
   const getHeroTransitionClass = () => {
     if (transitionState === 'idle') return '';
     
-    const isMovingToCourses = pendingTab === 'courses';
-    const isMovingFromCourses = activeSection === 'courses' && pendingTab !== 'courses';
+    const isMovingToCourses = activeSection === 'courses';
+    const isMovingFromCourses = activeSection !== 'courses';
     
-    if (transitionState === 'sliding-out') {
-      if (isMovingToCourses) {
-        return 'animate-slide-out-left';
-      } else if (isMovingFromCourses) {
-        return 'animate-slide-out-right';
-      }
-    } else if (transitionState === 'sliding-in') {
-      if (isMovingToCourses) {
-        return isMobile ? 'animate-slide-in-from-right-bounce' : 'animate-slide-in-from-right';
-      } else if (isMovingFromCourses) {
-        return isMobile ? 'animate-slide-in-from-left-bounce' : 'animate-slide-in-from-left';
-      }
+    if (transitionDirection === 'right') {
+      // Moving to courses
+      return isMovingToCourses 
+        ? (isMobile ? 'animate-slide-in-from-right-bounce' : 'animate-slide-in-from-right')
+        : 'animate-slide-out-left';
+    } else {
+      // Moving away from courses
+      return isMovingFromCourses
+        ? (isMobile ? 'animate-slide-in-from-left-bounce' : 'animate-slide-in-from-left')
+        : 'animate-slide-out-right';
     }
-    
-    return '';
   };
   
   // Stats state
@@ -575,11 +567,18 @@ const HeroProfileHeader = ({
       </div>
 
       {/* Hero Section - Achievements or Courses Journey */}
-      <div className={`relative overflow-hidden ${getHeroTransitionClass()}`}>
-        {(activeSection === 'courses' || (transitionState === 'sliding-in' && pendingTab === 'courses')) && (
-          <CoursesJourney className={transitionState === 'sliding-in' && pendingTab === 'courses' ? getHeroTransitionClass() : ''} />
-        )}
-        {(activeSection !== 'courses' || (transitionState === 'sliding-in' && pendingTab !== 'courses')) && (
+      <div className="relative">
+        {/* Courses Journey */}
+        <div className={`${activeSection === 'courses' ? 'block' : 'hidden'} ${
+          transitionState === 'transitioning' && activeSection === 'courses' ? getHeroTransitionClass() : ''
+        }`}>
+          <CoursesJourney />
+        </div>
+        
+        {/* Achievements */}
+        <div className={`${activeSection !== 'courses' ? 'block' : 'hidden'} ${
+          transitionState === 'transitioning' && activeSection !== 'courses' ? getHeroTransitionClass() : ''
+        }`}>
           <AchievementsCarousel
             achievements={achievements.map(a => ({
               id: a.id || `achievement-${Math.random()}`,
@@ -593,9 +592,8 @@ const HeroProfileHeader = ({
             userHandicap={profile?.eg_handicap_index}
             userProfilePhotoUrl={profile?.profile_photo_url}
             isCurrentUser={isOwnProfile}
-            className={transitionState === 'sliding-in' && pendingTab !== 'courses' ? getHeroTransitionClass() : ''}
           />
-        )}
+        </div>
       </div>
 
       {/* Tab Navigation and Content */}
