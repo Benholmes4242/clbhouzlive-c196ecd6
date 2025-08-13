@@ -157,9 +157,9 @@ const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({
               <TooltipProvider key={achievement.id}>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <div className="flex-shrink-0 text-center cursor-pointer w-20">
+                    <div className="flex-shrink-0 text-center cursor-pointer w-20 md:w-36">
                       <div 
-                        className={`w-20 h-20 transition-all duration-300 hover:scale-105 overflow-hidden ${
+                        className={`w-20 h-20 md:w-32 md:h-32 transition-all duration-300 hover:scale-105 overflow-hidden ${
                           !achievement.unlocked ? 'grayscale opacity-60' : ''
                         }`}
                         onClick={() => {

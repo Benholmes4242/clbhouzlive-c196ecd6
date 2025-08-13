@@ -89,9 +89,9 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
                   >
                     <IconComponent className="h-4 w-4" />
                     <span className="whitespace-nowrap font-medium">{tab.label}</span>
-                    {/* Desktop: underline only under text */}
+                    {/* Underline only under text label */}
                     {isActive && (
-                      <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-black md:left-1/2 md:right-1/2 md:transform md:-translate-x-1/2 md:w-[calc(100%-2rem)]" />
+                      <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-black" style={{ width: 'calc(100% - 2rem)' }} />
                     )}
                   </button>
                 );
