@@ -179,17 +179,19 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
             </p>
           </div>
         ) : (
-          <ExploreGrid
-            content={exploreContent}
-            onLike={handleLike}
-            onFollow={handleFollow}
-            onMediaClick={handleMediaClick}
-            isLoading={false}
-            hasMore={false}
-            onLoadMore={handleLoadMore}
-            isDiscoverPage={true}
-            hideBadges={true}
-          />
+          <div className="md:px-0">
+            <ExploreGrid
+              content={exploreContent}
+              onLike={handleLike}
+              onFollow={handleFollow}
+              onMediaClick={handleMediaClick}
+              isLoading={false}
+              hasMore={false}
+              onLoadMore={handleLoadMore}
+              isDiscoverPage={true}
+              hideBadges={true}
+            />
+          </div>
         )}
       </div>
 
