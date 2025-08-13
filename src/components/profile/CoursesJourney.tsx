@@ -119,18 +119,6 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({ className = '' }) => {
             ))}
           </div>
         </div>
-
-        {/* Highlights Navigation */}
-        <div className="flex justify-center mt-6 px-4 md:px-0">
-          <div className="flex border-b border-border">
-            <button className="px-4 py-2 text-sm font-medium text-foreground border-b-2 border-foreground">
-              My Highlights
-            </button>
-            <button className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground">
-              All Highlights
-            </button>
-          </div>
-        </div>
       </div>
     </div>
   );
