@@ -204,10 +204,139 @@ const Top100VideoHighlights: React.FC<Top100VideoHighlightsProps> = ({ userId, b
 
   return (
     <div className="space-y-4">
-      {/* This component is now empty - video highlights section removed */}
-      <div className="text-center py-8">
-        <p className="text-muted-foreground text-sm">Video highlights section removed</p>
-      </div>
+      {/* Removed title section as it's now handled by parent component */}
+      
+      {videoHighlights.length > 0 ? (
+        <div className="space-y-6">
+          {/* Fan Deck Video Container */}
+          <div 
+            {...swipeHandlers}
+            className="relative w-full h-[300px] md:h-[400px] flex items-center justify-center overflow-visible"
+          >
+            {videoHighlights.map((highlight, index) => {
+              // Calculate deck positions (cards lean out from bottom right)
+              const offset = index - currentIndex;
+              const absOffset = Math.abs(offset);
+              
+              // Show cards with a deck effect
+              const isVisible = absOffset <= 2; // Show 2 cards behind
+              
+              // Calculate positioning for deck effect from bottom right
+              const translateX = absOffset * 8; // Small horizontal offset to the right
+              const translateY = -absOffset * 8; // Move up slightly for depth
+              const rotate = absOffset * 3; // Slight rotation for deck effect
+              const scale = 1 - (absOffset * 0.05); // Very subtle scale for depth
+              const zIndex = 10 - absOffset; // Z-index for layering
+              
+              // Only show cards behind the current one (positive offset) and current
+              const shouldShow = offset >= 0 && isVisible;
+              
+              return (
+                <div
+                  key={highlight.id}
+                  className={`absolute w-[280px] h-[280px] md:w-[350px] md:h-[350px] transition-all duration-500 ease-out cursor-pointer ${
+                    shouldShow ? 'pointer-events-auto' : 'pointer-events-none opacity-0'
+                  }`}
+                  style={{
+                    transform: `translateX(${translateX}px) translateY(${translateY}px) rotate(${rotate}deg) scale(${scale})`,
+                    zIndex,
+                    transformOrigin: 'bottom right'
+                  }}
+                  onClick={() => setCurrentIndex(index)}
+                >
+                  <div className="relative w-full h-full bg-black rounded-lg overflow-hidden shadow-2xl">
+                    {/* My Highlights Badge in top left corner */}
+                    <div className="absolute top-3 left-3 z-10">
+                      <div 
+                        className="bg-white/10 backdrop-blur-2xl border border-white/20 px-3 py-1.5 text-black shadow-lg rounded-full"
+                        style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
+                      >
+                        <span className="text-xs font-medium">{badgeText}</span>
+                      </div>
+                    </div>
+                    <video
+                      ref={(el) => {
+                        if (el) videoRefs.current[index] = el;
+                      }}
+                      className="w-full h-full object-cover"
+                      src={highlight.media_url}
+                      muted={isMuted}
+                      loop
+                      playsInline
+                      autoPlay={index === currentIndex} // Only autoplay the front card
+                      poster={getVideoThumbnail(highlight.media_url) || undefined}
+                    />
+                    
+                    {/* Video Info Overlay - Only show on current video */}
+                    {index === currentIndex && (
+                      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-4 md:p-6">
+                        <h4 className="text-white font-semibold text-sm md:text-base line-clamp-2">
+                          {highlight.content}
+                        </h4>
+                        <p className="text-white/90 text-xs md:text-sm mt-1 md:mt-2">
+                          {highlight.course_name} • #{highlight.course_rank}
+                        </p>
+                        <p className="text-white/70 text-xs mt-1">
+                          {highlight.course_location}
+                        </p>
+                      </div>
+                    )}
+                    
+                    {/* Mute Toggle - Only show on current video */}
+                    {index === currentIndex && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleMuteToggle();
+                        }}
+                        className="absolute top-3 right-3 md:top-4 md:right-4 bg-black/50 hover:bg-black/70 text-white p-2 rounded-full transition-colors"
+                      >
+                        {isMuted ? (
+                          <VolumeX className="w-4 h-4 md:w-5 md:h-5" />
+                        ) : (
+                          <Volume2 className="w-4 h-4 md:w-5 md:h-5" />
+                        )}
+                      </button>
+                    )}
+                    
+                    {/* Card overlay for non-current cards to show they're interactive */}
+                    {index !== currentIndex && (
+                      <div className="absolute inset-0 bg-black/20 hover:bg-black/10 transition-colors" />
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          
+          {/* White Pagination Dots */}
+          {videoHighlights.length > 1 && (
+            <div className="flex justify-center space-x-3">
+              {videoHighlights.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentIndex(index)}
+                  className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                    index === currentIndex 
+                      ? 'bg-white scale-110' 
+                      : 'bg-white/50 hover:bg-white/70'
+                  }`}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="text-center py-8">
+          <div className="w-8 h-8 text-muted-foreground/40 mx-auto mb-2 flex items-center justify-center">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+          </div>
+          <p className="text-muted-foreground text-sm">No video highlights yet</p>
+          <p className="text-muted-foreground/60 text-xs">Be the first to share a moment!</p>
+        </div>
+      )}
     </div>
   );
 };
