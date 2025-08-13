@@ -4,6 +4,7 @@ import { Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ClbhouzAchievementsModal from '@/components/achievements/ClbhouzAchievementsModal';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useIsDesktop } from '@/hooks/useIsDesktop';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
@@ -35,6 +36,7 @@ const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({
   isCurrentUser
 }) => {
   const isMobile = useIsMobile();
+  const isDesktop = useIsDesktop();
   const [achievementsModalOpen, setAchievementsModalOpen] = useState(false);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
@@ -47,7 +49,8 @@ const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({
     { id: '1', name: '20 Club', xp: 200, unlocked: true, description: 'Play your first 20 golf courses. Welcome to the clubhouse!' },
     { id: '2', name: '50 Club', xp: 300, unlocked: true, description: 'Reach the milestone of 50 courses played. You\'re getting serious!' },
     { id: '3', name: 'Eagle Collector', xp: 400, unlocked: true, description: 'Collect multiple eagles during your rounds. A true precision player!' },
-    { id: '4', name: '100 Century Club', xp: 500, unlocked: false, description: 'Join the exclusive 100 courses club. True dedication to the game!', unlockHint: '22 more courses to unlock' }
+    { id: '4', name: '100 Century Club', xp: 500, unlocked: false, description: 'Join the exclusive 100 courses club. True dedication to the game!', unlockHint: '22 more courses to unlock' },
+    { id: '5', name: 'Birdie Blitz', xp: 350, unlocked: false, description: 'Master the art of consistent birdie scoring. Show your precision!', unlockHint: '5 more birdies to unlock' }
   ];
 
   // Use sample achievements if no achievements provided, or merge with provided ones
@@ -154,7 +157,7 @@ const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({
               }}
             >
               {/* Mobile: show 4, Desktop: show 5 */}
-              {displayAchievements.slice(0, window.innerWidth >= 1024 ? 5 : 4).map((achievement, index) => (
+              {displayAchievements.slice(0, isDesktop ? 5 : 4).map((achievement, index) => (
               <TooltipProvider key={achievement.id}>
                 <Tooltip>
                   <TooltipTrigger asChild>
