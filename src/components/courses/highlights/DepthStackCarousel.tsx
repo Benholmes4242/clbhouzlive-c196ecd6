@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
-import { ChevronLeft, ChevronRight, Volume2, VolumeX } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Volume2, VolumeX, MapPin } from 'lucide-react';
 import { useCarouselNavigation } from '@/hooks/useCarouselNavigation';
 import { useThumbnailGenerator } from '@/components/posts/video/ThumbnailGenerator';
 import { useVideoAutoplay } from '@/hooks/useVideoAutoplay';
@@ -214,9 +214,10 @@ const VideoCard: React.FC<{
       {/* Dark overlay for text readability */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/30" />
       
-      {/* My Highlights Badge - Top Left */}
-      <div className="absolute top-3 left-3 z-10">
-        <div className="bg-white/10 backdrop-blur-2xl border border-white/20 rounded-full px-3 py-1.5 shadow-lg">
+      {/* My Highlights Badge - Top Right */}
+      <div className="absolute top-3 right-3 z-10">
+        <div className="bg-black/60 backdrop-blur-sm rounded-full px-3 py-1.5 flex items-center gap-1.5 shadow-lg">
+          <MapPin className="h-3 w-3 text-white" />
           <span className="text-white text-xs font-medium">
             {isOwnProfile ? "My Highlights" : `${userFirstName}'s Highlights`}
           </span>
