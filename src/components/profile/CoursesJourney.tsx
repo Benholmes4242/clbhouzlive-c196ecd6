@@ -67,40 +67,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
 
         {/* Course highlights section removed */}
 
-        {/* Controls Section */}
-        <div className="flex items-center justify-between px-4 md:px-0 mt-6 mb-4">
-          <div className="flex items-center gap-3">
-            <span className="text-lg font-semibold text-foreground">Courses Played</span>
-            <RegionDropdown 
-              selectedRegion={selectedRegion}
-              onRegionChange={setSelectedRegion}
-            />
-            <SortViewDropdown 
-              selectedSort={selectedSort}
-              onSortChange={setSelectedSort}
-            />
-          </div>
-          
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setViewType(viewType === 'cards' ? 'list' : 'cards')}
-            className="bg-white/10 backdrop-blur-2xl border border-white/20 text-black hover:bg-white/20 transition-all duration-300"
-            style={{ backdropFilter: 'blur(40px) saturate(180%)', borderRadius: '8px' }}
-          >
-            {viewType === 'cards' ? (
-              <>
-                <List className="w-4 h-4 mr-2" />
-                List View
-              </>
-            ) : (
-              <>
-                <Grid3X3 className="w-4 h-4 mr-2" />
-                Card View
-              </>
-            )}
-          </Button>
-        </div>
+        {/* Controls Section moved - now appears above depth stack carousel */}
 
         {/* Progress Rings Section */}
         <div className="relative">
