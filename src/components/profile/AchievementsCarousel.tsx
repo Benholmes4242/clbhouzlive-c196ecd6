@@ -120,8 +120,8 @@ const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({
     <>
       <div className="w-full mb-6 md:mb-8 py-6 md:py-0">
         {/* Desktop: max-width container with centered content */}
-        <div className="md:max-w-[1150px] md:mx-auto md:px-0 px-4">
-          <div className="flex items-center justify-between mb-4 md:mb-6 md:py-6 md:pt-8">
+        <div className="md:max-w-[1150px] md:mx-auto">
+          <div className="flex items-center justify-between mb-4 md:mb-6 md:py-6 md:pt-8 px-4 md:px-0">
             <div className="flex items-center gap-2">
               <h3 className="text-xl md:text-2xl text-foreground">Achievements</h3>
             </div>
