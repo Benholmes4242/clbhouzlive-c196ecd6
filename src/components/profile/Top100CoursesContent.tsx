@@ -14,6 +14,7 @@ interface Top100CoursesContentProps {
   getUserRating: (courseId: string) => number | null;
   viewType?: 'cards' | 'list';
   sortType?: 'rank-asc' | 'rank-desc' | 'recent';
+  userFirstName?: string;
 }
 
 const Top100CoursesContent: React.FC<Top100CoursesContentProps> = ({
@@ -26,7 +27,8 @@ const Top100CoursesContent: React.FC<Top100CoursesContentProps> = ({
   toggleCourse,
   getUserRating,
   viewType = 'cards',
-  sortType = 'rank-asc'
+  sortType = 'rank-asc',
+  userFirstName
 }) => {
   // Filter and sort courses based on search term and sort preference
   const filteredAndSortedCourses = useMemo(() => {
@@ -110,6 +112,7 @@ const Top100CoursesContent: React.FC<Top100CoursesContentProps> = ({
               onToggle={isOwnProfile ? () => toggleCourse(course.id) : undefined}
               userRating={userRating}
               viewType={viewType}
+              userFirstName={userFirstName}
             />
           );
         })}

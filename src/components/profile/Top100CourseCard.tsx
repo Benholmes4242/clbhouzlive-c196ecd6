@@ -13,6 +13,7 @@ interface Top100CourseCardProps {
   onToggle?: () => void;
   userRating?: number | null;
   viewType?: 'cards' | 'list';
+  userFirstName?: string;
 }
 
 // Helper function to format description text with line breaks
@@ -54,7 +55,8 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
   isOwnProfile = false,
   onToggle,
   userRating,
-  viewType = 'cards'
+  viewType = 'cards',
+  userFirstName
 }) => {
   const [showRatingModal, setShowRatingModal] = useState(false);
   const [wasAlreadyPlayed, setWasAlreadyPlayed] = useState(false);
@@ -118,6 +120,15 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
         >
           {/* Dark overlay for text readability */}
           <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-black/20 z-10" />
+
+          {/* My Highlights Badge */}
+          <div className="absolute top-2 left-2 z-30">
+            <div className="bg-white/10 backdrop-blur-2xl border border-white/20 rounded-full px-3 py-1.5 shadow-lg">
+              <span className="text-black text-xs font-medium">
+                {isOwnProfile ? "My Highlights" : `${userFirstName || "User"}'s Highlights`}
+              </span>
+            </div>
+          </div>
 
           {/* Content overlay */}
           <div className="absolute inset-0 flex items-center justify-between p-4 z-20">
@@ -204,6 +215,15 @@ const Top100CourseCard: React.FC<Top100CourseCardProps> = ({
             alt={course.name}
             className="w-full h-full object-cover"
           />
+
+          {/* My Highlights Badge */}
+          <div className="absolute top-2 left-2 z-30">
+            <div className="bg-white/10 backdrop-blur-2xl border border-white/20 rounded-full px-3 py-1.5 shadow-lg">
+              <span className="text-black text-xs font-medium">
+                {isOwnProfile ? "My Highlights" : `${userFirstName || "User"}'s Highlights`}
+              </span>
+            </div>
+          </div>
 
           {/* Course ranking badges and user rating */}
           <CourseRankBadges
