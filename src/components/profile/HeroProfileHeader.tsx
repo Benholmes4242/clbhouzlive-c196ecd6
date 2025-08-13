@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useUserAchievements } from '@/hooks/useUserAchievements';
 import { Button } from '@/components/ui/button';
-import { MessageSquare, UserPlus, UserMinus, Copy, Share, Users, UserCheck } from 'lucide-react';
+import { MessageSquare, UserPlus, UserMinus, Copy, Share, Users, UserCheck, Camera, MapPin, BarChart3 } from 'lucide-react';
 import { toast } from 'sonner';
 import ProfileTabs from './ProfileTabs';
 import ActivityFeed from './ActivityFeed';
@@ -564,6 +564,34 @@ const HeroProfileHeader = ({
         </div>
       </div>
 
+      {/* Sticky Tab Navigation Bar - Moved to be under stats and above achievements/courses */}
+      <div className="sticky top-16 z-40 bg-background/95 backdrop-blur-sm border-b border-border py-3">
+        <div className="flex justify-center">
+          <div className="flex gap-1 bg-muted p-1 rounded-lg">
+            {[
+              { id: 'activity', label: 'Activity', icon: Camera },
+              { id: 'courses', label: 'Courses', icon: MapPin },
+              { id: 'stats', label: 'Stats', icon: BarChart3 }
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => handleTabChange(tab.id)}
+                className={`
+                  flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200
+                  ${activeSection === tab.id 
+                    ? 'bg-background text-foreground shadow-sm' 
+                    : 'text-muted-foreground hover:text-foreground hover:bg-background/50'
+                  }
+                `}
+              >
+                <tab.icon className="h-4 w-4" />
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* Hero Section - Achievements or Courses Journey */}
       <div className="relative">
         {/* During transition, both sections are visible with absolute positioning */}
@@ -654,49 +682,38 @@ const HeroProfileHeader = ({
         )}
       </div>
 
-      {/* Tab Navigation and Content */}
-      <ProfileTabs
-        activeTab={activeSection}
-        onTabChange={handleTabChange}
-        userId={profile?.id || ''}
-        userDisplayName={profile?.display_name}
-        userHandicap={profile?.eg_handicap_index}
-        userProfilePhotoUrl={profile?.profile_photo_url}
-        isCurrentUser={isOwnProfile}
-        transitionState={transitionState}
-      >
-        {{
-          activity: (
-            <ActivityFeed
-              userId={profile?.id || ''}
+      {/* Content sections handled by ProfileTabs */}
+      <div className="profile-content">
+        {activeSection === 'activity' && (
+          <ActivityFeed
+            userId={profile?.id || ''}
+            isOwnProfile={isOwnProfile}
+            profileDisplayName={profile?.display_name}
+            userHandicap={profile?.eg_handicap_index}
+            userProfilePhotoUrl={profile?.profile_photo_url}
+          />
+        )}
+        {activeSection === 'courses' && (
+          <>
+            <LatestHighlights 
+              userId={profile?.id || ''} 
               isOwnProfile={isOwnProfile}
-              profileDisplayName={profile?.display_name}
-              userHandicap={profile?.eg_handicap_index}
-              userProfilePhotoUrl={profile?.profile_photo_url}
+              userFirstName={profile?.display_name?.split(' ')[0] || profile?.username || 'User'}
             />
-          ),
-          courses: (
-            <>
-              <LatestHighlights 
-                userId={profile?.id || ''} 
-                isOwnProfile={isOwnProfile}
-                userFirstName={profile?.display_name?.split(' ')[0] || profile?.username || 'User'}
-              />
-              <UserCoursesContent 
-                username={profile?.username || ''}
-                isOwnProfile={isOwnProfile}
-                displayName={profile?.display_name || 'User'}
-              />
-            </>
-          ),
-          stats: (
-            <HandicapSection 
-              userId={profile?.id || ''}
-              profile={profile}
+            <UserCoursesContent 
+              username={profile?.username || ''}
+              isOwnProfile={isOwnProfile}
+              displayName={profile?.display_name || 'User'}
             />
-          )
-        }}
-      </ProfileTabs>
+          </>
+        )}
+        {activeSection === 'stats' && (
+          <HandicapSection 
+            userId={profile?.id || ''}
+            profile={profile}
+          />
+        )}
+      </div>
       
       {/* Post Viewer Modal */}
       {currentPost && (
