@@ -81,12 +81,12 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
                   onClick={() => onTabChange(tab.id)}
                   className={`flex-shrink-0 flex items-center gap-2 px-4 py-4 border-b-2 transition-all duration-200 ${
                     isActive 
-                      ? 'border-primary text-primary font-medium' 
+                      ? 'border-black text-black font-bold' 
                       : 'border-transparent text-muted-foreground hover:text-foreground'
                   }`}
                 >
                   <IconComponent className="h-4 w-4" />
-                  <span className="text-sm whitespace-nowrap">{tab.label}</span>
+                  <span className="whitespace-nowrap font-medium">{tab.label}</span>
                 </button>
               );
             })}

@@ -4,6 +4,8 @@ import { Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ClbhouzAchievementsModal from '@/components/achievements/ClbhouzAchievementsModal';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 interface Achievement {
   id: string;
@@ -12,6 +14,7 @@ interface Achievement {
   unlocked: boolean;
   iconURL?: string;
   description?: string;
+  unlockHint?: string;
 }
 
 interface AchievementsCarouselProps {
@@ -36,13 +39,15 @@ const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
+  const [showAchievementModal, setShowAchievementModal] = useState(false);
 
-  // Sample achievements with realistic titles that match the badge system
+  // Sample achievements with unlock hints for locked ones
   const sampleAchievements = [
     { id: '1', name: '20 Club', xp: 200, unlocked: true, description: 'Play your first 20 golf courses. Welcome to the clubhouse!' },
     { id: '2', name: '50 Club', xp: 300, unlocked: true, description: 'Reach the milestone of 50 courses played. You\'re getting serious!' },
     { id: '3', name: 'Eagle Collector', xp: 400, unlocked: true, description: 'Collect multiple eagles during your rounds. A true precision player!' },
-    { id: '4', name: 'Lynx Legend', xp: 500, unlocked: false, description: 'Master the courses of Britain & Ireland.' }
+    { id: '4', name: '100 Century Club', xp: 500, unlocked: false, description: 'Join the exclusive 100 courses club. True dedication to the game!', unlockHint: '22 more courses to unlock' }
   ];
 
   // Use sample achievements if no achievements provided, or merge with provided ones
@@ -119,7 +124,7 @@ const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({
             variant="ghost"
             size="sm"
             onClick={() => setAchievementsModalOpen(true)}
-            className="text-primary hover:text-primary/80"
+            className="text-black hover:text-black/80"
           >
             See All
           </Button>
@@ -147,27 +152,97 @@ const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({
             }}
           >
             {displayAchievements.slice(0, 6).map((achievement, index) => (
-              <div
-                key={achievement.id}
-                className="flex-shrink-0 text-center"
-              >
-                <div 
-                  className={`w-20 h-20 rounded-full mb-2 shadow-lg transition-all duration-300 hover:scale-105 overflow-hidden ${
-                    !achievement.unlocked ? 'grayscale opacity-60' : ''
-                  }`}
-                >
-                  {getAchievementBadge(achievement)}
-                </div>
-                {achievement.unlocked && (
-                  <div className="text-xs text-muted-foreground font-medium">
-                    +{achievement.xp} XP
-                  </div>
-                )}
-              </div>
+              <TooltipProvider key={achievement.id}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="flex-shrink-0 text-center cursor-pointer">
+                      <div 
+                        className={`w-20 h-20 shadow-lg transition-all duration-300 hover:scale-105 overflow-hidden ${
+                          !achievement.unlocked ? 'grayscale opacity-60' : ''
+                        }`}
+                        onClick={() => {
+                          if (isMobile) {
+                            setSelectedAchievement(achievement);
+                            setShowAchievementModal(true);
+                          }
+                        }}
+                      >
+                        {getAchievementBadge(achievement)}
+                      </div>
+                      <div className="text-xs text-muted-foreground font-medium mt-1">
+                        {achievement.unlocked ? (
+                          `+${achievement.xp} XP`
+                        ) : (
+                          achievement.unlockHint || 'Locked'
+                        )}
+                      </div>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent 
+                    side="top" 
+                    className="max-w-80 p-4 bg-background border border-border shadow-lg"
+                  >
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 flex-shrink-0 overflow-hidden">
+                          {getAchievementBadge(achievement)}
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-foreground">{achievement.name}</h4>
+                          <p className="text-sm text-primary">+{achievement.xp} XP</p>
+                        </div>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {achievement.description}
+                      </p>
+                      <div className="flex items-center justify-between">
+                        <span className={`text-xs font-medium px-2 py-1 rounded-full ${
+                          achievement.unlocked 
+                            ? 'bg-green-100 text-green-700' 
+                            : 'bg-gray-100 text-gray-600'
+                        }`}>
+                          {achievement.unlocked ? 'Unlocked' : 'Locked'}
+                        </span>
+                      </div>
+                    </div>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             ))}
           </div>
         </div>
       </div>
+
+      {/* Mobile Achievement Detail Modal */}
+      {showAchievementModal && selectedAchievement && (
+        <Dialog open={showAchievementModal} onOpenChange={setShowAchievementModal}>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-3">
+                <div className="w-12 h-12 flex-shrink-0 overflow-hidden">
+                  {getAchievementBadge(selectedAchievement)}
+                </div>
+                <div>
+                  <h3 className="font-semibold">{selectedAchievement.name}</h3>
+                  <p className="text-sm text-primary">+{selectedAchievement.xp} XP</p>
+                </div>
+              </DialogTitle>
+              <DialogDescription className="text-left pt-2">
+                {selectedAchievement.description}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex justify-center">
+              <span className={`text-xs font-medium px-3 py-1 rounded-full ${
+                selectedAchievement.unlocked 
+                  ? 'bg-green-100 text-green-700' 
+                  : 'bg-gray-100 text-gray-600'
+              }`}>
+                {selectedAchievement.unlocked ? 'Unlocked' : 'Locked'}
+              </span>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
 
       {/* Achievements Modal */}
       <ClbhouzAchievementsModal
