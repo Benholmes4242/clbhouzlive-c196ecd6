@@ -109,76 +109,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
           </Button>
         </div>
 
-        {/* Progress Rings Section */}
-        <div className="relative">
-          <div className="flex gap-3 md:gap-4 overflow-x-auto scrollbar-hide pb-2 md:justify-center px-4 md:px-0"
-               style={{
-                 scrollbarWidth: 'none',
-                 msOverflowStyle: 'none',
-                 WebkitOverflowScrolling: 'touch'
-               }}>
-            {journeyRings.map((ring, index) => (
-              <div key={ring.id} className="flex-shrink-0 flex flex-col items-center cursor-pointer w-28 md:w-36">
-                <div className="w-28 h-28 md:w-32 md:h-32 relative transition-all duration-300 hover:scale-105">
-                  {/* Progress Ring */}
-                  <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                    {/* Background circle */}
-                    <circle
-                      cx="50"
-                      cy="50"
-                      r="45"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="6"
-                      className="text-muted/20"
-                    />
-                    {/* Progress circle */}
-                    <circle
-                      cx="50"
-                      cy="50"
-                      r="45"
-                      fill="none"
-                      strokeWidth="6"
-                      strokeLinecap="round"
-                      strokeDasharray={`${ring.progress * 2.83} 283`}
-                      className={`bg-gradient-to-br ${ring.color}`}
-                      style={{
-                        stroke: ring.progress === 100 ? '#eab308' : 
-                               ring.color.includes('cyan') ? '#06b6d4' :
-                               ring.color.includes('purple') ? '#a855f7' :
-                               ring.color.includes('gray') ? '#9ca3af' : '#06b6d4'
-                      }}
-                    />
-                  </svg>
-                  
-                  {/* Center content */}
-                  <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                    <div className="text-lg md:text-xl font-bold text-foreground">
-                      {ring.value}
-                    </div>
-                    {ring.label && (
-                      <div className="text-xs text-muted-foreground">
-                        {ring.label}
-                      </div>
-                    )}
-                    {ring.hasStars && (
-                      <div className="flex gap-0.5 mt-1">
-                        {[1, 2, 3].map((star) => (
-                          <div key={star} className="w-2 h-2 bg-yellow-400 rounded-full" />
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-                
-                {/* Label below ring */}
-                <div className="text-xs text-muted-foreground font-medium mt-1 text-center line-clamp-2">
-                  {ring.sublabel}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        {/* Progress rings section removed */}
       </div>
     </div>
   );
