@@ -691,10 +691,10 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       >
         <DialogHeader className={`${isMobile ? 'p-4 pb-2' : 'p-6 pb-4'} flex-shrink-0`}>
           <DialogTitle className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold text-black dark:text-white`}>
-            Trophies & Milestones
+            Achievements
           </DialogTitle>
           <DialogDescription className={`${isMobile ? 'text-sm' : 'text-base'} text-muted-foreground mt-1`}>
-            Track your progress. Treasure your triumphs.
+            Defining your game through achievement
           </DialogDescription>
         </DialogHeader>
         
