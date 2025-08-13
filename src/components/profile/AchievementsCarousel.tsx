@@ -49,14 +49,16 @@ const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({
 
   // Sample achievements with detailed data matching ClbhouzAchievementsModal
   const sampleAchievements = [
+    // Top row - all unlocked
     { id: '1', name: '20 Club', xp: 200, unlocked: true, description: 'Reach the milestone of 20 courses played. You\'re getting started on your golf journey!', progress: '20 / 20 courses', isRepeatable: false },
     { id: '2', name: '50 Club', xp: 300, unlocked: true, description: 'Reach the milestone of 50 courses played. You\'re getting serious!', progress: '50 / 50 courses', isRepeatable: false },
-    { id: '3', name: 'Eagle Collector', xp: 250, unlocked: false, description: 'Accumulate 5 total eagles throughout your golf journey.', unlockHint: 'Look for eagle opportunities on par 5s and short par 4s. Aggressive play when the situation is right.', progress: '2 / 5 eagles', isRepeatable: false },
-    { id: '4', name: '100 Century Club', xp: 500, unlocked: false, description: 'Join the exclusive 100 courses club. True dedication to the game!', unlockHint: '22 more courses to unlock', progress: '78 / 100 courses', isRepeatable: false },
-    { id: '5', name: 'Birdie Blitz', xp: 75, unlocked: false, description: 'Master the art of consistent birdie scoring. Show your precision!', unlockHint: '5 more birdies to unlock', progress: '12 / 15 birdies', isRepeatable: false },
-    { id: '6', name: 'Hole-in-One', xp: 400, unlocked: false, description: 'Achieve the ultimate golf moment - a hole-in-one!', unlockHint: 'Keep playing and one day it will happen', progress: '0 / 1 hole-in-one', isRepeatable: false },
-    { id: '7', name: 'Lynx Legend', xp: 350, unlocked: false, description: 'Master the links courses of Britain & Ireland.', unlockHint: 'Play more courses in Britain & Ireland', progress: '8 / 20 courses', isRepeatable: false },
-    { id: '8', name: 'Stars and Stripes Tourer', xp: 350, unlocked: false, description: 'Conquer the golf courses across the United States.', unlockHint: 'Play more courses in the USA', progress: '5 / 15 courses', isRepeatable: false }
+    { id: '3', name: 'Eagle Collector', xp: 250, unlocked: true, description: 'Accumulate 5 total eagles throughout your golf journey.', progress: '5 / 5 eagles', isRepeatable: false },
+    { id: '4', name: '100 Century Club', xp: 500, unlocked: true, description: 'Join the exclusive 100 courses club. True dedication to the game!', progress: '100 / 100 courses', isRepeatable: false },
+    // Bottom row - mixed unlock states
+    { id: '5', name: 'Par Machine', xp: 300, unlocked: true, description: 'Master the art of consistent par scoring. Show your steady play!', progress: '50 / 50 pars', isRepeatable: false },
+    { id: '6', name: 'Stars and Stripes Tourer', xp: 350, unlocked: true, description: 'Conquer the golf courses across the United States.', progress: '15 / 15 courses', isRepeatable: false },
+    { id: '7', name: 'Birdie Blitz', xp: 75, unlocked: false, description: 'Master the art of consistent birdie scoring. Show your precision!', unlockHint: '5 more birdies to unlock', progress: '12 / 15 birdies', isRepeatable: false },
+    { id: '8', name: 'Globetrotter Golfer', xp: 400, unlocked: false, description: 'Play golf courses across multiple continents around the world.', unlockHint: 'Play courses on more continents', progress: '2 / 4 continents', isRepeatable: false }
   ];
 
   // Use sample achievements if no achievements provided, or merge with provided ones
@@ -107,6 +109,18 @@ const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({
         return <img src="/lovable-uploads/2b2ee6a8-e8c4-49d9-bfdf-86403c3a47b7.png" alt="USA Flag" className="w-full h-full object-cover rounded-lg" />;
       case "Hole-in-One":
         return <img src="/lovable-uploads/68aa3b6e-7c54-41e7-80f6-75b4bf6e8b63.png" alt="Hole-in-One Badge" className="w-full h-full object-cover" />;
+      case "Par Machine":
+        return (
+          <div className="w-full h-full flex items-center justify-center rounded-lg bg-gradient-to-br from-green-400 to-green-600 text-white">
+            <Trophy className="w-8 h-8" />
+          </div>
+        );
+      case "Globetrotter Golfer":
+        return (
+          <div className="w-full h-full flex items-center justify-center rounded-lg bg-gradient-to-br from-blue-400 to-purple-600 text-white">
+            <Trophy className="w-8 h-8" />
+          </div>
+        );
       default:
         // For locked or unknown achievements, use a placeholder
         return (
