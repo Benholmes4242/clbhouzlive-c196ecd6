@@ -565,6 +565,30 @@ const HeroProfileHeader = ({
         </div>
       </div>
 
+      {/* Sticky Tab Navigation - Positioned above achievements/courses journey */}
+      <ProfileTabs
+        activeTab={activeSection}
+        onTabChange={handleTabChange}
+        userId={profile?.id || ''}
+        userDisplayName={profile?.display_name}
+        userHandicap={profile?.eg_handicap_index}
+        userProfilePhotoUrl={profile?.profile_photo_url}
+        isCurrentUser={isOwnProfile}
+        transitionState={transitionState}
+      >
+        {{
+          activity: (
+            <div></div> // Content will be rendered separately below
+          ),
+          courses: (
+            <div></div> // Content will be rendered separately below
+          ),
+          stats: (
+            <div></div> // Content will be rendered separately below
+          )
+        }}
+      </ProfileTabs>
+
       {/* Hero Section - Achievements or Courses Journey */}
       <div className="relative">
         {/* During transition, both sections are visible with absolute positioning */}
@@ -655,19 +679,10 @@ const HeroProfileHeader = ({
         )}
       </div>
 
-      {/* Sticky Tab Navigation - Restored with proper sticky functionality */}
-      <ProfileTabs
-        activeTab={activeSection}
-        onTabChange={handleTabChange}
-        userId={profile?.id || ''}
-        userDisplayName={profile?.display_name}
-        userHandicap={profile?.eg_handicap_index}
-        userProfilePhotoUrl={profile?.profile_photo_url}
-        isCurrentUser={isOwnProfile}
-        transitionState={transitionState}
-      >
-        {{
-          activity: (
+      {/* Content sections for the selected tab */}
+      <div className="py-6 md:py-8 px-4 md:px-0">
+        <div className="md:max-w-[1150px] md:mx-auto">
+          {activeSection === 'activity' && (
             <ActivityFeed
               userId={profile?.id || ''}
               isOwnProfile={isOwnProfile}
@@ -675,8 +690,8 @@ const HeroProfileHeader = ({
               userHandicap={profile?.eg_handicap_index}
               userProfilePhotoUrl={profile?.profile_photo_url}
             />
-          ),
-          courses: (
+          )}
+          {activeSection === 'courses' && (
             <>
               <LatestHighlights 
                 userId={profile?.id || ''} 
@@ -689,15 +704,15 @@ const HeroProfileHeader = ({
                 displayName={profile?.display_name || 'User'}
               />
             </>
-          ),
-          stats: (
+          )}
+          {activeSection === 'stats' && (
             <HandicapSection 
               userId={profile?.id || ''}
               profile={profile}
             />
-          )
-        }}
-      </ProfileTabs>
+          )}
+        </div>
+      </div>
       
       {/* Post Viewer Modal */}
       {currentPost && (
