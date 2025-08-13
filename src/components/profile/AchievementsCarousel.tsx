@@ -3,10 +3,10 @@ import { useCarouselNavigation } from '@/hooks/useCarouselNavigation';
 import { Trophy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ClbhouzAchievementsModal from '@/components/achievements/ClbhouzAchievementsModal';
+import AchievementDetailModal from '@/components/achievements/AchievementDetailModal';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useIsDesktop } from '@/hooks/useIsDesktop';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 interface Achievement {
   id: string;
@@ -42,7 +42,7 @@ const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({
   const [canScrollRight, setCanScrollRight] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
-  const [showAchievementModal, setShowAchievementModal] = useState(false);
+  const [showAchievementDetailModal, setShowAchievementDetailModal] = useState(false);
 
   // Sample achievements with unlock hints for locked ones
   const sampleAchievements = [
@@ -169,7 +169,7 @@ const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({
                         onClick={() => {
                           if (isMobile) {
                             setSelectedAchievement(achievement);
-                            setShowAchievementModal(true);
+                            setShowAchievementDetailModal(true);
                           }
                         }}
                       >
@@ -220,36 +220,12 @@ const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({
         </div>
       </div>
 
-      {/* Mobile Achievement Detail Modal */}
-      {showAchievementModal && selectedAchievement && (
-        <Dialog open={showAchievementModal} onOpenChange={setShowAchievementModal}>
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-3">
-                <div className="w-12 h-12 flex-shrink-0 overflow-hidden">
-                  {getAchievementBadge(selectedAchievement)}
-                </div>
-                <div>
-                  <h3 className="font-semibold">{selectedAchievement.name}</h3>
-                  <p className="text-sm text-primary">+{selectedAchievement.xp} XP</p>
-                </div>
-              </DialogTitle>
-              <DialogDescription className="text-left pt-2">
-                {selectedAchievement.description}
-              </DialogDescription>
-            </DialogHeader>
-            <div className="flex justify-center">
-              <span className={`text-xs font-medium px-3 py-1 rounded-full ${
-                selectedAchievement.unlocked 
-                  ? 'bg-green-100 text-green-700' 
-                  : 'bg-gray-100 text-gray-600'
-              }`}>
-                {selectedAchievement.unlocked ? 'Unlocked' : 'Locked'}
-              </span>
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
+      {/* Achievement Detail Modal */}
+      <AchievementDetailModal
+        isOpen={showAchievementDetailModal}
+        onClose={() => setShowAchievementDetailModal(false)}
+        achievement={selectedAchievement}
+      />
 
       {/* Achievements Modal */}
       <ClbhouzAchievementsModal

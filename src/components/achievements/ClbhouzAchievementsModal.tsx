@@ -5,6 +5,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { XPRingSystem } from "@/components/profile/XPRingSystem";
 import { Sparkles, Trophy, ChevronDown, ChevronUp } from "lucide-react";
 import { useIsMobile } from '@/hooks/use-mobile';
+import AchievementDetailModal from '@/components/achievements/AchievementDetailModal';
 
 // Achievement badge imports - using user's uploaded image
 // import club300Badge from '@/assets/achievements/300-club-champion.png';
@@ -48,7 +49,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
   const [showCelebration, setShowCelebration] = useState(false);
   const [animateProgress, setAnimateProgress] = useState(false);
   const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
-  const [showAchievementModal, setShowAchievementModal] = useState(false);
+  const [showAchievementDetailModal, setShowAchievementDetailModal] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const lastScrollTop = useRef(0);
   const scrollDirection = useRef<'up' | 'down' | 'idle'>('idle');
@@ -1128,10 +1129,10 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                                      transition-all duration-200 hover:scale-105 cursor-pointer 
                                      ${isMobile ? 'p-2 flex flex-col items-center text-center space-y-2' : 'p-4 flex flex-col items-center text-center space-y-3'}
                                    `}
-                                   onClick={isMobile ? () => {
-                                     setSelectedAchievement(achievement);
-                                     setShowAchievementModal(true);
-                                   } : undefined}
+                                    onClick={isMobile ? () => {
+                                      setSelectedAchievement(achievement);
+                                      setShowAchievementDetailModal(true);
+                                    } : undefined}
                                  >
                                   {/* Icon directly on background - no container */}
                                   <div className="flex justify-center items-center">
@@ -1261,10 +1262,10 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                                      transition-all duration-200 hover:scale-105 cursor-pointer 
                                      ${isMobile ? 'p-2 flex flex-col items-center text-center space-y-2' : 'p-4 flex flex-col items-center text-center space-y-3'}
                                    `}
-                                   onClick={isMobile ? () => {
-                                     setSelectedAchievement(achievement);
-                                     setShowAchievementModal(true);
-                                   } : undefined}
+                                    onClick={isMobile ? () => {
+                                      setSelectedAchievement(achievement);
+                                      setShowAchievementDetailModal(true);
+                                    } : undefined}
                                  >
                                   {/* Icon directly on background - no container */}
                                   <div className="flex justify-center items-center">
@@ -1371,70 +1372,22 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
 
       </DialogContent>
       
-      {/* Achievement Detail Modal for Mobile */}
-      {selectedAchievement && (
-        <Dialog open={showAchievementModal} onOpenChange={setShowAchievementModal}>
-          <DialogContent className="max-w-[90vw] max-h-[70vh] p-4">
-            <DialogHeader>
-              <DialogTitle className="text-lg font-bold">{selectedAchievement.title}</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div className="flex justify-center">
-                {getAchievementIcon(selectedAchievement)}
-              </div>
-              
-              <div className="text-center">
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  selectedAchievement.isEarned 
-                    ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' 
-                    : 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
-                }`}>
-                  {selectedAchievement.isEarned ? 'Unlocked' : 'Locked'}
-                </span>
-              </div>
-              
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {selectedAchievement.description}
-              </p>
-              
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-primary inline-flex items-center gap-1">
-                  <span className="text-amber-500">✨</span>
-                  +{selectedAchievement.xp} XP
-                </span>
-                <span className="text-sm text-muted-foreground inline-flex items-center gap-1">
-                  {selectedAchievement.isRepeatable ? "🔄 Repeatable" : "🏆 One-time"}
-                </span>
-              </div>
-              
-              {selectedAchievement.isEarned && selectedAchievement.dateEarned && (
-                <div>
-                  <span className="text-sm text-green-600 dark:text-green-400 font-medium">
-                    ✅ Earned: {selectedAchievement.dateEarned}
-                  </span>
-                </div>
-              )}
-              
-              <div>
-                <span className="text-sm text-muted-foreground">
-                  Progress: {selectedAchievement.progress}
-                </span>
-              </div>
-              
-              {!selectedAchievement.isEarned && selectedAchievement.unlockHint && (
-                <div className="p-3 bg-blue-50 dark:bg-blue-950/20 rounded border border-blue-200 dark:border-blue-800">
-                  <div className="flex items-start gap-2">
-                    <span className="text-blue-500 text-sm">💡</span>
-                    <span className="text-sm text-blue-700 dark:text-blue-300 leading-relaxed">
-                      <strong>How to unlock:</strong> {selectedAchievement.unlockHint}
-                    </span>
-                  </div>
-                </div>
-              )}
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
+      {/* Achievement Detail Modal */}
+      <AchievementDetailModal
+        isOpen={showAchievementDetailModal}
+        onClose={() => setShowAchievementDetailModal(false)}
+        achievement={selectedAchievement ? {
+          id: selectedAchievement.title,
+          name: selectedAchievement.title,
+          xp: selectedAchievement.xp,
+          unlocked: selectedAchievement.isEarned,
+          description: selectedAchievement.description,
+          unlockHint: selectedAchievement.unlockHint,
+          progress: selectedAchievement.progress,
+          dateEarned: selectedAchievement.dateEarned,
+          isRepeatable: selectedAchievement.isRepeatable
+        } : null}
+      />
     </Dialog>
   );
 };
