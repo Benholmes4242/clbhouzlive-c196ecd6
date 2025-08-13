@@ -111,9 +111,9 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
 
   return (
     <>
-      <div className="py-4">
+      <div className="py-4 px-4 md:px-0">
 
-        <div className="flex items-center justify-between mb-4 px-4 md:px-0">
+        <div className="flex items-center justify-between mb-4">
           <div className="flex items-end gap-2">
             <h3 className="text-3xl font-bold text-foreground">Activity</h3>
             <span className="text-muted-foreground text-base">
@@ -178,22 +178,25 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
               No posts found for the selected filter.
             </p>
           </div>
-        ) : (
-          <div className="md:px-0">
-            <ExploreGrid
-              content={exploreContent}
-              onLike={handleLike}
-              onFollow={handleFollow}
-              onMediaClick={handleMediaClick}
-              isLoading={false}
-              hasMore={false}
-              onLoadMore={handleLoadMore}
-              isDiscoverPage={true}
-              hideBadges={true}
-            />
-          </div>
-        )}
+        ) : null}
       </div>
+
+      {/* Move ExploreGrid outside the padded container for mobile */}
+      {posts.length > 0 && filteredPosts.length > 0 && (
+        <div className="md:px-8">
+          <ExploreGrid
+            content={exploreContent}
+            onLike={handleLike}
+            onFollow={handleFollow}
+            onMediaClick={handleMediaClick}
+            isLoading={false}
+            hasMore={false}
+            onLoadMore={handleLoadMore}
+            isDiscoverPage={true}
+            hideBadges={true}
+          />
+        </div>
+      )}
 
       {/* Vertical Media Feed Modal */}
       {isOpen && initialItem && (
