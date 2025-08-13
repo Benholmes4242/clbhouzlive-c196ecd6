@@ -46,8 +46,8 @@ const CoursesControls: React.FC<CoursesControlsProps> = ({
               variant="outline"
               size="sm"
               onClick={() => onViewTypeChange(viewType === 'cards' ? 'list' : 'cards')}
-              className="bg-white/10 backdrop-blur-2xl border border-white/20 text-black hover:bg-white/20 transition-all duration-300"
-              style={{ backdropFilter: 'blur(40px) saturate(180%)', borderRadius: '8px' }}
+              className="bg-white/10 backdrop-blur-2xl border border-white/20 text-black shadow-lg hover:bg-white/20 transition-all duration-300 rounded-full px-3 py-1.5"
+              style={{ backdropFilter: 'blur(40px) saturate(180%)' }}
             >
               {viewType === 'cards' ? (
                 <>
