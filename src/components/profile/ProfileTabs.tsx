@@ -51,7 +51,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
   return (
     <div className="w-full">
       {/* Sticky Tab Bar */}
-      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm border-b border-border">
+      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm">
         <div className="relative">
           {/* Desktop: max-width container matching achievements */}
           <div className="md:max-w-[1150px] md:mx-auto">
