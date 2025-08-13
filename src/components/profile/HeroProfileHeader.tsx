@@ -1,16 +1,24 @@
 import React, { useState, useEffect } from 'react';
+import { useUserAchievements } from '@/hooks/useUserAchievements';
+import { Button } from '@/components/ui/button';
+import { MessageSquare, UserPlus, UserMinus, Copy, Share, Users, UserCheck } from 'lucide-react';
+import { toast } from 'sonner';
+import ProfileTabs from './ProfileTabs';
+import ActivityFeed from './ActivityFeed';
+import UniversalProfileTabs from './UniversalProfileTabs';
+import { useTabSlideTransition, TransitionDirection } from '@/hooks/useTabSlideTransition';
+import { useIsMobile } from '@/hooks/use-mobile';
+import AchievementsCarousel from './AchievementsCarousel';
+import CoursesJourney from './CoursesJourney';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
-import { toast } from '@/hooks/use-toast';
+import { toast as useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-
 import { useStaggeredInView } from '@/hooks/useInViewAnimation';
 import { useScrollPerformance } from '@/hooks/usePerformanceOptimizations';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import ProfileFormFields from "./ProfileFormFields";
 import { useProfileForm } from "./hooks/useProfileForm";
 import { useActivityPosts } from './hooks/useActivityPosts';
-import ActivityFeed from './ActivityFeed';
 import { ActivityPost } from './types/ActivityTypes';
 import ActivityHeader from './components/ActivityHeader';
 import ActivityPostCard from './components/ActivityPostCard';
@@ -26,15 +34,12 @@ import { getOptimizedImageUrl } from '@/utils/imageOptimization';
 import ProfileBadgeStrip from './ProfileBadgeStrip';
 import ProfileProgressSection from './ProfileProgressSection';
 import CompareProgressModal from './CompareProgressModal';
-import { useUserAchievements } from '@/hooks/useUserAchievements';
 import { Swords } from 'lucide-react';
 import ProfileVideoCircle from './ProfileVideoCircle';
 import { useCloudflareStream } from '@/hooks/useCloudflareStream';
 import { useR2Upload } from '@/hooks/useR2Upload';
 import PinnedAchievements from './PinnedAchievements';
 import ProfileStatsBar from './ProfileStatsBar';
-import AchievementsCarousel from './AchievementsCarousel';
-import ProfileTabs from './ProfileTabs';
 
 interface Course {
   id: string;
@@ -90,6 +95,60 @@ const HeroProfileHeader = ({
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const { uploadVideo, uploading: videoUploading } = useCloudflareStream();
   const { uploadImage, uploading: photoUploading } = useR2Upload();
+  const [pendingTab, setPendingTab] = useState<string | null>(null);
+  const isMobile = useIsMobile();
+
+  const { transitionState, transitionDirection, startTransition } = useTabSlideTransition({
+    onTransitionComplete: () => {
+      if (pendingTab) {
+        onSectionChange?.(pendingTab);
+        setPendingTab(null);
+      }
+    }
+  });
+
+  const tabs = [
+    { id: 'activity', label: 'Activity' },
+    { id: 'courses', label: 'Courses Played' },
+    { id: 'stats', label: 'Handicap & Rounds' },
+    { id: 'gear', label: 'Gear & Bag' }
+  ];
+
+  const handleTabChange = (newTab: string) => {
+    if (newTab === activeSection || transitionState !== 'idle') return;
+    
+    // Determine transition direction based on tab order
+    const currentIndex = tabs.findIndex(tab => tab.id === activeSection);
+    const newIndex = tabs.findIndex(tab => tab.id === newTab);
+    const direction: TransitionDirection = newIndex > currentIndex ? 'right' : 'left';
+    
+    setPendingTab(newTab);
+    startTransition(direction);
+  };
+
+  // Get transition classes for hero section (achievements/courses journey)
+  const getHeroTransitionClass = () => {
+    if (transitionState === 'idle') return '';
+    
+    const isMovingToCourses = pendingTab === 'courses';
+    const isMovingFromCourses = activeSection === 'courses' && pendingTab !== 'courses';
+    
+    if (transitionState === 'sliding-out') {
+      if (isMovingToCourses) {
+        return 'animate-slide-out-left';
+      } else if (isMovingFromCourses) {
+        return 'animate-slide-out-right';
+      }
+    } else if (transitionState === 'sliding-in') {
+      if (isMovingToCourses) {
+        return isMobile ? 'animate-slide-in-from-right-bounce' : 'animate-slide-in-from-right';
+      } else if (isMovingFromCourses) {
+        return isMobile ? 'animate-slide-in-from-left-bounce' : 'animate-slide-in-from-left';
+      }
+    }
+    
+    return '';
+  };
   
   // Stats state
   const [ratedCoursesCount, setRatedCoursesCount] = useState(0);
@@ -291,11 +350,7 @@ const HeroProfileHeader = ({
       const result = await uploadVideo(file);
       
       if (!result.success) {
-        toast({
-          title: "Upload Failed",
-          description: result.error || "Failed to upload video",
-          variant: "destructive"
-        });
+        toast.error(result.error || "Failed to upload video");
         return;
       }
 
@@ -314,20 +369,12 @@ const HeroProfileHeader = ({
         throw error;
       }
 
-      toast({
-        title: "Success",
-        description: "Profile video uploaded successfully!",
-        variant: "default"
-      });
+      toast.success("Profile video uploaded successfully!");
 
       onProfileUpdate();
     } catch (error) {
       console.error('Error updating profile video:', error);
-      toast({
-        title: "Update Failed",
-        description: "Failed to save video to profile",
-        variant: "destructive"
-      });
+      toast.error("Failed to save video to profile");
     }
   };
 
@@ -347,20 +394,12 @@ const HeroProfileHeader = ({
         throw error;
       }
 
-      toast({
-        title: "Success",
-        description: "Profile video removed successfully!",
-        variant: "default"
-      });
+      toast.success("Profile video removed successfully!");
 
       onProfileUpdate();
     } catch (error) {
       console.error('Error removing profile video:', error);
-      toast({
-        title: "Remove Failed",
-        description: "Failed to remove video from profile",
-        variant: "destructive"
-      });
+      toast.error("Failed to remove video from profile");
     }
   };
 
@@ -369,11 +408,7 @@ const HeroProfileHeader = ({
       const result = await uploadImage(file);
       
       if (!result.success) {
-        toast({
-          title: "Upload Failed",
-          description: result.error || "Failed to upload photo",
-          variant: "destructive"
-        });
+        toast.error(result.error || "Failed to upload photo");
         return;
       }
 
@@ -390,22 +425,14 @@ const HeroProfileHeader = ({
         throw error;
       }
 
-      toast({
-        title: "Success",
-        description: "Profile photo uploaded successfully!",
-        variant: "default"
-      });
+      toast.success("Profile photo uploaded successfully!");
 
       onProfileUpdate();
       
       console.log('Profile photo updated successfully:', result.imageUrl);
     } catch (error) {
       console.error('Error updating profile photo:', error);
-      toast({
-        title: "Update Failed",
-        description: "Failed to save photo to profile",
-        variant: "destructive"
-      });
+      toast.error("Failed to save photo to profile");
     }
   };
 
@@ -547,15 +574,40 @@ const HeroProfileHeader = ({
         </div>
       </div>
 
+      {/* Hero Section - Achievements or Courses Journey */}
+      <div className={`relative overflow-hidden ${getHeroTransitionClass()}`}>
+        {(activeSection === 'courses' || (transitionState === 'sliding-in' && pendingTab === 'courses')) && (
+          <CoursesJourney className={transitionState === 'sliding-in' && pendingTab === 'courses' ? getHeroTransitionClass() : ''} />
+        )}
+        {(activeSection !== 'courses' || (transitionState === 'sliding-in' && pendingTab !== 'courses')) && (
+          <AchievementsCarousel
+            achievements={achievements.map(a => ({
+              id: a.id || `achievement-${Math.random()}`,
+              name: a.type || 'Achievement',
+              xp: 100,
+              unlocked: true,
+              description: a.message || 'Achievement unlocked!'
+            }))}
+            userId={profile?.id || ''}
+            userDisplayName={profile?.display_name}
+            userHandicap={profile?.eg_handicap_index}
+            userProfilePhotoUrl={profile?.profile_photo_url}
+            isCurrentUser={isOwnProfile}
+            className={transitionState === 'sliding-in' && pendingTab !== 'courses' ? getHeroTransitionClass() : ''}
+          />
+        )}
+      </div>
+
       {/* Tab Navigation and Content */}
       <ProfileTabs
         activeTab={activeSection}
-        onTabChange={onSectionChange}
+        onTabChange={handleTabChange}
         userId={profile?.id || ''}
         userDisplayName={profile?.display_name}
         userHandicap={profile?.eg_handicap_index}
         userProfilePhotoUrl={profile?.profile_photo_url}
         isCurrentUser={isOwnProfile}
+        transitionState={transitionState}
       >
         {{
           activity: (
