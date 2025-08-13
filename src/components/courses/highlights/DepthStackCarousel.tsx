@@ -216,8 +216,7 @@ const VideoCard: React.FC<{
       
       {/* My Highlights Badge - Top Right */}
       <div className="absolute top-3 right-3 z-10">
-        <div className="bg-black/60 backdrop-blur-sm rounded-full px-3 py-1.5 flex items-center gap-1.5 shadow-lg">
-          <MapPin className="h-3 w-3 text-white" />
+        <div className="bg-white/10 backdrop-blur-2xl border border-white/20 rounded-full px-3 py-1.5 shadow-lg">
           <span className="text-white text-xs font-medium">
             {isOwnProfile ? "My Highlights" : `${userFirstName}'s Highlights`}
           </span>
