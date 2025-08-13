@@ -13,7 +13,9 @@ import {
   continentalEuropeCountries,
   worldwideCountries,
   top100ListMapping,
-  Top100ListKey
+  Top100ListKey,
+  sortOptionMapping,
+  SortOptionKey
 } from './types';
 
 interface CascadingFiltersProps {
@@ -61,7 +63,8 @@ const CascadingFilters: React.FC<CascadingFiltersProps> = ({
         region: 'all',
         subCountry: null,
         county: null,
-        top100List: regionalFilter.top100List
+        top100List: regionalFilter.top100List,
+        sortBy: regionalFilter.sortBy
       });
     } else {
       onRegionalFilterChange({
@@ -96,7 +99,8 @@ const CascadingFilters: React.FC<CascadingFiltersProps> = ({
       region: value,
       subCountry: null,
       county: null,
-      top100List: regionalFilter.top100List
+      top100List: regionalFilter.top100List,
+      sortBy: regionalFilter.sortBy
     });
   };
 
@@ -122,16 +126,24 @@ const CascadingFilters: React.FC<CascadingFiltersProps> = ({
     });
   };
 
+  const handleSortChange = (value: SortOptionKey) => {
+    onRegionalFilterChange({
+      ...regionalFilter,
+      sortBy: value
+    });
+  };
+
   const clearFilters = () => {
     onRegionalFilterChange({
       region: 'all',
       subCountry: null,
       county: null,
-      top100List: 'all'
+      top100List: 'all',
+      sortBy: 'rank-asc'
     });
   };
 
-  const hasActiveFilters = regionalFilter.region !== 'all' || regionalFilter.subCountry || regionalFilter.county || (regionalFilter.top100List && regionalFilter.top100List !== 'all');
+  const hasActiveFilters = regionalFilter.region !== 'all' || regionalFilter.subCountry || regionalFilter.county || (regionalFilter.top100List && regionalFilter.top100List !== 'all') || (regionalFilter.sortBy && regionalFilter.sortBy !== 'rank-asc');
 
   return (
     <div className="space-y-4">
@@ -160,6 +172,23 @@ const CascadingFilters: React.FC<CascadingFiltersProps> = ({
           </SelectTrigger>
           <SelectContent className="bg-popover border-border z-50">
             {Object.entries(top100ListMapping).map(([value, label]) => (
+              <SelectItem key={value} value={value} className="hover:bg-accent">
+                {label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        {/* Sort Options */}
+        <Select 
+          value={regionalFilter.sortBy || 'rank-asc'} 
+          onValueChange={handleSortChange}
+        >
+          <SelectTrigger className="w-full sm:w-60 focus:ring-[#b66b41] focus:border-[#b66b41] bg-background border-border">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent className="bg-popover border-border z-50">
+            {Object.entries(sortOptionMapping).map(([value, label]) => (
               <SelectItem key={value} value={value} className="hover:bg-accent">
                 {label}
               </SelectItem>
@@ -244,6 +273,11 @@ const CascadingFilters: React.FC<CascadingFiltersProps> = ({
           {regionalFilter.top100List && regionalFilter.top100List !== 'all' && (
             <span className="bg-secondary px-2 py-1 rounded text-secondary-foreground">
               {top100ListMapping[regionalFilter.top100List]}
+            </span>
+          )}
+          {regionalFilter.sortBy && regionalFilter.sortBy !== 'rank-asc' && (
+            <span className="bg-secondary px-2 py-1 rounded text-secondary-foreground">
+              {sortOptionMapping[regionalFilter.sortBy]}
             </span>
           )}
           {regionalFilter.region !== 'all' && (

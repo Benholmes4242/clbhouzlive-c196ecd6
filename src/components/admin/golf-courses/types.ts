@@ -51,6 +51,7 @@ export interface RegionalFilter {
   subCountry: string | null;
   county: string | null;
   top100List: Top100ListKey | null;
+  sortBy: SortOptionKey | null;
 }
 
 // Top 100 List filter type
@@ -62,6 +63,17 @@ export const top100ListMapping: Record<Top100ListKey, string> = {
   usa: 'Top 100 USA',
   'britain-ireland': 'Top 100 Great Britain & Ireland',
   europe: 'Top 100 Continental Europe'
+};
+
+// Sort options type
+export type SortOptionKey = 'rank-asc' | 'rank-desc' | 'name-asc' | 'name-desc' | 'recent-added';
+
+export const sortOptionMapping: Record<SortOptionKey, string> = {
+  'rank-asc': 'Rank: Best to Worst (1-100)',
+  'rank-desc': 'Rank: Worst to Best (100-1)',
+  'name-asc': 'Name: A to Z',
+  'name-desc': 'Name: Z to A',
+  'recent-added': 'Most Recently Added'
 };
 
 // Country/Sub-country mapping for Britain & Ireland

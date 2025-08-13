@@ -20,7 +20,8 @@ const GolfCoursesManagement = () => {
     region: 'all',
     subCountry: null,
     county: null,
-    top100List: 'all'
+    top100List: 'all',
+    sortBy: 'rank-asc'
   });
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCourse, setSelectedCourse] = useState<GolfCourse | null>(null);
