@@ -149,7 +149,7 @@ const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({
             {/* Achievements container */}
             <div 
               ref={containerRef}
-              className="flex gap-3 md:gap-4 overflow-x-auto scrollbar-hide pb-2 md:justify-center"
+              className="flex gap-3 md:gap-4 overflow-x-auto scrollbar-hide pb-2 md:justify-center px-4 md:px-0"
               style={{
                 scrollbarWidth: 'none',
                 msOverflowStyle: 'none',

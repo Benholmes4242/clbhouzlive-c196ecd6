@@ -548,7 +548,7 @@ const HeroProfileHeader = ({
       </div>
 
       {/* Achievements Carousel Section */}
-      <div className="relative w-full px-4 md:px-8">
+      <div className="relative w-full">
         <AchievementsCarousel
           achievements={achievements.map(a => ({
             id: a.id || `achievement-${Math.random()}`,
