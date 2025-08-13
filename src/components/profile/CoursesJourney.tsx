@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Grid3X3, List } from 'lucide-react';
 import RegionDropdown from './RegionDropdown';
 import SortViewDropdown from './SortViewDropdown';
-import Top100VideoHighlights from './Top100VideoHighlights';
+import CourseHighlightsCarousel from './CourseHighlightsCarousel';
 import { Badge } from '@/components/ui/badge';
 
 interface CoursesJourneyProps {
@@ -66,11 +66,11 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
           <h3 className="text-xl md:text-2xl text-foreground">Courses Journey</h3>
         </div>
 
-        {/* Video Highlights Section with Badges */}
+        {/* Course Highlights Section with Badges */}
         <div className="space-y-6">
-          <Top100VideoHighlights 
-            userId={userId}
-            badgeText={isOwnProfile ? 'My Highlights' : `${userDisplayName}'s Highlights`}
+          <CourseHighlightsCarousel 
+            userFirstName={userDisplayName?.split(' ')[0] || 'User'}
+            isOwnProfile={isOwnProfile}
           />
         </div>
 
