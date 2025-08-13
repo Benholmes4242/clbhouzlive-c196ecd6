@@ -153,7 +153,8 @@ const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({
                 WebkitOverflowScrolling: 'touch'
               }}
             >
-              {displayAchievements.slice(0, 6).map((achievement, index) => (
+              {/* Mobile: show 4, Desktop: show 5 */}
+              {displayAchievements.slice(0, window.innerWidth >= 1024 ? 5 : 4).map((achievement, index) => (
               <TooltipProvider key={achievement.id}>
                 <Tooltip>
                   <TooltipTrigger asChild>
