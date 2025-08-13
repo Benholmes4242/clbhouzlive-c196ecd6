@@ -114,7 +114,7 @@ export const usePostSubmission = () => {
                     });
 
                   if (mediaError) throw mediaError;
-                  return;
+                  return { success: true, fileName: file.name };
                 }
                 console.log('Cloudflare Stream upload failed, trying R2 fallback:', streamError || streamData);
               } catch (streamError) {
