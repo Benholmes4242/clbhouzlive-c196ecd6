@@ -39,18 +39,6 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
   const [achievementsModalOpen, setAchievementsModalOpen] = useState(false);
 
-  // Debug: Log what we're getting from useActivityPosts
-  console.log('ActivityFeed - Posts data:', {
-    postsLength: posts.length,
-    loading,
-    firstFewPosts: posts.slice(0, 3).map(p => ({
-      id: p.id,
-      content: p.content,
-      mediaCount: p.post_media?.length || 0,
-      media: p.post_media
-    }))
-  });
-
   // Filter posts based on active filter
   const filteredPosts = useMemo(() => {
     switch (activeFilter) {
@@ -96,14 +84,6 @@ const ActivityFeed: React.FC<ActivityFeedProps> = ({
         media_url: media.media_url
       }))
     }));
-
-  console.log('ActivityFeed - Debug info:', {
-    totalPosts: posts.length,
-    filteredPosts: filteredPosts.length,
-    exploreContent: exploreContent.length,
-    firstPost: posts[0],
-    firstExploreItem: exploreContent[0]
-  });
 
   const handleLike = useCallback((contentId: string) => {
     console.log('Like:', contentId);

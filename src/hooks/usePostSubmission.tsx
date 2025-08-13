@@ -74,6 +74,7 @@ export const usePostSubmission = () => {
       console.log('Post created:', postData);
 
       // Upload media files with error handling for each file
+      let uploadErrors: string[] = [];
       if (mediaFiles.length > 0) {
         const uploadPromises = mediaFiles.map(async (file, index) => {
           try {
@@ -83,7 +84,45 @@ export const usePostSubmission = () => {
             
             console.log(`Uploading file ${index + 1}/${mediaFiles.length}: ${file.name} (${file.size} bytes)`);
             
-            // Upload to Cloudflare R2 instead of Supabase storage
+            // For videos, try Cloudflare Stream first, then fallback to R2
+            if (file.type.startsWith('video/')) {
+              try {
+                // Create FormData for Cloudflare Stream upload
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('metadata', JSON.stringify({
+                  title: `Post video - ${Date.now()}`,
+                  description: 'Video uploaded from post'
+                }));
+                
+                const { data: streamData, error: streamError } = await supabase.functions.invoke('cloudflare-stream-upload', {
+                  body: formData
+                });
+                
+                if (!streamError && streamData?.success && streamData.videoId) {
+                  const hlsUrl = `https://customer-4ah4gni80ytefpck.cloudflarestream.com/${streamData.videoId}/manifest/video.m3u8`;
+                  
+                  console.log(`Successfully uploaded video to Cloudflare Stream: ${hlsUrl}`);
+                  
+                  // Create media record for video
+                  const { error: mediaError } = await supabase
+                    .from('post_media')
+                    .insert({
+                      post_id: postData.id,
+                      media_type: 'video',
+                      media_url: hlsUrl
+                    });
+
+                  if (mediaError) throw mediaError;
+                  return;
+                }
+                console.log('Cloudflare Stream upload failed, trying R2 fallback:', streamError || streamData);
+              } catch (streamError) {
+                console.log('Cloudflare Stream error, falling back to R2:', streamError);
+              }
+            }
+            
+            // Upload to Cloudflare R2 (for images or video fallback)
             const { uploadToCloudflareR2 } = await import('@/utils/cloudflareUpload');
             const uploadResult = await uploadToCloudflareR2(file, 'post-media', fullFileName);
 
