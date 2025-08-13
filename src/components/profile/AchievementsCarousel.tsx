@@ -15,6 +15,8 @@ interface Achievement {
   iconURL?: string;
   description?: string;
   unlockHint?: string;
+  progress?: string;
+  isRepeatable?: boolean;
 }
 
 interface AchievementsCarouselProps {
@@ -43,13 +45,13 @@ const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({
   const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
   const [showAchievementDetailModal, setShowAchievementDetailModal] = useState(false);
 
-  // Sample achievements with unlock hints for locked ones
+  // Sample achievements with detailed data matching ClbhouzAchievementsModal
   const sampleAchievements = [
-    { id: '1', name: '20 Club', xp: 200, unlocked: true, description: 'Play your first 20 golf courses. Welcome to the clubhouse!' },
-    { id: '2', name: '50 Club', xp: 300, unlocked: true, description: 'Reach the milestone of 50 courses played. You\'re getting serious!' },
-    { id: '3', name: 'Eagle Collector', xp: 400, unlocked: true, description: 'Collect multiple eagles during your rounds. A true precision player!' },
-    { id: '4', name: '100 Century Club', xp: 500, unlocked: false, description: 'Join the exclusive 100 courses club. True dedication to the game!', unlockHint: '22 more courses to unlock' },
-    { id: '5', name: 'Birdie Blitz', xp: 350, unlocked: false, description: 'Master the art of consistent birdie scoring. Show your precision!', unlockHint: '5 more birdies to unlock' }
+    { id: '1', name: '20 Club', xp: 200, unlocked: true, description: 'Reach the milestone of 20 courses played. You\'re getting started on your golf journey!', progress: '20 / 20 courses', isRepeatable: false },
+    { id: '2', name: '50 Club', xp: 300, unlocked: true, description: 'Reach the milestone of 50 courses played. You\'re getting serious!', progress: '50 / 50 courses', isRepeatable: false },
+    { id: '3', name: 'Eagle Collector', xp: 250, unlocked: false, description: 'Accumulate 5 total eagles throughout your golf journey.', unlockHint: 'Look for eagle opportunities on par 5s and short par 4s. Aggressive play when the situation is right.', progress: '2 / 5 eagles', isRepeatable: false },
+    { id: '4', name: '100 Century Club', xp: 500, unlocked: false, description: 'Join the exclusive 100 courses club. True dedication to the game!', unlockHint: '22 more courses to unlock', progress: '78 / 100 courses', isRepeatable: false },
+    { id: '5', name: 'Birdie Blitz', xp: 75, unlocked: false, description: 'Master the art of consistent birdie scoring. Show your precision!', unlockHint: '5 more birdies to unlock', progress: '12 / 15 birdies', isRepeatable: false }
   ];
 
   // Use sample achievements if no achievements provided, or merge with provided ones
