@@ -6,14 +6,23 @@ import SortViewDropdown from './SortViewDropdown';
 
 interface CoursesControlsProps {
   className?: string;
+  activeFilter: string | null;
+  onFilterChange: (filter: string | null) => void;
+  sortBy: string;
+  onSortChange: (sort: string) => void;
+  viewType: 'cards' | 'list';
+  onViewTypeChange: (viewType: 'cards' | 'list') => void;
 }
 
 const CoursesControls: React.FC<CoursesControlsProps> = ({ 
-  className = ''
+  className = '',
+  activeFilter,
+  onFilterChange,
+  sortBy,
+  onSortChange,
+  viewType,
+  onViewTypeChange
 }) => {
-  const [selectedRegion, setSelectedRegion] = useState('global');
-  const [selectedSort, setSelectedSort] = useState('rank-asc');
-  const [viewType, setViewType] = useState<'cards' | 'list'>('cards');
 
   return (
     <div className={`w-full ${className}`}>
@@ -26,17 +35,17 @@ const CoursesControls: React.FC<CoursesControlsProps> = ({
           
           <div className="flex items-center gap-3">
             <RegionDropdown 
-              selectedRegion={selectedRegion}
-              onRegionChange={setSelectedRegion}
+              selectedRegion={activeFilter || 'global'}
+              onRegionChange={onFilterChange}
             />
             <SortViewDropdown 
-              selectedSort={selectedSort}
-              onSortChange={setSelectedSort}
+              selectedSort={sortBy}
+              onSortChange={onSortChange}
             />
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setViewType(viewType === 'cards' ? 'list' : 'cards')}
+              onClick={() => onViewTypeChange(viewType === 'cards' ? 'list' : 'cards')}
               className="bg-white/10 backdrop-blur-2xl border border-white/20 text-black hover:bg-white/20 transition-all duration-300"
               style={{ backdropFilter: 'blur(40px) saturate(180%)', borderRadius: '8px' }}
             >

@@ -18,6 +18,7 @@ import CoursePickerModal from '@/components/profile/CoursePickerModal';
 import Top100Progress from './Top100Progress';
 import TrophyProgressSection from './TrophyProgressSection';
 import RegionalCompletionSection from './RegionalCompletionSection';
+import CoursesControls from '@/components/profile/CoursesControls';
 
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
@@ -290,42 +291,15 @@ const UserCoursesContent: React.FC<UserCoursesContentProps> = ({
       {/* Trophy Progress Section and Regional Completion Section removed */}
 
       <div className="flex flex-col gap-4">
-        {/* Mobile layout - stacked */}
-        {isMobile ? (
-          <>
-            {/* Regional tiles and sorting buttons */}
-            <UserCoursesRegionalTiles
-              regionProgress={regionProgress}
-              activeFilter={activeFilter}
-              onFilterChange={setActiveFilter}
-              isLoading={isLoadingProgress}
-              sortBy={sortBy}
-              onSortChange={setSortBy}
-              viewType={viewType}
-              onViewTypeChange={setViewType}
-              isOwnProfile={finalIsOwnProfile}
-              onAddCoursesClick={() => setIsCoursePickerOpen(true)}
-            />
-          </>
-        ) : (
-          /* Desktop layout - side by side */
-          <div className="flex items-center justify-between">
-            <div className="flex-1">
-              <UserCoursesRegionalTiles
-                regionProgress={regionProgress}
-                activeFilter={activeFilter}
-                onFilterChange={setActiveFilter}
-                isLoading={isLoadingProgress}
-                sortBy={sortBy}
-                onSortChange={setSortBy}
-                viewType={viewType}
-                onViewTypeChange={setViewType}
-                isOwnProfile={finalIsOwnProfile}
-                onAddCoursesClick={() => setIsCoursePickerOpen(true)}
-              />
-            </div>
-          </div>
-        )}
+        {/* CoursesControls component now handles all filtering and sorting */}
+        <CoursesControls
+          activeFilter={activeFilter}
+          onFilterChange={setActiveFilter}
+          sortBy={sortBy}
+          onSortChange={setSortBy}
+          viewType={viewType}
+          onViewTypeChange={setViewType}
+        />
       </div>
 
       <div className="space-y-4">

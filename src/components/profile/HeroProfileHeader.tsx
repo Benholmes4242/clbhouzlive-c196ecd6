@@ -677,7 +677,6 @@ const HeroProfileHeader = ({
           ),
           courses: (
             <>
-              <CoursesControls />
               <LatestHighlights 
                 userId={profile?.id || ''} 
                 isOwnProfile={isOwnProfile}
