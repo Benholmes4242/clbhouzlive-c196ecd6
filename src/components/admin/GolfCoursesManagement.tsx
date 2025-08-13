@@ -97,6 +97,7 @@ const GolfCoursesManagement = () => {
                 key={course.id}
                 course={course}
                 onEdit={handleEditCourse}
+                activeTop100Filter={regionalFilter.top100List}
               />
             ))
           )}
