@@ -5,6 +5,7 @@ import { User, Trophy, Camera, BarChart3, MapPin } from 'lucide-react';
 import { useTabSlideTransition } from '@/hooks/useTabSlideTransition';
 import { useCoursesJourneyPinning } from '@/hooks/useCoursesJourneyPinning';
 import LatestHighlights from '@/components/courses/highlights/LatestHighlights';
+import AchievementsCarousel from './AchievementsCarousel';
 
 interface ProfileTabsProps {
   activeTab: string;
@@ -175,22 +176,32 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
         ref={containerRef}
         className="tab-content-container relative"
       >
-        {/* Courses Journey Section - Pinned when active */}
-        {activeTab === 'courses' && (
-          <div 
-            ref={journeyRef}
-            className={`transition-all duration-300 ${
-              isJourneyPinned 
-                ? 'fixed top-20 left-0 right-0 z-30 shadow-lg' 
-                : 'relative z-10'
-            }`}
-          >
-            <CoursesJourney 
-              userId={userId}
-              isOwnProfile={isOwnProfile}
-            />
-          </div>
-        )}
+        {/* Achievements/Courses Journey Section - Replaces each other with sliding animation */}
+        <div className="relative">
+          {/* Achievements Section - visible for activity, stats, gear tabs */}
+          {(activeTab === 'activity' || activeTab === 'stats' || activeTab === 'gear') && (
+            <div className={animation.exitingTab === activeTab ? 'tab-slide-exit-right' : ''}>
+              <AchievementsCarousel userId={userId} isOwnProfile={isOwnProfile} />
+            </div>
+          )}
+          
+          {/* Courses Journey Section - visible for courses tab with pinning */}
+          {activeTab === 'courses' && (
+            <div 
+              ref={journeyRef}
+              className={`${
+                isJourneyPinned 
+                  ? 'fixed top-20 left-0 right-0 z-30 shadow-lg' 
+                  : 'relative z-10'
+              } ${animation.exitingTab === 'courses' ? 'tab-slide-exit-left' : ''}`}
+            >
+              <CoursesJourney 
+                userId={userId}
+                isOwnProfile={isOwnProfile}
+              />
+            </div>
+          )}
+        </div>
         
         {/* Main Content Area */}
         <div 
