@@ -172,11 +172,7 @@ const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({
                     {getAchievementBadge(achievement)}
                   </div>
                   <div className="text-xs text-muted-foreground font-medium mt-1 overflow-hidden line-clamp-1 md:line-clamp-none">
-                    {achievement.unlocked ? (
-                      `+${achievement.xp} XP`
-                    ) : (
-                      achievement.unlockHint || "Locked"
-                    )}
+                    {achievement.name}
                   </div>
                 </div>
               ))}
