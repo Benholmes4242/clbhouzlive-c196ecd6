@@ -6,7 +6,6 @@ import ClbhouzAchievementsModal from '@/components/achievements/ClbhouzAchieveme
 import AchievementDetailModal from '@/components/achievements/AchievementDetailModal';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useIsDesktop } from '@/hooks/useIsDesktop';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface Achievement {
   id: string;
@@ -158,60 +157,26 @@ const AchievementsCarousel: React.FC<AchievementsCarouselProps> = ({
             >
               {/* Mobile: show 5, Desktop: show 5 */}
               {displayAchievements.slice(0, 5).map((achievement, index) => (
-              <TooltipProvider key={achievement.id}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className="flex-shrink-0 text-center cursor-pointer w-20 md:w-36">
-                      <div 
-                        className={`w-20 h-20 md:w-32 md:h-32 transition-all duration-300 hover:scale-105 overflow-hidden ${
-                          !achievement.unlocked ? 'grayscale opacity-60' : ''
-                        }`}
-                        onClick={() => {
-                          setSelectedAchievement(achievement);
-                          setShowAchievementDetailModal(true);
-                        }}
-                      >
-                        {getAchievementBadge(achievement)}
-                      </div>
-                      <div className="text-xs text-muted-foreground font-medium mt-1 break-words line-clamp-2 md:line-clamp-none">
-                        {achievement.unlocked ? (
-                          `+${achievement.xp} XP`
-                        ) : (
-                          achievement.unlockHint || "Locked"
-                        )}
-                      </div>
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent 
-                    side="top" 
-                    className="max-w-80 p-4 bg-background border border-border shadow-lg"
+                <div key={achievement.id} className="flex-shrink-0 text-center cursor-pointer w-20 md:w-36">
+                  <div 
+                    className={`w-20 h-20 md:w-32 md:h-32 transition-all duration-300 hover:scale-105 overflow-hidden ${
+                      !achievement.unlocked ? 'grayscale opacity-60' : ''
+                    }`}
+                    onClick={() => {
+                      setSelectedAchievement(achievement);
+                      setShowAchievementDetailModal(true);
+                    }}
                   >
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 flex-shrink-0 overflow-hidden">
-                          {getAchievementBadge(achievement)}
-                        </div>
-                        <div>
-                          <h4 className="font-semibold text-foreground">{achievement.name}</h4>
-                          <p className="text-sm text-primary">+{achievement.xp} XP</p>
-                        </div>
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        {achievement.description}
-                      </p>
-                      <div className="flex items-center justify-between">
-                        <span className={`text-xs font-medium px-2 py-1 rounded-full ${
-                          achievement.unlocked 
-                            ? 'bg-green-100 text-green-700' 
-                            : 'bg-gray-100 text-gray-600'
-                        }`}>
-                          {achievement.unlocked ? 'Unlocked' : 'Locked'}
-                        </span>
-                      </div>
-                    </div>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+                    {getAchievementBadge(achievement)}
+                  </div>
+                  <div className="text-xs text-muted-foreground font-medium mt-1 break-words line-clamp-2 md:line-clamp-none">
+                    {achievement.unlocked ? (
+                      `+${achievement.xp} XP`
+                    ) : (
+                      achievement.unlockHint || "Locked"
+                    )}
+                  </div>
+                </div>
               ))}
             </div>
           </div>
