@@ -988,20 +988,30 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                               </defs>
                             </svg>
                             
-                            {/* Complex glow effect */}
+                            {/* Complex glow effect around the ring */}
                             <div className="absolute inset-0 pointer-events-none">
                               <div 
-                                className="absolute inset-0 rounded-full opacity-60 animate-pulse"
+                                className="absolute opacity-60 animate-pulse rounded-full"
                                 style={{
-                                  background: `radial-gradient(circle, rgba(59, 130, 246, 0.4) 0%, rgba(59, 130, 246, 0.2) 40%, transparent 70%)`,
-                                  filter: 'blur(8px)',
+                                  top: '10px',
+                                  left: '10px',
+                                  right: '10px',
+                                  bottom: '10px',
+                                  background: `conic-gradient(from 0deg, rgba(59, 130, 246, 0.4), rgba(139, 92, 246, 0.4), rgba(6, 182, 212, 0.4), rgba(59, 130, 246, 0.4))`,
+                                  filter: 'blur(12px)',
+                                  borderRadius: '50%'
                                 }}
                               />
                               <div 
-                                className="absolute inset-2 rounded-full opacity-40"
+                                className="absolute opacity-40 rounded-full"
                                 style={{
-                                  background: `radial-gradient(circle, rgba(59, 130, 246, 0.6) 0%, rgba(59, 130, 246, 0.1) 60%, transparent 80%)`,
-                                  filter: 'blur(4px)',
+                                  top: '15px',
+                                  left: '15px',
+                                  right: '15px',
+                                  bottom: '15px',
+                                  background: `conic-gradient(from 0deg, rgba(59, 130, 246, 0.6), rgba(139, 92, 246, 0.6), rgba(6, 182, 212, 0.6), rgba(59, 130, 246, 0.6))`,
+                                  filter: 'blur(6px)',
+                                  borderRadius: '50%'
                                 }}
                               />
                             </div>
