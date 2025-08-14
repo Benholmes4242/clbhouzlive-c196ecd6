@@ -15,25 +15,27 @@ const ActivityHeader: React.FC<ActivityHeaderProps> = ({ postsCount, isOwnProfil
   const navigate = useNavigate();
 
   return (
-    <div className="flex items-center justify-between mb-4">
+    <div className="mb-4">
+      {isOwnProfile && (
+        <div className="mb-4">
+          <Button
+            onClick={() => navigate('/achievements')}
+            variant="outline"
+            size="sm"
+            className="text-white border-white/20 hover:bg-white/10"
+          >
+            <TrophyIcon className="w-4 h-4 mr-2" />
+            Achievements
+          </Button>
+        </div>
+      )}
+      
       <div className="flex items-center gap-4">
         <h2 className="text-3xl font-bold text-white">Activity</h2>
         <span className="text-lg text-white/90">
           {postsCount} posts
         </span>
       </div>
-      
-      {isOwnProfile && (
-        <Button
-          onClick={() => navigate('/achievements')}
-          variant="outline"
-          size="sm"
-          className="text-white border-white/20 hover:bg-white/10"
-        >
-          <TrophyIcon className="w-4 h-4 mr-2" />
-          Achievements
-        </Button>
-      )}
     </div>
   );
 };
