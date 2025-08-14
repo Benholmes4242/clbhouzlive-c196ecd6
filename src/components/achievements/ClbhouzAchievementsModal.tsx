@@ -19,7 +19,6 @@ interface ClbhouzAchievementsModalProps {
   userHandicap?: string | number;
   userProfilePhotoUrl?: string;
   isCurrentUser?: boolean;
-  inline?: boolean; // New prop for inline rendering
 }
 
 interface Achievement {
@@ -54,8 +53,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
   userDisplayName = "User",
   userHandicap,
   userProfilePhotoUrl,
-  isCurrentUser = true,
-  inline = false
+  isCurrentUser = true
 }) => {
   console.log('ClbhouzAchievementsModal rendering - v2.0');
   
@@ -761,143 +759,89 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
     }
   }, [isOpen, isMobile]);
 
-  const renderContent = () => (
-    <>
-      <div className={`${isMobile ? 'p-4 pb-2' : 'p-6 pb-4'} flex-shrink-0`}>
-        <div className="flex justify-between items-center">
-          {/* Left side - Title and subtitle */}
-          <div className="text-left">
-            <h1 className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold text-black dark:text-white`}>
-              Achievements
-            </h1>
-            <p className={`${isMobile ? 'text-sm' : 'text-base'} text-muted-foreground mt-1`}>
-              Defining your game through achievement
-            </p>
-          </div>
-          
-          {/* Right side - User profile */}
-          <div className="flex items-center gap-3">
-            <div className={`${isMobile ? 'w-14 h-14' : 'w-16 h-16'} rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-white font-bold ${isMobile ? 'text-sm' : 'text-lg'}`}>
-              {userProfilePhotoUrl ? (
-                <img 
-                  src={userProfilePhotoUrl} 
-                  alt={userDisplayName} 
-                  className={`${isMobile ? 'w-14 h-14' : 'w-16 h-16'} rounded-full object-cover`}
-                />
-              ) : (
-                userDisplayName.charAt(0).toUpperCase()
-              )}
-            </div>
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className={`
+        ${isMobile ? 'max-w-[95vw] max-h-[90vh] p-0' : 'max-w-4xl max-h-[85vh] p-0'} 
+        overflow-hidden flex flex-col bg-white
+      `}
+      >
+        <DialogHeader className={`${isMobile ? 'p-4 pb-2' : 'p-6 pb-4'} flex-shrink-0`}>
+          <div className="flex justify-between items-center">
+            {/* Left side - Title and subtitle */}
             <div className="text-left">
-              <h3 className={`${isMobile ? 'text-sm' : 'text-base'} font-semibold`}>{userDisplayName}</h3>
-              <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
-                {userHandicap ? `${typeof userHandicap === 'number' ? userHandicap.toFixed(1) : userHandicap} Handicap` : 'No handicap set'}
-              </p>
+              <DialogTitle className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold text-black dark:text-white`}>
+                Achievements
+              </DialogTitle>
+              <DialogDescription className={`${isMobile ? 'text-sm' : 'text-base'} text-muted-foreground mt-1`}>
+                Defining your game through achievement
+              </DialogDescription>
+            </div>
+            
+            {/* Right side - User profile */}
+            <div className="flex items-center gap-3">
+              <div className={`${isMobile ? 'w-14 h-14' : 'w-16 h-16'} rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-white font-bold ${isMobile ? 'text-sm' : 'text-lg'}`}>
+                {userProfilePhotoUrl ? (
+                  <img 
+                    src={userProfilePhotoUrl} 
+                    alt={userDisplayName} 
+                    className={`${isMobile ? 'w-14 h-14' : 'w-16 h-16'} rounded-full object-cover`}
+                  />
+                ) : (
+                  userDisplayName.charAt(0).toUpperCase()
+                )}
+              </div>
+              <div className="text-left">
+                <h3 className={`${isMobile ? 'text-sm' : 'text-base'} font-semibold`}>{userDisplayName}</h3>
+                <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
+                  {userHandicap ? `${typeof userHandicap === 'number' ? userHandicap.toFixed(1) : userHandicap} Handicap` : 'No handicap set'}
+                </p>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
+        </DialogHeader>
 
         {/* XP Progress Header - Collapsible */}
-        <div className={`transition-all duration-300 ease-out border-b border-border bg-background/50 ${
-          isCollapsed ? 'py-2' : `${isMobile ? 'py-4' : 'py-6'}`
+        <div className={`transition-all duration-300 ease-out border-b border-border ${
+          isCollapsed ? 'py-2' : 'py-6'
         }`}>
-          <div className={`${isMobile ? 'px-4' : 'px-6'}`}>
+          <div className="px-4">
             <div className="flex items-center justify-between">
               <div className={`flex-1 transition-all duration-300 ease-out ${isCollapsed ? 'scale-90 opacity-70' : 'scale-100'}`}>
                 {!isCollapsed && (
-                  <div className="space-y-6">
-                    {/* XP Progress Section */}
-                    <div>
-                      <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-semibold text-foreground">XP Progress</h3>
-                        <div className="text-right">
-                          <div className="text-xl font-bold text-foreground">{totalXP.toLocaleString()} XP</div>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center gap-8">
-                        {/* XP Ring */}
-                        <div className="relative">
-                          <XPRingSystem currentXP={totalXP} />
-                          <div className="absolute inset-0 flex flex-col items-center justify-center">
-                            <div className="text-lg font-bold text-foreground">{(nextMilestone - totalXP).toLocaleString()}</div>
-                            <div className="text-xs text-muted-foreground">XP to next ring</div>
-                            <div className="text-xs text-primary font-medium">{Math.round((totalXP / nextMilestone) * 100)}% Complete</div>
-                          </div>
-                        </div>
-                        
-                        {/* Ring Status */}
-                        <div className="flex-1">
-                          <div className="mb-3">
-                            <h4 className="text-base font-semibold text-foreground mb-1">
-                              {currentTier ? currentTier.name : 'No Ring Achieved'}
-                            </h4>
-                            <p className="text-sm text-muted-foreground">
-                              {currentTier 
-                                ? `You've achieved the ${currentTier.name}!`
-                                : `Reach ${nextMilestone.toLocaleString()} XP to unlock your first ring`
-                              }
-                            </p>
-                          </div>
-                          
-                          {nextTier && (
-                            <div className="flex items-center gap-2 text-sm">
-                              <div className="w-4 h-4 rounded-full" style={{ backgroundColor: nextTier.color }}></div>
-                              <span className="text-muted-foreground">Next:</span>
-                              <span className="font-medium text-foreground">{nextTier.name} at {nextTier.minXP.toLocaleString()} XP</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Ring Progression */}
-                    <div>
-                      <h4 className="text-base font-semibold text-foreground mb-4">Ring Progression</h4>
-                      <div className="grid grid-cols-4 gap-4">
-                        {xpTiers.map((tier, index) => {
-                          const isUnlocked = totalXP >= tier.minXP;
-                          const isNext = !currentTier && tier === nextTier;
-                          const isCurrent = currentTier?.name === tier.name;
-                          
-                          return (
-                            <div key={tier.name} className="text-center">
-                              <div className={`w-16 h-16 mx-auto mb-2 rounded-full border-2 flex items-center justify-center relative ${
-                                isUnlocked 
-                                  ? 'border-transparent' 
-                                  : 'border-border bg-muted'
-                              }`} style={isUnlocked ? { backgroundColor: tier.color } : {}}>
-                                {isUnlocked ? (
-                                  <div className="w-6 h-6 rounded-full" style={{ backgroundColor: tier.color, filter: 'brightness(1.5)' }}></div>
-                                ) : (
-                                  <div className="w-6 h-6 text-muted-foreground">🔒</div>
-                                )}
-                                {isCurrent && (
-                                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-primary rounded-full border-2 border-background"></div>
-                                )}
-                              </div>
-                              <div className="text-xs font-medium text-foreground">{tier.name}</div>
-                              <div className="text-xs text-muted-foreground">{tier.minXP.toLocaleString()} XP</div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
+                  <div className="flex flex-col items-center text-center mb-4">
+                    <h2 className="text-2xl font-bold text-black dark:text-white mb-2">
+                      {userDisplayName}'s Golf Journey
+                    </h2>
+                    <p className="text-sm text-muted-foreground">
+                      Track your progress and unlock new milestones
+                    </p>
                   </div>
                 )}
                 
-                {isCollapsed && (
-                  <div className="flex items-center gap-4">
-                    <div className="scale-75">
-                      <XPRingSystem currentXP={totalXP} />
-                    </div>
-                    <div>
-                      <div className="text-sm font-semibold text-foreground">{totalXP.toLocaleString()} XP</div>
-                      <div className="text-xs text-muted-foreground">{(nextMilestone - totalXP).toLocaleString()} to next ring</div>
-                    </div>
+                <div className="flex items-center justify-center gap-4">
+                  <div className={`transition-all duration-300 ease-out ${isCollapsed ? 'scale-75' : 'scale-100'}`}>
+                    <XPRingSystem 
+                      currentXP={totalXP}
+                    />
                   </div>
-                )}
+                  
+                  {!isCollapsed && (
+                    <div className="text-center">
+                      <div className="text-lg font-semibold text-black dark:text-white">
+                        {totalXP.toLocaleString()} XP
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {(nextMilestone - totalXP).toLocaleString()} to {nextTier?.name || 'Blue Ring'}
+                      </div>
+                      {currentTier && (
+                        <div className="text-xs text-muted-foreground mt-1">
+                          Current: {currentTier.name}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
               
               <Button
@@ -1154,31 +1098,13 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
         </div>
 
         {/* Achievement Detail Modal */}
-        {(isOpen || inline) && (
+        {isOpen && (
           <AchievementDetailModal
             isOpen={showAchievementDetailModal}
             onClose={() => setShowAchievementDetailModal(false)}
             achievement={selectedAchievement}
           />
         )}
-    </>
-  );
-
-  if (inline) {
-    return (
-      <div className="flex flex-col bg-background min-h-0 flex-1">
-        {renderContent()}
-      </div>
-    );
-  }
-
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className={`
-        ${isMobile ? 'max-w-[95vw] max-h-[90vh] p-0' : 'max-w-4xl max-h-[85vh] p-0'} 
-        overflow-hidden flex flex-col bg-white
-      `}>
-        {renderContent()}
       </DialogContent>
     </Dialog>
   );
