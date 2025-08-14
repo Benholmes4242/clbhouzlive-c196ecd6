@@ -585,9 +585,6 @@ const HeroProfileHeader = ({
           ),
           stats: (
             <div></div> // Content will be rendered separately below
-          ),
-          achievements: (
-            <div></div> // Content will be rendered separately below
           )
         }}
       </ProfileTabs>
