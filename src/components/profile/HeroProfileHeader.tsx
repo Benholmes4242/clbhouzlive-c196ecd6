@@ -37,7 +37,7 @@ import ProfileBadgeStrip from './ProfileBadgeStrip';
 import ProfileProgressSection from './ProfileProgressSection';
 import CompareProgressModal from './CompareProgressModal';
 import { Swords } from 'lucide-react';
-import ProfileVideoCircle from './ProfileVideoCircle';
+import FullWidthProfileHeader from './FullWidthProfileHeader';
 import { useCloudflareStream } from '@/hooks/useCloudflareStream';
 import { useR2Upload } from '@/hooks/useR2Upload';
 import PinnedAchievements from './PinnedAchievements';
@@ -459,81 +459,25 @@ const HeroProfileHeader = ({
 
   return (
     <>
-      {/* Dynamic Background - Auto-generated from profile photo */}
-      <div className="relative w-full bg-background">
-        {/* Blurred Background Layer with Gradient Fade */}
-        {profile?.profile_photo_url && (
-          <div 
-            className="absolute top-0 left-0 w-full h-[400px] z-0"
-            style={createDynamicBackgroundStyle(profile.profile_photo_url)}
-          >
-            {/* Gradient overlay that fades the blur effect towards the profile photo */}
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/20 to-background"></div>
-          </div>
-        )}
-        
-        {/* Profile Content */}
-        <div className="relative z-10 flex flex-col items-center text-center pt-20 pb-8">
-          
-          
+      {/* Full-Width Profile Header */}
+      <FullWidthProfileHeader
+        videoUrl={profile?.profile_video_url}
+        thumbnailUrl={profile?.profile_video_thumbnail_url}
+        profilePhotoUrl={profile?.profile_photo_url}
+        displayName={displayName}
+        username={username}
+        homeClub={homeClub}
+        isOwnProfile={isOwnProfile}
+        onVideoUpload={handleVideoUpload}
+        onPhotoUpload={handlePhotoUpload}
+        onVideoRemove={handleVideoRemove}
+        onEditProfile={() => setEditDialogOpen(true)}
+        uploading={videoUploading || photoUploading}
+      />
 
-          {/* Profile Photo/Video */}
-          <div className="w-64 h-64 mb-6">
-            <div 
-              className="relative rounded-full overflow-hidden transition-all duration-300 w-full h-full"
-              title={achievementRing.title}
-            >
-              <ProfileVideoCircle
-                videoUrl={profile?.profile_video_url}
-                thumbnailUrl={profile?.profile_video_thumbnail_url}
-                profilePhotoUrl={profile?.profile_photo_url}
-                displayName={displayName}
-                isOwnProfile={isOwnProfile}
-                onVideoUpload={handleVideoUpload}
-                onPhotoUpload={handlePhotoUpload}
-                onVideoRemove={handleVideoRemove}
-                uploading={videoUploading || photoUploading}
-                className="w-full h-full"
-              />
-            </div>
-          </div>
-          
-          {/* User Information */}
-          <div className="text-center mb-6">
-            {/* User's Name */}
-            <div className="flex items-center justify-center">
-              <h1 className="font-bold text-foreground text-4xl">
-                {displayName}
-              </h1>
-            </div>
-            
-            {/* Username with Edit Button */}
-            {username && (
-              <div className="flex items-center justify-center gap-3 mb-2">
-                <p className="text-lg text-muted-foreground">
-                  @{username}
-                </p>
-                
-                {/* Edit Profile Button - Next to username for own profile */}
-                {isOwnProfile && (
-                  <button 
-                    className="bg-muted border border-border rounded-full text-foreground font-medium hover:bg-muted/80 transition-all duration-300 ease-in-out flex items-center justify-center py-1.5 px-3 text-xs" 
-                    onClick={() => setEditDialogOpen(true)}
-                  >
-                    Edit Profile
-                  </button>
-                )}
-              </div>
-            )}
-
-            
-            {/* Home Golf Club */}
-            <p className="text-base text-muted-foreground mb-4">
-              {homeClub}
-            </p>
-          </div>
-
-          {/* Stats Bar - New Horizontal Scrollable Design */}
+      {/* Stats Bar - New Horizontal Scrollable Design */}
+      <div className="relative z-10 bg-background py-6">
+        <div className="flex justify-center">
           <ProfileStatsBar 
             stats={[
               { 
