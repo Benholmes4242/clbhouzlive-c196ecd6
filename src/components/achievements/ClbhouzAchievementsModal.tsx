@@ -1083,7 +1083,19 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                            <div className="relative flex justify-center mb-2">
                              {/* Progress ring above titles */}
                              <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 64 64">
-                               {/* Background circle with blue glow for blue ring */}
+                               {/* Blue ring glow effect - behind the ring stroke only */}
+                               {tier.color === "#3B82F6" && (
+                                 <circle
+                                   cx="32"
+                                   cy="32"
+                                   r="30"
+                                   stroke="rgba(59, 130, 246, 0.4)"
+                                   strokeWidth="6"
+                                   fill="transparent"
+                                   style={{ filter: "blur(4px)" }}
+                                 />
+                               )}
+                               {/* Background circle */}
                                <circle
                                  cx="32"
                                  cy="32"
@@ -1092,9 +1104,6 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                                  strokeWidth="3"
                                  fill="transparent"
                                  className="text-gray-300 dark:text-gray-600"
-                                 style={{
-                                   filter: tier.color === "#3B82F6" ? "drop-shadow(0 0 12px rgba(59, 130, 246, 0.5))" : "none"
-                                 }}
                                />
                                {/* Progress circle */}
                                {tierProgress > 0 && (
