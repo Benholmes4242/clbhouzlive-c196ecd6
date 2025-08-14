@@ -1,6 +1,6 @@
 // ClbhouzAchievementsModal - Achievement Modal
 import React, { useState, useEffect, useRef } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+
 import { Button } from "@/components/ui/button";
 import { XPRingSystem } from "@/components/profile/XPRingSystem";
 import { Sparkles, Trophy, ChevronDown, ChevronUp } from "lucide-react";
@@ -759,23 +759,21 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
   }, [isOpen, isMobile]);
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className={`
-        ${isMobile ? 'max-w-[95vw] max-h-[90vh] p-0' : 'max-w-4xl max-h-[85vh] p-0'} 
-        overflow-hidden flex flex-col bg-white
-      `}
-      >
-        <DialogHeader className={`${isMobile ? 'p-4 pb-2' : 'p-6 pb-4'} flex-shrink-0`}>
-          <div className="flex justify-between items-center">
-            {/* Left side - Title and subtitle */}
-            <div className="text-left">
-              <DialogTitle className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold text-black dark:text-white`}>
-                Achievements
-              </DialogTitle>
-              <DialogDescription className={`${isMobile ? 'text-sm' : 'text-base'} text-muted-foreground mt-1`}>
-                Defining your game through achievement
-              </DialogDescription>
-            </div>
+    <div className={`
+      ${isMobile ? 'max-w-[95vw] max-h-[90vh] p-0' : 'max-w-4xl max-h-[85vh] p-0'} 
+      overflow-hidden flex flex-col bg-background
+    `}>
+      <div className={`${isMobile ? 'p-4 pb-2' : 'p-6 pb-4'} flex-shrink-0`}>
+        <div className="flex justify-between items-center">
+          {/* Left side - Title and subtitle */}
+          <div className="text-left">
+            <h1 className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold text-foreground`}>
+              Achievements
+            </h1>
+            <p className={`${isMobile ? 'text-sm' : 'text-base'} text-muted-foreground mt-1`}>
+              Defining your game through achievement
+            </p>
+          </div>
             
             {/* Right side - User profile */}
             <div className="flex items-center gap-3">
@@ -798,7 +796,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
               </div>
             </div>
           </div>
-        </DialogHeader>
+        </div>
         
         <div 
           ref={scrollRef}
@@ -1432,17 +1430,13 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
 
         </div>
 
-      </DialogContent>
-      
-      {/* Achievement Detail Modal - Moved outside the main Dialog to prevent nesting issues */}
-      {isOpen && (
-        <AchievementDetailModal
-          isOpen={showAchievementDetailModal}
-          onClose={() => setShowAchievementDetailModal(false)}
-          achievement={selectedAchievement}
-        />
-      )}
-    </Dialog>
+      {/* Achievement Detail Modal */}
+      <AchievementDetailModal
+        isOpen={showAchievementDetailModal}
+        onClose={() => setShowAchievementDetailModal(false)}
+        achievement={selectedAchievement}
+      />
+    </div>
   );
 };
 
