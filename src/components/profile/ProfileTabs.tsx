@@ -15,7 +15,6 @@ interface ProfileTabsProps {
   children: {
     activity: React.ReactNode;
     courses: React.ReactNode;
-    achievements: React.ReactNode;
     stats: React.ReactNode;
   };
 }
@@ -38,7 +37,6 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
   const tabs = [
     { id: 'activity', label: 'Activity', icon: Camera },
     { id: 'courses', label: 'Courses Played', icon: MapPin },
-    { id: 'achievements', label: 'Achievements', icon: Trophy },
     { id: 'stats', label: 'Handicap', icon: BarChart3 }
   ];
 
@@ -111,7 +109,6 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
         <div className={`md:max-w-[1150px] md:mx-auto`}>
           {activeTab === 'activity' && children.activity}
           {activeTab === 'courses' && children.courses}
-          {activeTab === 'achievements' && children.achievements}
           {activeTab === 'stats' && children.stats}
         </div>
       </div>

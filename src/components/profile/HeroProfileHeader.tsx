@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useUserAchievements } from '@/hooks/useUserAchievements';
 import { Button } from '@/components/ui/button';
 import { MessageSquare, UserPlus, UserMinus, Copy, Share, Users, UserCheck } from 'lucide-react';
-import { Camera, MapPin, BarChart3, Trophy } from 'lucide-react';
+import { Camera, MapPin, BarChart3 } from 'lucide-react';
 import { toast } from 'sonner';
 import ProfileTabs from './ProfileTabs';
 import ActivityFeed from './ActivityFeed';
@@ -42,7 +42,6 @@ import { useCloudflareStream } from '@/hooks/useCloudflareStream';
 import { useR2Upload } from '@/hooks/useR2Upload';
 import PinnedAchievements from './PinnedAchievements';
 import ProfileStatsBar from './ProfileStatsBar';
-import AchievementsPage from './AchievementsPage';
 
 interface Course {
   id: string;
@@ -107,7 +106,6 @@ const HeroProfileHeader = ({
   const tabs = [
     { id: 'activity', label: 'Activity' },
     { id: 'courses', label: 'Courses Played' },
-    { id: 'achievements', label: 'Achievements' },
     { id: 'stats', label: 'Handicap' },
     { id: 'gear', label: 'Gear & Bag' }
   ];
@@ -585,9 +583,6 @@ const HeroProfileHeader = ({
           courses: (
             <div></div> // Content will be rendered separately below
           ),
-          achievements: (
-            <div></div> // Content will be rendered separately below
-          ),
           stats: (
             <div></div> // Content will be rendered separately below
           )
@@ -722,8 +717,8 @@ const HeroProfileHeader = ({
                 userDisplayName={profile?.display_name || 'User'}
                 isOwnProfile={isOwnProfile}
               />
-            ) : activeSection === 'stats' || activeSection === 'achievements' ? (
-              // No hero section for handicap and achievements tabs
+            ) : activeSection === 'stats' ? (
+              // No hero section for handicap tab - achievements are removed
               <div></div>
             ) : (
               <AchievementsCarousel
@@ -770,15 +765,6 @@ const HeroProfileHeader = ({
                 displayName={profile?.display_name || 'User'}
               />
             </>
-          )}
-          {activeSection === 'achievements' && (
-            <AchievementsPage
-              userId={profile?.id || ''}
-              userDisplayName={profile?.display_name}
-              userHandicap={profile?.eg_handicap_index}
-              userProfilePhotoUrl={profile?.profile_photo_url}
-              isCurrentUser={isOwnProfile}
-            />
           )}
           {activeSection === 'stats' && (
             <HandicapSection 
