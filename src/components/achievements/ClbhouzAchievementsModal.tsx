@@ -1,4 +1,4 @@
-// ClbhouzAchievementsModal - Updated to use AchievementDetailModal consistently
+// ClbhouzAchievementsModal - Canvas Confetti Version - FIXED
 import React, { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -55,6 +55,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
   userProfilePhotoUrl,
   isCurrentUser = true
 }) => {
+  console.log('ClbhouzAchievementsModal rendering with canvas-confetti - v2.0');
   
   const isMobile = useIsMobile();
   const [activeFilter, setActiveFilter] = useState<'all' | 'unlocked' | 'locked' | 'exploration' | 'skill'>('all');
