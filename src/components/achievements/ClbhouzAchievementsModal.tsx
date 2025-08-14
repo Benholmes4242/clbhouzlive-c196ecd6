@@ -1080,41 +1080,9 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                        
                        return (
                          <div key={tier.name} className="flex-1 text-center">
-                           <div className="relative">
-                             {/* Background circle */}
-                             <div className={`
-                               relative w-16 h-16 mx-auto mb-2 rounded-full transition-all duration-500 flex items-center justify-center
-                               ${isActive 
-                                 ? `bg-gradient-to-br from-${tier.color}/20 to-${tier.color}/40 shadow-lg` 
-                                 : (isCurrent || isNext)
-                                   ? 'bg-gray-100 dark:bg-gray-800'
-                                   : 'bg-gray-50 dark:bg-gray-900'
-                               }
-                             `}
-                             style={{ 
-                               color: isActive ? tier.color : '#9CA3AF',
-                               filter: isActive ? (tier.color === "#3B82F6" ? `drop-shadow(0 0 12px rgba(59, 130, 246, 0.8))` :
-                                                      tier.color === "#10B981" ? `drop-shadow(0 0 12px rgba(16, 185, 129, 0.8))` :
-                                                      tier.color === "#6B7280" ? `drop-shadow(0 0 12px rgba(107, 114, 128, 0.8))` :
-                                                      `drop-shadow(0 0 12px rgba(245, 158, 11, 0.8))`) : 'none'
-                             }}
-                             >
-                               {/* Inner glow for blue ring */}
-                               {tier.color === "#3B82F6" && (
-                                 <div 
-                                   className="absolute inset-1 rounded-full opacity-40 animate-pulse"
-                                   style={{
-                                     background: `conic-gradient(from 0deg, rgba(59, 130, 246, 0.3), rgba(139, 92, 246, 0.3), rgba(6, 182, 212, 0.3), rgba(59, 130, 246, 0.3))`,
-                                     filter: 'blur(8px)'
-                                   }}
-                                 />
-                               )}
-                               
-                               <Trophy className={`relative z-10 w-6 h-6 ${isActive ? 'animate-pulse' : ''}`} />
-                             </div>
-                             
-                             {/* Progress ring around the mini ring */}
-                             <svg className="absolute inset-0 w-16 h-16 transform -rotate-90" viewBox="0 0 64 64">
+                           <div className="relative flex justify-center mb-2">
+                             {/* Progress ring above titles */}
+                             <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 64 64">
                                {/* Background circle */}
                                <circle
                                  cx="32"
