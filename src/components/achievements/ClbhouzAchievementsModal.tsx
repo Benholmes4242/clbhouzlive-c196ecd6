@@ -298,6 +298,87 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
     }
   };
 
+  // Get most recently unlocked achievement
+  const getMostRecentAchievement = () => {
+    const allAchievements = [...explorationAchievements, ...skillAchievements];
+    const unlockedAchievements = allAchievements.filter(a => a.isEarned && a.dateEarned);
+    
+    if (unlockedAchievements.length === 0) return null;
+    
+    // Sort by date earned (most recent first)
+    unlockedAchievements.sort((a, b) => {
+      const dateA = new Date(a.dateEarned!);
+      const dateB = new Date(b.dateEarned!);
+      return dateB.getTime() - dateA.getTime();
+    });
+    
+    return unlockedAchievements[0];
+  };
+
+  // Helper function to get achievement badge image for featured display
+  const getFeaturedAchievementIcon = (achievement: Achievement) => {
+    // Use custom badges for specific achievements
+    switch (achievement.title) {
+      case "20 Club":
+        return <img src="/lovable-uploads/20198e55-c649-4394-984a-3fda3a3c8981.png" alt="20 Club Badge" className="w-32 h-32" />;
+      case "50 Club":
+        return <img src="/lovable-uploads/e262bb44-197f-4aac-9823-abf51a3f29ae.png" alt="50 Club Badge" className="w-32 h-32" />;
+      case "100 Century Club":
+        return <img src="/lovable-uploads/c1d8b74c-57b4-4adc-9b6b-bbccc045e03a.png" alt="100 Century Club Badge" className="w-32 h-32" />;
+      case "200 Clubhouse Elite":
+        return <img src="/lovable-uploads/88ba82c3-999c-40b9-885e-313869a7e795.png" alt="200 Clubhouse Elite Badge" className="w-32 h-32" />;
+      case "300 Club Champion":
+        return <img src="/lovable-uploads/0088ccbe-6198-4f2c-ada2-e2bf642abec3.png" alt="300 Club Champion Badge" className="w-32 h-32" />;
+      case "Eagle Collector":
+        return <img src="/lovable-uploads/4ec4bfcd-f19c-4e11-b6a9-b81c1eaab19d.png" alt="Eagle Collector Badge" className="w-32 h-32" />;
+      case "Birdie Blitz":
+        return <img src="/lovable-uploads/5928ca86-f5a8-4ac1-8e15-f13ff748746a.png" alt="Birdie Badge" className="w-32 h-32" />;
+      case "Birdie Every Par":
+        return <img src="/lovable-uploads/164a0671-f0ff-4f1e-8780-4bba8a8fe7f4.png" alt="Birdie Every Par Badge" className="w-32 h-32" />;
+      case "One Day, Two Courses":
+        return <img src="/lovable-uploads/f8900d31-7d35-4e4e-9352-99f6198da121.png" alt="One Day Two Courses Badge" className="w-32 h-32" />;
+      case "Globetrotter Golfer":
+        return <img src="/lovable-uploads/684002ed-a5a9-46e9-a1fc-384da5a7c686.png" alt="Globetrotter Golfer Badge" className="w-32 h-32" />;
+      case "Marathon Golfer":
+        return <img src="/lovable-uploads/02a84f2b-af4f-4064-a7d6-bdd88575b69e.png" alt="Marathon Golfer Badge" className="w-32 h-32" />;
+      case "Single-Figure Handicap":
+        return <img src="/lovable-uploads/066c5dd6-9e79-49f2-8e4b-935a5242850a.png" alt="Single-Figure Handicap Badge" className="w-32 h-32" />;
+      case "Plus Handicap Player":
+        return <img src="/lovable-uploads/1779738a-184b-4a0d-85d0-b964641019d9.png" alt="Plus Handicap Player Badge" className="w-32 h-32" />;
+      case "Under Par Round":
+        return <img src="/lovable-uploads/d7d44dea-f5cc-416d-9a01-985d48262fc6.png" alt="Under Par Round Badge" className="w-32 h-32" />;
+      case "First Eagle":
+        return <img src="/lovable-uploads/6b62e9b3-33d7-4825-b1d7-aac6f86e4ad7.png" alt="First Eagle Badge" className="w-32 h-32" />;
+      case "Hole-in-One":
+        return <img src="/lovable-uploads/68aa3b6e-7c54-41e7-80f6-75b4bf6e8b63.png" alt="Hole-in-One Badge" className="w-32 h-32" />;
+      case "Back-to-Back Birdies":
+        return <img src="/lovable-uploads/7e98fdc5-ab55-44e0-87ec-8b93e493b7e4.png" alt="Back-to-Back Birdies Badge" className="w-32 h-32" />;
+      case "No Bogey Round":
+        return <img src="/lovable-uploads/1a37c1e5-56c0-4e02-a95a-cbfa8ce3a1b6.png" alt="No Bogey Round Badge" className="w-32 h-32" />;
+      case "Par Machine":
+        return <img src="/lovable-uploads/51973f3e-599d-4110-bcf6-8eac43b963f8.png" alt="Par Machine Badge" className="w-32 h-32" />;
+      case "International Golfer":
+        return <img src="/lovable-uploads/3c0146da-b965-42cc-b130-ef9c25727aad.png" alt="International Golfer Badge" className="w-32 h-32" />;
+      // Regional achievement badges
+      case "Lynx Legend":
+        return <img src="/lovable-uploads/f2714e7f-418b-4c4c-ae28-e4a1b1ea8033.png" alt="Britain & Ireland Flag" className="w-32 h-32 rounded-lg" />;
+      case "The Continental Swinger":
+        return <img src="/lovable-uploads/2fd872c8-aee1-4f0d-a3b9-fcfe49dbad20.png" alt="Continental Swinger Badge" className="w-32 h-32 rounded-lg" />;
+      case "Stars and Stripes Tourer":
+        return <img src="/lovable-uploads/2b2ee6a8-e8c4-49d9-bfdf-86403c3a47b7.png" alt="USA Flag" className="w-32 h-32 rounded-lg" />;
+      case "Legends Club":
+        return <img src="/lovable-uploads/3d5aac7d-1c4d-4b41-b450-35a0d7d4d5aa.png" alt="Legends Club Badge" className="w-32 h-32 rounded-lg" />;
+      case "Albatross Ace":
+        return <img src="/lovable-uploads/2fc5fb62-90a5-4424-b85f-9e6b08a774d8.png" alt="Albatross Ace Badge" className="w-32 h-32" />;
+      default:
+        return (
+          <div className="w-32 h-32 text-6xl flex items-center justify-center drop-shadow-lg">
+            {achievement.emoji}
+          </div>
+        );
+    }
+  };
+
   // Helper function to get achievement badge image
   const getAchievementIcon = (achievement: Achievement) => {
     // Use custom badges for specific achievements regardless of earned status
@@ -653,6 +734,8 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       unlockHint: "Target different par holes strategically. Look for opportunities on shorter par 4s and reachable par 5s."
     }
   ];
+
+  const mostRecentAchievement = getMostRecentAchievement();
 
   // Body scroll lock effect for mobile
   useEffect(() => {
@@ -1040,6 +1123,64 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
               </div>
             )}
           </div>
+
+          {/* Featured Most Recent Achievement */}
+          {mostRecentAchievement && (
+            <div className={`${isMobile ? 'px-4 pb-6' : 'px-6 pb-8'}`}>
+              <div className="relative">
+                {/* Confetti Animation */}
+                <div className="absolute inset-0 pointer-events-none">
+                  {[...Array(12)].map((_, i) => (
+                    <div
+                      key={i}
+                      className={`absolute animate-bounce`}
+                      style={{
+                        left: `${20 + Math.random() * 60}%`,
+                        top: `${10 + Math.random() * 80}%`,
+                        animationDelay: `${Math.random() * 2}s`,
+                        animationDuration: `${2 + Math.random() * 2}s`
+                      }}
+                    >
+                      <div 
+                        className="w-3 h-3 rounded-full"
+                        style={{
+                          backgroundColor: ['#FFD700', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FECA57'][Math.floor(Math.random() * 6)]
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+                
+                {/* Featured Achievement Card */}
+                <div className="bg-gradient-to-br from-yellow-50/80 to-amber-50/80 dark:from-yellow-950/20 dark:to-amber-950/20 border-2 border-yellow-200/50 dark:border-yellow-800/50 rounded-2xl p-8 text-center shadow-xl backdrop-blur-sm">
+                  <div className="flex flex-col items-center space-y-4">
+                    {/* Large Badge */}
+                    <div className="relative">
+                      <div className="animate-pulse absolute inset-0 bg-yellow-400/20 rounded-full blur-xl"></div>
+                      <div className="relative drop-shadow-2xl transform hover:scale-105 transition-transform duration-300">
+                        {getFeaturedAchievementIcon(mostRecentAchievement)}
+                      </div>
+                    </div>
+                    
+                    {/* Achievement Title */}
+                    <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
+                      {mostRecentAchievement.title}
+                    </h3>
+                    
+                    {/* XP Gained */}
+                    <div className="bg-gradient-to-r from-green-500 to-emerald-500 text-white px-6 py-2 rounded-full font-bold text-lg shadow-lg">
+                      +{mostRecentAchievement.xp} XP
+                    </div>
+                    
+                    {/* Date Earned */}
+                    <p className="text-sm text-muted-foreground">
+                      Unlocked {mostRecentAchievement.dateEarned}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Filter Buttons - Mobile Optimized */}
           <div className={`${isMobile ? 'px-4 pb-4' : 'px-6 pb-6'}`}>
