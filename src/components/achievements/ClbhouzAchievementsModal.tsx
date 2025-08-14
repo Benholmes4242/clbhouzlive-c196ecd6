@@ -806,39 +806,98 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
             <div className="flex items-center justify-between">
               <div className={`flex-1 transition-all duration-300 ease-out ${isCollapsed ? 'scale-90 opacity-70' : 'scale-100'}`}>
                 {!isCollapsed && (
-                  <div className="flex flex-col items-center text-center mb-4">
-                    <h2 className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold text-foreground mb-2`}>
-                      {userDisplayName}'s Golf Journey
-                    </h2>
-                    <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
-                      Track your progress and unlock new milestones
-                    </p>
+                  <div className="space-y-6">
+                    {/* XP Progress Section */}
+                    <div>
+                      <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-semibold text-foreground">XP Progress</h3>
+                        <div className="text-right">
+                          <div className="text-xl font-bold text-foreground">{totalXP.toLocaleString()} XP</div>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-8">
+                        {/* XP Ring */}
+                        <div className="relative">
+                          <XPRingSystem currentXP={totalXP} />
+                          <div className="absolute inset-0 flex flex-col items-center justify-center">
+                            <div className="text-lg font-bold text-foreground">{(nextMilestone - totalXP).toLocaleString()}</div>
+                            <div className="text-xs text-muted-foreground">XP to next ring</div>
+                            <div className="text-xs text-primary font-medium">{Math.round((totalXP / nextMilestone) * 100)}% Complete</div>
+                          </div>
+                        </div>
+                        
+                        {/* Ring Status */}
+                        <div className="flex-1">
+                          <div className="mb-3">
+                            <h4 className="text-base font-semibold text-foreground mb-1">
+                              {currentTier ? currentTier.name : 'No Ring Achieved'}
+                            </h4>
+                            <p className="text-sm text-muted-foreground">
+                              {currentTier 
+                                ? `You've achieved the ${currentTier.name}!`
+                                : `Reach ${nextMilestone.toLocaleString()} XP to unlock your first ring`
+                              }
+                            </p>
+                          </div>
+                          
+                          {nextTier && (
+                            <div className="flex items-center gap-2 text-sm">
+                              <div className="w-4 h-4 rounded-full" style={{ backgroundColor: nextTier.color }}></div>
+                              <span className="text-muted-foreground">Next:</span>
+                              <span className="font-medium text-foreground">{nextTier.name} at {nextTier.minXP.toLocaleString()} XP</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {/* Ring Progression */}
+                    <div>
+                      <h4 className="text-base font-semibold text-foreground mb-4">Ring Progression</h4>
+                      <div className="grid grid-cols-4 gap-4">
+                        {xpTiers.map((tier, index) => {
+                          const isUnlocked = totalXP >= tier.minXP;
+                          const isNext = !currentTier && tier === nextTier;
+                          const isCurrent = currentTier?.name === tier.name;
+                          
+                          return (
+                            <div key={tier.name} className="text-center">
+                              <div className={`w-16 h-16 mx-auto mb-2 rounded-full border-2 flex items-center justify-center relative ${
+                                isUnlocked 
+                                  ? 'border-transparent' 
+                                  : 'border-border bg-muted'
+                              }`} style={isUnlocked ? { backgroundColor: tier.color } : {}}>
+                                {isUnlocked ? (
+                                  <div className="w-6 h-6 rounded-full" style={{ backgroundColor: tier.color, filter: 'brightness(1.5)' }}></div>
+                                ) : (
+                                  <div className="w-6 h-6 text-muted-foreground">🔒</div>
+                                )}
+                                {isCurrent && (
+                                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-primary rounded-full border-2 border-background"></div>
+                                )}
+                              </div>
+                              <div className="text-xs font-medium text-foreground">{tier.name}</div>
+                              <div className="text-xs text-muted-foreground">{tier.minXP.toLocaleString()} XP</div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
                   </div>
                 )}
                 
-                <div className="flex items-center justify-center gap-4">
-                  <div className={`transition-all duration-300 ease-out ${isCollapsed ? 'scale-75' : 'scale-100'}`}>
-                    <XPRingSystem 
-                      currentXP={totalXP}
-                    />
-                  </div>
-                  
-                  {!isCollapsed && (
-                    <div className="text-center">
-                      <div className={`${isMobile ? 'text-base' : 'text-lg'} font-semibold text-foreground`}>
-                        {totalXP.toLocaleString()} XP
-                      </div>
-                      <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
-                        {(nextMilestone - totalXP).toLocaleString()} to {nextTier?.name || 'Blue Ring'}
-                      </div>
-                      {currentTier && (
-                        <div className="text-xs text-muted-foreground mt-1">
-                          Current: {currentTier.name}
-                        </div>
-                      )}
+                {isCollapsed && (
+                  <div className="flex items-center gap-4">
+                    <div className="scale-75">
+                      <XPRingSystem currentXP={totalXP} />
                     </div>
-                  )}
-                </div>
+                    <div>
+                      <div className="text-sm font-semibold text-foreground">{totalXP.toLocaleString()} XP</div>
+                      <div className="text-xs text-muted-foreground">{(nextMilestone - totalXP).toLocaleString()} to next ring</div>
+                    </div>
+                  </div>
+                )}
               </div>
               
               <Button
