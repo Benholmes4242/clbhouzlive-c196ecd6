@@ -1,4 +1,4 @@
-// ClbhouzAchievementsModal - Canvas Confetti Version - FIXED
+// ClbhouzAchievementsModal - Achievement Modal
 import React, { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
@@ -55,7 +55,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
   userProfilePhotoUrl,
   isCurrentUser = true
 }) => {
-  console.log('ClbhouzAchievementsModal rendering with canvas-confetti - v2.0');
+  console.log('ClbhouzAchievementsModal rendering - v2.0');
   
   const isMobile = useIsMobile();
   const [activeFilter, setActiveFilter] = useState<'all' | 'unlocked' | 'locked' | 'exploration' | 'skill'>('all');
@@ -1067,17 +1067,18 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                       return (
                         <div key={tier.name} className="flex-1 text-center">
                           <div className="relative">
-                            {/* Glow effect for active mini rings */}
-                            {isActive && (
+                            {/* Glow effect for blue mini ring only */}
+                            {isActive && tier.color === "#3B82F6" && (
                               <div 
-                                className="absolute inset-0 rounded-full animate-pulse"
+                                className="absolute opacity-60 animate-pulse rounded-full"
                                 style={{
-                                  background: tier.color === "#3B82F6" ? `radial-gradient(circle, rgba(59, 130, 246, 0.6) 0%, rgba(59, 130, 246, 0.3) 50%, transparent 70%)` :
-                                             tier.color === "#10B981" ? `radial-gradient(circle, rgba(16, 185, 129, 0.6) 0%, rgba(16, 185, 129, 0.3) 50%, transparent 70%)` :
-                                             tier.color === "#6B7280" ? `radial-gradient(circle, rgba(107, 114, 128, 0.6) 0%, rgba(107, 114, 128, 0.3) 50%, transparent 70%)` :
-                                             `radial-gradient(circle, rgba(245, 158, 11, 0.6) 0%, rgba(245, 158, 11, 0.3) 50%, transparent 70%)`,
+                                  top: '-10px',
+                                  left: '-10px',
+                                  right: '-10px',
+                                  bottom: '-10px',
+                                  background: `conic-gradient(from 0deg, rgba(59, 130, 246, 0.4), rgba(139, 92, 246, 0.4), rgba(6, 182, 212, 0.4), rgba(59, 130, 246, 0.4))`,
                                   filter: 'blur(12px)',
-                                  transform: 'scale(1.6)'
+                                  borderRadius: '50%'
                                 }}
                               />
                             )}
