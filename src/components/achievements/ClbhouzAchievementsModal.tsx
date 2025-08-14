@@ -785,29 +785,22 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
             overscrollBehaviorY: 'contain'
           }}
         >
-          {/* Header with Title Left and User Profile Right */}
+          {/* User Profile Section */}
           <div className={`${isMobile ? 'px-4 pb-2' : 'px-6 pb-4'}`}>
-            <div className={`flex justify-between items-center ${isMobile ? 'p-3' : 'p-4'}`}>
-              {/* Left side - Title and subtitle */}
-              <div className="text-left">
-                <h2 className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold text-black dark:text-white mb-1`}>Achievements</h2>
-                <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>Track your golf progress</p>
-              </div>
-
-              {/* Right side - User Profile */}
+            <div className={`flex items-center justify-center ${isMobile ? 'p-3' : 'p-4'}`}>
               <div className="flex items-center gap-3">
-                <div className={`${isMobile ? 'w-12 h-12' : 'w-16 h-16'} rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-white font-bold ${isMobile ? 'text-xs' : 'text-lg'}`}>
+                <div className={`${isMobile ? 'w-14 h-14' : 'w-16 h-16'} rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-white font-bold ${isMobile ? 'text-sm' : 'text-lg'}`}>
                   {userProfilePhotoUrl ? (
                     <img 
                       src={userProfilePhotoUrl} 
                       alt={userDisplayName} 
-                      className={`${isMobile ? 'w-12 h-12' : 'w-16 h-16'} rounded-full object-cover`}
+                      className={`${isMobile ? 'w-14 h-14' : 'w-16 h-16'} rounded-full object-cover`}
                     />
                   ) : (
                     userDisplayName.charAt(0).toUpperCase()
                   )}
                 </div>
-                <div className="text-left">
+                <div className="text-center">
                   <h3 className={`${isMobile ? 'text-sm' : 'text-base'} font-semibold`}>{userDisplayName}</h3>
                   <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
                     {userHandicap ? `Handicap: ${userHandicap}` : 'No handicap set'}
