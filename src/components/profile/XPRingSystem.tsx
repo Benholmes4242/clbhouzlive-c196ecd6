@@ -103,9 +103,9 @@ export const XPRingSystem: React.FC<XPRingSystemProps> = ({
               <div 
                 className="absolute inset-0 rounded-full animate-pulse"
                 style={{
-                  background: `radial-gradient(circle, ${currentTier.color}40 0%, ${currentTier.color}20 40%, transparent 70%)`,
-                  filter: 'blur(8px)',
-                  transform: 'scale(1.2)'
+                  background: `radial-gradient(circle, ${currentTier.color}80 0%, ${currentTier.color}40 40%, transparent 70%)`,
+                  filter: 'blur(16px)',
+                  transform: 'scale(1.4)'
                 }}
               />
               <div 
@@ -228,11 +228,11 @@ export const XPRingSystem: React.FC<XPRingSystemProps> = ({
                         {/* Glow effect for active mini rings */}
                         {isActive && (
                           <div 
-                            className="absolute inset-0 rounded-full"
+                            className="absolute inset-0 rounded-full animate-pulse"
                             style={{
-                              background: `radial-gradient(circle, ${tier.color}30 0%, ${tier.color}15 50%, transparent 70%)`,
-                              filter: 'blur(4px)',
-                              transform: 'scale(1.3)'
+                              background: `radial-gradient(circle, ${tier.color}60 0%, ${tier.color}30 50%, transparent 70%)`,
+                              filter: 'blur(8px)',
+                              transform: 'scale(1.5)'
                             }}
                           />
                         )}
@@ -289,9 +289,9 @@ export const XPRingSystem: React.FC<XPRingSystemProps> = ({
             <div 
               className="absolute inset-0 rounded-full animate-pulse"
               style={{
-                background: `radial-gradient(circle, ${currentTier.color}40 0%, ${currentTier.color}20 40%, transparent 70%)`,
-                filter: 'blur(8px)',
-                transform: 'scale(1.2)'
+                background: `radial-gradient(circle, ${currentTier.color}80 0%, ${currentTier.color}40 40%, transparent 70%)`,
+                filter: 'blur(16px)',
+                transform: 'scale(1.4)'
               }}
             />
             <div 
@@ -420,14 +420,14 @@ export const XPRingSystem: React.FC<XPRingSystemProps> = ({
                   <div className="relative">
                     {/* Glow effect for active mini rings */}
                     {isActive && (
-                      <div 
-                        className="absolute inset-0 rounded-full"
-                        style={{
-                          background: `radial-gradient(circle, ${tier.color}30 0%, ${tier.color}15 50%, transparent 70%)`,
-                          filter: 'blur(4px)',
-                          transform: 'scale(1.3)'
-                        }}
-                      />
+                       <div 
+                         className="absolute inset-0 rounded-full animate-pulse"
+                         style={{
+                           background: `radial-gradient(circle, ${tier.color}60 0%, ${tier.color}30 50%, transparent 70%)`,
+                           filter: 'blur(8px)',
+                           transform: 'scale(1.5)'
+                         }}
+                       />
                     )}
                     <div 
                       className={cn(
