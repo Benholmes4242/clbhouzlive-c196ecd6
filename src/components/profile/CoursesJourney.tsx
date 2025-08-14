@@ -126,7 +126,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                         r="45"
                         fill="none"
                         stroke={achievement.colorLight}
-                        strokeWidth="10"
+                        strokeWidth="3"
                         strokeLinecap="round"
                       />
                       
@@ -137,7 +137,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                         r="45"
                         fill="none"
                         stroke={achievement.color}
-                        strokeWidth="10"
+                        strokeWidth="3"
                         strokeLinecap="round"
                         strokeDasharray="283"
                         strokeDashoffset={283 - completedAngle}
@@ -232,7 +232,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                           r="45"
                           fill="none"
                           stroke={achievement.colorLight}
-                          strokeWidth="8"
+                          strokeWidth="3"
                           strokeLinecap="round"
                         />
                         
@@ -243,7 +243,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                           r="45"
                           fill="none"
                           stroke={achievement.color}
-                          strokeWidth="8"
+                          strokeWidth="3"
                           strokeLinecap="round"
                           strokeDasharray="283"
                           strokeDashoffset={283 - completedAngle}
