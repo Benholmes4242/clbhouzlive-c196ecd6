@@ -2,6 +2,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { User, Trophy, Camera, BarChart3, MapPin } from 'lucide-react';
+import ClbhouzAchievementsModal from '@/components/achievements/ClbhouzAchievementsModal';
 
 interface ProfileTabsProps {
   activeTab: string;
@@ -34,9 +35,12 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
   const [canScrollRight, setCanScrollRight] = useState(false);
   const tabsRef = useRef<HTMLDivElement>(null);
 
+  const [isAchievementsModalOpen, setIsAchievementsModalOpen] = useState(false);
+
   const tabs = [
     { id: 'activity', label: 'Activity', icon: Camera },
     { id: 'courses', label: 'Courses Played', icon: MapPin },
+    { id: 'achievements', label: 'Achievements', icon: Trophy },
     { id: 'stats', label: 'Handicap', icon: BarChart3 }
   ];
 
@@ -84,7 +88,13 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
               return (
                 <button
                   key={tab.id}
-                  onClick={() => onTabChange(tab.id)}
+                  onClick={() => {
+                    if (tab.id === 'achievements') {
+                      setIsAchievementsModalOpen(true);
+                    } else {
+                      onTabChange(tab.id);
+                    }
+                  }}
                   disabled={transitionState !== 'idle'}
                   className={`flex-1 flex items-center justify-center py-4 transition-all duration-200 text-base relative ${
                     isActive 
@@ -112,6 +122,17 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
           {activeTab === 'stats' && children.stats}
         </div>
       </div>
+
+      {/* Achievements Modal */}
+      <ClbhouzAchievementsModal
+        isOpen={isAchievementsModalOpen}
+        onClose={() => setIsAchievementsModalOpen(false)}
+        userId={userId}
+        userDisplayName={userDisplayName}
+        userHandicap={userHandicap}
+        userProfilePhotoUrl={userProfilePhotoUrl}
+        isCurrentUser={isCurrentUser}
+      />
     </div>
 
   );
