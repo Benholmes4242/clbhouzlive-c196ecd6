@@ -45,6 +45,7 @@
   }
 
   #root {
+    background-color: white !important;
     min-height: 100vh;
     min-height: -webkit-fill-available; /* iOS viewport fix */
     /* Ensure root extends behind status bar on mobile */
@@ -136,7 +137,8 @@
     @apply border-border;
   }
   html, body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
+    background-color: white !important;
     font-family: 'League Spartan', system-ui, sans-serif;
     overflow-x: hidden;
     width: 100vw;

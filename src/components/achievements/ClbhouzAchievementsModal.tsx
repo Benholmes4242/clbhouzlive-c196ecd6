@@ -6,7 +6,7 @@ import { XPRingSystem } from "@/components/profile/XPRingSystem";
 import { Sparkles, Trophy, ChevronDown, ChevronUp } from "lucide-react";
 import { useIsMobile } from '@/hooks/use-mobile';
 import AchievementDetailModal from '@/components/achievements/AchievementDetailModal';
-import Confetti from 'react-confetti';
+
 
 // Achievement badge imports - using user's uploaded image
 // import club300Badge from '@/assets/achievements/300-club-champion.png';
@@ -62,7 +62,6 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isManuallyCollapsed, setIsManuallyCollapsed] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
-  const [showConfetti, setShowConfetti] = useState(false);
   const [animateProgress, setAnimateProgress] = useState(false);
   const [selectedAchievement, setSelectedAchievement] = useState<AchievementModalData | null>(null);
   const [showAchievementDetailModal, setShowAchievementDetailModal] = useState(false);
@@ -74,19 +73,6 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
   
   // Clear any cached references by forcing recompilation
   
-  // Trigger subtle confetti on modal open
-  useEffect(() => {
-    if (isOpen) {
-      const timer = setTimeout(() => {
-        setShowConfetti(true);
-        // Hide confetti after 4 seconds
-        setTimeout(() => setShowConfetti(false), 4000);
-      }, 800);
-      return () => clearTimeout(timer);
-    } else {
-      setShowConfetti(false);
-    }
-  }, [isOpen]);
   
   // Mock data for now - replace with actual badge system later
   const totalXP = 2500;
@@ -773,21 +759,6 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
   }, [isOpen, isMobile]);
 
   return (
-    <>
-      {showConfetti && (
-        <Confetti
-          width={window.innerWidth}
-          height={window.innerHeight}
-          numberOfPieces={50}
-          gravity={0.03}
-          wind={0}
-          friction={0.99}
-          opacity={0.7}
-          initialVelocityY={-5}
-          initialVelocityX={0}
-          colors={['#FFD700', '#FFA500', '#FF6347', '#00CED1', '#32CD32', '#9370DB']}
-        />
-      )}
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className={`
         ${isMobile ? 'max-w-[95vw] max-h-[90vh] p-0' : 'max-w-4xl max-h-[85vh] p-0'} 
@@ -979,12 +950,6 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                         {/* Enhanced Progress Ring */}
                         <div className="relative flex-shrink-0">
                           <div className="relative w-40 h-40">
-                            {/* Consistent glow effect behind ring */}
-                            <div className={`absolute inset-2 rounded-full ${nextTier ? 'animate-pulse' : ''}`} 
-                                 style={{ 
-                                   boxShadow: nextTier ? `0 0 20px ${nextTier.color}60, 0 0 40px ${nextTier.color}30` : 'none',
-                                   background: nextTier ? `radial-gradient(circle, ${nextTier.color}20 0%, transparent 70%)` : 'none'
-                                 }} />
                             
                             <svg className="w-40 h-40 transform -rotate-90" viewBox="0 0 160 160">
                               {/* Background circle */}
@@ -1421,7 +1386,6 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
         />
       )}
     </Dialog>
-    </>
   );
 };
 
