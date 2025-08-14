@@ -1167,6 +1167,10 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                               });
                               setShowAchievementDetailModal(true);
                             } : undefined}
+                            onMouseLeave={!isMobile ? () => {
+                              setShowAchievementDetailModal(false);
+                              setSelectedAchievement(null);
+                            } : undefined}
                                  >
                                   {/* Icon directly on background - no container */}
                                   <div className="flex justify-center items-center">
@@ -1259,6 +1263,10 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                               });
                               setShowAchievementDetailModal(true);
                             } : undefined}
+                            onMouseLeave={!isMobile ? () => {
+                              setShowAchievementDetailModal(false);
+                              setSelectedAchievement(null);
+                            } : undefined}
                                  >
                                   {/* Icon directly on background - no container */}
                                   <div className="flex justify-center items-center">
@@ -1303,12 +1311,14 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
 
       </DialogContent>
       
-      {/* Achievement Detail Modal */}
-      <AchievementDetailModal
-        isOpen={showAchievementDetailModal}
-        onClose={() => setShowAchievementDetailModal(false)}
-        achievement={selectedAchievement}
-      />
+      {/* Achievement Detail Modal - Moved outside the main Dialog to prevent nesting issues */}
+      {isOpen && (
+        <AchievementDetailModal
+          isOpen={showAchievementDetailModal}
+          onClose={() => setShowAchievementDetailModal(false)}
+          achievement={selectedAchievement}
+        />
+      )}
     </Dialog>
   );
 };
