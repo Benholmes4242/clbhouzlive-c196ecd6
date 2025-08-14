@@ -108,15 +108,6 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                         </linearGradient>
                       </defs>
                       
-                      {/* Background full circle with light gradient */}
-                      <circle
-                        cx="60"
-                        cy="60"
-                        r="52"
-                        fill={`url(#bg-gradient-${achievement.id})`}
-                        stroke="none"
-                        opacity="0.4"
-                      />
                       
                       {/* Remaining portion (full ring) */}
                       <circle
@@ -213,15 +204,6 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                           </linearGradient>
                         </defs>
                         
-                        {/* Background full circle with light gradient */}
-                        <circle
-                          cx="60"
-                          cy="60"
-                          r="52"
-                          fill={`url(#mobile-bg-gradient-${achievement.id})`}
-                          stroke="none"
-                          opacity="0.4"
-                        />
                         
                         {/* Remaining portion (full ring) */}
                         <circle
