@@ -1081,18 +1081,18 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                        return (
                          <div key={tier.name} className="flex-1 text-center">
                            <div className="relative">
+                             {/* Background circle */}
                              <div className={`
-                               relative w-16 h-16 mx-auto mb-2 rounded-full border-4 transition-all duration-500 flex items-center justify-center overflow-hidden
+                               relative w-16 h-16 mx-auto mb-2 rounded-full transition-all duration-500 flex items-center justify-center
                                ${isActive 
-                                 ? `bg-gradient-to-br from-${tier.color}/20 to-${tier.color}/40 border-current shadow-lg` 
+                                 ? `bg-gradient-to-br from-${tier.color}/20 to-${tier.color}/40 shadow-lg` 
                                  : (isCurrent || isNext)
-                                   ? 'border-gray-400 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 animate-pulse'
-                                   : 'border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900'
+                                   ? 'bg-gray-100 dark:bg-gray-800'
+                                   : 'bg-gray-50 dark:bg-gray-900'
                                }
                              `}
                              style={{ 
                                color: isActive ? tier.color : '#9CA3AF',
-                               borderColor: isActive ? tier.color : undefined,
                                filter: isActive ? (tier.color === "#3B82F6" ? `drop-shadow(0 0 12px rgba(59, 130, 246, 0.8))` :
                                                       tier.color === "#10B981" ? `drop-shadow(0 0 12px rgba(16, 185, 129, 0.8))` :
                                                       tier.color === "#6B7280" ? `drop-shadow(0 0 12px rgba(107, 114, 128, 0.8))` :
@@ -1110,26 +1110,37 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                                  />
                                )}
                                
-                               {/* Progress ring for any tier with progress */}
-                               {tierProgress > 0 && (
-                                 <svg className="absolute inset-0 w-full h-full transform -rotate-90" viewBox="0 0 64 64">
-                                   <circle
-                                     cx="32"
-                                     cy="32"
-                                     r="28"
-                                     stroke={tier.color}
-                                     strokeWidth="4"
-                                     fill="transparent"
-                                     strokeDasharray={`${28 * 2 * Math.PI}`}
-                                     strokeDashoffset={`${28 * 2 * Math.PI * (1 - tierProgress / 100)}`}
-                                     strokeLinecap="round"
-                                     className="transition-all duration-700 opacity-80"
-                                   />
-                                 </svg>
-                               )}
-                               
                                <Trophy className={`relative z-10 w-6 h-6 ${isActive ? 'animate-pulse' : ''}`} />
                              </div>
+                             
+                             {/* Progress ring around the mini ring */}
+                             <svg className="absolute inset-0 w-16 h-16 transform -rotate-90" viewBox="0 0 64 64">
+                               {/* Background circle */}
+                               <circle
+                                 cx="32"
+                                 cy="32"
+                                 r="30"
+                                 stroke="currentColor"
+                                 strokeWidth="3"
+                                 fill="transparent"
+                                 className="text-gray-300 dark:text-gray-600"
+                               />
+                               {/* Progress circle */}
+                               {tierProgress > 0 && (
+                                 <circle
+                                   cx="32"
+                                   cy="32"
+                                   r="30"
+                                   stroke={tier.color}
+                                   strokeWidth="3"
+                                   fill="transparent"
+                                   strokeDasharray={`${30 * 2 * Math.PI}`}
+                                   strokeDashoffset={`${30 * 2 * Math.PI * (1 - tierProgress / 100)}`}
+                                   strokeLinecap="round"
+                                   className="transition-all duration-700"
+                                 />
+                               )}
+                             </svg>
                            </div>
                            <div className="text-xs font-medium mb-1" style={{ color: isActive ? tier.color : '#6B7280' }}>
                              {tier.name}
