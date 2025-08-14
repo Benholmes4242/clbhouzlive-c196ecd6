@@ -1,21 +1,33 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Search, User, Trophy, Star, Calendar, Medal, Target, Zap, Award, Crown, Gem, Shield, Sword, Lock, Filter } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { XPRingSystem } from "@/components/profile/XPRingSystem";
+import { Sparkles, Trophy, ChevronDown, ChevronUp } from "lucide-react";
 import { useIsMobile } from '@/hooks/use-mobile';
 import AchievementDetailModal from '@/components/achievements/AchievementDetailModal';
 
 interface Achievement {
+  title: string;
+  emoji: string;
+  isEarned: boolean;
+  description: string;
+  xp: number;
+  isRepeatable: boolean;
+  progress?: string;
+  dateEarned?: string;
+  unlockHint?: string;
+}
+
+interface AchievementModalData {
   id: string;
   name: string;
-  description: string;
-  icon: string;
-  color: string;
-  category: string;
-  unlockedAt?: string;
-  progress?: number;
-  maxProgress?: number;
-  rarity: 'common' | 'rare' | 'epic' | 'legendary';
   xp: number;
-  isUnlocked: boolean;
+  unlocked: boolean;
+  iconURL?: string;
+  description?: string;
+  unlockHint?: string;
+  progress?: string;
+  dateEarned?: string;
+  isRepeatable?: boolean;
 }
 
 interface AchievementsPageProps {
@@ -28,321 +40,426 @@ interface AchievementsPageProps {
 
 const AchievementsPage: React.FC<AchievementsPageProps> = ({
   userId,
-  userDisplayName,
+  userDisplayName = "User",
   userHandicap,
   userProfilePhotoUrl,
-  isCurrentUser
+  isCurrentUser = true
 }) => {
   const isMobile = useIsMobile();
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
-  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [activeFilter, setActiveFilter] = useState<'all' | 'unlocked' | 'locked' | 'exploration' | 'skill'>('all');
+  const [selectedAchievement, setSelectedAchievement] = useState<AchievementModalData | null>(null);
+  const [showAchievementDetailModal, setShowAchievementDetailModal] = useState(false);
+  const [animateProgress, setAnimateProgress] = useState(false);
 
-  // Sample achievements data - this would come from your database
-  const achievements: Achievement[] = [
+  // Mock data for now - replace with actual badge system later
+  const totalXP = 2500;
+  const nextMilestone = 10000;
+  const progressPercentage = isMobile ? 100 : (totalXP / nextMilestone) * 100;
+  
+  // XP Tier System
+  const xpTiers = [
+    { name: "Blue Ring", color: "#3B82F6", minXP: 10000 },
+    { name: "Green Ring", color: "#10B981", minXP: 20000 },
+    { name: "Silver Ring", color: "#6B7280", minXP: 30000 },
+    { name: "Gold Ring", color: "#F59E0B", minXP: 40000 }
+  ];
+  
+  const currentTier = xpTiers.slice().reverse().find(tier => totalXP >= tier.minXP);
+  const nextTier = xpTiers.find(tier => totalXP < tier.minXP) || xpTiers[xpTiers.length - 1];
+
+  // Animation trigger when component mounts
+  useEffect(() => {
+    const timer = setTimeout(() => setAnimateProgress(true), 300);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Helper function to get filtered achievements
+  const getFilteredAchievements = (achievements: Achievement[], category: string) => {
+    let filtered = achievements;
+    
+    switch (activeFilter) {
+      case 'unlocked':
+        filtered = achievements.filter(a => a.isEarned);
+        break;
+      case 'locked':
+        filtered = achievements.filter(a => !a.isEarned);
+        break;
+      case 'exploration':
+        filtered = category === 'exploration' ? achievements : [];
+        break;
+      case 'skill':
+        filtered = category === 'skill' ? achievements : [];
+        break;
+      case 'all':
+      default:
+        filtered = achievements;
+        break;
+    }
+    
+    return filtered;
+  };
+
+  // Helper function to calculate progress percentage and get smart nudges
+  const getAchievementProgress = (achievement: Achievement) => {
+    if (achievement.isEarned) return { percentage: 100, nudgeText: null };
+    
+    // Parse progress strings to calculate percentages
+    if (achievement.progress?.includes('/')) {
+      const [current, total] = achievement.progress.split('/').map(s => parseInt(s.trim()));
+      if (!isNaN(current) && !isNaN(total) && total > 0) {
+        const percentage = (current / total) * 100;
+        const remaining = total - current;
+        
+        // Generate nudge text based on achievement type
+        let nudgeText = null;
+        if (percentage >= 80 && percentage < 100) {
+          nudgeText = `${remaining} more to unlock!`;
+        }
+        
+        return { percentage, nudgeText };
+      }
+    }
+    
+    return { percentage: 0, nudgeText: null };
+  };
+
+  // Helper function to get achievement badge image
+  const getAchievementIcon = (achievement: Achievement) => {
+    // Use custom badges for specific achievements regardless of earned status
+    switch (achievement.title) {
+      case "20 Club":
+        return <img src="/lovable-uploads/20198e55-c649-4394-984a-3fda3a3c8981.png" alt="20 Club Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
+      case "50 Club":
+        return <img src="/lovable-uploads/e262bb44-197f-4aac-9823-abf51a3f29ae.png" alt="50 Club Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
+      case "100 Century Club":
+        return <img src="/lovable-uploads/c1d8b74c-57b4-4adc-9b6b-bbccc045e03a.png" alt="100 Century Club Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
+      case "Eagle Collector":
+        return <img src="/lovable-uploads/4ec4bfcd-f19c-4e11-b6a9-b81c1eaab19d.png" alt="Eagle Collector Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
+      default:
+        return (
+          <div className={`
+            text-4xl transition-all duration-200 
+            ${achievement.isEarned 
+              ? 'grayscale-0 opacity-100 drop-shadow-lg' 
+              : 'grayscale opacity-60'
+            }
+          `}>
+            {achievement.emoji}
+          </div>
+        );
+    }
+  };
+
+  // Exploration & Travel Achievements
+  const explorationAchievements: Achievement[] = [
     {
-      id: '1',
-      name: '20 Club',
-      description: 'Play 20 top-rated golf courses',
-      icon: '🏌️',
-      color: '#FFD700',
-      category: 'Courses',
-      unlockedAt: '2024-01-15',
-      progress: 20,
-      maxProgress: 20,
-      rarity: 'common',
-      xp: 100,
-      isUnlocked: true
-    },
-    {
-      id: '2',
-      name: '50 Club',
-      description: 'Play 50 top-rated golf courses',
-      icon: '⭐',
-      color: '#C0C0C0',
-      category: 'Courses',
-      unlockedAt: '2024-02-20',
-      progress: 50,
-      maxProgress: 50,
-      rarity: 'rare',
-      xp: 250,
-      isUnlocked: true
-    },
-    {
-      id: '3',
-      name: 'Century Club',
-      description: 'Play 100 top-rated golf courses',
-      icon: '💙',
-      color: '#1E90FF',
-      category: 'Courses',
-      progress: 87,
-      maxProgress: 100,
-      rarity: 'epic',
-      xp: 500,
-      isUnlocked: false
-    },
-    {
-      id: '4',
-      name: 'Eagle Collector',
-      description: 'Score 25 eagles in ranked rounds',
-      icon: '🦅',
-      color: '#8B4513',
-      category: 'Performance',
-      unlockedAt: '2024-03-10',
-      progress: 25,
-      maxProgress: 25,
-      rarity: 'epic',
-      xp: 400,
-      isUnlocked: true
-    },
-    {
-      id: '5',
-      name: 'Par Machine',
-      description: 'Score par or better on 100 consecutive holes',
-      icon: '⚙️',
-      color: '#4169E1',
-      category: 'Performance',
-      progress: 73,
-      maxProgress: 100,
-      rarity: 'rare',
-      xp: 300,
-      isUnlocked: false
-    },
-    {
-      id: '6',
-      name: 'World Traveler',
-      description: 'Play courses in 10 different countries',
-      icon: '🌍',
-      color: '#32CD32',
-      category: 'Travel',
-      unlockedAt: '2024-01-28',
-      progress: 12,
-      maxProgress: 10,
-      rarity: 'rare',
-      xp: 350,
-      isUnlocked: true
-    },
-    {
-      id: '7',
-      name: 'Social Butterfly',
-      description: 'Play rounds with 50 different players',
-      icon: '🦋',
-      color: '#FF69B4',
-      category: 'Social',
-      progress: 34,
-      maxProgress: 50,
-      rarity: 'common',
+      title: "20 Club",
+      emoji: "🏌️",
+      isEarned: true,
+      description: "Play your first 20 golf courses. Welcome to the clubhouse!",
       xp: 200,
-      isUnlocked: false
+      isRepeatable: false,
+      progress: "20 / 20 courses",
+      dateEarned: "January 15, 2024"
     },
     {
-      id: '8',
-      name: 'Legend Status',
-      description: 'Achieve single-digit handicap',
-      icon: '👑',
-      color: '#FFD700',
-      category: 'Handicap',
-      progress: 4.2,
-      maxProgress: 9.9,
-      rarity: 'legendary',
-      xp: 1000,
-      isUnlocked: true
+      title: "50 Club",
+      emoji: "⭐",
+      isEarned: true,
+      description: "Reach the milestone of 50 courses played. You're getting serious!",
+      xp: 300,
+      isRepeatable: false,
+      progress: "50 / 50 courses",
+      dateEarned: "November 8, 2023"
+    },
+    {
+      title: "100 Century Club",
+      emoji: "💯",
+      isEarned: false,
+      description: "Join the exclusive 100 courses club. True dedication to the game!",
+      xp: 500,
+      isRepeatable: false,
+      progress: "78 / 100 courses",
+      unlockHint: "Keep exploring new courses to unlock this achievement!"
     }
   ];
 
-  const categories = [
-    { id: 'all', label: 'All', icon: Trophy },
-    { id: 'Courses', label: 'Courses', icon: Target },
-    { id: 'Performance', label: 'Performance', icon: Star },
-    { id: 'Travel', label: 'Travel', icon: Medal },
-    { id: 'Social', label: 'Social', icon: User },
-    { id: 'Handicap', label: 'Handicap', icon: Crown }
+  // Skill-Based Achievements
+  const skillBasedAchievements: Achievement[] = [
+    {
+      title: "Eagle Collector",
+      emoji: "🦅",
+      isEarned: true,
+      description: "Score 5 eagles in ranked rounds. Master of precision!",
+      xp: 400,
+      isRepeatable: false,
+      progress: "5 / 5 eagles",
+      dateEarned: "March 10, 2024"
+    },
+    {
+      title: "Birdie Blitz",
+      emoji: "🎯",
+      isEarned: false,
+      description: "Score 3 birdies in a single round. Show your scoring prowess!",
+      xp: 150,
+      isRepeatable: true,
+      progress: "2 / 3 birdies",
+      unlockHint: "One more birdie in a round to unlock!"
+    },
+    {
+      title: "No Bogey Round",
+      emoji: "⚡",
+      isEarned: false,
+      description: "Complete a full round without a single bogey. Consistency is key!",
+      xp: 300,
+      isRepeatable: true,
+      unlockHint: "Avoid those last bogeys for a clean round!"
+    }
   ];
 
-  const filteredAchievements = achievements.filter(achievement => {
-    const matchesCategory = selectedCategory === 'all' || achievement.category === selectedCategory;
-    const matchesSearch = achievement.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         achievement.description.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+  const handleAchievementClick = (achievement: Achievement) => {
+    const modalData: AchievementModalData = {
+      id: achievement.title,
+      name: achievement.title,
+      description: achievement.description,
+      xp: achievement.xp,
+      unlocked: achievement.isEarned,
+      progress: achievement.progress,
+      dateEarned: achievement.dateEarned,
+      unlockHint: achievement.unlockHint,
+      isRepeatable: achievement.isRepeatable
+    };
+    setSelectedAchievement(modalData);
+    setShowAchievementDetailModal(true);
+  };
 
-  const getRarityColor = (rarity: string) => {
-    switch (rarity) {
-      case 'common': return 'border-gray-400';
-      case 'rare': return 'border-blue-400';
-      case 'epic': return 'border-purple-400';
-      case 'legendary': return 'border-yellow-400';
-      default: return 'border-gray-300';
+  const renderAchievementSection = (title: string, achievements: Achievement[], category: string) => {
+    const filteredAchievements = getFilteredAchievements(achievements, category);
+    
+    if (filteredAchievements.length === 0 && activeFilter !== 'all') {
+      return null;
     }
-  };
 
-  const getRarityBg = (rarity: string) => {
-    switch (rarity) {
-      case 'common': return 'bg-gray-50';
-      case 'rare': return 'bg-blue-50';
-      case 'epic': return 'bg-purple-50';
-      case 'legendary': return 'bg-yellow-50';
-      default: return 'bg-gray-50';
-    }
-  };
-
-  const stats = {
-    total: achievements.length,
-    unlocked: achievements.filter(a => a.isUnlocked).length,
-    totalXP: achievements.filter(a => a.isUnlocked).reduce((sum, a) => sum + a.xp, 0)
-  };
-
-  return (
-    <div className="space-y-6">
-      {/* Header Stats */}
-      <div className="text-center mb-8">
-        <h2 className="text-2xl font-bold text-foreground mb-4">Achievements</h2>
-        <div className="flex justify-center gap-8 text-sm text-muted-foreground">
-          <div className="text-center">
-            <div className="text-2xl font-bold text-foreground">{stats.unlocked}</div>
-            <div>Unlocked</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-foreground">{stats.total}</div>
-            <div>Total</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-foreground">{stats.totalXP}</div>
-            <div>XP Earned</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Search and Filters */}
-      <div className="space-y-4">
-        {/* Search */}
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <input
-            type="text"
-            placeholder="Search achievements..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-          />
-        </div>
-
-        {/* Category Filters */}
-        <div className="flex gap-2 overflow-x-auto pb-2">
-          {categories.map((category) => {
-            const IconComponent = category.icon;
+    return (
+      <div className="mb-8">
+        <h3 className="text-xl font-semibold text-foreground mb-4 flex items-center gap-2">
+          <Trophy className="h-5 w-5" />
+          {title}
+        </h3>
+        <div className={`grid gap-4 ${isMobile ? 'grid-cols-2' : 'grid-cols-3 lg:grid-cols-4'}`}>
+          {filteredAchievements.map((achievement, index) => {
+            const { percentage, nudgeText } = getAchievementProgress(achievement);
+            
             return (
-              <button
-                key={category.id}
-                onClick={() => setSelectedCategory(category.id)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg whitespace-nowrap transition-colors ${
-                  selectedCategory === category.id
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                }`}
+              <div
+                key={index}
+                onClick={() => handleAchievementClick(achievement)}
+                className={`
+                  relative p-4 rounded-lg border cursor-pointer transition-all duration-200 hover:scale-105
+                  ${achievement.isEarned 
+                    ? 'border-primary/50 bg-gradient-to-br from-primary/5 to-primary/10 shadow-md' 
+                    : 'border-border bg-muted/30 hover:bg-muted/50'
+                  }
+                `}
               >
-                <IconComponent className="h-4 w-4" />
-                <span className="text-sm font-medium">{category.label}</span>
-              </button>
+                {/* Achievement Badge */}
+                <div className="flex flex-col items-center mb-3">
+                  <div className={`mb-2 ${isMobile ? 'w-16 h-16' : 'w-20 h-20'} flex items-center justify-center`}>
+                    {getAchievementIcon(achievement)}
+                  </div>
+                  
+                  {/* Achievement Title */}
+                  <h4 className={`font-semibold text-center leading-tight ${isMobile ? 'text-sm' : 'text-base'}`}>
+                    {achievement.title}
+                  </h4>
+                </div>
+
+                {/* XP Badge */}
+                {achievement.isEarned && (
+                  <div className="absolute top-2 right-2">
+                    <div className="bg-primary text-primary-foreground px-2 py-1 rounded-full text-xs font-medium">
+                      +{achievement.xp} XP
+                    </div>
+                  </div>
+                )}
+
+                {/* Progress Bar for Locked Achievements */}
+                {!achievement.isEarned && achievement.progress && (
+                  <div className="mt-2">
+                    <div className="w-full bg-muted rounded-full h-2 mb-1">
+                      <div
+                        className="bg-primary rounded-full h-2 transition-all duration-500"
+                        style={{ width: `${percentage}%` }}
+                      />
+                    </div>
+                    <div className="text-xs text-muted-foreground text-center">
+                      {achievement.progress}
+                    </div>
+                  </div>
+                )}
+
+                {/* Nudge Text */}
+                {nudgeText && (
+                  <div className="mt-2 text-xs text-primary text-center font-medium">
+                    {nudgeText}
+                  </div>
+                )}
+
+                {/* Earned Date */}
+                {achievement.isEarned && achievement.dateEarned && (
+                  <div className="mt-2 text-xs text-muted-foreground text-center">
+                    Earned {achievement.dateEarned}
+                  </div>
+                )}
+              </div>
             );
           })}
         </div>
       </div>
+    );
+  };
 
-      {/* Achievements Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {filteredAchievements.map((achievement) => (
-          <div
-            key={achievement.id}
-            onClick={() => {
-              setSelectedAchievement(achievement);
-              setShowDetailModal(true);
-            }}
-            className={`p-4 rounded-lg border-2 cursor-pointer transition-all hover:scale-105 hover:shadow-lg ${
-              achievement.isUnlocked 
-                ? `${getRarityColor(achievement.rarity)} ${getRarityBg(achievement.rarity)}` 
-                : 'border-gray-300 bg-gray-100 opacity-60'
-            }`}
-          >
-            {/* Achievement Icon */}
-            <div className="flex items-center justify-center w-16 h-16 mx-auto mb-3 text-3xl rounded-full bg-white border-2 border-current">
-              {achievement.isUnlocked ? achievement.icon : <Lock className="h-6 w-6 text-gray-400" />}
-            </div>
-
-            {/* Achievement Info */}
-            <div className="text-center">
-              <h3 className="font-semibold text-foreground mb-1">{achievement.name}</h3>
-              <p className="text-sm text-muted-foreground mb-3">{achievement.description}</p>
-
-              {/* Progress Bar (for locked achievements) */}
-              {!achievement.isUnlocked && achievement.progress !== undefined && achievement.maxProgress && (
-                <div className="mb-2">
-                  <div className="flex justify-between text-xs text-muted-foreground mb-1">
-                    <span>Progress</span>
-                    <span>{achievement.progress}/{achievement.maxProgress}</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div
-                      className="bg-primary rounded-full h-2 transition-all"
-                      style={{ width: `${(achievement.progress / achievement.maxProgress) * 100}%` }}
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* Rarity Badge */}
-              <div className="flex items-center justify-center gap-2">
-                <span className={`px-2 py-1 rounded text-xs font-medium ${
-                  achievement.rarity === 'common' ? 'bg-gray-200 text-gray-800' :
-                  achievement.rarity === 'rare' ? 'bg-blue-200 text-blue-800' :
-                  achievement.rarity === 'epic' ? 'bg-purple-200 text-purple-800' :
-                  'bg-yellow-200 text-yellow-800'
-                }`}>
-                  {achievement.rarity.charAt(0).toUpperCase() + achievement.rarity.slice(1)}
-                </span>
-                {achievement.isUnlocked && (
-                  <span className="text-xs text-muted-foreground">+{achievement.xp} XP</span>
-                )}
-              </div>
-
-              {/* Unlock Date */}
-              {achievement.isUnlocked && achievement.unlockedAt && (
-                <p className="text-xs text-muted-foreground mt-2">
-                  Unlocked {new Date(achievement.unlockedAt).toLocaleDateString()}
-                </p>
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="max-w-4xl mx-auto p-6 space-y-6">
+        {/* Header with Profile Info */}
+        <div className="flex flex-col items-center text-center mb-8">
+          <h1 className="text-2xl font-bold text-foreground mb-2">Achievements</h1>
+          <p className="text-muted-foreground mb-6">Defining your game through achievement</p>
+          
+          {/* User Profile Section */}
+          <div className="flex items-center gap-4 mb-6">
+            {userProfilePhotoUrl && (
+              <img 
+                src={userProfilePhotoUrl} 
+                alt={userDisplayName} 
+                className="w-16 h-16 rounded-full object-cover"
+              />
+            )}
+            <div className="text-left">
+              <h2 className="text-lg font-semibold text-foreground">{userDisplayName}</h2>
+              {userHandicap && (
+                <p className="text-muted-foreground">Handicap: {userHandicap}</p>
               )}
             </div>
           </div>
-        ))}
-      </div>
-
-      {/* No Results */}
-      {filteredAchievements.length === 0 && (
-        <div className="text-center py-12">
-          <Trophy className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-foreground mb-2">No achievements found</h3>
-          <p className="text-muted-foreground">Try adjusting your search or filter criteria.</p>
         </div>
-      )}
 
-      {/* Achievement Detail Modal */}
-      {selectedAchievement && (
-        <AchievementDetailModal
-          isOpen={showDetailModal}
-          onClose={() => setShowDetailModal(false)}
-          achievement={{
-            id: selectedAchievement.id,
-            name: selectedAchievement.name,
-            description: selectedAchievement.description,
-            xp: selectedAchievement.xp,
-            unlocked: selectedAchievement.isUnlocked,
-            dateEarned: selectedAchievement.unlockedAt,
-            progress: selectedAchievement.progress ? `${selectedAchievement.progress}/${selectedAchievement.maxProgress}` : undefined,
-            unlockHint: !selectedAchievement.isUnlocked ? "Keep playing to unlock this achievement!" : undefined
-          }}
-        />
-      )}
+        {/* XP Progress Section */}
+        <div className="bg-card border rounded-lg p-6 mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-lg font-semibold text-foreground">XP Progress</h3>
+              <p className="text-muted-foreground">Keep playing to unlock new rings!</p>
+            </div>
+            <div className="text-right">
+              <div className="flex items-center gap-1">
+                <Sparkles className="h-4 w-4 text-primary" />
+                <span className="text-2xl font-bold text-foreground">{totalXP.toLocaleString()} XP</span>
+              </div>
+              <p className="text-sm text-muted-foreground">Current Progress</p>
+            </div>
+          </div>
+
+          {/* XP Ring System */}
+          <XPRingSystem 
+            currentXP={totalXP}
+            size="large"
+          />
+
+          {/* Ring Progress */}
+          <div className="mt-6">
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm text-foreground">Progress to {nextTier.name}</span>
+              <span className="text-sm font-medium text-foreground">
+                {Math.round(progressPercentage)}%
+              </span>
+            </div>
+            <div className="w-full bg-muted rounded-full h-2">
+              <div
+                className="bg-gradient-to-r from-primary to-primary/80 rounded-full h-2 transition-all duration-1000 ease-out"
+                style={{ 
+                  width: animateProgress ? `${Math.min(progressPercentage, 100)}%` : '0%'
+                }}
+              />
+            </div>
+            <div className="flex justify-between mt-2 text-xs text-muted-foreground">
+              <span>Next: {nextTier.name} at {nextTier.minXP.toLocaleString()} XP</span>
+            </div>
+          </div>
+
+          {/* Ring Progression */}
+          <div className="mt-6">
+            <h4 className="text-sm font-medium text-foreground mb-3">Ring Progression</h4>
+            <div className="grid grid-cols-4 gap-4">
+              {xpTiers.map((tier, index) => (
+                <div key={index} className="text-center">
+                  <div 
+                    className={`w-12 h-12 rounded-full border-2 flex items-center justify-center mx-auto mb-2 transition-all ${
+                      totalXP >= tier.minXP 
+                        ? 'border-primary bg-primary/10' 
+                        : 'border-muted bg-muted'
+                    }`}
+                    style={{
+                      borderColor: totalXP >= tier.minXP ? tier.color : undefined
+                    }}
+                  >
+                    <Trophy 
+                      className={`h-6 w-6 ${
+                        totalXP >= tier.minXP ? 'text-primary' : 'text-muted-foreground'
+                      }`}
+                      style={{
+                        color: totalXP >= tier.minXP ? tier.color : undefined
+                      }}
+                    />
+                  </div>
+                  <div className="text-xs font-medium text-foreground">{tier.name}</div>
+                  <div className="text-xs text-muted-foreground">{tier.minXP.toLocaleString()} XP</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Filter Buttons */}
+        <div className="flex flex-wrap gap-2 mb-6">
+          {[
+            { key: 'all', label: 'All Achievements' },
+            { key: 'unlocked', label: 'Unlocked Only' },
+            { key: 'locked', label: 'Locked Only' },
+            { key: 'exploration', label: 'Experience & Exploration' },
+            { key: 'skill', label: 'Skill-Based' }
+          ].map(({ key, label }) => (
+            <Button
+              key={key}
+              variant={activeFilter === key ? 'default' : 'outline'}
+              size="sm"
+              onClick={() => setActiveFilter(key as any)}
+              className="text-xs"
+            >
+              {label}
+            </Button>
+          ))}
+        </div>
+
+        {/* Achievement Sections */}
+        {(activeFilter === 'all' || activeFilter === 'exploration') && (
+          renderAchievementSection("Experience & Exploration Achievements", explorationAchievements, 'exploration')
+        )}
+        
+        {(activeFilter === 'all' || activeFilter === 'skill') && (
+          renderAchievementSection("Skill-Based Achievements", skillBasedAchievements, 'skill')
+        )}
+
+        {/* Achievement Detail Modal */}
+        {selectedAchievement && (
+          <AchievementDetailModal
+            isOpen={showAchievementDetailModal}
+            onClose={() => setShowAchievementDetailModal(false)}
+            achievement={selectedAchievement}
+          />
+        )}
+      </div>
     </div>
   );
 };
