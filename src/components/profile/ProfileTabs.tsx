@@ -63,8 +63,8 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
     <div className="w-full">
       {/* Sticky Tab Bar */}
       <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm">
-        <div className="relative">
-          {/* Desktop: max-width container matching achievements */}
+        <div className="relative px-4 md:px-8">
+          {/* Content width container matching achievements and activity sections */}
           <div className="md:max-w-[1150px] md:mx-auto md:px-0">
             {/* Left fade gradient */}
             {canScrollLeft && (
