@@ -6,7 +6,7 @@ import { XPRingSystem } from "@/components/profile/XPRingSystem";
 import { Sparkles, Trophy, ChevronDown, ChevronUp } from "lucide-react";
 import { useIsMobile } from '@/hooks/use-mobile';
 import AchievementDetailModal from '@/components/achievements/AchievementDetailModal';
-import { useSpring, animated, useTransition, useSprings } from 'react-spring';
+import confetti from 'canvas-confetti';
 
 // Achievement badge imports - using user's uploaded image
 // import club300Badge from '@/assets/achievements/300-club-champion.png';
@@ -72,98 +72,50 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
   
   // Clear any cached references by forcing recompilation
   
-  // React Spring confetti particles setup
-  const confettiCount = 12;
-  const confettiItems = Array.from({ length: confettiCount }, (_, i) => ({
-    id: i,
-    color: ['#FFD700', '#FFA500', '#FF6347', '#00CED1', '#32CD32', '#9370DB'][i % 6],
-    angle: (i * 30) * (Math.PI / 180),
-    delay: i * 100
-  }));
+  // Canvas confetti effect
+  const triggerConfetti = () => {
+    const duration = 3000;
+    const animationEnd = Date.now() + duration;
+    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
 
-  const [confettiSprings] = useSprings(
-    confettiCount,
-    (index) => ({
-      from: { 
-        transform: 'translate3d(0px, 0px, 0px) scale(0) rotate(0deg)',
-        opacity: 0
-      },
-      to: async (next) => {
-        const item = confettiItems[index];
-        const radius = 120 + Math.random() * 60;
-        const x = Math.cos(item.angle) * radius;
-        const y = Math.sin(item.angle) * radius;
-        
-        while (true) {
-          await next({
-            transform: `translate3d(${x}px, ${y}px, 0px) scale(1) rotate(360deg)`,
-            opacity: 1,
-          });
-          await next({
-            transform: `translate3d(${x * 1.5}px, ${y * 1.5}px, 0px) scale(0.8) rotate(720deg)`,
-            opacity: 0,
-          });
-          await next({
-            transform: 'translate3d(0px, 0px, 0px) scale(0) rotate(0deg)',
-            opacity: 0,
-          });
-        }
-      },
-      config: { mass: 1, tension: 280, friction: 60 },
-      delay: confettiItems[index].delay,
-    }),
-    []
-  );
+    function randomInRange(min: number, max: number) {
+      return Math.random() * (max - min) + min;
+    }
 
-  // Spring animation for the featured badge
-  const badgeSpring = useSpring({
-    from: { 
-      transform: 'scale(0) rotate(-180deg)',
-      opacity: 0 
-    },
-    to: { 
-      transform: 'scale(1) rotate(0deg)',
-      opacity: 1 
-    },
-    config: { mass: 1, tension: 180, friction: 12 },
-    delay: 300,
-  });
+    const interval: any = setInterval(function() {
+      const timeLeft = animationEnd - Date.now();
 
-  // Spring animation for the title
-  const titleSpring = useSpring({
-    from: { 
-      opacity: 0,
-      transform: 'translate3d(0, 30px, 0)'
-    },
-    to: { 
-      opacity: 1,
-      transform: 'translate3d(0, 0px, 0)'
-    },
-    config: { mass: 1, tension: 280, friction: 60 },
-    delay: 600,
-  });
+      if (timeLeft <= 0) {
+        return clearInterval(interval);
+      }
 
-  // Spring animation for XP
-  const xpSpring = useSpring({
-    from: { 
-      opacity: 0,
-      transform: 'scale(0.5)'
-    },
-    to: { 
-      opacity: 1,
-      transform: 'scale(1)'
-    },
-    config: { mass: 1, tension: 300, friction: 10 },
-    delay: 800,
-  });
+      const particleCount = 50 * (timeLeft / duration);
+      
+      // Left side confetti
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
+      });
+      
+      // Right side confetti
+      confetti({
+        ...defaults,
+        particleCount,
+        origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
+      });
+    }, 250);
+  };
 
-  // Spring animation for date
-  const dateSpring = useSpring({
-    from: { opacity: 0 },
-    to: { opacity: 1 },
-    config: { mass: 1, tension: 280, friction: 60 },
-    delay: 1000,
-  });
+  // Trigger confetti on modal open
+  useEffect(() => {
+    if (isOpen) {
+      const timer = setTimeout(() => {
+        triggerConfetti();
+      }, 800);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
   
   // Mock data for now - replace with actual badge system later
   const totalXP = 2500;
@@ -1221,62 +1173,31 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
           {mostRecentAchievement && (
             <div className={`${isMobile ? 'px-4 pb-6' : 'px-6 pb-8'}`}>
               <div className="relative">
-                {/* React Spring Physics-based Confetti */}
-                <div className="absolute inset-0 flex justify-center items-start pt-8 pointer-events-none">
-                  <div className="relative">
-                    {confettiSprings.map((spring, index) => (
-                      <animated.div
-                        key={confettiItems[index].id}
-                        style={{
-                          ...spring,
-                          backgroundColor: confettiItems[index].color,
-                          position: 'absolute',
-                          left: '0px',
-                          top: '0px',
-                        }}
-                        className="w-3 h-3 rounded-full"
-                      />
-                    ))}
-                  </div>
-                </div>
-                
                 {/* Featured Achievement Card */}
                 <div className="p-8 text-center">
                   <div className="flex flex-col items-center space-y-2">
-                    {/* Large Badge with Spring Physics */}
-                    <animated.div style={badgeSpring} className="relative">
+                    {/* Large Badge with CSS Animation */}
+                    <div className="relative animate-scale-in">
                       <div className="absolute inset-0 bg-yellow-400/20 rounded-full blur-xl animate-pulse"></div>
-                      <div className="relative drop-shadow-2xl">
+                      <div className="relative drop-shadow-2xl hover:scale-105 transition-transform duration-300">
                         {getFeaturedAchievementIcon(mostRecentAchievement)}
                       </div>
-                    </animated.div>
+                    </div>
                     
-                    {/* Achievement Title with Spring Animation */}
-                    <animated.h3 
-                      style={titleSpring}
-                      className="text-2xl font-bold text-gray-800 dark:text-gray-200"
-                    >
+                    {/* Achievement Title with Fade Animation */}
+                    <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200 animate-fade-in">
                       {mostRecentAchievement.title}
-                    </animated.h3>
+                    </h3>
                     
-                    {/* XP Gained with Spring Physics */}
-                    <animated.div 
-                      style={{
-                        ...xpSpring,
-                        color: '#3B82F6'
-                      }}
-                      className="font-bold text-lg cursor-pointer"
-                    >
+                    {/* XP Gained */}
+                    <div className="font-bold text-lg text-blue-500 animate-scale-in">
                       +{mostRecentAchievement.xp} XP
-                    </animated.div>
+                    </div>
                     
-                    {/* Date Earned with Spring Animation */}
-                    <animated.p 
-                      style={dateSpring}
-                      className="text-sm text-muted-foreground"
-                    >
+                    {/* Date Earned */}
+                    <p className="text-sm text-muted-foreground animate-fade-in">
                       Unlocked {mostRecentAchievement.dateEarned}
-                    </animated.p>
+                    </p>
                   </div>
                 </div>
               </div>
