@@ -9,7 +9,7 @@ import ActivityFeed from './ActivityFeed';
 import UniversalProfileTabs from './UniversalProfileTabs';
 import { useTabSlideTransition, TransitionDirection } from '@/hooks/useTabSlideTransition';
 import { useIsMobile } from '@/hooks/use-mobile';
-import AchievementsCarousel from './AchievementsCarousel';
+
 import CoursesJourney from './CoursesJourney';
 import { useSupabaseSession } from '@/hooks/useSupabaseSession';
 import { toast as useToast } from '@/hooks/use-toast';
@@ -599,20 +599,7 @@ const HeroProfileHeader = ({
               {transitionDirection === 'right' ? (
                 /* Moving away from current section */
                 activeSection === 'activity' ? (
-                  <AchievementsCarousel
-                    achievements={achievements.map(a => ({
-                      id: a.id || `achievement-${Math.random()}`,
-                      name: a.type || 'Achievement',
-                      xp: 100,
-                      unlocked: true,
-                      description: a.message || 'Achievement unlocked!'
-                    }))}
-                    userId={profile?.id || ''}
-                    userDisplayName={profile?.display_name}
-                    userHandicap={profile?.eg_handicap_index}
-                    userProfilePhotoUrl={profile?.profile_photo_url}
-                    isCurrentUser={isOwnProfile}
-                  />
+                  <div></div> // Achievements moved to dedicated tab
                 ) : activeSection === 'courses' ? (
                   <CoursesJourney 
                     userId={profile?.id}
@@ -633,20 +620,7 @@ const HeroProfileHeader = ({
                 ) : activeSection === 'stats' ? (
                   <div></div> // stats section has no hero content
                 ) : (
-                  <AchievementsCarousel
-                    achievements={achievements.map(a => ({
-                      id: a.id || `achievement-${Math.random()}`,
-                      name: a.type || 'Achievement',
-                      xp: 100,
-                      unlocked: true,
-                      description: a.message || 'Achievement unlocked!'
-                    }))}
-                    userId={profile?.id || ''}
-                    userDisplayName={profile?.display_name}
-                    userHandicap={profile?.eg_handicap_index}
-                    userProfilePhotoUrl={profile?.profile_photo_url}
-                    isCurrentUser={isOwnProfile}
-                  />
+                  <div></div> // Achievements moved to dedicated tab
                 )
               )}
             </div>
@@ -664,38 +638,12 @@ const HeroProfileHeader = ({
                 ) : activeSection === 'stats' ? (
                   <div></div> // stats section has no hero content
                 ) : (
-                  <AchievementsCarousel
-                    achievements={achievements.map(a => ({
-                      id: a.id || `achievement-${Math.random()}`,
-                      name: a.type || 'Achievement',
-                      xp: 100,
-                      unlocked: true,
-                      description: a.message || 'Achievement unlocked!'
-                    }))}
-                    userId={profile?.id || ''}
-                    userDisplayName={profile?.display_name}
-                    userHandicap={profile?.eg_handicap_index}
-                    userProfilePhotoUrl={profile?.profile_photo_url}
-                    isCurrentUser={isOwnProfile}
-                  />
+                  <div></div> // Achievements moved to dedicated tab
                 )
               ) : (
                 /* Moving to previous section */
                 activeSection === 'activity' ? (
-                  <AchievementsCarousel
-                    achievements={achievements.map(a => ({
-                      id: a.id || `achievement-${Math.random()}`,
-                      name: a.type || 'Achievement',
-                      xp: 100,
-                      unlocked: true,
-                      description: a.message || 'Achievement unlocked!'
-                    }))}
-                    userId={profile?.id || ''}
-                    userDisplayName={profile?.display_name}
-                    userHandicap={profile?.eg_handicap_index}
-                    userProfilePhotoUrl={profile?.profile_photo_url}
-                    isCurrentUser={isOwnProfile}
-                  />
+                  <div></div> // Achievements moved to dedicated tab
                 ) : activeSection === 'courses' ? (
                   <CoursesJourney 
                     userId={profile?.id}
@@ -721,20 +669,7 @@ const HeroProfileHeader = ({
               // No hero section for handicap tab - achievements are removed
               <div></div>
             ) : (
-              <AchievementsCarousel
-                achievements={achievements.map(a => ({
-                  id: a.id || `achievement-${Math.random()}`,
-                  name: a.type || 'Achievement',
-                  xp: 100,
-                  unlocked: true,
-                  description: a.message || 'Achievement unlocked!'
-                }))}
-                userId={profile?.id || ''}
-                userDisplayName={profile?.display_name}
-                userHandicap={profile?.eg_handicap_index}
-                userProfilePhotoUrl={profile?.profile_photo_url}
-                isCurrentUser={isOwnProfile}
-              />
+              <div></div> // Achievements moved to dedicated tab
             )}
           </>
         )}
