@@ -765,11 +765,11 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
         overflow-hidden flex flex-col bg-white
       `}
       >
-        <DialogHeader className={`${isMobile ? 'p-4 pb-2' : 'p-6 pb-4'} flex-shrink-0`}>
-          <DialogTitle className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold text-black dark:text-white`}>
+        <DialogHeader className={`${isMobile ? 'p-4 pb-2' : 'p-6 pb-4'} flex-shrink-0 text-center`}>
+          <DialogTitle className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold text-black dark:text-white text-center`}>
             Achievements
           </DialogTitle>
-          <DialogDescription className={`${isMobile ? 'text-sm' : 'text-base'} text-muted-foreground mt-1`}>
+          <DialogDescription className={`${isMobile ? 'text-sm' : 'text-base'} text-muted-foreground mt-1 text-center`}>
             Defining your game through achievement
           </DialogDescription>
         </DialogHeader>
@@ -787,7 +787,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
         >
           {/* User Profile Section */}
           <div className={`${isMobile ? 'px-4 pb-2' : 'px-6 pb-4'}`}>
-            <div className={`flex items-center justify-between ${isMobile ? 'p-3' : 'p-4'}`}>
+            <div className={`flex items-center justify-center ${isMobile ? 'p-3' : 'p-4'}`}>
               <div className="flex items-center gap-3">
                 <div className={`${isMobile ? 'w-14 h-14' : 'w-16 h-16'} rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-white font-bold ${isMobile ? 'text-sm' : 'text-lg'}`}>
                   {userProfilePhotoUrl ? (
@@ -800,7 +800,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                     userDisplayName.charAt(0).toUpperCase()
                   )}
                 </div>
-                <div>
+                <div className="text-center">
                   <h3 className={`${isMobile ? 'text-sm' : 'text-base'} font-semibold`}>{userDisplayName}</h3>
                   <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
                     {userHandicap ? `Handicap: ${userHandicap}` : 'No handicap set'}
@@ -1066,21 +1066,35 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                       
                       return (
                         <div key={tier.name} className="flex-1 text-center">
-                          <div className={`
-                            w-16 h-16 mx-auto mb-2 rounded-full border-4 transition-all duration-500 flex items-center justify-center
-                            ${isActive 
-                              ? `bg-gradient-to-br from-${tier.color}/20 to-${tier.color}/40 border-current shadow-lg` 
-                              : isNext 
-                                ? 'border-gray-400 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 animate-pulse'
-                                : 'border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900'
-                            }
-                          `}
-                          style={{ 
-                            color: isActive ? tier.color : '#9CA3AF',
-                            borderColor: isActive ? tier.color : undefined
-                          }}
-                          >
-                            <Trophy className={`w-6 h-6 ${isActive ? 'animate-pulse' : ''}`} />
+                          <div className="relative">
+                            {/* Glow effect for active mini rings */}
+                            {isActive && (
+                              <div 
+                                className="absolute inset-0 rounded-full animate-pulse"
+                                style={{
+                                  background: `radial-gradient(circle, ${tier.color}60 0%, ${tier.color}30 50%, transparent 70%)`,
+                                  filter: 'blur(8px)',
+                                  transform: 'scale(1.5)'
+                                }}
+                              />
+                            )}
+                            <div className={`
+                              relative w-16 h-16 mx-auto mb-2 rounded-full border-4 transition-all duration-500 flex items-center justify-center
+                              ${isActive 
+                                ? `bg-gradient-to-br from-${tier.color}/20 to-${tier.color}/40 border-current shadow-lg` 
+                                : isNext 
+                                  ? 'border-gray-400 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 animate-pulse'
+                                  : 'border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900'
+                              }
+                            `}
+                            style={{ 
+                              color: isActive ? tier.color : '#9CA3AF',
+                              borderColor: isActive ? tier.color : undefined,
+                              filter: isActive ? `drop-shadow(0 0 8px ${tier.color}60)` : 'none'
+                            }}
+                            >
+                              <Trophy className={`w-6 h-6 ${isActive ? 'animate-pulse' : ''}`} />
+                            </div>
                           </div>
                           <div className="text-xs font-medium mb-1" style={{ color: isActive ? tier.color : '#6B7280' }}>
                             {tier.name}
