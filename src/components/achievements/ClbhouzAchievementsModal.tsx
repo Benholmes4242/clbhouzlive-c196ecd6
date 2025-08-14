@@ -19,6 +19,7 @@ interface ClbhouzAchievementsModalProps {
   userHandicap?: string | number;
   userProfilePhotoUrl?: string;
   isCurrentUser?: boolean;
+  inline?: boolean; // New prop for inline rendering
 }
 
 interface Achievement {
@@ -53,7 +54,8 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
   userDisplayName = "User",
   userHandicap,
   userProfilePhotoUrl,
-  isCurrentUser = true
+  isCurrentUser = true,
+  inline = false
 }) => {
   console.log('ClbhouzAchievementsModal rendering - v2.0');
   
@@ -759,47 +761,42 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
     }
   }, [isOpen, isMobile]);
 
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className={`
-        ${isMobile ? 'max-w-[95vw] max-h-[90vh] p-0' : 'max-w-4xl max-h-[85vh] p-0'} 
-        overflow-hidden flex flex-col bg-white
-      `}
-      >
-        <DialogHeader className={`${isMobile ? 'p-4 pb-2' : 'p-6 pb-4'} flex-shrink-0`}>
-          <div className="flex justify-between items-center">
-            {/* Left side - Title and subtitle */}
-            <div className="text-left">
-              <DialogTitle className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold text-black dark:text-white`}>
-                Achievements
-              </DialogTitle>
-              <DialogDescription className={`${isMobile ? 'text-sm' : 'text-base'} text-muted-foreground mt-1`}>
-                Defining your game through achievement
-              </DialogDescription>
+  const renderContent = () => (
+    <>
+      <div className={`${isMobile ? 'p-4 pb-2' : 'p-6 pb-4'} flex-shrink-0`}>
+        <div className="flex justify-between items-center">
+          {/* Left side - Title and subtitle */}
+          <div className="text-left">
+            <h1 className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold text-black dark:text-white`}>
+              Achievements
+            </h1>
+            <p className={`${isMobile ? 'text-sm' : 'text-base'} text-muted-foreground mt-1`}>
+              Defining your game through achievement
+            </p>
+          </div>
+          
+          {/* Right side - User profile */}
+          <div className="flex items-center gap-3">
+            <div className={`${isMobile ? 'w-14 h-14' : 'w-16 h-16'} rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-white font-bold ${isMobile ? 'text-sm' : 'text-lg'}`}>
+              {userProfilePhotoUrl ? (
+                <img 
+                  src={userProfilePhotoUrl} 
+                  alt={userDisplayName} 
+                  className={`${isMobile ? 'w-14 h-14' : 'w-16 h-16'} rounded-full object-cover`}
+                />
+              ) : (
+                userDisplayName.charAt(0).toUpperCase()
+              )}
             </div>
-            
-            {/* Right side - User profile */}
-            <div className="flex items-center gap-3">
-              <div className={`${isMobile ? 'w-14 h-14' : 'w-16 h-16'} rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-white font-bold ${isMobile ? 'text-sm' : 'text-lg'}`}>
-                {userProfilePhotoUrl ? (
-                  <img 
-                    src={userProfilePhotoUrl} 
-                    alt={userDisplayName} 
-                    className={`${isMobile ? 'w-14 h-14' : 'w-16 h-16'} rounded-full object-cover`}
-                  />
-                ) : (
-                  userDisplayName.charAt(0).toUpperCase()
-                )}
-              </div>
-              <div className="text-left">
-                <h3 className={`${isMobile ? 'text-sm' : 'text-base'} font-semibold`}>{userDisplayName}</h3>
-                <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
-                  {userHandicap ? `${typeof userHandicap === 'number' ? userHandicap.toFixed(1) : userHandicap} Handicap` : 'No handicap set'}
-                </p>
-              </div>
+            <div className="text-left">
+              <h3 className={`${isMobile ? 'text-sm' : 'text-base'} font-semibold`}>{userDisplayName}</h3>
+              <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
+                {userHandicap ? `${typeof userHandicap === 'number' ? userHandicap.toFixed(1) : userHandicap} Handicap` : 'No handicap set'}
+              </p>
             </div>
           </div>
-        </DialogHeader>
+        </div>
+      </div>
 
         {/* XP Progress Header - Collapsible */}
         <div className={`transition-all duration-300 ease-out border-b border-border ${
@@ -1098,13 +1095,31 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
         </div>
 
         {/* Achievement Detail Modal */}
-        {isOpen && (
+        {(isOpen || inline) && (
           <AchievementDetailModal
             isOpen={showAchievementDetailModal}
             onClose={() => setShowAchievementDetailModal(false)}
             achievement={selectedAchievement}
           />
         )}
+    </>
+  );
+
+  if (inline) {
+    return (
+      <div className="flex flex-col bg-background min-h-0 flex-1">
+        {renderContent()}
+      </div>
+    );
+  }
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className={`
+        ${isMobile ? 'max-w-[95vw] max-h-[90vh] p-0' : 'max-w-4xl max-h-[85vh] p-0'} 
+        overflow-hidden flex flex-col bg-white
+      `}>
+        {renderContent()}
       </DialogContent>
     </Dialog>
   );
