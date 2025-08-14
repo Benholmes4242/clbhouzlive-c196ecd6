@@ -6,7 +6,7 @@ import { XPRingSystem } from "@/components/profile/XPRingSystem";
 import { Sparkles, Trophy, ChevronDown, ChevronUp } from "lucide-react";
 import { useIsMobile } from '@/hooks/use-mobile';
 import AchievementDetailModal from '@/components/achievements/AchievementDetailModal';
-import confetti from 'canvas-confetti';
+import Confetti from 'react-confetti';
 
 // Achievement badge imports - using user's uploaded image
 // import club300Badge from '@/assets/achievements/300-club-champion.png';
@@ -62,6 +62,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isManuallyCollapsed, setIsManuallyCollapsed] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
   const [animateProgress, setAnimateProgress] = useState(false);
   const [selectedAchievement, setSelectedAchievement] = useState<AchievementModalData | null>(null);
   const [showAchievementDetailModal, setShowAchievementDetailModal] = useState(false);
@@ -73,48 +74,17 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
   
   // Clear any cached references by forcing recompilation
   
-  // Canvas confetti effect
-  const triggerConfetti = () => {
-    const duration = 3000;
-    const animationEnd = Date.now() + duration;
-    const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
-
-    function randomInRange(min: number, max: number) {
-      return Math.random() * (max - min) + min;
-    }
-
-    const interval: any = setInterval(function() {
-      const timeLeft = animationEnd - Date.now();
-
-      if (timeLeft <= 0) {
-        return clearInterval(interval);
-      }
-
-      const particleCount = 50 * (timeLeft / duration);
-      
-      // Left side confetti
-      confetti({
-        ...defaults,
-        particleCount,
-        origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 }
-      });
-      
-      // Right side confetti
-      confetti({
-        ...defaults,
-        particleCount,
-        origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 }
-      });
-    }, 250);
-  };
-
-  // Trigger confetti on modal open
+  // Trigger subtle confetti on modal open
   useEffect(() => {
     if (isOpen) {
       const timer = setTimeout(() => {
-        triggerConfetti();
+        setShowConfetti(true);
+        // Hide confetti after 4 seconds
+        setTimeout(() => setShowConfetti(false), 4000);
       }, 800);
       return () => clearTimeout(timer);
+    } else {
+      setShowConfetti(false);
     }
   }, [isOpen]);
   
@@ -803,6 +773,21 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
   }, [isOpen, isMobile]);
 
   return (
+    <>
+      {showConfetti && (
+        <Confetti
+          width={window.innerWidth}
+          height={window.innerHeight}
+          numberOfPieces={50}
+          gravity={0.03}
+          wind={0}
+          friction={0.99}
+          opacity={0.7}
+          initialVelocityY={-5}
+          initialVelocityX={0}
+          colors={['#FFD700', '#FFA500', '#FF6347', '#00CED1', '#32CD32', '#9370DB']}
+        />
+      )}
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className={`
         ${isMobile ? 'max-w-[95vw] max-h-[90vh] p-0' : 'max-w-4xl max-h-[85vh] p-0'} 
@@ -932,7 +917,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
               </div>
             ) : (
               /* Full XP Ring Section - Mobile Optimized */
-              <div className={`bg-gradient-to-br from-blue-50 via-purple-50 to-blue-50 dark:from-blue-950/20 dark:via-purple-950/20 dark:to-blue-950/20 rounded-xl border border-blue-200 dark:border-blue-800 relative overflow-hidden ${
+              <div className={`bg-background rounded-xl border border-border relative overflow-hidden ${
                 isMobile ? 'p-3' : 'p-6'
               }`}>
                 {/* Celebration Animation Overlay */}
@@ -948,11 +933,10 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                     {/* Header with collapse button */}
                     <div className="flex justify-between items-center">
                       <div className="text-center flex-1">
-                        <div className="text-xl font-bold text-foreground flex items-center justify-center gap-2 mb-1">
-                          <Sparkles className={`w-4 h-4 ${nextTier ? 'text-yellow-500 animate-pulse' : 'text-muted-foreground'}`} />
-                          {totalXP.toLocaleString()} XP
-                        </div>
-                        <div className="text-xs text-muted-foreground">Current Progress</div>
+                         <div className="text-xl font-bold text-foreground flex items-center justify-center gap-2 mb-1">
+                           {totalXP.toLocaleString()} XP
+                         </div>
+                        
                       </div>
                       <Button
                         variant="ghost"
@@ -962,25 +946,6 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                       >
                         <ChevronUp className="h-3 w-3" />
                       </Button>
-                    </div>
-                    
-                    {/* Progress Bar */}
-                    <div className="space-y-1">
-                      <div className="flex justify-between text-xs text-muted-foreground">
-                        <span>Progress to {nextTier.name}</span>
-                        <span className="font-medium">{Math.round(progressPercentage)}%</span>
-                      </div>
-                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 overflow-hidden">
-                        <div 
-                          className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 rounded-full transition-all duration-1000 ease-out relative"
-                          style={{ 
-                            width: animateProgress ? `${progressPercentage}%` : '0%',
-                            boxShadow: '0 0 15px rgba(59, 130, 246, 0.6)'
-                          }}
-                        >
-                          <div className="absolute inset-0 bg-white/20 animate-pulse" />
-                        </div>
-                      </div>
                     </div>
                     
                     {/* Next ring text and toggle */}
@@ -994,15 +959,13 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                     <div className="flex justify-between items-start mb-6">
                       <div>
                         <h3 className="text-lg font-bold text-foreground mb-1">XP Progress</h3>
-                        <p className="text-sm text-muted-foreground">Keep playing to unlock new rings!</p>
+                        
                       </div>
                       <div className="flex items-center gap-4">
                         <div className="text-right">
-                          <div className="text-2xl font-bold text-foreground flex items-center gap-2">
-                            <Sparkles className={`w-5 h-5 ${nextTier ? 'text-yellow-500 animate-pulse' : 'text-muted-foreground'}`} />
-                            {totalXP.toLocaleString()} XP
-                          </div>
-                          <div className="text-xs text-muted-foreground">Current Progress</div>
+                           <div className="text-2xl font-bold text-foreground flex items-center gap-2">
+                             {totalXP.toLocaleString()} XP
+                           </div>
                         </div>
                         <Button
                           variant="ghost"
@@ -1107,24 +1070,6 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                       </div>
                     </div>
 
-                    {/* Horizontal Progress Bar */}
-                    <div className="mb-6">
-                      <div className="flex justify-between text-sm mb-2">
-                        <span className="text-muted-foreground">Progress to {nextTier.name}</span>
-                        <span className="font-medium">{Math.round(progressPercentage)}%</span>
-                      </div>
-                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
-                        <div 
-                          className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-cyan-500 rounded-full transition-all duration-1000 ease-out relative"
-                          style={{ 
-                            width: animateProgress ? `${progressPercentage}%` : '0%',
-                            boxShadow: '0 0 15px rgba(59, 130, 246, 0.6)'
-                          }}
-                        >
-                          <div className="absolute inset-0 bg-white/20 animate-pulse" />
-                        </div>
-                      </div>
-                    </div>
                   </>
                 )}
 
@@ -1268,9 +1213,9 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                       }
                     `}
                   >
-                    {filter === 'all' ? 'All Achievements' : 
-                     filter === 'unlocked' ? 'Unlocked Only' :
-                     filter === 'locked' ? 'Locked Only' :
+                     {filter === 'all' ? 'All Achievements' : 
+                      filter === 'unlocked' ? 'Unlocked' :
+                      filter === 'locked' ? 'Locked' :
                      filter === 'exploration' ? 'Experience & Exploration' :
                      'Skill-Based'}
                   </Button>
@@ -1484,6 +1429,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
         />
       )}
     </Dialog>
+    </>
   );
 };
 
