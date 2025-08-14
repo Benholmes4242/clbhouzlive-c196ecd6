@@ -62,8 +62,8 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
   return (
     <div className="w-full">
       {/* Sticky Tab Bar */}
-      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]">
-        <div className="relative">
+      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm w-full">
+        <div className="relative w-full">
           {/* Left fade gradient */}
           {canScrollLeft && (
             <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background/95 to-transparent z-10 pointer-events-none md:hidden" />
@@ -76,7 +76,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
           
           <div 
             ref={tabsRef}
-            className="flex md:justify-center md:gap-12 px-6 md:px-0 overflow-x-auto scrollbar-hide"
+            className="flex justify-start md:justify-center gap-2 md:gap-12 px-4 md:px-0 overflow-x-auto scrollbar-hide w-full"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {tabs.map((tab) => {
