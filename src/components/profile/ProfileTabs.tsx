@@ -2,8 +2,8 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { User, Trophy, Camera, BarChart3, MapPin } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { useIsMobile } from '@/hooks/use-mobile';
-import ClbhouzAchievementsModal from '@/components/achievements/ClbhouzAchievementsModal';
 
 interface ProfileTabsProps {
   activeTab: string;
@@ -36,8 +36,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
   const [canScrollRight, setCanScrollRight] = useState(false);
   const tabsRef = useRef<HTMLDivElement>(null);
   const isMobile = useIsMobile();
-
-  const [isAchievementsModalOpen, setIsAchievementsModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   const tabs = [
     { id: 'activity', label: 'Activity', icon: Camera },
@@ -92,7 +91,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
                   key={tab.id}
                   onClick={() => {
                     if (tab.id === 'achievements') {
-                      setIsAchievementsModalOpen(true);
+                      navigate('/achievements');
                     } else {
                       onTabChange(tab.id);
                     }
@@ -125,16 +124,6 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
         </div>
       </div>
 
-      {/* Achievements Modal */}
-      <ClbhouzAchievementsModal
-        isOpen={isAchievementsModalOpen}
-        onClose={() => setIsAchievementsModalOpen(false)}
-        userId={userId}
-        userDisplayName={userDisplayName}
-        userHandicap={userHandicap}
-        userProfilePhotoUrl={userProfilePhotoUrl}
-        isCurrentUser={isCurrentUser}
-      />
     </div>
 
   );
