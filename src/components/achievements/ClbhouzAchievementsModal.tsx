@@ -793,7 +793,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
         >
           {/* User Profile Section */}
           <div className={`${isMobile ? 'px-4 pb-2' : 'px-6 pb-4'}`}>
-            <div className={`flex items-center justify-between bg-muted/50 rounded-lg ${isMobile ? 'p-3' : 'p-4'}`}>
+            <div className={`flex items-center justify-between ${isMobile ? 'p-3' : 'p-4'}`}>
               <div className="flex items-center gap-3">
                 <div className={`${isMobile ? 'w-14 h-14' : 'w-16 h-16'} rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-white font-bold ${isMobile ? 'text-sm' : 'text-lg'}`}>
                   {userProfilePhotoUrl ? (
@@ -824,7 +824,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
           }`}>
             {isCollapsed ? (
               /* Collapsed Mini View */
-              <div className={`flex items-center justify-between bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-lg border border-blue-200/50 dark:border-blue-800/50 shadow-md ${
+              <div className={`flex items-center justify-between ${
                 isMobile ? 'p-2 max-h-[52px]' : 'p-3'
               }`}>
                 <div className="flex items-center gap-2">
@@ -1151,7 +1151,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                 </div>
                 
                 {/* Featured Achievement Card */}
-                <div className="bg-gradient-to-br from-yellow-50/80 to-amber-50/80 dark:from-yellow-950/20 dark:to-amber-950/20 border-2 border-yellow-200/50 dark:border-yellow-800/50 rounded-2xl p-8 text-center shadow-xl backdrop-blur-sm">
+                <div className="p-8 text-center">
                   <div className="flex flex-col items-center space-y-4">
                     {/* Large Badge */}
                     <div className="relative">
@@ -1259,7 +1259,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
           {(activeFilter === 'all' || activeFilter === 'exploration') && getFilteredAchievements(explorationAchievements, 'exploration').length > 0 && (
             <div className={`${isMobile ? 'px-4 pb-6' : 'px-6 pb-8'}`}>
               {/* Card Container with Visual Grouping */}
-              <div className="rounded-2xl p-6 border border-gray-200/40 dark:border-gray-800/40 shadow-xl backdrop-blur-sm">
+              <div className="p-6">
                 {/* Section Header with Icon */}
                   <div className={`flex items-center justify-center gap-3 ${isMobile ? 'mb-3' : 'mb-6'}`}>
                     <h3 className={`${isMobile ? 'text-base' : 'text-xl'} font-bold text-gray-800 dark:text-gray-200`}>
@@ -1355,7 +1355,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
           {(activeFilter === 'all' || activeFilter === 'skill') && getFilteredAchievements(skillAchievements, 'skill').length > 0 && (
             <div className={`${isMobile ? 'px-4 pb-6' : 'px-6 pb-8'}`}>
               {/* Card Container with Visual Grouping */}
-              <div className="rounded-2xl p-6 border border-gray-200/40 dark:border-gray-800/40 shadow-xl backdrop-blur-sm">
+              <div className="p-6">
                 {/* Section Header with Icon */}
                   <div className={`flex items-center justify-center gap-3 ${isMobile ? 'mb-3' : 'mb-6'}`}>
                     <h3 className={`${isMobile ? 'text-base' : 'text-xl'} font-bold text-gray-800 dark:text-gray-200`}>
