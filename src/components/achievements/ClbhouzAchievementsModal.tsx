@@ -963,13 +963,13 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                                 </linearGradient>
                               </defs>
                               
-                              {/* Remaining portion (full ring) */}
+                              {/* Background ring (light color) */}
                               <circle
                                 cx="80"
                                 cy="80"
                                 r="70"
                                 fill="none"
-                                stroke="none"
+                                stroke="#E6F0FF"
                                 strokeWidth="3"
                                 strokeLinecap="round"
                               />
@@ -1075,13 +1075,13 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                              <div className="relative flex justify-center mb-2">
                                {/* Progress ring above titles */}
                                 <svg className={`w-16 h-16 transform -rotate-90 ${isNext && !isActive ? 'animate-pulse' : ''}`} viewBox="0 0 64 64">
-                                  {/* Remaining portion (full ring) */}
+                                  {/* Background ring (light color) */}
                                   <circle
                                     cx="32"
                                     cy="32"
                                     r="30"
                                     fill="none"
-                                    stroke="none"
+                                    stroke={`${tier.color}30`}
                                     strokeWidth="3"
                                     strokeLinecap="round"
                                   />
