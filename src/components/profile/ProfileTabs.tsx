@@ -3,7 +3,6 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { User, Trophy, Camera, BarChart3, MapPin } from 'lucide-react';
 import ClbhouzAchievementsModal from '@/components/achievements/ClbhouzAchievementsModal';
-import AchievementsTabContent from '@/components/achievements/AchievementsTabContent';
 
 interface ProfileTabsProps {
   activeTab: string;
@@ -125,13 +124,16 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
                 </button>
               </div>
               
-              {/* Direct Achievements Content */}
-              <AchievementsTabContent
+              {/* Direct Achievements Modal as Inline Content */}
+              <ClbhouzAchievementsModal
+                isOpen={true}
+                onClose={() => {}}
                 userId={userId}
                 userDisplayName={userDisplayName}
                 userHandicap={userHandicap}
                 userProfilePhotoUrl={userProfilePhotoUrl}
                 isCurrentUser={isCurrentUser}
+                inline={true}
               />
             </div>
           )}
