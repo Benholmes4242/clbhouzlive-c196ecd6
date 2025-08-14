@@ -791,17 +791,8 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className={`
         ${isMobile ? 'max-w-[95vw] max-h-[90vh] p-0' : 'max-w-4xl max-h-[85vh] p-0'} 
-        overflow-hidden flex flex-col 
-        bg-gradient-to-br from-green-50/30 via-blue-50/20 to-green-50/30 
-        dark:from-green-950/10 dark:via-blue-950/10 dark:to-green-950/10
+        overflow-hidden flex flex-col bg-white
       `}
-        style={{
-          backgroundImage: `
-            radial-gradient(circle at 20% 50%, rgba(34, 197, 94, 0.03) 0%, transparent 50%),
-            radial-gradient(circle at 80% 20%, rgba(59, 130, 246, 0.03) 0%, transparent 50%),
-            radial-gradient(circle at 40% 80%, rgba(16, 185, 129, 0.02) 0%, transparent 50%)
-          `
-        }}
       >
         <DialogHeader className={`${isMobile ? 'p-4 pb-2' : 'p-6 pb-4'} flex-shrink-0`}>
           <DialogTitle className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold text-black dark:text-white`}>
