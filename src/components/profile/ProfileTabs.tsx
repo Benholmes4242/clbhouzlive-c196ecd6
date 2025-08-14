@@ -62,48 +62,45 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
   return (
     <div className="w-full">
       {/* Sticky Tab Bar */}
-      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm -mx-4 md:-mx-8">
+      <div className="sticky top-0 z-20 bg-background/95 backdrop-blur-sm w-screen relative left-1/2 right-1/2 -ml-[50vw] -mr-[50vw]">
         <div className="relative">
-          {/* Full width container */}
-          <div className="w-full px-4 md:px-8">
-            {/* Left fade gradient */}
-            {canScrollLeft && (
-              <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background/95 to-transparent z-10 pointer-events-none md:hidden" />
-            )}
-            
-            {/* Right fade gradient */}
-            {canScrollRight && (
-              <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background/95 to-transparent z-10 pointer-events-none md:hidden" />
-            )}
-            
-            <div 
-              ref={tabsRef}
-              className="flex md:justify-center md:gap-8 px-4 md:px-0 overflow-x-auto scrollbar-hide"
-              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-            >
-              {tabs.map((tab) => {
-                const IconComponent = tab.icon;
-                const isActive = activeTab === tab.id;
-                return (
-                  <button
-                    key={tab.id}
-                    onClick={() => onTabChange(tab.id)}
-                    disabled={transitionState !== 'idle'}
-                    className={`flex-shrink-0 flex items-center px-3 py-4 transition-all duration-200 text-base relative ${
-                      isActive 
-                        ? 'text-black' 
-                        : 'text-muted-foreground hover:text-foreground'
-                    } ${transitionState !== 'idle' ? 'pointer-events-none' : ''}`}
-                  >
-                    <span className="whitespace-nowrap text-lg md:text-2xl">{tab.label}</span>
-                    {/* Underline only under text label */}
-                    {isActive && (
-                      <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-black" style={{ width: 'calc(100% - 1.5rem)' }} />
-                    )}
-                  </button>
-                );
-              })}
-            </div>
+          {/* Left fade gradient */}
+          {canScrollLeft && (
+            <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background/95 to-transparent z-10 pointer-events-none md:hidden" />
+          )}
+          
+          {/* Right fade gradient */}
+          {canScrollRight && (
+            <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background/95 to-transparent z-10 pointer-events-none md:hidden" />
+          )}
+          
+          <div 
+            ref={tabsRef}
+            className="flex md:justify-center md:gap-12 px-6 md:px-0 overflow-x-auto scrollbar-hide"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {tabs.map((tab) => {
+              const IconComponent = tab.icon;
+              const isActive = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => onTabChange(tab.id)}
+                  disabled={transitionState !== 'idle'}
+                  className={`flex-shrink-0 flex items-center px-6 py-4 transition-all duration-200 text-base relative ${
+                    isActive 
+                      ? 'text-black' 
+                      : 'text-muted-foreground hover:text-foreground'
+                  } ${transitionState !== 'idle' ? 'pointer-events-none' : ''}`}
+                >
+                  <span className="whitespace-nowrap text-xl md:text-2xl font-medium">{tab.label}</span>
+                  {/* Underline only under text label */}
+                  {isActive && (
+                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-black" style={{ width: 'calc(100% - 3rem)' }} />
+                  )}
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>
