@@ -1,4 +1,4 @@
-// AchievementsTabContent - Achievement Tab Page Content
+// AchievementsTabContent - Achievement Tab Page Content (From Clubhouse Modal)
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { XPRingSystem } from "@/components/profile/XPRingSystem";
@@ -46,7 +46,7 @@ const AchievementsTabContent: React.FC<AchievementsTabContentProps> = ({
   userProfilePhotoUrl,
   isCurrentUser = true
 }) => {
-  console.log('AchievementsTabContent rendering - v1.0');
+  console.log('AchievementsTabContent rendering - v2.0 (From Clubhouse Modal)');
   
   const isMobile = useIsMobile();
   const [activeFilter, setActiveFilter] = useState<'all' | 'unlocked' | 'locked' | 'exploration' | 'skill'>('all');
@@ -184,10 +184,33 @@ const AchievementsTabContent: React.FC<AchievementsTabContentProps> = ({
     }
   }, [totalXP, nextMilestone, showCelebration]);
 
-  // Achievements Data
-  // Importing the existing achievements data and helper functions from the original modal
+  // Helper function to get filtered achievements
+  const getFilteredAchievements = (achievements: Achievement[], category: string) => {
+    let filtered = achievements;
+    
+    switch (activeFilter) {
+      case 'unlocked':
+        filtered = achievements.filter(a => a.isEarned);
+        break;
+      case 'locked':
+        filtered = achievements.filter(a => !a.isEarned);
+        break;
+      case 'exploration':
+        filtered = category === 'exploration' ? achievements : [];
+        break;
+      case 'skill':
+        filtered = category === 'skill' ? achievements : [];
+        break;
+      case 'all':
+      default:
+        filtered = achievements;
+        break;
+    }
+    
+    return filtered;
+  };
 
-  // EXPLORATION ACHIEVEMENTS
+  // EXPLORATION ACHIEVEMENTS (from original modal)
   const explorationAchievements: Achievement[] = [
     {
       title: "20 Club",
@@ -238,10 +261,108 @@ const AchievementsTabContent: React.FC<AchievementsTabContentProps> = ({
       isRepeatable: false,
       progress: "73/300",
       unlockHint: "The ultimate explorer achievement - for true golf legends"
+    },
+    // Additional exploration achievements from original modal
+    {
+      title: "Top 100 Conqueror",
+      emoji: "🏔️",
+      isEarned: false,
+      description: "Play 50 courses from the Top 100 in the World list",
+      xp: 2500,
+      isRepeatable: false,
+      progress: "17/50",
+      unlockHint: "Chase those bucket list courses - 33 more to conquer!"
+    },
+    {
+      title: "Globetrotter Golfer",
+      emoji: "🌍",
+      isEarned: false,
+      description: "Play golf on 5 different continents",
+      xp: 3000,
+      isRepeatable: false,
+      progress: "3/5",
+      unlockHint: "Two more continents to complete your global golf journey"
+    },
+    {
+      title: "One Day, Two Courses",
+      emoji: "⏰",
+      isEarned: true,
+      description: "Play two different courses in a single day",
+      xp: 300,
+      isRepeatable: false,
+      dateEarned: "2024-03-10"
+    },
+    {
+      title: "Marathon Golfer",
+      emoji: "🏃‍♂️",
+      isEarned: false,
+      description: "Play 54 holes in a single day",
+      xp: 500,
+      isRepeatable: true,
+      unlockHint: "Triple round day - the ultimate golf endurance test"
+    },
+    {
+      title: "Regional Master",
+      emoji: "🗺️",
+      isEarned: false,
+      description: "Play every course in a county/state (min. 10 courses)",
+      xp: 1500,
+      isRepeatable: true,
+      progress: "8/12",
+      unlockHint: "4 more courses to dominate your region"
+    },
+    {
+      title: "International Golfer",
+      emoji: "🛂",
+      isEarned: true,
+      description: "Play golf in 3 different countries",
+      xp: 750,
+      isRepeatable: false,
+      dateEarned: "2024-04-05"
+    },
+    // Regional Flag Achievements
+    {
+      title: "Lynx Legend",
+      emoji: "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
+      isEarned: false,
+      description: "Play 25 courses in Britain & Ireland",
+      xp: 1200,
+      isRepeatable: false,
+      progress: "12/25",
+      unlockHint: "Experience the home of golf - 13 more courses to go"
+    },
+    {
+      title: "The Continental Swinger",
+      emoji: "🇪🇺",
+      isEarned: false,
+      description: "Play 25 courses across Continental Europe",
+      xp: 1200,
+      isRepeatable: false,
+      progress: "7/25",
+      unlockHint: "Explore Europe's finest golf - 18 more courses await"
+    },
+    {
+      title: "Stars and Stripes Tourer",
+      emoji: "🇺🇸",
+      isEarned: true,
+      description: "Play 25 courses in the United States",
+      xp: 1200,
+      isRepeatable: false,
+      dateEarned: "2024-05-12"
+    },
+    {
+      title: "Legends Club",
+      emoji: "🏛️",
+      isEarned: false,
+      description: "Play the 'Big 4' major championship courses",
+      xp: 2000,
+      isRepeatable: false,
+      progress: "2/4",
+      unlockHint: "Augusta & St. Andrews await - complete the major slam"
     }
   ];
 
-  // SKILL ACHIEVEMENTS  
+  // SKILL ACHIEVEMENTS (from original modal)
   const skillAchievements: Achievement[] = [
     {
       title: "First Eagle",
@@ -279,36 +400,95 @@ const AchievementsTabContent: React.FC<AchievementsTabContentProps> = ({
       xp: 2000,
       isRepeatable: true,
       unlockHint: "Extremely rare - usually on a par 5 with perfect conditions"
+    },
+    // Additional skill achievements from original modal
+    {
+      title: "Birdie Blitz",
+      emoji: "🐦",
+      isEarned: true,
+      description: "Score 3+ birdies in a single round",
+      xp: 200,
+      isRepeatable: false,
+      dateEarned: "2024-02-14"
+    },
+    {
+      title: "Back-to-Back Birdies",
+      emoji: "🐦🐦",
+      isEarned: true,
+      description: "Score birdies on consecutive holes",
+      xp: 150,
+      isRepeatable: false,
+      dateEarned: "2024-01-28"
+    },
+    {
+      title: "No Bogey Round",
+      emoji: "✨",
+      isEarned: false,
+      description: "Complete a round without any bogeys",
+      xp: 400,
+      isRepeatable: false,
+      unlockHint: "Consistency is key - avoid those big numbers"
+    },
+    {
+      title: "Under Par Round",
+      emoji: "📈",
+      isEarned: false,
+      description: "Shoot under par for 18 holes",
+      xp: 600,
+      isRepeatable: false,
+      unlockHint: "The holy grail for amateur golfers"
+    },
+    {
+      title: "Birdie Every Par",
+      emoji: "🎯",
+      isEarned: false,
+      description: "Score a birdie on a par 3, 4, and 5 in one round",
+      xp: 300,
+      isRepeatable: false,
+      unlockHint: "Attack all types of holes for the complete birdie set"
+    },
+    {
+      title: "Par Machine",
+      emoji: "⚙️",
+      isEarned: false,
+      description: "Score par or better on 15+ holes in a round",
+      xp: 250,
+      isRepeatable: false,
+      progress: "13/15",
+      unlockHint: "2 more solid holes for mechanical precision"
+    },
+    {
+      title: "Single-Figure Handicap",
+      emoji: "🔢",
+      isEarned: false,
+      description: "Achieve a handicap of 9 or lower",
+      xp: 1000,
+      isRepeatable: false,
+      unlockHint: "The elite club - keep grinding to single figures"
+    },
+    {
+      title: "Plus Handicap Player",
+      emoji: "➕",
+      isEarned: false,
+      description: "Achieve a plus handicap (better than scratch)",
+      xp: 2500,
+      isRepeatable: false,
+      unlockHint: "Professional level - the ultimate amateur achievement"
+    },
+    {
+      title: "Club Loyalist",
+      emoji: "🏡",
+      isEarned: false,
+      description: "Play 50 rounds at your home club",
+      xp: 400,
+      isRepeatable: false,
+      progress: "23/50",
+      unlockHint: "27 more rounds to show true club loyalty"
     }
   ];
 
-  // Helper function to get filtered achievements
-  const getFilteredAchievements = (achievements: Achievement[], category: string) => {
-    let filtered = achievements;
-    
-    switch (activeFilter) {
-      case 'unlocked':
-        filtered = achievements.filter(a => a.isEarned);
-        break;
-      case 'locked':
-        filtered = achievements.filter(a => !a.isEarned);
-        break;
-      case 'exploration':
-        filtered = category === 'exploration' ? achievements : [];
-        break;
-      case 'skill':
-        filtered = category === 'skill' ? achievements : [];
-        break;
-      case 'all':
-      default:
-        filtered = achievements;
-        break;
-    }
-    
-    return filtered;
-  };
 
-  // Helper function to get achievement badge image
+  // Helper function to get achievement badge image (from original modal)
   const getAchievementIcon = (achievement: Achievement) => {
     // Use custom badges for specific achievements regardless of earned status
     switch (achievement.title) {
@@ -324,10 +504,43 @@ const AchievementsTabContent: React.FC<AchievementsTabContentProps> = ({
         return <img src="/lovable-uploads/0088ccbe-6198-4f2c-ada2-e2bf642abec3.png" alt="300 Club Champion Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
       case "Eagle Collector":
         return <img src="/lovable-uploads/4ec4bfcd-f19c-4e11-b6a9-b81c1eaab19d.png" alt="Eagle Collector Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
+      case "Birdie Blitz":
+        return <img src="/lovable-uploads/5928ca86-f5a8-4ac1-8e15-f13ff748746a.png" alt="Birdie Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
+      case "Birdie Every Par":
+        return <img src="/lovable-uploads/164a0671-f0ff-4f1e-8780-4bba8a8fe7f4.png" alt="Birdie Every Par Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
+      case "One Day, Two Courses":
+        return <img src="/lovable-uploads/f8900d31-7d35-4e4e-9352-99f6198da121.png" alt="One Day Two Courses Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
+      case "Globetrotter Golfer":
+        return <img src="/lovable-uploads/684002ed-a5a9-46e9-a1fc-384da5a7c686.png" alt="Globetrotter Golfer Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
+      case "Marathon Golfer":
+        return <img src="/lovable-uploads/02a84f2b-af4f-4064-a7d6-bdd88575b69e.png" alt="Marathon Golfer Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
+      case "Single-Figure Handicap":
+        return <img src="/lovable-uploads/066c5dd6-9e79-49f2-8e4b-935a5242850a.png" alt="Single-Figure Handicap Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
+      case "Plus Handicap Player":
+        return <img src="/lovable-uploads/1779738a-184b-4a0d-85d0-b964641019d9.png" alt="Plus Handicap Player Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
+      case "Under Par Round":
+        return <img src="/lovable-uploads/d7d44dea-f5cc-416d-9a01-985d48262fc6.png" alt="Under Par Round Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
       case "First Eagle":
         return <img src="/lovable-uploads/6b62e9b3-33d7-4825-b1d7-aac6f86e4ad7.png" alt="First Eagle Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
       case "Hole-in-One":
         return <img src="/lovable-uploads/68aa3b6e-7c54-41e7-80f6-75b4bf6e8b63.png" alt="Hole-in-One Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
+      case "Back-to-Back Birdies":
+        return <img src="/lovable-uploads/7e98fdc5-ab55-44e0-87ec-8b93e493b7e4.png" alt="Back-to-Back Birdies Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
+      case "No Bogey Round":
+        return <img src="/lovable-uploads/1a37c1e5-56c0-4e02-a95a-cbfa8ce3a1b6.png" alt="No Bogey Round Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
+      case "Par Machine":
+        return <img src="/lovable-uploads/51973f3e-599d-4110-bcf6-8eac43b963f8.png" alt="Par Machine Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
+      case "International Golfer":
+        return <img src="/lovable-uploads/3c0146da-b965-42cc-b130-ef9c25727aad.png" alt="International Golfer Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
+      // Regional achievement badges
+      case "Lynx Legend":
+        return <img src="/lovable-uploads/f2714e7f-418b-4c4c-ae28-e4a1b1ea8033.png" alt="Britain & Ireland Flag" className={isMobile ? "w-24 h-24 rounded-lg" : "w-40 h-40 rounded-lg"} />;
+      case "The Continental Swinger":
+        return <img src="/lovable-uploads/2fd872c8-aee1-4f0d-a3b9-fcfe49dbad20.png" alt="Continental Swinger Badge" className={isMobile ? "w-24 h-24 rounded-lg" : "w-40 h-40 rounded-lg"} />;
+      case "Stars and Stripes Tourer":
+        return <img src="/lovable-uploads/2b2ee6a8-e8c4-49d9-bfdf-86403c3a47b7.png" alt="USA Flag" className={isMobile ? "w-24 h-24 rounded-lg" : "w-40 h-40 rounded-lg"} />;
+      case "Legends Club":
+        return <img src="/lovable-uploads/3d5aac7d-1c4d-4b41-b450-35a0d7d4d5aa.png" alt="Legends Club Badge" className={isMobile ? "w-24 h-24 rounded-lg" : "w-40 h-40 rounded-lg"} />;
       case "Albatross Ace":
         return <img src="/lovable-uploads/2fc5fb62-90a5-4424-b85f-9e6b08a774d8.png" alt="Albatross Ace Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
       default:
