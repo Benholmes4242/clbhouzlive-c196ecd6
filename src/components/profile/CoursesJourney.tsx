@@ -114,8 +114,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                         cy="60"
                         r="52"
                         fill={`url(#bg-gradient-${achievement.id})`}
-                        stroke="hsl(var(--border))"
-                        strokeWidth="1"
+                        stroke="none"
                         opacity="0.4"
                       />
                       
@@ -220,8 +219,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                           cy="60"
                           r="52"
                           fill={`url(#mobile-bg-gradient-${achievement.id})`}
-                          stroke="hsl(var(--border))"
-                          strokeWidth="1"
+                          stroke="none"
                           opacity="0.4"
                         />
                         
