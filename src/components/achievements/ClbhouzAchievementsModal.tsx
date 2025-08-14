@@ -954,32 +954,6 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                           <div className="relative w-40 h-40">
                             
                             <svg className="w-40 h-40 transform -rotate-90" viewBox="0 0 160 160">
-                              {/* Background circle */}
-                              <circle
-                                cx="80"
-                                cy="80"
-                                r="70"
-                                stroke="currentColor"
-                                strokeWidth="3"
-                                fill="transparent"
-                                className="text-gray-300 dark:text-gray-600"
-                              />
-                              {/* Animated progress circle */}
-                              <circle
-                                cx="80"
-                                cy="80"
-                                r="70"
-                                stroke={`url(#progressGradient)`}
-                                strokeWidth="3"
-                                fill="transparent"
-                                strokeDasharray={`${70 * 2 * Math.PI}`}
-                                strokeDashoffset={animateProgress ? 
-                                  `${70 * 2 * Math.PI * (1 - progressPercentage / 100)}` : 
-                                  `${70 * 2 * Math.PI}`
-                                }
-                                strokeLinecap="round"
-                                className="transition-all duration-1000 ease-out"
-                              />
                               {/* Gradient definition */}
                               <defs>
                                 <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -988,6 +962,34 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                                   <stop offset="100%" stopColor="#06B6D4" />
                                 </linearGradient>
                               </defs>
+                              
+                              {/* Remaining portion (full ring) */}
+                              <circle
+                                cx="80"
+                                cy="80"
+                                r="70"
+                                fill="none"
+                                stroke="none"
+                                strokeWidth="3"
+                                strokeLinecap="round"
+                              />
+                              
+                              {/* Animated progress circle */}
+                              <circle
+                                cx="80"
+                                cy="80"
+                                r="70"
+                                stroke={`url(#progressGradient)`}
+                                strokeWidth="3"
+                                fill="none"
+                                strokeDasharray={`${70 * 2 * Math.PI}`}
+                                strokeDashoffset={animateProgress ? 
+                                  `${70 * 2 * Math.PI * (1 - progressPercentage / 100)}` : 
+                                  `${70 * 2 * Math.PI}`
+                                }
+                                strokeLinecap="round"
+                                className="transition-all duration-1000 ease-out"
+                              />
                             </svg>
                             
                             {/* Subtle glow effect around the ring */}
@@ -1072,33 +1074,34 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                           <div key={tier.name} className="flex-1 text-center">
                              <div className="relative flex justify-center mb-2">
                                {/* Progress ring above titles */}
-                               <svg className={`w-16 h-16 transform -rotate-90 ${isNext && !isActive ? 'animate-pulse' : ''}`} viewBox="0 0 64 64">
-                                 {/* Background circle */}
-                                 <circle
-                                   cx="32"
-                                   cy="32"
-                                   r="30"
-                                   stroke="currentColor"
-                                   strokeWidth="3"
-                                   fill="transparent"
-                                   className="text-gray-300 dark:text-gray-600"
-                                 />
-                                 {/* Progress circle */}
-                                 {tierProgress > 0 && (
-                                   <circle
-                                     cx="32"
-                                     cy="32"
-                                     r="30"
-                                     stroke={tier.color}
-                                     strokeWidth="3"
-                                     fill="transparent"
-                                     strokeDasharray={`${30 * 2 * Math.PI}`}
-                                     strokeDashoffset={`${30 * 2 * Math.PI * (1 - tierProgress / 100)}`}
-                                     strokeLinecap="round"
-                                     className="transition-all duration-700"
-                                   />
-                                 )}
-                               </svg>
+                                <svg className={`w-16 h-16 transform -rotate-90 ${isNext && !isActive ? 'animate-pulse' : ''}`} viewBox="0 0 64 64">
+                                  {/* Remaining portion (full ring) */}
+                                  <circle
+                                    cx="32"
+                                    cy="32"
+                                    r="30"
+                                    fill="none"
+                                    stroke="none"
+                                    strokeWidth="3"
+                                    strokeLinecap="round"
+                                  />
+                                  
+                                  {/* Progress circle */}
+                                  {tierProgress > 0 && (
+                                    <circle
+                                      cx="32"
+                                      cy="32"
+                                      r="30"
+                                      stroke={tier.color}
+                                      strokeWidth="3"
+                                      fill="none"
+                                      strokeDasharray={`${30 * 2 * Math.PI}`}
+                                      strokeDashoffset={`${30 * 2 * Math.PI * (1 - tierProgress / 100)}`}
+                                      strokeLinecap="round"
+                                      className="transition-all duration-700"
+                                    />
+                                  )}
+                                </svg>
                                
                                {/* Padlock icon for locked rings */}
                                {!isActive && !isNext && (
