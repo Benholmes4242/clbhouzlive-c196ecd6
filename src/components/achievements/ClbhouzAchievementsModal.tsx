@@ -977,9 +977,6 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                                 }
                                 strokeLinecap="round"
                                 className="transition-all duration-1000 ease-out"
-                                style={{
-                                  filter: 'drop-shadow(0 0 12px rgba(59, 130, 246, 0.6))'
-                                }}
                               />
                               {/* Gradient definition */}
                               <defs>
@@ -990,6 +987,24 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                                 </linearGradient>
                               </defs>
                             </svg>
+                            
+                            {/* Complex glow effect */}
+                            <div className="absolute inset-0 pointer-events-none">
+                              <div 
+                                className="absolute inset-0 rounded-full opacity-60 animate-pulse"
+                                style={{
+                                  background: `radial-gradient(circle, rgba(59, 130, 246, 0.4) 0%, rgba(59, 130, 246, 0.2) 40%, transparent 70%)`,
+                                  filter: 'blur(8px)',
+                                }}
+                              />
+                              <div 
+                                className="absolute inset-2 rounded-full opacity-40"
+                                style={{
+                                  background: `radial-gradient(circle, rgba(59, 130, 246, 0.6) 0%, rgba(59, 130, 246, 0.1) 60%, transparent 80%)`,
+                                  filter: 'blur(4px)',
+                                }}
+                              />
+                            </div>
                             
                             {/* Center content */}
                             <div className="absolute inset-0 flex flex-col items-center justify-center">
