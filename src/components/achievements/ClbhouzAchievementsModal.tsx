@@ -799,18 +799,18 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       </div>
 
         {/* XP Progress Header - Collapsible */}
-        <div className={`transition-all duration-300 ease-out border-b border-border ${
-          isCollapsed ? 'py-2' : 'py-6'
+        <div className={`transition-all duration-300 ease-out border-b border-border bg-background/50 ${
+          isCollapsed ? 'py-2' : `${isMobile ? 'py-4' : 'py-6'}`
         }`}>
-          <div className="px-4">
+          <div className={`${isMobile ? 'px-4' : 'px-6'}`}>
             <div className="flex items-center justify-between">
               <div className={`flex-1 transition-all duration-300 ease-out ${isCollapsed ? 'scale-90 opacity-70' : 'scale-100'}`}>
                 {!isCollapsed && (
                   <div className="flex flex-col items-center text-center mb-4">
-                    <h2 className="text-2xl font-bold text-black dark:text-white mb-2">
+                    <h2 className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold text-foreground mb-2`}>
                       {userDisplayName}'s Golf Journey
                     </h2>
-                    <p className="text-sm text-muted-foreground">
+                    <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
                       Track your progress and unlock new milestones
                     </p>
                   </div>
@@ -825,10 +825,10 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                   
                   {!isCollapsed && (
                     <div className="text-center">
-                      <div className="text-lg font-semibold text-black dark:text-white">
+                      <div className={`${isMobile ? 'text-base' : 'text-lg'} font-semibold text-foreground`}>
                         {totalXP.toLocaleString()} XP
                       </div>
-                      <div className="text-sm text-muted-foreground">
+                      <div className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
                         {(nextMilestone - totalXP).toLocaleString()} to {nextTier?.name || 'Blue Ring'}
                       </div>
                       {currentTier && (
