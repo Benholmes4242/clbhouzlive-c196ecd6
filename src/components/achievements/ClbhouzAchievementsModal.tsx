@@ -761,7 +761,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className={`
-        ${isMobile ? 'max-w-[95vw] max-h-[90vh] p-0' : 'max-w-4xl max-h-[85vh] p-0'} 
+        ${isMobile ? 'max-w-[95vw] max-h-[90vh] p-0' : 'max-w-3xl max-h-[85vh] p-0'} 
         overflow-hidden flex flex-col bg-white
       `}
       >
