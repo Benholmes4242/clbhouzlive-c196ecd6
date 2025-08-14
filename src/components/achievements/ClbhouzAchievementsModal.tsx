@@ -779,12 +779,6 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
             
             {/* Right side - User profile */}
             <div className="flex items-center gap-3">
-              <div className="text-right">
-                <h3 className={`${isMobile ? 'text-sm' : 'text-base'} font-semibold`}>{userDisplayName}</h3>
-                <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
-                  {userHandicap ? `${typeof userHandicap === 'number' ? userHandicap.toFixed(1) : userHandicap} Handicap` : 'No handicap set'}
-                </p>
-              </div>
               <div className={`${isMobile ? 'w-14 h-14' : 'w-16 h-16'} rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-white font-bold ${isMobile ? 'text-sm' : 'text-lg'}`}>
                 {userProfilePhotoUrl ? (
                   <img 
@@ -795,6 +789,12 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                 ) : (
                   userDisplayName.charAt(0).toUpperCase()
                 )}
+              </div>
+              <div className="text-left">
+                <h3 className={`${isMobile ? 'text-sm' : 'text-base'} font-semibold`}>{userDisplayName}</h3>
+                <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
+                  {userHandicap ? `${typeof userHandicap === 'number' ? userHandicap.toFixed(1) : userHandicap} Handicap` : 'No handicap set'}
+                </p>
               </div>
             </div>
           </div>
