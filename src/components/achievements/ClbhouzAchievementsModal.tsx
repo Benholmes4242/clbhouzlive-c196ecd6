@@ -1067,23 +1067,8 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                       return (
                         <div key={tier.name} className="flex-1 text-center">
                           <div className="relative">
-                            {/* Glow effect for blue mini ring always */}
-                            {tier.color === "#3B82F6" && (
-                              <div 
-                                className="absolute opacity-60 animate-pulse rounded-full"
-                                style={{
-                                  top: '-10px',
-                                  left: '-10px',
-                                  right: '-10px',
-                                  bottom: '-10px',
-                                  background: `conic-gradient(from 0deg, rgba(59, 130, 246, 0.4), rgba(139, 92, 246, 0.4), rgba(6, 182, 212, 0.4), rgba(59, 130, 246, 0.4))`,
-                                  filter: 'blur(12px)',
-                                  borderRadius: '50%'
-                                }}
-                              />
-                            )}
                             <div className={`
-                              relative w-16 h-16 mx-auto mb-2 rounded-full border-4 transition-all duration-500 flex items-center justify-center
+                              relative w-16 h-16 mx-auto mb-2 rounded-full border-4 transition-all duration-500 flex items-center justify-center overflow-hidden
                               ${isActive 
                                 ? `bg-gradient-to-br from-${tier.color}/20 to-${tier.color}/40 border-current shadow-lg` 
                                 : isNext 
@@ -1100,7 +1085,36 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                                                      `drop-shadow(0 0 12px rgba(245, 158, 11, 0.8))`) : 'none'
                             }}
                             >
-                              <Trophy className={`w-6 h-6 ${isActive ? 'animate-pulse' : ''}`} />
+                              {/* Inner glow for blue ring */}
+                              {tier.color === "#3B82F6" && (
+                                <div 
+                                  className="absolute inset-1 rounded-full opacity-40 animate-pulse"
+                                  style={{
+                                    background: `conic-gradient(from 0deg, rgba(59, 130, 246, 0.3), rgba(139, 92, 246, 0.3), rgba(6, 182, 212, 0.3), rgba(59, 130, 246, 0.3))`,
+                                    filter: 'blur(8px)'
+                                  }}
+                                />
+                              )}
+                              
+                              {/* Progress ring for current tier */}
+                              {isCurrent && (
+                                <svg className="absolute inset-0 w-full h-full transform -rotate-90" viewBox="0 0 64 64">
+                                  <circle
+                                    cx="32"
+                                    cy="32"
+                                    r="28"
+                                    stroke={tier.color}
+                                    strokeWidth="4"
+                                    fill="transparent"
+                                    strokeDasharray={`${28 * 2 * Math.PI}`}
+                                    strokeDashoffset={`${28 * 2 * Math.PI * (1 - progressPercentage / 100)}`}
+                                    strokeLinecap="round"
+                                    className="transition-all duration-700 opacity-80"
+                                  />
+                                </svg>
+                              )}
+                              
+                              <Trophy className={`relative z-10 w-6 h-6 ${isActive ? 'animate-pulse' : ''}`} />
                             </div>
                           </div>
                           <div className="text-xs font-medium mb-1" style={{ color: isActive ? tier.color : '#6B7280' }}>
