@@ -23,36 +23,36 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
       title: 'Legends Club',
       subtitle: 'Top 100 Worldwide Courses',
       region: 'global',
-      color: '#B8860B', // Darker golden brown for worldwide
-      colorLight: '#D2B48C', // Tan for remaining
-      gradient: 'from-yellow-700 to-yellow-800'
+      color: '#DAA520', // Rustic goldenrod for worldwide
+      colorLight: '#F5DEB3', // Wheat for remaining
+      gradient: 'from-yellow-600 to-yellow-700'
     },
     {
       id: 'stars-stripes',
       title: 'Stars and Stripes Tourer',
       subtitle: 'Top 100 USA Courses',
       region: 'usa',
-      color: '#8B4513', // Saddle brown for USA
-      colorLight: '#D2691E', // Chocolate for remaining
-      gradient: 'from-orange-800 to-red-900'
+      color: '#B22222', // Rustic fire brick red for USA
+      colorLight: '#F5C6C6', // Light rustic red for remaining
+      gradient: 'from-red-600 to-red-800'
     },
     {
       id: 'links-legend',
       title: 'Links Legend',
       subtitle: 'Top 100 Great Britain & Ireland Courses',
       region: 'britain-ireland',
-      color: '#556B2F', // Dark olive green for Britain & Ireland
-      colorLight: '#9ACD32', // Yellow green for remaining
-      gradient: 'from-green-700 to-green-900'
+      color: '#228B22', // Masters Augusta forest green for Britain & Ireland
+      colorLight: '#D4E5D4', // Light forest green for remaining
+      gradient: 'from-green-600 to-green-800'
     },
     {
       id: 'continental-swinger',
       title: 'Continental Swinger',
       subtitle: 'Top 100 Continental Europe Courses',
       region: 'europe',
-      color: '#2F4F4F', // Dark slate gray for Continental Europe
-      colorLight: '#708090', // Slate gray for remaining
-      gradient: 'from-slate-700 to-slate-900'
+      color: '#4682B4', // Rustic steel blue for Continental Europe
+      colorLight: '#E1EBEF', // Light steel blue for remaining
+      gradient: 'from-blue-600 to-blue-800'
     }
   ];
 
