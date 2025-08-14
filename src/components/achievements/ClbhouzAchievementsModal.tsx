@@ -988,29 +988,17 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                               </defs>
                             </svg>
                             
-                            {/* Complex glow effect around the ring */}
+                            {/* Subtle glow effect around the ring */}
                             <div className="absolute inset-0 pointer-events-none">
                               <div 
-                                className="absolute opacity-60 animate-pulse rounded-full"
-                                style={{
-                                  top: '10px',
-                                  left: '10px',
-                                  right: '10px',
-                                  bottom: '10px',
-                                  background: `conic-gradient(from 0deg, rgba(59, 130, 246, 0.4), rgba(139, 92, 246, 0.4), rgba(6, 182, 212, 0.4), rgba(59, 130, 246, 0.4))`,
-                                  filter: 'blur(12px)',
-                                  borderRadius: '50%'
-                                }}
-                              />
-                              <div 
-                                className="absolute opacity-40 rounded-full"
+                                className="absolute opacity-20 animate-pulse rounded-full"
                                 style={{
                                   top: '15px',
                                   left: '15px',
                                   right: '15px',
                                   bottom: '15px',
-                                  background: `conic-gradient(from 0deg, rgba(59, 130, 246, 0.6), rgba(139, 92, 246, 0.6), rgba(6, 182, 212, 0.6), rgba(59, 130, 246, 0.6))`,
-                                  filter: 'blur(6px)',
+                                  background: `conic-gradient(from 0deg, rgba(59, 130, 246, 0.3), rgba(139, 92, 246, 0.3), rgba(6, 182, 212, 0.3), rgba(59, 130, 246, 0.3))`,
+                                  filter: 'blur(8px)',
                                   borderRadius: '50%'
                                 }}
                               />
@@ -1056,7 +1044,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                 )}
 
                 {/* Ring Tier Display */}
-                <div className="w-full">
+                <div className="w-full mt-4">
                   <h4 className="text-sm font-medium text-muted-foreground mb-3 text-center">Ring Progression</h4>
                   <div className="flex justify-between items-center gap-2">
                      {xpTiers.map((tier, index) => {
@@ -1080,36 +1068,47 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                        
                        return (
                           <div key={tier.name} className="flex-1 text-center">
-                            <div className="relative flex justify-center mb-2">
-                              {/* Progress ring above titles */}
-                              <svg className={`w-16 h-16 transform -rotate-90 ${isNext && !isActive ? 'animate-pulse' : ''}`} viewBox="0 0 64 64">
-                                {/* Background circle */}
-                                <circle
-                                  cx="32"
-                                  cy="32"
-                                  r="30"
-                                  stroke="currentColor"
-                                  strokeWidth="3"
-                                  fill="transparent"
-                                  className="text-gray-300 dark:text-gray-600"
-                                />
-                                {/* Progress circle */}
-                                {tierProgress > 0 && (
-                                  <circle
-                                    cx="32"
-                                    cy="32"
-                                    r="30"
-                                    stroke={tier.color}
-                                    strokeWidth="3"
-                                    fill="transparent"
-                                    strokeDasharray={`${30 * 2 * Math.PI}`}
-                                    strokeDashoffset={`${30 * 2 * Math.PI * (1 - tierProgress / 100)}`}
-                                    strokeLinecap="round"
-                                    className="transition-all duration-700"
-                                  />
-                                )}
-                              </svg>
-                            </div>
+                             <div className="relative flex justify-center mb-2">
+                               {/* Progress ring above titles */}
+                               <svg className={`w-16 h-16 transform -rotate-90 ${isNext && !isActive ? 'animate-pulse' : ''}`} viewBox="0 0 64 64">
+                                 {/* Background circle */}
+                                 <circle
+                                   cx="32"
+                                   cy="32"
+                                   r="30"
+                                   stroke="currentColor"
+                                   strokeWidth="3"
+                                   fill="transparent"
+                                   className="text-gray-300 dark:text-gray-600"
+                                 />
+                                 {/* Progress circle */}
+                                 {tierProgress > 0 && (
+                                   <circle
+                                     cx="32"
+                                     cy="32"
+                                     r="30"
+                                     stroke={tier.color}
+                                     strokeWidth="3"
+                                     fill="transparent"
+                                     strokeDasharray={`${30 * 2 * Math.PI}`}
+                                     strokeDashoffset={`${30 * 2 * Math.PI * (1 - tierProgress / 100)}`}
+                                     strokeLinecap="round"
+                                     className="transition-all duration-700"
+                                   />
+                                 )}
+                               </svg>
+                               
+                               {/* Padlock icon for locked rings */}
+                               {!isActive && !isNext && (
+                                 <div className="absolute inset-0 flex items-center justify-center">
+                                   <img 
+                                     src="/lovable-uploads/b9837878-ceb4-4653-b157-cfe4045aac1d.png" 
+                                     alt="Locked" 
+                                     className="w-6 h-6 opacity-60"
+                                   />
+                                 </div>
+                               )}
+                             </div>
                            <div className="text-xs font-medium mb-1" style={{ color: isActive ? tier.color : '#6B7280' }}>
                              {tier.name}
                            </div>
