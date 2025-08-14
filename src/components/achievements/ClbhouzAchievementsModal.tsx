@@ -19,7 +19,6 @@ interface ClbhouzAchievementsModalProps {
   userHandicap?: string | number;
   userProfilePhotoUrl?: string;
   isCurrentUser?: boolean;
-  inline?: boolean; // New prop to render inline without modal wrapper
 }
 
 interface Achievement {
@@ -54,8 +53,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
   userDisplayName = "User",
   userHandicap,
   userProfilePhotoUrl,
-  isCurrentUser = true,
-  inline = false
+  isCurrentUser = true
 }) => {
   console.log('ClbhouzAchievementsModal rendering - v2.0');
   
@@ -741,6 +739,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
   ];
   // Get the most recently unlocked achievement after both arrays are defined
   const mostRecentAchievement = getMostRecentAchievement();
+
   // Body scroll lock effect for mobile
   useEffect(() => {
     if (isOpen && isMobile) {
@@ -760,210 +759,352 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
     }
   }, [isOpen, isMobile]);
 
-  // Render inline content without Dialog wrapper
-  const renderContent = () => (
-    <div className={`
-      ${isMobile ? 'w-full' : 'w-full'} 
-      ${inline ? 'min-h-screen' : 'max-h-[85vh]'} 
-      ${inline ? '' : 'overflow-hidden'} 
-      flex flex-col bg-background
-    `}
-    >
-      {/* Header */}
-      <div className={`${isMobile ? 'p-4 pb-2' : 'p-6 pb-4'} ${inline ? '' : 'flex-shrink-0'}`}>
-        <div className="flex justify-between items-center">
-          {/* Left side - Title and subtitle */}
-          <div className="text-left">
-            <h1 className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold text-foreground`}>
-              Achievements
-            </h1>
-            <p className={`${isMobile ? 'text-sm' : 'text-base'} text-muted-foreground mt-1`}>
-              Defining your game through achievement
-            </p>
-          </div>
-          
-          {/* Right side - User profile */}
-          <div className="flex items-center gap-3">
-            <div className={`${isMobile ? 'w-14 h-14' : 'w-16 h-16'} rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-primary-foreground font-bold ${isMobile ? 'text-sm' : 'text-lg'}`}>
-              {userProfilePhotoUrl ? (
-                <img 
-                  src={userProfilePhotoUrl} 
-                  alt={userDisplayName} 
-                  className={`${isMobile ? 'w-14 h-14' : 'w-16 h-16'} rounded-full object-cover`}
-                />
-              ) : (
-                userDisplayName.charAt(0).toUpperCase()
-              )}
-            </div>
-            <div className="text-left">
-              <h3 className={`${isMobile ? 'text-sm' : 'text-base'} font-semibold text-foreground`}>{userDisplayName}</h3>
-              <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
-                {userHandicap ? `${typeof userHandicap === 'number' ? userHandicap.toFixed(1) : userHandicap} Handicap` : 'No handicap set'}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* XP Progress Header - Collapsible */}
-      <div className={`transition-all duration-300 ease-out border-b border-border ${
-        isCollapsed ? 'py-2' : 'py-6'
-      } ${inline ? 'sticky top-0 z-20 bg-background/95 backdrop-blur-sm' : ''}`}>
-        <div className="px-4">
-          <div className="flex items-center justify-between">
-            <div className={`flex-1 transition-all duration-300 ease-out ${isCollapsed ? 'scale-90 opacity-70' : 'scale-100'}`}>
-              {!isCollapsed && (
-                <div className="flex flex-col items-center text-center mb-4">
-                  <h2 className="text-2xl font-bold text-foreground mb-2">
-                    {userDisplayName}'s Golf Journey
-                  </h2>
-                  <p className="text-sm text-muted-foreground">
-                    Track your progress and unlock new milestones
-                  </p>
-                </div>
-              )}
-              
-              <div className="flex items-center justify-center gap-4">
-                <div className={`transition-all duration-300 ease-out ${isCollapsed ? 'scale-75' : 'scale-100'}`}>
-                  <XPRingSystem 
-                    currentXP={totalXP}
-                  />
-                </div>
-                
-                {!isCollapsed && (
-                  <div className="text-center">
-                    <div className="text-lg font-semibold text-foreground">
-                      {totalXP.toLocaleString()} XP
-                    </div>
-                    <div className="text-sm text-muted-foreground">
-                      {(nextMilestone - totalXP).toLocaleString()} to {nextTier?.name || 'Blue Ring'}
-                    </div>
-                    {currentTier && (
-                      <div className="text-xs text-muted-foreground mt-1">
-                        Current: {currentTier.name}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
-            
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleToggleCollapse}
-              className="ml-4"
-            >
-              {isCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
-            </Button>
-          </div>
-        </div>
-      </div>
-
-      {/* Content */}
-      <div ref={scrollRef} className={`flex-1 ${inline ? '' : 'overflow-y-auto'}`}>
-        {/* Most Recent Achievement Highlight */}
-        {mostRecentAchievement && (
-          <div className="px-4 py-6 border-b border-border">
-            <div className="max-w-4xl mx-auto">
-              <h3 className="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-yellow-500" />
-                Latest Achievement
-              </h3>
-              <div className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-6">
-                <div className="flex items-center gap-4">
-                  <div className="flex-shrink-0">
-                    {getFeaturedAchievementIcon(mostRecentAchievement)}
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="text-xl font-bold text-foreground mb-2">{mostRecentAchievement.title}</h4>
-                    <p className="text-muted-foreground mb-2">{mostRecentAchievement.description}</p>
-                    <div className="flex items-center gap-4 text-sm">
-                      <span className="text-green-600 dark:text-green-400 font-medium">
-                        +{mostRecentAchievement.xp} XP
-                      </span>
-                      {mostRecentAchievement.dateEarned && (
-                        <span className="text-muted-foreground">
-                          Unlocked {new Date(mostRecentAchievement.dateEarned).toLocaleDateString()}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Filter Buttons */}
-        <div className="px-4 py-4 border-b border-border">
-          <div className="max-w-4xl mx-auto">
-            <div className="flex flex-wrap gap-2 justify-center">
-              {[
-                { id: 'all', label: 'All Achievements' },
-                { id: 'unlocked', label: 'Unlocked' },
-                { id: 'locked', label: 'Locked' },
-                { id: 'exploration', label: 'Exploration' },
-                { id: 'skill', label: 'Skill' }
-              ].map((filter) => (
-                <button
-                  key={filter.id}
-                  onClick={() => setActiveFilter(filter.id as any)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                    activeFilter === filter.id
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                  }`}
-                >
-                  {filter.label}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Rest of the content would go here - achievements grid, etc. */}
-        {/* This is a simplified version - the actual content from the original modal would be here */}
-        <div className="px-4 py-6">
-          <div className="max-w-4xl mx-auto space-y-8">
-            <div className="text-center py-12">
-              <Trophy className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-foreground mb-2">Achievements Content</h3>
-              <p className="text-muted-foreground">
-                The full achievements grid and content from the original modal would be rendered here.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Achievement Detail Modal */}
-      {selectedAchievement && (
-        <AchievementDetailModal
-          isOpen={showAchievementDetailModal}
-          onClose={() => {
-            setShowAchievementDetailModal(false);
-            setSelectedAchievement(null);
-          }}
-          achievement={selectedAchievement}
-        />
-      )}
-    </div>
-  );
-
-  // Return based on inline mode
-  if (inline) {
-    return renderContent();
-  }
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className={`
         ${isMobile ? 'max-w-[95vw] max-h-[90vh] p-0' : 'max-w-4xl max-h-[85vh] p-0'} 
-        overflow-hidden flex flex-col bg-background
+        overflow-hidden flex flex-col bg-white
       `}
       >
-        {renderContent()}
+        <DialogHeader className={`${isMobile ? 'p-4 pb-2' : 'p-6 pb-4'} flex-shrink-0`}>
+          <div className="flex justify-between items-center">
+            {/* Left side - Title and subtitle */}
+            <div className="text-left">
+              <DialogTitle className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold text-black dark:text-white`}>
+                Achievements
+              </DialogTitle>
+              <DialogDescription className={`${isMobile ? 'text-sm' : 'text-base'} text-muted-foreground mt-1`}>
+                Defining your game through achievement
+              </DialogDescription>
+            </div>
+            
+            {/* Right side - User profile */}
+            <div className="flex items-center gap-3">
+              <div className={`${isMobile ? 'w-14 h-14' : 'w-16 h-16'} rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-white font-bold ${isMobile ? 'text-sm' : 'text-lg'}`}>
+                {userProfilePhotoUrl ? (
+                  <img 
+                    src={userProfilePhotoUrl} 
+                    alt={userDisplayName} 
+                    className={`${isMobile ? 'w-14 h-14' : 'w-16 h-16'} rounded-full object-cover`}
+                  />
+                ) : (
+                  userDisplayName.charAt(0).toUpperCase()
+                )}
+              </div>
+              <div className="text-left">
+                <h3 className={`${isMobile ? 'text-sm' : 'text-base'} font-semibold`}>{userDisplayName}</h3>
+                <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
+                  {userHandicap ? `${typeof userHandicap === 'number' ? userHandicap.toFixed(1) : userHandicap} Handicap` : 'No handicap set'}
+                </p>
+              </div>
+            </div>
+          </div>
+        </DialogHeader>
+
+        {/* XP Progress Header - Collapsible */}
+        <div className={`transition-all duration-300 ease-out border-b border-border ${
+          isCollapsed ? 'py-2' : 'py-6'
+        }`}>
+          <div className="px-4">
+            <div className="flex items-center justify-between">
+              <div className={`flex-1 transition-all duration-300 ease-out ${isCollapsed ? 'scale-90 opacity-70' : 'scale-100'}`}>
+                {!isCollapsed && (
+                  <div className="flex flex-col items-center text-center mb-4">
+                    <h2 className="text-2xl font-bold text-black dark:text-white mb-2">
+                      {userDisplayName}'s Golf Journey
+                    </h2>
+                    <p className="text-sm text-muted-foreground">
+                      Track your progress and unlock new milestones
+                    </p>
+                  </div>
+                )}
+                
+                <div className="flex items-center justify-center gap-4">
+                  <div className={`transition-all duration-300 ease-out ${isCollapsed ? 'scale-75' : 'scale-100'}`}>
+                    <XPRingSystem 
+                      currentXP={totalXP}
+                    />
+                  </div>
+                  
+                  {!isCollapsed && (
+                    <div className="text-center">
+                      <div className="text-lg font-semibold text-black dark:text-white">
+                        {totalXP.toLocaleString()} XP
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        {(nextMilestone - totalXP).toLocaleString()} to {nextTier?.name || 'Blue Ring'}
+                      </div>
+                      {currentTier && (
+                        <div className="text-xs text-muted-foreground mt-1">
+                          Current: {currentTier.name}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+              
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={handleToggleCollapse}
+                className="ml-4"
+              >
+                {isCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div ref={scrollRef} className="flex-1 overflow-y-auto">
+          {/* Most Recent Achievement Highlight */}
+          {mostRecentAchievement && (
+            <div className="px-4 py-6 border-b border-border">
+              <div className="max-w-4xl mx-auto">
+                <h3 className="text-lg font-semibold text-black dark:text-white mb-4 flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-yellow-500" />
+                  Latest Achievement
+                </h3>
+                <div className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-6">
+                  <div className="flex items-center gap-4">
+                    <div className="flex-shrink-0">
+                      {getFeaturedAchievementIcon(mostRecentAchievement)}
+                    </div>
+                    <div className="flex-1">
+                      <h4 className="text-xl font-bold text-black dark:text-white mb-2">{mostRecentAchievement.title}</h4>
+                      <p className="text-muted-foreground mb-2">{mostRecentAchievement.description}</p>
+                      <div className="flex items-center gap-4 text-sm">
+                        <span className="text-green-600 dark:text-green-400 font-medium">
+                          +{mostRecentAchievement.xp} XP
+                        </span>
+                        {mostRecentAchievement.dateEarned && (
+                          <span className="text-muted-foreground">
+                            Unlocked {mostRecentAchievement.dateEarned}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Filter Buttons */}
+          <div className="px-4 py-4 border-b border-border">
+            <div className="max-w-4xl mx-auto">
+              <div className="flex flex-wrap gap-2 justify-center">
+                {[
+                  { id: 'all', label: 'All Achievements' },
+                  { id: 'unlocked', label: 'Unlocked' },
+                  { id: 'locked', label: 'Locked' },
+                  { id: 'exploration', label: 'Exploration' },
+                  { id: 'skill', label: 'Skill' }
+                ].map((filter) => (
+                  <button
+                    key={filter.id}
+                    onClick={() => setActiveFilter(filter.id as any)}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                      activeFilter === filter.id
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                    }`}
+                  >
+                    {filter.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Achievements Grid */}
+          <div className="px-4 py-6">
+            <div className="max-w-4xl mx-auto space-y-8">
+              
+              {/* Experience & Exploration Section */}
+              {(activeFilter === 'all' || activeFilter === 'exploration' || activeFilter === 'unlocked' || activeFilter === 'locked') && 
+               getFilteredAchievements(explorationAchievements, 'exploration').length > 0 && (
+                <section>
+                  <h3 className="text-xl font-semibold text-black dark:text-white mb-4 flex items-center gap-2">
+                    <span>🏌️</span>
+                    Experience & Exploration
+                  </h3>
+                  <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2 lg:grid-cols-3'} gap-4`}>
+                    {getFilteredAchievements(explorationAchievements, 'exploration').map((achievement, index) => {
+                      const progress = getAchievementProgress(achievement);
+                      
+                      return (
+                        <div
+                          key={index}
+                          onClick={() => {
+                            setSelectedAchievement({
+                              id: achievement.title,
+                              name: achievement.title,
+                              xp: achievement.xp,
+                              unlocked: achievement.isEarned,
+                              description: achievement.description,
+                              unlockHint: achievement.unlockHint,
+                              progress: achievement.progress,
+                              dateEarned: achievement.dateEarned,
+                              isRepeatable: achievement.isRepeatable
+                            });
+                            setShowAchievementDetailModal(true);
+                          }}
+                          className={`
+                            bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 
+                            hover:shadow-md transition-all cursor-pointer
+                            ${!achievement.isEarned ? 'opacity-60' : ''}
+                          `}
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className={`flex-shrink-0 ${!achievement.isEarned ? 'grayscale' : ''}`}>
+                              {getAchievementIcon(achievement)}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-semibold text-black dark:text-white text-sm truncate">{achievement.title}</h4>
+                              <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{achievement.description}</p>
+                              
+                              {achievement.isEarned ? (
+                                <div className="text-xs text-green-600 dark:text-green-400 font-medium">
+                                  ✓ Unlocked
+                                </div>
+                              ) : (
+                                <>
+                                  {progress.percentage > 0 && (
+                                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 mb-2">
+                                      <div 
+                                        className="bg-primary h-1.5 rounded-full transition-all duration-500" 
+                                        style={{ width: `${progress.percentage}%` }}
+                                      ></div>
+                                    </div>
+                                  )}
+                                  {achievement.progress && (
+                                    <div className="text-xs text-muted-foreground">{achievement.progress}</div>
+                                  )}
+                                  {progress.nudgeText && (
+                                    <div className="text-xs text-orange-600 dark:text-orange-400 mt-1">
+                                      {progress.nudgeText}
+                                    </div>
+                                  )}
+                                </>
+                              )}
+                              <div className="text-xs text-muted-foreground mt-1">+{achievement.xp} XP</div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </section>
+              )}
+
+              {/* Skill & Performance Section */}
+              {(activeFilter === 'all' || activeFilter === 'skill' || activeFilter === 'unlocked' || activeFilter === 'locked') && 
+               getFilteredAchievements(skillAchievements, 'skill').length > 0 && (
+                <section>
+                  <h3 className="text-xl font-semibold text-black dark:text-white mb-4 flex items-center gap-2">
+                    <span>⚡</span>
+                    Skill & Performance
+                  </h3>
+                  <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2 lg:grid-cols-3'} gap-4`}>
+                    {getFilteredAchievements(skillAchievements, 'skill').map((achievement, index) => {
+                      const progress = getAchievementProgress(achievement);
+                      
+                      return (
+                        <div
+                          key={index}
+                          onClick={() => {
+                            setSelectedAchievement({
+                              id: achievement.title,
+                              name: achievement.title,
+                              xp: achievement.xp,
+                              unlocked: achievement.isEarned,
+                              description: achievement.description,
+                              unlockHint: achievement.unlockHint,
+                              progress: achievement.progress,
+                              dateEarned: achievement.dateEarned,
+                              isRepeatable: achievement.isRepeatable
+                            });
+                            setShowAchievementDetailModal(true);
+                          }}
+                          className={`
+                            bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 
+                            hover:shadow-md transition-all cursor-pointer
+                            ${!achievement.isEarned ? 'opacity-60' : ''}
+                          `}
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className={`flex-shrink-0 ${!achievement.isEarned ? 'grayscale' : ''}`}>
+                              {getAchievementIcon(achievement)}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-semibold text-black dark:text-white text-sm truncate">{achievement.title}</h4>
+                              <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{achievement.description}</p>
+                              
+                              {achievement.isEarned ? (
+                                <div className="text-xs text-green-600 dark:text-green-400 font-medium">
+                                  ✓ Unlocked
+                                </div>
+                              ) : (
+                                <>
+                                  {progress.percentage > 0 && (
+                                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 mb-2">
+                                      <div 
+                                        className="bg-primary h-1.5 rounded-full transition-all duration-500" 
+                                        style={{ width: `${progress.percentage}%` }}
+                                      ></div>
+                                    </div>
+                                  )}
+                                  {achievement.progress && (
+                                    <div className="text-xs text-muted-foreground">{achievement.progress}</div>
+                                  )}
+                                  {achievement.unlockHint && (
+                                    <div className="text-xs text-muted-foreground mt-1">{achievement.unlockHint}</div>
+                                  )}
+                                  {progress.nudgeText && (
+                                    <div className="text-xs text-orange-600 dark:text-orange-400 mt-1">
+                                      {progress.nudgeText}
+                                    </div>
+                                  )}
+                                </>
+                              )}
+                              <div className="text-xs text-muted-foreground mt-1">+{achievement.xp} XP</div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </section>
+              )}
+
+              {/* No Results Message */}
+              {getFilteredAchievements(explorationAchievements, 'exploration').length === 0 && 
+               getFilteredAchievements(skillAchievements, 'skill').length === 0 && (
+                <div className="text-center py-12">
+                  <Trophy className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-black dark:text-white mb-2">No achievements found</h3>
+                  <p className="text-muted-foreground">
+                    {activeFilter === 'unlocked' 
+                      ? "You haven't unlocked any achievements yet. Keep playing to earn your first badge!"
+                      : `No ${activeFilter} achievements match your current filter.`
+                    }
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Achievement Detail Modal */}
+        {isOpen && (
+          <AchievementDetailModal
+            isOpen={showAchievementDetailModal}
+            onClose={() => setShowAchievementDetailModal(false)}
+            achievement={selectedAchievement}
+          />
+        )}
       </DialogContent>
     </Dialog>
   );

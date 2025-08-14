@@ -114,27 +114,13 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
           {activeTab === 'activity' && children.activity}
           {activeTab === 'courses' && children.courses}
           {activeTab === 'achievements' && (
-            <div className="space-y-6">
-              <div className="flex justify-center">
-                <button
-                  onClick={() => setIsAchievementsModalOpen(true)}
-                  className="bg-primary text-primary-foreground hover:bg-primary/90 px-6 py-3 rounded-lg font-medium transition-colors"
-                >
-                  Open Achievements Modal
-                </button>
-              </div>
-              
-              {/* Direct Achievements Modal as Inline Content */}
-              <ClbhouzAchievementsModal
-                isOpen={true}
-                onClose={() => {}}
-                userId={userId}
-                userDisplayName={userDisplayName}
-                userHandicap={userHandicap}
-                userProfilePhotoUrl={userProfilePhotoUrl}
-                isCurrentUser={isCurrentUser}
-                inline={true}
-              />
+            <div className="flex flex-col items-center justify-center py-8">
+              <button
+                onClick={() => setIsAchievementsModalOpen(true)}
+                className="bg-primary text-primary-foreground hover:bg-primary/90 px-6 py-3 rounded-lg font-medium transition-colors"
+              >
+                Achievements
+              </button>
             </div>
           )}
           {activeTab === 'stats' && children.stats}
