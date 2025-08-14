@@ -6,7 +6,7 @@ import { XPRingSystem } from "@/components/profile/XPRingSystem";
 import { Sparkles, Trophy, ChevronDown, ChevronUp } from "lucide-react";
 import { useIsMobile } from '@/hooks/use-mobile';
 import AchievementDetailModal from '@/components/achievements/AchievementDetailModal';
-import Confetti from 'react-confetti';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Achievement badge imports - using user's uploaded image
 // import club300Badge from '@/assets/achievements/300-club-champion.png';
@@ -1128,50 +1128,116 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
           {mostRecentAchievement && (
             <div className={`${isMobile ? 'px-4 pb-6' : 'px-6 pb-8'}`}>
               <div className="relative">
-                {/* React Confetti around Badge */}
-                <Confetti
-                  width={400}
-                  height={300}
-                  recycle={true}
-                  numberOfPieces={50}
-                  gravity={0.1}
-                  initialVelocityX={2}
-                  initialVelocityY={10}
-                  colors={['#FFD700', '#FFA500', '#FF6347', '#00CED1', '#32CD32', '#9370DB']}
-                  style={{
-                    position: 'absolute',
-                    left: '50%',
-                    top: '0',
-                    transform: 'translateX(-50%)',
-                    pointerEvents: 'none'
-                  }}
-                />
+                {/* Framer Motion Confetti around Badge */}
+                <AnimatePresence>
+                  <div className="absolute inset-0 flex justify-center items-start pt-8 pointer-events-none">
+                    <div className="relative">
+                      {[...Array(16)].map((_, i) => {
+                        const colors = ['#FFD700', '#FFA500', '#FF6347', '#00CED1', '#32CD32', '#9370DB'];
+                        const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                        const angle = (i * 22.5) * (Math.PI / 180); // 22.5 degrees apart for 16 particles
+                        const initialX = Math.cos(angle) * 100;
+                        const initialY = Math.sin(angle) * 100;
+                        
+                        return (
+                          <motion.div
+                            key={i}
+                            className="absolute w-3 h-3 rounded-full"
+                            style={{ backgroundColor: randomColor }}
+                            initial={{ 
+                              x: 0, 
+                              y: 0, 
+                              scale: 0,
+                              opacity: 1,
+                              rotate: 0
+                            }}
+                            animate={{ 
+                              x: [0, initialX * 1.5, initialX * 2],
+                              y: [0, initialY * 1.5, initialY * 2],
+                              scale: [0, 1, 0.8],
+                              opacity: [1, 0.8, 0],
+                              rotate: [0, 180, 360]
+                            }}
+                            transition={{
+                              duration: 3 + Math.random() * 2,
+                              repeat: Infinity,
+                              repeatDelay: Math.random() * 2,
+                              ease: "easeOut"
+                            }}
+                          />
+                        );
+                      })}
+                    </div>
+                  </div>
+                </AnimatePresence>
                 
                 {/* Featured Achievement Card */}
                 <div className="p-8 text-center">
                   <div className="flex flex-col items-center space-y-2">
-                    {/* Large Badge */}
-                    <div className="relative">
-                      <div className="animate-pulse absolute inset-0 bg-yellow-400/20 rounded-full blur-xl"></div>
-                      <div className="relative drop-shadow-2xl transform hover:scale-105 transition-transform duration-300">
+                    {/* Large Badge with Framer Motion */}
+                    <motion.div 
+                      className="relative"
+                      initial={{ scale: 0, rotate: -180 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      transition={{ 
+                        type: "spring", 
+                        stiffness: 260, 
+                        damping: 20,
+                        delay: 0.3
+                      }}
+                    >
+                      <motion.div 
+                        className="animate-pulse absolute inset-0 bg-yellow-400/20 rounded-full blur-xl"
+                        animate={{ 
+                          scale: [1, 1.1, 1],
+                          opacity: [0.3, 0.6, 0.3]
+                        }}
+                        transition={{ 
+                          duration: 2, 
+                          repeat: Infinity,
+                          ease: "easeInOut"
+                        }}
+                      />
+                      <motion.div 
+                        className="relative drop-shadow-2xl"
+                        whileHover={{ scale: 1.05, rotate: 5 }}
+                        transition={{ type: "spring", stiffness: 300 }}
+                      >
                         {getFeaturedAchievementIcon(mostRecentAchievement)}
-                      </div>
-                    </div>
+                      </motion.div>
+                    </motion.div>
                     
-                    {/* Achievement Title */}
-                    <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
+                    {/* Achievement Title with Animation */}
+                    <motion.h3 
+                      className="text-2xl font-bold text-gray-800 dark:text-gray-200"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.6, duration: 0.5 }}
+                    >
                       {mostRecentAchievement.title}
-                    </h3>
+                    </motion.h3>
                     
-                    {/* XP Gained */}
-                    <div className="text-white font-bold text-lg" style={{ color: '#3B82F6' }}>
+                    {/* XP Gained with Animation */}
+                    <motion.div 
+                      className="text-white font-bold text-lg" 
+                      style={{ color: '#3B82F6' }}
+                      initial={{ opacity: 0, scale: 0.5 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.8, type: "spring", stiffness: 500 }}
+                      whileHover={{ scale: 1.1 }}
+                    >
                       +{mostRecentAchievement.xp} XP
-                    </div>
+                    </motion.div>
                     
-                    {/* Date Earned */}
-                    <p className="text-sm text-muted-foreground">
+                    {/* Date Earned with Animation */}
+                    <motion.p 
+                      className="text-sm text-muted-foreground"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 1, duration: 0.5 }}
+                    >
                       Unlocked {mostRecentAchievement.dateEarned}
-                    </p>
+                    </motion.p>
                   </div>
                 </div>
               </div>
