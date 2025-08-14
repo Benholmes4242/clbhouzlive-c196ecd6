@@ -6,7 +6,7 @@ import { XPRingSystem } from "@/components/profile/XPRingSystem";
 import { Sparkles, Trophy, ChevronDown, ChevronUp } from "lucide-react";
 import { useIsMobile } from '@/hooks/use-mobile';
 import AchievementDetailModal from '@/components/achievements/AchievementDetailModal';
-import Lottie from 'lottie-react';
+import { useSpring, animated, useTransition, useSprings } from 'react-spring';
 
 // Achievement badge imports - using user's uploaded image
 // import club300Badge from '@/assets/achievements/300-club-champion.png';
@@ -71,6 +71,99 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
   const directionChangeTimer = useRef<NodeJS.Timeout | null>(null);
   
   // Clear any cached references by forcing recompilation
+  
+  // React Spring confetti particles setup
+  const confettiCount = 12;
+  const confettiItems = Array.from({ length: confettiCount }, (_, i) => ({
+    id: i,
+    color: ['#FFD700', '#FFA500', '#FF6347', '#00CED1', '#32CD32', '#9370DB'][i % 6],
+    angle: (i * 30) * (Math.PI / 180),
+    delay: i * 100
+  }));
+
+  const [confettiSprings] = useSprings(
+    confettiCount,
+    (index) => ({
+      from: { 
+        transform: 'translate3d(0px, 0px, 0px) scale(0) rotate(0deg)',
+        opacity: 0
+      },
+      to: async (next) => {
+        const item = confettiItems[index];
+        const radius = 120 + Math.random() * 60;
+        const x = Math.cos(item.angle) * radius;
+        const y = Math.sin(item.angle) * radius;
+        
+        while (true) {
+          await next({
+            transform: `translate3d(${x}px, ${y}px, 0px) scale(1) rotate(360deg)`,
+            opacity: 1,
+          });
+          await next({
+            transform: `translate3d(${x * 1.5}px, ${y * 1.5}px, 0px) scale(0.8) rotate(720deg)`,
+            opacity: 0,
+          });
+          await next({
+            transform: 'translate3d(0px, 0px, 0px) scale(0) rotate(0deg)',
+            opacity: 0,
+          });
+        }
+      },
+      config: { mass: 1, tension: 280, friction: 60 },
+      delay: confettiItems[index].delay,
+    }),
+    []
+  );
+
+  // Spring animation for the featured badge
+  const badgeSpring = useSpring({
+    from: { 
+      transform: 'scale(0) rotate(-180deg)',
+      opacity: 0 
+    },
+    to: { 
+      transform: 'scale(1) rotate(0deg)',
+      opacity: 1 
+    },
+    config: { mass: 1, tension: 180, friction: 12 },
+    delay: 300,
+  });
+
+  // Spring animation for the title
+  const titleSpring = useSpring({
+    from: { 
+      opacity: 0,
+      transform: 'translate3d(0, 30px, 0)'
+    },
+    to: { 
+      opacity: 1,
+      transform: 'translate3d(0, 0px, 0)'
+    },
+    config: { mass: 1, tension: 280, friction: 60 },
+    delay: 600,
+  });
+
+  // Spring animation for XP
+  const xpSpring = useSpring({
+    from: { 
+      opacity: 0,
+      transform: 'scale(0.5)'
+    },
+    to: { 
+      opacity: 1,
+      transform: 'scale(1)'
+    },
+    config: { mass: 1, tension: 300, friction: 10 },
+    delay: 800,
+  });
+
+  // Spring animation for date
+  const dateSpring = useSpring({
+    from: { opacity: 0 },
+    to: { opacity: 1 },
+    config: { mass: 1, tension: 280, friction: 60 },
+    delay: 1000,
+  });
   
   // Mock data for now - replace with actual badge system later
   const totalXP = 2500;
@@ -737,68 +830,6 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
   ];
   // Get the most recently unlocked achievement after both arrays are defined
   const mostRecentAchievement = getMostRecentAchievement();
-
-  // Simple confetti animation data for Lottie
-  const confettiAnimationData = {
-    "v": "5.7.4",
-    "fr": 30,
-    "ip": 0,
-    "op": 90,
-    "w": 400,
-    "h": 300,
-    "nm": "Confetti",
-    "ddd": 0,
-    "assets": [],
-    "layers": [
-      {
-        "ddd": 0,
-        "ind": 1,
-        "ty": 4,
-        "nm": "confetti",
-        "sr": 1,
-        "ks": {
-          "o": {"a": 0, "k": 100},
-          "r": {"a": 1, "k": [
-            {"i": {"x": [0.833], "y": [0.833]}, "o": {"x": [0.167], "y": [0.167]}, "t": 0, "s": [0]},
-            {"t": 89, "s": [360]}
-          ]},
-          "p": {"a": 1, "k": [
-            {"i": {"x": 0.833, "y": 0.833}, "o": {"x": 0.167, "y": 0.167}, "t": 0, "s": [200, 150], "to": [0, -16.667], "ti": [0, 16.667]},
-            {"t": 89, "s": [200, 50]}
-          ]},
-          "a": {"a": 0, "k": [0, 0]},
-          "s": {"a": 1, "k": [
-            {"i": {"x": [0.833], "y": [0.833]}, "o": {"x": [0.167], "y": [0.167]}, "t": 0, "s": [0]},
-            {"i": {"x": [0.833], "y": [0.833]}, "o": {"x": [0.167], "y": [0.167]}, "t": 30, "s": [100]},
-            {"t": 89, "s": [80]}
-          ]}
-        },
-        "ao": 0,
-        "shapes": [
-          {
-            "ty": "gr",
-            "it": [
-              {
-                "ty": "rc",
-                "d": 1,
-                "s": {"a": 0, "k": [20, 20]},
-                "p": {"a": 0, "k": [0, 0]},
-                "r": {"a": 0, "k": 4}
-              },
-              {
-                "ty": "fl",
-                "c": {"a": 0, "k": [1, 0.843, 0, 1]},
-                "o": {"a": 0, "k": 100}
-              }
-            ]
-          }
-        ],
-        "ip": 0,
-        "op": 90,
-        "st": 0
-      }
-    ]
-  };
   // Body scroll lock effect for mobile
   useEffect(() => {
     if (isOpen && isMobile) {
@@ -1190,44 +1221,62 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
           {mostRecentAchievement && (
             <div className={`${isMobile ? 'px-4 pb-6' : 'px-6 pb-8'}`}>
               <div className="relative">
-                {/* Lottie Confetti Animation */}
-                <div className="absolute inset-0 pointer-events-none flex justify-center items-start">
-                  <Lottie 
-                    animationData={confettiAnimationData}
-                    style={{ width: 400, height: 300 }}
-                    loop={true}
-                    autoplay={true}
-                  />
+                {/* React Spring Physics-based Confetti */}
+                <div className="absolute inset-0 flex justify-center items-start pt-8 pointer-events-none">
+                  <div className="relative">
+                    {confettiSprings.map((spring, index) => (
+                      <animated.div
+                        key={confettiItems[index].id}
+                        style={{
+                          ...spring,
+                          backgroundColor: confettiItems[index].color,
+                          position: 'absolute',
+                          left: '0px',
+                          top: '0px',
+                        }}
+                        className="w-3 h-3 rounded-full"
+                      />
+                    ))}
+                  </div>
                 </div>
                 
                 {/* Featured Achievement Card */}
                 <div className="p-8 text-center">
                   <div className="flex flex-col items-center space-y-2">
-                    {/* Large Badge with CSS Animation */}
-                    <div className="relative animate-pulse">
+                    {/* Large Badge with Spring Physics */}
+                    <animated.div style={badgeSpring} className="relative">
                       <div className="absolute inset-0 bg-yellow-400/20 rounded-full blur-xl animate-pulse"></div>
-                      <div className="relative drop-shadow-2xl transform hover:scale-105 transition-all duration-500 hover:rotate-3">
+                      <div className="relative drop-shadow-2xl">
                         {getFeaturedAchievementIcon(mostRecentAchievement)}
                       </div>
-                    </div>
+                    </animated.div>
                     
-                    {/* Achievement Title */}
-                    <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200 animate-fade-in">
+                    {/* Achievement Title with Spring Animation */}
+                    <animated.h3 
+                      style={titleSpring}
+                      className="text-2xl font-bold text-gray-800 dark:text-gray-200"
+                    >
                       {mostRecentAchievement.title}
-                    </h3>
+                    </animated.h3>
                     
-                    {/* XP Gained */}
-                    <div 
-                      className="text-white font-bold text-lg hover:scale-110 transition-transform duration-300" 
-                      style={{ color: '#3B82F6' }}
+                    {/* XP Gained with Spring Physics */}
+                    <animated.div 
+                      style={{
+                        ...xpSpring,
+                        color: '#3B82F6'
+                      }}
+                      className="font-bold text-lg cursor-pointer"
                     >
                       +{mostRecentAchievement.xp} XP
-                    </div>
+                    </animated.div>
                     
-                    {/* Date Earned */}
-                    <p className="text-sm text-muted-foreground animate-fade-in">
+                    {/* Date Earned with Spring Animation */}
+                    <animated.p 
+                      style={dateSpring}
+                      className="text-sm text-muted-foreground"
+                    >
                       Unlocked {mostRecentAchievement.dateEarned}
-                    </p>
+                    </animated.p>
                   </div>
                 </div>
               </div>
