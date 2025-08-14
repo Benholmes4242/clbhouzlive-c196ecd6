@@ -98,27 +98,39 @@ export const XPRingSystem: React.FC<XPRingSystemProps> = ({
         <div className="relative flex-shrink-0">
           {currentTier ? (
             // User has achieved a ring
-            <div 
-              className={cn('relative rounded-full flex items-center justify-center', sizeClasses[size])}
-              style={{
-                background: currentTier.ringGradient,
-                padding: '4px'
-              }}
-            >
-              {/* Inner circle with progress */}
-              <div className="w-full h-full bg-white dark:bg-gray-900 rounded-full flex items-center justify-center relative overflow-hidden">
-                {/* Progress fill */}
-                <div 
-                  className="absolute inset-0 rounded-full"
-                  style={{
-                    background: `conic-gradient(from 0deg, ${currentTier.color} 0%, ${currentTier.color} ${progress}%, transparent ${progress}%, transparent 100%)`,
-                    opacity: 0.2
-                  }}
-                />
-                
-                {/* Center icon/text */}
-                <div className="relative z-10 text-center">
-                  <div className="w-4 h-4 bg-current rounded-sm opacity-60" />
+            <div className="relative">
+              {/* Glow effect for current tier */}
+              <div 
+                className="absolute inset-0 rounded-full animate-pulse"
+                style={{
+                  background: `radial-gradient(circle, ${currentTier.color}40 0%, ${currentTier.color}20 40%, transparent 70%)`,
+                  filter: 'blur(8px)',
+                  transform: 'scale(1.2)'
+                }}
+              />
+              <div 
+                className={cn('relative rounded-full flex items-center justify-center', sizeClasses[size])}
+                style={{
+                  background: currentTier.ringGradient,
+                  padding: '4px',
+                  filter: `drop-shadow(0 0 12px ${currentTier.color}60) drop-shadow(0 0 6px ${currentTier.color}40)`
+                }}
+              >
+                {/* Inner circle with progress */}
+                <div className="w-full h-full bg-white dark:bg-gray-900 rounded-full flex items-center justify-center relative overflow-hidden">
+                  {/* Progress fill */}
+                  <div 
+                    className="absolute inset-0 rounded-full"
+                    style={{
+                      background: `conic-gradient(from 0deg, ${currentTier.color} 0%, ${currentTier.color} ${progress}%, transparent ${progress}%, transparent 100%)`,
+                      opacity: 0.2
+                    }}
+                  />
+                  
+                  {/* Center icon/text */}
+                  <div className="relative z-10 text-center">
+                    <div className="w-4 h-4 bg-current rounded-sm opacity-60" />
+                  </div>
                 </div>
               </div>
             </div>
@@ -212,19 +224,33 @@ export const XPRingSystem: React.FC<XPRingSystemProps> = ({
                   
                   return (
                     <div key={tier.name} className="flex flex-col items-center flex-1">
-                      <div 
-                        className={cn(
-                          'w-12 h-12 rounded-full border-4 flex items-center justify-center transition-all mb-2',
-                          isCurrent ? 'scale-110' : 'scale-100',
-                          isActive ? 'opacity-100' : 'opacity-40'
+                      <div className="relative">
+                        {/* Glow effect for active mini rings */}
+                        {isActive && (
+                          <div 
+                            className="absolute inset-0 rounded-full"
+                            style={{
+                              background: `radial-gradient(circle, ${tier.color}30 0%, ${tier.color}15 50%, transparent 70%)`,
+                              filter: 'blur(4px)',
+                              transform: 'scale(1.3)'
+                            }}
+                          />
                         )}
-                        style={{
-                          borderColor: tier.color,
-                          backgroundColor: isActive ? tier.color + '20' : 'transparent'
-                        }}
-                        title={`${tier.name}: ${tier.minXP.toLocaleString()} - ${tier.maxXP.toLocaleString()} XP`}
-                      >
-                        {/* Remove the inner dot/square */}
+                        <div 
+                          className={cn(
+                            'relative w-12 h-12 rounded-full border-4 flex items-center justify-center transition-all mb-2',
+                            isCurrent ? 'scale-110' : 'scale-100',
+                            isActive ? 'opacity-100' : 'opacity-40'
+                          )}
+                          style={{
+                            borderColor: tier.color,
+                            backgroundColor: isActive ? tier.color + '20' : 'transparent',
+                            filter: isActive ? `drop-shadow(0 0 6px ${tier.color}40)` : 'none'
+                          }}
+                          title={`${tier.name}: ${tier.minXP.toLocaleString()} - ${tier.maxXP.toLocaleString()} XP`}
+                        >
+                          {/* Remove the inner dot/square */}
+                        </div>
                       </div>
                       
                       {/* Ring information text */}
@@ -258,27 +284,39 @@ export const XPRingSystem: React.FC<XPRingSystemProps> = ({
       <div className="relative">
         {currentTier ? (
           // User has achieved a ring
-          <div 
-            className={cn('relative rounded-full flex items-center justify-center', sizeClasses[size])}
-            style={{
-              background: currentTier.ringGradient,
-              padding: '4px'
-            }}
-          >
-            {/* Inner circle with progress */}
-            <div className="w-full h-full bg-white dark:bg-gray-900 rounded-full flex items-center justify-center relative overflow-hidden">
-              {/* Progress fill */}
-              <div 
-                className="absolute inset-0 rounded-full"
-                style={{
-                  background: `conic-gradient(from 0deg, ${currentTier.color} 0%, ${currentTier.color} ${progress}%, transparent ${progress}%, transparent 100%)`,
-                  opacity: 0.2
-                }}
-              />
-              
-              {/* Center icon/text */}
-              <div className="relative z-10 text-center">
-                <div className="w-4 h-4 bg-current rounded-sm opacity-60" />
+          <div className="relative">
+            {/* Glow effect for current tier */}
+            <div 
+              className="absolute inset-0 rounded-full animate-pulse"
+              style={{
+                background: `radial-gradient(circle, ${currentTier.color}40 0%, ${currentTier.color}20 40%, transparent 70%)`,
+                filter: 'blur(8px)',
+                transform: 'scale(1.2)'
+              }}
+            />
+            <div 
+              className={cn('relative rounded-full flex items-center justify-center', sizeClasses[size])}
+              style={{
+                background: currentTier.ringGradient,
+                padding: '4px',
+                filter: `drop-shadow(0 0 12px ${currentTier.color}60) drop-shadow(0 0 6px ${currentTier.color}40)`
+              }}
+            >
+              {/* Inner circle with progress */}
+              <div className="w-full h-full bg-white dark:bg-gray-900 rounded-full flex items-center justify-center relative overflow-hidden">
+                {/* Progress fill */}
+                <div 
+                  className="absolute inset-0 rounded-full"
+                  style={{
+                    background: `conic-gradient(from 0deg, ${currentTier.color} 0%, ${currentTier.color} ${progress}%, transparent ${progress}%, transparent 100%)`,
+                    opacity: 0.2
+                  }}
+                />
+                
+                {/* Center icon/text */}
+                <div className="relative z-10 text-center">
+                  <div className="w-4 h-4 bg-current rounded-sm opacity-60" />
+                </div>
               </div>
             </div>
           </div>
@@ -379,19 +417,33 @@ export const XPRingSystem: React.FC<XPRingSystemProps> = ({
               
               return (
                 <div key={tier.name} className="flex flex-col items-center flex-1">
-                  <div 
-                    className={cn(
-                      'w-12 h-12 rounded-full border-4 flex items-center justify-center transition-all mb-2',
-                      isCurrent ? 'scale-110' : 'scale-100',
-                      isActive ? 'opacity-100' : 'opacity-40'
+                  <div className="relative">
+                    {/* Glow effect for active mini rings */}
+                    {isActive && (
+                      <div 
+                        className="absolute inset-0 rounded-full"
+                        style={{
+                          background: `radial-gradient(circle, ${tier.color}30 0%, ${tier.color}15 50%, transparent 70%)`,
+                          filter: 'blur(4px)',
+                          transform: 'scale(1.3)'
+                        }}
+                      />
                     )}
-                    style={{
-                      borderColor: tier.color,
-                      backgroundColor: isActive ? tier.color + '20' : 'transparent'
-                    }}
-                    title={`${tier.name}: ${tier.minXP.toLocaleString()} - ${tier.maxXP.toLocaleString()} XP`}
-                  >
-                    {/* Remove the inner dot/square */}
+                    <div 
+                      className={cn(
+                        'relative w-12 h-12 rounded-full border-4 flex items-center justify-center transition-all mb-2',
+                        isCurrent ? 'scale-110' : 'scale-100',
+                        isActive ? 'opacity-100' : 'opacity-40'
+                      )}
+                      style={{
+                        borderColor: tier.color,
+                        backgroundColor: isActive ? tier.color + '20' : 'transparent',
+                        filter: isActive ? `drop-shadow(0 0 6px ${tier.color}40)` : 'none'
+                      }}
+                      title={`${tier.name}: ${tier.minXP.toLocaleString()} - ${tier.maxXP.toLocaleString()} XP`}
+                    >
+                      {/* Remove the inner dot/square */}
+                    </div>
                   </div>
                   
                   {/* Ring information text */}
