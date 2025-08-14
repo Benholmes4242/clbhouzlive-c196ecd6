@@ -88,7 +88,13 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
               return (
                 <button
                   key={tab.id}
-                  onClick={() => onTabChange(tab.id)}
+                  onClick={() => {
+                    if (tab.id === 'achievements') {
+                      setIsAchievementsModalOpen(true);
+                    } else {
+                      onTabChange(tab.id);
+                    }
+                  }}
                   disabled={transitionState !== 'idle'}
                   className={`flex-1 flex items-center justify-center py-4 transition-all duration-200 text-base relative ${
                     isActive 
@@ -113,16 +119,6 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
         <div className={`md:max-w-[1150px] md:mx-auto`}>
           {activeTab === 'activity' && children.activity}
           {activeTab === 'courses' && children.courses}
-          {activeTab === 'achievements' && (
-            <div className="flex flex-col items-center justify-center py-8">
-              <button
-                onClick={() => setIsAchievementsModalOpen(true)}
-                className="bg-primary text-primary-foreground hover:bg-primary/90 px-6 py-3 rounded-lg font-medium transition-colors"
-              >
-                Achievements
-              </button>
-            </div>
-          )}
           {activeTab === 'stats' && children.stats}
         </div>
       </div>

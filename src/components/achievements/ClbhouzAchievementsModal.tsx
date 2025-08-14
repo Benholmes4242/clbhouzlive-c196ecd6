@@ -739,7 +739,6 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
   ];
   // Get the most recently unlocked achievement after both arrays are defined
   const mostRecentAchievement = getMostRecentAchievement();
-
   // Body scroll lock effect for mobile
   useEffect(() => {
     if (isOpen && isMobile) {
@@ -800,312 +799,649 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
             </div>
           </div>
         </DialogHeader>
+        
+        <div 
+          ref={scrollRef}
+          className="flex-1 overflow-y-auto overscroll-contain touch-pan-y"
+          style={{ 
+            scrollbarWidth: 'thin',
+            scrollBehavior: 'smooth',
+            WebkitOverflowScrolling: 'touch',
+            touchAction: 'pan-y',
+            overscrollBehaviorY: 'contain'
+          }}
+        >
 
-        {/* XP Progress Header - Collapsible */}
-        <div className={`transition-all duration-300 ease-out border-b border-border ${
-          isCollapsed ? 'py-2' : 'py-6'
-        }`}>
-          <div className="px-4">
-            <div className="flex items-center justify-between">
-              <div className={`flex-1 transition-all duration-300 ease-out ${isCollapsed ? 'scale-90 opacity-70' : 'scale-100'}`}>
-                {!isCollapsed && (
-                  <div className="flex flex-col items-center text-center mb-4">
-                    <h2 className="text-2xl font-bold text-black dark:text-white mb-2">
-                      {userDisplayName}'s Golf Journey
-                    </h2>
-                    <p className="text-sm text-muted-foreground">
-                      Track your progress and unlock new milestones
-                    </p>
+          {/* Collapsible XP Progress Header with Smooth Animations */}
+          <div className={`sticky top-0 z-10 bg-card/95 backdrop-blur-sm transition-all duration-400 ease-in-out ${
+            isCollapsed 
+              ? isMobile ? 'px-4 py-2' : 'px-6 py-3' 
+              : isMobile ? 'px-4 pb-3' : 'px-6 pb-4'
+          }`}>
+            {isCollapsed ? (
+              /* Collapsed Mini View */
+              <div className={`flex items-center justify-between ${
+                isMobile ? 'p-2 max-h-[52px]' : 'p-3'
+              }`}>
+                <div className="flex items-center gap-2">
+                  <div className={`relative ${isMobile ? 'w-6 h-6' : 'w-8 h-8'}`}>
+                    <svg className={`${isMobile ? 'w-6 h-6' : 'w-8 h-8'} transform -rotate-90`} viewBox="0 0 32 32">
+                      <circle
+                        cx="16"
+                        cy="16"
+                        r="14"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        fill="transparent"
+                        className="text-gray-300 dark:text-gray-600"
+                      />
+                      <circle
+                        cx="16"
+                        cy="16"
+                        r="14"
+                        stroke={nextTier.color}
+                        strokeWidth="2"
+                        fill="transparent"
+                        strokeDasharray={`${14 * 2 * Math.PI}`}
+                        strokeDashoffset={`${14 * 2 * Math.PI * (1 - progressPercentage / 100)}`}
+                        strokeLinecap="round"
+                        className="transition-all duration-700"
+                      />
+                    </svg>
+                    <Trophy className={`absolute inset-0 m-auto text-muted-foreground ${isMobile ? 'w-3 h-3' : 'w-4 h-4'}`} />
+                  </div>
+                  <div className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium`}>
+                    {totalXP.toLocaleString()} XP | {progressPercentage.toFixed(0)}% to {nextTier.name}
+                  </div>
+                </div>
+                <div className={`flex-1 mx-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden ${isMobile ? 'h-1.5' : 'h-2'}`}>
+                  <div 
+                    className="h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full transition-all duration-1000 ease-out"
+                    style={{ 
+                      width: animateProgress ? `${progressPercentage}%` : '0%',
+                      boxShadow: '0 0 10px rgba(59, 130, 246, 0.5)'
+                    }}
+                  />
+                </div>
+                <div className="flex items-center gap-1">
+                  {!isMobile && (
+                    <div className="text-xs text-muted-foreground">
+                      Next: {nextTier.name} at {nextTier.minXP.toLocaleString()} XP
+                    </div>
+                  )}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleToggleCollapse}
+                    className={`p-1 ${isMobile ? 'h-5 w-5' : 'h-6 w-6'}`}
+                  >
+                    <ChevronDown className={`${isMobile ? 'h-2.5 w-2.5' : 'h-3 w-3'}`} />
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              /* Full XP Ring Section - Mobile Optimized */
+              <div className={`relative overflow-hidden ${
+                isMobile ? 'p-3' : 'p-6'
+              }`}>
+                {/* Celebration Animation Overlay */}
+                {showCelebration && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-r from-yellow-400/20 to-orange-400/20 rounded-xl animate-pulse">
+                    <div className={`${isMobile ? 'text-4xl' : 'text-6xl'} animate-bounce`}>🎉</div>
                   </div>
                 )}
                 
-                <div className="flex items-center justify-center gap-4">
-                  <div className={`transition-all duration-300 ease-out ${isCollapsed ? 'scale-75' : 'scale-100'}`}>
-                    <XPRingSystem 
-                      currentXP={totalXP}
-                    />
-                  </div>
-                  
-                  {!isCollapsed && (
-                    <div className="text-center">
-                      <div className="text-lg font-semibold text-black dark:text-white">
-                        {totalXP.toLocaleString()} XP
+                {/* Mobile Stacked Layout */}
+                {isMobile ? (
+                  <div className="space-y-3">
+                    {/* Header with collapse button */}
+                    <div className="flex justify-between items-center">
+                      <div className="text-center flex-1">
+                         <div className="text-xl font-bold text-foreground flex items-center justify-center gap-2 mb-1">
+                           {totalXP.toLocaleString()} XP
+                         </div>
+                        
                       </div>
-                      <div className="text-sm text-muted-foreground">
-                        {(nextMilestone - totalXP).toLocaleString()} to {nextTier?.name || 'Blue Ring'}
-                      </div>
-                      {currentTier && (
-                        <div className="text-xs text-muted-foreground mt-1">
-                          Current: {currentTier.name}
-                        </div>
-                      )}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={handleToggleCollapse}
+                        className="p-1 h-6 w-6"
+                      >
+                        <ChevronUp className="h-3 w-3" />
+                      </Button>
                     </div>
-                  )}
+                    
+                    {/* Next ring text and toggle */}
+                    <div className="text-center text-xs text-muted-foreground">
+                      Next: {nextTier.name} at {nextTier.minXP.toLocaleString()} XP
+                    </div>
+                  </div>
+                ) : (
+                  /* Desktop Header Layout */
+                  <div>
+                    <div className="flex justify-between items-start mb-6">
+                      <div>
+                        <h3 className="text-lg font-bold text-foreground mb-1">XP Progress</h3>
+                        
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <div className="text-right">
+                           <div className="text-2xl font-bold text-foreground flex items-center gap-2">
+                             {totalXP.toLocaleString()} XP
+                           </div>
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={handleToggleCollapse}
+                          className="p-1 h-8 w-8"
+                        >
+                          <ChevronUp className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+                
+                {/* Main Progress Ring and Info - Desktop Only */}
+                {!isMobile && (
+                  <>
+                    <div className="flex justify-center mb-6">
+                      <div className="flex items-center gap-12">
+                        {/* Enhanced Progress Ring */}
+                        <div className="relative flex-shrink-0">
+                          <div className="relative w-40 h-40">
+                            
+                            <svg className="w-40 h-40 transform -rotate-90" viewBox="0 0 160 160">
+                              {/* Gradient definition */}
+                              <defs>
+                                <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                  <stop offset="0%" stopColor="#3B82F6" />
+                                  <stop offset="50%" stopColor="#8B5CF6" />
+                                  <stop offset="100%" stopColor="#06B6D4" />
+                                </linearGradient>
+                              </defs>
+                              
+                              {/* Background ring (light color) */}
+                              <circle
+                                cx="80"
+                                cy="80"
+                                r="70"
+                                fill="none"
+                                stroke="#E6F0FF"
+                                strokeWidth="3"
+                                strokeLinecap="round"
+                              />
+                              
+                              {/* Animated progress circle */}
+                              <circle
+                                cx="80"
+                                cy="80"
+                                r="70"
+                                stroke={`url(#progressGradient)`}
+                                strokeWidth="3"
+                                fill="none"
+                                strokeDasharray={`${70 * 2 * Math.PI}`}
+                                strokeDashoffset={animateProgress ? 
+                                  `${70 * 2 * Math.PI * (1 - progressPercentage / 100)}` : 
+                                  `${70 * 2 * Math.PI}`
+                                }
+                                strokeLinecap="round"
+                                className="transition-all duration-1000 ease-out"
+                              />
+                            </svg>
+                            
+                            {/* Subtle glow effect around the ring */}
+                            <div className="absolute inset-0 pointer-events-none">
+                              <div 
+                                className="absolute opacity-20 animate-pulse rounded-full"
+                                style={{
+                                  top: '15px',
+                                  left: '15px',
+                                  right: '15px',
+                                  bottom: '15px',
+                                  background: `conic-gradient(from 0deg, rgba(59, 130, 246, 0.3), rgba(139, 92, 246, 0.3), rgba(6, 182, 212, 0.3), rgba(59, 130, 246, 0.3))`,
+                                  filter: 'blur(8px)',
+                                  borderRadius: '50%'
+                                }}
+                              />
+                            </div>
+                            
+                            {/* Center content */}
+                            <div className="absolute inset-0 flex flex-col items-center justify-center">
+                              <div className="text-2xl font-bold text-foreground mb-1">
+                                {(nextTier.minXP - totalXP).toLocaleString()}
+                              </div>
+                              <div className="text-xs text-muted-foreground text-center mb-2">
+                                XP to next ring
+                              </div>
+                              <div className="text-xs font-medium" style={{ color: nextTier.color }}>
+                                {Math.round(progressPercentage)}% Complete
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Ring Info */}
+                        <div className="w-64 space-y-4">
+                          <div className="space-y-2">
+                            <h3 className="font-semibold text-xl text-muted-foreground">
+                              {currentTier ? currentTier.name : 'No Ring Achieved'}
+                            </h3>
+                            <p className="text-sm text-muted-foreground">
+                              {currentTier ? 
+                                `Congratulations! You've earned the ${currentTier.name}!` :
+                                `Reach ${nextTier.minXP.toLocaleString()} XP to unlock your first ring`
+                              }
+                            </p>
+                            <div className="flex items-center gap-2 text-sm font-medium" style={{ color: nextTier.color }}>
+                              <Trophy className="w-4 h-4" />
+                              Next: {nextTier.name} at {nextTier.minXP.toLocaleString()} XP
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                  </>
+                )}
+
+                {/* Ring Tier Display */}
+                <div className="w-full mt-4">
+                  <h4 className="text-sm font-medium text-muted-foreground mb-3 text-center">Ring Progression</h4>
+                  <div className="flex justify-between items-center gap-2">
+                     {xpTiers.map((tier, index) => {
+                       const isActive = totalXP >= tier.minXP;
+                       const isCurrent = currentTier?.name === tier.name;
+                       const isNext = nextTier?.name === tier.name;
+                       
+                       // Calculate progress for this specific tier
+                       let tierProgress = 0;
+                       if (isActive) {
+                         // Tier is completed, show 100%
+                         tierProgress = 100;
+                       } else if (isCurrent || isNext) {
+                         // This is the tier being worked towards
+                         const tierStart = index === 0 ? 0 : xpTiers[index - 1].minXP;
+                         const tierEnd = tier.minXP;
+                         const tierRange = tierEnd - tierStart;
+                         const currentProgress = Math.max(0, totalXP - tierStart);
+                         tierProgress = Math.min(100, (currentProgress / tierRange) * 100);
+                       }
+                       
+                       return (
+                          <div key={tier.name} className="flex-1 text-center">
+                             <div className="relative flex justify-center mb-2">
+                               {/* Progress ring above titles */}
+                                <svg className={`w-16 h-16 transform -rotate-90 ${isNext && !isActive ? 'animate-pulse' : ''}`} viewBox="0 0 64 64">
+                                  {/* Background ring (light color) */}
+                                  <circle
+                                    cx="32"
+                                    cy="32"
+                                    r="30"
+                                    fill="none"
+                                    stroke={`${tier.color}30`}
+                                    strokeWidth="3"
+                                    strokeLinecap="round"
+                                  />
+                                  
+                                  {/* Progress circle */}
+                                  {tierProgress > 0 && (
+                                    <circle
+                                      cx="32"
+                                      cy="32"
+                                      r="30"
+                                      stroke={tier.color}
+                                      strokeWidth="3"
+                                      fill="none"
+                                      strokeDasharray={`${30 * 2 * Math.PI}`}
+                                      strokeDashoffset={`${30 * 2 * Math.PI * (1 - tierProgress / 100)}`}
+                                      strokeLinecap="round"
+                                      className="transition-all duration-700"
+                                    />
+                                  )}
+                                </svg>
+                               
+                               {/* Padlock icon for locked rings */}
+                               {!isActive && !isNext && (
+                                 <div className="absolute inset-0 flex items-center justify-center">
+                                   <img 
+                                     src="/lovable-uploads/b9837878-ceb4-4653-b157-cfe4045aac1d.png" 
+                                     alt="Locked" 
+                                     className="w-6 h-6 opacity-60"
+                                   />
+                                 </div>
+                               )}
+                             </div>
+                           <div className="text-xs font-medium mb-1" style={{ color: isActive ? tier.color : '#6B7280' }}>
+                             {tier.name}
+                           </div>
+                           <div className="text-xs text-muted-foreground">
+                             {tier.minXP.toLocaleString()} XP
+                           </div>
+                         </div>
+                       );
+                    })}
+                  </div>
                 </div>
               </div>
-              
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleToggleCollapse}
-                className="ml-4"
-              >
-                {isCollapsed ? <ChevronDown className="w-4 h-4" /> : <ChevronUp className="w-4 h-4" />}
-              </Button>
-            </div>
+            )}
           </div>
-        </div>
 
-        {/* Main Content */}
-        <div ref={scrollRef} className="flex-1 overflow-y-auto">
-          {/* Most Recent Achievement Highlight */}
+          {/* Featured Most Recent Achievement */}
           {mostRecentAchievement && (
-            <div className="px-4 py-6 border-b border-border">
-              <div className="max-w-4xl mx-auto">
-                <h3 className="text-lg font-semibold text-black dark:text-white mb-4 flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-yellow-500" />
-                  Latest Achievement
-                </h3>
-                <div className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-6">
-                  <div className="flex items-center gap-4">
-                    <div className="flex-shrink-0">
-                      {getFeaturedAchievementIcon(mostRecentAchievement)}
-                    </div>
-                    <div className="flex-1">
-                      <h4 className="text-xl font-bold text-black dark:text-white mb-2">{mostRecentAchievement.title}</h4>
-                      <p className="text-muted-foreground mb-2">{mostRecentAchievement.description}</p>
-                      <div className="flex items-center gap-4 text-sm">
-                        <span className="text-green-600 dark:text-green-400 font-medium">
-                          +{mostRecentAchievement.xp} XP
-                        </span>
-                        {mostRecentAchievement.dateEarned && (
-                          <span className="text-muted-foreground">
-                            Unlocked {mostRecentAchievement.dateEarned}
-                          </span>
-                        )}
+            <div className={`${isMobile ? 'px-4 pb-6' : 'px-6 pb-8'}`}>
+              <div className="relative">
+                {/* Featured Achievement Card */}
+                <div className="p-8 text-center">
+                  <div className="flex flex-col items-center space-y-2">
+                    {/* Large Badge with CSS Animation */}
+                    <div className="relative animate-scale-in">
+                      <div className="absolute inset-0 bg-yellow-400/20 rounded-full blur-xl animate-pulse"></div>
+                      <div className="relative drop-shadow-2xl hover:scale-105 transition-transform duration-300">
+                        {getFeaturedAchievementIcon(mostRecentAchievement)}
                       </div>
                     </div>
+                    
+                    {/* Achievement Title with Fade Animation */}
+                    <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200 animate-fade-in">
+                      {mostRecentAchievement.title}
+                    </h3>
+                    
+                    {/* XP Gained */}
+                    <div className="font-bold text-lg text-blue-500 animate-scale-in">
+                      +{mostRecentAchievement.xp} XP
+                    </div>
+                    
+                    {/* Date Earned */}
+                    <p className="text-sm text-muted-foreground animate-fade-in">
+                      Unlocked {mostRecentAchievement.dateEarned}
+                    </p>
                   </div>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Filter Buttons */}
-          <div className="px-4 py-4 border-b border-border">
-            <div className="max-w-4xl mx-auto">
+          {/* Filter Buttons - Mobile Optimized */}
+          <div className={`${isMobile ? 'px-4 pb-4' : 'px-6 pb-6'}`}>
+            {isMobile ? (
+              /* Mobile: Full width layout */
+              <div className="space-y-2">
+                <div className="flex gap-1 w-full">
+                  {['all', 'unlocked', 'locked'].map((filter) => (
+                    <Button
+                      key={filter}
+                      variant={activeFilter === filter ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setActiveFilter(filter as typeof activeFilter)}
+                      className={`
+                        capitalize transition-all duration-200 text-xs h-8 flex-1
+                        ${activeFilter === filter 
+                          ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg' 
+                          : 'hover:bg-muted/80'
+                        }
+                      `}
+                    >
+                      {filter === 'all' ? 'All' : 
+                       filter === 'unlocked' ? 'Unlocked' :
+                       'Locked'}
+                    </Button>
+                  ))}
+                </div>
+                <div className="flex gap-1 w-full">
+                  {['exploration', 'skill'].map((filter) => (
+                    <Button
+                      key={filter}
+                      variant={activeFilter === filter ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setActiveFilter(filter as typeof activeFilter)}
+                      className={`
+                        capitalize transition-all duration-200 text-xs h-8 flex-1
+                        ${activeFilter === filter 
+                          ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg' 
+                          : 'hover:bg-muted/80'
+                        }
+                      `}
+                    >
+                      {filter === 'exploration' ? 'Exploration' : 'Skill-Based'}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              /* Desktop: single row layout */
               <div className="flex flex-wrap gap-2 justify-center">
-                {[
-                  { id: 'all', label: 'All Achievements' },
-                  { id: 'unlocked', label: 'Unlocked' },
-                  { id: 'locked', label: 'Locked' },
-                  { id: 'exploration', label: 'Exploration' },
-                  { id: 'skill', label: 'Skill' }
-                ].map((filter) => (
-                  <button
-                    key={filter.id}
-                    onClick={() => setActiveFilter(filter.id as any)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                      activeFilter === filter.id
-                        ? 'bg-primary text-primary-foreground'
-                        : 'bg-muted text-muted-foreground hover:bg-muted/80'
-                    }`}
+                {['all', 'unlocked', 'locked', 'exploration', 'skill'].map((filter) => (
+                  <Button
+                    key={filter}
+                    variant={activeFilter === filter ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setActiveFilter(filter as typeof activeFilter)}
+                    className={`
+                      capitalize transition-all duration-200 hover:scale-105
+                      ${activeFilter === filter 
+                        ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg' 
+                        : 'hover:bg-muted/80'
+                      }
+                    `}
                   >
-                    {filter.label}
-                  </button>
+                     {filter === 'all' ? 'All Achievements' : 
+                      filter === 'unlocked' ? 'Unlocked' :
+                      filter === 'locked' ? 'Locked' :
+                     filter === 'exploration' ? 'Experience & Exploration' :
+                     'Skill-Based'}
+                  </Button>
                 ))}
               </div>
-            </div>
+            )}
           </div>
 
-          {/* Achievements Grid */}
-          <div className="px-4 py-6">
-            <div className="max-w-4xl mx-auto space-y-8">
-              
-              {/* Experience & Exploration Section */}
-              {(activeFilter === 'all' || activeFilter === 'exploration' || activeFilter === 'unlocked' || activeFilter === 'locked') && 
-               getFilteredAchievements(explorationAchievements, 'exploration').length > 0 && (
-                <section>
-                  <h3 className="text-xl font-semibold text-black dark:text-white mb-4 flex items-center gap-2">
-                    <span>🏌️</span>
-                    Experience & Exploration
-                  </h3>
-                  <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2 lg:grid-cols-3'} gap-4`}>
-                    {getFilteredAchievements(explorationAchievements, 'exploration').map((achievement, index) => {
-                      const progress = getAchievementProgress(achievement);
+          {/* Experience & Exploration Achievements Section */}
+          {(activeFilter === 'all' || activeFilter === 'exploration') && getFilteredAchievements(explorationAchievements, 'exploration').length > 0 && (
+            <div className={`${isMobile ? 'px-4 pb-6' : 'px-6 pb-8'}`}>
+              {/* Card Container with Visual Grouping */}
+              <div className="p-6">
+                {/* Section Header with Icon */}
+                  <div className={`flex items-center justify-center gap-3 ${isMobile ? 'mb-3' : 'mb-6'}`}>
+                    <h3 className={`${isMobile ? 'text-base' : 'text-xl'} font-bold text-gray-800 dark:text-gray-200`}>
+                      Experience & Exploration Achievements
+                    </h3>
+                  </div>
+                
+                  <div className={`grid grid-cols-3 ${isMobile ? 'gap-2' : 'gap-6'}`}>
+                    {getFilteredAchievements(explorationAchievements, 'exploration').map((achievement) => {
+                      const { percentage, nudgeText } = getAchievementProgress(achievement);
+                      const isNearUnlock = percentage >= 80 && percentage < 100;
                       
                       return (
-                        <div
-                          key={index}
-                          onClick={() => {
-                            setSelectedAchievement({
-                              id: achievement.title,
-                              name: achievement.title,
-                              xp: achievement.xp,
-                              unlocked: achievement.isEarned,
-                              description: achievement.description,
-                              unlockHint: achievement.unlockHint,
-                              progress: achievement.progress,
-                              dateEarned: achievement.dateEarned,
-                              isRepeatable: achievement.isRepeatable
-                            });
-                            setShowAchievementDetailModal(true);
-                          }}
-                          className={`
-                            bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 
-                            hover:shadow-md transition-all cursor-pointer
-                            ${!achievement.isEarned ? 'opacity-60' : ''}
-                          `}
-                        >
-                          <div className="flex items-start gap-3">
-                            <div className={`flex-shrink-0 ${!achievement.isEarned ? 'grayscale' : ''}`}>
-                              {getAchievementIcon(achievement)}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <h4 className="font-semibold text-black dark:text-white text-sm truncate">{achievement.title}</h4>
-                              <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{achievement.description}</p>
-                              
-                              {achievement.isEarned ? (
-                                <div className="text-xs text-green-600 dark:text-green-400 font-medium">
-                                  ✓ Unlocked
-                                </div>
-                              ) : (
-                                <>
-                                  {progress.percentage > 0 && (
-                                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 mb-2">
-                                      <div 
-                                        className="bg-primary h-1.5 rounded-full transition-all duration-500" 
-                                        style={{ width: `${progress.percentage}%` }}
-                                      ></div>
+                        <div key={achievement.title} className="relative">
+                          <div
+                            className={`
+                              transition-all duration-200 hover:scale-105 cursor-pointer 
+                              ${isMobile ? 'p-1 flex flex-col items-center text-center space-y-1' : 'p-4 flex flex-col items-center text-center space-y-3'}
+                            `}
+                            onClick={() => {
+                              setSelectedAchievement({
+                                id: achievement.title,
+                                name: achievement.title,
+                                xp: achievement.xp,
+                                unlocked: achievement.isEarned,
+                                description: achievement.description,
+                                unlockHint: achievement.unlockHint,
+                                progress: achievement.progress,
+                                dateEarned: achievement.dateEarned,
+                                isRepeatable: achievement.isRepeatable
+                              });
+                              setShowAchievementDetailModal(true);
+                            }}
+                            onMouseEnter={!isMobile ? () => {
+                              setSelectedAchievement({
+                                id: achievement.title,
+                                name: achievement.title,
+                                xp: achievement.xp,
+                                unlocked: achievement.isEarned,
+                                description: achievement.description,
+                                unlockHint: achievement.unlockHint,
+                                progress: achievement.progress,
+                                dateEarned: achievement.dateEarned,
+                                isRepeatable: achievement.isRepeatable
+                              });
+                              setShowAchievementDetailModal(true);
+                            } : undefined}
+                            onMouseLeave={!isMobile ? () => {
+                              setShowAchievementDetailModal(false);
+                              setSelectedAchievement(null);
+                            } : undefined}
+                                 >
+                                  {/* Icon directly on background - no container */}
+                                  <div className="flex justify-center items-center">
+                                    <div className={`transition-all duration-200 ${achievement.isEarned ? 'drop-shadow-lg' : 'opacity-60 grayscale'}`}>
+                                      {getAchievementIcon(achievement)}
                                     </div>
-                                  )}
-                                  {achievement.progress && (
-                                    <div className="text-xs text-muted-foreground">{achievement.progress}</div>
-                                  )}
-                                  {progress.nudgeText && (
-                                    <div className="text-xs text-orange-600 dark:text-orange-400 mt-1">
-                                      {progress.nudgeText}
-                                    </div>
-                                  )}
-                                </>
-                              )}
-                              <div className="text-xs text-muted-foreground mt-1">+{achievement.xp} XP</div>
-                            </div>
-                          </div>
-                        </div>
+                                  </div>
+                                  
+                                  {/* Text stacked underneath */}
+                                  <div className="text-center">
+                                    <h4 className={`font-semibold mb-1 ${isMobile ? 'text-xs leading-tight' : 'text-sm'} ${achievement.isEarned ? 'text-blue-700 dark:text-blue-300' : 'text-muted-foreground'}`}>
+                                      {achievement.title.toUpperCase()}
+                                    </h4>
+                                    <p className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium ${achievement.isEarned ? 'text-blue-600 dark:text-blue-400' : 'text-muted-foreground'}`}>
+                                      +{achievement.xp} XP
+                                    </p>
+                                  </div>
+                                  
+                                   {/* Smart Nudge Label */}
+                                   {nudgeText && (
+                                     <div className="mt-2 px-2 py-1 bg-orange-100 dark:bg-orange-900/30 rounded-full border border-orange-300 dark:border-orange-700">
+                                       <p className="text-xs font-medium text-orange-700 dark:text-orange-300 leading-tight">
+                                         🎯 {nudgeText}
+                                       </p>
+                                     </div>
+                                   )}
+                                 </div>
+                               
+                               {/* Progress indicator for near-unlock achievements */}
+                               {isNearUnlock && (
+                                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-orange-500 rounded-full animate-ping"></div>
+                               )}
+                             </div>
                       );
                     })}
-                  </div>
-                </section>
-              )}
-
-              {/* Skill & Performance Section */}
-              {(activeFilter === 'all' || activeFilter === 'skill' || activeFilter === 'unlocked' || activeFilter === 'locked') && 
-               getFilteredAchievements(skillAchievements, 'skill').length > 0 && (
-                <section>
-                  <h3 className="text-xl font-semibold text-black dark:text-white mb-4 flex items-center gap-2">
-                    <span>⚡</span>
-                    Skill & Performance
-                  </h3>
-                  <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2 lg:grid-cols-3'} gap-4`}>
-                    {getFilteredAchievements(skillAchievements, 'skill').map((achievement, index) => {
-                      const progress = getAchievementProgress(achievement);
-                      
-                      return (
-                        <div
-                          key={index}
-                          onClick={() => {
-                            setSelectedAchievement({
-                              id: achievement.title,
-                              name: achievement.title,
-                              xp: achievement.xp,
-                              unlocked: achievement.isEarned,
-                              description: achievement.description,
-                              unlockHint: achievement.unlockHint,
-                              progress: achievement.progress,
-                              dateEarned: achievement.dateEarned,
-                              isRepeatable: achievement.isRepeatable
-                            });
-                            setShowAchievementDetailModal(true);
-                          }}
-                          className={`
-                            bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 
-                            hover:shadow-md transition-all cursor-pointer
-                            ${!achievement.isEarned ? 'opacity-60' : ''}
-                          `}
-                        >
-                          <div className="flex items-start gap-3">
-                            <div className={`flex-shrink-0 ${!achievement.isEarned ? 'grayscale' : ''}`}>
-                              {getAchievementIcon(achievement)}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <h4 className="font-semibold text-black dark:text-white text-sm truncate">{achievement.title}</h4>
-                              <p className="text-xs text-muted-foreground mb-2 line-clamp-2">{achievement.description}</p>
-                              
-                              {achievement.isEarned ? (
-                                <div className="text-xs text-green-600 dark:text-green-400 font-medium">
-                                  ✓ Unlocked
-                                </div>
-                              ) : (
-                                <>
-                                  {progress.percentage > 0 && (
-                                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 mb-2">
-                                      <div 
-                                        className="bg-primary h-1.5 rounded-full transition-all duration-500" 
-                                        style={{ width: `${progress.percentage}%` }}
-                                      ></div>
-                                    </div>
-                                  )}
-                                  {achievement.progress && (
-                                    <div className="text-xs text-muted-foreground">{achievement.progress}</div>
-                                  )}
-                                  {achievement.unlockHint && (
-                                    <div className="text-xs text-muted-foreground mt-1">{achievement.unlockHint}</div>
-                                  )}
-                                  {progress.nudgeText && (
-                                    <div className="text-xs text-orange-600 dark:text-orange-400 mt-1">
-                                      {progress.nudgeText}
-                                    </div>
-                                  )}
-                                </>
-                              )}
-                              <div className="text-xs text-muted-foreground mt-1">+{achievement.xp} XP</div>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </section>
-              )}
-
-              {/* No Results Message */}
-              {getFilteredAchievements(explorationAchievements, 'exploration').length === 0 && 
-               getFilteredAchievements(skillAchievements, 'skill').length === 0 && (
-                <div className="text-center py-12">
-                  <Trophy className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-black dark:text-white mb-2">No achievements found</h3>
-                  <p className="text-muted-foreground">
-                    {activeFilter === 'unlocked' 
-                      ? "You haven't unlocked any achievements yet. Keep playing to earn your first badge!"
-                      : `No ${activeFilter} achievements match your current filter.`
-                    }
-                  </p>
-                </div>
-              )}
+                   </div>
+               </div>
             </div>
-          </div>
+          )}
+
+          {/* Skill & Performance Achievements Section */}
+          {(activeFilter === 'all' || activeFilter === 'skill') && getFilteredAchievements(skillAchievements, 'skill').length > 0 && (
+            <div className={`${isMobile ? 'px-4 pb-6' : 'px-6 pb-8'}`}>
+              {/* Card Container with Visual Grouping */}
+              <div className="p-6">
+                {/* Section Header with Icon */}
+                  <div className={`flex items-center justify-center gap-3 ${isMobile ? 'mb-3' : 'mb-6'}`}>
+                    <h3 className={`${isMobile ? 'text-base' : 'text-xl'} font-bold text-gray-800 dark:text-gray-200`}>
+                      Skill & Performance Achievements
+                    </h3>
+                  </div>
+                
+                  <div className={`grid grid-cols-3 ${isMobile ? 'gap-2' : 'gap-6'}`}>
+                    {getFilteredAchievements(skillAchievements, 'skill').map((achievement) => {
+                      const { percentage, nudgeText } = getAchievementProgress(achievement);
+                      const isNearUnlock = percentage >= 80 && percentage < 100;
+                      
+                      return (
+                        <div key={achievement.title} className="relative">
+                          <div
+                            className={`
+                              transition-all duration-200 hover:scale-105 cursor-pointer 
+                              ${isMobile ? 'p-1 flex flex-col items-center text-center space-y-1' : 'p-4 flex flex-col items-center text-center space-y-3'}
+                            `}
+                            onClick={() => {
+                              setSelectedAchievement({
+                                id: achievement.title,
+                                name: achievement.title,
+                                xp: achievement.xp,
+                                unlocked: achievement.isEarned,
+                                description: achievement.description,
+                                unlockHint: achievement.unlockHint,
+                                progress: achievement.progress,
+                                dateEarned: achievement.dateEarned,
+                                isRepeatable: achievement.isRepeatable
+                              });
+                              setShowAchievementDetailModal(true);
+                            }}
+                            onMouseEnter={!isMobile ? () => {
+                              setSelectedAchievement({
+                                id: achievement.title,
+                                name: achievement.title,
+                                xp: achievement.xp,
+                                unlocked: achievement.isEarned,
+                                description: achievement.description,
+                                unlockHint: achievement.unlockHint,
+                                progress: achievement.progress,
+                                dateEarned: achievement.dateEarned,
+                                isRepeatable: achievement.isRepeatable
+                              });
+                              setShowAchievementDetailModal(true);
+                            } : undefined}
+                            onMouseLeave={!isMobile ? () => {
+                              setShowAchievementDetailModal(false);
+                              setSelectedAchievement(null);
+                            } : undefined}
+                                 >
+                                  {/* Icon directly on background - no container */}
+                                  <div className="flex justify-center items-center">
+                                    <div className={`transition-all duration-200 ${achievement.isEarned ? 'drop-shadow-lg' : 'opacity-60 grayscale'}`}>
+                                      {getAchievementIcon(achievement)}
+                                    </div>
+                                  </div>
+                                  
+                                  {/* Text stacked underneath */}
+                                  <div className="text-center">
+                                    <h4 className={`font-semibold mb-1 ${isMobile ? 'text-xs leading-tight' : 'text-sm'} ${achievement.isEarned ? 'text-green-700 dark:text-green-300' : 'text-muted-foreground'}`}>
+                                      {achievement.title.toUpperCase()}
+                                    </h4>
+                                    <p className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium ${achievement.isEarned ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}`}>
+                                      +{achievement.xp} XP
+                                    </p>
+                                  </div>
+                                  
+                                  {/* Smart Nudge Label */}
+                                  {nudgeText && (
+                                    <div className="mt-2 px-2 py-1 bg-orange-100 dark:bg-orange-900/30 rounded-full border border-orange-300 dark:border-orange-700">
+                                      <p className="text-xs font-medium text-orange-700 dark:text-orange-300 leading-tight">
+                                        🎯 {nudgeText}
+                                      </p>
+                                    </div>
+                                  )}
+                                </div>
+                              
+                               {/* Progress indicator for near-unlock achievements */}
+                               {isNearUnlock && (
+                                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-orange-500 rounded-full animate-ping"></div>
+                               )}
+                             </div>
+                      );
+                    })}
+                   </div>
+               </div>
+             </div>
+           )}
+
         </div>
 
-        {/* Achievement Detail Modal */}
-        {isOpen && (
-          <AchievementDetailModal
-            isOpen={showAchievementDetailModal}
-            onClose={() => setShowAchievementDetailModal(false)}
-            achievement={selectedAchievement}
-          />
-        )}
       </DialogContent>
+      
+      {/* Achievement Detail Modal - Moved outside the main Dialog to prevent nesting issues */}
+      {isOpen && (
+        <AchievementDetailModal
+          isOpen={showAchievementDetailModal}
+          onClose={() => setShowAchievementDetailModal(false)}
+          achievement={selectedAchievement}
+        />
+      )}
     </Dialog>
   );
 };
