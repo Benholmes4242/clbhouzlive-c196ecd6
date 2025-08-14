@@ -958,7 +958,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                                 cy="80"
                                 r="70"
                                 stroke="currentColor"
-                                strokeWidth="12"
+                                strokeWidth="3"
                                 fill="transparent"
                                 className="text-gray-300 dark:text-gray-600"
                               />
@@ -968,7 +968,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                                 cy="80"
                                 r="70"
                                 stroke={`url(#progressGradient)`}
-                                strokeWidth="12"
+                                strokeWidth="3"
                                 fill="transparent"
                                 strokeDasharray={`${70 * 2 * Math.PI}`}
                                 strokeDashoffset={animateProgress ? 
@@ -1079,37 +1079,37 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                        }
                        
                        return (
-                         <div key={tier.name} className="flex-1 text-center">
-                           <div className="relative flex justify-center mb-2">
-                             {/* Progress ring above titles */}
-                             <svg className="w-16 h-16 transform -rotate-90" viewBox="0 0 64 64">
-                               {/* Background circle */}
-                               <circle
-                                 cx="32"
-                                 cy="32"
-                                 r="30"
-                                 stroke="currentColor"
-                                 strokeWidth="3"
-                                 fill="transparent"
-                                 className="text-gray-300 dark:text-gray-600"
-                               />
-                               {/* Progress circle */}
-                               {tierProgress > 0 && (
-                                 <circle
-                                   cx="32"
-                                   cy="32"
-                                   r="30"
-                                   stroke={tier.color}
-                                   strokeWidth="3"
-                                   fill="transparent"
-                                   strokeDasharray={`${30 * 2 * Math.PI}`}
-                                   strokeDashoffset={`${30 * 2 * Math.PI * (1 - tierProgress / 100)}`}
-                                   strokeLinecap="round"
-                                   className="transition-all duration-700"
-                                 />
-                               )}
-                             </svg>
-                           </div>
+                          <div key={tier.name} className="flex-1 text-center">
+                            <div className="relative flex justify-center mb-2">
+                              {/* Progress ring above titles */}
+                              <svg className={`w-16 h-16 transform -rotate-90 ${isNext && !isActive ? 'animate-pulse' : ''}`} viewBox="0 0 64 64">
+                                {/* Background circle */}
+                                <circle
+                                  cx="32"
+                                  cy="32"
+                                  r="30"
+                                  stroke="currentColor"
+                                  strokeWidth="3"
+                                  fill="transparent"
+                                  className="text-gray-300 dark:text-gray-600"
+                                />
+                                {/* Progress circle */}
+                                {tierProgress > 0 && (
+                                  <circle
+                                    cx="32"
+                                    cy="32"
+                                    r="30"
+                                    stroke={tier.color}
+                                    strokeWidth="3"
+                                    fill="transparent"
+                                    strokeDasharray={`${30 * 2 * Math.PI}`}
+                                    strokeDashoffset={`${30 * 2 * Math.PI * (1 - tierProgress / 100)}`}
+                                    strokeLinecap="round"
+                                    className="transition-all duration-700"
+                                  />
+                                )}
+                              </svg>
+                            </div>
                            <div className="text-xs font-medium mb-1" style={{ color: isActive ? tier.color : '#6B7280' }}>
                              {tier.name}
                            </div>
