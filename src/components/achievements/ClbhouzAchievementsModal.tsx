@@ -977,9 +977,6 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                                 }
                                 strokeLinecap="round"
                                 className="transition-all duration-1000 ease-out"
-                                style={{
-                                  filter: 'drop-shadow(0 0 12px rgba(59, 130, 246, 0.6))'
-                                }}
                               />
                               {/* Gradient definition */}
                               <defs>
