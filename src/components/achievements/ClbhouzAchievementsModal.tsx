@@ -6,6 +6,7 @@ import { XPRingSystem } from "@/components/profile/XPRingSystem";
 import { Sparkles, Trophy, ChevronDown, ChevronUp } from "lucide-react";
 import { useIsMobile } from '@/hooks/use-mobile';
 import AchievementDetailModal from '@/components/achievements/AchievementDetailModal';
+import Confetti from 'react-confetti';
 
 // Achievement badge imports - using user's uploaded image
 // import club300Badge from '@/assets/achievements/300-club-champion.png';
@@ -1127,38 +1128,24 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
           {mostRecentAchievement && (
             <div className={`${isMobile ? 'px-4 pb-6' : 'px-6 pb-8'}`}>
               <div className="relative">
-                {/* Floating Particles around Badge */}
-                <div className="absolute inset-0 flex justify-center items-start pt-8 pointer-events-none">
-                  <div className="relative">
-                    {[...Array(12)].map((_, i) => {
-                      const angle = (i * 30) * (Math.PI / 180); // 30 degrees apart
-                      const radius = 140 + Math.random() * 40; // Random distance from badge
-                      const x = Math.cos(angle) * radius;
-                      const y = Math.sin(angle) * radius;
-                      
-                      return (
-                        <div
-                          key={i}
-                          className="absolute animate-bounce"
-                          style={{
-                            left: `${x}px`,
-                            top: `${y}px`,
-                            animationDelay: `${Math.random() * 3}s`,
-                            animationDuration: `${2 + Math.random() * 3}s`,
-                            animationIterationCount: 'infinite'
-                          }}
-                        >
-                          <div 
-                            className="w-2 h-2 rounded-full"
-                            style={{
-                              backgroundColor: ['#FFD700', '#FFA500', '#FF6347', '#00CED1', '#32CD32', '#9370DB'][Math.floor(Math.random() * 6)]
-                            }}
-                          />
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
+                {/* React Confetti around Badge */}
+                <Confetti
+                  width={400}
+                  height={300}
+                  recycle={true}
+                  numberOfPieces={50}
+                  gravity={0.1}
+                  initialVelocityX={2}
+                  initialVelocityY={10}
+                  colors={['#FFD700', '#FFA500', '#FF6347', '#00CED1', '#32CD32', '#9370DB']}
+                  style={{
+                    position: 'absolute',
+                    left: '50%',
+                    top: '0',
+                    transform: 'translateX(-50%)',
+                    pointerEvents: 'none'
+                  }}
+                />
                 
                 {/* Featured Achievement Card */}
                 <div className="p-8 text-center">
