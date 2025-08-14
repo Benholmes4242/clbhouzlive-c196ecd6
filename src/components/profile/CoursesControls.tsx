@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Grid3X3, List } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 import RegionDropdown from './RegionDropdown';
 import SortViewDropdown from './SortViewDropdown';
 
@@ -23,17 +24,18 @@ const CoursesControls: React.FC<CoursesControlsProps> = ({
   viewType,
   onViewTypeChange
 }) => {
+  const isMobile = useIsMobile();
 
   return (
     <div className={`w-full ${className}`}>
       <div className="md:max-w-[1150px] md:mx-auto">
         {/* Controls Section */}
-        <div className="flex items-center justify-between px-4 md:px-0 pt-1 mb-4">
+        <div className={`${isMobile ? 'flex flex-col space-y-3' : 'flex items-center justify-between'} px-4 md:px-0 pt-1 mb-4`}>
           <div className="flex items-center">
             <h3 className="text-xl md:text-2xl text-foreground">Courses Played</h3>
           </div>
           
-          <div className="flex items-center gap-3">
+          <div className={`flex items-center ${isMobile ? 'justify-center' : 'gap-3'} ${isMobile ? 'gap-2' : 'gap-3'}`}>
             <RegionDropdown 
               selectedRegion={activeFilter || 'global'}
               onRegionChange={onFilterChange}

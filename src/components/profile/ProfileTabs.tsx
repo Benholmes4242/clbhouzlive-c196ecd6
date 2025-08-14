@@ -2,6 +2,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { User, Trophy, Camera, BarChart3, MapPin } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 import ClbhouzAchievementsModal from '@/components/achievements/ClbhouzAchievementsModal';
 
 interface ProfileTabsProps {
@@ -34,12 +35,13 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
   const tabsRef = useRef<HTMLDivElement>(null);
+  const isMobile = useIsMobile();
 
   const [isAchievementsModalOpen, setIsAchievementsModalOpen] = useState(false);
 
   const tabs = [
     { id: 'activity', label: 'Activity', icon: Camera },
-    { id: 'courses', label: 'Courses Played', icon: MapPin },
+    { id: 'courses', label: isMobile ? 'Courses' : 'Courses Played', icon: MapPin },
     { id: 'achievements', label: 'Achievements', icon: Trophy },
     { id: 'stats', label: 'Handicap', icon: BarChart3 }
   ];

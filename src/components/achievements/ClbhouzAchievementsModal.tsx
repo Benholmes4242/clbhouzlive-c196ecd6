@@ -869,14 +869,16 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                       Next: {nextTier.name} at {nextTier.minXP.toLocaleString()} XP
                     </div>
                   )}
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleToggleCollapse}
-                    className={`p-1 ${isMobile ? 'h-5 w-5' : 'h-6 w-6'}`}
-                  >
-                    <ChevronDown className={`${isMobile ? 'h-2.5 w-2.5' : 'h-3 w-3'}`} />
-                  </Button>
+                  {!isMobile && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleToggleCollapse}
+                      className="p-1 h-6 w-6"
+                    >
+                      <ChevronDown className="h-3 w-3" />
+                    </Button>
+                  )}
                 </div>
               </div>
             ) : (
@@ -902,14 +904,16 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                          </div>
                         
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleToggleCollapse}
-                        className="p-1 h-6 w-6"
-                      >
-                        <ChevronUp className="h-3 w-3" />
-                      </Button>
+                      {!isMobile && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={handleToggleCollapse}
+                          className="p-1 h-6 w-6"
+                        >
+                          <ChevronUp className="h-3 w-3" />
+                        </Button>
+                      )}
                     </div>
                     
                     {/* Next ring text and toggle */}
@@ -931,14 +935,16 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                              {totalXP.toLocaleString()} XP
                            </div>
                         </div>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={handleToggleCollapse}
-                          className="p-1 h-8 w-8"
-                        >
-                          <ChevronUp className="h-4 w-4" />
-                        </Button>
+                        {!isMobile && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={handleToggleCollapse}
+                            className="p-1 h-8 w-8"
+                          >
+                            <ChevronUp className="h-4 w-4" />
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </div>
