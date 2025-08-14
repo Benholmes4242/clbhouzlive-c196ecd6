@@ -1059,72 +1059,86 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                 <div className="w-full">
                   <h4 className="text-sm font-medium text-muted-foreground mb-3 text-center">Ring Progression</h4>
                   <div className="flex justify-between items-center gap-2">
-                    {xpTiers.map((tier, index) => {
-                      const isActive = totalXP >= tier.minXP;
-                      const isCurrent = currentTier?.name === tier.name;
-                      const isNext = nextTier?.name === tier.name;
-                      
-                      return (
-                        <div key={tier.name} className="flex-1 text-center">
-                          <div className="relative">
-                            <div className={`
-                              relative w-16 h-16 mx-auto mb-2 rounded-full border-4 transition-all duration-500 flex items-center justify-center overflow-hidden
-                              ${isActive 
-                                ? `bg-gradient-to-br from-${tier.color}/20 to-${tier.color}/40 border-current shadow-lg` 
-                                : isNext 
-                                  ? 'border-gray-400 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 animate-pulse'
-                                  : 'border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900'
-                              }
-                            `}
-                            style={{ 
-                              color: isActive ? tier.color : '#9CA3AF',
-                              borderColor: isActive ? tier.color : undefined,
-                              filter: isActive ? (tier.color === "#3B82F6" ? `drop-shadow(0 0 12px rgba(59, 130, 246, 0.8))` :
-                                                     tier.color === "#10B981" ? `drop-shadow(0 0 12px rgba(16, 185, 129, 0.8))` :
-                                                     tier.color === "#6B7280" ? `drop-shadow(0 0 12px rgba(107, 114, 128, 0.8))` :
-                                                     `drop-shadow(0 0 12px rgba(245, 158, 11, 0.8))`) : 'none'
-                            }}
-                            >
-                              {/* Inner glow for blue ring */}
-                              {tier.color === "#3B82F6" && (
-                                <div 
-                                  className="absolute inset-1 rounded-full opacity-40 animate-pulse"
-                                  style={{
-                                    background: `conic-gradient(from 0deg, rgba(59, 130, 246, 0.3), rgba(139, 92, 246, 0.3), rgba(6, 182, 212, 0.3), rgba(59, 130, 246, 0.3))`,
-                                    filter: 'blur(8px)'
-                                  }}
-                                />
-                              )}
-                              
-                              {/* Progress ring for current tier */}
-                              {isCurrent && (
-                                <svg className="absolute inset-0 w-full h-full transform -rotate-90" viewBox="0 0 64 64">
-                                  <circle
-                                    cx="32"
-                                    cy="32"
-                                    r="28"
-                                    stroke={tier.color}
-                                    strokeWidth="4"
-                                    fill="transparent"
-                                    strokeDasharray={`${28 * 2 * Math.PI}`}
-                                    strokeDashoffset={`${28 * 2 * Math.PI * (1 - progressPercentage / 100)}`}
-                                    strokeLinecap="round"
-                                    className="transition-all duration-700 opacity-80"
-                                  />
-                                </svg>
-                              )}
-                              
-                              <Trophy className={`relative z-10 w-6 h-6 ${isActive ? 'animate-pulse' : ''}`} />
-                            </div>
-                          </div>
-                          <div className="text-xs font-medium mb-1" style={{ color: isActive ? tier.color : '#6B7280' }}>
-                            {tier.name}
-                          </div>
-                          <div className="text-xs text-muted-foreground">
-                            {tier.minXP.toLocaleString()} XP
-                          </div>
-                        </div>
-                      );
+                     {xpTiers.map((tier, index) => {
+                       const isActive = totalXP >= tier.minXP;
+                       const isCurrent = currentTier?.name === tier.name;
+                       const isNext = nextTier?.name === tier.name;
+                       
+                       // Calculate progress for this specific tier
+                       let tierProgress = 0;
+                       if (isActive) {
+                         // Tier is completed, show 100%
+                         tierProgress = 100;
+                       } else if (isCurrent || isNext) {
+                         // This is the tier being worked towards
+                         const tierStart = index === 0 ? 0 : xpTiers[index - 1].minXP;
+                         const tierEnd = tier.minXP;
+                         const tierRange = tierEnd - tierStart;
+                         const currentProgress = Math.max(0, totalXP - tierStart);
+                         tierProgress = Math.min(100, (currentProgress / tierRange) * 100);
+                       }
+                       
+                       return (
+                         <div key={tier.name} className="flex-1 text-center">
+                           <div className="relative">
+                             <div className={`
+                               relative w-16 h-16 mx-auto mb-2 rounded-full border-4 transition-all duration-500 flex items-center justify-center overflow-hidden
+                               ${isActive 
+                                 ? `bg-gradient-to-br from-${tier.color}/20 to-${tier.color}/40 border-current shadow-lg` 
+                                 : (isCurrent || isNext)
+                                   ? 'border-gray-400 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 animate-pulse'
+                                   : 'border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900'
+                               }
+                             `}
+                             style={{ 
+                               color: isActive ? tier.color : '#9CA3AF',
+                               borderColor: isActive ? tier.color : undefined,
+                               filter: isActive ? (tier.color === "#3B82F6" ? `drop-shadow(0 0 12px rgba(59, 130, 246, 0.8))` :
+                                                      tier.color === "#10B981" ? `drop-shadow(0 0 12px rgba(16, 185, 129, 0.8))` :
+                                                      tier.color === "#6B7280" ? `drop-shadow(0 0 12px rgba(107, 114, 128, 0.8))` :
+                                                      `drop-shadow(0 0 12px rgba(245, 158, 11, 0.8))`) : 'none'
+                             }}
+                             >
+                               {/* Inner glow for blue ring */}
+                               {tier.color === "#3B82F6" && (
+                                 <div 
+                                   className="absolute inset-1 rounded-full opacity-40 animate-pulse"
+                                   style={{
+                                     background: `conic-gradient(from 0deg, rgba(59, 130, 246, 0.3), rgba(139, 92, 246, 0.3), rgba(6, 182, 212, 0.3), rgba(59, 130, 246, 0.3))`,
+                                     filter: 'blur(8px)'
+                                   }}
+                                 />
+                               )}
+                               
+                               {/* Progress ring for any tier with progress */}
+                               {tierProgress > 0 && (
+                                 <svg className="absolute inset-0 w-full h-full transform -rotate-90" viewBox="0 0 64 64">
+                                   <circle
+                                     cx="32"
+                                     cy="32"
+                                     r="28"
+                                     stroke={tier.color}
+                                     strokeWidth="4"
+                                     fill="transparent"
+                                     strokeDasharray={`${28 * 2 * Math.PI}`}
+                                     strokeDashoffset={`${28 * 2 * Math.PI * (1 - tierProgress / 100)}`}
+                                     strokeLinecap="round"
+                                     className="transition-all duration-700 opacity-80"
+                                   />
+                                 </svg>
+                               )}
+                               
+                               <Trophy className={`relative z-10 w-6 h-6 ${isActive ? 'animate-pulse' : ''}`} />
+                             </div>
+                           </div>
+                           <div className="text-xs font-medium mb-1" style={{ color: isActive ? tier.color : '#6B7280' }}>
+                             {tier.name}
+                           </div>
+                           <div className="text-xs text-muted-foreground">
+                             {tier.minXP.toLocaleString()} XP
+                           </div>
+                         </div>
+                       );
                     })}
                   </div>
                 </div>
