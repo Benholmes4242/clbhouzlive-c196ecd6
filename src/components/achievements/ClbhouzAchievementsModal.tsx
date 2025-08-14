@@ -1067,8 +1067,8 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                       return (
                         <div key={tier.name} className="flex-1 text-center">
                           <div className="relative">
-                            {/* Glow effect for blue mini ring only */}
-                            {isActive && tier.color === "#3B82F6" && (
+                            {/* Glow effect for blue mini ring always */}
+                            {tier.color === "#3B82F6" && (
                               <div 
                                 className="absolute opacity-60 animate-pulse rounded-full"
                                 style={{
