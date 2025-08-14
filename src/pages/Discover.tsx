@@ -166,7 +166,7 @@ const Discover = () => {
 
 
   return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-white">
         <Header />
         
         <main className="pb-20">
