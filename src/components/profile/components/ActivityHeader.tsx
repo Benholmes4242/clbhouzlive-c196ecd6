@@ -1,5 +1,8 @@
 
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { TrophyIcon } from '@heroicons/react/24/outline';
 import CreatePostDialog from '@/components/posts/CreatePostDialog';
 
 interface ActivityHeaderProps {
@@ -9,6 +12,8 @@ interface ActivityHeaderProps {
 }
 
 const ActivityHeader: React.FC<ActivityHeaderProps> = ({ postsCount, isOwnProfile, onPostCreated }) => {
+  const navigate = useNavigate();
+
   return (
     <div className="flex items-center justify-between mb-4">
       <div className="flex items-center gap-4">
@@ -17,6 +22,18 @@ const ActivityHeader: React.FC<ActivityHeaderProps> = ({ postsCount, isOwnProfil
           {postsCount} posts
         </span>
       </div>
+      
+      {isOwnProfile && (
+        <Button
+          onClick={() => navigate('/achievements')}
+          variant="outline"
+          size="sm"
+          className="text-white border-white/20 hover:bg-white/10"
+        >
+          <TrophyIcon className="w-4 h-4 mr-2" />
+          Achievements
+        </Button>
+      )}
     </div>
   );
 };
