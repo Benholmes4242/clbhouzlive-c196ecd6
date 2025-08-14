@@ -1072,7 +1072,10 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                               <div 
                                 className="absolute inset-0 rounded-full animate-pulse"
                                 style={{
-                                  background: `radial-gradient(circle, ${tier.color}60 0%, ${tier.color}30 50%, transparent 70%)`,
+                                  background: tier.color === "#3B82F6" ? `radial-gradient(circle, rgba(59, 130, 246, 0.6) 0%, rgba(59, 130, 246, 0.3) 50%, transparent 70%)` :
+                                             tier.color === "#10B981" ? `radial-gradient(circle, rgba(16, 185, 129, 0.6) 0%, rgba(16, 185, 129, 0.3) 50%, transparent 70%)` :
+                                             tier.color === "#6B7280" ? `radial-gradient(circle, rgba(107, 114, 128, 0.6) 0%, rgba(107, 114, 128, 0.3) 50%, transparent 70%)` :
+                                             `radial-gradient(circle, rgba(245, 158, 11, 0.6) 0%, rgba(245, 158, 11, 0.3) 50%, transparent 70%)`,
                                   filter: 'blur(8px)',
                                   transform: 'scale(1.5)'
                                 }}
@@ -1090,7 +1093,10 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                             style={{ 
                               color: isActive ? tier.color : '#9CA3AF',
                               borderColor: isActive ? tier.color : undefined,
-                              filter: isActive ? `drop-shadow(0 0 8px ${tier.color}60)` : 'none'
+                              filter: isActive ? (tier.color === "#3B82F6" ? `drop-shadow(0 0 8px rgba(59, 130, 246, 0.6))` :
+                                                     tier.color === "#10B981" ? `drop-shadow(0 0 8px rgba(16, 185, 129, 0.6))` :
+                                                     tier.color === "#6B7280" ? `drop-shadow(0 0 8px rgba(107, 114, 128, 0.6))` :
+                                                     `drop-shadow(0 0 8px rgba(245, 158, 11, 0.6))`) : 'none'
                             }}
                             >
                               <Trophy className={`w-6 h-6 ${isActive ? 'animate-pulse' : ''}`} />
