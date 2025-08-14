@@ -734,9 +734,8 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       unlockHint: "Target different par holes strategically. Look for opportunities on shorter par 4s and reachable par 5s."
     }
   ];
-
+  // Get the most recently unlocked achievement after both arrays are defined
   const mostRecentAchievement = getMostRecentAchievement();
-
   // Body scroll lock effect for mobile
   useEffect(() => {
     if (isOpen && isMobile) {
