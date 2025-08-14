@@ -621,13 +621,13 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       unlockHint: "Master all aspects of your game and consistently shoot under par. This requires dedication and practice."
     },
     {
-      title: "Under Par Round",
-      emoji: "🎯",
+      title: "Single-Figure Handicap",
+      emoji: "🎯", 
       isEarned: true,
-      description: "Complete a round under par. Exceptional performance!",
+      description: "Achieve a single-digit handicap. Elite golfing status!",
       xp: 150,
       isRepeatable: true,
-      progress: "Achieved: 2 times",
+      progress: "Achieved: Handicap 8.5",
       dateEarned: "February 8, 2024"
     },
     {
