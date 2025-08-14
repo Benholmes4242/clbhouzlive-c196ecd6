@@ -765,13 +765,39 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
         overflow-hidden flex flex-col bg-white
       `}
       >
-        <DialogHeader className={`${isMobile ? 'p-4 pb-2' : 'p-6 pb-4'} flex-shrink-0 text-center`}>
-          <DialogTitle className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold text-black dark:text-white text-center`}>
-            Achievements
-          </DialogTitle>
-          <DialogDescription className={`${isMobile ? 'text-sm' : 'text-base'} text-muted-foreground mt-1 text-center`}>
-            Defining your game through achievement
-          </DialogDescription>
+        <DialogHeader className={`${isMobile ? 'p-4 pb-2' : 'p-6 pb-4'} flex-shrink-0`}>
+          <div className="flex justify-between items-center">
+            {/* Left side - Title and subtitle */}
+            <div className="text-left">
+              <DialogTitle className={`${isMobile ? 'text-xl' : 'text-3xl'} font-bold text-black dark:text-white`}>
+                Achievements
+              </DialogTitle>
+              <DialogDescription className={`${isMobile ? 'text-sm' : 'text-base'} text-muted-foreground mt-1`}>
+                Defining your game through achievement
+              </DialogDescription>
+            </div>
+            
+            {/* Right side - User profile */}
+            <div className="flex items-center gap-3">
+              <div className="text-right">
+                <h3 className={`${isMobile ? 'text-sm' : 'text-base'} font-semibold`}>{userDisplayName}</h3>
+                <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
+                  {userHandicap ? `${typeof userHandicap === 'number' ? userHandicap.toFixed(1) : userHandicap} Handicap` : 'No handicap set'}
+                </p>
+              </div>
+              <div className={`${isMobile ? 'w-14 h-14' : 'w-16 h-16'} rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-white font-bold ${isMobile ? 'text-sm' : 'text-lg'}`}>
+                {userProfilePhotoUrl ? (
+                  <img 
+                    src={userProfilePhotoUrl} 
+                    alt={userDisplayName} 
+                    className={`${isMobile ? 'w-14 h-14' : 'w-16 h-16'} rounded-full object-cover`}
+                  />
+                ) : (
+                  userDisplayName.charAt(0).toUpperCase()
+                )}
+              </div>
+            </div>
+          </div>
         </DialogHeader>
         
         <div 
@@ -785,30 +811,6 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
             overscrollBehaviorY: 'contain'
           }}
         >
-          {/* User Profile Section */}
-          <div className={`${isMobile ? 'px-4 pb-2' : 'px-6 pb-4'}`}>
-            <div className={`flex items-center justify-center ${isMobile ? 'p-3' : 'p-4'}`}>
-              <div className="flex items-center gap-3">
-                <div className={`${isMobile ? 'w-14 h-14' : 'w-16 h-16'} rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center text-white font-bold ${isMobile ? 'text-sm' : 'text-lg'}`}>
-                  {userProfilePhotoUrl ? (
-                    <img 
-                      src={userProfilePhotoUrl} 
-                      alt={userDisplayName} 
-                      className={`${isMobile ? 'w-14 h-14' : 'w-16 h-16'} rounded-full object-cover`}
-                    />
-                  ) : (
-                    userDisplayName.charAt(0).toUpperCase()
-                  )}
-                </div>
-                <div className="text-center">
-                  <h3 className={`${isMobile ? 'text-sm' : 'text-base'} font-semibold`}>{userDisplayName}</h3>
-                  <p className={`${isMobile ? 'text-xs' : 'text-sm'} text-muted-foreground`}>
-                    {userHandicap ? `Handicap: ${userHandicap}` : 'No handicap set'}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
 
           {/* Collapsible XP Progress Header with Smooth Animations */}
           <div className={`sticky top-0 z-10 bg-card/95 backdrop-blur-sm transition-all duration-400 ease-in-out ${
