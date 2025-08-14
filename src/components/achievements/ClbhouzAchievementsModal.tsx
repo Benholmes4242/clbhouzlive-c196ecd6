@@ -1250,7 +1250,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                     </h3>
                   </div>
                 
-                  <div className={`grid grid-cols-3 ${isMobile ? 'gap-2' : 'gap-6'}`}>
+                  <div className={`grid grid-cols-3 ${isMobile ? 'gap-2' : 'gap-3'}`}>
                     {getFilteredAchievements(explorationAchievements, 'exploration').map((achievement) => {
                       const { percentage, nudgeText } = getAchievementProgress(achievement);
                       const isNearUnlock = percentage >= 80 && percentage < 100;
@@ -1346,7 +1346,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                     </h3>
                   </div>
                 
-                  <div className={`grid grid-cols-3 ${isMobile ? 'gap-2' : 'gap-6'}`}>
+                  <div className={`grid grid-cols-3 ${isMobile ? 'gap-2' : 'gap-3'}`}>
                     {getFilteredAchievements(skillAchievements, 'skill').map((achievement) => {
                       const { percentage, nudgeText } = getAchievementProgress(achievement);
                       const isNearUnlock = percentage >= 80 && percentage < 100;
