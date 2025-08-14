@@ -76,8 +76,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
           
           <div 
             ref={tabsRef}
-            className="flex justify-start md:justify-center gap-2 md:gap-12 px-4 md:px-0 overflow-x-auto scrollbar-hide w-full"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            className="flex w-full"
           >
             {tabs.map((tab) => {
               const IconComponent = tab.icon;
@@ -87,16 +86,16 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
                   key={tab.id}
                   onClick={() => onTabChange(tab.id)}
                   disabled={transitionState !== 'idle'}
-                  className={`flex-shrink-0 flex items-center px-6 py-4 transition-all duration-200 text-base relative ${
+                  className={`flex-1 flex items-center justify-center py-4 transition-all duration-200 text-base relative ${
                     isActive 
                       ? 'text-black' 
                       : 'text-muted-foreground hover:text-foreground'
                   } ${transitionState !== 'idle' ? 'pointer-events-none' : ''}`}
                 >
-                  <span className="whitespace-nowrap text-xl md:text-2xl font-medium">{tab.label}</span>
+                  <span className="whitespace-nowrap text-lg md:text-xl font-medium">{tab.label}</span>
                   {/* Underline only under text label */}
                   {isActive && (
-                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-black" style={{ width: 'calc(100% - 3rem)' }} />
+                    <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 h-0.5 bg-black w-3/4" />
                   )}
                 </button>
               );
