@@ -1083,26 +1083,18 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                             )}
                             <div className={`
                               relative w-16 h-16 mx-auto mb-2 rounded-full border-4 transition-all duration-500 flex items-center justify-center
-                              ${isActive 
-                                ? `bg-gradient-to-br from-${tier.color}/20 to-${tier.color}/40 border-current shadow-lg` 
-                                : isNext 
-                                  ? 'border-gray-400 dark:border-gray-600 bg-gray-100 dark:bg-gray-800 animate-pulse'
-                                  : 'border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900'
-                              }
+                              bg-red-500 border-red-500 shadow-lg
                             `}
                             style={{ 
-                              color: isActive ? tier.color : '#9CA3AF',
-                              borderColor: isActive ? tier.color : undefined,
-                              filter: isActive ? (tier.color === "#3B82F6" ? `drop-shadow(0 0 8px rgba(59, 130, 246, 0.6))` :
-                                                     tier.color === "#10B981" ? `drop-shadow(0 0 8px rgba(16, 185, 129, 0.6))` :
-                                                     tier.color === "#6B7280" ? `drop-shadow(0 0 8px rgba(107, 114, 128, 0.6))` :
-                                                     `drop-shadow(0 0 8px rgba(245, 158, 11, 0.6))`) : 'none'
+                              color: 'red',
+                              borderColor: 'red',
+                              filter: `drop-shadow(0 0 8px rgba(255, 0, 0, 0.6))`
                             }}
                             >
-                              <Trophy className={`w-6 h-6 ${isActive ? 'animate-pulse' : ''}`} />
+                              <Trophy className="w-6 h-6" />
                             </div>
                           </div>
-                          <div className="text-xs font-medium mb-1" style={{ color: isActive ? tier.color : '#6B7280' }}>
+                          <div className="text-xs font-medium mb-1" style={{ color: 'red' }}>
                             {tier.name}
                           </div>
                           <div className="text-xs text-muted-foreground">
