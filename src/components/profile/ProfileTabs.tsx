@@ -2,7 +2,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { User, Trophy, Camera, BarChart3, MapPin } from 'lucide-react';
-import ClbhouzAchievementsModal from '@/components/achievements/ClbhouzAchievementsModal';
+import AchievementsTabContent from '@/components/achievements/AchievementsTabContent';
 
 interface ProfileTabsProps {
   activeTab: string;
@@ -17,6 +17,7 @@ interface ProfileTabsProps {
     activity: React.ReactNode;
     courses: React.ReactNode;
     stats: React.ReactNode;
+    achievements: React.ReactNode;
   };
 }
 
@@ -34,8 +35,6 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
   const tabsRef = useRef<HTMLDivElement>(null);
-
-  const [isAchievementsModalOpen, setIsAchievementsModalOpen] = useState(false);
 
   const tabs = [
     { id: 'activity', label: 'Activity', icon: Camera },
@@ -88,13 +87,7 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
               return (
                 <button
                   key={tab.id}
-                  onClick={() => {
-                    if (tab.id === 'achievements') {
-                      setIsAchievementsModalOpen(true);
-                    } else {
-                      onTabChange(tab.id);
-                    }
-                  }}
+                  onClick={() => onTabChange(tab.id)}
                   disabled={transitionState !== 'idle'}
                   className={`flex-1 flex items-center justify-center py-4 transition-all duration-200 text-base relative ${
                     isActive 
@@ -120,19 +113,18 @@ const ProfileTabs: React.FC<ProfileTabsProps> = ({
           {activeTab === 'activity' && children.activity}
           {activeTab === 'courses' && children.courses}
           {activeTab === 'stats' && children.stats}
+          {activeTab === 'achievements' && (
+            <AchievementsTabContent
+              userId={userId}
+              userDisplayName={userDisplayName}
+              userHandicap={userHandicap}
+              userProfilePhotoUrl={userProfilePhotoUrl}
+              isCurrentUser={isCurrentUser}
+            />
+          )}
         </div>
       </div>
 
-      {/* Achievements Modal */}
-      <ClbhouzAchievementsModal
-        isOpen={isAchievementsModalOpen}
-        onClose={() => setIsAchievementsModalOpen(false)}
-        userId={userId}
-        userDisplayName={userDisplayName}
-        userHandicap={userHandicap}
-        userProfilePhotoUrl={userProfilePhotoUrl}
-        isCurrentUser={isCurrentUser}
-      />
     </div>
 
   );
