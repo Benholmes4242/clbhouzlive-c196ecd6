@@ -1127,33 +1127,42 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
           {mostRecentAchievement && (
             <div className={`${isMobile ? 'px-4 pb-6' : 'px-6 pb-8'}`}>
               <div className="relative">
-                {/* Floating Particles Animation */}
-                <div className="absolute inset-0 pointer-events-none">
-                  {[...Array(20)].map((_, i) => (
-                    <div
-                      key={i}
-                      className="absolute animate-bounce"
-                      style={{
-                        left: `${Math.random() * 100}%`,
-                        top: `${Math.random() * 100}%`,
-                        animationDelay: `${Math.random() * 4}s`,
-                        animationDuration: `${3 + Math.random() * 4}s`,
-                        animationIterationCount: 'infinite'
-                      }}
-                    >
-                      <div 
-                        className="w-2 h-2 rounded-full"
-                        style={{
-                          backgroundColor: ['#FFD700', '#FFA500', '#FF6347', '#00CED1', '#32CD32', '#9370DB', '#FF69B4'][Math.floor(Math.random() * 7)]
-                        }}
-                      />
-                    </div>
-                  ))}
+                {/* Floating Particles around Badge */}
+                <div className="absolute inset-0 flex justify-center items-start pt-8 pointer-events-none">
+                  <div className="relative">
+                    {[...Array(12)].map((_, i) => {
+                      const angle = (i * 30) * (Math.PI / 180); // 30 degrees apart
+                      const radius = 140 + Math.random() * 40; // Random distance from badge
+                      const x = Math.cos(angle) * radius;
+                      const y = Math.sin(angle) * radius;
+                      
+                      return (
+                        <div
+                          key={i}
+                          className="absolute animate-bounce"
+                          style={{
+                            left: `${x}px`,
+                            top: `${y}px`,
+                            animationDelay: `${Math.random() * 3}s`,
+                            animationDuration: `${2 + Math.random() * 3}s`,
+                            animationIterationCount: 'infinite'
+                          }}
+                        >
+                          <div 
+                            className="w-2 h-2 rounded-full"
+                            style={{
+                              backgroundColor: ['#FFD700', '#FFA500', '#FF6347', '#00CED1', '#32CD32', '#9370DB'][Math.floor(Math.random() * 6)]
+                            }}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
                 
                 {/* Featured Achievement Card */}
                 <div className="p-8 text-center">
-                  <div className="flex flex-col items-center space-y-4">
+                  <div className="flex flex-col items-center space-y-2">
                     {/* Large Badge */}
                     <div className="relative">
                       <div className="animate-pulse absolute inset-0 bg-yellow-400/20 rounded-full blur-xl"></div>
