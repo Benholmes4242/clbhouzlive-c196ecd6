@@ -20,7 +20,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
   const achievementRings = [
     {
       id: 'legends-club',
-      title: 'Legends Club',
+      title: 'Worldwide',
       subtitle: 'Top 100 Worldwide Courses',
       region: 'global',
       color: '#DAA520', // Rustic goldenrod for worldwide
@@ -29,7 +29,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
     },
     {
       id: 'stars-stripes',
-      title: 'Stars and Stripes Tourer',
+      title: 'USA',
       subtitle: 'Top 100 USA Courses',
       region: 'usa',
       color: '#B22222', // Rustic fire brick red for USA
@@ -38,7 +38,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
     },
     {
       id: 'links-legend',
-      title: 'Links Legend',
+      title: 'Great Britain & Ireland',
       subtitle: 'Top 100 Great Britain & Ireland Courses',
       region: 'britain-ireland',
       color: '#228B22', // Masters Augusta forest green for Britain & Ireland
@@ -47,7 +47,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
     },
     {
       id: 'continental-swinger',
-      title: 'Continental Swinger',
+      title: 'Continental Europe',
       subtitle: 'Top 100 Continental Europe Courses',
       region: 'europe',
       color: '#4682B4', // Rustic steel blue for Continental Europe

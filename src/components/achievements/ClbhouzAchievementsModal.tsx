@@ -363,14 +363,14 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       case "International Golfer":
         return <img src="/lovable-uploads/3c0146da-b965-42cc-b130-ef9c25727aad.png" alt="International Golfer Badge" className="w-48 h-48" />;
       // Regional achievement badges
-      case "Lynx Legend":
+      case "Great Britain & Ireland":
         return <img src="/lovable-uploads/f2714e7f-418b-4c4c-ae28-e4a1b1ea8033.png" alt="Britain & Ireland Flag" className="w-48 h-48 rounded-lg" />;
-      case "The Continental Swinger":
-        return <img src="/lovable-uploads/2fd872c8-aee1-4f0d-a3b9-fcfe49dbad20.png" alt="Continental Swinger Badge" className="w-48 h-48 rounded-lg" />;
-      case "Stars and Stripes Tourer":
+      case "Continental Europe":
+        return <img src="/lovable-uploads/2fd872c8-aee1-4f0d-a3b9-fcfe49dbad20.png" alt="Continental Europe Badge" className="w-48 h-48 rounded-lg" />;
+      case "USA":
         return <img src="/lovable-uploads/2b2ee6a8-e8c4-49d9-bfdf-86403c3a47b7.png" alt="USA Flag" className="w-48 h-48 rounded-lg" />;
-      case "Legends Club":
-        return <img src="/lovable-uploads/3d5aac7d-1c4d-4b41-b450-35a0d7d4d5aa.png" alt="Legends Club Badge" className="w-48 h-48 rounded-lg" />;
+      case "Worldwide":
+        return <img src="/lovable-uploads/3d5aac7d-1c4d-4b41-b450-35a0d7d4d5aa.png" alt="Worldwide Badge" className="w-48 h-48 rounded-lg" />;
       case "Albatross Ace":
         return <img src="/lovable-uploads/2fc5fb62-90a5-4424-b85f-9e6b08a774d8.png" alt="Albatross Ace Badge" className="w-48 h-48" />;
       default:
@@ -427,19 +427,19 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       case "International Golfer":
         return <img src="/lovable-uploads/3c0146da-b965-42cc-b130-ef9c25727aad.png" alt="International Golfer Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
       // Regional achievement badges with flag images
-      case "Lynx Legend":
+      case "Great Britain & Ireland":
         return <img src="/lovable-uploads/f2714e7f-418b-4c4c-ae28-e4a1b1ea8033.png" alt="Britain & Ireland Flag" className={isMobile ? "w-24 h-24 rounded-lg" : "w-40 h-40 rounded-lg"} />;
-      case "The Continental Swinger":
-        return <img src="/lovable-uploads/2fd872c8-aee1-4f0d-a3b9-fcfe49dbad20.png" alt="Continental Swinger Badge" className={isMobile ? "w-24 h-24 rounded-lg" : "w-40 h-40 rounded-lg"} />;
-      case "Stars and Stripes Tourer":
+      case "Continental Europe":
+        return <img src="/lovable-uploads/2fd872c8-aee1-4f0d-a3b9-fcfe49dbad20.png" alt="Continental Europe Badge" className={isMobile ? "w-24 h-24 rounded-lg" : "w-40 h-40 rounded-lg"} />;
+      case "USA":
         return <img src="/lovable-uploads/2b2ee6a8-e8c4-49d9-bfdf-86403c3a47b7.png" alt="USA Flag" className={isMobile ? "w-24 h-24 rounded-lg" : "w-40 h-40 rounded-lg"} />;
-      case "Legends Club":
-        return <img src="/lovable-uploads/3d5aac7d-1c4d-4b41-b450-35a0d7d4d5aa.png" alt="Legends Club Badge" className={isMobile ? "w-24 h-24 rounded-lg" : "w-40 h-40 rounded-lg"} />;
+      case "Worldwide":
+        return <img src="/lovable-uploads/3d5aac7d-1c4d-4b41-b450-35a0d7d4d5aa.png" alt="Worldwide Badge" className={isMobile ? "w-24 h-24 rounded-lg" : "w-40 h-40 rounded-lg"} />;
       case "Albatross Ace":
         return <img src="/lovable-uploads/2fc5fb62-90a5-4424-b85f-9e6b08a774d8.png" alt="Albatross Ace Badge" className={isMobile ? "w-24 h-24" : "w-40 h-40"} />;
       default:
         // Enhanced emoji display with conditional styling - hide emojis on mobile for Experience/Exploration section
-        if (isMobile && (achievement.title.includes('Club') || ['Lynx Legend', 'The Continental Swinger', 'Stars and Stripes Tourer', 'Legends Club'].includes(achievement.title))) {
+        if (isMobile && (achievement.title.includes('Club') || ['Great Britain & Ireland', 'Continental Europe', 'USA', 'Worldwide'].includes(achievement.title))) {
           return (
             <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-700 flex items-center justify-center">
               <span className="text-xs font-semibold text-gray-600 dark:text-gray-300">Badge</span>
@@ -513,7 +513,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       unlockHint: "The ultimate goal for golf course enthusiasts. Continue your incredible journey!"
     },
     {
-      title: "Lynx Legend",
+      title: "Great Britain & Ireland",
       emoji: "🏴󠁧󠁢󠁥󠁮󠁧󠁿",
       isEarned: false,
       description: "Great Britain and Ireland, You've Mastered the Finest Across the British Isles",
@@ -523,7 +523,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       unlockHint: "Explore the historic golf courses across England, Scotland, Wales, and Ireland. You're making great progress!"
     },
     {
-      title: "The Continental Swinger",
+      title: "Continental Europe",
       emoji: "🇪🇺",
       isEarned: false,
       description: "Continental Europe, From Algarve to the Alps, Europe's Elite Courses, Conquered",
@@ -533,7 +533,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       unlockHint: "Plan golf trips across Europe. Consider France, Spain, Portugal, Germany, and other European golf destinations."
     },
     {
-      title: "Stars and Stripes Tourer",
+      title: "USA",
       emoji: "🇺🇸",
       isEarned: false,
       description: "USA. Coast to Coast you've played the American Greats",
@@ -543,7 +543,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
       unlockHint: "Plan golf trips to different US states. Consider popular golf destinations like Florida, California, or Arizona."
     },
     {
-      title: "Legends Club",
+      title: "Worldwide",
       emoji: "🌍",
       isEarned: false,
       description: "World Wide Top 100. From Seve, to Tiger, to Jack, Legends have walked where you now stand. You've joined Golf's most elite circle. Welcome.",
@@ -1109,16 +1109,16 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                                   )}
                                 </svg>
                                
-                               {/* Padlock icon for locked rings */}
-                               {!isActive && !isNext && (
-                                 <div className="absolute inset-0 flex items-center justify-center">
-                                   <img 
-                                     src="/lovable-uploads/b9837878-ceb4-4653-b157-cfe4045aac1d.png" 
-                                     alt="Locked" 
-                                     className="w-6 h-6 opacity-60"
-                                   />
-                                 </div>
-                               )}
+                                {/* Padlock icon for locked rings - including next tier */}
+                                {!isActive && (
+                                  <div className="absolute inset-0 flex items-center justify-center">
+                                    <img 
+                                      src="/lovable-uploads/b9837878-ceb4-4653-b157-cfe4045aac1d.png" 
+                                      alt="Locked" 
+                                      className="w-6 h-6 opacity-60"
+                                    />
+                                  </div>
+                                )}
                              </div>
                            <div className="text-xs font-medium mb-1" style={{ color: isActive ? tier.color : '#6B7280' }}>
                              {tier.name}
@@ -1173,47 +1173,43 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
           {/* Filter Buttons - Mobile Optimized */}
           <div className={`${isMobile ? 'px-4 pb-4' : 'px-6 pb-6'}`}>
             {isMobile ? (
-              /* Mobile: Full width layout */
-              <div className="space-y-2">
-                <div className="flex gap-1 w-full">
-                  {['all', 'unlocked', 'locked'].map((filter) => (
-                    <Button
-                      key={filter}
-                      variant={activeFilter === filter ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setActiveFilter(filter as typeof activeFilter)}
-                      className={`
-                        capitalize transition-all duration-200 text-xs h-8 flex-1
-                        ${activeFilter === filter 
-                          ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg' 
-                          : 'hover:bg-muted/80'
-                        }
-                      `}
-                    >
-                      {filter === 'all' ? 'All' : 
-                       filter === 'unlocked' ? 'Unlocked' :
-                       'Locked'}
-                    </Button>
-                  ))}
+              /* Mobile: Fixed titles with dropdowns */
+              <div className="space-y-3">
+                {/* Fixed tab titles */}
+                <div className="grid grid-cols-3 gap-2 text-center text-sm font-medium text-muted-foreground mb-2">
+                  <div>Region</div>
+                  <div>Sort</div>
+                  <div>View</div>
                 </div>
-                <div className="flex gap-1 w-full">
-                  {['exploration', 'skill'].map((filter) => (
-                    <Button
-                      key={filter}
-                      variant={activeFilter === filter ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => setActiveFilter(filter as typeof activeFilter)}
-                      className={`
-                        capitalize transition-all duration-200 text-xs h-8 flex-1
-                        ${activeFilter === filter 
-                          ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg' 
-                          : 'hover:bg-muted/80'
-                        }
-                      `}
-                    >
-                      {filter === 'exploration' ? 'Exploration' : 'Skill-Based'}
-                    </Button>
-                  ))}
+                
+                {/* Filter dropdowns */}
+                <div className="grid grid-cols-3 gap-2">
+                  {/* Region filter */}
+                  <select 
+                    value={activeFilter === 'exploration' ? 'exploration' : activeFilter === 'skill' ? 'skill' : 'all'}
+                    onChange={(e) => setActiveFilter(e.target.value as typeof activeFilter)}
+                    className="h-8 text-xs border border-border rounded bg-background px-2"
+                  >
+                    <option value="all">All</option>
+                    <option value="exploration">Exploration</option>
+                    <option value="skill">Skill</option>
+                  </select>
+                  
+                  {/* Sort filter */}
+                  <select 
+                    value={activeFilter === 'unlocked' ? 'unlocked' : activeFilter === 'locked' ? 'locked' : 'all'}
+                    onChange={(e) => setActiveFilter(e.target.value as typeof activeFilter)}
+                    className="h-8 text-xs border border-border rounded bg-background px-2"
+                  >
+                    <option value="all">All</option>
+                    <option value="unlocked">Earned</option>
+                    <option value="locked">Locked</option>
+                  </select>
+                  
+                  {/* View filter - placeholder for now */}
+                  <select className="h-8 text-xs border border-border rounded bg-background px-2">
+                    <option>Grid</option>
+                  </select>
                 </div>
               </div>
             ) : (
@@ -1244,9 +1240,9 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
             )}
           </div>
 
-          {/* Experience & Exploration Achievements Section */}
+           {/* Experience & Exploration Achievements Section */}
           {(activeFilter === 'all' || activeFilter === 'exploration') && getFilteredAchievements(explorationAchievements, 'exploration').length > 0 && (
-            <div className={`${isMobile ? 'px-4 pb-6' : 'px-6 pb-8'}`}>
+            <div className={`${isMobile ? 'px-0 pb-6' : 'px-6 pb-8'}`}>
               {/* Card Container with Visual Grouping */}
               <div className="p-6">
                 {/* Section Header with Icon */}
@@ -1256,7 +1252,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                     </h3>
                   </div>
                 
-                  <div className={`grid grid-cols-3 ${isMobile ? 'gap-2' : 'gap-3'}`}>
+                   <div className={`${isMobile ? 'grid grid-cols-3 gap-2 px-0' : 'grid grid-cols-3 gap-3'}`}>
                     {getFilteredAchievements(explorationAchievements, 'exploration').map((achievement) => {
                       const { percentage, nudgeText } = getAchievementProgress(achievement);
                       const isNearUnlock = percentage >= 80 && percentage < 100;
@@ -1340,9 +1336,9 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
             </div>
           )}
 
-          {/* Skill & Performance Achievements Section */}
+           {/* Skill & Performance Achievements Section */}
           {(activeFilter === 'all' || activeFilter === 'skill') && getFilteredAchievements(skillAchievements, 'skill').length > 0 && (
-            <div className={`${isMobile ? 'px-4 pb-6' : 'px-6 pb-8'}`}>
+            <div className={`${isMobile ? 'px-0 pb-6' : 'px-6 pb-8'}`}>
               {/* Card Container with Visual Grouping */}
               <div className="p-6">
                 {/* Section Header with Icon */}
@@ -1352,7 +1348,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                     </h3>
                   </div>
                 
-                  <div className={`grid grid-cols-3 ${isMobile ? 'gap-2' : 'gap-3'}`}>
+                  <div className={`${isMobile ? 'grid grid-cols-3 gap-2 px-0' : 'grid grid-cols-3 gap-3'}`}>
                     {getFilteredAchievements(skillAchievements, 'skill').map((achievement) => {
                       const { percentage, nudgeText } = getAchievementProgress(achievement);
                       const isNearUnlock = percentage >= 80 && percentage < 100;
