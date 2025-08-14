@@ -1106,6 +1106,9 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                                    strokeDashoffset={`${30 * 2 * Math.PI * (1 - tierProgress / 100)}`}
                                    strokeLinecap="round"
                                    className="transition-all duration-700"
+                                   style={{
+                                     filter: tier.color === "#3B82F6" ? "drop-shadow(0 0 8px rgba(59, 130, 246, 0.6))" : "none"
+                                   }}
                                  />
                                )}
                              </svg>
