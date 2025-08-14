@@ -917,7 +917,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
               </div>
             ) : (
               /* Full XP Ring Section - Mobile Optimized */
-              <div className={`bg-background rounded-xl border border-border relative overflow-hidden ${
+              <div className={`relative overflow-hidden ${
                 isMobile ? 'p-3' : 'p-6'
               }`}>
                 {/* Celebration Animation Overlay */}
