@@ -849,7 +849,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
           </div>
 
           {/* Collapsible XP Progress Header with Smooth Animations */}
-          <div className={`sticky top-0 z-10 bg-background/95 backdrop-blur-sm transition-all duration-400 ease-in-out ${
+          <div className={`sticky top-0 z-10 bg-card/95 backdrop-blur-sm transition-all duration-400 ease-in-out ${
             isCollapsed 
               ? isMobile ? 'px-4 py-2' : 'px-6 py-3' 
               : isMobile ? 'px-4 pb-3' : 'px-6 pb-4'
@@ -988,10 +988,11 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                         {/* Enhanced Progress Ring */}
                         <div className="relative flex-shrink-0">
                           <div className="relative w-40 h-40">
-                            {/* Glow effect for next goal */}
-                            <div className={`absolute inset-0 rounded-full ${nextTier ? 'animate-pulse' : ''}`} 
+                            {/* Consistent glow effect behind ring */}
+                            <div className={`absolute inset-2 rounded-full ${nextTier ? 'animate-pulse' : ''}`} 
                                  style={{ 
-                                   boxShadow: nextTier ? `0 0 30px ${nextTier.color}40` : 'none'
+                                   boxShadow: nextTier ? `0 0 20px ${nextTier.color}60, 0 0 40px ${nextTier.color}30` : 'none',
+                                   background: nextTier ? `radial-gradient(circle, ${nextTier.color}20 0%, transparent 70%)` : 'none'
                                  }} />
                             
                             <svg className="w-40 h-40 transform -rotate-90" viewBox="0 0 160 160">
