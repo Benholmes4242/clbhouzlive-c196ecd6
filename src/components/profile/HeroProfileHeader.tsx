@@ -532,7 +532,7 @@ const HeroProfileHeader = ({
             <div className="flex-shrink-0 overflow-hidden rounded-lg" style={{ width: '520px' }}>
               <div 
                 id="stats-container"
-                className="flex gap-8 overflow-x-auto scrollbar-hide px-2 py-2"
+                className="flex gap-12 overflow-x-auto scrollbar-hide px-2 py-2"
                 style={{
                   scrollbarWidth: 'none',
                   msOverflowStyle: 'none',
