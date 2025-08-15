@@ -3,6 +3,7 @@ import { useUserAchievements } from '@/hooks/useUserAchievements';
 import { Button } from '@/components/ui/button';
 import { MessageSquare, UserPlus, UserMinus, Copy, Share, Users, UserCheck } from 'lucide-react';
 import { Camera, MapPin, BarChart3 } from 'lucide-react';
+import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 import { toast } from 'sonner';
 import ProfileTabs from './ProfileTabs';
 import ActivityFeed from './ActivityFeed';
@@ -511,7 +512,7 @@ const HeroProfileHeader = ({
           </div>
 
           {/* Stats Carousel - 4 stats per row with navigation */}
-          <div className="relative w-full max-w-2xl">
+          <div className="relative w-full max-w-sm mx-auto">
             {/* Navigation Arrows */}
             <button
               onClick={() => {
@@ -522,7 +523,7 @@ const HeroProfileHeader = ({
               }}
               className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-muted/50 hover:bg-muted border border-border flex items-center justify-center text-foreground opacity-80 hover:opacity-100 transition-all duration-200"
             >
-              ←
+              <ArrowLeftIcon className="w-4 h-4" />
             </button>
             
             <button
@@ -534,59 +535,62 @@ const HeroProfileHeader = ({
               }}
               className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-muted/50 hover:bg-muted border border-border flex items-center justify-center text-foreground opacity-80 hover:opacity-100 transition-all duration-200"
             >
-              →
+              <ArrowRightIcon className="w-4 h-4" />
             </button>
 
-            {/* Stats Container */}
-            <div 
-              id="stats-container"
-              className="flex gap-4 overflow-x-auto scrollbar-hide px-8 py-2"
-              style={{
-                scrollbarWidth: 'none',
-                msOverflowStyle: 'none',
-                WebkitOverflowScrolling: 'touch'
-              }}
-            >
-              <div className="flex-shrink-0 text-center w-20">
-                <div className="text-xl md:text-2xl font-bold text-foreground">
-                  {profile?.eg_handicap_index ? profile.eg_handicap_index.toFixed(1) : '--'}
+            {/* Stats Container - Fixed width to show exactly 4 stats */}
+            <div className="overflow-hidden rounded-lg">
+              <div 
+                id="stats-container"
+                className="flex gap-4 overflow-x-auto scrollbar-hide px-8 py-2"
+                style={{
+                  scrollbarWidth: 'none',
+                  msOverflowStyle: 'none',
+                  WebkitOverflowScrolling: 'touch',
+                  width: 'calc(4 * 80px + 3 * 16px + 64px)' // 4 stats (80px each) + 3 gaps (16px each) + padding (64px total)
+                }}
+              >
+                <div className="flex-shrink-0 text-center w-20">
+                  <div className="text-xl md:text-2xl font-bold text-foreground">
+                    {profile?.eg_handicap_index ? profile.eg_handicap_index.toFixed(1) : '--'}
+                  </div>
+                  <div className="text-base text-muted-foreground">Handicap</div>
                 </div>
-                <div className="text-base text-muted-foreground">Handicap</div>
-              </div>
-              
-              <div className="flex-shrink-0 text-center w-20">
-                <div className="text-xl md:text-2xl font-bold text-foreground">
-                  {postsCount}
+                
+                <div className="flex-shrink-0 text-center w-20">
+                  <div className="text-xl md:text-2xl font-bold text-foreground">
+                    {postsCount}
+                  </div>
+                  <div className="text-base text-muted-foreground">Posts</div>
                 </div>
-                <div className="text-base text-muted-foreground">Posts</div>
-              </div>
-              
-              <div className="flex-shrink-0 text-center w-20">
-                <div className="text-xl md:text-2xl font-bold text-foreground">
-                  {followersCount}
+                
+                <div className="flex-shrink-0 text-center w-20">
+                  <div className="text-xl md:text-2xl font-bold text-foreground">
+                    {followersCount}
+                  </div>
+                  <div className="text-base text-muted-foreground">Followers</div>
                 </div>
-                <div className="text-base text-muted-foreground">Followers</div>
-              </div>
-              
-              <div className="flex-shrink-0 text-center w-20">
-                <div className="text-xl md:text-2xl font-bold text-foreground">
-                  {userProgressData.coursesPlayed || '24'}
+                
+                <div className="flex-shrink-0 text-center w-20">
+                  <div className="text-xl md:text-2xl font-bold text-foreground">
+                    {userProgressData.coursesPlayed || '24'}
+                  </div>
+                  <div className="text-base text-muted-foreground">Level</div>
                 </div>
-                <div className="text-base text-muted-foreground">Level</div>
-              </div>
-              
-              <div className="flex-shrink-0 text-center w-20">
-                <div className="text-xl md:text-2xl font-bold text-foreground">
-                  {ratedCoursesCount}
+                
+                <div className="flex-shrink-0 text-center w-20">
+                  <div className="text-xl md:text-2xl font-bold text-foreground">
+                    {ratedCoursesCount}
+                  </div>
+                  <div className="text-base text-muted-foreground">Rated</div>
                 </div>
-                <div className="text-base text-muted-foreground">Rated</div>
-              </div>
-              
-              <div className="flex-shrink-0 text-center w-20">
-                <div className="text-xl md:text-2xl font-bold text-foreground">
-                  {averageRating > 0 ? `${averageRating}/10` : '--'}
+                
+                <div className="flex-shrink-0 text-center w-20">
+                  <div className="text-xl md:text-2xl font-bold text-foreground">
+                    {averageRating > 0 ? `${averageRating}/10` : '--'}
+                  </div>
+                  <div className="text-base text-muted-foreground">Avg Rating</div>
                 </div>
-                <div className="text-base text-muted-foreground">Avg Rating</div>
               </div>
             </div>
           </div>
