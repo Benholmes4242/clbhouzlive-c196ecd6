@@ -995,7 +995,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                   <div className="flex flex-col items-center space-y-2">
                     {/* Large Badge with Subtle Glow and Bounce */}
                     <div className="relative animate-scale-in">
-                      <div className="absolute inset-0 bg-yellow-400/15 rounded-full blur-lg animate-pulse"></div>
+                      <div className="absolute inset-0 bg-yellow-400/25 rounded-full blur-xl animate-pulse"></div>
                       <div className="relative drop-shadow-2xl hover:scale-105 transition-transform duration-300 animate-subtle-bounce">
                         {getFeaturedAchievementIcon(mostRecentAchievement)}
                       </div>
