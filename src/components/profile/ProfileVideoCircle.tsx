@@ -254,26 +254,48 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
       onMouseLeave={() => setShowControls(false)}
       onClick={handleCircleClick}
     >
+      {/* Background Blur Layer - Always present */}
+      <div className="absolute -inset-8 overflow-hidden rounded-lg">
+        {videoUrl ? (
+          <video
+            ref={blurVideoRef}
+            src={videoUrl}
+            className={`absolute inset-0 w-[calc(100%+4rem)] h-[calc(100%+4rem)] object-cover transition-all duration-1000 ease-out scale-125 ${
+              showVideo ? 'opacity-80' : 'opacity-40'
+            }`}
+            playsInline
+            muted
+            preload="auto"
+            crossOrigin="anonymous"
+            style={{ 
+              filter: 'blur(60px) saturate(1.5) brightness(0.7) contrast(1.2)',
+              transform: 'scale(1.3)'
+            }}
+          />
+        ) : profilePhotoUrl ? (
+          <img
+            src={profilePhotoUrl}
+            alt=""
+            className="absolute inset-0 w-[calc(100%+4rem)] h-[calc(100%+4rem)] object-cover scale-125 opacity-40"
+            style={{ 
+              filter: 'blur(60px) saturate(1.5) brightness(0.7) contrast(1.2)',
+              transform: 'scale(1.3)'
+            }}
+          />
+        ) : (
+          <div 
+            className="absolute inset-0 w-[calc(100%+4rem)] h-[calc(100%+4rem)] scale-125 opacity-40"
+            style={{ 
+              filter: 'blur(60px) saturate(1.5) brightness(0.7) contrast(1.2)',
+              transform: 'scale(1.3)',
+              background: `linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 100%)`
+            }}
+          />
+        )}
+      </div>
+
       {videoUrl ? (
         <>
-          {/* Dynamic Blur Background Layer */}
-          <div className="absolute -inset-8 overflow-hidden">
-            <video
-              ref={blurVideoRef}
-              src={videoUrl}
-              className={`absolute inset-0 w-[calc(100%+4rem)] h-[calc(100%+4rem)] object-cover transition-all duration-1000 ease-out scale-125 ${
-                showVideo ? 'opacity-80' : 'opacity-40'
-              }`}
-              playsInline
-              muted
-              preload="auto"
-              crossOrigin="anonymous"
-              style={{ 
-                filter: 'blur(60px) saturate(1.5) brightness(0.7) contrast(1.2)',
-                transform: 'scale(1.3)'
-              }}
-            />
-          </div>
           
           {/* Main Content Container with rounded corners */}
           <div className="relative w-full h-full rounded-lg overflow-hidden bg-black/10 backdrop-blur-sm border border-white/20">
