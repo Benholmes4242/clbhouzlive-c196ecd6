@@ -247,7 +247,10 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
             {profilePhotoUrl && (
               <img
                 ref={photoRef}
-                src={`${profilePhotoUrl}?quality=100&format=auto&width=1280&height=720&fit=cover`}
+                src={`${profilePhotoUrl}?quality=95&format=auto&width=1280&height=720&fit=cover`}
+                loading="eager"
+                fetchPriority="high"
+                decoding="async"
                 alt={`${displayName} profile`}
                 className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
                   !showVideo || !videoUrl ? 'opacity-100 scale-100' : 'opacity-0 scale-95'

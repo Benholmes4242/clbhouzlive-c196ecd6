@@ -242,7 +242,10 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
           {/* Profile Photo with 4K quality optimization */}
           {profilePhotoUrl && (
             <img
-              src={`${profilePhotoUrl}?quality=100&format=auto&width=2048&height=2048&fit=cover`}
+              src={`${profilePhotoUrl}?quality=95&format=auto&width=512&height=512&fit=cover`}
+              loading="eager"
+              fetchPriority="high"
+              decoding="async"
               alt={`${displayName} profile`}
               className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
                 !showVideo ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
