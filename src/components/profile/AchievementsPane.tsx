@@ -957,7 +957,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                   variant={activeFilter === filter.key ? "default" : "outline"}
                   size="sm"
                   onClick={() => setActiveFilter(filter.key)}
-                  className="text-xs"
+                  className="rounded-full text-xs"
                 >
                   <span className="mr-1">{filter.icon}</span>
                   {filter.label} ({getFilterCount(filter.key)})
