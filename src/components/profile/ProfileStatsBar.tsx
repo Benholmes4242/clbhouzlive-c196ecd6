@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { useCarouselNavigation } from '@/hooks/useCarouselNavigation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useIsDesktop } from '@/hooks/useIsDesktop';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface StatItem {
   value: string | number;
@@ -18,6 +19,7 @@ const ProfileStatsBar: React.FC<ProfileStatsBarProps> = ({ stats }) => {
   const [canScrollRight, setCanScrollRight] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const isDesktop = useIsDesktop();
+  const isMobile = useIsMobile();
 
   const updateScrollState = () => {
     const container = containerRef.current;
@@ -47,7 +49,7 @@ const ProfileStatsBar: React.FC<ProfileStatsBarProps> = ({ stats }) => {
   }, [stats]);
 
   return (
-    <div className="relative w-full max-w-md mx-auto">
+    <div className={`relative w-full max-w-md mx-auto ${isMobile ? 'px-4' : ''}`}>
       {/* Desktop scroll buttons */}
       {isDesktop && canScrollLeft && (
         <button
@@ -69,18 +71,18 @@ const ProfileStatsBar: React.FC<ProfileStatsBarProps> = ({ stats }) => {
       
       {/* Left fade gradient */}
       {canScrollLeft && (
-        <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background/80 to-transparent z-10 pointer-events-none" />
+        <div className={`absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-background/80 to-transparent z-10 pointer-events-none ${isMobile ? 'ml-4' : ''}`} />
       )}
       
-      {/* Right fade gradient */}
+      {/* Right fade gradient for peek effect - stronger on mobile */}
       {canScrollRight && (
-        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-background/80 to-transparent z-10 pointer-events-none" />
+        <div className={`absolute right-0 top-0 bottom-0 ${isMobile ? 'w-12 mr-4 bg-gradient-to-l from-background/95 via-background/60 to-transparent' : 'w-8 bg-gradient-to-l from-background/80 to-transparent'} z-10 pointer-events-none`} />
       )}
       
       {/* Stats container */}
       <div 
         ref={containerRef}
-        className="flex gap-2 overflow-x-auto scrollbar-hide px-2 py-0.5 bg-background/70 backdrop-blur-sm rounded-2xl border border-border/20 shadow-sm"
+        className={`flex gap-2 overflow-x-auto scrollbar-hide py-0.5 bg-background/70 backdrop-blur-sm rounded-2xl border border-border/20 shadow-sm ${isMobile ? 'px-4 pr-8' : 'px-2'}`}
         style={{
           scrollbarWidth: 'none',
           msOverflowStyle: 'none',
