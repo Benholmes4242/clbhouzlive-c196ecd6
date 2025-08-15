@@ -206,7 +206,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   const hasMedia = videoUrl || profilePhotoUrl;
 
   return (
-    <div className={`relative w-full h-96 overflow-hidden ${className}`}>
+    <div className={`relative w-full h-screen overflow-hidden ${className}`} style={{ marginTop: '-4rem' }}>
       {/* Full-width Live Blur Background - extends edge to edge */}
       <div className="absolute inset-0 w-full h-full overflow-hidden">
         {hasMedia ? (
@@ -272,47 +272,45 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
         />
       </div>
 
-      {/* Central Crisp Media Player */}
-      <div className="absolute inset-0 flex items-center justify-center z-10">
-        <div className="relative w-[480px] h-80 rounded-2xl overflow-hidden shadow-2xl backdrop-blur-sm bg-black/5">
-          {hasMedia ? (
-            <>
-              {/* Main Video Element - Crisp and Clear */}
-              {videoUrl && (
-                <video
-                  ref={videoRef}
-                  src={videoUrl}
-                  poster={thumbnailUrl}
-                  className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
-                    showVideo ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
-                  }`}
-                  playsInline
-                  muted={isMuted}
-                  preload="auto"
-                  crossOrigin="anonymous"
-                />
-              )}
-              
-              {/* Profile Photo */}
-              {profilePhotoUrl && (
-                <img
-                  ref={photoRef}
-                  src={`${profilePhotoUrl}?quality=100&format=auto&width=1280&height=720&fit=cover`}
-                  alt={`${displayName} profile`}
-                  className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
-                    !showVideo || !videoUrl ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
-                  }`}
-                  onError={(e) => {
-                    e.currentTarget.src = profilePhotoUrl;
-                  }}
-                />
-              )}
-            </>
-          ) : (
-            /* Fallback for empty state */
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-background/80 to-muted/50 backdrop-blur-sm" />
-          )}
-        </div>
+      {/* Central Crisp Media Player - Full Coverage */}
+      <div className="absolute inset-0 z-10">
+        {hasMedia ? (
+          <>
+            {/* Main Video Element - Crisp and Clear */}
+            {videoUrl && (
+              <video
+                ref={videoRef}
+                src={videoUrl}
+                poster={thumbnailUrl}
+                className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
+                  showVideo ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
+                }`}
+                playsInline
+                muted={isMuted}
+                preload="auto"
+                crossOrigin="anonymous"
+              />
+            )}
+            
+            {/* Profile Photo */}
+            {profilePhotoUrl && (
+              <img
+                ref={photoRef}
+                src={`${profilePhotoUrl}?quality=100&format=auto&width=1280&height=720&fit=cover`}
+                alt={`${displayName} profile`}
+                className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
+                  !showVideo || !videoUrl ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+                }`}
+                onError={(e) => {
+                  e.currentTarget.src = profilePhotoUrl;
+                }}
+              />
+            )}
+          </>
+        ) : (
+          /* Fallback for empty state */
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-background/80 to-muted/50" />
+        )}
       </div>
 
       {/* Content Overlay */}
