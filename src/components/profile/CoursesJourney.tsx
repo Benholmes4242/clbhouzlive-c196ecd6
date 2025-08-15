@@ -362,7 +362,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                             </div>
                           </div>
                         ) : achievement.region === 'europe' ? (
-                          <div className="relative w-24 h-24 rounded-full overflow-hidden flex flex-col items-center justify-center">
+                          <div className="relative w-28 h-28 rounded-full overflow-hidden flex flex-col items-center justify-center">
                             {/* Continental Europe Map Background */}
                             <img
                               src="/lovable-uploads/793041de-0d8b-4c78-8256-3447ad57dc44.png"
