@@ -343,7 +343,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                       {/* Center content */}
                       <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
                         {achievement.region === 'usa' ? (
-                          <div className="relative w-25 h-25 rounded-full overflow-hidden flex flex-col items-center justify-center">
+                          <div className="relative w-32 h-32 rounded-full overflow-hidden flex flex-col items-center justify-center">
                             {/* USA Map Background */}
                             <img
                               src="/lovable-uploads/6152bbaa-1d05-4eab-bbde-08d43b96a693.png"
@@ -362,7 +362,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                             </div>
                           </div>
                         ) : achievement.region === 'europe' ? (
-                          <div className="relative w-26 h-26 rounded-full overflow-hidden flex flex-col items-center justify-center">
+                          <div className="relative w-30 h-30 rounded-full overflow-hidden flex flex-col items-center justify-center">
                             {/* Continental Europe Map Background */}
                             <img
                               src="/lovable-uploads/793041de-0d8b-4c78-8256-3447ad57dc44.png"
@@ -400,7 +400,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                             </div>
                           </div>
                         ) : achievement.region === 'global' ? (
-                          <div className="relative w-24 h-24 rounded-full overflow-hidden flex flex-col items-center justify-center">
+                          <div className="relative w-30 h-30 rounded-full overflow-hidden flex flex-col items-center justify-center">
                             {/* World Map Background */}
                             <img
                               src="/lovable-uploads/c0ba76eb-90e6-404b-8df7-f9f34a43b606.png"
