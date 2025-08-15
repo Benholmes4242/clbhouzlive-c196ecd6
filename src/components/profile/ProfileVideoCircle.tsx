@@ -257,60 +257,68 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
       {videoUrl ? (
         <>
           {/* Dynamic Blur Background Layer */}
-          <video
-            ref={blurVideoRef}
-            src={videoUrl}
-            className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out blur-3xl scale-110 opacity-60 ${
-              showVideo ? 'opacity-60' : 'opacity-30'
-            }`}
-            playsInline
-            muted
-            preload="auto"
-            crossOrigin="anonymous"
-            style={{ filter: 'blur(40px) saturate(1.2) brightness(0.8)' }}
-          />
-          
-          {/* Video Element with smooth fade transition */}
-          <video
-            ref={videoRef}
-            src={videoUrl}
-            poster={thumbnailUrl}
-            className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out z-10 ${
-              showVideo ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
-            }`}
-            playsInline
-            muted={isMuted}
-            preload="auto"
-            crossOrigin="anonymous"
-          />
-          
-          {/* Profile Photo with 4K quality optimization */}
-          {profilePhotoUrl && (
-            <img
-              src={`${profilePhotoUrl}?quality=100&format=auto&width=2048&height=2048&fit=cover`}
-              alt={`${displayName} profile`}
-              className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out z-10 ${
-                !showVideo ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+          <div className="absolute -inset-8 overflow-hidden">
+            <video
+              ref={blurVideoRef}
+              src={videoUrl}
+              className={`absolute inset-0 w-[calc(100%+4rem)] h-[calc(100%+4rem)] object-cover transition-all duration-1000 ease-out scale-125 ${
+                showVideo ? 'opacity-80' : 'opacity-40'
               }`}
-              onError={(e) => {
-                // Fallback to original URL without optimization
-                e.currentTarget.src = profilePhotoUrl;
+              playsInline
+              muted
+              preload="auto"
+              crossOrigin="anonymous"
+              style={{ 
+                filter: 'blur(60px) saturate(1.5) brightness(0.7) contrast(1.2)',
+                transform: 'scale(1.3)'
               }}
             />
-          )}
+          </div>
           
-          {/* Fallback when photo fails to load or no photo */}
-          {!showVideo && (!profilePhotoUrl || !profilePhotoUrl.trim()) && (
-            <div className="absolute inset-0 w-full h-full bg-muted/30 flex items-center justify-center z-10">
-              <div className="text-6xl text-muted-foreground/50">
-                {displayName.charAt(0)}
+          {/* Main Content Container with rounded corners */}
+          <div className="relative w-full h-full rounded-lg overflow-hidden bg-black/10 backdrop-blur-sm border border-white/20">
+            {/* Video Element with smooth fade transition */}
+            <video
+              ref={videoRef}
+              src={videoUrl}
+              poster={thumbnailUrl}
+              className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
+                showVideo ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
+              }`}
+              playsInline
+              muted={isMuted}
+              preload="auto"
+              crossOrigin="anonymous"
+            />
+          
+            {/* Profile Photo with 4K quality optimization */}
+            {profilePhotoUrl && (
+              <img
+                src={`${profilePhotoUrl}?quality=100&format=auto&width=2048&height=2048&fit=cover`}
+                alt={`${displayName} profile`}
+                className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
+                  !showVideo ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+                }`}
+                onError={(e) => {
+                  // Fallback to original URL without optimization
+                  e.currentTarget.src = profilePhotoUrl;
+                }}
+              />
+            )}
+          
+            {/* Fallback when photo fails to load or no photo */}
+            {!showVideo && (!profilePhotoUrl || !profilePhotoUrl.trim()) && (
+              <div className="absolute inset-0 w-full h-full bg-muted/30 flex items-center justify-center">
+                <div className="text-6xl text-muted-foreground/50">
+                  {displayName.charAt(0)}
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
           
           {/* Controls Overlay - Show for both video and photo states */}
           {showControls && (
-            <div className="absolute inset-0 bg-black/30 flex items-center justify-center transition-opacity z-20">
+            <div className="absolute inset-0 bg-black/30 flex items-center justify-center transition-opacity z-30">
               <div className="flex flex-col gap-2 items-center">
                 {/* Play/Replay Button - Centered */}
                 {((hasPlayed && !isPlaying && showVideo) || (!showVideo && videoUrl)) && (
