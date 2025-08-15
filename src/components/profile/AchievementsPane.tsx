@@ -835,13 +835,13 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                           
                           {/* Padlock icon for locked rings */}
                           {!isActive && (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <img 
-                                src="/lovable-uploads/b9837878-ceb4-4653-b157-cfe4045aac1d.png" 
-                                alt="Locked" 
-                                className="w-8 h-8 opacity-60"
-                              />
-                            </div>
+                             <div className="absolute inset-0 flex items-center justify-center">
+                               <img 
+                                 src="/lovable-uploads/b057696a-4b3d-49e9-82b0-b9a5226c0c68.png" 
+                                 alt="Locked" 
+                                 className="w-8 h-8 opacity-60"
+                               />
+                             </div>
                           )}
                         </div>
                         <div className="text-xs font-medium mb-1 text-black dark:text-white">
@@ -1097,9 +1097,11 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                                      </div>
                                      {!achievement.isEarned && (
                                        <div className="absolute inset-0 flex items-center justify-center">
-                                         <div className="bg-black/50 rounded-full p-3">
-                                           <Lock className="w-8 h-8 text-white/70" fill="currentColor" />
-                                         </div>
+                                         <img 
+                                           src="/lovable-uploads/b057696a-4b3d-49e9-82b0-b9a5226c0c68.png" 
+                                           alt="Locked" 
+                                           className="w-8 h-8 opacity-60"
+                                         />
                                        </div>
                                      )}
                                    </div>
@@ -1182,9 +1184,11 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                                      </div>
                                      {!achievement.isEarned && (
                                        <div className="absolute inset-0 flex items-center justify-center">
-                                         <div className="bg-black/50 rounded-full p-3">
-                                           <Lock className="w-8 h-8 text-white/70" fill="currentColor" />
-                                         </div>
+                                         <img 
+                                           src="/lovable-uploads/b057696a-4b3d-49e9-82b0-b9a5226c0c68.png" 
+                                           alt="Locked" 
+                                           className="w-8 h-8 opacity-60"
+                                         />
                                        </div>
                                      )}
                                    </div>
