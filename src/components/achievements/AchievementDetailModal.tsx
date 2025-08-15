@@ -99,7 +99,7 @@ const AchievementDetailModal: React.FC<AchievementDetailModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose} modal={false}>
-      <DialogContent className="max-w-sm mx-auto p-0 overflow-hidden bg-background border shadow-lg [&>button]:border-0">
+      <DialogContent className="max-w-sm mx-auto p-0 overflow-hidden bg-background border shadow-lg [&>button]:border-0 [&>button]:ring-0 [&>button]:outline-0 [&>button]:focus:ring-0 [&>button]:focus:border-0">
         {/* Header */}
         <DialogHeader className="relative bg-gradient-to-b from-background to-muted p-3 pb-2">
           <DialogTitle className="text-center text-lg font-semibold text-foreground">
