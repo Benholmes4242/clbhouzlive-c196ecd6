@@ -254,7 +254,7 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
                 fetchPriority="high"
                 decoding="async"
                 alt={`${displayName} profile`}
-                className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
+                className={`absolute inset-0 w-full h-full object-contain transition-all duration-1000 ease-out ${
                   !showVideo || !videoUrl ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
                 }`}
                 onError={(e) => {
