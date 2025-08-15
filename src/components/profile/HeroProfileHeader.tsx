@@ -42,7 +42,6 @@ import { useCloudflareStream } from '@/hooks/useCloudflareStream';
 import { useR2Upload } from '@/hooks/useR2Upload';
 import PinnedAchievements from './PinnedAchievements';
 import ProfileStatsBar from './ProfileStatsBar';
-import EmbeddedAchievementsContent from './EmbeddedAchievementsContent';
 
 interface Course {
   id: string;
@@ -107,7 +106,6 @@ const HeroProfileHeader = ({
   const tabs = [
     { id: 'activity', label: 'Activity' },
     { id: 'courses', label: 'Courses Played' },
-    { id: 'achievements', label: 'Achievements' },
     { id: 'stats', label: 'Handicap' },
     { id: 'gear', label: 'Gear & Bag' }
   ];
@@ -585,9 +583,6 @@ const HeroProfileHeader = ({
           courses: (
             <div></div> // Content will be rendered separately below
           ),
-          achievements: (
-            <div></div> // Content will be rendered separately below
-          ),
           stats: (
             <div></div> // Content will be rendered separately below
           )
@@ -705,15 +700,6 @@ const HeroProfileHeader = ({
                 displayName={profile?.display_name || 'User'}
               />
             </>
-          )}
-          {activeSection === 'achievements' && (
-            <EmbeddedAchievementsContent
-              userId={profile?.id || ''}
-              userDisplayName={profile?.display_name || 'User'}
-              userHandicap={profile?.eg_handicap_index}
-              userProfilePhotoUrl={profile?.profile_photo_url}
-              isCurrentUser={isOwnProfile}
-            />
           )}
           {activeSection === 'stats' && (
             <HandicapSection 

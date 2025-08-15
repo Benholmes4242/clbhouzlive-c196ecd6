@@ -16,7 +16,6 @@ import { VideoPlaybackManagerProvider } from './contexts/VideoPlaybackManager';
 
 
 const Auth = lazy(() => import("./pages/Auth"));
-const AchievementsPage = lazy(() => import("./pages/AchievementsPage"));
 const CreateProfile = lazy(() => import("./pages/CreateProfile"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage"));
 const UserProfilePage = lazy(() => import("./pages/UserProfilePage"));
@@ -38,7 +37,7 @@ const FollowersPage = lazy(() => import("./pages/FollowersPage"));
 const FollowingPage = lazy(() => import("./pages/FollowingPage"));
 
 const GlobalTop100 = lazy(() => import("./pages/GlobalTop100"));
-
+const AchievementsPage = lazy(() => import("./pages/AchievementsPage"));
 const AdminSetupPage = lazy(() => import("./pages/AdminSetupPage"));
 const AdminPage = lazy(() => import("./pages/AdminPage"));
 const NotFound = lazy(() => import("./pages/NotFound"));
@@ -98,7 +97,6 @@ const App: React.FC = () => {
                         
                         <Route path="/global-top100" element={<GlobalTop100 />} />
                         <Route path="/achievements" element={<AchievementsPage />} />
-                        
                         <Route path="/admin-setup" element={<AdminSetupPage />} />
                         <Route path="/admin" element={<AdminPage />} />
                         <Route path="*" element={<NotFound />} />
