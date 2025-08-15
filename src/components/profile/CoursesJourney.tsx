@@ -117,7 +117,7 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
         {/* Progress Rings Section */}
         <div className="relative py-8">
           {/* Desktop: Single row */}
-          <div className="hidden md:flex gap-16 justify-center">
+          <div className="hidden md:flex gap-8 justify-center px-4">{/* Reduced gap and added padding */}
             {achievementRings.map((achievement, index) => {
               const progress = getProgressData(achievement.region);
               const animationDelay = index * 0.2;
@@ -264,12 +264,12 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                     </div>
                   </div>
                   
-                  {/* Achievement info below ring - single line */}
-                  <div className="mt-4 text-center min-w-[180px]">
-                    <div className="text-lg text-foreground mb-2 whitespace-nowrap">
+                  {/* Achievement info below ring - with text wrapping */}
+                  <div className="mt-4 text-center max-w-[200px]">
+                    <div className="text-lg text-foreground mb-2">
                       {achievement.title}
                     </div>
-                    <div className="text-xs text-muted-foreground whitespace-nowrap">
+                    <div className="text-xs text-muted-foreground leading-relaxed">
                       {motivationalMessages[achievement.region] || `${progress.remaining} courses to go (${Math.round(progress.percentage)}% complete) Adventure awaits!`}
                     </div>
                   </div>
@@ -437,12 +437,12 @@ const CoursesJourney: React.FC<CoursesJourneyProps> = ({
                       </div>
                     </div>
                     
-                    {/* Achievement info below ring - single line */}
-                    <div className="mt-3 text-center w-36">
-                      <div className="text-sm text-foreground mb-1 whitespace-nowrap overflow-hidden text-ellipsis">
+                    {/* Achievement info */}
+                    <div className="mt-3 text-center max-w-[140px]">
+                      <div className="text-sm text-foreground mb-1">
                         {achievement.title}
                       </div>
-                      <div className="text-xs text-muted-foreground whitespace-nowrap overflow-hidden text-ellipsis">
+                      <div className="text-xs text-muted-foreground leading-relaxed">
                         {motivationalMessages[achievement.region] || `${progress.remaining} courses to go (${Math.round(progress.percentage)}%) Adventure awaits!`}
                       </div>
                     </div>
