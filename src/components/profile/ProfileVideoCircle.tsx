@@ -275,11 +275,11 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
             />
           </div>
           
-          {/* Main Content Container with soft faded edges */}
-          <div className="relative w-full h-full rounded-lg overflow-hidden bg-black/10 backdrop-blur-sm border border-white/20"
+          {/* Main Content Container with aggressive soft faded edges */}
+          <div className="relative w-full h-full overflow-hidden"
                style={{
-                 maskImage: 'radial-gradient(ellipse 85% 90% at center, black 60%, transparent 100%)',
-                 WebkitMaskImage: 'radial-gradient(ellipse 85% 90% at center, black 60%, transparent 100%)'
+                 maskImage: 'radial-gradient(ellipse 70% 75% at center, black 30%, rgba(0,0,0,0.8) 50%, rgba(0,0,0,0.3) 70%, transparent 85%)',
+                 WebkitMaskImage: 'radial-gradient(ellipse 70% 75% at center, black 30%, rgba(0,0,0,0.8) 50%, rgba(0,0,0,0.3) 70%, transparent 85%)'
                }}>
             {/* Video Element with smooth fade transition */}
             <video
@@ -295,10 +295,10 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
               crossOrigin="anonymous"
             />
             
-            {/* Soft edge overlay for additional fade effect */}
+            {/* Additional soft vignette for natural edge fade */}
             <div className="absolute inset-0 pointer-events-none"
                  style={{
-                   background: 'radial-gradient(ellipse 90% 95% at center, transparent 50%, rgba(0,0,0,0.1) 70%, rgba(0,0,0,0.3) 85%, rgba(0,0,0,0.6) 100%)'
+                   background: 'radial-gradient(ellipse 65% 70% at center, transparent 20%, rgba(0,0,0,0.05) 40%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0.5) 80%, rgba(0,0,0,0.8) 95%)'
                  }}
             />
           
