@@ -1061,11 +1061,11 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                       {/* Connector lines - segments between rings with gaps */}
                       <div className="absolute top-8 left-0 right-0 h-px z-0">
                         {/* Line segment 1: between ring 1 and 2 */}
-                        <div className="absolute h-px bg-gray-300 dark:bg-gray-600" style={{ left: '20%', right: '65%' }} />
+                        <div className="absolute h-px bg-gray-300 dark:bg-gray-600" style={{ left: '16%', right: '59%' }} />
                         {/* Line segment 2: between ring 2 and 3 */}
-                        <div className="absolute h-px bg-gray-300 dark:bg-gray-600" style={{ left: '45%', right: '40%' }} />
+                        <div className="absolute h-px bg-gray-300 dark:bg-gray-600" style={{ left: '41%', right: '34%' }} />
                         {/* Line segment 3: between ring 3 and 4 */}
-                        <div className="absolute h-px bg-gray-300 dark:bg-gray-600" style={{ left: '70%', right: '15%' }} />
+                        <div className="absolute h-px bg-gray-300 dark:bg-gray-600" style={{ left: '66%', right: '9%' }} />
                       </div>
                       
                       {xpTiers.map((tier, index) => {
