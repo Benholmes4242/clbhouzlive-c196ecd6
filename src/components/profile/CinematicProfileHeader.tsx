@@ -247,20 +247,24 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
             
             {/* Profile Photo */}
             {profilePhotoUrl && (
-              <img
-                ref={photoRef}
-                src={`${profilePhotoUrl}?quality=95&format=auto&width=1280&height=720&fit=cover`}
-                loading="eager"
-                fetchPriority="high"
-                decoding="async"
-                alt={`${displayName} profile`}
-                className={`absolute inset-0 w-full h-full object-contain transition-all duration-1000 ease-out ${
-                  !showVideo || !videoUrl ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
-                }`}
-                onError={(e) => {
-                  e.currentTarget.src = profilePhotoUrl;
-                }}
-              />
+              <div className="absolute inset-0 w-full h-full">
+                <img
+                  ref={photoRef}
+                  src={`${profilePhotoUrl}?quality=95&format=auto&width=1280&height=720&fit=cover`}
+                  loading="eager"
+                  fetchPriority="high"
+                  decoding="async"
+                  alt={`${displayName} profile`}
+                  className={`absolute inset-0 w-full h-full object-contain transition-all duration-1000 ease-out ${
+                    !showVideo || !videoUrl ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+                  }`}
+                  onError={(e) => {
+                    e.currentTarget.src = profilePhotoUrl;
+                  }}
+                />
+                {/* Gradient fade overlay for photo */}
+                <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-white via-white/80 via-white/40 to-transparent pointer-events-none"></div>
+              </div>
             )}
           </>
         ) : (
