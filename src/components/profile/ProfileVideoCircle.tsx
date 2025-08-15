@@ -115,6 +115,7 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
     };
   }, [videoUrl, hasPlayed, profilePhotoUrl]);
 
+  // File selection handlers
   const handleFileSelect = () => {
     fileInputRef.current?.click();
   };
@@ -247,58 +248,59 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
 
   return (
     <div 
-      className={`relative w-full h-full rounded-lg overflow-hidden group ${className} ${
-        (!showVideo && profilePhotoUrl) || (!isOwnProfile && hasPlayed && !isPlaying) ? 'cursor-pointer' : ''
-      }`}
+      className={`relative w-full h-full group ${className}`}
       onMouseEnter={() => setShowControls(true)}
       onMouseLeave={() => setShowControls(false)}
-      onClick={handleCircleClick}
     >
-      {/* Background Blur Layer - Always present */}
-      <div className="absolute -inset-8 overflow-hidden rounded-lg">
+      {/* Background Blur Layer - Extended outside bounds */}
+      <div className="absolute -inset-12 overflow-hidden">
         {videoUrl ? (
           <video
             ref={blurVideoRef}
             src={videoUrl}
-            className={`absolute inset-0 w-[calc(100%+4rem)] h-[calc(100%+4rem)] object-cover transition-all duration-1000 ease-out scale-125 ${
-              showVideo ? 'opacity-80' : 'opacity-40'
+            className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
+              showVideo ? 'opacity-60' : 'opacity-30'
             }`}
             playsInline
             muted
             preload="auto"
             crossOrigin="anonymous"
             style={{ 
-              filter: 'blur(60px) saturate(1.5) brightness(0.7) contrast(1.2)',
-              transform: 'scale(1.3)'
+              filter: 'blur(80px) saturate(1.5) brightness(0.6) contrast(1.2)',
+              transform: 'scale(1.4)'
             }}
           />
         ) : profilePhotoUrl ? (
           <img
             src={profilePhotoUrl}
             alt=""
-            className="absolute inset-0 w-[calc(100%+4rem)] h-[calc(100%+4rem)] object-cover scale-125 opacity-40"
+            className="absolute inset-0 w-full h-full object-cover opacity-30"
             style={{ 
-              filter: 'blur(60px) saturate(1.5) brightness(0.7) contrast(1.2)',
-              transform: 'scale(1.3)'
+              filter: 'blur(80px) saturate(1.5) brightness(0.6) contrast(1.2)',
+              transform: 'scale(1.4)'
             }}
           />
         ) : (
           <div 
-            className="absolute inset-0 w-[calc(100%+4rem)] h-[calc(100%+4rem)] scale-125 opacity-40"
+            className="absolute inset-0 w-full h-full opacity-30"
             style={{ 
-              filter: 'blur(60px) saturate(1.5) brightness(0.7) contrast(1.2)',
-              transform: 'scale(1.3)',
+              filter: 'blur(80px) saturate(1.5) brightness(0.6) contrast(1.2)',
+              transform: 'scale(1.4)',
               background: `linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 100%)`
             }}
           />
         )}
       </div>
 
-      {videoUrl ? (
-        <>
-          
-          {/* Main Content Container with rounded corners */}
-          <div className="relative w-full h-full rounded-lg overflow-hidden bg-black/10 backdrop-blur-sm border border-white/20">
+      {/* Main Content Container */}
+      <div 
+        className={`relative w-full h-full rounded-lg overflow-hidden bg-black/10 backdrop-blur-sm border border-white/20 ${
+          (!showVideo && profilePhotoUrl) || (!isOwnProfile && hasPlayed && !isPlaying) ? 'cursor-pointer' : ''
+        }`}
+        onClick={handleCircleClick}
+      >
+        {videoUrl ? (
+          <>
             {/* Video Element with smooth fade transition */}
             <video
               ref={videoRef}
@@ -336,96 +338,96 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
                 </div>
               </div>
             )}
-          </div>
           
-          {/* Controls Overlay - Show for both video and photo states */}
-          {showControls && (
-            <div className="absolute inset-0 bg-black/30 flex items-center justify-center transition-opacity z-30">
-              <div className="flex flex-col gap-2 items-center">
-                {/* Play/Replay Button - Centered */}
-                {((hasPlayed && !isPlaying && showVideo) || (!showVideo && videoUrl)) && (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => {
-                      if (!showVideo) {
-                        setShowVideo(true);
-                      }
-                      replayVideo();
-                    }}
-                    className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full p-2 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
-                  >
-                    <Play className="w-4 h-4" />
-                  </Button>
-                )}
-                
-                {/* Owner Controls - Change Video and Photo buttons */}
-                {isOwnProfile && (
-                  <div className="flex flex-col gap-2">
+            {/* Controls Overlay - Show for both video and photo states */}
+            {showControls && (
+              <div className="absolute inset-0 bg-black/30 flex items-center justify-center transition-opacity z-30">
+                <div className="flex flex-col gap-2 items-center">
+                  {/* Play/Replay Button - Centered */}
+                  {((hasPlayed && !isPlaying && showVideo) || (!showVideo && videoUrl)) && (
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={handleFileSelect}
-                      disabled={uploading}
-                      className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full px-3 py-1 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
-                      title="Change video"
+                      onClick={() => {
+                        if (!showVideo) {
+                          setShowVideo(true);
+                        }
+                        replayVideo();
+                      }}
+                      className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full p-2 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
                     >
-                      <span className="text-xs font-medium">Change Video</span>
+                      <Play className="w-4 h-4" />
                     </Button>
-                    
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={handlePhotoSelect}
-                      disabled={uploading}
-                      className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full px-3 py-1 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
-                      title="Change profile photo"
-                    >
-                      <span className="text-xs font-medium">Change Photo</span>
-                    </Button>
-                  </div>
-                )}
+                  )}
+                  
+                  {/* Owner Controls - Change Video and Photo buttons */}
+                  {isOwnProfile && (
+                    <div className="flex flex-col gap-2">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={handleFileSelect}
+                        disabled={uploading}
+                        className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full px-3 py-1 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
+                        title="Change video"
+                      >
+                        <span className="text-xs font-medium">Change Video</span>
+                      </Button>
+                      
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={handlePhotoSelect}
+                        disabled={uploading}
+                        className="bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white border-0 rounded-full px-3 py-1 shadow-lg transition-all duration-300 hover:shadow-xl hover:scale-105"
+                        title="Change profile photo"
+                      >
+                        <span className="text-xs font-medium">Change Photo</span>
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </div>
+            )}
+          </>
+        ) : (
+          /* No Video - Show Upload Area */
+          <div className="w-full h-full bg-muted/30 flex flex-col items-center justify-center">
+            <div className="text-6xl text-muted-foreground/50 mb-4">
+              {displayName.charAt(0)}
             </div>
-          )}
-        </>
-      ) : (
-        /* No Video - Show Upload Area */
-        <div className="w-full h-full bg-muted/30 flex flex-col items-center justify-center">
-          <div className="text-6xl text-muted-foreground/50 mb-4">
-            {displayName.charAt(0)}
+            
+            {isOwnProfile && !uploading && (
+              <div className="flex flex-col gap-2">
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  onClick={handleFileSelect}
+                  className="text-xs"
+                >
+                  <Upload className="w-3 h-3 mr-1" />
+                  Add Video
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handlePhotoSelect}
+                  className="text-xs"
+                >
+                  <Upload className="w-3 h-3 mr-1" />
+                  Add Photo
+                </Button>
+              </div>
+            )}
+            
+            {uploading && (
+              <div className="text-xs text-muted-foreground mt-2">
+                Uploading...
+              </div>
+            )}
           </div>
-          
-          {isOwnProfile && !uploading && (
-            <div className="flex flex-col gap-2">
-              <Button
-                size="sm"
-                variant="secondary"
-                onClick={handleFileSelect}
-                className="text-xs"
-              >
-                <Upload className="w-3 h-3 mr-1" />
-                Add Video
-              </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handlePhotoSelect}
-                className="text-xs"
-              >
-                <Upload className="w-3 h-3 mr-1" />
-                Add Photo
-              </Button>
-            </div>
-          )}
-          
-          {uploading && (
-            <div className="text-xs text-muted-foreground mt-2">
-              Uploading...
-            </div>
-          )}
-        </div>
-      )}
+        )}
+      </div>
       
       {/* Hidden File Inputs */}
       <input
