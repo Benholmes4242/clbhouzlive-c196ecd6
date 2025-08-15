@@ -275,9 +275,11 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
             background: `
               linear-gradient(to bottom, 
                 transparent 0%, 
-                transparent 95%, 
-                hsla(var(--background) / 0.4) 97%, 
-                hsla(var(--background) / 0.7) 98%, 
+                transparent 90%, 
+                hsla(var(--background) / 0.1) 92%, 
+                hsla(var(--background) / 0.3) 95%, 
+                hsla(var(--background) / 0.6) 97%, 
+                hsla(var(--background) / 0.8) 99%, 
                 hsl(var(--background)) 100%
               )
             `
