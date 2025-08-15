@@ -1133,36 +1133,42 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
             )}
           </div>
 
-          {/* Featured Most Recent Achievement */}
+          {/* Latest Achievement Section */}
           {mostRecentAchievement && (
             <div className={`${isMobile ? 'px-4 pb-6' : 'px-6 pb-8'}`}>
-              <div className="relative">
-                {/* Featured Achievement Card */}
-                <div className="p-8 text-center">
-                  <div className="flex flex-col items-center space-y-2">
-                    {/* Large Badge with CSS Animation */}
-                    <div className="relative animate-scale-in">
-                      <div className="absolute inset-0 bg-yellow-400/20 rounded-full blur-xl animate-pulse"></div>
-                      <div className="relative drop-shadow-2xl hover:scale-105 transition-transform duration-300">
-                        {getFeaturedAchievementIcon(mostRecentAchievement)}
-                      </div>
-                    </div>
-                    
-                    {/* Achievement Title with Fade Animation */}
-                    <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-200 animate-fade-in">
-                      {mostRecentAchievement.title}
-                    </h3>
-                    
-                    {/* XP Gained */}
-                    <div className="font-bold text-lg text-blue-500 animate-scale-in">
-                      +{mostRecentAchievement.xp} XP
-                    </div>
-                    
-                    {/* Date Earned */}
-                    <p className="text-sm text-muted-foreground animate-fade-in">
-                      Unlocked {mostRecentAchievement.dateEarned}
-                    </p>
+              <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6">
+                <div className="flex items-center gap-6">
+                  {/* Badge without glow */}
+                  <div className="relative">
+                    {getFeaturedAchievementIcon(mostRecentAchievement)}
                   </div>
+                  
+                  {/* Latest Achievement Details */}
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-3">
+                      <h3 className="text-xl font-bold text-white">Latest Achievement</h3>
+                    </div>
+                    
+                    <h4 className="text-2xl font-bold text-white mb-2">
+                      {mostRecentAchievement.title}
+                    </h4>
+                    
+                    <div className="flex items-center gap-4 text-sm text-white/70 mb-4">
+                      <span className="text-green-400 font-semibold">+{mostRecentAchievement.xp} XP</span>
+                      <span>Unlocked {mostRecentAchievement.dateEarned}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Share Button */}
+                <div className="mt-4">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="border-white/20 text-white hover:bg-white/10"
+                  >
+                    Share
+                  </Button>
                 </div>
               </div>
             </div>
@@ -1208,7 +1214,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                     </h3>
                   </div>
                 
-                   <div className={`${isMobile ? 'grid grid-cols-3 gap-2 px-0' : 'grid grid-cols-3 gap-3'}`}>
+                   <div className={`${isMobile ? 'grid grid-cols-3 gap-2 px-0' : 'grid grid-cols-4 gap-3'}`}>
                     {getFilteredAchievements(explorationAchievements, 'exploration').map((achievement) => {
                       const { percentage, nudgeText } = getAchievementProgress(achievement);
                       const isNearUnlock = percentage >= 80 && percentage < 100;
@@ -1254,20 +1260,29 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                             } : undefined}
                                  >
                                   {/* Icon directly on background - no container */}
-                                  <div className="flex justify-center items-center">
-                                    <div className={`transition-all duration-200 ${achievement.isEarned ? 'drop-shadow-lg' : 'opacity-60 grayscale'}`}>
-                                      {getAchievementIcon(achievement)}
-                                    </div>
-                                  </div>
+                                   <div className="flex justify-center items-center relative">
+                                     <div className={`transition-all duration-200 ${achievement.isEarned ? 'drop-shadow-lg' : 'opacity-60 grayscale'}`}>
+                                       {getAchievementIcon(achievement)}
+                                     </div>
+                                     {!achievement.isEarned && (
+                                       <div className="absolute inset-0 flex items-center justify-center">
+                                         <div className="w-8 h-8 bg-white bg-opacity-90 rounded-full flex items-center justify-center">
+                                           <svg className="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                                             <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                                           </svg>
+                                         </div>
+                                       </div>
+                                     )}
+                                   </div>
                                   
                                   {/* Text stacked underneath */}
                                   <div className="text-center">
                                     <h4 className={`font-semibold mb-1 ${isMobile ? 'text-xs leading-tight' : 'text-sm'} ${achievement.isEarned ? 'text-blue-700 dark:text-blue-300' : 'text-muted-foreground'}`}>
                                       {achievement.title.toUpperCase()}
                                     </h4>
-                                    <p className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium ${achievement.isEarned ? 'text-blue-600 dark:text-blue-400' : 'text-muted-foreground'}`}>
-                                      +{achievement.xp} XP
-                                    </p>
+                                     <p className={`${isMobile ? 'text-xs' : 'text-sm'} font-medium ${achievement.isEarned ? 'text-green-600 dark:text-green-400' : 'text-muted-foreground'}`}>
+                                       +{achievement.xp} XP
+                                     </p>
                                   </div>
                                   
                                    {/* Smart Nudge Label */}
@@ -1304,7 +1319,7 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                     </h3>
                   </div>
                 
-                  <div className={`${isMobile ? 'grid grid-cols-3 gap-2 px-0' : 'grid grid-cols-3 gap-3'}`}>
+                  <div className={`${isMobile ? 'grid grid-cols-3 gap-2 px-0' : 'grid grid-cols-4 gap-3'}`}>
                     {getFilteredAchievements(skillAchievements, 'skill').map((achievement) => {
                       const { percentage, nudgeText } = getAchievementProgress(achievement);
                       const isNearUnlock = percentage >= 80 && percentage < 100;
