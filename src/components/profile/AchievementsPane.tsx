@@ -721,7 +721,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                 </div>
                 
                 {/* Right Side Info */}
-                <div className="flex-1 space-y-6 pt-8">
+                <div className="flex-1 flex flex-col justify-center space-y-6">
                   {/* Ring Achievement Status */}
                   <div className="space-y-3">
                     <h3 className="font-semibold text-2xl text-muted-foreground">
