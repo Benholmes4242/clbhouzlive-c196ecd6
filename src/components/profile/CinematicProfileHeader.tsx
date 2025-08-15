@@ -205,6 +205,15 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
 
   const hasMedia = videoUrl || profilePhotoUrl;
 
+  // Debug logging
+  console.log('CinematicProfileHeader Debug:', {
+    videoUrl,
+    profilePhotoUrl,
+    hasMedia,
+    displayName,
+    showVideo
+  });
+
   return (
     <div className={`relative w-full overflow-hidden ${className}`} 
          style={{ 
