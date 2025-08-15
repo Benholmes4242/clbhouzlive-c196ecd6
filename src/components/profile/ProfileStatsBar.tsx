@@ -54,18 +54,18 @@ const ProfileStatsBar: React.FC<ProfileStatsBarProps> = ({ stats }) => {
       {isDesktop && canScrollLeft && (
         <button
           onClick={() => scroll('left')}
-          className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-2 z-20 w-7 h-7 p-1 rounded-full flex items-center justify-center opacity-60 hover:opacity-100 transition-all duration-200"
+          className="absolute left-1 top-1/2 transform -translate-y-1/2 z-20 w-8 h-8 p-1 rounded-full flex items-center justify-center opacity-60 hover:opacity-100 transition-all duration-200"
         >
-          <ChevronLeft className="w-4 h-4 text-white drop-shadow-lg" />
+          <ChevronLeft className="w-5 h-5 text-white drop-shadow-lg" />
         </button>
       )}
       
       {isDesktop && canScrollRight && (
         <button
           onClick={() => scroll('right')}
-          className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-2 z-20 w-7 h-7 p-1 rounded-full flex items-center justify-center opacity-60 hover:opacity-100 transition-all duration-200"
+          className="absolute right-1 top-1/2 transform -translate-y-1/2 z-20 w-8 h-8 p-1 rounded-full flex items-center justify-center opacity-60 hover:opacity-100 transition-all duration-200"
         >
-          <ChevronRight className="w-4 h-4 text-white drop-shadow-lg" />
+          <ChevronRight className="w-5 h-5 text-white drop-shadow-lg" />
         </button>
       )}
       
@@ -73,7 +73,7 @@ const ProfileStatsBar: React.FC<ProfileStatsBarProps> = ({ stats }) => {
       {/* Stats container */}
       <div 
         ref={containerRef}
-        className={`flex gap-6 overflow-x-auto scrollbar-hide py-3 px-6 bg-white/10 backdrop-blur-md rounded-full border border-white/20 shadow-xl ${isMobile ? 'pr-8' : ''}`}
+        className={`flex gap-6 overflow-x-auto scrollbar-hide px-6 bg-white/10 backdrop-blur-md rounded-full border border-white/20 shadow-xl ${isMobile ? 'pr-8' : ''}`}
         style={{
           scrollbarWidth: 'none',
           msOverflowStyle: 'none',
