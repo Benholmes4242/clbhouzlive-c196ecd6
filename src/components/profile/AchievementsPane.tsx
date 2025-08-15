@@ -754,7 +754,7 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
           {!isMobile && (
             <div className="px-0 pb-8">
               <div className="p-6">
-                <h4 className="text-sm font-medium text-black dark:text-white mb-3 text-center">Ring Progression UPDATED</h4>
+                <h4 className="text-sm font-medium text-black dark:text-white mb-3 text-center">Ring Progression</h4>
                 <div className="relative flex justify-between items-center gap-2">
                   {/* Connector lines */}
                   <div className="absolute top-8 left-0 right-0 h-px bg-gray-300 dark:bg-gray-600 z-0" style={{
