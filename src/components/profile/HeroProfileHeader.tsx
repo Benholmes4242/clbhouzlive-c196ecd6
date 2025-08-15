@@ -462,16 +462,7 @@ const HeroProfileHeader = ({
     <>
       {/* Dynamic Background - Auto-generated from profile photo */}
       <div className="relative w-full bg-background">
-        {/* Blurred Background Layer with Gradient Fade */}
-        {profile?.profile_photo_url && (
-          <div 
-            className="absolute top-0 left-0 w-full h-[400px] z-0"
-            style={createDynamicBackgroundStyle(profile.profile_photo_url)}
-          >
-            {/* Gradient overlay that fades the blur effect towards the profile photo */}
-            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/20 to-background"></div>
-          </div>
-        )}
+        {/* Clean background without blur effect */}
         
         {/* Profile Content */}
         <div className="relative z-10 flex flex-col items-center text-center pt-20 pb-8">
