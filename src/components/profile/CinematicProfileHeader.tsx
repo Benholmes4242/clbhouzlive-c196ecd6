@@ -268,16 +268,17 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
           <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-background to-muted" />
         )}
         
-        {/* Bottom gradient overlay for username readability */}
+        {/* Gradient overlay for text readability */}
         <div 
           className="absolute inset-0 pointer-events-none z-30"
           style={{
             background: `
               linear-gradient(to bottom, 
                 transparent 0%, 
-                transparent 70%, 
-                hsla(var(--background) / 0.4) 80%, 
-                hsla(var(--background) / 0.7) 90%, 
+                transparent 50%, 
+                hsla(var(--background) / 0.3) 65%, 
+                hsla(var(--background) / 0.6) 80%, 
+                hsla(var(--background) / 0.8) 90%, 
                 hsl(var(--background)) 100%
               )
             `
