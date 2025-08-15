@@ -220,11 +220,13 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
            marginTop: '-16rem',
            height: '100vh',
            minHeight: '500px',
-           maxHeight: '100vh'
+           maxHeight: '100vh',
+           width: '100vw',
+           maxWidth: '100vw'
          }}>
 
       {/* Central Crisp Media Player - Full Coverage */}
-      <div className="absolute inset-0 z-10">
+      <div className="absolute inset-0 z-10 w-full h-full overflow-hidden">
         {hasMedia ? (
           <>
             {/* Main Video Element - Crisp and Clear */}

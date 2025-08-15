@@ -53,7 +53,7 @@ const ProfileStatsBar: React.FC<ProfileStatsBarProps> = ({ stats }) => {
   }, [stats]);
 
   return (
-    <div className={`relative w-full max-w-lg mx-auto ${isMobile ? 'px-2' : ''}`}>
+    <div className={`relative w-full ${isMobile ? 'max-w-full px-1' : 'max-w-lg'} mx-auto`}>
       {/* Desktop scroll buttons */}
       {isDesktop && canScrollLeft && (
         <button
@@ -90,12 +90,12 @@ const ProfileStatsBar: React.FC<ProfileStatsBarProps> = ({ stats }) => {
             <button
               key={index}
               onClick={stat.onClick}
-              className="flex-shrink-0 w-20 flex flex-col items-center justify-center hover:opacity-80 transition-opacity duration-200"
+              className={`flex-shrink-0 ${isMobile ? 'w-16' : 'w-20'} flex flex-col items-center justify-center hover:opacity-80 transition-opacity duration-200`}
             >
-              <div className="text-lg font-semibold text-black">
+              <div className={`${isMobile ? 'text-base' : 'text-lg'} font-semibold text-black`}>
                 {stat.value}
               </div>
-              <div className="text-xs text-gray-600 font-medium">
+              <div className={`${isMobile ? 'text-xs' : 'text-xs'} text-gray-600 font-medium`}>
                 {stat.label}
               </div>
             </button>
