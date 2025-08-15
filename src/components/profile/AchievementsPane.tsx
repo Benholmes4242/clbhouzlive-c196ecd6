@@ -1,9 +1,10 @@
 // AchievementsPane - Complete inline achievements for Profile page
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from "@/components/ui/button";
-import { Sparkles, Trophy, ChevronDown, ChevronUp, Lock } from "lucide-react";
+import { Sparkles, Trophy, ChevronDown, ChevronUp } from "lucide-react";
 import { useIsMobile } from '@/hooks/use-mobile';
 import AchievementDetailModal from '@/components/achievements/AchievementDetailModal';
+import padlockIcon from '@/assets/padlock.png';
 
 interface AchievementsPaneProps {
   userId?: string;
@@ -833,16 +834,16 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                             )}
                           </svg>
                           
-                          {/* Padlock icon for locked rings */}
-                          {!isActive && (
-                             <div className="absolute inset-0 flex items-center justify-center">
-                               <img 
-                                 src="/lovable-uploads/b057696a-4b3d-49e9-82b0-b9a5226c0c68.png" 
-                                 alt="Locked" 
-                                 className="w-8 h-8 opacity-60"
-                               />
-                             </div>
-                          )}
+                           {/* Padlock icon for locked rings */}
+                           {!isActive && (
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <img 
+                                  src={padlockIcon} 
+                                  alt="Locked" 
+                                  className="w-10 h-10 opacity-60"
+                                />
+                              </div>
+                           )}
                         </div>
                         <div className="text-xs font-medium mb-1 text-black dark:text-white">
                           {tier.name}
@@ -1095,15 +1096,15 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                                      <div className={`transition-all duration-200 ${achievement.isEarned ? 'drop-shadow-lg' : 'opacity-60 grayscale'}`}>
                                        {getAchievementIcon(achievement)}
                                      </div>
-                                     {!achievement.isEarned && (
-                                       <div className="absolute inset-0 flex items-center justify-center">
-                                         <img 
-                                           src="/lovable-uploads/b057696a-4b3d-49e9-82b0-b9a5226c0c68.png" 
-                                           alt="Locked" 
-                                           className="w-8 h-8 opacity-60"
-                                         />
-                                       </div>
-                                     )}
+                                      {!achievement.isEarned && (
+                                        <div className="absolute inset-0 flex items-center justify-center">
+                                          <img 
+                                            src={padlockIcon} 
+                                            alt="Locked" 
+                                            className="w-16 h-16 opacity-60"
+                                          />
+                                        </div>
+                                      )}
                                    </div>
                                   
                                   {/* Text stacked underneath */}
@@ -1182,15 +1183,15 @@ const AchievementsPane: React.FC<AchievementsPaneProps> = ({
                                      <div className={`transition-all duration-200 ${achievement.isEarned ? 'drop-shadow-lg' : 'opacity-60 grayscale'}`}>
                                        {getAchievementIcon(achievement)}
                                      </div>
-                                     {!achievement.isEarned && (
-                                       <div className="absolute inset-0 flex items-center justify-center">
-                                         <img 
-                                           src="/lovable-uploads/b057696a-4b3d-49e9-82b0-b9a5226c0c68.png" 
-                                           alt="Locked" 
-                                           className="w-8 h-8 opacity-60"
-                                         />
-                                       </div>
-                                     )}
+                                      {!achievement.isEarned && (
+                                        <div className="absolute inset-0 flex items-center justify-center">
+                                          <img 
+                                            src={padlockIcon} 
+                                            alt="Locked" 
+                                            className="w-16 h-16 opacity-60"
+                                          />
+                                        </div>
+                                      )}
                                    </div>
                                   
                                   {/* Text stacked underneath */}

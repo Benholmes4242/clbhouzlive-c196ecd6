@@ -1,6 +1,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { Trophy, Lock, Plus } from 'lucide-react';
+import { Trophy, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import padlockIcon from '@/assets/padlock.png';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { useUserAchievements } from '@/hooks/useUserAchievements';
 import { useFriendsLeaderboard } from '@/hooks/useFriendsLeaderboard';
@@ -98,7 +99,7 @@ const TrophyIcon: React.FC<{
       'rounded-full flex items-center justify-center bg-gray-600 border-2 border-gray-500',
       sizeClasses[size]
     )}>
-      <Lock className="w-4 h-4 text-gray-400" />
+      <img src={padlockIcon} alt="Locked" className="w-5 h-5 opacity-70" />
     </div>
   );
 };
