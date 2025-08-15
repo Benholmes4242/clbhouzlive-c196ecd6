@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { XPRingSystem } from "@/components/profile/XPRingSystem";
 import { Sparkles, Trophy, ChevronDown, ChevronUp } from "lucide-react";
+import { PaperAirplaneIcon } from '@heroicons/react/24/outline';
 import { useIsMobile } from '@/hooks/use-mobile';
 import AchievementDetailModal from '@/components/achievements/AchievementDetailModal';
 
@@ -1170,8 +1171,9 @@ const ClbhouzAchievementsModal: React.FC<ClbhouzAchievementsModalProps> = ({
                       <Button
                         variant="outline"
                         size="sm"
-                        className="border-white/20 text-white hover:bg-white/10"
+                        className="border-white/20 text-white hover:bg-white/10 rounded-full flex items-center gap-2"
                       >
+                        <PaperAirplaneIcon className="w-6 h-6" />
                         Share
                       </Button>
                     </div>
