@@ -208,10 +208,10 @@ const CinematicProfileHeader: React.FC<CinematicProfileHeaderProps> = ({
   return (
     <div className={`relative w-full overflow-hidden ${className}`} 
          style={{ 
-           marginTop: '-4rem',
-           height: '60vh',
-           minHeight: '400px',
-           maxHeight: '500px'
+           marginTop: '-8rem',
+           height: '80vh',
+           minHeight: '600px',
+           maxHeight: '800px'
          }}>
       {/* Full-width Live Blur Background - extends edge to edge */}
       <div className="absolute inset-0 w-full h-full overflow-hidden">
