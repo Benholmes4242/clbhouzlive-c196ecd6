@@ -462,7 +462,16 @@ const HeroProfileHeader = ({
     <>
       {/* Dynamic Background - Auto-generated from profile photo */}
       <div className="relative w-full bg-background">
-        {/* Clean background without blur effect */}
+        {/* Blurred Background Layer with Gradient Fade */}
+        {profile?.profile_photo_url && (
+          <div 
+            className="absolute top-0 left-0 w-full h-[400px] z-0"
+            style={createDynamicBackgroundStyle(profile.profile_photo_url)}
+          >
+            {/* Gradient overlay that fades the blur effect towards the profile photo */}
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/20 to-background"></div>
+          </div>
+        )}
         
         {/* Profile Content */}
         <div className="relative z-10 flex flex-col items-center text-center pt-20 pb-8">
@@ -470,9 +479,9 @@ const HeroProfileHeader = ({
           
 
           {/* Profile Photo/Video */}
-          <div className="w-[512px] h-96 mb-6">
+          <div className="w-64 h-64 mb-6">
             <div 
-              className="relative rounded-lg overflow-hidden transition-all duration-300 w-full h-full"
+              className="relative rounded-full overflow-hidden transition-all duration-300 w-full h-full"
               title={achievementRing.title}
             >
               <ProfileVideoCircle

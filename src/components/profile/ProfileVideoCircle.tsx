@@ -29,7 +29,6 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
   className = ''
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const blurVideoRef = useRef<HTMLVideoElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const photoInputRef = useRef<HTMLInputElement>(null);
   const [hasPlayed, setHasPlayed] = useState(false);
@@ -42,25 +41,13 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
   // Auto-play video once when component mounts and video is available
   useEffect(() => {
     const video = videoRef.current;
-    const blurVideo = blurVideoRef.current;
     if (!video || !videoUrl || hasPlayed) return;
 
     const handleCanPlayThrough = async () => {
       try {
         video.muted = true; // Ensure muted for autoplay
         video.currentTime = 0; // Start from beginning
-        
-        // Sync blur video
-        if (blurVideo) {
-          blurVideo.muted = true;
-          blurVideo.currentTime = 0;
-        }
-        
         await video.play();
-        if (blurVideo) {
-          await blurVideo.play().catch(() => {}); // Silent fail for blur video
-        }
-        
         setIsPlaying(true);
         setHasPlayed(true);
         setShowVideo(true); // Ensure video is visible when playing
@@ -81,12 +68,6 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
           setIsPlaying(false);
           video.currentTime = 0; // Reset to first frame
           video.pause();
-          
-          // Pause blur video too
-          if (blurVideo) {
-            blurVideo.currentTime = 0;
-            blurVideo.pause();
-          }
           
           // Ensure we've transitioned to photo if it exists
           if (profilePhotoUrl) {
@@ -211,23 +192,11 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
 
   const replayVideo = async () => {
     const video = videoRef.current;
-    const blurVideo = blurVideoRef.current;
     if (video && videoUrl) {
       try {
         video.currentTime = 0;
         video.muted = isMuted;
-        
-        // Sync blur video
-        if (blurVideo) {
-          blurVideo.currentTime = 0;
-          blurVideo.muted = true;
-        }
-        
         await video.play();
-        if (blurVideo) {
-          await blurVideo.play().catch(() => {}); // Silent fail for blur video
-        }
-        
         setIsPlaying(true);
       } catch (error) {
         console.error('Replay failed:', error);
@@ -247,88 +216,56 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
 
   return (
     <div 
-      className={`relative w-full h-full group ${className}`}
+      className={`relative w-full h-full rounded-full overflow-hidden group ${className} ${
+        (!showVideo && profilePhotoUrl) || (!isOwnProfile && hasPlayed && !isPlaying) ? 'cursor-pointer' : ''
+      }`}
       onMouseEnter={() => setShowControls(true)}
       onMouseLeave={() => setShowControls(false)}
+      onClick={handleCircleClick}
     >
-      {/* Dedicated media container with radial mask */}
-      <div 
-        className={`relative w-full h-full ${
-          (!showVideo && profilePhotoUrl) || (!isOwnProfile && hasPlayed && !isPlaying) ? 'cursor-pointer' : ''
-        }`}
-        onClick={handleCircleClick}
-        style={{
-          WebkitMask: 'radial-gradient(ellipse at center, black 70%, transparent 100%)',
-          mask: 'radial-gradient(ellipse at center, black 70%, transparent 100%)',
-          WebkitMaskComposite: 'source-over',
-          maskComposite: 'intersect'
-        }}
-      >
       {videoUrl ? (
         <>
-          {/* Dynamic Blur Background Layer */}
-          <div className="absolute -inset-8 overflow-hidden">
-            <video
-              ref={blurVideoRef}
-              src={videoUrl}
-              className={`absolute inset-0 w-[calc(100%+4rem)] h-[calc(100%+4rem)] object-cover transition-all duration-1000 ease-out scale-125 ${
-                showVideo ? 'opacity-80' : 'opacity-40'
+          {/* Video Element with smooth fade transition */}
+          <video
+            ref={videoRef}
+            src={videoUrl}
+            poster={thumbnailUrl}
+            className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
+              showVideo ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
+            }`}
+            playsInline
+            muted={isMuted}
+            preload="auto"
+            crossOrigin="anonymous"
+          />
+          
+          {/* Profile Photo with 4K quality optimization */}
+          {profilePhotoUrl && (
+            <img
+              src={`${profilePhotoUrl}?quality=100&format=auto&width=2048&height=2048&fit=cover`}
+              alt={`${displayName} profile`}
+              className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
+                !showVideo ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
               }`}
-              playsInline
-              muted
-              preload="auto"
-              crossOrigin="anonymous"
-              style={{ 
-                filter: 'blur(60px) saturate(1.5) brightness(0.7) contrast(1.2)',
-                transform: 'scale(1.3)'
+              onError={(e) => {
+                // Fallback to original URL without optimization
+                e.currentTarget.src = profilePhotoUrl;
               }}
             />
-          </div>
+          )}
           
-          {/* Main Content Container with rounded corners */}
-          <div className="relative w-full h-full rounded-lg overflow-hidden bg-black/10 backdrop-blur-sm border border-white/20">
-            {/* Video Element with smooth fade transition */}
-            <video
-              ref={videoRef}
-              src={videoUrl}
-              poster={thumbnailUrl}
-              className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
-                showVideo ? 'opacity-100 scale-100' : 'opacity-0 scale-105'
-              }`}
-              playsInline
-              muted={isMuted}
-              preload="auto"
-              crossOrigin="anonymous"
-            />
-          
-            {/* Profile Photo with 4K quality optimization */}
-            {profilePhotoUrl && (
-              <img
-                src={`${profilePhotoUrl}?quality=100&format=auto&width=2048&height=2048&fit=cover`}
-                alt={`${displayName} profile`}
-                className={`absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-out ${
-                  !showVideo ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
-                }`}
-                onError={(e) => {
-                  // Fallback to original URL without optimization
-                  e.currentTarget.src = profilePhotoUrl;
-                }}
-              />
-            )}
-          
-            {/* Fallback when photo fails to load or no photo */}
-            {!showVideo && (!profilePhotoUrl || !profilePhotoUrl.trim()) && (
-              <div className="absolute inset-0 w-full h-full bg-muted/30 flex items-center justify-center">
-                <div className="text-6xl text-muted-foreground/50">
-                  {displayName.charAt(0)}
-                </div>
+          {/* Fallback when photo fails to load or no photo */}
+          {!showVideo && (!profilePhotoUrl || !profilePhotoUrl.trim()) && (
+            <div className="absolute inset-0 w-full h-full bg-muted/30 flex items-center justify-center">
+              <div className="text-6xl text-muted-foreground/50">
+                {displayName.charAt(0)}
               </div>
-            )}
-          </div>
+            </div>
+          )}
           
           {/* Controls Overlay - Show for both video and photo states */}
           {showControls && (
-            <div className="absolute inset-0 bg-black/30 flex items-center justify-center transition-opacity z-30">
+            <div className="absolute inset-0 bg-black/30 flex items-center justify-center transition-opacity">
               <div className="flex flex-col gap-2 items-center">
                 {/* Play/Replay Button - Centered */}
                 {((hasPlayed && !isPlaying && showVideo) || (!showVideo && videoUrl)) && (
@@ -414,7 +351,6 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
           )}
         </div>
       )}
-      </div>
       
       {/* Hidden File Inputs */}
       <input
@@ -435,7 +371,7 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
       
       {/* Loading Overlay */}
       {uploading && (
-        <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-lg">
+        <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-full">
           <div className="flex flex-col items-center gap-2">
             <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white"></div>
             <span className="text-white text-xs">Uploading...</span>
