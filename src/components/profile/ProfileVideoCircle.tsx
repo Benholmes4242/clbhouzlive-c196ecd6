@@ -2,7 +2,6 @@ import React, { useRef, useEffect, useState } from 'react';
 import { Play, Upload, Trash2, Volume2, VolumeX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { useIsMobile } from '@/hooks/use-mobile';
 
 interface ProfileVideoCircleProps {
   videoUrl?: string;
@@ -38,7 +37,6 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
   const [showControls, setShowControls] = useState(false);
   const [showVideo, setShowVideo] = useState(true); // true = show video, false = show photo
   const { toast } = useToast();
-  const isMobile = useIsMobile();
 
   // Auto-play video once when component mounts and video is available
   useEffect(() => {
@@ -218,12 +216,8 @@ const ProfileVideoCircle: React.FC<ProfileVideoCircleProps> = ({
 
   return (
     <div 
-      className={`relative w-full h-full group ${className} ${
+      className={`relative w-full h-full rounded-full overflow-hidden group ${className} ${
         (!showVideo && profilePhotoUrl) || (!isOwnProfile && hasPlayed && !isPlaying) ? 'cursor-pointer' : ''
-      } ${
-        isMobile 
-          ? 'rounded-none' // No border radius on mobile for full screen effect
-          : 'rounded-full overflow-hidden' // Normal circle on desktop
       }`}
       onMouseEnter={() => setShowControls(true)}
       onMouseLeave={() => setShowControls(false)}

@@ -473,26 +473,15 @@ const HeroProfileHeader = ({
           </div>
         )}
         
-        {/* Mobile Header Overlay - Blurred/Transparent */}
-        {isMobile && (
-          <div className="fixed top-0 left-0 w-full h-20 bg-background/10 backdrop-blur-md border-b border-white/10 z-50">
-            <div className="flex items-center justify-center h-full">
-              <h1 className="text-lg font-semibold text-white">Profile</h1>
-            </div>
-          </div>
-        )}
-        
         {/* Profile Content */}
-        <div className={`relative z-10 flex flex-col items-center text-center ${isMobile ? 'pt-0' : 'pt-20'} pb-8`}>
+        <div className="relative z-10 flex flex-col items-center text-center pt-20 pb-8">
           
+          
+
           {/* Profile Photo/Video */}
-          <div className={`${isMobile ? 'w-full h-screen fixed top-0 left-0 z-20' : 'w-64 h-64 mb-6'}`}>
+          <div className="w-64 h-64 mb-6">
             <div 
-              className={`relative transition-all duration-300 w-full h-full ${
-                isMobile 
-                  ? 'overflow-hidden' // Allow full screen on mobile
-                  : 'rounded-full overflow-hidden' // Circle on desktop
-              }`}
+              className="relative rounded-full overflow-hidden transition-all duration-300 w-full h-full"
               title={achievementRing.title}
             >
               <ProfileVideoCircle
@@ -510,11 +499,11 @@ const HeroProfileHeader = ({
             </div>
           </div>
           
-          {/* User Information - Positioned differently on mobile */}
-          <div className={`text-center mb-6 ${isMobile ? 'absolute bottom-20 left-0 w-full z-30 px-6' : ''}`}>
+          {/* User Information */}
+          <div className="text-center mb-6">
             {/* User's Name */}
             <div className="flex items-center justify-center">
-              <h1 className={`font-bold text-foreground ${isMobile ? 'text-white text-3xl' : 'text-4xl'}`}>
+              <h1 className="font-bold text-foreground text-4xl">
                 {displayName}
               </h1>
             </div>
